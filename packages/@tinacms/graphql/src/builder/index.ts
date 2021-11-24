@@ -39,13 +39,11 @@ import { TinaSchema } from '../schema'
 export const createBuilder = async ({
   database,
   tinaSchema,
-  experimentalData,
 }: {
   database: Database
   tinaSchema: TinaSchema
-  experimentalData?: boolean
 }) => {
-  return new Builder({ database, tinaSchema: tinaSchema, experimentalData })
+  return new Builder({ database, tinaSchema: tinaSchema })
 }
 
 /**
@@ -57,17 +55,14 @@ export class Builder {
   // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
-  private experimentalData: boolean
   constructor(
     public config: {
       database: Database
       tinaSchema: TinaSchema
-      experimentalData?: boolean
     }
   ) {
     this.tinaSchema = config.tinaSchema
     this.database = config.database
-    this.experimentalData = !!config.experimentalData
   }
   /**
    * ```graphql
@@ -1150,7 +1145,7 @@ export class Builder {
     collection?: Collectable
     collections?: Collectable[]
   }) => {
-    const extra = this.experimentalData
+    const extra = this.database.store.supportsIndexing()
       ? [
           await this._connectionFilterBuilder({
             fieldName,

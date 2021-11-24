@@ -46,7 +46,6 @@ export const setup = async (
   await indexDB({
     database: setupDatabase,
     config: schema,
-    experimentalData: store.supportsIndexing(),
   })
   const bridge = new MockFilesystemBridge(rootPath)
   const database = await createDatabase({

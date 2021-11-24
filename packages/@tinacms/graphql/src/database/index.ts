@@ -128,44 +128,48 @@ export class Database {
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
       }
-      const existingData = await this.get<{ _collection: string }>(filepath)
-      const collection = this.tinaSchema.getCollection(existingData._collection)
-      /**
-       * Determine the attributes which are already in the store and
-       * just remove them all. This can be more efficient if we only
-       * remove what's no longer needed, but keeping it simple for now.
-       */
-      const attributesToFilterOut = await _indexCollectable({
-        record: filepath,
-        value: existingData,
-        field: collection,
-        prefix: collection.name,
-        database: this,
-      })
-      /**
-       * As a separate step, add the "new" attributes, even though
-       * they'll often be the same as the ones we just removed
-       */
-      const attributesToAdd = await _indexCollectable({
-        record: filepath,
-        value: data,
-        field: collection,
-        prefix: collection.name,
-        database: this,
-      })
-      await sequential(attributesToFilterOut, async (attribute) => {
-        const records = (await this.store.get<string[]>(attribute)) || []
-        await this.store.put(
-          attribute,
-          records.filter((item) => item !== filepath)
+      if (this.store.supportsIndexing()) {
+        const existingData = await this.get<{ _collection: string }>(filepath)
+        const collection = this.tinaSchema.getCollection(
+          existingData._collection
         )
-        return true
-      })
-      await sequential(attributesToAdd, async (attribute) => {
-        const records = (await this.store.get<string[]>(attribute)) || []
-        await this.store.put(attribute, [...records, filepath])
-        return true
-      })
+        /**
+         * Determine the attributes which are already in the store and
+         * just remove them all. This can be more efficient if we only
+         * remove what's no longer needed, but keeping it simple for now.
+         */
+        const attributesToFilterOut = await _indexCollectable({
+          record: filepath,
+          value: existingData,
+          field: collection,
+          prefix: collection.name,
+          database: this,
+        })
+        /**
+         * As a separate step, add the "new" attributes, even though
+         * they'll often be the same as the ones we just removed
+         */
+        const attributesToAdd = await _indexCollectable({
+          record: filepath,
+          value: data,
+          field: collection,
+          prefix: collection.name,
+          database: this,
+        })
+        await sequential(attributesToFilterOut, async (attribute) => {
+          const records = (await this.store.get<string[]>(attribute)) || []
+          await this.store.put(
+            attribute,
+            records.filter((item) => item !== filepath)
+          )
+          return true
+        })
+        await sequential(attributesToAdd, async (attribute) => {
+          const records = (await this.store.get<string[]>(attribute)) || []
+          await this.store.put(attribute, [...records, filepath])
+          return true
+        })
+      }
       await this.store.put(filepath, payload)
     }
     return true
@@ -286,11 +290,9 @@ export class Database {
   }
 
   public indexData = async ({
-    experimentalData,
     graphQLSchema,
     tinaSchema,
   }: {
-    experimentalData?: boolean
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
@@ -308,10 +310,7 @@ export class Database {
       schemaPath,
       JSON.stringify(tinaSchema.schema, null, 2)
     )
-    if (experimentalData) {
-      if (!this.store.supportsIndexing()) {
-        throw new Error(`Schema cannot be indexed with provided Store`)
-      }
+    if (this.store.supportsSeeding()) {
       this.store.clear()
       await this.store.seed('_graphql', graphQLSchema)
       await this.store.seed('_schema', tinaSchema.schema)
@@ -402,8 +401,12 @@ const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
       const data = parseFile(dataString, path.extname(documentPath), (yup) =>
         yup.object({})
       )
-      await database.store.seed(documentPath, data)
-      return indexDocument({ documentPath, collection, data, database })
+      if (database.store.supportsSeeding()) {
+        await database.store.seed(documentPath, data)
+      }
+      if (database.store.supportsIndexing()) {
+        return indexDocument({ documentPath, collection, data, database })
+      }
     })
   })
 }

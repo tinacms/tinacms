@@ -8,18 +8,15 @@
       "page"
     ]
   },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
   "DocumentNode": {
     "type": "DocumentNode",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
-  },
-  "PostPostAuthorPostsConnection": {
-    "type": "PostPostAuthorPostsConnection",
-    "resolveType": "multiCollectionDocumentList",
-    "collections": [
-      "post"
-    ]
   },
   "Author": {
     "type": "Author",
@@ -64,10 +61,6 @@
     "type": "PostConnection",
     "resolveType": "collectionDocumentList",
     "collection": "post"
-  },
-  "Node": {
-    "type": "Node",
-    "resolveType": "nodeDocument"
   },
   "PageBlocks": {
     "type": "PageBlocks",

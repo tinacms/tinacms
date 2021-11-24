@@ -31,21 +31,18 @@ import { Database } from './database'
 export const indexDB = async ({
   database,
   config,
-  experimentalData,
 }: {
   database: Database
   config: TinaSchema['config']
-  experimentalData?: boolean
 }) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({
     database,
     tinaSchema,
-    experimentalData,
   })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   // @ts-ignore
-  await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
+  await database.indexData({ graphQLSchema, tinaSchema })
   await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
   await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
 }

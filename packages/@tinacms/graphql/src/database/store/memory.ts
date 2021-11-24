@@ -61,10 +61,11 @@ export class MemoryStore implements Store {
     return true
   }
   public async print() {
-    await fs.outputFile(
-      path.join(this.rootPath, '.tina/__generated__/map.json'),
-      JSON.stringify(this.map, null, 2)
-    )
+    // Uncomment to print
+    // await fs.outputFile(
+    //   path.join(this.rootPath, '.tina/__generated__/map.json'),
+    //   JSON.stringify(this.map, null, 2)
+    // )
   }
   public async clear() {
     this.map = {}
