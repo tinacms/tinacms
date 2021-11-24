@@ -76,6 +76,45 @@ query getDirectorList {
   }
 }
 
+query getCrewDocument($relativePath: String!) {
+  getCrewDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...CrewParts
+    }
+  }
+}
+
+query getCrewList {
+  getCrewList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...CrewParts
+        }
+      }
+    }
+  }
+}
+
 query getActorDocument($relativePath: String!) {
   getActorDocument(relativePath: $relativePath) {
     sys {

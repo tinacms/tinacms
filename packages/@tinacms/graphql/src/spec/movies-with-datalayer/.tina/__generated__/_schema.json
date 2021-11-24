@@ -105,6 +105,60 @@
       ]
     },
     {
+      "label": "Crew",
+      "name": "crew",
+      "path": "content/crew",
+      "templates": [
+        {
+          "label": "Costume Designer",
+          "name": "costumeDesigner",
+          "fields": [
+            {
+              "name": "favoriteColor",
+              "label": "Favorite Color",
+              "type": "string",
+              "namespace": [
+                "crew",
+                "costumeDesigner",
+                "favoriteColor"
+              ]
+            }
+          ],
+          "namespace": [
+            "crew",
+            "costumeDesigner"
+          ]
+        },
+        {
+          "label": "Stunt Person",
+          "name": "stuntPerson",
+          "fields": [
+            {
+              "name": "bestMove",
+              "label": "Best Move",
+              "type": "string",
+              "options": [
+                "frontFlip",
+                "backFlip"
+              ],
+              "namespace": [
+                "crew",
+                "stuntPerson",
+                "bestMove"
+              ]
+            }
+          ],
+          "namespace": [
+            "crew",
+            "stuntPerson"
+          ]
+        }
+      ],
+      "namespace": [
+        "crew"
+      ]
+    },
+    {
       "label": "Actor",
       "name": "actor",
       "path": "content/actors",

@@ -528,9 +528,27 @@ export class Resolver {
       const flattenedArgs = flat(args.filter, { delimiter: '#' })
       Object.entries(flattenedArgs).map(([key, value]) => {
         const keys = key.split('#')
+        // If the collection has templates, this will be a template name, otherwise it'll be the attribute
+        const maybeTemplateName = keys[0]
         const realKey = keys.slice(0, keys.length - 1).join('#')
+        const collection = this.tinaSchema.getCollection(lookup.collection)
+        let templateName = collection.name
+        if (collection.templates) {
+          const template = collection.templates.find((template) => {
+            if (typeof template === 'string') {
+              throw new Error('Global templates not yet supported for queries')
+            }
+            return template.name === maybeTemplateName
+          })
+          if (typeof template === 'string') {
+            throw new Error('Global templates not yet supported for queries')
+          }
+          if (template) {
+            templateName = template.name
+          }
+        }
         queries.push(
-          `__attribute__${lookup.collection}#${lookup.collection}#${realKey}#${value}`
+          `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
         )
       })
 

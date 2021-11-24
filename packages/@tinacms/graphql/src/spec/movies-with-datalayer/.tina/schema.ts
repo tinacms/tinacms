@@ -81,6 +81,36 @@ const tinaSchema: TinaCloudSchema<false> = {
       ],
     },
     {
+      label: 'Crew',
+      name: 'crew',
+      path: 'content/crew',
+      templates: [
+        {
+          label: 'Costume Designer',
+          name: 'costumeDesigner',
+          fields: [
+            {
+              name: 'favoriteColor',
+              label: 'Favorite Color',
+              type: 'string',
+            },
+          ],
+        },
+        {
+          label: 'Stunt Person',
+          name: 'stuntPerson',
+          fields: [
+            {
+              name: 'bestMove',
+              label: 'Best Move',
+              type: 'string',
+              options: ['frontFlip', 'backFlip'],
+            },
+          ],
+        },
+      ],
+    },
+    {
       label: 'Actor',
       name: 'actor',
       path: 'content/actors',

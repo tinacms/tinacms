@@ -10,6 +10,7 @@
     "collections": [
       "movie",
       "director",
+      "crew",
       "actor"
     ]
   },
@@ -59,5 +60,25 @@
     "collection": "actor",
     "createActorDocument": "create",
     "updateActorDocument": "update"
+  },
+  "Crew": {
+    "type": "Crew",
+    "resolveType": "unionData",
+    "typeMap": {
+      "costumeDesigner": "CrewCostumeDesigner",
+      "stuntPerson": "CrewStuntPerson"
+    }
+  },
+  "CrewDocument": {
+    "type": "CrewDocument",
+    "resolveType": "collectionDocument",
+    "collection": "crew",
+    "createCrewDocument": "create",
+    "updateCrewDocument": "update"
+  },
+  "CrewConnection": {
+    "type": "CrewConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "crew"
   }
 }
