@@ -20,6 +20,8 @@ import chalk from 'chalk'
 import tailwind from 'tailwindcss'
 import postcssNested from 'postcss-nested'
 
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 import * as commander from 'commander'
 
 export interface Command {
@@ -180,6 +182,102 @@ const config = (cwd = '') => {
     mode: 'jit',
     // prefix: 'tina-',
     important: true,
+    theme: {
+      borderWidth: {
+        DEFAULT: '1px',
+        0: '0',
+        2: '2px',
+        3: '3px',
+        4: '4px',
+        6: '6px',
+        8: '8px',
+      },
+      opacity: {
+        0: '0',
+        5: '.05',
+        7: '.07',
+        10: '.1',
+        15: '.15',
+        20: '.2',
+        25: '.25',
+        30: '.3',
+        40: '.4',
+        50: '.5',
+        60: '.6',
+        70: '.7',
+        75: '.75',
+        80: '.8',
+        90: '.9',
+        100: '1',
+      },
+      extend: {
+        scale: {
+          97: '.97',
+          103: '1.03',
+        },
+        spacing: {
+          18: '4.5rem',
+        },
+        transitionDuration: {
+          0: '0ms',
+          2000: '2000ms',
+        },
+        boxShadow: {
+          xs: '0 0 0 1px rgba(0, 0, 0, 0.05)',
+          outline: '0 0 0 3px rgba(66, 153, 225, 0.5)',
+        },
+        colors: {
+          blue: {
+            50: '#DCEEFF',
+            100: '#B4DBFF',
+            200: '#85C5FE',
+            300: '#4EABFE',
+            400: '#2296fe',
+            500: '#0084FF',
+            600: '#0574e4',
+            700: '#0D5DBD',
+            800: '#144696',
+            900: '#1D2C6C',
+            1000: '#241748',
+          },
+          gray: {
+            50: '#F6F6F9',
+            100: '#EDECF3',
+            200: '#E1DDEC',
+            250: '#C9C5D5',
+            300: '#b2adbe',
+            400: '#918c9e',
+            500: '#716c7f',
+            600: '#565165',
+            700: '#433e52',
+            800: '#363145',
+            900: '#252336',
+            1000: '#1c1b2e',
+          },
+          orange: {
+            400: '#EB6337',
+            500: '#EC4815',
+            600: '#DC4419',
+          },
+        },
+        fontFamily: {
+          sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+        },
+        fontSize: {
+          xs: '0.8125rem',
+        },
+        zIndex: {
+          '-1': '-1',
+        },
+      },
+    },
+    variants: {
+      backgroundColor: ['responsive', 'even', 'hover', 'focus'],
+      extend: {
+        animation: ['group-hover'],
+        padding: ['first', 'last'],
+      },
+    },
     purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
       require('@tailwindcss/typography'),
