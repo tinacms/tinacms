@@ -25,7 +25,7 @@ export const ModalActions = styled.div`
   border-radius: 0 0 5px 5px;
   padding: 0 var(--tina-padding-big) var(--tina-padding-big)
     var(--tina-padding-big);
-  ${Button} {
+  button {
     flex: 0 1 auto;
     min-width: 128px;
     margin: 0 var(--tina-padding-small) 0 0;

@@ -119,7 +119,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           primary
           small
         >
-          <AddIcon />
+          <AddIcon className="w-5/6 h-auto" />
         </IconButton>
         <BlockMenu open={visible}>
           <Dismissible

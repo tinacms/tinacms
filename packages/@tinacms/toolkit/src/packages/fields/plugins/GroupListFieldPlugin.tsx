@@ -99,7 +99,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
           )}
         </GroupListMeta>
         <IconButton onClick={addItem} primary small>
-          <AddIcon />
+          <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </GroupListHeader>
       <GroupListPanel>

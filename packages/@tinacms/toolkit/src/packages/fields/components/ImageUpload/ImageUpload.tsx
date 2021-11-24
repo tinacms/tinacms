@@ -133,7 +133,7 @@ export const ImageUpload = ({
                     onClear()
                   }}
                 >
-                  <TrashIcon />
+                  <TrashIcon className="w-5/6 h-auto" />
                 </DeleteButton>
               )}
             </>

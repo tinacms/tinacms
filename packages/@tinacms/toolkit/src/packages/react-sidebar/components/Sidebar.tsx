@@ -21,7 +21,7 @@ import { useState } from 'react'
 import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
-import { tina_reset_styles } from '../../styles'
+import { tina_reset_styles, Button } from '../../styles'
 import { CreateContentMenu } from '../../react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
@@ -177,13 +177,16 @@ const Watermark = styled(({ ...styleProps }: any) => {
 
 const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
   return (
-    <SidebarToggleButton
+    <Button
       onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
-      open={sidebar.isOpen}
       aria-label="toggles cms sidebar"
+      primary
+      rounded="right"
+      size="custom"
+      className="absolute bottom-12 right-0 transform translate-x-full pointer-events-auto w-14 h-11"
     >
       {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
-    </SidebarToggleButton>
+    </Button>
   )
 }
 

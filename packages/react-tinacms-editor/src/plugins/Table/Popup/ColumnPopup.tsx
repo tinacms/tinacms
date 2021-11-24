@@ -92,21 +92,21 @@ export default () => {
         ReactDOM.createPortal(
           <IconWrapperCol>
             <IconButton onClick={() => alignColumn(view, 'left')} small primary>
-              <AlignLeft />
+              <AlignLeft className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => alignColumn(view, 'center')}
               small
               primary
             >
-              <AlignCenter />
+              <AlignCenter className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => alignColumn(view, 'right')}
               small
               primary
             >
-              <AlignRight />
+              <AlignRight className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => {
@@ -116,7 +116,7 @@ export default () => {
               small
               primary
             >
-              <TrashIcon />
+              <TrashIcon className="w-5/6 h-auto" />
             </IconButton>
           </IconWrapperCol>,
           markerDivCol
@@ -132,7 +132,7 @@ export default () => {
               small
               primary
             >
-              <TrashIcon />
+              <TrashIcon className="w-5/6 h-auto" />
             </IconButton>
           </IconWrapperRow>,
           markerDivRow
