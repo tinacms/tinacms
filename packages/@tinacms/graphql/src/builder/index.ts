@@ -974,7 +974,26 @@ export class Builder {
         })
       case 'rich-text':
         if (!field.templates) {
-          return false
+          return astBuilder.InputValueDefinition({
+            name: field.name,
+            type: astBuilder.InputObjectTypeDefinition({
+              name: NAMER.dataFilterTypeName(['richText']),
+              fields: [
+                astBuilder.InputValueDefinition({
+                  name: 'startsWith',
+                  type: astBuilder.TYPES.String,
+                }),
+                astBuilder.InputValueDefinition({
+                  name: 'eq',
+                  type: astBuilder.TYPES.String,
+                }),
+                astBuilder.InputValueDefinition({
+                  name: 'exists',
+                  type: astBuilder.TYPES.Boolean,
+                }),
+              ],
+            }),
+          })
         }
         return astBuilder.InputValueDefinition({
           name: field.name,
