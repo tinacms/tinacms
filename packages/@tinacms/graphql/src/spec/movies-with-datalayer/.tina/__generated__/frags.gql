@@ -16,6 +16,15 @@ fragment DirectorParts on Director {
   name
 }
 
+fragment CrewParts on Crew {
+  ... on CrewCostumeDesigner {
+    favoriteColor
+  }
+  ... on CrewStuntPerson {
+    bestMove
+  }
+}
+
 fragment ActorParts on Actor {
   name
   body

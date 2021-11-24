@@ -51,6 +51,8 @@ type Query {
   getMovieList(before: String, after: String, first: Int, last: Int, filter: MovieFilter): MovieConnection!
   getDirectorDocument(relativePath: String): DirectorDocument!
   getDirectorList(before: String, after: String, first: Int, last: Int, filter: DirectorFilter): DirectorConnection!
+  getCrewDocument(relativePath: String): CrewDocument!
+  getCrewList(before: String, after: String, first: Int, last: Int, filter: CrewFilter): CrewConnection!
   getActorDocument(relativePath: String): ActorDocument!
   getActorList(before: String, after: String, first: Int, last: Int, filter: ActorFilter): ActorConnection!
 }
@@ -100,6 +102,19 @@ input MovieFilter {
   body: StringFilter
 }
 
+input CrewCostumeDesignerFilter {
+  favoriteColor: StringFilter
+}
+
+input CrewStuntPersonFilter {
+  bestMove: StringFilter
+}
+
+input CrewFilter {
+  costumeDesigner: CrewCostumeDesignerFilter
+  stuntPerson: CrewStuntPersonFilter
+}
+
 input ActorFilter {
   name: StringFilter
   body: StringFilter
@@ -108,6 +123,7 @@ input ActorFilter {
 input DocumentFilter {
   movie: MovieFilter
   director: DirectorFilter
+  crew: CrewFilter
   actor: ActorFilter
 }
 
@@ -134,7 +150,7 @@ type Collection {
   documents(before: String, after: String, first: Int, last: Int, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
+union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument
 
 union MovieDirectorDocument = DirectorDocument
 
@@ -192,6 +208,36 @@ type DirectorConnection implements Connection {
   edges: [DirectorConnectionEdges]
 }
 
+type CrewCostumeDesigner {
+  favoriteColor: String
+}
+
+type CrewStuntPerson {
+  bestMove: String
+}
+
+union Crew = CrewCostumeDesigner | CrewStuntPerson
+
+type CrewDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Crew!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type CrewConnectionEdges {
+  cursor: String
+  node: CrewDocument
+}
+
+type CrewConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [CrewConnectionEdges]
+}
+
 type Actor {
   name: String
   body: String
@@ -225,6 +271,8 @@ type Mutation {
   createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
   updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
   createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
+  createCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
   updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
   createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
 }
@@ -232,6 +280,7 @@ type Mutation {
 input DocumentMutation {
   movie: MovieMutation
   director: DirectorMutation
+  crew: CrewMutation
   actor: ActorMutation
 }
 
@@ -247,6 +296,19 @@ input MovieMutation {
 
 input DirectorMutation {
   name: String
+}
+
+input CrewCostumeDesignerMutation {
+  favoriteColor: String
+}
+
+input CrewStuntPersonMutation {
+  bestMove: String
+}
+
+input CrewMutation {
+  costumeDesigner: CrewCostumeDesignerMutation
+  stuntPerson: CrewStuntPersonMutation
 }
 
 input ActorMutation {

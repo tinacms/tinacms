@@ -463,7 +463,7 @@ const _indexCollectable = async ({
         )
       }
     })
-    extra = `#${lastItem(field.namespace)}`
+    extra = `#${lastItem(template.namespace)}`
   } else {
     template = field
   }

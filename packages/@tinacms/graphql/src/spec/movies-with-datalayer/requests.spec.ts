@@ -30,6 +30,11 @@ const fixtures: Fixture[] = [
     assert: 'output',
   },
   {
+    name: 'getCrewList',
+    description: 'Querying a collection with templates works',
+    assert: 'output',
+  },
+  {
     name: 'getDirectorList',
     assert: 'output',
   },
@@ -89,6 +94,7 @@ describe('A schema with indexing', () => {
         expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
+      // await store.print()
       responses.forEach((expResponse, index) => {
         const expectedResponsePath2 = expectedResponsePaths[index]
         expect(expResponse).toMatchFile(expectedResponsePath2)
