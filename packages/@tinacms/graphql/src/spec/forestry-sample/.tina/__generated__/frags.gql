@@ -1,4 +1,4 @@
-Author {
+fragment AuthorParts on Author {
   ... on AuthorAuthor {
     name
     socialMedia {
@@ -9,7 +9,7 @@ Author {
   }
 }
 
-Post {
+fragment PostParts on Post {
   ... on PostPost {
     title
     body
