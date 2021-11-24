@@ -23,7 +23,7 @@ import type {
   TinaCloudCollectionEnriched,
   TinaCloudTemplateEnriched,
 } from '../types'
-import { TinaField } from '../..'
+import { TinaField } from '..'
 
 const FIELD_TYPES: TinaField['type'][] = [
   'string',
