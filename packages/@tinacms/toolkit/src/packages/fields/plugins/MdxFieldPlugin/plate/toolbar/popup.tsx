@@ -59,7 +59,7 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
             setVisible((visible) => !visible)
           }}
           primary
-          small
+          size="small"
         >
           <Embed open={visible}>
             Embed <ArrowDownIcon />
@@ -87,7 +87,9 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
                 </PopupOption>
               ))
             ) : (
-              <PopupOption>No templates provided </PopupOption>
+              <div className="px-5 py-2 text-sm opacity-70">
+                No templates provided{' '}
+              </div>
             )}
           </PopupMenuList>
         </Dismissible>

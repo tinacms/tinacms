@@ -53,7 +53,7 @@ export function MediaItem({
         )}
         {onDelete && item.type === 'file' && (
           <IconButton small onClick={() => onDelete(item)}>
-            <TrashIcon />
+            <TrashIcon className="w-5/6 h-auto" />
           </IconButton>
         )}
       </ActionButtons>

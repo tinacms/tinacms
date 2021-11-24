@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { FC } from 'react'
-import styled from 'styled-components'
 import { Button } from '../styles'
 import {
   Modal,
@@ -38,18 +37,20 @@ export const ResetForm: FC<ResetFormProps> = ({
   pristine,
   reset,
   children,
+  ...props
 }: ResetFormProps) => {
   const [open, setOpen] = React.useState(false)
   return (
     <>
-      <ResetButton
+      <Button
         onClick={() => {
           setOpen((p) => !p)
         }}
         disabled={pristine}
+        {...props}
       >
         {children}
-      </ResetButton>
+      </Button>
       {open && <ResetModal reset={reset} close={() => setOpen(false)} />}
     </>
   )
@@ -71,7 +72,6 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
         <ModalActions>
           <Button onClick={close}>Cancel</Button>
           <Button
-            margin
             primary
             onClick={async () => {
               await reset()
@@ -85,7 +85,3 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
     </Modal>
   )
 }
-
-const ResetButton = styled(Button as any)`
-  flex: 0 0 96px;
-`

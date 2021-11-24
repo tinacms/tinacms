@@ -325,7 +325,7 @@ const Actions = styled.div`
   display: flex;
   align-items: center;
 
-  ${Button} {
+  button {
     margin-left: 12px;
   }
 `

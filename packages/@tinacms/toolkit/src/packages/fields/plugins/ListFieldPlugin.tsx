@@ -89,7 +89,7 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
           )}
         </ListMeta>
         <IconButton onClick={addItem} primary small>
-          <AddIcon />
+          <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </ListHeader>
       <ListPanel>
