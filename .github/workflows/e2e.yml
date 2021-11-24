@@ -13,6 +13,7 @@ jobs:
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build
+          command: yarn cypress run
           start: yarn workspace starter-basic dev 
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
