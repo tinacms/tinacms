@@ -8,4 +8,12 @@ body {
   @tailwind base;
   @tailwind components;
   @tailwind utilities;
+
+  @layer utilities {
+    .icon-parent {
+      svg {
+        fill: currentColor;
+      }
+    }
+  }
 }
