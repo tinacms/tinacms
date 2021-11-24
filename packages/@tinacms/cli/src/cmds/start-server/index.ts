@@ -87,7 +87,7 @@ stack: ${code.stack || 'No stack was provided'}`)
             logger.info(
               dangerText(
                 'Compilation failed with errors. Server has not been restarted.'
-              ) + `see error below \n ${e.message}`
+              ) + ` see error below \n ${e.message}`
             )
           }
         }
