@@ -24,6 +24,7 @@
     "@graphql-codegen/typescript-operations": "^1.15.4",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.4",
+    "@tinacms/sharedctx": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
     "@xstate/react": "^1.1.0",
     "codemirror": "^5.55.0",
