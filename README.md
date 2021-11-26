@@ -26,9 +26,6 @@ See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to
 ## Questions?
 
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
-[![Forum](https://img.shields.io/badge/forum-tinacms-blue.svg?logo=discourse)](https://community.tinacms.org/)
-
-Visit the [community forum](https://community.tinacms.org/) to ask questions or look us up on on Twitter at [@tina_cms](https://twitter.com/tina_cms).
 
 <!-- ## Changelog
 
