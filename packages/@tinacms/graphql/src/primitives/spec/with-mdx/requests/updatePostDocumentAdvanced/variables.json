@@ -15,6 +15,24 @@
           ]
         },
         {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
           "type": "mdxJsxFlowElement",
           "name": "Gallery",
           "props": {
