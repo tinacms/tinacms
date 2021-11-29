@@ -4770,6 +4770,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tinacms/sharedctx@workspace:*, @tinacms/sharedctx@workspace:packages/@tinacms/sharedctx":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/sharedctx@workspace:packages/@tinacms/sharedctx"
+  dependencies:
+    "@tinacms/scripts": "workspace:*"
+    react: 17.0.2
+    react-dom: 17.0.2
+    typescript: ^4.3.5
+  peerDependencies:
+    react: ">=16.14"
+    react-dom: ">=16.14"
+    react-is: ">=16.14.0"
+  languageName: unknown
+  linkType: soft
+
 "@tinacms/toolkit@workspace:*, @tinacms/toolkit@workspace:packages/@tinacms/toolkit":
   version: 0.0.0-use.local
   resolution: "@tinacms/toolkit@workspace:packages/@tinacms/toolkit"
@@ -27757,6 +27772,7 @@ resolve@^2.0.0-next.3:
     "@headlessui/react": ^1.4.1
     "@heroicons/react": ^1.0.4
     "@tinacms/scripts": "workspace:*"
+    "@tinacms/sharedctx": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
     "@types/lodash": ^4.14.169
     "@types/node": ^14.0.13

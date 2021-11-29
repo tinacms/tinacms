@@ -14,7 +14,7 @@ limitations under the License.
 import React from 'react'
 import { BiLogOut } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
-import { setEditing } from '../../edit-state'
+import { setEditing } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
 
 const logout = () => {

@@ -27,7 +27,7 @@ import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
 import useEmbedTailwind from './hooks/useEmbedTailwind'
-import { isEditing } from '../edit-state'
+import { useEditState } from '@tinacms/sharedctx'
 
 export const TinaAdmin = () => {
   useEmbedTailwind()
@@ -42,9 +42,9 @@ export const TinaAdmin = () => {
    * Ideally, this line should be `const { edit } = useEditState()` if we weren't having context issues with `EditStateProvider`.
    * https://github.com/tinacms/tinacms/issues/2081
    */
-  const isEdit = isEditing()
+  const { edit } = useEditState()
 
-  if (!isEdit) {
+  if (!edit) {
     return (
       <Layout>
         <LoginPage />
