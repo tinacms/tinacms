@@ -133,6 +133,46 @@ const tinaSchema: TinaCloudSchema<false> = {
           templates: [
             cta,
             {
+              name: 'Gallery',
+              label: 'Gallery',
+              fields: [
+                {
+                  label: 'Images',
+                  name: 'images',
+                  type: 'object',
+                  list: true,
+                  fields: [
+                    {
+                      type: 'image',
+                      name: 'src',
+                      label: 'Source',
+                    },
+                    {
+                      type: 'string',
+                      name: 'width',
+                      label: 'Width',
+                    },
+                    {
+                      type: 'string',
+                      name: 'height',
+                      label: 'Height',
+                    },
+                  ],
+                },
+                {
+                  type: 'string',
+                  name: 'alignment',
+                  label: 'Alignment',
+                  options: ['left', 'center', 'right'],
+                },
+                {
+                  type: 'string',
+                  name: 'gap',
+                  label: 'Gap',
+                },
+              ],
+            },
+            {
               name: 'BlockQuote',
               label: 'Block Quote',
               fields: [

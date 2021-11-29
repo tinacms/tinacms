@@ -15,6 +15,40 @@
           ]
         },
         {
+          "type": "mdxJsxFlowElement",
+          "name": "Gallery",
+          "props": {
+            "images": [{}],
+            "alignment": "right"
+          },
+          "ordered": false,
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "mdxJsxFlowElement",
+          "name": "Gallery",
+          "props": {
+            "images": [
+              {
+                "src": "https://placehold.it/300x200"
+              }
+            ],
+            "alignment": "right"
+          },
+          "ordered": false,
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
           "type": "p",
           "children": [
             {
