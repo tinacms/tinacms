@@ -1,0 +1,18 @@
+{
+  getCrewList(filter: { costumeDesigner: { favoriteColor: { eq: "blue" } } }) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+  shouldBeEmpty: getCrewList(
+    filter: { costumeDesigner: { favoriteColor: { eq: "red" } } }
+  ) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}

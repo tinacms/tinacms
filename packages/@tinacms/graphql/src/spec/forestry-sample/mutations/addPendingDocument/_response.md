@@ -1,0 +1,4 @@
+---
+_template: post
+---
+
