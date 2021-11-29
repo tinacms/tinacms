@@ -4,8 +4,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src/fixtures/**/*"
+    "dist"
   ],
   "license": "Apache-2.0",
   "buildConfig": {
@@ -38,7 +37,7 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc --project ./tsconfig.real.json",
+    "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
@@ -49,6 +48,7 @@
     "@octokit/graphql": "^4.5.6",
     "@octokit/rest": "18.0.6",
     "@types/estree": "^0.0.50",
+    "@types/level": "^6.0.0",
     "@types/mdast": "^3.0.10",
     "@types/node": "^16.9.1",
     "body-parser": "^1.19.0",
@@ -59,11 +59,13 @@
     "esbuild-jest": "^0.5.0",
     "estree-walker": "^3.0.0",
     "fast-glob": "^3.2.5",
+    "flat": "^5.0.2",
     "fs-extra": "^9.0.1",
     "graphql": "^15.3.0",
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",
+    "level": "^7.0.1",
     "lodash": "^4.17.20",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",

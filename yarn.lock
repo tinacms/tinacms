@@ -4543,6 +4543,7 @@ __metadata:
     "@types/fs-extra": ^9.0.2
     "@types/jest": ^26.0.4
     "@types/js-yaml": ^3.12.5
+    "@types/level": ^6.0.0
     "@types/lodash": ^4.14.161
     "@types/lodash.camelcase": ^4.3.6
     "@types/lodash.upperfirst": ^4.3.6
@@ -4560,6 +4561,7 @@ __metadata:
     esbuild-jest: ^0.5.0
     estree-walker: ^3.0.0
     fast-glob: ^3.2.5
+    flat: ^5.0.2
     fs-extra: ^9.0.1
     graphql: ^15.3.0
     graphql-type-json: ^0.3.2
@@ -4569,6 +4571,7 @@ __metadata:
     jest-file-snapshot: ^0.5.0
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
+    level: ^7.0.1
     lodash: ^4.17.20
     mdast: ^3.0.0
     mdast-util-from-markdown: ^1.0.0
@@ -4743,6 +4746,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/abstract-leveldown@npm:*":
+  version: 5.0.2
+  resolution: "@types/abstract-leveldown@npm:5.0.2"
+  checksum: b747512d57dc07cfd1affadc451798d750e041159f05a4a66e8f46882493b265af9000cfb999e457071443e96df2835c7bb9dfa0ca8883e44bb772821d33a63c
+  languageName: node
+  linkType: hard
+
 "@types/acorn@npm:^4.0.0":
   version: 4.0.6
   resolution: "@types/acorn@npm:4.0.6"
@@ -4904,6 +4914,16 @@ __metadata:
   version: 1.39.5
   resolution: "@types/emscripten@npm:1.39.5"
   checksum: 2a8b40ed832c633da202277d33fa59020cbf4a88c9bcbf9b22f93e9ac55501900c568614a971e2aebd0d97812fce05f01b395db6d933567587e931447731dbab
+  languageName: node
+  linkType: hard
+
+"@types/encoding-down@npm:*":
+  version: 5.0.0
+  resolution: "@types/encoding-down@npm:5.0.0"
+  dependencies:
+    "@types/abstract-leveldown": "*"
+    "@types/level-codec": "*"
+  checksum: 6ada77f79f2b69874cdb4d9909f9421a72c07ac9c366c03ed8b46d463fcb92d4a23757a83bcd5b78a38ae03d5c040f979744f3b41ffcd00703dcffd97545fc56
   languageName: node
   linkType: hard
 
@@ -5173,6 +5193,42 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: e9a442bd9ed7070fa1740cf1c298939c8b8dc65dfe01aa87125d1fda0b944a0ba3132da2550b2ab5e76e67abc1e6d55fd7a7e572601d75061575e6002e372ca5
+  languageName: node
+  linkType: hard
+
+"@types/level-codec@npm:*":
+  version: 9.0.1
+  resolution: "@types/level-codec@npm:9.0.1"
+  checksum: e2bfd08ce45e3d81481758c1b1feed43e9b5ba2ec441fa2bfe51c226158d6e2b7cd76a09a3d7f7ba4f3aa9eb1d6c665057edbfb704565c6bee0e0bc0eef30c9c
+  languageName: node
+  linkType: hard
+
+"@types/level-errors@npm:*":
+  version: 3.0.0
+  resolution: "@types/level-errors@npm:3.0.0"
+  checksum: cc9fd32145d46ad574e9d6c255ccf3c745717214a573e09dc94f63e4c5320ba8d15cc5741cb9565d4680b200b8abf729da38e38a63559ecd4cb574a81185e334
+  languageName: node
+  linkType: hard
+
+"@types/level@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@types/level@npm:6.0.0"
+  dependencies:
+    "@types/abstract-leveldown": "*"
+    "@types/encoding-down": "*"
+    "@types/levelup": "*"
+  checksum: 5bbcc14392271b556dd0e67921436c92be2f6fdf3ec84807dca19e5cb2edec37c68e8bf3eea9782ee249ec631da88a676211a2a55cacaf6edde61099b4674e49
+  languageName: node
+  linkType: hard
+
+"@types/levelup@npm:*":
+  version: 4.3.3
+  resolution: "@types/levelup@npm:4.3.3"
+  dependencies:
+    "@types/abstract-leveldown": "*"
+    "@types/level-errors": "*"
+    "@types/node": "*"
+  checksum: f09553ab633dacc7c550a09895d5f5d743cc0301a5358fa6c26cb0f6cca60643c881cc9823ae5727b7d641b8ab8cba60423f75242dc12ee20ec9fa246a0cd8b3
   languageName: node
   linkType: hard
 
@@ -7510,6 +7566,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"abstract-leveldown@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "abstract-leveldown@npm:7.2.0"
+  dependencies:
+    buffer: ^6.0.3
+    catering: ^2.0.0
+    is-buffer: ^2.0.5
+    level-concat-iterator: ^3.0.0
+    level-supports: ^2.0.1
+    queue-microtask: ^1.2.3
+  checksum: d12aaee92aa50af13e4d6a47ee694d78cef00425009c340cdf72aade547b24244e8b5694bc4b527b4de75ef9c81a1bc2689eaa196abe8d2d434084878c0b52f4
+  languageName: node
+  linkType: hard
+
 "accepts@npm:^1.3.7, accepts@npm:~1.3.7":
   version: 1.3.7
   resolution: "accepts@npm:1.3.7"
@@ -9651,6 +9721,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"buffer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.2.1
+  checksum: a8cf6a58571dc7c43b24ab821ad4c72222d9040775f49fd143a30fad45f33ec0a8e0d572ca80d589ad4f8b4715aa012c029dc2b925dc95467f135c2d13d7abfb
+  languageName: node
+  linkType: hard
+
 "builtin-status-codes@npm:^3.0.0":
   version: 3.0.0
   resolution: "builtin-status-codes@npm:3.0.0"
@@ -10027,6 +10107,15 @@ __metadata:
   version: 2.4.0
   resolution: "case-sensitive-paths-webpack-plugin@npm:2.4.0"
   checksum: 6eff838bb26107a7cddf25ab588ce165cb685cc2aa71f03dfa065d3fece31ce96dca90f079beb90e4d72d34295355afab0366512ec1b6381051bd3f5bf7aa83a
+  languageName: node
+  linkType: hard
+
+"catering@npm:^2.0.0, catering@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "catering@npm:2.1.0"
+  dependencies:
+    queue-tick: ^1.0.0
+  checksum: 9f2eb6b94d3c44e73dd2cb704141e7e6e0dbc0f2d815e8ac1c29358d75c3b723d456ba1e70aabdb69ebe866a0d36001833b5c2564823f92c33744012f0fc97eb
   languageName: node
   linkType: hard
 
@@ -12026,6 +12115,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"deferred-leveldown@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "deferred-leveldown@npm:7.0.0"
+  dependencies:
+    abstract-leveldown: ^7.2.0
+    inherits: ^2.0.3
+  checksum: 35347dddf6ab32c401c5c92042f360d712119513c9c11339115679a39da9300c31550234fb72907db6ba8f336f6b0edf150ef2a50075599d1e3627bddc71bbfc
+  languageName: node
+  linkType: hard
+
 "define-properties@npm:^1.1.2, define-properties@npm:^1.1.3":
   version: 1.1.3
   resolution: "define-properties@npm:1.1.3"
@@ -12716,6 +12815,18 @@ __metadata:
   version: 1.0.2
   resolution: "encodeurl@npm:1.0.2"
   checksum: 6ee5fcbcd245d2a2b6bd6fe36b80f91e31ab46e29192c50af00e8f860c0c2310ebbdaae40257878fdce90b42abcb3526895c7c3a2e229461ed1f0d0b5a020fc8
+  languageName: node
+  linkType: hard
+
+"encoding-down@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "encoding-down@npm:7.1.0"
+  dependencies:
+    abstract-leveldown: ^7.2.0
+    inherits: ^2.0.3
+    level-codec: ^10.0.0
+    level-errors: ^3.0.0
+  checksum: 10968f4773e1d0be41666bd92799c79797613467bdd618ef7e5d30aa5169680c1bf5881e9cffdba261ba76a8345c7a39fa341cae1591d0c029d2156967d2351e
   languageName: node
   linkType: hard
 
@@ -15854,7 +15965,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4":
+"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4, ieee754@npm:^1.2.1":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 6c1cfab995ecab3b0dbb6cfb7e192686eb02f0f8e788f2d962e1fc02e2d5ab38a85e06d417221f136bd029663a77cdb920d99605d68d3730a05597dd7910426a
@@ -16329,7 +16440,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"is-buffer@npm:^2.0.0, is-buffer@npm:^2.0.2":
+"is-buffer@npm:^2.0.0, is-buffer@npm:^2.0.2, is-buffer@npm:^2.0.5":
   version: 2.0.5
   resolution: "is-buffer@npm:2.0.5"
   checksum: 1a6dc68206e834887d3b0d8e8ec6c95e0d780314479526a5a2cf458838d1bc441a105c4cebf95d8cc16e383238f66c41761ec622f6154043186e3d9439d56970
@@ -18222,6 +18333,108 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"level-codec@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "level-codec@npm:10.0.0"
+  dependencies:
+    buffer: ^6.0.3
+  checksum: 5c353082c13245c8408c9fd3aeb65ee0840c2a04bde6af21964ba2b39776f64c43d4ea4721d745aee3092608fa7d9470621f9b5e28755ca2ee615e928a90d37f
+  languageName: node
+  linkType: hard
+
+"level-concat-iterator@npm:^3.0.0":
+  version: 3.1.0
+  resolution: "level-concat-iterator@npm:3.1.0"
+  dependencies:
+    catering: ^2.1.0
+  checksum: dcb1be9bf1b27c6596a4739b0765580468072c55aa322bf9d95ab375f3ce8b5178e75f5a4e2b16e7c762404de0a8b668af69664561eb8ffc84a9fb1d2e9672dc
+  languageName: node
+  linkType: hard
+
+"level-errors@npm:^3.0.0, level-errors@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "level-errors@npm:3.0.1"
+  checksum: 08de1a4669db24f7c64066631aed02957976b1306db183756110faa82ca771e04bc28f5422922d0ac35252d9b500403f2cbf8e13de5205ad91d41a0346911832
+  languageName: node
+  linkType: hard
+
+"level-iterator-stream@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "level-iterator-stream@npm:5.0.0"
+  dependencies:
+    inherits: ^2.0.4
+    readable-stream: ^3.4.0
+  checksum: 4aeaad2c3994cbf4b572e36b2fe85879ac122611bb36df729fd922bcc3cabd1f8b77252fe6423fe214a06924fa58e0efbd54ae4d7361c011a246c5cff480a965
+  languageName: node
+  linkType: hard
+
+"level-js@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "level-js@npm:6.1.0"
+  dependencies:
+    abstract-leveldown: ^7.2.0
+    buffer: ^6.0.3
+    inherits: ^2.0.3
+    ltgt: ^2.1.2
+    run-parallel-limit: ^1.1.0
+  checksum: ec09eaf1eaeba5b8dfc45d2709c2a0f1dcafb1bff24cf053727947a93319966f30d94f02ef3f6ccf873e675353ac092db8dd81dd2331ce3e583091b76b43bfee
+  languageName: node
+  linkType: hard
+
+"level-packager@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "level-packager@npm:6.0.1"
+  dependencies:
+    encoding-down: ^7.1.0
+    levelup: ^5.1.1
+  checksum: 9d1e4ffcc589e73ad1619b6d6017b621201e4eafe1b1359484ac21ac6ddd653cbe5b903011243753460bead892b654d888ed824b7b0f23c1d50e7ac2126bcb00
+  languageName: node
+  linkType: hard
+
+"level-supports@npm:^2.0.1":
+  version: 2.1.0
+  resolution: "level-supports@npm:2.1.0"
+  checksum: 92ea32cc296b28a91264a48e784fa28da77c994b2a2b32810ab74a6d7aca8029305f4f0ffaa08d33faf666bb0c6a1864a86de466ac950003854968b8eb26c7c7
+  languageName: node
+  linkType: hard
+
+"level@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "level@npm:7.0.1"
+  dependencies:
+    level-js: ^6.1.0
+    level-packager: ^6.0.1
+    leveldown: ^6.1.0
+  checksum: e4fb2e0f213e5c3efd31f0ff43a8324a062f1b0b374324f65c23bf65ebed21126c35be9ece7f02b31e02028bbe7e957c468fd58126992ee620b119eefe6c3709
+  languageName: node
+  linkType: hard
+
+"leveldown@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "leveldown@npm:6.1.0"
+  dependencies:
+    abstract-leveldown: ^7.2.0
+    napi-macros: ~2.0.0
+    node-gyp: latest
+    node-gyp-build: ^4.3.0
+  checksum: 97c3f69280234757da31866f40a824f4f669451ff9b46674975f45b7e5d8735fef05a3822360ff7e7879600ef9cbccbab6aa77eab433a998a5c6e39ad8ba3b69
+  languageName: node
+  linkType: hard
+
+"levelup@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "levelup@npm:5.1.1"
+  dependencies:
+    catering: ^2.0.0
+    deferred-leveldown: ^7.0.0
+    level-errors: ^3.0.1
+    level-iterator-stream: ^5.0.0
+    level-supports: ^2.0.1
+    queue-microtask: ^1.2.3
+  checksum: 6e0a3807390b9e6f141b7c0d017a0b8bb5144865622a5088c03e3452420971a9b00d2de69fc0d189f05d4f59eac27c96cf3a90caa9387e0dd19de9361a63ed2d
+  languageName: node
+  linkType: hard
+
 "leven@npm:^3.1.0":
   version: 3.1.0
   resolution: "leven@npm:3.1.0"
@@ -18725,6 +18938,13 @@ fsevents@~2.1.2:
   dependencies:
     yallist: ^3.0.2
   checksum: ffd9a280fa3400e731265db502270c2a65432f3fbfac23d480c72f675ec16dbbeddd57d4baf7aca70ab7af49949fad1bcaaf5a5e6e1cfed7316de71bb5dddf1c
+  languageName: node
+  linkType: hard
+
+"ltgt@npm:^2.1.2":
+  version: 2.2.1
+  resolution: "ltgt@npm:2.2.1"
+  checksum: 680494cb8f5ff63432f9802bac743cf6798b494dc3ea46b704e69c0c0655018eb83f0c25d76220f0877bda8aabf6f3d107f173597c98f22c6977422bb29fbc93
   languageName: node
   linkType: hard
 
@@ -20322,6 +20542,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"napi-macros@npm:~2.0.0":
+  version: 2.0.0
+  resolution: "napi-macros@npm:2.0.0"
+  checksum: 1b67e5271e6688d7801a5bfa49c50c097ead038ed552af5f4b1e849255f711581b389cbeb8d746ee14803612dbdf205c086e75606f8ff7d354bc9d4b5863912c
+  languageName: node
+  linkType: hard
+
 "native-url@npm:0.3.1":
   version: 0.3.1
   resolution: "native-url@npm:0.3.1"
@@ -20815,6 +21042,17 @@ fsevents@~2.1.2:
     encoding: ^0.1.11
     is-stream: ^1.0.1
   checksum: d04afb2e328ffb974a5ac4800fe5714d7419243d72f089a6a2383d3b93368c61ae88954a4866c476c0d7f95d7af414c1b9a885e051971061efe4054d526e23ed
+  languageName: node
+  linkType: hard
+
+"node-gyp-build@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "node-gyp-build@npm:4.3.0"
+  bin:
+    node-gyp-build: bin.js
+    node-gyp-build-optional: optional.js
+    node-gyp-build-test: build-test.js
+  checksum: 4d52eeecc8e4f3bf8d49dc0b2fd2c5bb4be33f529492f02ddf2a6e8d82501c83880bdcdd8be1f4117edf201419bf42f7ed281f9958bf6debf2c12f2ba1b3a925
   languageName: node
   linkType: hard
 
@@ -23332,10 +23570,17 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"queue-microtask@npm:^1.2.2":
+"queue-microtask@npm:^1.2.2, queue-microtask@npm:^1.2.3":
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: 0f88d794d4d825d39cdc2cda2fa701722858fc8de9567ad612776fce0d113376a3fc67f6a0091f31c9142b28f0c14fef08e9f92422b49f2372d5537e250fbfad
+  languageName: node
+  linkType: hard
+
+"queue-tick@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "queue-tick@npm:1.0.0"
+  checksum: 9086aded6384b9642fc7387a0eea1652099a717602d4721650db88a9e8bff38a4d0ff38994c2993598122ab75edd0ae503ad6d835f715a08c0a3f66e658c27b5
   languageName: node
   linkType: hard
 
@@ -25243,6 +25488,15 @@ resolve@^2.0.0-next.3:
   version: 2.4.1
   resolution: "run-async@npm:2.4.1"
   checksum: b1f06da336029be9c08312309ccdda107558ebf3e1212e960d7a54020f888a449ade2cb8b432a9a6750537ed80119a3c798f7592e8f8518f193ff4c50c13d4a3
+  languageName: node
+  linkType: hard
+
+"run-parallel-limit@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "run-parallel-limit@npm:1.1.0"
+  dependencies:
+    queue-microtask: ^1.2.2
+  checksum: 0176e95921f24d611259c39618bffd3970343c838243b9bfedc463a5e91042fa13d3f8868f3fd9b4437545595d3d21d68ae3b769f05e251d10812aa5a901ea93
   languageName: node
   linkType: hard
 
