@@ -233,28 +233,33 @@ export function useGraphqlForms<T extends object>({
               setPendingReset(queryName)
             },
             onSubmit: async (payload) => {
-              const params = transformDocumentIntoMutationRequestPayload(
-                payload,
-                result.form.mutationInfo
-              )
-              const variables = { params }
-              const mutationString = result.form.mutationInfo.string
-              if (onSubmit) {
-                onSubmit({
-                  queryString: mutationString,
-                  mutationString,
-                  variables,
-                })
-              } else {
-                try {
-                  await cms.api.tina.request(mutationString, {
+              try {
+                const params = transformDocumentIntoMutationRequestPayload(
+                  payload,
+                  result.form.mutationInfo
+                )
+                const variables = { params }
+                const mutationString = result.form.mutationInfo.string
+                if (onSubmit) {
+                  onSubmit({
+                    queryString: mutationString,
+                    mutationString,
                     variables,
                   })
-                  cms.alerts.success('Document saved!')
-                } catch (e) {
-                  cms.alerts.error('There was a problem saving your document')
-                  console.error(e)
+                } else {
+                  try {
+                    await cms.api.tina.request(mutationString, {
+                      variables,
+                    })
+                    cms.alerts.success('Document saved!')
+                  } catch (e) {
+                    cms.alerts.error('There was a problem saving your document')
+                    console.error(e)
+                  }
                 }
+              } catch (e) {
+                console.error(e)
+                cms.alerts.error('There was a problem saving your document')
               }
             },
           }
@@ -412,6 +417,9 @@ const transformParams = (data: unknown) => {
     return { [_template]: nested }
   } catch (e) {
     if (e.message === 'Failed to assertShape - _template is a required field') {
+      if (!data) {
+        return []
+      }
       const accum = {}
       Object.entries(data).map(([keyName, value]) => {
         accum[keyName] = transformParams(value)
