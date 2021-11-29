@@ -255,29 +255,32 @@ export const stringify = (
                   const values = []
                   value.forEach((item) => {
                     if (field.fields) {
-                      const v = {}
+                      const innerValue = {}
                       if (typeof field.fields === 'string') {
                         throw new Error(
                           `Global templates not yet supported for rich text`
                         )
                       }
-                      field.fields.forEach((field) => {
-                        const fieldValue = item[field.name]
+                      field.fields.forEach((innerField) => {
+                        const fieldValue = item[innerField.name]
                         if (fieldValue) {
-                          switch (field.type) {
+                          switch (innerField.type) {
                             case 'boolean':
                             case 'number':
-                              v[field.name] = `${fieldValue}`
+                              innerValue[innerField.name] = `${fieldValue}`
                               break
                             case 'image':
                             case 'datetime':
                             case 'string':
-                              v[field.name] = `"${fieldValue}"`
+                              innerValue[innerField.name] = `"${fieldValue}"`
                               break
                           }
                         }
-                        values.push(v)
                       })
+                      // Only add it if it's not empty
+                      if (Object.entries(innerValue).length > 0) {
+                        values.push(innerValue)
+                      }
                     } else {
                       value.forEach((item) => {
                         const template = field.templates.find((template) => {
