@@ -18,6 +18,7 @@ import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
+import { TinaContext } from '@tinacms/sharedctx'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
@@ -209,15 +210,20 @@ export const TinaCMSProvider2 = ({
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
     >
-      {props.query ? (
-        <SetupHooks key={props.query} {...props} query={props.query || ''}>
-          {children}
-        </SetupHooks>
-      ) : (
-        // @ts-ignore
-        children(props)
-      )}
+      <HydrateTinaHook>{children}</HydrateTinaHook>
     </TinaCloudProvider>
+  )
+}
+
+const HydrateTinaHook = ({ children }) => {
+  return (
+    <TinaContext.Provider
+      value={{
+        useForms2: useGraphqlForms,
+      }}
+    >
+      {children}
+    </TinaContext.Provider>
   )
 }
 
@@ -383,10 +389,10 @@ export const staticRequest = async ({
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
 
-The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions.
 This function should only be called on the server at build time.
 
-This will work when developing locally but NOT when deployed to production. 
+This will work when developing locally but NOT when deployed to production.
 `)
   }
 

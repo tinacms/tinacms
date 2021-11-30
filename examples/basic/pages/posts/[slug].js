@@ -19,7 +19,7 @@ export default function Home(props) {
 export const getStaticPaths = async () => {
   const tinaProps = await getStaticPropsForTina({
     query: `{
-        getPageList{
+        getPostList{
           edges {
             node {
               sys {
@@ -31,7 +31,7 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.data.getPageList.edges.map((x) => {
+  const paths = tinaProps.data.getPostList.edges.map((x) => {
     return { params: { slug: x.node.sys.filename } }
   })
 

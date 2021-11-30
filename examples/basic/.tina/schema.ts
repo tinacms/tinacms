@@ -5,6 +5,7 @@ export default defineSchema({
     {
       label: 'Page Content',
       name: 'page',
+      format: 'mdx',
       path: 'content/page',
       fields: [
         {

@@ -16,9 +16,34 @@ import {
   isEditing,
   setEditing,
   useEditState,
+  TinaContext,
 } from '@tinacms/sharedctx'
 
 import React from 'react'
+
+/**
+ *
+ * Hook dependency injection
+ *
+ * The default `useForms2` hook does nothing but return `true` for isLoading
+ * But when the proper `useGraphQlForms` hook is injected, that function comes to
+ * life and brings the props to life.
+ *
+ */
+export const useTina = ({
+  query,
+  variables,
+  data,
+}: {
+  query: string
+  variables: object
+  data: object
+}) => {
+  const { useForms2 } = React.useContext(TinaContext)
+  const [payload, isLoading] = useForms2({ query, variables })
+
+  return isLoading ? data : payload
+}
 
 export { isEditing, setEditing, useEditState }
 

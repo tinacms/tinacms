@@ -12,3 +12,15 @@ limitations under the License.
 */
 
 export * from './edit-state-ctx'
+
+import React from 'react'
+
+export const TinaContext = React.createContext({
+  useForms2: ({ query, variables }: { query: string; variables: object }) => {
+    // isLoading: true
+    // FIXME: this is just a fake out to tell our hook that we're still loading data
+    // in reality we'll want to refactor useGraphQLForms a bit to properly support
+    // this new pattern
+    return [{}, true]
+  },
+})

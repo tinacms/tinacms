@@ -34,7 +34,7 @@ export function useGraphqlForms<T extends object>({
   onSubmit,
   formify = null,
 }: {
-  query: (gqlTag: typeof gql) => DocumentNode
+  query: string
   variables: object
   onSubmit?: (args: onSubmitArgs) => void
   formify?: formifyCallback
@@ -135,7 +135,7 @@ export function useGraphqlForms<T extends object>({
     updateData()
   }, [JSON.stringify(formValues)])
 
-  const queryString = print(query(gql))
+  const queryString = query
 
   React.useEffect(() => {
     if (pendingReset) {
@@ -148,7 +148,7 @@ export function useGraphqlForms<T extends object>({
     const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina
-      .requestWithForm(query, { variables })
+      .requestWithForm((gql) => gql(query), { variables })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
 

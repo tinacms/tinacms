@@ -1,8 +1,19 @@
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { useTina } from 'tinacms/dist/edit-state'
 import { Layout } from '../components/Layout'
+
+const query = `{
+  getPageDocument(relativePath: "home.mdx"){
+    data{
+      body
+    }
+  }
+}`
+
 export default function Home(props) {
-  const content = props.data.getPageDocument.data.body
+  const data = useTina({ query, variables: {}, data: props.data })
+  const content = data.getPageDocument.data.body
   return (
     <Layout>
       <TinaMarkdown content={content} />
@@ -11,20 +22,14 @@ export default function Home(props) {
 }
 
 export const getStaticProps = async () => {
-  const tinaProps = await getStaticPropsForTina({
-    query: `{
-    getPageDocument(relativePath: "home.mdx"){
-      data{
-        body
-      }
-    }
-  }`,
+  const data = await staticRequest({
+    query,
     variables: {},
   })
 
   return {
     props: {
-      ...tinaProps,
+      data,
     },
   }
 }
