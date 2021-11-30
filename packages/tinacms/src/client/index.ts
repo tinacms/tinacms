@@ -194,6 +194,10 @@ mutation addPendingDocumentMutation(
       }),
     })
 
+    if (res.status !== 200) {
+      throw new Error(`Unable to complete request, ${res.statusText}`)
+    }
+
     const json = await res.json()
     if (json.errors) {
       throw new Error(
