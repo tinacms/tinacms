@@ -45,23 +45,22 @@ export const TinaUI: React.FC<TinaUIProps> = ({
 
   return (
     <MutationSignalProvider>
-      <ModalProvider>
-        <style>{styles}</style>
-        <div className="tina-tailwind">
-          <Alerts alerts={cms.alerts} />
-          {cms.enabled && styled && <Theme />}
-          {cms.enabled && cms.toolbar && <Toolbar />}
-          <MediaManager />
-          {cms.sidebar ? (
-            <SidebarProvider position={position} sidebar={cms.sidebar}>
-              {children}
-            </SidebarProvider>
-          ) : (
-            children
-          )}
-          <ActiveFieldIndicator />
-        </div>
-      </ModalProvider>
+      <>
+        <ModalProvider>
+          <style>{styles}</style>
+          <div className="tina-tailwind">
+            <Alerts alerts={cms.alerts} />
+            {cms.enabled && styled && <Theme />}
+            {cms.enabled && cms.toolbar && <Toolbar />}
+            <MediaManager />
+            {cms.sidebar && (
+              <SidebarProvider position={position} sidebar={cms.sidebar} />
+            )}
+            <ActiveFieldIndicator />
+          </div>
+        </ModalProvider>
+        {children}
+      </>
     </MutationSignalProvider>
   )
 }

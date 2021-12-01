@@ -18,7 +18,7 @@ limitations under the License.
 
 import styled from 'styled-components'
 import { FC } from 'react'
-import { InputCss, wrapFieldsWithMeta } from 'tinacms'
+import { wrapFieldsWithMeta } from 'tinacms'
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
@@ -28,7 +28,6 @@ export function wysiwygStyles(component: FC<any>) {
     position: relative;
 
     > [contenteditable] {
-      ${InputCss}
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       min-height: 200px;

@@ -126,9 +126,8 @@ const FormModal = ({ plugin, close }: any) => {
 }
 
 const ContentMenuWrapper = styled.div`
+  pointer-events: auto;
   position: relative;
-  grid-area: actions;
-  justify-self: end;
 `
 
 const CreateToggleButton = styled(Button as any)`
@@ -168,7 +167,6 @@ const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
   display: block;
   position: absolute;
   top: 0;
-  left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -178,18 +176,21 @@ const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
+
   ${(props) =>
     props.direction === 'left' &&
     css`
       right: 0;
       transform-origin: 100% 0;
     `}
+
   ${(props) =>
     props.direction === 'right' &&
     css`
       left: 0;
       transform-origin: 0 0;
     `}
+    
   ${(props) =>
     props.open &&
     css`

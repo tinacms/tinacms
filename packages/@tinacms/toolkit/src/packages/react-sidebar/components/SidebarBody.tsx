@@ -156,9 +156,11 @@ const FormWrapper = styled.div<FormWrapperProps>`
   flex-direction: column;
   flex-wrap: nowrap;
   overflow: hidden;
+  padding-top: 64px;
   height: 100%;
   width: 100%;
   position: relative;
+  background: white;
 
   > * {
     transform: translate3d(100%, 0, 0);

@@ -17,19 +17,19 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
+import { minSidebarWidth, SidebarContext } from './Sidebar'
 
 export const ResizeHandle = () => {
-  const [mouseDown, setMouseDown] = React.useState(false)
-  /* Only set sidebar width once resized; otherwise default to CSS width */
-  const [sidebarWidth, setSidebarWidth] = React.useState(null)
-
-  const pxToNumber = (string: string) => {
-    return parseInt(string.replace('px', ''), 10)
-  }
+  const {
+    resizingSidebar,
+    setResizingSidebar,
+    fullscreen,
+    setSidebarWidth,
+    displayState,
+  } = React.useContext(SidebarContext)
 
   React.useEffect(() => {
-    const handleMouseUp = () => setMouseDown(false)
+    const handleMouseUp = () => setResizingSidebar(false)
 
     window.addEventListener('mouseup', handleMouseUp)
 
@@ -42,18 +42,11 @@ export const ResizeHandle = () => {
     const handleMouseMove = (e: any) => {
       setSidebarWidth((sidebarWidth) => {
         /* Get value from CSS if sidebarWidth isn't set yet */
-        const newWidth = sidebarWidth
-          ? sidebarWidth + e.movementX
-          : pxToNumber(
-              window
-                .getComputedStyle(document.documentElement)
-                .getPropertyValue('--tina-sidebar-width')
-            ) + e.movementX
-        const minWidth = 250
-        const maxWidth = window.innerWidth - 64
+        const newWidth = sidebarWidth + e.movementX
+        const maxWidth = window.innerWidth - 8
 
-        if (newWidth < minWidth) {
-          return minWidth
+        if (newWidth < minSidebarWidth) {
+          return minSidebarWidth
         } else if (newWidth > maxWidth) {
           return maxWidth
         } else {
@@ -62,73 +55,32 @@ export const ResizeHandle = () => {
       })
     }
 
-    if (mouseDown) {
+    if (resizingSidebar) {
       window.addEventListener('mousemove', handleMouseMove)
+      document.body.classList.add('select-none')
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
+      document.body.classList.remove('select-none')
     }
-  }, [mouseDown])
+  }, [resizingSidebar])
 
-  const handleMouseDown = () => setMouseDown(true)
+  const handleresizingSidebar = () => setResizingSidebar(true)
+
+  if (fullscreen) {
+    return null
+  }
 
   return (
-    <>
-      <Handle onMouseDown={handleMouseDown}>
-        <span></span>
-        <span></span>
-      </Handle>
-      <GlobalStyles blockSelect={mouseDown} width={sidebarWidth} />
-    </>
+    <div
+      onMouseDown={handleresizingSidebar}
+      className={`z-20 absolute top-1/2 right-1 w-3 h-32 bg-gray-50 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-150 ease-out transform translate-x-1/2 -translate-y-1/2 group hover:bg-white ${
+        displayState !== 'closed' ? `opacity-100` : `opacity-0`
+      } ${resizingSidebar ? `scale-110` : ``}`}
+      style={{ cursor: 'grab' }}
+    >
+      <span className="absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-300 transform -translate-y-1/2 -translate-x-1/2 opacity-50 transition-opacity duration-150 ease-out group-hover:opacity-100"></span>
+    </div>
   )
 }
-
-const Handle = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0px;
-  padding-right: 6px;
-  width: 14px;
-  height: 100%;
-  cursor: ew-resize;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: var(--tina-z-index-3);
-
-  span {
-    width: 2px;
-    border-radius: 2px;
-    box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3);
-    max-height: 10rem;
-    min-height: 5rem;
-    height: 33.3%;
-    max-height: 20vh;
-    background: var(--tina-color-grey-3);
-  }
-`
-
-export const GlobalStyles = createGlobalStyle<{
-  width: number | null
-  blockSelect: boolean
-}>`
-  ${({ width }) =>
-    width &&
-    `
-    :root {
-      --tina-sidebar-width: ${width + `px`};
-    }
-  `}
-
-  ${({ blockSelect }) =>
-    blockSelect &&
-    `
-  * {
-  -webkit-user-select: none;  
-  -moz-user-select: none;    
-  -ms-user-select: none;      
-  user-select: none;
-  }
-  `}
-`
