@@ -50,7 +50,7 @@ import { ToolbarButtons } from './toolbar'
 import { createTinaImagePlugin, Img } from './image'
 import { createMDXPlugin, createMDXTextPlugin, MdxElement } from './mdx'
 
-import { InputProps, InputCss } from '../../../components'
+import { InputProps } from '../../../components'
 
 const options = createPlateOptions()
 
@@ -150,7 +150,6 @@ const normalize = (node: any) => {
 }
 
 const PlateWrapper = styled.div`
-  ${InputCss};
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 200px;

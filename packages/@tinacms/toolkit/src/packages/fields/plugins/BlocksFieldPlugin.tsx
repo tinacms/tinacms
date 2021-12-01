@@ -36,6 +36,9 @@ import {
   GroupListHeader,
   GroupListMeta,
   GroupLabel,
+  ItemDeleteButton,
+  ItemHeader,
+  ListPanel,
 } from './GroupListFieldPlugin'
 import { useCMS } from '../../react-core/use-cms'
 import { useEvent } from '../../react-core'
@@ -144,50 +147,48 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           </Dismissible>
         </BlockMenu>
       </GroupListHeader>
-      <GroupListPanel>
-        <ItemList>
-          <Droppable droppableId={field.name} type={field.name}>
-            {(provider) => (
-              <div ref={provider.innerRef} className="edit-page--list-parent">
-                {items.length === 0 && <EmptyState />}
-                {items.map((block: any, index: any) => {
-                  const template = field.templates[block._template]
+      <ListPanel>
+        <Droppable droppableId={field.name} type={field.name}>
+          {(provider) => (
+            <div ref={provider.innerRef} className="edit-page--list-parent">
+              {items.length === 0 && <EmptyState />}
+              {items.map((block: any, index: any) => {
+                const template = field.templates[block._template]
 
-                  if (!template) {
-                    return (
-                      <InvalidBlockListItem
-                        // NOTE: Supressing warnings, but not helping with render perf
-                        key={index}
-                        index={index}
-                        field={field}
-                        tinaForm={tinaForm}
-                      />
-                    )
-                  }
-
-                  const itemProps = (item: object) => {
-                    if (!template.itemProps) return {}
-                    return template.itemProps(item)
-                  }
+                if (!template) {
                   return (
-                    <BlockListItem
+                    <InvalidBlockListItem
                       // NOTE: Supressing warnings, but not helping with render perf
                       key={index}
-                      block={block}
-                      template={template}
                       index={index}
                       field={field}
                       tinaForm={tinaForm}
-                      {...itemProps(block)}
                     />
                   )
-                })}
-                {provider.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </ItemList>
-      </GroupListPanel>
+                }
+
+                const itemProps = (item: object) => {
+                  if (!template.itemProps) return {}
+                  return template.itemProps(item)
+                }
+                return (
+                  <BlockListItem
+                    // NOTE: Supressing warnings, but not helping with render perf
+                    key={index}
+                    block={block}
+                    template={template}
+                    index={index}
+                    field={field}
+                    tinaForm={tinaForm}
+                    {...itemProps(block)}
+                  />
+                )
+              })}
+              {provider.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </ListPanel>
     </>
   )
 }
@@ -249,9 +250,7 @@ const BlockListItem = ({
             >
               <GroupLabel>{label || template.label}</GroupLabel>
             </ItemClickTarget>
-            <DeleteButton onClick={removeItem}>
-              <TrashIcon />
-            </DeleteButton>
+            <ItemDeleteButton onClick={removeItem} />
           </ItemHeader>
           <FormPortal>
             {({ zIndexShift }) => (
@@ -305,9 +304,7 @@ const InvalidBlockListItem = ({
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>
-          <DeleteButton onClick={removeItem}>
-            <TrashIcon />
-          </DeleteButton>
+          <ItemDeleteButton onClick={removeItem} />
         </ItemHeader>
       )}
     </Draggable>
@@ -386,103 +383,6 @@ const ItemClickTarget = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-`
-
-const GroupListPanel = styled.div`
-  max-height: initial;
-  position: relative;
-  height: auto;
-  margin-bottom: 24px;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-`
-
-const ItemList = styled.div``
-
-const ItemHeader = styled.div<{ isDragging: boolean }>`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  background-color: white;
-  border: 1px solid var(--tina-color-grey-2);
-  margin: 0 0 -1px 0;
-  overflow: visible;
-  line-height: 1.35;
-  padding: 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-
-  ${GroupLabel} {
-    color: var(--tina-color-grey-10);
-    align-self: center;
-    max-width: 100%;
-  }
-
-  svg {
-    fill: var(--tina-color-grey-3);
-    width: 20px;
-    height: auto;
-    transition: fill 85ms ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    ${GroupLabel} {
-      color: var(--tina-color-primary);
-    }
-  }
-
-  &:first-child {
-    border-radius: 4px 4px 0 0;
-  }
-
-  &:nth-last-child(2) {
-    border-radius: 0 0 4px 4px;
-    &:first-child {
-      border-radius: var(--tina-radius-small);
-    }
-  }
-
-  ${(p) =>
-    p.isDragging &&
-    css<any>`
-      border-radius: var(--tina-radius-small);
-      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-
-      svg {
-        fill: var(--tina-color-grey-8);
-      }
-      ${GroupLabel} {
-        color: var(--tina-color-primary);
-      }
-
-      ${DragHandle} {
-        svg:first-child {
-          opacity: 0;
-        }
-        svg:last-child {
-          opacity: 1;
-        }
-      }
-    `};
-`
-
-const DeleteButton = styled.button`
-  text-align: center;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 12px 8px;
-  margin: 0;
-  transition: all var(--tina-timing-short) ease-out;
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-  }
 `
 
 const DragHandle = styled(function DragHandle({ ...styleProps }) {
@@ -572,8 +472,7 @@ const Panel = function Panel({
           }
         }}
       >
-        <LeftArrowIcon />
-        <GroupLabel>{label}</GroupLabel>
+        {label}
       </PanelHeader>
       <PanelBody>
         {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}

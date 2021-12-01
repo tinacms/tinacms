@@ -21,9 +21,10 @@ import { NoFormsPlaceholder } from './components/NoFormsPlaceHolder'
 import * as React from 'react'
 
 export interface SidebarStateOptions {
-  position?: SidebarPosition
+  displayMode?: SidebarPosition
   buttons?: SidebarButtons
   placeholder?: React.FC
+  defaultWidth?: number
 }
 
 /**
@@ -36,7 +37,7 @@ export interface SidebarButtons {
   reset: string
 }
 
-export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
+export declare type SidebarPosition = 'displace' | 'overlay'
 
 export class SidebarState {
   private _isOpen: boolean = false

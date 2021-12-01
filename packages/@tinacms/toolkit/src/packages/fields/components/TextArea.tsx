@@ -17,18 +17,22 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 >
-export interface TextFieldProps extends a {
+export interface TextAreaProps extends a {
   error?: boolean
   ref?: any
 }
 
-export const BaseTextField = styled.input<TextFieldProps>`
-  ${InputCss}
-`
+export const TextArea = ({ ...props }) => {
+  return (
+    <textarea
+      className="shadow-inner resize-y focus:shadow-outline focus:border-blue-500 block w-full border-gray-200 text-gray-600 focus:text-gray-900 rounded-md"
+      {...props}
+      style={{ minHeight: '160px' }}
+    />
+  )
+}

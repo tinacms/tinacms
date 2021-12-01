@@ -18,47 +18,55 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
+import styled, { css, createGlobalStyle } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
-import { tina_reset_styles, Button } from '../../styles'
+import { Button } from '../../styles'
 import { CreateContentMenu } from '../../react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
-import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
+import { SidebarState, SidebarStateOptions } from '../sidebar'
+
+export const SidebarContext = React.createContext<any>(null)
+
+export const minPreviewWidth = 440
+export const minSidebarWidth = 360
 
 export interface SidebarProviderProps {
-  children: any
   sidebar: SidebarState
-  position?: SidebarStateOptions['position']
+  defaultWidth?: SidebarStateOptions['defaultWidth']
+  position?: SidebarStateOptions['displayMode']
 }
 
 export function SidebarProvider({
-  children,
   position,
+  defaultWidth,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
   const cms = useCMS()
 
+  if (!cms.enabled) return null
+
   return (
-    <>
-      {isFixed(position || sidebar.position) ? (
-        <SiteWrapper open={sidebar.isOpen}>{children}</SiteWrapper>
-      ) : (
-        children
-      )}
-      {cms.enabled && <Sidebar sidebar={sidebar} />}
-    </>
+    <Sidebar
+      displayMode={position}
+      defaultWidth={defaultWidth}
+      sidebar={sidebar}
+    />
   )
 }
 
 interface SidebarProps {
   sidebar: SidebarState
+  defaultWidth?: SidebarStateOptions['defaultWidth']
+  displayMode?: SidebarStateOptions['displayMode']
 }
 
-const Sidebar = ({ sidebar }: SidebarProps) => {
+type displayStates = 'closed' | 'open' | 'fullscreen'
+
+const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const cms = useCMS()
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
@@ -68,11 +76,76 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const allScreens = screens.all()
   const showMenu = allScreens.length > 0
 
+  const [displayState, setDisplayState] =
+    React.useState<displayStates>('closed')
+  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
+  const [previousWidth, setPreviousWidth] = React.useState(defaultWidth)
+  const [resizingSidebar, setResizingSidebar] = React.useState(false)
+
+  const toggleFullscreen = () => {
+    if (displayState === 'fullscreen') {
+      setDisplayState('open')
+    } else {
+      setDisplayState('fullscreen')
+    }
+  }
+
+  const toggleSidebarOpen = () => {
+    if (displayState === 'closed') {
+      setDisplayState('open')
+    } else {
+      setDisplayState('closed')
+    }
+  }
+
+  React.useEffect(() => {
+    setPreviousWidth(sidebarWidth)
+    if (displayState === 'fullscreen') {
+      setSidebarWidth(window.innerWidth)
+    } else {
+      if (previousWidth < window.innerWidth) {
+        setSidebarWidth(previousWidth)
+      } else {
+        setSidebarWidth(window.innerWidth / 2)
+      }
+    }
+  }, [displayState])
+
+  React.useEffect(() => {
+    const updateLayout = () => {
+      if (displayState === 'fullscreen') {
+        return
+      }
+      if (displayMode === 'displace') {
+        updateBodyDisplacement({ displayState, sidebarWidth, resizingSidebar })
+      }
+    }
+
+    updateLayout()
+
+    window.addEventListener('resize', updateLayout)
+
+    return () => {
+      window.removeEventListener('resize', updateLayout)
+    }
+  }, [displayState, displayMode, sidebarWidth, resizingSidebar])
+
   return (
-    <>
-      <SidebarGlobalStyles />
-      <SidebarContainer open={sidebar.isOpen}>
-        <SidebarWrapper open={sidebar.isOpen}>
+    <SidebarContext.Provider
+      value={{
+        sidebarWidth,
+        setSidebarWidth,
+        displayState,
+        setDisplayState,
+        displayMode,
+        toggleFullscreen,
+        toggleSidebarOpen,
+        resizingSidebar,
+        setResizingSidebar,
+      }}
+    >
+      <SidebarWrapper>
+        <SidebarBody>
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
@@ -128,32 +201,38 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
               close={() => setActiveView(null)}
             />
           )}
-          <ResizeHandle />
-        </SidebarWrapper>
+        </SidebarBody>
+        <ResizeHandle />
         <SidebarToggle sidebar={sidebar} />
-      </SidebarContainer>
-    </>
+      </SidebarWrapper>
+    </SidebarContext.Provider>
   )
 }
 
-const SidebarGlobalStyles = createGlobalStyle`
-  @media (max-width: 500px) {
-    :root {
-      --tina-sidebar-width: calc(100vw - 64px);
-    }
-  }
-`
+const updateBodyDisplacement = ({
+  displayState,
+  sidebarWidth,
+  resizingSidebar,
+}) => {
+  const body = document.getElementsByTagName('body')[0]
+  const windowWidth = window.innerWidth
 
-const SiteWrapper = styled.div<{ open: boolean }>`
-  @media (min-width: 840px) {
-    padding-left: ${(props) =>
-      props.open ? 'var(--tina-sidebar-width)' : '0'};
-    transition: padding-left 150ms ease-out;
+  // Transition displacement when not dragging sidebar (opening/closing sidebar)
+  if (!resizingSidebar) {
+    body.style.transition = 'all 200ms ease-out'
+  } else {
+    body.style.transition = ''
   }
-`
 
-function isFixed(position: SidebarPosition): boolean {
-  return position === 'fixed' || position === 'displace'
+  if (displayState === 'open') {
+    const bodyDisplacement = Math.min(
+      sidebarWidth,
+      windowWidth - minPreviewWidth
+    )
+    body.style.paddingLeft = bodyDisplacement + 'px'
+  } else {
+    body.style.paddingLeft = '0'
+  }
 }
 
 const Watermark = styled(({ ...styleProps }: any) => {
@@ -176,9 +255,11 @@ const Watermark = styled(({ ...styleProps }: any) => {
 `
 
 const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
+  const { toggleSidebarOpen } = React.useContext(SidebarContext)
+
   return (
     <Button
-      onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
+      onClick={toggleSidebarOpen}
       aria-label="toggles cms sidebar"
       primary
       rounded="right"
@@ -248,15 +329,13 @@ const MenuLink = styled.div<{ value: string }>`
   }
 `
 
-const SidebarHeader = styled.div`
-  display: grid;
-  grid-template-areas: 'hamburger actions';
-  align-items: center;
-  z-index: var(--tina-z-index-5);
-  height: var(--tina-sidebar-header-height);
-  width: 100%;
-  padding: 0 var(--tina-padding-big);
-`
+const SidebarHeader = ({ children }) => {
+  return (
+    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-30 pointer-events-none">
+      {children}
+    </div>
+  )
+}
 
 const MenuToggle = styled.button<{ open: boolean }>`
   padding: 0 0 0 var(--tina-padding-big);
@@ -267,9 +346,9 @@ const MenuToggle = styled.button<{ open: boolean }>`
   text-align: left;
   width: 64px;
   height: 32px;
-  grid-area: hamburger;
-  justify-self: start;
   cursor: pointer;
+  pointer-events: auto;
+
   svg {
     position: relative;
     transition: fill 85ms ease-out;
@@ -352,105 +431,44 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   }
 `
 
-const SidebarToggleAnimation = keyframes`
-  from {
-    transform: translate3d(-100%,0,0);
-  }
+const SidebarWrapper = ({ children }) => {
+  const { displayState, sidebarWidth, resizingSidebar } =
+    React.useContext(SidebarContext)
 
-  to {
-    transform: translate3d(0,0,0);
-  }
-`
+  return (
+    <div className="fixed top-0 left-0 h-screen" style={{ zIndex: 9999 }}>
+      <div
+        className={`relative flex h-screen transform ${
+          displayState !== 'closed' ? `` : `-translate-x-full`
+        } ${
+          resizingSidebar
+            ? `transition-none`
+            : displayState === 'fullscreen'
+            ? `transition-all duration-150 ease-out`
+            : `transition-all duration-300 ease-out`
+        }`}
+        style={{
+          width: sidebarWidth,
+          maxWidth: '100vw',
+          minWidth: '360px',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
 
-const SidebarToggleButton = styled.button<{ open: boolean }>`
-  position: absolute;
-  pointer-events: all;
-  bottom: 44px;
-  left: var(--tina-sidebar-width);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 24px 24px 0;
-  width: 50px;
-  height: 44px;
-  border: 0;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  fill: white;
-  text-align: center;
-  background-color: var(--tina-color-primary);
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: background-color 150ms ease-out;
-  cursor: pointer;
-  animation: ${SidebarToggleAnimation} 200ms 300ms ease-out 1 both;
-  &:hover {
-    background-color: var(--tina-color-primary-light);
-  }
-  &:active {
-    background-color: var(--tina-color-primary-dark);
-  }
-`
+const SidebarBody = ({ children }) => {
+  const { displayState } = React.useContext(SidebarContext)
 
-const SidebarWrapper = styled.div<{ open: boolean }>`
-  margin: 0;
-  padding: 0;
-  border: 0;
-  z-index: 1;
-  background-color: white;
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  width: var(--tina-sidebar-width);
-  overflow: visible;
-  height: 100%;
-  left: 0;
-  top: 0;
-
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-  &:before {
-    /* Animate box-shadow with opacity for better performance */
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.07), 2px 0 8px rgba(0, 0, 0, 0.07);
-    transition: all ${(p) => (p.open ? 150 : 200)}ms ease-out;
-    opacity: ${(p) => (p.open ? 1 : 0)};
-  }
-  &:after {
-    /* Overlay outer border */
-    border-right: 1px solid rgba(51, 51, 51, 0.09);
-  }
-`
-
-const SidebarContainer = styled.div<{ open: boolean }>`
-  ${tina_reset_styles}
-
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  display: block !important;
-  background: transparent !important;
-  height: 100% !important;
-  width: var(--tina-sidebar-width) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  box-sizing: border-box;
-  z-index: var(--tina-z-index-4);
-  transition: all ${(p) => (p.open ? 150 : 200)}ms ease-out !important;
-  transform: translate3d(
-    ${(p) => (p.open ? '0' : 'calc(var(--tina-sidebar-width) * -1)')},
-    0,
-    0
-  ) !important;
-  pointer-events: ${(p) => (p.open ? `all` : `none`)};
-`
+  return (
+    <div
+      className={`relative left-0 w-full h-full bg-gray-50 shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+        displayState !== 'closed' ? `opacity-100` : `opacity-0`
+      } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
+    >
+      {children}
+    </div>
+  )
+}
