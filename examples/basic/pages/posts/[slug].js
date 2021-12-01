@@ -1,4 +1,4 @@
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 export default function Home(props) {
   return (
@@ -17,9 +17,9 @@ export default function Home(props) {
 }
 
 export const getStaticPaths = async () => {
-  const tinaProps = await getStaticPropsForTina({
+  const tinaProps = await staticRequest({
     query: `{
-        getPageList{
+        getPostList{
           edges {
             node {
               sys {
@@ -31,7 +31,7 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.data.getPageList.edges.map((x) => {
+  const paths = tinaProps.getPostList.edges.map((x) => {
     return { params: { slug: x.node.sys.filename } }
   })
 
@@ -41,24 +41,33 @@ export const getStaticPaths = async () => {
   }
 }
 export const getStaticProps = async (ctx) => {
-  const tinaProps = await getStaticPropsForTina({
-    query: `query getPost($relativePath: String!) {
-        getPostDocument(relativePath: $relativePath) {
-          data {
-            title
-            body
-          }
-        }
+  const query = `query getPost($relativePath: String!) {
+    getPostDocument(relativePath: $relativePath) {
+      data {
+        title
+        body
       }
-      `,
-    variables: {
-      relativePath: ctx.params.slug + '.md',
-    },
-  })
+    }
+  }
+  `
+  const variables = {
+    relativePath: ctx.params.slug + '.md',
+  }
+  let data = {}
+  try {
+    data = await staticRequest({
+      query,
+      variables,
+    })
+  } catch (error) {
+    // swallow errors related to document creation
+  }
 
   return {
     props: {
-      ...tinaProps,
+      data,
+      query,
+      variables,
     },
   }
 }
