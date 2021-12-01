@@ -6,6 +6,9 @@ jobs:
     name: E2E on Chrome
     steps:
       - uses: actions/checkout@v2
+      - name: check the file list
+        run: |
+          ls -la examples/basic/.tina/__generated__/  # list the files for confirmation.
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
