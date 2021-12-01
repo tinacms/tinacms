@@ -62,7 +62,9 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
-  await resetGeneratedFolder()
+  if (!process.env.CI && !noWatch) {
+    await resetGeneratedFolder()
+  }
   const bridge = new FilesystemBridge(rootPath)
   const store = experimentalData
     ? new LevelStore(rootPath)
