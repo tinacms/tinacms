@@ -95,7 +95,6 @@ export class GithubBridge implements Bridge {
         path: realpath,
       })
       .then((response) => {
-        // @ts-ignore
         return Buffer.from(response.data.content, 'base64').toString()
       })
       .catch((e) => {
@@ -135,7 +134,6 @@ export class GithubBridge implements Bridge {
         path: realpath,
       })
 
-      // @ts-ignore
       fileSha = fileContent.data.sha
     } catch (e) {
       console.log('No file exists, creating new one')
