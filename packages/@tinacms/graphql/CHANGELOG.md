@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.57.2
+
+### Patch Changes
+
+- edb2f4011: Trim path property on collections during compilation
+
 ## 0.57.1
 
 ### Patch Changes

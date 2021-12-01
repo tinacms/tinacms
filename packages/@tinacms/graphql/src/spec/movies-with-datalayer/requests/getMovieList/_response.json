@@ -1,0 +1,18 @@
+{
+  "data": {
+    "getMovieList": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    }
+  }
+}

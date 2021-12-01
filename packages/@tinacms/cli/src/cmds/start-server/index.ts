@@ -13,9 +13,18 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
-import { buildSchema } from '@tinacms/graphql'
+import {
+  buildSchema,
+  createDatabase,
+  MemoryStore,
+  FilesystemStore,
+  GithubStore,
+  GithubBridge,
+  FilesystemBridge,
+  LevelStore,
+} from '@tinacms/graphql'
 import { genTypes } from '../query-gen'
-import { compile } from '../compile'
+import { compile, resetGeneratedFolder } from '../compile'
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
@@ -23,7 +32,7 @@ import { logger } from '../../logger'
 interface Options {
   port?: number
   command?: string
-  experimental?: boolean
+  experimentalData?: boolean
   noWatch?: boolean
 }
 
@@ -32,8 +41,34 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, experimental, noWatch }: Options
+  { port = 4001, command, noWatch, experimentalData }: Options
 ) {
+  const rootPath = process.cwd()
+
+  /**
+   * To work with Github directly, replace the Bridge and Store
+   * and ensure you've provided your access token.
+   * NOTE: when talking the the tinacms repo, you must
+   * give your personal access token access to the TinaCMS org
+   */
+  // const ghConfig = {
+  //   rootPath: 'examples/tina-cloud-starter',
+  //   accessToken: '<my-token>',
+  //   owner: 'tinacms',
+  //   repo: 'tinacms',
+  //   ref: 'add-data-store',
+  // }
+  // const bridge = new GithubBridge(ghConfig)
+  // const store = new GithubStore(ghConfig)
+
+  await resetGeneratedFolder()
+  const bridge = new FilesystemBridge(rootPath)
+  const store = experimentalData
+    ? new LevelStore(rootPath)
+    : new FilesystemStore({ rootPath })
+  const shouldBuild = bridge.supportsBuilding()
+  const database = await createDatabase({ store, bridge })
+
   const startSubprocess = () => {
     if (typeof command === 'string') {
       const commands = command.split(' ')
@@ -60,21 +95,25 @@ stack: ${code.stack || 'No stack was provided'}`)
       })
     }
   }
-  const rootPath = process.cwd()
   let ready = false
+
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch(`${rootPath}/**/*.{ts,gql,graphql}`, {
+      .watch([`${rootPath}/**/*.{ts,gql,graphql}`], {
         ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
       })
       .on('ready', async () => {
         console.log('Generating Tina config')
         try {
-          await build()
+          if (shouldBuild) {
+            await build()
+          }
           ready = true
           startSubprocess()
         } catch (e) {
           logger.info(dangerText(`${e.message}`))
+          // FIXME: make this a debug flag
+          console.log(e)
           process.exit(0)
         }
       })
@@ -82,12 +121,14 @@ stack: ${code.stack || 'No stack was provided'}`)
         if (ready) {
           logger.info('Tina change detected, regenerating config')
           try {
-            await build()
+            if (shouldBuild) {
+              await build()
+            }
           } catch (e) {
             logger.info(
               dangerText(
                 'Compilation failed with errors. Server has not been restarted.'
-              ) + `see error below \n ${e.message}`
+              ) + ` see error below \n ${e.message}`
             )
           }
         }
@@ -96,7 +137,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   const build = async () => {
     await compile(null, null)
-    const schema = await buildSchema(rootPath)
+    const schema = await buildSchema(rootPath, database)
     await genTypes({ schema }, () => {}, {})
   }
 
@@ -109,7 +150,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   const start = async () => {
     const s = require('./server')
-    state.server = await s.default(experimental)
+    state.server = await s.default(database)
 
     state.server.listen(port, () => {
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)
