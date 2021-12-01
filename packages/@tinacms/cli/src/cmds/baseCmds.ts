@@ -39,6 +39,10 @@ const noWatchOption = {
   name: '--noWatch',
   description: "Don't regenerate config on file changes",
 }
+const noSDKCodegenOption = {
+  name: '--noSDK',
+  description: "Don't generate the generated client SDK",
+}
 
 export const baseCmds: Command[] = [
   {
@@ -49,6 +53,7 @@ export const baseCmds: Command[] = [
       subCommand,
       experimentalDatalayer,
       noWatchOption,
+      noSDKCodegenOption,
     ],
     action: (options) => chain([startServer], options),
   },
@@ -62,7 +67,7 @@ export const baseCmds: Command[] = [
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [experimentalDatalayer],
+    options: [experimentalDatalayer, noSDKCodegenOption],
     action: (options) => chain([attachSchema, genTypes], options),
   },
   {
