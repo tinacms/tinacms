@@ -3405,7 +3405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/core@npm:^3.0.0, @octokit/core@npm:^3.3.0":
+"@octokit/core@npm:^3.3.0, @octokit/core@npm:^3.5.1":
   version: 3.5.1
   resolution: "@octokit/core@npm:3.5.1"
   dependencies:
@@ -3442,6 +3442,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/openapi-types@npm:^11.2.0":
+  version: 11.2.0
+  resolution: "@octokit/openapi-types@npm:11.2.0"
+  checksum: 8fc9390afc59cb171e1eb5e7c816e14189d4e916f9ae580a0d2e288e7c2c8d2c3ce277f1e0782b2ae49f4f14f94854d8caa6f3283256cc25a84d991eadb3d763
+  languageName: node
+  linkType: hard
+
 "@octokit/openapi-types@npm:^9.1.0":
   version: 9.1.0
   resolution: "@octokit/openapi-types@npm:9.1.0"
@@ -3458,18 +3465,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-paginate-rest@npm:^2.2.0":
-  version: 2.14.0
-  resolution: "@octokit/plugin-paginate-rest@npm:2.14.0"
+"@octokit/plugin-paginate-rest@npm:^2.16.8":
+  version: 2.17.0
+  resolution: "@octokit/plugin-paginate-rest@npm:2.17.0"
   dependencies:
-    "@octokit/types": ^6.18.0
+    "@octokit/types": ^6.34.0
   peerDependencies:
     "@octokit/core": ">=2"
-  checksum: a94cbc932fd40e14f76baac4100a00d346fd46b70a85c73b9f4495b97356d27d9b6c571b29425ff8d259e6e579f3b7583bae64f350cf5358c6c3b870f2d79219
+  checksum: 83df8234fb60f8ac3b60c67f5dad8832db078914e93942dd11ab4ac1aa3b50cf00f7ce703aab8a85ae4cbb841efc4896f0ed79a09db691d01afe365359b02033
   languageName: node
   linkType: hard
 
-"@octokit/plugin-request-log@npm:^1.0.0":
+"@octokit/plugin-request-log@npm:^1.0.0, @octokit/plugin-request-log@npm:^1.0.4":
   version: 1.0.4
   resolution: "@octokit/plugin-request-log@npm:1.0.4"
   peerDependencies:
@@ -3488,13 +3495,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-rest-endpoint-methods@npm:4.2.0":
-  version: 4.2.0
-  resolution: "@octokit/plugin-rest-endpoint-methods@npm:4.2.0"
+"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0":
+  version: 5.13.0
+  resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.13.0"
   dependencies:
-    "@octokit/types": ^5.5.0
+    "@octokit/types": ^6.34.0
     deprecation: ^2.3.1
-  checksum: 4ab0c2eb8da8fac1e9bd0b053f27c2b7e2b7bd15279bb91f7a52d591c874200641e395efaef23d3e549f6260c7f8fbcf25b6faea77389aefe62e479df845d720
+  peerDependencies:
+    "@octokit/core": ">=3"
+  checksum: 65c1ebb25c4be366cca3223d7899017bb28259db98ab5941429db050b18e3b628f0e3abde7565c99c2d4da0cf897c72f756f77df0e2403fef28e01e9416e98fd
   languageName: node
   linkType: hard
 
@@ -3534,18 +3543,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/rest@npm:18.0.6":
-  version: 18.0.6
-  resolution: "@octokit/rest@npm:18.0.6"
-  dependencies:
-    "@octokit/core": ^3.0.0
-    "@octokit/plugin-paginate-rest": ^2.2.0
-    "@octokit/plugin-request-log": ^1.0.0
-    "@octokit/plugin-rest-endpoint-methods": 4.2.0
-  checksum: 3353b232ff80619cf8c976338ee581e29910771931534e5b7937e2e96f541d5c9606d42c62742635f0229a6f51cd6785ed037a0389b51cd972cae1443659550b
-  languageName: node
-  linkType: hard
-
 "@octokit/rest@npm:^16.43.1":
   version: 16.43.2
   resolution: "@octokit/rest@npm:16.43.2"
@@ -3570,6 +3567,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/rest@npm:^18.0.6":
+  version: 18.12.0
+  resolution: "@octokit/rest@npm:18.12.0"
+  dependencies:
+    "@octokit/core": ^3.5.1
+    "@octokit/plugin-paginate-rest": ^2.16.8
+    "@octokit/plugin-request-log": ^1.0.4
+    "@octokit/plugin-rest-endpoint-methods": ^5.12.0
+  checksum: abea3de75fd8cc9daea4190458808bb332053c3dbdbd5bf64a10d68b422395c1484698b95708d18585cda54f6c1c0dbfa3b805be69b97cb02b97403d61561264
+  languageName: node
+  linkType: hard
+
 "@octokit/types@npm:^2.0.0, @octokit/types@npm:^2.0.1":
   version: 2.16.2
   resolution: "@octokit/types@npm:2.16.2"
@@ -3579,21 +3588,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/types@npm:^5.5.0":
-  version: 5.5.0
-  resolution: "@octokit/types@npm:5.5.0"
-  dependencies:
-    "@types/node": ">= 8"
-  checksum: ef5429c90b6d8d4a8816611f39ae469f238f0de76085818081b6185c9a53c9dd8e1e024000c633f935920bdb8075c18cea6475bb2c1fc67aa5d0f50c8e104a12
-  languageName: node
-  linkType: hard
-
-"@octokit/types@npm:^6.0.3, @octokit/types@npm:^6.16.1, @octokit/types@npm:^6.18.0":
+"@octokit/types@npm:^6.0.3, @octokit/types@npm:^6.16.1":
   version: 6.21.0
   resolution: "@octokit/types@npm:6.21.0"
   dependencies:
     "@octokit/openapi-types": ^9.1.0
   checksum: 428ae3acb78445b9d12d93401796f1ae0b64f9a8ee03b6264e4a03e08d04bf91f4d4d49b4802d12b21b1c28fea499e7fd8b8315db2ee7860642e22f29ace7693
+  languageName: node
+  linkType: hard
+
+"@octokit/types@npm:^6.34.0":
+  version: 6.34.0
+  resolution: "@octokit/types@npm:6.34.0"
+  dependencies:
+    "@octokit/openapi-types": ^11.2.0
+  checksum: d797eb0d3c685e69281274ef92ce260dabd0af6f16ccf658eb93d6079658cffcaf46405f86b43d7b6ba48d742ee664502406dc52620e51a3b71ec1da4e444165
   languageName: node
   linkType: hard
 
@@ -4535,7 +4544,7 @@ __metadata:
   dependencies:
     "@octokit/auth-app": ^2.6.0
     "@octokit/graphql": ^4.5.6
-    "@octokit/rest": 18.0.6
+    "@octokit/rest": ^18.0.6
     "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
     "@types/estree": ^0.0.50
@@ -4549,7 +4558,7 @@ __metadata:
     "@types/lodash.upperfirst": ^4.3.6
     "@types/lru-cache": ^5.1.0
     "@types/mdast": ^3.0.10
-    "@types/node": ^16.9.1
+    "@types/node": ^14.17.34
     "@types/normalize-path": ^3.0.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
@@ -4592,7 +4601,6 @@ __metadata:
     remark-rehype: ^8.0.0
     remark-slate: ^1.8.0
     remark-stringify: ^8.1.1
-    tslib: ^1.11.1
     typescript: ^4.3.5
     unified: ^10.1.0
     unist-util-remove-position: ^3.0.0
@@ -5393,6 +5401,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^14.17.34":
+  version: 14.17.34
+  resolution: "@types/node@npm:14.17.34"
+  checksum: 5b6f29d06224841d9a51a769aa17933810e0dc2d74786098d01f855daf7d5d40f5ea0004848f2dd879b371f51a3c77ebd68bd656808d87813f0ae4b9e1eb1ea6
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^15.12.2":
   version: 15.14.9
   resolution: "@types/node@npm:15.14.9"
@@ -5404,13 +5419,6 @@ __metadata:
   version: 16.11.7
   resolution: "@types/node@npm:16.11.7"
   checksum: edd73014790c2889177e8eee35c58a76e644c5d1cc6e19325878cdb130ce6f826b452e7ca04b2e8f7787a5c706f7fab1ba168fe1492dd6da92c780e5bd2fbaa5
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^16.9.1":
-  version: 16.10.4
-  resolution: "@types/node@npm:16.10.4"
-  checksum: 5cae87a69236cce8c8e4361ae8b494e49df5fec3ed69ce8dd87b8da456f927a3c6c4eb5bb7c246dda262c1eaf3e49663805a27fd7413a77a4ca497595febcb33
   languageName: node
   linkType: hard
 
@@ -24298,7 +24306,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.7, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.52.8, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -24399,7 +24407,7 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.53.7, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@^0.53.8, react-tinacms-inline@workspace:packages/react-tinacms-inline":
   version: 0.0.0-use.local
   resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
   dependencies:
@@ -27912,8 +27920,8 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.7
-    react-tinacms-inline: ^0.53.7
+    react-tinacms-editor: ^0.52.8
+    react-tinacms-inline: ^0.53.8
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
@@ -28300,7 +28308,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.10.0, tslib@npm:^1.11.1, tslib@npm:^1.13.0, tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
+"tslib@npm:^1.10.0, tslib@npm:^1.13.0, tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: f44fe7f216946b17d3e3074df3746372703cf24e9127b4c045511456e8e4bf25515fb0a1bb3937676cc305651c5d4fcb6377b0588a4c6a957e748c4c28905d17
