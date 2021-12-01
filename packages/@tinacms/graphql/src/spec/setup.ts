@@ -52,7 +52,7 @@ export const setup = async (
     bridge,
     store,
   })
-  const schemaString = await database.getGraphQLSchema()
+  const schemaString = await database.getGraphQLSchemaFromBridge()
   // @ts-ignore
   const graphQLSchemaString = printSchema(buildASTSchema(schemaString))
   await fs.outputFileSync(

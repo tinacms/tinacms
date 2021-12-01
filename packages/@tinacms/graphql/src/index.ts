@@ -36,7 +36,7 @@ export const buildSchema = async (rootPath: string, database: Database) => {
     .toString()
   await fs.rmdir(tempConfig, { recursive: true })
   await indexDB({ database, config: JSON.parse(config) })
-  const gqlAst = await database.getGraphQLSchema()
+  const gqlAst = await database.getGraphQLSchemaFromBridge()
   return buildASTSchema(gqlAst)
 }
 

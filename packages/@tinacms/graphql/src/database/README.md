@@ -22,7 +22,7 @@ ephemeral, it can be blown away as soon as it's changes are flushed to the "brid
 lean into this capability more in the future as we start to think about tackling mutliple branches for a given
 repo.
 
-### `supportSeeding` & `supportsIndexing`
+### `supportsSeeding` & `supportsIndexing`
 
 These indicate that the store can hold onto data by itself instead of sending it straight over to the bridge.
 Seeding ideally happens whenever bridge data changes. For local setups, it currently only happens when the CLI

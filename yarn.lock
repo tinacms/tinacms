@@ -3405,7 +3405,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/core@npm:^3.3.0, @octokit/core@npm:^3.5.1":
+"@octokit/core@npm:^3.0.0, @octokit/core@npm:^3.3.0":
   version: 3.5.1
   resolution: "@octokit/core@npm:3.5.1"
   dependencies:
@@ -3465,7 +3465,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-paginate-rest@npm:^2.16.8":
+"@octokit/plugin-paginate-rest@npm:^2.2.0":
   version: 2.17.0
   resolution: "@octokit/plugin-paginate-rest@npm:2.17.0"
   dependencies:
@@ -3476,7 +3476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-request-log@npm:^1.0.0, @octokit/plugin-request-log@npm:^1.0.4":
+"@octokit/plugin-request-log@npm:^1.0.0":
   version: 1.0.4
   resolution: "@octokit/plugin-request-log@npm:1.0.4"
   peerDependencies:
@@ -3495,15 +3495,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-rest-endpoint-methods@npm:^5.12.0":
-  version: 5.13.0
-  resolution: "@octokit/plugin-rest-endpoint-methods@npm:5.13.0"
+"@octokit/plugin-rest-endpoint-methods@npm:4.2.0":
+  version: 4.2.0
+  resolution: "@octokit/plugin-rest-endpoint-methods@npm:4.2.0"
   dependencies:
-    "@octokit/types": ^6.34.0
+    "@octokit/types": ^5.5.0
     deprecation: ^2.3.1
-  peerDependencies:
-    "@octokit/core": ">=3"
-  checksum: 65c1ebb25c4be366cca3223d7899017bb28259db98ab5941429db050b18e3b628f0e3abde7565c99c2d4da0cf897c72f756f77df0e2403fef28e01e9416e98fd
+  checksum: 4ab0c2eb8da8fac1e9bd0b053f27c2b7e2b7bd15279bb91f7a52d591c874200641e395efaef23d3e549f6260c7f8fbcf25b6faea77389aefe62e479df845d720
   languageName: node
   linkType: hard
 
@@ -3543,6 +3541,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@octokit/rest@npm:18.0.6":
+  version: 18.0.6
+  resolution: "@octokit/rest@npm:18.0.6"
+  dependencies:
+    "@octokit/core": ^3.0.0
+    "@octokit/plugin-paginate-rest": ^2.2.0
+    "@octokit/plugin-request-log": ^1.0.0
+    "@octokit/plugin-rest-endpoint-methods": 4.2.0
+  checksum: 3353b232ff80619cf8c976338ee581e29910771931534e5b7937e2e96f541d5c9606d42c62742635f0229a6f51cd6785ed037a0389b51cd972cae1443659550b
+  languageName: node
+  linkType: hard
+
 "@octokit/rest@npm:^16.43.1":
   version: 16.43.2
   resolution: "@octokit/rest@npm:16.43.2"
@@ -3567,24 +3577,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/rest@npm:^18.0.6":
-  version: 18.12.0
-  resolution: "@octokit/rest@npm:18.12.0"
-  dependencies:
-    "@octokit/core": ^3.5.1
-    "@octokit/plugin-paginate-rest": ^2.16.8
-    "@octokit/plugin-request-log": ^1.0.4
-    "@octokit/plugin-rest-endpoint-methods": ^5.12.0
-  checksum: abea3de75fd8cc9daea4190458808bb332053c3dbdbd5bf64a10d68b422395c1484698b95708d18585cda54f6c1c0dbfa3b805be69b97cb02b97403d61561264
-  languageName: node
-  linkType: hard
-
 "@octokit/types@npm:^2.0.0, @octokit/types@npm:^2.0.1":
   version: 2.16.2
   resolution: "@octokit/types@npm:2.16.2"
   dependencies:
     "@types/node": ">= 8"
   checksum: 0cdd051034f3d48fc48f40929f2a7832236c490045242e04408c753edb4fa7e947e7e34d21b00df933b3719726671da89648a7bf20816f4e05368e420d874ae4
+  languageName: node
+  linkType: hard
+
+"@octokit/types@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "@octokit/types@npm:5.5.0"
+  dependencies:
+    "@types/node": ">= 8"
+  checksum: ef5429c90b6d8d4a8816611f39ae469f238f0de76085818081b6185c9a53c9dd8e1e024000c633f935920bdb8075c18cea6475bb2c1fc67aa5d0f50c8e104a12
   languageName: node
   linkType: hard
 
@@ -4544,7 +4551,7 @@ __metadata:
   dependencies:
     "@octokit/auth-app": ^2.6.0
     "@octokit/graphql": ^4.5.6
-    "@octokit/rest": ^18.0.6
+    "@octokit/rest": 18.0.6
     "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
     "@types/estree": ^0.0.50
