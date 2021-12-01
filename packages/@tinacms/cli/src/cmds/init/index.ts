@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import fs, { readFileSync, writeFileSync } from 'fs-extra'
+import fs, { readFileSync, writeFileSync, outputFileSync } from 'fs-extra'
 import p from 'path'
 import Progress from 'progress'
 import prompts from 'prompts'
@@ -22,13 +22,7 @@ import {
   warnText,
   dangerText,
 } from '../../utils/theme'
-import {
-  blogPost,
-  nextPostPage,
-  AppJsContent,
-  adminPage,
-  exitAdminPage,
-} from './setup-files'
+import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 
@@ -176,62 +170,15 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   )
   writeFileSync(packagePath, newPack)
 
-  // update the users /admin path
-  const adminPath = p.join(pagesPath, 'admin.tsx')
-  const adminPathJS = p.join(pagesPath, 'admin.js')
-  if (!fs.existsSync(adminPath) && !fs.existsSync(adminPathJS)) {
-    fs.writeFileSync(adminPathJS, adminPage)
-  } else {
-    const extension = fs.existsSync(adminPath) ? '.tsx' : 'js'
-    const override = await prompts({
-      name: 'override',
-      type: 'confirm',
-      message: `Whoops... looks like you already have an admin${extension} do you want to override it?`,
-    })
-    if (override.override) {
-      fs.writeFileSync(p.join(pagesPath, 'admin' + extension), adminPage)
-    } else {
-      const res = await prompts({
-        name: 'name',
-        type: 'text',
-        message: warnText(
-          'What would you like the route to be named that enters edit mode?: '
-        ),
-      })
-      const adminName = res.name || 'admin'
-      fs.writeFileSync(p.join(pagesPath, adminName + extension), adminPage)
-    }
+  // pages/admin/[[...tina]].tsx
+  const adminPath = p.join(pagesPath, 'admin', '[[...tina]].js')
+  if (fs.pathExistsSync(p.join(pagesPath, 'admin'))) {
+    logger.warn(`Unable to add /pages/admin/[[...tina]].js, this path already exists.
+\tLearn more about toggling edit-mode at https://tina.io/docs/tinacms-context/#manually-toggling-edit-mode`)
+    return next()
   }
 
-  // update the users /exit-admin path
-  const exitAdminPath = p.join(pagesPath, 'exit-admin.tsx')
-  const exitAdminPathJS = p.join(pagesPath, 'exit-admin.js')
-  if (!fs.existsSync(exitAdminPath) && !fs.existsSync(exitAdminPathJS)) {
-    fs.writeFileSync(exitAdminPathJS, exitAdminPage)
-  } else {
-    const extension = fs.existsSync(exitAdminPath) ? '.tsx' : 'js'
-    const override = await prompts({
-      name: 'override',
-      type: 'confirm',
-      message: `Whoops... looks like you already have an exit-admin${extension} do you want to override it?`,
-    })
-    if (override.override) {
-      fs.writeFileSync(
-        p.join(pagesPath, 'exit-admin' + extension),
-        exitAdminPage
-      )
-    } else {
-      const res = await prompts({
-        name: 'name',
-        type: 'text',
-        message: warnText(
-          'What would you like the route to be named that exits edit mode?: '
-        ),
-      })
-      const adminName = res.name || 'exit-admin'
-      fs.writeFileSync(p.join(pagesPath, adminName + extension), exitAdminPage)
-    }
-  }
+  outputFileSync(adminPath, adminPage)
 
   next()
 }

@@ -34,6 +34,7 @@ interface Options {
   command?: string
   experimentalData?: boolean
   noWatch?: boolean
+  noSDK: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -41,7 +42,7 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, noWatch, experimentalData }: Options
+  { port = 4001, command, noWatch, experimentalData, noSDK }: Options
 ) {
   const rootPath = process.cwd()
 
@@ -61,7 +62,9 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
-  await resetGeneratedFolder()
+  if (!process.env.CI && !noWatch) {
+    await resetGeneratedFolder()
+  }
   const bridge = new FilesystemBridge(rootPath)
   const store = experimentalData
     ? new LevelStore(rootPath)
@@ -106,7 +109,7 @@ stack: ${code.stack || 'No stack was provided'}`)
         console.log('Generating Tina config')
         try {
           if (shouldBuild) {
-            await build()
+            await build(noSDK)
           }
           ready = true
           startSubprocess()
@@ -122,7 +125,7 @@ stack: ${code.stack || 'No stack was provided'}`)
           logger.info('Tina change detected, regenerating config')
           try {
             if (shouldBuild) {
-              await build()
+              await build(noSDK)
             }
           } catch (e) {
             logger.info(
@@ -135,10 +138,10 @@ stack: ${code.stack || 'No stack was provided'}`)
       })
   }
 
-  const build = async () => {
+  const build = async (noSDK?: boolean) => {
     await compile(null, null)
     const schema = await buildSchema(rootPath, database)
-    await genTypes({ schema }, () => {}, {})
+    await genTypes({ schema }, () => {}, { noSDK })
   }
 
   const state = {
