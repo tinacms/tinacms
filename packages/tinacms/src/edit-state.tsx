@@ -11,7 +11,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useContext, useState } from 'react'
+import {
+  EditProvider,
+  isEditing,
+  setEditing,
+  useEditState,
+} from '@tinacms/sharedctx'
+
+import React from 'react'
+
+export { isEditing, setEditing, useEditState }
 
 export const TinaEditProvider = ({
   showEditButton,
@@ -31,7 +40,18 @@ export const TinaEditProvider = ({
 
 const ToggleButton = () => {
   const { edit } = useEditState()
-  return edit ? null : (
+
+  const [isOnAdmin, setIsOnAdmin] = React.useState(false)
+
+  React.useEffect(() => {
+    if (window) {
+      if (window.location?.pathname.startsWith('/admin')) {
+        setIsOnAdmin(true)
+      }
+    }
+  }, [setIsOnAdmin])
+
+  return edit || isOnAdmin ? null : (
     <div
       style={{ position: 'fixed', bottom: '56px', left: '0px', zIndex: 200 }}
     >
@@ -65,61 +85,4 @@ const TinaEditProviderInner = ({ children, editMode }) => {
   }
 
   return children
-}
-
-const LOCALSTORAGEKEY = 'tina.isEditing'
-
-// need this to see if our site is being rendered on the server
-const isSSR = typeof window === 'undefined'
-
-export const isEditing = (): boolean => {
-  if (!isSSR) {
-    const isEdit = window.localStorage.getItem(LOCALSTORAGEKEY)
-    return isEdit && isEdit === 'true'
-  }
-  // assume not editing if SSR
-  return false
-}
-
-export const setEditing = (isEditing: boolean) => {
-  if (!isSSR) {
-    window.localStorage.setItem(LOCALSTORAGEKEY, isEditing ? 'true' : 'false')
-  }
-}
-
-export const EditContext = React.createContext({
-  edit: isEditing(),
-  setEdit: undefined as (edit: boolean) => void,
-})
-
-/*
-  We will wrap our app in this so we will always be able to get the editmode state with `useEditMode`
-*/
-export const EditProvider: React.FC = ({ children }) => {
-  const [edit, setEditState] = useState(
-    // grabs the correct initial edit state from localstorage
-    isEditing()
-  )
-  const setEdit = (edit: boolean) => {
-    // set React state and localstorage
-    setEditState(edit)
-    setEditing(edit)
-    if (process.env.NODE_ENV === 'development') {
-      // Force Next.js to fetch fresh data from the file system when in dev mode
-      window.location.reload()
-    }
-  }
-  return (
-    <EditContext.Provider value={{ edit, setEdit }}>
-      {children}
-    </EditContext.Provider>
-  )
-}
-
-export const useEditState = () => {
-  const { edit, setEdit } = useContext(EditContext)
-  if (!setEdit) {
-    throw new Error('No `TinaEditProvider` found')
-  }
-  return { edit, setEdit }
 }

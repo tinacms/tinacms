@@ -77,3 +77,6 @@ We are using an `AuthorsParts` Fragment. For each collection this fragment is ge
  
 
 Demo: https://www.loom.com/share/dc09643ac8dd4c238fe06f144a8f3496
+
+
+> Discuss this feature on our [Github Discussions](https://github.com/tinacms/tinacms/discussions/2249)

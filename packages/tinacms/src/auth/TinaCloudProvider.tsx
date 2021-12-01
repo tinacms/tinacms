@@ -26,7 +26,7 @@ import {
 import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { setEditing } from '../edit-state'
+import { setEditing } from '@tinacms/sharedctx'
 
 type ModalNames = null | 'authenticate'
 

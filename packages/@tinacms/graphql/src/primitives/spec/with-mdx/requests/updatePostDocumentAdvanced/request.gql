@@ -1,7 +1,0 @@
-mutation UpdatePostDocument($params: PostMutation!) {
-  updatePostDocument(relativePath: "hello-world-advanced.md", params: $params) {
-    data {
-      body
-    }
-  }
-}
