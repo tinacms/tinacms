@@ -112,6 +112,7 @@ export class GithubStore implements Store {
       })
       .then((response) => {
         const responseString = Buffer.from(
+          // @ts-ignore
           response.data.content,
           'base64'
         ).toString()
@@ -156,6 +157,7 @@ export class GithubStore implements Store {
         path: realpath,
       })
 
+      // @ts-ignore
       fileSha = fileContent.data.sha
     } catch (e) {
       console.log('No file exists, creating new one')
