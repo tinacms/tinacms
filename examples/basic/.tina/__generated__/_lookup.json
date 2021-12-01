@@ -17,18 +17,6 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PostsDocument": {
-    "type": "PostsDocument",
-    "resolveType": "collectionDocument",
-    "collection": "posts",
-    "createPostsDocument": "create",
-    "updatePostsDocument": "update"
-  },
-  "PostsConnection": {
-    "type": "PostsConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "posts"
-  },
   "PageDocument": {
     "type": "PageDocument",
     "resolveType": "collectionDocument",
