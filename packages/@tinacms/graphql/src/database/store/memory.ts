@@ -24,8 +24,9 @@ import { sequential } from '../../util'
 export class MemoryStore implements Store {
   public rootPath
   public db
-  private map: object = {}
-  constructor(rootPath: string) {
+  private map: object
+  constructor(rootPath: string, object: object = {}) {
+    this.map = object
     this.rootPath = rootPath || ''
     this.db = {
       get: async (filepath: string) => {
