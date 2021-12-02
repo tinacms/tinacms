@@ -244,12 +244,22 @@ export class Database {
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
     const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     if (!this._lookup) {
-      const _lookup = await this.bridge.get(lookupPath)
-      this._lookup = JSON.parse(_lookup)
+      const _lookup = await this.store.get(lookupPath)
+      // @ts-ignore
+      this._lookup = _lookup
     }
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
+    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
+    if (!this._graphql) {
+      const _graphql = await this.store.get(graphqlPath)
+      // @ts-ignore
+      this._graphql = _graphql
+    }
+    return this._graphql
+  }
+  public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     if (!this._graphql) {
       const _graphql = await this.bridge.get(graphqlPath)
@@ -260,8 +270,9 @@ export class Database {
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
     if (!this._tinaSchema) {
-      const _tinaSchema = await this.bridge.get(schemaPath)
-      this._tinaSchema = JSON.parse(_tinaSchema)
+      const _tinaSchema = await this.store.get(schemaPath)
+      // @ts-ignore
+      this._tinaSchema = _tinaSchema
     }
     return this._tinaSchema
   }
@@ -310,10 +321,20 @@ export class Database {
       schemaPath,
       JSON.stringify(tinaSchema.schema, null, 2)
     )
+    const lookup = JSON.parse(
+      await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
+    )
     if (this.store.supportsSeeding()) {
       this.store.clear()
-      await this.store.seed('_graphql', graphQLSchema)
-      await this.store.seed('_schema', tinaSchema.schema)
+      await this.store.seed(
+        path.join(GENERATED_FOLDER, '_graphql.json'),
+        graphQLSchema
+      )
+      await this.store.seed(
+        path.join(GENERATED_FOLDER, '_schema.json'),
+        tinaSchema.schema
+      )
+      await this.store.seed(path.join(GENERATED_FOLDER, '_lookup.json'), lookup)
       await _indexContent(tinaSchema, this)
     } else {
       if (this.store.supportsIndexing()) {
