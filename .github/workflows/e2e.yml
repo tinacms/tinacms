@@ -14,7 +14,7 @@ jobs:
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build && yarn workspace starter-basic build 
           command: yarn cypress run
-          start: yarn workspace starter-basic start 
+          start: yarn -v && yarn workspace starter-basic start 
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180
