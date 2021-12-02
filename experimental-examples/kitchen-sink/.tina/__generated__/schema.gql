@@ -82,12 +82,6 @@ union DocumentNode = PageDocument | PostDocument
 type Page {
   body: JSON
   subtitle: String
-  new: String
-  new1: String
-  new2: String
-  new3: String
-  new4: String
-  new5: String
 }
 
 type PageDocument implements Node & Document {
@@ -153,12 +147,6 @@ input DocumentMutation {
 input PageMutation {
   body: JSON
   subtitle: String
-  new: String
-  new1: String
-  new2: String
-  new3: String
-  new4: String
-  new5: String
 }
 
 input PostMutation {
