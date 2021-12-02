@@ -18709,6 +18709,22 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"kitchen-sink-starter@workspace:experimental-examples/kitchen-sink":
+  version: 0.0.0-use.local
+  resolution: "kitchen-sink-starter@workspace:experimental-examples/kitchen-sink"
+  dependencies:
+    "@tinacms/cli": "workspace:*"
+    eslint: 7
+    eslint-config-next: 12.0.3
+    next: 12.0.3
+    react: 17.0.2
+    react-dom: 17.0.2
+    react-is: ^17.0.2
+    styled-components: ^5.1.3
+    tinacms: "workspace:*"
+  languageName: unknown
+  linkType: soft
+
 "klaw@npm:^1.0.0":
   version: 1.3.1
   resolution: "klaw@npm:1.3.1"

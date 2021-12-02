@@ -26,3 +26,6 @@ packages/cli/forestry/.env
 !.yarn/versions
 
 topologicalDeps.txt
+
+# Ignore any .next folder
+**/.next/**

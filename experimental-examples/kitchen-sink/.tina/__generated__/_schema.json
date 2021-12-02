@@ -1,0 +1,220 @@
+{
+  "collections": [
+    {
+      "label": "Page Content",
+      "name": "page",
+      "path": "content/page",
+      "fields": [
+        {
+          "name": "body",
+          "label": "Main Content",
+          "type": "rich-text",
+          "isBody": true,
+          "templates": [
+            {
+              "name": "component1",
+              "label": "Component Test",
+              "fields": [
+                {
+                  "label": "Prop 1",
+                  "name": "prop1",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "component1",
+                    "prop1"
+                  ]
+                },
+                {
+                  "label": "Prop 2",
+                  "name": "prop2",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "component1",
+                    "prop2"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "body",
+                "component1"
+              ]
+            },
+            {
+              "name": "component2",
+              "label": "I adding something new!!!!",
+              "fields": [
+                {
+                  "label": "Prop 1",
+                  "name": "prop1",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "component2",
+                    "prop1"
+                  ]
+                },
+                {
+                  "label": "Prop 2",
+                  "name": "prop2",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "component2",
+                    "prop2"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "body",
+                "component2"
+              ]
+            },
+            {
+              "name": "somethingelsenew",
+              "label": "I adding else something new!!!!",
+              "fields": [
+                {
+                  "label": "Prop 1",
+                  "name": "prop1",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "somethingelsenew",
+                    "prop1"
+                  ]
+                },
+                {
+                  "label": "Prop 2",
+                  "name": "prop2",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "body",
+                    "somethingelsenew",
+                    "prop2"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "body",
+                "somethingelsenew"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "body"
+          ]
+        },
+        {
+          "name": "subtitle",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "subtitle"
+          ]
+        },
+        {
+          "name": "new",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new"
+          ]
+        },
+        {
+          "name": "new1",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new1"
+          ]
+        },
+        {
+          "name": "new2",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new2"
+          ]
+        },
+        {
+          "name": "new3",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new3"
+          ]
+        },
+        {
+          "name": "new4",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new4"
+          ]
+        },
+        {
+          "name": "new5",
+          "label": "subtitle",
+          "type": "string",
+          "namespace": [
+            "page",
+            "new5"
+          ]
+        }
+      ],
+      "namespace": [
+        "page"
+      ]
+    },
+    {
+      "label": "Blog Posts",
+      "name": "post",
+      "path": "content/post",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "post",
+            "title"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Blog Post Body",
+          "name": "body",
+          "isBody": true,
+          "ui": {
+            "component": "textarea"
+          },
+          "namespace": [
+            "post",
+            "body"
+          ]
+        }
+      ],
+      "namespace": [
+        "post"
+      ]
+    }
+  ]
+}
