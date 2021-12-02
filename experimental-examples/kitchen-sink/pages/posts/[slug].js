@@ -1,4 +1,5 @@
 import { staticRequest } from 'tinacms'
+import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../../components/Layout'
 import { ExperimentalGetTinaClient } from '../../.tina/__generated__/types.ts'
 
@@ -14,6 +15,7 @@ export default function Home(props) {
           {JSON.stringify(props.data.getPostDocument.data, null, 2)}
         </pre>
       </code>
+      <TinaMarkdown content={props.data.getPostDocument.data.body} />
     </Layout>
   )
 }
