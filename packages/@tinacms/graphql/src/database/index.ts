@@ -261,20 +261,12 @@ export class Database {
   }
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
-    if (!this._graphql) {
-      const _graphql = await this.bridge.get(graphqlPath)
-      this._graphql = JSON.parse(_graphql)
-    }
-    return this._graphql
+    const _graphql = await this.bridge.get(graphqlPath)
+    return JSON.parse(_graphql)
   }
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
-    if (!this._tinaSchema) {
-      const _tinaSchema = await this.store.get(schemaPath)
-      // @ts-ignore
-      this._tinaSchema = _tinaSchema
-    }
-    return this._tinaSchema
+    return this.store.get(schemaPath)
   }
 
   public getSchema = async () => {
