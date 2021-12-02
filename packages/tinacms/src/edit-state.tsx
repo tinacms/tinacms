@@ -39,10 +39,14 @@ export const useTina = ({
   variables: object
   data: object
 }) => {
-  const { useForms2 } = React.useContext(TinaContext)
-  const [payload, isLoading] = useForms2({ query, variables })
+  const { onQuery, onVariables, state } = React.useContext(TinaContext)
 
-  return isLoading ? data : payload
+  React.useEffect(() => {
+    onQuery(query)
+    onVariables(variables)
+  }, [onQuery, query, JSON.stringify(variables), onVariables])
+
+  return state.isLoading ? data : state.payload
 }
 
 export { isEditing, setEditing, useEditState }

@@ -215,13 +215,36 @@ export const TinaCMSProvider2 = ({
   )
 }
 
+const Inner = ({ onReady, query, variables }) => {
+  const [payload, isLoading] = useGraphqlForms({ query, variables })
+
+  React.useEffect(() => {
+    onReady({ payload, isLoading })
+  }, [JSON.stringify(payload)])
+
+  return null
+}
+
 const HydrateTinaHook = ({ children }) => {
+  const [variables, setVariables] = React.useState({})
+  const [query, setQuery] = React.useState(``)
+  const [state, setState] = React.useState({ payload: {}, isLoading: true })
+
   return (
     <TinaContext.Provider
       value={{
-        useForms2: useGraphqlForms,
+        onQuery: setQuery,
+        onVariables: setVariables,
+        state,
       }}
     >
+      {query && (
+        <Inner
+          onReady={(meh) => setState(meh)}
+          query={query}
+          variables={variables}
+        />
+      )}
       {children}
     </TinaContext.Provider>
   )
