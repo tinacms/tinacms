@@ -5,6 +5,11 @@
     "minor": "57",
     "patch": "2"
   },
+  "meta": {
+    "flags": [
+      "experimentalData"
+    ]
+  },
   "collections": [
     {
       "label": "Movie",

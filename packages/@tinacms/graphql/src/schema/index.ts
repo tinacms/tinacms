@@ -29,11 +29,17 @@ import { TinaError } from '../resolver/error'
 
 export const createSchema = async ({
   schema,
+  flags = [],
 }: {
   schema: TinaCloudSchemaBase
+  flags: string[]
 }) => {
   const validSchema = await validateSchema(schema)
   const [major, minor, patch] = packageJSON.version.split('.')
+  const meta = {}
+  if (flags.length > 0) {
+    meta['flags'] = flags
+  }
   return new TinaSchema({
     version: {
       fullVersion: packageJSON.version,
@@ -41,6 +47,7 @@ export const createSchema = async ({
       minor,
       patch,
     },
+    meta,
     ...validSchema,
   })
 }
@@ -53,12 +60,21 @@ type Version = {
 }
 
 /**
+ * Metadata about how the schema was built
+ */
+type Meta = {
+  flags?: string[]
+}
+
+/**
  * TinaSchema is responsible for allowing you to look up certain
  * properties of the user-provided schema with ease.
  */
 export class TinaSchema {
   public schema: TinaCloudSchemaEnriched
-  constructor(public config: { version: Version } & TinaCloudSchemaBase) {
+  constructor(
+    public config: { version: Version; meta: Meta } & TinaCloudSchemaBase
+  ) {
     // @ts-ignore
     this.schema = config
   }
