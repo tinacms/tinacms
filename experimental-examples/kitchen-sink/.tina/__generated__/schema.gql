@@ -106,7 +106,7 @@ type PageConnection implements Connection {
 
 type Post {
   title: String
-  body: String
+  body: JSON
 }
 
 type PostDocument implements Node & Document {
@@ -151,7 +151,7 @@ input PageMutation {
 
 input PostMutation {
   title: String
-  body: String
+  body: JSON
 }
 
 schema {
