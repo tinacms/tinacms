@@ -3,6 +3,7 @@ on: [push]
 jobs:
   cypress-run:
     runs-on: ubuntu-20.04
+    container: cypress/browsers:node14.17.0-chrome88-ff89
     name: E2E on Chrome
     steps:
       - uses: actions/checkout@v2
