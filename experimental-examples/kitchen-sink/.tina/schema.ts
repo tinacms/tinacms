@@ -15,7 +15,7 @@ export default defineSchema({
           templates: [
             {
               name: 'component1',
-              label: 'Component Test',
+              label: 'Component Asdf',
               fields: [
                 { label: 'Prop 1', name: 'prop1', type: 'string' },
                 { label: 'Prop 2', name: 'prop2', type: 'string' },
@@ -24,14 +24,6 @@ export default defineSchema({
             {
               name: 'component2',
               label: 'I adding something new!!!!',
-              fields: [
-                { label: 'Prop 1', name: 'prop1', type: 'string' },
-                { label: 'Prop 2', name: 'prop2', type: 'string' },
-              ],
-            },
-            {
-              name: 'somethingelsenew',
-              label: 'I adding else something new!!!!',
               fields: [
                 { label: 'Prop 1', name: 'prop1', type: 'string' },
                 { label: 'Prop 2', name: 'prop2', type: 'string' },

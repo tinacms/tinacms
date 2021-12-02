@@ -1,12 +1,6 @@
 fragment PageParts on Page {
   body
   subtitle
-  new
-  new1
-  new2
-  new3
-  new4
-  new5
 }
 
 fragment PostParts on Post {

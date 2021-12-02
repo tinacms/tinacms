@@ -13,7 +13,7 @@
           "templates": [
             {
               "name": "component1",
-              "label": "Component Test",
+              "label": "Component Asdf",
               "fields": [
                 {
                   "label": "Prop 1",
@@ -76,39 +76,6 @@
                 "body",
                 "component2"
               ]
-            },
-            {
-              "name": "somethingelsenew",
-              "label": "I adding else something new!!!!",
-              "fields": [
-                {
-                  "label": "Prop 1",
-                  "name": "prop1",
-                  "type": "string",
-                  "namespace": [
-                    "page",
-                    "body",
-                    "somethingelsenew",
-                    "prop1"
-                  ]
-                },
-                {
-                  "label": "Prop 2",
-                  "name": "prop2",
-                  "type": "string",
-                  "namespace": [
-                    "page",
-                    "body",
-                    "somethingelsenew",
-                    "prop2"
-                  ]
-                }
-              ],
-              "namespace": [
-                "page",
-                "body",
-                "somethingelsenew"
-              ]
             }
           ],
           "namespace": [
@@ -123,60 +90,6 @@
           "namespace": [
             "page",
             "subtitle"
-          ]
-        },
-        {
-          "name": "new",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new"
-          ]
-        },
-        {
-          "name": "new1",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new1"
-          ]
-        },
-        {
-          "name": "new2",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new2"
-          ]
-        },
-        {
-          "name": "new3",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new3"
-          ]
-        },
-        {
-          "name": "new4",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new4"
-          ]
-        },
-        {
-          "name": "new5",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "new5"
           ]
         }
       ],
