@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 import GetCMS from '../components/GetCMS'
 import GetDocumentFields from '../components/GetDocumentFields'
@@ -62,7 +62,7 @@ const createDocument = async (
 
 const CollectionCreatePage = () => {
   const { collectionName, templateName } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <GetCMS>
@@ -96,7 +96,7 @@ const CollectionCreatePage = () => {
                   mutationInfo,
                   values
                 )
-                history.push(`/admin/collections/${collection.name}`)
+                navigate(`/admin/collections/${collection.name}`)
               },
             })
 

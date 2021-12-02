@@ -46,186 +46,16 @@ type Query {
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Int, last: Int, filter: DocumentFilter): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
   getDocumentFields: JSON!
   getPostsDocument(relativePath: String): PostsDocument!
-  getPostsList(before: String, after: String, first: Int, last: Int, filter: PostsFilter): PostsConnection!
+  getPostsList(before: String, after: String, first: Int, last: Int): PostsConnection!
   getGlobalDocument(relativePath: String): GlobalDocument!
-  getGlobalList(before: String, after: String, first: Int, last: Int, filter: GlobalFilter): GlobalConnection!
+  getGlobalList(before: String, after: String, first: Int, last: Int): GlobalConnection!
   getAuthorsDocument(relativePath: String): AuthorsDocument!
-  getAuthorsList(before: String, after: String, first: Int, last: Int, filter: AuthorsFilter): AuthorsConnection!
+  getAuthorsList(before: String, after: String, first: Int, last: Int): AuthorsConnection!
   getPagesDocument(relativePath: String): PagesDocument!
-  getPagesList(before: String, after: String, first: Int, last: Int, filter: PagesFilter): PagesConnection!
-}
-
-input StringFilter {
-  startsWith: String
-  eq: String
-  exists: Boolean
-}
-
-input Posts_bodyDateTimeFilter {
-  format: StringFilter
-}
-
-input Posts_bodyBlockQuoteFilter {
-  authorName: StringFilter
-}
-
-input Posts_bodyNewsletterSignupFilter {
-  placeholder: StringFilter
-  buttonText: StringFilter
-}
-
-input Posts_bodyFilter {
-  DateTime: Posts_bodyDateTimeFilter
-  BlockQuote: Posts_bodyBlockQuoteFilter
-  NewsletterSignup: Posts_bodyNewsletterSignupFilter
-}
-
-input AuthorsFilter {
-  name: StringFilter
-  avatar: StringFilter
-}
-
-input PostsAuthorFilter {
-  authors: AuthorsFilter
-}
-
-input DatetimeFilter {
-  after: String
-  before: String
-  eq: String
-  exists: Boolean
-}
-
-input ImageFilter {
-  startsWith: String
-  eq: String
-  exists: Boolean
-}
-
-input PostsFilter {
-  _body: Posts_bodyFilter
-  title: StringFilter
-  author: PostsAuthorFilter
-  date: DatetimeFilter
-  heroImg: ImageFilter
-  excerpt: StringFilter
-}
-
-input GlobalHeaderIconFilter {
-  color: StringFilter
-  style: StringFilter
-  name: StringFilter
-}
-
-input GlobalHeaderNavFilter {
-  href: StringFilter
-  label: StringFilter
-}
-
-input GlobalHeaderFilter {
-  icon: GlobalHeaderIconFilter
-  color: StringFilter
-  nav: GlobalHeaderNavFilter
-}
-
-input GlobalFooterSocialFilter {
-  facebook: StringFilter
-  twitter: StringFilter
-  instagram: StringFilter
-  github: StringFilter
-}
-
-input GlobalFooterFilter {
-  color: StringFilter
-  social: GlobalFooterSocialFilter
-}
-
-input GlobalThemeFilter {
-  color: StringFilter
-  font: StringFilter
-  icon: StringFilter
-  darkMode: StringFilter
-}
-
-input GlobalFilter {
-  header: GlobalHeaderFilter
-  footer: GlobalFooterFilter
-  theme: GlobalThemeFilter
-}
-
-input BooleanFilter {
-  eq: Boolean
-  exists: Boolean
-}
-
-input PagesBlocksHeroActionsFilter {
-  label: StringFilter
-  type: StringFilter
-  icon: BooleanFilter
-  link: StringFilter
-}
-
-input PagesBlocksHeroImageFilter {
-  src: ImageFilter
-  alt: StringFilter
-}
-
-input PagesBlocksHeroFilter {
-  tagline: StringFilter
-  headline: StringFilter
-  text: StringFilter
-  actions: PagesBlocksHeroActionsFilter
-  image: PagesBlocksHeroImageFilter
-  color: StringFilter
-}
-
-input PagesBlocksFeaturesItemsIconFilter {
-  color: StringFilter
-  style: StringFilter
-  name: StringFilter
-}
-
-input PagesBlocksFeaturesItemsFilter {
-  icon: PagesBlocksFeaturesItemsIconFilter
-  title: StringFilter
-  text: StringFilter
-}
-
-input PagesBlocksFeaturesFilter {
-  items: PagesBlocksFeaturesItemsFilter
-  color: StringFilter
-}
-
-input PagesBlocksContentFilter {
-  body: StringFilter
-  color: StringFilter
-}
-
-input PagesBlocksTestimonialFilter {
-  quote: StringFilter
-  author: StringFilter
-  color: StringFilter
-}
-
-input PagesBlocksFilter {
-  hero: PagesBlocksHeroFilter
-  features: PagesBlocksFeaturesFilter
-  content: PagesBlocksContentFilter
-  testimonial: PagesBlocksTestimonialFilter
-}
-
-input PagesFilter {
-  blocks: PagesBlocksFilter
-}
-
-input DocumentFilter {
-  posts: PostsFilter
-  global: GlobalFilter
-  authors: AuthorsFilter
-  pages: PagesFilter
+  getPagesList(before: String, after: String, first: Int, last: Int): PagesConnection!
 }
 
 type DocumentConnectionEdges {
@@ -248,7 +78,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Int, last: Int, filter: DocumentFilter): DocumentConnection!
+  documents(before: String, after: String, first: Int, last: Int): DocumentConnection!
 }
 
 union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
