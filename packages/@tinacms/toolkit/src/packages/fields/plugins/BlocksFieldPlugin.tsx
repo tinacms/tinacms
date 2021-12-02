@@ -353,27 +353,16 @@ const BlockMenuList = styled.div`
   flex-direction: column;
 `
 
-const BlockOption = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: var(--tina-padding-small);
-  font-weight: var(--tina-font-weight-regular);
-  color: var(--tina-color-grey-10);
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: var(--tina-color-grey-1);
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`
+const BlockOption = ({ children, ...props }) => {
+  return (
+    <button
+      className="relative text-center text-sm p-2 w-full border-b border-gray-50 outline-none transition-all ease-out duration-150 hover:text-blue-500 hover:bg-gray-50"
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
 const ItemClickTarget = styled.div`
   flex: 1 1 0;
