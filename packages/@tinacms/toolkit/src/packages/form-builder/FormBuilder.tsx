@@ -92,6 +92,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       cms.events.dispatch({
         type: `onChange:${tinaForm.id}`,
         value: newValue,
+        mutationType: newUpdate.mutationType,
         field: newUpdate.field,
       })
     }
@@ -100,29 +101,41 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   const { change } = finalForm
   const { insert, move, remove, ...moreMutators } = finalForm.mutators
 
-  const prepareNewUpdate = (name: string) => {
+  const prepareNewUpdate = (
+    name: string,
+    mutationType:
+      | { type: 'change' }
+      | { type: 'insert'; at: string }
+      | { type: 'move'; from: string; to: string }
+      | { type: 'remove'; at: string }
+  ) => {
     setNewUpdate({
       name,
       field: finalForm.getFieldState(name),
+      mutationType,
     })
   }
 
   finalForm.change = (name, value) => {
-    prepareNewUpdate(name.toString())
+    prepareNewUpdate(name.toString(), { type: 'change' })
     return change(name, value)
   }
 
   finalForm.mutators = {
     insert: (...args) => {
-      prepareNewUpdate(args[0])
+      prepareNewUpdate(args[0], { type: 'insert', at: args[1] })
       insert(...args)
     },
     move: (...args) => {
-      prepareNewUpdate(args[0])
+      prepareNewUpdate(args[0], {
+        type: 'move',
+        from: args[1],
+        to: args[2],
+      })
       move(...args)
     },
     remove: (...args) => {
-      prepareNewUpdate(args[0])
+      prepareNewUpdate(args[0], { type: 'remove', at: args[1] })
       remove(...args)
     },
     ...moreMutators,
