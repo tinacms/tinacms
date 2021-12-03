@@ -12,6 +12,8 @@ limitations under the License.
 */
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
+//@ts-ignore can't locate BranchChangeEvent
+import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit'
 import {
   DocumentNode,
   GraphQLSchema,
@@ -22,8 +24,7 @@ import {
 
 import { formify } from './formify'
 import gql from 'graphql-tag'
-//@ts-ignore can't locate BranchChangeEvent
-import { EventBus, BranchChangeEvent, BranchData } from '@tinacms/toolkit'
+
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
   identityApiUrlOverride?: string // https://identity.tinajs.io
@@ -33,7 +34,7 @@ interface ServerOptions {
   clientId: string
   branch: string
   customContentApiUrl?: string
-  getTokenFn?: () => TokenObject
+  getTokenFn?: () => Promise<TokenObject>
   tinaioConfig?: TinaIOConfig
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
@@ -47,7 +48,7 @@ export class Client {
   contentApiBase: string
   query: string
   setToken: (_token: TokenObject) => void
-  private getToken: () => TokenObject
+  private getToken: () => Promise<TokenObject>
   private token: string // used with memory storage
   private branch: string
   private options: ServerOptions
@@ -66,10 +67,10 @@ export class Client {
 
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
-        this.getToken = function () {
+        this.getToken = async function () {
           const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null
           if (tokens) {
-            return JSON.parse(tokens)
+            return await this.getRefreshedToken(tokens)
           } else {
             return {
               access_token: null,
@@ -83,9 +84,9 @@ export class Client {
         }
         break
       case 'MEMORY':
-        this.getToken = () => {
+        this.getToken = async () => {
           if (this.token) {
-            return JSON.parse(this.token)
+            return await this.getRefreshedToken(this.token)
           } else {
             return {
               access_token: null,
@@ -186,7 +187,7 @@ mutation addPendingDocumentMutation(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + this.getToken().id_token,
+        Authorization: 'Bearer ' + (await this.getToken()).id_token,
       },
       body: JSON.stringify({
         query: typeof query === 'function' ? print(query(gql)) : query,
@@ -208,6 +209,60 @@ mutation addPendingDocumentMutation(
       return json
     }
     return json.data as ReturnType
+  }
+
+  parseJwt(token) {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        })
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  }
+
+  async getRefreshedToken(tokens: string): Promise<TokenObject> {
+    const { access_token, id_token, refresh_token } = JSON.parse(tokens)
+    const { exp, iss, client_id } = this.parseJwt(access_token)
+
+    if (Date.now() / 1000 >= exp) {
+      // refresh the token
+      const refreshResponse = await fetch(iss, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-amz-json-1.1',
+          'x-amz-target': 'AWSCognitoIdentityProviderService.InitiateAuth',
+        },
+        body: JSON.stringify({
+          ClientId: client_id,
+          AuthFlow: 'REFRESH_TOKEN_AUTH',
+          AuthParameters: {
+            REFRESH_TOKEN: refresh_token,
+            DEVICE_KEY: null,
+          },
+        }),
+      })
+
+      if (refreshResponse.status !== 200) {
+        throw new Error('Unable to refresh auth tokens')
+      }
+
+      const responseJson = await refreshResponse.json()
+      const newToken = {
+        access_token: responseJson.AuthenticationResult.AccessToken,
+        id_token: responseJson.AuthenticationResult.IdToken,
+        refresh_token,
+      }
+      this.setToken(newToken)
+
+      return Promise.resolve(newToken)
+    }
+
+    return Promise.resolve({ access_token, id_token, refresh_token })
   }
 
   async isAuthorized(): Promise<boolean> {
@@ -240,7 +295,7 @@ mutation addPendingDocumentMutation(
     return await fetch(input, {
       ...init,
       headers: new Headers({
-        Authorization: 'Bearer ' + this.getToken().id_token,
+        Authorization: 'Bearer ' + (await this.getToken()).id_token,
         ...headers,
       }),
     })
