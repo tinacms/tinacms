@@ -1,6 +1,7 @@
 fragment PageParts on Page {
-  body
+  heading
   subtitle
+  body
 }
 
 fragment PostParts on Post {

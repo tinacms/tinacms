@@ -8,6 +8,19 @@ export default defineSchema({
       path: 'content/page',
       fields: [
         {
+          name: 'heading',
+          label: 'Heading',
+          type: 'string',
+        },
+        {
+          name: 'subtitle',
+          label: 'Subtitle',
+          type: 'string',
+          ui: {
+            component: 'textarea',
+          },
+        },
+        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',
@@ -32,9 +45,16 @@ export default defineSchema({
           ],
         },
         {
-          name: 'subtitle',
-          label: 'subtitle',
-          type: 'string',
+          name: 'objField',
+          label: 'This is an object field',
+          type: 'object',
+          fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
+        },
+        {
+          name: 'objFieldList',
+          label: 'This is an list object field',
+          type: 'object',
+          fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
         },
       ],
     },
