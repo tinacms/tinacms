@@ -212,9 +212,9 @@ mutation addPendingDocumentMutation(
   }
 
   parseJwt(token) {
-    var base64Url = token.split('.')[1]
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    var jsonPayload = decodeURIComponent(
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
         .map(function (c) {
@@ -226,7 +226,7 @@ mutation addPendingDocumentMutation(
   }
 
   async getRefreshedToken(tokens: string): Promise<TokenObject> {
-    let { access_token, id_token, refresh_token } = JSON.parse(tokens)
+    const { access_token, id_token, refresh_token } = JSON.parse(tokens)
     const { exp, iss, client_id } = this.parseJwt(access_token)
 
     if (Date.now() / 1000 >= exp) {
