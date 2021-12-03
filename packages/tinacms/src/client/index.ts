@@ -229,7 +229,7 @@ mutation addPendingDocumentMutation(
     let { access_token, id_token, refresh_token } = JSON.parse(tokens)
     const { exp, iss, client_id } = this.parseJwt(access_token)
 
-    if (Date.now() >= exp) {
+    if (Date.now() / 1000 >= exp) {
       // refresh the token
       const refreshResponse = await fetch(iss, {
         method: 'POST',
