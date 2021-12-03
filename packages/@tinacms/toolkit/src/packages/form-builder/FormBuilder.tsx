@@ -88,6 +88,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   React.useEffect(() => {
     if (newUpdate?.name) {
+      // console.log('update', newUpdate.name)
       const newValue = getIn(formValues, newUpdate?.name)
       cms.events.dispatch({
         type: `onChange:${tinaForm.id}`,
@@ -116,30 +117,32 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     })
   }
 
-  finalForm.change = (name, value) => {
-    prepareNewUpdate(name.toString(), { type: 'change' })
-    return change(name, value)
-  }
+  React.useMemo(() => {
+    finalForm.change = (name, value) => {
+      prepareNewUpdate(name.toString(), { type: 'change' })
+      return change(name, value)
+    }
 
-  finalForm.mutators = {
-    insert: (...args) => {
-      prepareNewUpdate(args[0], { type: 'insert', at: args[1] })
-      insert(...args)
-    },
-    move: (...args) => {
-      prepareNewUpdate(args[0], {
-        type: 'move',
-        from: args[1],
-        to: args[2],
-      })
-      move(...args)
-    },
-    remove: (...args) => {
-      prepareNewUpdate(args[0], { type: 'remove', at: args[1] })
-      remove(...args)
-    },
-    ...moreMutators,
-  }
+    finalForm.mutators = {
+      insert: (...args) => {
+        prepareNewUpdate(args[0], { type: 'insert', at: args[1] })
+        insert(...args)
+      },
+      move: (...args) => {
+        prepareNewUpdate(args[0], {
+          type: 'move',
+          from: args[1],
+          to: args[2],
+        })
+        move(...args)
+      },
+      remove: (...args) => {
+        prepareNewUpdate(args[0], { type: 'remove', at: args[1] })
+        remove(...args)
+      },
+      ...moreMutators,
+    }
+  }, [])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
