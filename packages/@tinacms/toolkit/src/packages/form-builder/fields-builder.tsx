@@ -64,6 +64,11 @@ export function FieldsBuilder({
           defaultValue = plugin.defaultValue
         }
 
+        // Populate final-form's `data` attribute with metadata
+        form.mutators.setFieldData(field.name, {
+          tinaField: field,
+        })
+
         return (
           <FinalField
             name={field.name}

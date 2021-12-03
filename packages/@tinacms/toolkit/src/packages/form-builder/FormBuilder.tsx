@@ -25,6 +25,8 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
+import { getIn } from 'final-form'
+import { useCMS } from '../react-core'
 
 export interface FormBuilderProps {
   form: Form
@@ -67,6 +69,64 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [tinaForm])
 
   const finalForm = tinaForm.finalForm
+  const [formValues, setFormValues] = React.useState({})
+  const [newUpdate, setNewUpdate] = React.useState(null)
+
+  const { subscribe } = finalForm
+
+  React.useEffect(
+    () =>
+      subscribe(
+        ({ values }) => {
+          setFormValues(values)
+        },
+        { values: true }
+      ),
+    [subscribe, setFormValues]
+  )
+  const cms = useCMS()
+
+  React.useEffect(() => {
+    if (newUpdate?.name) {
+      const newValue = getIn(formValues, newUpdate?.name)
+      cms.events.dispatch({
+        type: `onChange:${tinaForm.id}`,
+        value: newValue,
+        field: newUpdate.field,
+      })
+    }
+  }, [JSON.stringify(formValues), cms])
+
+  const { change } = finalForm
+  const { insert, move, remove, ...moreMutators } = finalForm.mutators
+
+  const prepareNewUpdate = (name: string) => {
+    setNewUpdate({
+      name,
+      field: finalForm.getFieldState(name),
+    })
+  }
+
+  finalForm.change = (name, value) => {
+    prepareNewUpdate(name.toString())
+    return change(name, value)
+  }
+
+  finalForm.mutators = {
+    insert: (...args) => {
+      prepareNewUpdate(args[0])
+      insert(...args)
+    },
+    move: (...args) => {
+      prepareNewUpdate(args[0])
+      move(...args)
+    },
+    remove: (...args) => {
+      prepareNewUpdate(args[0])
+      remove(...args)
+    },
+    ...moreMutators,
+  }
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {

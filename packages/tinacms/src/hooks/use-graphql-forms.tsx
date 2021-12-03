@@ -146,6 +146,7 @@ export function useGraphqlForms<T extends object>({
 
   React.useEffect(() => {
     const formIds: string[] = []
+    const eventsToUnsubscribe: (() => void)[] = []
     setIsLoading(true)
     cms.api.tina
       .requestWithForm(query, { variables })
@@ -351,6 +352,14 @@ export function useGraphqlForms<T extends object>({
             },
             { values: true }
           )
+
+          const unsubscribe = cms.events.subscribe(
+            `onChange:${form.id}`,
+            (event) => {
+              console.log('updated value', event)
+            }
+          )
+          eventsToUnsubscribe.push(unsubscribe)
         })
       })
       .catch((e) => {
@@ -361,6 +370,7 @@ export function useGraphqlForms<T extends object>({
       })
 
     return () => {
+      eventsToUnsubscribe.forEach((func) => func())
       formIds.forEach((name) => {
         const formPlugin = cms.forms.find(name)
         if (formPlugin) {
