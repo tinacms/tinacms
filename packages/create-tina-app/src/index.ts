@@ -142,24 +142,42 @@ export const run = async () => {
   // }
 
   console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
-  console.log('Inside that directory, you can run several commands:')
-  console.log()
-  console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}dev`))
-  console.log('    Starts the development server.')
-  console.log()
-  console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`))
-  console.log('    Builds the app for production.')
-  console.log()
-  console.log(chalk.cyan(`  ${displayedCommand} start`))
-  console.log('    Runs the built app in production mode.')
-  console.log()
-  console.log('We suggest that you begin by typing:')
+
+  // We can add this back in if we want
+  // console.log('Inside that directory, you can run several commands:')
+  // console.log()
+  // console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}dev`))
+  // console.log('    Starts the development server.')
+  // console.log()
+  // console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`))
+  // console.log('    Builds the app for production.')
+  // console.log()
+  // console.log(chalk.cyan(`  ${displayedCommand} start`))
+  // console.log('    Runs the built app in production mode.')
+  // console.log()
+  // console.log('We suggest that you begin by typing:')
+  console.log(chalk.bold('\tTo launch your app, run:'))
   console.log()
   console.log(chalk.cyan('  cd'), appName)
   console.log(
     `  ${chalk.cyan(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
   )
   console.log()
+  console.log(chalk.bold('\tNext steps:'))
+  console.log()
+  console.log('- Go to localhost:3000/admin to enter edit-mode')
+  console.log(
+    '- Edit some content on localhost:3000 (See https://tina.io/using-tina-editor )'
+  )
+  console.log(
+    '- Check out our concept docs, to learn how Tina powers the starters under the hood. (See https://tina.io/docs/schema/)'
+  )
+  console.log(
+    '- Learn how Tina can be extended to create new field components. (See https://tina.io/docs/advanced/extending-tina/) '
+  )
+  console.log(
+    '- Make your site editable with Tina on production. (See https://tina.io/docs/tina-cloud/ '
+  )
 }
 
 run()
