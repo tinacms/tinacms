@@ -78,7 +78,6 @@ export const run = async () => {
     projectName = res.name
   }
   const dirName = projectName
-  let isInternalExample = false
 
   // If there is no --example passed thought the CLI
   if (!example) {
@@ -136,10 +135,11 @@ export const run = async () => {
   await install(root, null, { useYarn, isOnline: true })
   console.log(chalk.green('Finished installing all packages'))
   console.log()
-  if (tryGitInit(root)) {
-    console.log('Initialized a git repository.')
-    console.log()
-  }
+
+  // if (tryGitInit(root)) {
+  //   console.log('Initialized a git repository.')
+  //   console.log()
+  // }
 
   console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
   console.log('Inside that directory, you can run several commands:')
