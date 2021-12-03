@@ -34,11 +34,16 @@ export function useGraphqlForms<T extends object>({
   onSubmit,
   formify = null,
 }: {
-  query: (gqlTag: typeof gql) => DocumentNode
+  query: string
   variables: object
   onSubmit?: (args: onSubmitArgs) => void
   formify?: formifyCallback
 }): [T, Boolean] {
+  if (typeof query !== 'function') {
+    throw new Error(
+      'Passing a query function to `useGraphQLForms` is deprecated, use a string instead'
+    )
+  }
   const cms = useCMS()
   const [formValues, setFormValues] = React.useState<FormValues>({})
   const [data, setData] = React.useState<object>(null)
@@ -135,8 +140,6 @@ export function useGraphqlForms<T extends object>({
     updateData()
   }, [JSON.stringify(formValues)])
 
-  const queryString = print(query(gql))
-
   React.useEffect(() => {
     if (pendingReset) {
       setData({ ...data, [pendingReset]: initialData[pendingReset] })
@@ -149,7 +152,7 @@ export function useGraphqlForms<T extends object>({
     const eventsToUnsubscribe: (() => void)[] = []
     setIsLoading(true)
     cms.api.tina
-      .requestWithForm(query, { variables })
+      .requestWithForm((gql) => gql(query), { variables })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
 
@@ -378,7 +381,7 @@ export function useGraphqlForms<T extends object>({
         }
       })
     }
-  }, [queryString, JSON.stringify(variables), currentBranch])
+  }, [query, JSON.stringify(variables), currentBranch])
 
   return [data as T, isLoading]
 }

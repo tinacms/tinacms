@@ -31,7 +31,7 @@ const SetupHooks = (props: {
 }) => {
   const cms = useCMS()
   const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
+    query: props.query,
     variables: props.variables || {},
     formify: (args) => {
       if (props.formifyCallback) {
@@ -383,10 +383,10 @@ export const staticRequest = async ({
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
 
-The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions.
 This function should only be called on the server at build time.
 
-This will work when developing locally but NOT when deployed to production. 
+This will work when developing locally but NOT when deployed to production.
 `)
   }
 
