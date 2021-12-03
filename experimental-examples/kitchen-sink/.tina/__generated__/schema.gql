@@ -80,8 +80,9 @@ type Collection {
 union DocumentNode = PageDocument | PostDocument
 
 type Page {
-  body: JSON
+  heading: String
   subtitle: String
+  body: JSON
 }
 
 type PageDocument implements Node & Document {
@@ -145,8 +146,9 @@ input DocumentMutation {
 }
 
 input PageMutation {
-  body: JSON
+  heading: String
   subtitle: String
+  body: JSON
 }
 
 input PostMutation {

@@ -9,10 +9,13 @@
   ],
   "scripts": {
     "build": "yarn buildBuilder && yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/scripts build:all",
-    "build:e2e": "yarn build && yarn workspace starter-basic build ",
+    "build:e2e": "yarn build && yarn workspace kitchen-sink-starter build",
+    "start:e2e": "yarn workspace kitchen-sink-starter start",
     "watch": "yarn build && yarn workspace @tinacms/scripts watch:all",
     "buildBuilder": "yarn workspace @tinacms/scripts build",
     "test": "yarn workspaces foreach --no-private -vip run test",
+    "test:dev": "cypress open",
+    "test:e2e": "yarn cypress run",
     "nuke": "yarn workspaces foreach --no-private -vip run g:nuke",
     "types": "yarn workspaces foreach --topological-dev --no-private -vip run types",
     "g:echo": "echo $INIT_CWD",
@@ -25,7 +28,6 @@
     "push-tags": "changeset tag && git push --follow-tags",
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include tina-tailwind-sidebar-demo --include starter-basic run g:swap",
-    "cypress:open": "cypress open",
     "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js",
     "g:test-run-bin": "yarn workspace create-tina-app run test-run-bin -- --dir=$INIT_CWD"
   },

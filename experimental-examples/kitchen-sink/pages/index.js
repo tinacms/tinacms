@@ -2,16 +2,24 @@ import { getStaticPropsForTina } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
 export default function Home(props) {
-  const content = props.data.getPageDocument.data.body
+  const { body, subtitle, heading } = props.data.getPageDocument.data
+  // const content =.body
+  // const subtitle = props.data.getPageDocument.data.subtitle
+  // const heading = props.data.getPageDocument.data.heading
   return (
     <Layout>
-      <TinaMarkdown
-        content={content}
-        components={{
-          component1: (props) => <div>{JSON.stringify(props)}</div>,
-          component2: (props) => <div>{JSON.stringify(props)}</div>,
-        }}
-      />
+      <h1 data-test="heading">{heading}</h1>
+      <div data-test="subtitle">{subtitle}</div>
+      <hr />
+      <div data-test="rich-text-body">
+        <TinaMarkdown
+          content={body}
+          components={{
+            component1: (props) => <div>{JSON.stringify(props)}</div>,
+            component2: (props) => <div>{JSON.stringify(props)}</div>,
+          }}
+        />
+      </div>
     </Layout>
   )
 }
@@ -22,6 +30,8 @@ export const getStaticProps = async () => {
     getPageDocument(relativePath: "home.mdx"){
       data{
         body
+        heading
+        subtitle
       }
     }
   }`,

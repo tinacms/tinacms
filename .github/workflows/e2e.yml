@@ -14,8 +14,8 @@ jobs:
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build:e2e
-          command: yarn cypress run
-          start: yarn workspace starter-basic start 
+          command: yarn test:e2e
+          start: yarn start:e2e
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180

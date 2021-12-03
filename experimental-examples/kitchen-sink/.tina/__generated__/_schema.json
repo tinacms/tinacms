@@ -6,6 +6,27 @@
       "path": "content/page",
       "fields": [
         {
+          "name": "heading",
+          "label": "Heading",
+          "type": "string",
+          "namespace": [
+            "page",
+            "heading"
+          ]
+        },
+        {
+          "name": "subtitle",
+          "label": "Subtitle",
+          "type": "string",
+          "ui": {
+            "component": "textarea"
+          },
+          "namespace": [
+            "page",
+            "subtitle"
+          ]
+        },
+        {
           "name": "body",
           "label": "Main Content",
           "type": "rich-text",
@@ -81,15 +102,6 @@
           "namespace": [
             "page",
             "body"
-          ]
-        },
-        {
-          "name": "subtitle",
-          "label": "subtitle",
-          "type": "string",
-          "namespace": [
-            "page",
-            "subtitle"
           ]
         }
       ],
