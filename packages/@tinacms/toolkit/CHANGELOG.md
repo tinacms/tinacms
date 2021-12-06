@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.2
+
+### Patch Changes
+
+- bc4699d2b: Use inline style instead of missing tailwind classes"
+
 ## 0.56.1
 
 ### Patch Changes
