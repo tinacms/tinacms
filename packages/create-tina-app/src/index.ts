@@ -39,7 +39,6 @@ program
   })
 
 export const run = async () => {
-  console.log('this is a test change 2')
   program.parse(process.argv)
   const opts = program.opts()
   if (opts.dir) {
@@ -164,11 +163,11 @@ export const run = async () => {
     `  ${chalk.cyan(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
   )
   console.log()
-  console.log(chalk.bold('\tNext steps:'))
+  console.log(chalk.bold('  Next steps:'))
   console.log()
-  console.log('- Go to localhost:3000/admin to enter edit-mode')
+  console.log('- Go to http://localhost:3000/admin to enter edit-mode')
   console.log(
-    '- Edit some content on localhost:3000 (See https://tina.io/using-tina-editor )'
+    '- Edit some content on http://localhost:3000 (See https://tina.io/using-tina-editor )'
   )
   console.log(
     '- Check out our concept docs, to learn how Tina powers the starters under the hood. (See https://tina.io/docs/schema/)'
