@@ -39,6 +39,7 @@ program
   })
 
 export const run = async () => {
+  console.log('this is a test change 2')
   program.parse(process.argv)
   const opts = program.opts()
   if (opts.dir) {
@@ -136,10 +137,10 @@ export const run = async () => {
   console.log(chalk.green('Finished installing all packages'))
   console.log()
 
-  // if (tryGitInit(root)) {
-  //   console.log('Initialized a git repository.')
-  //   console.log()
-  // }
+  if (tryGitInit(root)) {
+    console.log('Initialized a git repository.')
+    console.log()
+  }
 
   console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
 
