@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type { TinaSchema } from '../primitives/schema'
-import { NAMER } from '../primitives/ast-builder'
+import type { TinaSchema } from '../schema'
+import { NAMER } from '../ast-builder'
 
 export const buildSKD = (tinaSchema: TinaSchema) => {
   const methods = tinaSchema.getCollections().map((collection) => {
@@ -42,6 +42,6 @@ export const buildSKD = (tinaSchema: TinaSchema) => {
   })
 
   return `export class TinaGQLClient {
-  ${methods.join('\n')}      
+  ${methods.join('\n')}
 }`
 }

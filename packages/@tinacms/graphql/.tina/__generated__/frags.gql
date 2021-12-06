@@ -1,0 +1,20 @@
+fragment PageParts on Page {
+  title
+  seo {
+    __typename
+    seoTitle
+    ogImage
+    ogDescription
+  }
+  blocks {
+    __typename
+    ... on PageBlocksHero {
+      description
+      backgroundImage
+    }
+    ... on PageBlocksCta {
+      ctaText
+      ctaStyle
+    }
+  }
+}
