@@ -19,7 +19,7 @@ limitations under the License.
 import React from 'react'
 import { getPlatePluginTypes, getRenderElement } from '@udecode/plate'
 import { Transforms } from 'slate'
-import { useStoreEditorRef } from '@udecode/plate'
+import { usePlateEditorRef } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import { Form } from '../../../../../forms'
 import { useCMS } from '../../../../../react-core'
@@ -39,7 +39,7 @@ function dataURLtoFile(dataurl, filename) {
 }
 
 export const Img = (props) => {
-  const editor = useStoreEditorRef(props.name)
+  const editor = usePlateEditorRef(props.name)
   const isFocused = useFocused()
   const isSelected = useSelected()
   const cms = useCMS()
