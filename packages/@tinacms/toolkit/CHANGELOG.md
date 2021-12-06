@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.56.1
+
+### Patch Changes
+
+- f6876d30f: Alter empty sidebar message to be more specific to auto-generating logic
+- 92268fc85: Ensure "src" is used instead of "previewSrc" for images in MDX
+
 ## 0.56.0
 
 ### Minor Changes

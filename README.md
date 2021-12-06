@@ -9,34 +9,34 @@
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tina.io/)
 
-- [Community Forum](https://community.tinacms.org/)
+- [Community Discord](https://discord.com/invite/zumN63Ybpf)
 
 ## Getting Started
 
-Checkout the [tutorial](https://tina.io/guides/tina-cloud/starter/overview/) to get started with TinaCMS.
+Checkout the [tutorial](https://tina.io/docs/setup-overview/) to get started with TinaCMS.
 
 ## Documentation
 
 Visit https://tina.io/docs/ to view the full documentation.
 
-## Development Process
+<!-- ## Development Process
 
-See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to learn how the maintainers work.
+See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to learn how the maintainers work. -->
 
 ## Questions?
 
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
-[![Forum](https://img.shields.io/badge/forum-tinacms-blue.svg?logo=discourse)](https://community.tinacms.org/)
+[![Forum](https://shields.io/github/discussions/tinacms/tinacms)](https://github.com/tinacms/tinacms/discussions)
 
-Visit the [community forum](https://community.tinacms.org/) to ask questions or look us up on on Twitter at [@tina_cms](https://twitter.com/tina_cms).
+Visit the [Github forum](https://github.com/tinacms/tinacms/discussions) to ask questions or look us up on on Twitter at [@tina_cms](https://twitter.com/tina_cms).
 
-## Changelog
+<!-- ## Changelog
 
-Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.
+Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.  -->
 
 ## Contributing
 
-Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
+Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
 
 ### Maintainers
 
@@ -45,7 +45,6 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CO
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
 - Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
-- Jack Bevis ([@jbevis](https://github.com/jbevis)) - Forestry.io
 
 ### All Contributors ✨
 

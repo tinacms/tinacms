@@ -134,7 +134,7 @@ export const ToolbarButtons = ({ name, templates }) => {
         [
           {
             type: 'img',
-            url: selectedMedia.previewSrc,
+            url: selectedMedia.src || selectedMedia.previewSrc,
             alt: '',
             caption: '',
             children: [

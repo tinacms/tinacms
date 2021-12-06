@@ -70,7 +70,10 @@ export const Img = (props) => {
           // the base64 data url stored in markdown, which would be bad because it's
           // potentially very large. We should probably freeze form submission until
           // this is updated to mitigate that.
-          setLocalState({ ...localState, url: allMedia[0].previewSrc })
+          setLocalState({
+            ...localState,
+            url: allMedia[0].src || allMedia[0].previewSrc,
+          })
         }
       }
       Transforms.setNodes(editor, localState, {
