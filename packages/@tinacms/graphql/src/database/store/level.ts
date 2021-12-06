@@ -15,16 +15,24 @@ import type { Store } from './index'
 import path from 'path'
 import { sequential } from '../../util'
 import level, { LevelDB } from 'level'
+import levelup from 'levelup'
+import memdown from 'memdown'
+import encode from 'encoding-down'
 
 export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
-  constructor(rootPath: string) {
+  constructor(rootPath: string, useMemory: boolean = false) {
     this.rootPath = rootPath || ''
-    const db = level(path.join(rootPath, '.tina/__generated__/db'), {
-      valueEncoding: 'json',
-    })
-    this.db = db
+    if (useMemory) {
+      const db = levelup(encode(memdown(), { valueEncoding: 'json' }))
+      this.db = db
+    } else {
+      const db = level(path.join(rootPath, '.tina/__generated__/db'), {
+        valueEncoding: 'json',
+      })
+      this.db = db
+    }
   }
   public async query(queryStrings: string[], hydrator) {
     const resultSets = await sequential(queryStrings, async (queryString) => {

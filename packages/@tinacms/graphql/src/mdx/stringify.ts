@@ -27,7 +27,7 @@ export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
-    const tree = slateTree.map((item) => stringify(item, field))
+    const tree = stringifyChildren(slateTree, field)
     const out = toMarkdown(
       {
         type: 'root',
@@ -42,6 +42,22 @@ export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
   } catch (e) {
     console.log(e)
   }
+}
+
+const allChildrenEmpty = (children: any[]) => {
+  if (children.every((child) => child.type === 'text' && !child.value)) {
+    return true
+  }
+  return false
+}
+
+const stringifyChildren = (children: any[], field) => {
+  return (
+    children
+      .map((child) => stringify(child, field))
+      // This allows us to return `false` when we want a node to be removed entirely
+      .filter(Boolean) as PhrasingContent[]
+  )
 }
 
 export const stringify = (
@@ -61,74 +77,62 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 1,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_H2:
       return {
         type: 'heading',
         depth: 2,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_H3:
       return {
         type: 'heading',
         depth: 3,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_H4:
       return {
         type: 'heading',
         depth: 4,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_H5:
       return {
         type: 'heading',
         depth: 5,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_H6:
       return {
         type: 'heading',
         depth: 6,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_PARAGRAPH:
+      const children = stringifyChildren(node.children, field)
+      if (allChildrenEmpty(children)) {
+        return false
+      }
       return {
         type: 'paragraph',
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children,
       }
     case plateElements.ELEMENT_CODE_BLOCK:
       return {
         type: 'code',
         lang: node.lang,
-        value: node.children.map((child) => stringify(child, field)).join('\n'),
+        value: stringifyChildren(node.children, field).join('\n'),
       }
     case 'code_line':
-      return node.children.map((child) => child.text).join('\n')
+      return stringifyChildren(node.children, field).join('\n')
     case plateElements.ELEMENT_UL:
       return {
         type: 'list',
         ordered: false,
         spread: false,
         check: null,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_OL:
       return {
@@ -136,9 +140,7 @@ export const stringify = (
         ordered: true,
         spread: false,
         check: null,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_LI:
       const realChildren = []
@@ -162,15 +164,13 @@ export const stringify = (
         check: null,
         children: [
           stringify(p, field),
-          ...extraChildren.map((child) => stringify(child, field)),
+          ...stringifyChildren(extraChildren, field),
         ],
       }
     case plateElements.ELEMENT_LIC:
       return {
         type: 'paragraph',
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_IMAGE:
       return {
@@ -255,29 +255,32 @@ export const stringify = (
                   const values = []
                   value.forEach((item) => {
                     if (field.fields) {
-                      const v = {}
+                      const innerValue = {}
                       if (typeof field.fields === 'string') {
                         throw new Error(
                           `Global templates not yet supported for rich text`
                         )
                       }
-                      field.fields.forEach((field) => {
-                        const fieldValue = item[field.name]
+                      field.fields.forEach((innerField) => {
+                        const fieldValue = item[innerField.name]
                         if (fieldValue) {
-                          switch (field.type) {
+                          switch (innerField.type) {
                             case 'boolean':
                             case 'number':
-                              v[field.name] = `${fieldValue}`
+                              innerValue[innerField.name] = `${fieldValue}`
                               break
                             case 'image':
                             case 'datetime':
                             case 'string':
-                              v[field.name] = `"${fieldValue}"`
+                              innerValue[innerField.name] = `"${fieldValue}"`
                               break
                           }
                         }
-                        values.push(v)
                       })
+                      // Only add it if it's not empty
+                      if (Object.entries(innerValue).length > 0) {
+                        values.push(innerValue)
+                      }
                     } else {
                       value.forEach((item) => {
                         const template = field.templates.find((template) => {
