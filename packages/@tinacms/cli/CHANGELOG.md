@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.57.2
+
+### Patch Changes
+
+- edb2f4011: Trim path property on collections during compilation
+- Updated dependencies [edb2f4011]
+  - @tinacms/graphql@0.57.2
+
 ## 0.57.1
 
 ### Patch Changes

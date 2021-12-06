@@ -1,11 +1,10 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.57.1",
+  "version": "0.57.2",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src/fixtures/**/*"
+    "dist"
   ],
   "license": "Apache-2.0",
   "buildConfig": {
@@ -38,7 +37,7 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc --project ./tsconfig.real.json",
+    "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
@@ -48,9 +47,6 @@
     "@octokit/auth-app": "^2.6.0",
     "@octokit/graphql": "^4.5.6",
     "@octokit/rest": "18.0.6",
-    "@types/estree": "^0.0.50",
-    "@types/mdast": "^3.0.10",
-    "@types/node": "^16.9.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -59,11 +55,13 @@
     "esbuild-jest": "^0.5.0",
     "estree-walker": "^3.0.0",
     "fast-glob": "^3.2.5",
+    "flat": "^5.0.2",
     "fs-extra": "^9.0.1",
     "graphql": "^15.3.0",
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",
+    "level": "^7.0.1",
     "lodash": "^4.17.20",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",
@@ -83,7 +81,6 @@
     "remark-rehype": "^8.0.0",
     "remark-slate": "^1.8.0",
     "remark-stringify": "^8.1.1",
-    "tslib": "^1.11.1",
     "unified": "^10.1.0",
     "unist-util-remove-position": "^3.0.0",
     "unist-util-visit": "^4.0.0",
@@ -101,14 +98,18 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
+    "@types/estree": "^0.0.50",
     "@types/express": "^4.17.8",
     "@types/fs-extra": "^9.0.2",
     "@types/jest": "^26.0.4",
     "@types/js-yaml": "^3.12.5",
+    "@types/level": "^6.0.0",
     "@types/lodash": "^4.14.161",
     "@types/lodash.camelcase": "^4.3.6",
     "@types/lodash.upperfirst": "^4.3.6",
     "@types/lru-cache": "^5.1.0",
+    "@types/mdast": "^3.0.10",
+    "@types/node": "^14.17.34",
     "@types/normalize-path": "^3.0.0",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",

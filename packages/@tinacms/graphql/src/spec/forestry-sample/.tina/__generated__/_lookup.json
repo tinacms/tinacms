@@ -1,0 +1,85 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "author",
+      "post",
+      "page"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "Author": {
+    "type": "Author",
+    "resolveType": "unionData",
+    "typeMap": {
+      "author": "AuthorAuthor"
+    }
+  },
+  "AuthorDocument": {
+    "type": "AuthorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "author",
+    "createAuthorDocument": "create",
+    "updateAuthorDocument": "update"
+  },
+  "AuthorConnection": {
+    "type": "AuthorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "author"
+  },
+  "PostPostAuthorDocument": {
+    "type": "PostPostAuthorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "Post": {
+    "type": "Post",
+    "resolveType": "unionData",
+    "typeMap": {
+      "post": "PostPost"
+    }
+  },
+  "PostDocument": {
+    "type": "PostDocument",
+    "resolveType": "collectionDocument",
+    "collection": "post",
+    "createPostDocument": "create",
+    "updatePostDocument": "update"
+  },
+  "PostConnection": {
+    "type": "PostConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "post"
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PageBlocksHero",
+      "cta": "PageBlocksCta"
+    }
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
+  }
+}
