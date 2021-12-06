@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.3
+
+### Patch Changes
+
+- 4700d7ae4: Patch fix to ensure builds include latest dependencies
+
 ## 0.56.2
 
 ### Patch Changes

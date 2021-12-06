@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.58.1
+
+### Patch Changes
+
+- 4700d7ae4: Patch fix to ensure builds include latest dependencies
+
 ## 0.58.0
 
 ### Minor Changes
