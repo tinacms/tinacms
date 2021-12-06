@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.59.1
+
+### Patch Changes
+
+- ed9d48abc: Swaps starter's old admin for the new one
+- f6876d30f: Alter empty sidebar message to be more specific to auto-generating logic
+- Updated dependencies [f6876d30f]
+- Updated dependencies [92268fc85]
+  - @tinacms/toolkit@0.56.1
+
 ## 0.59.0
 
 ### Minor Changes

@@ -21,18 +21,15 @@ import * as React from 'react'
 
 export const NoFormsPlaceholder = () => (
   <EmptyState>
-    <Emoji>👋</Emoji>
-    <h3>
-      Welcome to <b>Tina</b>!
-    </h3>
+    <Emoji>🔎</Emoji>
     <p>
-      Let's get a form set up
-      <br />
-      so you can start editing.
+      Tina didn't find <br />
+      any queries to <br />
+      generate forms for.
     </p>
     <p>
-      <LinkButton href="https://tina.io/docs/schema/" target="_blank">
-        <Emoji>📖</Emoji> Content Modeling
+      <LinkButton href="https://tina.io/docs/tinacms-context/" target="_blank">
+        <Emoji>📖</Emoji> Contextual Editing
       </LinkButton>
     </p>
   </EmptyState>
