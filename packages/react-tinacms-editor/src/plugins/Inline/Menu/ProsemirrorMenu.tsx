@@ -17,7 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
+// @ts-ignore
+import { BoldIcon, ItalicIcon, StrikethroughIcon, SuperscriptIcon, SubscriptIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 import { formatKeymap } from '../../../utils'
@@ -52,12 +53,12 @@ const StrikeControl = markControl({
 
 const Subscript = markControl({
   mark: 'subscript',
-  Icon: StrikethroughIcon,
+  Icon: SubscriptIcon,
   tooltip: 'Subscript',
 })
 
 const Superscript = markControl({
   mark: 'superscript',
-  Icon: StrikethroughIcon,
+  Icon: SuperscriptIcon,
   tooltip: 'Superscript',
 })

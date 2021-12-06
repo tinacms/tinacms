@@ -17,7 +17,8 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import { LinkIcon } from '@tinacms/icons'
+// @ts-ignore
+import { FlagIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent } from '../../../utils'
@@ -26,7 +27,7 @@ import { openAnchorPopup } from '../commands'
 
 export const ProsemirrorMenu = markControl({
   mark: 'anchor',
-  Icon: LinkIcon,
+  Icon: FlagIcon,
   tooltip: 'Anchor',
   selectionOnly: true,
   noMix: ['code'],

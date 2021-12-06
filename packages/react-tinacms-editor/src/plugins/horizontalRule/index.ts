@@ -1,10 +1,11 @@
 import { commandControl } from 'components/MenuHelpers'
 import { insertHr } from 'plugins/Common/commands'
-import { QuoteIcon } from '@tinacms/icons'
+// @ts-ignore
+import { RulerIcon } from '@tinacms/icons'
 
 export const ProsemirrorMenu = commandControl(
   insertHr,
-  QuoteIcon,
+  RulerIcon,
   'Horizontal Rule',
   'Horizontal Rule'
 )

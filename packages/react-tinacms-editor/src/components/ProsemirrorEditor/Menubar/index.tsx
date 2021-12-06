@@ -29,6 +29,7 @@ import { ProsemirrorMenu as TableMenu } from '../../../plugins/Table'
 import { ProsemirrorMenu as ImageMenu } from '../../../plugins/Image'
 import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
 import { ProsemirrorMenu as AnchorMenu } from '../../../plugins/Anchor'
+import { AlignJustify, AlignRight, AlignLeft, AlignCenter } from '../../../plugins/TextAlignment'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
 import {
@@ -67,6 +68,10 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
         <CodeBlockMenu key="CodeBlockMenu" />,
         <HorizontalRule key="HorizontalRule"/>,
         <ListMenu key="ListMenu" />,
+        <AlignLeft key="AlignLeft" />,
+        <AlignCenter key="AlignCenter" />,
+        <AlignRight key="AlignRight" />,
+        <AlignJustify key="AlignJustify" />,
         <HistoryMenu key="HistoryMenu" />,
       ]}
       popups={[
