@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { css, createGlobalStyle } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
 import { Button } from '../../styles'
@@ -27,7 +27,6 @@ import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
-import { ActionButton } from '../../form-builder'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -164,7 +163,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
             <sidebar.placeholder />
           </FormsView>
           {showMenu && (
-            <MenuPanel visible={menuIsOpen}>
+            <MenuPanel>
               <MenuList>
                 {cms.flags.get('tina-admin') && (
                   <MenuButton
@@ -294,7 +293,7 @@ const MenuButton = ({ children, ...props }) => {
 
 const SidebarHeader = ({ children }) => {
   return (
-    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-30 pointer-events-none">
+    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-50 pointer-events-none">
       {children}
     </div>
   )

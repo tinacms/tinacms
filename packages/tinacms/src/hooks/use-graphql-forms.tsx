@@ -197,26 +197,10 @@ export function useGraphqlForms<T extends object>({
               Component: () => (
                 <a
                   href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '10px 20px',
-                    borderTop: '1px solid var(--tina-color-grey-2)',
-                    textTransform: 'uppercase',
-                    fontSize: '11px',
-                    fontWeight: 500,
-                    background: 'var(--tina-color-grey-0)',
-                  }}
+                  className="flex items-center px-5 py-2 border-t border-b shadow border-gray-200 uppercase text-xs font-medium bg-white hover:bg-gray-50 hover:text-blue-500 transition-colors duration-100 ease-out"
                 >
-                  <BiLinkExternal
-                    style={{
-                      height: '1.25em',
-                      width: 'auto',
-                      opacity: '0.8',
-                      marginRight: '8px',
-                    }}
-                  />{' '}
-                  Edit in Tina Admin
+                  <BiLinkExternal className="h-4 w-auto opacity-80 mr-2" /> Edit
+                  in Tina Admin
                 </a>
               ),
             })
