@@ -173,7 +173,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
                       window.location.href = window.location.origin + '/admin'
                     }}
                   >
-                    <TinaIcon className="w-6 h-auto mr-2 opacity-80" /> Tina
+                    <TinaIcon className="w-7 h-auto mr-2 opacity-80" /> Tina
                     Admin
                   </MenuButton>
                 )}
@@ -280,9 +280,9 @@ const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
 
 const MenuButton = ({ children, ...props }) => {
   return (
-    <li className="first:pt-2 last:pb-2">
+    <li className="py-2 first:pt-4 last:pb-4">
       <button
-        className={`block text-xl p-4 tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-white hover:opacity-100`}
+        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-white hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
         {...props}
       >
         {children}
@@ -361,14 +361,13 @@ const MenuList = ({ children }) => {
 }
 
 const MenuPanel = ({ children }) => {
-  const { sidebarWidth, menuIsOpen } = React.useContext(SidebarContext)
+  const { menuIsOpen } = React.useContext(SidebarContext)
 
   return (
     <div
-      className={`absolute top-0 left-0 h-full	overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-40 transition-transform duration-300 ease-out transform ${
+      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-40 transition-transform duration-300 ease-out transform ${
         menuIsOpen ? `` : `-translate-x-full`
       }`}
-      style={{ width: sidebarWidth + 'px' }}
     >
       {children}
     </div>
