@@ -118,8 +118,11 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                 return (
                   <li key={`${collection.name}-link`}>
                     <NavLink
-                      className={`text-lg tracking-wide hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`}
-                      activeClassName="text-blue-600"
+                      className={({ isActive }) => {
+                        return `text-lg tracking-wide ${
+                          isActive ? 'text-blue-600' : ''
+                        } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`
+                      }}
                       to={`/admin/collections/${collection.name}`}
                     >
                       <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
