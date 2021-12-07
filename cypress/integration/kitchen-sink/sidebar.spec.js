@@ -42,29 +42,150 @@ describe('Tina side bar', () => {
     // Edit subtitle
     cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
     cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
+
     // Editing heading
     cy.get('input[name="heading"]').click().type(HEADING_TEXT)
     cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
   })
 
   it('Can edit rich text', () => {
-    // get the rich text editor and type something
-    cy.get(SLATE_SELECTOR).click('bottom').type(LONG_FORM_TEXT)
-    // It renders paragraphs properly
-    cy.get(RICH_TEXT_BODY_SELECTOR)
-      .should('contain.html', '<h1>heading 1</h1>')
-      .should('contain.html', '<p>para 1</p>')
-      .should('contain.html', '<p>para 2</p>')
-      .should('contain.html', '<p>para 3</p>')
+    describe('Edit rich Text', () => {
+      // get the rich text editor and type something
+      cy.get(SLATE_SELECTOR).click('bottom').type(LONG_FORM_TEXT)
+      // It renders paragraphs properly
+      cy.get(RICH_TEXT_BODY_SELECTOR)
+        .should('contain.html', '<h1>heading 1</h1>')
+        .should('contain.html', '<p>para 1</p>')
+        .should('contain.html', '<p>para 2</p>')
+        .should('contain.html', '<p>para 3</p>')
 
-    // TODO: Test select from the toolbar
-    // cy.get('.sc-gIvpjk').click()
-    // cy.get(`[data-testid="ToolbarButton"]`).first().click()
+      // TODO: Test select from the toolbar
+      // cy.get('.sc-gIvpjk').click()
+      // cy.get(`[data-testid="ToolbarButton"]`).first().click()
 
-    // cy.get(SLATE_SELECTOR).click('bottom').type('this will be a heading')
-    // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-    //   'contain.html, "<h1>this will be a heading</h1>'
-    // )
+      // cy.get(SLATE_SELECTOR).click('bottom').type('this will be a heading')
+      // cy.get(RICH_TEXT_BODY_SELECTOR).should(
+      //   'contain.html, "<h1>this will be a heading</h1>'
+      // )
+
+      // Testing the "Quote" button
+      cy.get(SLATE_SELECTOR).click('bottom').type('This will be a quote')
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format quote')
+        .click({ force: true })
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<blockquote>This will be a quote</blockquote>'
+      )
+
+      // Code block
+      // cy.get(SLATE_SELECTOR).click('bottom').type('This will be a code block')
+      // cy.get('[data-testid="ToolbarButton"')
+      //   .contains('code')
+      //   .click({ force: true })
+      // cy.get(RICH_TEXT_BODY_SELECTOR).should(
+      //   'contain.html',
+      //   '<code>This will be a code block</code>'
+      // )
+
+      // Bold text
+      cy.get(SLATE_SELECTOR).click('bottom')
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format bold')
+        .click({ force: true })
+      cy.get(SLATE_SELECTOR)
+        .click('bottom')
+        .type('This will be a strong block{enter}')
+
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<strong>This will be a strong block</strong>'
+      )
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format bold')
+        .click({ force: true })
+
+      // italic
+      cy.get(SLATE_SELECTOR).click('bottom')
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format italic')
+        .click({ force: true })
+      cy.get(SLATE_SELECTOR)
+        .click('bottom')
+        .type('This will be a italic block{enter}')
+
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<em>This will be a italic block</em>'
+      )
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format italic')
+        .click({ force: true })
+
+      // underline
+      cy.get(SLATE_SELECTOR).click('bottom')
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format underlined')
+        .click({ force: true })
+      cy.get(SLATE_SELECTOR)
+        .click('bottom')
+        .type('This will be a underline block{enter}')
+
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<u>This will be a underline block</u>'
+      )
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('format underlined')
+        .click({ force: true })
+
+      // strike though
+      cy.get(SLATE_SELECTOR).click('bottom')
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('strikethrough s')
+        .click({ force: true })
+      cy.get(SLATE_SELECTOR)
+        .click('bottom')
+        .type('This will be a strikethrough block{enter}')
+
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<s>This will be a strikethrough block</s>'
+      )
+      cy.get('[data-testid="ToolbarButton"')
+        .contains('strikethrough s')
+        .click({ force: true })
+    })
+
+    describe('Saving and refresh', () => {
+      cy.get('button').contains('Save').click()
+      cy.wait(1000)
+      // Fake logout
+      localStorage.setItem('tina.isEditing', '')
+      cy.reload().wait(1000)
+
+      // Do all assertions again on new data
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<s>This will be a strikethrough block</s>'
+      )
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<u>This will be a underline block</u>'
+      )
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<em>This will be a italic block</em>'
+      )
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<strong>This will be a strong block</strong>'
+      )
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<blockquote>This will be a quote</blockquote>'
+      )
+    })
   })
 
   it('Can edit embedded objects', () => {
