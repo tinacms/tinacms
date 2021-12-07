@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.60.2
+
+### Patch Changes
+
+- 816271d03: Ensure login/logout pages work when admin flag is disabled
+
 ## 0.60.1
 
 ### Patch Changes
