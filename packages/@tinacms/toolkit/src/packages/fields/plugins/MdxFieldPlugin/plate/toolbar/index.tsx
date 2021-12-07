@@ -55,7 +55,7 @@ import { HeaderPopup } from './heading'
 import { useCMS } from '../../../../../react-core'
 
 const Wrapper = styled.div`
-  z-index: 100;
+  z-index: 30;
   padding-top: 6px;
   position: relative;
   width: 100%;
