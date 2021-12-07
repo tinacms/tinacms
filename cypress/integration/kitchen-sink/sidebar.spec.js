@@ -35,6 +35,19 @@ describe('Tina side bar', () => {
     // Fake Login
     localStorage.setItem('tina.isEditing', 'true')
     cy.reload()
+
+    // Open the sidebar
+    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+
+    // Delete all text in rich text editor
+    // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
+
+    const backspace = Array(300).fill(`{backspace}`).join('')
+    console.log({ backspace })
+    cy.get(SLATE_SELECTOR).click('bottom').type(backspace)
+    cy.get('button').contains('Save').click().wait(1000)
+    cy.visit('/').wait(100)
+
     // Open the sidebar
     cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
   })
