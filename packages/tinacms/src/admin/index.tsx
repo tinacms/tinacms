@@ -29,6 +29,16 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import useEmbedTailwind from './hooks/useEmbedTailwind'
 import { useEditState } from '@tinacms/sharedctx'
 
+const Redirect = () => {
+  React.useEffect(() => {
+    if (window) {
+      window.location.assign('/')
+    }
+  }, [])
+
+  return null
+}
+
 export const TinaAdmin = () => {
   useEmbedTailwind()
 
@@ -88,14 +98,8 @@ export const TinaAdmin = () => {
             <Layout>
               <Router>
                 <Routes>
-                  <Route path="/admin/logout">
-                    <LogoutPage />
-                  </Route>
-                  <Route path="/admin">
-                    {() => {
-                      window.location.href = '/'
-                    }}
-                  </Route>
+                  <Route path="/admin/logout" element={<LogoutPage />} />
+                  <Route path="/admin" element={<Redirect />} />
                 </Routes>
               </Router>
             </Layout>
