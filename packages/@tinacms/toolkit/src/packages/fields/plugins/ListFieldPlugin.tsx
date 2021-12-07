@@ -162,7 +162,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             <ItemActions>
               <DragHandle />
               <DeleteButton onClick={removeItem}>
-                <TrashIcon />
+                <TrashIcon className="w-7 h-auto" />
               </DeleteButton>
             </ItemActions>
           </ListItem>
@@ -359,7 +359,7 @@ const DeleteButton = styled.button`
 const DragHandle = styled(function DragHandle({ ...styleProps }) {
   return (
     <div {...styleProps}>
-      <ReorderIcon />
+      <ReorderIcon className="w-7 h-auto" />
     </div>
   )
 })`

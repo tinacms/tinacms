@@ -104,7 +104,7 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
     <span {...styleProps}>
       <span>{children}</span>
       <DeleteButton onClick={removeItem}>
-        <CloseIcon />
+        <CloseIcon className="w-7 h-auto" />
       </DeleteButton>
     </span>
   )

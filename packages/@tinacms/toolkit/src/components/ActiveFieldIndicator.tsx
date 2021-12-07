@@ -51,7 +51,7 @@ const AboveViewportIndicator = () => {
   return (
     <IndicatorWrap position="top">
       <ArrowWrap>
-        <ChevronUpIcon />
+        <ChevronUpIcon className="w-8 h-auto" />
       </ArrowWrap>
     </IndicatorWrap>
   )
@@ -61,7 +61,7 @@ const BelowViewportIndicator = () => {
   return (
     <IndicatorWrap position="bottom">
       <ArrowWrap>
-        <ChevronDownIcon />
+        <ChevronDownIcon className="w-8 h-auto" />
       </ArrowWrap>
     </IndicatorWrap>
   )

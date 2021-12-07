@@ -27,6 +27,7 @@ import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
+import { ActionButton } from '../../form-builder'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -142,6 +143,8 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         toggleSidebarOpen,
         resizingSidebar,
         setResizingSidebar,
+        menuIsOpen,
+        setMenuIsOpen,
       }}
     >
       <SidebarWrapper>
@@ -162,36 +165,36 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
           </FormsView>
           {showMenu && (
             <MenuPanel visible={menuIsOpen}>
-              <MenuWrapper>
-                <MenuList>
-                  {cms.flags.get('tina-admin') && (
-                    <MenuLink
-                      key="admin"
-                      value="admin"
+              <MenuList>
+                {cms.flags.get('tina-admin') && (
+                  <MenuButton
+                    key="admin"
+                    value="admin"
+                    onClick={() => {
+                      window.location.href = window.location.origin + '/admin'
+                    }}
+                  >
+                    <TinaIcon className="w-6 h-auto mr-2 opacity-80" /> Tina
+                    Admin
+                  </MenuButton>
+                )}
+                {allScreens.map((view) => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuButton
+                      key={view.name}
+                      value={view.name}
                       onClick={() => {
-                        window.location.href = window.location.origin + '/admin'
+                        setActiveView(view)
+                        setMenuIsOpen(false)
                       }}
                     >
-                      <TinaIcon /> Tina Admin
-                    </MenuLink>
-                  )}
-                  {allScreens.map((view) => {
-                    const Icon = view.Icon
-                    return (
-                      <MenuLink
-                        key={view.name}
-                        value={view.name}
-                        onClick={() => {
-                          setActiveView(view)
-                          setMenuIsOpen(false)
-                        }}
-                      >
-                        <Icon /> {view.name}
-                      </MenuLink>
-                    )
-                  })}
-                </MenuList>
-              </MenuWrapper>
+                      <Icon className="w-6 h-auto mr-2 opacity-80" />{' '}
+                      {view.name}
+                    </MenuButton>
+                  )
+                })}
+              </MenuList>
               <Watermark />
             </MenuPanel>
           )}
@@ -246,6 +249,7 @@ const Watermark = styled(({ ...styleProps }: any) => {
   z-index: -1;
   bottom: var(--tina-padding-big);
   left: var(--tina-padding-big);
+
   svg {
     width: 128px;
     height: 128px;
@@ -255,7 +259,7 @@ const Watermark = styled(({ ...styleProps }: any) => {
 `
 
 const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
-  const { toggleSidebarOpen } = React.useContext(SidebarContext)
+  const { toggleSidebarOpen, displayState } = React.useContext(SidebarContext)
 
   return (
     <Button
@@ -266,68 +270,27 @@ const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
       size="custom"
       className="absolute bottom-12 right-0 transform translate-x-full pointer-events-auto w-14 h-11"
     >
-      {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
+      {displayState === 'closed' ? (
+        <EditIcon className="w-8 h-auto" />
+      ) : (
+        <LeftArrowIcon className="w-8 h-auto" />
+      )}
     </Button>
   )
 }
 
-const MenuList = styled.div`
-  margin: 32px calc(var(--tina-padding-big) * -1) 32px
-    calc(var(--tina-padding-big) * -1);
-  display: block;
-`
-
-const MenuLink = styled.div<{ value: string }>`
-  color: var(--tina-color-grey-1);
-  font-size: var(--tina-font-size-4);
-  font-weight: var(--tina-font-weight-regular);
-  padding: var(--tina-padding-big) var(--tina-padding-big)
-    var(--tina-padding-big) 64px;
-  position: relative;
-  cursor: pointer;
-  transition: all var(--tina-timing-short) ease-out;
-  overflow: hidden;
-  &:after {
-    content: '';
-    position: absolute;
-    top: 8px;
-    bottom: 8px;
-    left: 8px;
-    right: 8px;
-    border-radius: var(--tina-radius-big);
-    background-color: var(--tina-color-grey-9);
-    z-index: -1;
-    transition: all 150ms ease;
-    transform: translate3d(0, 100%, 0);
-    opacity: 0;
-  }
-  &:hover {
-    color: var(--tina-color-primary-light);
-    &:after {
-      transform: translate3d(0, 0, 0);
-      transition: transform var(--tina-timing-short) ease-out, opacity 0ms;
-      opacity: 1;
-    }
-    svg {
-      fill: var(--tina-color-primary);
-    }
-    & ~ * {
-      &:after {
-        transform: translate3d(0, -100%, 0);
-      }
-    }
-  }
-  svg {
-    position: absolute;
-    left: var(--tina-padding-big);
-    top: 50%;
-    transform: translate3d(0, -50%, 0);
-    width: 36px;
-    height: auto;
-    fill: var(--tina-color-grey-4);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-`
+const MenuButton = ({ children, ...props }) => {
+  return (
+    <li className="first:pt-2 last:pb-2">
+      <button
+        className={`block text-xl p-4 tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-white hover:opacity-100`}
+        {...props}
+      >
+        {children}
+      </button>
+    </li>
+  )
+}
 
 const SidebarHeader = ({ children }) => {
   return (
@@ -394,49 +357,31 @@ const MenuToggle = styled.button<{ open: boolean }>`
     `};
 `
 
-const MenuWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  padding: var(--tina-sidebar-header-height) var(--tina-padding-big)
-    var(--tina-padding-big) var(--tina-padding-big);
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-`
+const MenuList = ({ children }) => {
+  return <ul className="">{children}</ul>
+}
 
-const MenuPanel = styled.div<{ visible: boolean }>`
-  background: var(--tina-color-grey-8);
-  z-index: var(--tina-z-index-4);
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: var(--tina-sidebar-width);
-  transform: translate3d(${(p) => (p.visible ? '0' : '-100%')}, 0, 0);
-  overflow: hidden;
-  padding: var(--tina-padding-big);
-  transition: all var(--tina-timing-long) ease-out;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-`
+const MenuPanel = ({ children }) => {
+  const { sidebarWidth, menuIsOpen } = React.useContext(SidebarContext)
+
+  return (
+    <div
+      className={`absolute top-0 left-0 h-full	overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-40 transition-transform duration-300 ease-out transform ${
+        menuIsOpen ? `` : `-translate-x-full`
+      }`}
+      style={{ width: sidebarWidth + 'px' }}
+    >
+      {children}
+    </div>
+  )
+}
 
 const SidebarWrapper = ({ children }) => {
   const { displayState, sidebarWidth, resizingSidebar } =
     React.useContext(SidebarContext)
 
   return (
-    <div className="fixed top-0 left-0 h-screen" style={{ zIndex: 9999 }}>
+    <div className="fixed top-0 left-0 h-screen z-base">
       <div
         className={`relative flex h-screen transform ${
           displayState !== 'closed' ? `` : `-translate-x-full`

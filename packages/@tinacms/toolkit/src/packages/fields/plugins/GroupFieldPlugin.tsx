@@ -130,7 +130,7 @@ export const PanelHeader = ({ onClick, children }) => {
       className={`group text-left w-full bg-white hover:bg-gray-50 py-3 border-b shadow border-gray-200 px-6`}
       onClick={onClick}
     >
-      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-500 group-hover:text-blue-400 uppercase">
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase">
         {children}
         <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
       </div>
