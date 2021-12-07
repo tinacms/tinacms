@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.60.3
+
+### Patch Changes
+
+- 4adaf15af: Fix types which weren't included in previous patch
+
 ## 0.60.2
 
 ### Patch Changes
