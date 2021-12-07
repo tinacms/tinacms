@@ -439,69 +439,19 @@ ${out}
       }
 
     case 'text':
-      if (node?.bold && node?.italic) {
-        return {
-          type: 'strong',
-          children: [
-            {
-              type: 'emphasis',
-              children: [
-                {
-                  type: 'text',
-                  value: node.text || '',
-                },
-              ],
-            },
-          ],
-        }
-      }
+      let returnNode: Content = { type: 'text', value: node.text || '' }
 
       if (node?.bold) {
-        return {
-          type: 'strong',
-          children: [
-            {
-              type: 'text',
-              value: node.text || '',
-            },
-          ],
-        }
+        returnNode = { type: 'strong', children: [returnNode] }
       }
-
       if (node?.italic) {
-        return {
+        returnNode = {
           type: 'emphasis',
-          children: [
-            {
-              type: 'text',
-              value: node.text || '',
-            },
-          ],
+          children: [returnNode],
         }
       }
+      return returnNode
 
-      // type delete is only supported via an extension
-      // see https://github.com/syntax-tree/mdast#delete
-      //
-      // if(node?.strikethrough) {
-      //   return {
-      //     type: 'delete',
-      //     children: [{
-      //       // @ts-ignore
-      //       type: 'text',
-      //       value: node.text || '',
-      //     }]
-      //   }
-      // }
-
-      // it seems that underline is not supported directly via mdast
-      // but only via github flavored markdown extension
-
-      return {
-        type: 'text',
-        // @ts-ignore
-        value: node.text || '',
-      }
     default:
       console.log(`Unrecognized field type: ${node.type}`)
       break
