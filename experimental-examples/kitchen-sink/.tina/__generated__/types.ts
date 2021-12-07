@@ -158,11 +158,23 @@ export type CollectionDocumentsArgs = {
 
 export type DocumentNode = PageDocument | PostDocument;
 
+export type PageObjField = {
+  __typename?: 'PageObjField';
+  test1?: Maybe<Scalars['String']>;
+};
+
+export type PageObjFieldList = {
+  __typename?: 'PageObjFieldList';
+  test1?: Maybe<Scalars['String']>;
+};
+
 export type Page = {
   __typename?: 'Page';
   heading?: Maybe<Scalars['String']>;
   subtitle?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
+  objField?: Maybe<PageObjField>;
+  objFieldList?: Maybe<PageObjFieldList>;
 };
 
 export type PageDocument = Node & Document & {
@@ -278,10 +290,20 @@ export type DocumentMutation = {
   post?: Maybe<PostMutation>;
 };
 
+export type PageObjFieldMutation = {
+  test1?: Maybe<Scalars['String']>;
+};
+
+export type PageObjFieldListMutation = {
+  test1?: Maybe<Scalars['String']>;
+};
+
 export type PageMutation = {
   heading?: Maybe<Scalars['String']>;
   subtitle?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
+  objField?: Maybe<PageObjFieldMutation>;
+  objFieldList?: Maybe<PageObjFieldListMutation>;
 };
 
 export type PostMutation = {
@@ -289,7 +311,7 @@ export type PostMutation = {
   body?: Maybe<Scalars['JSON']>;
 };
 
-export type PagePartsFragment = { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> };
+export type PagePartsFragment = { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> };
 
 export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, body?: Maybe<any> };
 
@@ -298,12 +320,12 @@ export type GetPageDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } } };
+export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> } } };
 
 export type GetPageListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } }> }>>> } };
+export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> } }> }>>> } };
 
 export type GetPostDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -322,6 +344,14 @@ export const PagePartsFragmentDoc = gql`
   heading
   subtitle
   body
+  objField {
+    __typename
+    test1
+  }
+  objFieldList {
+    __typename
+    test1
+  }
 }
     `;
 export const PostPartsFragmentDoc = gql`

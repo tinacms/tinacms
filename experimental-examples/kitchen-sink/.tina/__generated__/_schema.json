@@ -103,6 +103,48 @@
             "page",
             "body"
           ]
+        },
+        {
+          "name": "objField",
+          "label": "This is an object field",
+          "type": "object",
+          "fields": [
+            {
+              "label": "Test 1",
+              "name": "test1",
+              "type": "string",
+              "namespace": [
+                "page",
+                "objField",
+                "test1"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "objField"
+          ]
+        },
+        {
+          "name": "objFieldList",
+          "label": "This is an list object field",
+          "type": "object",
+          "fields": [
+            {
+              "label": "Test 1",
+              "name": "test1",
+              "type": "string",
+              "namespace": [
+                "page",
+                "objFieldList",
+                "test1"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "objFieldList"
+          ]
         }
       ],
       "namespace": [
