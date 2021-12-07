@@ -116,25 +116,9 @@ export const Reference: React.FC<ReferenceProps> = ({
               href={`/admin/collections/${
                 document.sys.collection.name
               }/${document.sys.breadcrumbs.join('/')}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                textTransform: 'uppercase',
-                fontSize: '12px',
-                fontWeight: 500,
-                marginTop: '8px',
-                marginBottom: '4px',
-                lineHeight: '1',
-              }}
+              className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
             >
-              <BiEdit
-                style={{
-                  height: '1.365em',
-                  width: 'auto',
-                  opacity: '0.8',
-                  marginRight: '6px',
-                }}
-              />
+              <BiEdit className="h-5 w-auto opacity-80 mr-2" />
               Edit in Tina Admin
             </a>
           )}

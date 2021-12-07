@@ -40,7 +40,7 @@ export interface SelectProps {
 }
 
 export const selectFieldClasses =
-  'shadow block w-full text-base border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
+  'shadow block w-full text-base cursor-pointer border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options

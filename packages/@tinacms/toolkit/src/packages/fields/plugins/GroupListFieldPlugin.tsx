@@ -354,8 +354,8 @@ export const ItemHeader = styled.div<{ isDragging: boolean }>`
 const DragHandle = styled(function DragHandle({ ...styleProps }) {
   return (
     <div {...styleProps}>
-      <DragIcon />
-      <ReorderIcon />
+      <DragIcon className="w-7 h-auto" />
+      <ReorderIcon className="w-7 h-auto" />
     </div>
   )
 })`

@@ -101,7 +101,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </FormPortalProvider>
               </SidebarFormBody>
               {!hideFooter && (
-                <div className="relative flex-none w-full h-16	bg-white border-t border-gray-200	flex justify-between gap-4 items-center px-4">
+                <div className="relative flex-none w-full h-16	bg-white border-t border-gray-100	flex justify-between gap-4 items-center px-4">
                   {tinaForm.reset && (
                     <ResetForm
                       pristine={pristine}
