@@ -49,11 +49,11 @@ export const EXAMPLES: Example[] = [
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-docs-starter',
   },
-  {
-    title: 'Tailwind Site Builder',
-    value: 'tina-tailwind-sidebar-demo',
-    isInternal: true,
-  },
+  // {
+  //   title: 'Tailwind Site Builder',
+  //   value: 'tina-tailwind-sidebar-demo',
+  //   isInternal: true,
+  // },
 ]
 
 export const downloadExample = async (example: Example, root: string) => {
