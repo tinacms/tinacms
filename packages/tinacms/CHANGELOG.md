@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.60.0
+
+### Minor Changes
+
+- 75974d0a4: Updates the tina cloud client to do id_token & access_token refreshes when needed
+
+### Patch Changes
+
+- 88c209b45: Throw when Tina Cloud responds with non 200 code
+- dcdf1ecf0: Updates `react-router` to `v6` for `TinaAdmin`
+- 47d126029: Fix support of objects in a list for MDX templates
+- Updated dependencies [bc4699d2b]
+  - @tinacms/toolkit@0.56.2
+
 ## 0.59.1
 
 ### Patch Changes

@@ -14,6 +14,8 @@ limitations under the License.
 import { execSync } from 'child_process'
 import path from 'path'
 import rimraf from 'rimraf'
+import fs from 'fs-extra'
+import chalk from 'chalk'
 
 function isInGitRepository(): boolean {
   try {
@@ -37,6 +39,22 @@ export function tryGitInit(root: string): boolean {
     execSync('git --version', { stdio: 'ignore' })
     if (isInGitRepository() || isInMercurialRepository()) {
       return false
+    }
+    if (!fs.existsSync('.gitignore')) {
+      console.warn(
+        chalk.yellow(
+          'There is no .gitignore file in this repository, creating one...'
+        )
+      )
+      fs.writeFileSync(
+        '.gitignore',
+        `node_modules
+.yarn/*
+.DS_Store
+.cache
+.next/
+`
+      )
     }
 
     execSync('git init', { stdio: 'ignore' })
