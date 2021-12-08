@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 0.1.2
+
+### Patch Changes
+
+- 371fc73dd: remove tailwind site builder from list of starters
+
 ## 0.1.1
 
 ### Patch Changes
