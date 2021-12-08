@@ -110,7 +110,7 @@ const Panel = function Panel({
 
 const Header = ({ onClick, children }) => {
   return (
-    <div className="pt-2 mb-6">
+    <div className="pt-1 mb-5">
       <button
         onClick={onClick}
         className="group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2"
@@ -127,7 +127,7 @@ const Header = ({ onClick, children }) => {
 export const PanelHeader = ({ onClick, children }) => {
   return (
     <button
-      className={`group text-left w-full bg-white hover:bg-gray-50 py-3 border-b shadow border-gray-200 px-6`}
+      className={`group text-left w-full bg-white hover:bg-gray-50 py-3 border-t border-b shadow border-gray-100 px-6 -mt-px`}
       onClick={onClick}
     >
       <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase">

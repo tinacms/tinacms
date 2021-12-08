@@ -197,7 +197,7 @@ export function useGraphqlForms<T extends object>({
               Component: () => (
                 <a
                   href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
-                  className="flex items-center px-5 py-2 border-t border-b shadow border-gray-200 uppercase text-xs font-medium bg-white hover:bg-gray-50 hover:text-blue-500 transition-colors duration-100 ease-out"
+                  className="flex items-center px-5 py-2 border-t border-b shadow border-gray-100 uppercase text-xs font-medium bg-white hover:bg-gray-50 hover:text-blue-500 transition-colors duration-100 ease-out"
                 >
                   <BiLinkExternal className="h-4 w-auto opacity-80 mr-2" /> Edit
                   in Tina Admin

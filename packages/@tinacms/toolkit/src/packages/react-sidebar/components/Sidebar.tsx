@@ -365,7 +365,7 @@ const MenuPanel = ({ children }) => {
 
   return (
     <div
-      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-40 transition-transform duration-300 ease-out transform ${
+      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-50 transition-transform duration-300 ease-out transform ${
         menuIsOpen ? `` : `-translate-x-full`
       }`}
     >
