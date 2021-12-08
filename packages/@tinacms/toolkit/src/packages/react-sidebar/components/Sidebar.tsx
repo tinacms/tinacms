@@ -282,7 +282,7 @@ const MenuButton = ({ children, ...props }) => {
   return (
     <li className="py-2 first:pt-4 last:pb-4">
       <button
-        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-white hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
+        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-blue-400 hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
         {...props}
       >
         {children}
