@@ -32,12 +32,12 @@ export const createSchema = async ({
   flags = [],
 }: {
   schema: TinaCloudSchemaBase
-  flags: string[]
+  flags?: string[]
 }) => {
   const validSchema = await validateSchema(schema)
   const [major, minor, patch] = packageJSON.version.split('.')
   const meta = {}
-  if (flags.length > 0) {
+  if (flags && flags.length > 0) {
     meta['flags'] = flags
   }
   return new TinaSchema({
@@ -73,7 +73,7 @@ type Meta = {
 export class TinaSchema {
   public schema: TinaCloudSchemaEnriched
   constructor(
-    public config: { version: Version; meta: Meta } & TinaCloudSchemaBase
+    public config: { version?: Version; meta?: Meta } & TinaCloudSchemaBase
   ) {
     // @ts-ignore
     this.schema = config
