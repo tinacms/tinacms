@@ -131,7 +131,7 @@ export const PanelHeader = ({ onClick, children }) => {
       onClick={onClick}
     >
       <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase">
-        {children} TEST
+        {children}
         <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
       </div>
     </button>
