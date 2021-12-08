@@ -25,28 +25,18 @@ export interface ModalHeaderProps {
   close?(): void
 }
 
-export const ModalHeader = styled(
-  ({ children, close, ...styleProps }: ModalHeaderProps) => {
-    return (
-      <div {...styleProps}>
-        <ModalTitle>{children}</ModalTitle>
-        {close && (
-          <CloseButton onClick={close}>
-            <CloseIcon />
-          </CloseButton>
-        )}
-      </div>
-    )
-  }
-)`
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--tina-padding-big) 0 var(--tina-padding-big);
-  border-bottom: 1px solid var(--tina-color-grey-3);
-  margin: 0;
-`
+export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
+  return (
+    <div className="h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0">
+      <ModalTitle>{children}</ModalTitle>
+      {close && (
+        <CloseButton onClick={close}>
+          <CloseIcon />
+        </CloseButton>
+      )}
+    </div>
+  )
+}
 
 const ModalTitle = styled.h2`
   all: unset;
