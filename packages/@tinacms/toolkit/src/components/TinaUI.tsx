@@ -41,26 +41,23 @@ export const TinaUI: React.FC<TinaUIProps> = ({
   styled = true,
 }) => {
   const cms = useCMS()
-  console.log(styles)
 
   return (
     <MutationSignalProvider>
-      <>
+      <style>{styles}</style>
+      <div className="tina-tailwind">
         <ModalProvider>
-          <style>{styles}</style>
-          <div className="tina-tailwind">
-            <Alerts alerts={cms.alerts} />
-            {cms.enabled && styled && <Theme />}
-            {cms.enabled && cms.toolbar && <Toolbar />}
-            <MediaManager />
-            {cms.sidebar && (
-              <SidebarProvider position={position} sidebar={cms.sidebar} />
-            )}
-            <ActiveFieldIndicator />
-          </div>
+          <Alerts alerts={cms.alerts} />
+          {cms.enabled && styled && <Theme />}
+          {cms.enabled && cms.toolbar && <Toolbar />}
+          <MediaManager />
+          {cms.sidebar && (
+            <SidebarProvider position={position} sidebar={cms.sidebar} />
+          )}
+          <ActiveFieldIndicator />
         </ModalProvider>
-        {children}
-      </>
+      </div>
+      {children}
     </MutationSignalProvider>
   )
 }

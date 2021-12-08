@@ -103,39 +103,3 @@ const theme = css`
 export const GlobalStyles = createGlobalStyle`
   ${theme};
 `
-
-export const tina_reset_styles = css`
-  font-family: 'Inter', sans-serif;
-  color: var(--tina-color-grey-10);
-
-  * {
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-      border-left: 1px solid var(--tina-color-grey-2);
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: var(--tina-color-grey-3);
-      border-radius: 0;
-      border: none;
-    }
-  }
-
-  *,
-  *:before,
-  *:after {
-    box-sizing: border-box;
-  }
-`
-
-export const StyleReset = styled.div`
-  ${tina_reset_styles}
-`
-
-/**
- * @alias StyleReset
- * @deprecated
- */
-export const TinaReset = StyleReset

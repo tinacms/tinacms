@@ -16,24 +16,33 @@ limitations under the License.
 
 */
 
+import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-const MenuItem = css`
-  flex: 1 1 32px;
-`
+interface MenuButtonProps {
+  children: React.ReactNode
+  title?: string
+  active?: boolean
+  disabled?: boolean
+  ref?: any
+}
 
-export const MenuButton = styled.button<{
+export const MenuButton = ({ children, active, disabled }: MenuButtonProps) => {
+  return <button className="p-4 bg-white text-black">{children}</button>
+}
+
+export const MenuButtonOld = styled.button<{
   title?: string
   active?: boolean
   disabled?: boolean
   ref?: any
 }>`
-  ${MenuItem}
-  background-color: ${p =>
+  flex: 1 1 32px;
+  background-color: ${(p) =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p =>
+  color: ${(p) =>
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${p =>
+  fill: ${(p) =>
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
   border: 1px solid var(--tina-color-grey-2);
   margin: -1px;
@@ -58,14 +67,14 @@ export const MenuButton = styled.button<{
     width: 20px;
     height: 20px;
   }
-  ${props =>
+  ${(props) =>
     props.active &&
     css`
       color: var(--tina-color-primary);
       fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
-  ${props =>
+  ${(props) =>
     props.disabled &&
     css`
       pointer-events: none;

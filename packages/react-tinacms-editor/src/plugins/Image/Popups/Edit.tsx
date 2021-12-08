@@ -22,8 +22,6 @@ import styled from 'styled-components'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
-import { StyleReset } from '@tinacms/toolkit'
-
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import { useEditorStateContext } from '../../../context/editorState'
 import { imagePluginKey } from '../plugin'
@@ -134,71 +132,69 @@ export const ImageEdit: FunctionComponent = () => {
   }
 
   return (
-    <StyleReset>
-      <LinkPopup
-        top={modalTop}
-        left={modalLeft}
-        ref={wrapperRef}
-        onKeyDown={handleKeyPress}
-      >
-        <LinkLabel>Title</LinkLabel>
-        <LinkInput
-          placeholder="Enter Title"
-          type={'text'}
-          ref={inputRef}
-          value={title}
-          onChange={(evt) => setTitle(evt.target.value)}
+    <LinkPopup
+      top={modalTop}
+      left={modalLeft}
+      ref={wrapperRef}
+      onKeyDown={handleKeyPress}
+    >
+      <LinkLabel>Title</LinkLabel>
+      <LinkInput
+        placeholder="Enter Title"
+        type={'text'}
+        ref={inputRef}
+        value={title}
+        onChange={(evt) => setTitle(evt.target.value)}
+      />
+      <LinkLabel>Alt</LinkLabel>
+      <LinkInput
+        placeholder="Enter Alt Text"
+        type={'text'}
+        value={alt}
+        onChange={(evt) => setAlt(evt.target.value)}
+      />
+      <ToggleElement>
+        <ToggleInput
+          id="toggleImageLink"
+          onChange={() => {
+            toggleLinked(!linked)
+            if (!linked) {
+              setLinkTitle('')
+              setLinkSrc('')
+            }
+          }}
+          type="checkbox"
         />
-        <LinkLabel>Alt</LinkLabel>
-        <LinkInput
-          placeholder="Enter Alt Text"
-          type={'text'}
-          value={alt}
-          onChange={(evt) => setAlt(evt.target.value)}
-        />
-        <ToggleElement>
-          <ToggleInput
-            id="toggleImageLink"
-            onChange={() => {
-              toggleLinked(!linked)
-              if (!linked) {
-                setLinkTitle('')
-                setLinkSrc('')
-              }
-            }}
-            type="checkbox"
+        <ToggleLabel htmlFor="toggleImageLink" role="switch">
+          Insert Link
+          <ToggleSwitch checked={linked}>
+            <span></span>
+          </ToggleSwitch>
+        </ToggleLabel>
+      </ToggleElement>
+      {linked && (
+        <>
+          <LinkLabel>Link Title</LinkLabel>
+          <LinkInput
+            placeholder="Enter Link Title"
+            type={'text'}
+            value={linkTitle}
+            onChange={(evt) => setLinkTitle(evt.target.value)}
           />
-          <ToggleLabel htmlFor="toggleImageLink" role="switch">
-            Insert Link
-            <ToggleSwitch checked={linked}>
-              <span></span>
-            </ToggleSwitch>
-          </ToggleLabel>
-        </ToggleElement>
-        {linked && (
-          <>
-            <LinkLabel>Link Title</LinkLabel>
-            <LinkInput
-              placeholder="Enter Link Title"
-              type={'text'}
-              value={linkTitle}
-              onChange={(evt) => setLinkTitle(evt.target.value)}
-            />
-            <LinkLabel>Link URL</LinkLabel>
-            <LinkInput
-              placeholder="Enter Link URL"
-              type={'text'}
-              value={linkSrc}
-              onChange={(evt) => setLinkSrc(evt.target.value)}
-            />
-          </>
-        )}
-        <LinkActions>
-          <CancelLink onClick={closeImageSettings}>Cancel</CancelLink>
-          <SaveLink onClick={updateNodeAttrs}>Save</SaveLink>
-        </LinkActions>
-      </LinkPopup>
-    </StyleReset>
+          <LinkLabel>Link URL</LinkLabel>
+          <LinkInput
+            placeholder="Enter Link URL"
+            type={'text'}
+            value={linkSrc}
+            onChange={(evt) => setLinkSrc(evt.target.value)}
+          />
+        </>
+      )}
+      <LinkActions>
+        <CancelLink onClick={closeImageSettings}>Cancel</CancelLink>
+        <SaveLink onClick={updateNodeAttrs}>Save</SaveLink>
+      </LinkActions>
+    </LinkPopup>
   )
 }
 

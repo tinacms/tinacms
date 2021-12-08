@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { StyleReset, Button as TinaButton } from '@tinacms/toolkit'
+import { Button as TinaButton } from '@tinacms/toolkit'
 import {
   Modal,
   ModalBody,
@@ -42,26 +42,24 @@ export const ActionableModal = ({
   }
 
   return (
-    <StyleReset>
-      <Modal>
-        <PopupModal>
-          <ModalHeader>{title}</ModalHeader>
-          <ModalBody padded>
-            <p>{message}</p>
-          </ModalBody>
-          <ModalActions>
-            {actions.map((action, index) => (
-              <TinaButton
-                key={index}
-                primary={action.primary}
-                onClick={action.action}
-              >
-                {action.name}
-              </TinaButton>
-            ))}
-          </ModalActions>
-        </PopupModal>
-      </Modal>
-    </StyleReset>
+    <Modal>
+      <PopupModal>
+        <ModalHeader>{title}</ModalHeader>
+        <ModalBody padded>
+          <p>{message}</p>
+        </ModalBody>
+        <ModalActions>
+          {actions.map((action, index) => (
+            <TinaButton
+              key={index}
+              primary={action.primary}
+              onClick={action.action}
+            >
+              {action.name}
+            </TinaButton>
+          ))}
+        </ModalActions>
+      </PopupModal>
+    </Modal>
   )
 }

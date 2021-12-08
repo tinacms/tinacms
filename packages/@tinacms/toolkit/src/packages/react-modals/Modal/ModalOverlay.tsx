@@ -19,10 +19,7 @@ import * as React from 'react'
 
 export const ModalOverlay = ({ children }) => {
   return (
-    <div
-      className="fixed inset-0	w-screen h-screen bg-black bg-opacity-50"
-      style={{ zIndex: 99999 }}
-    >
+    <div className="fixed inset-0 z-overlay w-screen h-screen bg-gray-800 bg-opacity-80">
       {children}
     </div>
   )
