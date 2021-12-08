@@ -1,4 +1,11 @@
 {
+  "version": {
+    "fullVersion": "0.57.2",
+    "major": "0",
+    "minor": "57",
+    "patch": "2"
+  },
+  "meta": {},
   "collections": [
     {
       "label": "Page Content",
