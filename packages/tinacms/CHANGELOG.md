@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.61.0
+
+### Minor Changes
+
+- 229feda1d: add .nvmrc file for setting preferred node version
+
 ## 0.60.3
 
 ### Patch Changes
