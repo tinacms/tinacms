@@ -13,6 +13,8 @@ limitations under the License.
 
 import { lastItem, assertShape } from '../util'
 import { validateSchema } from './validate'
+// @ts-ignore File '...' is not under 'rootDir'
+import packageJSON from '../../package.json'
 
 import type {
   CollectionTemplateable,
@@ -27,11 +29,41 @@ import { TinaError } from '../resolver/error'
 
 export const createSchema = async ({
   schema,
+  flags = [],
 }: {
   schema: TinaCloudSchemaBase
+  flags?: string[]
 }) => {
   const validSchema = await validateSchema(schema)
-  return new TinaSchema(validSchema)
+  const [major, minor, patch] = packageJSON.version.split('.')
+  const meta = {}
+  if (flags && flags.length > 0) {
+    meta['flags'] = flags
+  }
+  return new TinaSchema({
+    version: {
+      fullVersion: packageJSON.version,
+      major,
+      minor,
+      patch,
+    },
+    meta,
+    ...validSchema,
+  })
+}
+
+type Version = {
+  fullVersion: string
+  major: string
+  minor: string
+  patch: string
+}
+
+/**
+ * Metadata about how the schema was built
+ */
+type Meta = {
+  flags?: string[]
 }
 
 /**
@@ -40,7 +72,9 @@ export const createSchema = async ({
  */
 export class TinaSchema {
   public schema: TinaCloudSchemaEnriched
-  constructor(public config: TinaCloudSchemaBase) {
+  constructor(
+    public config: { version?: Version; meta?: Meta } & TinaCloudSchemaBase
+  ) {
     // @ts-ignore
     this.schema = config
   }

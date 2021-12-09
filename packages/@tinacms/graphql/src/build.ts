@@ -35,7 +35,11 @@ export const indexDB = async ({
   database: Database
   config: TinaSchema['config']
 }) => {
-  const tinaSchema = await createSchema({ schema: config })
+  const flags = []
+  if (database.store.supportsIndexing()) {
+    flags.push('experimentalData')
+  }
+  const tinaSchema = await createSchema({ schema: config, flags })
   const builder = await createBuilder({
     database,
     tinaSchema,

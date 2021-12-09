@@ -252,12 +252,7 @@ export class Database {
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
-    if (!this._graphql) {
-      const _graphql = await this.store.get(graphqlPath)
-      // @ts-ignore
-      this._graphql = _graphql
-    }
-    return this._graphql
+    return this.store.get(graphqlPath)
   }
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
