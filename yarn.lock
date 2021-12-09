@@ -2273,7 +2273,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cypress/request@npm:^2.88.7":
+"@cypress/request@npm:^2.88.10":
   version: 2.88.10
   resolution: "@cypress/request@npm:2.88.10"
   dependencies:
@@ -12106,11 +12106,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:9.1.0":
-  version: 9.1.0
-  resolution: "cypress@npm:9.1.0"
+"cypress@npm:9.1.1":
+  version: 9.1.1
+  resolution: "cypress@npm:9.1.1"
   dependencies:
-    "@cypress/request": ^2.88.7
+    "@cypress/request": ^2.88.10
     "@cypress/xvfb": ^1.2.4
     "@types/node": ^14.14.31
     "@types/sinonjs__fake-timers": ^6.0.2
@@ -12153,7 +12153,7 @@ __metadata:
     yauzl: ^2.10.0
   bin:
     cypress: bin/cypress
-  checksum: bce1048642def8f844fc3d187e4122e717f32ca68dd0d1bb466ea4eefdc905718ed197a334ecf149718a81bef0c51a9c7fc5b11792f234e868185d964f05dfe8
+  checksum: 204a34509e4940f818c9755d6bde2903a0c72f9d5147c1cfdffcfa2a8a1c92745386c070813c1e6e24e5e59adb7f3fa0a1d070613ed5070417d5ec8c7cba6341
   languageName: node
   linkType: hard
 
@@ -26154,7 +26154,7 @@ resolve@^2.0.0-next.3:
     "@typescript-eslint/eslint-plugin": ^2.3.0
     "@typescript-eslint/parser": ^2.3.0
     "@yarnpkg/pnpify": ^2.0.0-rc.20
-    cypress: 9.1.0
+    cypress: 9.1.1
     danger: ^10.6.4
     eslint: ^6.8.0
     eslint-config-prettier: ^6.3.0
