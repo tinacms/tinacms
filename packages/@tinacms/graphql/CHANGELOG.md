@@ -1,5 +1,27 @@
 # tina-graphql
 
+## 0.59.0
+
+### Minor Changes
+
+- 62bea7019: #2323: fix saving bold and italic text in rich-text editor
+
+### Patch Changes
+
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+
+## 0.58.2
+
+### Patch Changes
+
+- fffce3af8: Don't cache graphql schema during resolution, this was causing the schema to go stale, while updating the schema.gql, so GraphQL tooling thought the value was updated, but the server was still holding on to the cached version
+
+## 0.58.1
+
+### Patch Changes
+
+- 4700d7ae4: Patch fix to ensure builds include latest dependencies
+
 ## 0.58.0
 
 ### Minor Changes

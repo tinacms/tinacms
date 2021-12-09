@@ -1,5 +1,30 @@
 # tinacms
 
+## 0.61.0
+
+### Minor Changes
+
+- 229feda1d: add .nvmrc file for setting preferred node version
+
+## 0.60.3
+
+### Patch Changes
+
+- 4adaf15af: Fix types which weren't included in previous patch
+
+## 0.60.2
+
+### Patch Changes
+
+- 816271d03: Ensure login/logout pages work when admin flag is disabled
+
+## 0.60.1
+
+### Patch Changes
+
+- Updated dependencies [4700d7ae4]
+  - @tinacms/toolkit@0.56.3
+
 ## 0.60.0
 
 ### Minor Changes

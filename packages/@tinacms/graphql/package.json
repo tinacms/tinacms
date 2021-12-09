@@ -1,9 +1,10 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.58.0",
+  "version": "0.59.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
+    "package.json",
     "dist"
   ],
   "license": "Apache-2.0",

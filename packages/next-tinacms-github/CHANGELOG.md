@@ -1,5 +1,30 @@
 # Change Log
 
+## 1.1.30
+
+### Patch Changes
+
+- react-tinacms-github@0.51.11
+
+## 1.1.29
+
+### Patch Changes
+
+- Updated dependencies [4adaf15af]
+  - react-tinacms-github@0.51.11
+
+## 1.1.28
+
+### Patch Changes
+
+- react-tinacms-github@0.51.10
+
+## 1.1.27
+
+### Patch Changes
+
+- react-tinacms-github@0.51.10
+
 ## 1.1.26
 
 ### Patch Changes
