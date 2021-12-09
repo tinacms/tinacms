@@ -28,7 +28,7 @@ interface MenuButtonProps {
 }
 
 export const MenuButton = ({ children, active, disabled }: MenuButtonProps) => {
-  return <button className="p-4 bg-white text-black">{children}</button>
+  return <button className="p-2 bg-white text-black">{children}</button>
 }
 
 export const MenuButtonOld = styled.button<{

@@ -117,7 +117,7 @@ export const RichEditor = wrapFieldsWithMeta<
   return (
     <>
       <ToolbarButtons name={props.input.name} templates={templates} />
-      <PlateWrapper>
+      <RichTextInput>
         <Plate
           id={props.input.name}
           initialValue={value}
@@ -128,7 +128,7 @@ export const RichEditor = wrapFieldsWithMeta<
             setValue(value)
           }}
         />
-      </PlateWrapper>
+      </RichTextInput>
     </>
   )
 })
@@ -149,144 +149,13 @@ const normalize = (node: any) => {
   return node
 }
 
-const PlateWrapper = styled.div`
-  overflow-x: hidden;
-  overflow-y: auto;
-  min-height: 200px;
-  overflow-y: auto;
-  display: block;
-
-  p {
-    font-size: 16px;
-    line-height: 26px;
-    font-weight: normal;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: 600;
-    text-transform: none;
-    padding: 0;
-    margin-bottom: 16px;
-  }
-
-  h1 {
-    font-size: 32px;
-    line-height: 48px;
-    margin-top: 0;
-    &:not(:first-child) {
-      margin-top: 32px;
-    }
-  }
-
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    &:not(:first-child) {
-      margin-top: 21px;
-    }
-  }
-
-  h2 {
-    font-size: 28px;
-    line-height: 38px;
-    margin-top: 0;
-  }
-
-  h3 {
-    font-size: 24px;
-    line-height: 30px;
-    margin-top: 0;
-  }
-
-  h4 {
-    font-size: 21px;
-    line-height: 28px;
-    margin-top: 0;
-  }
-
-  h5 {
-    font-size: 18px;
-    line-height: 24px;
-    margin-top: 0;
-  }
-
-  h6 {
-    font-size: 16px;
-    line-height: 20px;
-    margin-top: 0;
-  }
-
-  a {
-    color: #0084ff;
-    border: 0;
-    font-weight: normal;
-    text-decoration: underline;
-  }
-
-  small {
-    font-size: 0.707em;
-  }
-
-  ul,
-  ol {
-    margin: 0;
-    padding: 0;
-  }
-
-  ol li {
-    /* prevent 2-digits numbers from being cut-off */
-    margin-left: 5px;
-    margin-right: 5px;
-  }
-
-  ul {
-    margin-left: 1.5em;
-    margin-bottom: 16px;
-    list-style-type: disc;
-    list-style-position: outside;
-    list-style-image: none;
-  }
-
-  ol {
-    margin-left: 1.25em;
-    margin-bottom: 16px;
-    list-style-type: decimal;
-  }
-
-  li {
-    list-style: inherit;
-    ol,
-    ul {
-      margin-bottom: 0;
-    }
-  }
-
-  pre {
-    padding: 0;
-    margin: 0;
-  }
-
-  pre > code {
-    display: block;
-    padding: 0.15em 0.6em;
-  }
-
-  img {
-    max-width: 100%;
-    border: 0;
-    padding: 0;
-    margin-bottom: 16px;
-  }
-
-  blockquote {
-    margin: 0 0 16px 0;
-    padding-left: 15px;
-  }
-`
+export const RichTextInput = ({ children }) => {
+  return (
+    <div
+      className="prose max-w-max shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md p-5 mb-5"
+      style={{ minHeight: '100px' }}
+    >
+      {children}
+    </div>
+  )
+}

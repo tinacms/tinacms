@@ -72,10 +72,16 @@ const ToolbarWrapper = styled.div`
   border: 1px solid var(--tina-color-grey-2);
   margin-bottom: 14px;
 
+  svg {
+    width: 20px;
+    height: auto;
+  }
+
   span[class*='ToolbarButton'],
   button {
     padding: 8px;
-    border: 1px solid var(--tina-color-grey-2);
+    border: none;
+    border-right: 1px solid var(--tina-color-grey-2);
     width: auto;
     height: auto;
     border-left: none;
@@ -84,13 +90,16 @@ const ToolbarWrapper = styled.div`
     max-width: 3rem;
     transition: background 150ms ease-out;
 
-    &:not(disabled):hover {
-      background: var(--tina-color-grey-1);
+    &:first-child {
+      border-radius: var(--tina-radius-small) 0 0 var(--tina-radius-small);
     }
 
-    svg {
-      width: 20px;
-      height: auto;
+    &:last-child {
+      border-radius: 0 var(--tina-radius-small) var(--tina-radius-small) 0;
+    }
+
+    &:not(disabled):hover {
+      background: var(--tina-color-grey-1);
     }
   }
 `
