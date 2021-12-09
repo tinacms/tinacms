@@ -205,8 +205,8 @@ describe('Tina side bar', () => {
     })
   })
 
-  it('Can edit embedded objects', () => {
-    // TODO: add tests for embedded objects
-    expect(1).equal(1)
-  })
+  // it('Can edit embedded objects', () => {
+  // TODO: add tests for embedded objects
+  // expect(1).equal(1)
+  // })
 })
