@@ -19,13 +19,15 @@ jobs:
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180
-      - uses: actions/upload-artifact@v2
+      - name: Capture Screenshots
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: cypress-screenshots
           path: cypress/screenshots
       # Test run video was always captured, so this action uses "always()" condition
-      - uses: actions/upload-artifact@v2
+      - name: Capture Video
+        uses: actions/upload-artifact@v2
         if: always()
         with:
           name: cypress-videos
