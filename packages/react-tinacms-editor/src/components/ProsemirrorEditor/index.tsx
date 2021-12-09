@@ -74,7 +74,7 @@ export const ProsemirrorEditor = styled(
     }, [input.value])
 
     return (
-      <WysiwygWrapper className="wysiwyg-wrapper" data-testid="wysiwyg-editor">
+      <>
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
@@ -82,14 +82,23 @@ export const ProsemirrorEditor = styled(
         <EditorStateProvider translator={translator} editorView={editorView}>
           <Menubar sticky={sticky} imageProps={imageProps} plugins={plugins} />
         </EditorStateProvider>
-        <div {...styleProps} ref={editorRef} />
-      </WysiwygWrapper>
+        <RichTextInput>
+          <div {...styleProps} ref={editorRef} />
+        </RichTextInput>
+      </>
     )
   }
 )`
   ${CodeMirrorCss}${ProseMirrorCss}
 `
 
-const WysiwygWrapper = styled.div`
-  position: relative;
-`
+const RichTextInput = ({ children }) => {
+  return (
+    <div
+      className="shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md p-3 mb-5"
+      style={{ minHeight: '100px' }}
+    >
+      {children}
+    </div>
+  )
+}

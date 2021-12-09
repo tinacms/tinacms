@@ -75,32 +75,21 @@ export const MarkdownEditor = ({
         uploadImages={imageProps?.upload}
         plugins={plugins}
       />
-      <EditingSection
+      <textarea
         data-testid="markdown-editing-textarea"
         ref={inputRef}
         value={val}
-        onChange={evt => {
+        onChange={(evt) => {
           const v = evt.target.value
           setVal(v)
           onChange(v)
         }}
-        onFocus={e => {
+        onFocus={(e) => {
           e.preventDefault()
           e.target.focus({ preventScroll: true })
         }}
+        className="shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border-gray-200 text-gray-600 focus:text-gray-900 rounded-md"
       />
     </>
   )
 }
-
-const EditingSection = styled.textarea`
-  border: none;
-  font-family: monospace;
-  font-size: 16px;
-  margin: 10px 0;
-  resize: none;
-  width: 100%;
-  &:focus {
-    outline: none;
-  }
-`
