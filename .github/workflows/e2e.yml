@@ -19,3 +19,9 @@ jobs:
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180
+      - uses: cypress-io/github-action
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+            name: cypress-videos
+            path: cypress/videos
