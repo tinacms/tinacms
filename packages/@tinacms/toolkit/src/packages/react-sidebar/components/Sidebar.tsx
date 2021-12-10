@@ -32,6 +32,7 @@ export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
+export const defaultSidebarWidth = 440
 
 export interface SidebarProviderProps {
   sidebar: SidebarState
@@ -41,7 +42,7 @@ export interface SidebarProviderProps {
 
 export function SidebarProvider({
   position,
-  defaultWidth,
+  defaultWidth = defaultSidebarWidth,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
