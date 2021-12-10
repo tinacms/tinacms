@@ -213,7 +213,10 @@ const config = (cwd = '') => {
       zIndex: {
         '-1': -1,
         base: 9000,
-        overlay: 9900,
+        panel: 9400,
+        menu: 9800,
+        chrome: 10200,
+        overlay: 10600,
         '0': 0,
         '10': 10,
         '20': 20,

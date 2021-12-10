@@ -91,15 +91,15 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
-              <SidebarFormBody className="form-body">
-                <FormPortalProvider>
+              <FormPortalProvider>
+                <FormWrapper>
                   {tinaForm && tinaForm.fields.length ? (
                     <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
-                </FormPortalProvider>
-              </SidebarFormBody>
+                </FormWrapper>
+              </FormPortalProvider>
               {!hideFooter && (
                 <div className="relative flex-none w-full h-16	bg-white border-t border-gray-100	flex justify-between gap-4 items-center px-4">
                   {tinaForm.reset && (
@@ -270,7 +270,10 @@ const FormStatus = ({ pristine }) => {
 
 export const FormWrapper = ({ children, padded = false }) => {
   return (
-    <div style={{ maxHeight: '100%', overflowY: 'auto', height: '100%' }}>
+    <div
+      style={{ maxHeight: '100%', overflowY: 'auto', height: '100%' }}
+      className="bg-gray-50"
+    >
       <div
         style={{
           width: '100%',
@@ -291,17 +294,6 @@ export const FormWrapper = ({ children, padded = false }) => {
     </div>
   )
 }
-
-const SidebarFormBody = styled.div`
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: auto;
-  border-top: 1px solid var(--tina-color-grey-2);
-  background-color: #f6f6f9;
-`
 
 const Emoji = styled.span`
   font-size: 40px;

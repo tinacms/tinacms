@@ -127,7 +127,8 @@ const Header = ({ onClick, children }) => {
 export const PanelHeader = ({ onClick, children }) => {
   return (
     <button
-      className={`group text-left w-full bg-white hover:bg-gray-50 py-3 border-t border-b shadow border-gray-100 px-6 -mt-px`}
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-3 border-t border-b shadow-sm
+       border-gray-100 px-6 -mt-px`}
       onClick={onClick}
     >
       <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase">
