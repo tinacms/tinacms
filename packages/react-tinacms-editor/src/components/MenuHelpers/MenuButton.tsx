@@ -27,34 +27,23 @@ interface MenuButtonProps {
   ref?: any
 }
 
-export const MenuButton = ({ children, active, disabled }: MenuButtonProps) => {
-  return <button className="p-2 bg-white text-black">{children}</button>
-}
-
-export const MenuButtonOld = styled.button<{
+export const MenuButton = styled.button<{
   title?: string
   active?: boolean
   disabled?: boolean
   ref?: any
 }>`
-  flex: 1 1 32px;
-  background-color: ${(p) =>
-    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${(p) =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${(p) =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  border: 1px solid var(--tina-color-grey-2);
-  margin: -1px;
-  outline: none;
-  padding: 6px 4px;
-  transition: all 85ms ease-out;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 8px !important;
+  border: none;
+  border-right: 1px solid var(--tina-color-grey-2);
+  width: auto;
+  height: auto;
+  border-left: none;
+  margin: 0 0 -1px 0;
+  flex-grow: 1;
+  max-width: 3rem;
+  transition: background 150ms ease-out;
+
   &:hover {
     background-color: rgba(53, 50, 50, 0.09);
   }
