@@ -32,7 +32,8 @@ export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
-export const defaultSidebarWidth = 440
+const defaultSidebarWidth = 440
+const defaultSidebarPosition = 'displace'
 
 export interface SidebarProviderProps {
   sidebar: SidebarState
@@ -41,7 +42,7 @@ export interface SidebarProviderProps {
 }
 
 export function SidebarProvider({
-  position,
+  position = defaultSidebarPosition,
   defaultWidth = defaultSidebarWidth,
   sidebar,
 }: SidebarProviderProps) {
@@ -294,7 +295,7 @@ const MenuButton = ({ children, ...props }) => {
 
 const SidebarHeader = ({ children }) => {
   return (
-    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-50 pointer-events-none">
+    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-chrome pointer-events-none">
       {children}
     </div>
   )
@@ -366,7 +367,7 @@ const MenuPanel = ({ children }) => {
 
   return (
     <div
-      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-50 transition-transform duration-300 ease-out transform ${
+      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
         menuIsOpen ? `` : `-translate-x-full`
       }`}
     >
