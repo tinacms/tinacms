@@ -100,6 +100,7 @@ const ToolbarWrapper = styled.div`
 
     &:not(disabled):hover {
       background: var(--tina-color-grey-1);
+      color: var(--tina-color-primary);
     }
   }
 `
