@@ -28,7 +28,7 @@ export interface TextFieldProps extends a {
 }
 
 export const textFieldClasses =
-  'shadow-inner focus:shadow-outline focus:border-blue-500 block p-3 w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md'
+  'shadow-inner focus:shadow-outline focus:border-blue-500 block px-3 py-2 w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md'
 
 export const BaseTextField = ({ ...props }) => {
   return <input type="text" className={textFieldClasses} {...props} />
