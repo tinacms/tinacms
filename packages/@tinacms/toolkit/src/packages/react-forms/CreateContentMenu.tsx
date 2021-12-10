@@ -146,7 +146,7 @@ const CreateToggleButton = styled(Button as any)`
     opacity: 0.7;
     width: 2em;
     height: 2em;
-    margin-right: 0.25rem;
+    margin-right: 4px;
     transform-origin: 50% 50%;
     transition: all 150ms ease-out;
   }

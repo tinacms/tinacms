@@ -212,7 +212,7 @@ const LinkPopup = styled.span<{
   overflow: visible;
   padding: 12px;
   z-index: 10;
-  width: 16rem;
+  width: 256px;
   left: ${({ left }) => `${left}px`};
   top: ${({ top }) => `${top}px`};
 `
@@ -306,7 +306,7 @@ const CancelLink = styled.button`
 const ToggleElement = styled.div`
   display: block;
   position: relative;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 8px 0;
 `
 
 const ToggleLabel = styled.label<{ disabled?: boolean }>`

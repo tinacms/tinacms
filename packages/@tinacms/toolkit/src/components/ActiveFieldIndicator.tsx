@@ -29,7 +29,7 @@ const IndicatorWrap = styled.div`
   position: fixed;
   z-index: var(--tina-z-index-3);
   left: 0;
-  padding: 0.5rem 0;
+  padding: 8px 0;
   margin-left: var(--tina-sidebar-width);
   width: calc(100% - var(--tina-sidebar-width));
   text-align: center;
