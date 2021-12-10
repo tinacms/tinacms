@@ -311,7 +311,7 @@ const Status = styled.div`
 
   > * {
     margin-bottom: 0;
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 
   label {
@@ -375,7 +375,7 @@ const MenuToggle = styled(Button)<{ open: boolean }>`
   margin-left: -12px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  margin-right: 0.5rem;
+  margin-right: 8px;
   display: flex;
   align-items: center;
   padding: 0 15px;

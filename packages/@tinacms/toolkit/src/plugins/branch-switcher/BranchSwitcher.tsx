@@ -57,7 +57,7 @@ export const BranchSwitcher = ({
   return (
     <>
       {listState === 'loading' ? (
-        <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+        <div style={{ margin: '32px auto', textAlign: 'center' }}>
           <LoadingDots color={'var(--tina-color-primary)'} />
         </div>
       ) : (
@@ -83,7 +83,7 @@ export const BranchSwitcher = ({
               />
             </SelectWrap>
           ) : (
-            <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+            <div style={{ margin: '32px auto', textAlign: 'center' }}>
               An error occurred while retrieving the branch list. <br />
               <Button onClick={refreshBranchList}>Try again ⟳</Button>
             </div>
@@ -176,7 +176,7 @@ const SelectWrap = styled.div`
 
 const SelectorColumn = styled.div`
   width: 100%;
-  padding: 1rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: stretch;

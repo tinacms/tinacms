@@ -300,7 +300,7 @@ const MediaPickerWrap = styled.div`
   flex-direction: column;
   position: relative;
   background-color: var(--tina-color-grey-1);
-  padding: 0 1rem var(--tina-padding-big) 1rem;
+  padding: 0 16px var(--tina-padding-big) 16px;
 
   ::-webkit-scrollbar {
     width: 0;
@@ -312,7 +312,7 @@ const MediaPickerWrap = styled.div`
   }
 
   @media (min-width: 720px) {
-    padding: 0 1.125rem var(--tina-padding-big) 1.125rem;
+    padding: 0 18px var(--tina-padding-big) 18px;
   }
 `
 
@@ -320,14 +320,14 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   background: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big) 0.75rem;
+  padding: var(--tina-padding-big) 12px;
   border-radius: var(--tina-radius-small);
   position: sticky;
   top: 0;
   z-index: 1;
 
   @media (min-width: 720px) {
-    padding: var(--tina-padding-big) 1rem var(--tina-padding-big) 1.125rem;
+    padding: var(--tina-padding-big) 16px var(--tina-padding-big) 18px;
   }
 `
 
@@ -338,7 +338,7 @@ interface ListProps {
 const List = styled.ul<ListProps>`
   display: flex;
   flex-direction: column;
-  padding: 0 0 2rem 0;
+  padding: 0 0 32px 0;
   margin: 0;
   height: 100%;
   overflow-y: auto;
@@ -355,9 +355,9 @@ const List = styled.ul<ListProps>`
 const EmptyMediaList = styled((props) => {
   return <div {...props}>Drag and Drop assets here</div>
 })`
-  font-size: 1.5rem;
+  font-size: 24px;
   opacity: 50%;
-  padding: 3rem;
+  padding: 48px;
   text-align: center;
 `
 

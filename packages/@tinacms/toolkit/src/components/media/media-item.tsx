@@ -72,7 +72,7 @@ interface ListItemProps {
 const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
-  padding: 1rem;
+  padding: 16px;
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
   transition: filter 300ms ease;
@@ -95,7 +95,7 @@ const ListItem = styled.li<ListItemProps>`
   }
 
   @media screen and (min-width: 720px) {
-    padding: 1.125rem;
+    padding: 18px;
 
     > :first-child {
       margin-right: var(--tina-padding-big);

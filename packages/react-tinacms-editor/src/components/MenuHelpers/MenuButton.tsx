@@ -41,7 +41,7 @@ export const MenuButton = styled.button<{
   border-left: none;
   margin: 0 0 -1px 0;
   flex-grow: 1;
-  max-width: 3rem;
+  max-width: 48px;
   transition: background 150ms ease-out;
 
   &:hover {
