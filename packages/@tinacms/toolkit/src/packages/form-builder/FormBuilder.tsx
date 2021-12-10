@@ -101,35 +101,37 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </FormWrapper>
               </FormPortalProvider>
               {!hideFooter && (
-                <div className="relative flex-none w-full h-16	bg-white border-t border-gray-100	flex justify-between gap-4 items-center px-4">
-                  {tinaForm.reset && (
-                    <ResetForm
-                      pristine={pristine}
-                      reset={async () => {
-                        finalForm.reset()
-                        await tinaForm.reset!()
-                      }}
-                      style={{ flexGrow: 1 }}
+                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                        style={{ flexGrow: 1 }}
+                      >
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={() => handleSubmit()}
+                      disabled={pristine || submitting || invalid}
+                      busy={submitting}
+                      primary
+                      style={{ flexGrow: 3 }}
                     >
-                      {tinaForm.buttons.reset}
-                    </ResetForm>
-                  )}
-                  <Button
-                    onClick={() => handleSubmit()}
-                    disabled={pristine || submitting || invalid}
-                    busy={submitting}
-                    primary
-                    style={{ flexGrow: 3 }}
-                  >
-                    {submitting && <LoadingDots />}
-                    {!submitting && tinaForm.buttons.save}
-                  </Button>
-                  {tinaForm.actions.length > 0 && (
-                    <FormActionMenu
-                      form={tinaForm as any}
-                      actions={tinaForm.actions}
-                    />
-                  )}
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
+                  </div>
                 </div>
               )}
             </DragDropContext>
@@ -224,13 +226,9 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                   </div>
                 </div>
                 <FormPortalProvider>
-                  <FormWrapper padded={true}>
+                  <FormWrapper>
                     {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder
-                        form={tinaForm}
-                        fields={tinaForm.fields}
-                        padding={false}
-                      />
+                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                     ) : (
                       <NoFieldsPlaceholder />
                     )}
@@ -268,28 +266,11 @@ const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ children, padded = false }) => {
+export const FormWrapper = ({ children }) => {
   return (
-    <div
-      style={{ maxHeight: '100%', overflowY: 'auto', height: '100%' }}
-      className="bg-gray-50"
-    >
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          padding: padded ? `2rem 1.5rem 0 1.5rem` : ``,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '900px',
-            width: '100%',
-          }}
-        >
-          {children}
-        </div>
+    <div className="h-full overflow-y-auto max-h-full bg-gray-50 pt-8 px-6 pb-2">
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-form">{children}</div>
       </div>
     </div>
   )
