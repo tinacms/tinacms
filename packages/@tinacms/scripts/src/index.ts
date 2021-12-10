@@ -284,6 +284,9 @@ const config = (cwd = '') => {
         fontSize: {
           xs: '0.8125rem',
         },
+        maxWidth: {
+          form: '900px',
+        },
       },
     },
     variants: {
