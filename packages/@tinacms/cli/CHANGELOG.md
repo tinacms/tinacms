@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.58.4
+
+### Patch Changes
+
+- 118524507: Fixed typo in admin link
+- Updated dependencies [f46c6f987]
+  - @tinacms/graphql@0.59.1
+
 ## 0.58.3
 
 ### Patch Changes
