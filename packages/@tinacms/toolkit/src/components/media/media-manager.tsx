@@ -219,7 +219,7 @@ export function MediaPicker({
       <DocsLink
         title="No Media Store Configured"
         message="To use the media manager, you need to configure a Media Store."
-        docsLink="https://tina.io/docs/media/"
+        docsLink="https://tina.io/docs/media-cloudinary/"
       />
     )
   }
