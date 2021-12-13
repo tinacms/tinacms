@@ -67,12 +67,18 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
   const allScreens = screens.all()
   const showMenu = allScreens.length > 0
+  const localMode = (cms.api?.tina?.contentApiUrl || '').includes('localhost')
 
   return (
     <>
       <SidebarGlobalStyles />
       <SidebarContainer open={sidebar.isOpen}>
         <SidebarWrapper open={sidebar.isOpen}>
+          {localMode && (
+            <SidebarLocalWarning>
+              You are currently in "local mode" <a href="#">(i)</a>
+            </SidebarLocalWarning>
+          )}
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
@@ -387,6 +393,10 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   &:active {
     background-color: var(--tina-color-primary-dark);
   }
+`
+
+const SidebarLocalWarning = styled.div`
+  background-color: fuchsia;
 `
 
 const SidebarWrapper = styled.div<{ open: boolean }>`
