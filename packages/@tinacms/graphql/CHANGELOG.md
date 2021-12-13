@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.59.1
+
+### Patch Changes
+
+- f46c6f987: Fix type definitions for schema metadata so they're optional
+
 ## 0.59.0
 
 ### Minor Changes
