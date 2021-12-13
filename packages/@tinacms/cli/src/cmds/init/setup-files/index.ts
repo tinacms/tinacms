@@ -20,9 +20,7 @@ title: Vote For Pedro
 ---
 # Welcome to the blog.
 
-> To edit this site head over to the [\` /
-  admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙. 
-
+> To edit this site head over to the [\`/admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙. 
 
 # Dixi gaude Arethusa
 
