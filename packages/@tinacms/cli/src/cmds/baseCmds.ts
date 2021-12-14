@@ -22,6 +22,7 @@ export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
 export const CMD_COMPILE_MODELS = 'schema:compile'
 export const INIT = 'init'
+export const AUDIT = 'audit'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -87,6 +88,22 @@ export const baseCmds: Command[] = [
           genTypes,
           tinaSetup,
           successMessage,
+        ],
+        options
+      ),
+  },
+  {
+    command: AUDIT,
+    description: 'Audit your schema and the files to check for errors',
+    action: (options) =>
+      chain(
+        [
+          async (_ctx, next) => {
+            await compile(_ctx, next)
+            next()
+          },
+          attachSchema,
+          genTypes,
         ],
         options
       ),
