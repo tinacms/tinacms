@@ -231,11 +231,16 @@ export function MediaPicker({
 
   return (
     <MediaPickerWrap>
-      <Header>
+      <div className="flex items-center bg-white border-b border-gray-100 py-3 px-5 shadow-sm flex-shrink-0">
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <UploadButton onClick={onClick} uploading={uploading} />
-      </Header>
-      <List {...rootProps} dragActive={isDragActive}>
+      </div>
+      <ul
+        {...rootProps}
+        className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
+          isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
+        }`}
+      >
         <input {...getInputProps()} />
 
         {listState === 'loaded' && list.items.length === 0 && (
@@ -251,8 +256,7 @@ export function MediaPicker({
             onDelete={deleteMediaItem}
           />
         ))}
-      </List>
-
+      </ul>
       <CursorPaginator
         currentOffset={offset}
         hasNext={hasNext}
@@ -300,7 +304,6 @@ const MediaPickerWrap = styled.div`
   flex-direction: column;
   position: relative;
   background-color: var(--tina-color-grey-1);
-  padding: 0 16px var(--tina-padding-big) 16px;
 
   ::-webkit-scrollbar {
     width: 0;
@@ -310,46 +313,6 @@ const MediaPickerWrap = styled.div`
   *:focus {
     outline: none;
   }
-
-  @media (min-width: 720px) {
-    padding: 0 18px var(--tina-padding-big) 18px;
-  }
-`
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  background: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big) 12px;
-  border-radius: var(--tina-radius-small);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-
-  @media (min-width: 720px) {
-    padding: var(--tina-padding-big) 16px var(--tina-padding-big) 18px;
-  }
-`
-
-interface ListProps {
-  dragActive: boolean
-}
-
-const List = styled.ul<ListProps>`
-  display: flex;
-  flex-direction: column;
-  padding: 0 0 32px 0;
-  margin: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  ${(p) =>
-    p.dragActive &&
-    css`
-      border: 2px solid var(--tina-color-primary);
-      border-radius: var(--tina-radius-small);
-    `}
 `
 
 const EmptyMediaList = styled((props) => {
