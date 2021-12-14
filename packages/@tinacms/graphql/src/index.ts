@@ -19,14 +19,6 @@ import { indexDB } from './build'
 export { indexDB } from './build'
 export { resolve } from './resolve'
 export { createDatabase } from './database'
-export { GithubBridge } from '@tinacms/datalayer'
-export { GithubStore } from '@tinacms/datalayer'
-export { FilesystemBridge } from '@tinacms/datalayer'
-export { FilesystemStore } from '@tinacms/datalayer'
-export { MemoryStore } from '@tinacms/datalayer'
-export { LevelStore } from '@tinacms/datalayer'
-
-export type { GithubManagerInit } from '@tinacms/datalayer'
 import type { Database } from './database'
 
 export const buildSchema = async (rootPath: string, database: Database) => {
