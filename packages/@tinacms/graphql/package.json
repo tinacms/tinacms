@@ -45,7 +45,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@tinacms/datalayer": "workspace:*",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -95,6 +94,7 @@
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",

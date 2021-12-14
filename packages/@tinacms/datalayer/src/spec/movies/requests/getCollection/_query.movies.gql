@@ -1,5 +1,0 @@
-query {
-  getCollection(collection: "movie") {
-    name
-  }
-}
