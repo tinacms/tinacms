@@ -83,10 +83,14 @@ export const BranchSwitcher = ({
               />
             </SelectWrap>
           ) : (
-            <div style={{ margin: '32px auto', textAlign: 'center' }}>
-              An error occurred while retrieving the branch list. <br />
-              <Button onClick={refreshBranchList}>Try again ⟳</Button>
-            </div>
+            <>
+              <p className="mt-8 mx-8 mb-4 text-center">
+                An error occurred while retrieving the branch list.
+              </p>
+              <Button className="mx-auto" onClick={refreshBranchList}>
+                Try again ⟳
+              </Button>
+            </>
           )}
         </>
       )}
