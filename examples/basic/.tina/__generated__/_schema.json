@@ -1,4 +1,11 @@
 {
+  "version": {
+    "fullVersion": "0.57.2",
+    "major": "0",
+    "minor": "57",
+    "patch": "2"
+  },
+  "meta": {},
   "collections": [
     {
       "label": "Page Content",
@@ -24,6 +31,7 @@
       "label": "Blog Posts",
       "name": "post",
       "path": "content/post",
+      "format": "md",
       "fields": [
         {
           "type": "string",
@@ -36,12 +44,113 @@
         },
         {
           "type": "string",
+          "label": "Topic",
+          "name": "topic",
+          "options": [
+            "programming",
+            "blacksmithing"
+          ],
+          "list": true,
+          "namespace": [
+            "post",
+            "topic"
+          ]
+        },
+        {
+          "type": "rich-text",
           "label": "Blog Post Body",
           "name": "body",
           "isBody": true,
-          "ui": {
-            "component": "textarea"
-          },
+          "templates": [
+            {
+              "name": "Gallery",
+              "label": "Gallery",
+              "fields": [
+                {
+                  "label": "Images",
+                  "name": "images",
+                  "type": "object",
+                  "list": true,
+                  "fields": [
+                    {
+                      "type": "image",
+                      "name": "src",
+                      "label": "Source",
+                      "namespace": [
+                        "post",
+                        "body",
+                        "Gallery",
+                        "images",
+                        "src"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "name": "width",
+                      "label": "Width",
+                      "namespace": [
+                        "post",
+                        "body",
+                        "Gallery",
+                        "images",
+                        "width"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "name": "height",
+                      "label": "Height",
+                      "namespace": [
+                        "post",
+                        "body",
+                        "Gallery",
+                        "images",
+                        "height"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "images"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "alignment",
+                  "label": "Alignment",
+                  "options": [
+                    "left",
+                    "center",
+                    "right"
+                  ],
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "alignment"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "gap",
+                  "label": "Gap",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "gap"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "Gallery"
+              ]
+            }
+          ],
           "namespace": [
             "post",
             "body"
@@ -52,6 +161,5 @@
         "post"
       ]
     }
-  ],
-  "namespace": []
+  ]
 }

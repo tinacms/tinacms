@@ -1,5 +1,56 @@
 # tina-graphql
 
+## 0.59.2
+
+### Patch Changes
+
+- 212685fc3: Allow indexDB to skip building the query and fragment generation files
+
+## 0.59.1
+
+### Patch Changes
+
+- f46c6f987: Fix type definitions for schema metadata so they're optional
+
+## 0.59.0
+
+### Minor Changes
+
+- 62bea7019: #2323: fix saving bold and italic text in rich-text editor
+
+### Patch Changes
+
+- bd4e1f802: Pin version number from @tinacms/graphql during schema compilation. This can be used to ensure the proper version is provided when working with Tina Cloud
+
+## 0.58.2
+
+### Patch Changes
+
+- fffce3af8: Don't cache graphql schema during resolution, this was causing the schema to go stale, while updating the schema.gql, so GraphQL tooling thought the value was updated, but the server was still holding on to the cached version
+
+## 0.58.1
+
+### Patch Changes
+
+- 4700d7ae4: Patch fix to ensure builds include latest dependencies
+
+## 0.58.0
+
+### Minor Changes
+
+- fa7a0419f: Adds experimental support for a data layer between file-based content and the GraphQL API. This allows documents to be indexed so the CMS can behave more like a traditional CMS, with the ability enforce foreign reference constraints and filtering/pagination capabilities.
+
+### Patch Changes
+
+- eb5fbfac7: Ensure GraphQL resolve doesn't access "bridge" documents
+- 47d126029: Fix support of objects in a list for MDX templates
+
+## 0.57.2
+
+### Patch Changes
+
+- edb2f4011: Trim path property on collections during compilation
+
 ## 0.57.1
 
 ### Patch Changes

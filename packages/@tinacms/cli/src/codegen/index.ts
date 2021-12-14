@@ -28,7 +28,8 @@ import { logger } from '../logger'
 export const generateTypes = async (
   schema: GraphQLSchema,
   queryPathGlob = process.cwd(),
-  fragDocPath = process.cwd()
+  fragDocPath = process.cwd(),
+  options: { noSDK: boolean } = { noSDK: false }
 ) => {
   logger.info('Generating types...')
   try {
@@ -37,9 +38,11 @@ export const generateTypes = async (
 
     // Load GQL queries from user queries folder
     try {
-      docs = await loadDocuments(queryPathGlob, {
-        loaders: [new GraphQLFileLoader()],
-      })
+      if (!options.noSDK) {
+        docs = await loadDocuments(queryPathGlob, {
+          loaders: [new GraphQLFileLoader()],
+        })
+      }
     } catch (e) {
       let showErrorMessage = true
       const message: string = e.message || ''
@@ -57,9 +60,11 @@ export const generateTypes = async (
 
     // Load fragments from generated document
     try {
-      fragDocs = await loadDocuments(fragDocPath, {
-        loaders: [new GraphQLFileLoader()],
-      })
+      if (!options.noSDK) {
+        fragDocs = await loadDocuments(fragDocPath, {
+          loaders: [new GraphQLFileLoader()],
+        })
+      }
     } catch (error) {
       console.error(error)
     }

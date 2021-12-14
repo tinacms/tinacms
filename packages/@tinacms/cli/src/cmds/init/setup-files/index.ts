@@ -11,38 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const adminPage = `import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { useEditState } from "tinacms/dist/edit-state";
-
-const GoToEditPage = () => {
-  const { setEdit } = useEditState();
-  const router = useRouter();
-  useEffect(() => {
-    setEdit(true);
-    router.back();
-  }, []);
-  return <div>Entering edit mode..</div>;
-};
-
-export default GoToEditPage;
-`
-
-export const exitAdminPage = `import { useEffect } from "react";
-import { useRouter } from "next/router";
-import { useEditState } from "tinacms/dist/edit-state";
-
-const GoToEditPage = () => {
-  const { setEdit } = useEditState();
-  const router = useRouter();
-  useEffect(() => {
-    setEdit(false);
-    router.back();
-  }, []);
-  return <div>Exiting edit mode..</div>;;
-};
-
-export default GoToEditPage;
+export const adminPage = `import { TinaAdmin } from 'tinacms';
+export default TinaAdmin;
 `
 
 export const blogPost = `---
@@ -50,9 +20,7 @@ title: Vote For Pedro
 ---
 # Welcome to the blog.
 
-> To edit this site head over to the [\` /
-  admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙. 
-
+> To edit this site head over to the [\`/admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙. 
 
 # Dixi gaude Arethusa
 
@@ -353,7 +321,6 @@ const App = ({ Component, pageProps }) => {
           <TinaCMS
             clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
             branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-            organization={process.env.NEXT_PUBLIC_ORGANIZATION_NAME}
             isLocalClient={Boolean(
               Number(process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT ?? true)
             )}

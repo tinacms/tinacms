@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+div[class^='ModalBody'],
+div[class*=' ModalBody'] {
+  min-height: 42vh;
+}
+
+button[class^='SidebarToggleButton']:focus,
+button[class*=' SidebarToggleButton']:focus,
+button[class^='SidebarToggleButton'],
+button[class*=' SidebarToggleButton'] {
+  outline: 0 !important;
+  outline-color: transparent;
+}

@@ -1,0 +1,17 @@
+{
+  "errors": [
+    {
+      "message": "Unable to add document, content/movies/star-wars.md already exists",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": [
+        "addPendingDocument"
+      ]
+    }
+  ],
+  "data": null
+}
