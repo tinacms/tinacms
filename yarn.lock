@@ -28684,6 +28684,7 @@ resolve@^2.0.0-next.3:
     "@tinacms/scripts": "workspace:*"
     "@tinacms/sharedctx": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
+    "@types/jest": ^27.0.1
     "@types/lodash": ^4.14.169
     "@types/node": ^14.0.13
     "@types/react": ^16.9.38
@@ -28692,11 +28693,13 @@ resolve@^2.0.0-next.3:
     final-form: 4.20.1
     graphql: ^15.1.0
     graphql-tag: ^2.11.0
+    jest: ^27.0.6
     lodash.set: ^4.3.2
     next: 9.4.2
     react: 16.14.0
     react-dom: 16.14.0
     react-icons: ^4.3.1
+    react-is: ^17.0.2
     react-router-dom: 6
     styled-components: ^5.2.0
     typescript: ^4.3.5
