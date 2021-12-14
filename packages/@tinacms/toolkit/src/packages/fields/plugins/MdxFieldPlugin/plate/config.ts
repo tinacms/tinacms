@@ -62,7 +62,6 @@ export const CONFIG: {
   components: Record<string, any>
   editableProps: EditableProps
 
-  align: AlignPluginOptions
   autoformat: AutoformatPluginOptions
   exitBreak: ExitBreakPluginOptions
   forceLayout: NormalizeTypesPluginOptions
@@ -95,20 +94,8 @@ export const CONFIG: {
       },
     }),
   }),
-
-  align: {
-    types: [
-      ELEMENT_PARAGRAPH,
-      ELEMENT_H1,
-      ELEMENT_H2,
-      ELEMENT_H3,
-      ELEMENT_H4,
-      ELEMENT_H5,
-      ELEMENT_H6,
-    ],
-  },
   indent: {
-    types: [
+    validTypes: [
       ELEMENT_PARAGRAPH,
       ELEMENT_H1,
       ELEMENT_H2,

@@ -1,5 +1,0 @@
-query {
-  getAuthorDocument(relativePath: "homer.md") {
-    id
-  }
-}

@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.51.7",
+  "version": "0.51.12",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

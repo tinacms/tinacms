@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
@@ -56,7 +56,7 @@ const updateDocument = async (
 
 const CollectionUpdatePage = () => {
   const { collectionName, filename } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <GetCMS>
@@ -85,7 +85,7 @@ const CollectionUpdatePage = () => {
                         mutationInfo,
                         values
                       )
-                      history.push(`/admin/collections/${collection.name}`)
+                      navigate(`/collections/${collection.name}`)
                     },
                   })
 

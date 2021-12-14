@@ -1,0 +1,15 @@
+mutation {
+  updateMovieDocument(
+    relativePath: "star-wars-2.md"
+    params: {
+      title: "Star War" # change the title
+      releaseDate: "2021-02-02T07:00:00.000Z"
+      archived: true
+      director: "content/directors/george.md"
+      genre: "scifi"
+      rating: 10
+    }
+  ) {
+    id
+  }
+}

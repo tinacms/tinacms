@@ -1,5 +1,65 @@
 # tinacms-cli
 
+## 0.58.5
+
+### Patch Changes
+
+- Updated dependencies [212685fc3]
+  - @tinacms/graphql@0.59.2
+
+## 0.58.4
+
+### Patch Changes
+
+- 118524507: Fixed typo in admin link
+- Updated dependencies [f46c6f987]
+  - @tinacms/graphql@0.59.1
+
+## 0.58.3
+
+### Patch Changes
+
+- Updated dependencies [bd4e1f802]
+- Updated dependencies [62bea7019]
+  - @tinacms/graphql@0.59.0
+
+## 0.58.2
+
+### Patch Changes
+
+- Updated dependencies [fffce3af8]
+  - @tinacms/graphql@0.58.2
+
+## 0.58.1
+
+### Patch Changes
+
+- Updated dependencies [4700d7ae4]
+  - @tinacms/graphql@0.58.1
+
+## 0.58.0
+
+### Minor Changes
+
+- fa7a0419f: Adds experimental support for a data layer between file-based content and the GraphQL API. This allows documents to be indexed so the CMS can behave more like a traditional CMS, with the ability enforce foreign reference constraints and filtering/pagination capabilities.
+- 8c14f29ef: Updated cli to include a new option, `--noSDK`. When this flag is present it will not generate the SDK.
+
+### Patch Changes
+
+- 9c5f888a3: Modifies `tinacms init` for `TinaAdmin`-ready page
+- Updated dependencies [eb5fbfac7]
+- Updated dependencies [fa7a0419f]
+- Updated dependencies [47d126029]
+  - @tinacms/graphql@0.58.0
+
+## 0.57.2
+
+### Patch Changes
+
+- edb2f4011: Trim path property on collections during compilation
+- Updated dependencies [edb2f4011]
+  - @tinacms/graphql@0.57.2
+
 ## 0.57.1
 
 ### Patch Changes
