@@ -70,8 +70,11 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
           <p>Are you sure you want to reset all changes?</p>
         </ModalBody>
         <ModalActions>
-          <Button onClick={close}>Cancel</Button>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
           <Button
+            style={{ flexGrow: 3 }}
             primary
             onClick={async () => {
               await reset()
