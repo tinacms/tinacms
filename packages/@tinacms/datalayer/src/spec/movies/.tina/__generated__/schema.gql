@@ -1,0 +1,199 @@
+"""References another document, used as a foreign key"""
+scalar Reference
+
+""""""
+scalar JSON
+
+type SystemInfo {
+  filename: String!
+  basename: String!
+  breadcrumbs(excludeExtension: Boolean): [String!]!
+  path: String!
+  relativePath: String!
+  extension: String!
+  template: String!
+  collection: Collection!
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+""""""
+interface Node {
+  id: ID!
+}
+
+""""""
+interface Document {
+  sys: SystemInfo
+  id: ID!
+  form: JSON!
+  values: JSON!
+}
+
+"""A relay-compliant pagination connection"""
+interface Connection {
+  totalCount: Int!
+}
+
+type Query {
+  getCollection(collection: String): Collection!
+  getCollections: [Collection!]!
+  node(id: String): Node!
+  getDocument(collection: String, relativePath: String): DocumentNode!
+  getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
+  getDocumentFields: JSON!
+  getMovieDocument(relativePath: String): MovieDocument!
+  getMovieList(before: String, after: String, first: Int, last: Int): MovieConnection!
+  getDirectorDocument(relativePath: String): DirectorDocument!
+  getDirectorList(before: String, after: String, first: Int, last: Int): DirectorConnection!
+  getActorDocument(relativePath: String): ActorDocument!
+  getActorList(before: String, after: String, first: Int, last: Int): ActorConnection!
+}
+
+type DocumentConnectionEdges {
+  cursor: String
+  node: DocumentNode
+}
+
+type DocumentConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [DocumentConnectionEdges]
+}
+
+type Collection {
+  name: String!
+  slug: String!
+  label: String!
+  path: String!
+  format: String
+  matches: String
+  templates: [JSON]
+  fields: [JSON]
+  documents(before: String, after: String, first: Int, last: Int): DocumentConnection!
+}
+
+union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
+
+union MovieDirectorDocument = DirectorDocument
+
+type Movie {
+  title: String
+  releaseDate: String
+  rating: Int
+  archived: Boolean
+  genre: String
+  director: MovieDirectorDocument
+  body: JSON
+}
+
+type MovieDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Movie!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type MovieConnectionEdges {
+  cursor: String
+  node: MovieDocument
+}
+
+type MovieConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [MovieConnectionEdges]
+}
+
+type Director {
+  name: String
+}
+
+type DirectorDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Director!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type DirectorConnectionEdges {
+  cursor: String
+  node: DirectorDocument
+}
+
+type DirectorConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [DirectorConnectionEdges]
+}
+
+type Actor {
+  name: String
+  body: String
+}
+
+type ActorDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Actor!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type ActorConnectionEdges {
+  cursor: String
+  node: ActorDocument
+}
+
+type ActorConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [ActorConnectionEdges]
+}
+
+type Mutation {
+  addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
+  createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+}
+
+input DocumentMutation {
+  movie: MovieMutation
+  director: DirectorMutation
+  actor: ActorMutation
+}
+
+input MovieMutation {
+  title: String
+  releaseDate: String
+  rating: Int
+  archived: Boolean
+  genre: String
+  director: String
+  body: JSON
+}
+
+input DirectorMutation {
+  name: String
+}
+
+input ActorMutation {
+  name: String
+  body: String
+}

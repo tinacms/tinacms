@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.0",
+    "fullVersion": "0.59.1",
     "major": "0",
     "minor": "59",
-    "patch": "0"
+    "patch": "1"
   },
   "meta": {
     "flags": [

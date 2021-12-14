@@ -1,0 +1,5 @@
+mutation {
+  addPendingDocument(collection: "post", relativePath: "my-post.md") {
+    __typename
+  }
+}
