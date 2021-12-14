@@ -1,8 +1,0 @@
-{
-  "data": null,
-  "errors": [
-    {
-      "message": "Unable to add document, content/movies/star-wars.md already exists"
-    }
-  ]
-}

@@ -1,3 +1,0 @@
----
-name: George Lucas
----
