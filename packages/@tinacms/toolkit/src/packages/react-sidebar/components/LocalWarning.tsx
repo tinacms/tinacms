@@ -1,0 +1,59 @@
+/**
+
+Copyright 2021 Forestry.io Holdings, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/
+
+import * as React from 'react'
+import { useCMS } from '../../react-core'
+import { AiFillWarning } from 'react-icons/ai'
+
+export const LocalWarning = () => {
+  const cms = useCMS()
+  const localMode = (cms.api?.tina?.contentApiUrl || '').includes('localhost')
+
+  if (!localMode) return null
+
+  return (
+    <a
+      style={{
+        display: 'flex',
+        width: '100%',
+        alignItems: 'center',
+        padding: '6px 14px',
+        color: '#ab9e58',
+        backgroundColor: '#f4efd3',
+        borderBottom: '1px solid #F5E06E',
+      }}
+      href="https://tina.io/docs/using-tina-editor/#editing-the-content"
+      target="_blank"
+    >
+      <AiFillWarning
+        style={{
+          width: '1.25rem',
+          height: 'auto',
+          display: 'inline-block',
+          marginRight: '0.25rem',
+          opacity: '0.4',
+          color: 'inherit',
+        }}
+      />{' '}
+      You are currently in
+      <strong style={{ marginLeft: '0.25rem', color: 'inherit' }}>
+        Local Mode
+      </strong>
+    </a>
+  )
+}
