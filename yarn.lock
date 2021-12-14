@@ -4709,12 +4709,14 @@ __metadata:
   resolution: "@tinacms/toolkit@workspace:packages/@tinacms/toolkit"
   dependencies:
     "@sambego/storybook-styles": ^1.0.0
+    "@testing-library/react": ^12.0.0
     "@tinacms/scripts": "workspace:*"
     "@types/atob": ^2.1.2
     "@types/codemirror": ^0.0.71
     "@types/color-string": ^1.5.0
     "@types/cors": ^2.8.12
     "@types/express": ^4.17.13
+    "@types/jest": ^27.0.1
     "@types/lodash.debounce": ^4.0.6
     "@types/lodash.get": ^4.4.5
     "@types/multer": ^1.4.7
@@ -4733,6 +4735,7 @@ __metadata:
     express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
+    jest: ^27.0.6
     lodash.get: ^4.4.2
     moment: ">=2 <=3"
     multer: 1.4.2
@@ -4746,6 +4749,7 @@ __metadata:
     react-dropzone: 10.1.8
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
+    react-is: ^17.0.2
     simple-git: 1.126.0
     slate: ^0.66.0
     slate-history: ^0.66.0
