@@ -74,7 +74,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
       <SidebarGlobalStyles />
       <SidebarContainer open={sidebar.isOpen}>
         <SidebarWrapper open={sidebar.isOpen}>
-          <LocalWarning />
+          {cms.api?.tina?.isLocalMode && <LocalWarning />}
           <SidebarHeader>
             {showMenu && (
               <MenuToggle

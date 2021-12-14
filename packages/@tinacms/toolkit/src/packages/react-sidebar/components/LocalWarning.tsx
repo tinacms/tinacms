@@ -17,15 +17,9 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS } from '../../react-core'
 import { AiFillWarning } from 'react-icons/ai'
 
 export const LocalWarning = () => {
-  const cms = useCMS()
-  const localMode = (cms.api?.tina?.contentApiUrl || '').includes('localhost')
-
-  if (!localMode) return null
-
   return (
     <a
       style={{
