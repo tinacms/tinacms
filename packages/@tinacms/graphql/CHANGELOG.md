@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.59.2
+
+### Patch Changes
+
+- 212685fc3: Allow indexDB to skip building the query and fragment generation files
+
 ## 0.59.1
 
 ### Patch Changes
