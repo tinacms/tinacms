@@ -17,7 +17,7 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
-    "test": "jest --passWithNoTests"
+    "test": "jest --env=jsdom --passWithNoTests"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -34,6 +34,9 @@
     "yup": "^0.32.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^12.7.0",
     "@tinacms/scripts": "workspace:*",
     "@types/jest": "^27.0.1",
     "@types/lodash": "^4.14.169",
