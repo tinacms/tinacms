@@ -84,7 +84,7 @@ export const BranchSwitcher = ({
             </SelectWrap>
           ) : (
             <>
-              <p className="mt-8 mx-8 mb-4 text-center">
+              <p className="text-base mt-8 mx-8 mb-4 text-center">
                 An error occurred while retrieving the branch list.
               </p>
               <Button className="mx-auto" onClick={refreshBranchList}>
