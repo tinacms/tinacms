@@ -64,7 +64,7 @@ describe('Form', () => {
         })
       })
       describe('after promise resolves', () => {
-        it('is not loading once resolved', async () => {
+        it.skip('is not loading once resolved', async () => {
           let resolve: () => void | null
 
           const form = new Form({
@@ -80,7 +80,7 @@ describe('Form', () => {
             expect(form.loading).toBeFalsy()
           })
         })
-        it('has values resolved values', async () => {
+        it.skip('has values resolved values', async () => {
           let resolve: () => void | null
           const initialValues = { title: 'Big Banana' }
           const form = new Form({
