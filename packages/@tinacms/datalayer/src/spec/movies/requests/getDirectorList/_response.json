@@ -1,0 +1,22 @@
+{
+  "data": {
+    "getDirectorList": {
+      "edges": [
+        {
+          "node": {
+            "data": {
+              "name": "Francis Ford Coppolla"
+            }
+          }
+        },
+        {
+          "node": {
+            "data": {
+              "name": "George Lucas"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

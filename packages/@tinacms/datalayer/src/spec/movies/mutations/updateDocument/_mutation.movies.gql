@@ -1,0 +1,10 @@
+mutation {
+  updateMovieDocument(
+    relativePath: "star-wars.md"
+    params: { title: "A New Hope" }
+  ) {
+    data {
+      title
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "data": {
+    "getCollections": [
+      {
+        "name": "movie"
+      },
+      {
+        "name": "director"
+      },
+      {
+        "name": "actor"
+      }
+    ]
+  }
+}
