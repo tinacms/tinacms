@@ -68,7 +68,6 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
   align-items: center;
   color: var(--tina-color-grey-4);
   font-size: var(--tina-font-size-3);
-  margin-left: -12px;
 
   button {
     text-transform: capitalize;
