@@ -4662,9 +4662,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/graphql@workspace:packages/@tinacms/graphql"
   dependencies:
-    "@octokit/auth-app": ^2.6.0
-    "@octokit/graphql": ^4.5.6
-    "@octokit/rest": 18.0.6
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
@@ -4702,15 +4699,12 @@ __metadata:
     jest-file-snapshot: ^0.5.0
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
-    level: ^7.0.1
-    levelup: ^5.1.1
     lodash: ^4.17.20
     mdast: ^3.0.0
     mdast-util-from-markdown: ^1.0.0
     mdast-util-mdx: ^1.1.0
     mdast-util-mdx-expression: ^1.1.0
     mdast-util-to-markdown: ^1.2.1
-    memdown: ^6.1.1
     micromark-extension-mdxjs: ^1.0.0
     mocha: ^9.1.1
     nodemon: ^2.0.4
