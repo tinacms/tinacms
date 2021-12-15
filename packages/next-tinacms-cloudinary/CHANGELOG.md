@@ -1,5 +1,19 @@
 # next-tinacms-cloudinary
 
+## 3.4.3
+
+## 3.4.2
+
+## 3.4.1
+
+## 3.4.0
+
+### Minor Changes
+
+- e792dd0fd: Added basic Create Tina App
+
+## 3.3.8
+
 ## 3.3.7
 
 ## 3.3.6

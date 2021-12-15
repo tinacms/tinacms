@@ -62,7 +62,6 @@ export const CONFIG: {
   components: Record<string, any>
   editableProps: EditableProps
 
-  align: AlignPluginOptions
   autoformat: AutoformatPluginOptions
   exitBreak: ExitBreakPluginOptions
   forceLayout: NormalizeTypesPluginOptions
@@ -95,29 +94,21 @@ export const CONFIG: {
       },
     }),
   }),
-
-  align: {
-    types: [
-      ELEMENT_PARAGRAPH,
-      ELEMENT_H1,
-      ELEMENT_H2,
-      ELEMENT_H3,
-      ELEMENT_H4,
-      ELEMENT_H5,
-      ELEMENT_H6,
-    ],
-  },
+  /**
+   * Indenting isn't really represented in markdown, so disable it.
+   * TODO: remove this block when it's clear this is the correct behavior
+   */
   indent: {
-    types: [
-      ELEMENT_PARAGRAPH,
-      ELEMENT_H1,
-      ELEMENT_H2,
-      ELEMENT_H3,
-      ELEMENT_H4,
-      ELEMENT_H5,
-      ELEMENT_H6,
-      ELEMENT_BLOCKQUOTE,
-      ELEMENT_CODE_BLOCK,
+    validTypes: [
+      // ELEMENT_PARAGRAPH,
+      // ELEMENT_H1,
+      // ELEMENT_H2,
+      // ELEMENT_H3,
+      // ELEMENT_H4,
+      // ELEMENT_H5,
+      // ELEMENT_H6,
+      // ELEMENT_BLOCKQUOTE,
+      // ELEMENT_CODE_BLOCK,
     ],
   },
   resetBlockType: {

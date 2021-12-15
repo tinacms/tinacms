@@ -1,5 +1,61 @@
 # tinacms
 
+## 0.61.1
+
+### Patch Changes
+
+- Updated dependencies [2c7718636]
+  - @tinacms/toolkit@0.56.4
+
+## 0.61.0
+
+### Minor Changes
+
+- 229feda1d: add .nvmrc file for setting preferred node version
+
+## 0.60.3
+
+### Patch Changes
+
+- 4adaf15af: Fix types which weren't included in previous patch
+
+## 0.60.2
+
+### Patch Changes
+
+- 816271d03: Ensure login/logout pages work when admin flag is disabled
+
+## 0.60.1
+
+### Patch Changes
+
+- Updated dependencies [4700d7ae4]
+  - @tinacms/toolkit@0.56.3
+
+## 0.60.0
+
+### Minor Changes
+
+- 75974d0a4: Updates the tina cloud client to do id_token & access_token refreshes when needed
+
+### Patch Changes
+
+- 88c209b45: Throw when Tina Cloud responds with non 200 code
+- dcdf1ecf0: Updates `react-router` to `v6` for `TinaAdmin`
+- 47d126029: Fix support of objects in a list for MDX templates
+- Updated dependencies [bc4699d2b]
+  - @tinacms/toolkit@0.56.2
+
+## 0.59.1
+
+### Patch Changes
+
+- ed9d48abc: Swaps starter's old admin for the new one
+- f6876d30f: Alter empty sidebar message to be more specific to auto-generating logic
+- Updated dependencies [f6876d30f]
+- Updated dependencies [92268fc85]
+  - @tinacms/toolkit@0.56.1
+
 ## 0.59.0
 
 ### Minor Changes

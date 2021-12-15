@@ -1,0 +1,5 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "experimentalStudio": true,
+  "chromeWebSecurity": false
+}

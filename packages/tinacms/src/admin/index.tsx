@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
@@ -27,24 +27,29 @@ import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
 import useEmbedTailwind from './hooks/useEmbedTailwind'
-import { isEditing } from '../edit-state'
+import { useEditState } from '@tinacms/sharedctx'
+
+const Redirect = () => {
+  React.useEffect(() => {
+    if (window) {
+      window.location.assign('/')
+    }
+  }, [])
+
+  return null
+}
 
 export const TinaAdmin = () => {
   useEmbedTailwind()
 
   const isSSR = typeof window === 'undefined'
+  const { edit } = useEditState()
+
   if (isSSR) {
     return null
   }
 
-  /**
-   * TODO:
-   * Ideally, this line should be `const { edit } = useEditState()` if we weren't having context issues with `EditStateProvider`.
-   * https://github.com/tinacms/tinacms/issues/2081
-   */
-  const isEdit = isEditing()
-
-  if (!isEdit) {
+  if (!edit) {
     return (
       <Layout>
         <LoginPage />
@@ -64,27 +69,25 @@ export const TinaAdmin = () => {
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <Sidebar cms={cms} />
                   <div className="flex-1">
-                    <Switch>
-                      <Route path={`/admin/collections/:collectionName/new`}>
-                        <CollectionCreatePage />
-                      </Route>
+                    <Routes>
                       <Route
-                        path={`/admin/collections/:collectionName/:templateName/new`}
-                      >
-                        <CollectionCreatePage />
-                      </Route>
+                        path="/admin/collections/:collectionName/new"
+                        element={<CollectionCreatePage />}
+                      />
                       <Route
-                        path={`/admin/collections/:collectionName/:filename`}
-                      >
-                        <CollectionUpdatePage />
-                      </Route>
-                      <Route path={`/admin/collections/:collectionName`}>
-                        <CollectionListPage />
-                      </Route>
-                      <Route path={`/admin`}>
-                        <DashboardPage />
-                      </Route>
-                    </Switch>
+                        path="/admin/collections/:collectionName/:templateName/new"
+                        element={<CollectionCreatePage />}
+                      />
+                      <Route
+                        path="/admin/collections/:collectionName/:filename"
+                        element={<CollectionUpdatePage />}
+                      />
+                      <Route
+                        path="/admin/collections/:collectionName"
+                        element={<CollectionListPage />}
+                      />
+                      <Route path="/admin" element={<DashboardPage />} />
+                    </Routes>
                   </div>
                 </div>
               </Router>
@@ -94,18 +97,10 @@ export const TinaAdmin = () => {
           return (
             <Layout>
               <Router>
-                <Switch>
-                  <Route
-                    path={[`/admin/logout`, `/admin/exit`, `/admin/exit-admin`]}
-                  >
-                    <LogoutPage />
-                  </Route>
-                  <Route path={`/admin`}>
-                    {() => {
-                      window.location.href = '/'
-                    }}
-                  </Route>
-                </Switch>
+                <Routes>
+                  <Route path="/admin/logout" element={<LogoutPage />} />
+                  <Route path="/admin" element={<Redirect />} />
+                </Routes>
               </Router>
             </Layout>
           )
