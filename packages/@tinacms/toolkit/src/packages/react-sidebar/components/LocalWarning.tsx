@@ -31,7 +31,7 @@ export const LocalWarning = () => {
         backgroundColor: '#f4efd3',
         borderBottom: '1px solid #F5E06E',
       }}
-      href="https://tina.io/docs/using-tina-editor/#editing-the-content"
+      href="https://tina.io/docs/tina-cloud/"
       target="_blank"
     >
       <AiFillWarning
