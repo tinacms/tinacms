@@ -1,11 +1,4 @@
 {
-  "version": {
-    "fullVersion": "0.59.1",
-    "major": "0",
-    "minor": "59",
-    "patch": "1"
-  },
-  "meta": {},
   "collections": [
     {
       "label": "Blog Posts",
@@ -1353,5 +1346,6 @@
         "pages"
       ]
     }
-  ]
+  ],
+  "namespace": []
 }
