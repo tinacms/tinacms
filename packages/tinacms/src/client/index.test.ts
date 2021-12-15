@@ -25,7 +25,7 @@ describe('Tina Client', () => {
         customContentApiUrl: 'http://localhost:4001',
       })
     })
-    it('test stuff', () => {
+    it('sets isLocalMode', () => {
       expect(client.isLocalMode).toEqual(true)
     })
   })
@@ -41,7 +41,7 @@ describe('Tina Client', () => {
         customContentApiUrl: 'http://tina.io/fakeURL',
       })
     })
-    it('test stuff', () => {
+    it('sets isLocalMode to false', () => {
       expect(client.isLocalMode).toEqual(false)
     })
   })
