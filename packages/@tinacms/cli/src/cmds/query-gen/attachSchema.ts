@@ -11,14 +11,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { buildSchema } from '@tinacms/graphql'
+import {
+  buildSchema,
+  createDatabase,
+  FilesystemBridge,
+  FilesystemStore,
+} from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
 import { logger } from '../../logger'
 
 export async function attachSchema(ctx: any, next: () => void, options) {
   logger.info(logText('Building schema...'))
   const rootPath = process.cwd()
-  const schema = await buildSchema(rootPath)
+  const bridge = new FilesystemBridge(rootPath)
+  const store = new FilesystemStore({ rootPath })
+  const database = await createDatabase({ store, bridge })
+  const schema = await buildSchema(rootPath, database)
 
   ctx.schema = schema
   next()

@@ -33,7 +33,7 @@ const App = ({ Component, pageProps }) => {
               /**
                * Enables `tina-admin` specific features in the Tina Sidebar
                */
-              cms.flags.set("tina-admin", true);
+              cms.flags.set("tina-admin", false);
 
               /**
                * An example of a RouteMapping plugin for TinaAdmin

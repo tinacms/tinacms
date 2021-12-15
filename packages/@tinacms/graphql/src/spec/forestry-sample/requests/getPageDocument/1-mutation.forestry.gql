@@ -1,0 +1,24 @@
+mutation {
+  updatePageDocument(
+    relativePath: "home.md"
+    params: {
+      title: "Welcome back"
+      seo: {
+        seoTitle: "Welcome back to our website"
+        ogImage: "http://placehold.it/300x200"
+        ogDescription: "You're still gonna love this site!"
+      }
+      blocks: [
+        { cta: { ctaText: "Join us again", ctaStyle: "minimal" } }
+        {
+          hero: {
+            backgroundImage: "http://placehold.it/300x200"
+            description: "Welcome back!"
+          }
+        }
+      ]
+    }
+  ) {
+    id
+  }
+}

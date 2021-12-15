@@ -29,12 +29,12 @@ import {
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
-  ToolbarCodeBlock,
-  ToolbarElement,
-  ToolbarList,
-  ToolbarMark,
-  ToolbarLink,
-  useStoreEditorRef,
+  CodeBlockToolbarButton,
+  BlockToolbarButton,
+  ListToolbarButton,
+  MarkToolbarButton,
+  LinkToolbarButton,
+  usePlateEditorRef,
   getPlatePluginType,
 } from '@udecode/plate'
 import {
@@ -101,10 +101,8 @@ const EmbedButtunWrapper = styled.div`
 `
 
 export const ToolbarButtons = ({ name, templates }) => {
-  // const editor = useStoreEditorRef(useEventEditorId('focus'));
-
   const cms = useCMS()
-  const editor = useStoreEditorRef(name)
+  const editor = usePlateEditorRef(name)
   const popup = {
     showButton: true,
     onAdd: (template) => {
@@ -160,40 +158,40 @@ export const ToolbarButtons = ({ name, templates }) => {
     <Wrapper>
       <ToolbarWrapper>
         <HeaderPopup icon={<HeadingIcon />}>
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H1)}
             icon={<strong>H1</strong>}
           />
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H2)}
             icon={<strong>H2</strong>}
           />
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H3)}
             icon={<strong>H3</strong>}
           />
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H4)}
             icon={<strong>H4</strong>}
           />
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H5)}
             icon={<strong>H5</strong>}
           />
-          <ToolbarElement
+          <BlockToolbarButton
             type={getPlatePluginType(editor, ELEMENT_H6)}
             icon={<strong>H6</strong>}
           />
         </HeaderPopup>
-        <ToolbarElement
+        <BlockToolbarButton
           type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
           icon={<QuoteIcon />}
         />
-        <ToolbarCodeBlock
+        <CodeBlockToolbarButton
           type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
           icon={<CodeIcon />}
         />
-        <ToolbarLink icon={<LinkIcon />} />
+        <LinkToolbarButton icon={<LinkIcon />} />
         <ToolbarButton
           icon={<ImageIcon />}
           onMouseDown={() => {
@@ -206,27 +204,27 @@ export const ToolbarButtons = ({ name, templates }) => {
             })
           }}
         />
-        <ToolbarList
+        <ListToolbarButton
           type={getPlatePluginType(editor, ELEMENT_UL)}
           icon={<UnorderedListIcon />}
         />
-        <ToolbarList
+        <ListToolbarButton
           type={getPlatePluginType(editor, ELEMENT_OL)}
           icon={<OrderedListIcon />}
         />
-        <ToolbarMark
+        <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_BOLD)}
           icon={<BoldIcon />}
         />
-        <ToolbarMark
+        <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_ITALIC)}
           icon={<ItalicIcon />}
         />
-        <ToolbarMark
+        <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_UNDERLINE)}
           icon={<UnderlineIcon />}
         />
-        <ToolbarMark
+        <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
           icon={<StrikethroughIcon />}
         />

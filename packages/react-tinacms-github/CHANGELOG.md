@@ -1,5 +1,45 @@
 # Change Log
 
+## 0.51.12
+
+### Patch Changes
+
+- Updated dependencies [2c7718636]
+  - @tinacms/toolkit@0.56.4
+  - next-tinacms-markdown@0.50.3
+
+## 0.51.11
+
+### Patch Changes
+
+- 4adaf15af: Fix types which weren't included in previous patch
+  - next-tinacms-markdown@0.50.3
+
+## 0.51.10
+
+### Patch Changes
+
+- Updated dependencies [4700d7ae4]
+  - @tinacms/toolkit@0.56.3
+  - next-tinacms-markdown@0.50.3
+
+## 0.51.9
+
+### Patch Changes
+
+- Updated dependencies [bc4699d2b]
+  - @tinacms/toolkit@0.56.2
+  - next-tinacms-markdown@0.50.3
+
+## 0.51.8
+
+### Patch Changes
+
+- Updated dependencies [f6876d30f]
+- Updated dependencies [92268fc85]
+  - @tinacms/toolkit@0.56.1
+  - next-tinacms-markdown@0.50.3
+
 ## 0.51.7
 
 ### Patch Changes

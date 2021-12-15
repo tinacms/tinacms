@@ -1,0 +1,25 @@
+{
+  "data": {
+    "getMovieList": {
+      "edges": []
+    },
+    "b": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    },
+    "c": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/actors/harrison.md"
+          }
+        }
+      ]
+    }
+  }
+}

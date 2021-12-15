@@ -14,15 +14,12 @@ limitations under the License.
 import React from 'react'
 import { BiLogIn } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
-import { setEditing } from '../../edit-state'
+import { useEditState } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
 
-const login = () => {
-  setEditing(true)
-  window.location.reload()
-}
-
 const LoginPage = () => {
+  const { setEdit } = useEditState()
+  const login = () => setEdit(true)
   return (
     <AuthTemplate message="Please log in to Tina Cloud to access your content.">
       <a
