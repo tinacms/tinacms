@@ -54,37 +54,34 @@ import { InputProps, InputCss } from '../../../components'
 
 const options = createPlateOptions()
 
-const wrapValue = (value) => {
-  return value.children
-    ? [
-        ...value.children?.map(normalize),
-        { type: 'p', children: [{ type: 'text', text: '' }] },
-      ]
-    : // Empty values need at least one item
-      [{ type: 'p', children: [{ type: 'text', text: '' }] }]
-}
-
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: unknown[] }
 >((props) => {
   const [initialValue, setInitialValue] = React.useState()
-  const [key, setKey] = React.useState(0)
-
-  React.useEffect(() => {
-    if (initialValue) {
-      if (initialValue === JSON.stringify(props.input.value)) {
-        setKey((key) => key + 1)
-      }
-    }
-  }, [JSON.stringify(props.input.value)])
 
   React.useEffect(() => {
     setInitialValue(JSON.stringify(props.input.value))
   }, [])
 
+  React.useEff
+
+  const [value, setValue] = React.useState(
+    props.input.value.children
+      ? [
+          ...props.input.value.children?.map(normalize),
+          { type: 'p', children: [{ type: 'text', text: '' }] },
+        ]
+      : // Empty values need at least one item
+        [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+  )
+
   const templates = props.field.templates
   const name = props.input.name
+
+  React.useEffect(() => {
+    props.input.onChange({ type: 'root', children: value })
+  }, [JSON.stringify(value)])
 
   const components = createPlateComponents({
     img: (props) => <Img {...props} name={name} />,
@@ -131,13 +128,12 @@ export const RichEditor = wrapFieldsWithMeta<
       <PlateWrapper>
         <Plate
           id={props.input.name}
-          initialValue={wrapValue(props.input.value)}
-          key={key}
+          initialValue={value}
           plugins={pluginsBasic}
           components={components}
           options={options}
           onChange={(value) => {
-            props.input.onChange({ type: 'root', children: value })
+            setValue(value)
           }}
         />
       </PlateWrapper>
