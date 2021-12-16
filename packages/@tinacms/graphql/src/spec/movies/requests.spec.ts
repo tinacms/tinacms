@@ -15,7 +15,7 @@ import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
-import { MemoryStore } from '../../database/store/memory'
+import { MemoryStore } from '@tinacms/datalayer'
 
 class FilesystemStoreTest extends MemoryStore {
   public supportsSeeding() {

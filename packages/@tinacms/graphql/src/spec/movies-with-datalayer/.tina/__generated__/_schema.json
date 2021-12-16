@@ -6,9 +6,7 @@
     "patch": "2"
   },
   "meta": {
-    "flags": [
-      "experimentalData"
-    ]
+    "flags": ["experimentalData"]
   },
   "collections": [
     {
@@ -20,81 +18,50 @@
           "name": "title",
           "label": "Title",
           "type": "string",
-          "namespace": [
-            "movie",
-            "title"
-          ]
+          "namespace": ["movie", "title"]
         },
         {
           "name": "releaseDate",
           "label": "Release Date",
           "type": "datetime",
-          "namespace": [
-            "movie",
-            "releaseDate"
-          ]
+          "namespace": ["movie", "releaseDate"]
         },
         {
           "name": "rating",
           "label": "Rating",
           "required": true,
           "type": "number",
-          "namespace": [
-            "movie",
-            "rating"
-          ]
+          "namespace": ["movie", "rating"]
         },
         {
           "name": "archived",
           "label": "Archived",
           "type": "boolean",
-          "namespace": [
-            "movie",
-            "archived"
-          ]
+          "namespace": ["movie", "archived"]
         },
         {
           "name": "genre",
           "label": "Genre",
           "type": "string",
-          "options": [
-            "scifi",
-            "mystery",
-            "drama",
-            "comedy",
-            "action"
-          ],
-          "namespace": [
-            "movie",
-            "genre"
-          ]
+          "options": ["scifi", "mystery", "drama", "comedy", "action"],
+          "namespace": ["movie", "genre"]
         },
         {
           "type": "reference",
           "label": "Director",
           "name": "director",
-          "collections": [
-            "director"
-          ],
-          "namespace": [
-            "movie",
-            "director"
-          ]
+          "collections": ["director"],
+          "namespace": ["movie", "director"]
         },
         {
           "name": "body",
           "label": "Body",
           "type": "string",
           "isBody": true,
-          "namespace": [
-            "movie",
-            "body"
-          ]
+          "namespace": ["movie", "body"]
         }
       ],
-      "namespace": [
-        "movie"
-      ]
+      "namespace": ["movie"]
     },
     {
       "label": "Director",
@@ -105,15 +72,10 @@
           "type": "string",
           "label": "Name",
           "name": "name",
-          "namespace": [
-            "director",
-            "name"
-          ]
+          "namespace": ["director", "name"]
         }
       ],
-      "namespace": [
-        "director"
-      ]
+      "namespace": ["director"]
     },
     {
       "label": "Crew",
@@ -128,17 +90,10 @@
               "name": "favoriteColor",
               "label": "Favorite Color",
               "type": "string",
-              "namespace": [
-                "crew",
-                "costumeDesigner",
-                "favoriteColor"
-              ]
+              "namespace": ["crew", "costumeDesigner", "favoriteColor"]
             }
           ],
-          "namespace": [
-            "crew",
-            "costumeDesigner"
-          ]
+          "namespace": ["crew", "costumeDesigner"]
         },
         {
           "label": "Stunt Person",
@@ -148,26 +103,14 @@
               "name": "bestMove",
               "label": "Best Move",
               "type": "string",
-              "options": [
-                "frontFlip",
-                "backFlip"
-              ],
-              "namespace": [
-                "crew",
-                "stuntPerson",
-                "bestMove"
-              ]
+              "options": ["frontFlip", "backFlip"],
+              "namespace": ["crew", "stuntPerson", "bestMove"]
             }
           ],
-          "namespace": [
-            "crew",
-            "stuntPerson"
-          ]
+          "namespace": ["crew", "stuntPerson"]
         }
       ],
-      "namespace": [
-        "crew"
-      ]
+      "namespace": ["crew"]
     },
     {
       "label": "Actor",
@@ -178,24 +121,16 @@
           "type": "string",
           "label": "Name",
           "name": "name",
-          "namespace": [
-            "actor",
-            "name"
-          ]
+          "namespace": ["actor", "name"]
         },
         {
           "type": "string",
           "label": "Body",
           "name": "body",
-          "namespace": [
-            "actor",
-            "body"
-          ]
+          "namespace": ["actor", "body"]
         }
       ],
-      "namespace": [
-        "actor"
-      ]
+      "namespace": ["actor"]
     }
   ]
 }
