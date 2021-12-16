@@ -13,16 +13,15 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
+import { buildSchema, createDatabase } from '@tinacms/graphql'
 import {
-  buildSchema,
-  createDatabase,
   MemoryStore,
   FilesystemStore,
   GithubStore,
   GithubBridge,
   FilesystemBridge,
   LevelStore,
-} from '@tinacms/graphql'
+} from '@tinacms/datalayer'
 import { genTypes } from '../query-gen'
 import { compile, resetGeneratedFolder } from '../compile'
 import chokidar from 'chokidar'
