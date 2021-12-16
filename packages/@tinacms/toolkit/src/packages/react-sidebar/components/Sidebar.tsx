@@ -394,11 +394,15 @@ const SidebarWrapper = ({ children }) => {
             ? `transition-all duration-150 ease-out`
             : `transition-all duration-300 ease-out`
         }`}
-        style={{
-          width: sidebarWidth,
-          maxWidth: '100vw',
-          minWidth: '360px',
-        }}
+        style={
+          displayState !== 'closed'
+            ? {
+                width: sidebarWidth,
+                maxWidth: '100vw',
+                minWidth: '360px',
+              }
+            : { width: 0 }
+        }
       >
         {children}
       </div>
