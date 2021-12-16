@@ -75,7 +75,7 @@ export const ResizeHandle = () => {
   return (
     <div
       onMouseDown={handleresizingSidebar}
-      className={`z-100 absolute top-1/2 right-1 w-3 h-32 bg-gray-50 rounded-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-150 ease-out transform translate-x-1/2 -translate-y-1/2 group hover:bg-white ${
+      className={`z-100 absolute top-1/2 right-0 w-2 h-32 bg-white rounded-r-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50 ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${resizingSidebar ? `scale-110` : ``}`}
       style={{ cursor: 'grab' }}
