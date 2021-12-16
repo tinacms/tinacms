@@ -117,6 +117,7 @@ const SimpleBranchSelector = ({ branchList, currentBranch, onChange }) => {
         {branchList.map((branch) => {
           return (
             <option
+              key={`branch-${branch.name}`}
               value={branch.name}
               disabled={branch.name === currentBranch}
             >
