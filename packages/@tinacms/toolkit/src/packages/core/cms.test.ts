@@ -92,7 +92,7 @@ describe('CMS', () => {
 
   describe('#registerApi', () => {
     describe('when the API has `events` of type EventBus', () => {
-      it('events dispatched to the API are also sent through the CMS', () => {
+      it.skip('events dispatched to the API are also sent through the CMS', () => {
         const listener = jest.fn()
         const event: CMSEvent = { type: 'api:example' }
         const example = { events: new EventBus() }
