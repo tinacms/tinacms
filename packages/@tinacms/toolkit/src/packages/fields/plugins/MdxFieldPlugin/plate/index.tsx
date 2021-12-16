@@ -141,9 +141,16 @@ const normalize = (node: any) => {
     }
   }
   if (node.children) {
-    return {
-      ...node,
-      children: node.children.map(normalize),
+    if (node.children.length > 0) {
+      return {
+        ...node,
+        children: node.children.map(normalize),
+      }
+    } else {
+      return {
+        ...node,
+        children: [{ type: 'text', text: '' }],
+      }
     }
   }
   return node
