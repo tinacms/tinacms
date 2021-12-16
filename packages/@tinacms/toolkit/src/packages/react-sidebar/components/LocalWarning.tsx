@@ -25,6 +25,7 @@ export const LocalWarning = () => {
       style={{
         display: 'flex',
         width: '100%',
+        fontSize: '14px',
         alignItems: 'center',
         padding: '6px 14px',
         color: '#ab9e58',
@@ -36,16 +37,16 @@ export const LocalWarning = () => {
     >
       <AiFillWarning
         style={{
-          width: '1.25rem',
+          width: '16px',
           height: 'auto',
           display: 'inline-block',
-          marginRight: '0.25rem',
-          opacity: '0.4',
-          color: 'inherit',
+          marginRight: '4px',
+          opacity: '0.7',
+          fill: '#ab9e58',
         }}
       />{' '}
       You are currently in
-      <strong style={{ marginLeft: '0.25rem', color: 'inherit' }}>
+      <strong style={{ marginLeft: '3px', color: 'inherit' }}>
         Local Mode
       </strong>
     </a>
