@@ -31,9 +31,11 @@ import { Database } from './database'
 export const indexDB = async ({
   database,
   config,
+  buildSDK = true,
 }: {
   database: Database
   config: TinaSchema['config']
+  buildSDK?: boolean
 }) => {
   const flags = []
   if (database.store.supportsIndexing()) {
@@ -47,8 +49,10 @@ export const indexDB = async ({
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   // @ts-ignore
   await database.indexData({ graphQLSchema, tinaSchema })
-  await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
-  await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
+  if (buildSDK) {
+    await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
+    await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
+  }
 }
 
 const _buildFragments = async (

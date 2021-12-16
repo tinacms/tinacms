@@ -106,6 +106,7 @@ const SimpleBranchSelector = ({ branchList, currentBranch, onChange }) => {
           margin: '2rem',
           fontSize: '1.2rem',
           minWidth: '10em',
+          maxWidth: 'calc(100% - 4rem)',
           padding: '0.5rem',
         }}
       >

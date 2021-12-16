@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.4
+
+### Patch Changes
+
+- 2c7718636: updated media link
+
 ## 0.56.3
 
 ### Patch Changes

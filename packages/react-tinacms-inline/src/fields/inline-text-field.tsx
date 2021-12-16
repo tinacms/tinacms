@@ -100,4 +100,5 @@ const Input = styled.input`
   overflow: visible;
   position: relative;
   -ms-overflow-style: none;
+  color: inherit;
 `
