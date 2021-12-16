@@ -95,6 +95,7 @@ const Textarea = styled(TextareaAutosize)`
   border: none;
   overflow: visible;
   position: relative;
+  color: inherit;
   -ms-overflow-style: none;
 
   ::-webkit-scrollbar {
