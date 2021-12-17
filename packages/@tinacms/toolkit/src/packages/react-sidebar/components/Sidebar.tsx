@@ -383,10 +383,16 @@ const SidebarWrapper = ({ children }) => {
     React.useContext(SidebarContext)
 
   return (
-    <div className="fixed top-0 left-0 h-screen z-base">
+    <div
+      className={`fixed top-0 left-0 h-screen z-base ${
+        displayState === 'closed' ? `pointer-events-none` : ``
+      }`}
+    >
       <div
         className={`relative flex h-screen transform ${
-          displayState !== 'closed' ? `` : `-translate-x-full`
+          displayState === 'closed'
+            ? `pointer-events-none -translate-x-full`
+            : ``
         } ${
           resizingSidebar
             ? `transition-none`
@@ -394,15 +400,11 @@ const SidebarWrapper = ({ children }) => {
             ? `transition-all duration-150 ease-out`
             : `transition-all duration-300 ease-out`
         }`}
-        style={
-          displayState !== 'closed'
-            ? {
-                width: sidebarWidth,
-                maxWidth: '100vw',
-                minWidth: '360px',
-              }
-            : { width: 0 }
-        }
+        style={{
+          width: sidebarWidth,
+          maxWidth: '100vw',
+          minWidth: '360px',
+        }}
       >
         {children}
       </div>
@@ -415,7 +417,7 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full bg-gray-50 shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
     >
