@@ -20,6 +20,7 @@ import * as React from 'react'
 import { useState } from 'react'
 import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
+import { MdClose } from 'react-icons/md'
 import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
 import { Button } from '../../styles'
 import { CreateContentMenu } from '../../react-forms'
@@ -155,10 +156,11 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
+                className="text-gray-600 hover:text-blue-500"
                 onClick={() => setMenuIsOpen(!menuIsOpen)}
                 open={menuIsOpen}
               >
-                <HamburgerIcon />
+                <HamburgerIcon className="w-9 h-auto" />
               </MenuToggle>
             )}
             <CreateContentMenu sidebar={true} />
@@ -297,82 +299,45 @@ const MenuButton = ({ children, ...props }) => {
 
 const SidebarHeader = ({ children }) => {
   return (
-    <div className="absolute top-0 left-0 w-full p-4 flex items-center justify-between z-chrome pointer-events-none">
+    <div className="flex-grow-0 bg-white text-gray-700 w-full p-4 flex items-center justify-between pointer-events-none">
       {children}
     </div>
   )
 }
 
-const MenuToggle = styled.button<{ open: boolean }>`
-  padding: 0 0 0 var(--tina-padding-big);
-  margin-left: calc(var(--tina-padding-big) * -1);
-  background: transparent;
-  outline: none;
-  border: 0;
-  text-align: left;
-  width: 64px;
-  height: 32px;
-  cursor: pointer;
-  pointer-events: auto;
-
-  svg {
-    position: relative;
-    transition: fill 85ms ease-out;
-    fill: var(--tina-color-grey-6);
-    margin-left: -4px;
-    width: 32px;
-    height: auto;
-    path {
-      position: relative;
-      transition: transform var(--tina-timing-long) ease-out,
-        opacity var(--tina-timing-long) ease-out,
-        fill var(--tina-timing-short) ease-out;
-      transform-origin: 50% 50%;
-    }
-  }
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-7);
-    }
-  }
-  ${(props) =>
-    props.open &&
-    css<any>`
-      svg {
-        fill: var(--tina-color-grey-1);
-        &:hover {
-          fill: var(--tina-color-grey-2);
-        }
-        path:first-child {
-          /* Top bar */
-          transform: rotate(45deg) translate3d(0, 0.45rem, 0);
-        }
-        path:nth-child(2) {
-          /* Middle bar */
-          transform: translate3d(-100%, 0, 0);
-          opacity: 0;
-        }
-        path:last-child {
-          /* Bottom Bar */
-          transform: rotate(-45deg) translate3d(0, -0.45rem, 0);
-        }
-      }
-    `};
-`
+const MenuToggle = ({ children, className = ``, ...props }) => {
+  return (
+    <button
+      className={`p-0 z-10 bg-transparent outline-none border-0 text-left -ml-1 w-11 h-11 flex items-center justify-center cursor-pointer pointer-events-auto ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
 const MenuList = ({ children }) => {
   return <ul className="">{children}</ul>
 }
 
 const MenuPanel = ({ children }) => {
-  const { menuIsOpen } = React.useContext(SidebarContext)
+  const { menuIsOpen, setMenuIsOpen } = React.useContext(SidebarContext)
 
   return (
     <div
-      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-12 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
+      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-16 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
         menuIsOpen ? `` : `-translate-x-full`
       }`}
     >
+      <div className="absolute top-3 right-4">
+        <MenuToggle
+          className="text-gray-300 hover:text-blue-400"
+          onClick={() => setMenuIsOpen(false)}
+          open={menuIsOpen}
+        >
+          <MdClose className="w-9 h-auto" />
+        </MenuToggle>
+      </div>
       {children}
     </div>
   )
@@ -417,7 +382,7 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out flex flex-col items-stretch ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
     >

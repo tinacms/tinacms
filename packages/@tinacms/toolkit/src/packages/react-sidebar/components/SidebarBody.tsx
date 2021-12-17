@@ -152,11 +152,11 @@ interface FormWrapperProps {
 }
 
 const FormWrapper = styled.div<FormWrapperProps>`
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   overflow: hidden;
-  padding-top: 64px;
   height: 100%;
   width: 100%;
   position: relative;
