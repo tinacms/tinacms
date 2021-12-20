@@ -623,9 +623,16 @@ export class Resolver {
     assertShape<{ [key: string]: unknown }>(rawData, (yup) => yup.object())
     const value = rawData[field.name]
     switch (field.type) {
+      case 'datetime':
+        // See you in March ;)
+        if (value instanceof Date) {
+          accumulator[field.name] = value.toISOString()
+        } else {
+          accumulator[field.name] = value
+        }
+        break
       case 'string':
       case 'boolean':
-      case 'datetime':
       case 'number':
       case 'reference':
       case 'image':
