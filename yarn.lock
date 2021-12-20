@@ -4481,6 +4481,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testing-library/jest-dom@npm:^5.11.9":
+  version: 5.16.1
+  resolution: "@testing-library/jest-dom@npm:5.16.1"
+  dependencies:
+    "@babel/runtime": ^7.9.2
+    "@types/testing-library__jest-dom": ^5.9.1
+    aria-query: ^5.0.0
+    chalk: ^3.0.0
+    css: ^3.0.0
+    css.escape: ^1.5.1
+    dom-accessibility-api: ^0.5.6
+    lodash: ^4.17.15
+    redent: ^3.0.0
+  checksum: c91fb03e5bcec558cc16116e6fd051fb8818727c8d040aac167db229531c37b00937d5ce315e403fc6408a41447fa2739505be05b5103465d5685d6d7df3dda7
+  languageName: node
+  linkType: hard
+
 "@testing-library/react@npm:^12.0.0":
   version: 12.0.0
   resolution: "@testing-library/react@npm:12.0.0"
@@ -4491,6 +4508,17 @@ __metadata:
     react: "*"
     react-dom: "*"
   checksum: 2b5da0513f5de02636c1610625ca55222ea5c89ee271a9c9c3bcc1282010b9649b8168b8c84d8dc37a29daf0a8c909280ccaf8648dd09c19f2e2d640ea7f9459
+  languageName: node
+  linkType: hard
+
+"@testing-library/user-event@npm:^12.7.0":
+  version: 12.8.3
+  resolution: "@testing-library/user-event@npm:12.8.3"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    "@testing-library/dom": ">=7.21.4"
+  checksum: de7ec0222bc30f5b967c03298563c9c1fe2dc94e3d1ad94607df90f660f68d9c9686c25f59be4f049ab3cccc80080d6056b32d6851666afe3fbc35d9c384fb20
   languageName: node
   linkType: hard
 
@@ -4534,6 +4562,7 @@ __metadata:
     "@graphql-codegen/visitor-plugin-common": ^2.4.0
     "@graphql-tools/graphql-file-loader": ^7.2.0
     "@graphql-tools/load": ^7.3.2
+    "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
@@ -4581,13 +4610,50 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tinacms/graphql@workspace:*, @tinacms/graphql@workspace:packages/@tinacms/graphql":
+"@tinacms/datalayer@workspace:*, @tinacms/datalayer@workspace:packages/@tinacms/datalayer":
   version: 0.0.0-use.local
-  resolution: "@tinacms/graphql@workspace:packages/@tinacms/graphql"
+  resolution: "@tinacms/datalayer@workspace:packages/@tinacms/datalayer"
   dependencies:
     "@octokit/auth-app": ^2.6.0
     "@octokit/graphql": ^4.5.6
     "@octokit/rest": 18.0.6
+    "@tinacms/scripts": "workspace:*"
+    "@types/fs-extra": ^9.0.2
+    "@types/jest": ^26.0.4
+    "@types/js-yaml": ^3.12.5
+    "@types/level": ^6.0.0
+    "@types/lodash": ^4.14.161
+    "@types/lodash.camelcase": ^4.3.6
+    "@types/lodash.upperfirst": ^4.3.6
+    "@types/node": ^14.17.34
+    "@types/normalize-path": ^3.0.0
+    "@types/yup": ^0.29.7
+    encoding-down: ^7.1.0
+    fast-glob: ^3.2.5
+    fs-extra: ^9.0.1
+    graphql: ^15.3.0
+    gray-matter: ^4.0.2
+    jest: 27.0.6
+    jest-diff: 27.0.6
+    jest-file-snapshot: ^0.5.0
+    jest-matcher-utils: 27.0.6
+    js-yaml: ^3.14.0
+    level: ^7.0.1
+    levelup: ^5.1.1
+    lodash: ^4.17.20
+    memdown: ^6.1.1
+    normalize-path: ^3.0.0
+    prettier: ^2.2.1
+    typescript: ^4.3.5
+    yup: ^0.32.9
+  languageName: unknown
+  linkType: soft
+
+"@tinacms/graphql@workspace:*, @tinacms/graphql@workspace:packages/@tinacms/graphql":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/graphql@workspace:packages/@tinacms/graphql"
+  dependencies:
+    "@tinacms/datalayer": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
     "@types/estree": ^0.0.50
@@ -4624,15 +4690,12 @@ __metadata:
     jest-file-snapshot: ^0.5.0
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
-    level: ^7.0.1
-    levelup: ^5.1.1
     lodash: ^4.17.20
     mdast: ^3.0.0
     mdast-util-from-markdown: ^1.0.0
     mdast-util-mdx: ^1.1.0
     mdast-util-mdx-expression: ^1.1.0
     mdast-util-to-markdown: ^1.2.1
-    memdown: ^6.1.1
     micromark-extension-mdxjs: ^1.0.0
     mocha: ^9.1.1
     nodemon: ^2.0.4
@@ -4708,12 +4771,16 @@ __metadata:
   resolution: "@tinacms/toolkit@workspace:packages/@tinacms/toolkit"
   dependencies:
     "@sambego/storybook-styles": ^1.0.0
+    "@testing-library/jest-dom": ^5.11.9
+    "@testing-library/react": ^12.0.0
+    "@testing-library/user-event": ^12.7.0
     "@tinacms/scripts": "workspace:*"
     "@types/atob": ^2.1.2
     "@types/codemirror": ^0.0.71
     "@types/color-string": ^1.5.0
     "@types/cors": ^2.8.12
     "@types/express": ^4.17.13
+    "@types/jest": ^27.0.1
     "@types/lodash.debounce": ^4.0.6
     "@types/lodash.get": ^4.4.5
     "@types/multer": ^1.4.7
@@ -4732,6 +4799,7 @@ __metadata:
     express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
+    jest: ^27.0.6
     lodash.get: ^4.4.2
     moment: ">=2 <=3"
     multer: 1.4.2
@@ -4745,6 +4813,7 @@ __metadata:
     react-dropzone: 10.1.8
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
+    react-is: ^17.0.2
     simple-git: 1.126.0
     slate: ^0.66.0
     slate-history: ^0.66.0
@@ -5168,6 +5237,16 @@ __metadata:
   dependencies:
     "@types/istanbul-lib-report": "*"
   checksum: 398cc6bea308522f70829875c983cb26a19f2e420859a629d57713e3bfad64a02cf1c505575b29b5c3a1816397ad523135ae43a67eaeeae3b054f75233f4e7c4
+  languageName: node
+  linkType: hard
+
+"@types/jest@npm:*":
+  version: 27.0.3
+  resolution: "@types/jest@npm:27.0.3"
+  dependencies:
+    jest-diff: ^27.0.0
+    pretty-format: ^27.0.0
+  checksum: c3c0f707f86d9b4195e29fd28871bd1017a242a60764d8f404ef3f8c5d9cdf95fc1d69fde9e2de09f23987457647cc690b9a9834ec6a3bf14a65ddb1d2cba492
   languageName: node
   linkType: hard
 
@@ -5971,6 +6050,15 @@ __metadata:
   dependencies:
     "@types/estree": "*"
   checksum: c2d8ed65340d63cc86ba34c7a9bcf314e44f647bc3bdaacd585ab288946531876f8feb4b900b6e8747c5265c7ee895fb2cbe883368bd5fa9508b9f41d2dd743a
+  languageName: node
+  linkType: hard
+
+"@types/testing-library__jest-dom@npm:^5.9.1":
+  version: 5.14.2
+  resolution: "@types/testing-library__jest-dom@npm:5.14.2"
+  dependencies:
+    "@types/jest": "*"
+  checksum: 43b426ca7364199a6c321e9b8e1c1950d728db64056c93fccb87901c438e676da5edcb2d6863f1c7f4ca9aa96904b2028ae59ff588570ec37582711519d3524f
   languageName: node
   linkType: hard
 
@@ -8379,6 +8467,13 @@ __metadata:
     "@babel/runtime": ^7.10.2
     "@babel/runtime-corejs3": ^7.10.2
   checksum: dc7631b6f9aee453aee3587f1b4e998e2fca89909a7d2587d91694165d161850a8b64c433348efde78297e35473df6d79deb7abea8571f82485dad9b5401c390
+  languageName: node
+  linkType: hard
+
+"aria-query@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "aria-query@npm:5.0.0"
+  checksum: d25020459620570d05d39327e1269da4f213ff1632c0b8be1bfac984c76601dfcfe7acacd94da4c007ea204144fee8728d6d0d4b7d0f527e84cd748bf980bddc
   languageName: node
   linkType: hard
 
@@ -11867,7 +11962,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css.escape@npm:1.5.1, css.escape@npm:^1.5.0":
+"css.escape@npm:1.5.1, css.escape@npm:^1.5.0, css.escape@npm:^1.5.1":
   version: 1.5.1
   resolution: "css.escape@npm:1.5.1"
   checksum: 44fe5e93fee46fe60dbd0cdd078b14ef75697ee93519a7157f976b655463dd66eba598b0df16c16a897ac884c97845d2a3819cb8d370cbf91bc59bb557ebe826
@@ -11883,6 +11978,17 @@ __metadata:
     source-map-resolve: ^0.5.2
     urix: ^0.1.0
   checksum: b94365b3c07c35529beab95f679102c66d1027774c2e80f5179a6ee11ccc440046aeb7771df33569334bbdfd8ea753dd132197040dc079fcd881141348a1886f
+  languageName: node
+  linkType: hard
+
+"css@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "css@npm:3.0.0"
+  dependencies:
+    inherits: ^2.0.4
+    source-map: ^0.6.1
+    source-map-resolve: ^0.6.0
+  checksum: a62cc8350fa1f6805a81447dc4a1df30f37316bcb671e4669531b5ddf24a8dd7024324ce321a8ec0b1dd48baafb38781ae4b0d80fa7c7f5adab5f46b8b9e29c8
   languageName: node
   linkType: hard
 
@@ -27122,6 +27228,16 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"source-map-resolve@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "source-map-resolve@npm:0.6.0"
+  dependencies:
+    atob: ^2.1.2
+    decode-uri-component: ^0.2.0
+  checksum: 9bbd2656937ce422f1526026638a91dacba0822f1ab954ac34728c9b4f2960dbfc22a8463af9fbf74f28f3722263444df79b2b5ffa07de07dbcda2ec5a8c7513
+  languageName: node
+  linkType: hard
+
 "source-map-support@npm:^0.5.3, source-map-support@npm:^0.5.6, source-map-support@npm:~0.5.12, source-map-support@npm:~0.5.19":
   version: 0.5.19
   resolution: "source-map-support@npm:0.5.19"
@@ -28679,9 +28795,13 @@ resolve@^2.0.0-next.3:
   dependencies:
     "@headlessui/react": ^1.4.1
     "@heroicons/react": ^1.0.4
+    "@testing-library/jest-dom": ^5.11.9
+    "@testing-library/react": ^12.0.0
+    "@testing-library/user-event": ^12.7.0
     "@tinacms/scripts": "workspace:*"
     "@tinacms/sharedctx": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
+    "@types/jest": ^27.0.1
     "@types/lodash": ^4.14.169
     "@types/node": ^14.0.13
     "@types/react": ^16.9.38
@@ -28690,11 +28810,13 @@ resolve@^2.0.0-next.3:
     final-form: 4.20.1
     graphql: ^15.1.0
     graphql-tag: ^2.11.0
+    jest: ^27.0.6
     lodash.set: ^4.3.2
     next: 9.4.2
     react: 16.14.0
     react-dom: 16.14.0
     react-icons: ^4.3.1
+    react-is: ^17.0.2
     react-router-dom: 6
     styled-components: ^5.2.0
     typescript: ^4.3.5
