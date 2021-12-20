@@ -14,7 +14,6 @@ import * as React from 'react'
 import { BranchSwitcherProps, Branch, BranchChangeEvent } from './types'
 import styled from 'styled-components'
 import { useBranchData } from './BranchData'
-import { useEvent } from '../../packages/react-core/use-cms-event'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 
@@ -95,37 +94,56 @@ const BranchSelector = ({
 }) => {
   const [newBranch, setNewBranch] = React.useState('')
   const branchExists = branchList.find((branch) => branch.name === newBranch)
+  const filteredBranchList = branchList.filter(
+    (branch) => !newBranch || branch.name.includes(newBranch)
+  )
   return (
     <SelectorColumn>
-      <input value={newBranch} onChange={(e) => setNewBranch(e.target.value)} />
-      <hr />
+      <input
+        placeholder="Type the name of a branch to filter or create"
+        value={newBranch}
+        style={{ padding: '0.5rem' }}
+        onChange={(e) => setNewBranch(e.target.value)}
+      />
+
       {!branchExists && newBranch ? (
-        <SelectableItem onClick={() => onCreateBranch(newBranch)}>
-          Create New Branch `{newBranch}`...
-        </SelectableItem>
+        <>
+          <Spacer />
+          <Button small primary onClick={() => onCreateBranch(newBranch)}>
+            Create New Branch `{newBranch}`...
+          </Button>
+        </>
       ) : (
         ''
       )}
-      <hr />
-      <ListWrap>
-        {branchList
-          .filter((branch) => !newBranch || branch.name.includes(newBranch))
-          .map((branch) => {
-            return (
-              <SelectableItem
-                key={branch}
-                onClick={() => onChange(branch.name)}
-              >
-                {branch.name}
-                {branch.name === currentBranch && (
-                  <span style={{ fontStyle: 'italic', opacity: 0.5 }}>
-                    (current)
-                  </span>
-                )}
-              </SelectableItem>
-            )
-          })}
-      </ListWrap>
+      {filteredBranchList.length > 0 && (
+        <>
+          <Spacer />
+          <ListWrap>
+            {filteredBranchList.map((branch) => {
+              const isCurrentBranch = branch.name === currentBranch
+              return (
+                <SelectableItem
+                  key={branch}
+                  onClick={() => onChange(branch.name)}
+                  style={
+                    isCurrentBranch
+                      ? {
+                          opacity: 0.6,
+                          pointerEvents: 'none',
+                          fontStyle: 'italic',
+                        }
+                      : {}
+                  }
+                >
+                  {branch.name}
+                  {isCurrentBranch && '(current)'}
+                </SelectableItem>
+              )
+            })}
+          </ListWrap>
+        </>
+      )}
     </SelectorColumn>
   )
 }
@@ -153,7 +171,15 @@ const SelectableItem = styled.div`
   }
 `
 const ListWrap = styled.div`
-  border: 1px solid magenta;
   max-height: 70vh;
-  overflow-y: auto;
+  overflow: auto;
+  white-space: nowrap;
+  background-color: #fff;
+  padding: 0.5rem;
+  box-shadow: inset 0px 0px 5px 0px rgb(0 0 0 / 20%);
+`
+const Spacer = styled.div`
+  height: 0;
+  width: 100%;
+  margin: 0.5rem 0;
 `
