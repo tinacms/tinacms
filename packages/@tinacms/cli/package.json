@@ -56,6 +56,7 @@
     "@graphql-codegen/visitor-plugin-common": "^2.4.0",
     "@graphql-tools/graphql-file-loader": "^7.2.0",
     "@graphql-tools/load": "^7.3.2",
+    "@tinacms/datalayer": "workspace:*",
     "@tinacms/graphql": "workspace:*",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
