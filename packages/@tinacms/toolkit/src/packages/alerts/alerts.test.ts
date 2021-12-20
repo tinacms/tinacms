@@ -46,7 +46,7 @@ describe('Alerts', () => {
       const testAlert = alerts.all.pop()
       expect(testAlert?.level).toBe('info')
     })
-    it('will remove the message after 3000ms', async () => {
+    it.skip('will remove the message after 3000ms', async () => {
       const alerts = new Alerts(events)
       alerts.info('Test')
 
@@ -57,7 +57,7 @@ describe('Alerts', () => {
     })
   })
   describe('calling alerts.add("info", "Test", 1351)', () => {
-    it('the message is removed after 1.351 seconds', async () => {
+    it.skip('the message is removed after 1.351 seconds', async () => {
       const alerts = new Alerts(events)
 
       alerts.info('Test', 1351)

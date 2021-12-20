@@ -1,0 +1,68 @@
+{
+  "name": "@tinacms/datalayer",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node",
+        "bundle": []
+      }
+    ]
+  },
+  "scripts": {
+    "types": "yarn tsc",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@octokit/auth-app": "^2.6.0",
+    "@octokit/graphql": "^4.5.6",
+    "@octokit/rest": "18.0.6",
+    "encoding-down": "^7.1.0",
+    "fast-glob": "^3.2.5",
+    "fs-extra": "^9.0.1",
+    "graphql": "^15.3.0",
+    "gray-matter": "^4.0.2",
+    "js-yaml": "^3.14.0",
+    "level": "^7.0.1",
+    "levelup": "^5.1.1",
+    "lodash": "^4.17.20",
+    "memdown": "^6.1.1",
+    "normalize-path": "^3.0.0",
+    "prettier": "^2.2.1",
+    "yup": "^0.32.9"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/datalayer"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@types/fs-extra": "^9.0.2",
+    "@types/jest": "^26.0.4",
+    "@types/js-yaml": "^3.12.5",
+    "@types/level": "^6.0.0",
+    "@types/lodash": "^4.14.161",
+    "@types/lodash.camelcase": "^4.3.6",
+    "@types/lodash.upperfirst": "^4.3.6",
+    "@types/node": "^14.17.34",
+    "@types/normalize-path": "^3.0.0",
+    "@types/yup": "^0.29.7",
+    "jest": "27.0.6",
+    "jest-diff": "27.0.6",
+    "jest-file-snapshot": "^0.5.0",
+    "jest-matcher-utils": "27.0.6",
+    "typescript": "^4.3.5"
+  }
+}

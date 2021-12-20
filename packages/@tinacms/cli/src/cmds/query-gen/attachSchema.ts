@@ -11,12 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  buildSchema,
-  createDatabase,
-  FilesystemBridge,
-  FilesystemStore,
-} from '@tinacms/graphql'
+import { buildSchema, createDatabase } from '@tinacms/graphql'
+import { FilesystemBridge, FilesystemStore } from '@tinacms/datalayer'
 import { logText } from '../../utils/theme'
 import { logger } from '../../logger'
 
