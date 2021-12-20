@@ -18,6 +18,7 @@ import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
+import UrlPattern from 'url-pattern'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
@@ -161,11 +162,31 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+const parseURL = (url: string): { branch; isLocalClient; clientId } => {
+  if (url.includes('localhost')) {
+    return { branch: null, isLocalClient: true, clientId: null }
+  }
+
+  const tinaHost = 'content.tinajs.io'
+
+  const params = new URL(url)
+  const pattern = new UrlPattern('/content/:clientId/github/:branch')
+  const result = pattern.match(params.pathname)
+
+  if (params.host !== tinaHost) {
+    throw new Error(
+      `The only supported hosts are ${tinaHost} or localhost, but received ${params.host}.`
+    )
+  }
+
+  return {
+    ...result,
+    isLocalClient: false,
+  }
+}
+
 export const TinaCMSProvider2 = ({
   children,
-  branch,
-  clientId,
-  isLocalClient,
   cmsCallback,
   mediaStore,
   tinaioConfig,
@@ -179,11 +200,31 @@ export const TinaCMSProvider2 = ({
   data: object
   /** Your React page component */
   children: () => React.ReactNode
-  /** Point to the local version of GraphQL instead of tina.io */
+  /**
+   * The URL for the GraphQL API.
+   *
+   * When working locally, this should be http://localhost:4001/graphql.
+   *
+   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
+   */
+  apiURL: string
+  /**
+   * Point to the local version of GraphQL instead of tina.io
+   *
+   * @deprecated use apiURL instead
+   */
   isLocalClient?: boolean
-  /** The base branch to pull content from. Note that this is ignored for local development */
+  /**
+   * The base branch to pull content from. Note that this is ignored for local development
+   *
+   * @deprecated use apiURL instead
+   */
   branch?: string
-  /** Your clientID from tina.aio */
+  /**
+   * Your clientID from tina.aio
+   *
+   * @deprecated use apiURL instead
+   */
   clientId?: string
   /** Callback if you need access to the TinaCMS instance */
   cmsCallback?: (cms: TinaCMS) => TinaCMS
@@ -200,6 +241,20 @@ export const TinaCMSProvider2 = ({
   if (typeof props.query === 'string') {
     props.query
   }
+
+  // branch & clientId are still supported, so don't throw if they're provided
+  if (!props.apiURL || (props.branch && props.clientId)) {
+    throw new Error(`apiURL is a required field`)
+  }
+
+  const { branch, clientId, isLocalClient } = props.apiURL
+    ? parseURL(props.apiURL)
+    : {
+        branch: props.branch,
+        clientId: props.clientId,
+        isLocalClient: props.isLocalClient,
+      }
+
   return (
     <TinaCloudProvider
       branch={branch}
@@ -383,10 +438,10 @@ export const staticRequest = async ({
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
 
-The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions.
 This function should only be called on the server at build time.
 
-This will work when developing locally but NOT when deployed to production. 
+This will work when developing locally but NOT when deployed to production.
 `)
   }
 
