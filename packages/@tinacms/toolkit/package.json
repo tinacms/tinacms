@@ -23,12 +23,18 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\""
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "test": "jest --env=jsdom --passWithNoTests",
+    "test-watch": "jest --watch --env=jsdom --passWithNoTests"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^12.7.0",
     "@tinacms/scripts": "workspace:*",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
+    "@types/jest": "^27.0.1",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.get": "^4.4.5",
     "@types/react": "^17.0.14",
@@ -38,8 +44,10 @@
     "@types/react-select": "^2.0.11",
     "@types/storybook__react": "^4.0.2",
     "@types/styled-components": "4.1.8",
+    "jest": "^27.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-is": "^17.0.2",
     "styled-components": ">=4.1",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5"

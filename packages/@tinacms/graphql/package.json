@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.59.1",
+  "version": "0.59.2",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -45,9 +45,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@octokit/auth-app": "^2.6.0",
-    "@octokit/graphql": "^4.5.6",
-    "@octokit/rest": "18.0.6",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -63,15 +60,12 @@
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",
-    "level": "^7.0.1",
-    "levelup": "^5.1.1",
     "lodash": "^4.17.20",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",
     "mdast-util-mdx": "^1.1.0",
     "mdast-util-mdx-expression": "^1.1.0",
     "mdast-util-to-markdown": "^1.2.1",
-    "memdown": "^6.1.1",
     "micromark-extension-mdxjs": "^1.0.0",
     "mocha": "^9.1.1",
     "normalize-path": "^3.0.0",
@@ -100,6 +94,7 @@
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
+    "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",
