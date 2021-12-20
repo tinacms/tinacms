@@ -13,7 +13,7 @@ limitations under the License.
 
 import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
-import { LevelStore } from '../../database/store/level'
+import { LevelStore } from '@tinacms/datalayer'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
 const store = new LevelStore(rootPath, true)

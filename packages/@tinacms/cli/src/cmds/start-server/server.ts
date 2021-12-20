@@ -18,7 +18,6 @@ import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
 
-const GITHUB_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN
 const gqlServer = async (database) => {
   // This is lazily required so we can update the module
   // without having to restart the server
@@ -58,39 +57,6 @@ const gqlServer = async (database) => {
       variables,
     })
     return res.json(result)
-  })
-
-  app.get('/list-branches', async (req, res) => {
-    try {
-      const { query } = req
-      const { owner, repo } = query
-      const result = await gqlPackage.listBranches({
-        auth: GITHUB_ACCESS_TOKEN,
-        owner,
-        repo,
-      })
-
-      return res.json(result.data)
-    } catch (error) {
-      console.error('There was a problem fetching the branches.', error)
-    }
-  })
-
-  app.post('/create-branch', async (req, res) => {
-    try {
-      const { owner, repo, name, baseBranch } = req.body
-      const result = await gqlPackage.createBranch({
-        auth: GITHUB_ACCESS_TOKEN,
-        owner,
-        repo,
-        baseBranch,
-        name,
-      })
-      return res.json(result)
-    } catch (error) {
-      res.end()
-      console.error('There was a problem creating a new branch.', error)
-    }
   })
 
   return server
