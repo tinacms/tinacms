@@ -28,16 +28,16 @@ export const BranchSwitcher = ({
   const [branchList, setBranchList] = React.useState([])
   const { currentBranch, setCurrentBranch } = useBranchData()
 
-  // const handleCreateBranch = React.useCallback((value) => {
-  //   setListState('loading')
-  //   createBranch({
-  //     branchName: value,
-  //     baseBranch: currentBranch,
-  //   }).then(async (createdBranchName) => {
-  //     setCurrentBranch(createdBranchName)
-  //     await refreshBranchList()
-  //   })
-  // }, [])
+  const handleCreateBranch = React.useCallback((value) => {
+    setListState('loading')
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      setCurrentBranch(createdBranchName)
+      await refreshBranchList()
+    })
+  }, [])
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading')
@@ -64,19 +64,12 @@ export const BranchSwitcher = ({
         <>
           {listState === 'ready' ? (
             <SelectWrap>
-              {/* <BranchSelector
-        currentBranch={currentBranch}
-        branchList={branchList}
-        onCreateBranch={(newBranch) => {
-          handleCreateBranch(newBranch)
-        }}
-        onChange={(branchName) => {
-          setCurrentBranch(branchName)
-        }}
-      /> */}
-              <SimpleBranchSelector
-                branchList={branchList}
+              <BranchSelector
                 currentBranch={currentBranch}
+                branchList={branchList}
+                onCreateBranch={(newBranch) => {
+                  handleCreateBranch(newBranch)
+                }}
                 onChange={(branchName) => {
                   setCurrentBranch(branchName)
                 }}
@@ -90,36 +83,6 @@ export const BranchSwitcher = ({
           )}
         </>
       )}
-    </>
-  )
-}
-
-const SimpleBranchSelector = ({ branchList, currentBranch, onChange }) => {
-  return (
-    <>
-      <select
-        onChange={(e) => {
-          onChange(e.target.value)
-        }}
-        value={currentBranch}
-        style={{
-          margin: '2rem',
-          fontSize: '1.2rem',
-          minWidth: '10em',
-          padding: '0.5rem',
-        }}
-      >
-        {branchList.map((branch) => {
-          return (
-            <option
-              value={branch.name}
-              disabled={branch.name === currentBranch}
-            >
-              {branch.name}
-            </option>
-          )
-        })}
-      </select>
     </>
   )
 }
