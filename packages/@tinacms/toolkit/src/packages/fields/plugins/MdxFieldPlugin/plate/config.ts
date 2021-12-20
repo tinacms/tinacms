@@ -94,17 +94,21 @@ export const CONFIG: {
       },
     }),
   }),
+  /**
+   * Indenting isn't really represented in markdown, so disable it.
+   * TODO: remove this block when it's clear this is the correct behavior
+   */
   indent: {
     validTypes: [
-      ELEMENT_PARAGRAPH,
-      ELEMENT_H1,
-      ELEMENT_H2,
-      ELEMENT_H3,
-      ELEMENT_H4,
-      ELEMENT_H5,
-      ELEMENT_H6,
-      ELEMENT_BLOCKQUOTE,
-      ELEMENT_CODE_BLOCK,
+      // ELEMENT_PARAGRAPH,
+      // ELEMENT_H1,
+      // ELEMENT_H2,
+      // ELEMENT_H3,
+      // ELEMENT_H4,
+      // ELEMENT_H5,
+      // ELEMENT_H6,
+      // ELEMENT_BLOCKQUOTE,
+      // ELEMENT_CODE_BLOCK,
     ],
   },
   resetBlockType: {

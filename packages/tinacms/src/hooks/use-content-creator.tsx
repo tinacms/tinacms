@@ -171,7 +171,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
     }
 
     run()
-  }, [cms, values?.collection])
+  }, [cms])
 
   React.useEffect(() => {
     if (plugin) {
