@@ -22,6 +22,19 @@ import { useCMS } from '@tinacms/toolkit'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 
+const errorButtonStyles = {
+  background: '#eb6337',
+  padding: '12px 18px',
+  cursor: 'pointer',
+  borderRadius: '50px',
+  textTransform: 'uppercase',
+  letterSpacing: '2px',
+  fontWeight: 'bold',
+  border: 'none',
+  color: 'white',
+  margin: '1rem 0',
+}
+
 const SetupHooks = (props: {
   query: string
   variables?: object
@@ -79,6 +92,8 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
+    const branchData = window.localStorage.getItem('tinacms-current-branch')
+    const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {
       return (
@@ -113,8 +128,10 @@ class ErrorBoundary extends React.Component {
           >
             <h3 style={{ color: '#eb6337' }}>TinaCMS Render Error</h3>
             <p>Tina caught an error while updating the page:</p>
-            {/* @ts-ignore */}
-            <pre>{this.state.message}</pre>
+            <pre style={{ marginTop: '1rem', overflowX: 'auto' }}>
+              {/* @ts-ignore */}
+              {this.state.message}
+            </pre>
             <br />
             <p>
               If you've just updated the form, undo your most recent changes and
@@ -122,32 +139,40 @@ class ErrorBoundary extends React.Component {
               encountering this error. There is a bigger issue with the site.
               Please reach out to your site admin.
             </p>
-            <div style={{ padding: '10px 0' }}>
-              <button
-                style={{
-                  background: '#eb6337',
-                  padding: '12px 18px',
-                  cursor: 'pointer',
-                  borderRadius: '50px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '2px',
-                  fontWeight: 'bold',
-                  border: 'none',
-                  color: 'white',
-                }}
-                onClick={() => {
-                  /* @ts-ignore */
-                  this.setState({ pageRefresh: true })
-                  setTimeout(
-                    () =>
-                      this.setState({ hasError: false, pageRefresh: false }),
-                    3000
-                  )
-                }}
-              >
-                Refresh
-              </button>
-            </div>
+
+            <button
+              style={errorButtonStyles as any}
+              onClick={() => {
+                /* @ts-ignore */
+                this.setState({ pageRefresh: true })
+                setTimeout(
+                  () => this.setState({ hasError: false, pageRefresh: false }),
+                  3000
+                )
+              }}
+            >
+              Refresh
+            </button>
+            {hasBranchData && (
+              <>
+                <p>
+                  If you're using the branch switcher, you may currently be on a
+                  "stale" branch that has been deleted or whose content is not
+                  compatible with the latest version of the site's layout. Click
+                  the button below to switch back to the default branch for this
+                  deployment.
+                </p>
+                <button
+                  style={errorButtonStyles as any}
+                  onClick={() => {
+                    window.localStorage.removeItem('tinacms-current-branch')
+                    window.location.reload()
+                  }}
+                >
+                  Switch to default branch
+                </button>
+              </>
+            )}
           </div>
         </div>
       )
