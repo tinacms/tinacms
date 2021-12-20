@@ -116,6 +116,10 @@ export class Client {
     }
   }
 
+  public get isLocalMode() {
+    return this.contentApiUrl.includes('localhost')
+  }
+
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
     this.frontendUrl =

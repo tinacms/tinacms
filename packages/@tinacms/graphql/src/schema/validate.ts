@@ -22,6 +22,7 @@ import type {
   TinaCloudSchemaBase,
   TinaCloudCollectionEnriched,
   TinaCloudTemplateEnriched,
+  TinaCloudCollection,
 } from '../types'
 import { TinaField } from '..'
 
@@ -47,9 +48,90 @@ export const validateSchema = async (
     schema2.collections,
     async (collection) => validateCollection(collection)
   )
+  validationCollectionsPathAndMatch(collections)
   return {
     collections,
   }
+}
+
+const validationCollectionsPathAndMatch = (
+  collections: TinaCloudCollection<true>[]
+) => {
+  // Early return if no two `path` are the same
+  const paths = collections.map((x) => x.path)
+  if (paths.length === new Set(paths).size) {
+    // If the paths are all different it is valid
+    return
+  }
+
+  // make sure that no two collections have the same `path` when no `matches is present`
+  // checks this type of invalid state
+  // {
+  //   path: 'content/posts'
+  // },
+  // {
+  //   path: 'content/posts'
+  // }
+
+  const noMatchCollections = collections
+    .filter((x) => {
+      return typeof x?.match === 'undefined'
+    })
+    .map((x) => x.path)
+
+  if (noMatchCollections.length !== new Set(noMatchCollections).size) {
+    throw new Error('path must be unique when no `match` is provided')
+  }
+
+  // Make sure both path and match are not the same
+
+  // checks this type of invalid state
+  // {
+  //   path: 'content/posts',
+  //   matches: '**/*.en.md'
+  // },{
+  //   path: 'content/posts'
+  //   matches: '**/*.en.md'
+  // }
+
+  const hasMatchAndPath = collections
+    .filter((x) => {
+      return typeof x.path !== 'undefined' && typeof x.match !== 'undefined'
+    })
+    .map((x) => `${x.path}|${x.match}`)
+
+  if (hasMatchAndPath.length !== new Set(hasMatchAndPath).size) {
+    throw new Error('Both `match` and `path` can not be the same')
+  }
+
+  // Check to make sure that when two paths are the same they all have different matches
+  // checks this type of invalid state
+  //  {
+  //   path: 'content/posts',
+  //   matches: '**/*.en.md'
+  // },
+  // {
+  //   path: 'content/posts'
+  // }
+  const groupbyPath = collections.reduce((r, a) => {
+    r[a.path] = r[a.path] || []
+    r[a.path].push(a)
+    return r
+  }, Object.create(null))
+
+  Object.keys(groupbyPath).forEach((key) => {
+    const collectionsArr: TinaCloudCollection<true>[] = groupbyPath[key]
+    if (collectionsArr.length === 1) {
+      return
+    }
+    // check if one or more does not have the "matches key" it is invalid
+    const matches = collectionsArr.filter((x) => {
+      return typeof x.match !== 'undefined'
+    })
+    if (matches.length !== collections.length) {
+      throw new Error('path must be unique when no `match` is provided')
+    }
+  })
 }
 
 const validateCollection = async (

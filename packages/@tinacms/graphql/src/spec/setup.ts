@@ -19,7 +19,7 @@ import { buildASTSchema, printSchema } from 'graphql'
 import { toMatchFile } from 'jest-file-snapshot'
 import { createDatabase } from '../database'
 import { Database } from '../database'
-import { FilesystemBridge } from '../database/bridge/filesystem'
+import { FilesystemBridge } from '@tinacms/datalayer'
 
 import type { Store } from '../database/store'
 import type { TinaCloudSchema } from '../types'

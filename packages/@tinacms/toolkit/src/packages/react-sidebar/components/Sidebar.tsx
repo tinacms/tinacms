@@ -27,6 +27,7 @@ import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
+import { LocalWarning } from './LocalWarning'
 
 export interface SidebarProviderProps {
   children: any
@@ -73,6 +74,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
       <SidebarGlobalStyles />
       <SidebarContainer open={sidebar.isOpen}>
         <SidebarWrapper open={sidebar.isOpen}>
+          {cms.api?.tina?.isLocalMode && <LocalWarning />}
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
