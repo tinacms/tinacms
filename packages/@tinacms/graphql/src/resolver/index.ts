@@ -779,6 +779,7 @@ export class Resolver {
       case 'image':
         return {
           component: 'image',
+          clearable: true,
           ...field,
           ...extraFields,
         }
