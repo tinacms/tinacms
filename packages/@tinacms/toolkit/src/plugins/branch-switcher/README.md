@@ -71,7 +71,6 @@ cms.plugins.add(new BranchSwitcherPlugin({
     return customGetBranchList()
   },
   createBranch: () => {
-    // note: branch creation is currently not implemented in the branch switcher, but will be soon.
     return customCreateBranch()
   },
 }))
