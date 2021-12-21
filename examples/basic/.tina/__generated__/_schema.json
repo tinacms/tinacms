@@ -22,16 +22,6 @@
             "page",
             "body"
           ]
-        },
-        {
-          "name": "test",
-          "label": "test",
-          "type": "string",
-          "required": true,
-          "namespace": [
-            "page",
-            "test"
-          ]
         }
       ],
       "namespace": [

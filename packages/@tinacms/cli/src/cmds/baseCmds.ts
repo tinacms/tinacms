@@ -17,7 +17,7 @@ import { genTypes, attachSchema } from './query-gen'
 import { startServer } from './start-server'
 import { compile } from './compile'
 import { initTina, installDeps, tinaSetup, successMessage } from './init'
-import { audit } from './audit'
+import { audit, printFinalMessage } from './audit'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -106,6 +106,7 @@ export const baseCmds: Command[] = [
           attachSchema,
           genTypes,
           audit,
+          printFinalMessage,
         ],
         options
       ),
