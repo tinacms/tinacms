@@ -1,5 +1,6 @@
 fragment PageParts on Page {
   body
+  test
 }
 
 fragment PostParts on Post {
