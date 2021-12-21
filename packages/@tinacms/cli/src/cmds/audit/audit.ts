@@ -16,6 +16,7 @@ import type { Database, TinaCloudCollection } from '@tinacms/graphql'
 import p from 'path'
 import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
+import chalk from 'chalk'
 
 type AuditArgs = {
   collection: TinaCloudCollection
@@ -23,6 +24,7 @@ type AuditArgs = {
   rootPath: string
 }
 export const auditCollection = async (args: AuditArgs) => {
+  let warning = false
   const { collection, database, rootPath } = args
   const query = `query {
         getCollection(collection: "${collection.name}") {
@@ -54,16 +56,21 @@ export const auditCollection = async (args: AuditArgs) => {
   docs.forEach((x) => {
     const node = x.node
     if (node.sys.extension.replace('.', '') !== format) {
+      warning = true
       logger.warn(
-        `WARNING: there is a file with extension \`${
-          node.sys.extension
-        }\` but in your schema it is defined to be \`.${format}\`\n\location: ${p.join(
-          rootPath,
-          node.sys.path
-        )}`
+        chalk.yellowBright(
+          `WARNING: there is a file with extension \`${
+            node.sys.extension
+          }\` but in your schema it is defined to be \`.${format}\`\n\location: ${p.join(
+            rootPath,
+            node.sys.path
+          )}`
+        )
       )
     }
   })
+
+  return warning
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
@@ -93,6 +100,7 @@ export const auditDocuments = async (args: AuditArgs) => {
     query,
     variables: {},
   })
+  let error = false
   const documents: any[] = result.data.getCollection.documents.edges
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
@@ -130,7 +138,6 @@ export const auditDocuments = async (args: AuditArgs) => {
         ){__typename}
       }`
 
-    // try {
     const mutationRes = await resolve({
       database,
       query: mutation,
@@ -143,10 +150,12 @@ export const auditDocuments = async (args: AuditArgs) => {
     })
     if (mutationRes.errors) {
       mutationRes.errors.forEach((err) => {
-        logger.error(err.message)
+        error = true
+        logger.error(chalk.red(err.message))
       })
     }
   }
+  return error
 }
 
 // TODO: move this to its own package

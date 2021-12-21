@@ -15,6 +15,8 @@ import { createDatabase, resolve } from '@tinacms/graphql'
 
 import { FilesystemBridge, FilesystemStore } from '@tinacms/datalayer'
 import { auditCollection, auditDocuments } from './audit'
+import { logger } from '../../logger'
+import chalk from 'chalk'
 
 const rootPath = process.cwd()
 
@@ -24,13 +26,39 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const database = await createDatabase({ store, bridge })
   const schema = await database.getSchema()
   const collections = schema.getCollections()
+  let warning = false
+  let error = false
 
   for (let i = 0; i < collections.length; i++) {
     const collection = collections[i]
-    await auditCollection({ collection, database, rootPath })
-    await auditDocuments({ collection, database, rootPath })
+    const returnWarning = await auditCollection({
+      collection,
+      database,
+      rootPath,
+    })
+    const returnError = await auditDocuments({ collection, database, rootPath })
+    warning = warning || returnWarning
+    error = error || returnError
   }
+  ctx.warning = warning
+  ctx.error = error
 
   next()
   //validate the result
+}
+
+export const printFinalMessage = async (
+  ctx: any,
+  next: () => void,
+  options
+) => {
+  if (ctx.error) {
+    logger.error(
+      chalk.redBright(`‼️ Audit ${chalk.bold('failed')} with errors`)
+    )
+  } else if (ctx.warning) {
+    logger.warn(chalk.yellowBright('⚠️ Audit passed with warnings'))
+  } else {
+    logger.info(chalk.greenBright('✅ Audit passed'))
+  }
 }
