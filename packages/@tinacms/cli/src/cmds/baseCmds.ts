@@ -47,6 +47,11 @@ const noSDKCodegenOption = {
   name: '--noSDK',
   description: "Don't generate the generated client SDK",
 }
+const cleanOption = {
+  name: '--clean',
+  description:
+    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.ta`',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -96,6 +101,7 @@ export const baseCmds: Command[] = [
       ),
   },
   {
+    options: [cleanOption],
     command: AUDIT,
     description: 'Audit your schema and the files to check for errors',
     action: (options) =>
