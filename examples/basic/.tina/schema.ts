@@ -16,7 +16,6 @@ import { defineSchema } from '@tinacms/cli'
 export default defineSchema({
   collections: [
     {
-      label: 'Page Content',
       name: 'page',
       path: 'content/page',
       format: 'mdx',
