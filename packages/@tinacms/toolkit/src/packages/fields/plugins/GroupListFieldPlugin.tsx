@@ -140,6 +140,7 @@ interface ItemProps {
 }
 
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+  const cms = useCMS()
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
@@ -171,6 +172,13 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
               }
               onMouseOut={() => setHoveredField({ fieldName: null })}
               onClick={() => {
+                const state = tinaForm.finalForm.getState()
+                if (state.invalid === true) {
+                  // @ts-ignore
+                  cms.alerts.error('Cannot navigate away from an invalid form.')
+                  return
+                }
+
                 setExpanded(true)
                 setFocusedField({ fieldName: `${field.name}.${index}` })
               }}
@@ -436,9 +444,10 @@ const Panel = function Panel({
           if (state.invalid === true) {
             // @ts-ignore
             cms.alerts.error('Cannot navigate away from an invalid form.')
-          } else {
-            setExpanded(false)
+            return
           }
+
+          setExpanded(false)
         }}
       >
         <LeftArrowIcon />

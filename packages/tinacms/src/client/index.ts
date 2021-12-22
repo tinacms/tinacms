@@ -39,6 +39,12 @@ interface ServerOptions {
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
 
+const captureBranchName = /^refs\/heads\/(.*)/
+const parseRefForBranchName = (ref: string) => {
+  const matches = ref.match(captureBranchName)
+  return matches[1]
+}
+
 export class Client {
   frontendUrl: string
   contentApiUrl: string
@@ -341,16 +347,15 @@ mutation addPendingDocumentMutation(
     try {
       const res = await this.fetchWithToken(url, {
         method: 'POST',
-        body: {
+        body: JSON.stringify({
           baseBranch,
           branchName,
-        } as any,
+        }),
         headers: {
           'Content-Type': 'application/json',
         },
       })
-
-      return JSON.stringify(res)
+      return await res.json().then((r) => parseRefForBranchName(r.data.ref))
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
       return null
