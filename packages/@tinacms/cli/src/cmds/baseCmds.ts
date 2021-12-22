@@ -18,6 +18,8 @@ import { startServer } from './start-server'
 import { compile } from './compile'
 import { initTina, installDeps, tinaSetup, successMessage } from './init'
 import { audit, printFinalMessage } from './audit'
+import { logger } from '../logger'
+import chalk from 'chalk'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -99,12 +101,24 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
+          // Disable the output of the compile step
+          async (_ctx, next) => {
+            logger.level = 'error'
+            next()
+          },
           async (_ctx, next) => {
             await compile(_ctx, next)
             next()
           },
           attachSchema,
           genTypes,
+          async (_ctx, next) => {
+            logger.level = 'info'
+            logger.info(
+              chalk.hex('#eb6337').bgWhite('Welcome to tina audit 🦙')
+            )
+            next()
+          },
           audit,
           printFinalMessage,
         ],

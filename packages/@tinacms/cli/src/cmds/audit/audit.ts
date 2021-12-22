@@ -26,6 +26,7 @@ type AuditArgs = {
 export const auditCollection = async (args: AuditArgs) => {
   let warning = false
   const { collection, database, rootPath } = args
+  logger.info(`Checking collection ${collection.name}`)
   const query = `query {
         getCollection(collection: "${collection.name}") {
           format
@@ -61,7 +62,7 @@ export const auditCollection = async (args: AuditArgs) => {
         chalk.yellowBright(
           `WARNING: there is a file with extension \`${
             node.sys.extension
-          }\` but in your schema it is defined to be \`.${format}\`\n\location: ${p.join(
+          }\` but in your schema it is defined to be \`.${format}\`\n\n\location: ${p.join(
             rootPath,
             node.sys.path
           )}`
@@ -74,7 +75,7 @@ export const auditCollection = async (args: AuditArgs) => {
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database } = args
+  const { collection, database, rootPath } = args
   const query = `query {
         getCollection(collection: "${collection.name}") {
           format
@@ -104,6 +105,8 @@ export const auditDocuments = async (args: AuditArgs) => {
   const documents: any[] = result.data.getCollection.documents.edges
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
+    const fullPath = p.join(rootPath, node.sys.path)
+    logger.info(`Checking document: ${fullPath}`)
     const documentQuery = `query {
         getDocument(collection: "${collection.name}", relativePath: "${node.sys.relativePath}") {
           __typename
