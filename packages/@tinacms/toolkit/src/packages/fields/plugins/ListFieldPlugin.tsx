@@ -88,7 +88,7 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </ListMeta>
-        <IconButton onClick={addItem} primary small>
+        <IconButton onClick={addItem} primary size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </ListHeader>
@@ -151,6 +151,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
         <>
           <ListItem
             ref={provider.innerRef}
+            // @ts-ignore FIXME twind
             isDragging={snapshot.isDragging}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
@@ -281,10 +282,11 @@ const ListItem = styled.div<{ isDragging: boolean }>`
     align-items: center;
   }
 
-  ${FieldWrapper} {
+  /* @ts-ignore FIXME twind */
+  /* FieldWrapper {
     margin: 0;
     flex: 1;
-  }
+  } */
 
   svg {
     fill: var(--tina-color-grey-4);
@@ -312,6 +314,7 @@ const ListItem = styled.div<{ isDragging: boolean }>`
   }
 
   ${(p) =>
+    // @ts-ignore FIXME twind
     p.isDragging &&
     css<any>`
       border-radius: var(--tina-radius-small);
