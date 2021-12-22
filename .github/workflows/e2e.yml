@@ -13,9 +13,20 @@ jobs:
           install-command: yarn install --immutable --immutable-cache
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: yarn build
-          command: yarn cypress run
-          start: yarn workspace starter-basic dev 
+          build: yarn build:e2e
+          command: yarn test:e2e
+          start: yarn start:e2e
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+      # Test run video was always captured, so this action uses "always()" condition
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos

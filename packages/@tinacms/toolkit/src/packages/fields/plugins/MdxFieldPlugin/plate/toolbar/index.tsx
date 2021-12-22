@@ -230,14 +230,6 @@ export const ToolbarButtons = ({ name, templates }) => {
           type={getPlatePluginType(editor, MARK_ITALIC)}
           icon={<ItalicIcon />}
         />
-        <MarkToolbarButton
-          type={getPlatePluginType(editor, MARK_UNDERLINE)}
-          icon={<UnderlineIcon />}
-        />
-        <MarkToolbarButton
-          type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
-          icon={<StrikethroughIcon />}
-        />
       </ToolbarWrapper>
       <EmbedButtunWrapper>
         <PopupAdder {...popup} />

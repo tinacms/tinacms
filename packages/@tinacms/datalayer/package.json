@@ -20,7 +20,7 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@octokit/auth-app": "^2.6.0",
