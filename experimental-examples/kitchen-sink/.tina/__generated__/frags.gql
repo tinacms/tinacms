@@ -1,0 +1,18 @@
+fragment PageParts on Page {
+  heading
+  subtitle
+  body
+  objField {
+    __typename
+    test1
+  }
+  objFieldList {
+    __typename
+    test1
+  }
+}
+
+fragment PostParts on Post {
+  title
+  body
+}
