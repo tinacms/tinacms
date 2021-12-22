@@ -100,6 +100,7 @@ export function AddBlockMenu({
       isOpen={isOpen}
     >
       <AddBlockButton
+        // @ts-ignore FIXME twind
         ref={addBlockButtonRef}
         onClick={handleOpenBlockMenu}
         isOpen={isOpen}
