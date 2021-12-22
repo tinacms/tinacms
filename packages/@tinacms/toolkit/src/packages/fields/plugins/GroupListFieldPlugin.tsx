@@ -98,7 +98,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <IconButton onClick={addItem} primary small>
+        <IconButton onClick={addItem} primary size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </GroupListHeader>

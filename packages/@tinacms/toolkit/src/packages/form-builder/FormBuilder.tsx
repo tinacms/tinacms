@@ -110,6 +110,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
+                        // @ts-ignore FIXME twind
                         style={{ flexGrow: 1 }}
                       >
                         {tinaForm.buttons.reset}
@@ -202,6 +203,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
+                        // @ts-ignore FIXME twind
                         style={{ flexBasis: '7rem' }}
                       >
                         {tinaForm.buttons.reset}

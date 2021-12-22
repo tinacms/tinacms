@@ -31,6 +31,7 @@ export interface FieldsBuilderProps {
 export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   const cms = useCMS()
   return (
+    // @ts-ignore FIXME twind
     <FieldsGroup>
       {fields.map((field: Field) => {
         if (field.component === null) return null
