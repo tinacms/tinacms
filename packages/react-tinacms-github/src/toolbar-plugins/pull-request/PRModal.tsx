@@ -192,7 +192,7 @@ const ModalDescription = styled.p`
     font-weight: bold;
   }
 `
-
+// @ts-ignore FIXME twind
 const PrModalBody = styled(ModalBody)`
   padding: 20px 20px 0 20px;
 `
