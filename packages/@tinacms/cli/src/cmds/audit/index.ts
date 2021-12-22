@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { createDatabase, resolve } from '@tinacms/graphql'
+import { createDatabase } from '@tinacms/graphql'
 
 import { FilesystemBridge, FilesystemStore } from '@tinacms/datalayer'
 import { auditCollection, auditDocuments } from './audit'
@@ -44,13 +44,12 @@ export const audit = async (ctx: any, next: () => void, options) => {
   ctx.error = error
 
   next()
-  //validate the result
 }
 
 export const printFinalMessage = async (
   ctx: any,
   next: () => void,
-  options
+  _options
 ) => {
   if (ctx.error) {
     logger.error(
@@ -61,4 +60,5 @@ export const printFinalMessage = async (
   } else {
     logger.info(chalk.greenBright('✅ Audit passed'))
   }
+  next()
 }
