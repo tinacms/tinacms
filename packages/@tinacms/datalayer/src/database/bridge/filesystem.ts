@@ -53,3 +53,12 @@ export class FilesystemBridge implements Bridge {
     await fs.outputFileSync(path.join(this.rootPath, filepath), data)
   }
 }
+
+/**
+ * Same as the `FileSystemBridge` except it does not save files
+ */
+export class AuditFileSystemBridge extends FilesystemBridge {
+  public async put(_filepath: string, _data: string) {
+    return
+  }
+}

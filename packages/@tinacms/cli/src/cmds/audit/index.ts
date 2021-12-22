@@ -13,7 +13,7 @@ limitations under the License.
 
 import { createDatabase } from '@tinacms/graphql'
 
-import { FilesystemBridge, FilesystemStore } from '@tinacms/datalayer'
+import { AuditFileSystemBridge, AuditFilesystemStore } from '@tinacms/datalayer'
 import { auditCollection, auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
@@ -21,8 +21,8 @@ import chalk from 'chalk'
 const rootPath = process.cwd()
 
 export const audit = async (ctx: any, next: () => void, options) => {
-  const bridge = new FilesystemBridge(rootPath)
-  const store = new FilesystemStore({ rootPath })
+  const bridge = new AuditFileSystemBridge(rootPath)
+  const store = new AuditFilesystemStore({ rootPath })
   const database = await createDatabase({ store, bridge })
   const schema = await database.getSchema()
   const collections = schema.getCollections()
