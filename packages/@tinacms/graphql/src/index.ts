@@ -18,7 +18,6 @@ import { indexDB } from './build'
 
 export { indexDB } from './build'
 export { resolve } from './resolve'
-export { stringifyFile, parseFile } from './database/util'
 export { createDatabase } from './database'
 import type { Database } from './database'
 export type { Store } from './database/store'
