@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
+
+**Note:** Version bump only for package react-tinacms-inline
+
+
+
+
+
+## [0.43.2](https://github.com/tinacms/tinacms/compare/v0.43.1...v0.43.2) (2021-07-20)
+
+
+### Bug Fixes
+
+* **react-tinacms-editor,react-tinacms-inline:** Fixes deps ([d60eb84](https://github.com/tinacms/tinacms/commit/d60eb8400595de3f0286f0236bba52b02b01cb51))
+
+
+
+
+
+# [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
+
+
+### Features
+
+* **react-tinacms-inline:** InlineBlocks children ([00d5804](https://github.com/tinacms/tinacms/commit/00d580492370714096c051761b90cea013dc7644))
+
+
+
+
+
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+**Note:** Version bump only for package react-tinacms-inline
+
+
+
+
+
 ## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
 
 **Note:** Version bump only for package react-tinacms-inline

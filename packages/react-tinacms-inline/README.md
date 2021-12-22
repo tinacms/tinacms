@@ -230,6 +230,7 @@ export interface InlineBlocksProps {
   components?: {
     Container?: React.FunctionComponent<BlocksContainerProps>
   }
+  children?: React.ReactNode | null
 }
 ```
 
@@ -271,6 +272,33 @@ useInlineBlocks(): InlineBlocksActions
 ```
 
 `useInlineBlocks` is a hook that can be used to access the _Inline Blocks Context_ when creating custom controls.
+
+**Context and inline blocks children**
+
+To conditionally render markup adjacent to your inline blocks, depending on context values, pass children to the `InlineBlocks` and call `useInlineBlocks` in your child component(s). For example, this will render some text below your inline blocks, but only if there are more than three inline blocks currently on the page:
+
+```ts
+import { InlineBlocks, useInlineBlocks } from 'react-tinacms-inline'
+
+export function LotsOfBlocksMessage() {
+  const blocks = useInlineBlocks()
+  return <>
+    {blocks.count > 3 &&
+      <p>
+        Wow, there are {blocks.count} blocks, that's rather a lot!
+      </p>
+    }
+  </>
+}
+
+export function MyBlocksContainer() {
+  return (
+    <InlineBlocks name="myBlocks" blocks={MY_BLOCKS}>
+      <LotsOfBlocksMessage />
+    </InlineBlocks>
+  )
+}
+```
 
 ### Inline Block Field Controls
 
@@ -545,7 +573,7 @@ interface BlocksContainerProps {s
 }
 ```
 
-**Example** 
+**Example**
 
 ```js
 import { useJsonForm } from 'next-tinacms-json'

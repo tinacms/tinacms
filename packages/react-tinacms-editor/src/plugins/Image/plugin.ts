@@ -111,6 +111,7 @@ export const imagePlugin = ({ previewSrc, upload: uploadImages }: ImageProps) =>
     },
     props: {
       nodeViews: {
+        // @ts-ignore
         image(node, view) {
           return new ImageView(node, view, previewSrc)
         },

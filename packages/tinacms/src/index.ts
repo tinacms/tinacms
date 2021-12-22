@@ -27,6 +27,7 @@ export {
   MediaListOptions,
   MediaList,
   MediaManager,
+  MediaListError,
 } from '@tinacms/core'
 export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'

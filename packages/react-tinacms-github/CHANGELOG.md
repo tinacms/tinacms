@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
+## [0.43.1](https://github.com/tinacms/tinacms/compare/v0.43.0...v0.43.1) (2021-07-13)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** Makes form-builder a peerDependency ([0e2174c](https://github.com/tinacms/tinacms/commit/0e2174ceef97ecd507e0a13d1f6a23cc7e843064))
+
+
+
+
+
+# [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/tinacms/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+* **react-tinacms-github:** Migrate GithubMediaStore to cursor-based pagination ([5163fad](https://github.com/tinacms/tinacms/commit/5163fad6023ac133668736262c5c9732dfdd2c6d))
+
+
+
+
+
 ## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
 
 **Note:** Version bump only for package react-tinacms-github

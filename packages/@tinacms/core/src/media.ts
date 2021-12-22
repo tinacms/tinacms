@@ -167,7 +167,10 @@ export class MediaManager implements MediaStore {
     return this.store.accept
   }
 
-  async persist(files: MediaUploadOptions[], currentTab?: number): Promise<Media[]> {
+  async persist(
+    files: MediaUploadOptions[],
+    currentTab?: number
+  ): Promise<Media[]> {
     try {
       this.events.dispatch({ type: 'media:upload:start', uploaded: files })
       const media = await this.store.persist(files, currentTab || 0)
@@ -255,4 +258,22 @@ export interface SelectMediaOptions {
   allowDelete?: boolean
   directory?: string
   onSelect?(media: Media): void
+}
+
+interface MediaListErrorConfig {
+  title: string
+  message: string
+  docsLink: string
+}
+
+export class MediaListError extends Error {
+  public ERR_TYPE = 'MediaListError'
+  public title: string
+  public docsLink: string
+
+  constructor(config: MediaListErrorConfig) {
+    super(config.message)
+    this.title = config.title
+    this.docsLink = config.docsLink
+  }
 }

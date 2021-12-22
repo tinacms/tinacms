@@ -1,15 +1,9 @@
 #!/bin/bash
 
-# Check for $GH_TOKEN
-if [[ -z $GH_TOKEN ]]
-then
-  echo "ENV '\$GH_TOKEN' is required to proceed; learn more at https://github.com/lerna/lerna/blob/main/commands/version/README.md#--create-release-type"
-  exit 1
-fi
-
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
+source $(dirname $0)/require_gh_token.sh
 source $(dirname $0)/require_clean_work_tree.sh
 
 # 0.1. Confirm Action
@@ -22,6 +16,9 @@ fi
 
 #0.2. Ensure no uncommitted changes
 require_clean_work_tree
+
+#0.3 Check if GH_TOKEN present and has correct permissions
+require_gh_token
 
 # 1. Update Matser
 git checkout master

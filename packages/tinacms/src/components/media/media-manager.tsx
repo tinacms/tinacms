@@ -25,10 +25,15 @@ import {
   ModalHeader,
   ModalBody,
   FullscreenModal,
-  PopupModal
+  PopupModal,
 } from '@tinacms/react-modals'
-import { MediaList, Media, MediaListOffset } from '@tinacms/core'
-import path from 'path'
+import {
+  MediaList,
+  Media,
+  MediaListOffset,
+  MediaListError,
+} from '@tinacms/core'
+// import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
@@ -72,6 +77,12 @@ export function MediaManager() {
 
 type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
+const defaultListError = new MediaListError({
+  title: 'Error fetching media',
+  message: 'Something went wrong while requesting the resource.',
+  docsLink: 'https://tina.io/docs/media/#media-store',
+})
+
 export function MediaPicker({
   allowDelete,
   onSelect,
@@ -85,8 +96,10 @@ export function MediaPicker({
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
+
+  const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
-    props.directory,
+    props.directory
   )
 
   const [list, setList] = useState<MediaList>({
@@ -114,29 +127,31 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
   const resetLocalStorage = () => {
-    localStorage.removeItem('Media - 0');
-    localStorage.removeItem('Media - 1');
-    localStorage.removeItem('Media - 2');
+    localStorage.removeItem('Media - 0')
+    localStorage.removeItem('Media - 1')
+    localStorage.removeItem('Media - 2')
   }
 
-  const loadMedia = useCallback(
-    () => {
-        setListState('loading')
-        cms.media
-          .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab, search })
-          .then(list => {
-            setList(list)
-            setListState('loaded')
-            localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list));
-          })
-          .catch(e => {
-            console.error(e)
-            setListState('error')
-          })
-    },
-    [currentTab, offset, search],
-  );
-
+  const loadMedia = useCallback(() => {
+    setListState('loading')
+    cms.media
+      .list({
+        offset,
+        limit: cms.media.pageSize,
+        directory,
+        currentList: currentTab,
+        search,
+      })
+      .then(list => {
+        setList(list)
+        setListState('loaded')
+        localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list))
+      })
+      .catch(e => {
+        console.error(e)
+        setListState('error')
+      })
+  }, [currentTab, offset, search])
 
   useEffect(() => {
     if (setAllTabs) {
@@ -144,11 +159,28 @@ export function MediaPicker({
     }
   }, [setAllTabs])
 
-
   useEffect(() => {
+    if (!cms.media.isConfigured) return
+    function loadMedia() {
+      setListState('loading')
+      cms.media
+        .list({ offset, limit: cms.media.pageSize, directory })
+        .then(list => {
+          setList(list)
+          setListState('loaded')
+        })
+        .catch(e => {
+          console.error(e)
+          if (e.ERR_TYPE === 'MediaListError') {
+            setListError(e)
+          } else {
+            setListError(defaultListError)
+          }
+          setListState('error')
+        })
+    }
     loadMedia()
   }, [offset])
-
 
   function refresh() {
     resetLocalStorage()
@@ -173,9 +205,9 @@ export function MediaPicker({
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
-      loadMedia,
+      loadMedia
     )
-  }, [currentTab])
+  }, [offset, directory, cms.media.isConfigured, currentTab])
 
   const onClickMediaItem = (item: Media) => {
     /*if (item.type === 'dir') {
@@ -215,7 +247,8 @@ export function MediaPicker({
               directory: directory || '/',
               file,
             }
-          }), currentTab,
+          }),
+          currentTab
         )
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
@@ -242,11 +275,18 @@ export function MediaPicker({
   }
 
   if (listState === 'not-configured') {
-    return <DocsLink title='Please Set up a Media Store' />
+    return (
+      <DocsLink
+        title="No Media Store Configured"
+        message="To use the media manager, you need to configure a Media Store."
+        docsLink="https://tina.io/docs/media/"
+      />
+    )
   }
 
   if (listState === 'error') {
-    return <DocsLink title='Failed to Load Media' />
+    const { title, message, docsLink } = listError
+    return <DocsLink title={title} message={message} docsLink={docsLink} />
   }
 
   // https://einsteinindustries.atlassian.net/browse/LUC-778
@@ -267,50 +307,63 @@ export function MediaPicker({
   }
 
   return (
-    <><MediaPickerWrap>
-      <Header>
-        <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <form onSubmit={(e) => handleSubmit(e)}>
-          <StyledSearch type='text' placeholder='Search' value={search} onChange={(e) => setSearch(e.target.value)} />
-        </form>
-        <div>
-          <RefreshButton onClick={refresh} />
-          <UploadButton onClick={onClick} uploading={uploading} />
-        </div>
-      </Header>
-      <List {...rootProps} dragActive={isDragActive}>
-        <input {...getInputProps()} />
+    <>
+      <MediaPickerWrap>
+        <Header>
+          <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          <form onSubmit={e => handleSubmit(e)}>
+            <StyledSearch
+              type="text"
+              placeholder="Search"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </form>
+          <div>
+            <RefreshButton onClick={refresh} />
+            <UploadButton onClick={onClick} uploading={uploading} />
+          </div>
+        </Header>
+        <List {...rootProps} dragActive={isDragActive}>
+          <input {...getInputProps()} />
 
-        {listState === 'loaded' && list.items.length === 0 && (
-          <EmptyMediaList />
+          {listState === 'loaded' && list.items.length === 0 && (
+            <EmptyMediaList />
+          )}
+
+          {listByFour.map((four: Media[]) => (
+            <div
+              key={four[0].id}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              {four.map((item: Media) => (
+                <MediaItem
+                  key={item.id}
+                  item={item}
+                  onClick={onClickMediaItem}
+                  onSelect={selectMediaItem}
+                  onDelete={deleteMediaItem}
+                />
+              ))}
+            </div>
+          ))}
+        </List>
+
+        <CursorPaginator
+          currentOffset={offset}
+          hasNext={hasNext}
+          navigateNext={navigateNext}
+          hasPrev={hasPrev}
+          navigatePrev={navigatePrev}
+        />
+        {itemModal && (
+          <ItemModal close={() => setItemModal(null)} item={itemModal} />
         )}
-
-        {listByFour.map((four: Media[]) => <div key={four[0].id} style={{
-            display: 'flex',
-            justifyContent: 'center',
-          }}>
-            {four.map((item: Media) => (
-              <MediaItem
-                key={item.id}
-                item={item}
-                onClick={onClickMediaItem}
-                onSelect={selectMediaItem}
-                onDelete={deleteMediaItem}
-              />
-            ))}
-          </div>,
-        )}
-      </List>
-
-      <CursorPaginator
-        currentOffset={offset}
-        hasNext={hasNext}
-        navigateNext={navigateNext}
-        hasPrev={hasPrev}
-        navigatePrev={navigatePrev}
-      />
-      {itemModal && <ItemModal close={() => setItemModal(null)} item={itemModal} />}
-    </MediaPickerWrap></>
+      </MediaPickerWrap>
+    </>
   )
 }
 
@@ -334,7 +387,6 @@ const StyledSearch = styled.input`
   margin: 0;
   outline: none;
   box-shadow: 0 0 0 2px transparent;
-
 `
 
 const StyledImg = styled.img`
@@ -362,42 +414,58 @@ const objToStringArray = (item: any) => {
   return arr
 }
 
-const ItemModal = ({close, item }: ItemModal) => {
+const ItemModal = ({ close, item }: ItemModal) => {
   const imgix = item.metaData?.attributes
   const tags = imgix?.tags
   const colors = imgix?.colors['dominant_colors']
-  const meta =  objToStringArray(imgix || item.metaData);
-  return <Modal>
-    <PopupModal style={{width: '70%'}}>
-      <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
-      <ModalBody>
-        <div style={{display: 'flex', margin: '50px auto', width: '80%'}}>
-          <div style={{width: '70%'}}>
-            <StyledImg src={item.previewSrc} alt='clicked image' />
-          </div>
-          <div style={{width: '100%'}}>
-            <ul style={{listStyle: 'none', marginLeft: '20px' }}>
-              <li style={{marginBottom: '5px'}}>name: {item.filename}</li>
-              <li style={{marginBottom: '5px'}}>url: {item.previewSrc}</li>
-              <li style={{marginBottom: '5px'}}>id: {item.id}</li>
-              <li style={{marginBottom: '5px'}}>type: {item.type}</li>
-              {meta.map(([key, value]: [string, any]) =>
-                typeof value !== 'object'
-                && <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
-              )}
-              {tags && Object.entries(tags).map(([key, value]) =>
-                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+  const meta = objToStringArray(imgix || item.metaData)
+  return (
+    <Modal>
+      <PopupModal style={{ width: '70%' }}>
+        <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
+        <ModalBody>
+          <div style={{ display: 'flex', margin: '50px auto', width: '80%' }}>
+            <div style={{ width: '70%' }}>
+              <StyledImg src={item.previewSrc} alt="clicked image" />
+            </div>
+            <div style={{ width: '100%' }}>
+              <ul style={{ listStyle: 'none', marginLeft: '20px' }}>
+                <li style={{ marginBottom: '5px' }}>name: {item.filename}</li>
+                <li style={{ marginBottom: '5px' }}>url: {item.previewSrc}</li>
+                <li style={{ marginBottom: '5px' }}>id: {item.id}</li>
+                <li style={{ marginBottom: '5px' }}>type: {item.type}</li>
+                {meta.map(
+                  ([key, value]: [string, any]) =>
+                    typeof value !== 'object' && (
+                      <li key={key} style={{ marginBottom: '5px' }}>
+                        {key}: {value}
+                      </li>
+                    )
                 )}
-              {colors && Object.entries(colors).map(([key, value]) =>
-                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
-              )}
-              {item.metaData?.LastModified && <li style={{marginBottom: '5px'}}>last modified: {item.metaData?.LastModified.toString()}</li>}
-            </ul>
+                {tags &&
+                  Object.entries(tags).map(([key, value]) => (
+                    <li key={key} style={{ marginBottom: '5px' }}>
+                      {key}: {value}
+                    </li>
+                  ))}
+                {colors &&
+                  Object.entries(colors).map(([key, value]) => (
+                    <li key={key} style={{ marginBottom: '5px' }}>
+                      {key}: {value}
+                    </li>
+                  ))}
+                {item.metaData?.LastModified && (
+                  <li style={{ marginBottom: '5px' }}>
+                    last modified: {item.metaData?.LastModified.toString()}
+                  </li>
+                )}
+              </ul>
+            </div>
           </div>
-        </div>
-      </ModalBody>
-    </PopupModal>
-  </Modal>
+        </ModalBody>
+      </PopupModal>
+    </Modal>
+  )
 }
 
 const RefreshButton = ({ onClick }: any) => {
@@ -494,11 +562,11 @@ const List = styled.ul<ListProps>`
   overflow-x: hidden;
 
   ${p =>
-          p.dragActive &&
-          css`
-            border: 2px solid var(--tina-color-primary);
-            border-radius: var(--tina-radius-small);
-          `}
+    p.dragActive &&
+    css`
+      border: 2px solid var(--tina-color-primary);
+      border-radius: var(--tina-radius-small);
+    `}
 `
 
 const EmptyMediaList = styled(props => {
@@ -510,18 +578,19 @@ const EmptyMediaList = styled(props => {
   text-align: center;
 `
 
-const DocsLink = styled(({ title, ...props }) => {
+const DocsLink = styled(({ title, message, docsLink, ...props }) => {
   return (
     <div {...props}>
       <h2>{title}</h2>
-      <div>
-        {' '}
-        Visit the{' '}
-        <a href='https://tinacms.org/docs/media' rel='noreferrer noopener'>
-          docs
-        </a>{' '}
-        to learn more about setting up the Media Manager for your CMS.
-      </div>
+      <div>{message}</div>
+      <a
+        style={{ marginTop: '1rem' }}
+        href={docsLink}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        Learn More
+      </a>
     </div>
   )
 })`

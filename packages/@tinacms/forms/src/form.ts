@@ -68,10 +68,12 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.label = label
     this.fields = fields || []
     this.onSubmit = options.onSubmit
+    // @ts-ignore
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
       onSubmit: this.handleSubmit,
+      // @ts-ignore
       mutators: {
         ...arrayMutators,
         ...options.mutators,

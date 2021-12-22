@@ -1001,6 +1001,16 @@
         "code",
         "plugin"
       ]
+    },
+    {
+      "login": "arpi0003",
+      "name": "Eddie Arpin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1330417?v=4",
+      "profile": "https://github.com/arpi0003",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -43,6 +43,7 @@ export interface InlineBlocksProps {
   components?: {
     Container?: React.FunctionComponent<BlocksContainerProps>
   }
+  children?: React.ReactNode | null
 }
 
 export interface BlocksContainerProps {
@@ -91,6 +92,7 @@ export function InlineBlocks({
   min,
   max,
   components = {},
+  children = null,
 }: InlineBlocksProps) {
   const cms = useCMS()
   const { setFocussedField } = useInlineForm()
@@ -178,6 +180,8 @@ export function InlineBlocks({
                   />
                 )
               })}
+
+              {children}
             </InlineBlocksContext.Provider>
           </Container>
         )

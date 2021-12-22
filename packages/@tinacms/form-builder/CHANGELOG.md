@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
+
+
+### Bug Fixes
+
+* **@tinacms/form-builder:** Removes onKeyPress from FormBuilder ([f0e456b](https://github.com/tinacms/tinacms/commit/f0e456b2f9d1f2cc8a0a3ede38eee47da46e710c))
+
+
+
+
+
+# [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/tinacms/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+
+
+
+
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 
