@@ -243,7 +243,7 @@ export const TinaCMSProvider2 = ({
   }
 
   // branch & clientId are still supported, so don't throw if they're provided
-  if (!props.apiURL || (props.branch && props.clientId)) {
+  if (!props.apiURL || ( !props.clientId && !isLocalClient )) {
     throw new Error(`apiURL is a required field`)
   }
 
