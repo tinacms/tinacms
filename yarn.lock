@@ -2273,9 +2273,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cypress/request@npm:^2.88.7":
-  version: 2.88.7
-  resolution: "@cypress/request@npm:2.88.7"
+"@cypress/request@npm:^2.88.10":
+  version: 2.88.10
+  resolution: "@cypress/request@npm:2.88.10"
   dependencies:
     aws-sign2: ~0.7.0
     aws4: ^1.8.0
@@ -2284,8 +2284,7 @@ __metadata:
     extend: ~3.0.2
     forever-agent: ~0.6.1
     form-data: ~2.3.2
-    har-validator: ~5.1.3
-    http-signature: ~1.2.0
+    http-signature: ~1.3.6
     is-typedarray: ~1.0.0
     isstream: ~0.1.2
     json-stringify-safe: ~5.0.1
@@ -2296,7 +2295,7 @@ __metadata:
     tough-cookie: ~2.5.0
     tunnel-agent: ^0.6.0
     uuid: ^8.3.2
-  checksum: c739179031a609e13cd58061b7645685458d6c747d77a81525c5d72c2cd01d18647850b20f8d5fb5a07ea7252d520bfc6802dbe0aa9680f3addf226e93e0a55b
+  checksum: 4e1a8ecb8865a430ee0ef3df6835e3aeb48dd8c84668d6fa6c8bfa388ad901d1ad0cdc355168935841d4299a48437f607d233dfa632e04d650b0b906e5f8f5f7
   languageName: node
   linkType: hard
 
@@ -12213,11 +12212,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "cypress@npm:9.1.0"
+"cypress@npm:9.1.1":
+  version: 9.1.1
+  resolution: "cypress@npm:9.1.1"
   dependencies:
-    "@cypress/request": ^2.88.7
+    "@cypress/request": ^2.88.10
     "@cypress/xvfb": ^1.2.4
     "@types/node": ^14.14.31
     "@types/sinonjs__fake-timers": ^6.0.2
@@ -12260,7 +12259,7 @@ __metadata:
     yauzl: ^2.10.0
   bin:
     cypress: bin/cypress
-  checksum: bce1048642def8f844fc3d187e4122e717f32ca68dd0d1bb466ea4eefdc905718ed197a334ecf149718a81bef0c51a9c7fc5b11792f234e868185d964f05dfe8
+  checksum: 204a34509e4940f818c9755d6bde2903a0c72f9d5147c1cfdffcfa2a8a1c92745386c070813c1e6e24e5e59adb7f3fa0a1d070613ed5070417d5ec8c7cba6341
   languageName: node
   linkType: hard
 
@@ -15903,23 +15902,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"har-schema@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "har-schema@npm:2.0.0"
-  checksum: e27ac33a968b8a3b2cc32e53afaec8aa795d08b058ef9b09b3bbce74db7ecadcabf60a6186e3bb901335d2c72bbf9e2af59429d736b5e80dc0edf18b3e1c5860
-  languageName: node
-  linkType: hard
-
-"har-validator@npm:~5.1.3":
-  version: 5.1.5
-  resolution: "har-validator@npm:5.1.5"
-  dependencies:
-    ajv: ^6.12.3
-    har-schema: ^2.0.0
-  checksum: 01b905cdaa7632c926a962c8127a77b98387935ef3aa0b44dae871eae2592ba6da948a3bdbb3eeceb90fa1599300f16716e50147965a7ea7c4e7c4e57ac69727
-  languageName: node
-  linkType: hard
-
 "hard-rejection@npm:^2.1.0":
   version: 2.1.0
   resolution: "hard-rejection@npm:2.1.0"
@@ -16478,14 +16460,14 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"http-signature@npm:~1.2.0":
-  version: 1.2.0
-  resolution: "http-signature@npm:1.2.0"
+"http-signature@npm:~1.3.6":
+  version: 1.3.6
+  resolution: "http-signature@npm:1.3.6"
   dependencies:
     assert-plus: ^1.0.0
-    jsprim: ^1.2.2
-    sshpk: ^1.7.0
-  checksum: d28227eed37cb0dae0e76c46b2a5e611c678808433e5642238f17dba7f2c9c8f8d1646122d57ec1a110ecc7e8b9f5b7aa0462f1e2a5fa3b41f2fca5a69af7edf
+    jsprim: ^2.0.2
+    sshpk: ^1.14.1
+  checksum: ecfd58fe869ae1a819203174fbc0ca9a511f8ed27d70d26b574f34a844defe8ff4bf4e83888bc5e41e9a99283cc6c34da5d0e418a28a2c24a7bed5b3445aaaba
   languageName: node
   linkType: hard
 
@@ -18745,10 +18727,10 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"json-schema@npm:0.2.3":
-  version: 0.2.3
-  resolution: "json-schema@npm:0.2.3"
-  checksum: d382ea841f0af5cf6ae3b63043c6ddbd144086de52342b5dd32d8966872dce1e0ed280f6b27c5fba97e50cf8640f27b593e039cb95df365718ada03ef0feb9f2
+"json-schema@npm:0.4.0":
+  version: 0.4.0
+  resolution: "json-schema@npm:0.4.0"
+  checksum: e13c202bbd04c5bdc1b7e90596d973551777f426f77537d5d9249dce31b4b2196cf511bc18213811333d677ab47770a90ac6e42e038edd99b7af0c1dd13626a6
   languageName: node
   linkType: hard
 
@@ -18857,15 +18839,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"jsprim@npm:^1.2.2":
-  version: 1.4.1
-  resolution: "jsprim@npm:1.4.1"
+"jsprim@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "jsprim@npm:2.0.2"
   dependencies:
     assert-plus: 1.0.0
     extsprintf: 1.3.0
-    json-schema: 0.2.3
+    json-schema: 0.4.0
     verror: 1.10.0
-  checksum: ee0177b7ef39e6becf18c586d31fabe15d62be88e7867d3aff86466e4a3de9a2cd47b6e597417aebc1cd3c2d43bc662e79ab5eecdadf3ce0643e909432ed6d2c
+  checksum: 639b8a832840d1cd4504fcf3176a336a516432bd8b6b5cd56d0a6e98687dac455cf6cbed71d7529d641107f0c2fb7d6e36fbafa380c1b7240c540ed7a0f678e5
   languageName: node
   linkType: hard
 
@@ -18968,6 +18950,22 @@ fsevents@~2.1.2:
   checksum: 5de5d6577796af87a983199d6350ed41c670abec4a306cc43ca887c1afdbd6b89af9ab00016e3ca17eb7ad89ebfd9bb817d33baa89f855c6c95398a8b8abbf08
   languageName: node
   linkType: hard
+
+"kitchen-sink-starter@workspace:experimental-examples/kitchen-sink":
+  version: 0.0.0-use.local
+  resolution: "kitchen-sink-starter@workspace:experimental-examples/kitchen-sink"
+  dependencies:
+    "@tinacms/cli": "workspace:*"
+    eslint: 7
+    eslint-config-next: 12.0.3
+    next: 12.0.3
+    react: 17.0.2
+    react-dom: 17.0.2
+    react-is: ^17.0.2
+    styled-components: ^5.1.3
+    tinacms: "workspace:*"
+  languageName: unknown
+  linkType: soft
 
 "klaw@npm:^1.0.0":
   version: 1.3.1
@@ -26262,7 +26260,7 @@ resolve@^2.0.0-next.3:
     "@typescript-eslint/eslint-plugin": ^2.3.0
     "@typescript-eslint/parser": ^2.3.0
     "@yarnpkg/pnpify": ^2.0.0-rc.20
-    cypress: ^9.1.0
+    cypress: 9.1.1
     danger: ^10.6.4
     eslint: ^6.8.0
     eslint-config-prettier: ^6.3.0
@@ -27384,7 +27382,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"sshpk@npm:^1.7.0":
+"sshpk@npm:^1.14.1":
   version: 1.16.1
   resolution: "sshpk@npm:1.16.1"
   dependencies:
