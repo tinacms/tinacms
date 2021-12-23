@@ -148,7 +148,6 @@ const validateCollection = async (
           `Collection's "name" must match ${obj.regex} at ${messageName}`,
       })
       .required(),
-    // label: yup.string().required(),
     path: yup
       .string()
       .required()
@@ -204,7 +203,6 @@ const validateField = async (
           `Field's 'name' must match ${obj.regex} at ${messageName}`,
       })
       .required(),
-    // label: yup.string().required(),
     type: yup
       .string()
       .oneOf(
