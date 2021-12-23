@@ -19,19 +19,22 @@ yarn add --dev @tinacms/cli
 ## Usage
 
 ```
-Usage:  command [options]
+Usage: @tinacms/cli command [options]
 
 Options:
-  -V, --version           output the version number
-  -h, --help              display help for command
+  -V, --version             output the version number
+  -h, --help                display help for command
 
 Commands:
-  server:start [options]  Start Filesystem Graphql Server
-  schema:compile          Compile schema into static files for the server
-  schema:types            Generate a GraphQL query for your site's schema, (and
-                          optionally Typescript types)
-  help [command]          display help for command
+  server:start [options]    Start Filesystem Graphql Server
+  schema:compile [options]  Compile schema into static files for the server
+  schema:types [options]    Generate a GraphQL query for your site's schema, (and optionally Typescript types)
+  init [options]            Add Tina Cloud to an existing project
+  audit [options]           Audit your schema and the files to check for errors
+  help [command]            display help for command
 ```
+
+[See our docs](https://tina.io/docs/cli-overview/) for more information about the commands.
 
 ## Getting started
 
@@ -228,3 +231,8 @@ getPostsDocument(relativePath: "voteForPedro.md") {
 To learn how to work with this data on a Tina-enabled site, check out the [client documentation](https://tina.io/docs/tina-cloud/client/)
 
 > This API is currently somewhat limited. Specifically there's no support for filtering and sorting "list" queries. We have plans to tackle that in upcoming cycles
+
+
+## API Docs
+
+
