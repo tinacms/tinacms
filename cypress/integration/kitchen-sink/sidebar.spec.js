@@ -60,6 +60,7 @@ describe('Tina side bar', () => {
     cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
+    cy.get('[data-test="form:getPageDocument"]').scrollTo('top').wait(1000)
     // Edit subtitle
     cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
     cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
