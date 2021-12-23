@@ -193,14 +193,18 @@ export const ToolbarButtons = ({ name, templates }) => {
             icon={<strong>H6</strong>}
           />
         </HeaderPopup>
-        <BlockToolbarButton
-          type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
-          icon={<QuoteIcon />}
-        />
-        <CodeBlockToolbarButton
-          type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
-          icon={<CodeIcon />}
-        />
+        <span data-test="quoteButton">
+          <BlockToolbarButton
+            type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
+            icon={<QuoteIcon />}
+          />
+        </span>
+        <span data-test="codeBlockButton">
+          <CodeBlockToolbarButton
+            type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
+            icon={<CodeIcon />}
+          />
+        </span>
         <LinkToolbarButton icon={<LinkIcon />} />
         <ToolbarButton
           icon={<ImageIcon />}
@@ -222,10 +226,12 @@ export const ToolbarButtons = ({ name, templates }) => {
           type={getPlatePluginType(editor, ELEMENT_OL)}
           icon={<OrderedListIcon />}
         />
-        <MarkToolbarButton
-          type={getPlatePluginType(editor, MARK_BOLD)}
-          icon={<BoldIcon />}
-        />
+        <span data-test="boldButton">
+          <MarkToolbarButton
+            type={getPlatePluginType(editor, MARK_BOLD)}
+            icon={<BoldIcon />}
+          />
+        </span>
         <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_ITALIC)}
           icon={<ItalicIcon />}

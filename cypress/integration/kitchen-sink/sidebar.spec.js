@@ -19,9 +19,7 @@ const HEADING_TEXT = 'This is a heading'
 
 const LONG_FORM_TEXT = `# heading 1
 para 1
-
 para 2
-
 para 3
 
 `
@@ -37,14 +35,22 @@ describe('Tina side bar', () => {
     cy.reload()
 
     // Open the sidebar
-    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 })
+      .click()
+      .wait(1000)
 
     // Delete all text in rich text editor
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
 
     const backspace = Array(300).fill(`{backspace}`).join('')
-    console.log({ backspace })
-    cy.get(SLATE_SELECTOR).click('bottom').type(backspace)
+
+    cy.get('[data-test="form:getPageDocument"]').scrollTo('bottom').wait(100)
+
+    cy.get(SLATE_SELECTOR)
+      .scrollIntoView()
+      .wait(1000)
+      .click('bottomLeft')
+      .type(backspace)
     cy.get('button').contains('Save').click().wait(1000)
     cy.visit('/').wait(100)
 
@@ -65,13 +71,17 @@ describe('Tina side bar', () => {
     describe('Edit rich Text', () => {
       // TODO: fix issue where if bold text test is at the bottom, this test will fail
       // Bold text
-      cy.get(SLATE_SELECTOR).click('bottom')
-      cy.get('[data-testid="ToolbarButton"')
-        .contains('format bold')
-        .click({ force: true })
+      cy.get(SLATE_SELECTOR).scrollIntoView().wait(1000).click('bottomLeft')
+
+      cy.get('[data-test="boldButton"]').click()
+
       cy.get(SLATE_SELECTOR)
+        .scrollIntoView()
+        .wait(1000)
         .click('bottom')
         .type('This will be a strong block{enter}')
+
+      // cy.get('[data-test="boldButton"]').click({ force: true })
 
       cy.get(RICH_TEXT_BODY_SELECTOR).should(
         'contain.html',
@@ -82,7 +92,11 @@ describe('Tina side bar', () => {
         .click({ force: true })
 
       // get the rich text editor and type something
-      cy.get(SLATE_SELECTOR).click('bottom').type(LONG_FORM_TEXT)
+      cy.get(SLATE_SELECTOR)
+        .scrollIntoView()
+        .wait(1000)
+        .click('bottomLeft')
+        .type(LONG_FORM_TEXT)
       // It renders paragraphs properly
       cy.get(RICH_TEXT_BODY_SELECTOR)
         .should('contain.html', '<h1>heading 1</h1>')
@@ -100,10 +114,16 @@ describe('Tina side bar', () => {
       // )
 
       // Testing the "Quote" button
-      cy.get(SLATE_SELECTOR).click('bottom').type('This will be a quote')
+      cy.get(SLATE_SELECTOR)
+        .scrollIntoView()
+        .wait(1000)
+        .click('bottomLeft')
+        .type('This will be a quote')
+
       cy.get('[data-testid="ToolbarButton"')
         .contains('format quote')
         .click({ force: true })
+
       cy.get(RICH_TEXT_BODY_SELECTOR).should(
         'contain.html',
         '<blockquote>This will be a quote</blockquote>'
