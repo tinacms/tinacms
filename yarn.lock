@@ -12248,9 +12248,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:9.1.1":
-  version: 9.1.1
-  resolution: "cypress@npm:9.1.1"
+"cypress@npm:9.2.0":
+  version: 9.2.0
+  resolution: "cypress@npm:9.2.0"
   dependencies:
     "@cypress/request": ^2.88.10
     "@cypress/xvfb": ^1.2.4
@@ -12295,7 +12295,7 @@ __metadata:
     yauzl: ^2.10.0
   bin:
     cypress: bin/cypress
-  checksum: 204a34509e4940f818c9755d6bde2903a0c72f9d5147c1cfdffcfa2a8a1c92745386c070813c1e6e24e5e59adb7f3fa0a1d070613ed5070417d5ec8c7cba6341
+  checksum: c08ae2371f4be6ca62aed645db5a52591073f7f23afbc458103aa8c0f4a0c48c98ab84a555e7ac83895991dc8caf71d3e166f40ede43971d1a81e4761e55bfcf
   languageName: node
   linkType: hard
 
@@ -26332,7 +26332,7 @@ resolve@^2.0.0-next.3:
     "@typescript-eslint/eslint-plugin": ^2.3.0
     "@typescript-eslint/parser": ^2.3.0
     "@yarnpkg/pnpify": ^2.0.0-rc.20
-    cypress: 9.1.1
+    cypress: 9.2.0
     danger: ^10.6.4
     eslint: ^6.8.0
     eslint-config-prettier: ^6.3.0
