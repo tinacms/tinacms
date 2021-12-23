@@ -44,12 +44,14 @@ describe('Tina side bar', () => {
 
     const backspace = Array(300).fill(`{backspace}`).join('')
 
-    cy.get('[data-test="form:getPageDocument"]').scrollTo('bottom').wait(100)
+    cy.get('[data-test="form:getPageDocument"]')
+      .scrollTo('bottomLeft')
+      .wait(1000)
 
     cy.get(SLATE_SELECTOR)
       .scrollIntoView()
       .wait(1000)
-      .click('bottomLeft')
+      .click('bottomLeft', { force: true })
       .type(backspace)
     cy.get('button').contains('Save').click().wait(1000)
     cy.visit('/').wait(100)
