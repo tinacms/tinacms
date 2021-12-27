@@ -12,7 +12,8 @@
     "lerna": "lerna",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
-    "docs": "lerna run docs"
+    "docs": "lerna run docs",
+    "prepublish": "node ./einstein-scripts/prepublish.js"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
