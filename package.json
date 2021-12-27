@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
-    "build": "lerna run build --scope '{@tinacms/*,react-tinacms-@(date|editor|inline),tinacms}' --reject-cycles",
+    "build": "lerna run build --scope '{@tinacms/*,next-tinacms-@(json|markdown),react-tinacms-@(date|editor|inline),tinacms}' --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
     "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",
