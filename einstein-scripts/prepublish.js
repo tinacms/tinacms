@@ -19,6 +19,8 @@ function deleteUnusedPackage(packageName) {
 
   const usedPackages = [
     '@tinacms',
+    'next-tinacms-json',
+    'next-tinacms-markdown',
     'react-tinacms-date',
     'react-tinacms-editor',
     'react-tinacms-inline',
