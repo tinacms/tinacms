@@ -28,22 +28,22 @@ import {
   getMarkPresent, getAllMarkOccurrences,
 } from '../../../utils'
 import {
-  removeLinkBeingEdited,
-  unmountLinkForm,
-  updateLinkBeingEdited,
+  removeAnchorBeingEdited,
+  unmountAnchorForm,
+  updateAnchorBeingEdited,
 } from '../commands'
-import { linkPluginKey } from '../plugin'
+import { anchorPluginKey } from '../plugin'
 import { InnerForm } from './InnerForm'
 
 const width = 240
 
-export const LinkForm = () => {
+export const AnchorForm = () => {
   const { editorView } = useEditorStateContext()
   const [position, setPosition] = useState<any>(undefined)
 
   if (!editorView) return null
   const { view } = editorView
-  const linkPluginState = linkPluginKey.getState(view.state)
+  const AnchorPluginState = anchorPluginKey.getState(view.state)
   const { anchor, head } = view.state.selection
   const selState = anchor < head ? anchor : head
   const node = view.state.selection.empty
@@ -52,12 +52,12 @@ export const LinkForm = () => {
   const clickTarget = node.parentNode as HTMLElement
 
   const onChange = (attrs: any) => {
-    updateLinkBeingEdited(view.state, view.dispatch, attrs)
+    updateAnchorBeingEdited(view.state, view.dispatch, attrs)
     view.focus()
   }
 
   const onCancel = () => {
-    unmountLinkForm(view)
+    unmountAnchorForm(view)
     view.focus()
   }
 
@@ -78,38 +78,40 @@ export const LinkForm = () => {
       width
     )
     setPosition({ arrowOffset, left, top })
-  }, [linkPluginState])
+  }, [AnchorPluginState])
 
-  if (!linkPluginState!.show_link_toolbar) {
+  if (!AnchorPluginState!.show_anchor_toolbar) {
     return null
   }
 
   const { arrowOffset, left, top } = position || {}
   const { state, dispatch } = view
-  let href = ''
+  let name = ''
   // let title = ''
-  const linkMark = getMarkPresent(state, state.schema.marks.link)
+  const linkMark = getMarkPresent(state, state.schema.marks.anchor)
+
   if (linkMark) {
-    href = linkMark.attrs.href
-    // title = linkMark.attrs.title
+    // console.log('linkMark', linkMark)
+    name = linkMark.attrs.name
   }
 
   const anchors = getAllMarkOccurrences(state.doc.content, 'anchor')
+
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>
       {position && (
         <StyleReset>
           <LinkFormWrapper>
-            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+            <LinkArrow offset={arrowOffset} top={top}/>
             <InnerForm
               style={{
                 left,
                 top,
                 width: `${width}px`,
               }}
-              removeLink={() => removeLinkBeingEdited(state, dispatch)}
+              removeLink={() => removeAnchorBeingEdited(state, dispatch)}
               onChange={onChange}
-              href={href}
+              name={name}
               allAnchors={anchors}
               cancel={onCancel}
             />

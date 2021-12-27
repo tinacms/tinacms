@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import { EditorState } from 'prosemirror-state'
-import { MarkType, Mark } from 'prosemirror-model'
+import { MarkType, Mark, Fragment } from 'prosemirror-model'
 
 export const findElementOffsetTop = (
   element: HTMLElement,
@@ -126,4 +126,17 @@ export const formatKeymap = (keymapStr: string) => {
   formattedKeymap = formattedKeymap.replace('Shift', '⇧')
   formattedKeymap = formattedKeymap.replace('Alt', '⌥')
   return formattedKeymap
+}
+
+export const getAllMarkOccurrences = (content: Fragment, markName: string, allAnchors: string[] = []) => {
+  content.forEach(item => {
+    if (item.marks.length > 0) {
+      item.marks.forEach((mark: any) => {
+        if (mark.type?.name === markName) {
+          allAnchors.push(mark.attrs.name)
+        }
+      })
+    } else if (item.content.size > 0) getAllMarkOccurrences(item.content, markName, allAnchors)
+  })
+  return allAnchors
 }

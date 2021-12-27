@@ -17,11 +17,13 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+
+type E = React.ChangeEvent<HTMLInputElement>
 
 interface Props {
-  // title: string | null
-  href: string | null
+  name: string | null
+  // id: string | null
   onChange(attrs: any): void
   removeLink(): void
   cancel(): void
@@ -32,16 +34,13 @@ interface Props {
 }
 
 interface State {
-  href: string | null,
-  isAnchorPanel: boolean
-  // title: string | null
+  name: string | null
+  // id: string | null
 }
 
 export class InnerForm extends React.Component<Props, State> {
   state = {
-    href: this.props.href || '',
-    isAnchorPanel: false,
-    // title: this.props.title || '',
+    name: this.props.name || '',
   }
 
   inputRef = React.createRef<HTMLInputElement>()
@@ -56,19 +55,18 @@ export class InnerForm extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { href } = this.props
-    if (href !== prevProps.href) this.setState(() => ({ href }))
+    const { name } = this.props
+    if (name !== prevProps.name) this.setState(() => ({ name }))
   }
 
   closeModal() {
-    const { href } = this.state
-    const { cancel, removeLink, href: originalHref } = this.props
-    if (!href && !originalHref) removeLink()
+    const { name } = this.state
+    const { cancel, removeLink, name: originalName } = this.props
+    if (!name && !originalName ) removeLink()
     cancel()
   }
 
-  setHref = (value: string, isAnchor: boolean) => this.setState(() => ({ href: isAnchor ? `#${value}` : value }))
-  setIsAnchorPanel = (value: boolean) => this.setState(() => ({ isAnchorPanel: value }))
+  setName = ({ target: { value } }: E) => this.setState(() => ({ name: value }))
   // setTitle = ({ target: { value } }: E) =>
   //   this.setState(() => ({ title: value }))
 
@@ -88,7 +86,8 @@ export class InnerForm extends React.Component<Props, State> {
 
   render() {
     const { removeLink, style = {}, allAnchors } = this.props
-    const { href, isAnchorPanel } = this.state
+    const { name } = this.state
+    const isNameTaken = allAnchors.includes(name)
     return (
       <LinkPopup
         style={{
@@ -103,28 +102,19 @@ export class InnerForm extends React.Component<Props, State> {
           onChange={this.setTitle}
           onKeyPress={this.onEnterSave as any}
         /> */}
-        <PanelActions>
-          <PanelActionButton active={!isAnchorPanel}
-                             onClick={() => this.setIsAnchorPanel(false)}>Link</PanelActionButton>
-          <PanelActionButton active={isAnchorPanel}
-                             onClick={() => this.setIsAnchorPanel(true)}>Anchor</PanelActionButton>
-        </PanelActions>
-        <LinkLabel>URL</LinkLabel>
-        {isAnchorPanel ? (
-          <SelectAnchor onChange={(e) => this.setHref(e.target.value, true)}>
-            {allAnchors.length ? allAnchors.map(anchor => <option key={anchor} value={anchor}>{anchor}</option>) : <option value={''}>no anchors found</option>}
-          </SelectAnchor>
-        ) : (<LinkInput
+        <LinkLabel>Name</LinkLabel>
+        <LinkInput
           ref={this.inputRef}
-          placeholder='Enter URL'
+          placeholder="Enter anchor name"
           type={'text'}
-          value={href}
-          onChange={(e) => this.setHref(e.target.value, false)}
+          value={name}
+          onChange={this.setName}
           onKeyPress={this.onEnterSave as any}
-        />)}
+        />
+        {isNameTaken && name &&<span style={{ color: 'firebrick' }}>This name is already taken.</span>}
         <LinkActions>
           <DeleteLink onClick={removeLink}>Delete</DeleteLink>
-          <SaveLink onClick={this.save} disabled={!href}>
+          <SaveLink onClick={this.save} disabled={!name || isNameTaken}>
             Save
           </SaveLink>
         </LinkActions>
@@ -135,7 +125,7 @@ export class InnerForm extends React.Component<Props, State> {
 
 const LinkPopupKeyframes = keyframes`
   0% {
-    transform: scale3d(0.5, 0.5, 1)
+    transform: scale3d(0.5,0.5,1)
   }
   100% {
     transform: scale3d(1, 1, 1);
@@ -148,7 +138,8 @@ const LinkPopup = styled.div`
   height: max-content;
   border-radius: var(--tina-radius-small);
   border: 1px solid var(--tina-color-grey-2);
-  filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1)) drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
+  filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
+    drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
   animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
@@ -165,7 +156,7 @@ const LinkLabel = styled.label`
   margin-bottom: 3px;
 `
 
-const sharedStyle = css`
+const LinkInput = styled.input`
   position: relative;
   background-color: white;
   border-radius: var(--tina-radius-small);
@@ -191,52 +182,6 @@ const sharedStyle = css`
     font-size: var(--tina-font-size-2);
     color: #cfd3d7;
   }
-`
-
-const SelectAnchor = styled.select`
-  ${sharedStyle}
-`
-
-const LinkInput = styled.input`
-  ${sharedStyle}
-`
-
-const PanelActions = styled.div`
-  display: flex;
-  justify-content: center;
-
-  > button {
-    &:first-child {
-      border-top-left-radius: 10px;
-      border-bottom-left-radius: 10px;
-    }
-
-    &:nth-child(2) {
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-  }
-`
-
-const PanelActionButton = styled.button<{ active: boolean }>`
-  background-color: ${props => props.active ? '#0574e4' : 'white'};
-  color: ${props => props.active ? 'white' : '#0574e4'};
-  border: ${props => props.active ? '1px solid var(--tina-color-blue-2);' : '1px solid var(--tina-color-grey-2);'};
-  text-align: center;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.12);
-  font-weight: var(--tina-font-weight-regular);
-  cursor: pointer;
-  transition: all 85ms ease-out;
-  font-size: var(--tina-font-size-0);
-  padding: 8px 0;
-  width: 80px;
-
-  &:hover {
-    background-color: #f6f6f9;
-    color: #0574e4;
-    opacity: 1;
-  }
-
 `
 
 const LinkActions = styled.div`

@@ -16,22 +16,13 @@ limitations under the License.
 
 */
 
-import { Node } from 'prosemirror-model'
-import { docAttrs, getAttrs, domAttrs } from './utils'
+import React from 'react'
+import { LinkIcon } from '@tinacms/icons'
 
-export const paragraph = {
-  content: 'inline*',
-  marks: '_',
-  attrs: {
-    class: { default: 'pm-align--left' },
-    id: { default: '' },
-  },
-  group: 'block',
-  parseDOM: [{ tag: 'p', getAttrs }],
-  toDocument(node: Node) {
-    return ['p', docAttrs(node.attrs), 0]
-  },
-  toDOM(node: Node) {
-    return ['p', domAttrs(node.attrs), 0]
-  },
-}
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu = () => (
+  <MenuButton data-tooltip="Link" data-side="top" disabled>
+    <LinkIcon />
+  </MenuButton>
+)

@@ -32,6 +32,7 @@ import { imagePlugin } from '../../../plugins/Image'
 import { codeBlockPlugin } from '../../../plugins/CodeBlock'
 import { inlinePlugin } from '../../../plugins/Inline'
 import { linkPlugin } from '../../../plugins/Link'
+import { anchorPlugin } from '../../../plugins/Anchor'
 import { tablePlugin } from '../../../plugins/Table'
 import { ImageProps } from '../../../types'
 
@@ -48,6 +49,7 @@ export function buildEditorState(
     keymap(buildKeymap(schema)),
     history(),
     linkPlugin(),
+    anchorPlugin(),
     dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
     gapCursor(),
     tableEditing(),

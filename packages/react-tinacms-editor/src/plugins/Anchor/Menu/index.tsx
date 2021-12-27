@@ -16,22 +16,5 @@ limitations under the License.
 
 */
 
-import { Node } from 'prosemirror-model'
-import { docAttrs, getAttrs, domAttrs } from './utils'
-
-export const paragraph = {
-  content: 'inline*',
-  marks: '_',
-  attrs: {
-    class: { default: 'pm-align--left' },
-    id: { default: '' },
-  },
-  group: 'block',
-  parseDOM: [{ tag: 'p', getAttrs }],
-  toDocument(node: Node) {
-    return ['p', docAttrs(node.attrs), 0]
-  },
-  toDOM(node: Node) {
-    return ['p', domAttrs(node.attrs), 0]
-  },
-}
+export { ProsemirrorMenu } from './ProsemirrorMenu'
+export { MarkdownMenu } from './MarkdownMenu'
