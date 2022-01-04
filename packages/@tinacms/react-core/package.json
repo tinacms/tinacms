@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-core",
-  "version": "0.43.0",
+  "version": "0.43.4",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

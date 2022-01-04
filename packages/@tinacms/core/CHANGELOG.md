@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Features
+
+* **tinacms:** configure media mgr page size via mediaOptions.pageSize ([5d7890f](https://github.com/einstein/tinacms/commit/5d7890f5312e5efa08a07cd7fc4e3967d71eccf3))
+* **tinacms:** customize list error message by throwing a MediaListError ([5aff1da](https://github.com/einstein/tinacms/commit/5aff1da8e725ad4046bf1888fa83599c3ef0a4c5))
+* **tinacms:** use cursor-based pagination in media manager ([7a94b97](https://github.com/einstein/tinacms/commit/7a94b97e228ffd490a68159d458130e089dd6c87))
+
+
+
+
+
 # [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
 
 

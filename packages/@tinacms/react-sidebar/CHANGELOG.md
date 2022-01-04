@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Features
+
+* **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/einstein/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+
+
+
+
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 **Note:** Version bump only for package @tinacms/react-sidebar

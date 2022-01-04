@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Bug Fixes
+
+* **react-tinacms-editor:** fixing FocusRingOptions import path ([7096add](https://github.com/einstein/tinacms/commit/7096add5f5915ac69f90682d00d73dc1e739ffd5))
+* **react-tinacms-editor,react-tinacms-inline:** Fixes deps ([d60eb84](https://github.com/einstein/tinacms/commit/d60eb8400595de3f0286f0236bba52b02b01cb51))
+
+
+
+
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 **Note:** Version bump only for package react-tinacms-editor

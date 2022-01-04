@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Features
+
+* Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/einstein/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+
+
+
+
+
 # [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
 
 **Note:** Version bump only for package @tinacms/forms

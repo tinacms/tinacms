@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Bug Fixes
+
+* **bug:** disables form save button if field fails validation ([e829ffa](https://github.com/einstein/tinacms/commit/e829ffa6756a22b58c9de9403895d76696d224fe))
+
+
+
+
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 **Note:** Version bump only for package @tinacms/react-toolbar
