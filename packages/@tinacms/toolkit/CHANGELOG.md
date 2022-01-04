@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.56.5
+
+### Patch Changes
+
+- ddf81a4fd: constrain width of simple branch selector dropdown
+- 20260a82d: Prevents navigation into objects when parent form is invalid
+- 0370147fb: Remove ability to tab in rich-text editing
+- 3de8c6165: Enabled branch creation in branch switcher
+- 2eaad97bf: Remove unused underline and strikethrough icons in rich text editor
+- 5c070a83f: feat: Add UI banner for when in localMode
+
 ## 0.56.4
 
 ### Patch Changes
