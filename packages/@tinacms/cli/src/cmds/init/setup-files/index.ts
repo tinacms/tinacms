@@ -50,7 +50,7 @@ export const nextPostPage =
   () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
   // This is a demo file once you have tina setup feel free to delete this file
   
-  import { staticRequest, gql, getStaticPropsForTina } from "tinacms";
+  import { staticRequest, gql } from "tinacms";
   import Head from "next/head";
   import { createGlobalStyle } from "styled-components";
   
@@ -141,24 +141,35 @@ export const nextPostPage =
   };
   
   export const getStaticProps = async ({ params }) => {
-    const tinaProps = await getStaticPropsForTina({
-      query: gql\`
-        query BlogPostQuery($relativePath: String!) {
-          getPostsDocument(relativePath: $relativePath) {
-            data {
-              title
-              body
-            }
+    const query = gql\`
+      query BlogPostQuery($relativePath: String!) {
+        getPostsDocument(relativePath: $relativePath) {
+          data {
+           title
+            body
           }
         }
-      \`,
-      variables: { relativePath: \`\${params.filename}.md\` },
-    });
+      }
+    \`
+    const variables = { relativePath: \`\${params.filename}.md\` }
+    let data = {}
+    try {
+      data = await staticRequest({
+        query,
+        variables,
+      })
+    } catch {
+      // swallow errors related to document creation
+    }
+
     return {
       props: {
-        ...tinaProps,
+        query,
+        variables,
+        data,
+        //myOtherProp: 'some-other-data',
       },
-    };
+    }
   };
   
   export const getStaticPaths = async () => {
