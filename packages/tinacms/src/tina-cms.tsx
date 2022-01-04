@@ -210,6 +210,7 @@ export const TinaCMSProvider2 = ({
   apiURL: string
   /**
    * Point to the local version of GraphQL instead of tina.io
+   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
    *
    * @deprecated use apiURL instead
    */
