@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.0.1
+
+### Patch Changes
+
+- 80732bd97: Create a @tinacms/datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @tinacms/graphql package and allows for a clearer separation.
+
 ## 0.59.1
 
 ### Patch Changes
