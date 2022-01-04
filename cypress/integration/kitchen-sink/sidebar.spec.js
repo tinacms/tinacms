@@ -29,84 +29,109 @@ const RICH_TEXT_BODY_SELECTOR = `[data-test="rich-text-body"]`
 
 describe('Tina side bar', () => {
   beforeEach(() => {
+    cy.debug()
+    cy.intercept('http://localhost:4001/graphql').as('graphQL')
+    cy.intercept('/_next/**').as('next')
     cy.visit('/')
     // Fake Login
     localStorage.setItem('tina.isEditing', 'true')
-    cy.reload()
+    cy.reload().wait(['@graphQL', '@next', '@next'])
 
     // Open the sidebar
-    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 })
-      .click()
-      .wait(1000)
+    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
 
     // Delete all text in rich text editor
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
 
-    const backspace = Array(300).fill(`{backspace}`).join('')
-
     cy.get('[data-test="form:getPageDocument"]')
-      .scrollTo('bottomLeft')
-      .wait(1000)
+      .scrollTo('bottomLeft', {
+        easing: 'linear',
+        duration: 100,
+      })
+      .then((_) => {
+        // cy.get(SLATE_SELECTOR)
+        //   .scrollIntoView({ easing: 'linear', duration: 100 })
+        //   .then((_) => {
+        const backspace = Array(300).fill(`{backspace}`).join('')
+        cy.get(SLATE_SELECTOR).click('bottomLeft').type(backspace)
+        cy.get('button').contains('Save').click()
+        cy.wait('@graphQL')
+        cy.visit('/')
+        // })
+      })
 
-    cy.get(SLATE_SELECTOR)
-      .scrollIntoView()
-      .wait(1000)
-      .click('bottomLeft', { force: true })
-      .type(backspace)
-    cy.get('button').contains('Save').click().wait(1000)
-    cy.visit('/').wait(100)
+    // .wait(1000)
+
+    // .wait(1000)
+    // .wait(100)
 
     // Open the sidebar
     cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
-    cy.get('[data-test="form:getPageDocument"]').scrollTo('top').wait(1000)
-    // Edit subtitle
-    cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
-    cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
+    cy.get('[data-test="form:getPageDocument"]')
+      .scrollTo('top', {
+        easing: 'linear',
+        duration: 100,
+      })
+      .then((_) => {
+        // .wait(1000)
+        // Edit subtitle
+        cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
+        cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
 
-    cy.get('[data-test="form:getPageDocument"]').scrollTo('top').wait(1000)
-    // Editing heading
-    cy.get('input[name="heading"]').click().type(HEADING_TEXT)
-    cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
+        cy.get('[data-test="form:getPageDocument"]').scrollTo('top')
+        // .wait(1000)
+        // Editing heading
+        cy.get('input[name="heading"]').click().type(HEADING_TEXT)
+        cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
+      })
   })
 
   it('Can edit rich text', () => {
     describe('Edit rich Text', () => {
       // TODO: fix issue where if bold text test is at the bottom, this test will fail
       // Bold text
-      cy.get(SLATE_SELECTOR).scrollIntoView().wait(1000).click('bottomLeft')
+      describe('Edit Bold', () => {
+        cy.get(SLATE_SELECTOR)
+          .scrollIntoView({ easing: 'linear', duration: 100 })
+          .then((_) => {
+            // Edit Bold
+            cy.get(SLATE_SELECTOR).click('bottomLeft')
+            cy.get('[data-test="boldButton"]').click()
+            cy.get(SLATE_SELECTOR)
+              .click('bottomLeft')
+              .type('This will be a strong block{enter}')
+            cy.get('[data-test="boldButton"]').click()
+            // cy.get(SLATE_SELECTOR).
+            cy.get(RICH_TEXT_BODY_SELECTOR).should(
+              'contain.html',
+              '<strong>This will be a strong block</strong>'
+            )
 
-      cy.get('[data-test="boldButton"]').click()
+            // Edit Paragraphs
+            cy.get(SLATE_SELECTOR).click('bottomLeft').type(LONG_FORM_TEXT)
+            // It renders paragraphs properly
+            cy.get(RICH_TEXT_BODY_SELECTOR)
+              .should('contain.html', '<h1>heading 1</h1>')
+              .should('contain.html', '<p>para 1</p>')
+              .should('contain.html', '<p>para 2</p>')
+              .should('contain.html', '<p>para 3</p>')
 
-      cy.get(SLATE_SELECTOR)
-        .scrollIntoView()
-        .wait(1000)
-        .click('bottom')
-        .type('This will be a strong block{enter}')
+            // Edit Quotes
+            cy.get(SLATE_SELECTOR)
+              .click('bottomLeft')
+              .type('This will be a quote')
+            cy.get('[data-testid="ToolbarButton"')
+              .contains('format quote')
+              .click({ force: true })
 
-      // cy.get('[data-test="boldButton"]').click({ force: true })
-
-      cy.get(RICH_TEXT_BODY_SELECTOR).should(
-        'contain.html',
-        '<strong>This will be a strong block</strong>'
-      )
-      cy.get('[data-testid="ToolbarButton"')
-        .contains('format bold')
-        .click({ force: true })
-
-      // get the rich text editor and type something
-      cy.get(SLATE_SELECTOR)
-        .scrollIntoView()
-        .wait(1000)
-        .click('bottomLeft')
-        .type(LONG_FORM_TEXT)
-      // It renders paragraphs properly
-      cy.get(RICH_TEXT_BODY_SELECTOR)
-        .should('contain.html', '<h1>heading 1</h1>')
-        .should('contain.html', '<p>para 1</p>')
-        .should('contain.html', '<p>para 2</p>')
-        .should('contain.html', '<p>para 3</p>')
+            cy.get(RICH_TEXT_BODY_SELECTOR).should(
+              'contain.html',
+              '<blockquote>This will be a quote</blockquote>'
+            )
+          })
+      })
 
       // TODO: Test select from the toolbar
       // cy.get('.sc-gIvpjk').click()
@@ -116,22 +141,6 @@ describe('Tina side bar', () => {
       // cy.get(RICH_TEXT_BODY_SELECTOR).should(
       //   'contain.html, "<h1>this will be a heading</h1>'
       // )
-
-      // Testing the "Quote" button
-      cy.get(SLATE_SELECTOR)
-        .scrollIntoView()
-        .wait(1000)
-        .click('bottomLeft')
-        .type('This will be a quote')
-
-      cy.get('[data-testid="ToolbarButton"')
-        .contains('format quote')
-        .click({ force: true })
-
-      cy.get(RICH_TEXT_BODY_SELECTOR).should(
-        'contain.html',
-        '<blockquote>This will be a quote</blockquote>'
-      )
 
       // Code block
       // cy.get(SLATE_SELECTOR).click('bottom').type('This will be a code block')
@@ -198,11 +207,10 @@ describe('Tina side bar', () => {
 
     describe('Saving and refresh', () => {
       cy.get('button').contains('Save').click()
-      cy.wait(1000)
+      cy.wait('@graphQL')
       // Fake logout
       localStorage.setItem('tina.isEditing', '')
-      cy.reload().wait(1000)
-
+      cy.reload().wait('@next')
       // Do all assertions again on new data
       // We can add these back in when they are working
       // cy.get(RICH_TEXT_BODY_SELECTOR).should(
@@ -213,7 +221,6 @@ describe('Tina side bar', () => {
       //   'contain.html',
       //   '<u>This will be a underline block</u>'
       // )
-
       // cy.get(RICH_TEXT_BODY_SELECTOR).should(
       //   'contain.html',
       //   '<em>This will be a italic block</em>'
@@ -222,10 +229,11 @@ describe('Tina side bar', () => {
         'contain.html',
         '<strong>This will be a strong block</strong>'
       )
-      // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-      //   'contain.html',
-      //   '<blockquote>This will be a quote</blockquote>'
-      // )
+      // Not sure why this version has a P and the other one does not
+      cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        'contain.html',
+        '<blockquote><p>This will be a quote</p></blockquote>'
+      )
     })
   })
 
