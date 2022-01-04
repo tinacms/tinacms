@@ -1,4 +1,4 @@
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
 export default function Home(props) {
@@ -20,25 +20,35 @@ export default function Home(props) {
 }
 
 export const getStaticProps = async () => {
-  const tinaProps = await getStaticPropsForTina({
-    query: `{
-        getPostList{
-          edges {
-            node {
-              id
-              sys {
-                filename
-              }
-            }
+  let data = {}
+  const variables = {}
+  const query = `{
+    getPostList{
+      edges {
+        node {
+          id
+          sys {
+            filename
           }
         }
-      }`,
-    variables: {},
-  })
+      }
+    }
+  }`
+  try {
+    data = await staticRequest({
+      query,
+      variables,
+    })
+  } catch {
+    // swallow errors related to document creation
+  }
 
   return {
     props: {
-      ...tinaProps,
+      query,
+      variables,
+      data,
+      //myOtherProp: 'some-other-data',
     },
   }
 }
