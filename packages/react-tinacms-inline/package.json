@@ -1,5 +1,5 @@
 {
-  "name": "react-tinacms-inline",
+  "name": "@einsteinindustries/react-tinacms-inline",
   "version": "0.43.3",
   "license": "Apache-2.0",
   "main": "dist/index.js",

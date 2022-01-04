@@ -1,18 +1,16 @@
 {
-  "name": "react-tinacms-date",
+  "name": "@einsteinindustries/react-tinacms-date",
   "version": "0.43.3",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
-  "keywords": [
-    "react"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/react-tinacms-date"
   },
   "files": [

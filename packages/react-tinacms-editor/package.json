@@ -1,5 +1,5 @@
 {
-  "name": "react-tinacms-editor",
+  "name": "@einsteinindustries/react-tinacms-editor",
   "version": "0.43.3",
   "license": "Apache-2.0",
   "main": "dist/index.js",

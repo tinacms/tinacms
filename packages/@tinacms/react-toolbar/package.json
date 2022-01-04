@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/react-toolbar",
+  "name": "@einsteinindustries/tinacms-react-toolbar",
   "version": "0.43.3",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -7,18 +7,13 @@
   "files": [
     "build"
   ],
-  "keywords": [
-    "tinacms",
-    "cms",
-    "react",
-    "forms"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/react-toolbar"
   },
   "scripts": {

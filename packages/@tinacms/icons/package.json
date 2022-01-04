@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/icons",
+  "name": "@einsteinindustries/tinacms-icons",
   "version": "0.42.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -7,17 +7,13 @@
   "files": [
     "build"
   ],
-  "keywords": [
-    "tinacms",
-    "cms",
-    "react"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/icons"
   },
   "scripts": {

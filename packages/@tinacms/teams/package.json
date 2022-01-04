@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/teams",
+  "name": "@einsteinindustries/tinacms-teams",
   "version": "0.42.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -8,16 +8,13 @@
     "build",
     "public"
   ],
-  "keywords": [
-    "tinacms",
-    "cms"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/teams"
   },
   "scripts": {

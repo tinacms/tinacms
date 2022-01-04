@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/api-git",
+  "name": "@einsteinindustries/tinacms-api-git",
   "version": "0.42.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -8,18 +8,13 @@
     "build",
     "bin"
   ],
-  "keywords": [
-    "tinacms",
-    "cms",
-    "git",
-    "react"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/api-git"
   },
   "scripts": {
