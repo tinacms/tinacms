@@ -65,6 +65,7 @@ describe('Tina side bar', () => {
     cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
     cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
 
+    cy.get('[data-test="form:getPageDocument"]').scrollTo('top').wait(1000)
     // Editing heading
     cy.get('input[name="heading"]').click().type(HEADING_TEXT)
     cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
