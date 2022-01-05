@@ -443,7 +443,7 @@ const Panel = function Panel({
       >
         {itemTitle}
       </PanelHeader>
-      <PanelBody>
+      <PanelBody id={tinaForm.id}>
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
     </GroupPanel>
