@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "build": "lerna run build --scope '{@tinacms/*,next-tinacms-@(json|markdown),react-tinacms-@(date|editor|inline),tinacms}' --reject-cycles",
-    "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
+    "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local -- --legacy-peer-deps",
     "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
