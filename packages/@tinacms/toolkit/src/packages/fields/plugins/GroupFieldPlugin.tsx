@@ -20,7 +20,6 @@ import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css } from 'styled-components'
 import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
-import { LeftArrowIcon } from '../../icons'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
@@ -110,7 +109,7 @@ const Panel = function Panel({
           >
             {field.label || field.name}
           </PanelHeader>
-          <PanelBody>
+          <PanelBody id={tinaForm.id}>
             {isExpanded ? (
               <FieldsBuilder form={tinaForm} fields={fields} />
             ) : null}
@@ -152,7 +151,7 @@ export const PanelHeader = ({ onClick, children }) => {
   )
 }
 
-export const PanelBody = ({ children }) => {
+export const PanelBody = ({ id, children }) => {
   return (
     <div
       style={{
@@ -162,7 +161,7 @@ export const PanelBody = ({ children }) => {
         background: 'var(--tina-color-grey-1)',
       }}
     >
-      <FormWrapper>{children}</FormWrapper>
+      <FormWrapper id={id}>{children}</FormWrapper>
     </div>
   )
 }

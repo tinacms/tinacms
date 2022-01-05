@@ -472,7 +472,7 @@ const Panel = function Panel({
       >
         {label}
       </PanelHeader>
-      <PanelBody>
+      <PanelBody id={tinaForm.id}>
         {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
