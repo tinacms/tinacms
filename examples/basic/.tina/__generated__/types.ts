@@ -429,16 +429,26 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
   export type Sdk = ReturnType<typeof getSdk>;
 
 // TinaSDK generated code
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   doc,
   vars,
   _options
 ) => {
-  // const data = await tinaClient.request(doc, { variables: vars }); 
-  const res = await await getStaticPropsForTina({query: doc, variables: vars})
-  return res
-};
+  let data = {}
+  try {
+    data = await staticRequest({
+      query: doc,
+      variables: vars,
+    })
+  } catch (e) {
+    // swallow errors related to document creation
+    console.warn('Warning: There was an error when fetching data')
+    console.warn(e)
+  }
+
+  return { data, query: doc, variables: vars || {} }
+}
 
 /**
  * @experimental this class can be used but may change in the future

@@ -24,6 +24,7 @@ export type { Database } from './database'
 export type { Store } from './database/store'
 export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
+export { stringifyFile, parseFile } from './database/util'
 
 export const buildSchema = async (rootPath: string, database: Database) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')

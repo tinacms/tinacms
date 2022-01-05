@@ -351,6 +351,8 @@ const Loader = (props: { children: React.ReactNode }) => {
 }
 
 /**
+ * @deprecated v0.62.0: Use `staticRequest` and a "try catch" block instead. see https://tina.io/docs/features/data-fetching/#querying-tina-content-in-nextjs for more details
+ *
  * A convenience function which makes a GraphQL request
  * to a local GraphQL server and ensures the response fits
  * the shape expected by Tina context in your application
