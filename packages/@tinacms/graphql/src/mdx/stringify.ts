@@ -64,7 +64,6 @@ export const stringify = (
   node: { type: typeof plateElements },
   field: RichTypeInner
 ): Content => {
-  console.log({ node: JSON.stringify(node, null, 2) })
   if (!node.type) {
     let returnNode: Content = { type: 'text', value: node.text || '' }
     if (node?.bold) {
