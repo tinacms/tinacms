@@ -123,15 +123,10 @@ export const auditDocuments = async (args: AuditArgs) => {
     const params = transformDocumentIntoMutationRequestPayload(
       docResult.data.getDocument.values,
       {
-        //   I am not 100% sure if these args are correct
         includeCollection: true,
         includeTemplate: typeof collection.templates !== 'undefined',
       }
     )
-    // console.log({ params: JSON.stringify(params, null, 2) })
-    // console.log({
-    //   values: JSON.stringify(docResult.data.getDocument.values, null, 2),
-    // })
 
     const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
         updateDocument(
