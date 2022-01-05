@@ -86,8 +86,6 @@ function formatPackageJSON(packageName) {
     console.error(error)
   }
 
-  // console.log(`\npackages/${packageName}/package.json`)
-
   let json
 
   try {
@@ -98,34 +96,25 @@ function formatPackageJSON(packageName) {
 
   const data = JSON.parse(json)
 
-  // console.log('Updating fields...\n')
-
   if (packageName.startsWith('@')) {
     data.name = `@einsteinindustries/${packageName
       .substring(1)
       .replace(/\//, '-')}`
-    // console.log(`\t"name": `, data.name)
   } else {
     data.name = `@einsteinindustries/${packageName.replace(/\//, '-')}`
-    // console.log(`\t"name": `, data.name)
   }
 
   if (data?.keywords) {
     data.keywords = []
-    // console.log(`\t"keywords: []`)
   }
 
   if (data?.bugs?.url) {
     data.bugs.url = 'https://github.com/einstein/tinacms/issues'
-    // console.log(`\t"bugs": { "url": "${data.bugs.url}" }`)
   }
 
   if (data?.repository?.url) {
     data.repository.url = 'https://github.com/einstein/tinacms.git'
-    // console.log(`\t"repository": { "url": "${data.repository.url}" }`)
   }
-
-  // console.log(JSON.stringify(data, null, 2))
 
   try {
     json = JSON.stringify(data, null, 2) + '\n'
