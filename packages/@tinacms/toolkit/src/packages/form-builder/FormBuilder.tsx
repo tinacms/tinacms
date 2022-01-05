@@ -92,7 +92,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
-                <FormWrapper>
+                <FormWrapper id={tinaForm.id}>
                   {tinaForm && tinaForm.fields.length ? (
                     <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                   ) : (
@@ -228,7 +228,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                   </div>
                 </div>
                 <FormPortalProvider>
-                  <FormWrapper>
+                  <FormWrapper id={tinaForm.id}>
                     {tinaForm && tinaForm.fields.length ? (
                       <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                     ) : (
@@ -268,9 +268,12 @@ const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ children }) => {
+export const FormWrapper = ({ children, id }) => {
   return (
-    <div className="h-full overflow-y-auto max-h-full bg-gray-50 pt-8 px-6 pb-2">
+    <div
+      data-test={`form:${id}`}
+      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-8 px-6 pb-2"
+    >
       <div className="w-full flex justify-center">
         <div className="w-full max-w-form">{children}</div>
       </div>
