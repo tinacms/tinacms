@@ -64,12 +64,19 @@ export const stringify = (
   node: { type: typeof plateElements },
   field: RichTypeInner
 ): Content => {
+  console.log({ node: JSON.stringify(node, null, 2) })
   if (!node.type) {
-    return {
-      type: 'text',
-      // @ts-ignore
-      value: node.text || '',
+    let returnNode: Content = { type: 'text', value: node.text || '' }
+    if (node?.bold) {
+      returnNode = { type: 'strong', children: [returnNode] }
     }
+    if (node?.italic) {
+      returnNode = {
+        type: 'emphasis',
+        children: [returnNode],
+      }
+    }
+    return returnNode
   }
 
   switch (node.type) {
