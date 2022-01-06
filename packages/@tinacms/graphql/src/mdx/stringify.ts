@@ -65,11 +65,17 @@ export const stringify = (
   field: RichTypeInner
 ): Content => {
   if (!node.type) {
-    return {
-      type: 'text',
-      // @ts-ignore
-      value: node.text || '',
+    let returnNode: Content = { type: 'text', value: node.text || '' }
+    if (node?.bold) {
+      returnNode = { type: 'strong', children: [returnNode] }
     }
+    if (node?.italic) {
+      returnNode = {
+        type: 'emphasis',
+        children: [returnNode],
+      }
+    }
+    return returnNode
   }
 
   switch (node.type) {
