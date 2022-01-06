@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms",
-  "version": "0.43.8",
+  "version": "0.43.9",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [],
