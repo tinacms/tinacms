@@ -72,12 +72,16 @@ describe('Tina side bar', () => {
       })
       .then((_) => {
         // Edit subtitle
-        cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
+        cy.get('textarea[name="subtitle"]', { timeout: 3000 })
+          .click()
+          .type(SUBTITLE_TEXT)
         cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
 
-        cy.get('[data-test="form:getPageDocument"]').first().scrollTo('top')
+        // cy.get('[data-test="form:getPageDocument"]').first().scrollTo('top')
         // Editing heading
-        cy.get('input[name="heading"]').click().type(HEADING_TEXT)
+        cy.get('input[name="heading"]', { timeout: 3000 })
+          .click()
+          .type(HEADING_TEXT)
         cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
       })
   })
