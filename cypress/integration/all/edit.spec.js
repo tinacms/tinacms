@@ -27,11 +27,12 @@ describe('Have Edit mode button', () => {
     // cy.get('#__next > div:nth-child(1) > a').should('exist')
     // Redirects do not seem to work in Electron. So this is a work around
     cy.visit('/admin')
-    cy.wait(2000)
-    cy.get('button[type=submit').should('contain', 'Log in')
+    cy.get('button[type=submit', { timeout: 3000 }).should(
+      'contain',
+      'Enter edit-mode'
+    )
     cy.get('button[type=submit')
       .click()
-      .wait(1000)
       .should(() => {
         expect(localStorage.getItem('tina.isEditing')).to.eq('true')
       })
