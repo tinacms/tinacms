@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.7](https://github.com/einstein/tinacms/compare/v0.43.6...v0.43.7) (2022-01-06)
+
+**Note:** Version bump only for package @einsteinindustries/tinacms
+
+
+
+
+
 ## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
 
 
