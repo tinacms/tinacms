@@ -39,10 +39,10 @@ echo "Updating versions..."
 # 4. Generate CHANGELOGs and Git Tags
 #    You must have GH_TOKEN in your environment variables
 npm run lerna -- version \
-  --yes \
-  --conventional-commits \
-  --conventional-graduate \
-  --allow-branch ein/main \
+  # --yes \
+  # --conventional-commits \
+  # --conventional-graduate \
+  # --allow-branch ein/main \
   # --create-release github \
   # -m "chore(publish): latest" \
   # --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json' \
