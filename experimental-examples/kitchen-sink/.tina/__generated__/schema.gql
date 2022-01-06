@@ -79,20 +79,10 @@ type Collection {
 
 union DocumentNode = PageDocument | PostDocument
 
-type PageObjField {
-  test1: String
-}
-
-type PageObjFieldList {
-  test1: String
-}
-
 type Page {
   heading: String
   subtitle: String
   body: JSON
-  objField: PageObjField
-  objFieldList: PageObjFieldList
 }
 
 type PageDocument implements Node & Document {
@@ -155,20 +145,10 @@ input DocumentMutation {
   post: PostMutation
 }
 
-input PageObjFieldMutation {
-  test1: String
-}
-
-input PageObjFieldListMutation {
-  test1: String
-}
-
 input PageMutation {
   heading: String
   subtitle: String
   body: JSON
-  objField: PageObjFieldMutation
-  objFieldList: PageObjFieldListMutation
 }
 
 input PostMutation {

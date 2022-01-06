@@ -29,10 +29,10 @@ const RICH_TEXT_BODY_SELECTOR = `[data-test="rich-text-body"]`
 
 describe('Tina side bar', () => {
   beforeEach(() => {
-    cy.debug()
     cy.intercept('http://localhost:4001/graphql').as('graphQL')
     cy.intercept('/_next/**').as('next')
     cy.visit('/')
+
     // Fake Login
     localStorage.setItem('tina.isEditing', 'true')
     cy.reload().wait(['@graphQL', '@next', '@next'])
@@ -44,44 +44,38 @@ describe('Tina side bar', () => {
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
 
     cy.get('[data-test="form:getPageDocument"]')
+      .first()
       .scrollTo('bottomLeft', {
         easing: 'linear',
         duration: 100,
       })
       .then((_) => {
-        // cy.get(SLATE_SELECTOR)
-        //   .scrollIntoView({ easing: 'linear', duration: 100 })
-        //   .then((_) => {
         const backspace = Array(300).fill(`{backspace}`).join('')
-        cy.get(SLATE_SELECTOR).click('bottomLeft').type(backspace)
+        cy.get(SLATE_SELECTOR)
+          .scrollIntoView({ easing: 'linear', duration: 100 })
+          .click({}, { timeout: 3000 })
+          .type(backspace)
         cy.get('button').contains('Save').click()
         cy.wait('@graphQL')
         cy.visit('/')
-        // })
       })
-
-    // .wait(1000)
-
-    // .wait(1000)
-    // .wait(100)
 
     // Open the sidebar
     cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
     cy.get('[data-test="form:getPageDocument"]')
+      .first()
       .scrollTo('top', {
         easing: 'linear',
         duration: 100,
       })
       .then((_) => {
-        // .wait(1000)
         // Edit subtitle
         cy.get('textarea[name="subtitle"]').click().type(SUBTITLE_TEXT)
         cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
 
-        cy.get('[data-test="form:getPageDocument"]').scrollTo('top')
-        // .wait(1000)
+        cy.get('[data-test="form:getPageDocument"]').first().scrollTo('top')
         // Editing heading
         cy.get('input[name="heading"]').click().type(HEADING_TEXT)
         cy.get('[data-test="heading"]').should('contain', HEADING_TEXT)
@@ -103,7 +97,6 @@ describe('Tina side bar', () => {
               .click('bottomLeft')
               .type('This will be a strong block{enter}')
             cy.get('[data-test="boldButton"]').click()
-            // cy.get(SLATE_SELECTOR).
             cy.get(RICH_TEXT_BODY_SELECTOR).should(
               'contain.html',
               '<strong>This will be a strong block</strong>'
