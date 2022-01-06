@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/next-tinacms-json",
-  "version": "0.43.5",
+  "version": "0.43.12",
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
