@@ -120,10 +120,12 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             <ScreenPluginModal
               screen={activeScreen}
               close={() => setActiveView(null)}
-             back={() => {
-               setActiveView(null)
-               setMenuIsOpen(true)
-             }}/>
+              // @ts-ignore
+              back={() => {
+                setActiveView(null)
+                setMenuIsOpen(true)
+              }}
+            />
           )}
           <ResizeHandle />
         </SidebarWrapper>

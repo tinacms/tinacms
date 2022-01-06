@@ -134,9 +134,9 @@ export const Toolbar = () => {
           <CreateContentMenu sidebar={false} />
         </BottomLeft>
         <AlignLeft>
-        <Link href='/sites'>
-          <a>Lucid</a>
-        </Link>
+          <Link href="/sites">
+            <a>Lucid</a>
+          </Link>
         </AlignLeft>
 
         <AlignRight>
@@ -209,6 +209,7 @@ export const Toolbar = () => {
         <ScreenPluginModal
           screen={activeScreen}
           close={() => setActiveView(null)}
+          // @ts-ignore
           back={() => {
             setActiveView(null)
             setMenuIsOpen(true)
@@ -308,8 +309,8 @@ const AlignLeft = styled.div`
   justify-self: start;
   display: flex;
   align-items: center;
-  
-  >a:first-child {
+
+  > a:first-child {
     margin-left: 52px;
     font-size: 1.5rem;
     font-weight: 700;
