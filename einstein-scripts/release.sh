@@ -45,7 +45,7 @@ npm run lerna -- version \
   --allow-branch ein/main \
   # --create-release github \
   # -m "chore(publish): latest" \
-  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json' \
+  # --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json' \
   --no-granular-pathspec
 
 echo "Publishing to NPM..."
