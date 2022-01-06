@@ -39,6 +39,7 @@ echo "Updating versions..."
 # 4. Generate CHANGELOGs and Git Tags
 #    You must have GH_TOKEN in your environment variables
 npm run lerna -- version \
+  --force-publish
   # --yes \
   # --conventional-commits \
   # --conventional-graduate \
