@@ -29,8 +29,12 @@ git checkout ein/main
 git pull
 git merge ein/develop
 
+echo "Running a fresh build..."
+
 # 3. Run a fresh build
 npm run hard-reset
+
+echo "Updating versions..."
 
 # 4. Generate CHANGELOGs and Git Tags
 #    You must have GH_TOKEN in your environment variables
@@ -40,14 +44,20 @@ npm run lerna -- version \
   --conventional-graduate \
   --allow-branch ein/main \
   # --create-release github \
-  -m "chore(publish): latest" \
+  # -m "chore(publish): latest" \
   --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json' \
   --no-granular-pathspec
 
+echo "Publishing to NPM..."
+
 # 5. Publish to NPM
 npm run lerna -- publish from-package --yes
+
+echo "Backmerge..."
 
 # 7. Backmerge to develop (ein/develop)
 git checkout ein/develop
 git merge ein/main
 git push
+
+echo "Release successful!"
