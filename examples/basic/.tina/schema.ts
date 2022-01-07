@@ -22,13 +22,6 @@ export default defineSchema({
       format: 'mdx',
       fields: [
         {
-          type: 'string',
-          name: 'asdf',
-          ui: {
-            defaultValue: 'This is a test',
-          },
-        },
-        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',
