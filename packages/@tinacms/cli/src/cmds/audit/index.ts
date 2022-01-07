@@ -22,10 +22,34 @@ import {
 import { auditCollection, auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
+import prompts from 'prompts'
 
 const rootPath = process.cwd()
 
 export const audit = async (ctx: any, next: () => void, options) => {
+  if (options.clean) {
+    logger.info(
+      `You are using the \`--clean\` option. This will modify your content as if a user is submitting a form. Before running this you should have a ${chalk.bold(
+        'clean git tree'
+      )} so unwanted changes can be undone.\n\n`
+    )
+    const res = await prompts({
+      name: 'useClean',
+      type: 'confirm',
+      message: `Do you want to continue?`,
+    })
+    if (!res.useClean) {
+      logger.warn(chalk.yellowBright('⚠️ Audit not complete'))
+      process.exit(0)
+    }
+  }
+  if (options.useDefaultValues && !options.clean) {
+    logger.warn(
+      chalk.yellowBright(
+        'WARNING: using the `--useDefaultValues` without the `--clean` flag has no effect. Please re-run audit and add the `--clean` flag'
+      )
+    )
+  }
   const bridge = options.clean
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
@@ -44,8 +68,14 @@ export const audit = async (ctx: any, next: () => void, options) => {
       collection,
       database,
       rootPath,
+      useDefaultValues: options.useDefaultValues,
     })
-    const returnError = await auditDocuments({ collection, database, rootPath })
+    const returnError = await auditDocuments({
+      collection,
+      database,
+      rootPath,
+      useDefaultValues: options.useDefaultValues,
+    })
     warning = warning || returnWarning
     error = error || returnError
   }

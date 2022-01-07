@@ -10,8 +10,20 @@
     {
       "name": "page",
       "path": "content/page",
+      "label": "Page",
       "format": "mdx",
       "fields": [
+        {
+          "type": "string",
+          "name": "asdf",
+          "ui": {
+            "defaultValue": "This is a test"
+          },
+          "namespace": [
+            "page",
+            "asdf"
+          ]
+        },
         {
           "name": "body",
           "label": "Main Content",
