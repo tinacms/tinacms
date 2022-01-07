@@ -80,6 +80,7 @@ type Collection {
 union DocumentNode = PageDocument | PostDocument
 
 type Page {
+  asdf: String
   body: JSON
 }
 
@@ -145,6 +146,7 @@ input DocumentMutation {
 }
 
 input PageMutation {
+  asdf: String
   body: JSON
 }
 

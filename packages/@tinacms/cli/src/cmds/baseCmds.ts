@@ -50,7 +50,13 @@ const noSDKCodegenOption = {
 const cleanOption = {
   name: '--clean',
   description:
-    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.ta`',
+    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.ts`',
+}
+
+const useDefaultValuesOption = {
+  name: '--useDefaultValues',
+  description:
+    'Adds default values to the graphQL mutation so that default values can be filled into existing documents (useful for adding a field with `required: true`)',
 }
 
 export const baseCmds: Command[] = [
@@ -101,7 +107,7 @@ export const baseCmds: Command[] = [
       ),
   },
   {
-    options: [cleanOption],
+    options: [cleanOption, useDefaultValuesOption],
     command: AUDIT,
     description: 'Audit your schema and the files to check for errors',
     action: (options) =>

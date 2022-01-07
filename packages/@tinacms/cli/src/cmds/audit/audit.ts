@@ -22,6 +22,7 @@ type AuditArgs = {
   collection: TinaCloudCollection
   database: Database
   rootPath: string
+  useDefaultValues: boolean
 }
 export const auditCollection = async (args: AuditArgs) => {
   let warning = false
@@ -75,7 +76,7 @@ export const auditCollection = async (args: AuditArgs) => {
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database, rootPath } = args
+  const { collection, database, rootPath, useDefaultValues } = args
   const query = `query {
         getCollection(collection: "${collection.name}") {
           format
@@ -120,12 +121,26 @@ export const auditDocuments = async (args: AuditArgs) => {
       query: documentQuery,
       variables: {},
     })
+    const topLevelDefaults = {}
+
+    // TODO: account for when collection is a string
+    if (useDefaultValues && typeof collection.fields !== 'string') {
+      collection.fields
+        .filter((x) => !x.list)
+        .forEach((x) => {
+          const value = x.ui as any
+          if (typeof value !== 'undefined') {
+            topLevelDefaults[x.name] = value.defaultValue
+          }
+        })
+    }
     const params = transformDocumentIntoMutationRequestPayload(
       docResult.data.getDocument.values,
       {
         includeCollection: true,
         includeTemplate: typeof collection.templates !== 'undefined',
-      }
+      },
+      topLevelDefaults
     )
 
     const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
@@ -165,7 +180,8 @@ export const transformDocumentIntoMutationRequestPayload = (
     [key: string]: unknown
   },
   /** Whether to include the collection and template names as top-level keys in the payload */
-  instructions: { includeCollection?: boolean; includeTemplate?: boolean }
+  instructions: { includeCollection?: boolean; includeTemplate?: boolean },
+  defaults?: any
 ) => {
   const { _collection, __typename, _template, ...rest } = document
 
@@ -175,8 +191,8 @@ export const transformDocumentIntoMutationRequestPayload = (
     : params
 
   return instructions.includeCollection
-    ? { [_collection]: paramsWithTemplate }
-    : paramsWithTemplate
+    ? { [_collection]: { ...defaults, ...filterObject(paramsWithTemplate) } }
+    : { ...defaults, ...filterObject(paramsWithTemplate) }
 }
 
 const transformParams = (data: unknown) => {
@@ -197,6 +213,7 @@ const transformParams = (data: unknown) => {
   } catch (e) {
     if (e.message === 'Failed to assertShape - _template is a required field') {
       if (!data) {
+        return undefined
         return []
       }
       const accum = {}
@@ -206,9 +223,19 @@ const transformParams = (data: unknown) => {
       return accum
     } else {
       if (!data) {
+        return undefined
         return []
       }
       throw e
     }
   }
+}
+
+// SRC: https://stackoverflow.com/questions/39977214/merge-in-es6-es7object-assign-without-overriding-undefined-values
+function filterObject(obj) {
+  const ret = {}
+  Object.keys(obj)
+    .filter((key) => obj[key] !== undefined)
+    .forEach((key) => (ret[key] = obj[key]))
+  return ret
 }

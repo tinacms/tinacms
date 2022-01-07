@@ -18,8 +18,16 @@ export default defineSchema({
     {
       name: 'page',
       path: 'content/page',
+      label: 'Page',
       format: 'mdx',
       fields: [
+        {
+          type: 'string',
+          name: 'asdf',
+          ui: {
+            defaultValue: 'This is a test',
+          },
+        },
         {
           name: 'body',
           label: 'Main Content',
