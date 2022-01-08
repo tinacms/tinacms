@@ -1,5 +1,16 @@
 # tina-graphql
 
+## 0.59.3
+
+### Patch Changes
+
+- 34cd3a44a: Fix issue where frontmatter parser would return a Date object which would be cast to epoch format
+- b006a5ab9: Added delete button to image field
+- a324b9c37: Export utilities for working with the data layer
+- 80732bd97: Create a @tinacms/datalayer package which houses the logic for data management for the GraphQL API. This simplifies the @tinacms/graphql package and allows for a clearer separation.
+- 0bec208e2: validate the schema for `path` and `matches`
+- 5c070a83f: feat: Add UI banner for when in localMode
+
 ## 0.59.2
 
 ### Patch Changes

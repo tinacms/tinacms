@@ -1,5 +1,4 @@
 import { Post } from "../../components/post";
-import { getStaticPropsForTina, staticRequest } from "tinacms";
 import { ExperimentalGetTinaClient } from "../../.tina/__generated__/types";
 
 // Use the props returned by get static props

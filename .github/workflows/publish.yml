@@ -42,6 +42,12 @@ jobs:
         if: matrix.channel == 'latest'
         run: |
           yarn publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Push tags
+        if: matrix.channel == 'latest'
+        run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           yarn push-tags
@@ -49,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Create release pull request
-        uses: changesets/action@master
+        uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
           version: yarn version
