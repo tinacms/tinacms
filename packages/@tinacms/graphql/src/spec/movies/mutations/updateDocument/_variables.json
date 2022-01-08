@@ -1,0 +1,94 @@
+{
+  "params": {
+    "title": "A New Hope",
+    "body": {
+      "children": [
+        {
+          "children": [
+            {
+              "text": "This is ",
+              "type": "text"
+            }
+          ],
+          "type": "p"
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "And here is an "
+            },
+            {
+              "type": "text",
+              "text": "inline code",
+              "code": true
+            },
+            {
+              "text": " block",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "text": "const meh = \"\"",
+                  "type": "text"
+                }
+              ],
+              "type": "code_line"
+            },
+            {
+              "children": [
+                {
+                  "text": ""
+                }
+              ],
+              "type": "code_line"
+            },
+            {
+              "children": [
+                {
+                  "text": "const ok = “yes”"
+                }
+              ],
+              "type": "code_line"
+            },
+            {
+              "children": [
+                {
+                  "text": "let it = “be”"
+                }
+              ],
+              "type": "code_line"
+            }
+          ],
+          "lang": "javascript",
+          "type": "code_block"
+        },
+        {
+          "children": [
+            {
+              "text": "",
+              "type": "text"
+            }
+          ],
+          "type": "p"
+        },
+        {
+          "children": [
+            {
+              "text": "",
+              "type": "text"
+            }
+          ],
+          "type": "p"
+        }
+      ],
+      "type": "root"
+    }
+  }
+}
