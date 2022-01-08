@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.32
+
+### Patch Changes
+
+- react-tinacms-github@0.51.13
+
 ## 1.1.31
 
 ### Patch Changes
