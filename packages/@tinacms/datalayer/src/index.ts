@@ -13,8 +13,14 @@ limitations under the License.
 
 export { GithubBridge } from './database/bridge/github'
 export { GithubStore } from './database/store/github'
-export { FilesystemBridge } from './database/bridge/filesystem'
-export { FilesystemStore } from './database/store/filesystem'
+export {
+  FilesystemBridge,
+  AuditFileSystemBridge,
+} from './database/bridge/filesystem'
+export {
+  FilesystemStore,
+  AuditFilesystemStore,
+} from './database/store/filesystem'
 export { MemoryStore } from './database/store/memory'
 export { LevelStore } from './database/store/level'
 

@@ -93,7 +93,7 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
     const useRootDirectory =
       !directory || directory === '/' || directory === '""'
 
-    const query = useRootDirectory ? 'folder=""' : `folder=${directory}`
+    const query = useRootDirectory ? 'folder=""' : `folder="${directory}"`
 
     const response = await cloudinary.search
       .expression(query)
