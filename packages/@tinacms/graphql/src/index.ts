@@ -20,10 +20,11 @@ export { indexDB } from './build'
 export { resolve } from './resolve'
 export { createDatabase } from './database'
 import type { Database } from './database'
+export type { Database } from './database'
 export type { Store } from './database/store'
 export type { Bridge } from './database/bridge'
+export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
-export { sequential } from './util'
 
 export const buildSchema = async (rootPath: string, database: Database) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')

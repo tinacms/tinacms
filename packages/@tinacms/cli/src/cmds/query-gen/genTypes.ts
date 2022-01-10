@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { successText } from '../../utils/theme'
+import { logText } from '../../utils/theme'
 import { generateTypes } from '../../codegen'
 import { printSchema, GraphQLSchema, DocumentNode } from 'graphql'
 import fs from 'fs-extra'
@@ -40,7 +40,7 @@ export async function genTypes(
 ${typescriptTypes}
 `
   )
-  logger.info(`Typescript types => ${successText(typesPath)}`)
+  logger.info(`Typescript types => ${logText(typesPath)}`)
 
   const schemaString = await printSchema(schema)
   const schemaPath = process.cwd() + '/.tina/__generated__/schema.gql'
@@ -55,6 +55,6 @@ schema {
 }
   `
   )
-  logger.info(`GraphQL types ====> ${successText(schemaPath)}`)
+  logger.info(`GraphQL types ====> ${logText(schemaPath)}`)
   next()
 }
