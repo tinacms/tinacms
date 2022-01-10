@@ -1,11 +1,15 @@
 {
   "version": {
-    "fullVersion": "0.59.2",
+    "fullVersion": "0.59.3",
     "major": "0",
     "minor": "59",
-    "patch": "2"
+    "patch": "3"
   },
-  "meta": {},
+  "meta": {
+    "flags": [
+      "experimentalData"
+    ]
+  },
   "collections": [
     {
       "label": "Blog Posts",

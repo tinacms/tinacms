@@ -287,27 +287,32 @@ export class Database {
     return await this.store.query(queryStrings, hydrator)
   }
 
-  public indexData = async ({
+  public putConfigFiles = async ({
     graphQLSchema,
     tinaSchema,
   }: {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
-    if (!this.bridge.supportsBuilding()) {
-      throw new Error(`Schema cannot be built with provided Bridge`)
+    if (this.bridge.supportsBuilding()) {
+      await this.bridge.putConfig(
+        path.join(GENERATED_FOLDER, `_graphql.json`),
+        JSON.stringify(graphQLSchema, null, 2)
+      )
+      await this.bridge.putConfig(
+        path.join(GENERATED_FOLDER, `_schema.json`),
+        JSON.stringify(tinaSchema.schema, null, 2)
+      )
     }
-    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
-    const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
-    await this.bridge.putConfig(
-      graphqlPath,
-      JSON.stringify(graphQLSchema, null, 2)
-    )
-    // @ts-ignore
-    await this.bridge.putConfig(
-      schemaPath,
-      JSON.stringify(tinaSchema.schema, null, 2)
-    )
+  }
+
+  public indexContent = async ({
+    graphQLSchema,
+    tinaSchema,
+  }: {
+    graphQLSchema: DocumentNode
+    tinaSchema: TinaSchema
+  }) => {
     const lookup = JSON.parse(
       await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
     )
