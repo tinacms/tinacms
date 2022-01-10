@@ -187,7 +187,6 @@ function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
     }
 
     const sel = useHttps ? ('secure_url' as const) : ('url' as const)
-    console.log({ sel })
 
     const filename = path.basename(file.public_id)
     const directory = path.dirname(file.public_id)
