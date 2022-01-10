@@ -1,6 +1,8 @@
 name: Build, Test, Lint for Main
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches:
       - main
