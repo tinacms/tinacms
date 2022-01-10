@@ -2,13 +2,10 @@
 title: A New Hope
 ---
 
-This is&#x20;
+Here is some `inline code`.
 
-And here is an `inline code` block
+And this is a code block:
 
 ```javascript
-const meh = ""
-
-const ok = “yes”
 let it = “be”
 ```

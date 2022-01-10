@@ -7,6 +7,8 @@ rating: 10
 
 A long, long time ago, in galaxy far far away...
 
+this is an** **`inline`**  **code block
+
 <Cta title="ok"/>
 
 <BlockQuote

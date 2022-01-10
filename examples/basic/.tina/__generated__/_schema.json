@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.2",
+    "fullVersion": "0.59.3",
     "major": "0",
     "minor": "59",
-    "patch": "2"
+    "patch": "3"
   },
   "meta": {},
   "collections": [
@@ -17,10 +17,15 @@
           "label": "Main Content",
           "type": "rich-text",
           "isBody": true,
-          "namespace": ["page", "body"]
+          "namespace": [
+            "page",
+            "body"
+          ]
         }
       ],
-      "namespace": ["page"]
+      "namespace": [
+        "page"
+      ]
     },
     {
       "label": "Blog Posts",
@@ -32,15 +37,24 @@
           "type": "string",
           "label": "Title",
           "name": "title",
-          "namespace": ["post", "title"]
+          "namespace": [
+            "post",
+            "title"
+          ]
         },
         {
           "type": "string",
           "label": "Topic",
           "name": "topic",
-          "options": ["programming", "blacksmithing"],
+          "options": [
+            "programming",
+            "blacksmithing"
+          ],
           "list": true,
-          "namespace": ["post", "topic"]
+          "namespace": [
+            "post",
+            "topic"
+          ]
         },
         {
           "type": "rich-text",
@@ -62,7 +76,13 @@
                       "type": "image",
                       "name": "src",
                       "label": "Source",
-                      "namespace": ["post", "body", "Gallery", "images", "src"]
+                      "namespace": [
+                        "post",
+                        "body",
+                        "Gallery",
+                        "images",
+                        "src"
+                      ]
                     },
                     {
                       "type": "string",
@@ -89,29 +109,57 @@
                       ]
                     }
                   ],
-                  "namespace": ["post", "body", "Gallery", "images"]
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "images"
+                  ]
                 },
                 {
                   "type": "string",
                   "name": "alignment",
                   "label": "Alignment",
-                  "options": ["left", "center", "right"],
-                  "namespace": ["post", "body", "Gallery", "alignment"]
+                  "options": [
+                    "left",
+                    "center",
+                    "right"
+                  ],
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "alignment"
+                  ]
                 },
                 {
                   "type": "string",
                   "name": "gap",
                   "label": "Gap",
-                  "namespace": ["post", "body", "Gallery", "gap"]
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Gallery",
+                    "gap"
+                  ]
                 }
               ],
-              "namespace": ["post", "body", "Gallery"]
+              "namespace": [
+                "post",
+                "body",
+                "Gallery"
+              ]
             }
           ],
-          "namespace": ["post", "body"]
+          "namespace": [
+            "post",
+            "body"
+          ]
         }
       ],
-      "namespace": ["post"]
+      "namespace": [
+        "post"
+      ]
     }
   ]
 }
