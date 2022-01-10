@@ -82,12 +82,6 @@ export const stringify = (
         children: [returnNode],
       }
     }
-    if (node?.code) {
-      returnNode = {
-        type: 'inlineCode',
-        children: [returnNode],
-      }
-    }
     return returnNode
   }
 

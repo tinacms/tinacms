@@ -55,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Create release pull request
-        uses: changesets/action@master
+        uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
           version: yarn version
