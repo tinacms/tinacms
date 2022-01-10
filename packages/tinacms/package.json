@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.61.1",
+  "version": "0.62.0",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -16,7 +16,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\""
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "test": "jest --env=jsdom --passWithNoTests"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
@@ -30,17 +31,24 @@
     "lodash.set": "^4.3.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "6",
+    "url-pattern": "^1.0.3",
     "yup": "^0.32.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^12.7.0",
     "@tinacms/scripts": "workspace:*",
+    "@types/jest": "^27.0.1",
     "@types/lodash": "^4.14.169",
     "@types/node": "^14.0.13",
     "@types/react": "^16.9.38",
     "@types/yup": "^0.29.10",
+    "jest": "^27.0.6",
     "next": "9.4.2",
     "react": "16.14.0",
     "react-dom": "16.14.0",
+    "react-is": "^17.0.2",
     "styled-components": "^5.2.0",
     "typescript": "^4.3.5"
   },

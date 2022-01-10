@@ -19,15 +19,12 @@ import { indexDB } from './build'
 export { indexDB } from './build'
 export { resolve } from './resolve'
 export { createDatabase } from './database'
-export { GithubBridge } from './database/bridge/github'
-export { GithubStore } from './database/store/github'
-export { FilesystemBridge } from './database/bridge/filesystem'
-export { FilesystemStore } from './database/store/filesystem'
-export { MemoryStore } from './database/store/memory'
-export { LevelStore } from './database/store/level'
-
-export type { GithubManagerInit } from './database/bridge/github'
 import type { Database } from './database'
+export type { Database } from './database'
+export type { Store } from './database/store'
+export type { Bridge } from './database/bridge'
+export { sequential, assertShape } from './util'
+export { stringifyFile, parseFile } from './database/util'
 
 export const buildSchema = async (rootPath: string, database: Database) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
@@ -46,37 +43,6 @@ import type {
   TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
 } from './types'
-
-import { Octokit } from '@octokit/rest'
-
-export const listBranches = async ({ auth, owner, repo }) => {
-  const appOctoKit = new Octokit({ auth })
-  const branchList = await appOctoKit.repos.listBranches({
-    owner,
-    repo,
-    per_page: 100,
-  })
-
-  return branchList
-}
-
-export const createBranch = async ({ auth, owner, repo, name, baseBranch }) => {
-  const appOctoKit = new Octokit({ auth })
-  const currentBranch = await appOctoKit.repos.getBranch({
-    owner,
-    repo,
-    branch: baseBranch,
-  })
-
-  const newBranch = await appOctoKit.git.createRef({
-    owner,
-    repo,
-    ref: `refs/heads/${name}`,
-    sha: currentBranch.data.commit.sha,
-  })
-
-  return newBranch
-}
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud

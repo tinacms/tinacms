@@ -1,0 +1,5 @@
+---
+'tinacms': patch
+---
+
+Fixed types
