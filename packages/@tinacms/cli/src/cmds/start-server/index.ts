@@ -13,16 +13,15 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
+import { buildSchema, createDatabase } from '@tinacms/graphql'
 import {
-  buildSchema,
-  createDatabase,
   MemoryStore,
   FilesystemStore,
   GithubStore,
   GithubBridge,
   FilesystemBridge,
   LevelStore,
-} from '@tinacms/graphql'
+} from '@tinacms/datalayer'
 import { genTypes } from '../query-gen'
 import { compile, resetGeneratedFolder } from '../compile'
 import chokidar from 'chokidar'
@@ -139,6 +138,14 @@ stack: ${code.stack || 'No stack was provided'}`)
   }
 
   const build = async (noSDK?: boolean) => {
+    if (!process.env.CI && !noWatch) {
+      await resetGeneratedFolder()
+    }
+    const bridge = new FilesystemBridge(rootPath)
+    const store = experimentalData
+      ? new LevelStore(rootPath)
+      : new FilesystemStore({ rootPath })
+    const database = await createDatabase({ store, bridge })
     await compile(null, null)
     const schema = await buildSchema(rootPath, database)
     await genTypes({ schema }, () => {}, { noSDK })

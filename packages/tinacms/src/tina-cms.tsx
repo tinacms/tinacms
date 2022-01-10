@@ -18,9 +18,23 @@ import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
+import UrlPattern from 'url-pattern'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
+
+const errorButtonStyles = {
+  background: '#eb6337',
+  padding: '12px 18px',
+  cursor: 'pointer',
+  borderRadius: '50px',
+  textTransform: 'uppercase',
+  letterSpacing: '2px',
+  fontWeight: 'bold',
+  border: 'none',
+  color: 'white',
+  margin: '1rem 0',
+}
 
 const SetupHooks = (props: {
   query: string
@@ -79,6 +93,8 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
+    const branchData = window.localStorage.getItem('tinacms-current-branch')
+    const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {
       return (
@@ -113,8 +129,10 @@ class ErrorBoundary extends React.Component {
           >
             <h3 style={{ color: '#eb6337' }}>TinaCMS Render Error</h3>
             <p>Tina caught an error while updating the page:</p>
-            {/* @ts-ignore */}
-            <pre>{this.state.message}</pre>
+            <pre style={{ marginTop: '1rem', overflowX: 'auto' }}>
+              {/* @ts-ignore */}
+              {this.state.message}
+            </pre>
             <br />
             <p>
               If you've just updated the form, undo your most recent changes and
@@ -122,32 +140,40 @@ class ErrorBoundary extends React.Component {
               encountering this error. There is a bigger issue with the site.
               Please reach out to your site admin.
             </p>
-            <div style={{ padding: '10px 0' }}>
-              <button
-                style={{
-                  background: '#eb6337',
-                  padding: '12px 18px',
-                  cursor: 'pointer',
-                  borderRadius: '50px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '2px',
-                  fontWeight: 'bold',
-                  border: 'none',
-                  color: 'white',
-                }}
-                onClick={() => {
-                  /* @ts-ignore */
-                  this.setState({ pageRefresh: true })
-                  setTimeout(
-                    () =>
-                      this.setState({ hasError: false, pageRefresh: false }),
-                    3000
-                  )
-                }}
-              >
-                Refresh
-              </button>
-            </div>
+
+            <button
+              style={errorButtonStyles as any}
+              onClick={() => {
+                /* @ts-ignore */
+                this.setState({ pageRefresh: true })
+                setTimeout(
+                  () => this.setState({ hasError: false, pageRefresh: false }),
+                  3000
+                )
+              }}
+            >
+              Refresh
+            </button>
+            {hasBranchData && (
+              <>
+                <p>
+                  If you're using the branch switcher, you may currently be on a
+                  "stale" branch that has been deleted or whose content is not
+                  compatible with the latest version of the site's layout. Click
+                  the button below to switch back to the default branch for this
+                  deployment.
+                </p>
+                <button
+                  style={errorButtonStyles as any}
+                  onClick={() => {
+                    window.localStorage.removeItem('tinacms-current-branch')
+                    window.location.reload()
+                  }}
+                >
+                  Switch to default branch
+                </button>
+              </>
+            )}
           </div>
         </div>
       )
@@ -161,11 +187,31 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+const parseURL = (url: string): { branch; isLocalClient; clientId } => {
+  if (url.includes('localhost')) {
+    return { branch: null, isLocalClient: true, clientId: null }
+  }
+
+  const tinaHost = 'content.tinajs.io'
+
+  const params = new URL(url)
+  const pattern = new UrlPattern('/content/:clientId/github/:branch')
+  const result = pattern.match(params.pathname)
+
+  if (params.host !== tinaHost) {
+    throw new Error(
+      `The only supported hosts are ${tinaHost} or localhost, but received ${params.host}.`
+    )
+  }
+
+  return {
+    ...result,
+    isLocalClient: false,
+  }
+}
+
 export const TinaCMSProvider2 = ({
   children,
-  branch,
-  clientId,
-  isLocalClient,
   cmsCallback,
   mediaStore,
   tinaioConfig,
@@ -179,11 +225,32 @@ export const TinaCMSProvider2 = ({
   data: object
   /** Your React page component */
   children: () => React.ReactNode
-  /** Point to the local version of GraphQL instead of tina.io */
+  /**
+   * The URL for the GraphQL API.
+   *
+   * When working locally, this should be http://localhost:4001/graphql.
+   *
+   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
+   */
+  apiURL: string
+  /**
+   * Point to the local version of GraphQL instead of tina.io
+   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+   *
+   * @deprecated use apiURL instead
+   */
   isLocalClient?: boolean
-  /** The base branch to pull content from. Note that this is ignored for local development */
+  /**
+   * The base branch to pull content from. Note that this is ignored for local development
+   *
+   * @deprecated use apiURL instead
+   */
   branch?: string
-  /** Your clientID from tina.aio */
+  /**
+   * Your clientID from tina.aio
+   *
+   * @deprecated use apiURL instead
+   */
   clientId?: string
   /** Callback if you need access to the TinaCMS instance */
   cmsCallback?: (cms: TinaCMS) => TinaCMS
@@ -200,6 +267,20 @@ export const TinaCMSProvider2 = ({
   if (typeof props.query === 'string') {
     props.query
   }
+
+  // branch & clientId are still supported, so don't throw if they're provided
+  if (!props.apiURL && !(props?.clientId || props?.isLocalClient)) {
+    throw new Error(`apiURL is a required field`)
+  }
+
+  const { branch, clientId, isLocalClient } = props.apiURL
+    ? parseURL(props.apiURL)
+    : {
+        branch: props.branch,
+        clientId: props.clientId,
+        isLocalClient: props.isLocalClient,
+      }
+
   return (
     <TinaCloudProvider
       branch={branch}
@@ -326,6 +407,8 @@ const Loader = (props: { children: React.ReactNode }) => {
 }
 
 /**
+ * @deprecated v0.62.0: Use `staticRequest` and a "try catch" block instead. see https://tina.io/docs/features/data-fetching/#querying-tina-content-in-nextjs for more details
+ *
  * A convenience function which makes a GraphQL request
  * to a local GraphQL server and ensures the response fits
  * the shape expected by Tina context in your application
@@ -383,10 +466,10 @@ export const staticRequest = async ({
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
 
-The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions.
 This function should only be called on the server at build time.
 
-This will work when developing locally but NOT when deployed to production. 
+This will work when developing locally but NOT when deployed to production.
 `)
   }
 

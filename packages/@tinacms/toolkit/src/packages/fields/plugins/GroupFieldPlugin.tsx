@@ -37,10 +37,22 @@ export interface GroupProps {
 }
 
 export const Group = ({ tinaForm, field }: GroupProps) => {
+  const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
-      <Header onClick={() => setExpanded((p) => !p)}>
+      <Header
+        onClick={() => {
+          const state = tinaForm.finalForm.getState()
+          if (state.invalid === true) {
+            // @ts-ignore
+            cms.alerts.error('Cannot navigate away from an invalid form.')
+            return
+          }
+
+          setExpanded((p) => !p)
+        }}
+      >
         {field.label || field.name}
         <RightArrowIcon />
       </Header>
@@ -89,9 +101,10 @@ const Panel = function Panel({
               if (state.invalid === true) {
                 // @ts-ignore
                 cms.alerts.error('Cannot navigate away from an invalid form.')
-              } else {
-                setExpanded(false)
+                return
               }
+
+              setExpanded(false)
             }}
           >
             <LeftArrowIcon /> <span>{field.label || field.name}</span>

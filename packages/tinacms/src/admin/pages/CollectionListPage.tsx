@@ -151,12 +151,12 @@ const CollectionListPage = () => {
                                     </span>
                                     <Link
                                       to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="h-5 leading-5 block"
+                                      className="h-5 leading-5 flex max-w-xs"
                                     >
-                                      <span className="leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
+                                      <span className="flex-shrink-1 leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
                                         {document.node.sys.filename}
                                       </span>
-                                      <span className="leading-5 text-base font-medium text-gray-300">
+                                      <span className="flex-shrink-0 leading-5 text-base font-medium text-gray-300">
                                         {document.node.sys.extension}
                                       </span>
                                     </Link>

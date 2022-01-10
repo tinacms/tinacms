@@ -211,6 +211,7 @@ const BlockListItem = ({
   template,
   block,
 }: BlockListItemProps) => {
+  const cms = useCMS()
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
@@ -239,6 +240,13 @@ const BlockListItem = ({
             <DragHandle />
             <ItemClickTarget
               onClick={() => {
+                const state = tinaForm.finalForm.getState()
+                if (state.invalid === true) {
+                  // @ts-ignore
+                  cms.alerts.error('Cannot navigate away from an invalid form.')
+                  return
+                }
+
                 setExpanded(true)
                 setFocusedField({ fieldName: `${field.name}.${index}` })
               }}
@@ -567,9 +575,10 @@ const Panel = function Panel({
           if (state.invalid === true) {
             // @ts-ignore
             cms.alerts.error('Cannot navigate away from an invalid form.')
-          } else {
-            setExpanded(false)
+            return
           }
+
+          setExpanded(false)
         }}
       >
         <LeftArrowIcon />

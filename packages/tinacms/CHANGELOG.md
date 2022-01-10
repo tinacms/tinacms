@@ -1,5 +1,26 @@
 # tinacms
 
+## 0.62.0
+
+### Minor Changes
+
+- 70da62fe8: deprecated the use of `getStaticPropsForTina`
+
+### Patch Changes
+
+- 0afa75df1: 2342 - [TinaAdmin] Truncates the `filename` column for the Document List View
+- 7dafce89d: Fixed issue where content creator was invalid
+- 3de8c6165: Enabled branch creation in branch switcher
+- fee183f8f: add "switch to default branch" recover option to error boundary
+- 5c070a83f: feat: Add UI banner for when in localMode
+- Updated dependencies [ddf81a4fd]
+- Updated dependencies [20260a82d]
+- Updated dependencies [0370147fb]
+- Updated dependencies [3de8c6165]
+- Updated dependencies [2eaad97bf]
+- Updated dependencies [5c070a83f]
+  - @tinacms/toolkit@0.56.5
+
 ## 0.61.1
 
 ### Patch Changes
