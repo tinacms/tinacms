@@ -54,26 +54,48 @@ import { InputProps, InputCss } from '../../../components'
 
 const options = createPlateOptions()
 
+const wrapValue = (value) => {
+  return value.children
+    ? [
+        ...value.children?.map(normalize),
+        { type: 'p', children: [{ type: 'text', text: '' }] },
+      ]
+    : // Empty values need at least one item
+      [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+}
+
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: unknown[] }
 >((props) => {
-  const [value, setValue] = React.useState(
-    props.input.value.children
-      ? [
-          ...props.input.value.children?.map(normalize),
-          { type: 'p', children: [{ type: 'text', text: '' }] },
-        ]
-      : // Empty values need at least one item
-        [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+  /**
+   * FIXME: this is storing the initial value as a way to determine if we should reset the
+   * slate editor. Since slate holds onto its own state, treating it as a traditional
+   * controlled component doesn't work.
+   */
+  const initialValue = React.useMemo(
+    () => JSON.stringify(props.input.value),
+    []
   )
+  /**
+   * Used to refresh slate's state
+   */
+  const [key, setKey] = React.useState(0)
+
+  React.useEffect(() => {
+    /**
+     * If we get a new value from props.input.value and it's equal
+     * to our current value, odds are that it's a reset from the form.
+     * Note that this would also happen if the editor adds some text then
+     * deletes it, but that's ok, a refresh to slate won't do any harm in that case
+     */
+    if (initialValue === JSON.stringify(props.input.value)) {
+      setKey((key) => key + 1)
+    }
+  }, [JSON.stringify(props.input.value)])
 
   const templates = props.field.templates
   const name = props.input.name
-
-  React.useEffect(() => {
-    props.input.onChange({ type: 'root', children: value })
-  }, [JSON.stringify(value)])
 
   const components = createPlateComponents({
     img: (props) => <Img {...props} name={name} />,
@@ -120,12 +142,13 @@ export const RichEditor = wrapFieldsWithMeta<
       <PlateWrapper>
         <Plate
           id={props.input.name}
-          initialValue={value}
+          initialValue={wrapValue(props.input.value)}
+          key={key}
           plugins={pluginsBasic}
           components={components}
           options={options}
           onChange={(value) => {
-            setValue(value)
+            props.input.onChange({ type: 'root', children: value })
           }}
         />
       </PlateWrapper>
