@@ -4,20 +4,11 @@
     "body": {
       "children": [
         {
-          "children": [
-            {
-              "text": "This is ",
-              "type": "text"
-            }
-          ],
-          "type": "p"
-        },
-        {
           "type": "p",
           "children": [
             {
               "type": "text",
-              "text": "And here is an "
+              "text": "Here is some "
             },
             {
               "type": "text",
@@ -25,38 +16,22 @@
               "code": true
             },
             {
-              "text": " block",
+              "text": ".",
               "type": "text"
             }
           ]
         },
         {
+          "type": "p",
           "children": [
             {
-              "children": [
-                {
-                  "text": "const meh = \"\"",
-                  "type": "text"
-                }
-              ],
-              "type": "code_line"
-            },
-            {
-              "children": [
-                {
-                  "text": ""
-                }
-              ],
-              "type": "code_line"
-            },
-            {
-              "children": [
-                {
-                  "text": "const ok = “yes”"
-                }
-              ],
-              "type": "code_line"
-            },
+              "type": "text",
+              "text": "And this is a code block:"
+            }
+          ]
+        },
+        {
+          "children": [
             {
               "children": [
                 {
@@ -68,24 +43,6 @@
           ],
           "lang": "javascript",
           "type": "code_block"
-        },
-        {
-          "children": [
-            {
-              "text": "",
-              "type": "text"
-            }
-          ],
-          "type": "p"
-        },
-        {
-          "children": [
-            {
-              "text": "",
-              "type": "text"
-            }
-          ],
-          "type": "p"
         }
       ],
       "type": "root"
