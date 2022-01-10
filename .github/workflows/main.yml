@@ -39,6 +39,7 @@ jobs:
         run: yarn test
 
       - name: Lint
+        if: matrix.os == 'ubuntu-latest'
         run: yarn lint
 
       - name: Build Types
