@@ -8,9 +8,10 @@
   "meta": {},
   "collections": [
     {
-      "label": "Page Content",
       "name": "page",
       "path": "content/page",
+      "label": "Page",
+      "format": "mdx",
       "fields": [
         {
           "name": "body",

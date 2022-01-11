@@ -112,7 +112,7 @@ export class Builder {
         }),
         astBuilder.FieldDefinition({
           name: 'label',
-          required: true,
+          required: false,
           type: astBuilder.TYPES.String,
         }),
         astBuilder.FieldDefinition({
