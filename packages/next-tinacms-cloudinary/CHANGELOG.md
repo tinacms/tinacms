@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.4.5
+
+### Patch Changes
+
+- 2a4a23b74: Fixed issue where folders could not have spaces
+
 ## 3.4.4
 
 ## 3.4.3
