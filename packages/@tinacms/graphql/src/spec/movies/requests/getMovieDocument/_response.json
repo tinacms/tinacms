@@ -32,6 +32,25 @@
               ]
             },
             {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "this is an** "
+                },
+                {
+                  "bold": true,
+                  "type": "text",
+                  "text": "inline",
+                  "value": "inline"
+                },
+                {
+                  "type": "text",
+                  "text": "  **code block"
+                }
+              ]
+            },
+            {
               "type": "mdxJsxFlowElement",
               "name": "Cta",
               "props": {

@@ -1,0 +1,51 @@
+{
+  "params": {
+    "title": "A New Hope",
+    "body": {
+      "children": [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Here is some "
+            },
+            {
+              "type": "text",
+              "text": "inline code",
+              "code": true
+            },
+            {
+              "text": ".",
+              "type": "text"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "And this is a code block:"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "text": "let it = “be”"
+                }
+              ],
+              "type": "code_line"
+            }
+          ],
+          "lang": "javascript",
+          "type": "code_block"
+        }
+      ],
+      "type": "root"
+    }
+  }
+}
