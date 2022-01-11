@@ -65,6 +65,13 @@ export const stringify = (
   field: RichTypeInner
 ): Content => {
   if (!node.type) {
+    // Inline code cannot have other marks like bold and emphasis
+    if (node?.code) {
+      return {
+        type: 'inlineCode',
+        value: node.text,
+      }
+    }
     let returnNode: Content = { type: 'text', value: node.text || '' }
     if (node?.bold) {
       returnNode = { type: 'strong', children: [returnNode] }
@@ -128,10 +135,8 @@ export const stringify = (
       return {
         type: 'code',
         lang: node.lang,
-        value: stringifyChildren(node.children, field).join('\n'),
+        value: node.children.map((child) => child.children[0].text).join('\n'),
       }
-    case 'code_line':
-      return stringifyChildren(node.children, field).join('\n')
     case plateElements.ELEMENT_UL:
       return {
         type: 'list',
@@ -445,6 +450,13 @@ ${out}
       }
 
     case 'text':
+      // Inline code cannot have other marks like bold and emphasis
+      if (node?.code) {
+        return {
+          type: 'inlineCode',
+          value: node.text,
+        }
+      }
       let returnNode: Content = { type: 'text', value: node.text || '' }
 
       if (node?.bold) {

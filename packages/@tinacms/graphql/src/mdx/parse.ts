@@ -629,7 +629,7 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'code':
       return {
         type: types.code_block,
-        language: node.lang,
+        lang: node.lang,
         children: node.value.split('\n').map((item) => ({
           type: 'code_line',
           children: [{ type: 'text', text: item }],
@@ -694,15 +694,15 @@ const forceLeafNode = (children: Array<MdxAstNode>) => {
 
   children.forEach((k) => {
     switch (k.type) {
+      case 'inlineCode':
       case 'text':
         return text.push(k.value || '')
       case 'strong':
       case 'emphasis':
-      case 'code':
         const format = { strong: 'bold', em: 'italic', code: 'code' }
         extraProps[format[k.type]] = true
-        //@ts-ignore FIXME: Property 'children' does not exist on type 'Code | Emphasis | Strong'
         return k.children.forEach((item) => {
+          //@ts-ignore FIXME: Property 'children' does not exist on type 'Code | Emphasis | Strong'
           text.push(item.value)
         })
       default:
