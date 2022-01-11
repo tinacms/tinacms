@@ -24,10 +24,11 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.43.0",
-    "@einsteinindustries/tinacms-scripts": "^0.42.1"
+    "@tinacms/core": "^0.43.0",
+    "@tinacms/scripts": "^0.42.1"
   },
   "dependencies": {
+    "@einsteinindustries/tinacms-alerts": "^0.43.12",
     "final-form": "^4.20.2",
     "final-form-arrays": "^3.0.1"
   },

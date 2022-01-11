@@ -24,9 +24,12 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.43.0",
-    "@einsteinindustries/tinacms-react-core": "^0.43.0",
-    "@einsteinindustries/tinacms-scripts": "^0.42.1"
+    "@tinacms/core": "^0.43.0",
+    "@tinacms/react-core": "^0.43.0",
+    "@tinacms/scripts": "^0.42.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd",
+  "dependencies": {
+    "@einsteinindustries/tinacms-alerts": "^0.43.12"
+  }
 }

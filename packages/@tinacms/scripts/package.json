@@ -11,5 +11,8 @@
   "bin": {
     "tinacms-scripts": "./bin/scripts.js"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "@einsteinindustries/tinacms-alerts": "^0.43.12"
+  }
 }

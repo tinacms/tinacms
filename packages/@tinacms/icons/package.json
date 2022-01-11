@@ -24,6 +24,9 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.42.1"
+    "@tinacms/scripts": "^0.42.1"
+  },
+  "dependencies": {
+    "@einsteinindustries/tinacms-alerts": "^0.43.12"
   }
 }
