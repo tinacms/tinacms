@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-browser-storage",
-  "version": "0.43.13",
+  "version": "0.43.14",
   "description": "A TinaCMS adapter for backing up form data in browser storage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,9 +19,9 @@
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-forms": "^0.43.13",
-    "@einsteinindustries/tinacms-react-core": "^0.43.13",
-    "@einsteinindustries/tinacms-scripts": "^0.43.13"
+    "@einsteinindustries/tinacms-forms": "^0.43.14",
+    "@einsteinindustries/tinacms-react-core": "^0.43.14",
+    "@einsteinindustries/tinacms-scripts": "^0.43.14"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

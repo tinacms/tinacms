@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-git-client",
-  "version": "0.43.13",
+  "version": "0.43.14",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -24,9 +24,9 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.43.13",
-    "@einsteinindustries/tinacms-react-core": "^0.43.13",
-    "@einsteinindustries/tinacms-scripts": "^0.43.13"
+    "@einsteinindustries/tinacms-core": "^0.43.14",
+    "@einsteinindustries/tinacms-react-core": "^0.43.14",
+    "@einsteinindustries/tinacms-scripts": "^0.43.14"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
