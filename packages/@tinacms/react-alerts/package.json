@@ -27,10 +27,10 @@
     "@einsteinindustries/tinacms-styles": "^0.43.13"
   },
   "peerDependencies": {
-    "@einsteinindustries/tinacms-alerts": "^0.43.12",
-    "@einsteinindustries/tinacms-icons": "^0.43.12",
-    "@einsteinindustries/tinacms-react-core": "^0.43.12",
-    "@einsteinindustries/tinacms-styles": "^0.43.12",
+    "@einsteinindustries/tinacms-alerts": ">=0.1",
+    "@einsteinindustries/tinacms-icons": ">=0.7",
+    "@einsteinindustries/tinacms-react-core": ">=0.2",
+    "@einsteinindustries/tinacms-styles": ">=0.3",
     "react": ">=16.8",
     "styled-components": ">=4.1"
   },

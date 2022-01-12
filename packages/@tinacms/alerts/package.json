@@ -25,10 +25,10 @@
   },
   "devDependencies": {
     "@einsteinindustries/tinacms-core": "^0.43.13",
-    "@einsteinindustries/tinacms-scripts": "^0.3.12"
+    "@einsteinindustries/tinacms-scripts": "^0.43.13"
   },
   "peerDependencies": {
-    "@einsteinindustries/tinacms-core": "0.43.12"
+    "@einsteinindustries/tinacms-core": ">=0.7"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

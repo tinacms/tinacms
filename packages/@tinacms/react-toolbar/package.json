@@ -40,13 +40,13 @@
     "@einsteinindustries/tinacms-styles": "^0.43.13"
   },
   "peerDependencies": {
-    "@einsteinindustries/tinacms-form-builder": "^0.43.12",
-    "@einsteinindustries/tinacms-icons": "^0.43.12",
-    "@einsteinindustries/tinacms-react-core": "^0.43.12",
-    "@einsteinindustries/tinacms-react-forms": "^0.43.12",
-    "@einsteinindustries/tinacms-react-modals": "^0.43.12",
-    "@einsteinindustries/tinacms-react-screens": "^0.43.12",
-    "@einsteinindustries/tinacms-styles": "^0.43.12",
+    "@einsteinindustries/tinacms-form-builder": ">=0.3",
+    "@einsteinindustries/tinacms-icons": ">=0.8",
+    "@einsteinindustries/tinacms-react-core": ">=0.2.10",
+    "@einsteinindustries/tinacms-react-forms": ">=0.1",
+    "@einsteinindustries/tinacms-react-modals": ">=0.1",
+    "@einsteinindustries/tinacms-react-screens": ">=0.1",
+    "@einsteinindustries/tinacms-styles": ">=0.4",
     "prop-types": ">=15",
     "react": ">=16.8",
     "styled-components": ">=4.1"

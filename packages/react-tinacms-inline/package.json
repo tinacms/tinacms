@@ -19,7 +19,7 @@
     "react-use": "^17.1.1"
   },
   "peerDependencies": {
-    "@einsteinindustries/tinacms-form-builder": "^0.43.12",
+    "@einsteinindustries/tinacms-form-builder": ">=0.39",
     "react": ">=16.8",
     "react-dropzone": "10.2.1",
     "react-final-form": ">=6",
@@ -33,9 +33,9 @@
     "@einsteinindustries/tinacms-react-forms": "^0.43.13",
     "@einsteinindustries/tinacms-scripts": "^0.43.13",
     "@einsteinindustries/tinacms-styles": "^0.43.13",
-    "@testing-library/react": "^11.1.2",
-    "jest": "^26.6.3",
-    "react-dropzone": "10.1.8",
+    "@testing-library/react": "^9.3.2",
+    "jest": "^24.9.0",
+    "react-dropzone": "^11.1.0",
     "react-tinacms-editor": "^0.4.0",
     "tinacms": "^0.43.3"
   },

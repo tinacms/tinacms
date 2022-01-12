@@ -34,11 +34,11 @@
     "@types/react-beautiful-dnd": "^11.0.3"
   },
   "peerDependencies": {
-    "@einsteinindustries/tinacms-forms": "^0.43.12",
-    "@einsteinindustries/tinacms-icons": "^0.43.12",
-    "@einsteinindustries/tinacms-react-core": "^0.43.12",
-    "@einsteinindustries/tinacms-react-modals": "^0.43.12",
-    "@einsteinindustries/tinacms-styles": "^0.43.12",
+    "@einsteinindustries/tinacms-forms": ">=0.3",
+    "@einsteinindustries/tinacms-icons": ">=0.7",
+    "@einsteinindustries/tinacms-react-core": ">=0.2",
+    "@einsteinindustries/tinacms-react-modals": ">=0.1",
+    "@einsteinindustries/tinacms-styles": ">=0.3",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
