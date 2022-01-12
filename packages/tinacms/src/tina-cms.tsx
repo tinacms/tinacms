@@ -36,40 +36,6 @@ const errorButtonStyles = {
   margin: '1rem 0',
 }
 
-const SetupHooks = (props: {
-  query: string
-  variables?: object
-  formifyCallback?: formifyCallback
-  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
-  children: (args) => React.ReactNode
-}) => {
-  const cms = useCMS()
-  const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
-    variables: props.variables || {},
-    formify: (args) => {
-      if (props.formifyCallback) {
-        return props.formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
-  })
-
-  useDocumentCreatorPlugin(props.documentCreatorCallback)
-
-  return (
-    <ErrorBoundary>
-      {isLoading ? (
-        <Loader>{props.children(props)}</Loader>
-      ) : (
-        // pass the new edit state data to the child
-        props.children({ ...props, data: payload })
-      )}
-    </ErrorBoundary>
-  )
-}
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -221,7 +187,7 @@ export const TinaCMSProvider2 = ({
   /** The `data` from getStaticProps */
   data: object
   /** Your React page component */
-  children: () => React.ReactNode
+  children: (props?: any) => React.ReactNode
   /**
    * The URL for the GraphQL API.
    *
@@ -262,11 +228,21 @@ export const TinaCMSProvider2 = ({
   tinaioConfig?: TinaIOConfig
 }) => {
   if (!query) {
-    //@ts-ignore
-    return children(props)
+    return props.children(props)
   }
 
-  return <TinaCMSProviderWithQuery {...props} query={query} />
+  return (
+    <TinaCloudProvider
+      branch={props.branch}
+      clientId={props.clientId}
+      tinaioConfig={props.tinaioConfig}
+      isLocalClient={props.isLocalClient}
+      cmsCallback={props.cmsCallback}
+      mediaStore={props.mediaStore}
+    >
+      <TinaCMSProviderWithQuery {...props} query={query} />
+    </TinaCloudProvider>
+  )
 }
 
 const TinaCMSProviderWithQuery = ({
@@ -283,7 +259,7 @@ const TinaCMSProviderWithQuery = ({
   /** The `data` from getStaticProps */
   data: object
   /** Your React page component */
-  children: () => React.ReactNode
+  children: (props?: any) => React.ReactNode
   /**
    * The URL for the GraphQL API.
    *
@@ -327,6 +303,21 @@ const TinaCMSProviderWithQuery = ({
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
 
+  const cms = useCMS()
+  const [payload, isLoading] = useGraphqlForms({
+    query: (gql) => gql(props.query),
+    variables: props.variables || {},
+    formify: (args) => {
+      if (props.formifyCallback) {
+        return props.formifyCallback(args, cms)
+      } else {
+        return args.createForm(args.formConfig)
+      }
+    },
+  })
+
+  useDocumentCreatorPlugin(props.documentCreatorCallback)
+
   // branch & clientId are still supported, so don't throw if they're provided
   if (!props.apiURL && !validOldSetup) {
     throw new Error(`apiURL is a required field`)
@@ -341,18 +332,14 @@ const TinaCMSProviderWithQuery = ({
       }
 
   return (
-    <TinaCloudProvider
-      branch={branch}
-      clientId={clientId}
-      tinaioConfig={tinaioConfig}
-      isLocalClient={isLocalClient}
-      cmsCallback={cmsCallback}
-      mediaStore={mediaStore}
-    >
-      <SetupHooks key={props.query} {...props} query={props.query || ''}>
-        {children}
-      </SetupHooks>
-    </TinaCloudProvider>
+    <ErrorBoundary>
+      {isLoading ? (
+        <Loader>{children(props)}</Loader>
+      ) : (
+        // pass the new edit state data to the child
+        children({ ...props, data: payload })
+      )}
+    </ErrorBoundary>
   )
 }
 
