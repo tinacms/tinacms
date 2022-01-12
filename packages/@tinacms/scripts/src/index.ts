@@ -179,7 +179,6 @@ e.g: "forestry types:gen --help"
 
 const config = (cwd = '') => {
   return {
-    mode: 'jit',
     // prefix: 'tina-',
     important: true,
     theme: {
@@ -385,14 +384,7 @@ const config = (cwd = '') => {
         },
       },
     },
-    variants: {
-      backgroundColor: ['responsive', 'even', 'hover', 'focus'],
-      extend: {
-        animation: ['group-hover'],
-        padding: ['first', 'last'],
-      },
-    },
-    purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
+    content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
       require('@tailwindcss/typography'),
       require('@tailwindcss/line-clamp'),

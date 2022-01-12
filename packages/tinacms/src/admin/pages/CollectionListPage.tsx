@@ -153,7 +153,7 @@ const CollectionListPage = () => {
                                       to={`${location.pathname}/${document.node.sys.filename}`}
                                       className="h-5 leading-5 flex max-w-xs"
                                     >
-                                      <span className="flex-shrink-1 leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
+                                      <span className="flex-shrink-1 leading-5 font-medium text-base text-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
                                         {document.node.sys.filename}
                                       </span>
                                       <span className="flex-shrink-0 leading-5 text-base font-medium text-gray-300">
@@ -165,7 +165,7 @@ const CollectionListPage = () => {
                                     <span className="block text-xs mb-0.5 text-gray-400 uppercase">
                                       Template
                                     </span>
-                                    <span className="h-5 block leading-5 font-regular text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-500">
+                                    <span className="h-5 block leading-5 font-regular text-base text-ellipsis overflow-hidden whitespace-nowrap text-gray-500">
                                       {document.node.sys.template}
                                     </span>
                                   </td>
