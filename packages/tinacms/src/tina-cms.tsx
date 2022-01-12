@@ -211,10 +211,7 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
 }
 
 export const TinaCMSProvider2 = ({
-  children,
-  cmsCallback,
-  mediaStore,
-  tinaioConfig,
+  query,
   ...props
 }: {
   /** The query from getStaticProps */
@@ -264,10 +261,68 @@ export const TinaCMSProvider2 = ({
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
 }) => {
-  if (typeof props.query === 'string') {
-    props.query
+  if (!query) {
+    //@ts-ignore
+    return children(props)
   }
 
+  return <TinaCMSProviderWithQuery {...props} query={query} />
+}
+
+const TinaCMSProviderWithQuery = ({
+  children,
+  cmsCallback,
+  mediaStore,
+  tinaioConfig,
+  ...props
+}: {
+  /** The query from getStaticProps */
+  query: string
+  /** Any variables from getStaticProps */
+  variables?: object
+  /** The `data` from getStaticProps */
+  data: object
+  /** Your React page component */
+  children: () => React.ReactNode
+  /**
+   * The URL for the GraphQL API.
+   *
+   * When working locally, this should be http://localhost:4001/graphql.
+   *
+   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
+   */
+  apiURL: string
+  /**
+   * Point to the local version of GraphQL instead of tina.io
+   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+   *
+   * @deprecated use apiURL instead
+   */
+  isLocalClient?: boolean
+  /**
+   * The base branch to pull content from. Note that this is ignored for local development
+   *
+   * @deprecated use apiURL instead
+   */
+  branch?: string
+  /**
+   * Your clientID from tina.aio
+   *
+   * @deprecated use apiURL instead
+   */
+  clientId?: string
+  /** Callback if you need access to the TinaCMS instance */
+  cmsCallback?: (cms: TinaCMS) => TinaCMS
+  /** Callback if you need access to the "formify" API */
+  formifyCallback?: formifyCallback
+  /** Callback if you need access to the "document creator" API */
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
+  /** TinaCMS media store instance */
+  mediaStore?:
+    | TinaCloudMediaStoreClass
+    | (() => Promise<TinaCloudMediaStoreClass>)
+  tinaioConfig?: TinaIOConfig
+}) => {
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
@@ -294,14 +349,9 @@ export const TinaCMSProvider2 = ({
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
     >
-      {props.query ? (
-        <SetupHooks key={props.query} {...props} query={props.query || ''}>
-          {children}
-        </SetupHooks>
-      ) : (
-        // @ts-ignore
-        children(props)
-      )}
+      <SetupHooks key={props.query} {...props} query={props.query || ''}>
+        {children}
+      </SetupHooks>
     </TinaCloudProvider>
   )
 }
