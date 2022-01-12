@@ -63,7 +63,7 @@
     "codemirror": "^5.42.2",
     "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
-    "markdown-it": "^8.3.1",
+    "markdown-it": "^12.3.2",
     "prosemirror-commands": "^1.0.8",
     "prosemirror-dropcursor": "^1.1.2",
     "prosemirror-gapcursor": "^1.0.4",
