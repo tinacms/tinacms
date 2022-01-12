@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { MdKeyboardArrowDown } from 'react-icons/md'
 
 type Option = {
   value: string
@@ -40,24 +41,27 @@ export interface SelectProps {
 }
 
 export const selectFieldClasses =
-  'shadow block w-full text-base cursor-pointer border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
+  'shadow appearance-none text-gray-600 block px-3 py-2  w-full text-base cursor-pointer border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
   return (
-    <select
-      id={input.name}
-      value={input.value}
-      onChange={input.onChange}
-      className={selectFieldClasses}
-      {...input}
-    >
-      {selectOptions ? (
-        selectOptions.map(toProps).map(toComponent)
-      ) : (
-        <option>{input.value}</option>
-      )}
-    </select>
+    <div className="relative group">
+      <select
+        id={input.name}
+        value={input.value}
+        onChange={input.onChange}
+        className={selectFieldClasses}
+        {...input}
+      >
+        {selectOptions ? (
+          selectOptions.map(toProps).map(toComponent)
+        ) : (
+          <option>{input.value}</option>
+        )}
+      </select>
+      <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out" />
+    </div>
   )
 }
 function toProps(option: Option | string): Option {

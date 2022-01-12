@@ -38,16 +38,13 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
   )
 }
 
-const ModalTitle = styled.h2`
-  all: unset;
-  color: var(--tina-color-grey-10);
-  font-weight: var(--tina-font-weight-regular);
-  font-family: var(--tina-font-family);
-  font-size: var(--tina-font-size-4);
-  font-weight: var(--tina-font-weight-regular);
-  line-height: 1;
-  margin: 0;
-`
+const ModalTitle = ({ children }) => {
+  return (
+    <h2 className="text-gray-600 font-medium text-base leading-none m-0">
+      {children}
+    </h2>
+  )
+}
 
 const CloseButton = styled.div`
   display: flex;
