@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-alerts",
-  "version": "0.43.12",
+  "version": "0.43.13",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -24,7 +24,7 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.43.12",
+    "@einsteinindustries/tinacms-core": "^0.43.13",
     "@einsteinindustries/tinacms-scripts": "^0.3.12"
   },
   "peerDependencies": {
