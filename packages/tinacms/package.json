@@ -24,7 +24,7 @@
     "watch": "tinacms-scripts watch"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.42.1",
+    "@einsteinindustries/tinacms-scripts": "^0.43.13",
     "@types/styled-components": "4.1.8",
     "styled-components": ">=4.1"
   },
@@ -34,7 +34,7 @@
     "@einsteinindustries/tinacms-fields": "^0.43.13",
     "@einsteinindustries/tinacms-form-builder": "^0.43.13",
     "@einsteinindustries/tinacms-forms": "^0.43.13",
-    "@einsteinindustries/tinacms-icons": "^0.42.12",
+    "@einsteinindustries/tinacms-icons": "^0.43.13",
     "@einsteinindustries/tinacms-react-alerts": "^0.43.13",
     "@einsteinindustries/tinacms-react-core": "^0.43.13",
     "@einsteinindustries/tinacms-react-forms": "^0.43.13",
@@ -42,7 +42,7 @@
     "@einsteinindustries/tinacms-react-screens": "^0.43.13",
     "@einsteinindustries/tinacms-react-sidebar": "^0.43.13",
     "@einsteinindustries/tinacms-react-toolbar": "^0.43.13",
-    "@einsteinindustries/tinacms-styles": "^0.42.12",
+    "@einsteinindustries/tinacms-styles": "^0.43.13",
     "react-dropzone": "^11.1.0"
   },
   "peerDependencies": {
