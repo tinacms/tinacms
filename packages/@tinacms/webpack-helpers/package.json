@@ -13,8 +13,5 @@
     "build": "echo 'build'",
     "dev": "echo 'dev'"
   },
-  "keywords": [],
-  "dependencies": {
-    "@einsteinindustries/tinacms-alerts": "^0.43.12"
-  }
+  "keywords": []
 }

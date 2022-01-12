@@ -25,12 +25,11 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
+    "@einsteinindustries/tinacms-scripts": "^0.43.12",
     "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "8.3.5"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-alerts": "^0.43.12",
     "express": "^4.17.1",
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.6.0",

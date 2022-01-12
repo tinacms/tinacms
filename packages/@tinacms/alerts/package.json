@@ -24,11 +24,11 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@einsteinindustries/tinacms-core": "^0.43.12",
+    "@einsteinindustries/tinacms-scripts": "^0.3.12"
   },
   "peerDependencies": {
-    "@tinacms/core": ">=0.7"
+    "@einsteinindustries/tinacms-core": "0.43.12"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
