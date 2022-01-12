@@ -113,7 +113,11 @@ export function SettingsModal({
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormBody>
               <Wrapper>
-                <FieldsBuilder form={form} fields={formFields} />
+                <FieldsBuilder
+                  // @ts-ignore
+                  form={form}
+                  fields={formFields}
+                />
               </Wrapper>
             </FormBody>
           </DragDropContext>

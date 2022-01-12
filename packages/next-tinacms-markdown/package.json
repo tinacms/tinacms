@@ -31,7 +31,7 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.42.1",
+    "@einsteinindustries/tinacms-scripts": "^0.43.12",
     "@types/js-yaml": "^4.0.5",
     "tinacms": "^0.43.3"
   },
