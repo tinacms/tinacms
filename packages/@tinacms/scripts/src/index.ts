@@ -395,7 +395,6 @@ const config = (cwd = '') => {
     purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
       require('@tailwindcss/typography'),
-      require('@tailwindcss/forms'),
       require('@tailwindcss/line-clamp'),
       require('@tailwindcss/aspect-ratio'),
     ],

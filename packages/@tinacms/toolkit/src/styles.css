@@ -1,13 +1,10 @@
-body {
-  font-family: system-ui, -apple-system,
-    /* Firefox supports this but not yet `system-ui` */ 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
-}
-
 .tina-tailwind {
   @tailwind base;
   @tailwind components;
   @tailwind utilities;
+
+  /* gray-600 from tailwind config */
+  color: #565165;
 
   @layer utilities {
     .icon-parent {

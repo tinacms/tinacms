@@ -3,6 +3,9 @@
   @tailwind components;
   @tailwind utilities;
 
+  /* gray-600 from tailwind config */
+  color: #565165;
+
   @layer utilities {
     .icon-parent {
       svg {
