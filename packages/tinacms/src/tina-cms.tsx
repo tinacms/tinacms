@@ -231,12 +231,29 @@ export const TinaCMSProvider2 = ({
     return props.children(props)
   }
 
+  const validOldSetup =
+    new Boolean(props?.isLocalClient) ||
+    (new Boolean(props?.clientId) && new Boolean(props?.branch))
+
+  // branch & clientId are still supported, so don't throw if they're provided
+  if (!props.apiURL && !validOldSetup) {
+    throw new Error(`apiURL is a required field`)
+  }
+
+  const { branch, clientId, isLocalClient } = props.apiURL
+    ? parseURL(props.apiURL)
+    : {
+        branch: props.branch,
+        clientId: props.clientId,
+        isLocalClient: props.isLocalClient,
+      }
+
   return (
     <TinaCloudProvider
-      branch={props.branch}
-      clientId={props.clientId}
+      branch={branch}
+      clientId={clientId}
       tinaioConfig={props.tinaioConfig}
-      isLocalClient={props.isLocalClient}
+      isLocalClient={isLocalClient}
       cmsCallback={props.cmsCallback}
       mediaStore={props.mediaStore}
     >
@@ -299,10 +316,6 @@ const TinaCMSProviderWithQuery = ({
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
 }) => {
-  const validOldSetup =
-    new Boolean(props?.isLocalClient) ||
-    (new Boolean(props?.clientId) && new Boolean(props?.branch))
-
   const cms = useCMS()
   const [payload, isLoading] = useGraphqlForms({
     query: (gql) => gql(props.query),
@@ -317,19 +330,6 @@ const TinaCMSProviderWithQuery = ({
   })
 
   useDocumentCreatorPlugin(props.documentCreatorCallback)
-
-  // branch & clientId are still supported, so don't throw if they're provided
-  if (!props.apiURL && !validOldSetup) {
-    throw new Error(`apiURL is a required field`)
-  }
-
-  const { branch, clientId, isLocalClient } = props.apiURL
-    ? parseURL(props.apiURL)
-    : {
-        branch: props.branch,
-        clientId: props.clientId,
-        isLocalClient: props.isLocalClient,
-      }
 
   return (
     <ErrorBoundary>
