@@ -19,6 +19,7 @@ import path from 'path'
 import chalk from 'chalk'
 import tailwind from 'tailwindcss'
 import postcssNested from 'postcss-nested'
+import tailwindNesting from 'tailwindcss/nesting'
 
 const defaultTheme = require('tailwindcss/defaultTheme')
 
@@ -180,7 +181,7 @@ e.g: "forestry types:gen --help"
 const config = (cwd = '') => {
   return {
     // prefix: 'tina-',
-    important: true,
+    important: '.tina-tailwind',
     theme: {
       columns: {
         auto: 'auto',
@@ -455,6 +456,7 @@ const buildIt = async (entryPoint, packageJSON) => {
           let plugins = []
 
           const tw = tailwind(config(process.cwd()))
+          plugins.push(tailwindNesting)
           plugins.push(postcssNested)
           plugins.push(tw)
 

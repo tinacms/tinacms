@@ -1,16 +1,16 @@
-.tina-tailwind {
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  /* gray-600 from tailwind config */
-  color: #565165;
-
-  @layer utilities {
-    .icon-parent {
-      svg {
-        fill: currentColor;
-      }
+@layer utilities {
+  .icon-parent {
+    svg {
+      fill: currentColor;
     }
   }
+}
+
+.tina-tailwind {
+  /* gray-600 from tailwind config */
+  color: #565165;
 }
