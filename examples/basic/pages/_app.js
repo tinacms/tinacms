@@ -18,9 +18,10 @@ const App = ({ Component, pageProps }) => {
             branch="main"
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
-            {...pageProps}
           >
-            {(livePageProps) => <Component {...livePageProps} />}
+            {(livePageProps) => (
+              <Component {...livePageProps} data={pageProps.data} />
+            )}
           </TinaCMS>
         }
       >

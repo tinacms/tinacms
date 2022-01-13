@@ -145,6 +145,12 @@ export function useGraphqlForms<T extends object>({
   }, [pendingReset])
 
   React.useEffect(() => {
+    if (!queryString) {
+      // don't do work on empty queries
+      setIsLoading(false)
+      return
+    }
+
     const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina

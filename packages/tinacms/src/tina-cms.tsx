@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
@@ -22,6 +22,7 @@ import UrlPattern from 'url-pattern'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
+import { TinaDataContext } from '@tinacms/sharedctx'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -227,10 +228,6 @@ export const TinaCMSProvider2 = ({
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
 }) => {
-  if (!query) {
-    return props.children(props)
-  }
-
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
@@ -317,8 +314,11 @@ const TinaCMSProviderWithQuery = ({
   tinaioConfig?: TinaIOConfig
 }) => {
   const cms = useCMS()
+
+  // Note - this will only register for legacy implementations taking in query
+  // Hopefuly things work if we call this twice
   const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
+    query: (gql) => (props.query ? gql(props.query) : undefined),
     variables: props.variables || {},
     formify: (args) => {
       if (props.formifyCallback) {
@@ -333,13 +333,50 @@ const TinaCMSProviderWithQuery = ({
 
   return (
     <ErrorBoundary>
-      {isLoading ? (
-        <Loader>{children(props)}</Loader>
-      ) : (
-        // pass the new edit state data to the child
-        children({ ...props, data: payload })
-      )}
+      <TinaDataProvider formifyCallback={props.formifyCallback}>
+        {isLoading ? (
+          <Loader>{children(props)}</Loader>
+        ) : (
+          // pass the new edit state data to the child
+          children({ ...props, data: payload })
+        )}
+      </TinaDataProvider>
     </ErrorBoundary>
+  )
+}
+
+// TinaDataProvider can only manage one "request" object at a timee
+const TinaDataProvider = ({
+  children,
+  formifyCallback,
+}: {
+  children: any
+  formifyCallback: formifyCallback
+}) => {
+  const cms = useCMS()
+  const [request, setRequest] = useState<{ query: string; variables: object }>()
+  const [payload, isLoading] = useGraphqlForms({
+    query: (gql) => (request ? gql(request?.query) : undefined),
+    variables: request?.variables,
+    formify: (args) => {
+      if (formifyCallback) {
+        return formifyCallback(args, cms)
+      } else {
+        return args.createForm(args.formConfig)
+      }
+    },
+  })
+
+  return (
+    <TinaDataContext.Provider
+      value={{
+        setRequest,
+        isLoading: isLoading.valueOf(),
+        state: { payload },
+      }}
+    >
+      {children}
+    </TinaDataContext.Provider>
   )
 }
 
