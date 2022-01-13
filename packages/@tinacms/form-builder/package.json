@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-form-builder",
-  "version": "0.43.14",
+  "version": "0.43.15",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -24,14 +24,14 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.14"
+    "@einsteinindustries/tinacms-scripts": "^0.43.15"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-forms": "^0.43.14",
-    "@einsteinindustries/tinacms-icons": "^0.43.14",
-    "@einsteinindustries/tinacms-react-core": "^0.43.14",
-    "@einsteinindustries/tinacms-react-modals": "^0.43.14",
-    "@einsteinindustries/tinacms-styles": "^0.43.14",
+    "@einsteinindustries/tinacms-forms": "^0.43.15",
+    "@einsteinindustries/tinacms-icons": "^0.43.15",
+    "@einsteinindustries/tinacms-react-core": "^0.43.15",
+    "@einsteinindustries/tinacms-react-modals": "^0.43.15",
+    "@einsteinindustries/tinacms-styles": "^0.43.15",
     "react-final-form": "^6.3.0"
   },
   "peerDependencies": {
