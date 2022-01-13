@@ -57,7 +57,7 @@ export const useTina = ({
     }
   }, [JSON.stringify(variables), query, setRequest])
 
-  //TODO - don't load assuming that we're loading if there's no payload...
+  //TODO - don't assume that we're loading if there's no payload...
   // Doing so for now, because isLoading will be false on the first render
   return {
     data:
