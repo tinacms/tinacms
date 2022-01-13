@@ -52,10 +52,13 @@ export const useTina = ({
     React.useContext(TinaDataContext)
   React.useEffect(() => {
     setRequest({ query, variables })
+  }, [JSON.stringify(variables), query])
+
+  React.useEffect(() => {
     return () => {
-      setRequest(undefined) // remove form
+      setRequest(undefined) // remove form on unload
     }
-  }, [JSON.stringify(variables), query, setRequest])
+  }, [])
 
   //TODO - don't assume that we're loading if there's no payload...
   // Doing so for now, because isLoading will be false on the first render
