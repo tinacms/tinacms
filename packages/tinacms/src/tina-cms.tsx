@@ -357,8 +357,42 @@ const TinaDataProvider = ({
   children: any
   formifyCallback: formifyCallback
 }) => {
-  const cms = useCMS()
   const [request, setRequest] = useState<{ query: string; variables: object }>()
+  const [state, setState] = React.useState({
+    payload: undefined,
+    isLoading: true,
+  })
+
+  return (
+    <TinaDataContext.Provider
+      value={{
+        setRequest,
+        isLoading: state.isLoading,
+        state: { payload: state.payload },
+      }}
+    >
+      <FormRegistrar
+        key={request?.query} // unload on page/query change
+        request={request}
+        formifyCallback={formifyCallback}
+        onPayloadStateChange={setState}
+      />
+      {children}
+    </TinaDataContext.Provider>
+  )
+}
+
+const FormRegistrar = ({
+  request,
+  formifyCallback,
+  onPayloadStateChange,
+}: {
+  request: { query: string; variables: object }
+  formifyCallback: formifyCallback
+  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
+}) => {
+  const cms = useCMS()
+
   const [payload, isLoading] = useGraphqlForms({
     query: (gql) => (request ? gql(request?.query) : undefined),
     variables: request?.variables,
@@ -371,17 +405,11 @@ const TinaDataProvider = ({
     },
   })
 
-  return (
-    <TinaDataContext.Provider
-      value={{
-        setRequest,
-        isLoading: isLoading.valueOf(),
-        state: { payload },
-      }}
-    >
-      {children}
-    </TinaDataContext.Provider>
-  )
+  React.useEffect(() => {
+    onPayloadStateChange({ payload, isLoading })
+  }, [JSON.stringify(payload)])
+
+  return null
 }
 
 const Loader = (props: { children: React.ReactNode }) => {
