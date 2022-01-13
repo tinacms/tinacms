@@ -2795,6 +2795,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@headlessui/react@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "@headlessui/react@npm:1.4.2"
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+    react-dom: ^16 || ^17 || ^18
+  checksum: b9987c9331aa1dccd2c72bc042cbbc1b74481523f49fa1fbd333d562dbfebc54c3cb49d6b3a93050f817caf1d77c8e30ac79eef215a34f94fcfec832e07d3ea8
+  languageName: node
+  linkType: hard
+
 "@heroicons/react@npm:^1.0.4":
   version: 1.0.4
   resolution: "@heroicons/react@npm:1.0.4"
@@ -26329,6 +26339,7 @@ resolve@^2.0.0-next.3:
   resolution: "root@workspace:."
   dependencies:
     "@changesets/cli": 2.18.0
+    "@headlessui/react": ^1.4.2
     "@typescript-eslint/eslint-plugin": ^2.3.0
     "@typescript-eslint/parser": ^2.3.0
     "@yarnpkg/pnpify": ^2.0.0-rc.20

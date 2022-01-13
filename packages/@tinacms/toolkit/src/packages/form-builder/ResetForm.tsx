@@ -75,7 +75,7 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
           </Button>
           <Button
             style={{ flexGrow: 3 }}
-            primary
+            variant="primary"
             onClick={async () => {
               await reset()
               close()
