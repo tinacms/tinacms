@@ -24,7 +24,7 @@
   "peerDependencies": {
     "next": ">=9",
     "react": ">=16",
-    "tinacms": ">=0.11"
+    "@einsteinindustries/tinacms": ">=0.11"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "@einsteinindustries/tinacms-scripts": "^0.43.14",
     "@types/js-yaml": "^4.0.5",
-    "tinacms": "^0.43.3"
+    "@einsteinindustries/tinacms": "^0.43.3"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
