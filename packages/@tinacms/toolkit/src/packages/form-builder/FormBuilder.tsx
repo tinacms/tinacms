@@ -120,7 +120,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       onClick={() => handleSubmit()}
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
-                      primary
+                      variant="primary"
                       style={{ flexGrow: 3 }}
                     >
                       {submitting && <LoadingDots />}
@@ -213,7 +213,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                       onClick={() => handleSubmit()}
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
-                      primary
+                      variant="primary"
                       style={{ flexBasis: '10rem' }}
                     >
                       {submitting && <LoadingDots />}

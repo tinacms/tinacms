@@ -21,9 +21,11 @@ import { useState } from 'react'
 import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import { MdClose } from 'react-icons/md'
-import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
+import { TinaIcon } from '../../icons'
+import { BiMenu, BiPencil } from 'react-icons/bi'
+import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
+import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Button } from '../../styles'
-import { CreateContentMenu } from '../../react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
@@ -102,18 +104,9 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     }
   }
 
-  React.useEffect(() => {
-    setPreviousWidth(sidebarWidth)
-    if (displayState === 'fullscreen') {
-      setSidebarWidth(window.innerWidth)
-    } else {
-      if (previousWidth < window.innerWidth) {
-        setSidebarWidth(previousWidth)
-      } else {
-        setSidebarWidth(window.innerWidth / 2)
-      }
-    }
-  }, [displayState])
+  const toggleMenu = () => {
+    setMenuIsOpen((menuIsOpen) => !menuIsOpen)
+  }
 
   React.useEffect(() => {
     const updateLayout = () => {
@@ -148,23 +141,13 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         setResizingSidebar,
         menuIsOpen,
         setMenuIsOpen,
+        toggleMenu,
       }}
     >
       <SidebarWrapper>
+        <EditButton />
         <SidebarBody>
-          {cms.api?.tina?.isLocalMode && <LocalWarning />}
-          <SidebarHeader>
-            {showMenu && (
-              <MenuToggle
-                className="text-gray-600 hover:text-blue-500"
-                onClick={() => setMenuIsOpen(!menuIsOpen)}
-                open={menuIsOpen}
-              >
-                <HamburgerIcon className="w-9 h-auto" />
-              </MenuToggle>
-            )}
-            <CreateContentMenu sidebar={true} />
-          </SidebarHeader>
+          <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
           <FormsView>
             <sidebar.placeholder />
           </FormsView>
@@ -211,7 +194,6 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
           )}
         </SidebarBody>
         <ResizeHandle />
-        <SidebarToggle sidebar={sidebar} />
       </SidebarWrapper>
     </SidebarContext.Provider>
   )
@@ -263,27 +245,6 @@ const Watermark = styled(({ ...styleProps }: any) => {
   }
 `
 
-const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
-  const { toggleSidebarOpen, displayState } = React.useContext(SidebarContext)
-
-  return (
-    <Button
-      onClick={toggleSidebarOpen}
-      aria-label="toggles cms sidebar"
-      primary
-      rounded="right"
-      size="custom"
-      className="absolute bottom-12 right-0 transform translate-x-full pointer-events-auto w-14 h-11"
-    >
-      {displayState === 'closed' ? (
-        <EditIcon className="w-8 h-auto" />
-      ) : (
-        <LeftArrowIcon className="w-8 h-auto" />
-      )}
-    </Button>
-  )
-}
-
 const MenuButton = ({ children, ...props }) => {
   return (
     <li className="py-2 first:pt-4 last:pb-4">
@@ -297,11 +258,77 @@ const MenuButton = ({ children, ...props }) => {
   )
 }
 
-const SidebarHeader = ({ children }) => {
+const SidebarHeader = ({ isLocalMode }) => {
+  const {
+    toggleFullscreen,
+    displayState,
+    toggleMenu,
+    toggleSidebarOpen,
+    sidebarWidth,
+  } = React.useContext(SidebarContext)
+
   return (
-    <div className="flex-grow-0 bg-white text-gray-700 w-full p-4 flex items-center justify-between pointer-events-none">
-      {children}
+    <div className="flex-grow-0 w-full bg-white pb-2 overflow-visible z-20">
+      {isLocalMode && <LocalWarning />}
+      <div className="mt-4 w-full flex items-center justify-between">
+        {sidebarWidth < 1201 && (
+          <div style={{ marginLeft: '-1px' }} className="pointer-events-auto">
+            <Button
+              rounded="right"
+              variant="secondary"
+              onClick={toggleMenu}
+              className="pointer-events-auto"
+            >
+              <BiMenu className="h-7 w-auto" />
+            </Button>
+          </div>
+        )}
+        <div className="flex-1"></div>
+        <div
+          className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
+        >
+          <Button
+            rounded="full"
+            variant="ghost"
+            onClick={toggleFullscreen}
+            className="pointer-events-auto opacity-50 hover:opacity-100 focus:opacity-80"
+          >
+            {displayState === 'fullscreen' ? (
+              <BsArrowsAngleContract className="h-5 w-auto -mx-1" />
+            ) : (
+              <BsArrowsAngleExpand className="h-5 w-auto -mx-1" />
+            )}
+          </Button>
+          <Button
+            rounded="left"
+            variant="secondary"
+            onClick={toggleSidebarOpen}
+            className={``}
+          >
+            <MdOutlineArrowBackIos className="h-6 w-auto" />
+          </Button>
+        </div>
+      </div>
     </div>
+  )
+}
+
+const EditButton = ({}) => {
+  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
+
+  return (
+    <Button
+      rounded="right"
+      variant="primary"
+      onClick={toggleSidebarOpen}
+      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
+        displayState !== 'closed'
+          ? 'opacity-0'
+          : 'translate-x-full pointer-events-auto'
+      }`}
+    >
+      <BiPencil className="h-6 w-auto" />
+    </Button>
   )
 }
 
@@ -354,10 +381,8 @@ const SidebarWrapper = ({ children }) => {
       }`}
     >
       <div
-        className={`relative flex h-screen transform ${
-          displayState === 'closed'
-            ? `pointer-events-none -translate-x-full`
-            : ``
+        className={`relative h-screen transform ${
+          displayState !== 'closed' ? `` : `-translate-x-full`
         } ${
           resizingSidebar
             ? `transition-none`
@@ -366,7 +391,7 @@ const SidebarWrapper = ({ children }) => {
             : `transition-all duration-300 ease-out`
         }`}
         style={{
-          width: sidebarWidth,
+          width: displayState === 'fullscreen' ? '100vw' : sidebarWidth,
           maxWidth: '100vw',
           minWidth: '360px',
         }}
@@ -382,9 +407,10 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out flex flex-col items-stretch ${
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-gray-50 shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
+      style={{ boxShadow: 'inset -1px 0 b' }}
     >
       {children}
     </div>
