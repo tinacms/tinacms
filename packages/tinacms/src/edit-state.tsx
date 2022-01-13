@@ -13,6 +13,7 @@ limitations under the License.
 
 import {
   EditProvider,
+  TinaDataContext,
   isEditing,
   setEditing,
   useEditState,
@@ -36,6 +37,33 @@ export const TinaEditProvider = ({
       <TinaEditProviderInner {...props} />
     </EditProvider>
   )
+}
+
+export const useTina = ({
+  query,
+  variables,
+  data,
+}: {
+  query: string
+  variables: object
+  data: object
+}) => {
+  const { setRequest, state, isDummyContainer, isLoading } =
+    React.useContext(TinaDataContext)
+  React.useEffect(() => {
+    setRequest({ query, variables })
+    return () => {
+      setRequest(undefined) // remove form
+    }
+  }, [JSON.stringify(variables), query, setRequest])
+
+  //TODO - don't load assuming that we're loading if there's no payload...
+  // Doing so for now, because isLoading will be false on the first render
+  return {
+    data:
+      isDummyContainer || isLoading || !state.payload ? data : state.payload,
+    isLoading,
+  }
 }
 
 const ToggleButton = () => {

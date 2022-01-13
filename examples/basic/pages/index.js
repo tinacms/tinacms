@@ -1,8 +1,22 @@
 import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
+import { useTina } from 'tinacms/dist/edit-state'
+
 export default function Home(props) {
-  const content = props.data.getPageDocument.data.body
+  const { data } = useTina({
+    query: `{
+    getPageDocument(relativePath: "home.mdx"){
+      data{
+        body
+      }
+    }
+  }`,
+    variables: {},
+    data: props.data,
+  })
+
+  const content = data.getPageDocument.data.body
   return (
     <Layout>
       <TinaMarkdown content={content} />
