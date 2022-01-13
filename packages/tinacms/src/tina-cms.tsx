@@ -335,10 +335,14 @@ const TinaCMSProviderWithQuery = ({
     <ErrorBoundary>
       <TinaDataProvider formifyCallback={props.formifyCallback}>
         {isLoading ? (
-          <Loader>{children(props)}</Loader>
-        ) : (
-          // pass the new edit state data to the child
+          <Loader>
+            {typeof children == 'function' ? children(props) : children}
+          </Loader>
+        ) : // pass the new edit state data to the child
+        typeof children == 'function' ? (
           children({ ...props, data: payload })
+        ) : (
+          children
         )}
       </TinaDataProvider>
     </ErrorBoundary>
