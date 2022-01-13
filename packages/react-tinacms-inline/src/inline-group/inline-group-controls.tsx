@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS } from 'tinacms'
+import { useCMS } from '@einsteinindustries/tinacms'
 
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'

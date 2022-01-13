@@ -19,7 +19,7 @@ limitations under the License.
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
-import { Field } from '@tinacms/forms'
+import { Field } from '@einsteinindustries/tinacms-forms'
 
 export interface ToggleProps {
   name: string

@@ -1,7 +1,11 @@
-import { FormOptions, Form } from '@tinacms/forms'
+import { FormOptions, Form } from '@einsteinindustries/tinacms-forms'
 import { GlobalFormPlugin } from '../plugins/screens'
 import { useMemo } from 'react'
-import { useForm, WatchableFormValue, usePlugins } from '@tinacms/react-core'
+import {
+  useForm,
+  WatchableFormValue,
+  usePlugins,
+} from '@einsteinindustries/tinacms-react-core'
 
 /**
 
@@ -21,7 +25,11 @@ limitations under the License.
 
 */
 
-export { useLocalForm, useForm, WatchableFormValue } from '@tinacms/react-core'
+export {
+  useLocalForm,
+  useForm,
+  WatchableFormValue,
+} from '@einsteinindustries/tinacms-react-core'
 
 /**
  * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md

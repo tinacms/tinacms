@@ -27,18 +27,18 @@ import {
   ModalBody,
   FullscreenModal,
   PopupModal,
-} from '@tinacms/react-modals'
+} from '@einsteinindustries/tinacms-react-modals'
 import {
   MediaList,
   Media,
   MediaListOffset,
   MediaListError,
-} from '@tinacms/core'
+} from '@einsteinindustries/tinacms-core'
 // import path from 'path'
-import { Button } from '@tinacms/styles'
+import { Button } from '@einsteinindustries/tinacms-styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
-import { LoadingDots } from '@tinacms/form-builder'
+import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
 
 export interface MediaRequest {
   directory?: string

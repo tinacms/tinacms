@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import get from 'lodash.get'
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 
 export function getFlattenedFormValues(form: Form) {
   const flatData: any = {}

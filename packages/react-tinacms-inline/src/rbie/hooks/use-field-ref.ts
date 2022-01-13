@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS, useCMSEvent } from 'tinacms'
+import { useCMS, useCMSEvent } from '@einsteinindustries/tinacms'
 
 export const useFieldRef = (formId: string, fieldName: string) => {
   const [node, setNode] = React.useState<HTMLElement | null>(null)

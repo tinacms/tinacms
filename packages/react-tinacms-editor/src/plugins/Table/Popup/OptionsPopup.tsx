@@ -21,8 +21,8 @@ import ReactDOM from 'react-dom'
 import { deleteTable } from 'prosemirror-tables'
 import styled from 'styled-components'
 
-import { TrashIcon } from '@tinacms/icons'
-import { IconButton } from '@tinacms/styles'
+import { TrashIcon } from '@einsteinindustries/tinacms-icons'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
 
 import { useEditorStateContext } from '../../../context/editorState'
 

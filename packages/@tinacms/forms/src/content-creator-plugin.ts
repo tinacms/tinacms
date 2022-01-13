@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, Plugin } from '@tinacms/core'
+import { CMS, Plugin } from '@einsteinindustries/tinacms-core'
 import { Field } from './field'
 import { FormOptions } from './form'
 

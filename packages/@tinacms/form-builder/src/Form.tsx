@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 import { FormLegacy } from './FormLegacy'
 import { Field } from 'react-final-form'
 

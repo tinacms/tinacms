@@ -24,7 +24,7 @@ import {
   ModalBody,
   ModalFullscreen,
   ModalPopup,
-} from '@tinacms/react-modals'
+} from '@einsteinindustries/tinacms-react-modals'
 import { ScreenPlugin } from '../screen-plugin'
 
 export interface ScreenPluginModalProps {

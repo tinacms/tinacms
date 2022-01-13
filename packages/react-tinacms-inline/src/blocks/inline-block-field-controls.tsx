@@ -25,8 +25,8 @@ import {
   ChevronRightIcon,
   DuplicateIcon,
   TrashIcon,
-} from '@tinacms/icons'
-import { useCMS } from 'tinacms'
+} from '@einsteinindustries/tinacms-icons'
+import { useCMS } from '@einsteinindustries/tinacms'
 
 import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'

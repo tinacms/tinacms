@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export { useSubscribable } from '@tinacms/react-core'
+export { useSubscribable } from '@einsteinindustries/tinacms-react-core'

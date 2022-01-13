@@ -18,7 +18,12 @@ limitations under the License.
 
 import { EditorState } from 'prosemirror-state'
 // @ts-ignore
-import { AlignCenter as AlignCenterIcon, AlignRight as AlignRightIcon, AlignLeft as AlignLeftIcon, JustifyIcon } from '@tinacms/icons'
+import {
+  AlignCenter as AlignCenterIcon,
+  AlignRight as AlignRightIcon,
+  AlignLeft as AlignLeftIcon,
+  JustifyIcon,
+} from '@einsteinindustries/tinacms-icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
 import { textAlign } from 'plugins/TextAlignment/Commands'

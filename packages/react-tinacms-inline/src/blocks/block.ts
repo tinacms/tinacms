@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { BlockTemplate } from 'tinacms'
+import { BlockTemplate } from '@einsteinindustries/tinacms'
 
 /**
  * Blocks consist of a `template` and a `Component`

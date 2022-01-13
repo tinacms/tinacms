@@ -18,7 +18,7 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
-import { Plugin } from '@tinacms/core'
+import { Plugin } from '@einsteinindustries/tinacms-core'
 import { Field, AnyField } from './field'
 
 export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {

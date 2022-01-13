@@ -23,7 +23,7 @@ import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
-import { useCMS } from 'tinacms'
+import { useCMS } from '@einsteinindustries/tinacms'
 
 export interface InlineBlocksProps {
   name: string

@@ -26,8 +26,8 @@ import {
   getCellsInRow,
 } from 'prosemirror-utils'
 import styled from 'styled-components'
-import { AddIcon } from '@tinacms/icons'
-import { IconButton } from '@tinacms/styles'
+import { AddIcon } from '@einsteinindustries/tinacms-icons'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
 
 const borderWidth = 1
 const controlSize = 12

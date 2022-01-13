@@ -20,7 +20,7 @@ import { render, screen } from '@testing-library/react'
 import * as React from 'react'
 import { InlineGroup } from '.'
 import { InlineForm, InlineText } from '../'
-import { withTina, useForm } from 'tinacms'
+import { withTina, useForm } from '@einsteinindustries/tinacms'
 
 describe('Inline Group', () => {
   const Wrapper = withTina(

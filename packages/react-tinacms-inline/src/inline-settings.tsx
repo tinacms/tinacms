@@ -25,12 +25,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from 'tinacms'
+} from '@einsteinindustries/tinacms'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '@tinacms/styles'
-import { EditIcon } from '@tinacms/icons'
-import { Field } from 'tinacms'
-import { FormPortalProvider } from '@tinacms/form-builder'
+import { Button } from '@einsteinindustries/tinacms-styles'
+import { EditIcon } from '@einsteinindustries/tinacms-icons'
+import { Field } from '@einsteinindustries/tinacms'
+import { FormPortalProvider } from '@einsteinindustries/tinacms-form-builder'
 import { BlockAction } from './blocks/inline-block-field-controls'
 import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'

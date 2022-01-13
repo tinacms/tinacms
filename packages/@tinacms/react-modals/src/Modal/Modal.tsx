@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@einsteinindustries/tinacms-styles'
 import { useModalContainer } from '../ModalProvider'
 import { ModalOverlay } from './ModalOverlay'
 

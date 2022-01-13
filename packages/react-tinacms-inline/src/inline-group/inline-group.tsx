@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field } from 'tinacms'
+import { Field } from '@einsteinindustries/tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
 import { InlineGroupControls } from './inline-group-controls'

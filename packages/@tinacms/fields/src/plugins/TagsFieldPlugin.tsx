@@ -21,7 +21,7 @@ import { InputProps, BaseTextField } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
 import styled from 'styled-components'
-import { CloseIcon } from '@tinacms/icons'
+import { CloseIcon } from '@einsteinindustries/tinacms-icons'
 
 export const TagsField = wrapFieldsWithMeta<
   { placeholder: string },

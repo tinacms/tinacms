@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Callback } from '@tinacms/core'
+import { Callback } from '@einsteinindustries/tinacms-core'
 import { useCMS } from './use-cms'
 
 export function useCMSEvent(

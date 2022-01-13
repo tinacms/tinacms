@@ -18,8 +18,8 @@ limitations under the License.
 
 import React from 'react'
 import styled from 'styled-components'
-import { MediaListOffset } from '@tinacms/core'
-import { Button } from '@tinacms/styles'
+import { MediaListOffset } from '@einsteinindustries/tinacms-core'
+import { Button } from '@einsteinindustries/tinacms-styles'
 
 export interface MediaPaginatorProps {
   currentOffset: MediaListOffset

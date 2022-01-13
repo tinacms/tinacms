@@ -19,7 +19,7 @@ limitations under the License.
 import React, { FunctionComponent } from 'react'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
-import { LoadingDots } from '@tinacms/form-builder'
+import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
 
 export const Loader: FunctionComponent = () => {
   const markerImageLoader = document.getElementsByClassName(

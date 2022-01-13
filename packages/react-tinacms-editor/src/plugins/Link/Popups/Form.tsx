@@ -19,13 +19,14 @@ limitations under the License.
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@einsteinindustries/tinacms-styles'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import {
   findElementOffsetTop,
   findElementOffsetLeft,
-  getMarkPresent, getAllMarkOccurrences,
+  getMarkPresent,
+  getAllMarkOccurrences,
 } from '../../../utils'
 import {
   removeLinkBeingEdited,

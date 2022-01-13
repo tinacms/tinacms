@@ -18,7 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 // @ts-ignore
-import { FlagIcon } from '@tinacms/icons'
+import { FlagIcon } from '@einsteinindustries/tinacms-icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent } from '../../../utils'

@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import styled from 'styled-components'
-import { useCMS } from 'tinacms'
+import { useCMS } from '@einsteinindustries/tinacms'
 import { InlineField } from '../inline-field'
 import TextareaAutosize from 'react-textarea-autosize'
 import { InlineTextProps } from './inline-text-field'

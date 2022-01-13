@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plugin } from '@tinacms/core'
+import { Plugin } from '@einsteinindustries/tinacms-core'
 
 /**
  * Represents a Screen that should be accessible via the CMS.

@@ -18,10 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css, StyledComponent } from 'styled-components'
-import { EllipsisVerticalIcon } from '@tinacms/icons'
+import { EllipsisVerticalIcon } from '@einsteinindustries/tinacms-icons'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 
 export interface FormActionMenuProps {
   form: Form

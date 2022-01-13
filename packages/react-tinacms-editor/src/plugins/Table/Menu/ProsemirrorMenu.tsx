@@ -18,7 +18,7 @@ limitations under the License.
 
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import { TableIcon } from '@tinacms/icons'
+import { TableIcon } from '@einsteinindustries/tinacms-icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
 import { insertTable } from '../commands'

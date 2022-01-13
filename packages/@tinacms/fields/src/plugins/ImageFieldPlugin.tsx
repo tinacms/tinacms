@@ -19,8 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
-import { Media, MediaStore } from '@tinacms/core'
-import { useCMS } from '@tinacms/react-core'
+import { Media, MediaStore } from '@einsteinindustries/tinacms-core'
+import { useCMS } from '@einsteinindustries/tinacms-react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
 

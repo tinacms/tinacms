@@ -18,10 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { BlockTemplate } from 'tinacms'
-import { IconButton } from '@tinacms/styles'
-import { AddIcon } from '@tinacms/icons'
-import { Input } from 'tinacms'
+import { BlockTemplate } from '@einsteinindustries/tinacms'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
+import { AddIcon } from '@einsteinindustries/tinacms-icons'
+import { Input } from '@einsteinindustries/tinacms'
 
 import { getOffset, getOffsetX, getOffsetY } from '../styles'
 

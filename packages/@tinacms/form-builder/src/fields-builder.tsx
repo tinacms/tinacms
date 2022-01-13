@@ -17,8 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Form, Field } from '@tinacms/forms'
-import { useCMS } from '@tinacms/react-core'
+import { Form, Field } from '@einsteinindustries/tinacms-forms'
+import { useCMS } from '@einsteinindustries/tinacms-react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
 import styled from 'styled-components'

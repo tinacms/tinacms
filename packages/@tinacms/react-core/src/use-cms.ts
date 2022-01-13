@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { CMS } from '@tinacms/core'
+import { CMS } from '@einsteinindustries/tinacms-core'
 
 export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 

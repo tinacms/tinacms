@@ -17,8 +17,8 @@ limitations under the License.
 */
 import React from 'react'
 import styled from 'styled-components'
-import { Media } from '@tinacms/core'
-import { Folder, File } from '@tinacms/icons'
+import { Media } from '@einsteinindustries/tinacms-core'
+import { Folder, File } from '@einsteinindustries/tinacms-icons'
 
 interface MediaItemProps {
   item: Media
@@ -35,7 +35,11 @@ export function MediaItem({
   onDelete,
 }: MediaItemProps) {
   return (
-    <ListItem onClick={() => onSelect ? onSelect(item) : onClick(item)} type={item.type} data-content={item.filename}>
+    <ListItem
+      onClick={() => (onSelect ? onSelect(item) : onClick(item))}
+      type={item.type}
+      data-content={item.filename}
+    >
       <ItemPreview>
         {item.previewSrc ? (
           <img src={item.previewSrc} alt={item.filename} />
@@ -114,7 +118,8 @@ const ListItem = styled.li<ListItemProps>`
     -moz-box-sizing: border-box;
   }
 
-  &:hover:after, &:hover:before {
+  &:hover:after,
+  &:hover:before {
     opacity: 0.9;
     cursor: pointer;
   }
@@ -136,9 +141,8 @@ const ItemPreview = styled.div`
   display: flex;
   justify-content: center;
   flex-shrink: 0;
-  vertical-align:top;
-  
-  
+  vertical-align: top;
+
   > img {
     object-fit: cover;
     width: 100%;

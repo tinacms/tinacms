@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useForm, useCMS, FormOptions, Form } from 'tinacms'
+import { useForm, useCMS, FormOptions, Form } from '@einsteinindustries/tinacms'
 import { generateFields } from './generate-fields'
 
 /**

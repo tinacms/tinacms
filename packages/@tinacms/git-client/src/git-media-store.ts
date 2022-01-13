@@ -21,7 +21,7 @@ import {
   Media,
   MediaListOptions,
   MediaList,
-} from '@tinacms/core'
+} from '@einsteinindustries/tinacms-core'
 import { GitClient } from './git-client'
 
 export class GitMediaStore implements MediaStore {

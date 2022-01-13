@@ -19,9 +19,9 @@ limitations under the License.
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled, { css } from 'styled-components'
-import { IconButton } from '@tinacms/styles'
-import { TrashIcon } from '@tinacms/icons'
-import { LoadingDots } from '@tinacms/form-builder'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
+import { TrashIcon } from '@einsteinindustries/tinacms-icons'
+import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void

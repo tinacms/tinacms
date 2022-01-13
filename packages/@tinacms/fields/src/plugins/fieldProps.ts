@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { Field, FormApi } from '@tinacms/forms'
-import { FieldRenderProps } from '@tinacms/form-builder'
+import { Field, FormApi } from '@einsteinindustries/tinacms-forms'
+import { FieldRenderProps } from '@einsteinindustries/tinacms-form-builder'
 
 export interface FieldProps<InputProps>
   extends FieldRenderProps<any, HTMLElement> {

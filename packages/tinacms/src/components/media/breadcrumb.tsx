@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { LeftArrowIcon } from '@tinacms/icons'
+import { LeftArrowIcon } from '@einsteinindustries/tinacms-icons'
 import path from 'path'
 
 interface BreadcrumbProps {

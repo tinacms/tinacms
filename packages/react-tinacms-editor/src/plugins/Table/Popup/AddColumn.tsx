@@ -19,10 +19,10 @@ limitations under the License.
 import React, { useState, useEffect, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import styled from 'styled-components'
-import { IconButton } from '@tinacms/styles'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
 import { EditorView } from 'prosemirror-view'
 import { addColumnAt } from 'prosemirror-utils'
-import { AddIcon } from '@tinacms/icons'
+import { AddIcon } from '@einsteinindustries/tinacms-icons'
 
 const borderWidth = 1
 const controlSize = 12

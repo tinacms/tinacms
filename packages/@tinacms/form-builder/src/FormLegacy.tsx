@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 import { Form as FinalForm, FormRenderProps } from 'react-final-form'
 import { FC } from 'react'
 

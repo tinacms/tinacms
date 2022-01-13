@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FunctionComponent } from 'react'
 
-import { HeadingIcon } from '@tinacms/icons'
+import { HeadingIcon } from '@einsteinindustries/tinacms-icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 

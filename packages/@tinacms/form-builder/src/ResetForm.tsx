@@ -19,14 +19,14 @@ limitations under the License.
 import * as React from 'react'
 import { FC } from 'react'
 import styled from 'styled-components'
-import { Button } from '@tinacms/styles'
+import { Button } from '@einsteinindustries/tinacms-styles'
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalActions,
   ModalPopup,
-} from '@tinacms/react-modals'
+} from '@einsteinindustries/tinacms-react-modals'
 
 interface ResetFormProps {
   children: any

@@ -18,8 +18,8 @@ limitations under the License.
 
 import React, { useRef } from 'react'
 
-import { useCMS, Media } from 'tinacms'
-import { MediaIcon } from '@tinacms/icons'
+import { useCMS, Media } from '@einsteinindustries/tinacms'
+import { MediaIcon } from '@einsteinindustries/tinacms-icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 import { useEditorStateContext } from '../../../context/editorState'

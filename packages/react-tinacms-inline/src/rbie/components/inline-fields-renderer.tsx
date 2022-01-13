@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS, useCMSEvent, Form, Field } from 'tinacms'
+import { useCMS, useCMSEvent, Form, Field } from '@einsteinindustries/tinacms'
 import { FieldOverlay } from './field-overlay'
 import { useMap } from 'react-use'
 

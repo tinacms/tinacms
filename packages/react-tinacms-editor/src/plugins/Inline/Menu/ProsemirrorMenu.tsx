@@ -18,7 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 // @ts-ignore
-import { BoldIcon, ItalicIcon, StrikethroughIcon, SuperscriptIcon, SubscriptIcon } from '@tinacms/icons'
+import {
+  BoldIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  SuperscriptIcon,
+  SubscriptIcon,
+} from '@einsteinindustries/tinacms-icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 import { formatKeymap } from '../../../utils'

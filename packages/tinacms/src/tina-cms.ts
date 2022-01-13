@@ -16,9 +16,9 @@
 
  */
 
-import { CMS, CMSConfig, PluginType } from '@tinacms/core'
-import { FieldPlugin } from '@tinacms/form-builder'
-import { ScreenPlugin } from '@tinacms/react-screens'
+import { CMS, CMSConfig, PluginType } from '@einsteinindustries/tinacms-core'
+import { FieldPlugin } from '@einsteinindustries/tinacms-form-builder'
+import { ScreenPlugin } from '@einsteinindustries/tinacms-react-screens'
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -34,11 +34,17 @@ import {
   BlocksFieldPlugin,
   TagsFieldPlugin,
   DateFieldPlugin,
-} from '@tinacms/fields'
-import { Form } from '@tinacms/forms'
-import { Alerts, EventsToAlerts } from '@tinacms/alerts'
-import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
-import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
+} from '@einsteinindustries/tinacms-fields'
+import { Form } from '@einsteinindustries/tinacms-forms'
+import { Alerts, EventsToAlerts } from '@einsteinindustries/tinacms-alerts'
+import {
+  SidebarState,
+  SidebarStateOptions,
+} from '@einsteinindustries/tinacms-react-sidebar'
+import {
+  ToolbarStateOptions,
+  ToolbarState,
+} from '@einsteinindustries/tinacms-react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
