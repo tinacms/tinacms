@@ -48,8 +48,8 @@
     "eol": "^0.9.0",
     "react-docgen-typescript-loader": "^3.1.0",
     "react-docgen-typescript-webpack-plugin": "^1.1.0",
-    "react-tinacms-inline": "^0.43.3",
-    "tinacms": "^0.43.3"
+    "@einsteinindustries/react-tinacms-inline": "^0.43.3",
+    "@einsteinindustries/tinacms": "^0.43.3"
   },
   "dependencies": {
     "codemirror": "^5.42.2",
@@ -75,9 +75,9 @@
     "@einsteinindustries/tinacms-form-builder": ">=0.39",
     "react": ">=16.8",
     "react-dom": ">=16.8",
-    "react-tinacms-inline": ">=0.29",
+    "@einsteinindustries/react-tinacms-inline": ">=0.29",
     "styled-components": ">=4.1",
-    "tinacms": ">=0.13"
+    "@einsteinindustries/tinacms": ">=0.13"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
