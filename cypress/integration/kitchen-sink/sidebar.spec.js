@@ -29,6 +29,19 @@ const RICH_TEXT_BODY_SELECTOR = `[data-test="rich-text-body"]`
 
 describe('Tina side bar', () => {
   beforeEach(() => {
+    // reset content from GraphQL API
+    cy.request({
+      method: 'POST',
+      url: 'http://localhost:4001/graphql',
+      body: {
+        query: `mutation {
+          updatePageDocument(relativePath: "home.mdx", params: { heading: "" subtitle: "" body: ""  }) {
+            __typename
+          }
+        }`,
+      },
+    })
+
     cy.intercept('http://localhost:4001/graphql').as('graphQL')
     cy.intercept('/_next/**').as('next')
     cy.visit('/')
@@ -43,25 +56,25 @@ describe('Tina side bar', () => {
     // Delete all text in rich text editor
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
 
-    cy.get('[data-test="form:getPageDocument"]')
-      .first()
-      .scrollTo('bottomLeft', {
-        easing: 'linear',
-        duration: 100,
-      })
-      .then((_) => {
-        const backspace = Array(300).fill(`{backspace}`).join('')
-        cy.get(SLATE_SELECTOR)
-          .scrollIntoView({ easing: 'linear', duration: 100 })
-          .click({}, { timeout: 3000 })
-          .type(backspace)
-        cy.get('button').contains('Save').click()
-        cy.wait('@graphQL')
-        cy.visit('/')
-      })
+    // cy.get('[data-test="form:getPageDocument"]')
+    //   .first()
+    //   .scrollTo('bottomLeft', {
+    //     easing: 'linear',
+    //     duration: 100,
+    //   })
+    //   .then((_) => {
+    //     const backspace = Array(300).fill(`{backspace}`).join('')
+    //     cy.get(SLATE_SELECTOR)
+    //       .scrollIntoView({ easing: 'linear', duration: 100 })
+    //       .click({}, { timeout: 3000 })
+    //       .type(backspace)
+    //     cy.get('button').contains('Save').click()
+    //     cy.wait('@graphQL')
+    //     cy.visit('/')
+    //   })
 
     // Open the sidebar
-    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+    // cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
     cy.get('[data-test="form:getPageDocument"]')
