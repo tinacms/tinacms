@@ -69,10 +69,7 @@ export class Database {
           ? contentObject._template
           : undefined
       const { collection, template } =
-        await tinaSchema.getCollectionAndTemplateByFullPath(
-          filepath,
-          templateName
-        )
+        tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
       const field = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
@@ -327,12 +324,23 @@ export class Database {
         tinaSchema.schema
       )
       await this.store.seed(path.join(GENERATED_FOLDER, '_lookup.json'), lookup)
-      await _indexContent(tinaSchema, this)
+      await this._indexAllContent()
     } else {
       if (this.store.supportsIndexing()) {
         throw new Error(`Schema must be indexed with provided Store`)
       }
     }
+  }
+
+  public indexContentByPaths = async (documentPaths: string[]) => {
+    await _indexContent(this.tinaSchema, this, documentPaths)
+  }
+
+  public _indexAllContent = async () => {
+    await sequential(this.tinaSchema.getCollections(), async (collection) => {
+      const documentPaths = await this.bridge.glob(collection.path)
+      await _indexContent(this.tinaSchema, this, documentPaths)
+    })
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
@@ -406,21 +414,24 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
-  await sequential(tinaSchema.getCollections(), async (collection) => {
-    const documentPaths = await database.bridge.glob(collection.path)
-    await sequential(documentPaths, async (documentPath) => {
-      const dataString = await database.bridge.get(documentPath)
-      const data = parseFile(dataString, path.extname(documentPath), (yup) =>
-        yup.object({})
-      )
-      if (database.store.supportsSeeding()) {
-        await database.store.seed(documentPath, data)
-      }
-      if (database.store.supportsIndexing()) {
-        return indexDocument({ documentPath, collection, data, database })
-      }
-    })
+const _indexContent = async (
+  tinaSchema: TinaSchema,
+  database: Database,
+  documentPaths: string[]
+) => {
+  await sequential(documentPaths, async (documentPath) => {
+    const dataString = await database.bridge.get(documentPath)
+    const data = parseFile(dataString, path.extname(documentPath), (yup) =>
+      yup.object({})
+    )
+    const { collection } =
+      tinaSchema.getCollectionAndTemplateByFullPath(documentPath)
+    if (database.store.supportsSeeding()) {
+      await database.store.seed(documentPath, data)
+    }
+    if (database.store.supportsIndexing()) {
+      return indexDocument({ documentPath, collection, data, database })
+    }
   })
 }
 
