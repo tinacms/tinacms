@@ -1,5 +1,26 @@
 # next-tinacms-cloudinary
 
+## 3.5.0
+
+### Minor Changes
+
+- 4a3990c7e: Cloudinary media store now serves images over `https` by default. This can now be configured though the handler provided.
+
+  To revert to the old behavior:
+
+  ```ts
+  export default createMediaHandler(
+    {
+      // ...
+    },
+    {
+      useHttps: false,
+    }
+  )
+  ```
+
+  The default for `useHttps` is `true`
+
 ## 3.4.5
 
 ### Patch Changes
