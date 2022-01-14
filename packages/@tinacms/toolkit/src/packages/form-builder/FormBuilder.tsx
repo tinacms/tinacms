@@ -245,7 +245,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-const FormStatus = ({ pristine }) => {
+export const FormStatus = ({ pristine }) => {
   return (
     <div className="flex flex-0 items-center">
       {!pristine && (

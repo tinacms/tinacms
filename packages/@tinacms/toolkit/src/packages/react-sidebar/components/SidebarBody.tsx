@@ -27,6 +27,7 @@ import { useCMS, useSubscribable } from '../../react-core'
 import { LeftArrowIcon } from '../../icons'
 import { FormBuilder } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
+import { SidebarContext, navBreakpoint } from './Sidebar'
 
 export const FormsView = ({
   children,
@@ -261,32 +262,26 @@ export interface FormHeaderProps {
   activeForm: Form
 }
 
-export const FormHeader = styled(
-  ({ activeForm, ...styleProps }: FormHeaderProps) => {
-    return (
-      <div {...styleProps}>
-        <span>{activeForm.label}</span>
-      </div>
-    )
-  }
-)`
-  position: relative;
-  width: 100%;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
-  font-size: var(--tina-font-size-5);
-  user-select: none;
+export const FormHeader = ({ activeForm }: FormHeaderProps) => {
+  const { sidebarWidth } = React.useContext(SidebarContext)
 
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`
+  return (
+    <div
+      className={`py-4 border-b border-gray-200 bg-white ${
+        sidebarWidth > navBreakpoint ? `px-6` : `px-20`
+      }`}
+    >
+      <div className="max-w-form">
+        <div className="mb-2">
+          <span className="text-xl text-gray-700 font-medium leading-tight">
+            {activeForm.label}
+          </span>
+        </div>
+        {/* <FormStatus pristine={false} /> */}
+      </div>
+    </div>
+  )
+}
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
   Button as any

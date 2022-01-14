@@ -22,7 +22,7 @@ import { AiFillWarning } from 'react-icons/ai'
 export const LocalWarning = () => {
   return (
     <a
-      className="flex w-full -mb-1 text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-yellow-200"
+      className="flex w-full text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-yellow-200"
       href="https://tina.io/docs/tina-cloud/"
       target="_blank"
     >
