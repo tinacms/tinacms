@@ -151,7 +151,9 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
       <>
         <SidebarWrapper>
           <EditButton />
-          {sidebarWidth > navBreakpoint && <Nav screens={allScreens} />}
+          {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
+            <Nav screens={allScreens} />
+          )}
           <SidebarBody>
             <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
             <FormsView>
@@ -257,7 +259,7 @@ const SidebarHeader = ({ isLocalMode }) => {
     <div className="flex-grow-0 w-full pb-2 overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       <div className="mt-4 -mb-14 w-full flex items-center justify-between">
-        {sidebarWidth < navBreakpoint + 1 && (
+        {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
           <Button
             rounded="right"
             variant="secondary"
