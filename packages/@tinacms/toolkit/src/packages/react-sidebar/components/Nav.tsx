@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { VscOpenPreview } from 'react-icons/vsc'
+import { BiExit } from 'react-icons/bi'
 import { FiMoreVertical } from 'react-icons/fi'
 import { ImFilesEmpty } from 'react-icons/im'
 import { Menu, Transition } from '@headlessui/react'
@@ -89,8 +89,8 @@ export const Nav = ({
                           }`}
                           href="/"
                         >
-                          <VscOpenPreview className="w-6 h-auto mr-2 text-blue-400" />{' '}
-                          Manage in Tina Cloud
+                          <BiExit className="w-6 h-auto mr-2 text-blue-400" />{' '}
+                          Log Out
                         </a>
                       )}
                     </Menu.Item>
