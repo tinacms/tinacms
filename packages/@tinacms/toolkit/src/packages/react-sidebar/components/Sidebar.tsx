@@ -36,7 +36,7 @@ export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
-const navBreakpoint = 1000
+export const navBreakpoint = 1000
 const defaultSidebarWidth = 440
 const defaultSidebarPosition = 'displace'
 
@@ -254,9 +254,9 @@ const SidebarHeader = ({ isLocalMode }) => {
   } = React.useContext(SidebarContext)
 
   return (
-    <div className="flex-grow-0 w-full bg-white pb-2 overflow-visible z-20">
+    <div className="flex-grow-0 w-full pb-2 overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
-      <div className="mt-4 w-full flex items-center justify-between">
+      <div className="mt-4 -mb-14 w-full flex items-center justify-between">
         {sidebarWidth < navBreakpoint + 1 && (
           <Button
             rounded="right"
@@ -355,7 +355,7 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-gray-50 shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
         displayState !== 'closed' ? `opacity-100` : `opacity-0`
       } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
       style={{ boxShadow: 'inset -1px 0 b' }}
