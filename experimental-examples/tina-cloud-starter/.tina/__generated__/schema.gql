@@ -72,7 +72,7 @@ type DocumentConnection implements Connection {
 type Collection {
   name: String!
   slug: String!
-  label: String!
+  label: String
   path: String!
   format: String
   matches: String
