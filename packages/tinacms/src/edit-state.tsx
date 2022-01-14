@@ -19,7 +19,7 @@ import {
   useEditState,
 } from '@tinacms/sharedctx'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export { isEditing, setEditing, useEditState }
 
@@ -48,11 +48,32 @@ export const useTina = ({
   variables: object
   data: object
 }) => {
-  const { setRequest, state, isDummyContainer, isLoading } =
-    React.useContext(TinaDataContext)
+  const {
+    setRequest,
+    state,
+    isDummyContainer,
+    isLoading: contextLoading,
+  } = React.useContext(TinaDataContext)
+
+  const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
+    !isDummyContainer
+  )
+
+  const isLoading = contextLoading || waitForContextRerender
+
   React.useEffect(() => {
     setRequest({ query, variables })
   }, [JSON.stringify(variables), query])
+
+  // A bit of a hack here
+  // We need to wait 1 frame because the parent context will need to react to our
+  // new query that we've just sent when this hook was initialized.
+  // Otherwise, things get wonky when changing pages
+  useEffect(() => {
+    if (!isDummyContainer) {
+      setTimeout(() => setWaitForContextRerender(false), 1)
+    }
+  }, [isDummyContainer])
 
   //TODO - don't assume that we're loading if there's no payload...
   // Doing so for now, because isLoading will be false on the first render
