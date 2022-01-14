@@ -291,6 +291,7 @@ const SidebarHeader = ({ isLocalMode }) => {
             rounded="left"
             variant="secondary"
             onClick={toggleSidebarOpen}
+            aria-label="toggles cms sidebar"
             className={``}
           >
             <MdOutlineArrowBackIos className="h-6 w-auto" />
@@ -314,6 +315,7 @@ const EditButton = ({}) => {
           ? 'opacity-0'
           : 'translate-x-full pointer-events-auto'
       }`}
+      aria-label="toggles cms sidebar"
     >
       <BiPencil className="h-6 w-auto" />
     </Button>
