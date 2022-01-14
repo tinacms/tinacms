@@ -273,6 +273,7 @@ const config = (cwd = '') => {
         xs: ['13px', { lineHeight: '1.33' }],
         sm: ['14px', { lineHeight: '1.43' }],
         base: ['16px', { lineHeight: '1.5' }],
+        md: ['16px', { lineHeight: '1.5' }],
         lg: ['18px', { lineHeight: '1.55' }],
         xl: ['20px', { lineHeight: '1.4' }],
         '2xl': ['24px', { lineHeight: '1.33' }],
