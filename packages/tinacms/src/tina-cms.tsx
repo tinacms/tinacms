@@ -267,7 +267,7 @@ const TinaCMSProviderWithQuery = ({
   ...props
 }: {
   /** The query from getStaticProps */
-  query: string
+  query?: string
   /** Any variables from getStaticProps */
   variables?: object
   /** The `data` from getStaticProps */
@@ -330,6 +330,7 @@ const TinaCMSProviderWithQuery = ({
   })
 
   useDocumentCreatorPlugin(props.documentCreatorCallback)
+
   return (
     <ErrorBoundary>
       <TinaDataProvider formifyCallback={props.formifyCallback}>
