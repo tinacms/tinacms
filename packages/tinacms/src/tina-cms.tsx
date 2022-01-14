@@ -318,7 +318,7 @@ const TinaCMSProviderWithQuery = ({
   // Note - this will only register for legacy implementations taking in query
   // Hopefuly things work if we call this twice
   const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => (props.query ? gql(props.query) : undefined),
+    query: props.query,
     variables: props.variables || {},
     formify: (args) => {
       if (props.formifyCallback) {
@@ -392,7 +392,7 @@ const FormRegistrar = ({
   const cms = useCMS()
 
   const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => (request ? gql(request?.query) : undefined),
+    query: request?.query,
     variables: request?.variables,
     formify: (args) => {
       if (formifyCallback) {
