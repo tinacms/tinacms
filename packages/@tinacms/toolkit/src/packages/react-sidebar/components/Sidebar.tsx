@@ -238,7 +238,7 @@ const updateBodyDisplacement = ({
       sidebarWidth,
       windowWidth - minPreviewWidth
     )
-    body.style.paddingLeft = bodyDisplacement + 'px'
+    body.style.paddingLeft = bodyDisplacement - 6 + 'px'
   } else {
     body.style.paddingLeft = '0'
   }
@@ -339,8 +339,7 @@ const SidebarWrapper = ({ children }) => {
             : `transition-all duration-300 ease-out`
         }`}
         style={{
-          width:
-            displayState === 'fullscreen' ? '100vw' : sidebarWidth + 6 + 'px',
+          width: displayState === 'fullscreen' ? '100vw' : sidebarWidth + 'px',
           maxWidth: '100vw',
           minWidth: '360px',
         }}
