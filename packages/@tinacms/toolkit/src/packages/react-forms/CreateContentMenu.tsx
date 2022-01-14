@@ -40,7 +40,7 @@ export const CreateContentMenu: React.FC<CreateContentMenuProps> = ({
     return (
       <ContentMenuWrapper>
         {sidebar ? (
-          <IconButton onClick={() => setVisible(true)} open={visible} primary>
+          <IconButton onClick={() => setVisible(true)} variant="primary">
             <AddIcon className="w-5/6 h-auto" />
           </IconButton>
         ) : (

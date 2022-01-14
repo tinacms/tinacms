@@ -21,7 +21,6 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'white' | 'ghost'
   size?: 'small' | 'medium' | 'custom'
-  open?: boolean
   busy?: boolean
   rounded?: 'full' | 'left' | 'right'
   disabled?: boolean
@@ -32,7 +31,6 @@ export interface ButtonProps
 export const Button = ({
   variant = 'secondary',
   size = 'medium',
-  open,
   busy,
   disabled,
   rounded = 'full',
@@ -76,9 +74,8 @@ export const Button = ({
 }
 
 export const IconButton = ({
-  primary,
+  variant = 'secondary',
   size = 'medium',
-  open,
   busy,
   disabled,
   children,
@@ -89,15 +86,10 @@ export const IconButton = ({
     'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full '
   const variantClasses = {
     primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500`,
-    secondary: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
+    secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
+    white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
+    ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent hover:border-gray-200 bg-transparent`,
   }
-  const variantStateClasses = primary
-    ? open
-      ? variantClasses.secondary
-      : variantClasses.primary
-    : open
-    ? variantClasses.primary
-    : variantClasses.secondary
   const state = busy ? `busy` : disabled ? `disabled` : `default`
   const stateClasses = {
     disabled: `pointer-events-none	opacity-30 cursor-not-allowed`,
@@ -105,14 +97,14 @@ export const IconButton = ({
     default: ``,
   }
   const sizeClasses = {
-    small: `h-6 w-6`,
-    medium: `h-8 w-8`,
+    small: `h-7 w-7`,
+    medium: `h-9 w-9`,
     custom: ``,
   }
 
   return (
     <button
-      className={`${baseClasses} ${variantStateClasses} ${sizeClasses[size]} ${stateClasses[state]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${className}`}
       {...props}
     >
       {children}
