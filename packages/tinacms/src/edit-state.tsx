@@ -73,6 +73,10 @@ export const useTina = ({
     if (!isDummyContainer) {
       setTimeout(() => setWaitForContextRerender(false), 1)
     }
+
+    return () => {
+      setRequest(undefined) // unregister forms
+    }
   }, [isDummyContainer])
 
   //TODO - don't assume that we're loading if there's no payload...
