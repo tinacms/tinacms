@@ -94,14 +94,14 @@ export default () => {
             <IconButton
               onClick={() => alignColumn(view, 'left')}
               size="small"
-              primary
+              variant="primary"
             >
               <AlignLeft className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => alignColumn(view, 'center')}
               size="small"
-              primary
+              variant="primary"
             >
               <AlignCenter className="w-5/6 h-auto" />
             </IconButton>
@@ -118,7 +118,7 @@ export default () => {
                 view.focus()
               }}
               size="small"
-              primary
+              variant="primary"
             >
               <TrashIcon className="w-5/6 h-auto" />
             </IconButton>
@@ -134,7 +134,7 @@ export default () => {
                 view.focus()
               }}
               size="small"
-              primary
+              variant="primary"
             >
               <TrashIcon className="w-5/6 h-auto" />
             </IconButton>

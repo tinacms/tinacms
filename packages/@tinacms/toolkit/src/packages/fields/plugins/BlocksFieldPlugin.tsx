@@ -116,11 +116,12 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           onClick={(event: any) => {
             event.stopPropagation()
             event.preventDefault()
-            setVisible(true)
+            setVisible((visible) => !visible)
           }}
           open={visible}
-          primary
+          variant={`${visible ? 'secondary' : 'primary'}`}
           size="small"
+          className={`${visible ? `rotate-45` : ``}`}
         >
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
