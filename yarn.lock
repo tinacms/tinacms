@@ -4816,6 +4816,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/toolkit@workspace:packages/@tinacms/toolkit"
   dependencies:
+    "@headlessui/react": ^1.4.2
     "@sambego/storybook-styles": ^1.0.0
     "@testing-library/jest-dom": ^5.11.9
     "@testing-library/react": ^12.0.0

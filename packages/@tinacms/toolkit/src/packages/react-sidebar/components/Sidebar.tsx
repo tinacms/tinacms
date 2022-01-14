@@ -18,10 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
-import { MdClose } from 'react-icons/md'
-import { TinaIcon } from '../../icons'
 import { BiMenu, BiPencil } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
@@ -31,11 +28,15 @@ import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { LocalWarning } from './LocalWarning'
+import { Nav } from './Nav'
+import { Transition, Dialog } from '@headlessui/react'
+import { IoMdClose } from 'react-icons/io'
 
 export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
+const navBreakpoint = 1000
 const defaultSidebarWidth = 440
 const defaultSidebarPosition = 'displace'
 
@@ -77,15 +78,13 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
   useSubscribable(screens)
+  const allScreens = screens.all()
+
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const allScreens = screens.all()
-  const showMenu = allScreens.length > 0
-
   const [displayState, setDisplayState] =
     React.useState<displayStates>('closed')
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [previousWidth, setPreviousWidth] = React.useState(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
 
   const toggleFullscreen = () => {
@@ -95,6 +94,10 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
       setDisplayState('fullscreen')
     }
   }
+
+  React.useEffect(() => {
+    console.log('menuIsOpen', menuIsOpen)
+  }, [menuIsOpen])
 
   const toggleSidebarOpen = () => {
     if (displayState === 'closed') {
@@ -142,59 +145,75 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         menuIsOpen,
         setMenuIsOpen,
         toggleMenu,
+        setActiveView,
       }}
     >
-      <SidebarWrapper>
-        <EditButton />
-        <SidebarBody>
-          <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
-          <FormsView>
-            <sidebar.placeholder />
-          </FormsView>
-          {showMenu && (
-            <MenuPanel>
-              <MenuList>
-                {cms.flags.get('tina-admin') && (
-                  <MenuButton
-                    key="admin"
-                    value="admin"
-                    onClick={() => {
-                      window.location.href = window.location.origin + '/admin'
-                    }}
-                  >
-                    <TinaIcon className="w-7 h-auto mr-2 opacity-80" /> Tina
-                    Admin
-                  </MenuButton>
-                )}
-                {allScreens.map((view) => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuButton
-                      key={view.name}
-                      value={view.name}
+      <>
+        <SidebarWrapper>
+          <EditButton />
+          {sidebarWidth > navBreakpoint && <Nav screens={allScreens} />}
+          <SidebarBody>
+            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
+            <FormsView>
+              <sidebar.placeholder />
+            </FormsView>
+            {activeScreen && (
+              <ScreenPluginModal
+                screen={activeScreen}
+                close={() => setActiveView(null)}
+              />
+            )}
+          </SidebarBody>
+          <ResizeHandle />
+        </SidebarWrapper>
+        {sidebarWidth < navBreakpoint + 1 && (
+          <Transition show={menuIsOpen}>
+            <Transition.Child
+              as={React.Fragment}
+              enter="transform transition-all ease-out duration-300"
+              enterFrom="opacity-0 -translate-x-full"
+              enterTo="opacity-100 translate-x-0"
+              leave="transform transition-all ease-in duration-200"
+              leaveFrom="opacity-100 translate-x-0"
+              leaveTo="opacity-0 -translate-x-full"
+            >
+              <div className="fixed left-0 z-overlay h-full transform">
+                <Nav screens={allScreens} className="rounded-r-md">
+                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                    <Button
+                      rounded="right"
+                      variant="secondary"
                       onClick={() => {
-                        setActiveView(view)
                         setMenuIsOpen(false)
                       }}
+                      className={`transition-opacity duration-150 ease-out`}
                     >
-                      <Icon className="w-6 h-auto mr-2 opacity-80" />{' '}
-                      {view.name}
-                    </MenuButton>
-                  )
-                })}
-              </MenuList>
-              <Watermark />
-            </MenuPanel>
-          )}
-          {activeScreen && (
-            <ScreenPluginModal
-              screen={activeScreen}
-              close={() => setActiveView(null)}
-            />
-          )}
-        </SidebarBody>
-        <ResizeHandle />
-      </SidebarWrapper>
+                      <IoMdClose className="h-6 w-auto" />
+                    </Button>
+                  </div>
+                </Nav>
+              </div>
+            </Transition.Child>
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-70"
+              entered="opacity-70"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-70"
+              leaveTo="opacity-0"
+            >
+              <div
+                onClick={() => {
+                  setMenuIsOpen(false)
+                }}
+                className="fixed z-menu inset-0 bg-gradient-to-br from-black to-gray-900"
+              ></div>
+            </Transition.Child>
+          </Transition>
+        )}
+      </>
     </SidebarContext.Provider>
   )
 }
@@ -225,44 +244,11 @@ const updateBodyDisplacement = ({
   }
 }
 
-const Watermark = styled(({ ...styleProps }: any) => {
-  return (
-    <div {...styleProps}>
-      <TinaIcon />
-    </div>
-  )
-})`
-  position: absolute;
-  z-index: -1;
-  bottom: var(--tina-padding-big);
-  left: var(--tina-padding-big);
-
-  svg {
-    width: 128px;
-    height: 128px;
-    margin: -4px -20px;
-    fill: var(--tina-color-grey-9);
-  }
-`
-
-const MenuButton = ({ children, ...props }) => {
-  return (
-    <li className="py-2 first:pt-4 last:pb-4">
-      <button
-        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-blue-400 hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
-        {...props}
-      >
-        {children}
-      </button>
-    </li>
-  )
-}
-
 const SidebarHeader = ({ isLocalMode }) => {
   const {
     toggleFullscreen,
     displayState,
-    toggleMenu,
+    setMenuIsOpen,
     toggleSidebarOpen,
     sidebarWidth,
   } = React.useContext(SidebarContext)
@@ -271,17 +257,17 @@ const SidebarHeader = ({ isLocalMode }) => {
     <div className="flex-grow-0 w-full bg-white pb-2 overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       <div className="mt-4 w-full flex items-center justify-between">
-        {sidebarWidth < 1201 && (
-          <div style={{ marginLeft: '-1px' }} className="pointer-events-auto">
-            <Button
-              rounded="right"
-              variant="secondary"
-              onClick={toggleMenu}
-              className="pointer-events-auto"
-            >
-              <BiMenu className="h-7 w-auto" />
-            </Button>
-          </div>
+        {sidebarWidth < navBreakpoint + 1 && (
+          <Button
+            rounded="right"
+            variant="secondary"
+            onClick={() => {
+              setMenuIsOpen(true)
+            }}
+            className="pointer-events-auto -ml-px"
+          >
+            <BiMenu className="h-7 w-auto" />
+          </Button>
         )}
         <div className="flex-1"></div>
         <div
@@ -332,44 +318,6 @@ const EditButton = ({}) => {
   )
 }
 
-const MenuToggle = ({ children, className = ``, ...props }) => {
-  return (
-    <button
-      className={`p-0 z-10 bg-transparent outline-none border-0 text-left -ml-1 w-11 h-11 flex items-center justify-center cursor-pointer pointer-events-auto ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
-
-const MenuList = ({ children }) => {
-  return <ul className="">{children}</ul>
-}
-
-const MenuPanel = ({ children }) => {
-  const { menuIsOpen, setMenuIsOpen } = React.useContext(SidebarContext)
-
-  return (
-    <div
-      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-16 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
-        menuIsOpen ? `` : `-translate-x-full`
-      }`}
-    >
-      <div className="absolute top-3 right-4">
-        <MenuToggle
-          className="text-gray-300 hover:text-blue-400"
-          onClick={() => setMenuIsOpen(false)}
-          open={menuIsOpen}
-        >
-          <MdClose className="w-9 h-auto" />
-        </MenuToggle>
-      </div>
-      {children}
-    </div>
-  )
-}
-
 const SidebarWrapper = ({ children }) => {
   const { displayState, sidebarWidth, resizingSidebar } =
     React.useContext(SidebarContext)
@@ -381,7 +329,7 @@ const SidebarWrapper = ({ children }) => {
       }`}
     >
       <div
-        className={`relative h-screen transform ${
+        className={`relative h-screen transform flex ${
           displayState !== 'closed' ? `` : `-translate-x-full`
         } ${
           resizingSidebar
