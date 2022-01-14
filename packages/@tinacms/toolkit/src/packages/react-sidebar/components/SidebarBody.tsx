@@ -25,7 +25,7 @@ import { Button } from '../../styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { LeftArrowIcon } from '../../icons'
-import { FormBuilder } from '../../form-builder'
+import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 
@@ -271,13 +271,11 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
         sidebarWidth > navBreakpoint ? `px-6` : `px-20`
       }`}
     >
-      <div className="max-w-form">
-        <div className="mb-2">
-          <span className="text-xl text-gray-700 font-medium leading-tight">
-            {activeForm.label}
-          </span>
-        </div>
-        {/* <FormStatus pristine={false} /> */}
+      <div className="max-w-form mx-auto">
+        <span className="block text-xl mb-[6px] text-gray-700 font-medium leading-tight">
+          {activeForm.label}
+        </span>
+        <FormStatus pristine={true} />
       </div>
     </div>
   )
