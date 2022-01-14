@@ -339,7 +339,8 @@ const SidebarWrapper = ({ children }) => {
             : `transition-all duration-300 ease-out`
         }`}
         style={{
-          width: displayState === 'fullscreen' ? '100vw' : sidebarWidth,
+          width:
+            displayState === 'fullscreen' ? '100vw' : sidebarWidth + 6 + 'px',
           maxWidth: '100vw',
           minWidth: '360px',
         }}
@@ -356,9 +357,8 @@ const SidebarBody = ({ children }) => {
   return (
     <div
       className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
-        displayState !== 'closed' ? `opacity-100` : `opacity-0`
-      } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
-      style={{ boxShadow: 'inset -1px 0 b' }}
+        displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
+      } ${displayState === 'fullscreen' ? '' : 'rounded-r-md'}`}
     >
       {children}
     </div>

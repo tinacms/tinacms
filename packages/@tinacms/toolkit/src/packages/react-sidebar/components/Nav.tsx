@@ -30,7 +30,12 @@ interface NavProps {
   screens?: any
 }
 
-export const Nav = ({ className, children, screens, ...props }: NavProps) => {
+export const Nav = ({
+  className = '',
+  children,
+  screens,
+  ...props
+}: NavProps) => {
   const { sidebarWidth } = React.useContext(SidebarContext)
 
   return (
@@ -44,11 +49,11 @@ export const Nav = ({ className, children, screens, ...props }: NavProps) => {
           {({ open }) => (
             <div>
               <Menu.Button
-                className={`group w-full px-6 py-4 flex justify-between items-center transition-colors duration-150 ease-out ${
+                className={`group w-full px-6 py-3 flex justify-between items-center transition-colors duration-150 ease-out ${
                   open ? `bg-gray-50` : `bg-transparent`
                 }`}
               >
-                <span className="text-left inline-flex items-center text-2xl tracking-wide text-gray-800 flex-1 gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+                <span className="text-left inline-flex items-center text-xl tracking-wide text-gray-800 flex-1 gap-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
                   <svg
                     viewBox="0 0 32 32"
                     fill="#EC4815"
