@@ -25,16 +25,15 @@ import {
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
-import type { DocumentNode } from 'graphql'
 import { BiLinkExternal } from 'react-icons/bi'
 
 export function useGraphqlForms<T extends object>({
-  query,
   variables,
   onSubmit,
   formify = null,
+  query,
 }: {
-  query: (gqlTag: typeof gql) => DocumentNode
+  query: string
   variables: object
   onSubmit?: (args: onSubmitArgs) => void
   formify?: formifyCallback
@@ -135,8 +134,6 @@ export function useGraphqlForms<T extends object>({
     updateData()
   }, [JSON.stringify(formValues)])
 
-  const queryString = print(query(gql))
-
   React.useEffect(() => {
     if (pendingReset) {
       setData({ ...data, [pendingReset]: initialData[pendingReset] })
@@ -145,7 +142,7 @@ export function useGraphqlForms<T extends object>({
   }, [pendingReset])
 
   React.useEffect(() => {
-    if (!queryString) {
+    if (!query) {
       // don't do work on empty queries
       setIsLoading(false)
       return
@@ -154,7 +151,9 @@ export function useGraphqlForms<T extends object>({
     const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina
-      .requestWithForm(query, { variables })
+      .requestWithForm((gql) => gql(query), {
+        variables,
+      })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
 
@@ -379,7 +378,7 @@ export function useGraphqlForms<T extends object>({
         }
       })
     }
-  }, [queryString, JSON.stringify(variables), currentBranch])
+  }, [query, JSON.stringify(variables), currentBranch])
 
   return [data as T, isLoading]
 }
