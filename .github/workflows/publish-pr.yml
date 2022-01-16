@@ -26,7 +26,7 @@ jobs:
         run: |
           echo running on branch ${GITHUB_REF##*/}
           yarn version:snapshot
-          yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag ${GITHUB_REF##*/} --access public
+          yarn workspaces foreach --parallel --no-private --verbose npm publish --tolerate-republish --tag ${GITHUB_REF##*/} --access public
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
