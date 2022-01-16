@@ -25,13 +25,20 @@ export interface CloudinaryConfig {
   authorized: (req: NextApiRequest, res: NextApiResponse) => Promise<boolean>
 }
 
+export interface CloudinaryOptions {
+  useHttps?: boolean
+}
+
 export const mediaHandlerConfig = {
   api: {
     bodyParser: false,
   },
 }
 
-export const createMediaHandler = (config: CloudinaryConfig) => {
+export const createMediaHandler = (
+  config: CloudinaryConfig,
+  options?: CloudinaryOptions
+) => {
   cloudinary.config(Object.assign({ secure: true }, config))
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -43,7 +50,7 @@ export const createMediaHandler = (config: CloudinaryConfig) => {
     }
     switch (req.method) {
       case 'GET':
-        return listMedia(req, res)
+        return listMedia(req, res, options)
       case 'POST':
         return uploadMedia(req, res)
       case 'DELETE':
@@ -82,7 +89,11 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   res.json(result)
 }
 
-async function listMedia(req: NextApiRequest, res: NextApiResponse) {
+async function listMedia(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  opts?: CloudinaryOptions
+) {
   try {
     const {
       directory = '""',
@@ -101,7 +112,7 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
       .next_cursor(offset as string)
       .execute()
 
-    const files = response.resources.map(cloudinaryToTina)
+    const files = response.resources.map(getCloudinaryToTinaFunc(opts))
 
     //@ts-ignore TODO: Open PR to cloudinary-core
     cloudinary.api.folders = (directory: string = '""') => {
@@ -164,18 +175,33 @@ async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
     })
   })
 }
+function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
+  return function cloudinaryToTina(file: any): Media {
+    // TODO: I want to use this but it seams we might have to update our webpack config in order to do this in node
+    // const useHttps = opts?.useHttps ?? true
 
-function cloudinaryToTina(file: any): Media {
-  const filename = path.basename(file.public_id)
-  const directory = path.dirname(file.public_id)
+    // Default to true
+    let useHttps = true
+    if (typeof opts !== 'undefined' && typeof opts.useHttps !== 'undefined') {
+      useHttps = opts.useHttps
+    }
 
-  return {
-    id: file.public_id,
-    filename,
-    directory,
-    src: file.url,
-    previewSrc: transformCloudinaryImage(file.url, 'w_75,h_75,c_fill,q_auto'),
-    type: 'file',
+    const sel = useHttps ? ('secure_url' as const) : ('url' as const)
+
+    const filename = path.basename(file.public_id)
+    const directory = path.dirname(file.public_id)
+
+    return {
+      id: file.public_id,
+      filename,
+      directory,
+      src: file[sel],
+      previewSrc: transformCloudinaryImage(
+        file[sel],
+        'w_75,h_75,c_fill,q_auto'
+      ),
+      type: 'file',
+    }
   }
 }
 

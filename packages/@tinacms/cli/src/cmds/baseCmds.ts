@@ -17,11 +17,15 @@ import { genTypes, attachSchema } from './query-gen'
 import { startServer } from './start-server'
 import { compile } from './compile'
 import { initTina, installDeps, tinaSetup, successMessage } from './init'
+import { audit, printFinalMessage } from './audit'
+import { logger } from '../logger'
+import chalk from 'chalk'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
 export const CMD_COMPILE_MODELS = 'schema:compile'
 export const INIT = 'init'
+export const AUDIT = 'audit'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -42,6 +46,17 @@ const noWatchOption = {
 const noSDKCodegenOption = {
   name: '--noSDK',
   description: "Don't generate the generated client SDK",
+}
+const cleanOption = {
+  name: '--clean',
+  description:
+    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.ts`',
+}
+
+const useDefaultValuesOption = {
+  name: '--useDefaultValues',
+  description:
+    'Adds default values to the graphQL mutation so that default values can be filled into existing documents (useful for adding a field with `required: true`)',
 }
 
 export const baseCmds: Command[] = [
@@ -87,6 +102,37 @@ export const baseCmds: Command[] = [
           genTypes,
           tinaSetup,
           successMessage,
+        ],
+        options
+      ),
+  },
+  {
+    options: [cleanOption, useDefaultValuesOption],
+    command: AUDIT,
+    description: 'Audit your schema and the files to check for errors',
+    action: (options) =>
+      chain(
+        [
+          // Disable the output of the compile step
+          async (_ctx, next) => {
+            logger.level = 'error'
+            next()
+          },
+          async (_ctx, next) => {
+            await compile(_ctx, next)
+            next()
+          },
+          attachSchema,
+          genTypes,
+          async (_ctx, next) => {
+            logger.level = 'info'
+            logger.info(
+              chalk.hex('#eb6337').bgWhite('Welcome to tina audit 🦙')
+            )
+            next()
+          },
+          audit,
+          printFinalMessage,
         ],
         options
       ),

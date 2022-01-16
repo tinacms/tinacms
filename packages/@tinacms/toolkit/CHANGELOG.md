@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.56.6
+
+### Patch Changes
+
+- 60f939f34: Don't allow "tabbing" for rich-text. Tabs in markdown represent code blocks, so this isn't something we want to support.
+
+  Fixes bug where "reset" wasn't working for rich text.
+
 ## 0.56.5
 
 ### Patch Changes

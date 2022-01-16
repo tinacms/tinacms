@@ -39,7 +39,7 @@ export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
 type FormatType = 'json' | 'md' | 'markdown' | 'mdx'
 
 interface BaseCollection {
-  label: string
+  label?: string
   name: string
   path: string
   format?: FormatType
@@ -94,7 +94,7 @@ export type TinaFieldEnriched = TinaFieldInner<true>
 
 interface TinaField {
   name: string
-  label: string
+  label?: string
   description?: string
   required?: boolean
   list?: boolean
