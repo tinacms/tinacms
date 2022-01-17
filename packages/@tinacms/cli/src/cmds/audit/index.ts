@@ -51,8 +51,8 @@ export const audit = async (ctx: any, next: () => void, options) => {
       )
     )
   }
-  const t = new Telemetry()
-  t.submitRecord({ event: 'audit' })
+  const t = new Telemetry({ disabled: options.noTelemetry })
+  t.submitRecord({ event: 'tinacms:audit:invoke' })
   const bridge = options.clean
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
