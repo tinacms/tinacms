@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 0.60.0
+
+### Minor Changes
+
+- 35884152b: Adds and audit command that checks files for errors.
+
+### Patch Changes
+
+- 083aa8ec6: Rebuild database every save while in local mode
+- Updated dependencies [b66aefde1]
+- Updated dependencies [35884152b]
+- Updated dependencies [4948beec6]
+  - @tinacms/graphql@0.59.4
+
 ## 0.59.0
 
 ### Minor Changes

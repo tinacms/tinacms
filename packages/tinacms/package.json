@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.62.0",
+  "version": "0.63.0",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -31,6 +31,7 @@
     "lodash.set": "^4.3.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "6",
+    "url-pattern": "^1.0.3",
     "yup": "^0.32.0"
   },
   "devDependencies": {

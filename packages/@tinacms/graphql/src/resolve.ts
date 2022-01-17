@@ -58,10 +58,12 @@ export const resolve = async ({
   query,
   variables,
   database,
+  silenceErrors,
 }: {
   query: string
   variables: object
   database: Database
+  silenceErrors?: boolean
 }) => {
   try {
     const graphQLSchemaAst = await database.getGraphQLSchema()
@@ -376,11 +378,15 @@ export const resolve = async ({
       }
     })
     if (res.errors) {
-      console.error(res.errors)
+      if (!silenceErrors) {
+        console.error(res.errors)
+      }
     }
     return res
   } catch (e) {
-    console.error(e)
+    if (!silenceErrors) {
+      console.error(e)
+    }
     if (e instanceof GraphQLError) {
       return {
         errors: [e],
