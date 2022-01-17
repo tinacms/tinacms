@@ -392,7 +392,11 @@ const FormRegistrar = ({
     onPayloadStateChange({ payload, isLoading })
   }, [JSON.stringify(payload)])
 
-  return null
+  return isLoading ? (
+    <Loader>
+      <></>
+    </Loader>
+  ) : null
 }
 
 const Loader = (props: { children: React.ReactNode }) => {
