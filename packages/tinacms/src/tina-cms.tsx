@@ -21,7 +21,6 @@ import { useCMS } from '@tinacms/toolkit'
 import UrlPattern from 'url-pattern'
 
 import type { TinaCMS } from '@tinacms/toolkit'
-import type { formifyCallback } from './hooks/use-graphql-forms'
 import { TinaDataContext } from '@tinacms/sharedctx'
 
 const errorButtonStyles = {
