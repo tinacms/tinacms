@@ -19,7 +19,7 @@ import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 import UrlPattern from 'url-pattern'
-
+import type { formifyCallback } from './hooks/use-graphql-forms'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaDataContext } from '@tinacms/sharedctx'
 
