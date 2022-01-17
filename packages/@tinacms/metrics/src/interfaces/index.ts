@@ -13,7 +13,15 @@ export interface TinaCMSAuditInvoke extends EventsBase {
   clean: boolean
   useDefaults: boolean
 }
-export type Events = CreateTinaAppInvoke | TinaCMSAuditInvoke
+
+export interface TinaCMSInitInvoke extends EventsBase {
+  name: 'tinacms:cli:init:invoke'
+}
+
+export type Events =
+  | CreateTinaAppInvoke
+  | TinaCMSAuditInvoke
+  | TinaCMSInitInvoke
 export interface MetricPayload {
   event: Events
   id: string
