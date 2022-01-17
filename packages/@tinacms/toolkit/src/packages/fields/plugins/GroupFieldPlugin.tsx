@@ -139,7 +139,7 @@ const Header = ({ onClick, children }) => {
 export const PanelHeader = ({ onClick, children }) => {
   return (
     <button
-      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-3 border-t border-b shadow-sm
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
        border-gray-100 px-6 -mt-px`}
       onClick={onClick}
     >
