@@ -1,5 +1,49 @@
 # tinacms
 
+## 0.64.0
+
+### Minor Changes
+
+- 4a3990c7e: Cloudinary media store now serves images over `https` by default. This can now be configured though the handler provided.
+
+  To revert to the old behavior:
+
+  ```ts
+  export default createMediaHandler(
+    {
+      // ...
+    },
+    {
+      useHttps: false,
+    }
+  )
+  ```
+
+  The default for `useHttps` is `true`
+
+## 0.63.0
+
+### Minor Changes
+
+- 3897ec5d9: Replace `branch`, `clientId`, `isLocalClient` props with single `apiURL`. When working locally, this should be `http://localhost:4001/graphql`. For Tina Cloud, use `https://content.tinajs.io/content/<my-client-id>/github/<my-branch>`
+
+  ```tsx
+  // _app.tsx
+  // ...
+  <TinaCMS apiURL={process.env.NEXT_PUBLIC_TINA_API_URL} {...pageProps}>
+    {livePageProps => <Component {...livePageProps} />}
+  </TinaCMS>
+  ```
+
+  DEPRECATION NOTICE: `branch`, `clientId`, `isLocalClient` props will be deprecated in the future
+
+### Patch Changes
+
+- 96e4a77e2: Fixed types
+- b5c22503a: Changes messaging on login page for TinaAdmin when in local-mode
+- Updated dependencies [60f939f34]
+  - @tinacms/toolkit@0.56.6
+
 ## 0.62.0
 
 ### Minor Changes
