@@ -79,11 +79,8 @@ export const useTina = ({
     }
   }, [isDummyContainer])
 
-  //TODO - don't assume that we're loading if there's no payload...
-  // Doing so for now, because isLoading will be false on the first render
   return {
-    data:
-      isDummyContainer || isLoading || !state.payload ? data : state.payload,
+    data: isDummyContainer || isLoading ? data : state.payload,
     isLoading,
   }
 }
