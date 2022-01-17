@@ -4564,6 +4564,7 @@ __metadata:
     "@graphql-tools/load": ^7.3.2
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
+    "@tinacms/metrics": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
@@ -4718,6 +4719,20 @@ __metadata:
     vfile: ^4.2.0
     ws: ^7.3.1
     yup: ^0.32.9
+  languageName: unknown
+  linkType: soft
+
+"@tinacms/metrics@workspace:*, @tinacms/metrics@workspace:packages/@tinacms/metrics":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/metrics@workspace:packages/@tinacms/metrics"
+  dependencies:
+    "@tinacms/scripts": "workspace:*"
+    "@types/fs-extra": ^9.0.11
+    fs-extra: ^9.0.1
+    jest: ^27.0.6
+    node-fetch: ^3.1.1
+  peerDependencies:
+    fs-extra: ^9.0.1
   languageName: unknown
   linkType: soft
 
