@@ -200,17 +200,17 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
               as={React.Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0"
-              enterTo="opacity-70"
-              entered="opacity-70"
+              enterTo="opacity-80"
+              entered="opacity-80"
               leave="ease-in duration-200"
-              leaveFrom="opacity-70"
+              leaveFrom="opacity-80"
               leaveTo="opacity-0"
             >
               <div
                 onClick={() => {
                   setMenuIsOpen(false)
                 }}
-                className="fixed z-menu inset-0 bg-gradient-to-br from-black to-gray-900"
+                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
               ></div>
             </Transition.Child>
           </Transition>
