@@ -39,15 +39,15 @@ export const TinaEditProvider = ({
   )
 }
 
-export const useTina = ({
+export function useTina<T extends object>({
   query,
   variables,
   data,
 }: {
   query: string
   variables: object
-  data: object
-}) => {
+  data: T
+}): { data: T; isLoading: boolean } {
   const {
     setRequest,
     state,
@@ -80,7 +80,7 @@ export const useTina = ({
   }, [isDummyContainer])
 
   return {
-    data: isDummyContainer || isLoading ? data : state.payload,
+    data: isDummyContainer || isLoading ? data : (state.payload as T),
     isLoading,
   }
 }
