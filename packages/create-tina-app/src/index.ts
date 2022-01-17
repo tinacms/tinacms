@@ -33,6 +33,7 @@ program
   .version(version)
   .option('-e, --example <example>', 'Choose which example to start from')
   .option('-d, --dir <dir>', 'Choose which directory to run this script from')
+  .option('--noTelemetry', 'Disable anonymous telemetry that is collected')
   .arguments('[project-directory]')
   .usage(`${chalk.green('<project-directory>')} [options]`)
   .action((name) => {
@@ -42,11 +43,11 @@ program
 export const run = async () => {
   program.parse(process.argv)
   const opts = program.opts()
-  const t = new Telemetry({ disabled: opts?.noTelemetry })
-  t.submitRecord({ event: 'create-tina-app:invoke' })
   if (opts.dir) {
     process.chdir(opts.dir)
   }
+  const t = new Telemetry({ disabled: opts?.noTelemetry })
+
   let example = opts.example
 
   const res = await prompts({
@@ -106,6 +107,13 @@ export const run = async () => {
       )}`
     )
   }
+  t.submitRecord({
+    event: {
+      name: 'create-tina-app:invoke',
+      example,
+      useYarn: Boolean(useYarn),
+    },
+  })
 
   // Setup directory
   const root = path.join(process.cwd(), dirName)
