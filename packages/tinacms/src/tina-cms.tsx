@@ -22,6 +22,7 @@ import UrlPattern from 'url-pattern'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaDataContext } from '@tinacms/sharedctx'
+import { useTina } from './edit-state'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -256,31 +257,37 @@ export const TinaCMSProvider2 = ({
       mediaStore={props.mediaStore}
     >
       <ErrorBoundary>
+        <DocumentCreator />
         <TinaDataProvider formifyCallback={formifyCallback}>
-          <QueryContainer
-            key={`rootQuery-${query}`}
-            variables={props.variables}
-            data={props.data}
-            query={query}
-            formifyCallback={formifyCallback}
-            documentCreatorCallback={documentCreatorCallback}
-            children={props.children}
-          />
+          {typeof props.children == 'function' ? (
+            <TinaQuery
+              variables={props.variables}
+              data={props.data}
+              query={query}
+              formifyCallback={formifyCallback}
+              children={props.children}
+            />
+          ) : (
+            props.children
+          )}
         </TinaDataProvider>
       </ErrorBoundary>
     </TinaCloudProvider>
   )
 }
 
-//Legacy'ish Container that auto-registers forms/document creator
-const QueryContainer = ({
-  children,
-  formifyCallback,
+const DocumentCreator = ({
   documentCreatorCallback,
-  query,
-  variables,
-  data,
 }: {
+  /** Callback if you need access to the "document creator" API */
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
+}) => {
+  useDocumentCreatorPlugin(documentCreatorCallback)
+
+  return null
+}
+
+interface TinaQueryProps {
   /** The query from getStaticProps */
   query?: string
   /** Any variables from getStaticProps */
@@ -288,48 +295,30 @@ const QueryContainer = ({
   /** The `data` from getStaticProps */
   data?: object
   /** Your React page component */
-  children: (props?: any) => React.ReactNode
-  /** Callback if you need access to the "document creator" API */
-  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
+  children: (props: { data: object }) => React.ReactNode
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
-}) => {
-  const cms = useCMS()
+}
 
-  useDocumentCreatorPlugin(documentCreatorCallback)
+//Legacy'ish Container that auto-registers forms/document creator
+const TinaQuery = (props: TinaQueryProps) => {
+  return <TinaQueryInner key={`rootQuery-${props.query}`} {...props} />
+}
 
-  // Note - this will only register for legacy implementations taking in query
-  // Hopefuly things work if we call this twice
-  const [payload, isLoading] = useGraphqlForms({
-    query: query,
-    variables: variables || {},
-    formify: (args) => {
-      if (formifyCallback) {
-        return formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
+const TinaQueryInner = ({
+  children,
+  query,
+  variables,
+  data,
+}: TinaQueryProps) => {
+  const { data: liveData, isLoading } = useTina({
+    query,
+    variables,
+    data,
   })
 
-  return (
-    <>
-      {isLoading && (
-        <Loader>
-          <></>
-        </Loader>
-      )}
-      {/* pass the new edit state data to the child */}
-      {typeof children == 'function'
-        ? children(
-            isLoading
-              ? { query, variables, data }
-              : { query, variables, data: payload }
-          )
-        : children}
-    </>
-  )
+  return <>{children(isLoading ? { data } : { data: liveData })}</>
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
