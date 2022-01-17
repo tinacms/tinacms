@@ -177,28 +177,8 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
   }
 }
 
-export const TinaCMSProvider2 = ({
-  query,
-  documentCreatorCallback,
-  formifyCallback,
-  ...props
-}: {
-  /** The query from getStaticProps */
-  query?: string
-  /** Any variables from getStaticProps */
-  variables?: object
-  /** The `data` from getStaticProps */
-  data?: object
-  /** Your React page component */
-  children: (props?: any) => React.ReactNode
-  /**
-   * The URL for the GraphQL API.
-   *
-   * When working locally, this should be http://localhost:4001/graphql.
-   *
-   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
-   */
-  apiURL: string
+interface BaseProviderProps {
+  apiURL?: string
   /**
    * Point to the local version of GraphQL instead of tina.io
    * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
@@ -229,7 +209,36 @@ export const TinaCMSProvider2 = ({
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
-}) => {
+}
+
+type QueryProviderProps =
+  | {
+      /** Your React page component */
+      children: (props?: any) => React.ReactNode
+      /** The query from getStaticProps */
+      query: string | undefined
+      /** Any variables from getStaticProps */
+      variables: object | undefined
+      /** The `data` from getStaticProps */
+      data: object
+    }
+  | {
+      /** Your React page component */
+      children: React.ReactNode
+      /** The query from getStaticProps */
+      query?: never
+      /** Any variables from getStaticProps */
+      variables?: never
+      /** The `data` from getStaticProps */
+      data?: never
+    }
+
+export const TinaCMSProvider2 = ({
+  query,
+  documentCreatorCallback,
+  formifyCallback,
+  ...props
+}: QueryProviderProps & BaseProviderProps) => {
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
@@ -265,7 +274,7 @@ export const TinaCMSProvider2 = ({
               data={props.data}
               query={query}
               formifyCallback={formifyCallback}
-              children={props.children}
+              children={props.children as any}
             />
           ) : (
             props.children
