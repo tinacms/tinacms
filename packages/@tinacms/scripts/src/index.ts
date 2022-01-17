@@ -208,6 +208,7 @@ const buildIt = async (entryPoint, packageJSON) => {
         platform: 'node',
         outdir: path.join(process.cwd(), 'dist'),
         external,
+        target: 'node12',
       })
     }
 
