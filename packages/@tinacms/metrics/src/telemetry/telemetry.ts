@@ -1,4 +1,4 @@
-import { BinaryLike, createHash, randomBytes } from 'crypto'
+import { BinaryLike, createHash } from 'crypto'
 import { getID } from './getId'
 import fetch from 'node-fetch'
 import {
@@ -7,18 +7,21 @@ import {
   getYarnVersion,
   getNpmVersion,
 } from './getVersion'
+import { Events, MetricPayload } from '../interfaces'
 
 const TINA_METRICS_ENDPOINT = 'https://something.tinajs.dev/asdf/asdf'
 
 export class Telemetry {
   //   private config: Conf<Record<string, unknown>>
   private projectIDRaw: string
+  private _disabled: boolean
 
-  constructor() {
+  constructor({ disabled }: { disabled: any }) {
     // this.config = new Conf({ projectName: 'tinacms', cwd: dir })
     this.projectIDRaw = getID()
+    this._disabled = Boolean(disabled)
   }
-  oneWayHash = (payload: BinaryLike): string => {
+  private oneWayHash = (payload: BinaryLike): string => {
     const hash = createHash('sha256')
 
     // Always prepend the payload value with salt. This ensures the hash is truly
@@ -33,10 +36,16 @@ export class Telemetry {
   private get projectId(): string {
     return this.oneWayHash(this.projectIDRaw)
   }
+  private get isDisabled(): boolean {
+    return this._disabled
+  }
 
-  submitRecord = async ({ event }: { event: string }) => {
+  submitRecord = async ({ event }: { event: Events }) => {
+    if (this.isDisabled) {
+      return
+    }
     try {
-      const body = {
+      const body: MetricPayload = {
         event,
         id: this.projectId,
         nodeVersion: process.version,
@@ -44,6 +53,7 @@ export class Telemetry {
         tinaVersion: getTinaVersion(),
         yarnVersion: getYarnVersion(),
         npmVersion: getNpmVersion(),
+        CI: Boolean(process.env.CI),
       }
       console.log({ body })
       // const res = await fetch(TINA_METRICS_ENDPOINT, {

@@ -11657,6 +11657,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
+    "@tinacms/metrics": "workspace:*"
     "@types/fs-extra": ^9.0.13
     "@types/node": ^16.11.7
     "@types/prompts": ^2.0.14

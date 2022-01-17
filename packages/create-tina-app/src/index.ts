@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { Telemetry } from '@tinacms/metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
 // TODO: add and implement async-retry
@@ -41,6 +42,8 @@ program
 export const run = async () => {
   program.parse(process.argv)
   const opts = program.opts()
+  const t = new Telemetry({ disabled: opts?.noTelemetry })
+  t.submitRecord({ event: 'create-tina-app:invoke' })
   if (opts.dir) {
     process.chdir(opts.dir)
   }
