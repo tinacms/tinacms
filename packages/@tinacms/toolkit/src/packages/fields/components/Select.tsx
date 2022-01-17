@@ -25,6 +25,7 @@ type Option = {
 }
 
 interface SelectFieldProps {
+  required?: boolean
   label?: string
   name: string
   component: string
@@ -41,6 +42,16 @@ export interface SelectProps {
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
+  React.useEffect(() => {
+    const firstItem = selectOptions[0]
+    if (field?.required && firstItem) {
+      if (typeof firstItem === 'string') {
+        input.onChange(firstItem)
+      } else {
+        input.onChange(firstItem.label)
+      }
+    }
+  }, [])
   return (
     <SelectElement>
       <select

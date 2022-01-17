@@ -1,12 +1,42 @@
 {
   "version": {
-    "fullVersion": "0.59.3",
+    "fullVersion": "0.59.4",
     "major": "0",
     "minor": "59",
-    "patch": "3"
+    "patch": "4"
   },
   "meta": {},
   "collections": [
+    {
+      "label": "Some Collection",
+      "name": "test",
+      "format": "json",
+      "path": "content/test",
+      "fields": [
+        {
+          "required": true,
+          "name": "foo",
+          "type": "string",
+          "options": [
+            {
+              "label": "One",
+              "value": "one"
+            },
+            {
+              "label": "Two",
+              "value": "two"
+            }
+          ],
+          "namespace": [
+            "test",
+            "foo"
+          ]
+        }
+      ],
+      "namespace": [
+        "test"
+      ]
+    },
     {
       "label": "Blog Posts",
       "name": "posts",

@@ -384,6 +384,23 @@ const heroBlockSchema: TinaTemplate = {
 export default defineSchema({
   collections: [
     {
+      label: "Some Collection",
+      name: "test",
+      format: "json",
+      path: "content/test",
+      fields: [
+        {
+          required: true,
+          name: "foo",
+          type: "string",
+          options: [
+            { label: "One", value: "one" },
+            { label: "Two", value: "two" },
+          ],
+        },
+      ],
+    },
+    {
       label: "Blog Posts",
       name: "posts",
       path: "content/posts",
