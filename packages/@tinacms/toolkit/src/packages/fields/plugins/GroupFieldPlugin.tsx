@@ -36,10 +36,9 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = ({ tinaForm, field, meta, ...rest }: GroupProps) => {
+export const Group = ({ tinaForm, field, meta }: GroupProps) => {
   const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
-  console.log({ rest })
   return (
     <>
       <div>
