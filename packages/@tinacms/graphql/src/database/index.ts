@@ -337,9 +337,10 @@ export class Database {
   }
 
   public _indexAllContent = async () => {
-    await sequential(this.tinaSchema.getCollections(), async (collection) => {
+    const tinaSchema = await this.getSchema()
+    await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(collection.path)
-      await _indexContent(this.tinaSchema, this, documentPaths)
+      await _indexContent(tinaSchema, this, documentPaths)
     })
   }
 
@@ -424,8 +425,14 @@ const _indexContent = async (
     const data = parseFile(dataString, path.extname(documentPath), (yup) =>
       yup.object({})
     )
-    const { collection } =
-      tinaSchema.getCollectionAndTemplateByFullPath(documentPath)
+    const templateName =
+      hasOwnProperty(data, '_template') && typeof data._template === 'string'
+        ? data._template
+        : undefined
+    const { collection } = tinaSchema.getCollectionAndTemplateByFullPath(
+      documentPath,
+      templateName
+    )
     if (database.store.supportsSeeding()) {
       await database.store.seed(documentPath, data)
     }
