@@ -36,26 +36,40 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = ({ tinaForm, field }: GroupProps) => {
+export const Group = ({ tinaForm, field, meta, ...rest }: GroupProps) => {
   const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
+  console.log({ rest })
   return (
     <>
-      <Header
-        onClick={() => {
-          const state = tinaForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-            return
-          }
+      <div>
+        <Header
+          onClick={() => {
+            let isValid = true
+            tinaForm.fields
+              .filter((asdf) => asdf.component !== 'group')
+              .forEach((x) => {
+                const isValidField = tinaForm.finalForm.getFieldState(
+                  x.name
+                ).valid
+                if (!isValidField) {
+                  isValid = false
+                }
+              })
+            if (!isValid) {
+              // @ts-ignore
+              cms.alerts.error('Cannot navigate away from an invalid form.')
+              return
+            }
 
-          setExpanded((p) => !p)
-        }}
-      >
-        {field.label || field.name}
-        <RightArrowIcon />
-      </Header>
+            setExpanded((p) => !p)
+          }}
+        >
+          {field.label || field.name}
+          <RightArrowIcon />
+        </Header>
+        <div>{meta?.error ? meta?.error?.toString() : ''}</div>
+      </div>
       <Panel
         isExpanded={isExpanded}
         setExpanded={setExpanded}
@@ -257,4 +271,7 @@ export function GroupField(props: GroupFieldProps) {
 export const GroupFieldPlugin = {
   name: 'group',
   Component: Group,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }

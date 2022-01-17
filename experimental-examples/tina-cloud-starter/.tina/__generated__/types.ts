@@ -66,6 +66,8 @@ export type Query = {
   getDocument: DocumentNode;
   getDocumentList: DocumentConnection;
   getDocumentFields: Scalars['JSON'];
+  getTestDocument: TestDocument;
+  getTestList: TestConnection;
   getPostsDocument: PostsDocument;
   getPostsList: PostsConnection;
   getGlobalDocument: GlobalDocument;
@@ -94,6 +96,19 @@ export type QueryGetDocumentArgs = {
 
 
 export type QueryGetDocumentListArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetTestDocumentArgs = {
+  relativePath?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetTestListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -169,7 +184,7 @@ export type Collection = {
   __typename?: 'Collection';
   name: Scalars['String'];
   slug: Scalars['String'];
-  label: Scalars['String'];
+  label?: Maybe<Scalars['String']>;
   path: Scalars['String'];
   format?: Maybe<Scalars['String']>;
   matches?: Maybe<Scalars['String']>;
@@ -186,7 +201,41 @@ export type CollectionDocumentsArgs = {
   last?: Maybe<Scalars['Int']>;
 };
 
-export type DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument;
+export type DocumentNode = TestDocument | PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument;
+
+export type TestObjField = {
+  __typename?: 'TestObjField';
+  test: Scalars['String'];
+};
+
+export type Test = {
+  __typename?: 'Test';
+  strField: Scalars['String'];
+  objField: TestObjField;
+};
+
+export type TestDocument = Node & Document & {
+  __typename?: 'TestDocument';
+  id: Scalars['ID'];
+  sys: SystemInfo;
+  data: Test;
+  form: Scalars['JSON'];
+  values: Scalars['JSON'];
+  dataJSON: Scalars['JSON'];
+};
+
+export type TestConnectionEdges = {
+  __typename?: 'TestConnectionEdges';
+  cursor?: Maybe<Scalars['String']>;
+  node?: Maybe<TestDocument>;
+};
+
+export type TestConnection = Connection & {
+  __typename?: 'TestConnection';
+  pageInfo?: Maybe<PageInfo>;
+  totalCount: Scalars['Int'];
+  edges?: Maybe<Array<Maybe<TestConnectionEdges>>>;
+};
 
 export type PostsAuthorDocument = AuthorsDocument;
 
@@ -416,6 +465,8 @@ export type Mutation = {
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
   createDocument: DocumentNode;
+  updateTestDocument: TestDocument;
+  createTestDocument: TestDocument;
   updatePostsDocument: PostsDocument;
   createPostsDocument: PostsDocument;
   updateGlobalDocument: GlobalDocument;
@@ -445,6 +496,18 @@ export type MutationCreateDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
+};
+
+
+export type MutationUpdateTestDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: TestMutation;
+};
+
+
+export type MutationCreateTestDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: TestMutation;
 };
 
 
@@ -496,10 +559,20 @@ export type MutationCreatePagesDocumentArgs = {
 };
 
 export type DocumentMutation = {
+  test?: Maybe<TestMutation>;
   posts?: Maybe<PostsMutation>;
   global?: Maybe<GlobalMutation>;
   authors?: Maybe<AuthorsMutation>;
   pages?: Maybe<PagesMutation>;
+};
+
+export type TestObjFieldMutation = {
+  test?: Maybe<Scalars['String']>;
+};
+
+export type TestMutation = {
+  strField?: Maybe<Scalars['String']>;
+  objField?: Maybe<TestObjFieldMutation>;
 };
 
 export type PostsMutation = {
@@ -639,6 +712,8 @@ export type BlogPostQueryQueryVariables = Exact<{
 
 export type BlogPostQueryQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } }, getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', name?: Maybe<string>, color?: Maybe<string>, style?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, icon?: Maybe<string>, font?: Maybe<string>, darkMode?: Maybe<string> }> } } };
 
+export type TestPartsFragment = { __typename?: 'Test', strField: string, objField: { __typename: 'TestObjField', test: string } };
+
 export type PostsPartsFragment = { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> };
 
 export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
@@ -646,6 +721,18 @@ export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __ty
 export type AuthorsPartsFragment = { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> };
 
 export type PagesPartsFragment = { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<string>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<string>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> };
+
+export type GetTestDocumentQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type GetTestDocumentQuery = { __typename?: 'Query', getTestDocument: { __typename?: 'TestDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Test', strField: string, objField: { __typename: 'TestObjField', test: string } } } };
+
+export type GetTestListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTestListQuery = { __typename?: 'Query', getTestList: { __typename?: 'TestConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'TestConnectionEdges', node?: Maybe<{ __typename?: 'TestDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Test', strField: string, objField: { __typename: 'TestObjField', test: string } } }> }>>> } };
 
 export type GetPostsDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -727,6 +814,15 @@ export const LayoutQueryFragmentFragmentDoc = gql`
         darkMode
       }
     }
+  }
+}
+    `;
+export const TestPartsFragmentDoc = gql`
+    fragment TestParts on Test {
+  strField
+  objField {
+    __typename
+    test
   }
 }
     `;
@@ -891,6 +987,47 @@ export const BlogPostQueryDocument = gql`
 }
     ${LayoutQueryFragmentFragmentDoc}
 ${PostsPartsFragmentDoc}`;
+export const GetTestDocumentDocument = gql`
+    query getTestDocument($relativePath: String!) {
+  getTestDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...TestParts
+    }
+  }
+}
+    ${TestPartsFragmentDoc}`;
+export const GetTestListDocument = gql`
+    query getTestList {
+  getTestList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...TestParts
+        }
+      }
+    }
+  }
+}
+    ${TestPartsFragmentDoc}`;
 export const GetPostsDocumentDocument = gql`
     query getPostsDocument($relativePath: String!) {
   getPostsDocument(relativePath: $relativePath) {
@@ -1066,6 +1203,12 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
       },
     BlogPostQuery(variables: BlogPostQueryQueryVariables, options?: C): Promise<{data: BlogPostQueryQuery, variables: BlogPostQueryQueryVariables, query: string}> {
         return requester<{data: BlogPostQueryQuery, variables: BlogPostQueryQueryVariables, query: string}, BlogPostQueryQueryVariables>(BlogPostQueryDocument, variables, options);
+      },
+    getTestDocument(variables: GetTestDocumentQueryVariables, options?: C): Promise<{data: GetTestDocumentQuery, variables: GetTestDocumentQueryVariables, query: string}> {
+        return requester<{data: GetTestDocumentQuery, variables: GetTestDocumentQueryVariables, query: string}, GetTestDocumentQueryVariables>(GetTestDocumentDocument, variables, options);
+      },
+    getTestList(variables?: GetTestListQueryVariables, options?: C): Promise<{data: GetTestListQuery, variables: GetTestListQueryVariables, query: string}> {
+        return requester<{data: GetTestListQuery, variables: GetTestListQueryVariables, query: string}, GetTestListQueryVariables>(GetTestListDocument, variables, options);
       },
     getPostsDocument(variables: GetPostsDocumentQueryVariables, options?: C): Promise<{data: GetPostsDocumentQuery, variables: GetPostsDocumentQueryVariables, query: string}> {
         return requester<{data: GetPostsDocumentQuery, variables: GetPostsDocumentQueryVariables, query: string}, GetPostsDocumentQueryVariables>(GetPostsDocumentDocument, variables, options);
