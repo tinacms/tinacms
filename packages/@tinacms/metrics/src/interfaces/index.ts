@@ -21,11 +21,17 @@ export interface TinaCMSInitInvoke extends EventsBase {
 export interface TinaCMSServerStartInvoke extends EventsBase {
   name: 'tinacms:cli:server:start:invoke'
 }
+
+export interface TinaCMSServerError extends EventsBase {
+  name: 'tinacms:cli:server:error'
+  errorMessage: string
+}
 export type Events =
   | CreateTinaAppInvoke
   | TinaCMSAuditInvoke
   | TinaCMSInitInvoke
   | TinaCMSServerStartInvoke
+  | TinaCMSServerError
 export interface MetricPayload {
   event: Events
   id: string
