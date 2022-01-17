@@ -177,27 +177,63 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
   }
 }
 
+type APIProviderProps =
+  | {
+      /**
+       * Content API URL
+       *
+       * @deprecated use apiURL instead
+       */
+      apiURL: string
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: never
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: never
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: never
+    }
+  | {
+      /**
+       * Content API URL
+       *
+       * @deprecated use apiURL instead
+       */
+      apiURL?: never
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: boolean
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: string
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: string
+    }
+
 interface BaseProviderProps {
-  apiURL?: string
-  /**
-   * Point to the local version of GraphQL instead of tina.io
-   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
-   *
-   * @deprecated use apiURL instead
-   */
-  isLocalClient?: boolean
-  /**
-   * The base branch to pull content from. Note that this is ignored for local development
-   *
-   * @deprecated use apiURL instead
-   */
-  branch?: string
-  /**
-   * Your clientID from tina.aio
-   *
-   * @deprecated use apiURL instead
-   */
-  clientId?: string
   /** Callback if you need access to the TinaCMS instance */
   cmsCallback?: (cms: TinaCMS) => TinaCMS
   /** Callback if you need access to the "formify" API */
@@ -238,7 +274,7 @@ export const TinaCMSProvider2 = ({
   documentCreatorCallback,
   formifyCallback,
   ...props
-}: QueryProviderProps & BaseProviderProps) => {
+}: QueryProviderProps & APIProviderProps & BaseProviderProps) => {
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
