@@ -18,10 +18,14 @@ export interface TinaCMSInitInvoke extends EventsBase {
   name: 'tinacms:cli:init:invoke'
 }
 
+export interface TinaCMSServerStartInvoke extends EventsBase {
+  name: 'tinacms:cli:server:start:invoke'
+}
 export type Events =
   | CreateTinaAppInvoke
   | TinaCMSAuditInvoke
   | TinaCMSInitInvoke
+  | TinaCMSServerStartInvoke
 export interface MetricPayload {
   event: Events
   id: string
