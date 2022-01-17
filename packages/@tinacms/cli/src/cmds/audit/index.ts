@@ -23,7 +23,7 @@ import { auditCollection, auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
-import { Telemetry } from '../../telemetry'
+import { Telemetry } from '@tinacms/metrics'
 
 const rootPath = process.cwd()
 
