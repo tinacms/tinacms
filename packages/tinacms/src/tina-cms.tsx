@@ -186,7 +186,7 @@ export const TinaCMSProvider2 = ({
   /** Any variables from getStaticProps */
   variables?: object
   /** The `data` from getStaticProps */
-  data: object
+  data?: object
   /** Your React page component */
   children: (props?: any) => React.ReactNode
   /**
@@ -261,9 +261,8 @@ export const TinaCMSProvider2 = ({
 
 const TinaCMSProviderWithQuery = ({
   children,
-  cmsCallback,
-  mediaStore,
-  tinaioConfig,
+  formifyCallback,
+  documentCreatorCallback,
   ...props
 }: {
   /** The query from getStaticProps */
@@ -271,47 +270,13 @@ const TinaCMSProviderWithQuery = ({
   /** Any variables from getStaticProps */
   variables?: object
   /** The `data` from getStaticProps */
-  data: object
+  data?: object
   /** Your React page component */
   children: (props?: any) => React.ReactNode
-  /**
-   * The URL for the GraphQL API.
-   *
-   * When working locally, this should be http://localhost:4001/graphql.
-   *
-   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
-   */
-  apiURL: string
-  /**
-   * Point to the local version of GraphQL instead of tina.io
-   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
-   *
-   * @deprecated use apiURL instead
-   */
-  isLocalClient?: boolean
-  /**
-   * The base branch to pull content from. Note that this is ignored for local development
-   *
-   * @deprecated use apiURL instead
-   */
-  branch?: string
-  /**
-   * Your clientID from tina.aio
-   *
-   * @deprecated use apiURL instead
-   */
-  clientId?: string
-  /** Callback if you need access to the TinaCMS instance */
-  cmsCallback?: (cms: TinaCMS) => TinaCMS
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
   documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
-  /** TinaCMS media store instance */
-  mediaStore?:
-    | TinaCloudMediaStoreClass
-    | (() => Promise<TinaCloudMediaStoreClass>)
-  tinaioConfig?: TinaIOConfig
 }) => {
   const cms = useCMS()
 
@@ -321,19 +286,19 @@ const TinaCMSProviderWithQuery = ({
     query: props.query,
     variables: props.variables || {},
     formify: (args) => {
-      if (props.formifyCallback) {
-        return props.formifyCallback(args, cms)
+      if (formifyCallback) {
+        return formifyCallback(args, cms)
       } else {
         return args.createForm(args.formConfig)
       }
     },
   })
 
-  useDocumentCreatorPlugin(props.documentCreatorCallback)
+  useDocumentCreatorPlugin(documentCreatorCallback)
 
   return (
     <ErrorBoundary>
-      <TinaDataProvider formifyCallback={props.formifyCallback}>
+      <TinaDataProvider formifyCallback={formifyCallback}>
         {isLoading && (
           <Loader>
             <></>
