@@ -1020,6 +1020,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "xaviemirmon",
+      "name": "Xavier Mirabelli-Montan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5609840?v=4",
+      "profile": "https://github.com/xaviemirmon",
+      "contributions": [
+        "code",
+        "bug",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
