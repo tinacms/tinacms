@@ -23,6 +23,7 @@ import { auditCollection, auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
+import { Telemetry } from '../../telemetry'
 
 const rootPath = process.cwd()
 
@@ -50,6 +51,8 @@ export const audit = async (ctx: any, next: () => void, options) => {
       )
     )
   }
+  const t = new Telemetry()
+  t.submitRecord({ event: 'audit' })
   const bridge = options.clean
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
