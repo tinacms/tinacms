@@ -259,6 +259,7 @@ export const TinaCMSProvider2 = ({
       <ErrorBoundary>
         <TinaDataProvider formifyCallback={formifyCallback}>
           <QueryContainer
+            key={`rootQuery-${query}`}
             variables={props.variables}
             data={props.data}
             query={query}
