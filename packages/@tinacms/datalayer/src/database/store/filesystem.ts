@@ -74,3 +74,9 @@ export class FilesystemStore implements Store {
     )
   }
 }
+
+export class AuditFilesystemStore extends FilesystemStore {
+  public async put(_filepath: string, _data: object) {
+    return
+  }
+}
