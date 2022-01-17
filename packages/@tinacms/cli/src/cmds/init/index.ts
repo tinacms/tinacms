@@ -14,6 +14,7 @@ import fs, { readFileSync, writeFileSync, outputFileSync } from 'fs-extra'
 import p from 'path'
 import Progress from 'progress'
 import prompts from 'prompts'
+import { Telemetry } from '@tinacms/metrics'
 
 import {
   successText,
@@ -44,6 +45,8 @@ function execShellCommand(cmd): Promise<string> {
 }
 
 export async function initTina(ctx: any, next: () => void, options) {
+  const t = new Telemetry({ disabled: options.noTelemetry })
+  t.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
   logger.info(successText('Setting up Tina...'))
   next()
 }
