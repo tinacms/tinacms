@@ -179,6 +179,8 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
 
 export const TinaCMSProvider2 = ({
   query,
+  documentCreatorCallback,
+  formifyCallback,
   ...props
 }: {
   /** The query from getStaticProps */
@@ -254,16 +256,30 @@ export const TinaCMSProvider2 = ({
       cmsCallback={props.cmsCallback}
       mediaStore={props.mediaStore}
     >
-      <TinaCMSProviderWithQuery {...props} query={query} />
+      <ErrorBoundary>
+        <TinaDataProvider formifyCallback={formifyCallback}>
+          <QueryContainer
+            variables={props.variables}
+            data={props.data}
+            query={query}
+            formifyCallback={formifyCallback}
+            documentCreatorCallback={documentCreatorCallback}
+            children={props.children}
+          />
+        </TinaDataProvider>
+      </ErrorBoundary>
     </TinaCloudProvider>
   )
 }
 
-const TinaCMSProviderWithQuery = ({
+//Legacy'ish Container that auto-registers forms/document creator
+const QueryContainer = ({
   children,
   formifyCallback,
   documentCreatorCallback,
-  ...props
+  query,
+  variables,
+  data,
 }: {
   /** The query from getStaticProps */
   query?: string
@@ -273,18 +289,21 @@ const TinaCMSProviderWithQuery = ({
   data?: object
   /** Your React page component */
   children: (props?: any) => React.ReactNode
+  /** Callback if you need access to the "document creator" API */
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
-  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
 }) => {
   const cms = useCMS()
+
+  useDocumentCreatorPlugin(documentCreatorCallback)
 
   // Note - this will only register for legacy implementations taking in query
   // Hopefuly things work if we call this twice
   const [payload, isLoading] = useGraphqlForms({
-    query: props.query,
-    variables: props.variables || {},
+    query: query,
+    variables: variables || {},
     formify: (args) => {
       if (formifyCallback) {
         return formifyCallback(args, cms)
@@ -294,22 +313,22 @@ const TinaCMSProviderWithQuery = ({
     },
   })
 
-  useDocumentCreatorPlugin(documentCreatorCallback)
-
   return (
-    <ErrorBoundary>
-      <TinaDataProvider formifyCallback={formifyCallback}>
-        {isLoading && (
-          <Loader>
-            <></>
-          </Loader>
-        )}
-        {/* pass the new edit state data to the child */}
-        {typeof children == 'function'
-          ? children(isLoading ? props : { ...props, data: payload })
-          : children}
-      </TinaDataProvider>
-    </ErrorBoundary>
+    <>
+      {isLoading && (
+        <Loader>
+          <></>
+        </Loader>
+      )}
+      {/* pass the new edit state data to the child */}
+      {typeof children == 'function'
+        ? children(
+            isLoading
+              ? { query, variables, data }
+              : { query, variables, data: payload }
+          )
+        : children}
+    </>
   )
 }
 
