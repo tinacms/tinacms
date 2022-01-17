@@ -147,6 +147,12 @@ stack: ${code.stack || 'No stack was provided'}`)
                 'Compilation failed with errors. Server has not been restarted.'
               ) + ` see error below \n ${e.message}`
             )
+            t.submitRecord({
+              event: {
+                name: 'tinacms:cli:server:error',
+                errorMessage: e.message,
+              },
+            })
           }
         }
       })
