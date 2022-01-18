@@ -133,26 +133,15 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
   }
 `
 
-const ToggleInput = styled.input`
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 48px;
-  height: 28px;
-  opacity: 0;
-  margin: 0;
-  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  pointer-events: auto;
-
-  &:hover {
-    + ${ToggleLabel} ${ToggleSwitch} {
-      box-shadow: 0 0 0 2px var(--tina-color-grey-3);
-    }
-  }
-
-  &:focus {
-    + ${ToggleLabel} ${ToggleSwitch} {
-      box-shadow: 0 0 0 2px var(--tina-color-primary);
-    }
-  }
-`
+const ToggleInput = ({ disabled, ...props }) => {
+  return (
+    <input
+      className={`absolute left-0 top-0 w-12 h-8 opacity-0 m-0 ${
+        disabled
+          ? `cursor-not-allowed pointer-events-none`
+          : `cursor-pointer z-20`
+      }`}
+      {...props}
+    />
+  )
+}
