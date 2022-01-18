@@ -19,8 +19,11 @@ import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 import UrlPattern from 'url-pattern'
-import type { formifyCallback } from './hooks/use-graphql-forms'
+// @ts-ignore importing css is not recognized
+import styles from './styles.css'
+
 import type { TinaCMS } from '@tinacms/toolkit'
+import type { formifyCallback } from './hooks/use-graphql-forms'
 import { TinaDataContext } from '@tinacms/sharedctx'
 import { useTina } from './edit-state'
 
@@ -293,31 +296,34 @@ export const TinaCMSProvider2 = ({
       }
 
   return (
-    <TinaCloudProvider
-      branch={branch}
-      clientId={clientId}
-      tinaioConfig={props.tinaioConfig}
-      isLocalClient={isLocalClient}
-      cmsCallback={props.cmsCallback}
-      mediaStore={props.mediaStore}
-    >
-      <ErrorBoundary>
-        <DocumentCreator />
-        <TinaDataProvider formifyCallback={formifyCallback}>
-          {typeof props.children == 'function' ? (
-            <TinaQuery
-              variables={props.variables}
-              data={props.data}
-              query={query}
-              formifyCallback={formifyCallback}
-              children={props.children as any}
-            />
-          ) : (
-            props.children
-          )}
-        </TinaDataProvider>
-      </ErrorBoundary>
-    </TinaCloudProvider>
+    <>
+      <TinaCloudProvider
+        branch={branch}
+        clientId={clientId}
+        tinaioConfig={props.tinaioConfig}
+        isLocalClient={isLocalClient}
+        cmsCallback={props.cmsCallback}
+        mediaStore={props.mediaStore}
+      >
+        <style>{styles}</style>
+        <ErrorBoundary>
+          <DocumentCreator />
+          <TinaDataProvider formifyCallback={formifyCallback}>
+            {typeof props.children == 'function' ? (
+              <TinaQuery
+                variables={props.variables}
+                data={props.data}
+                query={query}
+                formifyCallback={formifyCallback}
+                children={props.children as any}
+              />
+            ) : (
+              props.children
+            )}
+          </TinaDataProvider>
+        </ErrorBoundary>
+      </TinaCloudProvider>
+    </>
   )
 }
 

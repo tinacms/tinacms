@@ -45,18 +45,18 @@ export function MediaItem({
         )}
       </ItemPreview>
       <Filename>{item.filename}</Filename>
-      <ActionButtons>
+      <div className="flex justify-end gap-2 items-center ml-2">
         {onSelect && item.type === 'file' && (
-          <Button small onClick={() => onSelect(item)}>
+          <Button size="medium" onClick={() => onSelect(item)}>
             Insert
           </Button>
         )}
         {onDelete && item.type === 'file' && (
-          <IconButton small onClick={() => onDelete(item)}>
-            <TrashIcon />
+          <IconButton size="medium" onClick={() => onDelete(item)}>
+            <TrashIcon className="w-5/6 h-auto" />
           </IconButton>
         )}
-      </ActionButtons>
+      </div>
     </ListItem>
   )
 }
@@ -72,14 +72,11 @@ interface ListItemProps {
 const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
-  padding: 1rem;
+  padding: 8px;
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
   transition: filter 300ms ease;
-  border: 1px solid var(--tina-color-grey-2);
-  margin-bottom: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
-  min-height: 90px;
 
   > :first-child {
     margin-right: var(--tina-padding-small);
@@ -92,14 +89,6 @@ const ListItem = styled.li<ListItemProps>`
       css`
         cursor: pointer;
       `}
-  }
-
-  @media screen and (min-width: 720px) {
-    padding: 1.125rem;
-
-    > :first-child {
-      margin-right: var(--tina-padding-big);
-    }
   }
 `
 
@@ -134,11 +123,4 @@ const Filename = styled.span`
   overflow-wrap: break-word;
   white-space: nowrap;
   text-overflow: ellipsis;
-`
-
-const ActionButtons = styled.span`
-  display: flex;
-  > * {
-    margin-left: var(--tina-padding-small);
-  }
 `

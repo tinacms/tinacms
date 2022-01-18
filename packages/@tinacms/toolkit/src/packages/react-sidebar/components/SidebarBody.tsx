@@ -152,6 +152,7 @@ interface FormWrapperProps {
 }
 
 const FormWrapper = styled.div<FormWrapperProps>`
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -159,6 +160,7 @@ const FormWrapper = styled.div<FormWrapperProps>`
   height: 100%;
   width: 100%;
   position: relative;
+  background: white;
 
   > * {
     transform: translate3d(100%, 0, 0);

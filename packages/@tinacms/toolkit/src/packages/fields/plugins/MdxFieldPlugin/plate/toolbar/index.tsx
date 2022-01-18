@@ -55,7 +55,7 @@ import { HeaderPopup } from './heading'
 import { useCMS } from '../../../../../react-core'
 
 const Wrapper = styled.div`
-  z-index: 100;
+  z-index: 30;
   padding-top: 6px;
   position: relative;
   width: 100%;
@@ -72,25 +72,35 @@ const ToolbarWrapper = styled.div`
   border: 1px solid var(--tina-color-grey-2);
   margin-bottom: 14px;
 
+  svg {
+    width: 20px;
+    height: auto;
+  }
+
   span[class*='ToolbarButton'],
   button {
     padding: 8px;
-    border: 1px solid var(--tina-color-grey-2);
+    border: none;
+    border-right: 1px solid var(--tina-color-grey-2);
     width: auto;
     height: auto;
     border-left: none;
     margin: 0 0 -1px 0;
     flex-grow: 1;
-    max-width: 3rem;
+    max-width: 48px;
     transition: background 150ms ease-out;
+
+    &:first-child {
+      border-radius: var(--tina-radius-small) 0 0 var(--tina-radius-small);
+    }
+
+    &:last-child {
+      border-radius: 0 var(--tina-radius-small) var(--tina-radius-small) 0;
+    }
 
     &:not(disabled):hover {
       background: var(--tina-color-grey-1);
-    }
-
-    svg {
-      width: 20px;
-      height: auto;
+      color: var(--tina-color-primary);
     }
   }
 `
@@ -183,14 +193,18 @@ export const ToolbarButtons = ({ name, templates }) => {
             icon={<strong>H6</strong>}
           />
         </HeaderPopup>
-        <BlockToolbarButton
-          type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
-          icon={<QuoteIcon />}
-        />
-        <CodeBlockToolbarButton
-          type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
-          icon={<CodeIcon />}
-        />
+        <span data-test="quoteButton">
+          <BlockToolbarButton
+            type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
+            icon={<QuoteIcon />}
+          />
+        </span>
+        <span data-test="codeBlockButton">
+          <CodeBlockToolbarButton
+            type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
+            icon={<CodeIcon />}
+          />
+        </span>
         <LinkToolbarButton icon={<LinkIcon />} />
         <ToolbarButton
           icon={<ImageIcon />}
@@ -212,10 +226,12 @@ export const ToolbarButtons = ({ name, templates }) => {
           type={getPlatePluginType(editor, ELEMENT_OL)}
           icon={<OrderedListIcon />}
         />
-        <MarkToolbarButton
-          type={getPlatePluginType(editor, MARK_BOLD)}
-          icon={<BoldIcon />}
-        />
+        <span data-test="boldButton">
+          <MarkToolbarButton
+            type={getPlatePluginType(editor, MARK_BOLD)}
+            icon={<BoldIcon />}
+          />
+        </span>
         <MarkToolbarButton
           type={getPlatePluginType(editor, MARK_ITALIC)}
           icon={<ItalicIcon />}

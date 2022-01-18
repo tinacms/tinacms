@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as React from 'react'
-import { BranchSwitcherProps, Branch, BranchChangeEvent } from './types'
+import { BranchSwitcherProps, Branch } from './types'
 import styled from 'styled-components'
 import { useBranchData } from './BranchData'
 import { Button } from '../../packages/styles'
@@ -56,7 +56,7 @@ export const BranchSwitcher = ({
   return (
     <>
       {listState === 'loading' ? (
-        <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+        <div style={{ margin: '32px auto', textAlign: 'center' }}>
           <LoadingDots color={'var(--tina-color-primary)'} />
         </div>
       ) : (
@@ -75,10 +75,14 @@ export const BranchSwitcher = ({
               />
             </SelectWrap>
           ) : (
-            <div style={{ margin: '2rem auto', textAlign: 'center' }}>
-              An error occurred while retrieving the branch list. <br />
-              <Button onClick={refreshBranchList}>Try again ⟳</Button>
-            </div>
+            <>
+              <p className="text-base mt-8 mx-8 mb-4 text-center">
+                An error occurred while retrieving the branch list.
+              </p>
+              <Button className="mx-auto" onClick={refreshBranchList}>
+                Try again ⟳
+              </Button>
+            </>
           )}
         </>
       )}
@@ -109,7 +113,11 @@ const BranchSelector = ({
       {!branchExists && newBranch ? (
         <>
           <Spacer />
-          <Button small primary onClick={() => onCreateBranch(newBranch)}>
+          <Button
+            size="small"
+            primary
+            onClick={() => onCreateBranch(newBranch)}
+          >
             Create New Branch `{newBranch}`...
           </Button>
         </>
@@ -157,7 +165,7 @@ const SelectWrap = styled.div`
 
 const SelectorColumn = styled.div`
   width: 100%;
-  padding: 1rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
