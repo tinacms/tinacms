@@ -18,7 +18,7 @@ import {
   ModalBody,
   ModalActions,
 } from '@tinacms/toolkit'
-import { StyleReset, LoadingDots, Button } from '@tinacms/toolkit'
+import { LoadingDots, Button } from '@tinacms/toolkit'
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
@@ -32,22 +32,20 @@ interface ModalBuilderProps {
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
-    <StyleReset>
-      <Modal>
-        <ModalPopup>
-          <ModalHeader>{modalProps.title}</ModalHeader>
-          <ModalBody padded>
-            <p>{modalProps.message}</p>
-            {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
-          </ModalBody>
-          <ModalActions>
-            {modalProps.actions.map((action) => (
-              <AsyncButton key={action.name} {...action} />
-            ))}
-          </ModalActions>
-        </ModalPopup>
-      </Modal>
-    </StyleReset>
+    <Modal>
+      <ModalPopup>
+        <ModalHeader>{modalProps.title}</ModalHeader>
+        <ModalBody padded>
+          <p>{modalProps.message}</p>
+          {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
+        </ModalBody>
+        <ModalActions>
+          {modalProps.actions.map((action) => (
+            <AsyncButton key={action.name} {...action} />
+          ))}
+        </ModalActions>
+      </ModalPopup>
+    </Modal>
   )
 }
 

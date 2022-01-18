@@ -47,7 +47,7 @@ export const ToolbarButton = styled(Button)`
     padding: 0 20px;
 
     svg {
-      margin-right: 0.25rem;
+      margin-right: 4px;
     }
   }
 `
