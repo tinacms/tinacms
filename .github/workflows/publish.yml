@@ -18,6 +18,9 @@ jobs:
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
       - name: Install dependencies
         # Before merging to main, re-run the install for security purposes
         # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications

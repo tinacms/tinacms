@@ -29,7 +29,7 @@ const IndicatorWrap = styled.div`
   position: fixed;
   z-index: var(--tina-z-index-3);
   left: 0;
-  padding: 0.5rem 0;
+  padding: 8px 0;
   margin-left: var(--tina-sidebar-width);
   width: calc(100% - var(--tina-sidebar-width));
   text-align: center;
@@ -51,7 +51,7 @@ const AboveViewportIndicator = () => {
   return (
     <IndicatorWrap position="top">
       <ArrowWrap>
-        <ChevronUpIcon />
+        <ChevronUpIcon className="w-8 h-auto" />
       </ArrowWrap>
     </IndicatorWrap>
   )
@@ -61,7 +61,7 @@ const BelowViewportIndicator = () => {
   return (
     <IndicatorWrap position="bottom">
       <ArrowWrap>
-        <ChevronDownIcon />
+        <ChevronDownIcon className="w-8 h-auto" />
       </ArrowWrap>
     </IndicatorWrap>
   )

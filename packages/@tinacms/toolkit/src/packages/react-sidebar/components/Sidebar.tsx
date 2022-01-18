@@ -18,48 +18,59 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
+import { MdClose } from 'react-icons/md'
 import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
-import { tina_reset_styles } from '../../styles'
+import { Button } from '../../styles'
 import { CreateContentMenu } from '../../react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
-import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
+import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { LocalWarning } from './LocalWarning'
 
+export const SidebarContext = React.createContext<any>(null)
+
+export const minPreviewWidth = 440
+export const minSidebarWidth = 360
+const defaultSidebarWidth = 440
+const defaultSidebarPosition = 'displace'
+
 export interface SidebarProviderProps {
-  children: any
   sidebar: SidebarState
-  position?: SidebarStateOptions['position']
+  defaultWidth?: SidebarStateOptions['defaultWidth']
+  position?: SidebarStateOptions['displayMode']
 }
 
 export function SidebarProvider({
-  children,
-  position,
+  position = defaultSidebarPosition,
+  defaultWidth = defaultSidebarWidth,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
   const cms = useCMS()
 
+  if (!cms.enabled) return null
+
   return (
-    <>
-      {isFixed(position || sidebar.position) ? (
-        <SiteWrapper open={sidebar.isOpen}>{children}</SiteWrapper>
-      ) : (
-        children
-      )}
-      {cms.enabled && <Sidebar sidebar={sidebar} />}
-    </>
+    <Sidebar
+      displayMode={position}
+      defaultWidth={defaultWidth}
+      sidebar={sidebar}
+    />
   )
 }
 
 interface SidebarProps {
   sidebar: SidebarState
+  defaultWidth?: SidebarStateOptions['defaultWidth']
+  displayMode?: SidebarStateOptions['displayMode']
 }
 
-const Sidebar = ({ sidebar }: SidebarProps) => {
+type displayStates = 'closed' | 'open' | 'fullscreen'
+
+const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const cms = useCMS()
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
@@ -69,19 +80,87 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const allScreens = screens.all()
   const showMenu = allScreens.length > 0
 
+  const [displayState, setDisplayState] =
+    React.useState<displayStates>('closed')
+  const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
+  const [previousWidth, setPreviousWidth] = React.useState(defaultWidth)
+  const [resizingSidebar, setResizingSidebar] = React.useState(false)
+
+  const toggleFullscreen = () => {
+    if (displayState === 'fullscreen') {
+      setDisplayState('open')
+    } else {
+      setDisplayState('fullscreen')
+    }
+  }
+
+  const toggleSidebarOpen = () => {
+    if (displayState === 'closed') {
+      setDisplayState('open')
+    } else {
+      setDisplayState('closed')
+    }
+  }
+
+  React.useEffect(() => {
+    setPreviousWidth(sidebarWidth)
+    if (displayState === 'fullscreen') {
+      setSidebarWidth(window.innerWidth)
+    } else {
+      if (previousWidth < window.innerWidth) {
+        setSidebarWidth(previousWidth)
+      } else {
+        setSidebarWidth(window.innerWidth / 2)
+      }
+    }
+  }, [displayState])
+
+  React.useEffect(() => {
+    const updateLayout = () => {
+      if (displayState === 'fullscreen') {
+        return
+      }
+      if (displayMode === 'displace') {
+        updateBodyDisplacement({ displayState, sidebarWidth, resizingSidebar })
+      }
+    }
+
+    updateLayout()
+
+    window.addEventListener('resize', updateLayout)
+
+    return () => {
+      window.removeEventListener('resize', updateLayout)
+    }
+  }, [displayState, displayMode, sidebarWidth, resizingSidebar])
+
   return (
-    <>
-      <SidebarGlobalStyles />
-      <SidebarContainer open={sidebar.isOpen}>
-        <SidebarWrapper open={sidebar.isOpen}>
+    <SidebarContext.Provider
+      value={{
+        sidebarWidth,
+        setSidebarWidth,
+        displayState,
+        setDisplayState,
+        displayMode,
+        toggleFullscreen,
+        toggleSidebarOpen,
+        resizingSidebar,
+        setResizingSidebar,
+        menuIsOpen,
+        setMenuIsOpen,
+      }}
+    >
+      <SidebarWrapper>
+        <SidebarBody>
           {cms.api?.tina?.isLocalMode && <LocalWarning />}
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
+                className="text-gray-600 hover:text-blue-500"
                 onClick={() => setMenuIsOpen(!menuIsOpen)}
                 open={menuIsOpen}
               >
-                <HamburgerIcon />
+                <HamburgerIcon className="w-9 h-auto" />
               </MenuToggle>
             )}
             <CreateContentMenu sidebar={true} />
@@ -90,37 +169,37 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             <sidebar.placeholder />
           </FormsView>
           {showMenu && (
-            <MenuPanel visible={menuIsOpen}>
-              <MenuWrapper>
-                <MenuList>
-                  {cms.flags.get('tina-admin') && (
-                    <MenuLink
-                      key="admin"
-                      value="admin"
+            <MenuPanel>
+              <MenuList>
+                {cms.flags.get('tina-admin') && (
+                  <MenuButton
+                    key="admin"
+                    value="admin"
+                    onClick={() => {
+                      window.location.href = window.location.origin + '/admin'
+                    }}
+                  >
+                    <TinaIcon className="w-7 h-auto mr-2 opacity-80" /> Tina
+                    Admin
+                  </MenuButton>
+                )}
+                {allScreens.map((view) => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuButton
+                      key={view.name}
+                      value={view.name}
                       onClick={() => {
-                        window.location.href = window.location.origin + '/admin'
+                        setActiveView(view)
+                        setMenuIsOpen(false)
                       }}
                     >
-                      <TinaIcon /> Tina Admin
-                    </MenuLink>
-                  )}
-                  {allScreens.map((view) => {
-                    const Icon = view.Icon
-                    return (
-                      <MenuLink
-                        key={view.name}
-                        value={view.name}
-                        onClick={() => {
-                          setActiveView(view)
-                          setMenuIsOpen(false)
-                        }}
-                      >
-                        <Icon /> {view.name}
-                      </MenuLink>
-                    )
-                  })}
-                </MenuList>
-              </MenuWrapper>
+                      <Icon className="w-6 h-auto mr-2 opacity-80" />{' '}
+                      {view.name}
+                    </MenuButton>
+                  )
+                })}
+              </MenuList>
               <Watermark />
             </MenuPanel>
           )}
@@ -130,32 +209,38 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
               close={() => setActiveView(null)}
             />
           )}
-          <ResizeHandle />
-        </SidebarWrapper>
+        </SidebarBody>
+        <ResizeHandle />
         <SidebarToggle sidebar={sidebar} />
-      </SidebarContainer>
-    </>
+      </SidebarWrapper>
+    </SidebarContext.Provider>
   )
 }
 
-const SidebarGlobalStyles = createGlobalStyle`
-  @media (max-width: 500px) {
-    :root {
-      --tina-sidebar-width: calc(100vw - 64px);
-    }
-  }
-`
+const updateBodyDisplacement = ({
+  displayState,
+  sidebarWidth,
+  resizingSidebar,
+}) => {
+  const body = document.getElementsByTagName('body')[0]
+  const windowWidth = window.innerWidth
 
-const SiteWrapper = styled.div<{ open: boolean }>`
-  @media (min-width: 840px) {
-    padding-left: ${(props) =>
-      props.open ? 'var(--tina-sidebar-width)' : '0'};
-    transition: padding-left 150ms ease-out;
+  // Transition displacement when not dragging sidebar (opening/closing sidebar)
+  if (!resizingSidebar) {
+    body.style.transition = 'all 200ms ease-out'
+  } else {
+    body.style.transition = ''
   }
-`
 
-function isFixed(position: SidebarPosition): boolean {
-  return position === 'fixed' || position === 'displace'
+  if (displayState === 'open') {
+    const bodyDisplacement = Math.min(
+      sidebarWidth,
+      windowWidth - minPreviewWidth
+    )
+    body.style.paddingLeft = bodyDisplacement + 'px'
+  } else {
+    body.style.paddingLeft = '0'
+  }
 }
 
 const Watermark = styled(({ ...styleProps }: any) => {
@@ -169,6 +254,7 @@ const Watermark = styled(({ ...styleProps }: any) => {
   z-index: -1;
   bottom: var(--tina-padding-big);
   left: var(--tina-padding-big);
+
   svg {
     width: 128px;
     height: 128px;
@@ -178,278 +264,129 @@ const Watermark = styled(({ ...styleProps }: any) => {
 `
 
 const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
+  const { toggleSidebarOpen, displayState } = React.useContext(SidebarContext)
+
   return (
-    <SidebarToggleButton
-      onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
-      open={sidebar.isOpen}
+    <Button
+      onClick={toggleSidebarOpen}
       aria-label="toggles cms sidebar"
+      primary
+      rounded="right"
+      size="custom"
+      className="absolute bottom-12 right-0 transform translate-x-full pointer-events-auto w-14 h-11"
     >
-      {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
-    </SidebarToggleButton>
+      {displayState === 'closed' ? (
+        <EditIcon className="w-8 h-auto" />
+      ) : (
+        <LeftArrowIcon className="w-8 h-auto" />
+      )}
+    </Button>
   )
 }
 
-const MenuList = styled.div`
-  margin: 32px calc(var(--tina-padding-big) * -1) 32px
-    calc(var(--tina-padding-big) * -1);
-  display: block;
-`
+const MenuButton = ({ children, ...props }) => {
+  return (
+    <li className="py-2 first:pt-4 last:pb-4">
+      <button
+        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-blue-400 hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
+        {...props}
+      >
+        {children}
+      </button>
+    </li>
+  )
+}
 
-const MenuLink = styled.div<{ value: string }>`
-  color: var(--tina-color-grey-1);
-  font-size: var(--tina-font-size-4);
-  font-weight: var(--tina-font-weight-regular);
-  padding: var(--tina-padding-big) var(--tina-padding-big)
-    var(--tina-padding-big) 64px;
-  position: relative;
-  cursor: pointer;
-  transition: all var(--tina-timing-short) ease-out;
-  overflow: hidden;
-  &:after {
-    content: '';
-    position: absolute;
-    top: 8px;
-    bottom: 8px;
-    left: 8px;
-    right: 8px;
-    border-radius: var(--tina-radius-big);
-    background-color: var(--tina-color-grey-9);
-    z-index: -1;
-    transition: all 150ms ease;
-    transform: translate3d(0, 100%, 0);
-    opacity: 0;
-  }
-  &:hover {
-    color: var(--tina-color-primary-light);
-    &:after {
-      transform: translate3d(0, 0, 0);
-      transition: transform var(--tina-timing-short) ease-out, opacity 0ms;
-      opacity: 1;
-    }
-    svg {
-      fill: var(--tina-color-primary);
-    }
-    & ~ * {
-      &:after {
-        transform: translate3d(0, -100%, 0);
-      }
-    }
-  }
-  svg {
-    position: absolute;
-    left: var(--tina-padding-big);
-    top: 50%;
-    transform: translate3d(0, -50%, 0);
-    width: 36px;
-    height: auto;
-    fill: var(--tina-color-grey-4);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-`
+const SidebarHeader = ({ children }) => {
+  return (
+    <div className="flex-grow-0 bg-white text-gray-700 w-full p-4 flex items-center justify-between pointer-events-none">
+      {children}
+    </div>
+  )
+}
 
-const SidebarHeader = styled.div`
-  display: grid;
-  grid-template-areas: 'hamburger actions';
-  align-items: center;
-  z-index: var(--tina-z-index-5);
-  height: var(--tina-sidebar-header-height);
-  width: 100%;
-  padding: 0 var(--tina-padding-big);
-`
+const MenuToggle = ({ children, className = ``, ...props }) => {
+  return (
+    <button
+      className={`p-0 z-10 bg-transparent outline-none border-0 text-left -ml-1 w-11 h-11 flex items-center justify-center cursor-pointer pointer-events-auto ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
-const MenuToggle = styled.button<{ open: boolean }>`
-  padding: 0 0 0 var(--tina-padding-big);
-  margin-left: calc(var(--tina-padding-big) * -1);
-  background: transparent;
-  outline: none;
-  border: 0;
-  text-align: left;
-  width: 64px;
-  height: 32px;
-  grid-area: hamburger;
-  justify-self: start;
-  cursor: pointer;
-  svg {
-    position: relative;
-    transition: fill 85ms ease-out;
-    fill: var(--tina-color-grey-6);
-    margin-left: -4px;
-    width: 32px;
-    height: auto;
-    path {
-      position: relative;
-      transition: transform var(--tina-timing-long) ease-out,
-        opacity var(--tina-timing-long) ease-out,
-        fill var(--tina-timing-short) ease-out;
-      transform-origin: 50% 50%;
-    }
-  }
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-7);
-    }
-  }
-  ${(props) =>
-    props.open &&
-    css<any>`
-      svg {
-        fill: var(--tina-color-grey-1);
-        &:hover {
-          fill: var(--tina-color-grey-2);
-        }
-        path:first-child {
-          /* Top bar */
-          transform: rotate(45deg) translate3d(0, 0.45rem, 0);
-        }
-        path:nth-child(2) {
-          /* Middle bar */
-          transform: translate3d(-100%, 0, 0);
-          opacity: 0;
-        }
-        path:last-child {
-          /* Bottom Bar */
-          transform: rotate(-45deg) translate3d(0, -0.45rem, 0);
-        }
-      }
-    `};
-`
+const MenuList = ({ children }) => {
+  return <ul className="">{children}</ul>
+}
 
-const MenuWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  padding: var(--tina-sidebar-header-height) var(--tina-padding-big)
-    var(--tina-padding-big) var(--tina-padding-big);
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-`
+const MenuPanel = ({ children }) => {
+  const { menuIsOpen, setMenuIsOpen } = React.useContext(SidebarContext)
 
-const MenuPanel = styled.div<{ visible: boolean }>`
-  background: var(--tina-color-grey-8);
-  z-index: var(--tina-z-index-4);
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: var(--tina-sidebar-width);
-  transform: translate3d(${(p) => (p.visible ? '0' : '-100%')}, 0, 0);
-  overflow: hidden;
-  padding: var(--tina-padding-big);
-  transition: all var(--tina-timing-long) ease-out;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-`
+  return (
+    <div
+      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-16 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
+        menuIsOpen ? `` : `-translate-x-full`
+      }`}
+    >
+      <div className="absolute top-3 right-4">
+        <MenuToggle
+          className="text-gray-300 hover:text-blue-400"
+          onClick={() => setMenuIsOpen(false)}
+          open={menuIsOpen}
+        >
+          <MdClose className="w-9 h-auto" />
+        </MenuToggle>
+      </div>
+      {children}
+    </div>
+  )
+}
 
-const SidebarToggleAnimation = keyframes`
-  from {
-    transform: translate3d(-100%,0,0);
-  }
+const SidebarWrapper = ({ children }) => {
+  const { displayState, sidebarWidth, resizingSidebar } =
+    React.useContext(SidebarContext)
 
-  to {
-    transform: translate3d(0,0,0);
-  }
-`
+  return (
+    <div
+      className={`fixed top-0 left-0 h-screen z-base ${
+        displayState === 'closed' ? `pointer-events-none` : ``
+      }`}
+    >
+      <div
+        className={`relative flex h-screen transform ${
+          displayState === 'closed'
+            ? `pointer-events-none -translate-x-full`
+            : ``
+        } ${
+          resizingSidebar
+            ? `transition-none`
+            : displayState === 'fullscreen'
+            ? `transition-all duration-150 ease-out`
+            : `transition-all duration-300 ease-out`
+        }`}
+        style={{
+          width: sidebarWidth,
+          maxWidth: '100vw',
+          minWidth: '360px',
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
 
-const SidebarToggleButton = styled.button<{ open: boolean }>`
-  position: absolute;
-  pointer-events: all;
-  bottom: 44px;
-  left: var(--tina-sidebar-width);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 24px 24px 0;
-  width: 50px;
-  height: 44px;
-  border: 0;
-  outline: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  fill: white;
-  text-align: center;
-  background-color: var(--tina-color-primary);
-  background-repeat: no-repeat;
-  background-position: center;
-  transition: background-color 150ms ease-out;
-  cursor: pointer;
-  animation: ${SidebarToggleAnimation} 200ms 300ms ease-out 1 both;
-  &:hover {
-    background-color: var(--tina-color-primary-light);
-  }
-  &:active {
-    background-color: var(--tina-color-primary-dark);
-  }
-`
+const SidebarBody = ({ children }) => {
+  const { displayState } = React.useContext(SidebarContext)
 
-const SidebarWrapper = styled.div<{ open: boolean }>`
-  margin: 0;
-  padding: 0;
-  border: 0;
-  z-index: 1;
-  background-color: white;
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  width: var(--tina-sidebar-width);
-  overflow: visible;
-  height: 100%;
-  left: 0;
-  top: 0;
-
-  &:before,
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-  &:before {
-    /* Animate box-shadow with opacity for better performance */
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.07), 2px 0 8px rgba(0, 0, 0, 0.07);
-    transition: all ${(p) => (p.open ? 150 : 200)}ms ease-out;
-    opacity: ${(p) => (p.open ? 1 : 0)};
-  }
-  &:after {
-    /* Overlay outer border */
-    border-right: 1px solid rgba(51, 51, 51, 0.09);
-  }
-`
-
-const SidebarContainer = styled.div<{ open: boolean }>`
-  ${tina_reset_styles}
-
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  display: block !important;
-  background: transparent !important;
-  height: 100% !important;
-  width: var(--tina-sidebar-width) !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  box-sizing: border-box;
-  z-index: var(--tina-z-index-4);
-  transition: all ${(p) => (p.open ? 150 : 200)}ms ease-out !important;
-  transform: translate3d(
-    ${(p) => (p.open ? '0' : 'calc(var(--tina-sidebar-width) * -1)')},
-    0,
-    0
-  ) !important;
-  pointer-events: ${(p) => (p.open ? `all` : `none`)};
-`
+  return (
+    <div
+      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out flex flex-col items-stretch ${
+        displayState !== 'closed' ? `opacity-100` : `opacity-0`
+      } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
+    >
+      {children}
+    </div>
+  )
+}

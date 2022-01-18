@@ -45,10 +45,8 @@ const createDocument = async (
   await cms.api.tina.request(
     `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
       createDocument(
-        collection: $collection, 
-        relativePath: $relativePath, 
-        params: $params
-      ){__typename}
+        collection: $collection,
+        relativePath: $relativePath,
     }`,
     {
       variables: {
