@@ -534,7 +534,7 @@ export const astBuilder = {
     Node: 'Node',
     PageInfo: 'PageInfo',
     Connection: 'Connection',
-    Number: 'Int',
+    Number: 'Float',
     Document: 'Document',
   },
 
