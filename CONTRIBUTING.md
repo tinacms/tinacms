@@ -134,7 +134,7 @@ If you've made changes to the ContentAPI or Identity and you want the starter to
 
 ```
 IDENTITY_API_OVERRIDE=<URL TO IDENTITY>
-CONTENT_API_OVERRIDE<URL TO CONTENTAPI>
+CONTENT_API_OVERRIDE=<URL TO CONTENTAPI>
 ```
 
 ### Import errors
