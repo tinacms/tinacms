@@ -26,17 +26,13 @@ import styled, { css } from 'styled-components'
 export interface FieldsBuilderProps {
   form: Form
   fields: Field[]
-  padding?: boolean
 }
 
-export function FieldsBuilder({
-  form,
-  fields,
-  padding = true,
-}: FieldsBuilderProps) {
+export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   const cms = useCMS()
   return (
-    <FieldsGroup padding={padding}>
+    // @ts-ignore FIXME twind
+    <FieldsGroup>
       {fields.map((field: Field) => {
         if (field.component === null) return null
 
@@ -128,14 +124,6 @@ export const FieldsGroup = styled.div<{ padding: boolean }>`
   height: 100%;
   white-space: nowrap;
   overflow-x: visible !important;
-
-  ${(props) =>
-    props.padding &&
-    css`
-      overflow-x: hidden;
-      overflow-y: auto;
-      padding: 20px 20px 0 20px;
-    `};
 `
 
 /**
