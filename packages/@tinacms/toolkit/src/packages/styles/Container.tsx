@@ -15,22 +15,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
 import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
 
-type a = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
-export interface TextAreaProps extends a {
-  error?: boolean
-  ref?: any
+interface ContainerPropse {
+  size?: 'medium' | 'large'
+  children?: any
 }
 
-export const TextArea = styled.textarea<{ error?: boolean }>`
-  ${InputCss};
-  resize: vertical;
-  height: 160px;
-`
+export const Container = ({
+  children,
+  size = 'medium',
+  ...props
+}: ContainerPropse) => {
+  const sizeClasses = {
+    medium: 'max-w-prose',
+    large: 'max-w-screen-xl',
+  }
+
+  return (
+    <div className={`w-full mx-auto ${sizeClasses[size]}`} {...props}>
+      {children}
+    </div>
+  )
+}

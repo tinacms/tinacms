@@ -15,145 +15,112 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import styled, { css } from 'styled-components'
+import * as React from 'react'
 
-export interface ButtonProps {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   primary?: boolean
-  small?: boolean
-  margin?: boolean
-  grow?: boolean
+  size?: 'small' | 'medium' | 'custom'
   open?: boolean
   busy?: boolean
+  rounded?: 'full' | 'left' | 'right'
   disabled?: boolean
+  className?: string
+  children?: React.ReactNode
 }
 
-export const Button = styled.button<ButtonProps>`
-  text-align: center;
-  border: 0;
-  border-radius: var(--tina-radius-big);
-  box-shadow: var(--tina-shadow-small);
-  background-color: var(--tina-color-grey-0);
-  border: 1px solid var(--tina-color-grey-2);
-  color: var(--tina-color-primary);
-  fill: var(--tina-color-primary);
-  font-weight: var(--tina-font-weight-regular);
-  cursor: pointer;
-  font-size: var(--tina-font-size-1);
-  height: 40px;
-  padding: 0 var(--tina-padding-big);
-  transition: all 85ms ease-out;
-
-  &:hover {
-    background-color: var(--tina-color-grey-1);
+export const Button = ({
+  primary,
+  size = 'medium',
+  open,
+  busy,
+  disabled,
+  rounded = 'full',
+  children,
+  className,
+  ...props
+}: ButtonProps) => {
+  const baseClasses =
+    'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out '
+  const variantClasses = {
+    primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 border-0`,
+    secondary: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-100`,
   }
-  &:active {
-    background-color: var(--tina-color-grey-2);
-    outline: none;
+  const variantStateClasses = primary
+    ? open
+      ? variantClasses.secondary
+      : variantClasses.primary
+    : open
+    ? variantClasses.primary
+    : variantClasses.secondary
+  const state = busy ? `busy` : disabled ? `disabled` : `default`
+  const stateClasses = {
+    disabled: `pointer-events-none	opacity-30 cursor-not-allowed`,
+    busy: `pointer-events-none opacity-70 cursor-wait`,
+    default: ``,
   }
-
-  ${(p) =>
-    p.disabled &&
-    css`
-      opacity: 0.3;
-      pointer: not-allowed;
-      pointer-events: none;
-    `};
-
-  ${(p) =>
-    p.primary &&
-    css`
-      background-color: var(--tina-color-primary);
-      color: var(--tina-color-grey-0);
-      fill: var(--tina-color-grey-0);
-      border: none;
-      &:hover {
-        background-color: var(--tina-color-primary-light);
-      }
-      &:active {
-        background-color: var(--tina-color-primary-dark);
-      }
-    `};
-
-  ${(p) =>
-    p.small &&
-    css`
-      height: 32px;
-      font-size: var(--tina-font-size-0);
-      padding: 0 var(--tina-padding-big);
-    `};
-
-  ${(p) =>
-    p.margin &&
-    css`
-      &:not(:first-child) {
-        margin-left: 8px;
-      }
-    `};
-
-  ${(p) =>
-    p.grow &&
-    css`
-      flex-grow: 1;
-    `};
-
-  ${(p) =>
-    p.busy &&
-    css`
-      cursor: wait;
-    `};
-`
-
-// Type of property 'defaultProps' circularly references itself in mapped type
-// @ts-ignore
-export const IconButton = styled(Button)`
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  margin: 0;
-  position: relative;
-  transform-origin: 50% 50%;
-  transition: all 150ms ease-out;
-  padding: 0;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: center;
-  align-items: center;
-  min-width: 0;
-
-  svg {
-    width: 26px;
-    height: 26px;
-    transition: all 150ms ease-out;
+  const roundedClasses = {
+    full: `rounded-full`,
+    left: `rounded-l-full`,
+    right: `rounded-r-full`,
+  }
+  const sizeClasses = {
+    small: `text-xs h-8 px-4`,
+    medium: `text-sm h-10 px-6`,
+    custom: ``,
   }
 
-  ${(p) =>
-    p.small &&
-    css`
-      width: 28px;
-      height: 28px;
-      padding: 0;
+  return (
+    <button
+      className={`${baseClasses} ${variantStateClasses} ${sizeClasses[size]} ${stateClasses[state]} ${roundedClasses[rounded]} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
-      svg {
-        width: 24px;
-        height: 24px;
-      }
-    `};
+export const IconButton = ({
+  primary,
+  size = 'medium',
+  open,
+  busy,
+  disabled,
+  children,
+  className,
+  ...props
+}: ButtonProps) => {
+  const baseClasses =
+    'icon-parent inline-flex items-center border border-transparent text-sm font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out rounded-full '
+  const variantClasses = {
+    primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500`,
+    secondary: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
+  }
+  const variantStateClasses = primary
+    ? open
+      ? variantClasses.secondary
+      : variantClasses.primary
+    : open
+    ? variantClasses.primary
+    : variantClasses.secondary
+  const state = busy ? `busy` : disabled ? `disabled` : `default`
+  const stateClasses = {
+    disabled: `pointer-events-none	opacity-30 cursor-not-allowed`,
+    busy: `pointer-events-none opacity-70 cursor-wait`,
+    default: ``,
+  }
+  const sizeClasses = {
+    small: `h-6 w-6`,
+    medium: `h-8 w-8`,
+    custom: ``,
+  }
 
-  ${(props) =>
-    props.open &&
-    css`
-      background-color: var(--tina-color-grey-0);
-      border-color: var(--tina-color-grey-2);
-      outline: none;
-      fill: var(--tina-color-primary);
-      svg {
-        transform: rotate(45deg);
-      }
-      &:hover {
-        background-color: var(--tina-color-grey-1);
-      }
-      &:active {
-        background-color: var(--tina-color-grey-2);
-      }
-    `};
-`
+  return (
+    <button
+      className={`${baseClasses} ${variantStateClasses} ${sizeClasses[size]} ${stateClasses[state]} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}

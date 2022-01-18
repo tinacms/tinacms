@@ -133,7 +133,7 @@ export const ImageUpload = ({
                     onClear()
                   }}
                 >
-                  <TrashIcon />
+                  <TrashIcon className="w-5/6 h-auto" />
                 </DeleteButton>
               )}
             </>
@@ -163,9 +163,9 @@ const ImageLoadingIndicator = () => (
 )
 
 const ImageLoaderWrapper = styled.div`
-  padding: 1rem;
+  padding: 16px;
   width: 100%;
-  min-height: 6rem;
+  min-height: 96px;
   display: flex;
   flex-direction: column;
   justify-content: center;
