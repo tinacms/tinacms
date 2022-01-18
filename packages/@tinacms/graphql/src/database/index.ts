@@ -333,7 +333,8 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    await _indexContent(this.tinaSchema, this, documentPaths)
+    const tinaSchema = await this.getSchema()
+    await _indexContent(tinaSchema, this, documentPaths)
   }
 
   public _indexAllContent = async () => {
