@@ -51,7 +51,7 @@ export const indexDB = async ({
     graphQLSchema = await _buildSchema(builder, tinaSchema)
     await database.putConfigFiles({ graphQLSchema, tinaSchema })
   } else {
-    graphQLSchema = JSON.parse(await database.bridge.get('_graphql.json'))
+    graphQLSchema = JSON.parse(await database.bridge.get('.tina/__generated__/_graphql.json'))
   }
   await database.indexContent({ graphQLSchema, tinaSchema })
   if (buildSDK) {
