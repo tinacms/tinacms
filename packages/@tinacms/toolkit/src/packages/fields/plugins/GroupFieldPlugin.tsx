@@ -67,7 +67,14 @@ export const Group = ({ tinaForm, field, meta }: GroupProps) => {
           {field.label || field.name}
           <RightArrowIcon />
         </Header>
-        <div>{meta?.error ? meta?.error?.toString() : ''}</div>
+        <div
+          style={{
+            color: 'var(--tina-color-error)',
+            fontSize: 'var(--tina-font-size-2)',
+          }}
+        >
+          {meta?.error ? meta?.error?.toString() : ''}
+        </div>
       </div>
       <Panel
         isExpanded={isExpanded}
