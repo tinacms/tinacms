@@ -22,7 +22,7 @@ import * as React from 'react'
 export const NoFormsPlaceholder = () => (
   <EmptyState>
     <Emoji>🔎</Emoji>
-    <p>
+    <p className="mb-4">
       Tina didn't find <br />
       any queries to <br />
       generate forms for.

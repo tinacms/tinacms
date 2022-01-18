@@ -179,20 +179,20 @@ export const PRModal = () => {
 // @ts-ignore
 const TinaButton = styled(RawTinaButton)`
   height: auto;
-  padding-top: 0.8125rem;
-  padding-bottom: 0.8125rem;
+  padding-top: 13px;
+  padding-bottom: 13px;
   text-decoration: none;
   line-height: 1;
 `
 
 const ModalDescription = styled.p`
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 
   b {
     font-weight: bold;
   }
 `
-
+// @ts-ignore FIXME twind
 const PrModalBody = styled(ModalBody)`
-  padding: 1.25rem 1.25rem 0 1.25rem;
+  padding: 20px 20px 0 20px;
 `
