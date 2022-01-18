@@ -98,11 +98,11 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <IconButton onClick={addItem} primary small>
-          <AddIcon />
+        <IconButton onClick={addItem} primary size="small">
+          <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </GroupListHeader>
-      <GroupListPanel>
+      <ListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
@@ -124,7 +124,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
             )}
           </Droppable>
         </ItemList>
-      </GroupListPanel>
+      </ListPanel>
     </>
   )
 }
@@ -185,9 +185,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             >
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
-            <DeleteButton onClick={removeItem}>
-              <TrashIcon />
-            </DeleteButton>
+            <ItemDeleteButton onClick={removeItem} />
           </ItemHeader>
           <FormPortal>
             {({ zIndexShift }) => (
@@ -217,6 +215,17 @@ const ItemClickTarget = styled.div`
   align-items: center;
   padding: 8px;
 `
+
+export const ItemDeleteButton = ({ onClick }) => {
+  return (
+    <button
+      className="w-8 h-10 flex items-center justify-center hover:text-red-500"
+      onClick={onClick}
+    >
+      <TrashIcon className="" />
+    </button>
+  )
+}
 
 export const GroupLabel = styled.span<{ error?: boolean }>`
   margin: 0;
@@ -257,14 +266,13 @@ export const GroupListMeta = styled.div`
   line-height: 1;
 `
 
-const GroupListPanel = styled.div`
-  max-height: initial;
-  position: relative;
-  height: auto;
-  margin-bottom: 24px;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-`
+export const ListPanel = ({ children }) => {
+  return (
+    <div className="relative mb-6 rounded-md bg-gray-100 shadow">
+      {children}
+    </div>
+  )
+}
 
 const EmptyList = styled.div`
   text-align: center;
@@ -279,14 +287,14 @@ const EmptyList = styled.div`
 
 const ItemList = styled.div``
 
-const ItemHeader = styled.div<{ isDragging: boolean }>`
+export const ItemHeader = styled.div<{ isDragging: boolean }>`
   position: relative;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid var(--tina-color-grey-2);
+  border: 1px solid var(--tina-color-grey-2) !important;
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
@@ -320,7 +328,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     border-radius: 4px 4px 0 0;
   }
 
-  &:nth-last-child(2) {
+  &:last-child {
     border-radius: 0 0 4px 4px;
     &:first-child {
       border-radius: var(--tina-radius-small);
@@ -351,28 +359,11 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     `};
 `
 
-const DeleteButton = styled.button`
-  text-align: center;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 12px 8px;
-  margin: 0;
-  transition: all 85ms ease-out;
-  svg {
-    transition: all 85ms ease-out;
-  }
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-  }
-`
-
 const DragHandle = styled(function DragHandle({ ...styleProps }) {
   return (
     <div {...styleProps}>
-      <DragIcon />
-      <ReorderIcon />
+      <DragIcon className="w-7 h-auto" />
+      <ReorderIcon className="w-7 h-auto" />
     </div>
   )
 })`
@@ -450,10 +441,9 @@ const Panel = function Panel({
           setExpanded(false)
         }}
       >
-        <LeftArrowIcon />
-        <GroupLabel>{itemTitle}</GroupLabel>
+        {itemTitle}
       </PanelHeader>
-      <PanelBody>
+      <PanelBody id={tinaForm.id}>
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
     </GroupPanel>

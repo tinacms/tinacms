@@ -36,20 +36,13 @@ export function CursorPaginator({
   hasPrev,
 }: MediaPaginatorProps) {
   return (
-    <PageLinksWrap>
-      <Button small disabled={!hasPrev} onClick={navigatePrev}>
+    <div className="w-full flex flex-shrink-0 justify-end gap-2 items-center bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+      <Button size="small" disabled={!hasPrev} onClick={navigatePrev}>
         &laquo; Previous
       </Button>
-      <Button small disabled={!hasNext} onClick={navigateNext}>
+      <Button size="small" disabled={!hasNext} onClick={navigateNext}>
         Next &raquo;
       </Button>
-    </PageLinksWrap>
+    </div>
   )
 }
-
-const PageLinksWrap = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: var(--tina-padding-small);
-`

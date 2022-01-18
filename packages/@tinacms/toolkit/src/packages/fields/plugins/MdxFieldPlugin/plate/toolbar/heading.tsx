@@ -28,7 +28,8 @@ export const HeaderPopup = ({ children, icon }) => {
         position: 'relative',
       }}
     >
-      <Button
+      <button
+        className="p-2 border-b-0"
         onClick={(event: any) => {
           event.stopPropagation()
           event.preventDefault()
@@ -36,7 +37,7 @@ export const HeaderPopup = ({ children, icon }) => {
         }}
       >
         {icon}
-      </Button>
+      </button>
       <BlockMenu open={visible}>
         <Dismissible
           click
@@ -50,13 +51,6 @@ export const HeaderPopup = ({ children, icon }) => {
     </span>
   )
 }
-
-const Button = styled.button`
-  svg {
-    width: 20px;
-    height: auto;
-  }
-`
 
 const BlockMenu = styled.div<{ open: boolean }>`
   border-radius: var(--tina-radius-small);

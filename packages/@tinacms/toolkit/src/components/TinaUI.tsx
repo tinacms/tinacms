@@ -26,6 +26,8 @@ import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
 import { ActiveFieldIndicator } from './ActiveFieldIndicator'
 import { MutationSignalProvider } from './MutationSignal'
+// @ts-ignore importing css is not recognized
+import styles from '../styles.css'
 
 export interface TinaUIProps {
   position?: SidebarPosition
@@ -42,20 +44,20 @@ export const TinaUI: React.FC<TinaUIProps> = ({
 
   return (
     <MutationSignalProvider>
-      <ModalProvider>
-        <Alerts alerts={cms.alerts} />
-        {cms.enabled && styled && <Theme />}
-        {cms.enabled && cms.toolbar && <Toolbar />}
-        <MediaManager />
-        {cms.sidebar ? (
-          <SidebarProvider position={position} sidebar={cms.sidebar}>
-            {children}
-          </SidebarProvider>
-        ) : (
-          children
-        )}
-        <ActiveFieldIndicator />
-      </ModalProvider>
+      <style>{styles}</style>
+      <div className="tina-tailwind">
+        <ModalProvider>
+          <Alerts alerts={cms.alerts} />
+          {cms.enabled && styled && <Theme />}
+          {cms.enabled && cms.toolbar && <Toolbar />}
+          <MediaManager />
+          {cms.sidebar && (
+            <SidebarProvider position={position} sidebar={cms.sidebar} />
+          )}
+          <ActiveFieldIndicator />
+        </ModalProvider>
+      </div>
+      {children}
     </MutationSignalProvider>
   )
 }

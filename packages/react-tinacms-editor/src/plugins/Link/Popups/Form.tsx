@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { StyleReset } from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import {
@@ -99,23 +98,21 @@ export const LinkForm = () => {
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>
       {position && (
-        <StyleReset>
-          <LinkFormWrapper>
-            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-            <InnerForm
-              style={{
-                left,
-                top,
-                width: `${width}px`,
-              }}
-              removeLink={() => removeLinkBeingEdited(state, dispatch)}
-              onChange={onChange}
-              href={href}
-              // title={title}
-              cancel={onCancel}
-            />
-          </LinkFormWrapper>
-        </StyleReset>
+        <LinkFormWrapper>
+          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+          <InnerForm
+            style={{
+              left,
+              top,
+              width: `${width}px`,
+            }}
+            removeLink={() => removeLinkBeingEdited(state, dispatch)}
+            onChange={onChange}
+            href={href}
+            // title={title}
+            cancel={onCancel}
+          />
+        </LinkFormWrapper>
       )}
     </div>
   )
