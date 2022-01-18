@@ -160,10 +160,10 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
 }
 
 const FormWrapper = styled.div`
-  padding: 1rem;
-  border-radius: 3rem;
+  padding: 16px;
+  border-radius: 48px;
 `
 
 const InputWrapper = styled.div`
-  padding-bottom: 1rem;
+  padding-bottom: 16px;
 `

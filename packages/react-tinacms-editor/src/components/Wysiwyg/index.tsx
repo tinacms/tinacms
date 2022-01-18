@@ -60,40 +60,33 @@ export const Wysiwyg = ({
       <EditorModeConsumer>
         {({ mode }) => (
           <BrowserFocusProvider>
-            <Wrapper>
-              {mode === 'markdown' ? (
-                <MarkdownEditor
-                  value={value}
-                  onChange={onChange}
-                  imageProps={imageProps}
-                  plugins={pluginList}
-                  sticky={sticky}
-                />
-              ) : (
-                <ProsemirrorEditor
-                  input={{
-                    value,
-                    onChange: onChange,
-                  }}
-                  plugins={pluginList}
-                  sticky={sticky}
-                  format={format}
-                  imageProps={imageProps}
-                  className={className}
-                />
-              )}
-            </Wrapper>
+            {mode === 'markdown' ? (
+              <MarkdownEditor
+                value={value}
+                onChange={onChange}
+                imageProps={imageProps}
+                plugins={pluginList}
+                sticky={sticky}
+              />
+            ) : (
+              <ProsemirrorEditor
+                input={{
+                  value,
+                  onChange: onChange,
+                }}
+                plugins={pluginList}
+                sticky={sticky}
+                format={format}
+                imageProps={imageProps}
+                className={className}
+              />
+            )}
           </BrowserFocusProvider>
         )}
       </EditorModeConsumer>
     </EditorModeProvider>
   )
 }
-
-const Wrapper = styled.div`
-  display: block;
-  min-height: 100px;
-`
 
 const defaultParse = (media: Media) => media.id
 

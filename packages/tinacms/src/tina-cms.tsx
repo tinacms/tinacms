@@ -19,6 +19,8 @@ import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 import UrlPattern from 'url-pattern'
+// @ts-ignore importing css is not recognized
+import styles from './styles.css'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
@@ -268,8 +270,12 @@ export const TinaCMSProvider2 = ({
     props.query
   }
 
+  const validOldSetup =
+    new Boolean(props?.isLocalClient) ||
+    (new Boolean(props?.clientId) && new Boolean(props?.branch))
+
   // branch & clientId are still supported, so don't throw if they're provided
-  if (!props.apiURL && !(props?.clientId || props?.isLocalClient)) {
+  if (!props.apiURL && !validOldSetup) {
     throw new Error(`apiURL is a required field`)
   }
 
@@ -290,6 +296,7 @@ export const TinaCMSProvider2 = ({
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
     >
+      <style>{styles}</style>
       {props.query ? (
         <SetupHooks key={props.query} {...props} query={props.query || ''}>
           {children}

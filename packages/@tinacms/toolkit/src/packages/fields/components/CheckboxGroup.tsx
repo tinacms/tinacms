@@ -76,7 +76,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
           value={option.value}
           checked={checked}
           disabled={disabled}
-          onChange={event => {
+          onChange={(event) => {
             if (event.target.checked === true) {
               /**
                * Add `value` to `input.value[]`
@@ -93,7 +93,11 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
           }}
         />
         <CheckboxOption htmlFor={optionId} checked={checked}>
-          {checked === true ? <CircleCheck /> : <Circle />}
+          {checked === true ? (
+            <CircleCheck className="w-5 h-auto text-black" />
+          ) : (
+            <Circle className="w-5 h-auto text-black" />
+          )}
           <Label>{option.label}</Label>
         </CheckboxOption>
       </CheckboxOptionWrap>

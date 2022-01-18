@@ -16,11 +16,16 @@ limitations under the License.
 
 */
 
+import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-const MenuItem = css`
-  flex: 1 1 32px;
-`
+interface MenuButtonProps {
+  children: React.ReactNode
+  title?: string
+  active?: boolean
+  disabled?: boolean
+  ref?: any
+}
 
 export const MenuButton = styled.button<{
   title?: string
@@ -28,24 +33,17 @@ export const MenuButton = styled.button<{
   disabled?: boolean
   ref?: any
 }>`
-  ${MenuItem}
-  background-color: ${p =>
-    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  border: 1px solid var(--tina-color-grey-2);
-  margin: -1px;
-  outline: none;
-  padding: 6px 4px;
-  transition: all 85ms ease-out;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 8px !important;
+  border: none;
+  border-right: 1px solid var(--tina-color-grey-2);
+  width: auto;
+  height: auto;
+  border-left: none;
+  margin: 0 0 -1px 0;
+  flex-grow: 1;
+  max-width: 48px;
+  transition: background 150ms ease-out;
+
   &:hover {
     background-color: rgba(53, 50, 50, 0.09);
   }
@@ -58,14 +56,14 @@ export const MenuButton = styled.button<{
     width: 20px;
     height: 20px;
   }
-  ${props =>
+  ${(props) =>
     props.active &&
     css`
       color: var(--tina-color-primary);
       fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
-  ${props =>
+  ${(props) =>
     props.disabled &&
     css`
       pointer-events: none;

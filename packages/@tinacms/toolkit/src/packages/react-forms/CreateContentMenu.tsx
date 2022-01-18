@@ -41,7 +41,7 @@ export const CreateContentMenu: React.FC<CreateContentMenuProps> = ({
       <ContentMenuWrapper>
         {sidebar ? (
           <IconButton onClick={() => setVisible(true)} open={visible} primary>
-            <AddIcon />
+            <AddIcon className="w-5/6 h-auto" />
           </IconButton>
         ) : (
           <CreateToggleButton onClick={() => setVisible(true)} open={visible}>
@@ -126,9 +126,8 @@ const FormModal = ({ plugin, close }: any) => {
 }
 
 const ContentMenuWrapper = styled.div`
+  pointer-events: auto;
   position: relative;
-  grid-area: actions;
-  justify-self: end;
 `
 
 const CreateToggleButton = styled(Button as any)`
@@ -147,7 +146,7 @@ const CreateToggleButton = styled(Button as any)`
     opacity: 0.7;
     width: 2em;
     height: 2em;
-    margin-right: 0.25rem;
+    margin-right: 4px;
     transform-origin: 50% 50%;
     transition: all 150ms ease-out;
   }
@@ -168,7 +167,6 @@ const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
   display: block;
   position: absolute;
   top: 0;
-  left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -178,18 +176,21 @@ const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
+
   ${(props) =>
     props.direction === 'left' &&
     css`
       right: 0;
       transform-origin: 100% 0;
     `}
+
   ${(props) =>
     props.direction === 'right' &&
     css`
       left: 0;
       transform-origin: 0 0;
     `}
+    
   ${(props) =>
     props.open &&
     css`
@@ -199,27 +200,16 @@ const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
     `};
 `
 
-const CreateButton = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-1);
-  padding: 0 12px;
-  height: 40px;
-  font-weight: var(--tina-font-weight-regular);
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: #f6f6f9;
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`
+const CreateButton = ({ children, ...props }) => {
+  return (
+    <button
+      className="relative text-center text-sm p-2 w-full border-b border-gray-50 outline-none transition-all ease-out duration-150 hover:text-blue-500 hover:bg-gray-50"
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
 export const DesktopLabel = styled.span`
   display: none;

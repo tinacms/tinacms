@@ -21,6 +21,7 @@ import { Field, Form } from '../../../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../../../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../../../icons'
+import { BiPencil } from 'react-icons/bi'
 
 interface MdxFieldFieldDefinititon extends Field {
   component: 'group'
@@ -42,13 +43,12 @@ export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
   return (
     <>
       {inline ? (
-        <SpanHeader onClick={() => setExpanded(!isExpanded)}>
+        <InlineHeader onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
-        </SpanHeader>
+        </InlineHeader>
       ) : (
         <Header onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
-          <RightArrowIcon />
         </Header>
       )}
       <Panel
@@ -96,63 +96,35 @@ const Panel = function Panel({
   )
 }
 
-const SpanHeader: StyledComponent<'span', {}, {}> = styled.span`
-  position: relative;
-  cursor: pointer;
-  border: 1px solid var(--tina-color-grey-3);
-  border-left: 3px solid var(--tina-color-primary);
-  border-radius: var(--tina-radius-small);
-  overflow: visible;
-  line-height: 1.35;
-  padding: 2px 8px;
-  color: var(--tina-color-grey-10);
-  background-color: white;
+const InlineHeader = ({ onClick, children }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="group mx-0.5 px-2 py-0.5 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md inline-flex justify-between items-center gap-2"
+    >
+      <span className="text-left font-medium overflow-hidden overflow-ellipsis whitespace-nowrap flex-1">
+        {children}
+      </span>{' '}
+      <BiPencil className="h-5 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90" />
+    </button>
+  )
+}
 
-  svg {
-    width: 24px;
-    height: auto;
-    fill: var(--tina-color-grey-3);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    color: #0084ff;
-  }
-`
-
-const Header: StyledComponent<'div', {}, {}> = styled.div`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--tina-color-grey-2);
-  border-left: 3px solid var(--tina-color-primary);
-  border-radius: var(--tina-radius-small);
-  overflow: visible;
-  line-height: 1.35;
-  padding: 12px;
-  margin: 8px 0;
-  color: var(--tina-color-grey-10);
-  background-color: white;
-
-  svg {
-    width: 24px;
-    height: auto;
-    fill: var(--tina-color-grey-3);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    color: #0084ff;
-  }
-`
+const Header = ({ onClick, children }) => {
+  return (
+    <div className="pt-1 mb-5">
+      <button
+        onClick={onClick}
+        className="group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2"
+      >
+        <span className="text-left font-medium overflow-hidden overflow-ellipsis whitespace-nowrap flex-1">
+          {children}
+        </span>{' '}
+        <BiPencil className="h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90" />
+      </button>
+    </div>
+  )
+}
 
 const PanelHeader = styled.div`
   position: relative;

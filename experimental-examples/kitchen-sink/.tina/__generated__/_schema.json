@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.2",
+    "fullVersion": "0.59.3",
     "major": "0",
     "minor": "59",
-    "patch": "2"
+    "patch": "3"
   },
   "meta": {},
   "collections": [
@@ -109,48 +109,6 @@
           "namespace": [
             "page",
             "body"
-          ]
-        },
-        {
-          "name": "objField",
-          "label": "This is an object field",
-          "type": "object",
-          "fields": [
-            {
-              "label": "Test 1",
-              "name": "test1",
-              "type": "string",
-              "namespace": [
-                "page",
-                "objField",
-                "test1"
-              ]
-            }
-          ],
-          "namespace": [
-            "page",
-            "objField"
-          ]
-        },
-        {
-          "name": "objFieldList",
-          "label": "This is an list object field",
-          "type": "object",
-          "fields": [
-            {
-              "label": "Test 1",
-              "name": "test1",
-              "type": "string",
-              "namespace": [
-                "page",
-                "objFieldList",
-                "test1"
-              ]
-            }
-          ],
-          "namespace": [
-            "page",
-            "objFieldList"
           ]
         }
       ],
