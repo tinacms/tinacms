@@ -26,7 +26,6 @@ import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
-import useEmbedTailwind from './hooks/useEmbedTailwind'
 import { useEditState } from '@tinacms/sharedctx'
 
 const Redirect = () => {
@@ -40,8 +39,6 @@ const Redirect = () => {
 }
 
 export const TinaAdmin = () => {
-  useEmbedTailwind()
-
   const isSSR = typeof window === 'undefined'
   const { edit } = useEditState()
 
