@@ -18,9 +18,8 @@ limitations under the License.
 
 import React from 'react'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { wysiwygStyles } from './wysiwygStyles'
 
-export const MarkdownField = wysiwygStyles((props) => {
+export const MarkdownField = (props) => {
   return (
     <Wysiwyg
       {...props}
@@ -29,7 +28,7 @@ export const MarkdownField = wysiwygStyles((props) => {
       imageProps={props.field.imageProps}
     />
   )
-})
+}
 
 export const MarkdownFieldPlugin = {
   __type: 'field',

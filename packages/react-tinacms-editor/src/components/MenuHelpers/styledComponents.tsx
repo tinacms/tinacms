@@ -28,8 +28,8 @@ export const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
   pointer-events: none;
   position: relative;
   display: block;
-  height: ${props => props.menuBoundingBox.height}px;
-  width: ${props => props.menuBoundingBox.width}px;
+  height: ${(props) => props.menuBoundingBox.height}px;
+  width: ${(props) => props.menuBoundingBox.width}px;
 `
 
 type MenuWrapperProps = {
@@ -43,7 +43,7 @@ export const MenuWrapper = styled.div<MenuWrapperProps>`
   margin-bottom: 14px;
   z-index: var(--tina-z-index-1);
 
-  ${props =>
+  ${(props) =>
     props.menuFixed &&
     css`
       position: fixed;
