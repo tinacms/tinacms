@@ -6,6 +6,8 @@
   /* gray-600 from tailwind config */
   color: #565165;
 
+  @apply font-sans;
+
   @layer utilities {
     .icon-parent {
       svg {
