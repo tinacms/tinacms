@@ -5,6 +5,7 @@
   "files": [
     "dist",
     "bin/*",
+    "__mocks__/styleMock.js",
     ".env"
   ],
   "license": "Apache-2.0",
@@ -14,8 +15,8 @@
   "scripts": {
     "build:all": "bin/tina-build build:all",
     "watch:all": "bin/tina-build build:all --watch",
-    "build": "yarn tsup src/jest-runner.ts src/index.ts --format cjs --external pnpapi",
-    "watch": "yarn tsup src/jest-runner.ts src/index.ts --watch --format cjs --external pnpapi"
+    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs --external pnpapi",
+    "watch": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --watch --format cjs --external pnpapi"
   },
   "dependencies": {
     "@babel/core": "^7.15.0",
@@ -36,6 +37,7 @@
     "execa": "^5.1.1",
     "express": "^4.17.1",
     "fs-extra": "^9.0.1",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^27.0.6",
     "meow": "^10.0.1",
     "normalize-path": "^3.0.0",
