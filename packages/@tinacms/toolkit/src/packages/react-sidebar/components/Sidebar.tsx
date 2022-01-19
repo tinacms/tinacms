@@ -95,10 +95,6 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     }
   }
 
-  React.useEffect(() => {
-    console.log('menuIsOpen', menuIsOpen)
-  }, [menuIsOpen])
-
   const toggleSidebarOpen = () => {
     if (displayState === 'closed') {
       setDisplayState('open')
