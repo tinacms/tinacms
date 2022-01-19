@@ -22,5 +22,4 @@ export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 
 import { TinaCMSProvider2 } from './tina-cms'
-import { type } from 'os'
 export default TinaCMSProvider2

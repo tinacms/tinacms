@@ -91,46 +91,49 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
-              <SidebarFormBody className="form-body">
-                <FormPortalProvider>
+              <FormPortalProvider>
+                <FormWrapper id={tinaForm.id}>
                   {tinaForm && tinaForm.fields.length ? (
                     <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
-                </FormPortalProvider>
-              </SidebarFormBody>
+                </FormWrapper>
+              </FormPortalProvider>
               {!hideFooter && (
-                <FormFooter className="form-footer">
-                  {tinaForm.reset && (
-                    <ResetForm
-                      pristine={pristine}
-                      reset={async () => {
-                        finalForm.reset()
-                        await tinaForm.reset!()
-                      }}
+                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                        // @ts-ignore FIXME twind
+                        style={{ flexGrow: 1 }}
+                      >
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={() => handleSubmit()}
+                      disabled={pristine || submitting || invalid}
+                      busy={submitting}
+                      primary
+                      style={{ flexGrow: 3 }}
                     >
-                      {tinaForm.buttons.reset}
-                    </ResetForm>
-                  )}
-                  <Button
-                    onClick={() => handleSubmit()}
-                    disabled={pristine || submitting || invalid}
-                    busy={submitting}
-                    primary
-                    grow
-                    margin
-                  >
-                    {submitting && <LoadingDots />}
-                    {!submitting && tinaForm.buttons.save}
-                  </Button>
-                  {tinaForm.actions.length > 0 && (
-                    <FormActionMenu
-                      form={tinaForm as any}
-                      actions={tinaForm.actions}
-                    />
-                  )}
-                </FormFooter>
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
+                  </div>
+                </div>
               )}
             </DragDropContext>
           )
@@ -191,7 +194,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                   {label && (
                     <h4 className="font-bold text-lg opacity-80">{label}</h4>
                   )}
-                  <div className="flex flex-1 items-center justify-end">
+                  <div className="flex flex-1 gap-4 items-center justify-end">
                     <FormStatus pristine={pristine} />
                     {tinaForm.reset && (
                       <ResetForm
@@ -200,6 +203,8 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
+                        // @ts-ignore FIXME twind
+                        style={{ flexBasis: '7rem' }}
                       >
                         {tinaForm.buttons.reset}
                       </ResetForm>
@@ -209,7 +214,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
                       primary
-                      margin
+                      style={{ flexBasis: '10rem' }}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
@@ -223,13 +228,9 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                   </div>
                 </div>
                 <FormPortalProvider>
-                  <FormWrapper padded={true}>
+                  <FormWrapper id={tinaForm.id}>
                     {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder
-                        form={tinaForm}
-                        fields={tinaForm.fields}
-                        padding={false}
-                      />
+                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
                     ) : (
                       <NoFieldsPlaceholder />
                     )}
@@ -246,7 +247,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
 
 const FormStatus = ({ pristine }) => {
   return (
-    <div className="mr-6 flex flex-0 items-center">
+    <div className="flex flex-0 items-center">
       {!pristine && (
         <>
           <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
@@ -267,52 +268,19 @@ const FormStatus = ({ pristine }) => {
   )
 }
 
-export const FormWrapper = ({ children, padded = false }) => {
+export const FormWrapper = ({ children, id }) => {
   return (
-    <div style={{ maxHeight: '100%', overflowY: 'auto', height: '100%' }}>
-      <div
-        style={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          padding: padded ? `2rem 1.5rem 0 1.5rem` : ``,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '900px',
-            width: '100%',
-          }}
-        >
-          {children}
-        </div>
+    <div
+      data-test={`form:${id}`}
+      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-8 px-6 pb-2"
+    >
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-form">{children}</div>
       </div>
     </div>
   )
 }
 
-const SidebarFormBody = styled.div`
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: auto;
-  border-top: 1px solid var(--tina-color-grey-2);
-  background-color: #f6f6f9;
-`
-const FormFooter = styled.div`
-  position: relative;
-  flex: 0 0 auto;
-  width: 100%;
-  height: 64px;
-  background-color: white;
-  border-top: 1px solid var(--tina-color-grey-2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 16px;
-`
 const Emoji = styled.span`
   font-size: 40px;
   line-height: 1;
