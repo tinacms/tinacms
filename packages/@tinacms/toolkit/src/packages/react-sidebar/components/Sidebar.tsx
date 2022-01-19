@@ -79,6 +79,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   useSubscribable(sidebar)
   useSubscribable(screens)
   const allScreens = screens.all()
+  const contentCreators = cms.plugins.findOrCreateMap('content-creator')
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
@@ -148,7 +149,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         <SidebarWrapper>
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
-            <Nav screens={allScreens} />
+            <Nav screens={allScreens} contentCreators={contentCreators} />
           )}
           <SidebarBody>
             <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
@@ -176,7 +177,11 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
               leaveTo="opacity-0 -translate-x-full"
             >
               <div className="fixed left-0 z-overlay h-full transform">
-                <Nav screens={allScreens} className="rounded-r-md">
+                <Nav
+                  screens={allScreens}
+                  contentCreators={contentCreators}
+                  className="rounded-r-md"
+                >
                   <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
                     <Button
                       rounded="right"

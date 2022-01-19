@@ -20,8 +20,13 @@ import * as React from 'react'
 import { BiExit } from 'react-icons/bi'
 import { FiMoreVertical } from 'react-icons/fi'
 import { ImFilesEmpty } from 'react-icons/im'
+import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
 import { SidebarContext } from './Sidebar'
+import { Modal, ModalPopup, ModalHeader, ModalBody } from '../../react-modals'
+import { Form } from '../../forms'
+import { FormBuilder } from '../../form-builder'
+import { useCMS } from '../../react-core'
 
 interface NavProps {
   children?: any
@@ -34,6 +39,7 @@ export const Nav = ({
   className = '',
   children,
   screens,
+  contentCreators,
   ...props
 }: NavProps) => {
   const { sidebarWidth } = React.useContext(SidebarContext)
@@ -111,6 +117,9 @@ export const Nav = ({
             const Icon = view.Icon
             return <NavItem name={view.name} view={view} icon={Icon} />
           })}
+          {contentCreators.all().map((plugin) => {
+            return <CreateContentNavItem plugin={plugin} />
+          })}
         </ul>
       </div>
     </div>
@@ -122,10 +131,9 @@ const NavItem = ({ name, view, icon }) => {
   const Icon = icon ? icon : ImFilesEmpty
 
   return (
-    <li>
+    <li key={name}>
       <button
         className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
-        key={name}
         value={name}
         onClick={() => {
           setActiveView(view)
@@ -135,5 +143,59 @@ const NavItem = ({ name, view, icon }) => {
         <Icon className="mr-3 h-6 opacity-80 w-auto" /> {name}
       </button>
     </li>
+  )
+}
+
+const CreateContentNavItem = ({ plugin }) => {
+  const { setMenuIsOpen } = React.useContext(SidebarContext)
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <li key={plugin.name}>
+      <button
+        className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+        onClick={() => {
+          setOpen(true)
+          setMenuIsOpen(false)
+        }}
+      >
+        <VscNewFile className="mr-3 h-6 opacity-80 w-auto" /> {plugin.name}
+      </button>
+      {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
+    </li>
+  )
+}
+
+const FormModal = ({ plugin, close }: any) => {
+  const cms = useCMS()
+  const form: Form = React.useMemo(
+    () =>
+      new Form({
+        id: 'create-form-id',
+        label: 'create-form',
+        fields: plugin.fields,
+        actions: plugin.actions,
+        buttons: plugin.buttons,
+        initialValues: plugin.initialValues || {},
+        reset: plugin.reset,
+        onChange: plugin.onChange,
+        onSubmit: async (values) => {
+          await plugin.onSubmit(values, cms).then(() => {
+            close()
+          })
+        },
+      }),
+    [close, cms, plugin]
+  )
+
+  return (
+    <Modal>
+      <ModalPopup>
+        <ModalHeader close={close}>{plugin.name}</ModalHeader>
+        <ModalBody>
+          <FormBuilder form={form} />
+        </ModalBody>
+      </ModalPopup>
+    </Modal>
   )
 }
