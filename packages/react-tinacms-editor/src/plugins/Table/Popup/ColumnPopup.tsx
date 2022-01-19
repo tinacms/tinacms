@@ -108,7 +108,7 @@ export default () => {
             <IconButton
               onClick={() => alignColumn(view, 'right')}
               size="small"
-              primary
+              variant="primary"
             >
               <AlignRight className="w-5/6 h-auto" />
             </IconButton>

@@ -21,13 +21,7 @@ import { Field, Form } from '../../forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder, useFormPortal } from '../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import {
-  AddIcon,
-  DragIcon,
-  ReorderIcon,
-  TrashIcon,
-  LeftArrowIcon,
-} from '../../icons'
+import { AddIcon, DragIcon, ReorderIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from '../../react-dismissible'
 import { IconButton } from '../../styles'
@@ -118,8 +112,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             event.preventDefault()
             setVisible((visible) => !visible)
           }}
-          open={visible}
-          variant={`${visible ? 'secondary' : 'primary'}`}
+          variant={visible ? 'secondary' : 'primary'}
           size="small"
           className={`${visible ? `rotate-45` : ``}`}
         >
