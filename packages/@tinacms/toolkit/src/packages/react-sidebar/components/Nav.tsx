@@ -33,6 +33,7 @@ interface NavProps {
   children?: any
   className?: string
   userName?: string
+  contentCreators?: any
   screens?: any
 }
 
