@@ -310,6 +310,7 @@ const config = (cwd = '') => {
         menu: 9800,
         chrome: 10200,
         overlay: 10600,
+        modal: 10800,
         '0': 0,
         '10': 10,
         '20': 20,
@@ -369,7 +370,7 @@ const config = (cwd = '') => {
           },
         },
         fontFamily: {
-          sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+          sans: ['Inter', ...defaultTheme.fontFamily.sans],
         },
         lineHeight: {
           3: '12px',
