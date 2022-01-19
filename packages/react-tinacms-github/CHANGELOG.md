@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.51.16
+
+### Patch Changes
+
+- Updated dependencies [7006b38ea]
+  - @tinacms/toolkit@0.56.8
+  - next-tinacms-markdown@0.50.3
+
 ## 0.51.15
 
 ### Patch Changes
