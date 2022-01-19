@@ -91,7 +91,7 @@ const CreateContentButton = ({ plugin, onClick }: any) => {
   )
 }
 
-const FormModal = ({ plugin, close }: any) => {
+export const FormModal = ({ plugin, close }: any) => {
   const cms = useCMS()
   const form: Form = useMemo(
     () =>

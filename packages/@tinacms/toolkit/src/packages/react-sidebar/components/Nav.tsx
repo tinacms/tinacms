@@ -27,6 +27,7 @@ import { Modal, ModalPopup, ModalHeader, ModalBody } from '../../react-modals'
 import { Form } from '../../forms'
 import { FormBuilder } from '../../form-builder'
 import { useCMS } from '../../react-core'
+import { FormModal } from '../../react-forms'
 
 interface NavProps {
   children?: any
@@ -163,39 +164,5 @@ const CreateContentNavItem = ({ plugin }) => {
       </button>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </li>
-  )
-}
-
-const FormModal = ({ plugin, close }: any) => {
-  const cms = useCMS()
-  const form: Form = React.useMemo(
-    () =>
-      new Form({
-        id: 'create-form-id',
-        label: 'create-form',
-        fields: plugin.fields,
-        actions: plugin.actions,
-        buttons: plugin.buttons,
-        initialValues: plugin.initialValues || {},
-        reset: plugin.reset,
-        onChange: plugin.onChange,
-        onSubmit: async (values) => {
-          await plugin.onSubmit(values, cms).then(() => {
-            close()
-          })
-        },
-      }),
-    [close, cms, plugin]
-  )
-
-  return (
-    <Modal>
-      <ModalPopup>
-        <ModalHeader close={close}>{plugin.name}</ModalHeader>
-        <ModalBody>
-          <FormBuilder form={form} />
-        </ModalBody>
-      </ModalPopup>
-    </Modal>
   )
 }
