@@ -311,6 +311,7 @@ export const TinaCMSProvider2 = ({
           <TinaDataProvider formifyCallback={formifyCallback}>
             {typeof props.children == 'function' ? (
               <TinaQuery
+                {...props}
                 variables={props.variables}
                 data={props.data}
                 query={query}
@@ -340,11 +341,11 @@ const DocumentCreator = ({
 
 interface TinaQueryProps {
   /** The query from getStaticProps */
-  query?: string
+  query: string
   /** Any variables from getStaticProps */
-  variables?: object
+  variables: object
   /** The `data` from getStaticProps */
-  data?: object
+  data: object
   /** Your React page component */
   children: (props: { data: object }) => React.ReactNode
   /** Callback if you need access to the "formify" API */
@@ -357,19 +358,14 @@ const TinaQuery = (props: TinaQueryProps) => {
   return <TinaQueryInner key={`rootQuery-${props.query}`} {...props} />
 }
 
-const TinaQueryInner = ({
-  children,
-  query,
-  variables,
-  data,
-}: TinaQueryProps) => {
+const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
   const { data: liveData, isLoading } = useTina({
-    query,
-    variables,
-    data,
+    query: props.query,
+    variables: props.variables,
+    data: props.data,
   })
 
-  return <>{children(isLoading ? { data } : { data: liveData })}</>
+  return <>{children(isLoading ? props : { ...props, data: liveData })}</>
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
