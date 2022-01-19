@@ -13,7 +13,8 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --env=jsdom --passWithNoTests"
+    "test": "jest --env=jsdom --passWithNoTests",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
     "@einsteinindustries/react-tinacms-inline": "^0.43.15",

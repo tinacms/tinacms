@@ -21,7 +21,8 @@
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
     "docs": "npx typedoc",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
     "@einsteinindustries/tinacms-core": "^0.43.15",
