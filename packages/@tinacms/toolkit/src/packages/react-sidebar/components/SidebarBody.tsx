@@ -263,7 +263,7 @@ export interface FormHeaderProps {
 }
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const { sidebarWidth } = React.useContext(SidebarContext)
+  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
 
   return (
     <div
@@ -275,7 +275,7 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
         <span className="block text-xl mb-[6px] text-gray-700 font-medium leading-tight">
           {activeForm.label}
         </span>
-        <FormStatus pristine={true} />
+        <FormStatus pristine={formIsPristine} />
       </div>
     </div>
   )
