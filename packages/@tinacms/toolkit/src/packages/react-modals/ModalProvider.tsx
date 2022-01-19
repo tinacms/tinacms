@@ -32,7 +32,7 @@ export const ModalProvider: React.FC = ({ children }) => {
 
   return (
     <>
-      <div id="modal-root" ref={setModalRef} />
+      <div id="modal-root" className="tina-tailwind" ref={setModalRef} />
       <ModalContainerContext.Provider
         value={{ portalNode: modalRootContainerRef }}
       >
