@@ -24,7 +24,6 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { StyleReset } from '@tinacms/toolkit'
 import { AsyncButton } from '../components/AsyncButton'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -114,22 +113,20 @@ interface ModalBuilderProps {
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
-    <StyleReset>
-      <Modal>
-        <ModalPopup>
-          <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
-          <ModalBody padded>
-            <p>{modalProps.message}</p>
-            {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
-          </ModalBody>
-          <ModalActions>
-            {modalProps.actions.map((action: any) => (
-              <AsyncButton {...action} />
-            ))}
-          </ModalActions>
-        </ModalPopup>
-      </Modal>
-    </StyleReset>
+    <Modal>
+      <ModalPopup>
+        <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
+        <ModalBody padded>
+          <p>{modalProps.message}</p>
+          {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
+        </ModalBody>
+        <ModalActions>
+          {modalProps.actions.map((action: any) => (
+            <AsyncButton {...action} />
+          ))}
+        </ModalActions>
+      </ModalPopup>
+    </Modal>
   )
 }
 

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.7
+
+### Patch Changes
+
+- e8ca82899: Passes id to FormWrapper now that id is required
+
 ## 0.56.6
 
 ### Patch Changes

@@ -67,29 +67,6 @@ export const TagsField = wrapFieldsWithMeta<
   )
 })
 
-const DeleteButton = styled.button`
-  text-align: center;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 6px;
-  margin: 0 calc(var(--tina-padding-small) * -1) 0 6px;
-  display: flex;
-  align-items: center;
-  transition: all 85ms ease-out;
-
-  svg {
-    transition: all 85ms ease-out;
-    width: 16px;
-    height: auto;
-    fill: var(--tina-color-grey-8);
-  }
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-  }
-`
-
 const TagGrid = styled.span`
   display: flex;
   flex-wrap: wrap;
@@ -103,9 +80,12 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
   return (
     <span {...styleProps}>
       <span>{children}</span>
-      <DeleteButton onClick={removeItem}>
-        <CloseIcon />
-      </DeleteButton>
+      <button
+        className="text-center flex-shrink-0 border-0 bg-transparent p-2 flex items-center justify-center cursor-pointer"
+        onClick={removeItem}
+      >
+        <CloseIcon className="w-4 h-auto" />
+      </button>
     </span>
   )
 })`
@@ -118,9 +98,10 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
   font-size: var(--tina-font-size-2);
   font-weight: 600;
   letter-spacing: 0.01em;
-  line-height: 1.35;
+  white-space: nowrap;
+  line-height: 1;
   color: var(--tina-color-grey-8);
-  padding: 0 var(--tina-padding-small);
+  padding: 0 0 0 10px;
   margin: 4px;
   text-overflow: ellipsis;
   overflow: hidden;

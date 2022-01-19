@@ -91,32 +91,36 @@ export default () => {
       {markerDivCol &&
         ReactDOM.createPortal(
           <IconWrapperCol>
-            <IconButton onClick={() => alignColumn(view, 'left')} small primary>
-              <AlignLeft />
+            <IconButton
+              onClick={() => alignColumn(view, 'left')}
+              size="small"
+              primary
+            >
+              <AlignLeft className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => alignColumn(view, 'center')}
-              small
+              size="small"
               primary
             >
-              <AlignCenter />
+              <AlignCenter className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => alignColumn(view, 'right')}
-              small
+              size="small"
               primary
             >
-              <AlignRight />
+              <AlignRight className="w-5/6 h-auto" />
             </IconButton>
             <IconButton
               onClick={() => {
                 deleteColumn(state, dispatch)
                 view.focus()
               }}
-              small
+              size="small"
               primary
             >
-              <TrashIcon />
+              <TrashIcon className="w-5/6 h-auto" />
             </IconButton>
           </IconWrapperCol>,
           markerDivCol
@@ -129,10 +133,10 @@ export default () => {
                 deleteRow(state, dispatch)
                 view.focus()
               }}
-              small
+              size="small"
               primary
             >
-              <TrashIcon />
+              <TrashIcon className="w-5/6 h-auto" />
             </IconButton>
           </IconWrapperRow>,
           markerDivRow

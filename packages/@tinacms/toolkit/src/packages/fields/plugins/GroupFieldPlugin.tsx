@@ -18,10 +18,11 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../forms'
-import styled, { keyframes, css, StyledComponent } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
-import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { useCMS } from '../../react-core/use-cms'
+import { BiPencil } from 'react-icons/bi'
+import { IoMdClose } from 'react-icons/io'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -65,7 +66,6 @@ export const Group = ({ tinaForm, field, meta }: GroupProps) => {
           }}
         >
           {field.label || field.name}
-          <RightArrowIcon />
         </Header>
         <div
           style={{
@@ -127,9 +127,9 @@ const Panel = function Panel({
               setExpanded(false)
             }}
           >
-            <LeftArrowIcon /> <span>{field.label || field.name}</span>
+            {field.label || field.name}
           </PanelHeader>
-          <PanelBody>
+          <PanelBody id={tinaForm.id}>
             {isExpanded ? (
               <FieldsBuilder form={tinaForm} fields={fields} />
             ) : null}
@@ -140,75 +140,38 @@ const Panel = function Panel({
   )
 }
 
-const Header: StyledComponent<'div', {}, {}> = styled.div`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--tina-color-grey-2);
-  border-radius: var(--tina-radius-small);
-  margin: 0 0 24px 0;
-  overflow: visible;
-  line-height: 1.35;
-  padding: 12px;
-  color: var(--tina-color-grey-10);
-  background-color: white;
+const Header = ({ onClick, children }) => {
+  return (
+    <div className="pt-1 mb-5">
+      <button
+        onClick={onClick}
+        className="group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2"
+      >
+        <span className="text-left text-base font-medium overflow-hidden overflow-ellipsis whitespace-nowrap flex-1">
+          {children}
+        </span>{' '}
+        <BiPencil className="h-6 w-auto transition-opacity duration-150 ease-out opacity-80 group-hover:opacity-90" />
+      </button>
+    </div>
+  )
+}
 
-  svg {
-    width: 24px;
-    height: auto;
-    fill: var(--tina-color-grey-3);
-    transition: all var(--tina-timing-short) ease-out;
-  }
+export const PanelHeader = ({ onClick, children }) => {
+  return (
+    <button
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-3 border-t border-b shadow-sm
+       border-gray-100 px-6`}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase">
+        {children}
+        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+      </div>
+    </button>
+  )
+}
 
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    color: #0084ff;
-  }
-`
-
-export const PanelHeader = styled.div`
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 6px 18px 6px 18px;
-  font-size: var(--tina-font-size-3);
-  transition: color var(--tina-timing-medium) ease-out;
-  user-select: none;
-  border-bottom: 1px solid var(--tina-color-grey-2);
-  margin: 0;
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  svg {
-    flex: 0 0 auto;
-    width: 24px;
-    fill: var(--tina-color-grey-3);
-    height: auto;
-    transform: translate3d(-4px, 0, 0);
-    transition: transform var(--tina-timing-medium) ease-out;
-  }
-  :hover {
-    color: var(--tina-color-primary);
-    svg {
-      fill: var(--tina-color-grey-8);
-      transform: translate3d(-7px, 0, 0);
-      transition: transform var(--tina-timing-medium) ease-out;
-    }
-  }
-`
-
-export const PanelBody = ({ children }) => {
+export const PanelBody = ({ id, children }) => {
   return (
     <div
       style={{
@@ -218,7 +181,7 @@ export const PanelBody = ({ children }) => {
         background: 'var(--tina-color-grey-1)',
       }}
     >
-      <FormWrapper>{children}</FormWrapper>
+      <FormWrapper id={id}>{children}</FormWrapper>
     </div>
   )
 }

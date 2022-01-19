@@ -21,7 +21,7 @@ import { useCMS, useSubscribable } from '../../react-core'
 import { Plugin } from '../../core'
 import { Form } from '../../forms'
 import { FieldMeta } from '../../fields'
-import { Button, tina_reset_styles } from '../../styles'
+import { Button } from '../../styles'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { CreateContentMenu } from '../../react-forms'
 import styled, { css } from 'styled-components'
@@ -230,8 +230,6 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
 }
 
 const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
-  ${tina_reset_styles}
-
   font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
@@ -313,7 +311,7 @@ const Status = styled.div`
 
   > * {
     margin-bottom: 0;
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 
   label {
@@ -325,7 +323,7 @@ const Actions = styled.div`
   display: flex;
   align-items: center;
 
-  ${Button} {
+  button {
     margin-left: 12px;
   }
 `
@@ -377,7 +375,7 @@ const MenuToggle = styled(Button)<{ open: boolean }>`
   margin-left: -12px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  margin-right: 0.5rem;
+  margin-right: 8px;
   display: flex;
   align-items: center;
   padding: 0 15px;
@@ -500,7 +498,6 @@ const MenuWrapper = styled.div`
 
 const MenuPanel = styled.div<{ visible: boolean }>`
   all: unset;
-  ${tina_reset_styles}
   box-sizing: border-box;
   background: var(--tina-color-grey-8);
   position: fixed;

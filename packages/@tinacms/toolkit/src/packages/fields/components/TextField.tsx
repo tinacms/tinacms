@@ -17,8 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -29,6 +27,9 @@ export interface TextFieldProps extends a {
   ref?: any
 }
 
-export const BaseTextField = styled.input<TextFieldProps>`
-  ${InputCss}
-`
+export const textFieldClasses =
+  'shadow-inner focus:shadow-outline focus:border-blue-500 block text-base px-3 py-2 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded-md'
+
+export const BaseTextField = ({ ...props }) => {
+  return <input type="text" className={textFieldClasses} {...props} />
+}
