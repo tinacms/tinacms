@@ -158,7 +158,6 @@ const CreateContentNavItem = ({ plugin }) => {
         className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
         onClick={() => {
           setOpen(true)
-          setMenuIsOpen(false)
         }}
       >
         <VscNewFile className="mr-3 h-6 opacity-80 w-auto" /> {plugin.name}
