@@ -82,64 +82,62 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 
   return (
-    <ModalProvider>
-      <FinalForm
-        form={finalForm}
-        key={`${i}: ${tinaForm.id}`}
-        onSubmit={tinaForm.onSubmit}
-      >
-        {({ handleSubmit, pristine, invalid, submitting }) => {
-          return (
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormPortalProvider>
-                <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  )}
-                </FormWrapper>
-              </FormPortalProvider>
-              {!hideFooter && (
-                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        // @ts-ignore FIXME twind
-                        style={{ flexGrow: 1 }}
-                      >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={() => handleSubmit()}
-                      disabled={pristine || submitting || invalid}
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexGrow: 3 }}
+    <FinalForm
+      form={finalForm}
+      key={`${i}: ${tinaForm.id}`}
+      onSubmit={tinaForm.onSubmit}
+    >
+      {({ handleSubmit, pristine, invalid, submitting }) => {
+        return (
+          <DragDropContext onDragEnd={moveArrayItem}>
+            <FormPortalProvider>
+              <FormWrapper id={tinaForm.id}>
+                {tinaForm && tinaForm.fields.length ? (
+                  <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                ) : (
+                  <NoFieldsPlaceholder />
+                )}
+              </FormWrapper>
+            </FormPortalProvider>
+            {!hideFooter && (
+              <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                  {tinaForm.reset && (
+                    <ResetForm
+                      pristine={pristine}
+                      reset={async () => {
+                        finalForm.reset()
+                        await tinaForm.reset!()
+                      }}
+                      // @ts-ignore FIXME twind
+                      style={{ flexGrow: 1 }}
                     >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
-                  </div>
+                      {tinaForm.buttons.reset}
+                    </ResetForm>
+                  )}
+                  <Button
+                    onClick={() => handleSubmit()}
+                    disabled={pristine || submitting || invalid}
+                    busy={submitting}
+                    variant="primary"
+                    style={{ flexGrow: 3 }}
+                  >
+                    {submitting && <LoadingDots />}
+                    {!submitting && tinaForm.buttons.save}
+                  </Button>
+                  {tinaForm.actions.length > 0 && (
+                    <FormActionMenu
+                      form={tinaForm as any}
+                      actions={tinaForm.actions}
+                    />
+                  )}
                 </div>
-              )}
-            </DragDropContext>
-          )
-        }}
-      </FinalForm>
-    </ModalProvider>
+              </div>
+            )}
+          </DragDropContext>
+        )
+      }}
+    </FinalForm>
   )
 }
 
