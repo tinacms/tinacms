@@ -1,11 +1,15 @@
 import { render, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { TinaCMSProvider2 } from './tina-cms'
 
+import { useTina } from './edit-state'
+
 jest.mock('./auth', () => {
-  return { TinaCloudProvider: ({ children }: any) => <>{children}</> }
+  return {
+    TinaCloudProvider: ({ children }: any) => (<>{children}</>) as ReactNode,
+  }
 })
 jest.mock('./hooks/use-content-creator', () => {
   return { useDocumentCreatorPlugin: () => {} }
@@ -14,13 +18,23 @@ jest.mock('@tinacms/toolkit', () => {
   return { useCMS: () => {} }
 })
 jest.mock('./hooks/use-graphql-forms', () => {
-  return { useGraphqlForms: () => [{}, false] }
+  return { useGraphqlForms: jest.fn(() => [{}, false]) }
+})
+jest.mock('./edit-state', () => {
+  return {
+    useTina: jest.fn(() => {
+      return { data: {}, isLoading: true }
+    }),
+  }
 })
 
 describe('TinaCMSProvider', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('with render props children', () => {
     it('passes along all props', () => {
-      const { queryByText, debug } = render(
+      const { queryByText } = render(
         <TinaCMSProvider2
           query="my-query"
           variables={{ foo: 'my-variable-val' }}
@@ -41,17 +55,64 @@ describe('TinaCMSProvider', () => {
       expect(variablesPropText).toBeInTheDocument()
       expect(dataPropText).toBeInTheDocument()
     })
+
+    it('registers form', () => {
+      const request = {
+        query: 'my-query',
+        variables: { foo: 'my-variable-val' },
+        data: { foo: 'my-data' },
+      }
+      render(
+        <TinaCMSProvider2 {...request}>
+          {(liveProps) => <DummyChild {...liveProps} />}
+        </TinaCMSProvider2>
+      )
+
+      expect(useTina).toHaveBeenCalledWith(request)
+    })
+
+    it('returns new props', () => {
+      useTina.mockImplementationOnce(() => {
+        return { data: { liveDataProp: 'foobar' }, isLoading: false }
+      })
+      const request = {
+        query: 'my-query',
+        variables: { foo: 'my-variable-val' },
+        data: { foo: 'my-data' },
+      }
+      const { queryByText } = render(
+        <TinaCMSProvider2 {...request}>
+          {(liveProps) => <DummyChild {...liveProps} />}
+        </TinaCMSProvider2>
+      )
+
+      const text = queryByText(/liveDataProp/)
+
+      expect(text).toBeInTheDocument()
+    })
   })
 
   describe('with ReactNode children', () => {
     it('render children', () => {
-      const { queryByText, debug } = render(
+      const { queryByText } = render(
         <TinaCMSProvider2 apiURL={'http://localhost:3000'}>
           <DummyChild />
         </TinaCMSProvider2>
       )
 
-      const fakePropText = queryByText(/My Dummy Header/)
+      const header = queryByText(/My Dummy Header/)
+
+      expect(header).toBeInTheDocument()
+    })
+
+    it('doesnt register form', () => {
+      render(
+        <TinaCMSProvider2>
+          <DummyChild />
+        </TinaCMSProvider2>
+      )
+
+      expect(useTina).not.toHaveBeenCalled()
     })
   })
 })
