@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 0.1.3
+
+### Patch Changes
+
+- d0ac25b73: Update link for bare bones starter
+
 ## 0.1.2
 
 ### Patch Changes
