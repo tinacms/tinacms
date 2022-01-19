@@ -13,7 +13,8 @@
     "dev": "tinacms-scripts dev",
     "docs": "npx typedoc",
     "test": "jest --passWithNoTests",
-    "watch": "tinacms-scripts watch"
+    "watch": "tinacms-scripts watch",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "dependencies": {
     "lodash.get": "^4.4.2"

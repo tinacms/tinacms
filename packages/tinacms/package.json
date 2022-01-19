@@ -21,7 +21,8 @@
     "test": "jest --passWithNoTests",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "watch": "tinacms-scripts watch"
+    "watch": "tinacms-scripts watch",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
     "@einsteinindustries/tinacms-scripts": "^0.43.15",
