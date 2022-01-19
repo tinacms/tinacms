@@ -29,7 +29,7 @@ import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { LocalWarning } from './LocalWarning'
 import { Nav } from './Nav'
-import { Transition, Dialog } from '@headlessui/react'
+import { Transition } from '@headlessui/react'
 import { IoMdClose } from 'react-icons/io'
 
 export const SidebarContext = React.createContext<any>(null)
@@ -86,6 +86,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     React.useState<displayStates>('closed')
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
+  const [formIsPristine, setFormIsPristine] = React.useState(true)
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {
@@ -94,10 +95,6 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
       setDisplayState('fullscreen')
     }
   }
-
-  React.useEffect(() => {
-    console.log('menuIsOpen', menuIsOpen)
-  }, [menuIsOpen])
 
   const toggleSidebarOpen = () => {
     if (displayState === 'closed') {
@@ -146,6 +143,8 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         setMenuIsOpen,
         toggleMenu,
         setActiveView,
+        formIsPristine,
+        setFormIsPristine,
       }}
     >
       <>
@@ -220,7 +219,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   )
 }
 
-const updateBodyDisplacement = ({
+export const updateBodyDisplacement = ({
   displayState,
   sidebarWidth,
   resizingSidebar,

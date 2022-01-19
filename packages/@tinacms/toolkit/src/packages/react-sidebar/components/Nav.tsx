@@ -21,7 +21,8 @@ import { BiExit } from 'react-icons/bi'
 import { FiMoreVertical } from 'react-icons/fi'
 import { ImFilesEmpty } from 'react-icons/im'
 import { Menu, Transition } from '@headlessui/react'
-import { SidebarContext } from './Sidebar'
+import { SidebarContext, updateBodyDisplacement } from './Sidebar'
+import { useEditState } from '@tinacms/sharedctx'
 
 interface NavProps {
   children?: any
@@ -37,6 +38,7 @@ export const Nav = ({
   ...props
 }: NavProps) => {
   const { sidebarWidth } = React.useContext(SidebarContext)
+  const { setEdit } = useEditState()
 
   return (
     <div
@@ -83,15 +85,22 @@ export const Nav = ({
                   <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
                     <Menu.Item>
                       {({ active }) => (
-                        <a
+                        <button
                           className={`text-lg px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
                             active && 'text-blue-400 bg-gray-50 opacity-100'
                           }`}
-                          href="/"
+                          onClick={() => {
+                            updateBodyDisplacement({
+                              displayState: 'closed',
+                              sidebarWidth: null,
+                              resizingSidebar: false,
+                            })
+                            setEdit(false)
+                          }}
                         >
                           <BiExit className="w-6 h-auto mr-2 text-blue-400" />{' '}
                           Log Out
-                        </a>
+                        </button>
                       )}
                     </Menu.Item>
                   </Menu.Items>
@@ -109,7 +118,14 @@ export const Nav = ({
         <ul className="flex flex-col gap-4">
           {screens.map((view) => {
             const Icon = view.Icon
-            return <NavItem name={view.name} view={view} icon={Icon} />
+            return (
+              <NavItem
+                key={`nav-item-${view.name}`}
+                name={view.name}
+                view={view}
+                icon={Icon}
+              />
+            )
           })}
         </ul>
       </div>

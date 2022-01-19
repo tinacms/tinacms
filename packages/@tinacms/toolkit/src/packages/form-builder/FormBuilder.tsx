@@ -15,7 +15,7 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
 import { Form } from '../forms'
-import { Form as FinalForm } from 'react-final-form'
+import { Form as FinalForm, FormSpy } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '../styles'
@@ -25,6 +25,7 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
+import { SidebarContext } from '../react-sidebar/components/Sidebar'
 
 export interface FormBuilderProps {
   form: Form
@@ -66,6 +67,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
+  const { setFormIsPristine } = React.useContext(SidebarContext)
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -90,52 +92,60 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       >
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormPortalProvider>
-                <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  )}
-                </FormWrapper>
-              </FormPortalProvider>
-              {!hideFooter && (
-                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        // @ts-ignore FIXME twind
-                        style={{ flexGrow: 1 }}
+            <>
+              <FormSpy
+                subscription={{ pristine: true }}
+                onChange={({ pristine }) => {
+                  setFormIsPristine && setFormIsPristine(pristine)
+                }}
+              />
+              <DragDropContext onDragEnd={moveArrayItem}>
+                <FormPortalProvider>
+                  <FormWrapper id={tinaForm.id}>
+                    {tinaForm && tinaForm.fields.length ? (
+                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </FormWrapper>
+                </FormPortalProvider>
+                {!hideFooter && (
+                  <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                    <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                      {tinaForm.reset && (
+                        <ResetForm
+                          pristine={pristine}
+                          reset={async () => {
+                            finalForm.reset()
+                            await tinaForm.reset!()
+                          }}
+                          // @ts-ignore FIXME twind
+                          style={{ flexGrow: 1 }}
+                        >
+                          {tinaForm.buttons.reset}
+                        </ResetForm>
+                      )}
+                      <Button
+                        onClick={() => handleSubmit()}
+                        disabled={pristine || submitting || invalid}
+                        busy={submitting}
+                        variant="primary"
+                        style={{ flexGrow: 3 }}
                       >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={() => handleSubmit()}
-                      disabled={pristine || submitting || invalid}
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexGrow: 3 }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
+                        {submitting && <LoadingDots />}
+                        {!submitting && tinaForm.buttons.save}
+                      </Button>
+                      {tinaForm.actions.length > 0 && (
+                        <FormActionMenu
+                          form={tinaForm as any}
+                          actions={tinaForm.actions}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </DragDropContext>
+                )}
+              </DragDropContext>
+            </>
           )
         }}
       </FinalForm>
