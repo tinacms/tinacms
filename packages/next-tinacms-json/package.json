@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/next-tinacms-json",
-  "version": "0.43.15",
+  "version": "0.43.16",
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
@@ -27,8 +27,8 @@
     "react": ">=16"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms": "^0.43.15",
-    "@einsteinindustries/tinacms-scripts": "^0.43.15"
+    "@einsteinindustries/tinacms": "^0.43.16",
+    "@einsteinindustries/tinacms-scripts": "^0.43.16"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
