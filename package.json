@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@changesets/cli": "2.18.0",
-    "@headlessui/react": "^1.4.2",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "@yarnpkg/pnpify": "^2.0.0-rc.20",
