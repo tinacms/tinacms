@@ -11,7 +11,8 @@
   "scripts": {
     "watch": "echo 'watch'",
     "build": "echo 'build'",
-    "dev": "echo 'dev'"
+    "dev": "echo 'dev'",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "keywords": []
 }

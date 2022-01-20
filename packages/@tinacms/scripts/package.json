@@ -11,5 +11,8 @@
   "bin": {
     "tinacms-scripts": "./bin/scripts.js"
   },
+  "scripts": {
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
+  },
   "keywords": []
 }

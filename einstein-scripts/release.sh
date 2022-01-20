@@ -33,6 +33,7 @@ echo "Running a fresh build..."
 
 # 3. Run a fresh build
 npm run hard-reset
+npx lerna run --parallel generate-lock-file
 
 echo "Updating versions..."
 
