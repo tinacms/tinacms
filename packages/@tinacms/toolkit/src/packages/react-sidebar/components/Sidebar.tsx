@@ -79,7 +79,6 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   useSubscribable(sidebar)
   useSubscribable(screens)
   const allScreens = screens.all()
-  const contentCreators = cms.plugins.findOrCreateMap('content-creator')
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
@@ -88,6 +87,13 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+
+  /**
+   * Only show ContentCreators when TinaAdmin is disabled
+   */
+  const contentCreators = cms.flags.get('tina-admin')
+    ? []
+    : cms.plugins.getType('content-creator').all()
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {

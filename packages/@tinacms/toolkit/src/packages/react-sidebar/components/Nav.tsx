@@ -131,7 +131,7 @@ export const Nav = ({
               />
             )
           })}
-          {contentCreators.all().map((plugin, idx) => {
+          {contentCreators.map((plugin, idx) => {
             return (
               <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
             )
