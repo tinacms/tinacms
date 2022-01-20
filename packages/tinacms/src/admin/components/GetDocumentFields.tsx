@@ -13,14 +13,8 @@ limitations under the License.
 
 import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
+import { TinaAdminApi } from '../api'
 
-interface GetDocumentFields {
-  [collectionName: string]: {
-    collection: Object
-    templates?: Object[]
-    fields?: Object[]
-  }
-}
 export interface Info {
   collection: Object | undefined
   template: Object | undefined
@@ -36,6 +30,7 @@ export const useGetDocumentFields = (
   collectionName: string,
   templateName: string
 ) => {
+  const api = new TinaAdminApi(cms.api.tina)
   const [info, setInfo] = useState<Info>({
     collection: undefined,
     template: undefined,
@@ -45,11 +40,7 @@ export const useGetDocumentFields = (
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
-      const response: GetDocumentFields = await cms.api.tina.request(
-        `query { getDocumentFields }`,
-        {}
-      )
-
+      const response = await api.fetchDocumentFields()
       const documentFields = response.getDocumentFields
       const collection: Object = documentFields[collectionName].collection
       const mutationInfo: {

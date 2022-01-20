@@ -22,6 +22,7 @@ import GetDocumentFields from '../components/GetDocumentFields'
 import GetDocument from '../components/GetDocument'
 
 import type { TinaCMS } from '@tinacms/toolkit'
+import { TinaAdminApi } from '../api'
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -30,28 +31,14 @@ const updateDocument = async (
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
+  const api = new TinaAdminApi(cms.api.tina)
   const { includeCollection, includeTemplate } = mutationInfo
   const params = transformDocumentIntoMutationRequestPayload(values, {
     includeCollection,
     includeTemplate,
   })
 
-  await cms.api.tina.request(
-    `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-      updateDocument( 
-        collection: $collection,
-        relativePath: $relativePath, 
-        params: $params
-      ){__typename}
-    }`,
-    {
-      variables: {
-        collection: collection.name,
-        relativePath,
-        params,
-      },
-    }
-  )
+  await api.updateDocument(collection.name, relativePath, params)
 }
 
 const CollectionUpdatePage = () => {

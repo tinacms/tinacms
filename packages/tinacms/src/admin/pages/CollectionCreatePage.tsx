@@ -20,6 +20,7 @@ import GetDocumentFields from '../components/GetDocumentFields'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+import { TinaAdminApi } from '../api'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -28,6 +29,7 @@ const createDocument = async (
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
+  const api = new TinaAdminApi(cms.api.tina)
   const { relativePath, ...leftover } = values
   const { includeCollection, includeTemplate } = mutationInfo
   const params = transformDocumentIntoMutationRequestPayload(
@@ -42,20 +44,7 @@ const createDocument = async (
     }
   )
 
-  await cms.api.tina.request(
-    `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-      createDocument(
-        collection: $collection,
-        relativePath: $relativePath,
-    }`,
-    {
-      variables: {
-        collection: collection.name,
-        relativePath,
-        params,
-      },
-    }
-  )
+  await api.createDocument(collection.name, relativePath, params)
 }
 
 const CollectionCreatePage = () => {
