@@ -17,8 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -29,8 +27,12 @@ export interface TextAreaProps extends a {
   ref?: any
 }
 
-export const TextArea = styled.textarea<{ error?: boolean }>`
-  ${InputCss};
-  resize: vertical;
-  height: 160px;
-`
+export const TextArea = ({ ...props }) => {
+  return (
+    <textarea
+      className="shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border-gray-200 focus:text-gray-900 rounded-md"
+      {...props}
+      style={{ minHeight: '160px' }}
+    />
+  )
+}
