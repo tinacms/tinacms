@@ -25,12 +25,12 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
-import { SidebarContext } from '../react-sidebar/components/Sidebar'
 
 export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
+  onPristineChange?: (pristine: boolean) => unknown
 }
 
 const NoFieldsPlaceholder = () => (
@@ -47,6 +47,7 @@ const NoFieldsPlaceholder = () => (
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
+  onPristineChange,
   ...rest
 }) => {
   const hideFooter = !!rest.hideFooter
@@ -67,7 +68,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
-  const { setFormIsPristine } = React.useContext(SidebarContext)
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -95,7 +95,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
             <FormSpy
               subscription={{ pristine: true }}
               onChange={({ pristine }) => {
-                setFormIsPristine && setFormIsPristine(pristine)
+                onPristineChange && onPristineChange(pristine)
               }}
             />
             <DragDropContext onDragEnd={moveArrayItem}>
