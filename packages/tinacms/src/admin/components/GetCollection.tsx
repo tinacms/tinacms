@@ -13,79 +13,25 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
-
-interface Document {
-  node: {
-    sys: {
-      template: string
-      breadcrumbs: string[]
-      path: string
-      basename: string
-      relativePath: string
-      filename: string
-      extension: string
-    }
-  }
-}
-
-export interface Template {
-  name: string
-  label: string
-  fields: any[]
-}
-export interface Collection {
-  label: string
-  name: string
-  format: string
-  templates: Template[]
-  documents: {
-    totalCount: number
-    edges: Document[]
-  }
-}
+import { TinaAdminApi } from '../api'
+import type { Collection } from '../types'
 
 export const useGetCollection = (
   cms: TinaCMS,
   collectionName: string,
   includeDocuments: boolean = true
 ) => {
+  const api = new TinaAdminApi(cms.api.tina)
   const [collection, setCollection] = useState<Collection | undefined>(
     undefined
   )
 
   useEffect(() => {
     const fetchCollection = async () => {
-      const response: { getCollection: Collection } =
-        await cms.api.tina.request(
-          `
-          query($collection: String!, $includeDocuments: Boolean!){
-            getCollection(collection: $collection){
-              name
-              label
-              format
-              templates
-              documents @include(if: $includeDocuments) {
-                totalCount
-                edges {
-                  node {
-                    ... on Document {
-                      sys {
-                        template
-                        breadcrumbs
-                        path
-                        basename
-                        relativePath
-                        filename
-                        extension
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }`,
-          { variables: { collection: collectionName, includeDocuments } }
-        )
+      const response = await api.fetchCollection(
+        collectionName,
+        includeDocuments
+      )
       setCollection(response.getCollection)
     }
 

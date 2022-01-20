@@ -19,7 +19,8 @@ import { ImFilesEmpty } from 'react-icons/im'
 import { VscOpenPreview } from 'react-icons/vsc'
 import type { TinaCMS } from '@tinacms/toolkit'
 
-import GetCollections, { Collection } from './GetCollections'
+import GetCollections from './GetCollections'
+import type { Collection } from '../types'
 import { useEditState } from '@tinacms/sharedctx'
 
 const Sidebar = ({ cms }: { cms: TinaCMS }) => {
