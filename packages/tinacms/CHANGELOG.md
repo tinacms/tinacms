@@ -1,5 +1,20 @@
 # tinacms
 
+## 0.64.2
+
+### Patch Changes
+
+- Updated dependencies [7006b38ea]
+  - @tinacms/toolkit@0.56.8
+
+## 0.64.1
+
+### Patch Changes
+
+- 28010a026: Adds tailwind styles to Admin Layout
+- Updated dependencies [e8ca82899]
+  - @tinacms/toolkit@0.56.7
+
 ## 0.64.0
 
 ### Minor Changes

@@ -55,7 +55,7 @@ export type Document = {
 
 /** A relay-compliant pagination connection */
 export type Connection = {
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
 };
 
 export type Query = {
@@ -92,8 +92,8 @@ export type QueryGetDocumentArgs = {
 export type QueryGetDocumentListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 
@@ -105,8 +105,8 @@ export type QueryGetPageDocumentArgs = {
 export type QueryGetPageListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 
@@ -118,8 +118,8 @@ export type QueryGetPostDocumentArgs = {
 export type QueryGetPostListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 export type DocumentConnectionEdges = {
@@ -131,7 +131,7 @@ export type DocumentConnectionEdges = {
 export type DocumentConnection = Connection & {
   __typename?: 'DocumentConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<DocumentConnectionEdges>>>;
 };
 
@@ -139,7 +139,7 @@ export type Collection = {
   __typename?: 'Collection';
   name: Scalars['String'];
   slug: Scalars['String'];
-  label: Scalars['String'];
+  label?: Maybe<Scalars['String']>;
   path: Scalars['String'];
   format?: Maybe<Scalars['String']>;
   matches?: Maybe<Scalars['String']>;
@@ -152,29 +152,17 @@ export type Collection = {
 export type CollectionDocumentsArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 export type DocumentNode = PageDocument | PostDocument;
-
-export type PageObjField = {
-  __typename?: 'PageObjField';
-  test1?: Maybe<Scalars['String']>;
-};
-
-export type PageObjFieldList = {
-  __typename?: 'PageObjFieldList';
-  test1?: Maybe<Scalars['String']>;
-};
 
 export type Page = {
   __typename?: 'Page';
   heading?: Maybe<Scalars['String']>;
   subtitle?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
-  objField?: Maybe<PageObjField>;
-  objFieldList?: Maybe<PageObjFieldList>;
 };
 
 export type PageDocument = Node & Document & {
@@ -196,7 +184,7 @@ export type PageConnectionEdges = {
 export type PageConnection = Connection & {
   __typename?: 'PageConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
 };
 
@@ -225,7 +213,7 @@ export type PostConnectionEdges = {
 export type PostConnection = Connection & {
   __typename?: 'PostConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PostConnectionEdges>>>;
 };
 
@@ -290,20 +278,10 @@ export type DocumentMutation = {
   post?: Maybe<PostMutation>;
 };
 
-export type PageObjFieldMutation = {
-  test1?: Maybe<Scalars['String']>;
-};
-
-export type PageObjFieldListMutation = {
-  test1?: Maybe<Scalars['String']>;
-};
-
 export type PageMutation = {
   heading?: Maybe<Scalars['String']>;
   subtitle?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
-  objField?: Maybe<PageObjFieldMutation>;
-  objFieldList?: Maybe<PageObjFieldListMutation>;
 };
 
 export type PostMutation = {
@@ -311,7 +289,7 @@ export type PostMutation = {
   body?: Maybe<Scalars['JSON']>;
 };
 
-export type PagePartsFragment = { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> };
+export type PagePartsFragment = { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> };
 
 export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, body?: Maybe<any> };
 
@@ -320,12 +298,12 @@ export type GetPageDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> } } };
+export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } } };
 
 export type GetPageListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, objField?: Maybe<{ __typename: 'PageObjField', test1?: Maybe<string> }>, objFieldList?: Maybe<{ __typename: 'PageObjFieldList', test1?: Maybe<string> }> } }> }>>> } };
+export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } }> }>>> } };
 
 export type GetPostDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -344,14 +322,6 @@ export const PagePartsFragmentDoc = gql`
   heading
   subtitle
   body
-  objField {
-    __typename
-    test1
-  }
-  objFieldList {
-    __typename
-    test1
-  }
 }
     `;
 export const PostPartsFragmentDoc = gql`
@@ -462,16 +432,26 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
   export type Sdk = ReturnType<typeof getSdk>;
 
 // TinaSDK generated code
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   doc,
   vars,
   _options
 ) => {
-  // const data = await tinaClient.request(doc, { variables: vars }); 
-  const res = await await getStaticPropsForTina({query: doc, variables: vars})
-  return res
-};
+  let data = {}
+  try {
+    data = await staticRequest({
+      query: doc,
+      variables: vars,
+    })
+  } catch (e) {
+    // swallow errors related to document creation
+    console.warn('Warning: There was an error when fetching data')
+    console.warn(e)
+  }
+
+  return { data, query: doc, variables: vars || {} }
+}
 
 /**
  * @experimental this class can be used but may change in the future

@@ -44,18 +44,18 @@ export default defineSchema({
             },
           ],
         },
-        {
-          name: 'objField',
-          label: 'This is an object field',
-          type: 'object',
-          fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
-        },
-        {
-          name: 'objFieldList',
-          label: 'This is an list object field',
-          type: 'object',
-          fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
-        },
+        // {
+        //   name: 'objField',
+        //   label: 'This is an object field',
+        //   type: 'object',
+        //   fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
+        // },
+        // {
+        //   name: 'objFieldList',
+        //   label: 'This is an list object field',
+        //   type: 'object',
+        //   fields: [{ label: 'Test 1', name: 'test1', type: 'string' }],
+        // },
       ],
     },
     {

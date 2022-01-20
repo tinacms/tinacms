@@ -83,15 +83,15 @@ export const FieldMeta = ({
 }
 
 // Styling
-export const FieldWrapper = styled.div<{ margin: boolean }>`
-  position: relative;
-
-  ${(props) =>
-    props.margin &&
-    css<any>`
-      margin-bottom: var(--tina-padding-big);
-    `};
-`
+export const FieldWrapper = ({
+  margin,
+  children,
+}: {
+  margin: boolean
+  children: React.ReactNode
+}) => {
+  return <div className={`relative ${margin ? `mb-5` : ``}`}>{children}</div>
+}
 
 export const FieldLabel = styled.label`
   all: unset;

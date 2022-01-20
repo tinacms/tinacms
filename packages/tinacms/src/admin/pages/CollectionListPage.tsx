@@ -17,10 +17,8 @@ import { useParams, useLocation, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
 import GetCMS from '../components/GetCMS'
-import GetCollection, {
-  Collection,
-  Template,
-} from '../components/GetCollection'
+import GetCollection from '../components/GetCollection'
+import type { Collection, Template } from '../types'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
@@ -173,7 +171,7 @@ const CollectionListPage = () => {
                                     {livesiteRoute && (
                                       <a
                                         href={livesiteRoute}
-                                        className="flex gap-1.5 items-center px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
+                                        className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
                                       >
                                         <BiLinkExternal className="inline-block h-5 w-auto opacity-70" />{' '}
                                         View
@@ -181,7 +179,7 @@ const CollectionListPage = () => {
                                     )}
                                     <Link
                                       to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="flex gap-1.5 items-center px-4 py-1.5 rounded-full border border-gray-150 transition-all ease-out duration-150 text-gray-700  hover:bg-gray-50 hover:text-blue-500"
+                                      className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full border border-gray-150 transition-all ease-out duration-150 text-gray-700  hover:bg-gray-50 hover:text-blue-500"
                                     >
                                       <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
                                       Edit

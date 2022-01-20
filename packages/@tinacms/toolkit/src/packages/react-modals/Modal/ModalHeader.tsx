@@ -25,39 +25,26 @@ export interface ModalHeaderProps {
   close?(): void
 }
 
-export const ModalHeader = styled(
-  ({ children, close, ...styleProps }: ModalHeaderProps) => {
-    return (
-      <div {...styleProps}>
-        <ModalTitle>{children}</ModalTitle>
-        {close && (
-          <CloseButton onClick={close}>
-            <CloseIcon />
-          </CloseButton>
-        )}
-      </div>
-    )
-  }
-)`
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--tina-padding-big) 0 var(--tina-padding-big);
-  border-bottom: 1px solid var(--tina-color-grey-3);
-  margin: 0;
-`
+export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
+  return (
+    <div className="h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0">
+      <ModalTitle>{children}</ModalTitle>
+      {close && (
+        <CloseButton onClick={close}>
+          <CloseIcon />
+        </CloseButton>
+      )}
+    </div>
+  )
+}
 
-const ModalTitle = styled.h2`
-  all: unset;
-  color: var(--tina-color-grey-10);
-  font-weight: var(--tina-font-weight-regular);
-  font-family: var(--tina-font-family);
-  font-size: var(--tina-font-size-4);
-  font-weight: var(--tina-font-weight-regular);
-  line-height: 1;
-  margin: 0;
-`
+const ModalTitle = ({ children }) => {
+  return (
+    <h2 className="text-gray-600 font-medium text-base leading-none m-0">
+      {children}
+    </h2>
+  )
+}
 
 const CloseButton = styled.div`
   display: flex;

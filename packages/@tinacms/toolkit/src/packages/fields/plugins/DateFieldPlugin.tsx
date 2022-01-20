@@ -19,8 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
-import { InputProps } from '../components'
-import { InputCss } from '../components/Input'
+import { InputProps, textFieldClasses } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import ReactDatetime from 'react-datetime'
 import { DatetimepickerProps } from 'react-datetime'
@@ -49,28 +48,21 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     }, [document])
 
     return (
-      <DatetimeContainer>
-        <ReactDateTimeContainer ref={area}>
-          <ReactDatetime
-            value={input.value}
-            onFocus={input.onFocus}
-            onChange={input.onChange}
-            open={isOpen}
-            dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
-            timeFormat={timeFormat || false}
-            {...rest}
-          />
-        </ReactDateTimeContainer>
-      </DatetimeContainer>
+      <ReactDateTimeContainer ref={area}>
+        <ReactDatetime
+          value={input.value}
+          onFocus={input.onFocus}
+          onChange={input.onChange}
+          open={isOpen}
+          dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
+          timeFormat={timeFormat || false}
+          inputProps={{ className: textFieldClasses }}
+          {...rest}
+        />
+      </ReactDateTimeContainer>
     )
   }
 )
-
-const DatetimeContainer = styled.div`
-  input {
-    ${InputCss};
-  }
-`
 
 const ReactDateTimeContainer = styled.div`
   .rdt {

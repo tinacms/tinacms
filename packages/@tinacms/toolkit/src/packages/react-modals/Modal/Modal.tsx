@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { StyleReset } from '../../styles'
 import { useModalContainer } from '../ModalProvider'
 import { ModalOverlay } from './ModalOverlay'
 
@@ -33,11 +32,9 @@ export const Modal = (props: ModalProps) => {
   if (!portalNode) return null
 
   return createPortal(
-    <StyleReset>
-      <ModalOverlay>
-        <div {...props} />
-      </ModalOverlay>
-    </StyleReset>,
+    <ModalOverlay>
+      <div {...props} />
+    </ModalOverlay>,
     portalNode
   )
 }
