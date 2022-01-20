@@ -515,7 +515,7 @@ export const astBuilder = {
       const scalars = {
         string: 'String',
         boolean: 'Boolean',
-        number: 'Int', // FIXME - needs to be float or int
+        number: 'Float', // FIXME - needs to be float or int
         datetime: 'String', // FIXME
         image: 'String', // FIXME
         text: 'String',
