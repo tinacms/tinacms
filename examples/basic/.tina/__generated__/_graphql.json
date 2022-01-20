@@ -1260,24 +1260,6 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "dropdown"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
             "value": "body"
           },
           "arguments": [],
@@ -2308,20 +2290,6 @@
         "value": "PageMutation"
       },
       "fields": [
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "dropdown"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
-            }
-          }
-        },
         {
           "kind": "InputValueDefinition",
           "name": {

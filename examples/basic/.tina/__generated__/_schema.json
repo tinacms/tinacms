@@ -14,20 +14,6 @@
       "format": "mdx",
       "fields": [
         {
-          "name": "dropdown",
-          "type": "string",
-          "required": true,
-          "options": [
-            "foo",
-            "bar",
-            "baz"
-          ],
-          "namespace": [
-            "page",
-            "dropdown"
-          ]
-        },
-        {
           "name": "body",
           "label": "Main Content",
           "type": "rich-text",

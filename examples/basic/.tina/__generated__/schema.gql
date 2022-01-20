@@ -80,7 +80,6 @@ type Collection {
 union DocumentNode = PageDocument | PostDocument
 
 type Page {
-  dropdown: String!
   body: JSON
 }
 
@@ -146,7 +145,6 @@ input DocumentMutation {
 }
 
 input PageMutation {
-  dropdown: String
   body: JSON
 }
 

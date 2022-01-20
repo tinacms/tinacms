@@ -1,5 +1,4 @@
 fragment PageParts on Page {
-  dropdown
   body
 }
 
