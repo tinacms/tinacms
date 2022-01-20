@@ -131,8 +131,10 @@ export const Nav = ({
               />
             )
           })}
-          {contentCreators.all().map((plugin) => {
-            return <CreateContentNavItem plugin={plugin} />
+          {contentCreators.all().map((plugin, idx) => {
+            return (
+              <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
+            )
           })}
         </ul>
       </div>

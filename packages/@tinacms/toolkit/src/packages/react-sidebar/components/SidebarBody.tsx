@@ -37,6 +37,7 @@ export const FormsView = ({
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const formPlugins = cms.plugins.getType<Form>('form')
+  const { setFormIsPristine } = React.useContext(SidebarContext)
 
   /**
    * If there's only one form, make it the active form.
@@ -110,7 +111,10 @@ export const FormsView = ({
                 <meta.Component />
               </React.Fragment>
             ))}
-          <FormBuilder form={activeForm as any} />
+          <FormBuilder
+            form={activeForm as any}
+            onPristineChange={setFormIsPristine}
+          />
         </FormWrapper>
       )}
     </>
