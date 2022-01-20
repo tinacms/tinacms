@@ -27,4 +27,7 @@ export const SelectFieldPlugin = {
   type: 'select',
   Component: SelectField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }

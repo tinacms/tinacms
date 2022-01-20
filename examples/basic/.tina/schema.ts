@@ -22,6 +22,12 @@ export default defineSchema({
       format: 'mdx',
       fields: [
         {
+          name: 'dropdown',
+          type: 'string',
+          required: true,
+          options: ['foo', 'bar', 'baz'],
+        },
+        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',
