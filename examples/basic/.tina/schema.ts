@@ -22,6 +22,17 @@ export default defineSchema({
       format: 'mdx',
       fields: [
         {
+          type: 'object',
+          name: 'someObj',
+          fields: [
+            {
+              name: 'thingOne',
+              type: 'string',
+              required: true,
+            },
+          ],
+        },
+        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',

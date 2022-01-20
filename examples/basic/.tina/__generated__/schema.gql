@@ -79,7 +79,13 @@ type Collection {
 
 union DocumentNode = PageDocument | PostDocument
 
+type PageSomeObj {
+  thingOne: String!
+  thingTwo: String
+}
+
 type Page {
+  someObj: PageSomeObj
   body: JSON
 }
 
@@ -144,7 +150,13 @@ input DocumentMutation {
   post: PostMutation
 }
 
+input PageSomeObjMutation {
+  thingOne: String
+  thingTwo: String
+}
+
 input PageMutation {
+  someObj: PageSomeObjMutation
   body: JSON
 }
 
