@@ -3,8 +3,7 @@
   @tailwind components;
   @tailwind utilities;
 
-  /* gray-600 from tailwind config */
-  color: #565165;
+  @apply font-sans text-gray-600;
 
   @layer utilities {
     .icon-parent {
