@@ -126,45 +126,10 @@ export class Database {
         await this.bridge.put(filepath, stringifiedFile)
       }
       if (this.store.supportsIndexing()) {
-        const existingData = await this.get<{ _collection: string }>(filepath)
-        const collection = this.tinaSchema.getCollection(
-          existingData._collection
-        )
-        /**
-         * Determine the attributes which are already in the store and
-         * just remove them all. This can be more efficient if we only
-         * remove what's no longer needed, but keeping it simple for now.
-         */
-        const attributesToFilterOut = await _indexCollectable({
-          record: filepath,
-          value: existingData,
-          field: collection,
-          prefix: collection.name,
+        await indexDocument({
+          filepath: filepath,
+          data,
           database: this,
-        })
-        /**
-         * As a separate step, add the "new" attributes, even though
-         * they'll often be the same as the ones we just removed
-         */
-        const attributesToAdd = await _indexCollectable({
-          record: filepath,
-          value: data,
-          field: collection,
-          prefix: collection.name,
-          database: this,
-        })
-        await sequential(attributesToFilterOut, async (attribute) => {
-          const records = (await this.store.get<string[]>(attribute)) || []
-          await this.store.put(
-            attribute,
-            records.filter((item) => item !== filepath)
-          )
-          return true
-        })
-        await sequential(attributesToAdd, async (attribute) => {
-          const records = (await this.store.get<string[]>(attribute)) || []
-          await this.store.put(attribute, [...records, filepath])
-          return true
         })
       }
       await this.store.put(filepath, payload)
@@ -333,15 +298,14 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    const tinaSchema = await this.getSchema()
-    await _indexContent(tinaSchema, this, documentPaths)
+    await _indexContent(this, documentPaths)
   }
 
   public _indexAllContent = async () => {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(collection.path)
-      await _indexContent(tinaSchema, this, documentPaths)
+      await _indexContent(this, documentPaths)
     })
   }
 
@@ -416,46 +380,51 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const _indexContent = async (
-  tinaSchema: TinaSchema,
-  database: Database,
-  documentPaths: string[]
-) => {
-  await sequential(documentPaths, async (documentPath) => {
-    const dataString = await database.bridge.get(documentPath)
-    const data = parseFile(dataString, path.extname(documentPath), (yup) =>
+const _indexContent = async (database: Database, documentPaths: string[]) => {
+  await sequential(documentPaths, async (filepath) => {
+    const dataString = await database.bridge.get(filepath)
+    const data = parseFile(dataString, path.extname(filepath), (yup) =>
       yup.object({})
     )
-    const templateName =
-      hasOwnProperty(data, '_template') && typeof data._template === 'string'
-        ? data._template
-        : undefined
-    const { collection } = tinaSchema.getCollectionAndTemplateByFullPath(
-      documentPath,
-      templateName
-    )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(documentPath, data)
+      await database.store.seed(filepath, data)
     }
     if (database.store.supportsIndexing()) {
-      return indexDocument({ documentPath, collection, data, database })
+      return indexDocument({ filepath, data, database })
     }
   })
 }
 
 const indexDocument = async ({
-  documentPath,
+  filepath,
   data,
-  collection,
   database,
 }: {
-  documentPath: string
+  filepath: string
   data: object
-  collection: Collectable
   database: Database
 }) => {
+  const schema = await database.getSchema()
+  const collection = await schema.getCollectionByFullPath(filepath)
+  const existingData = await database.get<{ _collection: string }>(filepath)
+  const attributesToFilterOut = await _indexCollectable({
+    record: filepath,
+    value: existingData,
+    field: collection,
+    prefix: collection.name,
+    database,
+  })
+  await sequential(attributesToFilterOut, async (attribute) => {
+    const records = (await database.store.get<string[]>(attribute)) || []
+    await database.store.put(
+      attribute,
+      records.filter((item) => item !== filepath)
+    )
+    return true
+  })
+
   const attributes = await _indexCollectable({
-    record: documentPath,
+    record: filepath,
     //@ts-ignore
     field: collection,
     value: data,
@@ -467,8 +436,8 @@ const indexDocument = async ({
       (await database.store.get<string[]>(fieldName)) || []
     // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
     // // @ts-ignore
-    const uniqueItems = [...new Set([...existingRecords, documentPath])]
-    await database.store.seed(fieldName, uniqueItems)
+    const uniqueItems = [...new Set([...existingRecords, filepath])]
+    await database.store.put(fieldName, uniqueItems)
   })
 }
 
@@ -554,17 +523,13 @@ const _indexAttributes = async ({
 }
 
 const _indexAttribute = async ({
-  record,
   value,
   prefix,
   field,
-  database,
 }: {
-  record: string
   value: string
   prefix: string
   field: TinaFieldEnriched
-  database: Database
 }) => {
   const stringValue = value.toString().substr(0, 100)
   const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
