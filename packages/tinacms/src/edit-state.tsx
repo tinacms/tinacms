@@ -71,7 +71,7 @@ export function useTina<T extends object>({
   // Otherwise, things get wonky when changing pages
   useEffect(() => {
     if (!isDummyContainer) {
-      setTimeout(() => setWaitForContextRerender(false), 1)
+      setTimeout(() => setWaitForContextRerender(false), 0)
     }
 
     return () => {
