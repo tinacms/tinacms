@@ -243,7 +243,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
 interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
-  required: false
+  required?: false
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
