@@ -155,6 +155,11 @@ export class Resolver {
            * Collection with no templates...
            */
           case 'object':
+            if (collectable.required) {
+              console.warn(
+                "WARNING: `{type: 'object', required: true}` is unsupported by our User Interface and could result in errors"
+              )
+            }
             response[collection.name] = {
               collection,
               fields: await sequential(
