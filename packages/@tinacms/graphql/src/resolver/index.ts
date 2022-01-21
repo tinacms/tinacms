@@ -797,9 +797,10 @@ export class Resolver {
             component: 'select',
             ...field,
             ...extraFields,
-            options: field.required
-              ? field.options
-              : [{ label: `Choose an option`, value: '' }, ...field.options],
+            options: [
+              { label: `Choose an option`, value: '' },
+              ...field.options,
+            ],
           }
         }
         if (field.list) {
