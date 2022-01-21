@@ -157,7 +157,7 @@ export class Resolver {
           case 'object':
             if (collectable.required) {
               console.warn(
-                "WARNING: `{type: 'object', : required: true}` is unsupported by our User Interfaced and could result in errors"
+                "WARNING: `{type: 'object', required: true}` is unsupported by our User Interface and could result in errors"
               )
             }
             response[collection.name] = {
