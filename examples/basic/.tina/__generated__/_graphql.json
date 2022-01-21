@@ -427,7 +427,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -625,7 +625,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -639,7 +639,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -751,7 +751,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -765,7 +765,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -859,7 +859,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -873,7 +873,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -977,7 +977,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -1191,7 +1191,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -1205,7 +1205,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -1552,7 +1552,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -1856,7 +1856,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
