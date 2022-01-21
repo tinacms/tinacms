@@ -13,43 +13,20 @@ limitations under the License.
 
 import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
-
-export interface Document {
-  form: {
-    label: string
-    name: string
-    fields: Object[]
-    mutationInfo: {
-      path: string[]
-      string: string
-      includeCollection: boolean
-      includeTemplate: boolean
-    }
-  }
-  values: Object
-}
+import { TinaAdminApi } from '../api'
+import type { DocumentForm } from '../types'
 
 export const useGetDocument = (
   cms: TinaCMS,
   collectionName: string,
   relativePath: string
 ) => {
-  const [document, setDocument] = useState<Document>(undefined)
+  const api = new TinaAdminApi(cms.api.tina)
+  const [document, setDocument] = useState<DocumentForm>(undefined)
 
   useEffect(() => {
     const fetchDocument = async () => {
-      const response: { getDocument: Document } = await cms.api.tina.request(
-        `
-        query($collection: String!, $relativePath: String!) {
-          getDocument(collection:$collection, relativePath:$relativePath) {
-            ... on Document {
-              form
-              values
-            }
-          }
-        }`,
-        { variables: { collection: collectionName, relativePath } }
-      )
+      const response = await api.fetchDocument(collectionName, relativePath)
 
       setDocument(response.getDocument)
     }
