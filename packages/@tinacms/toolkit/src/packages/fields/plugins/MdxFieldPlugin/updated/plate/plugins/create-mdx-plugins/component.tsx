@@ -75,7 +75,11 @@ export const InlineEmbed = ({
     <span {...attributes}>
       {children}
       <Wrapper inline={true}>
-        <span className="relative inline-flex shadow-sm rounded-md leading-none">
+        <span
+          // give just enough margin so that the cursor is visible when adjacent to this node.
+          style={{ margin: '0 0.5px' }}
+          className="relative inline-flex shadow-sm rounded-md leading-none"
+        >
           {selected && (
             <span className="absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
           )}
