@@ -1,8 +1,28 @@
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
+import { useTina } from 'tinacms/dist/edit-state'
+
+const query = `{
+  getPostList{
+    edges {
+      node {
+        id
+        sys {
+          filename
+        }
+      }
+    }
+  }
+}`
+
 export default function Home(props) {
-  const postsList = props.data.getPostList.edges
+  const { data } = useTina({
+    query,
+    variables: {},
+    data: props.data,
+  })
+  const postsList = data.getPostList.edges
   return (
     <Layout>
       <h1>Posts</h1>
@@ -22,18 +42,6 @@ export default function Home(props) {
 export const getStaticProps = async () => {
   let data = {}
   const variables = {}
-  const query = `{
-    getPostList{
-      edges {
-        node {
-          id
-          sys {
-            filename
-          }
-        }
-      }
-    }
-  }`
   try {
     data = await staticRequest({
       query,
