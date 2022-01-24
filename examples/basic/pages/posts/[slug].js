@@ -1,6 +1,24 @@
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
+import { useTina } from 'tinacms/dist/edit-state'
+
+const query = `query getPost($relativePath: String!) {
+  getPostDocument(relativePath: $relativePath) {
+    data {
+      title
+      body
+    }
+  }
+}
+`
+
 export default function Home(props) {
+  const { data } = useTina({
+    query,
+    variables: props.variables,
+    data: props.data,
+  })
+
   return (
     <Layout>
       <code>
@@ -9,7 +27,7 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(props.data.getPostDocument.data, null, 2)}
+          {JSON.stringify(data.getPostDocument.data, null, 2)}
         </pre>
       </code>
     </Layout>
@@ -41,15 +59,6 @@ export const getStaticPaths = async () => {
   }
 }
 export const getStaticProps = async (ctx) => {
-  const query = `query getPost($relativePath: String!) {
-    getPostDocument(relativePath: $relativePath) {
-      data {
-        title
-        body
-      }
-    }
-  }
-  `
   const variables = {
     relativePath: ctx.params.slug + '.md',
   }

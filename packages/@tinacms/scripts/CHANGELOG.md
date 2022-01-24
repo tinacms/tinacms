@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.50.5
+
+### Patch Changes
+
+- 6a50a1368: Updates the look and feel of the Tina Sidebar
+
 ## 0.50.4
 
 ### Patch Changes

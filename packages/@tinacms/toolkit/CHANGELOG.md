@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.56.9
+
+### Patch Changes
+
+- 8ad8f03fd: Select field now validates when required is true.
+- 6a50a1368: Updates the look and feel of the Tina Sidebar
+- Updated dependencies [792f47251]
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.56.8
 
 ### Patch Changes

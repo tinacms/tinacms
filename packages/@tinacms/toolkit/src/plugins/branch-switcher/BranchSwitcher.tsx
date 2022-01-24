@@ -115,7 +115,7 @@ const BranchSelector = ({
           <Spacer />
           <Button
             size="small"
-            primary
+            variant="primary"
             onClick={() => onCreateBranch(newBranch)}
           >
             Create New Branch `{newBranch}`...

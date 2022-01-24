@@ -11,14 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as React from 'react'
-import { PullRequestIcon } from '../../packages/icons'
+import { BiGitRepoForked } from 'react-icons/bi'
 import { ScreenPlugin } from '../../packages/react-screens'
 import { BranchSwitcher } from './BranchSwitcher'
 import { BranchSwitcherProps } from './types'
 
 export class BranchSwitcherPlugin implements ScreenPlugin {
   __type = 'screen' as 'screen'
-  Icon = PullRequestIcon
+  Icon = BiGitRepoForked
   name = 'Select Branch'
   layout = 'popup' as 'popup'
 

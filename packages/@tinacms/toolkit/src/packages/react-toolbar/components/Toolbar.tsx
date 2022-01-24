@@ -158,7 +158,7 @@ export const Toolbar = () => {
               <DesktopLabel>{buttons.reset}</DesktopLabel>
             </ToolbarButton>
             <SaveButton
-              primary
+              variant="primary"
               //@ts-ignore
               onClick={submit}
               busy={submitting}
@@ -255,6 +255,8 @@ const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
   }
 `
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 const SaveButton = styled(ToolbarButton)`
   padding: 0 32px;
 `
