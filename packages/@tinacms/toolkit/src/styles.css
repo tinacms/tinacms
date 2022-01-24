@@ -13,3 +13,38 @@
     }
   }
 }
+
+[data-slate-editor='true'] {
+  @apply prose;
+  max-width: 100% !important; /* prose limits to 65ch */
+}
+/* prose adds backticks, which look like they should be editable */
+[data-slate-editor='true'] .slate-code::before {
+  content: '';
+}
+[data-slate-editor='true'] .slate-code::after {
+  content: '';
+}
+[data-slate-editor='true'] .slate-code {
+  padding: 2px 2px;
+  background: #e5e5e5;
+  border-radius: 3px;
+}
+/** prose top-margin is pretty aggressive **/
+[data-slate-editor='true'] .slate-h1,
+[data-slate-editor='true'] .slate-h2,
+[data-slate-editor='true'] .slate-h3,
+[data-slate-editor='true'] .slate-h4,
+[data-slate-editor='true'] .slate-h5 {
+  margin-top: 1em;
+}
+[data-slate-editor='true'] .slate-code_block .slate-code {
+  background: none;
+}
+/* prose makes this italic, which makes italic marks indistinguishable */
+[data-slate-editor='true'] blockquote {
+  font-style: normal;
+}
+.with-toolbar [data-slate-editor='true'] {
+  min-height: 100px;
+}

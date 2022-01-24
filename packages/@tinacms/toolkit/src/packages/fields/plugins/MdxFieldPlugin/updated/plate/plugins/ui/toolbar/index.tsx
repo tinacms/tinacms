@@ -1,0 +1,276 @@
+/**
+
+Copyright 2021 Forestry.io Holdings, Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/
+
+import * as React from 'react'
+import {
+  useEditorState,
+  getPreventDefaultHandler,
+  toggleMark,
+  toggleNodeType,
+} from '@udecode/plate-core'
+import { ELEMENT_LINK } from '@udecode/plate-link'
+import {
+  ELEMENT_H1,
+  ELEMENT_H2,
+  ELEMENT_H3,
+  ELEMENT_H4,
+  ELEMENT_H5,
+  ELEMENT_H6,
+} from '@udecode/plate-heading'
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
+import { MARK_BOLD, MARK_ITALIC, MARK_CODE } from '@udecode/plate-basic-marks'
+import { toggleList, ELEMENT_UL, ELEMENT_OL } from '@udecode/plate-list'
+import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
+import {
+  insertEmptyCodeBlock,
+  ELEMENT_CODE_BLOCK,
+} from '@udecode/plate-code-block'
+import { ToolbarItem, ToolbarItemType, EmbedButton } from './toolbar-item'
+import { OverflowMenu } from './overflow-menu'
+import { helpers } from '../../core/common'
+import { classNames } from '../helpers'
+import { useResize } from '../../../hooks/use-resize'
+import { FloatingToolbarWrapper } from './floating-toolbar'
+import { unwrapLink } from '../../create-link-plugin'
+import { ELEMENT_IMG } from '../../create-img-plugin'
+
+import type { MdxTemplate } from '../../../types'
+
+const headers = [
+  { name: ELEMENT_H1, render: <h1 className="my-0">Heading 1</h1> },
+  { name: ELEMENT_H2, render: <h2 className="my-0">Heading 2</h2> },
+  { name: ELEMENT_H3, render: <h3 className="my-0">Heading 3</h3> },
+  { name: ELEMENT_H4, render: <h4 className="my-0">Heading 4</h4> },
+  { name: ELEMENT_H5, render: <h5 className="my-0">Heading 5</h5> },
+  { name: ELEMENT_H6, render: <h6 className="my-0">Heading 6</h6> },
+  { name: ELEMENT_PARAGRAPH, render: <p className="my-0">Paragraph</p> },
+]
+
+const ICON_WIDTH = 40
+const EMBED_ICON_WIDTH = 85
+
+export function Toolbar({
+  templates,
+}: {
+  inlineOnly: boolean
+  templates: MdxTemplate[]
+}) {
+  const toolbarRef = React.useRef(null)
+  const editor = useEditorState()!
+  const isBoldActive = helpers.isMarkActive(editor, MARK_BOLD)
+  const isCodeActive = helpers.isMarkActive(editor, MARK_CODE)
+  const isItalicActive = helpers.isMarkActive(editor, MARK_ITALIC)
+  const isLinkActive = helpers.isNodeActive(editor, ELEMENT_LINK)
+  const ulActive = helpers.isListActive(editor, ELEMENT_UL)
+  const olActive = helpers.isListActive(editor, ELEMENT_OL)
+  const codeBlockActive = helpers.isNodeActive(editor, ELEMENT_CODE_BLOCK)
+  const blockQuoteActive = helpers.isNodeActive(editor, ELEMENT_BLOCKQUOTE)
+  const isImgActive = helpers.isNodeActive(editor, ELEMENT_IMG)
+
+  const toolbarItems: ToolbarItemType[] = [
+    {
+      name: 'heading',
+      label: 'Heading',
+      active: false,
+      options: headers.map((item) => (
+        <span
+          key={item.name}
+          onMouseDown={getPreventDefaultHandler(toggleNodeType, editor, {
+            activeType: item.name,
+          })}
+          className={classNames(
+            'hover:bg-gray-100 hover:text-gray-900 cursor-pointer block px-4 py-2 text-sm w-full text-left'
+          )}
+        >
+          {item.render}
+        </span>
+      )),
+    },
+    {
+      name: 'link',
+      label: 'Link',
+      active: isLinkActive,
+    },
+    {
+      name: 'image',
+      label: 'Image',
+      active: isImgActive,
+    },
+    {
+      name: 'quote',
+      label: 'Quote',
+      active: blockQuoteActive,
+      onMouseDown: getPreventDefaultHandler(toggleNodeType, editor, {
+        activeType: ELEMENT_BLOCKQUOTE,
+      }),
+    },
+    {
+      name: 'ul',
+      label: 'Bullet List',
+      active: ulActive,
+      onMouseDown: getPreventDefaultHandler(toggleList, editor, {
+        type: ELEMENT_UL,
+      }),
+    },
+    {
+      name: 'ol',
+      label: 'List',
+      active: olActive,
+      onMouseDown: getPreventDefaultHandler(toggleList, editor, {
+        type: ELEMENT_OL,
+      }),
+    },
+    {
+      name: 'code',
+      label: 'Code',
+      active: isCodeActive,
+      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
+        key: MARK_CODE,
+      }),
+    },
+    {
+      name: 'codeBlock',
+      label: 'Code Block',
+      active: codeBlockActive,
+      onMouseDown: getPreventDefaultHandler(insertEmptyCodeBlock, editor, {
+        insertNodesOptions: { select: true },
+      }),
+    },
+    {
+      name: 'bold',
+      label: 'Bold',
+      active: isBoldActive,
+      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
+        key: MARK_BOLD,
+      }),
+    },
+    {
+      name: 'italic',
+      label: 'Italic',
+      active: isItalicActive,
+      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
+        key: MARK_ITALIC,
+      }),
+    },
+  ]
+  const [itemsShown, setItemsShown] = React.useState(toolbarItems.length)
+
+  useResize(toolbarRef, (entry) => {
+    const width = entry.target.getBoundingClientRect().width
+    const itemsShown = (width - EMBED_ICON_WIDTH) / ICON_WIDTH
+    setItemsShown(Math.floor(itemsShown))
+  })
+
+  return (
+    // Note: -top-6 is because there's padding on the form wrapper that pushes this too far down
+    <div
+      className="sticky -top-6 inline-flex shadow-sm rounded-md mb-2 z-20 max-w-full"
+      style={{
+        width: `${toolbarItems.length * ICON_WIDTH + EMBED_ICON_WIDTH}px`,
+      }}
+    >
+      <div
+        ref={toolbarRef}
+        className="grid w-full"
+        style={{ gridTemplateColumns: `1fr ${EMBED_ICON_WIDTH}px` }}
+      >
+        <div
+          className="grid divide-x"
+          style={{
+            gridTemplateColumns: `repeat(auto-fit, minmax(${ICON_WIDTH}px, 1fr))`,
+            gridTemplateRows: 'auto',
+            gridAutoRows: 0,
+          }}
+        >
+          {toolbarItems.map((toolbarItem, index) => {
+            const isLastItem = index + 1 === itemsShown
+            const hidden = index + 1 > itemsShown
+            if (itemsShown < toolbarItems.length) {
+              if (isLastItem) {
+                return (
+                  <OverflowMenu
+                    key={toolbarItem.name}
+                    itemsShown={itemsShown}
+                    toolbarItems={toolbarItems}
+                  />
+                )
+              } else {
+                return (
+                  <ToolbarItem
+                    key={toolbarItem.name}
+                    hidden={hidden}
+                    active={toolbarItem.active}
+                    onMouseDown={toolbarItem.onMouseDown}
+                    label={toolbarItem.label}
+                    options={toolbarItem.options}
+                    icon={toolbarItem.name}
+                  />
+                )
+              }
+            } else {
+              return (
+                <ToolbarItem
+                  key={toolbarItem.name}
+                  hidden={hidden}
+                  active={toolbarItem.active}
+                  onMouseDown={toolbarItem.onMouseDown}
+                  label={toolbarItem.label}
+                  options={toolbarItem.options}
+                  icon={toolbarItem.name}
+                />
+              )
+            }
+          })}
+        </div>
+        <EmbedButton templates={templates} editor={editor} />
+      </div>
+    </div>
+  )
+}
+
+export const FloatingToolbar = ({
+  templates,
+}: {
+  templates: MdxTemplate[]
+}) => {
+  return (
+    <FloatingToolbarWrapper>
+      <Toolbar templates={templates} inlineOnly={true} />
+    </FloatingToolbarWrapper>
+  )
+}
+
+export const FloatingLink = () => {
+  const editor = useEditorState()!
+  const isLinkActive = helpers.isNodeActive(editor, ELEMENT_LINK)
+  return (
+    <FloatingToolbarWrapper position="bottom">
+      {isLinkActive && (
+        <button
+          onMouseDown={(e) => {
+            e.preventDefault()
+            unwrapLink(editor)
+          }}
+          className="mt-2 cursor-pointer hover:bg-gray-100 border border-gray-200 rounded-md bg-gray-100 text-gray-600 py-1 px-2"
+        >
+          Clear
+        </button>
+      )}
+    </FloatingToolbarWrapper>
+  )
+}
