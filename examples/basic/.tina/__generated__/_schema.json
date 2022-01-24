@@ -14,6 +14,35 @@
       "format": "mdx",
       "fields": [
         {
+          "type": "object",
+          "name": "someObj",
+          "fields": [
+            {
+              "name": "thingOne",
+              "type": "string",
+              "required": true,
+              "namespace": [
+                "page",
+                "someObj",
+                "thingOne"
+              ]
+            },
+            {
+              "name": "thingTwo",
+              "type": "string",
+              "namespace": [
+                "page",
+                "someObj",
+                "thingTwo"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "someObj"
+          ]
+        },
+        {
           "name": "body",
           "label": "Main Content",
           "type": "rich-text",

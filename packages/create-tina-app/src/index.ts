@@ -178,7 +178,7 @@ export const run = async () => {
   console.log()
   console.log('- Go to http://localhost:3000/admin to enter edit-mode')
   console.log(
-    '- Edit some content on http://localhost:3000 (See https://tina.io/using-tina-editor )'
+    '- Edit some content on http://localhost:3000 (See https://tina.io/docs/using-tina-editor )'
   )
   console.log(
     '- Check out our concept docs, to learn how Tina powers the starters under the hood. (See https://tina.io/docs/schema/)'
@@ -187,7 +187,7 @@ export const run = async () => {
     '- Learn how Tina can be extended to create new field components. (See https://tina.io/docs/advanced/extending-tina/) '
   )
   console.log(
-    '- Make your site editable with Tina on production. (See https://tina.io/docs/tina-cloud/ '
+    '- Make your site editable with Tina on production. (See https://tina.io/docs/tina-cloud/)'
   )
 }
 

@@ -13,22 +13,16 @@ limitations under the License.
 
 import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
-
-export interface Collection {
-  label: string
-  name: string
-}
+import { TinaAdminApi } from '../api'
+import type { Collection } from '../types'
 
 export const useGetCollections = (cms: TinaCMS) => {
+  const api = new TinaAdminApi(cms.api.tina)
   const [collections, setCollections] = useState<Collection[]>([])
 
   useEffect(() => {
     const fetchCollections = async () => {
-      const response: { getCollections: Collection[] } =
-        await cms.api.tina.request(
-          `query{ getCollections { label, name } }`,
-          {}
-        )
+      const response = await api.fetchCollections()
       setCollections(response.getCollections)
     }
 

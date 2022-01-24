@@ -35,7 +35,7 @@ export const EXAMPLES: Example[] = [
     title: 'Bare bones starter',
     value: 'basic',
     isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-basic-starter',
+    gitURL: 'https://github.com/tinacms/tina-barebones-starter',
   },
   {
     title: 'Tailwind Starter',
