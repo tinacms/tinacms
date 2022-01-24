@@ -38,7 +38,7 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
 
   return (
     <div className="relative">
-      <div contentEditable={false} className="absolute top-2 right-2">
+      <div contentEditable={false} className="absolute top-1 right-1">
         <div className="flex w-full">
           <div />
           <Dropdown
@@ -47,7 +47,7 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
           />
         </div>
       </div>
-      <pre {...attributes} className="pt-10">
+      <pre {...attributes} className="pt-10 m-0">
         <code {...props} />
       </pre>
     </div>
