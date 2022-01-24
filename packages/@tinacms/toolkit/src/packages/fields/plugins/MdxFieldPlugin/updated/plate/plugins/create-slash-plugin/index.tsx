@@ -152,14 +152,16 @@ const SlashCombobox = (props: {
   return (
     <span {...props.attributes} className={`${props.className}`}>
       {props.children}
-      <span ref={ref} className="block absolute z-50" contentEditable={false}>
-        <SearchAutocomplete
-          value={value}
-          onValue={onValue}
-          onCancel={onCancel}
-          onMatches={(count) => setMatches(count)}
-        />
-      </span>
+      {selected && (
+        <span ref={ref} className="block absolute z-50" contentEditable={false}>
+          <SearchAutocomplete
+            value={value}
+            onValue={onValue}
+            onCancel={onCancel}
+            onMatches={(count) => setMatches(count)}
+          />
+        </span>
+      )}
     </span>
   )
 }
