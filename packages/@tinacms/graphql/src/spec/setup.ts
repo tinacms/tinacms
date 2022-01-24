@@ -31,6 +31,9 @@ class MockFilesystemBridge extends FilesystemBridge {
   }
 }
 
+// FIXME: CI for macos runs very slow
+jest.setTimeout(10000)
+
 export const setup = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
