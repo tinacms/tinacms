@@ -21,12 +21,13 @@ import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
 import { useEditorState } from '@udecode/plate-core'
 import { insertMDX } from '../../create-mdx-plugins'
-import { LinkForm } from '../../create-link-plugin'
+import { LinkForm, wrapOrRewrapLink } from '../../create-link-plugin'
 import { classNames } from '../helpers'
 
 import type { PlateEditor } from '@udecode/plate-core'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
+import { Transforms } from 'slate'
 
 export type ToolbarItemType = {
   label: string
@@ -94,48 +95,47 @@ export const ToolbarItem = ({
   if (icon === 'image') {
     return (
       <span className="relative">
-        <button
-          type="button"
+        <span
           className={classNames(
             active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           )}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
             pointerEvents: hidden ? 'none' : 'auto',
           }}
-          onClick={(e) => {
+          onMouseDown={(e) => {
             e.preventDefault()
             insertImg(editor)
           }}
         >
           <span className="sr-only">{label}</span>
           <ToolbarIcon name={icon} />
-        </button>
+        </span>
       </span>
     )
   }
   if (icon === 'link') {
     return (
       <span className="relative">
-        <button
-          type="button"
+        <span
           className={classNames(
             active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           )}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
             pointerEvents: hidden ? 'none' : 'auto',
           }}
-          onClick={(e) => {
+          onMouseDown={(e) => {
             e.preventDefault()
+            wrapOrRewrapLink(editor)
             setIsExpanded((isExpanded) => !isExpanded)
           }}
         >
           <span className="sr-only">{label}</span>
           <ToolbarIcon name={icon} />
-        </button>
+        </span>
 
         {isExpanded && (
           <LinkForm
