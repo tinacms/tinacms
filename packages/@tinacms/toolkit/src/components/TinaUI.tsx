@@ -45,8 +45,8 @@ export const TinaUI: React.FC<TinaUIProps> = ({
   return (
     <MutationSignalProvider>
       <style>{styles}</style>
-      <div className="tina-tailwind">
-        <ModalProvider>
+      <ModalProvider>
+        <div className="tina-tailwind">
           <Alerts alerts={cms.alerts} />
           {cms.enabled && styled && <Theme />}
           {cms.enabled && cms.toolbar && <Toolbar />}
@@ -55,9 +55,9 @@ export const TinaUI: React.FC<TinaUIProps> = ({
             <SidebarProvider position={position} sidebar={cms.sidebar} />
           )}
           <ActiveFieldIndicator />
-        </ModalProvider>
-      </div>
-      {children}
+        </div>
+        {children}
+      </ModalProvider>
     </MutationSignalProvider>
   )
 }

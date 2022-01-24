@@ -20,6 +20,7 @@ export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
+export { TinaAdminApi } from './admin/api'
 
 import { TinaCMSProvider2 } from './tina-cms'
 export default TinaCMSProvider2
