@@ -185,7 +185,6 @@ type APIProviderProps =
       /**
        * Content API URL
        *
-       * @deprecated use apiURL instead
        */
       apiURL: string
       /**
@@ -212,7 +211,6 @@ type APIProviderProps =
       /**
        * Content API URL
        *
-       * @deprecated use apiURL instead
        */
       apiURL?: never
       /**
