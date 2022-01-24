@@ -15,7 +15,7 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
 import { Form } from '../forms'
-import { Form as FinalForm } from 'react-final-form'
+import { Form as FinalForm, FormSpy } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '../styles'
@@ -30,6 +30,7 @@ export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
+  onPristineChange?: (pristine: boolean) => unknown
 }
 
 const NoFieldsPlaceholder = () => (
@@ -46,6 +47,7 @@ const NoFieldsPlaceholder = () => (
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
+  onPristineChange,
   ...rest
 }) => {
   const hideFooter = !!rest.hideFooter
@@ -82,14 +84,20 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 
   return (
-    <ModalProvider>
-      <FinalForm
-        form={finalForm}
-        key={`${i}: ${tinaForm.id}`}
-        onSubmit={tinaForm.onSubmit}
-      >
-        {({ handleSubmit, pristine, invalid, submitting }) => {
-          return (
+    <FinalForm
+      form={finalForm}
+      key={`${i}: ${tinaForm.id}`}
+      onSubmit={tinaForm.onSubmit}
+    >
+      {({ handleSubmit, pristine, invalid, submitting }) => {
+        return (
+          <>
+            <FormSpy
+              subscription={{ pristine: true }}
+              onChange={({ pristine }) => {
+                onPristineChange && onPristineChange(pristine)
+              }}
+            />
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
                 <FormWrapper id={tinaForm.id}>
@@ -120,7 +128,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       onClick={() => handleSubmit()}
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
-                      primary
+                      variant="primary"
                       style={{ flexGrow: 3 }}
                     >
                       {submitting && <LoadingDots />}
@@ -136,10 +144,10 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 </div>
               )}
             </DragDropContext>
-          )
-        }}
-      </FinalForm>
-    </ModalProvider>
+          </>
+        )
+      }}
+    </FinalForm>
   )
 }
 
@@ -213,7 +221,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                       onClick={() => handleSubmit()}
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
-                      primary
+                      variant="primary"
                       style={{ flexBasis: '10rem' }}
                     >
                       {submitting && <LoadingDots />}
@@ -245,7 +253,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-const FormStatus = ({ pristine }) => {
+export const FormStatus = ({ pristine }) => {
   return (
     <div className="flex flex-0 items-center">
       {!pristine && (
@@ -272,7 +280,7 @@ export const FormWrapper = ({ children, id }) => {
   return (
     <div
       data-test={`form:${id}`}
-      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-8 px-6 pb-2"
+      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-6 px-6 pb-2"
     >
       <div className="w-full flex justify-center">
         <div className="w-full max-w-form">{children}</div>
