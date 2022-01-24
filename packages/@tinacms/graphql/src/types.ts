@@ -193,6 +193,7 @@ type ObjectTemplates<WithNamespace extends boolean> = WithNamespace extends true
 interface ObjectTemplatesInner<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  required?: false
   /**
    * templates can either be an array of Tina templates or a reference to
    * global template definition.
@@ -208,6 +209,7 @@ interface ObjectTemplatesInner<WithNamespace extends boolean>
 interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  required?: false
   /**
    * templates can either be an array of Tina templates or a reference to
    * global template definition.
@@ -227,6 +229,7 @@ type ObjectFields<WithNamespace extends boolean> = WithNamespace extends true
 
 interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
+  required?: false
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -240,6 +243,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
 interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  required?: false
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -301,6 +305,7 @@ export type CollectionTemplateableUnion = {
 export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
+  required?: false
   template: Templateable
 }
 export type CollectionTemplateable =
