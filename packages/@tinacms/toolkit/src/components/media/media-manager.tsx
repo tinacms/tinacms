@@ -272,7 +272,7 @@ const UploadButton = ({ onClick, uploading }: any) => {
   return (
     <Button
       style={{ minWidth: '5.3rem' }}
-      primary
+      variant="primary"
       busy={uploading}
       onClick={onClick}
     >

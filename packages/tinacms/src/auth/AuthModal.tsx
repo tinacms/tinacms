@@ -75,7 +75,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
 
   return (
     <Button
-      primary={primary}
+      variant={primary ? 'primary' : 'secondary'}
       onClick={onClick}
       busy={submitting}
       disabled={submitting}

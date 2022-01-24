@@ -248,7 +248,7 @@ const ConfirmSwitchBranchModal = ({ name, onBranchChange, close }: any) => {
         </ModalBody>
         <ModalActions>
           <Button onClick={close}>Cancel</Button>
-          <Button onClick={onBranchChange} primary>
+          <Button onClick={onBranchChange} variant="primary">
             Switch Branch
           </Button>
         </ModalActions>

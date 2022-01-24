@@ -2795,6 +2795,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@headlessui/react@npm:^1.4.2":
+  version: 1.4.2
+  resolution: "@headlessui/react@npm:1.4.2"
+  peerDependencies:
+    react: ^16 || ^17 || ^18
+    react-dom: ^16 || ^17 || ^18
+  checksum: b9987c9331aa1dccd2c72bc042cbbc1b74481523f49fa1fbd333d562dbfebc54c3cb49d6b3a93050f817caf1d77c8e30ac79eef215a34f94fcfec832e07d3ea8
+  languageName: node
+  linkType: hard
+
 "@heroicons/react@npm:^1.0.4":
   version: 1.0.4
   resolution: "@heroicons/react@npm:1.0.4"
@@ -4807,11 +4817,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/toolkit@workspace:packages/@tinacms/toolkit"
   dependencies:
+    "@headlessui/react": ^1.4.2
     "@sambego/storybook-styles": ^1.0.0
     "@testing-library/jest-dom": ^5.11.9
     "@testing-library/react": ^12.0.0
     "@testing-library/user-event": ^12.7.0
     "@tinacms/scripts": "workspace:*"
+    "@tinacms/sharedctx": "workspace:*"
     "@types/atob": ^2.1.2
     "@types/codemirror": ^0.0.71
     "@types/color-string": ^1.5.0
@@ -25194,7 +25206,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.15, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.52.16, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -25295,7 +25307,7 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.53.15, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@^0.53.16, react-tinacms-inline@workspace:packages/react-tinacms-inline":
   version: 0.0.0-use.local
   resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
   dependencies:
@@ -28915,8 +28927,8 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.15
-    react-tinacms-inline: ^0.53.15
+    react-tinacms-editor: ^0.52.16
+    react-tinacms-inline: ^0.53.16
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
@@ -28945,6 +28957,7 @@ resolve@^2.0.0-next.3:
     final-form: 4.20.1
     graphql: ^15.1.0
     graphql-tag: ^2.11.0
+    identity-obj-proxy: ^3.0.0
     jest: ^27.0.6
     lodash.set: ^4.3.2
     next: 9.4.2

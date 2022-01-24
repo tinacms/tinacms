@@ -1,5 +1,21 @@
 # tinacms
 
+## 0.65.0
+
+### Minor Changes
+
+- 792f47251: useTina hook for page-level form registration
+
+### Patch Changes
+
+- 6a50a1368: Updates the look and feel of the Tina Sidebar
+- 239382619: Introduces TinaAdminApi and consolidates types
+- Updated dependencies [8ad8f03fd]
+- Updated dependencies [6a50a1368]
+- Updated dependencies [792f47251]
+  - @tinacms/toolkit@0.56.9
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.64.2
 
 ### Patch Changes
