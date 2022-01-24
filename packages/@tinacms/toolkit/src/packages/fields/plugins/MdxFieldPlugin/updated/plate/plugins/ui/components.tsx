@@ -38,55 +38,110 @@ import {
 } from '@udecode/plate-heading'
 import { MARK_CODE, MARK_BOLD, MARK_ITALIC } from '@udecode/plate-basic-marks'
 import { CodeBlock } from './code-block'
+import { classNames } from './helpers'
+import { useSelected } from 'slate-react'
 
 export const components = () => {
   return {
-    [ELEMENT_H1]: ({ attributes, editor, element, ...props }) => (
-      <h1 {...attributes} {...props} />
+    [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
+      <h1
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_H2]: ({ attributes, editor, element, ...props }) => (
-      <h2 {...attributes} {...props} />
+    [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
+      <h2
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_H3]: ({ attributes, editor, element, ...props }) => (
-      <h3 {...attributes} {...props} />
+    [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
+      <h3
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_H4]: ({ attributes, editor, element, ...props }) => (
-      <h4 {...attributes} {...props} />
+    [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
+      <h4
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_H5]: ({ attributes, editor, element, ...props }) => (
-      <h5 {...attributes} {...props} />
+    [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
+      <h5
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_H6]: ({ attributes, editor, element, ...props }) => (
-      <h6 {...attributes} {...props} />
+    [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
+      <h6
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_PARAGRAPH]: ({ attributes, editor, element, ...props }) => (
-      <p {...attributes} {...props} />
+    [ELEMENT_PARAGRAPH]: ({
+      attributes,
+      className,
+      editor,
+      element,
+      ...props
+    }) => (
+      <p
+        className={classNames('mt-0.5', className)}
+        {...attributes}
+        {...props}
+      />
     ),
-    [ELEMENT_BLOCKQUOTE]: ({ attributes, editor, element, ...props }) => (
-      <blockquote {...attributes} {...props} />
+    [ELEMENT_BLOCKQUOTE]: ({
+      className,
+      attributes,
+      editor,
+      element,
+      ...props
+    }) => (
+      <blockquote
+        className={classNames('not-italic', className)}
+        {...attributes}
+        {...props}
+      />
     ),
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
-    [ELEMENT_UL]: ({ attributes, editor, element, ...props }) => (
-      <ul {...attributes} {...props} />
+    [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
+      <ul className={classNames(className)} {...attributes} {...props} />
     ),
-    [ELEMENT_LI]: ({ attributes, editor, element, ...props }) => (
-      <li {...attributes} {...props} />
+    [ELEMENT_LI]: ({ attributes, editor, className, element, ...props }) => (
+      <li className={classNames(className)} {...attributes} {...props} />
     ),
-    [ELEMENT_OL]: ({ attributes, editor, element, ...props }) => (
-      <ol {...attributes} {...props} />
+    [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
+      <ol className={classNames(className)} {...attributes} {...props} />
     ),
-    [ELEMENT_LI]: ({ attributes, editor, element, ...props }) => (
-      <li {...attributes} {...props} />
+    [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
+      <li className={classNames(className)} {...attributes} {...props} />
     ),
     /** "list item content" */
-    [ELEMENT_LIC]: ({ attributes, editor, element, ...props }) => (
-      <span {...attributes} {...props} />
+    [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
+      <span className={classNames(className)} {...attributes} {...props} />
     ),
-    [ELEMENT_LINK]: ({ attributes, editor, element, nodeProps, ...props }) => (
-      <a {...attributes} {...props} />
-    ),
-    [MARK_CODE]: ({ editor, leaf, text, ...props }) => (
-      <code {...props.attributes} {...props} />
+    [ELEMENT_LINK]: ({
+      attributes,
+      editor,
+      element,
+      nodeProps,
+      className,
+      ...props
+    }) => <a className={classNames(className)} {...attributes} {...props} />,
+    [MARK_CODE]: ({ editor, leaf, text, attributes, className, ...props }) => (
+      <code
+        className={classNames('bg-gray-100 p-1 rounded-sm', className)}
+        {...attributes}
+        {...props}
+      />
     ),
     [MARK_ITALIC]: ({ editor, leaf, text, ...props }) => (
       <em {...props.attributes} {...props} />
@@ -94,12 +149,30 @@ export const components = () => {
     [MARK_BOLD]: ({ editor, leaf, text, ...props }) => (
       <strong {...props.attributes} {...props} />
     ),
-    [ELEMENT_HR]: ({ attributes, editor, element, ...props }) => (
-      <div
-        {...attributes}
-        {...props}
-        className={`${props.className} border bg-gray-200`}
-      />
-    ),
+    [ELEMENT_HR]: ({
+      attributes,
+      className,
+      editor,
+      element,
+      children,
+      ...props
+    }) => {
+      const selected = useSelected()
+      return (
+        <div
+          className={classNames(
+            className,
+            'cursor-pointer relative border bg-gray-200 my-4'
+          )}
+          {...attributes}
+          {...props}
+        >
+          {children}
+          {selected && (
+            <span className="absolute h-4 -top-2 inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
+          )}
+        </div>
+      )
+    },
   }
 }

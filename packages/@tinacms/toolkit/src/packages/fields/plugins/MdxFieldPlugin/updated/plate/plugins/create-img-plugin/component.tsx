@@ -66,7 +66,7 @@ export const ImgEmbed = ({
           <span
             onMouseDown={handleSelect}
             style={{ minHeight: '50px' }}
-            className="cursor-pointer rounded-md w-full relative bg-gray-100 overflow-hidden"
+            className="cursor-pointer flex items-center justify-center rounded-md w-full relative bg-gray-100 overflow-hidden"
           >
             {element.url ? (
               <img

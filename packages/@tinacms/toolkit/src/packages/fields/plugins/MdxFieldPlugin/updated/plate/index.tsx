@@ -71,7 +71,7 @@ export const RichEditor = wrapFieldsWithMeta<
     <EditorContext.Provider value={{ templates: props.field.templates }}>
       <div className={withToolbar ? 'with-toolbar' : ''}>
         <div
-          className="relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5"
+          className="prose relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5"
           style={{
             minHeight: withToolbar ? '100px' : 'auto',
             maxWidth: `100%`,
