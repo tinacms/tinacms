@@ -38,6 +38,22 @@ export const EditContext = React.createContext({
   setEdit: undefined as (edit: boolean) => void,
 })
 
+export const TinaDataContext = React.createContext<{
+  state: {
+    payload: object
+  }
+  setRequest: (props: { query: string; variables: object }) => void
+  isLoading: boolean
+  isDummyContainer?: boolean
+}>({
+  state: {
+    payload: {},
+  },
+  setRequest: () => {},
+  isLoading: false,
+  isDummyContainer: true,
+})
+
 /*
   We will wrap our app in this so we will always be able to get the editmode state with `useEditMode`
 */
