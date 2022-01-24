@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.51.17
+
+### Patch Changes
+
+- 6a50a1368: Updates the look and feel of the Tina Sidebar
+- Updated dependencies [8ad8f03fd]
+- Updated dependencies [6a50a1368]
+  - @tinacms/toolkit@0.56.9
+
 ## 0.51.16
 
 ### Patch Changes
