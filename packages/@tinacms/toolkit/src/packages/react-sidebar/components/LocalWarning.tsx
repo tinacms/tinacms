@@ -22,33 +22,13 @@ import { AiFillWarning } from 'react-icons/ai'
 export const LocalWarning = () => {
   return (
     <a
-      style={{
-        display: 'flex',
-        width: '100%',
-        fontSize: '14px',
-        alignItems: 'center',
-        padding: '6px 14px',
-        color: '#ab9e58',
-        backgroundColor: '#f4efd3',
-        borderBottom: '1px solid #F5E06E',
-      }}
+      className="flex w-full text-xs items-center py-1 px-4 text-yellow-600 bg-gradient-to-r from-yellow-50 to-yellow-100 border-b border-yellow-200"
       href="https://tina.io/docs/tina-cloud/"
       target="_blank"
     >
-      <AiFillWarning
-        style={{
-          width: '16px',
-          height: 'auto',
-          display: 'inline-block',
-          marginRight: '4px',
-          opacity: '0.7',
-          fill: '#ab9e58',
-        }}
-      />{' '}
+      <AiFillWarning className="w-5 h-auto inline-block mr-1 opacity-70 text-yellow-600" />{' '}
       You are currently in
-      <strong style={{ marginLeft: '3px', color: 'inherit' }}>
-        Local Mode
-      </strong>
+      <strong className="ml-1 font-bold text-yellow-700">Local Mode</strong>
     </a>
   )
 }

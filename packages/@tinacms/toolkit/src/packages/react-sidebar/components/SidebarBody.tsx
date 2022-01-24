@@ -25,8 +25,9 @@ import { Button } from '../../styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { LeftArrowIcon } from '../../icons'
-import { FormBuilder } from '../../form-builder'
+import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
+import { SidebarContext, navBreakpoint } from './Sidebar'
 
 export const FormsView = ({
   children,
@@ -36,6 +37,7 @@ export const FormsView = ({
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const formPlugins = cms.plugins.getType<Form>('form')
+  const { setFormIsPristine } = React.useContext(SidebarContext)
 
   /**
    * If there's only one form, make it the active form.
@@ -109,7 +111,10 @@ export const FormsView = ({
                 <meta.Component />
               </React.Fragment>
             ))}
-          <FormBuilder form={activeForm as any} />
+          <FormBuilder
+            form={activeForm as any}
+            onPristineChange={setFormIsPristine}
+          />
         </FormWrapper>
       )}
     </>
@@ -261,32 +266,24 @@ export interface FormHeaderProps {
   activeForm: Form
 }
 
-export const FormHeader = styled(
-  ({ activeForm, ...styleProps }: FormHeaderProps) => {
-    return (
-      <div {...styleProps}>
-        <span>{activeForm.label}</span>
-      </div>
-    )
-  }
-)`
-  position: relative;
-  width: 100%;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
-  font-size: var(--tina-font-size-5);
-  user-select: none;
+export const FormHeader = ({ activeForm }: FormHeaderProps) => {
+  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
 
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`
+  return (
+    <div
+      className={`py-4 border-b border-gray-200 bg-white ${
+        sidebarWidth > navBreakpoint ? `px-6` : `px-20`
+      }`}
+    >
+      <div className="max-w-form mx-auto">
+        <span className="block text-xl mb-[6px] text-gray-700 font-medium leading-tight">
+          {activeForm.label}
+        </span>
+        <FormStatus pristine={formIsPristine} />
+      </div>
+    </div>
+  )
+}
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
   Button as any
