@@ -1,5 +1,17 @@
 # tina-graphql
 
+## 0.59.5
+
+### Patch Changes
+
+- 8ad8f03fd: Select field now validates when required is true.
+- 04b7988d5: Some updates to the data layer POC work
+  - Don't attempt to put config files on to bridge if it's not supported
+  - Split logic for indexing all content vs a subset of files
+- e3c41f69d: Fixed type for `required: true` on `type: "object"`
+- f5390e841: Don't attempt to put config files on to bridge if it's not supported
+- 32082e0b3: GraphQL number type is changed from "Int" to "Float"
+
 ## 0.59.4
 
 ### Patch Changes
