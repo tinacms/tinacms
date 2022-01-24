@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { SettingsIcon } from '../../packages/icons'
+import { MdOutlineSettings } from 'react-icons/md'
 import { Form } from '../../packages/forms'
 import { ScreenPlugin } from '../../packages/react-screens'
 import { FormBuilder } from '../../packages/form-builder'
@@ -35,7 +35,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     layout?: ScreenPlugin['layout']
   ) {
     this.name = form.label
-    this.Icon = icon || SettingsIcon
+    this.Icon = icon || MdOutlineSettings
     this.layout = layout || 'popup'
     this.Component = () => {
       return <FormBuilder form={form as any} />

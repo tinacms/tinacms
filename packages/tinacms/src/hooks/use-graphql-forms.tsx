@@ -196,22 +196,6 @@ export function useGraphqlForms<T extends object>({
             `Unable to build form shape for fields at ${queryName}`
           )
 
-          if (cms.flags.get('tina-admin')) {
-            const TinaAdminLink = new FormMetaPlugin({
-              name: 'tina-admin-link',
-              Component: () => (
-                <a
-                  href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
-                  className="flex items-center px-5 py-2 border-t border-b shadow border-gray-100 uppercase text-xs font-medium bg-white hover:bg-gray-50 hover:text-blue-500 transition-colors duration-100 ease-out"
-                >
-                  <BiLinkExternal className="h-4 w-auto opacity-80 mr-2" /> Edit
-                  in Tina Admin
-                </a>
-              ),
-            })
-            cms.plugins.add(TinaAdminLink)
-          }
-
           const formConfig = {
             id: queryName,
             label: result.form.label,

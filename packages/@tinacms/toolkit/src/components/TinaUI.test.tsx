@@ -41,14 +41,14 @@ describe('TinaUI', () => {
 
         app.getByText('something')
       })
-      it('renders the "toggle cms" sidebar button', () => {
+      it('renders the "open cms" sidebar button', () => {
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
           </TinaCMSProvider>
         )
 
-        app.getByLabelText('toggles cms sidebar')
+        app.getByLabelText('opens cms sidebar')
       })
     })
     describe('when sidebar is false', () => {
@@ -68,14 +68,14 @@ describe('TinaUI', () => {
 
         app.getByText('something')
       })
-      it('does not render the "toggle cms" sidebar button', () => {
+      it('does not render the "opens cms" sidebar button', () => {
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
           </TinaCMSProvider>
         )
 
-        const sidebarButton = app.queryByLabelText('toggles cms sidebar')
+        const sidebarButton = app.queryByLabelText('opens cms sidebar')
         expect(sidebarButton).toBeNull()
       })
     })
@@ -98,14 +98,14 @@ describe('TinaUI', () => {
 
         app.getByText('something')
       })
-      it('does not render the "toggle cms" sidebar button', () => {
+      it('does not render the "opens cms" sidebar button', () => {
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
           </TinaCMSProvider>
         )
 
-        const sidebarButton = app.queryByLabelText('toggles cms sidebar')
+        const sidebarButton = app.queryByLabelText('opens cms sidebar')
         expect(sidebarButton).toBeNull()
       })
       it('does not remount children when cms is toggled', () => {
@@ -150,14 +150,14 @@ describe('TinaUI', () => {
 
         app.getByText('something')
       })
-      it('does not render the "toggle cms" sidebar button', () => {
+      it('does not render the "opens cms" sidebar button', () => {
         const app = render(
           <TinaCMSProvider cms={cms}>
             <TinaUI />
           </TinaCMSProvider>
         )
 
-        const sidebarButton = app.queryByLabelText('toggles cms sidebar')
+        const sidebarButton = app.queryByLabelText('opens cms sidebar')
         expect(sidebarButton).toBeNull()
       })
     })

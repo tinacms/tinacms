@@ -122,7 +122,7 @@ export function SettingsModal({
           <Button
             onClick={handleClose}
             disabled={form.values === initialValues}
-            primary
+            variant="primary"
           >
             Confirm
           </Button>
