@@ -36,6 +36,6 @@ describe('Have Edit mode button', () => {
       .should(() => {
         expect(localStorage.getItem('tina.isEditing')).to.eq('true')
       })
-    // cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+    // cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()
   })
 })

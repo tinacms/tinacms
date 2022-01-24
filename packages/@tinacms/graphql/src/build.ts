@@ -13,7 +13,7 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import { print, OperationDefinitionNode } from 'graphql'
+import { print, OperationDefinitionNode, DocumentNode } from 'graphql'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
 import { astBuilder, NAMER } from './ast-builder'
@@ -46,9 +46,14 @@ export const indexDB = async ({
     database,
     tinaSchema,
   })
-  const graphQLSchema = await _buildSchema(builder, tinaSchema)
-  // @ts-ignore
-  await database.indexData({ graphQLSchema, tinaSchema })
+  let graphQLSchema: DocumentNode
+  if (database.bridge.supportsBuilding()) {
+    graphQLSchema = await _buildSchema(builder, tinaSchema)
+    await database.putConfigFiles({ graphQLSchema, tinaSchema })
+  } else {
+    graphQLSchema = JSON.parse(await database.bridge.get('.tina/__generated__/_graphql.json'))
+  }
+  await database.indexContent({ graphQLSchema, tinaSchema })
   if (buildSDK) {
     await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
     await _buildQueries(builder, tinaSchema, database.bridge.rootPath)

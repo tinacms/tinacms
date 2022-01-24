@@ -161,7 +161,7 @@ export const PRModal = () => {
             </TinaButton>
             <TinaButton
               as="a"
-              primary
+              variant="primary"
               // @ts-ignore
               href={fetchedPR.html_url}
               target="_blank"
