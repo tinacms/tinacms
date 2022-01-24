@@ -17,10 +17,8 @@ import { useParams, useLocation, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
 import GetCMS from '../components/GetCMS'
-import GetCollection, {
-  Collection,
-  Template,
-} from '../components/GetCollection'
+import GetCollection from '../components/GetCollection'
+import type { Collection, Template } from '../types'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'

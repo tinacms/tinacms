@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.8
+
+### Patch Changes
+
+- 7006b38ea: Fixed issue where one could not login with tina cloud because the model context was null
+
 ## 0.56.7
 
 ### Patch Changes

@@ -12,27 +12,17 @@ limitations under the License.
 */
 
 import { Plugin } from '@tinacms/toolkit'
-import { Collection } from '../components/GetCollection'
-
-interface Document {
-  sys: {
-    template: string
-    breadcrumbs: string[]
-    path: string
-    basename: string
-    relativePath: string
-    filename: string
-    extension: string
-  }
-}
-
+import type { Collection, DocumentSys } from '../types'
 export class RouteMappingPlugin implements Plugin {
   __type: string = 'tina-admin'
   name: string = 'route-mapping'
-  mapper: (collection: Collection, document: Document) => string | undefined
+  mapper: (collection: Collection, document: DocumentSys) => string | undefined
 
   constructor(
-    mapper: (collection: Collection, document: Document) => string | undefined
+    mapper: (
+      collection: Collection,
+      document: DocumentSys
+    ) => string | undefined
   ) {
     this.mapper = mapper
   }
