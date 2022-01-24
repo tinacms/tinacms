@@ -134,7 +134,7 @@ export function StrapiLoginForm({ onSubmit, close, error }: LoginFormProps) {
               <Button type="button" onClick={close}>
                 Close
               </Button>
-              <Button primary type="submit">
+              <Button variant="primary" type="submit">
                 Submit
               </Button>
             </ModalActions>

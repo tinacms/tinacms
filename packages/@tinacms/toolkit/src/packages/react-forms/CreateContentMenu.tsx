@@ -13,7 +13,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { Modal, ModalHeader, ModalBody, ModalPopup } from '../react-modals'
+import { Modal, ModalHeader, ModalBody, PopupModal } from '../react-modals'
 import { FormBuilder } from '../form-builder'
 import { useMemo } from 'react'
 import { Form } from '../forms'
@@ -40,7 +40,7 @@ export const CreateContentMenu: React.FC<CreateContentMenuProps> = ({
     return (
       <ContentMenuWrapper>
         {sidebar ? (
-          <IconButton onClick={() => setVisible(true)} open={visible} primary>
+          <IconButton onClick={() => setVisible(true)} variant="primary">
             <AddIcon className="w-5/6 h-auto" />
           </IconButton>
         ) : (
@@ -91,7 +91,7 @@ const CreateContentButton = ({ plugin, onClick }: any) => {
   )
 }
 
-const FormModal = ({ plugin, close }: any) => {
+export const FormModal = ({ plugin, close }: any) => {
   const cms = useCMS()
   const form: Form = useMemo(
     () =>
@@ -114,13 +114,13 @@ const FormModal = ({ plugin, close }: any) => {
   )
 
   return (
-    <Modal>
-      <ModalPopup>
+    <Modal id="content-creator-modal" onClick={(e) => e.stopPropagation()}>
+      <PopupModal>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>
           <FormBuilder form={form} />
         </ModalBody>
-      </ModalPopup>
+      </PopupModal>
     </Modal>
   )
 }

@@ -51,7 +51,7 @@ describe('Tina side bar', () => {
     cy.reload().wait(['@graphQL', '@next', '@next'])
 
     // Open the sidebar
-    cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+    cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()
 
     // Delete all text in rich text editor
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
@@ -74,7 +74,7 @@ describe('Tina side bar', () => {
     //   })
 
     // Open the sidebar
-    // cy.get(`[aria-label="toggles cms sidebar"]`, { timeout: 5000 }).click()
+    // cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
     cy.get('[data-test="form:getPageDocument"]')

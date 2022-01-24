@@ -74,7 +74,11 @@ export default ({ index, marker, tableWidth, view }: AddRowProps) => {
       >
         {hovered && index > 0 ? (
           <IconWrapperRow>
-            <IconButton onClick={() => addRow(index)} size="small" primary>
+            <IconButton
+              onClick={() => addRow(index)}
+              size="small"
+              variant="primary"
+            >
               <AddIcon className="w-5/6 h-auto" />
             </IconButton>
           </IconWrapperRow>

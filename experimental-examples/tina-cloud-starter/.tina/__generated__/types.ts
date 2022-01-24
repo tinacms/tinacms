@@ -137,6 +137,7 @@ export type QueryGetAuthorsListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+ main
 };
 
 

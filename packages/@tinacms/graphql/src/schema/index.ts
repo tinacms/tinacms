@@ -144,15 +144,17 @@ export class TinaSchema {
     }
     return collection
   }
-  public getCollectionAndTemplateByFullPath = async (
+  public getCollectionAndTemplateByFullPath = (
     filepath: string,
     templateName?: string
-  ): Promise<{
+  ): {
     collection: TinaCloudCollection<true>
     template: Templateable
-  }> => {
+  } => {
     let template
     const collection = this.getCollections().find((collection) => {
+      // FIXME: searching by startsWith will break for collections
+      // that only differ by their "matches" property (eg. **/*.en.md vs **/*.fr.md)
       return filepath.replace('\\', '/').startsWith(collection.path)
     })
     if (!collection) {
