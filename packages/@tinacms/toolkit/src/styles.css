@@ -14,37 +14,23 @@
   }
 }
 
-[data-slate-editor='true'] {
-  @apply prose;
-  max-width: 100% !important; /* prose limits to 65ch */
-}
 /* prose adds backticks, which look like they should be editable */
-[data-slate-editor='true'] .slate-code::before {
+.prose [data-slate-editor='true'] .slate-code::before {
   content: '';
 }
-[data-slate-editor='true'] .slate-code::after {
+.prose [data-slate-editor='true'] .slate-code::after {
   content: '';
 }
-[data-slate-editor='true'] .slate-code {
-  padding: 2px 2px;
-  background: #e5e5e5;
-  border-radius: 3px;
-}
-/** prose top-margin is pretty aggressive **/
-[data-slate-editor='true'] .slate-h1,
-[data-slate-editor='true'] .slate-h2,
-[data-slate-editor='true'] .slate-h3,
-[data-slate-editor='true'] .slate-h4,
-[data-slate-editor='true'] .slate-h5 {
-  margin-top: 1em;
-}
-[data-slate-editor='true'] .slate-code_block .slate-code {
+/* code lines as part of a block don't need the same background formatting */
+.prose [data-slate-editor='true'] .slate-code_block .slate-code {
   background: none;
 }
-/* prose makes this italic, which makes italic marks indistinguishable */
-[data-slate-editor='true'] blockquote {
-  font-style: normal;
+/* prose makes the first p in a block slightly larger */
+.prose [data-slate-editor='true'] p:first-of-type {
+  font-size: 1em;
 }
+
+/* experimental floating toolbar doesn't need a large text area */
 .with-toolbar [data-slate-editor='true'] {
   min-height: 100px;
 }
