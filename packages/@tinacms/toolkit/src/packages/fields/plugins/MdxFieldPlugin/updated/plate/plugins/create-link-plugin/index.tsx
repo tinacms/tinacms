@@ -19,13 +19,15 @@ limitations under the License.
 import React from 'react'
 import {
   useEditorState,
-  setNodes,
   getNodes,
   unwrapNodes,
+  setNodes,
+  wrapNodes,
+  PlateEditor,
 } from '@udecode/plate-core'
-import { Transforms, Editor, Range, Element } from 'slate'
+import { Editor, Element, BaseRange } from 'slate'
 import { NestedFormInner } from '../../nested-form'
-import { createLinkPlugin } from '@udecode/plate-link'
+import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
 
 export { createLinkPlugin }
 
@@ -35,29 +37,50 @@ type LinkElement = {
   text: string | undefined
 }
 
+export const wrapOrRewrapLink = (editor) => {
+  const baseLink = {
+    type: 'a',
+    url: '',
+    title: '',
+    children: [{ text: '' }],
+  }
+  if (isLinkActive(editor)) {
+    const [link] = getLinks(editor)
+    baseLink.url = link[0].url
+    baseLink.title = link[0].title
+
+    unwrapLink(editor)
+  }
+
+  wrapNodes(editor, baseLink, { split: true })
+}
+
 export const LinkForm = (props) => {
   const editor = useEditorState()!
-  const [hasInserted, setHasInserted] = React.useState(false)
-  const [values, setValues] = React.useState<{ url?: string }>({})
+  // Memoize selection so we hang onto when editor loses focus
+  const selection = React.useMemo(() => editor.selection, [])
 
-  /**
-   * There can be multiple links for a given selection because
-   * whenever a selection spans multiple block elements each
-   * link is a separate node within its respective block.
-   *
-   * When there is no link yet, insert it. Otherwise update it's value
-   */
-  React.useEffect(() => {
-    if (values.url) {
-      if (hasInserted) {
-        updateLinks(editor, values)
-      } else {
-        insertLinks(editor, values)
-        setHasInserted(true)
+  const handleChange = (values) => {
+    const linksInSelection = getNodes<LinkElement>(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+      at: selection,
+    })
+    if (linksInSelection) {
+      for (const [, location] of linksInSelection) {
+        setNodes(editor, values, {
+          match: (n) => {
+            return (
+              !Editor.isEditor(n) &&
+              Element.isElement(n) &&
+              n.type === ELEMENT_LINK
+            )
+          },
+          at: location,
+        })
       }
     }
-  }, [editor, hasInserted, JSON.stringify(values)])
-
+  }
   const [link] = getLinks(editor)
 
   return (
@@ -69,72 +92,31 @@ export const LinkForm = (props) => {
         { label: 'Title', name: 'title', component: 'text' },
       ]}
       initialValues={{
-        url: link ? link[0]?.url || '' : '',
-        title: link ? link[0]?.title || '' : '',
+        url: link ? link[0].url : '',
+        title: link ? link[0].title : '',
       }}
-      onChange={(values) => setValues(values)}
+      onChange={handleChange}
       onClose={props.onClose}
     />
   )
 }
 
-/**
- * Borrowed from https://github.com/ianstormtaylor/slate/blob/main/site/examples/inlines.tsx
- */
-const isLinkActive = (editor) => {
+export const isLinkActive = (editor) => {
   const [link] = getLinks(editor)
   return !!link
 }
 
-const insertLinks = (editor, values) => {
-  if (editor.selection) {
-    wrapLink(editor, values)
-  }
-}
-const updateLinks = (editor, values) => {
-  if (editor.selection) {
-    const links = getLinks(editor)
-    if (links) {
-      for (const [, location] of links) {
-        setNodes(
-          editor,
-          { url: values.url, title: values.title },
-          { at: location }
-        )
-      }
-    }
-  }
-}
-const wrapLink = (editor, values) => {
-  if (isLinkActive(editor)) {
-    unwrapLink(editor)
-  }
-
-  const { selection } = editor
-  const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
-    type: 'a',
-    url: values.url,
-    title: values.title || '',
-    children: isCollapsed ? [{ text: values.url }] : [],
-  }
-
-  if (isCollapsed) {
-    Transforms.insertNodes(editor, [link])
-  } else {
-    Transforms.wrapNodes(editor, link, { split: true })
-    Transforms.collapse(editor, { edge: 'end' })
-  }
-}
-
-export const unwrapLink = (editor) => {
+export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
   unwrapNodes(editor, {
-    match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'a',
+    match: (n) =>
+      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
+    at: selection || undefined,
   })
 }
 
-const getLinks = (editor) => {
+export const getLinks = (editor) => {
   return getNodes<LinkElement>(editor, {
-    match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'a',
+    match: (n) =>
+      !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
   })
 }
