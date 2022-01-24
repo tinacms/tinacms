@@ -18,22 +18,25 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { css } from 'styled-components'
 import { FormsView } from './SidebarBody'
-import { MdClose } from 'react-icons/md'
-import { HamburgerIcon, LeftArrowIcon, EditIcon, TinaIcon } from '../../icons'
+import { BiMenu, BiPencil } from 'react-icons/bi'
+import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
+import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Button } from '../../styles'
-import { CreateContentMenu } from '../../react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
 import { LocalWarning } from './LocalWarning'
+import { Nav } from './Nav'
+import { Transition } from '@headlessui/react'
+import { IoMdClose } from 'react-icons/io'
 
 export const SidebarContext = React.createContext<any>(null)
 
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
+export const navBreakpoint = 1000
 const defaultSidebarWidth = 440
 const defaultSidebarPosition = 'displace'
 
@@ -75,16 +78,22 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
   useSubscribable(screens)
+  const allScreens = screens.all()
+
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const allScreens = screens.all()
-  const showMenu = allScreens.length > 0
-
   const [displayState, setDisplayState] =
     React.useState<displayStates>('closed')
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [previousWidth, setPreviousWidth] = React.useState(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
+  const [formIsPristine, setFormIsPristine] = React.useState(true)
+
+  /**
+   * Only show ContentCreators when TinaAdmin is disabled
+   */
+  const contentCreators = cms.flags.get('tina-admin')
+    ? []
+    : cms.plugins.getType('content-creator').all()
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {
@@ -102,18 +111,9 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     }
   }
 
-  React.useEffect(() => {
-    setPreviousWidth(sidebarWidth)
-    if (displayState === 'fullscreen') {
-      setSidebarWidth(window.innerWidth)
-    } else {
-      if (previousWidth < window.innerWidth) {
-        setSidebarWidth(previousWidth)
-      } else {
-        setSidebarWidth(window.innerWidth / 2)
-      }
-    }
-  }, [displayState])
+  const toggleMenu = () => {
+    setMenuIsOpen((menuIsOpen) => !menuIsOpen)
+  }
 
   React.useEffect(() => {
     const updateLayout = () => {
@@ -148,76 +148,89 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         setResizingSidebar,
         menuIsOpen,
         setMenuIsOpen,
+        toggleMenu,
+        setActiveView,
+        formIsPristine,
+        setFormIsPristine,
       }}
     >
-      <SidebarWrapper>
-        <SidebarBody>
-          {cms.api?.tina?.isLocalMode && <LocalWarning />}
-          <SidebarHeader>
-            {showMenu && (
-              <MenuToggle
-                className="text-gray-600 hover:text-blue-500"
-                onClick={() => setMenuIsOpen(!menuIsOpen)}
-                open={menuIsOpen}
-              >
-                <HamburgerIcon className="w-9 h-auto" />
-              </MenuToggle>
+      <>
+        <SidebarWrapper>
+          <EditButton />
+          {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
+            <Nav screens={allScreens} contentCreators={contentCreators} />
+          )}
+          <SidebarBody>
+            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
+            <FormsView>
+              <sidebar.placeholder />
+            </FormsView>
+            {activeScreen && (
+              <ScreenPluginModal
+                screen={activeScreen}
+                close={() => setActiveView(null)}
+              />
             )}
-            <CreateContentMenu sidebar={true} />
-          </SidebarHeader>
-          <FormsView>
-            <sidebar.placeholder />
-          </FormsView>
-          {showMenu && (
-            <MenuPanel>
-              <MenuList>
-                {cms.flags.get('tina-admin') && (
-                  <MenuButton
-                    key="admin"
-                    value="admin"
-                    onClick={() => {
-                      window.location.href = window.location.origin + '/admin'
-                    }}
-                  >
-                    <TinaIcon className="w-7 h-auto mr-2 opacity-80" /> Tina
-                    Admin
-                  </MenuButton>
-                )}
-                {allScreens.map((view) => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuButton
-                      key={view.name}
-                      value={view.name}
+          </SidebarBody>
+          <ResizeHandle />
+        </SidebarWrapper>
+        {sidebarWidth < navBreakpoint + 1 && (
+          <Transition show={menuIsOpen}>
+            <Transition.Child
+              as={React.Fragment}
+              enter="transform transition-all ease-out duration-300"
+              enterFrom="opacity-0 -translate-x-full"
+              enterTo="opacity-100 translate-x-0"
+              leave="transform transition-all ease-in duration-200"
+              leaveFrom="opacity-100 translate-x-0"
+              leaveTo="opacity-0 -translate-x-full"
+            >
+              <div className="fixed left-0 z-overlay h-full transform">
+                <Nav
+                  screens={allScreens}
+                  contentCreators={contentCreators}
+                  className="rounded-r-md"
+                >
+                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                    <Button
+                      rounded="right"
+                      variant="secondary"
                       onClick={() => {
-                        setActiveView(view)
                         setMenuIsOpen(false)
                       }}
+                      className={`transition-opacity duration-150 ease-out`}
                     >
-                      <Icon className="w-6 h-auto mr-2 opacity-80" />{' '}
-                      {view.name}
-                    </MenuButton>
-                  )
-                })}
-              </MenuList>
-              <Watermark />
-            </MenuPanel>
-          )}
-          {activeScreen && (
-            <ScreenPluginModal
-              screen={activeScreen}
-              close={() => setActiveView(null)}
-            />
-          )}
-        </SidebarBody>
-        <ResizeHandle />
-        <SidebarToggle sidebar={sidebar} />
-      </SidebarWrapper>
+                      <IoMdClose className="h-6 w-auto" />
+                    </Button>
+                  </div>
+                </Nav>
+              </div>
+            </Transition.Child>
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-80"
+              entered="opacity-80"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-80"
+              leaveTo="opacity-0"
+            >
+              <div
+                onClick={() => {
+                  setMenuIsOpen(false)
+                }}
+                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+              ></div>
+            </Transition.Child>
+          </Transition>
+        )}
+      </>
     </SidebarContext.Provider>
   )
 }
 
-const updateBodyDisplacement = ({
+export const updateBodyDisplacement = ({
   displayState,
   sidebarWidth,
   resizingSidebar,
@@ -237,109 +250,85 @@ const updateBodyDisplacement = ({
       sidebarWidth,
       windowWidth - minPreviewWidth
     )
-    body.style.paddingLeft = bodyDisplacement + 'px'
+    body.style.paddingLeft = bodyDisplacement - 6 + 'px'
   } else {
     body.style.paddingLeft = '0'
   }
 }
 
-const Watermark = styled(({ ...styleProps }: any) => {
+const SidebarHeader = ({ isLocalMode }) => {
+  const {
+    toggleFullscreen,
+    displayState,
+    setMenuIsOpen,
+    toggleSidebarOpen,
+    sidebarWidth,
+  } = React.useContext(SidebarContext)
+
   return (
-    <div {...styleProps}>
-      <TinaIcon />
+    <div className="flex-grow-0 w-full overflow-visible z-20">
+      {isLocalMode && <LocalWarning />}
+      <div className="mt-4 -mb-14 w-full flex items-center justify-between">
+        {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
+          <Button
+            rounded="right"
+            variant="secondary"
+            onClick={() => {
+              setMenuIsOpen(true)
+            }}
+            className="pointer-events-auto -ml-px"
+          >
+            <BiMenu className="h-7 w-auto" />
+          </Button>
+        )}
+        <div className="flex-1"></div>
+        <div
+          className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
+        >
+          <Button
+            rounded="full"
+            variant="ghost"
+            onClick={toggleFullscreen}
+            className="pointer-events-auto opacity-50 hover:opacity-100 focus:opacity-80"
+          >
+            {displayState === 'fullscreen' ? (
+              <BsArrowsAngleContract className="h-5 w-auto -mx-1" />
+            ) : (
+              <BsArrowsAngleExpand className="h-5 w-auto -mx-1" />
+            )}
+          </Button>
+          <Button
+            rounded="left"
+            variant="secondary"
+            onClick={toggleSidebarOpen}
+            aria-label="closes cms sidebar"
+            className={``}
+          >
+            <MdOutlineArrowBackIos className="h-6 w-auto" />
+          </Button>
+        </div>
+      </div>
     </div>
   )
-})`
-  position: absolute;
-  z-index: -1;
-  bottom: var(--tina-padding-big);
-  left: var(--tina-padding-big);
+}
 
-  svg {
-    width: 128px;
-    height: 128px;
-    margin: -4px -20px;
-    fill: var(--tina-color-grey-9);
-  }
-`
-
-const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
-  const { toggleSidebarOpen, displayState } = React.useContext(SidebarContext)
+const EditButton = ({}) => {
+  const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)
 
   return (
     <Button
-      onClick={toggleSidebarOpen}
-      aria-label="toggles cms sidebar"
-      primary
       rounded="right"
-      size="custom"
-      className="absolute bottom-12 right-0 transform translate-x-full pointer-events-auto w-14 h-11"
-    >
-      {displayState === 'closed' ? (
-        <EditIcon className="w-8 h-auto" />
-      ) : (
-        <LeftArrowIcon className="w-8 h-auto" />
-      )}
-    </Button>
-  )
-}
-
-const MenuButton = ({ children, ...props }) => {
-  return (
-    <li className="py-2 first:pt-4 last:pb-4">
-      <button
-        className={`text-xl px-4 py-2 rounded-full tracking-wide whitespace-nowrap w-full flex items-center opacity-80 text-gray-50 hover:text-blue-400 hover:bg-gray-900 hover:opacity-100 transition-all duration-150 ease-out`}
-        {...props}
-      >
-        {children}
-      </button>
-    </li>
-  )
-}
-
-const SidebarHeader = ({ children }) => {
-  return (
-    <div className="flex-grow-0 bg-white text-gray-700 w-full p-4 flex items-center justify-between pointer-events-none">
-      {children}
-    </div>
-  )
-}
-
-const MenuToggle = ({ children, className = ``, ...props }) => {
-  return (
-    <button
-      className={`p-0 z-10 bg-transparent outline-none border-0 text-left -ml-1 w-11 h-11 flex items-center justify-center cursor-pointer pointer-events-auto ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
-
-const MenuList = ({ children }) => {
-  return <ul className="">{children}</ul>
-}
-
-const MenuPanel = ({ children }) => {
-  const { menuIsOpen, setMenuIsOpen } = React.useContext(SidebarContext)
-
-  return (
-    <div
-      className={`absolute top-0 left-0 h-full w-96 overflow-hidden pt-16 px-6 pb-8 bg-gray-800 z-menu transition-transform duration-300 ease-out transform ${
-        menuIsOpen ? `` : `-translate-x-full`
+      variant="primary"
+      onClick={toggleSidebarOpen}
+      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
+        displayState !== 'closed'
+          ? 'opacity-0'
+          : 'translate-x-full pointer-events-auto'
       }`}
+      aria-label="opens cms sidebar"
     >
-      <div className="absolute top-3 right-4">
-        <MenuToggle
-          className="text-gray-300 hover:text-blue-400"
-          onClick={() => setMenuIsOpen(false)}
-          open={menuIsOpen}
-        >
-          <MdClose className="w-9 h-auto" />
-        </MenuToggle>
-      </div>
-      {children}
-    </div>
+      <BiPencil className="h-6 w-auto" />
+    </Button>
   )
 }
 
@@ -354,10 +343,8 @@ const SidebarWrapper = ({ children }) => {
       }`}
     >
       <div
-        className={`relative flex h-screen transform ${
-          displayState === 'closed'
-            ? `pointer-events-none -translate-x-full`
-            : ``
+        className={`relative h-screen transform flex ${
+          displayState !== 'closed' ? `` : `-translate-x-full`
         } ${
           resizingSidebar
             ? `transition-none`
@@ -366,7 +353,7 @@ const SidebarWrapper = ({ children }) => {
             : `transition-all duration-300 ease-out`
         }`}
         style={{
-          width: sidebarWidth,
+          width: displayState === 'fullscreen' ? '100vw' : sidebarWidth + 'px',
           maxWidth: '100vw',
           minWidth: '360px',
         }}
@@ -382,9 +369,9 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full bg-gray-50 shadow-xl overflow-hidden transition-opacity duration-300 ease-out flex flex-col items-stretch ${
-        displayState !== 'closed' ? `opacity-100` : `opacity-0`
-      } ${displayState === 'fullscreen' ? `` : `rounded-r-md`}`}
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+        displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
+      } ${displayState === 'fullscreen' ? '' : 'rounded-r-md'}`}
     >
       {children}
     </div>

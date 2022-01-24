@@ -13,12 +13,13 @@ limitations under the License.
 
 import {
   EditProvider,
+  TinaDataContext,
   isEditing,
   setEditing,
   useEditState,
 } from '@tinacms/sharedctx'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export { isEditing, setEditing, useEditState }
 
@@ -36,6 +37,52 @@ export const TinaEditProvider = ({
       <TinaEditProviderInner {...props} />
     </EditProvider>
   )
+}
+
+export function useTina<T extends object>({
+  query,
+  variables,
+  data,
+}: {
+  query: string
+  variables: object
+  data: T
+}): { data: T; isLoading: boolean } {
+  const {
+    setRequest,
+    state,
+    isDummyContainer,
+    isLoading: contextLoading,
+  } = React.useContext(TinaDataContext)
+
+  const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
+    !isDummyContainer
+  )
+
+  const isLoading = contextLoading || waitForContextRerender
+
+  React.useEffect(() => {
+    setRequest({ query, variables })
+  }, [JSON.stringify(variables), query])
+
+  // A bit of a hack here
+  // We need to wait 1 frame because the parent context will need to react to our
+  // new query that we've just sent when this hook was initialized.
+  // Otherwise, things get wonky when changing pages
+  useEffect(() => {
+    if (!isDummyContainer) {
+      setTimeout(() => setWaitForContextRerender(false), 0)
+    }
+
+    return () => {
+      setRequest(undefined) // unregister forms
+    }
+  }, [isDummyContainer])
+
+  return {
+    data: isDummyContainer || isLoading ? data : (state.payload as T),
+    isLoading,
+  }
 }
 
 const ToggleButton = () => {

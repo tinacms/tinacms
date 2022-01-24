@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
@@ -24,6 +24,8 @@ import styles from './styles.css'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
+import { TinaDataContext } from '@tinacms/sharedctx'
+import { useTina } from './edit-state'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -36,40 +38,6 @@ const errorButtonStyles = {
   border: 'none',
   color: 'white',
   margin: '1rem 0',
-}
-
-const SetupHooks = (props: {
-  query: string
-  variables?: object
-  formifyCallback?: formifyCallback
-  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
-  children: (args) => React.ReactNode
-}) => {
-  const cms = useCMS()
-  const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
-    variables: props.variables || {},
-    formify: (args) => {
-      if (props.formifyCallback) {
-        return props.formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
-  })
-
-  useDocumentCreatorPlugin(props.documentCreatorCallback)
-
-  return (
-    <ErrorBoundary>
-      {isLoading ? (
-        <Loader>{props.children(props)}</Loader>
-      ) : (
-        // pass the new edit state data to the child
-        props.children({ ...props, data: payload })
-      )}
-    </ErrorBoundary>
-  )
 }
 
 class ErrorBoundary extends React.Component {
@@ -212,48 +180,61 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
   }
 }
 
-export const TinaCMSProvider2 = ({
-  children,
-  cmsCallback,
-  mediaStore,
-  tinaioConfig,
-  ...props
-}: {
-  /** The query from getStaticProps */
-  query?: string
-  /** Any variables from getStaticProps */
-  variables?: object
-  /** The `data` from getStaticProps */
-  data: object
-  /** Your React page component */
-  children: () => React.ReactNode
-  /**
-   * The URL for the GraphQL API.
-   *
-   * When working locally, this should be http://localhost:4001/graphql.
-   *
-   * For Tina Cloud, use https://content.tinajs.io/content/my-client-id/github/my-branch
-   */
-  apiURL: string
-  /**
-   * Point to the local version of GraphQL instead of tina.io
-   * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
-   *
-   * @deprecated use apiURL instead
-   */
-  isLocalClient?: boolean
-  /**
-   * The base branch to pull content from. Note that this is ignored for local development
-   *
-   * @deprecated use apiURL instead
-   */
-  branch?: string
-  /**
-   * Your clientID from tina.aio
-   *
-   * @deprecated use apiURL instead
-   */
-  clientId?: string
+type APIProviderProps =
+  | {
+      /**
+       * Content API URL
+       *
+       */
+      apiURL: string
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: never
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: never
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: never
+    }
+  | {
+      /**
+       * Content API URL
+       *
+       */
+      apiURL?: never
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: boolean
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: string
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: string
+    }
+
+interface BaseProviderProps {
   /** Callback if you need access to the TinaCMS instance */
   cmsCallback?: (cms: TinaCMS) => TinaCMS
   /** Callback if you need access to the "formify" API */
@@ -265,11 +246,36 @@ export const TinaCMSProvider2 = ({
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
-}) => {
-  if (typeof props.query === 'string') {
-    props.query
-  }
+}
 
+type QueryProviderProps =
+  | {
+      /** Your React page component */
+      children: (props?: any) => React.ReactNode
+      /** The query from getStaticProps */
+      query: string | undefined
+      /** Any variables from getStaticProps */
+      variables: object | undefined
+      /** The `data` from getStaticProps */
+      data: object
+    }
+  | {
+      /** Your React page component */
+      children: React.ReactNode
+      /** The query from getStaticProps */
+      query?: never
+      /** Any variables from getStaticProps */
+      variables?: never
+      /** The `data` from getStaticProps */
+      data?: never
+    }
+
+export const TinaCMSProvider2 = ({
+  query,
+  documentCreatorCallback,
+  formifyCallback,
+  ...props
+}: QueryProviderProps & APIProviderProps & BaseProviderProps) => {
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
@@ -288,25 +294,143 @@ export const TinaCMSProvider2 = ({
       }
 
   return (
-    <TinaCloudProvider
-      branch={branch}
-      clientId={clientId}
-      tinaioConfig={tinaioConfig}
-      isLocalClient={isLocalClient}
-      cmsCallback={cmsCallback}
-      mediaStore={mediaStore}
-    >
-      <style>{styles}</style>
-      {props.query ? (
-        <SetupHooks key={props.query} {...props} query={props.query || ''}>
-          {children}
-        </SetupHooks>
-      ) : (
-        // @ts-ignore
-        children(props)
-      )}
-    </TinaCloudProvider>
+    <>
+      <TinaCloudProvider
+        branch={branch}
+        clientId={clientId}
+        tinaioConfig={props.tinaioConfig}
+        isLocalClient={isLocalClient}
+        cmsCallback={props.cmsCallback}
+        mediaStore={props.mediaStore}
+      >
+        <style>{styles}</style>
+        <ErrorBoundary>
+          <DocumentCreator />
+          <TinaDataProvider formifyCallback={formifyCallback}>
+            {typeof props.children == 'function' ? (
+              <TinaQuery
+                {...props}
+                variables={props.variables}
+                data={props.data}
+                query={query}
+                formifyCallback={formifyCallback}
+                children={props.children as any}
+              />
+            ) : (
+              props.children
+            )}
+          </TinaDataProvider>
+        </ErrorBoundary>
+      </TinaCloudProvider>
+    </>
   )
+}
+
+const DocumentCreator = ({
+  documentCreatorCallback,
+}: {
+  /** Callback if you need access to the "document creator" API */
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
+}) => {
+  useDocumentCreatorPlugin(documentCreatorCallback)
+
+  return null
+}
+
+interface TinaQueryProps {
+  /** The query from getStaticProps */
+  query: string
+  /** Any variables from getStaticProps */
+  variables: object
+  /** The `data` from getStaticProps */
+  data: object
+  /** Your React page component */
+  children: (props: { data: object }) => React.ReactNode
+  /** Callback if you need access to the "formify" API */
+  formifyCallback?: formifyCallback
+  /** Callback if you need access to the "document creator" API */
+}
+
+//Legacy'ish Container that auto-registers forms/document creator
+const TinaQuery = (props: TinaQueryProps) => {
+  return <TinaQueryInner key={`rootQuery-${props.query}`} {...props} />
+}
+
+const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
+  const { data: liveData, isLoading } = useTina({
+    query: props.query,
+    variables: props.variables,
+    data: props.data,
+  })
+
+  return <>{children(isLoading ? props : { ...props, data: liveData })}</>
+}
+
+// TinaDataProvider can only manage one "request" object at a timee
+const TinaDataProvider = ({
+  children,
+  formifyCallback,
+}: {
+  children: any
+  formifyCallback: formifyCallback
+}) => {
+  const [request, setRequest] = useState<{ query: string; variables: object }>()
+  const [state, setState] = React.useState({
+    payload: undefined,
+    isLoading: true,
+  })
+
+  return (
+    <TinaDataContext.Provider
+      value={{
+        setRequest,
+        isLoading: state.isLoading,
+        state: { payload: state.payload },
+      }}
+    >
+      <FormRegistrar
+        key={request?.query} // unload on page/query change
+        request={request}
+        formifyCallback={formifyCallback}
+        onPayloadStateChange={setState}
+      />
+      {children}
+    </TinaDataContext.Provider>
+  )
+}
+
+const FormRegistrar = ({
+  request,
+  formifyCallback,
+  onPayloadStateChange,
+}: {
+  request: { query: string; variables: object }
+  formifyCallback: formifyCallback
+  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
+}) => {
+  const cms = useCMS()
+
+  const [payload, isLoading] = useGraphqlForms({
+    query: request?.query,
+    variables: request?.variables,
+    formify: (args) => {
+      if (formifyCallback) {
+        return formifyCallback(args, cms)
+      } else {
+        return args.createForm(args.formConfig)
+      }
+    },
+  })
+
+  React.useEffect(() => {
+    onPayloadStateChange({ payload, isLoading })
+  }, [JSON.stringify(payload)])
+
+  return isLoading ? (
+    <Loader>
+      <></>
+    </Loader>
+  ) : null
 }
 
 const Loader = (props: { children: React.ReactNode }) => {
