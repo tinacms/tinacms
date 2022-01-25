@@ -180,7 +180,7 @@ export function Toolbar({
   return (
     // Note: -top-6 is because there's padding on the form wrapper that pushes this too far down
     <div
-      className="sticky -top-6 inline-flex shadow-sm rounded-md mb-2 z-20 max-w-full"
+      className="sticky -top-6 inline-flex shadow rounded-md mb-2 z-50 max-w-full"
       style={{
         width: `${
           toolbarItems.length * ICON_WIDTH + (showEmbed ? EMBED_ICON_WIDTH : 0)
