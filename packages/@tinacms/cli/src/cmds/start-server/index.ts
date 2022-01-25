@@ -141,10 +141,6 @@ stack: ${code.stack || 'No stack was provided'}`)
     if (!process.env.CI && !noWatch) {
       await resetGeneratedFolder()
     }
-    const bridge = new FilesystemBridge(rootPath)
-    const store = experimentalData
-      ? new LevelStore(rootPath)
-      : new FilesystemStore({ rootPath })
     const database = await createDatabase({ store, bridge })
     await compile(null, null)
     const schema = await buildSchema(rootPath, database)
