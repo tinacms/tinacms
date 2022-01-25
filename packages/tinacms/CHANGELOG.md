@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.65.2
+
+### Patch Changes
+
+- a9b385b01: Fix mutation string for document creation
+
 ## 0.65.1
 
 ### Patch Changes
