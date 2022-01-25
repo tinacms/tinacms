@@ -79,7 +79,6 @@ export const plugins = [
           hotkey: 'mod+shift+enter',
           before: true,
         },
-        // FIXME: not working - When in a header block, breaking onto a new line will be a 'p'
         {
           hotkey: 'enter',
           query: {
