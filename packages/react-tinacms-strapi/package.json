@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-strapi",
-  "version": "0.51.17",
+  "version": "0.52.0",
   "description": "",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
