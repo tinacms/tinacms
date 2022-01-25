@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.65.2
+
+### Patch Changes
+
+- a9b385b01: Fix mutation string for document creation
+
+## 0.65.1
+
+### Patch Changes
+
+- 68284198a: fix: use user-specific document creator callback
+- ccf4dcbd4: chore: Export low-level data provider from "tinacms", for the playground and other sandboz environments
+- f2431c031: Fix type for code_block TinaMarkdown element
+
 ## 0.65.0
 
 ### Minor Changes
