@@ -26,8 +26,8 @@ export const createImgPlugin = createPluginFactory({
   isInline: false,
   isElement: true,
   component: (props) => {
-    const path = ReactEditor.findPath(props.editor, props.element)
     const handleChange = (values) => {
+      const path = ReactEditor.findPath(props.editor, props.element)
       setNodes(props.editor, values, { at: path })
     }
     return <ImgEmbed {...props} onChange={handleChange} />

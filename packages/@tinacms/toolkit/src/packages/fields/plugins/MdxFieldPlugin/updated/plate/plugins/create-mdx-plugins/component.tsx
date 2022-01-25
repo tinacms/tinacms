@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { Element } from 'slate'
-import { useSelected } from 'slate-react'
+import { useSelected, ReactEditor } from 'slate-react'
 import { insertNodes } from '@udecode/plate-core'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { Transition, Popover } from '@headlessui/react'
@@ -67,6 +67,14 @@ export const InlineEmbed = ({
     (template) => template.name === element.name
   )
 
+  const formProps = {
+    activeTemplate,
+    element,
+    editor,
+    onChange,
+    onClose: handleClose,
+  }
+
   if (!activeTemplate) {
     return null
   }
@@ -93,14 +101,7 @@ export const InlineEmbed = ({
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
-        {isExpanded && (
-          <EmbedNestedForm
-            onChange={(values) => onChange(values)}
-            onClose={handleClose}
-            activeTemplate={activeTemplate}
-            initialValues={element.props}
-          />
-        )}
+        {isExpanded && <EmbedNestedForm {...formProps} />}
       </Wrapper>
     </span>
   )
@@ -127,6 +128,14 @@ export const BlockEmbed = ({
     (template) => template.name === element.name
   )
 
+  const formProps = {
+    activeTemplate,
+    element,
+    editor,
+    onChange,
+    onClose: handleClose,
+  }
+
   if (!activeTemplate) {
     return null
   }
@@ -147,16 +156,30 @@ export const BlockEmbed = ({
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
-        {isExpanded && (
-          <EmbedNestedForm
-            onChange={(values) => onChange(values)}
-            onClose={handleClose}
-            activeTemplate={activeTemplate}
-            initialValues={element.props}
-          />
-        )}
+        {isExpanded && <EmbedNestedForm {...formProps} />}
       </Wrapper>
     </div>
+  )
+}
+
+const EmbedNestedForm = ({
+  editor,
+  element,
+  activeTemplate,
+  onClose,
+  onChange,
+}) => {
+  const path = ReactEditor.findPath(editor, element)
+  const id = [...path, activeTemplate.name].join('.')
+  return (
+    <NestedForm
+      id={id}
+      label={activeTemplate.label}
+      fields={activeTemplate.fields}
+      initialValues={element.props}
+      onChange={onChange}
+      onClose={onClose}
+    />
   )
 }
 
@@ -203,19 +226,5 @@ const DotMenu = ({ onOpen, onRemove }) => {
         </div>
       </Transition>
     </Popover>
-  )
-}
-
-export const EmbedNestedForm = (props) => {
-  const activeTemplate = props.activeTemplate
-  return (
-    <NestedForm
-      id={activeTemplate.name}
-      label={activeTemplate.label}
-      fields={activeTemplate.fields}
-      initialValues={props.initialValues}
-      onChange={props.onChange}
-      onClose={props.onClose}
-    />
   )
 }
