@@ -88,7 +88,7 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </ListMeta>
-        <IconButton onClick={addItem} primary size="small">
+        <IconButton onClick={addItem} variant="primary" size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </ListHeader>

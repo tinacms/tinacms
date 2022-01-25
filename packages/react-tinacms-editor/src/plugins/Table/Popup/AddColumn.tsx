@@ -62,7 +62,7 @@ export default ({ index, marker, tableHeight, view }: AddColumnProps) => {
                 setHovered(false)
               }}
               size="small"
-              primary
+              variant="primary"
             >
               <AddIcon />
             </IconButton>

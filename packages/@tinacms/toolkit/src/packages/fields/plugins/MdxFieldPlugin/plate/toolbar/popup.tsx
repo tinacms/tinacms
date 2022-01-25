@@ -58,7 +58,7 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
             event.preventDefault()
             setVisible((visible) => !visible)
           }}
-          primary
+          variant="primary"
           size="small"
         >
           <Embed open={visible}>

@@ -52,7 +52,7 @@ export const ActionableModal = ({
           {actions.map((action, index) => (
             <TinaButton
               key={index}
-              primary={action.primary}
+              variant={action.primary ? 'primary' : 'secondary'}
               onClick={action.action}
             >
               {action.name}
