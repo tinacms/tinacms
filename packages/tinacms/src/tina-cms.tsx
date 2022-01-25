@@ -424,7 +424,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
-  }, [JSON.stringify(payload)])
+  }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (
     <Loader>
