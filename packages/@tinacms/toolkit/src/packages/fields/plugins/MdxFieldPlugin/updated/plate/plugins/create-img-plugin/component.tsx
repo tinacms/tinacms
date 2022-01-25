@@ -15,7 +15,7 @@ import React from 'react'
 import { useSelected } from 'slate-react'
 import { insertNodes } from '@udecode/plate-core'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
-import { NestedFormInner } from '../../nested-form'
+import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
 import { DeleteImageButton } from '../../../../../../components'
 
@@ -97,7 +97,7 @@ export const ImgEmbed = ({
 
 export const ImageForm = (props) => {
   return (
-    <NestedFormInner
+    <NestedForm
       id="image-form"
       label="Image"
       fields={[

@@ -26,7 +26,7 @@ import {
   PlateEditor,
 } from '@udecode/plate-core'
 import { Editor, Element, BaseRange } from 'slate'
-import { NestedFormInner } from '../../nested-form'
+import { NestedForm } from '../../nested-form'
 import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
 
 export { createLinkPlugin }
@@ -84,7 +84,7 @@ export const LinkForm = (props) => {
   const [link] = getLinks(editor)
 
   return (
-    <NestedFormInner
+    <NestedForm
       id="link-form"
       label="Link"
       fields={[
