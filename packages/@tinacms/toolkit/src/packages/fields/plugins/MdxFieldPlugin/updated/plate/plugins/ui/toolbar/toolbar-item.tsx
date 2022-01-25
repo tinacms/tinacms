@@ -182,42 +182,54 @@ export const EmbedButton = ({
       className="relative z-10 block"
       style={{ width: '85px' }}
     >
-      <Popover.Button
-        as="span"
-        onMouseDown={(e) => {
-          e.preventDefault()
-        }}
-        className="cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border border-blue-500 bg-blue-500 text-sm font-medium text-white hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-      >
-        <span className="text-sm font-semibold tracking-wide align-baseline mr-1">
-          Embed
-        </span>
-        <PlusIcon />
-      </Popover.Button>
-      <Transition
-        as={Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
-          {templates.map((template) => (
-            <button
-              key={template.name}
-              type="button"
-              onClick={() => {
-                insertMDX(editor, template)
-              }}
-              className={`hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
-            >
-              {template.name}
-            </button>
-          ))}
-        </div>
-      </Transition>
+      {({ open }) => (
+        <>
+          <Popover.Button
+            as="span"
+            onMouseDown={(e) => {
+              e.preventDefault()
+            }}
+            className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border  text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+              open
+                ? `bg-gray-50 border-gray-200 text-blue-500`
+                : `text-white border-blue-500 bg-blue-500`
+            }`}
+          >
+            <span className="text-sm font-semibold tracking-wide align-baseline mr-1">
+              Embed
+            </span>
+            <PlusIcon
+              className={`origin-center transition-all ease-out duration-150 ${
+                open ? `rotate-45` : ``
+              }`}
+            />
+          </Popover.Button>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
+              {templates.map((template) => (
+                <button
+                  key={template.name}
+                  type="button"
+                  onClick={() => {
+                    insertMDX(editor, template)
+                  }}
+                  className={`hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
+                >
+                  {template.name}
+                </button>
+              ))}
+            </div>
+          </Transition>
+        </>
+      )}
     </Popover>
   )
 }
