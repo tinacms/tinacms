@@ -70,6 +70,7 @@ export function Toolbar({
   inlineOnly: boolean
   templates: MdxTemplate[]
 }) {
+  const showEmbed = templates.length > 0
   const toolbarRef = React.useRef(null)
   const editor = useEditorState()!
   const isBoldActive = helpers.isMarkActive(editor, MARK_BOLD)
@@ -172,7 +173,7 @@ export function Toolbar({
 
   useResize(toolbarRef, (entry) => {
     const width = entry.target.getBoundingClientRect().width
-    const itemsShown = (width - EMBED_ICON_WIDTH) / ICON_WIDTH
+    const itemsShown = (width - (showEmbed ? EMBED_ICON_WIDTH : 0)) / ICON_WIDTH
     setItemsShown(Math.floor(itemsShown))
   })
 
@@ -181,16 +182,20 @@ export function Toolbar({
     <div
       className="sticky -top-6 inline-flex shadow-sm rounded-md mb-2 z-20 max-w-full"
       style={{
-        width: `${toolbarItems.length * ICON_WIDTH + EMBED_ICON_WIDTH}px`,
+        width: `${
+          toolbarItems.length * ICON_WIDTH + (showEmbed ? EMBED_ICON_WIDTH : 0)
+        }px`,
       }}
     >
       <div
         ref={toolbarRef}
         className="grid w-full"
-        style={{ gridTemplateColumns: `1fr ${EMBED_ICON_WIDTH}px` }}
+        style={{
+          gridTemplateColumns: showEmbed ? `1fr ${EMBED_ICON_WIDTH}px` : `1fr`,
+        }}
       >
         <div
-          className="grid divide-x"
+          className="grid"
           style={{
             gridTemplateColumns: `repeat(auto-fit, minmax(${ICON_WIDTH}px, 1fr))`,
             gridTemplateRows: 'auto',
@@ -207,6 +212,7 @@ export function Toolbar({
                     key={toolbarItem.name}
                     itemsShown={itemsShown}
                     toolbarItems={toolbarItems}
+                    showEmbed={showEmbed}
                   />
                 )
               } else {
@@ -237,7 +243,7 @@ export function Toolbar({
             }
           })}
         </div>
-        <EmbedButton templates={templates} editor={editor} />
+        {showEmbed && <EmbedButton templates={templates} editor={editor} />}
       </div>
     </div>
   )

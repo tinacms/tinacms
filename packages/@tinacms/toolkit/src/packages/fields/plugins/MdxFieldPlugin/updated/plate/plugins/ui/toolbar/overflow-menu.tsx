@@ -22,12 +22,14 @@ import { ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
 import { classNames } from '../helpers'
 
-export const OverflowMenu = ({ toolbarItems, itemsShown }) => {
+export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
   return (
     <Popover as="span" className="relative z-10 block w-full">
       <Popover.Button
         as="span"
-        className="cursor-pointer relative w-full justify-center inline-flex border-t border-b border-gray-200 focus:border-blue-500 items-center px-2 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 "
+        className={`cursor-pointer relative w-full justify-center inline-flex border border-gray-200 focus:border-blue-500 items-center px-2 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+          showEmbed ? `rounded-none` : `rounded-r-md`
+        }`}
         onMouseDown={(e) => {
           e.preventDefault()
         }}
