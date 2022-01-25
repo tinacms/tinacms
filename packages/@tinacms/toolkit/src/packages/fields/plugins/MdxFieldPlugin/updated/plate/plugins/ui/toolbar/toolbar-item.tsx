@@ -68,7 +68,7 @@ export const ToolbarItem = ({
       <Popover as="div" className="relative z-10 w-full">
         <Popover.Button
           as="span"
-          className="cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border -mr-1 border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border -mr-px border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           onMouseDown={(e) => {
             e.preventDefault()
           }}
@@ -203,23 +203,19 @@ export const EmbedButton = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="py-2">
-            {templates.map((template) => (
-              <button
-                key={template.name}
-                type="button"
-                onClick={() => {
-                  insertMDX(editor, template)
-                }}
-                className={classNames(
-                  'hover:bg-gray-100 hover:text-gray-900 block px-4 py-2 text-sm w-full text-left'
-                )}
-              >
-                {template.name}
-              </button>
-            ))}
-          </div>
+        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
+          {templates.map((template) => (
+            <button
+              key={template.name}
+              type="button"
+              onClick={() => {
+                insertMDX(editor, template)
+              }}
+              className={`hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
+            >
+              {template.name}
+            </button>
+          ))}
         </div>
       </Transition>
     </Popover>
