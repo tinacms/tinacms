@@ -16,13 +16,14 @@ limitations under the License.
 
 */
 
-import { render, waitFor } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 
 import React, { ReactNode } from 'react'
 import { TinaCMSProvider2 } from './tina-cms'
 
 import { useTina } from './edit-state'
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 
 jest.mock('./auth', () => {
   return {
@@ -30,7 +31,7 @@ jest.mock('./auth', () => {
   }
 })
 jest.mock('./hooks/use-content-creator', () => {
-  return { useDocumentCreatorPlugin: () => {} }
+  return { useDocumentCreatorPlugin: jest.fn(() => {}) }
 })
 jest.mock('@tinacms/toolkit', () => {
   return { useCMS: () => {} }
@@ -107,6 +108,26 @@ describe('TinaCMSProvider', () => {
       const text = queryByText(/liveDataProp/)
 
       expect(text).toBeInTheDocument()
+    })
+
+    it('registers document creator callback', () => {
+      let mockDocumentCreatorCallback = jest.fn()
+      const request = {
+        query: 'my-query',
+        variables: { foo: 'my-variable-val' },
+        data: { foo: 'my-data' },
+        documentCreatorCallback: mockDocumentCreatorCallback,
+      }
+      render(
+        <TinaCMSProvider2 {...request}>
+          {(liveProps) => <DummyChild {...liveProps} />}
+        </TinaCMSProvider2>
+      )
+
+      expect(useDocumentCreatorPlugin).toHaveBeenCalledTimes(1)
+      expect(useDocumentCreatorPlugin).toHaveBeenCalledWith(
+        mockDocumentCreatorCallback
+      )
     })
   })
 
