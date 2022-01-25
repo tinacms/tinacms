@@ -21,7 +21,7 @@ import { useFormPortal, FormBuilder } from '../../../../../form-builder'
 import { PanelHeader, GroupPanel } from '../../../GroupFieldPlugin'
 import { Form, Field } from '../../../../../forms'
 
-export const NestedFormInner = (props: {
+export const NestedForm = (props: {
   onClose: () => void
   id: string
   label: string

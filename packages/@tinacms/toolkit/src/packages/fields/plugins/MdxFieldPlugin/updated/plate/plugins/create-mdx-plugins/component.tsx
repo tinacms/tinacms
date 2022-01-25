@@ -17,7 +17,7 @@ import { useSelected } from 'slate-react'
 import { insertNodes } from '@udecode/plate-core'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { Transition, Popover } from '@headlessui/react'
-import { NestedFormInner } from '../../nested-form'
+import { NestedForm } from '../../nested-form'
 import { classNames } from '../ui/helpers'
 import { ELEMENT_MDX_INLINE } from '.'
 import { EllipsisIcon } from '../ui/icons'
@@ -94,7 +94,7 @@ export const InlineEmbed = ({
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
         {isExpanded && (
-          <NestedForm
+          <EmbedNestedForm
             onChange={(values) => onChange(values)}
             onClose={handleClose}
             activeTemplate={activeTemplate}
@@ -148,7 +148,7 @@ export const BlockEmbed = ({
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
         {isExpanded && (
-          <NestedForm
+          <EmbedNestedForm
             onChange={(values) => onChange(values)}
             onClose={handleClose}
             activeTemplate={activeTemplate}
@@ -206,10 +206,10 @@ const DotMenu = ({ onOpen, onRemove }) => {
   )
 }
 
-export const NestedForm = (props) => {
+export const EmbedNestedForm = (props) => {
   const activeTemplate = props.activeTemplate
   return (
-    <NestedFormInner
+    <NestedForm
       id={activeTemplate.name}
       label={activeTemplate.label}
       fields={activeTemplate.fields}
@@ -219,14 +219,3 @@ export const NestedForm = (props) => {
     />
   )
 }
-
-// // if this is a void element at the top of the editor, insert an empty paragraph above it
-// const insertBlockAbove = (editor: PlateEditor) => {
-//   const parentPath = Path.parent(editor.selection.anchor.path)
-//   if (parentPath.length === 1 && parentPath[0] === 0) {
-//     insertNodes(editor, [{ type: 'p', children: [{ text: '' }] }], {
-//       select: true,
-//       at: [0],
-//     })
-//   }
-// }
