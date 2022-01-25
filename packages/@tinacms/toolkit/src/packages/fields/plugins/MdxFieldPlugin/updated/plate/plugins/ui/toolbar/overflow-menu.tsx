@@ -27,7 +27,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
     <Popover as="span" className="relative z-10 block w-full">
       <Popover.Button
         as="span"
-        className={`cursor-pointer relative w-full justify-center inline-flex border border-gray-200 focus:border-blue-500 items-center px-2 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-100 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+        className={`cursor-pointer relative w-full justify-center inline-flex border border-gray-200 focus:border-blue-500 items-center px-2 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 pointer-events-auto ${
           showEmbed ? `rounded-none` : `rounded-r-md`
         }`}
         onMouseDown={(e) => {
@@ -58,34 +58,32 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <div className="origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="py-2">
-            {toolbarItems.map((toolbarItem, index) => {
-              if (index < itemsShown - 1) {
-                return null
-              }
-              return (
-                <button
-                  key={toolbarItem.name}
-                  type="button"
-                  onMouseDown={(event) => {
-                    toolbarItem.onMouseDown(event)
-                  }}
-                  className={classNames(
-                    toolbarItem.active
-                      ? 'bg-gray-50 text-blue-500'
-                      : 'bg-white text-gray-600',
-                    'hover:bg-gray-100 hover:text-gray-900 px-4 py-2 text-sm w-full flex items-center'
-                  )}
-                >
-                  <div className="mr-2">
-                    <ToolbarIcon name={toolbarItem.name} />
-                  </div>{' '}
-                  {toolbarItem.label}
-                </button>
-              )
-            })}
-          </div>
+        <div className="origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
+          {toolbarItems.map((toolbarItem, index) => {
+            if (index < itemsShown - 1) {
+              return null
+            }
+            return (
+              <button
+                key={toolbarItem.name}
+                type="button"
+                onMouseDown={(event) => {
+                  toolbarItem.onMouseDown(event)
+                }}
+                className={classNames(
+                  toolbarItem.active
+                    ? 'bg-gray-50 text-blue-500'
+                    : 'bg-white text-gray-600',
+                  'hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
+                )}
+              >
+                <div className="mr-2 opacity-80">
+                  <ToolbarIcon name={toolbarItem.name} />
+                </div>{' '}
+                {toolbarItem.label}
+              </button>
+            )
+          })}
         </div>
       </Transition>
     </Popover>
