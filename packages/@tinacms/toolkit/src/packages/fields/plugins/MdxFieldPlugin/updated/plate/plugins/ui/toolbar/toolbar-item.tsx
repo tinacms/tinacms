@@ -68,7 +68,7 @@ export const ToolbarItem = ({
       <Popover as="div" className="relative z-10 w-full">
         <Popover.Button
           as="span"
-          className="cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border-t border-l border-b border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className="cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border -mr-1 border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           onMouseDown={(e) => {
             e.preventDefault()
           }}
@@ -98,7 +98,7 @@ export const ToolbarItem = ({
         <span
           className={classNames(
             active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           )}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
@@ -121,7 +121,7 @@ export const ToolbarItem = ({
         <span
           className={classNames(
             active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
           )}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
@@ -155,7 +155,7 @@ export const ToolbarItem = ({
       type="button"
       className={classNames(
         active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-        'w-full inline-flex relative justify-center items-center px-2 py-2 border-t border-b border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
+        'w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
       )}
       style={{
         visibility: hidden ? 'hidden' : 'visible',
