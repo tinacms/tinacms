@@ -305,7 +305,7 @@ export const TinaCMSProvider2 = ({
       >
         <style>{styles}</style>
         <ErrorBoundary>
-          <DocumentCreator />
+          <DocumentCreator documentCreatorCallback={documentCreatorCallback} />
           <TinaDataProvider formifyCallback={formifyCallback}>
             {typeof props.children == 'function' ? (
               <TinaQuery
