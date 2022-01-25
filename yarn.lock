@@ -5190,28 +5190,28 @@ __metadata:
     "@types/storybook__react": ^4.0.2
     "@types/styled-components": 4.1.8
     "@udecode/plate": ^7.0.3
-    "@udecode/plate-autoformat": ^9.0.0
-    "@udecode/plate-basic-elements": ^9.0.0
-    "@udecode/plate-basic-marks": ^9.0.0
-    "@udecode/plate-block-quote": ^9.0.0
-    "@udecode/plate-break": ^9.0.0
-    "@udecode/plate-code-block": ^9.0.0
+    "@udecode/plate-autoformat": ^9.2.1
+    "@udecode/plate-basic-elements": ^9.2.1
+    "@udecode/plate-basic-marks": ^9.2.1
+    "@udecode/plate-block-quote": ^9.2.1
+    "@udecode/plate-break": ^9.2.1
+    "@udecode/plate-code-block": ^9.2.1
     "@udecode/plate-common": ^7.0.2
-    "@udecode/plate-core": ^9.0.0
-    "@udecode/plate-heading": ^9.0.0
-    "@udecode/plate-horizontal-rule": ^9.0.0
-    "@udecode/plate-image": ^9.0.0
-    "@udecode/plate-kbd": ^9.0.0
-    "@udecode/plate-link": ^9.0.0
-    "@udecode/plate-list": ^9.0.0
-    "@udecode/plate-node-id": ^9.0.0
-    "@udecode/plate-normalizers": ^9.0.0
-    "@udecode/plate-paragraph": ^9.0.0
-    "@udecode/plate-reset-node": ^9.0.0
-    "@udecode/plate-select": ^9.0.0
-    "@udecode/plate-table": ^9.0.0
-    "@udecode/plate-trailing-block": ^9.0.0
-    "@udecode/plate-ui-combobox": ^9.0.0
+    "@udecode/plate-core": ^9.2.1
+    "@udecode/plate-heading": ^9.2.1
+    "@udecode/plate-horizontal-rule": ^9.2.1
+    "@udecode/plate-image": ^9.2.1
+    "@udecode/plate-kbd": ^9.2.1
+    "@udecode/plate-link": ^9.2.1
+    "@udecode/plate-list": ^9.2.1
+    "@udecode/plate-node-id": ^9.2.1
+    "@udecode/plate-normalizers": ^9.2.1
+    "@udecode/plate-paragraph": ^9.2.1
+    "@udecode/plate-reset-node": ^9.2.1
+    "@udecode/plate-select": ^9.2.1
+    "@udecode/plate-table": ^9.2.1
+    "@udecode/plate-trailing-block": ^9.2.1
+    "@udecode/plate-ui-combobox": ^9.2.1
     atob: 2.1.2
     color-string: ^1.5.3
     cors: ^2.8.5
@@ -6816,7 +6816,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-autoformat@npm:^9.0.0":
+"@udecode/plate-autoformat@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-autoformat@npm:9.2.1"
   dependencies:
@@ -6851,7 +6851,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-basic-elements@npm:^9.0.0":
+"@udecode/plate-basic-elements@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-basic-elements@npm:9.2.1"
   dependencies:
@@ -6886,7 +6886,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-basic-marks@npm:^9.0.0":
+"@udecode/plate-basic-marks@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-basic-marks@npm:9.2.1"
   dependencies:
@@ -6936,7 +6936,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-block-quote@npm:9.2.1, @udecode/plate-block-quote@npm:^9.0.0":
+"@udecode/plate-block-quote@npm:9.2.1, @udecode/plate-block-quote@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-block-quote@npm:9.2.1"
   dependencies:
@@ -6967,7 +6967,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-break@npm:^9.0.0":
+"@udecode/plate-break@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-break@npm:9.2.1"
   dependencies:
@@ -7021,7 +7021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-code-block@npm:9.2.1, @udecode/plate-code-block@npm:^9.0.0":
+"@udecode/plate-code-block@npm:9.2.1, @udecode/plate-code-block@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-code-block@npm:9.2.1"
   dependencies:
@@ -7111,7 +7111,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-core@npm:9.2.1, @udecode/plate-core@npm:^9.0.0":
+"@udecode/plate-core@npm:9.2.1, @udecode/plate-core@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-core@npm:9.2.1"
   dependencies:
@@ -7260,7 +7260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-heading@npm:9.2.1, @udecode/plate-heading@npm:^9.0.0":
+"@udecode/plate-heading@npm:9.2.1, @udecode/plate-heading@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-heading@npm:9.2.1"
   dependencies:
@@ -7307,7 +7307,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-horizontal-rule@npm:^9.0.0":
+"@udecode/plate-horizontal-rule@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-horizontal-rule@npm:9.2.1"
   dependencies:
@@ -7378,7 +7378,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-image@npm:^9.0.0":
+"@udecode/plate-image@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-image@npm:9.2.1"
   dependencies:
@@ -7443,7 +7443,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-kbd@npm:^9.0.0":
+"@udecode/plate-kbd@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-kbd@npm:9.2.1"
   dependencies:
@@ -7531,7 +7531,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-link@npm:^9.0.0":
+"@udecode/plate-link@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-link@npm:9.2.1"
   dependencies:
@@ -7584,7 +7584,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-list@npm:^9.0.0":
+"@udecode/plate-list@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-list@npm:9.2.1"
   dependencies:
@@ -7715,7 +7715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-node-id@npm:^9.0.0":
+"@udecode/plate-node-id@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-node-id@npm:9.2.1"
   dependencies:
@@ -7746,7 +7746,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-normalizers@npm:9.2.1, @udecode/plate-normalizers@npm:^9.0.0":
+"@udecode/plate-normalizers@npm:9.2.1, @udecode/plate-normalizers@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-normalizers@npm:9.2.1"
   dependencies:
@@ -7777,7 +7777,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-paragraph@npm:9.2.1, @udecode/plate-paragraph@npm:^9.0.0":
+"@udecode/plate-paragraph@npm:9.2.1, @udecode/plate-paragraph@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-paragraph@npm:9.2.1"
   dependencies:
@@ -7844,7 +7844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-reset-node@npm:9.2.1, @udecode/plate-reset-node@npm:^9.0.0":
+"@udecode/plate-reset-node@npm:9.2.1, @udecode/plate-reset-node@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-reset-node@npm:9.2.1"
   dependencies:
@@ -7875,7 +7875,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-select@npm:^9.0.0":
+"@udecode/plate-select@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-select@npm:9.2.1"
   dependencies:
@@ -7983,7 +7983,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-table@npm:^9.0.0":
+"@udecode/plate-table@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-table@npm:9.2.1"
   dependencies:
@@ -8036,7 +8036,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-trailing-block@npm:^9.0.0":
+"@udecode/plate-trailing-block@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-trailing-block@npm:9.2.1"
   dependencies:
@@ -8069,7 +8069,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-ui-combobox@npm:^9.0.0":
+"@udecode/plate-ui-combobox@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-ui-combobox@npm:9.2.1"
   dependencies:

@@ -23,8 +23,8 @@ export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement'
 export const ELEMENT_MDX_BLOCK = 'mdxJsxFlowElement'
 
 const Embed = (props) => {
-  const path = ReactEditor.findPath(props.editor, props.element)
   const handleChange = (values) => {
+    const path = ReactEditor.findPath(props.editor, props.element)
     setNodes(props.editor, { props: values }, { at: path })
   }
 
