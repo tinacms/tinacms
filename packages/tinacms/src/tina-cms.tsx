@@ -305,7 +305,7 @@ export const TinaCMSProvider2 = ({
       >
         <style>{styles}</style>
         <ErrorBoundary>
-          <DocumentCreator />
+          <DocumentCreator documentCreatorCallback={documentCreatorCallback} />
           <TinaDataProvider formifyCallback={formifyCallback}>
             {typeof props.children == 'function' ? (
               <TinaQuery
@@ -367,7 +367,7 @@ const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
-const TinaDataProvider = ({
+export const TinaDataProvider = ({
   children,
   formifyCallback,
 }: {
