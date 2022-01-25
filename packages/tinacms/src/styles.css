@@ -12,6 +12,4 @@
 
 .tina-tailwind {
   @apply font-sans text-gray-600;
-  /* gray-600 from tailwind config */
-  color: #565165;
 }
