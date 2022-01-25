@@ -1,5 +1,4 @@
 ---
-"@tinacms/graphql": patch
 "tinacms": patch
 ---
 
