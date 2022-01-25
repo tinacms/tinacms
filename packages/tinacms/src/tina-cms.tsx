@@ -367,7 +367,7 @@ const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
-const TinaDataProvider = ({
+export const TinaDataProvider = ({
   children,
   formifyCallback,
 }: {
