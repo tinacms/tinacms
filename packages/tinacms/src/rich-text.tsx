@@ -30,7 +30,7 @@ type BaseComponents = {
   ul?: { children: JSX.Element }
   ol?: { children: JSX.Element }
   block_quote?: { children: JSX.Element }
-  code_block?: { language?: string; children: JSX.Element }
+  code_block?: { lang?: string; children: JSX.Element }
   img?: { url: string; caption?: string; alt?: string }
   hr?: {}
   // Provide a fallback when a JSX component wasn't provided
