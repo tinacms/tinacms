@@ -17,7 +17,8 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
-    "test": "jest --env=jsdom --passWithNoTests"
+    "test": "jest --env=jsdom --passWithNoTests",
+    "test-watch": "jest --env=jsdom --passWithNoTests --watch"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.1",
