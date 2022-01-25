@@ -324,17 +324,19 @@ import { TinaEditProvider } from 'tinacms/dist/edit-state'
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
 ${extraImports || ''}
 
+const branch = process.env.NEXT_PUBLIC_EDIT_BRANCH || "main";
+const apiURL =
+  process.env.NODE_ENV == "development"
+    ? "http://localhost:4001/graphql"
+    : \`https://content.tinajs.io/content/\${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/\${branch}\`;
+
 const App = ({ Component, pageProps }) => {
   return (
     <>
       <TinaEditProvider
         editMode={
           <TinaCMS
-            clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-            branch={process.env.NEXT_PUBLIC_EDIT_BRANCH}
-            isLocalClient={Boolean(
-              Number(process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT ?? true)
-            )}
+            apiURL={apiURL}
             {...pageProps}
           >
             {(livePageProps) => <Component {...livePageProps} />}
