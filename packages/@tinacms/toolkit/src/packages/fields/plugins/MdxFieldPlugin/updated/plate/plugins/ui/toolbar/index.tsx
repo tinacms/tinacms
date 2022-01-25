@@ -225,6 +225,7 @@ export function Toolbar({
                     label={toolbarItem.label}
                     options={toolbarItem.options}
                     icon={toolbarItem.name}
+                    isLastItem={isLastItem && !showEmbed}
                   />
                 )
               }
@@ -238,6 +239,7 @@ export function Toolbar({
                   label={toolbarItem.label}
                   options={toolbarItem.options}
                   icon={toolbarItem.name}
+                  isLastItem={isLastItem && !showEmbed}
                 />
               )
             }

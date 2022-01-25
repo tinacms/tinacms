@@ -45,6 +45,7 @@ export const ToolbarItem = ({
   onMouseDown,
   icon,
   options,
+  isLastItem = false,
 }: {
   label: string
   hidden?: boolean
@@ -52,6 +53,7 @@ export const ToolbarItem = ({
   onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   icon: string
   options?: {}[]
+  isLastItem?: boolean
 }) => {
   const editor = useEditorState()!
   const [selection, setSelection] = React.useState(null)
@@ -68,7 +70,9 @@ export const ToolbarItem = ({
       <Popover as="div" className="relative z-10 w-full">
         <Popover.Button
           as="span"
-          className="cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border -mr-px border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          className={`cursor-pointer w-full inline-flex justify-center items-center px-2 py-2 rounded-l-md border-l border-b border-t border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+            isLastItem ? 'border-r rounded-r-md' : 'border-r-0'
+          }`}
           onMouseDown={(e) => {
             e.preventDefault()
           }}
@@ -96,10 +100,9 @@ export const ToolbarItem = ({
     return (
       <span className="relative">
         <span
-          className={classNames(
-            active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
-          )}
+          className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+            active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
+          } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
             pointerEvents: hidden ? 'none' : 'auto',
@@ -119,10 +122,9 @@ export const ToolbarItem = ({
     return (
       <span className="relative">
         <span
-          className={classNames(
-            active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-            'cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
-          )}
+          className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+            active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
+          } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
             pointerEvents: hidden ? 'none' : 'auto',
@@ -153,10 +155,9 @@ export const ToolbarItem = ({
   return (
     <button
       type="button"
-      className={classNames(
-        active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600',
-        'w-full inline-flex relative justify-center items-center px-2 py-2 border border-gray-200 -mr-px text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500'
-      )}
+      className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+        active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
+      } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
       style={{
         visibility: hidden ? 'hidden' : 'visible',
         pointerEvents: hidden ? 'none' : 'auto',
