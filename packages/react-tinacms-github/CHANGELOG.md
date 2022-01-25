@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.52.0
+
+### Minor Changes
+
+- 7e9000f83: Update readme in packages
+
+### Patch Changes
+
+- Updated dependencies [7e9000f83]
+  - next-tinacms-markdown@0.51.0
+
 ## 0.51.17
 
 ### Patch Changes
