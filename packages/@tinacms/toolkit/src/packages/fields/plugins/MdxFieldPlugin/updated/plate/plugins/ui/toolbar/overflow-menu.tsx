@@ -64,10 +64,10 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
               return null
             }
             return (
-              <button
+              <span
                 key={toolbarItem.name}
-                type="button"
                 onMouseDown={(event) => {
+                  event.preventDefault()
                   toolbarItem.onMouseDown(event)
                 }}
                 className={classNames(
@@ -81,7 +81,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
                   <ToolbarIcon name={toolbarItem.name} />
                 </div>{' '}
                 {toolbarItem.label}
-              </button>
+              </span>
             )
           })}
         </div>
