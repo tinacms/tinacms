@@ -1937,6 +1937,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.15.4":
+  version: 7.16.7
+  resolution: "@babel/runtime@npm:7.16.7"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 2e2078cd935c4a0f79d1128f3fc5aa2e89b2112b01cc6538fcca0da056252d5b88d20164192893bb891831ec147aafeeedb08172535547592ffbcdde67d82dd4
+  languageName: node
+  linkType: hard
+
 "@babel/standalone@npm:^7.4.5":
   version: 7.14.8
   resolution: "@babel/standalone@npm:7.14.8"
@@ -5343,10 +5352,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.0, @types/js-yaml@npm:^4.0.2":
+"@types/js-yaml@npm:^4.0.0":
   version: 4.0.2
   resolution: "@types/js-yaml@npm:4.0.2"
   checksum: bfe9df75d6144c0dc1e60e56eabb49dbe22bf65ba021735282da58cfc255f0a9a183239619efa5dc9393a20f2941c2dc6ff9d0c447edc00b26b88db2278eb3aa
+  languageName: node
+  linkType: hard
+
+"@types/js-yaml@npm:^4.0.2":
+  version: 4.0.5
+  resolution: "@types/js-yaml@npm:4.0.5"
+  checksum: 108327045353d101f334928cb199e7e9db706e3d93dd430604f778fae87456ac14fc410776aac5afd96800a6a95db4966be8229368a3592bb798c1aad7ad3ad2
   languageName: node
   linkType: hard
 
@@ -5558,7 +5574,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:>=6, @types/node@npm:^16.3.2, @types/node@npm:^16.3.3":
+"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:>=6":
   version: 16.4.0
   resolution: "@types/node@npm:16.4.0"
   checksum: 3f2aaccbe8795079dad399f9c0e90ebf97093835dbbe93284a3655b1c018b9db34c76b8ee16f14b06b6e6e3f69b23208055f8b7417be24f7eaaa048883af37c1
@@ -5604,6 +5620,13 @@ __metadata:
   version: 16.11.7
   resolution: "@types/node@npm:16.11.7"
   checksum: edd73014790c2889177e8eee35c58a76e644c5d1cc6e19325878cdb130ce6f826b452e7ca04b2e8f7787a5c706f7fab1ba168fe1492dd6da92c780e5bd2fbaa5
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.3.2, @types/node@npm:^16.3.3":
+  version: 16.11.21
+  resolution: "@types/node@npm:16.11.21"
+  checksum: 743a79fbcebc833d8d01a66515d2600917a1ccfb8a0bcf0a3fa0578d83e0d1576bcbb5b0a1ed5ad694c60b629851d8c0c215f1361701cb80ba55abf6a1c8cb88
   languageName: node
   linkType: hard
 
@@ -5875,6 +5898,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-redux@npm:^7.1.20":
+  version: 7.1.22
+  resolution: "@types/react-redux@npm:7.1.22"
+  dependencies:
+    "@types/hoist-non-react-statics": ^3.3.0
+    "@types/react": "*"
+    hoist-non-react-statics: ^3.3.0
+    redux: ^4.0.0
+  checksum: a260afe024362f4e633c70d94d371f06bd1e607cc68e6c0b17d581c4b722726942b8d853720900379564aecbd47803d30ed2f1faa4b697a4a01146c108d1677b
+  languageName: node
+  linkType: hard
+
 "@types/react-select@npm:^2.0.11":
   version: 2.0.19
   resolution: "@types/react-select@npm:2.0.19"
@@ -6055,13 +6090,13 @@ __metadata:
   linkType: hard
 
 "@types/styled-components@npm:^5.1.12":
-  version: 5.1.12
-  resolution: "@types/styled-components@npm:5.1.12"
+  version: 5.1.21
+  resolution: "@types/styled-components@npm:5.1.21"
   dependencies:
     "@types/hoist-non-react-statics": "*"
     "@types/react": "*"
     csstype: ^3.0.2
-  checksum: 46822c41bf7e16598a7bf13c8d693754c9f2c607ae2052983a0630828809f6efd95d7493542a9a041b82799139ea7be95ff83cfae794ed5b0c6fd9ba3eaebf88
+  checksum: 9aa6381c3dbff81cf1596a9e7e821ba63aad4b26af02b99c5af50598002eb3533b8b66942356a4407ff6e411b1737bc1e92031e1f09b4126324afecbc3fe04b7
   languageName: node
   linkType: hard
 
@@ -6144,9 +6179,9 @@ __metadata:
   linkType: hard
 
 "@types/uuid@npm:^8.0.0":
-  version: 8.3.1
-  resolution: "@types/uuid@npm:8.3.1"
-  checksum: 5864be83031f5836be985187ecebb2769936bf223bad896dac381f1a0fdd2ae239f448263196f752d62a4ecc8563817d6d94e329eb2099a28e743ab206e7bfea
+  version: 8.3.4
+  resolution: "@types/uuid@npm:8.3.4"
+  checksum: eec476ba760e83ba6c67bd246c4400fa329ea10990e6427051722d90d6f52e7d062ba12b595703cb6aa92480775ee792802d4d90ae0f1c864a0e74c81e1e6c67
   languageName: node
   linkType: hard
 
@@ -14865,7 +14900,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"final-form@npm:^4.18.7, final-form@npm:^4.20.2":
+"final-form@npm:^4.18.7":
+  version: 4.20.6
+  resolution: "final-form@npm:4.20.6"
+  dependencies:
+    "@babel/runtime": ^7.10.0
+  checksum: 2ddf97a547b29fdddf47a2545c6d50ddeaab5af4a43611507a7c2f9bb1ee0edbbae4733bd8fee8e102a92272c9c4cf0858a04eb59a59f97d05d76f4d164fa9d8
+  languageName: node
+  linkType: hard
+
+"final-form@npm:^4.20.2":
   version: 4.20.2
   resolution: "final-form@npm:4.20.2"
   dependencies:
@@ -15039,12 +15083,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.10.0":
-  version: 1.14.1
-  resolution: "follow-redirects@npm:1.14.1"
+  version: 1.14.7
+  resolution: "follow-redirects@npm:1.14.7"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 761a18699688b19d66b3e9199ecaf9cd39ede953f3529299c7fca4190b27b855c17c491170977844d5db5e169ffc35ebae999bb0833e9c9c61988d19c20ae7ab
+  checksum: 5f486f1767a1fcd9ccb70495bc81489908632cdf119408aadabe128567ab69803ffbcfabdcf222c2b7d637fe3c60a7a712b0d17ade41ec943aadac07e46f42b8
   languageName: node
   linkType: hard
 
@@ -21523,9 +21567,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"next-tinacms-github@workspace:packages/next-tinacms-github":
+"next-tinacms-github@workspace:deprecated-packages/next-tinacms-github":
   version: 0.0.0-use.local
-  resolution: "next-tinacms-github@workspace:packages/next-tinacms-github"
+  resolution: "next-tinacms-github@workspace:deprecated-packages/next-tinacms-github"
   dependencies:
     "@tinacms/scripts": "workspace:*"
     "@types/cookie": 0.3.3
@@ -21553,9 +21597,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"next-tinacms-json@workspace:packages/next-tinacms-json":
+"next-tinacms-json@workspace:deprecated-packages/next-tinacms-json":
   version: 0.0.0-use.local
-  resolution: "next-tinacms-json@workspace:packages/next-tinacms-json"
+  resolution: "next-tinacms-json@workspace:deprecated-packages/next-tinacms-json"
   dependencies:
     "@tinacms/scripts": "workspace:*"
     "@types/jest": ^27.0.1
@@ -21571,9 +21615,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"next-tinacms-markdown@workspace:*, next-tinacms-markdown@workspace:packages/next-tinacms-markdown":
+"next-tinacms-markdown@workspace:*, next-tinacms-markdown@workspace:deprecated-packages/next-tinacms-markdown":
   version: 0.0.0-use.local
-  resolution: "next-tinacms-markdown@workspace:packages/next-tinacms-markdown"
+  resolution: "next-tinacms-markdown@workspace:deprecated-packages/next-tinacms-markdown"
   dependencies:
     "@tinacms/scripts": "workspace:*"
     "@types/jest": ^27.0.1
@@ -24924,7 +24968,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-final-form@npm:^6.3.0, react-final-form@npm:^6.5.3":
+"react-final-form@npm:^6.3.0":
   version: 6.5.3
   resolution: "react-final-form@npm:6.5.3"
   dependencies:
@@ -24933,6 +24977,18 @@ fsevents@~2.1.2:
     final-form: ^4.20.0
     react: ^16.8.0 || ^17.0.0
   checksum: 6e1007e1adda1da74d6e0624398f7f04d5b31b409ef0c1c5fe1d35e1789011d0e0788932419b6b51563336fc4374c0322fd71d5794b7d15baceca01a7da74ef8
+  languageName: node
+  linkType: hard
+
+"react-final-form@npm:^6.5.3":
+  version: 6.5.7
+  resolution: "react-final-form@npm:6.5.7"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+  peerDependencies:
+    final-form: 4.20.4
+    react: ^16.8.0 || ^17.0.0
+  checksum: ca2369c0c5d209bae0202a2486870020416870e58b816f1552e4144ac9ab89df7c694657d5fc391989655132a5fdebddf53c97e3318b6f24b064ef96bb830562
   languageName: node
   linkType: hard
 
@@ -25092,7 +25148,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^7.0.3, react-redux@npm:^7.2.0":
+"react-redux@npm:^7.0.3":
   version: 7.2.4
   resolution: "react-redux@npm:7.2.4"
   dependencies:
@@ -25110,6 +25166,27 @@ fsevents@~2.1.2:
     react-native:
       optional: true
   checksum: 24c4dd26dc55c498d0dcec2e2ef1678aa8cb3f2e1c31704363d072b045460c1f60f5b89b508d3984ae680779cba00ee65f1344a4c4c02768a6bec132e33ee815
+  languageName: node
+  linkType: hard
+
+"react-redux@npm:^7.2.0":
+  version: 7.2.6
+  resolution: "react-redux@npm:7.2.6"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    "@types/react-redux": ^7.1.20
+    hoist-non-react-statics: ^3.3.2
+    loose-envify: ^1.4.0
+    prop-types: ^15.7.2
+    react-is: ^17.0.2
+  peerDependencies:
+    react: ^16.8.3 || ^17
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 32952c3fa1fbc12a28e93a6a116f320319c3d82ded71af053e7d405d760e96bccbc1d939ad06848ed6f088819d490f3180a31975c53ce23248934de906f2b27c
   languageName: node
   linkType: hard
 
@@ -25276,9 +25353,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-github@workspace:*, react-tinacms-github@workspace:packages/react-tinacms-github":
+"react-tinacms-github@workspace:*, react-tinacms-github@workspace:deprecated-packages/react-tinacms-github":
   version: 0.0.0-use.local
-  resolution: "react-tinacms-github@workspace:packages/react-tinacms-github"
+  resolution: "react-tinacms-github@workspace:deprecated-packages/react-tinacms-github"
   dependencies:
     "@tinacms/scripts": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
@@ -25307,9 +25384,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.54.0, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@workspace:deprecated-packages/react-tinacms-inline":
   version: 0.0.0-use.local
-  resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
+  resolution: "react-tinacms-inline@workspace:deprecated-packages/react-tinacms-inline"
   dependencies:
     "@testing-library/react": ^12.0.0
     "@tinacms/scripts": "workspace:*"
@@ -25345,9 +25422,9 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-strapi@workspace:packages/react-tinacms-strapi":
+"react-tinacms-strapi@workspace:deprecated-packages/react-tinacms-strapi":
   version: 0.0.0-use.local
-  resolution: "react-tinacms-strapi@workspace:packages/react-tinacms-strapi"
+  resolution: "react-tinacms-strapi@workspace:deprecated-packages/react-tinacms-strapi"
   dependencies:
     "@tinacms/scripts": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
@@ -25628,12 +25705,21 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"redux@npm:^4.0.0, redux@npm:^4.0.1, redux@npm:^4.0.4":
+"redux@npm:^4.0.0, redux@npm:^4.0.1":
   version: 4.1.0
   resolution: "redux@npm:4.1.0"
   dependencies:
     "@babel/runtime": ^7.9.2
   checksum: d939d0df1e12982c66c0ea767c8ec98276ee981ce0381222239b7f823c6ad02ea3e3c622859bcb4934446b3f86d735db35d7bd8b1697d359070e5fbef1f4ad49
+  languageName: node
+  linkType: hard
+
+"redux@npm:^4.0.4":
+  version: 4.1.2
+  resolution: "redux@npm:4.1.2"
+  dependencies:
+    "@babel/runtime": ^7.9.2
+  checksum: 39aba0fc41c0187cb46b38e52dcb9dc039b785cae772bad9c30cd1d24c67942739285fc013bf804d286aad3c660c1d74cdab5923e1c1535839c5f996d1491365
   languageName: node
   linkType: hard
 
@@ -28100,7 +28186,29 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"styled-components@npm:>4.5, styled-components@npm:>=4.1, styled-components@npm:^5.1.3, styled-components@npm:^5.2.0":
+"styled-components@npm:>4.5":
+  version: 5.3.3
+  resolution: "styled-components@npm:5.3.3"
+  dependencies:
+    "@babel/helper-module-imports": ^7.0.0
+    "@babel/traverse": ^7.4.5
+    "@emotion/is-prop-valid": ^0.8.8
+    "@emotion/stylis": ^0.8.4
+    "@emotion/unitless": ^0.7.4
+    babel-plugin-styled-components: ">= 1.12.0"
+    css-to-react-native: ^3.0.0
+    hoist-non-react-statics: ^3.0.0
+    shallowequal: ^1.1.0
+    supports-color: ^5.5.0
+  peerDependencies:
+    react: ">= 16.8.0"
+    react-dom: ">= 16.8.0"
+    react-is: ">= 16.8.0"
+  checksum: c0879b91e0994db108b2b775b778d87b81527febc28946819c0e97c57f5aa524f82c9b4da905f8787ecae08f30a3eadecb75a54b3c4ec28718438b660b46853e
+  languageName: node
+  linkType: hard
+
+"styled-components@npm:>=4.1, styled-components@npm:^5.1.3, styled-components@npm:^5.2.0":
   version: 5.3.0
   resolution: "styled-components@npm:5.3.0"
   dependencies:
@@ -28928,7 +29036,6 @@ resolve@^2.0.0-next.3:
     react-icons: ^4.2.0
     react-is: ^17.0.2
     react-tinacms-editor: ^0.53.0
-    react-tinacms-inline: ^0.54.0
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"

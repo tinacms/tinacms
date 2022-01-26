@@ -23,7 +23,6 @@
     "react-icons": "^4.2.0",
     "react-is": "^17.0.2",
     "react-tinacms-editor": "^0.53.0",
-    "react-tinacms-inline": "^0.54.0",
     "styled-components": "^5.3.0",
     "tinacms": "workspace:*"
   },
