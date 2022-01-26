@@ -153,8 +153,7 @@ export const ToolbarItem = ({
   }
 
   return (
-    <button
-      type="button"
+    <span
       className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
         active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
       } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
@@ -166,7 +165,7 @@ export const ToolbarItem = ({
     >
       <span className="sr-only">{label}</span>
       <ToolbarIcon name={icon} />
-    </button>
+    </span>
   )
 }
 
@@ -216,16 +215,16 @@ export const EmbedButton = ({
           >
             <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
               {templates.map((template) => (
-                <button
+                <span
                   key={template.name}
-                  type="button"
-                  onClick={() => {
+                  onMouseDown={(e) => {
+                    e.preventDefault()
                     insertMDX(editor, template)
                   }}
                   className={`hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
                 >
                   {template.name}
-                </button>
+                </span>
               ))}
             </div>
           </Transition>

@@ -33,7 +33,7 @@ import {
 } from '@udecode/plate-basic-marks'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
-import { Editor, Node } from 'slate'
+import { Editor, Node, Transforms } from 'slate'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -80,11 +80,23 @@ const normalize = (node: any) => {
   return node
 }
 
+export const insertInlineElement = (editor, inlineElement) => {
+  insertNodes(editor, [inlineElement])
+  /**
+   * FIXME mdx-setTimeout: setTimeout seems to work, but not sure why it's necessary
+   * Without this, the move occurs on the element that was selected
+   * _before_ we inserted the node
+   */
+  // Move selection to the space after the embedded line
+  setTimeout(() => {
+    Transforms.move(editor)
+  }, 1)
+}
 export const insertBlockElement = (editor, blockElement) => {
   const editorEl = ReactEditor.toDOMNode(editor, editor)
   if (editorEl) {
     /**
-     * FIXME: there must be a better way to do this. When jumping
+     * FIXME mdx-setTimeout: there must be a better way to do this. When jumping
      * back from a nested form, the entire editor doesn't receive
      * focus, so enable that, but what we also want is to ensure
      * that this node is selected - so do that, too. But there

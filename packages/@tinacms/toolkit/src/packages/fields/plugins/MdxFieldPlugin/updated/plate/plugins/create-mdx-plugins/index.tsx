@@ -12,11 +12,11 @@ limitations under the License.
 */
 
 import React from 'react'
-import { createPluginFactory, setNodes, insertNodes } from '@udecode/plate-core'
+import { createPluginFactory, setNodes } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { BlockEmbed, InlineEmbed } from './component'
-import { Transforms, Editor } from 'slate'
-import { insertBlockElement } from '../core/common'
+import { Editor } from 'slate'
+import { insertBlockElement, insertInlineElement } from '../core/common'
 import type { MdxTemplate } from '../../types'
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement'
@@ -64,15 +64,11 @@ export const insertMDX = (editor: ReactEditor, value: MdxTemplate) => {
     // FIXME: not sure why this was needed
     Editor.normalize(editor, { force: true })
   } else {
-    insertNodes(editor, [
-      {
-        type: ELEMENT_MDX_INLINE,
-        name: value.name,
-        children: [{ text: '' }],
-        props: value.defaultItem ? value.defaultItem : {},
-      },
-    ])
-    // Move selection to the space after the embedded line
-    Transforms.move(editor)
+    insertInlineElement(editor, {
+      type: ELEMENT_MDX_INLINE,
+      name: value.name,
+      children: [{ text: '' }],
+      props: value.defaultItem ? value.defaultItem : {},
+    })
   }
 }
