@@ -16,6 +16,7 @@ import {
   isMarkActive as isMarkActiveBase,
   getPluginType,
   insertNodes,
+  setNodes,
 } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { createParagraphPlugin } from '@udecode/plate-paragraph'
@@ -32,6 +33,7 @@ import {
 } from '@udecode/plate-basic-marks'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
+import { Editor, Node } from 'slate'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -94,15 +96,24 @@ export const insertBlockElement = (editor, blockElement) => {
      */
     editorEl.focus()
     setTimeout(() => {
-      // FIXME: this will insert the element on the same node
-      // if it's empty, but it moves the focus down to the next
-      // node automatically
-      // if (isBlockAboveEmpty(editor)) {
-      //   Transforms.removeNodes(editor)
-      // }
-      insertNodes(editor, [blockElement])
+      // If empty, replace the current block
+      if (isCurrentBlockEmpty(editor)) {
+        setNodes(editor, blockElement)
+      } else {
+        insertNodes(editor, [blockElement])
+      }
     }, 1)
   }
+}
+
+const isCurrentBlockEmpty = (editor) => {
+  const [node] = Editor.node(editor, editor.selection)
+  const isEmpty =
+    !Node.string(node) &&
+    // @ts-ignore bad type from slate
+    !node.children?.some((n) => Editor.isInline(editor, n))
+
+  return isEmpty
 }
 
 export const helpers = {
