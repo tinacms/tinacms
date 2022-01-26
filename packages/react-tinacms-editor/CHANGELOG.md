@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.53.0
+
+### Minor Changes
+
+- 7e9000f83: Update readme in packages
+
 ## 0.52.16
 
 ### Patch Changes

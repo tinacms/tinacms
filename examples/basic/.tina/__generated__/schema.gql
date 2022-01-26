@@ -81,7 +81,6 @@ union DocumentNode = PageDocument | PostDocument
 
 type PageSomeObj {
   thingOne: String!
-  thingTwo: String
 }
 
 type Page {
@@ -152,7 +151,6 @@ input DocumentMutation {
 
 input PageSomeObjMutation {
   thingOne: String
-  thingTwo: String
 }
 
 input PageMutation {

@@ -5425,13 +5425,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cookie@npm:0.3.3":
-  version: 0.3.3
-  resolution: "@types/cookie@npm:0.3.3"
-  checksum: 35d603d5e620ed8a0c4dedcf6b6e19e4981a4c44d40402de39e53f041ce74bf66b40272a355db37271b9557709fd3e6dfc8fe6ea4031f59b8b16cf0606ea3797
-  languageName: node
-  linkType: hard
-
 "@types/cors@npm:2.8.5":
   version: 2.8.5
   resolution: "@types/cors@npm:2.8.5"
@@ -5700,7 +5693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-cookie@npm:^2.2.5, @types/js-cookie@npm:^2.2.6":
+"@types/js-cookie@npm:^2.2.6":
   version: 2.2.7
   resolution: "@types/js-cookie@npm:2.2.7"
   checksum: 8a45b2a60f535853db1c86ab71e200b190c97a62d7fb63fca3a71b3785c1a67fc360ada1c9061273cacf878ccc8b69b6db1754efb76237f18200dcbddaee608a
@@ -5714,7 +5707,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.0, @types/js-yaml@npm:^4.0.2":
+"@types/js-yaml@npm:^4.0.0":
   version: 4.0.2
   resolution: "@types/js-yaml@npm:4.0.2"
   checksum: bfe9df75d6144c0dc1e60e56eabb49dbe22bf65ba021735282da58cfc255f0a9a183239619efa5dc9393a20f2941c2dc6ff9d0c447edc00b26b88db2278eb3aa
@@ -5929,7 +5922,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:>=6, @types/node@npm:^16.3.2, @types/node@npm:^16.3.3":
+"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:>=6":
   version: 16.4.0
   resolution: "@types/node@npm:16.4.0"
   checksum: 3f2aaccbe8795079dad399f9c0e90ebf97093835dbbe93284a3655b1c018b9db34c76b8ee16f14b06b6e6e3f69b23208055f8b7417be24f7eaaa048883af37c1
@@ -6174,7 +6167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/qs@npm:*, @types/qs@npm:^6.9.7":
+"@types/qs@npm:*":
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
   checksum: ee2cd0bd1eda38bcf868bb1aebb99401eb05641fff29f910c1c8316718e4d3b26c403594a62d694145684643a5d2e4dfc4b9860630c412651d37ff97571de8b0
@@ -6425,17 +6418,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/styled-components@npm:^5.1.12":
-  version: 5.1.12
-  resolution: "@types/styled-components@npm:5.1.12"
-  dependencies:
-    "@types/hoist-non-react-statics": "*"
-    "@types/react": "*"
-    csstype: ^3.0.2
-  checksum: 46822c41bf7e16598a7bf13c8d693754c9f2c607ae2052983a0630828809f6efd95d7493542a9a041b82799139ea7be95ff83cfae794ed5b0c6fd9ba3eaebf88
-  languageName: node
-  linkType: hard
-
 "@types/styled-components@npm:^5.1.3":
   version: 5.1.11
   resolution: "@types/styled-components@npm:5.1.11"
@@ -6511,13 +6493,6 @@ __metadata:
   version: 2.0.6
   resolution: "@types/unist@npm:2.0.6"
   checksum: 0b98b3b1e21cb316cc68dcc73e960233a80771ebf477cf6cf58d43b181a3d586edd4eeab994f1885eebefec9acc97c9b97c067dfe9ef7ff1d65786c564594d0b
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:^8.0.0":
-  version: 8.3.1
-  resolution: "@types/uuid@npm:8.3.1"
-  checksum: 5864be83031f5836be985187ecebb2769936bf223bad896dac381f1a0fdd2ae239f448263196f752d62a4ecc8563817d6d94e329eb2099a28e743ab206e7bfea
   languageName: node
   linkType: hard
 
@@ -9774,15 +9749,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:0.21.1":
-  version: 0.21.1
-  resolution: "axios@npm:0.21.1"
-  dependencies:
-    follow-redirects: ^1.10.0
-  checksum: 864fb7b5d077d236737f10adca53bf451a93f35a15271f56fba8da07265a02d26b7d881b935a6697dc6adb0549ea3e56d2eecb403edaa3bb78f6479901c10f69
-  languageName: node
-  linkType: hard
-
 "axobject-query@npm:^2.2.0":
   version: 2.2.0
   resolution: "axobject-query@npm:2.2.0"
@@ -10815,15 +10781,6 @@ __metadata:
   version: 1.0.0
   resolution: "btoa-lite@npm:1.0.0"
   checksum: d41fc7dc9f111a0082e1d67554ecdd3add151920bf5f3fbb9bdffd5c67b2e247a8c2a060607e8a2acd518eeb1b75d8a0828c36717f710ceebe0e88eb487a7394
-  languageName: node
-  linkType: hard
-
-"btoa@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "btoa@npm:1.2.1"
-  bin:
-    btoa: bin/btoa.js
-  checksum: d8f863b356706f64d6f9f4ed30711b72b8e76e36dcd25ed14349829f0450a1a06ee8abb8006b1ff7461650933fd9347f0df095c0bacc9ab46c55e4857ce3db21
   languageName: node
   linkType: hard
 
@@ -12582,7 +12539,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-box-model@npm:^1.1.2, css-box-model@npm:^1.2.0":
+"css-box-model@npm:^1.1.2":
   version: 1.2.1
   resolution: "css-box-model@npm:1.2.1"
   dependencies:
@@ -15638,7 +15595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"final-form@npm:^4.18.7, final-form@npm:^4.20.2":
+"final-form@npm:^4.20.2":
   version: 4.20.2
   resolution: "final-form@npm:4.20.2"
   dependencies:
@@ -15808,16 +15765,6 @@ __metadata:
   dependencies:
     debug: =3.1.0
   checksum: 6e58e02c31337b6b41ffc3d5f3d49920b7db428eddcf374537da00ef121fe473983e12d8557f4304287604168d3efcc288d1f009abaf4c9d61e5db0c0cee3c4a
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.10.0":
-  version: 1.14.1
-  resolution: "follow-redirects@npm:1.14.1"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: 761a18699688b19d66b3e9199ecaf9cd39ede953f3529299c7fca4190b27b855c17c491170977844d5db5e169ffc35ebae999bb0833e9c9c61988d19c20ae7ab
   languageName: node
   linkType: hard
 
@@ -16673,18 +16620,6 @@ fsevents@~2.1.2:
   version: 15.5.1
   resolution: "graphql@npm:15.5.1"
   checksum: 509cdc2fc072e7cd1b5a25cf3fe13838d41892b035434f02419c209608f89e323f5234ca7e2bde77e9371e629339cbd8435f1dbc8c250910e4e9ac0babfa6c64
-  languageName: node
-  linkType: hard
-
-"gray-matter@npm:4.0.2":
-  version: 4.0.2
-  resolution: "gray-matter@npm:4.0.2"
-  dependencies:
-    js-yaml: ^3.11.0
-    kind-of: ^6.0.2
-    section-matter: ^1.0.0
-    strip-bom-string: ^1.0.0
-  checksum: a4e24f74db6e7827012bb82633330d25b7a220676e4438c6213c145e4b7412872f6ce0fc19d01991331222b6c90dbd6243c937700776ed43b956728f08b94f23
   languageName: node
   linkType: hard
 
@@ -19452,7 +19387,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.10.0, js-yaml@npm:^3.11.0, js-yaml@npm:^3.13.0, js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.0, js-yaml@npm:^3.6.1":
+"js-yaml@npm:^3.10.0, js-yaml@npm:^3.13.0, js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.0, js-yaml@npm:^3.6.1":
   version: 3.14.1
   resolution: "js-yaml@npm:3.14.1"
   dependencies:
@@ -21043,7 +20978,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"memoize-one@npm:^5.0.4, memoize-one@npm:^5.1.1":
+"memoize-one@npm:^5.0.4":
   version: 5.2.1
   resolution: "memoize-one@npm:5.2.1"
   checksum: 6b7dab7d8d9dca696d500dbc7f6b1445cbc4168d8208ee2746dd1a7f75378445d9bc6a2def7868afee81c87e630294456310f33f3f1eb738f69d748c797d87d5
@@ -22311,76 +22246,6 @@ fsevents@~2.1.2:
     react-dom: ">=16.14"
     react-is: ^16.13.1 || <18.0.0
     styled-components: "*"
-    tinacms: ">=0.50.0"
-  languageName: unknown
-  linkType: soft
-
-"next-tinacms-github@workspace:packages/next-tinacms-github":
-  version: 0.0.0-use.local
-  resolution: "next-tinacms-github@workspace:packages/next-tinacms-github"
-  dependencies:
-    "@tinacms/scripts": "workspace:*"
-    "@types/cookie": 0.3.3
-    "@types/crypto-js": ^3.1.47
-    "@types/jest": ^27.0.1
-    "@types/node": ^16.3.2
-    "@types/qs": ^6.9.7
-    "@types/styled-components": ^5.1.12
-    "@types/uuid": ^8.0.0
-    atob: 2.1.2
-    axios: 0.21.1
-    cookie: 0.4.0
-    crypto-js: ^4.0.0
-    gray-matter: 4.0.2
-    jest: ^27.0.6
-    qs: 6.9.3
-    react-tinacms-github: "workspace:*"
-    tinacms: "workspace:*"
-    tslib: ^1.10.0
-    typescript: ^4.3.5
-    uuid: ^8.1.0
-  peerDependencies:
-    react-is: ^17.0.2
-    tinacms: "*"
-  languageName: unknown
-  linkType: soft
-
-"next-tinacms-json@workspace:packages/next-tinacms-json":
-  version: 0.0.0-use.local
-  resolution: "next-tinacms-json@workspace:packages/next-tinacms-json"
-  dependencies:
-    "@tinacms/scripts": "workspace:*"
-    "@types/jest": ^27.0.1
-    jest: ^27.0.6
-    tinacms: "workspace:*"
-    tslib: ^1.10.0
-    typescript: ^4.3.5
-  peerDependencies:
-    next: ">=9"
-    react: ">=16.14.0"
-    react-is: ">=16.14.0"
-    tinacms: ">=0.50.0"
-  languageName: unknown
-  linkType: soft
-
-"next-tinacms-markdown@workspace:*, next-tinacms-markdown@workspace:packages/next-tinacms-markdown":
-  version: 0.0.0-use.local
-  resolution: "next-tinacms-markdown@workspace:packages/next-tinacms-markdown"
-  dependencies:
-    "@tinacms/scripts": "workspace:*"
-    "@types/jest": ^27.0.1
-    "@types/js-yaml": ^4.0.2
-    "@types/node": ^16.3.3
-    gray-matter: ^4.0.2
-    jest: ^27.0.6
-    js-yaml: ^3.13.1
-    tinacms: "workspace:*"
-    tslib: ^1.10.0
-    typescript: ^4.3.5
-  peerDependencies:
-    next: ">=9"
-    react: ">=16.14.0"
-    react-is: ^17.0.2
     tinacms: ">=0.50.0"
   languageName: unknown
   linkType: soft
@@ -25210,13 +25075,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"qs@npm:6.9.3":
-  version: 6.9.3
-  resolution: "qs@npm:6.9.3"
-  checksum: ac934049258cbebd4c6691c9c5c2676e90ed481b18178c030ef6acaa08e737d959028a4a75f460e414a5f24e1ef4a4aafb63d0b2fbc074d8597e2d17c2b9ec24
-  languageName: node
-  linkType: hard
-
 "qs@npm:^6.6.0":
   version: 6.10.1
   resolution: "qs@npm:6.10.1"
@@ -25320,7 +25178,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"raf-schd@npm:^4.0.0, raf-schd@npm:^4.0.2":
+"raf-schd@npm:^4.0.0":
   version: 4.0.3
   resolution: "raf-schd@npm:4.0.3"
   checksum: b5e28f9ee7f7803ccb067f75f8e93b78d995c16b0b606468e2bd46631e37cea6d8daa6dcede7640dd068413f8a3b85578ec393b59037a98548ba9c73e732624d
@@ -25455,24 +25313,6 @@ fsevents@~2.1.2:
   peerDependencies:
     react: ^16.8.5
   checksum: 1842c33e9bd18cac75540e108c63bb8fdfbfd16de187a3734eb0dbd22b891393ea30ccfc208c76551c378ff2ef2194f7fa1db275540f38c3f3ca2d5bfa2cf93d
-  languageName: node
-  linkType: hard
-
-"react-beautiful-dnd@npm:^13.1.0":
-  version: 13.1.0
-  resolution: "react-beautiful-dnd@npm:13.1.0"
-  dependencies:
-    "@babel/runtime": ^7.9.2
-    css-box-model: ^1.2.0
-    memoize-one: ^5.1.1
-    raf-schd: ^4.0.2
-    react-redux: ^7.2.0
-    redux: ^4.0.4
-    use-memo-one: ^1.1.1
-  peerDependencies:
-    react: ^16.8.5 || ^17.0.0
-    react-dom: ^16.8.5 || ^17.0.0
-  checksum: d380b698278000fe39e48f1a257ada3afa4b039ed93a52fa9a476d46a0b5f2ad833b7fee4e5914360172ae45899ca084ef37a1a012fcfb467a7920217cc8a994
   languageName: node
   linkType: hard
 
@@ -25716,7 +25556,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-final-form@npm:^6.3.0, react-final-form@npm:^6.5.3":
+"react-final-form@npm:^6.3.0":
   version: 6.5.3
   resolution: "react-final-form@npm:6.5.3"
   dependencies:
@@ -25884,7 +25724,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^7.0.3, react-redux@npm:^7.2.0":
+"react-redux@npm:^7.0.3":
   version: 7.2.4
   resolution: "react-redux@npm:7.2.4"
   dependencies:
@@ -25973,19 +25813,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-textarea-autosize@npm:>=7.1, react-textarea-autosize@npm:^8.3.3":
-  version: 8.3.3
-  resolution: "react-textarea-autosize@npm:8.3.3"
-  dependencies:
-    "@babel/runtime": ^7.10.2
-    use-composed-ref: ^1.0.0
-    use-latest: ^1.0.0
-  peerDependencies:
-    react: ^16.8.0 || ^17.0.0
-  checksum: fa24eec06273e0bd56875c14ab6e90c5ef728dc4231a80a44854d861ec2ba10296e975758c1f211bd613df279476049d20fc84fe01dc5e3afaceecf17686fb1a
-  languageName: node
-  linkType: hard
-
 "react-textarea-autosize@npm:^7.1.0":
   version: 7.1.2
   resolution: "react-textarea-autosize@npm:7.1.2"
@@ -25998,7 +25825,20 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.16, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-textarea-autosize@npm:^8.3.3":
+  version: 8.3.3
+  resolution: "react-textarea-autosize@npm:8.3.3"
+  dependencies:
+    "@babel/runtime": ^7.10.2
+    use-composed-ref: ^1.0.0
+    use-latest: ^1.0.0
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0
+  checksum: fa24eec06273e0bd56875c14ab6e90c5ef728dc4231a80a44854d861ec2ba10296e975758c1f211bd613df279476049d20fc84fe01dc5e3afaceecf17686fb1a
+  languageName: node
+  linkType: hard
+
+"react-tinacms-editor@^0.53.0, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -26064,104 +25904,6 @@ fsevents@~2.1.2:
     react: ">=16.14.0"
     react-dom: ">=16.14.0"
     styled-components: ">=4.1"
-    tinacms: ">=0.50.0"
-  languageName: unknown
-  linkType: soft
-
-"react-tinacms-github@workspace:*, react-tinacms-github@workspace:packages/react-tinacms-github":
-  version: 0.0.0-use.local
-  resolution: "react-tinacms-github@workspace:packages/react-tinacms-github"
-  dependencies:
-    "@tinacms/scripts": "workspace:*"
-    "@tinacms/toolkit": "workspace:*"
-    "@types/jest": ^27.0.1
-    "@types/js-cookie": ^2.2.5
-    "@types/react": ^16.8.23
-    "@types/react-dom": ^16.9.4
-    "@types/styled-components": 4.1.8
-    btoa: ^1.2.1
-    final-form: ^4.18.7
-    jest: ^27.0.6
-    js-cookie: ^2.2.1
-    next-tinacms-markdown: "workspace:*"
-    react: 16.14.0
-    react-dom: 16.14.0
-    styled-components: ">=4.1"
-    tinacms: "workspace:*"
-    tslib: ^1.10.0
-    typescript: ^4.3.5
-  peerDependencies:
-    final-form: ">=4.18.0"
-    react: ">=16.14.0"
-    react-is: ^17.0.2
-    styled-components: ">=4.1"
-    tinacms: ">=0.50.0"
-  languageName: unknown
-  linkType: soft
-
-"react-tinacms-inline@^0.53.16, react-tinacms-inline@workspace:packages/react-tinacms-inline":
-  version: 0.0.0-use.local
-  resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
-  dependencies:
-    "@testing-library/react": ^12.0.0
-    "@tinacms/scripts": "workspace:*"
-    "@tinacms/toolkit": "workspace:*"
-    "@types/jest": ^27.0.1
-    "@types/react": ^16.8.23
-    "@types/react-beautiful-dnd": ^11.0.3
-    "@types/react-dom": ^16.9.4
-    "@types/styled-components": 4.1.8
-    final-form: ^4.20.2
-    jest: ^27.0.6
-    react: 16.14.0
-    react-beautiful-dnd: ^13.1.0
-    react-dom: 16.14.0
-    react-dropzone: 10.1.8
-    react-final-form: ^6.5.3
-    react-is: ^17.0.2
-    react-textarea-autosize: ">=7.1"
-    react-tinacms-editor: "workspace:*"
-    react-use: ^17.1.1
-    styled-components: ">=4.1"
-    tinacms: "workspace:*"
-    typescript: ^4.3.5
-  peerDependencies:
-    final-form: ">=4.20.2"
-    react: ">=16.14.0"
-    react-dropzone: 10.2.1
-    react-final-form: ">=6"
-    react-is: ^17.0.2
-    react-tinacms-editor: ">=0.44.0"
-    styled-components: ">=4.1"
-    tinacms: ">=0.50.0"
-  languageName: unknown
-  linkType: soft
-
-"react-tinacms-strapi@workspace:packages/react-tinacms-strapi":
-  version: 0.0.0-use.local
-  resolution: "react-tinacms-strapi@workspace:packages/react-tinacms-strapi"
-  dependencies:
-    "@tinacms/scripts": "workspace:*"
-    "@tinacms/toolkit": "workspace:*"
-    "@types/jest": ^27.0.1
-    "@types/js-cookie": ^2.2.5
-    "@types/react": ^16.8.23
-    "@types/react-dom": ^16.9.4
-    "@types/styled-components": 4.1.8
-    jest: ^27.0.6
-    js-cookie: ^2.2.1
-    react-final-form: ^6.3.0
-    styled-components: ">4.5"
-    tinacms: "workspace:*"
-    tslib: ^1.10.0
-    typescript: ^4.3.5
-  peerDependencies:
-    final-form: ">=4.20.2"
-    react: ">=16.14.0"
-    react-dom: ">=16.14.0"
-    react-final-form: ^6.3.0
-    react-is: ^17.0.2
-    styled-components: ">4.5"
     tinacms: ">=0.50.0"
   languageName: unknown
   linkType: soft
@@ -26420,7 +26162,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"redux@npm:^4.0.0, redux@npm:^4.0.1, redux@npm:^4.0.4":
+"redux@npm:^4.0.0, redux@npm:^4.0.1":
   version: 4.1.0
   resolution: "redux@npm:4.1.0"
   dependencies:
@@ -28892,7 +28634,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"styled-components@npm:>4.5, styled-components@npm:>=4.1, styled-components@npm:^5.1.3, styled-components@npm:^5.2.0":
+"styled-components@npm:>=4.1, styled-components@npm:^5.1.3, styled-components@npm:^5.2.0":
   version: 5.3.0
   resolution: "styled-components@npm:5.3.0"
   dependencies:
@@ -29719,8 +29461,7 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.16
-    react-tinacms-inline: ^0.53.16
+    react-tinacms-editor: ^0.53.0
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
@@ -30985,7 +30726,7 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-"use-memo-one@npm:^1.1.0, use-memo-one@npm:^1.1.1":
+"use-memo-one@npm:^1.1.0":
   version: 1.1.2
   resolution: "use-memo-one@npm:1.1.2"
   peerDependencies:
@@ -31137,7 +30878,7 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-"uuid@npm:^8.1.0, uuid@npm:^8.3.2":
+"uuid@npm:^8.3.2":
   version: 8.3.2
   resolution: "uuid@npm:8.3.2"
   bin:

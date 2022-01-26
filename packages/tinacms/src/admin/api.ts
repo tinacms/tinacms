@@ -100,10 +100,13 @@ export class TinaAdminApi {
     params: Object
   ) {
     const response = await this.api.request(
-      `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+      `#graphql
+      mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
         createDocument(
           collection: $collection,
           relativePath: $relativePath,
+          params: $params
+        ){__typename}
       }`,
       {
         variables: {
@@ -123,10 +126,11 @@ export class TinaAdminApi {
     params: Object
   ) {
     const response = await this.api.request(
-      `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-        updateDocument( 
+      `#graphql
+      mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+        updateDocument(
           collection: $collection,
-          relativePath: $relativePath, 
+          relativePath: $relativePath,
           params: $params
         ){__typename}
       }`,

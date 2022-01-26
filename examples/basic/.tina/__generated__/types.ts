@@ -161,7 +161,6 @@ export type DocumentNode = PageDocument | PostDocument;
 export type PageSomeObj = {
   __typename?: 'PageSomeObj';
   thingOne: Scalars['String'];
-  thingTwo?: Maybe<Scalars['String']>;
 };
 
 export type Page = {
@@ -286,7 +285,6 @@ export type DocumentMutation = {
 
 export type PageSomeObjMutation = {
   thingOne?: Maybe<Scalars['String']>;
-  thingTwo?: Maybe<Scalars['String']>;
 };
 
 export type PageMutation = {
@@ -300,7 +298,7 @@ export type PostMutation = {
   body?: Maybe<Scalars['JSON']>;
 };
 
-export type PagePartsFragment = { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string, thingTwo?: Maybe<string> }> };
+export type PagePartsFragment = { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string }> };
 
 export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any> };
 
@@ -309,12 +307,12 @@ export type GetPageDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string, thingTwo?: Maybe<string> }> } } };
+export type GetPageDocumentQuery = { __typename?: 'Query', getPageDocument: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string }> } } };
 
 export type GetPageListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string, thingTwo?: Maybe<string> }> } }> }>>> } };
+export type GetPageListQuery = { __typename?: 'Query', getPageList: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', body?: Maybe<any>, someObj?: Maybe<{ __typename: 'PageSomeObj', thingOne: string }> } }> }>>> } };
 
 export type GetPostDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -333,7 +331,6 @@ export const PagePartsFragmentDoc = gql`
   someObj {
     __typename
     thingOne
-    thingTwo
   }
   body
 }
