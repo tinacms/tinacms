@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.65.3
+
+### Patch Changes
+
+- 0c4456c11: fix: Send update to useTina hook on the initial isLoading change
+
 ## 0.65.2
 
 ### Patch Changes
