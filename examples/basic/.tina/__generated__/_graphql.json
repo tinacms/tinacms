@@ -1273,21 +1273,6 @@
               }
             }
           }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "thingTwo"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
-            }
-          }
         }
       ]
     },
@@ -2354,20 +2339,6 @@
           "name": {
             "kind": "Name",
             "value": "thingOne"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
-            }
-          }
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "thingTwo"
           },
           "type": {
             "kind": "NamedType",
