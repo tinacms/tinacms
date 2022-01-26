@@ -38,7 +38,11 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
 
   return (
     <div className="relative mb-1">
-      <div contentEditable={false} className="absolute top-1 right-1">
+      <div
+        style={{ userSelect: 'none' }}
+        contentEditable={false}
+        className="absolute top-1 right-1"
+      >
         <div className="flex w-full">
           <div />
           <Dropdown
