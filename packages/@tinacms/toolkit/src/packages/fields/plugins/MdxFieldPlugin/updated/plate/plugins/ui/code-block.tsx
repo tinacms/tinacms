@@ -37,7 +37,7 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
   })
 
   return (
-    <div className="relative mb-1">
+    <div className="relative mb-1 mt-0.5">
       <div
         style={{ userSelect: 'none' }}
         contentEditable={false}

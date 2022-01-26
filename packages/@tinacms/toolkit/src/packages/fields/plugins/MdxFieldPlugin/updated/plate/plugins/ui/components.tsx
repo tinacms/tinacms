@@ -41,46 +41,54 @@ import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
 
+/**
+ * For blocks elements (p, blockquote, ul, ...etc), it
+ * can be jarring to see the cursor jump inconsistently
+ * based on .prose styles. These classes aim to normalize
+ * blocks behavior so they take up the same space
+ */
+const blockClasses = 'mt-0.5'
+
 export const components = () => {
   return {
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
       <h2
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
       <h3
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
       <h4
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
       <h5
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
       <h6
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
@@ -93,7 +101,7 @@ export const components = () => {
       ...props
     }) => (
       <p
-        className={classNames('mt-0.5', className)}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
@@ -106,23 +114,39 @@ export const components = () => {
       ...props
     }) => (
       <blockquote
-        className={classNames('not-italic', className)}
+        className={classNames('not-italic', blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
-      <ul className={classNames(className)} {...attributes} {...props} />
+      <ul
+        className={classNames(blockClasses, className)}
+        {...attributes}
+        {...props}
+      />
     ),
     [ELEMENT_LI]: ({ attributes, editor, className, element, ...props }) => (
-      <li className={classNames(className)} {...attributes} {...props} />
+      <li
+        className={classNames(blockClasses, className)}
+        {...attributes}
+        {...props}
+      />
     ),
     [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
-      <ol className={classNames(className)} {...attributes} {...props} />
+      <ol
+        className={classNames(blockClasses, className)}
+        {...attributes}
+        {...props}
+      />
     ),
     [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
-      <li className={classNames(className)} {...attributes} {...props} />
+      <li
+        className={classNames('mt-0 mb-1', className)}
+        {...attributes}
+        {...props}
+      />
     ),
     /** "list item content" */
     [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
