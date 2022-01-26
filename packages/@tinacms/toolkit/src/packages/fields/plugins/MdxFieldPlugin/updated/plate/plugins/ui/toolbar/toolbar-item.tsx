@@ -22,12 +22,10 @@ import { Popover, Transition } from '@headlessui/react'
 import { useEditorState } from '@udecode/plate-core'
 import { insertMDX } from '../../create-mdx-plugins'
 import { LinkForm, wrapOrRewrapLink } from '../../create-link-plugin'
-import { classNames } from '../helpers'
 
 import type { PlateEditor } from '@udecode/plate-core'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
-import { Transforms } from 'slate'
 
 export type ToolbarItemType = {
   label: string
