@@ -48,47 +48,49 @@ import { useSelected } from 'slate-react'
  * blocks behavior so they take up the same space
  */
 const blockClasses = 'mt-0.5'
+/** prose sets a bold font, making bold marks impossible to see */
+const headerClasses = 'font-normal'
 
 export const components = () => {
   return {
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
       <h2
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
       <h3
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
       <h4
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
       <h5
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
       <h6
-        className={classNames(blockClasses, className)}
+        className={classNames(headerClasses, blockClasses, className)}
         {...attributes}
         {...props}
       />
