@@ -23,9 +23,9 @@ import { ReactEditor } from 'slate-react'
 import { Dropdown } from './dropdown'
 
 export const CodeBlock = ({ attributes, editor, element, ...props }) => {
-  const setLanguage = (language) => {
+  const setLanguage = (lang) => {
     const path = ReactEditor.findPath(editor, element)
-    setNodes(editor, { language: language }, { at: path })
+    setNodes(editor, { lang: lang }, { at: path })
   }
 
   const items = Object.entries(CODE_BLOCK_LANGUAGES).map(([key, item]) => {
@@ -46,7 +46,7 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
         <div className="flex w-full">
           <div />
           <Dropdown
-            label={CODE_BLOCK_LANGUAGES[element.language] || 'Language'}
+            label={CODE_BLOCK_LANGUAGES[element.lang] || 'Language'}
             items={items}
           />
         </div>
