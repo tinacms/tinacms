@@ -19,9 +19,9 @@ limitations under the License.
 import React from 'react'
 import { useFilter } from '@react-aria/i18n'
 import { useTemplates } from '../../editor-context'
-import { useKeyPress } from '../../hooks/use-key-press'
 import { classNames } from './helpers'
 import type { MdxTemplate } from '../../types'
+import { useHotkey } from '../../hooks/embed-hooks'
 
 type TemplateType = MdxTemplate & { selected?: boolean }
 
@@ -37,10 +37,6 @@ export function SearchAutocomplete(props: {
   onMatches: (count: number) => void
 }) {
   const templates = useTemplates()
-  const arrowDownPressed = useKeyPress('ArrowDown')
-  const arrowUpPressed = useKeyPress('ArrowUp')
-  const enterPressed = useKeyPress('Enter')
-  const escapePressed = useKeyPress('Escape')
   const initialTemplates = templates as TemplateType[]
 
   const [activeTemplates, setTemplates] =
@@ -54,24 +50,20 @@ export function SearchAutocomplete(props: {
     sensitivity: 'base',
   })
 
-  React.useEffect(() => {
-    if (escapePressed) {
-      props.onCancel()
-    }
-  }, [escapePressed])
+  useHotkey('escape', () => {
+    props.onCancel()
+  })
 
-  React.useEffect(() => {
-    if (enterPressed) {
-      const selected = findSelected(activeTemplates)
-      if (selected) {
-        props.onValue(selected)
-      } else {
-        // If none selected, choose the first item
-        // TODO: this should highlight the item
-        props.onValue(activeTemplates[0])
-      }
+  useHotkey('enter', () => {
+    const selected = findSelected(activeTemplates)
+    if (selected) {
+      props.onValue(selected)
+    } else {
+      // If none selected, choose the first item
+      // TODO: this should highlight the item
+      props.onValue(activeTemplates[0])
     }
-  }, [enterPressed, activeTemplates.length, props.onValue])
+  })
 
   React.useEffect(() => {
     const lowerCaseValue = props.value.toLocaleLowerCase()
@@ -96,47 +88,43 @@ export function SearchAutocomplete(props: {
     })
   }, [props.value])
 
-  React.useEffect(() => {
-    if (arrowDownPressed) {
-      setTemplates((activeTemplates) => {
-        const selectedIndex = findSelectedIndex(activeTemplates)
-        return activeTemplates.map(({ selected, ...rest }, index) => {
-          if (
-            selectedIndex === activeTemplates.length - 1 &&
-            index === activeTemplates.length - 1
-          ) {
-            return { selected: true, ...rest }
-          }
-          if (selectedIndex === -1 && index === 0) {
-            return { selected: true, ...rest }
-          }
-          if (selectedIndex + 1 === index) {
-            return { selected: true, ...rest }
-          }
-          return { selected: false, ...rest }
-        })
+  useHotkey('ArrowDown', () => {
+    setTemplates((activeTemplates) => {
+      const selectedIndex = findSelectedIndex(activeTemplates)
+      return activeTemplates.map(({ selected, ...rest }, index) => {
+        if (
+          selectedIndex === activeTemplates.length - 1 &&
+          index === activeTemplates.length - 1
+        ) {
+          return { selected: true, ...rest }
+        }
+        if (selectedIndex === -1 && index === 0) {
+          return { selected: true, ...rest }
+        }
+        if (selectedIndex + 1 === index) {
+          return { selected: true, ...rest }
+        }
+        return { selected: false, ...rest }
       })
-    }
-  }, [arrowDownPressed, activeTemplates.length])
-  React.useEffect(() => {
-    if (arrowUpPressed) {
-      setTemplates((activeTemplates) => {
-        const selectedIndex = findSelectedIndex(activeTemplates)
-        return activeTemplates.map(({ selected, ...rest }, index) => {
-          if (selectedIndex === 0 && index === 0) {
-            return { selected: true, ...rest }
-          }
-          if (selectedIndex === -1 && index === activeTemplates.length - 1) {
-            return { selected: true, ...rest }
-          }
-          if (selectedIndex - 1 === index) {
-            return { selected: true, ...rest }
-          }
-          return { selected: false, ...rest }
-        })
+    })
+  })
+  useHotkey('ArrowUp', () => {
+    setTemplates((activeTemplates) => {
+      const selectedIndex = findSelectedIndex(activeTemplates)
+      return activeTemplates.map(({ selected, ...rest }, index) => {
+        if (selectedIndex === 0 && index === 0) {
+          return { selected: true, ...rest }
+        }
+        if (selectedIndex === -1 && index === activeTemplates.length - 1) {
+          return { selected: true, ...rest }
+        }
+        if (selectedIndex - 1 === index) {
+          return { selected: true, ...rest }
+        }
+        return { selected: false, ...rest }
       })
-    }
-  }, [arrowUpPressed, activeTemplates.length])
+    })
+  })
   const ref = React.useRef()
   useOnClickOutside(ref, () => props.onCancel())
 
