@@ -22,6 +22,9 @@ import {
   insertNodes,
   getPlugin,
   unwrapNodes,
+  findNode,
+  getPluginType,
+  PlateEditor,
 } from '@udecode/plate-core'
 import { computePosition, flip, shift } from '@floating-ui/dom'
 import { Element, Transforms } from 'slate'
@@ -31,6 +34,14 @@ import { insertMDX } from '../create-mdx-plugins'
 import type { MdxTemplate } from '../../types'
 
 export const ELEMENT_MAYBE_MDX = 'maybe_mdx'
+
+export const isSelectionInMaybeMDX = (editor: PlateEditor) =>
+  findMaybeMDX(editor) !== undefined
+
+export const findMaybeMDX = (editor: PlateEditor) =>
+  findNode(editor, {
+    match: { type: getPluginType(editor, ELEMENT_MAYBE_MDX) },
+  })
 
 /**
  * `ELEMENT_MAYBE_MDX` is inserted by a forward slash (`/`)
@@ -42,6 +53,9 @@ export const withMaybeMDX = (editor) => {
   const { type } = getPlugin(editor, ELEMENT_MAYBE_MDX)
   const { insertText } = editor
   editor.insertText = (text) => {
+    if (isSelectionInMaybeMDX(editor)) {
+      return Transforms.insertText(editor, text)
+    }
     if (!editor.selection || text !== '/') {
       return insertText(text)
     }

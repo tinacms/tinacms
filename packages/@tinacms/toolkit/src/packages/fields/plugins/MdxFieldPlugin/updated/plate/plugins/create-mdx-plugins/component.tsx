@@ -141,7 +141,7 @@ export const BlockEmbed = ({
   }
 
   return (
-    <div {...attributes} className="w-full mb-2">
+    <div {...attributes} className="w-full my-2">
       {children}
       <Wrapper inline={false}>
         <span className="relative w-full inline-flex shadow-sm rounded-md">
