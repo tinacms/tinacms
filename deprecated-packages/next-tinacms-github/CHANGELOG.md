@@ -1,5 +1,28 @@
 # Change Log
 
+## 1.2.2
+
+### Patch Changes
+
+- react-tinacms-github@0.52.0
+
+## 1.2.1
+
+### Patch Changes
+
+- react-tinacms-github@0.52.0
+
+## 1.2.0
+
+### Minor Changes
+
+- 7e9000f83: Update readme in packages
+
+### Patch Changes
+
+- Updated dependencies [7e9000f83]
+  - react-tinacms-github@0.52.0
+
 ## 1.1.37
 
 ### Patch Changes
