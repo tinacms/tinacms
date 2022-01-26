@@ -2,7 +2,6 @@ fragment PageParts on Page {
   someObj {
     __typename
     thingOne
-    thingTwo
   }
   body
 }
