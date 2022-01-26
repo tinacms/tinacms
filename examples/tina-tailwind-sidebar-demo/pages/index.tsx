@@ -19,7 +19,8 @@ import { Footer } from '../components/footer'
 import { Features, features_template } from '../components/features'
 import { Page, ThemeDocument } from '../.tina/__generated__/types'
 import { Theme } from '../components/theme'
-import { gql, getStaticPropsForTina } from 'tinacms'
+import { gql, staticRequest } from 'tinacms'
+import { useTina } from 'tinacms/dist/edit-state'
 
 interface AppProps {
   data: {
@@ -27,7 +28,13 @@ interface AppProps {
     getThemeDocument: ThemeDocument
   }
 }
-const App = ({ data }: AppProps) => {
+const App = (props: AppProps) => {
+  const { data } = useTina({
+    query,
+    variables: {},
+    data: props.data,
+  })
+
   const { getPageDocument } = data
   const { blocks, nav, footer, navlist } = getPageDocument.data
   return (
@@ -177,10 +184,20 @@ export const query = gql`
 `
 
 export const getStaticProps = async (ctx) => {
-  const tinaProps = await getStaticPropsForTina({ query, variables: {} })
+  const variables = {}
+  let data = {}
+  try {
+    data = await staticRequest({
+      query,
+      variables,
+    })
+  } catch {
+    // swallow errors related to document creation
+  }
+
   return {
     props: {
-      ...tinaProps,
+      data,
     },
   }
 }
