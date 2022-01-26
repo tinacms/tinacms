@@ -1,4 +1,11 @@
 {
+  "version": {
+    "fullVersion": "0.59.5",
+    "major": "0",
+    "minor": "59",
+    "patch": "5"
+  },
+  "meta": {},
   "collections": [
     {
       "label": "Theme",
@@ -846,6 +853,5 @@
         "page"
       ]
     }
-  ],
-  "namespace": []
+  ]
 }
