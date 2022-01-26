@@ -119,6 +119,9 @@ export const insertBlockElement = (editor, blockElement) => {
 }
 
 const isCurrentBlockEmpty = (editor) => {
+  if (!editor.selection) {
+    return false
+  }
   const [node] = Editor.node(editor, editor.selection)
   const isEmpty =
     !Node.string(node) &&
