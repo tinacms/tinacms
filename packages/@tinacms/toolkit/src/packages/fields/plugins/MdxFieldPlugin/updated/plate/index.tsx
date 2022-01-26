@@ -29,6 +29,7 @@ import { EditorContext } from './editor-context'
 
 import type { MdxTemplate } from './types'
 import type { InputProps } from '../../../../components'
+import { uuid } from './plugins/ui/helpers'
 
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
@@ -66,7 +67,8 @@ export const RichEditor = wrapFieldsWithMeta<
   // This should be a plugin customization
   const withToolbar = true
   // const withToolbar = false
-  const id = [props.tinaForm.id, props.input.name].join('.')
+  const tempId = [props.tinaForm.id, props.input.name].join('.')
+  const id = React.useMemo(() => uuid(), [tempId])
   return (
     <EditorContext.Provider value={{ templates: props.field.templates }}>
       <div className={withToolbar ? 'with-toolbar' : ''}>
