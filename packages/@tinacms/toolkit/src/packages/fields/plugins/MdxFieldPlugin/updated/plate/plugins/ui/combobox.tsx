@@ -74,10 +74,11 @@ export function SearchAutocomplete(props: {
   }, [enterPressed, activeTemplates.length, props.onValue])
 
   React.useEffect(() => {
+    const lowerCaseValue = props.value.toLocaleLowerCase()
     const matchedTemplates = initialTemplates.filter(
       (template) =>
-        contains(template.name, props.value) ||
-        contains(template.label, props.value)
+        contains(template.name.toLocaleLowerCase(), lowerCaseValue) ||
+        contains(template.label.toLocaleLowerCase(), lowerCaseValue)
     )
 
     setTemplates((activeTemplates) => {

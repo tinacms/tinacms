@@ -84,7 +84,8 @@ const SlashCombobox = (props: {
   children: React.ReactNode
   templates: MdxTemplate[]
 }) => {
-  const ref = React.useRef<HTMLDivElement | null>()
+  const baseRef = React.useRef<HTMLSpanElement | null>()
+  const ref = React.useRef<HTMLSpanElement | null>()
   const focused = useFocused()
   const selected = useSelected()
   const onCancel = () => {
@@ -146,9 +147,7 @@ const SlashCombobox = (props: {
 
     const run = async () => {
       if (ref.current) {
-        const domSelection = window.getSelection()
-        const domRange = domSelection.getRangeAt(0)
-        const { x, y } = await computePosition(domRange, ref.current, {
+        const { x, y } = await computePosition(baseRef.current, ref.current, {
           placement: 'bottom-start',
           middleware: [flip(), shift()],
         })
@@ -161,10 +160,10 @@ const SlashCombobox = (props: {
       }
     }
     run()
-  }, [JSON.stringify(selection), ref.current])
+  }, [JSON.stringify(selection), ref.current, baseRef.current])
 
   return (
-    <span {...props.attributes} className={`${props.className}`}>
+    <span {...props.attributes} ref={baseRef} className={`${props.className}`}>
       {props.children}
       {selected && (
         <span ref={ref} className="block absolute z-50" contentEditable={false}>
