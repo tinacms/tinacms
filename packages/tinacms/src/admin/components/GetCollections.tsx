@@ -17,7 +17,7 @@ import { TinaAdminApi } from '../api'
 import type { Collection } from '../types'
 
 export const useGetCollections = (cms: TinaCMS) => {
-  const api = new TinaAdminApi(cms.api.tina)
+  const api = new TinaAdminApi(cms)
   const [collections, setCollections] = useState<Collection[]>([])
 
   useEffect(() => {

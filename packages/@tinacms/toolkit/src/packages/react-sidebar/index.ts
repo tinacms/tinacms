@@ -18,3 +18,4 @@ limitations under the License.
 
 export * from './sidebar'
 export { SidebarProvider } from './components/Sidebar'
+export { Nav } from './components/Nav'

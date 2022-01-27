@@ -21,7 +21,7 @@ export const useGetDocument = (
   collectionName: string,
   relativePath: string
 ) => {
-  const api = new TinaAdminApi(cms.api.tina)
+  const api = new TinaAdminApi(cms)
   const [document, setDocument] = useState<DocumentForm>(undefined)
 
   useEffect(() => {

@@ -27,6 +27,7 @@ import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
+import { TinaAdminApi } from '../admin/api'
 
 type ModalNames = null | 'authenticate'
 
@@ -173,6 +174,14 @@ export const TinaCloudProvider = (
       }
     }
   }
+  /**
+   * Attaches a new instance of the TinaAdminApi to `cms.api.admin`
+   */
+  const setupAdmin = async () => {
+    if (!cms.api.admin) {
+      cms.registerApi('admin', new TinaAdminApi(cms))
+    }
+  }
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
@@ -189,6 +198,9 @@ export const TinaCloudProvider = (
   }
 
   setupMedia()
+  if (cms.flags.get('tina-admin') === true) {
+    setupAdmin()
+  }
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')

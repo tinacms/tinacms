@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiLinkExternal } from 'react-icons/bi'
+import { BiEdit } from 'react-icons/bi'
 import { useParams, useLocation, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
@@ -22,6 +22,7 @@ import type { Collection, Template } from '../types'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
+import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -114,86 +115,85 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
 
               return (
-                <div className="px-6 py-14 h-screen overflow-y-auto flex justify-center">
-                  <div className="max-w-screen-md w-full">
-                    <div className="w-full flex justify-between items-end">
-                      <h3 className="text-3xl">{collection.label}</h3>
-                      {!collection.templates && (
-                        <Link
-                          to={`${location.pathname}/new`}
-                          className="inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-                          style={{ background: '#0084FF' }}
-                        >
-                          Create New
-                        </Link>
-                      )}
-                      {collection.templates && (
-                        <TemplateMenu templates={collection.templates} />
-                      )}
-                    </div>
-
-                    {totalCount > 0 && (
-                      <div className="mt-8 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table className="min-w-full">
-                          <tbody className="bg-white divide-y divide-gray-150">
-                            {documents.map((document) => {
-                              const livesiteRoute = routeMapping
-                                ? routeMapping.mapper(collection, document.node)
-                                : undefined
-
-                              return (
-                                <tr key={document.node.sys.relativePath}>
-                                  <td className="px-5 py-3 whitespace-nowrap">
-                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
-                                      Filename
-                                    </span>
-                                    <Link
-                                      to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="h-5 leading-5 flex max-w-xs"
-                                    >
-                                      <span className="flex-shrink-1 leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
-                                        {document.node.sys.filename}
+                <PageWrapper>
+                  <>
+                    <PageHeader>
+                      <>
+                        <h3 className="text-2xl text-gray-700">
+                          {collection.label}
+                        </h3>
+                        {!collection.templates && (
+                          <Link
+                            to={`${location.pathname}/new`}
+                            className="inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
+                            style={{ background: '#0084FF' }}
+                          >
+                            Create New
+                          </Link>
+                        )}
+                        {collection.templates && (
+                          <TemplateMenu templates={collection.templates} />
+                        )}
+                      </>
+                    </PageHeader>
+                    <PageBody>
+                      <div className="w-full mx-auto max-w-screen-xl">
+                        {totalCount > 0 && (
+                          <table className="shadow overflow-hidden border-b border-gray-200 w-full max-w-full rounded-lg">
+                            <tbody className="bg-white divide-y divide-gray-150">
+                              {documents.map((document) => {
+                                // const documentRoute = routeMapping
+                                //   ? routeMapping.mapper(
+                                //       collection,
+                                //       document.node
+                                //     )
+                                //   : `${document.node.sys.filename}`
+                                return (
+                                  <tr
+                                    key={`document-${document.node.sys.filename}`}
+                                  >
+                                    <td className="px-6 py-2 whitespace-nowrap">
+                                      <Link
+                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                        to={`${document.node.sys.filename}`}
+                                      >
+                                        <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                        <span>
+                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                            Filename
+                                          </span>
+                                          <span className="h-5 leading-5 block whitespace-nowrap">
+                                            {document.node.sys.filename}
+                                          </span>
+                                        </span>
+                                      </Link>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        Extension
                                       </span>
-                                      <span className="flex-shrink-0 leading-5 text-base font-medium text-gray-300">
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
                                         {document.node.sys.extension}
                                       </span>
-                                    </Link>
-                                  </td>
-                                  <td className="px-5 py-3 whitespace-nowrap">
-                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
-                                      Template
-                                    </span>
-                                    <span className="h-5 block leading-5 font-regular text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-500">
-                                      {document.node.sys.template}
-                                    </span>
-                                  </td>
-                                  <td className="px-5 py-3 whitespace-nowrap flex gap-3 items-center justify-end">
-                                    {livesiteRoute && (
-                                      <a
-                                        href={livesiteRoute}
-                                        className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
-                                      >
-                                        <BiLinkExternal className="inline-block h-5 w-auto opacity-70" />{' '}
-                                        View
-                                      </a>
-                                    )}
-                                    <Link
-                                      to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full border border-gray-150 transition-all ease-out duration-150 text-gray-700  hover:bg-gray-50 hover:text-blue-500"
-                                    >
-                                      <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
-                                      Edit
-                                    </Link>
-                                  </td>
-                                </tr>
-                              )
-                            })}
-                          </tbody>
-                        </table>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        Template
+                                      </span>
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                        {document.node.sys.template}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </PageBody>
+                  </>
+                </PageWrapper>
               )
             }}
           </GetCollection>
