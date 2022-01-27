@@ -38,6 +38,17 @@ import {
 import { createTrailingBlockPlugin } from './trailing-block'
 import { withCorrectVoidBehavior } from './with-correct-void-behavior'
 
+export const HANDLES_MDX = [
+  ELEMENT_H1,
+  ELEMENT_H2,
+  ELEMENT_H3,
+  ELEMENT_H3,
+  ELEMENT_H4,
+  ELEMENT_H5,
+  ELEMENT_H6,
+  ELEMENT_PARAGRAPH,
+]
+
 const resetBlockTypesCommonRule = {
   types: [
     ELEMENT_BLOCKQUOTE,

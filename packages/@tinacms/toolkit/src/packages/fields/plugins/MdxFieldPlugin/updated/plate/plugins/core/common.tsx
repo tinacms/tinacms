@@ -17,11 +17,14 @@ import {
   getPluginType,
   insertNodes,
   setNodes,
+  findNode,
+  PlateEditor,
 } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { createParagraphPlugin } from '@udecode/plate-paragraph'
 import { createCodeBlockPlugin } from '@udecode/plate-code-block'
 import { createHorizontalRulePlugin } from '@udecode/plate-horizontal-rule'
+import { createNodeIdPlugin } from '@udecode/plate-node-id'
 import { createListPlugin, getListItemEntry } from '@udecode/plate-list'
 import { createBlockquotePlugin } from '@udecode/plate-block-quote'
 import { createHeadingPlugin } from '@udecode/plate-heading'
@@ -31,9 +34,10 @@ import {
   createUnderlinePlugin,
   createCodePlugin,
 } from '@udecode/plate-basic-marks'
+import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
-import { Editor, Node, Transforms } from 'slate'
+import { HANDLES_MDX } from './formatting'
 
 export const plugins = [
   createHeadingPlugin(),
@@ -46,6 +50,8 @@ export const plugins = [
   createCodePlugin(),
   createListPlugin(),
   createHorizontalRulePlugin(),
+  // Allows us to do things like copy/paste, remembering the state of the element (like mdx)
+  createNodeIdPlugin(),
 ]
 
 const isNodeActive = (editor, type) => {
@@ -131,9 +137,21 @@ const isCurrentBlockEmpty = (editor) => {
   return isEmpty
 }
 
+/** Specifies node types which mdx can be embedded.
+ * This prevents nodes like code blocks from having
+ * MDX elements in them, which can't be parsed
+ * NOTE: this also excludes block quotes, but probably should
+ * allow for that, at the moment blockquotes are strict
+ */
+const currentNodeSupportsMDX = (editor: PlateEditor) =>
+  findNode(editor, {
+    match: { type: HANDLES_MDX },
+  })
+
 export const helpers = {
   isNodeActive,
   isMarkActive,
   isListActive,
+  currentNodeSupportsMDX,
   normalize,
 }
