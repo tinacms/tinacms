@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plate, createPlugins } from '@udecode/plate-core'
+import { Plate, createPlugins, usePlateEditorState } from '@udecode/plate-core'
 import { wrapFieldsWithMeta } from '../../../wrapFieldWithMeta'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
@@ -35,7 +35,7 @@ export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: MdxTemplate[] }
 >((props) => {
-  const value = React.useMemo(
+  const initialValue = React.useMemo(
     () =>
       props.input.value?.children?.length
         ? props.input.value.children.map(helpers.normalize)
@@ -77,7 +77,7 @@ export const RichEditor = wrapFieldsWithMeta<
         >
           <Plate
             id={id}
-            initialValue={value}
+            initialValue={initialValue}
             plugins={plugins}
             normalizeInitialValue={true}
             onChange={(value) => {
@@ -90,6 +90,7 @@ export const RichEditor = wrapFieldsWithMeta<
             ) : (
               <FloatingToolbar templates={props.field.templates} />
             )}
+            <Reset form={props.form} initialValue={initialValue} />
             <FloatingLink />
           </Plate>
         </div>
@@ -97,3 +98,23 @@ export const RichEditor = wrapFieldsWithMeta<
     </EditorContext.Provider>
   )
 })
+
+/**
+ * Since slate keeps track of it's own state, and that state is an object rather
+ * than something easily memoizable like a string it can be tricky to ensure
+ * resets are properly handled. So we sneak in a callback to the form's reset
+ * logic that updates slate's internal values imperatively.
+ */
+const Reset = ({ form, initialValue }: { form; initialValue }) => {
+  const editor = usePlateEditorState()
+
+  React.useMemo(() => {
+    const { reset } = form
+    form.reset = (initialValues) => {
+      editor.children = initialValue
+      return reset(initialValues)
+    }
+  }, [])
+
+  return null
+}
