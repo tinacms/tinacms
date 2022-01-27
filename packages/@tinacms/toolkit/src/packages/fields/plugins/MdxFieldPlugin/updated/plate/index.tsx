@@ -35,10 +35,12 @@ export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: MdxTemplate[] }
 >((props) => {
-  const [value, setValue] = React.useState(
-    props.input.value?.children?.length
-      ? props.input.value.children.map(helpers.normalize)
-      : [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+  const value = React.useMemo(
+    () =>
+      props.input.value?.children?.length
+        ? props.input.value.children.map(helpers.normalize)
+        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
+    []
   )
 
   const plugins = React.useMemo(
@@ -60,13 +62,8 @@ export const RichEditor = wrapFieldsWithMeta<
     []
   )
 
-  React.useEffect(() => {
-    props.input.onChange({ type: 'root', children: value })
-  }, [JSON.stringify(value)])
-
   // This should be a plugin customization
   const withToolbar = true
-  // const withToolbar = false
   const tempId = [props.tinaForm.id, props.input.name].join('.')
   const id = React.useMemo(() => uuid(), [tempId])
   return (
@@ -86,7 +83,7 @@ export const RichEditor = wrapFieldsWithMeta<
             normalizeInitialValue={true}
             onChange={(value) => {
               // console.log(JSON.stringify(value, null, 2))
-              setValue(value)
+              props.input.onChange({ type: 'root', children: value })
             }}
           >
             {withToolbar ? (
