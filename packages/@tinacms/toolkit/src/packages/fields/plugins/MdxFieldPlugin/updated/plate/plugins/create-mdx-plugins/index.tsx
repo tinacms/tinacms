@@ -12,11 +12,15 @@ limitations under the License.
 */
 
 import React from 'react'
-import { createPluginFactory, setNodes } from '@udecode/plate-core'
+import { createPluginFactory, setNodes, PlateEditor } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { BlockEmbed, InlineEmbed } from './component'
 import { Editor } from 'slate'
-import { insertBlockElement, insertInlineElement } from '../core/common'
+import {
+  insertBlockElement,
+  insertInlineElement,
+  helpers,
+} from '../core/common'
 import type { MdxTemplate } from '../../types'
 
 export const ELEMENT_MDX_INLINE = 'mdxJsxTextElement'
@@ -51,8 +55,11 @@ export const createMdxBlockPlugin = createPluginFactory({
   component: (props) => <Embed {...props} inline={false} />,
 })
 
-export const insertMDX = (editor: ReactEditor, value: MdxTemplate) => {
+export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
   const flow = value.inline ? false : true
+  if (!helpers.currentNodeSupportsMDX(editor)) {
+    return
+  }
   if (flow) {
     insertBlockElement(editor, {
       type: ELEMENT_MDX_BLOCK,

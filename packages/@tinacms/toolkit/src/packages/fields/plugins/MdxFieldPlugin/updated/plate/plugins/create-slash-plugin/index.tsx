@@ -28,10 +28,11 @@ import {
 } from '@udecode/plate-core'
 import { computePosition, flip, shift } from '@floating-ui/dom'
 import { Element, Transforms } from 'slate'
-import { ReactEditor, useFocused, useSelected } from 'slate-react'
+import { useFocused, useSelected } from 'slate-react'
 import { SearchAutocomplete } from '../ui/combobox'
 import { insertMDX } from '../create-mdx-plugins'
 import type { MdxTemplate } from '../../types'
+import { helpers } from '../core/common'
 
 export const ELEMENT_MAYBE_MDX = 'maybe_mdx'
 
@@ -59,10 +60,14 @@ export const withMaybeMDX = (editor) => {
     if (!editor.selection || text !== '/') {
       return insertText(text)
     }
-    insertNodes(editor, {
-      type,
-      children: [{ type: 'text', text: '/' }],
-    })
+    if (helpers.currentNodeSupportsMDX(editor)) {
+      insertNodes(editor, {
+        type,
+        children: [{ type: 'text', text: '/' }],
+      })
+    } else {
+      return insertText(text)
+    }
   }
 
   return editor
@@ -77,7 +82,7 @@ export const createSlashPlugin = createPluginFactory({
 })
 
 const SlashCombobox = (props: {
-  editor: ReactEditor
+  editor: PlateEditor
   element: Element
   attributes: object
   className: string

@@ -40,7 +40,6 @@ type Action =
   | { type: 'move'; value: 'up' | 'down' }
 
 function reducer(state: State, action: Action): State {
-  console.log(action)
   switch (action.type) {
     case 'selectItem':
       return {
