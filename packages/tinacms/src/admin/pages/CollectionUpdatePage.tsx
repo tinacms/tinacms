@@ -11,9 +11,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
-import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
-import { useParams, useNavigate } from 'react-router-dom'
+import React, { useMemo, useState } from 'react'
+import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { HiChevronRight } from 'react-icons/hi'
 
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
@@ -21,6 +22,7 @@ import GetCMS from '../components/GetCMS'
 import GetDocumentFields from '../components/GetDocumentFields'
 import GetDocument from '../components/GetDocument'
 
+import { PageWrapper } from '../components/Page'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
 
@@ -31,7 +33,7 @@ const updateDocument = async (
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
-  const api = new TinaAdminApi(cms.api.tina)
+  const api = new TinaAdminApi(cms)
   const { includeCollection, includeTemplate } = mutationInfo
   const params = transformDocumentIntoMutationRequestPayload(values, {
     includeCollection,
@@ -43,7 +45,6 @@ const updateDocument = async (
 
 const CollectionUpdatePage = () => {
   const { collectionName, filename } = useParams()
-  const navigate = useNavigate()
 
   return (
     <GetCMS>
@@ -58,41 +59,80 @@ const CollectionUpdatePage = () => {
                 collectionName={collection.name}
                 relativePath={relativePath}
               >
-                {(document) => {
-                  const form = new Form({
-                    id: 'update-form',
-                    label: 'form',
-                    fields: document.form.fields,
-                    initialValues: document.values,
-                    onSubmit: async (values) => {
-                      await updateDocument(
-                        cms,
-                        relativePath,
-                        collection,
-                        mutationInfo,
-                        values
-                      )
-                      navigate(`/collections/${collection.name}`)
-                    },
-                  })
-
-                  return (
-                    <div className="w-full h-screen">
-                      <div className="flex flex-col items-center w-full flex-1">
-                        <FullscreenFormBuilder
-                          label={collection.label + ` - ` + filename}
-                          form={form}
-                        />
-                      </div>
-                    </div>
-                  )
-                }}
+                {(document) => (
+                  <RenderForm
+                    cms={cms}
+                    document={document}
+                    filename={filename}
+                    relativePath={relativePath}
+                    collection={collection}
+                    mutationInfo={mutationInfo}
+                  />
+                )}
               </GetDocument>
             )
           }}
         </GetDocumentFields>
       )}
     </GetCMS>
+  )
+}
+
+const RenderForm = ({
+  cms,
+  document,
+  filename,
+  relativePath,
+  collection,
+  mutationInfo,
+}) => {
+  const navigate = useNavigate()
+  const [formIsPristine, setFormIsPristine] = useState(true)
+
+  const form = useMemo(() => {
+    return new Form({
+      id: 'update-form',
+      label: 'form',
+      fields: document.form.fields,
+      initialValues: document.values,
+      onSubmit: async (values) => {
+        await updateDocument(
+          cms,
+          relativePath,
+          collection,
+          mutationInfo,
+          values
+        )
+        navigate(`/collections/${collection.name}`)
+      },
+    })
+  }, [cms, document, relativePath, collection, mutationInfo])
+
+  return (
+    <PageWrapper>
+      <>
+        <div className="py-4 px-20 border-b border-gray-200 bg-white">
+          <div className="max-w-form mx-auto">
+            <div className="mb-2">
+              <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
+                <Link
+                  to={`/collections/${collection.name}`}
+                  className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
+                >
+                  {collection.label}
+                </Link>
+                <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
+              </span>
+              <span className="text-xl text-gray-700 font-medium leading-tight">
+                Edit {`${filename}.${collection.format}`}
+              </span>
+            </div>
+            <FormStatus pristine={formIsPristine} />
+          </div>
+        </div>
+        <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+      </>
+    </PageWrapper>
   )
 }
 

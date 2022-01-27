@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FormsView } from './SidebarBody'
 import { BiMenu, BiPencil } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
+import { ImFilesEmpty } from 'react-icons/im'
 import { Button } from '../../styles'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
 import { useSubscribable, useCMS } from '../../react-core'
@@ -73,8 +74,27 @@ interface SidebarProps {
 
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
+const useFetchCollections = (cms) => {
+  const [collections, setCollections] = useState([])
+
+  useEffect(() => {
+    const fetchCollections = async () => {
+      const response = await cms.api.admin.fetchCollections()
+      setCollections(response.getCollections)
+    }
+
+    if (cms.api.admin) {
+      fetchCollections()
+    }
+  }, [cms.api.admin])
+
+  return collections
+}
+
 const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const cms = useCMS()
+  const collections = useFetchCollections(cms)
+
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
   useSubscribable(screens)
@@ -158,7 +178,24 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         <SidebarWrapper>
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
-            <Nav screens={allScreens} contentCreators={contentCreators} />
+            <Nav
+              collections={collections}
+              screens={allScreens}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              RenderNavSite={({ view }) => (
+                <SidebarSiteLink
+                  view={view}
+                  onClick={() => {
+                    setActiveView(view)
+                    setMenuIsOpen(false)
+                  }}
+                />
+              )}
+              RenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink collection={collection} />
+              )}
+            />
           )}
           <SidebarBody>
             <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
@@ -187,9 +224,23 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
             >
               <div className="fixed left-0 z-overlay h-full transform">
                 <Nav
+                  className="rounded-r-md"
+                  collections={collections}
                   screens={allScreens}
                   contentCreators={contentCreators}
-                  className="rounded-r-md"
+                  sidebarWidth={sidebarWidth}
+                  RenderNavSite={({ view }) => (
+                    <SidebarSiteLink
+                      view={view}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuIsOpen(false)
+                      }}
+                    />
+                  )}
+                  RenderNavCollection={({ collection }) => (
+                    <SidebarCollectionLink collection={collection} />
+                  )}
                 >
                   <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
                     <Button
@@ -311,6 +362,40 @@ const SidebarHeader = ({ isLocalMode }) => {
     </div>
   )
 }
+
+const SidebarSiteLink = ({
+  view,
+  onClick,
+}: {
+  view: ScreenPlugin
+  onClick: () => void
+}) => {
+  return (
+    <button
+      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+      value={view.name}
+      onClick={onClick}
+    >
+      <view.Icon className="mr-3 h-6 opacity-80 w-auto" /> {view.name}
+    </button>
+  )
+}
+
+const SidebarCollectionLink = ({
+  collection,
+}: {
+  collection: {
+    label: string
+    name: string
+  }
+}) => (
+  <a
+    href={`/admin/collections/${collection.name}`}
+    className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+  >
+    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" /> {collection.label}
+  </a>
+)
 
 const EditButton = ({}) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)

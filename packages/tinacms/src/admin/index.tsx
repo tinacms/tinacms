@@ -25,6 +25,7 @@ import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
+import ScreenPage from './pages/ScreenPage'
 
 import { useEditState } from '@tinacms/sharedctx'
 
@@ -62,28 +63,32 @@ export const TinaAdmin = () => {
         if (isTinaAdminEnabled) {
           return (
             <Layout>
-              <Router>
+              <Router basename={'/admin'}>
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <Sidebar cms={cms} />
                   <div className="flex-1">
                     <Routes>
                       <Route
-                        path="/admin/collections/:collectionName/new"
+                        path="collections/:collectionName/new"
                         element={<CollectionCreatePage />}
                       />
                       <Route
-                        path="/admin/collections/:collectionName/:templateName/new"
+                        path="collections/:collectionName/:templateName/new"
                         element={<CollectionCreatePage />}
                       />
                       <Route
-                        path="/admin/collections/:collectionName/:filename"
+                        path="collections/:collectionName/:filename"
                         element={<CollectionUpdatePage />}
                       />
                       <Route
-                        path="/admin/collections/:collectionName"
+                        path="collections/:collectionName"
                         element={<CollectionListPage />}
                       />
-                      <Route path="/admin" element={<DashboardPage />} />
+                      <Route
+                        path="screens/:screenName"
+                        element={<ScreenPage />}
+                      />
+                      <Route path="/" element={<DashboardPage />} />
                     </Routes>
                   </div>
                 </div>
@@ -95,8 +100,8 @@ export const TinaAdmin = () => {
             <Layout>
               <Router>
                 <Routes>
-                  <Route path="/admin/logout" element={<LogoutPage />} />
-                  <Route path="/admin" element={<Redirect />} />
+                  <Route path="logout" element={<LogoutPage />} />
+                  <Route path="/" element={<Redirect />} />
                 </Routes>
               </Router>
             </Layout>
