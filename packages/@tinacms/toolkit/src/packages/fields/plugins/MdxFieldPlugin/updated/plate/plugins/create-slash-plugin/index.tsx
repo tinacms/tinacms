@@ -109,7 +109,6 @@ const SlashCombobox = (props: {
   // @ts-ignore
   const fullValue = props.element.children[0]?.text
   const value = fullValue.slice(1) as string
-  const [matches, setMatches] = React.useState(0)
   const { selection } = props.editor
 
   React.useEffect(() => {
@@ -120,14 +119,6 @@ const SlashCombobox = (props: {
       })
     }
   }, [focused, selected, JSON.stringify(selection)])
-
-  React.useEffect(() => {
-    if (matches === 0 && value.endsWith(' ')) {
-      unwrapNodes(props.editor, {
-        match: (n) => Element.isElement(n) && n.type === ELEMENT_MAYBE_MDX,
-      })
-    }
-  }, [matches, value])
 
   // If the full value no longer starts with "/", cancel
   React.useEffect(() => {
@@ -166,12 +157,16 @@ const SlashCombobox = (props: {
     <span {...props.attributes} ref={baseRef} className={`${props.className}`}>
       {props.children}
       {selected && (
-        <span ref={ref} className="block absolute z-50" contentEditable={false}>
+        <span
+          ref={ref}
+          className="block absolute z-50"
+          contentEditable={false}
+          style={{ userSelect: 'none' }}
+        >
           <SearchAutocomplete
             value={value}
             onValue={onValue}
             onCancel={onCancel}
-            onMatches={(count) => setMatches(count)}
           />
         </span>
       )}

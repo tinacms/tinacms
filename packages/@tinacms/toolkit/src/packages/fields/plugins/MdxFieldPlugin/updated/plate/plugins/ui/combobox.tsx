@@ -17,113 +17,156 @@ limitations under the License.
 */
 
 import React from 'react'
-import { useFilter } from '@react-aria/i18n'
 import { useTemplates } from '../../editor-context'
 import { classNames } from './helpers'
 import type { MdxTemplate } from '../../types'
 import { useHotkey } from '../../hooks/embed-hooks'
 
-type TemplateType = MdxTemplate & { selected?: boolean }
+type TemplateType = MdxTemplate
 
-const findSelectedIndex = (activeTemplates) =>
-  activeTemplates.findIndex(({ selected }) => !!selected)
-const findSelected = (activeTemplates: TemplateType[]) =>
-  activeTemplates.find(({ selected }) => !!selected)
+export type Dispatch = React.Dispatch<Action>
+export type State = {
+  initialTemplates: TemplateType[]
+  activeIndex: number
+  activeTemplates: TemplateType[]
+  value: string
+  status: 'pending' | 'selected' | 'cancelled'
+}
 
+type Action =
+  | { type: 'selectItem'; value: number }
+  | { type: 'selectCurrentItem' }
+  | { type: 'updateValue'; value: string }
+  | { type: 'move'; value: 'up' | 'down' }
+
+function reducer(state: State, action: Action): State {
+  console.log(action)
+  switch (action.type) {
+    case 'selectItem':
+      return {
+        ...state,
+        activeIndex: action.value,
+        status: 'selected',
+      }
+    case 'updateValue':
+      const lowerCaseValue = action.value.toLocaleLowerCase()
+      const activeTemplates =
+        lowerCaseValue === ''
+          ? state.initialTemplates
+          : state.activeTemplates.filter((template) => {
+              return (
+                template.name.toLocaleLowerCase().startsWith(lowerCaseValue) ||
+                template.label.toLocaleLowerCase().startsWith(lowerCaseValue)
+              )
+            })
+
+      if (activeTemplates.length === 0) {
+        return {
+          ...state,
+          activeTemplates,
+          activeIndex: 0,
+          value: action.value,
+          status: 'cancelled',
+        }
+      }
+      return {
+        ...state,
+        activeTemplates,
+        activeIndex: 0,
+        value: action.value,
+      }
+    case 'selectCurrentItem':
+      return {
+        ...state,
+        status: 'selected',
+      }
+
+    case 'move':
+      if (action.value === 'down') {
+        if (state.activeIndex === state.activeTemplates.length - 1) {
+          return {
+            ...state,
+            activeIndex: 0,
+          }
+        } else {
+          return {
+            ...state,
+            activeIndex: state.activeIndex + 1,
+          }
+        }
+      }
+      if (action.value === 'up') {
+        if (state.activeIndex === 0) {
+          return {
+            ...state,
+            activeIndex: state.activeTemplates.length - 1,
+          }
+        } else {
+          return {
+            ...state,
+            activeIndex: state.activeIndex - 1,
+          }
+        }
+      }
+      throw new Error(`Unexpected value for move action ${action.value}`)
+    default:
+      return {
+        ...state,
+      }
+  }
+}
+
+/**
+ * This could (should?) be replaced by something like downshift, but in some
+ * ways it's not like a traditional combobox because so much of what's needed
+ * here should _not_ steal focus from the editor. Some of the combobox libraries
+ * I've tried really shine when it comes to accessibility out-of-the-box which is
+ * sort of the opposite of what we want here. I'm not sure of the best way to make
+ * this accessible, but I have a feeling the plate combobox is the way to go.
+ * At first glance, there's very little documentation for using it, though it
+ * does seem to support bringing out own UI (it uses downshift).
+ */
 export function SearchAutocomplete(props: {
   value: string
   onValue: (value: { name: string; inline?: boolean }) => void
   onCancel: () => void
-  onMatches: (count: number) => void
 }) {
   const templates = useTemplates()
-  const initialTemplates = templates as TemplateType[]
 
-  const [activeTemplates, setTemplates] =
-    React.useState<TemplateType[]>(initialTemplates)
+  const [state, dispatch] = React.useReducer(reducer, {
+    activeIndex: 0,
+    status: 'pending',
+    value: props.value,
+    initialTemplates: templates,
+    activeTemplates: templates,
+  })
 
   React.useEffect(() => {
-    props.onMatches(activeTemplates.length)
-  }, [activeTemplates.length])
+    if (state.status === 'selected') {
+      props.onValue(state.activeTemplates[state.activeIndex])
+    }
+    if (state.status === 'cancelled') {
+      props.onCancel()
+    }
+  }, [state.status])
 
-  const { contains } = useFilter({
-    sensitivity: 'base',
-  })
+  React.useEffect(() => {
+    dispatch({ type: 'updateValue', value: props.value })
+  }, [props.value])
 
   useHotkey('escape', () => {
     props.onCancel()
   })
 
   useHotkey('enter', () => {
-    const selected = findSelected(activeTemplates)
-    if (selected) {
-      props.onValue(selected)
-    } else {
-      // If none selected, choose the first item
-      // TODO: this should highlight the item
-      props.onValue(activeTemplates[0])
-    }
+    dispatch({ type: 'selectCurrentItem' })
   })
-
-  React.useEffect(() => {
-    const lowerCaseValue = props.value.toLocaleLowerCase()
-    const matchedTemplates = initialTemplates.filter(
-      (template) =>
-        contains(template.name.toLocaleLowerCase(), lowerCaseValue) ||
-        contains(template.label.toLocaleLowerCase(), lowerCaseValue)
-    )
-
-    setTemplates((activeTemplates) => {
-      return matchedTemplates.map((matchedTemplate, index) => {
-        // Retain "selected" state
-        const existingTemplate = activeTemplates.find(
-          ({ name }) => name == matchedTemplate.name
-        )
-        if (existingTemplate) {
-          return existingTemplate
-        } else {
-          return matchedTemplate
-        }
-      })
-    })
-  }, [props.value])
 
   useHotkey('ArrowDown', () => {
-    setTemplates((activeTemplates) => {
-      const selectedIndex = findSelectedIndex(activeTemplates)
-      return activeTemplates.map(({ selected, ...rest }, index) => {
-        if (
-          selectedIndex === activeTemplates.length - 1 &&
-          index === activeTemplates.length - 1
-        ) {
-          return { selected: true, ...rest }
-        }
-        if (selectedIndex === -1 && index === 0) {
-          return { selected: true, ...rest }
-        }
-        if (selectedIndex + 1 === index) {
-          return { selected: true, ...rest }
-        }
-        return { selected: false, ...rest }
-      })
-    })
+    dispatch({ type: 'move', value: 'down' })
   })
   useHotkey('ArrowUp', () => {
-    setTemplates((activeTemplates) => {
-      const selectedIndex = findSelectedIndex(activeTemplates)
-      return activeTemplates.map(({ selected, ...rest }, index) => {
-        if (selectedIndex === 0 && index === 0) {
-          return { selected: true, ...rest }
-        }
-        if (selectedIndex === -1 && index === activeTemplates.length - 1) {
-          return { selected: true, ...rest }
-        }
-        if (selectedIndex - 1 === index) {
-          return { selected: true, ...rest }
-        }
-        return { selected: false, ...rest }
-      })
-    })
+    dispatch({ type: 'move', value: 'up' })
   })
   const ref = React.useRef()
   useOnClickOutside(ref, () => props.onCancel())
@@ -134,29 +177,20 @@ export function SearchAutocomplete(props: {
       className="block w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
     >
       <span className="block py-1">
-        {activeTemplates.length === 0 && (
+        {state.activeTemplates.length === 0 && (
           <span className="block px-4 py-2 text-sm text-left w-full text-gray-500">
             No matches found
           </span>
         )}
-        {activeTemplates.map((activeTemplate) => {
+        {state.activeTemplates.map((activeTemplate, index) => {
           return (
             <span key={activeTemplate.key} className="block">
               <button
                 onClick={() => {
-                  setTemplates((activeTemplates) => {
-                    return activeTemplates.map((template) => {
-                      if (template.name === activeTemplate.name) {
-                        return { ...template, selected: true }
-                      } else {
-                        return { ...template, selected: false }
-                      }
-                    })
-                  })
-                  props.onValue(activeTemplate)
+                  dispatch({ type: 'selectItem', value: index })
                 }}
                 className={classNames(
-                  activeTemplate.selected
+                  index === state.activeIndex
                     ? 'bg-gray-50 text-gray-900'
                     : 'text-gray-700',
                   'truncate block px-4 py-2 text-sm text-left w-full hover:bg-gray-100 hover:text-gray-900'
