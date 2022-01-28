@@ -45,13 +45,22 @@ export type Events =
   | TinaCMSInitInvoke
   | TinaCMSServerStartInvoke
   | TinaCMSServerError
+
 export interface MetricPayload {
-  event: Events
-  id: string
-  nodeVersion: string
-  tinaCliVersion: string
-  tinaVersion: string
-  yarnVersion: string
-  npmVersion: string
-  CI: boolean
+  partitionKey: string
+  data: {
+    anonymousId: string
+    event: Events['name']
+    properties: {
+      event: Events
+      system: {
+        nodeVersion: string
+        tinaCliVersion: string
+        tinaVersion: string
+        yarnVersion: string
+        npmVersion: string
+        CI: boolean
+      }
+    }
+  }
 }
