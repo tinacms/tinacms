@@ -57,6 +57,12 @@ const mutationFixtures: Fixture[] = [
     expectError: true,
   },
   {
+    name: 'createDocument',
+    description: 'Creating a document works',
+    assert: 'file',
+    filename: 'content/stuff/my-stuff.md',
+  },
+  {
     name: 'updateDocument',
     description: 'Updating a document works',
     assert: 'file',
