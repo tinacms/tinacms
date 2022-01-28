@@ -48,14 +48,14 @@ export function useTina<T extends object>({
   variables: object
   data: T
 }): { data: T; isLoading: boolean } {
-  const tinaDataContext = React.useContext(TinaDataContext)
-
   const {
     setRequest,
     state,
     isDummyContainer,
     isLoading: contextLoading,
-  } = tinaDataContext
+  } = React.useContext(TinaDataContext)
+
+  const tinaDataContext = React.useContext(TinaDataContext)
 
   if (!tinaDataContext) {
     console.warn(
