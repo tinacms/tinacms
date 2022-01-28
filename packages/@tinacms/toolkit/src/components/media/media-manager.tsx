@@ -19,6 +19,7 @@ limitations under the License.
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
+import { BiCloudUpload } from 'react-icons/bi'
 import {
   Modal,
   ModalHeader,
@@ -270,12 +271,19 @@ export function MediaPicker({
 const UploadButton = ({ onClick, uploading }: any) => {
   return (
     <Button
-      style={{ minWidth: '5.3rem' }}
       variant="primary"
+      size="custom"
+      className="text-sm h-10 px-6"
       busy={uploading}
       onClick={onClick}
     >
-      {uploading ? <LoadingDots /> : 'Upload'}
+      {uploading ? (
+        <LoadingDots />
+      ) : (
+        <>
+          Upload <BiCloudUpload className="w-6 h-full ml-2 opacity-70" />
+        </>
+      )}
     </Button>
   )
 }
