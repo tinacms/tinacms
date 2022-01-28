@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.60.2
+
+### Patch Changes
+
+- d17de356a: Update CLI to use apiUrl
+- a67b0c1d7: Dont reinstantiate bridge and store
+
 ## 0.60.1
 
 ### Patch Changes
