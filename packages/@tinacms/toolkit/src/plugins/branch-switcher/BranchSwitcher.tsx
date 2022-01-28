@@ -16,6 +16,7 @@ import styled from 'styled-components'
 import { useBranchData } from './BranchData'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
+import { BiRefresh } from 'react-icons/bi'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -75,14 +76,14 @@ export const BranchSwitcher = ({
               />
             </SelectWrap>
           ) : (
-            <>
-              <p className="text-base mt-8 mx-8 mb-4 text-center">
+            <div className="px-6 py-8 w-full h-full flex flex-col items-center justify-center">
+              <p className="text-base mb-4 text-center">
                 An error occurred while retrieving the branch list.
               </p>
-              <Button className="mx-auto" onClick={refreshBranchList}>
-                Try again ⟳
+              <Button className="mb-4" onClick={refreshBranchList}>
+                Try again <BiRefresh className="w-6 h-full ml-1 opacity-70" />
               </Button>
-            </>
+            </div>
           )}
         </>
       )}
