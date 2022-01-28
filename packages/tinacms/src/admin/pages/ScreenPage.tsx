@@ -29,7 +29,7 @@ const ScreenPage = () => {
         )
         console.log('selectedScreen', selectedScreen)
         return (
-          <div>
+          <div className="relative w-full h-full">
             <selectedScreen.Component close={() => {}} />
           </div>
         )
