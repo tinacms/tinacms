@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled from 'styled-components'
 import { MediaListOffset } from '../../packages/core'
 import { Button } from '../../packages/styles'
+import { BiLeftArrowAlt, BiRightArrowAlt } from 'react-icons/bi'
 
 export interface MediaPaginatorProps {
   currentOffset: MediaListOffset
@@ -37,11 +37,11 @@ export function CursorPaginator({
 }: MediaPaginatorProps) {
   return (
     <div className="w-full flex flex-shrink-0 justify-end gap-2 items-center bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
-      <Button size="small" disabled={!hasPrev} onClick={navigatePrev}>
-        &laquo; Previous
+      <Button variant="secondary" disabled={!hasPrev} onClick={navigatePrev}>
+        <BiLeftArrowAlt className="w-6 h-full mr-2 opacity-70" /> Previous
       </Button>
-      <Button size="small" disabled={!hasNext} onClick={navigateNext}>
-        Next &raquo;
+      <Button variant="secondary" disabled={!hasNext} onClick={navigateNext}>
+        Next <BiRightArrowAlt className="w-6 h-full ml-2 opacity-70" />
       </Button>
     </div>
   )

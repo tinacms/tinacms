@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit } from 'react-icons/bi'
+import { BiEdit, BiPlus } from 'react-icons/bi'
 import { useParams, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
@@ -30,28 +30,8 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
       {({ open }) => (
         <div>
           <div>
-            <Menu.Button
-              className="inline-flex items-center px-8 py-2.5 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-              style={{ background: '#0084FF' }}
-            >
-              Create New
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className={`ml-1 flex-0 inline-block opacity-50 group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
-                  open ? `rotate-90 opacity-100` : `rotate-0`
-                }`}
-              >
-                <g opacity="1.0">
-                  <path
-                    d="M7.91675 13.8086L9.16675 15.0586L14.2253 10L9.16675 4.9414L7.91675 6.1914L11.7253 10L7.91675 13.8086Z"
-                    fill="currentColor"
-                  />
-                </g>
-              </svg>
+            <Menu.Button className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
+              Create New <BiPlus className="w-5 h-full ml-1 opacity-70" />
             </Menu.Button>
           </div>
 
@@ -124,10 +104,10 @@ const CollectionListPage = () => {
                         {!collection.templates && (
                           <Link
                             to={`new`}
-                            className="inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-                            style={{ background: '#0084FF' }}
+                            className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
                           >
-                            Create New
+                            Create New{' '}
+                            <BiPlus className="w-5 h-full ml-1 opacity-70" />
                           </Link>
                         )}
                         {collection.templates && (

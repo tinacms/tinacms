@@ -18,8 +18,8 @@ limitations under the License.
 
 import React from 'react'
 import { useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms/use-cms'
+import { BiCloudUpload } from 'react-icons/bi'
 import {
   Modal,
   ModalHeader,
@@ -271,83 +271,63 @@ export function MediaPicker({
 const UploadButton = ({ onClick, uploading }: any) => {
   return (
     <Button
-      style={{ minWidth: '5.3rem' }}
       variant="primary"
+      size="custom"
+      className="text-sm h-10 px-6"
       busy={uploading}
       onClick={onClick}
     >
-      {uploading ? <LoadingDots /> : 'Upload'}
+      {uploading ? (
+        <LoadingDots />
+      ) : (
+        <>
+          Upload <BiCloudUpload className="w-6 h-full ml-2 opacity-70" />
+        </>
+      )}
     </Button>
   )
 }
 
-const LoadingMediaList = styled((props) => {
+const LoadingMediaList = (props) => {
   return (
-    <div {...props}>
+    <div
+      className="w-full h-full flex flex-col items-center justify-center"
+      {...props}
+    >
       <LoadingDots color={'var(--tina-color-primary)'} />
     </div>
   )
-})`
-  width: 100%;
-  height: 75%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`
+}
 
-const MediaPickerWrap = styled.div`
-  height: 100%;
-  overflow-y: auto;
-  color: var(--tina-color-grey-9);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  background-color: var(--tina-color-grey-1);
-
-  ::-webkit-scrollbar {
-    width: 0;
-  }
-
-  *:active,
-  *:focus {
-    outline: none;
-  }
-`
-
-const EmptyMediaList = styled((props) => {
-  return <div {...props}>Drag and Drop assets here</div>
-})`
-  font-size: 24px;
-  opacity: 50%;
-  padding: 48px;
-  text-align: center;
-`
-
-const DocsLink = styled(({ title, message, docsLink, ...props }) => {
+const MediaPickerWrap = ({ children }) => {
   return (
-    <div {...props}>
-      <h2>{title}</h2>
-      <div>{message}</div>
+    <div className="h-full overflow-y-auto text-gray-700 flex flex-col relative bg-gray-50 outline-none active:outline-none focus:outline-none">
+      {children}
+    </div>
+  )
+}
+
+const EmptyMediaList = (props) => {
+  return (
+    <div className={`text-2xl opacity-50 p-12 text-center`} {...props}>
+      Drag and Drop assets here
+    </div>
+  )
+}
+
+const DocsLink = ({ title, message, docsLink, ...props }) => {
+  return (
+    <div className="h-3/4 text-center flex flex-col justify-center" {...props}>
+      <h2 className="mb-3 text-xl text-gray-600">{title}</h2>
+      <div className="mb-3 text-base text-gray-700">{message}</div>
       <a
-        style={{ marginTop: '1rem' }}
         href={docsLink}
         target="_blank"
         rel="noreferrer noopener"
+        className="font-bold text-blue-500 hover:text-blue-600 hover:underline transition-all ease-out duration-150"
       >
         Learn More
       </a>
     </div>
   )
-})`
-  height: 75%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  a {
-    color: black;
-    text-decoration: underline;
-    font-weight: bold;
-  }
-`
+}
