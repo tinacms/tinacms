@@ -376,7 +376,7 @@ const SidebarSiteLink = ({
       value={view.name}
       onClick={onClick}
     >
-      <view.Icon className="mr-3 h-6 opacity-80 w-auto" /> {view.name}
+      <view.Icon className="mr-2 h-6 opacity-80 w-auto" /> {view.name}
     </button>
   )
 }
