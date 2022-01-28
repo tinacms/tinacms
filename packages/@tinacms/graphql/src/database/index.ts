@@ -104,24 +104,20 @@ export class Database {
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    const { stringifiedFile, payload } = await this.stringifyFile(
-      filepath,
-      data
-    )
+    const { stringifiedFile, payload, keepTemplateKey } =
+      await this.stringifyFile(filepath, data)
     if (this.store.supportsSeeding()) {
       await this.bridge.put(filepath, stringifiedFile)
     }
-    await this.store.put(filepath, payload)
+    await this.store.put(filepath, payload, keepTemplateKey)
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
-      const { stringifiedFile, payload } = await this.stringifyFile(
-        filepath,
-        data
-      )
+      const { stringifiedFile, payload, keepTemplateKey } =
+        await this.stringifyFile(filepath, data)
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
       }
@@ -132,7 +128,7 @@ export class Database {
           database: this,
         })
       }
-      await this.store.put(filepath, payload)
+      await this.store.put(filepath, payload, keepTemplateKey)
     }
     return true
   }
@@ -193,7 +189,11 @@ export class Database {
         extension,
         templateInfo.type === 'union'
       )
-      return { stringifiedFile, payload }
+      return {
+        stringifiedFile,
+        payload,
+        keepTemplateKey: templateInfo.type === 'union',
+      }
     }
   }
 
