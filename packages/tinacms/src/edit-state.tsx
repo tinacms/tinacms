@@ -48,12 +48,23 @@ export function useTina<T extends object>({
   variables: object
   data: T
 }): { data: T; isLoading: boolean } {
+  const tinaDataContext = React.useContext(TinaDataContext)
+
+  if (!tinaDataContext) {
+    // Technically breaking the rules of hooks, but we'll otherwise have to handle a lot of manual error coniditionals.
+    console.warn(
+      'Warning! You are using useTina without a <TinaCMS> provider\n.' +
+        'This will return the original data unchanged, and potentially cause issues on a rerender'
+    )
+    return { data, isLoading: false }
+  }
+
   const {
     setRequest,
     state,
     isDummyContainer,
     isLoading: contextLoading,
-  } = React.useContext(TinaDataContext)
+  } = tinaDataContext
 
   const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
     !isDummyContainer
