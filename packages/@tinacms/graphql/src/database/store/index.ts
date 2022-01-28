@@ -81,11 +81,5 @@ export interface Store {
    * user's repo.
    */
   supportsIndexing(): boolean
-  put(
-    filepath: string,
-    data: object,
-    options?: {
-      includeTemplate?: boolean
-    }
-  ): Promise<void>
+  put(filepath: string, data: object, keepTemplateKey?: boolean): Promise<void>
 }
