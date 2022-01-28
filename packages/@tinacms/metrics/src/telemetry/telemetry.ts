@@ -58,15 +58,24 @@ export class Telemetry {
       return
     }
     try {
+      const id = this.projectId
       const body: MetricPayload = {
-        event,
-        id: this.projectId,
-        nodeVersion: process.version,
-        tinaCliVersion: getTinaCliVersion(),
-        tinaVersion: getTinaVersion(),
-        yarnVersion: getYarnVersion(),
-        npmVersion: getNpmVersion(),
-        CI: Boolean(process.env.CI),
+        partitionKey: id,
+        data: {
+          anonymousId: id,
+          event: event.name,
+          properties: {
+            event,
+            system: {
+              nodeVersion: process.version,
+              tinaCliVersion: getTinaCliVersion(),
+              tinaVersion: getTinaVersion(),
+              yarnVersion: getYarnVersion(),
+              npmVersion: getNpmVersion(),
+              CI: Boolean(process.env.CI),
+            },
+          },
+        },
       }
       console.log({ body })
       // const res = await fetch(TINA_METRICS_ENDPOINT, {
