@@ -34,7 +34,7 @@ Now, you can register the Cloudinary Media store with the instance of Tina in yo
 
 This is also where we can update our `mediaOptions` on the cms object.
 
-```
+```tsx
 // Typically in the _app.js file of a Next.js project
 
 import dynamic from "next/dynamic";
@@ -52,7 +52,10 @@ const App = ({ Component, pageProps }) => {
             branch="main"
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
-            mediaStore={TinaCloudCloudinaryMediaStore}
+            mediaStore={async () => {
+              const pack = await import("next-tinacms-cloudinary");
+              return pack.TinaCloudCloudinaryMediaStore;
+            }}
             {...pageProps}
           >
             {(livePageProps) => (

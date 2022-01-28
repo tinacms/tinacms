@@ -367,7 +367,7 @@ const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
-const TinaDataProvider = ({
+export const TinaDataProvider = ({
   children,
   formifyCallback,
 }: {
@@ -424,7 +424,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
-  }, [JSON.stringify(payload)])
+  }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (
     <Loader>
