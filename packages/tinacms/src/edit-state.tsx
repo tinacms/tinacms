@@ -14,6 +14,7 @@ limitations under the License.
 import {
   EditProvider,
   TinaDataContext,
+  TinaDataContextType,
   isEditing,
   setEditing,
   useEditState,
@@ -48,21 +49,22 @@ export function useTina<T extends object>({
   variables: object
   data: T
 }): { data: T; isLoading: boolean } {
-  const {
-    setRequest,
-    state,
-    isDummyContainer,
-    isLoading: contextLoading,
-  } = React.useContext(TinaDataContext)
-
-  const tinaDataContext = React.useContext(TinaDataContext)
+  const tinaDataContext = React.useContext<TinaDataContextType>(TinaDataContext)
 
   if (!tinaDataContext) {
     console.warn(
       'Warning! You are using useTina without a <TinaCMS> provider\n.' +
         'This will return the original data unchanged, and potentially cause issues on a rerender'
     )
+    return { data, isLoading: false }
   }
+
+  const {
+    setRequest,
+    state,
+    isDummyContainer,
+    isLoading: contextLoading,
+  } = tinaDataContext
 
   const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
     !isDummyContainer
@@ -71,9 +73,6 @@ export function useTina<T extends object>({
   const isLoading = contextLoading || waitForContextRerender
 
   React.useEffect(() => {
-    if (!tinaDataContext) {
-      return
-    }
     setRequest({ query, variables })
   }, [JSON.stringify(variables), query])
 
@@ -82,9 +81,6 @@ export function useTina<T extends object>({
   // new query that we've just sent when this hook was initialized.
   // Otherwise, things get wonky when changing pages
   useEffect(() => {
-    if (!tinaDataContext) {
-      return
-    }
     if (!isDummyContainer) {
       setTimeout(() => setWaitForContextRerender(false), 0)
     }
@@ -93,10 +89,6 @@ export function useTina<T extends object>({
       setRequest(undefined) // unregister forms
     }
   }, [isDummyContainer])
-
-  if (!tinaDataContext) {
-    return { data, isLoading: false }
-  }
 
   return {
     data: isDummyContainer || isLoading ? data : (state.payload as T),

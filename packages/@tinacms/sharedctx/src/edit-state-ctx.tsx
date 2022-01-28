@@ -38,14 +38,16 @@ export const EditContext = React.createContext({
   setEdit: undefined as (edit: boolean) => void,
 })
 
-export const TinaDataContext = React.createContext<{
+export type TinaDataContextType = {
   state: {
     payload: object
   }
   setRequest: (props: { query: string; variables: object }) => void
   isLoading: boolean
   isDummyContainer?: boolean
-}>({
+}
+
+export const TinaDataContext = React.createContext<TinaDataContextType>({
   state: {
     payload: {},
   },
