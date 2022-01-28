@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled from 'styled-components'
 import { MediaListOffset } from '../../packages/core'
 import { Button } from '../../packages/styles'
 import { BiLeftArrowAlt, BiRightArrowAlt } from 'react-icons/bi'
