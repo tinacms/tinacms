@@ -83,6 +83,47 @@ const tinaSchema: TinaCloudSchema = {
         },
       ],
     },
+    {
+      label: 'Stuff',
+      name: 'stuff',
+      path: 'content/stuff',
+      format: 'md',
+      templates: [
+        {
+          label: 'Template 1',
+          name: 'template_1',
+          fields: [
+            {
+              type: 'string',
+              label: 'Title',
+              name: 'title',
+            },
+          ],
+        },
+        {
+          label: 'Template 2',
+          name: 'template_2',
+          fields: [
+            {
+              type: 'string',
+              label: 'Title',
+              name: 'title',
+            },
+          ],
+        },
+        {
+          label: 'Template 3',
+          name: 'template_3',
+          fields: [
+            {
+              type: 'string',
+              label: 'Title',
+              name: 'title',
+            },
+          ],
+        },
+      ],
+    },
     blocksCollection,
   ],
 }
