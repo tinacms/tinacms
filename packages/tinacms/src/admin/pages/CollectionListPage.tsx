@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus } from 'react-icons/bi'
+import { BiEdit, BiPlus, BiExit, BiTrash } from 'react-icons/bi'
 import { useParams, useLocation, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
@@ -23,6 +23,7 @@ import type { Collection, Template } from '../types'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
+import { FiMoreVertical } from 'react-icons/fi'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -119,8 +120,8 @@ const CollectionListPage = () => {
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
                         {totalCount > 0 && (
-                          <table className="shadow overflow-hidden border-b border-gray-200 w-full max-w-full rounded-lg">
-                            <tbody className="bg-white divide-y divide-gray-150">
+                          <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
+                            <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
                                 // const documentRoute = routeMapping
                                 //   ? routeMapping.mapper(
@@ -131,6 +132,7 @@ const CollectionListPage = () => {
                                 return (
                                   <tr
                                     key={`document-${document.node.sys.filename}`}
+                                    className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
                                       <Link
@@ -164,6 +166,26 @@ const CollectionListPage = () => {
                                         {document.node.sys.template}
                                       </span>
                                     </td>
+                                    <td className="w-0">
+                                      <OverflowMenu
+                                        items={[
+                                          {
+                                            label: 'Edit in Admin',
+                                            icon: BiEdit,
+                                            onClick: () => {
+                                              alert('edit thing')
+                                            },
+                                          },
+                                          {
+                                            label: 'Delete',
+                                            icon: BiTrash,
+                                            onClick: () => {
+                                              alert('delete thing')
+                                            },
+                                          },
+                                        ]}
+                                      />
+                                    </td>
                                   </tr>
                                 )
                               })}
@@ -180,6 +202,61 @@ const CollectionListPage = () => {
         )
       }}
     </GetCMS>
+  )
+}
+
+const OverflowMenu = ({ items = [] }) => {
+  if (items.length === 0) return null
+
+  return (
+    <Menu>
+      {({ open }) => (
+        <div className="relative">
+          <Menu.Button
+            className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
+          >
+            <FiMoreVertical
+              className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
+                open
+                  ? `opacity-100 text-blue-500`
+                  : `opacity-70 group-hover:opacity-100`
+              }`}
+            />
+          </Menu.Button>
+          <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
+            <Transition
+              enter="transition duration-150 ease-out"
+              enterFrom="transform opacity-0 -translate-y-2"
+              enterTo="transform opacity-100 translate-y-0"
+              leave="transition duration-75 ease-in"
+              leaveFrom="transform opacity-100 translate-y-0"
+              leaveTo="transform opacity-0 -translate-y-2"
+            >
+              <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
+                {items.map((item) => {
+                  const Icon = item.icon ? item.icon : BiExit
+                  return (
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
+                            active && 'text-blue-400 bg-gray-50 opacity-100'
+                          }`}
+                          onClick={item.onClick}
+                        >
+                          <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
+                          {item.label}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  )
+                })}
+              </Menu.Items>
+            </Transition>
+          </div>
+        </div>
+      )}
+    </Menu>
   )
 }
 
