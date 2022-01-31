@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 0.60.3
+
+### Patch Changes
+
+- 43b40cc8b: Implement useTina in CLI init
+- b399c734c: Fixes support for collection.templates in graphql
+- Updated dependencies [b399c734c]
+  - @tinacms/datalayer@0.0.2
+  - @tinacms/graphql@0.59.6
+
 ## 0.60.2
 
 ### Patch Changes

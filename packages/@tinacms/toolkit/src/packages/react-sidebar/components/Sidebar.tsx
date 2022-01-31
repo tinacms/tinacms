@@ -222,7 +222,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
               leaveFrom="opacity-100 translate-x-0"
               leaveTo="opacity-0 -translate-x-full"
             >
-              <div className="fixed left-0 z-overlay h-full transform">
+              <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
                   className="rounded-r-md"
                   collections={collections}

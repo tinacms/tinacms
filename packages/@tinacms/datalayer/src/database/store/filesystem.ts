@@ -67,10 +67,10 @@ export class FilesystemStore implements Store {
       return items
     }
   }
-  public async put(filepath: string, data: object) {
+  public async put(filepath: string, data: object, keepTemplateKey: boolean) {
     await fs.outputFileSync(
       path.join(this.rootPath, filepath),
-      stringifyFile(data, path.extname(filepath), false)
+      stringifyFile(data, path.extname(filepath), keepTemplateKey)
     )
   }
 }
