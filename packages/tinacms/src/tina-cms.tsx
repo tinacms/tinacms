@@ -363,7 +363,13 @@ const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
     data: props.data,
   })
 
-  return <>{children(isLoading ? props : { ...props, data: liveData })}</>
+  return (
+    <>
+      {children(
+        isLoading || !props.query ? props : { ...props, data: liveData }
+      )}
+    </>
+  )
 }
 
 // TinaDataProvider can only manage one "request" object at a timee
