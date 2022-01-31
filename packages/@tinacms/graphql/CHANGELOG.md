@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.59.6
+
+### Patch Changes
+
+- b399c734c: Fixes support for collection.templates in graphql
+
 ## 0.59.5
 
 ### Patch Changes
