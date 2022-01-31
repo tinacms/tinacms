@@ -16,14 +16,15 @@ import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
 
-import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+import type { TinaCMS } from '@tinacms/toolkit'
+import { LocalWarning } from '@tinacms/toolkit'
 
 import GetCMS from '../components/GetCMS'
 import GetDocumentFields from '../components/GetDocumentFields'
 import GetDocument from '../components/GetDocument'
+import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
 import { PageWrapper } from '../components/Page'
-import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
 
 const updateDocument = async (
@@ -111,6 +112,7 @@ const RenderForm = ({
   return (
     <PageWrapper>
       <>
+        {cms?.api?.tina?.isLocalMode && <LocalWarning />}
         <div className="py-4 px-20 border-b border-gray-200 bg-white">
           <div className="max-w-form mx-auto">
             <div className="mb-2">

@@ -12,23 +12,24 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiExit, BiTrash } from 'react-icons/bi'
-import { useParams, Link } from 'react-router-dom'
+import { BiEdit, BiPlus, BiExit } from 'react-icons/bi'
+import { FiMoreVertical } from 'react-icons/fi'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
+import type { TinaCMS } from '@tinacms/toolkit'
+
+import type { Collection, Template } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import type { Collection, Template } from '../types'
 
-import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
-import { FiMoreVertical } from 'react-icons/fi'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
-      {({ open }) => (
+      {() => (
         <div>
           <div>
             <Menu.Button className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
@@ -72,6 +73,7 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
 
 const CollectionListPage = () => {
   const { collectionName } = useParams()
+  const navigate = useNavigate()
 
   return (
     <GetCMS>
@@ -97,7 +99,7 @@ const CollectionListPage = () => {
               return (
                 <PageWrapper>
                   <>
-                    <PageHeader>
+                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
                         <h3 className="text-2xl text-gray-700">
                           {collection.label}
@@ -122,32 +124,50 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
-                                // const documentRoute = routeMapping
-                                //   ? routeMapping.mapper(
-                                //       collection,
-                                //       document.node
-                                //     )
-                                //   : `${document.node.sys.filename}`
+                                const overrideRoute = routeMapping
+                                  ? routeMapping.mapper(
+                                      collection,
+                                      document.node
+                                    )
+                                  : undefined
                                 return (
                                   <tr
                                     key={`document-${document.node.sys.filename}`}
                                     className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
-                                      <Link
-                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
-                                        to={`${document.node.sys.filename}`}
-                                      >
-                                        <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                        <span>
-                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            Filename
+                                      {overrideRoute && (
+                                        <a
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                          href={`${overrideRoute}`}
+                                        >
+                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                          <span>
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Filename
+                                            </span>
+                                            <span className="h-5 leading-5 block whitespace-nowrap">
+                                              {document.node.sys.filename}
+                                            </span>
                                           </span>
-                                          <span className="h-5 leading-5 block whitespace-nowrap">
-                                            {document.node.sys.filename}
+                                        </a>
+                                      )}
+                                      {!overrideRoute && (
+                                        <Link
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                          to={`${document.node.sys.filename}`}
+                                        >
+                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                          <span>
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Filename
+                                            </span>
+                                            <span className="h-5 leading-5 block whitespace-nowrap">
+                                              {document.node.sys.filename}
+                                            </span>
                                           </span>
-                                        </span>
-                                      </Link>
+                                        </Link>
+                                      )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
@@ -172,16 +192,19 @@ const CollectionListPage = () => {
                                             label: 'Edit in Admin',
                                             icon: BiEdit,
                                             onClick: () => {
-                                              alert('edit thing')
+                                              navigate(
+                                                `${document.node.sys.filename}`,
+                                                { replace: true }
+                                              )
                                             },
                                           },
-                                          {
-                                            label: 'Delete',
-                                            icon: BiTrash,
-                                            onClick: () => {
-                                              alert('delete thing')
-                                            },
-                                          },
+                                          // {
+                                          //   label: 'Delete',
+                                          //   icon: BiTrash,
+                                          //   onClick: () => {
+                                          //     alert('delete thing')
+                                          //   },
+                                          // },
                                         ]}
                                       />
                                     </td>

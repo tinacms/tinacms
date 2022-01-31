@@ -13,10 +13,11 @@ limitations under the License.
 
 import React from 'react'
 import { useParams } from 'react-router-dom'
+import { LocalWarning } from '@tinacms/toolkit'
+import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
 
 import GetCMS from '../components/GetCMS'
 import { slugify } from '../components/Sidebar'
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
 
 const ScreenPage = () => {
   const { screenName } = useParams()
@@ -27,11 +28,13 @@ const ScreenPage = () => {
         const selectedScreen = screens.find(
           ({ name }) => slugify(name) === screenName
         )
-        console.log('selectedScreen', selectedScreen)
         return (
-          <div className="relative w-full h-full">
-            <selectedScreen.Component close={() => {}} />
-          </div>
+          <>
+            {cms?.api?.tina?.isLocalMode && <LocalWarning />}
+            <div className="relative w-full h-full">
+              <selectedScreen.Component close={() => {}} />
+            </div>
+          </>
         )
       }}
     </GetCMS>

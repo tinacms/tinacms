@@ -25,12 +25,17 @@ import { updateBodyDisplacement } from './Sidebar'
 import { FormModal } from '../../react-forms'
 import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '../../react-screens'
+import { LoadingDots } from '../../form-builder'
 
 interface NavProps {
   children?: any
   className?: string
   userName?: string
-  collections?: { label: string; name: string }[]
+  collectionsInfo: {
+    collections: { label: string; name: string }[]
+    loading: boolean
+    error: boolean
+  }
   contentCreators?: any
   screens?: ScreenPlugin[]
   sidebarWidth?: number
@@ -43,7 +48,7 @@ interface NavProps {
 export const Nav = ({
   className = '',
   children,
-  collections,
+  collectionsInfo,
   screens,
   contentCreators,
   sidebarWidth,
@@ -125,22 +130,13 @@ export const Nav = ({
       </div>
       {children}
       <div className="px-6 flex-1">
-        {collections.length > 0 && (
-          <>
-            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
-              Collections
-            </h4>
-            <ul className="flex flex-col gap-4">
-              {collections.map((collection) => {
-                return (
-                  <li key={`nav-collection-${collection.name}`}>
-                    <RenderNavCollection collection={collection} />
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        )}
+        <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+          Collections
+        </h4>
+        <CollectionsList
+          RenderNavCollection={RenderNavCollection}
+          {...collectionsInfo}
+        />
         {(screens.length > 0 || contentCreators.length) > 0 && (
           <>
             <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
@@ -165,6 +161,40 @@ export const Nav = ({
         )}
       </div>
     </div>
+  )
+}
+
+const CollectionsList = ({
+  collections,
+  loading,
+  error,
+  RenderNavCollection,
+}: {
+  collections: { label: string; name: string }[]
+  loading: boolean
+  error: boolean
+  RenderNavCollection: React.ComponentType<{
+    collection: { label: string; name: string }
+  }>
+}) => {
+  if (loading === true) {
+    return <LoadingDots color="var(--tina-color-primary)" />
+  }
+
+  if (collections.length === 0) {
+    return <div>No collections found</div>
+  }
+
+  return (
+    <ul className="flex flex-col gap-4">
+      {collections.map((collection) => {
+        return (
+          <li key={`nav-collection-${collection.name}`}>
+            <RenderNavCollection collection={collection} />
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 

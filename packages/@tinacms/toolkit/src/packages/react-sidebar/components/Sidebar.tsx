@@ -75,12 +75,24 @@ interface SidebarProps {
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
 const useFetchCollections = (cms) => {
-  const [collections, setCollections] = useState([])
+  const [info, setInfo] = useState<{
+    loading: boolean
+    error: boolean
+    collections: any[]
+  }>({
+    loading: true,
+    error: false,
+    collections: [],
+  })
 
   useEffect(() => {
     const fetchCollections = async () => {
       const response = await cms.api.admin.fetchCollections()
-      setCollections(response.getCollections)
+      setInfo({
+        loading: false,
+        error: false,
+        collections: response.getCollections,
+      })
     }
 
     if (cms.api.admin) {
@@ -88,12 +100,12 @@ const useFetchCollections = (cms) => {
     }
   }, [cms.api.admin])
 
-  return collections
+  return info
 }
 
 const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
   const cms = useCMS()
-  const collections = useFetchCollections(cms)
+  const collectionsInfo = useFetchCollections(cms)
 
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
@@ -179,7 +191,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
             <Nav
-              collections={collections}
+              collectionsInfo={collectionsInfo}
               screens={allScreens}
               contentCreators={contentCreators}
               sidebarWidth={sidebarWidth}
@@ -225,7 +237,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
               <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
                   className="rounded-r-md"
-                  collections={collections}
+                  collectionsInfo={collectionsInfo}
                   screens={allScreens}
                   contentCreators={contentCreators}
                   sidebarWidth={sidebarWidth}

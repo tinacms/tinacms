@@ -18,24 +18,32 @@ import type { Collection } from '../types'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [info, setInfo] = useState<{
+    collections: Collection[]
+    loading: boolean
+    error: boolean
+  }>({ collections: [], loading: true, error: false })
 
   useEffect(() => {
     const fetchCollections = async () => {
       const response = await api.fetchCollections()
-      setCollections(response.getCollections)
+      setInfo({
+        collections: response.getCollections,
+        loading: false,
+        error: false,
+      })
     }
 
     fetchCollections()
   }, [cms])
 
-  return collections
+  return info
 }
 
 const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
-  const collections = useGetCollections(cms)
+  const { collections, loading, error } = useGetCollections(cms)
   if (!collections) return null
-  return <>{children(collections)}</>
+  return <>{children(collections, loading, error)}</>
 }
 
 export default GetCollections
