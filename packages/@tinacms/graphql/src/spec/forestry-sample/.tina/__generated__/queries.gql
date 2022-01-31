@@ -76,6 +76,45 @@ query getPostList {
   }
 }
 
+query getStuffDocument($relativePath: String!) {
+  getStuffDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...StuffParts
+    }
+  }
+}
+
+query getStuffList {
+  getStuffList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...StuffParts
+        }
+      }
+    }
+  }
+}
+
 query getPageDocument($relativePath: String!) {
   getPageDocument(relativePath: $relativePath) {
     sys {

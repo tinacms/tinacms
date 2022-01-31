@@ -129,6 +129,28 @@ describe('TinaCMSProvider', () => {
         mockDocumentCreatorCallback
       )
     })
+
+    describe('with no query', () => {
+      it('doesnt overwrite data property', () => {
+        useTina.mockImplementationOnce(() => {
+          return { data: null, isLoading: false }
+        })
+        const request = {
+          query: undefined,
+          variables: undefined,
+          data: { foo: 'my-data' },
+        }
+        const { queryByText } = render(
+          <TinaCMSProvider2 {...request}>
+            {(liveProps) => <DummyChild {...liveProps} />}
+          </TinaCMSProvider2>
+        )
+
+        const text = queryByText(/my-data/)
+
+        expect(text).toBeInTheDocument()
+      })
+    })
   })
 
   describe('with ReactNode children', () => {

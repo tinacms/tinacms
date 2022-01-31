@@ -5,6 +5,7 @@
     "collections": [
       "author",
       "post",
+      "stuff",
       "page"
     ]
   },
@@ -81,5 +82,26 @@
     "type": "PageConnection",
     "resolveType": "collectionDocumentList",
     "collection": "page"
+  },
+  "Stuff": {
+    "type": "Stuff",
+    "resolveType": "unionData",
+    "typeMap": {
+      "template_1": "StuffTemplate_1",
+      "template_2": "StuffTemplate_2",
+      "template_3": "StuffTemplate_3"
+    }
+  },
+  "StuffDocument": {
+    "type": "StuffDocument",
+    "resolveType": "collectionDocument",
+    "collection": "stuff",
+    "createStuffDocument": "create",
+    "updateStuffDocument": "update"
+  },
+  "StuffConnection": {
+    "type": "StuffConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "stuff"
   }
 }

@@ -17,8 +17,6 @@ import { buildSchema, createDatabase } from '@tinacms/graphql'
 import {
   MemoryStore,
   FilesystemStore,
-  GithubStore,
-  GithubBridge,
   FilesystemBridge,
   LevelStore,
 } from '@tinacms/datalayer'

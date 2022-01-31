@@ -24,10 +24,10 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { Button } from '../../styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
-import { LeftArrowIcon } from '../../icons'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
+import { IoMdClose } from 'react-icons/io'
 
 export const FormsView = ({
   children,
@@ -190,17 +190,17 @@ export interface MultiformFormHeaderProps {
   setActiveFormId(id: string): void
 }
 
-export const MultiformFormHeader = styled(
-  ({
-    activeForm,
-    setActiveFormId,
-    ...styleProps
-  }: MultiformFormHeaderProps) => {
-    const cms = useCMS()
+export const MultiformFormHeader = ({
+  activeForm,
+  setActiveFormId,
+}: MultiformFormHeaderProps) => {
+  const cms = useCMS()
 
-    return (
+  return (
+    <div className="pt-18">
       <button
-        {...styleProps}
+        className={`relative group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
+   border-gray-100 px-6 -mt-px`}
         onClick={() => {
           const state = activeForm.finalForm.getState()
           if (state.invalid === true) {
@@ -211,56 +211,14 @@ export const MultiformFormHeader = styled(
           }
         }}
       >
-        <LeftArrowIcon />
-        <span>{activeForm.label}</span>
+        <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+          {activeForm.label}
+          <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+        </div>
       </button>
-    )
-  }
-)`
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  border: none;
-  background-image: none;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
-  font-size: var(--tina-font-size-5);
-  transition: color 250ms ease-out;
-  user-select: none;
-
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: left;
-  }
-
-  svg {
-    flex: 0 0 auto;
-    width: 24px;
-    fill: var(--tina-color-grey-3);
-    height: auto;
-    transform: translate3d(-4px, 0, 0);
-    transition: transform 150ms ease-out;
-  }
-
-  :hover,
-  :active {
-    color: var(--tina-color-primary);
-    outline: none;
-    border: none;
-
-    svg {
-      fill: var(--tina-color-grey-8);
-      transform: translate3d(-7px, 0, 0);
-      transition: transform var(--tina-timing-long) ease;
-    }
-  }
-`
+    </div>
+  )
+}
 
 export interface FormHeaderProps {
   activeForm: Form
