@@ -19,7 +19,6 @@ import prompts from 'prompts'
 import path from 'path'
 //@ts-ignore
 import { version, name } from '../package.json'
-import { getRepoInfo, downloadAndExtractRepo } from './util/examples'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
@@ -107,7 +106,7 @@ export const run = async () => {
       )}`
     )
   }
-  t.submitRecord({
+  await t.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
       example,

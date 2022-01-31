@@ -13,7 +13,7 @@ limitations under the License.
 
 import { BinaryLike, createHash } from 'crypto'
 import { getID } from './getId'
-import fetch from 'node-fetch'
+import fetch from 'isomorphic-fetch'
 import {
   getTinaVersion,
   getTinaCliVersion,
@@ -22,7 +22,9 @@ import {
 } from './getVersion'
 import { Events, MetricPayload } from '../interfaces'
 
-const TINA_METRICS_ENDPOINT = 'https://something.tinajs.dev/asdf/asdf'
+const TINA_METRICS_ENDPOINT = 'https://metrics.tina.io/record'
+// Use this for testing!
+const TINA_METRICS_ENDPOINT_DEV = 'https://metrics-stage.tinajs.dev/record'
 
 export class Telemetry {
   //   private config: Conf<Record<string, unknown>>
@@ -36,10 +38,6 @@ export class Telemetry {
   }
   private oneWayHash = (payload: BinaryLike): string => {
     const hash = createHash('sha256')
-
-    // Always prepend the payload value with salt. This ensures the hash is truly
-    // one-way.
-    // hash.update(this.salt)
 
     // Update is an append operation, not a replacement. The salt from the prior
     // update is still present!
@@ -77,12 +75,11 @@ export class Telemetry {
           },
         },
       }
-      console.log({ body })
-      // const res = await fetch(TINA_METRICS_ENDPOINT, {
-      //   method: 'POST',
-      //   body: JSON.stringify(body),
-      //   headers: { 'content-type': 'application/json' },
-      // })
+      await fetch(TINA_METRICS_ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: { 'content-type': 'application/json' },
+      })
     } catch (_e) {
       // If there is errors here it should not effect the user
     }
