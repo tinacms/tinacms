@@ -36,10 +36,14 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const screens = cms.plugins.getType<ScreenPlugin>('screen').all()
   return (
     <GetCollections cms={cms}>
-      {(collections: [Collection]) => (
+      {(collections: [Collection], loading: boolean, error: boolean) => (
         <Nav
           sidebarWidth={360}
-          collections={collections}
+          collectionsInfo={{
+            collections,
+            loading,
+            error,
+          }}
           screens={screens}
           contentCreators={[]}
           RenderNavSite={({ view }) => (

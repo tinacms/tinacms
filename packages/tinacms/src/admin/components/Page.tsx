@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
+import { LocalWarning } from '@tinacms/toolkit'
 
 export const PageWrapper = ({
   children,
@@ -26,19 +27,24 @@ export const PageWrapper = ({
 }
 
 export const PageHeader = ({
+  isLocalMode,
   children,
 }: {
+  isLocalMode?: boolean
   children: React.ReactChild | React.ReactChildren
 }) => (
-  <div className="bg-white pb-4 pt-18 border-b border-gray-200 px-12">
-    <div className="w-full mx-auto max-w-screen-xl">
-      <div className="w-full flex justify-between items-end">{children}</div>
+  <>
+    {isLocalMode && <LocalWarning />}
+    <div className="bg-white pb-4 pt-18 border-b border-gray-200 px-12">
+      <div className="w-full mx-auto max-w-screen-xl">
+        <div className="w-full flex justify-between items-end">{children}</div>
+      </div>
     </div>
-  </div>
+  </>
 )
 
 export const PageBody = ({
   children,
 }: {
   children: React.ReactChild | React.ReactChildren
-}) => <div className="py-10 shadow-inner px-12">{children}</div>
+}) => <div className="py-10 px-12">{children}</div>
