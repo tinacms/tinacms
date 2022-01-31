@@ -13,7 +13,7 @@ limitations under the License.
 
 import React, { Fragment } from 'react'
 import { BiEdit, BiPlus, BiExit, BiTrash } from 'react-icons/bi'
-import { useParams, useLocation, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
 import GetCMS from '../components/GetCMS'
@@ -51,7 +51,7 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
                   <Menu.Item key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
-                        to={`${location.pathname}/${template.name}/new`}
+                        to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
                           active && 'text-gray-800 opacity-100'
                         }`}
@@ -71,7 +71,6 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
 }
 
 const CollectionListPage = () => {
-  const location = useLocation()
   const { collectionName } = useParams()
 
   return (
@@ -105,7 +104,7 @@ const CollectionListPage = () => {
                         </h3>
                         {!collection.templates && (
                           <Link
-                            to={`${location.pathname}/new`}
+                            to={`new`}
                             className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
                           >
                             Create New{' '}
