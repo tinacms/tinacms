@@ -34,7 +34,7 @@ import chalk from 'chalk'
  */
 function execShellCommand(cmd): Promise<string> {
   const exec = require('child_process').exec
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
         console.warn(error)
@@ -46,7 +46,7 @@ function execShellCommand(cmd): Promise<string> {
 
 export async function initTina(ctx: any, next: () => void, options) {
   const t = new Telemetry({ disabled: options.noTelemetry })
-  t.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
+  await t.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
   logger.info(successText('Setting up Tina...'))
   next()
 }
@@ -187,7 +187,6 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
 }
 
 export async function successMessage(ctx: any, next: () => void, options) {
-  const baseDir = process.cwd()
   logger.info(`Tina setup ${chalk.underline.green('done')}  ✅
 \t Start your dev server with ${successText(
     `yarn tina-dev`

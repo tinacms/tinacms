@@ -29,7 +29,7 @@ const rootPath = process.cwd()
 
 export const audit = async (ctx: any, next: () => void, options) => {
   const t = new Telemetry({ disabled: options.noTelemetry })
-  t.submitRecord({
+  await t.submitRecord({
     event: {
       name: 'tinacms:audit:invoke',
       clean: Boolean(options.clean),
