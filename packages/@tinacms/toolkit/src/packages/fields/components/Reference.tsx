@@ -22,6 +22,7 @@ import { BiEdit } from 'react-icons/bi'
 import { useCMS } from '../../../react-tinacms/use-cms'
 import { TinaCMS } from '../../../tina-cms'
 import { selectFieldClasses } from './Select'
+import { MdKeyboardArrowDown } from 'react-icons/md'
 
 type Option = {
   value: string
@@ -96,19 +97,22 @@ export const Reference: React.FC<ReferenceProps> = ({
   const selectOptions = options || field.options
   return (
     <div>
-      <select
-        id={input.name}
-        value={input.value}
-        onChange={input.onChange}
-        className={selectFieldClasses}
-        {...input}
-      >
-        {selectOptions ? (
-          selectOptions.map(toProps).map(toComponent)
-        ) : (
-          <option>{input.value}</option>
-        )}
-      </select>
+      <div className="relative group">
+        <select
+          id={input.name}
+          value={input.value}
+          onChange={input.onChange}
+          className={selectFieldClasses}
+          {...input}
+        >
+          {selectOptions ? (
+            selectOptions.map(toProps).map(toComponent)
+          ) : (
+            <option>{input.value}</option>
+          )}
+        </select>
+        <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out" />
+      </div>
       {hasTinaAdmin && (
         <GetReference cms={cms} id={input.value}>
           {(document) => (
