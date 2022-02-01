@@ -59,7 +59,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-4xl font-semibold'
+          'text-4xl font-medium'
         )}
         {...attributes}
         {...props}
@@ -71,7 +71,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-3xl font-semibold'
+          'text-3xl font-medium'
         )}
         {...attributes}
         {...props}
