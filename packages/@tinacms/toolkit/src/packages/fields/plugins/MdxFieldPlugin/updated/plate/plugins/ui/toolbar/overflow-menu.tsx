@@ -74,7 +74,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
                   toolbarItem.active
                     ? 'bg-gray-50 text-blue-500'
                     : 'bg-white text-gray-600',
-                  'hover:bg-gray-50 hover:text-blue-500 pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
+                  'hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
                 )}
               >
                 <div className="mr-2 opacity-80">
