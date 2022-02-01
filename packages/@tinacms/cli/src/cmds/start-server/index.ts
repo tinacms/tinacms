@@ -25,6 +25,7 @@ import { compile, resetGeneratedFolder } from '../compile'
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
+import { Telemetry } from '@tinacms/metrics'
 
 interface Options {
   port?: number
@@ -32,6 +33,7 @@ interface Options {
   experimentalData?: boolean
   noWatch?: boolean
   noSDK: boolean
+  noTelemetry: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -39,9 +41,22 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, noWatch, experimentalData, noSDK }: Options
+  {
+    port = 4001,
+    command,
+    noWatch,
+    experimentalData,
+    noSDK,
+    noTelemetry,
+  }: Options
 ) {
   const rootPath = process.cwd()
+  const t = new Telemetry({ disabled: Boolean(noTelemetry) })
+  t.submitRecord({
+    event: {
+      name: 'tinacms:cli:server:start:invoke',
+    },
+  })
 
   /**
    * To work with Github directly, replace the Bridge and Store
@@ -130,6 +145,12 @@ stack: ${code.stack || 'No stack was provided'}`)
                 'Compilation failed with errors. Server has not been restarted.'
               ) + ` see error below \n ${e.message}`
             )
+            t.submitRecord({
+              event: {
+                name: 'tinacms:cli:server:error',
+                errorMessage: e.message,
+              },
+            })
           }
         }
       })

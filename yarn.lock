@@ -4603,6 +4603,7 @@ __metadata:
     "@graphql-tools/load": ^7.3.2
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
+    "@tinacms/metrics": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
@@ -4756,6 +4757,22 @@ __metadata:
     vfile: ^4.2.0
     ws: ^7.3.1
     yup: ^0.32.9
+  languageName: unknown
+  linkType: soft
+
+"@tinacms/metrics@workspace:*, @tinacms/metrics@workspace:packages/@tinacms/metrics":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/metrics@workspace:packages/@tinacms/metrics"
+  dependencies:
+    "@tinacms/scripts": "workspace:*"
+    "@types/fs-extra": ^9.0.11
+    "@types/isomorphic-fetch": ^0.0.35
+    fs-extra: ^9.0.1
+    isomorphic-fetch: ^3.0.0
+    jest: ^27.0.6
+    typescript: ^4.3.5
+  peerDependencies:
+    fs-extra: ^9.0.1
   languageName: unknown
   linkType: soft
 
@@ -5244,6 +5261,13 @@ __metadata:
   version: 0.1.5
   resolution: "@types/is-hotkey@npm:0.1.5"
   checksum: 4f85f115640097f503146fe031049c75e33557938792353363a0a6c67a65ec7db959392ffe8ed7340b3a3e3dca463d84a6e8c7149982abf209ecc9d45916ef0c
+  languageName: node
+  linkType: hard
+
+"@types/isomorphic-fetch@npm:^0.0.35":
+  version: 0.0.35
+  resolution: "@types/isomorphic-fetch@npm:0.0.35"
+  checksum: a9806f9618e860b7b8b37b8b283ca67ef81bc67fb6110c87d06684fe256d81b2e4ef395852c6b7804014c7c7023fddf42112a7868bf71a5d13d84d44e67b08ed
   languageName: node
   linkType: hard
 
@@ -11647,6 +11671,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
+    "@tinacms/metrics": "workspace:*"
     "@types/fs-extra": ^9.0.13
     "@types/node": ^16.11.7
     "@types/prompts": ^2.0.14
@@ -17800,6 +17825,16 @@ fsevents@~2.1.2:
     node-fetch: ^1.0.1
     whatwg-fetch: ">=0.10.0"
   checksum: a4174e332ae98fc93269162f1d8a3ee1f7255257d4eaeea5145d4068f64ac2dbff7e7f681889097238e1e009f7a74ba1a23ffd8ed967402777a32cca96204508
+  languageName: node
+  linkType: hard
+
+"isomorphic-fetch@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "isomorphic-fetch@npm:3.0.0"
+  dependencies:
+    node-fetch: ^2.6.1
+    whatwg-fetch: ^3.4.1
+  checksum: 999c2845d440a6d53755d7954af40e55b38a25140a81f782aced55d56698f05aae8a0528ba6fd5630cc1040ecbf330c9858340a63b25645c0f81fa2f057fd0bb
   languageName: node
   linkType: hard
 
@@ -30628,7 +30663,7 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-"whatwg-fetch@npm:>=0.10.0":
+"whatwg-fetch@npm:>=0.10.0, whatwg-fetch@npm:^3.4.1":
   version: 3.6.2
   resolution: "whatwg-fetch@npm:3.6.2"
   checksum: eaa370015f81fbf7fc69d5410a13c2200d3342fa783397e9a7e64215498276459993c05e826ed736d28a8abe4e7cc3f97e9b2ffadbc58129a55f443abdfea494
