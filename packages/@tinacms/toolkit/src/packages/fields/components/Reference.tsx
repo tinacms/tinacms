@@ -119,7 +119,7 @@ export const Reference: React.FC<ReferenceProps> = ({
               className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
             >
               <BiEdit className="h-5 w-auto opacity-80 mr-2" />
-              Edit in Tina Admin
+              Edit in Admin
             </a>
           )}
         </GetReference>
