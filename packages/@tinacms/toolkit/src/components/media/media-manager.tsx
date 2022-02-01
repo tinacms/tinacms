@@ -301,7 +301,7 @@ const LoadingMediaList = (props) => {
 
 const MediaPickerWrap = ({ children }) => {
   return (
-    <div className="h-full overflow-y-auto text-gray-700 flex flex-col relative bg-gray-50 outline-none active:outline-none focus:outline-none">
+    <div className="h-full flex-1 text-gray-700 flex flex-col relative bg-gray-50 outline-none active:outline-none focus:outline-none">
       {children}
     </div>
   )
