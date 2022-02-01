@@ -63,15 +63,13 @@ export class Telemetry {
           anonymousId: id,
           event: event.name,
           properties: {
-            event,
-            system: {
-              nodeVersion: process.version,
-              tinaCliVersion: getTinaCliVersion(),
-              tinaVersion: getTinaVersion(),
-              yarnVersion: getYarnVersion(),
-              npmVersion: getNpmVersion(),
-              CI: Boolean(process.env.CI),
-            },
+            ...event,
+            nodeVersion: process.version,
+            tinaCliVersion: getTinaCliVersion(),
+            tinaVersion: getTinaVersion(),
+            yarnVersion: getYarnVersion(),
+            npmVersion: getNpmVersion(),
+            CI: Boolean(process.env.CI),
           },
         },
       }
