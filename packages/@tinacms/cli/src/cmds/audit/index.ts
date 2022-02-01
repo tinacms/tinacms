@@ -31,7 +31,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const telemetry = new Telemetry({ disabled: options.noTelemetry })
   await telemetry.submitRecord({
     event: {
-      name: 'tinacms:cli:audit:invokee',
+      name: 'tinacms:cli:audit:invoke',
       clean: Boolean(options.clean),
       useDefaults: Boolean(options.useDefaultValues),
     },
