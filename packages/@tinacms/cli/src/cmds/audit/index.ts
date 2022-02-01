@@ -23,10 +23,19 @@ import { auditCollection, auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
+import { Telemetry } from '@tinacms/metrics'
 
 const rootPath = process.cwd()
 
 export const audit = async (ctx: any, next: () => void, options) => {
+  const telemetry = new Telemetry({ disabled: options.noTelemetry })
+  await telemetry.submitRecord({
+    event: {
+      name: 'tinacms:cli:audit:invoke',
+      clean: Boolean(options.clean),
+      useDefaults: Boolean(options.useDefaultValues),
+    },
+  })
   if (options.clean) {
     logger.info(
       `You are using the \`--clean\` option. This will modify your content as if a user is submitting a form. Before running this you should have a ${chalk.bold(
@@ -50,6 +59,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
       )
     )
   }
+
   const bridge = options.clean
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
