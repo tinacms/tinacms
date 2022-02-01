@@ -14,6 +14,7 @@ import fs, { readFileSync, writeFileSync, outputFileSync } from 'fs-extra'
 import p from 'path'
 import Progress from 'progress'
 import prompts from 'prompts'
+import { Telemetry } from '@tinacms/metrics'
 
 import {
   successText,
@@ -33,7 +34,7 @@ import chalk from 'chalk'
  */
 function execShellCommand(cmd): Promise<string> {
   const exec = require('child_process').exec
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
         console.warn(error)
@@ -44,6 +45,8 @@ function execShellCommand(cmd): Promise<string> {
 }
 
 export async function initTina(ctx: any, next: () => void, options) {
+  const telemetry = new Telemetry({ disabled: options.noTelemetry })
+  await telemetry.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
   logger.info(successText('Setting up Tina...'))
   next()
 }
@@ -184,7 +187,6 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
 }
 
 export async function successMessage(ctx: any, next: () => void, options) {
-  const baseDir = process.cwd()
   logger.info(`Tina setup ${chalk.underline.green('done')}  ✅
 \t Start your dev server with ${successText(
     `yarn tina-dev`

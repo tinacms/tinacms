@@ -58,6 +58,10 @@ const useDefaultValuesOption = {
   description:
     'Adds default values to the graphQL mutation so that default values can be filled into existing documents (useful for adding a field with `required: true`)',
 }
+const noTelemetryOption = {
+  name: '--noTelemetry',
+  description: 'Disable anonymous telemetry that is collected',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -69,25 +73,26 @@ export const baseCmds: Command[] = [
       experimentalDatalayer,
       noWatchOption,
       noSDKCodegenOption,
+      noTelemetryOption,
     ],
     action: (options) => chain([startServer], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer],
+    options: [experimentalDatalayer, noTelemetryOption],
     action: (options) => chain([compile], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [experimentalDatalayer, noSDKCodegenOption],
+    options: [experimentalDatalayer, noSDKCodegenOption, noTelemetryOption],
     action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
-    options: [experimentalDatalayer],
+    options: [experimentalDatalayer, noTelemetryOption],
     description: 'Add Tina Cloud to an existing project',
     action: (options) =>
       chain(
@@ -107,7 +112,7 @@ export const baseCmds: Command[] = [
       ),
   },
   {
-    options: [cleanOption, useDefaultValuesOption],
+    options: [cleanOption, useDefaultValuesOption, noTelemetryOption],
     command: AUDIT,
     description: 'Audit your schema and the files to check for errors',
     action: (options) =>
