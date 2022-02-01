@@ -54,11 +54,11 @@ import type { MdxTemplate } from '../../../types'
 const headers = [
   {
     name: ELEMENT_H1,
-    render: <h1 className="my-0 text-4xl font-semibold">Heading 1</h1>,
+    render: <h1 className="my-0 text-4xl font-medium">Heading 1</h1>,
   },
   {
     name: ELEMENT_H2,
-    render: <h2 className="my-0 text-3xl font-semibold">Heading 2</h2>,
+    render: <h2 className="my-0 text-3xl font-medium">Heading 2</h2>,
   },
   {
     name: ELEMENT_H3,
