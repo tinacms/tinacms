@@ -17,9 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
 import { Form } from '../../forms'
-import { RightArrowIcon } from '../../icons'
+import { BiPencil } from 'react-icons/bi'
 
 export interface FormsListProps {
   forms: Form[]
@@ -27,20 +26,24 @@ export interface FormsListProps {
   isEditing: Boolean
 }
 
-export const FormList = ({
-  forms,
-  setActiveFormId,
-  isEditing,
-}: FormsListProps) => {
+export const FormList = ({ forms, setActiveFormId }: FormsListProps) => {
   return (
-    <StyledFormList isEditing={isEditing}>
-      {forms.sort(byId).map((form) => (
-        <FormListItem key={form.id} onClick={() => setActiveFormId(form.id)}>
-          <span>{form.label}</span>
-          <RightArrowIcon />
-        </FormListItem>
+    <ul className="pt-16">
+      {forms.sort(byId).map((form, index) => (
+        <li key={form.id} className={`relative px-6 py-2`}>
+          <button
+            onClick={() => setActiveFormId(form.id)}
+            className="w-full h-full bg-transparent border-none text-lg text-gray-700 hover:text-blue-500 transition-all ease-out duration-150 flex items-center gap-2 p-1 m-0"
+          >
+            <BiPencil className="opacity-70 w-5 h-auto fill-current" />
+            {form.label}
+          </button>
+          {index !== forms.length - 1 && (
+            <hr className="absolute bottom-0 left-0 border-t border-gray-100 w-full" />
+          )}
+        </li>
       ))}
-    </StyledFormList>
+    </ul>
   )
 }
 
@@ -53,93 +56,3 @@ const byId = (b: Form, a: Form) => {
   }
   return 0
 }
-
-const FormListItem = styled.li`
-  position: relative;
-  font-size: var(--tina-font-size-6);
-  line-height: 1.2;
-  position: relative;
-  padding: var(--tina-padding-big);
-  margin: 0;
-  color: var(--tina-color-grey-8);
-  font-weight: normal;
-  transition: color 150ms ease-out;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  user-select: none;
-  svg {
-    width: 28px;
-    fill: var(--tina-color-grey-3);
-    margin-top: -1px;
-    height: auto;
-    transform: translate3d(0, 0, 0);
-    transition: transform 250ms ease-out;
-  }
-  &:after {
-    content: '';
-    display: block;
-    width: 100%;
-    background-color: var(--tina-color-grey-2);
-    height: 1px;
-    position: absolute;
-    bottom: 0;
-    left: var(--tina-padding-big);
-    transform-origin: 0 0;
-    transform: scale3d(0.15, 1, 1) translate3d(0, 0, 0);
-    transition: all 250ms ease-out;
-  }
-  &:hover {
-    color: var(--tina-color-primary);
-    svg {
-      transform: translate3d(3px, 0, 0);
-      transition: transform 250ms ease;
-      fill: var(--tina-color-grey-8);
-    }
-    &:after {
-      transform: scale3d(1, 1, 1)
-        translate3d(calc(var(--tina-padding-big) * -1), 0, 0);
-    }
-  }
-`
-
-const slideIn = keyframes`
-  from {
-    transform: translate3d(-100%,0,0);
-    opacity: 0;
-  }
-
-  to {
-    transform: translate3d(0,0,0);
-    opacity: 1;
-  }
-`
-
-function slideInMixin(i: number) {
-  return `
-    &:nth-child(${i + 1}) {
-      animation-delay: ${25 * i}ms;
-    }
-  `
-}
-
-function staggerSlideIn() {
-  let animationCss = ''
-  for (let index = 0; index < 15; index += 1) {
-    animationCss += slideInMixin(index)
-  }
-  return animationCss
-}
-
-const StyledFormList = styled.ul<{ isEditing: Boolean }>`
-  padding: var(--tina-padding-big);
-  cursor: pointer;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  ${FormListItem} {
-    animation: ${slideIn} 150ms ease-out both 1;
-    ${staggerSlideIn()}
-  }
-`

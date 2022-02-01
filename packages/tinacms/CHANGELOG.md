@@ -1,5 +1,16 @@
 # tinacms
 
+## 0.66.0
+
+### Minor Changes
+
+- d6f46a9f9: fix: When passing in queries into the root TinaCMS container, don't overwrite the data prop on an empty query
+
+### Patch Changes
+
+- Updated dependencies [37286858e]
+  - @tinacms/toolkit@0.56.10
+
 ## 0.65.3
 
 ### Patch Changes
