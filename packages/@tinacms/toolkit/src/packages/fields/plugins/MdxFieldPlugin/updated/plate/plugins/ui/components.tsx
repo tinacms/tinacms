@@ -55,28 +55,48 @@ export const components = () => {
   return {
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-4xl font-semibold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
       <h2
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-3xl font-semibold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
       <h3
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-2xl font-semibold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
       <h4
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-xl font-bold'
+        )}
         {...attributes}
         {...props}
       />
@@ -88,7 +108,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-[13px] font-semibold'
+          'text-lg font-bold'
         )}
         {...attributes}
         {...props}
@@ -100,7 +120,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-[12px] font-semibold'
+          'text-base font-bold'
         )}
         {...attributes}
         {...props}
@@ -114,7 +134,7 @@ export const components = () => {
       ...props
     }) => (
       <p
-        className={classNames(blockClasses, className)}
+        className={classNames(blockClasses, className, `text-base font-normal`)}
         {...attributes}
         {...props}
       />
