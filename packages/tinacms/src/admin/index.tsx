@@ -98,7 +98,7 @@ export const TinaAdmin = () => {
         } else {
           return (
             <Layout>
-              <Router>
+              <Router basename={'/admin'}>
                 <Routes>
                   <Route path="logout" element={<LogoutPage />} />
                   <Route path="/" element={<Redirect />} />
