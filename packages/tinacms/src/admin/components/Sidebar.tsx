@@ -39,6 +39,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
       {(collections: [Collection], loading: boolean, error: boolean) => (
         <Nav
           sidebarWidth={360}
+          showCollections={true}
           collectionsInfo={{
             collections,
             loading,

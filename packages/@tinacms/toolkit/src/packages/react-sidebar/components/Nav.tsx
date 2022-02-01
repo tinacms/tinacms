@@ -31,6 +31,7 @@ interface NavProps {
   children?: any
   className?: string
   userName?: string
+  showCollections: boolean
   collectionsInfo: {
     collections: { label: string; name: string }[]
     loading: boolean
@@ -48,6 +49,7 @@ interface NavProps {
 export const Nav = ({
   className = '',
   children,
+  showCollections,
   collectionsInfo,
   screens,
   contentCreators,
@@ -130,13 +132,17 @@ export const Nav = ({
       </div>
       {children}
       <div className="px-6 flex-1">
-        <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
-          Collections
-        </h4>
-        <CollectionsList
-          RenderNavCollection={RenderNavCollection}
-          {...collectionsInfo}
-        />
+        {showCollections && (
+          <>
+            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+              Collections
+            </h4>
+            <CollectionsList
+              RenderNavCollection={RenderNavCollection}
+              {...collectionsInfo}
+            />
+          </>
+        )}
         {(screens.length > 0 || contentCreators.length) > 0 && (
           <>
             <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">

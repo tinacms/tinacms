@@ -191,6 +191,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
             <Nav
+              showCollections={cms.flags.get('tina-admin')}
               collectionsInfo={collectionsInfo}
               screens={allScreens}
               contentCreators={contentCreators}
@@ -237,6 +238,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
               <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
                   className="rounded-r-md"
+                  showCollections={cms.flags.get('tina-admin')}
                   collectionsInfo={collectionsInfo}
                   screens={allScreens}
                   contentCreators={contentCreators}
