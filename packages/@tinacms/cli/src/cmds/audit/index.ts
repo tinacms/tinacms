@@ -28,10 +28,10 @@ import { Telemetry } from '@tinacms/metrics'
 const rootPath = process.cwd()
 
 export const audit = async (ctx: any, next: () => void, options) => {
-  const t = new Telemetry({ disabled: options.noTelemetry })
-  await t.submitRecord({
+  const telemetry = new Telemetry({ disabled: options.noTelemetry })
+  await telemetry.submitRecord({
     event: {
-      name: 'tinacms:audit:invoke',
+      name: 'tinacms:cli:audit:invokee',
       clean: Boolean(options.clean),
       useDefaults: Boolean(options.useDefaultValues),
     },

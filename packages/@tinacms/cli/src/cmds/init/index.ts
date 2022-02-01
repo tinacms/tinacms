@@ -45,8 +45,8 @@ function execShellCommand(cmd): Promise<string> {
 }
 
 export async function initTina(ctx: any, next: () => void, options) {
-  const t = new Telemetry({ disabled: options.noTelemetry })
-  await t.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
+  const telemetry = new Telemetry({ disabled: options.noTelemetry })
+  await telemetry.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
   logger.info(successText('Setting up Tina...'))
   next()
 }
