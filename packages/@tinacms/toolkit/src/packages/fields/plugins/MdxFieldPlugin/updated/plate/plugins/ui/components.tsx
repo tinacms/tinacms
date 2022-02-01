@@ -81,16 +81,27 @@ export const components = () => {
         {...props}
       />
     ),
+    /** Tailwind prose doesn't style h5 and h6 elements */
     [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
       <h5
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-[13px] font-semibold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
       <h6
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-[12px] font-semibold'
+        )}
         {...attributes}
         {...props}
       />
