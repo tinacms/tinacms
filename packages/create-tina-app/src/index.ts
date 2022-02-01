@@ -45,7 +45,7 @@ export const run = async () => {
   if (opts.dir) {
     process.chdir(opts.dir)
   }
-  const t = new Telemetry({ disabled: opts?.noTelemetry })
+  const telemetry = new Telemetry({ disabled: opts?.noTelemetry })
 
   let example = opts.example
 
@@ -106,7 +106,7 @@ export const run = async () => {
       )}`
     )
   }
-  await t.submitRecord({
+  await telemetry.submitRecord({
     event: {
       name: 'create-tina-app:invoke',
       example,

@@ -22,7 +22,7 @@ export interface CreateTinaAppInvoke extends EventsBase {
 }
 
 export interface TinaCMSAuditInvoke extends EventsBase {
-  name: 'tinacms:audit:invoke'
+  name: 'tinacms:cli:audit:invoke'
   clean: boolean
   useDefaults: boolean
 }
