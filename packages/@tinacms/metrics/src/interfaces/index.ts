@@ -46,21 +46,25 @@ export type Events =
   | TinaCMSServerStartInvoke
   | TinaCMSServerError
 
+type Merge<A, B> = {
+  [K in keyof A]: K extends keyof B ? B[K] : A[K]
+} & B extends infer O
+  ? { [K in keyof O]: O[K] }
+  : never
+
+type EventBaseProperties = {
+  nodeVersion: string
+  tinaCliVersion: string
+  tinaVersion: string
+  yarnVersion: string
+  npmVersion: string
+  CI: boolean
+}
 export interface MetricPayload {
   partitionKey: string
   data: {
     anonymousId: string
     event: Events['name']
-    properties: {
-      event: Events
-      system: {
-        nodeVersion: string
-        tinaCliVersion: string
-        tinaVersion: string
-        yarnVersion: string
-        npmVersion: string
-        CI: boolean
-      }
-    }
+    properties: Merge<Events, EventBaseProperties>
   }
 }
