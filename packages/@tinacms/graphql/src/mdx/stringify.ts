@@ -174,7 +174,7 @@ export const stringify = (
         spread: false,
         check: null,
         children: [
-          stringify(p, field),
+          ...stringifyChildren([p], field),
           ...stringifyChildren(extraChildren, field),
         ],
       }
@@ -199,15 +199,13 @@ export const stringify = (
         type: 'link',
         url: node.url,
         children: node.children.map((child) =>
-          stringify(child, field)
+          stringifyChildren([child], field)
         ) as StaticPhrasingContent[],
       }
     case plateElements.ELEMENT_BLOCKQUOTE:
       return {
         type: 'blockquote',
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as StaticPhrasingContent[],
+        children: stringifyChildren(node.children, field),
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
@@ -392,15 +390,7 @@ export const stringify = (
                 }
                 break
               case 'rich-text':
-                const tree = value.children
-                  .map((item) => stringify(item, field))
-                  .filter((item) => {
-                    if (item.type === 'text' && !item.text) {
-                      return false
-                    }
-
-                    return true
-                  })
+                const tree = stringifyChildren(value.children, field)
                 if (field.name === 'children') {
                   children = tree
                 } else {
