@@ -30,7 +30,7 @@ export const useGetDocumentFields = (
   collectionName: string,
   templateName: string
 ) => {
-  const api = new TinaAdminApi(cms.api.tina)
+  const api = new TinaAdminApi(cms)
   const [info, setInfo] = useState<Info>({
     collection: undefined,
     template: undefined,

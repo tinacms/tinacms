@@ -25,9 +25,35 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
   export default TinaAdmin;
   ```
 
-3. Run `yarn dev`
+3. Set the `tina-admin` flag to `true` inside the `cmsCallback` in `pages/_app.tsx`:
+  ```tsx
+  const App = ({ Component, pageProps }) => {
+    return (
+      <>
+        <TinaEditProvider
+          ...
+          editMode={
+            <TinaCMS
+              ...
+              cmsCallback={(cms) => {
+  +             cms.flags.set("tina-admin", true);
+              }}
+              ...
+            >
+              ...
+            </TinaCMS>
+          }
+        >
+          ...
+        </TinaEditProvider>
+      </>
+    );
+  };
+  ```
 
-4. Visit `http://localhost:3000/admin` 👍
+4. Run `yarn dev`
+
+5. Visit `http://localhost:3000/admin` 👍
 
 ### From an existing TinaCMS-powered site
 
@@ -46,9 +72,35 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
   export default TinaAdmin;
   ``` 
 
-3. Run `yarn dev`
+3. Set the `tina-admin` flag to `true` inside the `cmsCallback` in `pages/_app.tsx`:
+  ```tsx
+  const App = ({ Component, pageProps }) => {
+    return (
+      <>
+        <TinaEditProvider
+          ...
+          editMode={
+            <TinaCMS
+              ...
+              cmsCallback={(cms) => {
+  +             cms.flags.set("tina-admin", true);
+              }}
+              ...
+            >
+              ...
+            </TinaCMS>
+          }
+        >
+          ...
+        </TinaEditProvider>
+      </>
+    );
+  };
+  ```
 
-4. Visit `http://localhost:3000/admin` 👍
+4. Run `yarn dev`
+
+5. Visit `http://localhost:3000/admin` 👍
 
 ## Want More?
 
@@ -130,42 +182,6 @@ const App = ({ Component, pageProps }) => {
   );
 };
 ```
-
-### Enable the `tina-admin` flag
-
-We are hard at work implementing ways for `TinaAdmin` and the `TinaCMS` Sidebar Experience to work together.  Right now, we've hidden those changes behind a `flag` to prevent unwanted side effects in the Sidebar Experience.
-
-However, if you'd like to see those features firsthand, you can enable the `tina-admin` flag within the `cmsCallback` inside your `_app.tsx`:
-
-```tsx
-/**
- * Inside _app.tsx
- **/
-const App = ({ Component, pageProps }) => {
-  return (
-    <>
-      <TinaEditProvider
-        ...
-        editMode={
-          <TinaCMS
-            ...
-            cmsCallback={(cms) => {
-+             cms.flags.set("tina-admin", true);
-            }}
-            ...
-          >
-            ...
-          </TinaCMS>
-        }
-      >
-        ...
-      </TinaEditProvider>
-    </>
-  );
-};
-```
-
-With this `flag` enabled, you'll see links to `TinaAdmin` within the `TinaCMS` Sidebar when visiting a document, choosing a `reference` value, or viewing the `Global` menu.
 
 ## Important Details
 

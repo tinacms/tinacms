@@ -1,13 +1,11 @@
 {
   "version": {
-    "fullVersion": "0.59.4",
+    "fullVersion": "0.59.6",
     "major": "0",
     "minor": "59",
-    "patch": "4"
+    "patch": "6"
   },
-  "meta": {
-    "flags": ["experimentalData"]
-  },
+  "meta": {},
   "collections": [
     {
       "label": "Blog Posts",
@@ -29,11 +27,24 @@
                   "name": "format",
                   "label": "Format",
                   "type": "string",
-                  "options": ["utc", "iso", "local"],
-                  "namespace": ["posts", "_body", "DateTime", "format"]
+                  "options": [
+                    "utc",
+                    "iso",
+                    "local"
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "DateTime",
+                    "format"
+                  ]
                 }
               ],
-              "namespace": ["posts", "_body", "DateTime"]
+              "namespace": [
+                "posts",
+                "_body",
+                "DateTime"
+              ]
             },
             {
               "name": "BlockQuote",
@@ -43,16 +54,30 @@
                   "name": "children",
                   "label": "Quote",
                   "type": "rich-text",
-                  "namespace": ["posts", "_body", "BlockQuote", "children"]
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "children"
+                  ]
                 },
                 {
                   "name": "authorName",
                   "label": "Author",
                   "type": "string",
-                  "namespace": ["posts", "_body", "BlockQuote", "authorName"]
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "authorName"
+                  ]
                 }
               ],
-              "namespace": ["posts", "_body", "BlockQuote"]
+              "namespace": [
+                "posts",
+                "_body",
+                "BlockQuote"
+              ]
             },
             {
               "name": "NewsletterSignup",
@@ -109,24 +134,39 @@
                   "buttonText": "Notify Me"
                 }
               },
-              "namespace": ["posts", "_body", "NewsletterSignup"]
+              "namespace": [
+                "posts",
+                "_body",
+                "NewsletterSignup"
+              ]
             }
           ],
           "isBody": true,
-          "namespace": ["posts", "_body"]
+          "namespace": [
+            "posts",
+            "_body"
+          ]
         },
         {
           "type": "string",
           "label": "Title",
           "name": "title",
-          "namespace": ["posts", "title"]
+          "namespace": [
+            "posts",
+            "title"
+          ]
         },
         {
           "type": "reference",
           "label": "Author",
           "name": "author",
-          "collections": ["authors"],
-          "namespace": ["posts", "author"]
+          "collections": [
+            "authors"
+          ],
+          "namespace": [
+            "posts",
+            "author"
+          ]
         },
         {
           "type": "datetime",
@@ -136,13 +176,19 @@
             "dateFormat": "MMMM DD YYYY",
             "timeFormat": "hh:mm A"
           },
-          "namespace": ["posts", "date"]
+          "namespace": [
+            "posts",
+            "date"
+          ]
         },
         {
           "type": "image",
           "name": "heroImg",
           "label": "Hero Image",
-          "namespace": ["posts", "heroImg"]
+          "namespace": [
+            "posts",
+            "heroImg"
+          ]
         },
         {
           "type": "string",
@@ -151,10 +197,15 @@
             "component": "textarea"
           },
           "name": "excerpt",
-          "namespace": ["posts", "excerpt"]
+          "namespace": [
+            "posts",
+            "excerpt"
+          ]
         }
       ],
-      "namespace": ["posts"]
+      "namespace": [
+        "posts"
+      ]
     },
     {
       "label": "Global",
@@ -214,7 +265,12 @@
                       "value": "yellow"
                     }
                   ],
-                  "namespace": ["global", "header", "icon", "color"]
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "color"
+                  ]
                 },
                 {
                   "name": "style",
@@ -230,7 +286,12 @@
                       "value": "float"
                     }
                   ],
-                  "namespace": ["global", "header", "icon", "style"]
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "style"
+                  ]
                 },
                 {
                   "type": "string",
@@ -322,10 +383,19 @@
                       "value": "tina"
                     }
                   ],
-                  "namespace": ["global", "header", "icon", "name"]
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "name"
+                  ]
                 }
               ],
-              "namespace": ["global", "header", "icon"]
+              "namespace": [
+                "global",
+                "header",
+                "icon"
+              ]
             },
             {
               "type": "string",
@@ -341,7 +411,11 @@
                   "value": "primary"
                 }
               ],
-              "namespace": ["global", "header", "color"]
+              "namespace": [
+                "global",
+                "header",
+                "color"
+              ]
             },
             {
               "type": "object",
@@ -359,19 +433,36 @@
                   "type": "string",
                   "label": "Link",
                   "name": "href",
-                  "namespace": ["global", "header", "nav", "href"]
+                  "namespace": [
+                    "global",
+                    "header",
+                    "nav",
+                    "href"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Label",
                   "name": "label",
-                  "namespace": ["global", "header", "nav", "label"]
+                  "namespace": [
+                    "global",
+                    "header",
+                    "nav",
+                    "label"
+                  ]
                 }
               ],
-              "namespace": ["global", "header", "nav"]
+              "namespace": [
+                "global",
+                "header",
+                "nav"
+              ]
             }
           ],
-          "namespace": ["global", "header"]
+          "namespace": [
+            "global",
+            "header"
+          ]
         },
         {
           "type": "object",
@@ -392,7 +483,11 @@
                   "value": "primary"
                 }
               ],
-              "namespace": ["global", "footer", "color"]
+              "namespace": [
+                "global",
+                "footer",
+                "color"
+              ]
             },
             {
               "type": "object",
@@ -403,31 +498,58 @@
                   "type": "string",
                   "label": "Facebook",
                   "name": "facebook",
-                  "namespace": ["global", "footer", "social", "facebook"]
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "facebook"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Twitter",
                   "name": "twitter",
-                  "namespace": ["global", "footer", "social", "twitter"]
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "twitter"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Instagram",
                   "name": "instagram",
-                  "namespace": ["global", "footer", "social", "instagram"]
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "instagram"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Github",
                   "name": "github",
-                  "namespace": ["global", "footer", "social", "github"]
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "github"
+                  ]
                 }
               ],
-              "namespace": ["global", "footer", "social"]
+              "namespace": [
+                "global",
+                "footer",
+                "social"
+              ]
             }
           ],
-          "namespace": ["global", "footer"]
+          "namespace": [
+            "global",
+            "footer"
+          ]
         },
         {
           "type": "object",
@@ -472,7 +594,11 @@
                   "value": "yellow"
                 }
               ],
-              "namespace": ["global", "theme", "color"]
+              "namespace": [
+                "global",
+                "theme",
+                "color"
+              ]
             },
             {
               "type": "string",
@@ -492,7 +618,11 @@
                   "value": "lato"
                 }
               ],
-              "namespace": ["global", "theme", "font"]
+              "namespace": [
+                "global",
+                "theme",
+                "font"
+              ]
             },
             {
               "type": "string",
@@ -508,7 +638,11 @@
                   "value": "heroicon"
                 }
               ],
-              "namespace": ["global", "theme", "icon"]
+              "namespace": [
+                "global",
+                "theme",
+                "icon"
+              ]
             },
             {
               "type": "string",
@@ -528,13 +662,22 @@
                   "value": "dark"
                 }
               ],
-              "namespace": ["global", "theme", "darkMode"]
+              "namespace": [
+                "global",
+                "theme",
+                "darkMode"
+              ]
             }
           ],
-          "namespace": ["global", "theme"]
+          "namespace": [
+            "global",
+            "theme"
+          ]
         }
       ],
-      "namespace": ["global"]
+      "namespace": [
+        "global"
+      ]
     },
     {
       "label": "Authors",
@@ -545,16 +688,24 @@
           "type": "string",
           "label": "Name",
           "name": "name",
-          "namespace": ["authors", "name"]
+          "namespace": [
+            "authors",
+            "name"
+          ]
         },
         {
           "type": "string",
           "label": "Avatar",
           "name": "avatar",
-          "namespace": ["authors", "avatar"]
+          "namespace": [
+            "authors",
+            "avatar"
+          ]
         }
       ],
-      "namespace": ["authors"]
+      "namespace": [
+        "authors"
+      ]
     },
     {
       "label": "Pages",
@@ -582,13 +733,23 @@
                   "type": "string",
                   "label": "Tagline",
                   "name": "tagline",
-                  "namespace": ["pages", "blocks", "hero", "tagline"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "tagline"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Headline",
                   "name": "headline",
-                  "namespace": ["pages", "blocks", "hero", "headline"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "headline"
+                  ]
                 },
                 {
                   "label": "Text",
@@ -597,7 +758,12 @@
                   "ui": {
                     "component": "markdown"
                   },
-                  "namespace": ["pages", "blocks", "hero", "text"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "text"
+                  ]
                 },
                 {
                   "label": "Actions",
@@ -672,7 +838,12 @@
                       ]
                     }
                   ],
-                  "namespace": ["pages", "blocks", "hero", "actions"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "actions"
+                  ]
                 },
                 {
                   "type": "object",
@@ -683,16 +854,33 @@
                       "name": "src",
                       "label": "Image Source",
                       "type": "image",
-                      "namespace": ["pages", "blocks", "hero", "image", "src"]
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "image",
+                        "src"
+                      ]
                     },
                     {
                       "name": "alt",
                       "label": "Alt Text",
                       "type": "string",
-                      "namespace": ["pages", "blocks", "hero", "image", "alt"]
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "image",
+                        "alt"
+                      ]
                     }
                   ],
-                  "namespace": ["pages", "blocks", "hero", "image"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "image"
+                  ]
                 },
                 {
                   "type": "string",
@@ -712,10 +900,19 @@
                       "value": "primary"
                     }
                   ],
-                  "namespace": ["pages", "blocks", "hero", "color"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "color"
+                  ]
                 }
               ],
-              "namespace": ["pages", "blocks", "hero"]
+              "namespace": [
+                "pages",
+                "blocks",
+                "hero"
+              ]
             },
             {
               "name": "features",
@@ -983,7 +1180,12 @@
                       ]
                     }
                   ],
-                  "namespace": ["pages", "blocks", "features", "items"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "features",
+                    "items"
+                  ]
                 },
                 {
                   "type": "string",
@@ -1003,10 +1205,19 @@
                       "value": "primary"
                     }
                   ],
-                  "namespace": ["pages", "blocks", "features", "color"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "features",
+                    "color"
+                  ]
                 }
               ],
-              "namespace": ["pages", "blocks", "features"]
+              "namespace": [
+                "pages",
+                "blocks",
+                "features"
+              ]
             },
             {
               "name": "content",
@@ -1024,7 +1235,12 @@
                   },
                   "label": "Body",
                   "name": "body",
-                  "namespace": ["pages", "blocks", "content", "body"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "content",
+                    "body"
+                  ]
                 },
                 {
                   "type": "string",
@@ -1044,10 +1260,19 @@
                       "value": "primary"
                     }
                   ],
-                  "namespace": ["pages", "blocks", "content", "color"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "content",
+                    "color"
+                  ]
                 }
               ],
-              "namespace": ["pages", "blocks", "content"]
+              "namespace": [
+                "pages",
+                "blocks",
+                "content"
+              ]
             },
             {
               "name": "testimonial",
@@ -1067,13 +1292,23 @@
                   },
                   "label": "Quote",
                   "name": "quote",
-                  "namespace": ["pages", "blocks", "testimonial", "quote"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "quote"
+                  ]
                 },
                 {
                   "type": "string",
                   "label": "Author",
                   "name": "author",
-                  "namespace": ["pages", "blocks", "testimonial", "author"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "author"
+                  ]
                 },
                 {
                   "type": "string",
@@ -1093,16 +1328,30 @@
                       "value": "primary"
                     }
                   ],
-                  "namespace": ["pages", "blocks", "testimonial", "color"]
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "color"
+                  ]
                 }
               ],
-              "namespace": ["pages", "blocks", "testimonial"]
+              "namespace": [
+                "pages",
+                "blocks",
+                "testimonial"
+              ]
             }
           ],
-          "namespace": ["pages", "blocks"]
+          "namespace": [
+            "pages",
+            "blocks"
+          ]
         }
       ],
-      "namespace": ["pages"]
+      "namespace": [
+        "pages"
+      ]
     }
   ]
 }
