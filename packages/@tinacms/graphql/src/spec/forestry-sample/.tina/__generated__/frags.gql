@@ -21,6 +21,18 @@ fragment PostParts on Post {
   }
 }
 
+fragment StuffParts on Stuff {
+  ... on StuffTemplate_1 {
+    title
+  }
+  ... on StuffTemplate_2 {
+    title
+  }
+  ... on StuffTemplate_3 {
+    title
+  }
+}
+
 fragment PageParts on Page {
   title
   seo {

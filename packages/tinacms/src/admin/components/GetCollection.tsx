@@ -21,7 +21,7 @@ export const useGetCollection = (
   collectionName: string,
   includeDocuments: boolean = true
 ) => {
-  const api = new TinaAdminApi(cms.api.tina)
+  const api = new TinaAdminApi(cms)
   const [collection, setCollection] = useState<Collection | undefined>(
     undefined
   )

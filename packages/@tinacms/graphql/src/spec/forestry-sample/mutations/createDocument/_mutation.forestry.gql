@@ -1,0 +1,9 @@
+mutation {
+  createDocument(
+    collection: "stuff"
+    relativePath: "my-stuff.md"
+    params: { stuff: { template_1: { title: "Ok" } } }
+  ) {
+    __typename
+  }
+}

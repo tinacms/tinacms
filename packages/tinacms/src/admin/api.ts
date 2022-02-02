@@ -11,22 +11,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import type { TinaCMS } from '@tinacms/toolkit'
 import type { Collection, DocumentForm, GetDocumentFields } from './types'
 
 export class TinaAdminApi {
-  /**
-   * cms.api.tina
-   */
   api: {
     request: (query: string, { variables }: { variables: object }) => any
   }
-  constructor(TinaApi) {
-    this.api = TinaApi
+  constructor(cms: TinaCMS) {
+    this.api = cms.api.tina
   }
 
   async fetchCollections() {
     const response: { getCollections: Collection[] } = await this.api.request(
-      `query{ getCollections { label, name } }`,
+      `#graphql
+      query{ 
+        getCollections { 
+          label, 
+          name 
+        } 
+      }`,
       { variables: {} }
     )
 
@@ -35,7 +39,7 @@ export class TinaAdminApi {
 
   async fetchCollection(collectionName: string, includeDocuments: boolean) {
     const response: { getCollection: Collection } = await this.api.request(
-      `
+      `#graphql
       query($collection: String!, $includeDocuments: Boolean!){
         getCollection(collection: $collection){
           name
@@ -70,7 +74,7 @@ export class TinaAdminApi {
 
   async fetchDocument(collectionName: string, relativePath: string) {
     const response: { getDocument: DocumentForm } = await this.api.request(
-      `
+      `#graphql
       query($collection: String!, $relativePath: String!) {
         getDocument(collection:$collection, relativePath:$relativePath) {
           ... on Document {
@@ -87,7 +91,10 @@ export class TinaAdminApi {
 
   async fetchDocumentFields() {
     const response: GetDocumentFields = await this.api.request(
-      `query { getDocumentFields }`,
+      `#graphql
+      query { 
+        getDocumentFields 
+      }`,
       { variables: {} }
     )
 
@@ -128,7 +135,7 @@ export class TinaAdminApi {
     const response = await this.api.request(
       `#graphql
       mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-        updateDocument(
+        updateDocument( 
           collection: $collection,
           relativePath: $relativePath,
           params: $params
