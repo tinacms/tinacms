@@ -198,9 +198,8 @@ export const stringify = (
       return {
         type: 'link',
         url: node.url,
-        children: node.children.map((child) =>
-          stringifyChildren([child], field)
-        ) as StaticPhrasingContent[],
+        title: node.title,
+        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_BLOCKQUOTE:
       return {
