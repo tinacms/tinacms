@@ -258,7 +258,7 @@ const OverflowMenu = ({ items = [] }) => {
                 {items.map((item) => {
                   const Icon = item.icon ? item.icon : BiExit
                   return (
-                    <Menu.Item>
+                    <Menu.Item key={`menu-item-${item.label}`}>
                       {({ active }) => (
                         <button
                           className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
