@@ -1,5 +1,5 @@
 ---
-@tinacms/toolkit
+"@tinacms/toolkit": patch
 ---
 
 Update rich-text editor with some 

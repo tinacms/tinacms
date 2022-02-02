@@ -55,42 +55,73 @@ export const components = () => {
   return {
     [ELEMENT_H1]: ({ attributes, editor, element, className, ...props }) => (
       <h1
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-4xl font-medium'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H2]: ({ attributes, editor, element, className, ...props }) => (
       <h2
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-3xl font-medium'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H3]: ({ attributes, editor, element, className, ...props }) => (
       <h3
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-2xl font-semibold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H4]: ({ attributes, editor, element, className, ...props }) => (
       <h4
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-xl font-bold'
+        )}
         {...attributes}
         {...props}
       />
     ),
+    /** Tailwind prose doesn't style h5 and h6 elements */
     [ELEMENT_H5]: ({ attributes, editor, element, className, ...props }) => (
       <h5
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-lg font-bold'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_H6]: ({ attributes, editor, element, className, ...props }) => (
       <h6
-        className={classNames(headerClasses, blockClasses, className)}
+        className={classNames(
+          headerClasses,
+          blockClasses,
+          className,
+          'text-base font-bold'
+        )}
         {...attributes}
         {...props}
       />
@@ -103,7 +134,7 @@ export const components = () => {
       ...props
     }) => (
       <p
-        className={classNames(blockClasses, className)}
+        className={classNames(blockClasses, className, `text-base font-normal`)}
         {...attributes}
         {...props}
       />

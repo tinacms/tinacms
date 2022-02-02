@@ -79,7 +79,6 @@ export const RichEditor = wrapFieldsWithMeta<
             id={id}
             initialValue={initialValue}
             plugins={plugins}
-            normalizeInitialValue={true}
             onChange={(value) => {
               // console.log(JSON.stringify(value, null, 2))
               props.input.onChange({ type: 'root', children: value })
