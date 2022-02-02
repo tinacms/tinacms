@@ -11,8 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { GithubBridge } from './database/bridge/github'
-export { GithubStore } from './database/store/github'
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
@@ -23,5 +21,3 @@ export {
 } from './database/store/filesystem'
 export { MemoryStore } from './database/store/memory'
 export { LevelStore } from './database/store/level'
-
-export type { GithubManagerInit } from './database/bridge/github'

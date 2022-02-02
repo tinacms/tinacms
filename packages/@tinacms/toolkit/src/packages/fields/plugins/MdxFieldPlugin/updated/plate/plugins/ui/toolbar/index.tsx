@@ -52,12 +52,31 @@ import { ELEMENT_IMG } from '../../create-img-plugin'
 import type { MdxTemplate } from '../../../types'
 
 const headers = [
-  { name: ELEMENT_H1, render: <h1 className="my-0">Heading 1</h1> },
-  { name: ELEMENT_H2, render: <h2 className="my-0">Heading 2</h2> },
-  { name: ELEMENT_H3, render: <h3 className="my-0">Heading 3</h3> },
-  { name: ELEMENT_H4, render: <h4 className="my-0">Heading 4</h4> },
-  { name: ELEMENT_H5, render: <h5 className="my-0">Heading 5</h5> },
-  { name: ELEMENT_H6, render: <h6 className="my-0">Heading 6</h6> },
+  {
+    name: ELEMENT_H1,
+    render: <h1 className="my-0 text-4xl font-medium">Heading 1</h1>,
+  },
+  {
+    name: ELEMENT_H2,
+    render: <h2 className="my-0 text-3xl font-medium">Heading 2</h2>,
+  },
+  {
+    name: ELEMENT_H3,
+    render: <h3 className="my-0 text-2xl font-semibold">Heading 3</h3>,
+  },
+  {
+    name: ELEMENT_H4,
+    render: <h4 className="my-0 text-xl font-bold">Heading 4</h4>,
+  },
+  /** Tailwind prose doesn't style h5 and h6 elements */
+  {
+    name: ELEMENT_H5,
+    render: <h5 className="my-0 text-lg font-bold">Heading 5</h5>,
+  },
+  {
+    name: ELEMENT_H6,
+    render: <h6 className="my-0 text-base font-bold">Heading 6</h6>,
+  },
   { name: ELEMENT_PARAGRAPH, render: <p className="my-0">Paragraph</p> },
 ]
 

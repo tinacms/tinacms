@@ -53,7 +53,19 @@ export const nextPostPage =
   import { staticRequest, gql } from "tinacms";
   import Head from "next/head";
   import { createGlobalStyle } from "styled-components";
-  
+  import { useTina } from "tinacms/dist/edit-state";
+
+  const query = gql\`
+    query BlogPostQuery($relativePath: String!) {
+      getPostsDocument(relativePath: $relativePath) {
+        data {
+        title
+          body
+        }
+      }
+    }
+  \`
+
   // Styles for markdown
   const GlobalStyle = createGlobalStyle\`
   h1,h2,h3,h4,h5 {
@@ -90,6 +102,12 @@ export const nextPostPage =
   const defaultMarked = (markdown) => markdown;
   // Use the props returned by get static props (this can be deleted when the edit provider and tina-wrapper are moved to _app.js)
   const BlogPage = (props) => {
+    const { data } = useTina({
+      query,
+      variables: props.variables,
+      data: props.data,
+    });
+
     return (
       <>
         <Head>
@@ -115,12 +133,12 @@ export const nextPostPage =
             }}
           >
             <h1 className="text-3xl m-8 text-center leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              {props.data.getPostsDocument.data.title}
+              {data.getPostsDocument.data.title}
             </h1>
             {/* Convert markdown to html in the browser only */}
             {typeof window !== "undefined" && (
               <ContentSection
-                content={window.marked.parse(props.data.getPostsDocument.data.body)}
+                content={window.marked.parse(data.getPostsDocument.data.body)}
               ></ContentSection>
             )}
           </div>
@@ -141,16 +159,6 @@ export const nextPostPage =
   };
   
   export const getStaticProps = async ({ params }) => {
-    const query = gql\`
-      query BlogPostQuery($relativePath: String!) {
-        getPostsDocument(relativePath: $relativePath) {
-          data {
-           title
-            body
-          }
-        }
-      }
-    \`
     const variables = { relativePath: \`\${params.filename}.md\` }
     let data = {}
     try {
@@ -164,7 +172,6 @@ export const nextPostPage =
 
     return {
       props: {
-        query,
         variables,
         data,
         //myOtherProp: 'some-other-data',
@@ -337,9 +344,9 @@ const App = ({ Component, pageProps }) => {
         editMode={
           <TinaCMS
             apiURL={apiURL}
-            {...pageProps}
+
           >
-            {(livePageProps) => <Component {...livePageProps} />}
+            <Component {...pageProps} />
           </TinaCMS>
         }
       >
