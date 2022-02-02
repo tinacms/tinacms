@@ -184,19 +184,20 @@ export function SearchAutocomplete(props: {
         {state.activeTemplates.map((activeTemplate, index) => {
           return (
             <span key={activeTemplate.key} className="block">
-              <button
-                onClick={() => {
+              <span
+                onMouseDown={(e) => {
+                  e.preventDefault()
                   dispatch({ type: 'selectItem', value: index })
                 }}
                 className={classNames(
                   index === state.activeIndex
                     ? 'bg-gray-50 text-gray-900'
                     : 'text-gray-700',
-                  'truncate block px-4 py-2 text-sm text-left w-full hover:bg-gray-100 hover:text-gray-900'
+                  'cursor-pointer truncate block px-4 py-2 text-sm text-left w-full hover:bg-gray-100 hover:text-gray-900'
                 )}
               >
                 {activeTemplate.label || activeTemplate.name}
-              </button>
+              </span>
             </span>
           )
         })}
