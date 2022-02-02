@@ -174,14 +174,7 @@ export const TinaCloudProvider = (
       }
     }
   }
-  /**
-   * Attaches a new instance of the TinaAdminApi to `cms.api.admin`
-   */
-  const setupAdmin = async () => {
-    if (!cms.api.admin) {
-      cms.registerApi('admin', new TinaAdminApi(cms))
-    }
-  }
+
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
@@ -198,9 +191,15 @@ export const TinaCloudProvider = (
   }
 
   setupMedia()
-  if (cms.flags.get('tina-admin') === true) {
-    setupAdmin()
-  }
+
+  /**
+   * Attaches a new instance of the TinaAdminApi to `cms.api.admin`
+   */
+  React.useMemo(() => {
+    if (cms.flags.get('tina-admin') === true) {
+      cms.registerApi('admin', new TinaAdminApi(cms))
+    }
+  }, [cms, cms.flags.get('tina-admin')])
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
