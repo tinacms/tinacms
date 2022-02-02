@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.66.1
+
+### Patch Changes
+
+- 3bba1817d: Integrates Chrome Components with TinaAdmin
+- Updated dependencies [3bba1817d]
+- Updated dependencies [415c03d25]
+  - @tinacms/toolkit@0.56.11
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.66.0
 
 ### Minor Changes
