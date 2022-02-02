@@ -79,9 +79,17 @@ const normalize = (node: any) => {
     }
   }
   if (node.children) {
-    return {
-      ...node,
-      children: node.children.map(normalize),
+    if (node.children.length) {
+      return {
+        ...node,
+        children: node.children.map(normalize),
+      }
+    } else {
+      // Always supply an empty text leaf
+      return {
+        ...node,
+        children: [{ text: '' }],
+      }
     }
   }
   return node
