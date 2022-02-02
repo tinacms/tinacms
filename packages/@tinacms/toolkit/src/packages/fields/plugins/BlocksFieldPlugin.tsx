@@ -101,10 +101,10 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const [filter, setFilter] = React.useState('')
   const filteredBlocks = React.useMemo(() => {
     return Object.entries(field.templates).filter(([name, template]) => {
-      return (
-        template.label.toLowerCase().includes(filter.toLowerCase()) ||
-        name.toLowerCase().includes(filter.toLowerCase())
-      )
+      return template.label
+        ? template.label.toLowerCase().includes(filter.toLowerCase()) ||
+            name.toLowerCase().includes(filter.toLowerCase())
+        : name.toLowerCase().includes(filter.toLowerCase())
     })
   }, [filter])
 
@@ -169,7 +169,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                               setFilter('')
                             }}
                           >
-                            {template.label}
+                            {template.label ? template.label : name}
                           </button>
                         </Popover.Button>
                       ))}
