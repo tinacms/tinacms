@@ -19,6 +19,7 @@ import {
   setNodes,
   findNode,
   PlateEditor,
+  getBlockAbove,
 } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { createParagraphPlugin } from '@udecode/plate-paragraph'
@@ -116,6 +117,7 @@ export const insertBlockElement = (editor, blockElement) => {
     setTimeout(() => {
       // If empty, replace the current block
       if (isCurrentBlockEmpty(editor)) {
+        console.log('itsempty')
         setNodes(editor, blockElement)
       } else {
         insertNodes(editor, [blockElement])
@@ -129,10 +131,14 @@ const isCurrentBlockEmpty = (editor) => {
     return false
   }
   const [node] = Editor.node(editor, editor.selection)
+  const cursor = editor.selection.focus
+  const blockAbove = getBlockAbove(editor)
   const isEmpty =
     !Node.string(node) &&
     // @ts-ignore bad type from slate
-    !node.children?.some((n) => Editor.isInline(editor, n))
+    !node.children?.some((n) => Editor.isInline(editor, n)) &&
+    // Only do this if we're at the start of a block
+    Editor.isStart(editor, cursor, blockAbove[1])
 
   return isEmpty
 }
