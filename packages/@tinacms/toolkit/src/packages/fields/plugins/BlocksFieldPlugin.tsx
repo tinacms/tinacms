@@ -150,6 +150,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                             event.stopPropagation()
                             event.preventDefault()
                           }}
+                          value={filter}
                           onChange={(event: any) => {
                             setFilter(event.target.value)
                           }}
@@ -164,6 +165,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                           key={name}
                           onClick={() => {
                             addItem(name, template)
+                            setFilter('')
                           }}
                         >
                           {template.label}
