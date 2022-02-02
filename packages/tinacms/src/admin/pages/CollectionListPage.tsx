@@ -185,29 +185,25 @@ const CollectionListPage = () => {
                                         {document.node.sys.template}
                                       </span>
                                     </td>
-                                    <td className="w-0">
-                                      <OverflowMenu
-                                        items={[
-                                          {
-                                            label: 'Edit in Admin',
-                                            icon: BiEdit,
-                                            onClick: () => {
-                                              navigate(
-                                                `${document.node.sys.filename}`,
-                                                { replace: true }
-                                              )
+                                    {/* For now only route-mapped documents need an alternative edit link */}
+                                    {overrideRoute && (
+                                      <td className="w-0">
+                                        <OverflowMenu
+                                          items={[
+                                            {
+                                              label: 'Edit in Admin',
+                                              icon: BiEdit,
+                                              onClick: () => {
+                                                navigate(
+                                                  `${document.node.sys.filename}`,
+                                                  { replace: true }
+                                                )
+                                              },
                                             },
-                                          },
-                                          // {
-                                          //   label: 'Delete',
-                                          //   icon: BiTrash,
-                                          //   onClick: () => {
-                                          //     alert('delete thing')
-                                          //   },
-                                          // },
-                                        ]}
-                                      />
-                                    </td>
+                                          ]}
+                                        />
+                                      </td>
+                                    )}
                                   </tr>
                                 )
                               })}

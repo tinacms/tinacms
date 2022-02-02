@@ -48,3 +48,13 @@ export const PageBody = ({
 }: {
   children: React.ReactChild | React.ReactChildren
 }) => <div className="py-10 px-12">{children}</div>
+
+export const PageBodyNarrow = ({
+  children,
+}: {
+  children: React.ReactChild | React.ReactChildren
+}) => (
+  <div className="py-10 px-12">
+    <div className="w-full mx-auto max-w-screen-xl">{children}</div>
+  </div>
+)
