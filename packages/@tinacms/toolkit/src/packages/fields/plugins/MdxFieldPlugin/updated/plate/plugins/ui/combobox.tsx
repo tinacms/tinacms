@@ -173,7 +173,7 @@ export function SearchAutocomplete(props: {
   return (
     <span
       ref={ref}
-      className="block w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+      className="block w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none max-h-[10rem] overflow-scroll"
     >
       <span className="block py-1">
         {state.activeTemplates.length === 0 && (
