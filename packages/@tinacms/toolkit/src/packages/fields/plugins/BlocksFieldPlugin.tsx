@@ -162,7 +162,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                         )}
                         {filteredBlocks.length === 0 && (
                           <span className="relative text-center text-xs px-2 py-3 text-gray-300 bg-gray-50 italic">
-                            No blocks to display.
+                            No matches found
                           </span>
                         )}
                         {filteredBlocks.length > 0 &&
