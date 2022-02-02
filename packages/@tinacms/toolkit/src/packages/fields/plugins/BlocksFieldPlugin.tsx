@@ -25,7 +25,7 @@ import { AddIcon, DragIcon, ReorderIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from '../../react-dismissible'
 import { IconButton } from '../../styles'
-import { Menu, Transition } from '@headlessui/react'
+import { Popover, Transition } from '@headlessui/react'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {
   GroupListHeader,
@@ -119,10 +119,10 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <Menu>
+        <Popover>
           {({ open }) => (
             <>
-              <Menu.Button as={React.Fragment}>
+              <Popover.Button as={React.Fragment}>
                 <IconButton
                   variant={open ? 'secondary' : 'primary'}
                   size="small"
@@ -130,7 +130,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                 >
                   <AddIcon className="w-5/6 h-auto" />
                 </IconButton>
-              </Menu.Button>
+              </Popover.Button>
               <div className="transform translate-y-full absolute -bottom-1 right-0 z-50">
                 <Transition
                   enter="transition duration-150 ease-out"
@@ -140,7 +140,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                   leaveFrom="transform opacity-100 translate-y-0"
                   leaveTo="transform opacity-0 -translate-y-2"
                 >
-                  <Menu.Items className="relative min-w-[192px] max-h-[24rem] overflow-y-auto rounded-lg shadow-lg bg-white border border-gray-100 flex flex-col">
+                  <Popover.Panel className="relative min-w-[192px] max-h-[24rem] overflow-y-auto rounded-lg shadow-lg bg-white border border-gray-100 flex flex-col">
                     {showFilter && (
                       <div className="sticky top-0 bg-gray-50 p-2 border-b border-gray-100 z-10">
                         <input
@@ -159,25 +159,23 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                       </div>
                     )}
                     {filteredBlocks.map(([name, template]) => (
-                      <Menu.Item>
-                        <button
-                          className="relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 hover:bg-gray-50"
-                          key={name}
-                          onClick={() => {
-                            addItem(name, template)
-                            setFilter('')
-                          }}
-                        >
-                          {template.label}
-                        </button>
-                      </Menu.Item>
+                      <button
+                        className="relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
+                        key={name}
+                        onClick={() => {
+                          addItem(name, template)
+                          setFilter('')
+                        }}
+                      >
+                        {template.label}
+                      </button>
                     ))}
-                  </Menu.Items>
+                  </Popover.Panel>
                 </Transition>
               </div>
             </>
           )}
-        </Menu>
+        </Popover>
       </GroupListHeader>
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
