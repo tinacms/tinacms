@@ -15,7 +15,7 @@ import React from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 import GetCMS from '../components/GetCMS'
-import { PageWrapper, PageHeader, PageBody } from '../components/Page'
+import { PageWrapper, PageHeader, PageBodyNarrow } from '../components/Page'
 
 const DashboardPage = () => {
   return (
@@ -26,10 +26,10 @@ const DashboardPage = () => {
             <PageHeader isLocalMode={cms.api?.tina?.isLocalMode}>
               <h3 className="text-2xl text-gray-700">Welcome to Tina!</h3>
             </PageHeader>
-            <PageBody>
+            <PageBodyNarrow>
               This is your dashboard for editing or creating content. Select a
               collection on the left to begin.
-            </PageBody>
+            </PageBodyNarrow>
           </>
         </PageWrapper>
       )}
