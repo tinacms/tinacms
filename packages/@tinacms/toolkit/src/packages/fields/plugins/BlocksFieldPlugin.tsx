@@ -160,7 +160,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                         </div>
                       )}
                       {filteredBlocks.map(([name, template]) => (
-                        <button
+                        <Popover.Button
                           className="relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
                           key={name}
                           onClick={() => {
@@ -169,7 +169,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                           }}
                         >
                           {template.label}
-                        </button>
+                        </Popover.Button>
                       ))}
                     </div>
                   </Popover.Panel>
