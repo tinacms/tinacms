@@ -23,6 +23,7 @@ import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -37,7 +38,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = ({ tinaForm, field }: GroupProps) => {
+export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
   const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
@@ -64,7 +65,7 @@ export const Group = ({ tinaForm, field }: GroupProps) => {
       />
     </>
   )
-}
+})
 
 interface PanelProps {
   setExpanded(next: boolean): void
@@ -127,6 +128,7 @@ const Header = ({ onClick, children }) => {
         onClick={onClick}
         className="group px-4 py-3 bg-white hover:bg-gray-50 shadow focus:shadow-outline focus:border-blue-500 w-full border border-gray-100 hover:border-gray-200 text-gray-500 hover:text-blue-400 focus:text-blue-500 rounded-md flex justify-between items-center gap-2"
       >
+        <h3>GROUP FIELD CARD</h3>
         <span className="text-left text-base font-medium overflow-hidden overflow-ellipsis whitespace-nowrap flex-1">
           {children}
         </span>{' '}
