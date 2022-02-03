@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.50.6
+
+### Patch Changes
+
+- a05546eb4: Added basic open source telemetry
+
+  See [this discussion](https://github.com/tinacms/tinacms/discussions/2451) for more information and how to opt out.
+
 ## 0.50.5
 
 ### Patch Changes
