@@ -1,5 +1,17 @@
 # create-tina-app
 
+## 0.1.4
+
+### Patch Changes
+
+- a05546eb4: Added basic open source telemetry
+
+  See [this discussion](https://github.com/tinacms/tinacms/discussions/2451) for more information and how to opt out.
+
+- Updated dependencies [8bf0ac832]
+- Updated dependencies [a05546eb4]
+  - @tinacms/metrics@0.0.2
+
 ## 0.1.3
 
 ### Patch Changes
