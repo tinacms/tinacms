@@ -25,6 +25,7 @@ import { AddIcon, DragIcon, ReorderIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from '../../react-dismissible'
 import { IconButton } from '../../styles'
+import { Popover, Transition } from '@headlessui/react'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {
   GroupListHeader,
@@ -94,9 +95,21 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
     [field.name, form.mutators]
   )
 
+  const showFilter = React.useMemo(() => {
+    return Object.entries(field.templates).length > 6
+  }, [field.templates])
+  const [filter, setFilter] = React.useState('')
+  const filteredBlocks = React.useMemo(() => {
+    return Object.entries(field.templates).filter(([name, template]) => {
+      return template.label
+        ? template.label.toLowerCase().includes(filter.toLowerCase()) ||
+            name.toLowerCase().includes(filter.toLowerCase())
+        : name.toLowerCase().includes(filter.toLowerCase())
+    })
+  }, [filter])
+
   const items = input.value || []
 
-  const [visible, setVisible] = React.useState(false)
   return (
     <>
       <GroupListHeader>
@@ -106,40 +119,74 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <IconButton
-          onClick={(event: any) => {
-            event.stopPropagation()
-            event.preventDefault()
-            setVisible((visible) => !visible)
-          }}
-          variant={visible ? 'secondary' : 'primary'}
-          size="small"
-          className={`${visible ? `rotate-45` : ``}`}
-        >
-          <AddIcon className="w-5/6 h-auto" />
-        </IconButton>
-        <BlockMenu open={visible}>
-          <Dismissible
-            click
-            escape
-            onDismiss={() => setVisible(false)}
-            disabled={!visible}
-          >
-            <BlockMenuList>
-              {Object.entries(field.templates).map(([name, template]) => (
-                <BlockOption
-                  key={name}
-                  onClick={() => {
-                    addItem(name, template)
-                    setVisible(false)
-                  }}
+        <Popover>
+          {({ open }) => (
+            <>
+              <Popover.Button as={React.Fragment}>
+                <IconButton
+                  variant={open ? 'secondary' : 'primary'}
+                  size="small"
+                  className={`${open ? `rotate-45 pointer-events-none` : ``}`}
                 >
-                  {template.label}
-                </BlockOption>
-              ))}
-            </BlockMenuList>
-          </Dismissible>
-        </BlockMenu>
+                  <AddIcon className="w-5/6 h-auto" />
+                </IconButton>
+              </Popover.Button>
+              <div className="transform translate-y-full absolute -bottom-1 right-0 z-50">
+                <Transition
+                  enter="transition duration-150 ease-out"
+                  enterFrom="transform opacity-0 -translate-y-2"
+                  enterTo="transform opacity-100 translate-y-0"
+                  leave="transition duration-75 ease-in"
+                  leaveFrom="transform opacity-100 translate-y-0"
+                  leaveTo="transform opacity-0 -translate-y-2"
+                >
+                  <Popover.Panel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100">
+                    {({ close }) => (
+                      <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full">
+                        {showFilter && (
+                          <div className="sticky top-0 bg-gray-50 p-2 border-b border-gray-100 z-10">
+                            <input
+                              type="text"
+                              className="bg-white text-xs rounded-sm border border-gray-100 shadow-inner py-1 px-2 w-full block placeholder-gray-200"
+                              onClick={(event: any) => {
+                                event.stopPropagation()
+                                event.preventDefault()
+                              }}
+                              value={filter}
+                              onChange={(event: any) => {
+                                setFilter(event.target.value)
+                              }}
+                              placeholder="Filter..."
+                            />
+                          </div>
+                        )}
+                        {filteredBlocks.length === 0 && (
+                          <span className="relative text-center text-xs px-2 py-3 text-gray-300 bg-gray-50 italic">
+                            No matches found
+                          </span>
+                        )}
+                        {filteredBlocks.length > 0 &&
+                          filteredBlocks.map(([name, template]) => (
+                            <button
+                              className="relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
+                              key={name}
+                              onClick={() => {
+                                addItem(name, template)
+                                setFilter('')
+                                close()
+                              }}
+                            >
+                              {template.label ? template.label : name}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </Popover.Panel>
+                </Transition>
+              </div>
+            </>
+          )}
+        </Popover>
       </GroupListHeader>
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
@@ -323,48 +370,6 @@ const EmptyList = styled.div`
   font-size: var(--tina-font-size-2);
   font-weight: var(--tina-font-weight-regular);
 `
-
-const BlockMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-  ${(props) =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 36px, 0) scale3d(1, 1, 1);
-    `};
-`
-
-const BlockMenuList = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const BlockOption = ({ children, ...props }) => {
-  return (
-    <button
-      className="relative text-center text-sm p-2 w-full border-b border-gray-50 outline-none transition-all ease-out duration-150 hover:text-blue-500 hover:bg-gray-50"
-      {...props}
-    >
-      {children}
-    </button>
-  )
-}
 
 const ItemClickTarget = styled.div`
   flex: 1 1 0;
