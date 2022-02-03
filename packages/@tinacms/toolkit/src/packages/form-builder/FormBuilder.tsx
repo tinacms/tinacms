@@ -83,6 +83,15 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     [tinaForm]
   )
 
+  /**
+   * On unmount, clear the `onbeforeunload` event (if one is lingering)
+   */
+  React.useEffect(() => {
+    return () => {
+      window.onbeforeunload = undefined
+    }
+  }, [])
+
   return (
     <FinalForm
       form={finalForm}
@@ -96,6 +105,15 @@ export const FormBuilder: FC<FormBuilderProps> = ({
               subscription={{ pristine: true }}
               onChange={({ pristine }) => {
                 onPristineChange && onPristineChange(pristine)
+
+                if (!pristine) {
+                  window.onbeforeunload = (event) => {
+                    event.preventDefault()
+                    event.returnValue = ''
+                  }
+                } else {
+                  window.onbeforeunload = undefined
+                }
               }}
             />
             <DragDropContext onDragEnd={moveArrayItem}>
