@@ -114,8 +114,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [displayState, setDisplayState] =
-    React.useState<displayStates>('closed')
+  const [displayState, setDisplayState] = React.useState<displayStates>('open')
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
