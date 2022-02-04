@@ -127,7 +127,7 @@ export const ToolbarItem = ({
             active
               ? 'bg-gray-50 text-blue-500'
               : isDisabled
-              ? 'text-gray-300'
+              ? 'bg-gray-50 text-gray-300'
               : 'bg-white text-gray-600'
           } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
           style={{
