@@ -24,8 +24,11 @@ import {
   setNodes,
   wrapNodes,
   PlateEditor,
+  isCollapsed,
+  getAbove,
+  getPluginType,
 } from '@udecode/plate-core'
-import { Editor, Element, BaseRange } from 'slate'
+import { Editor, Element, BaseRange, Transforms } from 'slate'
 import { NestedForm } from '../../nested-form'
 import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
 
@@ -43,6 +46,17 @@ export const wrapOrRewrapLink = (editor) => {
     url: '',
     title: '',
     children: [{ text: '' }],
+  }
+
+  // if our cursor is inside an existing link, but don't have the text selected, select it now
+  if (isCollapsed(editor.selection)) {
+    const [, path] = getAbove(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        Element.isElement(n) &&
+        getPluginType(editor, ELEMENT_LINK),
+    })
+    Transforms.select(editor, path)
   }
   if (isLinkActive(editor)) {
     const [link] = getLinks(editor)

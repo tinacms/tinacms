@@ -19,9 +19,13 @@ limitations under the License.
 import React, { Fragment } from 'react'
 import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
-import { useEditorState } from '@udecode/plate-core'
+import { useEditorState, isCollapsed } from '@udecode/plate-core'
 import { insertMDX } from '../../create-mdx-plugins'
-import { LinkForm, wrapOrRewrapLink } from '../../create-link-plugin'
+import {
+  LinkForm,
+  wrapOrRewrapLink,
+  isLinkActive,
+} from '../../create-link-plugin'
 
 import type { PlateEditor } from '@udecode/plate-core'
 import type { MdxTemplate } from '../../../types'
@@ -30,10 +34,13 @@ import { insertImg } from '../../create-img-plugin'
 export type ToolbarItemType = {
   label: string
   name: string
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  options?: JSX.Element[]
-  active: boolean
   inlineOnly?: boolean
+  hidden?: boolean
+  active?: boolean
+  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  icon?: string
+  options?: {}[]
+  isLastItem?: boolean
 }
 
 export const ToolbarItem = ({
@@ -44,15 +51,7 @@ export const ToolbarItem = ({
   icon,
   options,
   isLastItem = false,
-}: {
-  label: string
-  hidden?: boolean
-  active?: boolean
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  icon: string
-  options?: {}[]
-  isLastItem?: boolean
-}) => {
+}: ToolbarItemType) => {
   const editor = useEditorState()!
   const [selection, setSelection] = React.useState(null)
 
@@ -117,11 +116,19 @@ export const ToolbarItem = ({
     )
   }
   if (icon === 'link') {
+    const isDisabled =
+      !editor.selection ||
+      // If selection is collapsed and the cursor is _not_ inside a link
+      (isCollapsed(editor.selection) && !isLinkActive(editor))
     return (
       <span className="relative">
         <span
           className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
-            active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
+            active
+              ? 'bg-gray-50 text-blue-500'
+              : isDisabled
+              ? 'text-gray-300'
+              : 'bg-white text-gray-600'
           } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
           style={{
             visibility: hidden ? 'hidden' : 'visible',
@@ -129,6 +136,9 @@ export const ToolbarItem = ({
           }}
           onMouseDown={(e) => {
             e.preventDefault()
+            if (isDisabled) {
+              return
+            }
             wrapOrRewrapLink(editor)
             setIsExpanded((isExpanded) => !isExpanded)
           }}
