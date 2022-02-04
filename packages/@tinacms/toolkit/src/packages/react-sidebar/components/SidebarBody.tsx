@@ -27,7 +27,7 @@ import { useCMS, useSubscribable } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
-import { IoMdClose } from 'react-icons/io'
+import { BiChevronLeft } from 'react-icons/bi'
 
 export const FormsView = ({
   children,
@@ -193,27 +193,35 @@ export const MultiformFormHeader = ({
   setActiveFormId,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
+  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
 
   return (
-    <div className="pt-18">
-      <button
-        className={`relative group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
-   border-gray-100 px-6 -mt-px`}
-        onClick={() => {
-          const state = activeForm.finalForm.getState()
-          if (state.invalid === true) {
-            // @ts-ignore
-            cms.alerts.error('Cannot navigate away from an invalid form.')
-          } else {
-            setActiveFormId('')
-          }
-        }}
-      >
-        <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
-          {activeForm.label}
-          <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
-        </div>
-      </button>
+    <div
+      className={`py-4 border-b border-gray-200 bg-white ${
+        sidebarWidth > navBreakpoint ? `px-6` : `px-20`
+      }`}
+    >
+      <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
+        <button
+          className="pointer-events-auto text-xs mb-1 text-gray-400 hover:text-blue-500 hover:underline transition-all ease-out duration-150 font-medium flex items-center justify-start gap-0.5"
+          onClick={() => {
+            const state = activeForm.finalForm.getState()
+            if (state.invalid === true) {
+              // @ts-ignore
+              cms.alerts.error('Cannot navigate away from an invalid form.')
+            } else {
+              setActiveFormId('')
+            }
+          }}
+        >
+          <BiChevronLeft className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+          Return to Form List
+        </button>
+        <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
+          {activeForm.label || activeForm.name}
+        </span>
+        <FormStatus pristine={formIsPristine} />
+      </div>
     </div>
   )
 }
