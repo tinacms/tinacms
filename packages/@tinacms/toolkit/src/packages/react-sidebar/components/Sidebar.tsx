@@ -333,7 +333,7 @@ const SidebarHeader = ({ isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
-      <div className="mt-4 -mb-14 w-full flex items-center justify-between">
+      <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
           <Button
             rounded="right"
