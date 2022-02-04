@@ -102,9 +102,7 @@ export const FormsView = ({
               setActiveFormId={setActiveFormId}
             />
           )}
-          {!isMultiform && activeForm.label && (
-            <FormHeader activeForm={activeForm} />
-          )}
+          {!isMultiform && <FormHeader activeForm={activeForm} />}
           {formMetas &&
             formMetas.map((meta) => (
               <React.Fragment key={meta.name}>
@@ -233,10 +231,12 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
         sidebarWidth > navBreakpoint ? `px-6` : `px-20`
       }`}
     >
-      <div className="max-w-form mx-auto">
-        <span className="block text-xl mb-[6px] text-gray-700 font-medium leading-tight">
-          {activeForm.label}
-        </span>
+      <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
+        {activeForm.label && (
+          <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
+            {activeForm.label}
+          </span>
+        )}
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>
