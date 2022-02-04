@@ -86,11 +86,16 @@ export const FieldMeta = ({
 export const FieldWrapper = ({
   margin,
   children,
+  ...props
 }: {
   margin: boolean
   children: React.ReactNode
-}) => {
-  return <div className={`relative ${margin ? `mb-5` : ``}`}>{children}</div>
+} & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
+  return (
+    <div className={`relative ${margin ? `mb-5` : ``}`} {...props}>
+      {children}
+    </div>
+  )
 }
 
 export const FieldLabel = styled.label`

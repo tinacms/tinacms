@@ -51,6 +51,8 @@ type Query {
   getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
   getPostDocument(relativePath: String): PostDocument!
   getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
+  getStuffDocument(relativePath: String): StuffDocument!
+  getStuffList(before: String, after: String, first: Float, last: Float): StuffConnection!
   getPageDocument(relativePath: String): PageDocument!
   getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
 }
@@ -78,7 +80,7 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
 }
 
-union DocumentNode = AuthorDocument | PostDocument | PageDocument
+union DocumentNode = AuthorDocument | PostDocument | StuffDocument | PageDocument
 
 type AuthorAuthorSocialMedia {
   platform: String
@@ -142,6 +144,40 @@ type PostConnection implements Connection {
   edges: [PostConnectionEdges]
 }
 
+type StuffTemplate_1 {
+  title: String
+}
+
+type StuffTemplate_2 {
+  title: String
+}
+
+type StuffTemplate_3 {
+  title: String
+}
+
+union Stuff = StuffTemplate_1 | StuffTemplate_2 | StuffTemplate_3
+
+type StuffDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Stuff!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type StuffConnectionEdges {
+  cursor: String
+  node: StuffDocument
+}
+
+type StuffConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Float!
+  edges: [StuffConnectionEdges]
+}
+
 type PageSeo {
   seoTitle: String
   ogImage: String
@@ -194,6 +230,8 @@ type Mutation {
   createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
   createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  updateStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
+  createStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
   updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
   createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
 }
@@ -201,6 +239,7 @@ type Mutation {
 input DocumentMutation {
   author: AuthorMutation
   post: PostMutation
+  stuff: StuffMutation
   page: PageMutation
 }
 
@@ -226,6 +265,24 @@ input PostPostMutation {
 
 input PostMutation {
   post: PostPostMutation
+}
+
+input StuffTemplate_1Mutation {
+  title: String
+}
+
+input StuffTemplate_2Mutation {
+  title: String
+}
+
+input StuffTemplate_3Mutation {
+  title: String
+}
+
+input StuffMutation {
+  template_1: StuffTemplate_1Mutation
+  template_2: StuffTemplate_2Mutation
+  template_3: StuffTemplate_3Mutation
 }
 
 input PageSeoMutation {
