@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.56.11
+
+### Patch Changes
+
+- 3bba1817d: Integrates Chrome Components with TinaAdmin
+- 415c03d25: adds missing arrow icon to reference field, truncates text in select dropdown
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.56.10
 
 ### Patch Changes

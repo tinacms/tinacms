@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { Telemetry } from '@tinacms/metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
 // TODO: add and implement async-retry
@@ -18,7 +19,6 @@ import prompts from 'prompts'
 import path from 'path'
 //@ts-ignore
 import { version, name } from '../package.json'
-import { getRepoInfo, downloadAndExtractRepo } from './util/examples'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
@@ -32,6 +32,7 @@ program
   .version(version)
   .option('-e, --example <example>', 'Choose which example to start from')
   .option('-d, --dir <dir>', 'Choose which directory to run this script from')
+  .option('--noTelemetry', 'Disable anonymous telemetry that is collected')
   .arguments('[project-directory]')
   .usage(`${chalk.green('<project-directory>')} [options]`)
   .action((name) => {
@@ -44,6 +45,8 @@ export const run = async () => {
   if (opts.dir) {
     process.chdir(opts.dir)
   }
+  const telemetry = new Telemetry({ disabled: opts?.noTelemetry })
+
   let example = opts.example
 
   const res = await prompts({
@@ -103,6 +106,13 @@ export const run = async () => {
       )}`
     )
   }
+  await telemetry.submitRecord({
+    event: {
+      name: 'create-tina-app:invoke',
+      example,
+      useYarn: Boolean(useYarn),
+    },
+  })
 
   // Setup directory
   const root = path.join(process.cwd(), dirName)

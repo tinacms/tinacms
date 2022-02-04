@@ -132,6 +132,77 @@
       ]
     },
     {
+      "label": "Stuff",
+      "name": "stuff",
+      "path": "content/stuff",
+      "format": "md",
+      "templates": [
+        {
+          "label": "Template 1",
+          "name": "template_1",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Title",
+              "name": "title",
+              "namespace": [
+                "stuff",
+                "template_1",
+                "title"
+              ]
+            }
+          ],
+          "namespace": [
+            "stuff",
+            "template_1"
+          ]
+        },
+        {
+          "label": "Template 2",
+          "name": "template_2",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Title",
+              "name": "title",
+              "namespace": [
+                "stuff",
+                "template_2",
+                "title"
+              ]
+            }
+          ],
+          "namespace": [
+            "stuff",
+            "template_2"
+          ]
+        },
+        {
+          "label": "Template 3",
+          "name": "template_3",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Title",
+              "name": "title",
+              "namespace": [
+                "stuff",
+                "template_3",
+                "title"
+              ]
+            }
+          ],
+          "namespace": [
+            "stuff",
+            "template_3"
+          ]
+        }
+      ],
+      "namespace": [
+        "stuff"
+      ]
+    },
+    {
       "label": "Page",
       "name": "page",
       "path": "content/pages",

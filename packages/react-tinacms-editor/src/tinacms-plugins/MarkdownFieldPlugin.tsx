@@ -18,17 +18,17 @@ limitations under the License.
 
 import React from 'react'
 import { Wysiwyg } from '../components/Wysiwyg'
+import { wrapFieldsWithMeta } from 'tinacms'
+import { EditorProps } from '../types'
 
-export const MarkdownField = (props) => {
-  return (
-    <Wysiwyg
-      {...props}
-      sticky={false}
-      format="markdown"
-      imageProps={props.field.imageProps}
-    />
-  )
-}
+export const MarkdownField = wrapFieldsWithMeta<EditorProps, any>((props) => (
+  <Wysiwyg
+    {...props}
+    sticky={false}
+    format="markdown"
+    imageProps={props.field.imageProps}
+  />
+))
 
 export const MarkdownFieldPlugin = {
   __type: 'field',

@@ -19,29 +19,45 @@ limitations under the License.
 import * as React from 'react'
 import { BiExit } from 'react-icons/bi'
 import { FiMoreVertical } from 'react-icons/fi'
-import { ImFilesEmpty } from 'react-icons/im'
 import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
-import { SidebarContext, updateBodyDisplacement } from './Sidebar'
+import { updateBodyDisplacement } from './Sidebar'
 import { FormModal } from '../../react-forms'
 import { useEditState } from '@tinacms/sharedctx'
+import type { ScreenPlugin } from '../../react-screens'
+import { LoadingDots } from '../../form-builder'
 
 interface NavProps {
   children?: any
   className?: string
   userName?: string
+  showCollections: boolean
+  collectionsInfo: {
+    collections: { label: string; name: string }[]
+    loading: boolean
+    error: boolean
+  }
   contentCreators?: any
-  screens?: any
+  screens?: ScreenPlugin[]
+  sidebarWidth?: number
+  RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>
+  RenderNavCollection: React.ComponentType<{
+    collection: { label: string; name: string }
+  }>
 }
 
 export const Nav = ({
   className = '',
   children,
+  showCollections,
+  collectionsInfo,
   screens,
   contentCreators,
+  sidebarWidth,
+  RenderNavSite,
+  RenderNavCollection,
   ...props
 }: NavProps) => {
-  const { sidebarWidth } = React.useContext(SidebarContext)
   const { setEdit } = useEditState()
 
   return (
@@ -115,50 +131,76 @@ export const Nav = ({
         </Menu>
       </div>
       {children}
-      <div className="px-6 py-7 flex-1">
-        {/* <h4 className="uppercase font-bold text-sm mb-3 text-gray-700">
-          Collections
-        </h4> */}
-        <ul className="flex flex-col gap-4">
-          {screens.map((view) => {
-            const Icon = view.Icon
-            return (
-              <NavItem
-                key={`nav-item-${view.name}`}
-                name={view.name}
-                view={view}
-                icon={Icon}
-              />
-            )
-          })}
-          {contentCreators.map((plugin, idx) => {
-            return (
-              <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
-            )
-          })}
-        </ul>
+      <div className="px-6 flex-1">
+        {showCollections && (
+          <>
+            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+              Collections
+            </h4>
+            <CollectionsList
+              RenderNavCollection={RenderNavCollection}
+              {...collectionsInfo}
+            />
+          </>
+        )}
+        {(screens.length > 0 || contentCreators.length) > 0 && (
+          <>
+            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+              Site
+            </h4>
+            <ul className="flex flex-col gap-4">
+              {screens.map((view) => {
+                return (
+                  <li key={`nav-site-${view.name}`}>
+                    <RenderNavSite view={view} />
+                  </li>
+                )
+              })}
+
+              {contentCreators.map((plugin, idx) => {
+                return (
+                  <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
+                )
+              })}
+            </ul>
+          </>
+        )}
       </div>
     </div>
   )
 }
 
-const NavItem = ({ name, view, icon }) => {
-  const { setMenuIsOpen, setActiveView } = React.useContext(SidebarContext)
-  const Icon = icon ? icon : ImFilesEmpty
+const CollectionsList = ({
+  collections,
+  loading,
+  error,
+  RenderNavCollection,
+}: {
+  collections: { label: string; name: string }[]
+  loading: boolean
+  error: boolean
+  RenderNavCollection: React.ComponentType<{
+    collection: { label: string; name: string }
+  }>
+}) => {
+  if (loading === true) {
+    return <LoadingDots color="var(--tina-color-primary)" />
+  }
+
+  if (collections.length === 0) {
+    return <div>No collections found</div>
+  }
 
   return (
-    <li key={name}>
-      <button
-        className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
-        value={name}
-        onClick={() => {
-          setActiveView(view)
-          setMenuIsOpen(false)
-        }}
-      >
-        <Icon className="mr-3 h-6 opacity-80 w-auto" /> {name}
-      </button>
-    </li>
+    <ul className="flex flex-col gap-4">
+      {collections.map((collection) => {
+        return (
+          <li key={`nav-collection-${collection.name}`}>
+            <RenderNavCollection collection={collection} />
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 

@@ -12,45 +12,28 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiLinkExternal } from 'react-icons/bi'
-import { useParams, useLocation, Link } from 'react-router-dom'
+import { BiEdit, BiPlus, BiExit } from 'react-icons/bi'
+import { FiMoreVertical } from 'react-icons/fi'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
+import type { TinaCMS } from '@tinacms/toolkit'
+
+import type { Collection, Template } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import type { Collection, Template } from '../types'
 
-import type { TinaCMS } from '@tinacms/toolkit'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
+import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
-      {({ open }) => (
+      {() => (
         <div>
           <div>
-            <Menu.Button
-              className="inline-flex items-center px-8 py-2.5 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-              style={{ background: '#0084FF' }}
-            >
-              Create New
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className={`ml-1 flex-0 inline-block opacity-50 group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
-                  open ? `rotate-90 opacity-100` : `rotate-0`
-                }`}
-              >
-                <g opacity="1.0">
-                  <path
-                    d="M7.91675 13.8086L9.16675 15.0586L14.2253 10L9.16675 4.9414L7.91675 6.1914L11.7253 10L7.91675 13.8086Z"
-                    fill="currentColor"
-                  />
-                </g>
-              </svg>
+            <Menu.Button className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6">
+              Create New <BiPlus className="w-5 h-full ml-1 opacity-70" />
             </Menu.Button>
           </div>
 
@@ -69,7 +52,7 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
                   <Menu.Item key={`${template.label}-${template.name}`}>
                     {({ active }) => (
                       <Link
-                        to={`${location.pathname}/${template.name}/new`}
+                        to={`${template.name}/new`}
                         className={`w-full text-md px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
                           active && 'text-gray-800 opacity-100'
                         }`}
@@ -89,8 +72,8 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
 }
 
 const CollectionListPage = () => {
-  const location = useLocation()
   const { collectionName } = useParams()
+  const navigate = useNavigate()
 
   return (
     <GetCMS>
@@ -114,92 +97,184 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
 
               return (
-                <div className="px-6 py-14 h-screen overflow-y-auto flex justify-center">
-                  <div className="max-w-screen-md w-full">
-                    <div className="w-full flex justify-between items-end">
-                      <h3 className="text-3xl">{collection.label}</h3>
-                      {!collection.templates && (
-                        <Link
-                          to={`${location.pathname}/new`}
-                          className="inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-                          style={{ background: '#0084FF' }}
-                        >
-                          Create New
-                        </Link>
-                      )}
-                      {collection.templates && (
-                        <TemplateMenu templates={collection.templates} />
-                      )}
-                    </div>
-
-                    {totalCount > 0 && (
-                      <div className="mt-8 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table className="min-w-full">
-                          <tbody className="bg-white divide-y divide-gray-150">
-                            {documents.map((document) => {
-                              const livesiteRoute = routeMapping
-                                ? routeMapping.mapper(collection, document.node)
-                                : undefined
-
-                              return (
-                                <tr key={document.node.sys.relativePath}>
-                                  <td className="px-5 py-3 whitespace-nowrap">
-                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
-                                      Filename
-                                    </span>
-                                    <Link
-                                      to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="h-5 leading-5 flex max-w-xs"
-                                    >
-                                      <span className="flex-shrink-1 leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
-                                        {document.node.sys.filename}
+                <PageWrapper>
+                  <>
+                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
+                      <>
+                        <h3 className="text-2xl text-gray-700">
+                          {collection.label}
+                        </h3>
+                        {!collection.templates && (
+                          <Link
+                            to={`new`}
+                            className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
+                          >
+                            Create New{' '}
+                            <BiPlus className="w-5 h-full ml-1 opacity-70" />
+                          </Link>
+                        )}
+                        {collection.templates && (
+                          <TemplateMenu templates={collection.templates} />
+                        )}
+                      </>
+                    </PageHeader>
+                    <PageBody>
+                      <div className="w-full mx-auto max-w-screen-xl">
+                        {totalCount > 0 && (
+                          <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
+                            <tbody className="divide-y divide-gray-150">
+                              {documents.map((document) => {
+                                const overrideRoute = routeMapping
+                                  ? routeMapping.mapper(
+                                      collection,
+                                      document.node
+                                    )
+                                  : undefined
+                                return (
+                                  <tr
+                                    key={`document-${document.node.sys.filename}`}
+                                    className=""
+                                  >
+                                    <td className="px-6 py-2 whitespace-nowrap">
+                                      {overrideRoute && (
+                                        <a
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                          href={`${overrideRoute}`}
+                                        >
+                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                          <span>
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Filename
+                                            </span>
+                                            <span className="h-5 leading-5 block whitespace-nowrap">
+                                              {document.node.sys.filename}
+                                            </span>
+                                          </span>
+                                        </a>
+                                      )}
+                                      {!overrideRoute && (
+                                        <Link
+                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                          to={`${document.node.sys.filename}`}
+                                        >
+                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                          <span>
+                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                              Filename
+                                            </span>
+                                            <span className="h-5 leading-5 block whitespace-nowrap">
+                                              {document.node.sys.filename}
+                                            </span>
+                                          </span>
+                                        </Link>
+                                      )}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        Extension
                                       </span>
-                                      <span className="flex-shrink-0 leading-5 text-base font-medium text-gray-300">
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
                                         {document.node.sys.extension}
                                       </span>
-                                    </Link>
-                                  </td>
-                                  <td className="px-5 py-3 whitespace-nowrap">
-                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
-                                      Template
-                                    </span>
-                                    <span className="h-5 block leading-5 font-regular text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-500">
-                                      {document.node.sys.template}
-                                    </span>
-                                  </td>
-                                  <td className="px-5 py-3 whitespace-nowrap flex gap-3 items-center justify-end">
-                                    {livesiteRoute && (
-                                      <a
-                                        href={livesiteRoute}
-                                        className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
-                                      >
-                                        <BiLinkExternal className="inline-block h-5 w-auto opacity-70" />{' '}
-                                        View
-                                      </a>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                        Template
+                                      </span>
+                                      <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                        {document.node.sys.template}
+                                      </span>
+                                    </td>
+                                    {/* For now only route-mapped documents need an alternative edit link */}
+                                    {overrideRoute && (
+                                      <td className="w-0">
+                                        <OverflowMenu
+                                          items={[
+                                            {
+                                              label: 'Edit in Admin',
+                                              icon: BiEdit,
+                                              onClick: () => {
+                                                navigate(
+                                                  `${document.node.sys.filename}`,
+                                                  { replace: true }
+                                                )
+                                              },
+                                            },
+                                          ]}
+                                        />
+                                      </td>
                                     )}
-                                    <Link
-                                      to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="flex gap-1.5 items-center text-base px-4 py-1.5 rounded-full border border-gray-150 transition-all ease-out duration-150 text-gray-700  hover:bg-gray-50 hover:text-blue-500"
-                                    >
-                                      <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
-                                      Edit
-                                    </Link>
-                                  </td>
-                                </tr>
-                              )
-                            })}
-                          </tbody>
-                        </table>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </PageBody>
+                  </>
+                </PageWrapper>
               )
             }}
           </GetCollection>
         )
       }}
     </GetCMS>
+  )
+}
+
+const OverflowMenu = ({ items = [] }) => {
+  if (items.length === 0) return null
+
+  return (
+    <Menu>
+      {({ open }) => (
+        <div className="relative">
+          <Menu.Button
+            className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
+          >
+            <FiMoreVertical
+              className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
+                open
+                  ? `opacity-100 text-blue-500`
+                  : `opacity-70 group-hover:opacity-100`
+              }`}
+            />
+          </Menu.Button>
+          <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
+            <Transition
+              enter="transition duration-150 ease-out"
+              enterFrom="transform opacity-0 -translate-y-2"
+              enterTo="transform opacity-100 translate-y-0"
+              leave="transition duration-75 ease-in"
+              leaveFrom="transform opacity-100 translate-y-0"
+              leaveTo="transform opacity-0 -translate-y-2"
+            >
+              <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
+                {items.map((item) => {
+                  const Icon = item.icon ? item.icon : BiExit
+                  return (
+                    <Menu.Item key={`menu-item-${item.label}`}>
+                      {({ active }) => (
+                        <button
+                          className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
+                            active && 'text-blue-400 bg-gray-50 opacity-100'
+                          }`}
+                          onClick={item.onClick}
+                        >
+                          <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
+                          {item.label}
+                        </button>
+                      )}
+                    </Menu.Item>
+                  )
+                })}
+              </Menu.Items>
+            </Transition>
+          </div>
+        </div>
+      )}
+    </Menu>
   )
 }
 
