@@ -44,7 +44,7 @@ const defaultSidebarPosition = 'displace'
 export interface SidebarProviderProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
-  position?: SidebarStateOptions['displayMode']
+  position?: SidebarStateOptions['position']
 }
 
 export function SidebarProvider({
@@ -59,7 +59,7 @@ export function SidebarProvider({
 
   return (
     <Sidebar
-      displayMode={position}
+      position={position}
       defaultWidth={defaultWidth}
       sidebar={sidebar}
     />
@@ -69,7 +69,7 @@ export function SidebarProvider({
 interface SidebarProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
-  displayMode?: SidebarStateOptions['displayMode']
+  position?: SidebarStateOptions['position']
 }
 
 type displayStates = 'closed' | 'open' | 'fullscreen'
@@ -103,7 +103,7 @@ const useFetchCollections = (cms) => {
   return info
 }
 
-const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
+const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
 
@@ -152,7 +152,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
       if (displayState === 'fullscreen') {
         return
       }
-      if (displayMode === 'displace') {
+      if (position === 'displace') {
         updateBodyDisplacement({ displayState, sidebarWidth, resizingSidebar })
       }
     }
@@ -164,7 +164,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     return () => {
       window.removeEventListener('resize', updateLayout)
     }
-  }, [displayState, displayMode, sidebarWidth, resizingSidebar])
+  }, [displayState, position, sidebarWidth, resizingSidebar])
 
   return (
     <SidebarContext.Provider
@@ -173,7 +173,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         setSidebarWidth,
         displayState,
         setDisplayState,
-        displayMode,
+        position,
         toggleFullscreen,
         toggleSidebarOpen,
         resizingSidebar,
