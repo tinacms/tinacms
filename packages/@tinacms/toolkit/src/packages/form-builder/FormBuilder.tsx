@@ -84,11 +84,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 
   /**
-   * On unmount, clear the `onbeforeunload` event (if one is lingering)
+   * Prevent navigation away from the window when the form is dirty
+   */
+  const onBeforeUnload = React.useCallback(
+    (e) => {
+      e.preventDefault()
+      e.returnValue = ''
+    },
+    [tinaForm]
+  )
+
+  /**
+   * Ensures the `beforeunload` event is removed when the form is unmounted
    */
   React.useEffect(() => {
     return () => {
-      window.onbeforeunload = undefined
+      window.removeEventListener('beforeunload', onBeforeUnload, true)
     }
   }, [])
 
@@ -107,12 +118,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 onPristineChange && onPristineChange(pristine)
 
                 if (!pristine) {
-                  window.onbeforeunload = (event) => {
-                    event.preventDefault()
-                    event.returnValue = ''
-                  }
+                  window.addEventListener('beforeunload', onBeforeUnload)
                 } else {
-                  window.onbeforeunload = undefined
+                  window.removeEventListener('beforeunload', onBeforeUnload)
                 }
               }}
             />
