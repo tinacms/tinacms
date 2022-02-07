@@ -56,7 +56,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           )}
           RenderNavCollection={({ collection }) => (
             <SidebarLink
-              label={collection.label}
+              label={collection.label ? collection.label : collection.name}
               to={`collections/${collection.name}`}
               Icon={ImFilesEmpty}
             />
