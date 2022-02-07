@@ -127,14 +127,12 @@ export const ImageUpload = ({
             <>
               <StyledImage src={previewSrc} />
               {onClear && (
-                <DeleteButton
+                <DeleteImageButton
                   onClick={(e) => {
                     e.stopPropagation()
                     onClear()
                   }}
-                >
-                  <TrashIcon className="w-5/6 h-auto" />
-                </DeleteButton>
+                />
               )}
             </>
           )}
@@ -153,6 +151,18 @@ export const ImageUpload = ({
         </StyledImageContainer>
       )}
     </DropArea>
+  )
+}
+
+export const DeleteImageButton = ({
+  onClick,
+}: {
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+}) => {
+  return (
+    <DeleteButton onClick={onClick}>
+      <TrashIcon className="w-5/6 h-auto" />
+    </DeleteButton>
   )
 }
 
