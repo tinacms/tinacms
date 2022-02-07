@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic'
 const TinaProvider = dynamic(() => import('./_TinaProvider'), { ssr: false })
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
 
-const Tina = ({ children }) => {
+const DynamicTina = ({ children }) => {
   return (
     <>
       <TinaEditProvider editMode={<TinaProvider>{children}</TinaProvider>}>
@@ -12,4 +12,4 @@ const Tina = ({ children }) => {
   )
 }
 
-export default Tina
+export default DynamicTina
