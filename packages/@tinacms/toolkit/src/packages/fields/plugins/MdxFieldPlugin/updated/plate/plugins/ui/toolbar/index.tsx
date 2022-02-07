@@ -238,6 +238,7 @@ export function Toolbar({
                 return (
                   <ToolbarItem
                     key={toolbarItem.name}
+                    name={toolbarItem.name}
                     hidden={hidden}
                     active={toolbarItem.active}
                     onMouseDown={toolbarItem.onMouseDown}
@@ -252,6 +253,7 @@ export function Toolbar({
               return (
                 <ToolbarItem
                   key={toolbarItem.name}
+                  name={toolbarItem.name}
                   hidden={hidden}
                   active={toolbarItem.active}
                   onMouseDown={toolbarItem.onMouseDown}
