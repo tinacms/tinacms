@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.66.2
+
+### Patch Changes
+
+- 102628c7f: Fixes admin page wrapper scrolling
+- 55cb0c5ec: Updates the relativePath field for clarity
+- 9e77273d2: use collection name as fallback for label
+- Updated dependencies [8c18edd5c]
+- Updated dependencies [0773f6486]
+- Updated dependencies [d8cd60f65]
+- Updated dependencies [9e77273d2]
+- Updated dependencies [63a74aece]
+  - @tinacms/toolkit@0.56.12
+
 ## 0.66.1
 
 ### Patch Changes

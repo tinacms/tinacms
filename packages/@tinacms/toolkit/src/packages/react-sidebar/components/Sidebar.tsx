@@ -333,7 +333,7 @@ const SidebarHeader = ({ isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
-      <div className="mt-4 -mb-14 w-full flex items-center justify-between">
+      <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
           <Button
             rounded="right"
@@ -407,7 +407,8 @@ const SidebarCollectionLink = ({
     href={`/admin/collections/${collection.name}`}
     className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
   >
-    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" /> {collection.label}
+    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+    {collection.label ? collection.label : collection.name}
   </a>
 )
 
