@@ -54,12 +54,11 @@ export function SidebarProvider({
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
   const cms = useCMS()
-
   if (!cms.enabled) return null
 
   return (
     <Sidebar
-      position={position}
+      position={cms?.sidebar?.position || position}
       defaultWidth={defaultWidth}
       sidebar={sidebar}
     />
