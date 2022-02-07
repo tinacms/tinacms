@@ -20,7 +20,7 @@ export const PageWrapper = ({
   children: React.ReactChild | React.ReactChildren
 }) => {
   return (
-    <div className="relative left-0 w-full h-full bg-gray-50 shadow-2xl overflow-hidden transition-opacity duration-300 ease-out flex flex-col opacity-100">
+    <div className="relative left-0 w-full h-full bg-gray-50 shadow-2xl overflow-y-auto transition-opacity duration-300 ease-out flex flex-col opacity-100">
       {children}
     </div>
   )
