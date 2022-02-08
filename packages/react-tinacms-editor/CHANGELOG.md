@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.53.4
+
+### Patch Changes
+
+- Updated dependencies [e41b709ce]
+  - @tinacms/toolkit@0.56.13
+
+## 0.53.3
+
+### Patch Changes
+
+- 8c18edd5c: restore event handlers that were detached from most field types
+- Updated dependencies [8c18edd5c]
+- Updated dependencies [0773f6486]
+- Updated dependencies [d8cd60f65]
+- Updated dependencies [9e77273d2]
+- Updated dependencies [63a74aece]
+  - @tinacms/toolkit@0.56.12
+
 ## 0.53.2
 
 ### Patch Changes

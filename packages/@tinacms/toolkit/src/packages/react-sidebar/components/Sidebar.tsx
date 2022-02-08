@@ -44,7 +44,7 @@ const defaultSidebarPosition = 'displace'
 export interface SidebarProviderProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
-  position?: SidebarStateOptions['displayMode']
+  position?: SidebarStateOptions['position']
 }
 
 export function SidebarProvider({
@@ -54,12 +54,12 @@ export function SidebarProvider({
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
   const cms = useCMS()
-
   if (!cms.enabled) return null
 
   return (
     <Sidebar
-      displayMode={position}
+      // @ts-ignore
+      position={cms?.sidebar?.position || position}
       defaultWidth={defaultWidth}
       sidebar={sidebar}
     />
@@ -69,7 +69,7 @@ export function SidebarProvider({
 interface SidebarProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
-  displayMode?: SidebarStateOptions['displayMode']
+  position?: SidebarStateOptions['position']
 }
 
 type displayStates = 'closed' | 'open' | 'fullscreen'
@@ -103,7 +103,7 @@ const useFetchCollections = (cms) => {
   return info
 }
 
-const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
+const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
 
@@ -151,7 +151,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
       if (displayState === 'fullscreen') {
         return
       }
-      if (displayMode === 'displace') {
+      if (position === 'displace') {
         updateBodyDisplacement({ displayState, sidebarWidth, resizingSidebar })
       }
     }
@@ -163,7 +163,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
     return () => {
       window.removeEventListener('resize', updateLayout)
     }
-  }, [displayState, displayMode, sidebarWidth, resizingSidebar])
+  }, [displayState, position, sidebarWidth, resizingSidebar])
 
   return (
     <SidebarContext.Provider
@@ -172,7 +172,7 @@ const Sidebar = ({ sidebar, defaultWidth, displayMode }: SidebarProps) => {
         setSidebarWidth,
         displayState,
         setDisplayState,
-        displayMode,
+        position,
         toggleFullscreen,
         toggleSidebarOpen,
         resizingSidebar,
@@ -332,7 +332,7 @@ const SidebarHeader = ({ isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
-      <div className="mt-4 -mb-14 w-full flex items-center justify-between">
+      <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
           <Button
             rounded="right"
@@ -406,7 +406,8 @@ const SidebarCollectionLink = ({
     href={`/admin/collections/${collection.name}`}
     className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
   >
-    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" /> {collection.label}
+    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+    {collection.label ? collection.label : collection.name}
   </a>
 )
 

@@ -28,14 +28,16 @@ import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-gra
 
 const createDocument = async (
   cms: TinaCMS,
-  collection: { name: string },
+  collection: { name: string; format: string },
   template: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
   const api = new TinaAdminApi(cms)
-  const { relativePath, ...leftover } = values
+  const { filename, ...leftover } = values
   const { includeCollection, includeTemplate } = mutationInfo
+
+  const relativePath = `${filename}.${collection.format}`
   const params = transformDocumentIntoMutationRequestPayload(
     {
       _collection: collection.name,
@@ -87,11 +89,24 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
       label: 'form',
       fields: [
         {
-          name: 'relativePath',
-          label: 'Relative Path',
+          name: 'filename',
+          label: 'Filename',
           component: 'text',
-          required: true,
-          defaultValue: `${collection.name}${Date.now()}.${collection.format}`,
+          description: `A unique filename for the content.  Example: My_Document`,
+          placeholder: `My_Document`,
+          validate: (value, allValues, meta) => {
+            if (!value) {
+              if (meta.dirty) {
+                return 'Required'
+              }
+              return true
+            }
+
+            const isValid = /^[_a-zA-Z][-,_a-zA-Z0-9]*$/.test(value)
+            if (value && !isValid) {
+              return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, - or _'
+            }
+          },
         },
         ...fields,
       ],
@@ -114,7 +129,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
                   to={`/collections/${collection.name}`}
                   className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
                 >
-                  {collection.label}
+                  {collection.label ? collection.label : collection.name}
                 </Link>
                 <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
               </span>

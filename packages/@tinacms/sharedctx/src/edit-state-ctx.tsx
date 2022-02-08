@@ -20,7 +20,9 @@ const isSSR = typeof window === 'undefined'
 
 export const isEditing = (): boolean => {
   if (!isSSR) {
-    const isEdit = window.localStorage.getItem(LOCALSTORAGEKEY)
+    // localStorage may be intentionally disabled for site visitors, 
+    // in that case Tina can't be used so just return false
+    const isEdit = window.localStorage && window.localStorage.getItem(LOCALSTORAGEKEY)
     return isEdit && isEdit === 'true'
   }
   // assume not editing if SSR

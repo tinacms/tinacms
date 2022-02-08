@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.60.5
+
+### Patch Changes
+
+- 399fbf4fa: Fix an issue where builds weren't happening during CI, this is only an issue for the experimental data layer
+
 ## 0.60.4
 
 ### Patch Changes
