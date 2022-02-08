@@ -23,6 +23,7 @@ import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -37,7 +38,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = ({ tinaForm, field }: GroupProps) => {
+export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
   const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
@@ -64,7 +65,7 @@ export const Group = ({ tinaForm, field }: GroupProps) => {
       />
     </>
   )
-}
+})
 
 interface PanelProps {
   setExpanded(next: boolean): void

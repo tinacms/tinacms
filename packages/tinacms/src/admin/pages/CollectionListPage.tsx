@@ -98,7 +98,9 @@ const CollectionListPage = () => {
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
                         <h3 className="text-2xl text-gray-700">
-                          {collection.label}
+                          {collection.label
+                            ? collection.label
+                            : collection.name}
                         </h3>
                         {!collection.templates && (
                           <Link

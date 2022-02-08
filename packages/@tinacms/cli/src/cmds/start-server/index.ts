@@ -112,6 +112,16 @@ stack: ${code.stack || 'No stack was provided'}`)
   }
   let ready = false
 
+  const build = async (noSDK?: boolean) => {
+    if (!process.env.CI && !noWatch) {
+      await resetGeneratedFolder()
+    }
+    const database = await createDatabase({ store, bridge })
+    await compile(null, null)
+    const schema = await buildSchema(rootPath, database)
+    await genTypes({ schema }, () => {}, { noSDK })
+  }
+
   if (!noWatch && !process.env.CI) {
     chokidar
       .watch([`${rootPath}/**/*.{ts,gql,graphql}`], {
@@ -154,16 +164,10 @@ stack: ${code.stack || 'No stack was provided'}`)
           }
         }
       })
-  }
-
-  const build = async (noSDK?: boolean) => {
-    if (!process.env.CI && !noWatch) {
-      await resetGeneratedFolder()
+  } else {
+    if (shouldBuild) {
+      await build(noSDK)
     }
-    const database = await createDatabase({ store, bridge })
-    await compile(null, null)
-    const schema = await buildSchema(rootPath, database)
-    await genTypes({ schema }, () => {}, { noSDK })
   }
 
   const state = {

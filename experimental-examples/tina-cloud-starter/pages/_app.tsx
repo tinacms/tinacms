@@ -23,6 +23,7 @@ const App = ({ Component, pageProps }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
               cms.flags.set("branch-switcher", true);
+              cms.flags.set("rich-text-alt", true);
 
               /**
                * Enables `tina-admin` specific features in the Tina Sidebar
