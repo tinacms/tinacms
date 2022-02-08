@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.13
+
+### Patch Changes
+
+- e41b709ce: Fix sidebar position
+
 ## 0.56.12
 
 ### Patch Changes
