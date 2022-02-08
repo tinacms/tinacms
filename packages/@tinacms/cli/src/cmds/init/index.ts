@@ -80,8 +80,8 @@ const baseDir = process.cwd()
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
 const TinaProviderFolder = p.join(baseDir, '.tina', 'components', 'provider')
-const TinaProviderPath = p.join(TinaProviderFolder, '_TinaProvider.tsx')
-const TinaProviderPathIndex = p.join(TinaProviderFolder, 'index.tsx')
+const TinaProviderPath = p.join(TinaProviderFolder, '_TinaProvider.js')
+const TinaProviderPathIndex = p.join(TinaProviderFolder, 'index.js')
 
 export async function tinaSetup(ctx: any, next: () => void, options) {
   const useingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
