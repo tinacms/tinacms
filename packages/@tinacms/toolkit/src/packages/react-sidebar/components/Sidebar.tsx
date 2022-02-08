@@ -58,6 +58,7 @@ export function SidebarProvider({
 
   return (
     <Sidebar
+      // @ts-ignore
       position={cms?.sidebar?.position || position}
       defaultWidth={defaultWidth}
       sidebar={sidebar}
