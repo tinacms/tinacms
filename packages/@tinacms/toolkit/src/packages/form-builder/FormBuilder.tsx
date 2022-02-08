@@ -86,22 +86,31 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   /**
    * Prevent navigation away from the window when the form is dirty
    */
-  const onBeforeUnload = React.useCallback(
-    (e) => {
-      e.preventDefault()
-      e.returnValue = ''
-    },
-    [tinaForm]
-  )
-
-  /**
-   * Ensures the `beforeunload` event is removed when the form is unmounted
-   */
   React.useEffect(() => {
-    return () => {
-      window.removeEventListener('beforeunload', onBeforeUnload, true)
+    const onBeforeUnload = (event) => {
+      event.preventDefault()
+      event.returnValue = ''
     }
-  }, [])
+
+    const unsubscribe = finalForm.subscribe(
+      ({ pristine }) => {
+        if (onPristineChange) {
+          onPristineChange(pristine)
+        }
+
+        if (!pristine) {
+          window.addEventListener('beforeunload', onBeforeUnload)
+        } else {
+          window.removeEventListener('beforeunload', onBeforeUnload)
+        }
+      },
+      { pristine: true }
+    )
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
+      unsubscribe()
+    }
+  }, [finalForm])
 
   return (
     <FinalForm
@@ -112,18 +121,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       {({ handleSubmit, pristine, invalid, submitting }) => {
         return (
           <>
-            <FormSpy
-              subscription={{ pristine: true }}
-              onChange={({ pristine }) => {
-                onPristineChange && onPristineChange(pristine)
-
-                if (!pristine) {
-                  window.addEventListener('beforeunload', onBeforeUnload)
-                } else {
-                  window.removeEventListener('beforeunload', onBeforeUnload)
-                }
-              }}
-            />
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
                 <FormWrapper id={tinaForm.id}>
