@@ -26,6 +26,7 @@ import {
 import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
+import { TinaProvider, TinaProviderIndex } from './setup-files/tinaProvider'
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -76,10 +77,12 @@ export async function installDeps(ctx: any, next: () => void, options) {
 
 const baseDir = process.cwd()
 // TODO: should handle src folder here
-const TinaWrapperPathDir = p.join(baseDir, 'components')
-const TinaWrapperPath = p.join(TinaWrapperPathDir, 'tina-wrapper.tsx')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
+const TinaProviderFolder = p.join(baseDir, '.tina', 'components', 'provider')
+const TinaProviderPath = p.join(TinaProviderFolder, '_TinaProvider.tsx')
+const TinaProviderPathIndex = p.join(TinaProviderFolder, 'index.tsx')
+
 export async function tinaSetup(ctx: any, next: () => void, options) {
   const useingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
 
@@ -90,12 +93,16 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
     fs.writeFileSync(blogPostPath, blogPost)
   }
 
-  // // 2. Create a Tina Wrapper
-  // if (!fs.pathExistsSync(TinaWrapperPath)) {
-  //   logger.info(logText('Adding a tina-wrapper...'))
-  //   fs.mkdirpSync(TinaWrapperPathDir)
-  //   fs.writeFileSync(TinaWrapperPath, TinaWrapper)
-  // }
+  // 2. Create a Tina Provider
+  if (
+    !fs.pathExistsSync(TinaProviderFolder) &&
+    !fs.existsSync(TinaProviderPath) &&
+    !fs.existsSync(TinaProviderPathIndex)
+  ) {
+    fs.mkdirpSync(TinaProviderFolder)
+    fs.writeFileSync(TinaProviderPath, TinaProvider)
+    fs.writeFileSync(TinaProviderPathIndex, TinaProviderIndex)
+  }
   logger.level = 'info'
 
   // 3. Create an _app.js
@@ -103,12 +110,11 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   const appPath = p.join(pagesPath, '_app.js')
   const appPathTS = p.join(pagesPath, '_app.tsx')
   const appExtension = fs.existsSync(appPath) ? '.js' : '.tsx'
-  let wrapper = false
 
   if (!fs.pathExistsSync(appPath) && !fs.pathExistsSync(appPathTS)) {
     // if they don't have a _app.js or an _app.tsx just make one
     logger.info(logText('Adding _app.js ... ✅'))
-    fs.writeFileSync(appPath, AppJsContent())
+    fs.writeFileSync(appPath, AppJsContent(useingSrc))
   } else {
     // Ask the user if they want to update there _app.js
     const override = await prompts({
@@ -132,14 +138,13 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
       const primaryMatches = matches.map((x) => x[0])
       fs.writeFileSync(
         appPathWithExtension,
-        AppJsContent(primaryMatches.join('\n'))
+        AppJsContent(useingSrc, primaryMatches.join('\n'))
       )
     } else {
-      wrapper = true
       logger.info(
         dangerText(
           `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
-          warnText(AppJsContent())
+          warnText(AppJsContent(useingSrc))
         )
       )
     }
