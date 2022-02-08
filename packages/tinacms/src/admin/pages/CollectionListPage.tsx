@@ -12,17 +12,13 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiExit } from 'react-icons/bi'
-import { FiMoreVertical } from 'react-icons/fi'
+import { BiEdit, BiPlus } from 'react-icons/bi'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
-
-import type { TinaCMS } from '@tinacms/toolkit'
-
+import { TinaCMS } from '@tinacms/toolkit'
 import type { Collection, Template } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 
@@ -187,25 +183,6 @@ const CollectionListPage = () => {
                                         {document.node.sys.template}
                                       </span>
                                     </td>
-                                    {/* For now only route-mapped documents need an alternative edit link */}
-                                    {overrideRoute && (
-                                      <td className="w-0">
-                                        <OverflowMenu
-                                          items={[
-                                            {
-                                              label: 'Edit in Admin',
-                                              icon: BiEdit,
-                                              onClick: () => {
-                                                navigate(
-                                                  `${document.node.sys.filename}`,
-                                                  { replace: true }
-                                                )
-                                              },
-                                            },
-                                          ]}
-                                        />
-                                      </td>
-                                    )}
                                   </tr>
                                 )
                               })}
@@ -225,59 +202,60 @@ const CollectionListPage = () => {
   )
 }
 
-const OverflowMenu = ({ items = [] }) => {
-  if (items.length === 0) return null
+// const OverflowMenu = ({ items = [] }) => {
+//   if (items.length === 0) return null
 
-  return (
-    <Menu>
-      {({ open }) => (
-        <div className="relative">
-          <Menu.Button
-            className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
-          >
-            <FiMoreVertical
-              className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
-                open
-                  ? `opacity-100 text-blue-500`
-                  : `opacity-70 group-hover:opacity-100`
-              }`}
-            />
-          </Menu.Button>
-          <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
-            <Transition
-              enter="transition duration-150 ease-out"
-              enterFrom="transform opacity-0 -translate-y-2"
-              enterTo="transform opacity-100 translate-y-0"
-              leave="transition duration-75 ease-in"
-              leaveFrom="transform opacity-100 translate-y-0"
-              leaveTo="transform opacity-0 -translate-y-2"
-            >
-              <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
-                {items.map((item) => {
-                  const Icon = item.icon ? item.icon : BiExit
-                  return (
-                    <Menu.Item key={`menu-item-${item.label}`}>
-                      {({ active }) => (
-                        <button
-                          className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
-                            active && 'text-blue-400 bg-gray-50 opacity-100'
-                          }`}
-                          onClick={item.onClick}
-                        >
-                          <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
-                          {item.label}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  )
-                })}
-              </Menu.Items>
-            </Transition>
-          </div>
-        </div>
-      )}
-    </Menu>
-  )
-}
+//   return (
+//     <Menu>
+//       {({ open }) => (
+//         <div className="relative">
+//           <Menu.Button
+//             className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
+//           >
+//             <FiMoreVertical
+//               className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
+//                 open
+//                   ? `opacity-100 text-blue-500`
+//                   : `opacity-70 group-hover:opacity-100`
+//               }`}
+//             />
+//           </Menu.Button>
+//           <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
+//             <Transition
+//               enter="transition duration-150 ease-out"
+//               enterFrom="transform opacity-0 -translate-y-2"
+//               enterTo="transform opacity-100 translate-y-0"
+//               leave="transition duration-75 ease-in"
+//               leaveFrom="transform opacity-100 translate-y-0"
+//               leaveTo="transform opacity-0 -translate-y-2"
+//             >
+//               <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
+//                 {items.map((item) => {
+//                   if (!item) return null
+//                   const Icon = item.icon ? item.icon : BiExit
+//                   return (
+//                     <Menu.Item key={`menu-item-${item.label}`}>
+//                       {({ active }) => (
+//                         <button
+//                           className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
+//                             active && 'text-blue-400 bg-gray-50 opacity-100'
+//                           }`}
+//                           onClick={item.onClick}
+//                         >
+//                           <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
+//                           {item.label}
+//                         </button>
+//                       )}
+//                     </Menu.Item>
+//                   )
+//                 })}
+//               </Menu.Items>
+//             </Transition>
+//           </div>
+//         </div>
+//       )}
+//     </Menu>
+//   )
+// }
 
 export default CollectionListPage
