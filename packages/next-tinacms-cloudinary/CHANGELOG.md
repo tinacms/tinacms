@@ -1,5 +1,7 @@
 # next-tinacms-cloudinary
 
+## 3.5.7
+
 ## 3.5.6
 
 ### Patch Changes
