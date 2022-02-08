@@ -21,7 +21,7 @@ import { NoFormsPlaceholder } from './components/NoFormsPlaceHolder'
 import * as React from 'react'
 
 export interface SidebarStateOptions {
-  displayMode?: SidebarPosition
+  position?: SidebarPosition
   buttons?: SidebarButtons
   placeholder?: React.FC
   defaultWidth?: number
