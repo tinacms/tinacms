@@ -253,6 +253,7 @@ type PagesBlocksTestimonial {
 union PagesBlocks = PagesBlocksHero | PagesBlocksFeatures | PagesBlocksContent | PagesBlocksTestimonial
 
 type Pages {
+  test: String
   blocks: [PagesBlocks]
 }
 
@@ -410,6 +411,7 @@ input PagesBlocksMutation {
 }
 
 input PagesMutation {
+  test: String
   blocks: [PagesBlocksMutation]
 }
 

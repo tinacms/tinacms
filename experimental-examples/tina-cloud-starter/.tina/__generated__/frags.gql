@@ -53,6 +53,7 @@ fragment AuthorsParts on Authors {
 }
 
 fragment PagesParts on Pages {
+  test
   blocks {
     __typename
     ... on PagesBlocksHero {

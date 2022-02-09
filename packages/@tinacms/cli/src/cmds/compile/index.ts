@@ -11,11 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import glob from 'fast-glob'
-import normalize from 'normalize-path'
 import path from 'path'
 import fs from 'fs-extra'
-import * as ts from 'typescript'
+import { build } from 'esbuild'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
@@ -81,32 +79,14 @@ export const compile = async (_ctx, _next) => {
 
 const transpile = async (projectDir, tempDir) => {
   logger.info(logText('Transpiling...'))
-  // Make sure that post paths are posix (unix paths). This is necessary on windows.
-  const posixProjectDir = normalize(projectDir)
-  const posixTempDir = normalize(tempDir)
-
-  return Promise.all(
-    glob
-      // We will replaces \\ with / as required by docs see: https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows
-      .sync(path.join(projectDir, '**', '*.ts').replace(/\\/g, '/'), {
-        ignore: [
-          path
-            .join(projectDir, '__generated__', '**', '*.ts')
-            .replace(/\\/g, '/'),
-        ],
-      })
-      .map(async function (file) {
-        const fullPath = path.resolve(file)
-
-        const contents = await fs.readFileSync(fullPath).toString()
-        const newContent = ts.transpile(contents)
-        const newPath = file
-          .replace(posixProjectDir, posixTempDir)
-          .replace('.ts', '.js')
-        await fs.outputFile(newPath, newContent)
-        return true
-      })
-  )
+  const inputPath = path.join(projectDir, 'schema.ts')
+  const outputPath = path.join(tempDir, 'schema.js')
+  await build({
+    entryPoints: [inputPath],
+    target: 'es6',
+    treeShaking: true,
+    outfile: outputPath,
+  })
 }
 
 export const defineSchema = (config: TinaCloudSchema) => {

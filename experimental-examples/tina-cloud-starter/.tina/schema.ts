@@ -707,6 +707,10 @@ export default defineSchema({
       path: "content/pages",
       fields: [
         {
+          type: "string",
+          name: "test",
+        },
+        {
           type: "object",
           list: true,
           name: "blocks",
