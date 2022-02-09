@@ -95,6 +95,9 @@ class FormifyError extends Error {
   }
 }
 
+/**
+ * TODO: this is currently only used for testing, `formify` is where the primary logic is housed
+ */
 export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
   const [state, dispatch] = React.useReducer(reducer, {
     status: 'pending',
@@ -112,141 +115,51 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
       const formifiedQuery = formify({
         schema: state.schema,
         query,
-        state,
-        dispatch,
       })
       dispatch({ type: 'setQuery', value: formifiedQuery })
     }
   }, [state.status])
 
-  const formify = ({
-    schema,
-    query,
-    state,
-    dispatch,
-  }: {
-    schema: GraphQLSchema
-    query: string
-    state: State
-    dispatch: Dispatch
-  }): DocumentNode => {
-    const documentNode = G.parse(query)
-    const visitor2: VisitorType = {
-      OperationDefinition: (node) => {
-        if (!node.name) {
-          return {
-            ...node,
-            name: {
-              kind: 'Name',
-              // FIXME: add some sort of uuid to this
-              value: `QueryOperation`,
-            },
-          }
-        }
-        return node
-      },
-    }
-    const documentNodeWithName = visit(documentNode, visitor2)
+  return {
+    query: G.print(state.query),
+    status: state.status,
+    nodes: state.nodes,
+  }
+}
 
-    const [optimizedQuery] = optimizeDocuments(
-      state.schema,
-      [documentNodeWithName],
-      {
-        assumeValid: true,
-        // Include actually means to keep them as part of the document.
-        // We want to merge them into the query so there's a single top-level node
-        includeFragments: false,
-        noLocation: true,
-      }
-    )
-    const typeInfo = new G.TypeInfo(schema)
-    return {
-      kind: 'Document',
-      definitions: optimizedQuery.definitions.map((definition) => {
-        typeInfo.enter(definition)
-        util.ensureOperationDefinition(definition)
-        const type = typeInfo.getType()
-        const namedType = G.getNamedType(type)
-        util.ensureObjectType(namedType)
+export const formify = ({
+  schema,
+  query,
+}: {
+  schema: GraphQLSchema
+  query: string
+}): DocumentNode => {
+  const documentNode = G.parse(query)
+  const visitor2: VisitorType = {
+    OperationDefinition: (node) => {
+      if (!node.name) {
         return {
-          ...definition,
-          selectionSet: {
-            kind: 'SelectionSet',
-            selections: definition.selectionSet.selections.map(
-              (selectionNode) => {
-                switch (selectionNode.kind) {
-                  case 'Field':
-                    const parentType = type
-                    const namedParentType = G.getNamedType(parentType)
-                    util.ensureObjectType(namedParentType)
-                    const field = util.getObjectField(
-                      namedParentType,
-                      selectionNode
-                    )
-                    const namedFieldType = G.getNamedType(field.type)
-                    if (util.isNodeField(namedFieldType)) {
-                      return formifyNode({
-                        fieldOrInlineFragmentNode: selectionNode,
-                        parentType: field.type,
-                      })
-                    } else if (util.isConnectionField(namedFieldType)) {
-                      return formifyConnection({
-                        namedFieldType,
-                        selectionNode,
-                      })
-                    }
-
-                    /**
-                     * `getCollection` and `getColletions` include a `documents` list field
-                     * which can possibly be formified.
-                     */
-                    if (
-                      selectionNode.name.value === COLLECTION_FIELD_NAME ||
-                      selectionNode.name.value === COLLECTIONS_FIELD_NAME
-                    ) {
-                      return {
-                        ...selectionNode,
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: selectionNode.selectionSet.selections.map(
-                            (selectionNode) => {
-                              switch (selectionNode.kind) {
-                                case 'Field':
-                                  if (
-                                    selectionNode.name.value ===
-                                    COLLECTIONS_DOCUMENTS_NAME
-                                  ) {
-                                    util.ensureObjectType(namedFieldType)
-                                    const n =
-                                      namedFieldType.getFields()[
-                                        COLLECTIONS_DOCUMENTS_NAME
-                                      ]
-                                    const docType = G.getNamedType(n.type)
-                                    return formifyConnection({
-                                      namedFieldType: docType,
-                                      selectionNode,
-                                    })
-                                  }
-                                  return selectionNode
-                                default:
-                                  throw new FormifyError('NOOP')
-                              }
-                            }
-                          ),
-                        },
-                      }
-                    }
-                    throw new FormifyError('NOOP')
-                  default:
-                    throw new FormifyError('UNEXPECTED')
-                }
-              }
-            ),
+          ...node,
+          name: {
+            kind: 'Name',
+            // FIXME: add some sort of uuid to this
+            value: `QueryOperation`,
           },
         }
-      }),
-    }
+      }
+      return node
+    },
   }
+  const documentNodeWithName = visit(documentNode, visitor2)
+
+  const [optimizedQuery] = optimizeDocuments(schema, [documentNodeWithName], {
+    assumeValid: true,
+    // Include actually means to keep them as part of the document.
+    // We want to merge them into the query so there's a single top-level node
+    includeFragments: false,
+    noLocation: true,
+  })
+  const typeInfo = new G.TypeInfo(schema)
 
   const formifyConnection = ({ namedFieldType, selectionNode }) => {
     util.ensureObjectType(namedFieldType)
@@ -326,7 +239,7 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
                    */
                   if (G.isInterfaceType(namedParentType)) {
                     const type =
-                      state.schema.getImplementations(namedParentType).objects[
+                      schema.getImplementations(namedParentType).objects[
                         selectionNode.typeCondition.name.value
                       ]
                     return formifyNode({
@@ -511,10 +424,90 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
       },
     }
   }
-
   return {
-    query: G.print(state.query),
-    status: state.status,
-    nodes: state.nodes,
+    kind: 'Document',
+    definitions: optimizedQuery.definitions.map((definition) => {
+      typeInfo.enter(definition)
+      util.ensureOperationDefinition(definition)
+      const type = typeInfo.getType()
+      const namedType = G.getNamedType(type)
+      util.ensureObjectType(namedType)
+      return {
+        ...definition,
+        selectionSet: {
+          kind: 'SelectionSet',
+          selections: definition.selectionSet.selections.map(
+            (selectionNode) => {
+              switch (selectionNode.kind) {
+                case 'Field':
+                  const parentType = type
+                  const namedParentType = G.getNamedType(parentType)
+                  util.ensureObjectType(namedParentType)
+                  const field = util.getObjectField(
+                    namedParentType,
+                    selectionNode
+                  )
+                  const namedFieldType = G.getNamedType(field.type)
+                  if (util.isNodeField(namedFieldType)) {
+                    return formifyNode({
+                      fieldOrInlineFragmentNode: selectionNode,
+                      parentType: field.type,
+                    })
+                  } else if (util.isConnectionField(namedFieldType)) {
+                    return formifyConnection({
+                      namedFieldType,
+                      selectionNode,
+                    })
+                  }
+
+                  /**
+                   * `getCollection` and `getColletions` include a `documents` list field
+                   * which can possibly be formified.
+                   */
+                  if (
+                    selectionNode.name.value === COLLECTION_FIELD_NAME ||
+                    selectionNode.name.value === COLLECTIONS_FIELD_NAME
+                  ) {
+                    return {
+                      ...selectionNode,
+                      selectionSet: {
+                        kind: 'SelectionSet',
+                        selections: selectionNode.selectionSet.selections.map(
+                          (selectionNode) => {
+                            switch (selectionNode.kind) {
+                              case 'Field':
+                                if (
+                                  selectionNode.name.value ===
+                                  COLLECTIONS_DOCUMENTS_NAME
+                                ) {
+                                  util.ensureObjectType(namedFieldType)
+                                  const n =
+                                    namedFieldType.getFields()[
+                                      COLLECTIONS_DOCUMENTS_NAME
+                                    ]
+                                  const docType = G.getNamedType(n.type)
+                                  return formifyConnection({
+                                    namedFieldType: docType,
+                                    selectionNode,
+                                  })
+                                }
+                                return selectionNode
+                              default:
+                                throw new FormifyError('NOOP')
+                            }
+                          }
+                        ),
+                      },
+                    }
+                  }
+                  throw new FormifyError('NOOP')
+                default:
+                  throw new FormifyError('UNEXPECTED')
+              }
+            }
+          ),
+        },
+      }
+    }),
   }
 }
