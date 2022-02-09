@@ -14,7 +14,6 @@ limitations under the License.
 import path from 'path'
 import fs from 'fs-extra'
 import { build } from 'esbuild'
-import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
@@ -82,7 +81,6 @@ export const compile = async (_ctx, _next) => {
 const transpile = async (projectDir, tempDir) => {
   logger.info(logText('Transpiling...'))
 
-  // TODO: handle when no package.json is present
   const packageJSON = JSON.parse(
     fs.readFileSync(packageJSONFilePath).toString() || '{}'
   )
@@ -91,15 +89,33 @@ const transpile = async (projectDir, tempDir) => {
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
 
-  const inputPath = path.join(projectDir, 'schema.ts')
+  // Get file
+  const inputPathTS = path.join(projectDir, 'schema.ts')
+  const inputPathJS = path.join(projectDir, 'schema.js')
+  const inputPathTSX = path.join(projectDir, 'schema.tsx')
+  const inputPathJSX = path.join(projectDir, 'schema.jsx')
+  let inputFile
+
+  // Find the file the user provided
+  if (fs.existsSync(inputPathTS)) {
+    inputFile = inputPathTS
+  } else if (fs.existsSync(inputPathJS)) {
+    inputFile = inputPathJS
+  } else if (fs.existsSync(inputPathTSX)) {
+    inputFile = inputPathTSX
+  } else if (fs.existsSync(inputPathJSX)) {
+    inputFile = inputPathJSX
+  }
+  if (!inputFile) {
+    throw new Error('Must provide a `.tina/schema.{ts,js,tsx,jsx}`')
+  }
+
   const outputPath = path.join(tempDir, 'schema.js')
   await build({
-    // TODO: only load this plugin when working in the mono repo
-    plugins: [pnpPlugin()],
     bundle: true,
     platform: 'node',
     target: ['node10.4'],
-    entryPoints: [inputPath],
+    entryPoints: [inputFile],
     external: [...external, './node_modules/*'],
     treeShaking: true,
     outfile: outputPath,
