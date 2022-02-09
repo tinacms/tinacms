@@ -220,7 +220,11 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
           <Disclosure.Button
             className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
               templates.length === 0 ? `pointer-events-none` : ``
-            } ${!isLast && !open && `border-b border-gray-100`}`}
+            } ${
+              !isLast &&
+              (!open || templates.length === 0) &&
+              `border-b border-gray-100`
+            }`}
           >
             <span
               className={`text-gray-500 group-hover:text-gray-800 transition-all ease-out duration-150 ${
