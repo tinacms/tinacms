@@ -23,7 +23,8 @@ import { Disclosure, Transition } from '@headlessui/react'
 import { useFormPortal } from '../../../form-builder'
 import { PanelHeader } from '../GroupFieldPlugin'
 import { BlockTemplate } from '.'
-import { MdKeyboardArrowDown } from 'react-icons/md'
+import { MdKeyboardArrowDown, MdOutlineClear } from 'react-icons/md'
+import { BiSearch } from 'react-icons/bi'
 
 export const BlockSelectorBig = ({
   templates,
@@ -119,24 +120,42 @@ export const BlockSelectorBig = ({
                   <div className="w-full flex justify-center">
                     <div className="w-full max-w-form">
                       {showFilter && (
-                        <input
-                          type="text"
-                          className={
-                            'shadow-inner focus:shadow-outline focus:border-blue-500 block text-sm px-2.5 py-1.5 mb-3 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded-md'
-                          }
-                          onClick={(event: any) => {
-                            event.stopPropagation()
-                            event.preventDefault()
-                          }}
-                          value={filter}
-                          onChange={(event: any) => {
-                            setFilter(event.target.value)
-                          }}
-                          placeholder="Filter..."
-                        />
+                        <div className="block relative group mb-1">
+                          <input
+                            type="text"
+                            className={
+                              'shadow-inner focus:shadow-outline focus:border-blue-400 focus:outline-none block text-sm pl-2.5 pr-8 py-1.5 text-gray-600 w-full bg-white border border-gray-200 focus:text-gray-900 rounded-md placeholder-gray-400 hover:placeholder-gray-600 transition-all ease-out duration-150'
+                            }
+                            onClick={(event: any) => {
+                              event.stopPropagation()
+                              event.preventDefault()
+                            }}
+                            value={filter}
+                            onChange={(event: any) => {
+                              setFilter(event.target.value)
+                            }}
+                            placeholder="Search"
+                          />
+                          {filter === '' ? (
+                            <BiSearch className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-auto text-blue-500 opacity-70 group-hover:opacity-100 transition-all ease-out duration-150" />
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setFilter('')
+                              }}
+                              className="outline-none focus:outline-none bg-transparent border-0 p-0 m-0 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-all ease-out duration-150"
+                            >
+                              <MdOutlineClear className="w-5 h-auto text-gray-600" />
+                            </button>
+                          )}
+                        </div>
                       )}
+                      {uncategorized.length === 0 &&
+                        categories.length === 0 && (
+                          <EmptyState>No blocks to display.</EmptyState>
+                        )}
                       {uncategorized.length > 0 && categories.length === 0 && (
-                        <CardColumns>
+                        <CardColumns className="pt-3">
                           {uncategorized.map(([name, template]) => (
                             <BlockCard
                               close={close}
@@ -194,18 +213,22 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
     <Disclosure
       defaultOpen={true}
       as="div"
-      className={`left-0 right-0 relative ${
-        !isLast && `border-b border-gray-100`
-      }`}
+      className={`left-0 right-0 relative`}
     >
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`relative block group text-left w-full text-base font-bold tracking-wide text-gray-500 hover:text-gray-800 my-2 truncate ${
-              templates.length === 0 ? `opacity-30 pointer-events-none` : ``
-            }`}
+            className={`relative block group text-left w-full text-base font-bold tracking-wide py-2 truncate ${
+              templates.length === 0 ? `pointer-events-none` : ``
+            } ${!isLast && !open && `border-b border-gray-100`}`}
           >
-            {category}
+            <span
+              className={`text-gray-500 group-hover:text-gray-800 transition-all ease-out duration-150 ${
+                templates.length === 0 ? `opacity-50` : ``
+              }`}
+            >
+              {category}
+            </span>
             {templates.length > 0 && (
               <MdKeyboardArrowDown
                 className={`absolute top-1/2 right-0 w-6 h-auto -translate-y-1/2 text-gray-300 origin-center group-hover:text-blue-500 transition-all duration-150 ease-out ${
@@ -223,7 +246,7 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel as={React.Fragment}>
+            <Disclosure.Panel>
               {templates.length > 0 && (
                 <CardColumns>
                   {templates.map(([name, template]) => (
@@ -239,10 +262,10 @@ const BlockGroup = ({ category, templates, close, isLast = false }) => {
   )
 }
 
-const CardColumns = ({ children }) => {
+const CardColumns = ({ children, className = '' }) => {
   return (
     <div
-      className="w-full py-2 space-y-4"
+      className={`w-full mb-1 -mt-2 ${className}`}
       style={{ columns: '320px', columnGap: '16px' }}
     >
       {children}
@@ -253,8 +276,8 @@ const CardColumns = ({ children }) => {
 const BlockCard = ({ close, name, template }) => {
   return (
     <button
-      className="group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden"
-      style={{ breakInside: 'avoid' }}
+      className="mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden"
+      style={{ breakInside: 'avoid', transform: 'translateZ(0)' }}
       key={name}
       onClick={() => {
         close(name, template)
@@ -271,5 +294,11 @@ const BlockCard = ({ close, name, template }) => {
         <AddIcon className="w-5 h-auto group-hover:text-blue-500 opacity-30 transition-all ease-out duration-150 group-hover:opacity-80" />
       </span>
     </button>
+  )
+}
+
+const EmptyState = ({ children }) => {
+  return (
+    <div className="block relative text-gray-300 italic py-1">{children}</div>
   )
 }
