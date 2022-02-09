@@ -19,6 +19,7 @@ import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
+import { getSchemaPath } from '../../lib'
 
 const tinaPath = path.join(process.cwd(), '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
@@ -40,11 +41,14 @@ export const resetGeneratedFolder = async () => {
 
 export const compile = async (_ctx, _next) => {
   logger.info(logText('Compiling...'))
-  // FIXME: This assume it is a schema.ts file
-  if (
-    !fs.existsSync(tinaPath) ||
-    !fs.existsSync(path.join(tinaPath, 'schema.ts'))
-  ) {
+  let schemaExists = true
+  try {
+    getSchemaPath({ projectDir: tinaPath })
+  } catch (_) {
+    // getSchemaPath will throw an error if it is not found
+    schemaExists = false
+  }
+  if (!schemaExists) {
     // The schema.ts file does not exist
     logger.info(
       dangerText(`
@@ -52,6 +56,7 @@ export const compile = async (_ctx, _next) => {
       See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
       `)
     )
+    // We will default to TS?
     const file = path.join(tinaPath, 'schema.ts')
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
@@ -59,7 +64,7 @@ export const compile = async (_ctx, _next) => {
     await fs.writeFile(file, defaultSchema)
   }
 
-  // Turn the TS files into JS files so they can be exacted
+  // Turns the schema into JS files so they can be run
   await transpile(tinaPath, tinaTempPath)
 
   // Delete the node require cache for .tina temp folder
@@ -88,27 +93,7 @@ const transpile = async (projectDir, tempDir) => {
   const peerDeps = packageJSON?.peerDependencies || []
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
-
-  // Get file
-  const inputPathTS = path.join(projectDir, 'schema.ts')
-  const inputPathJS = path.join(projectDir, 'schema.js')
-  const inputPathTSX = path.join(projectDir, 'schema.tsx')
-  const inputPathJSX = path.join(projectDir, 'schema.jsx')
-  let inputFile
-
-  // Find the file the user provided
-  if (fs.existsSync(inputPathTS)) {
-    inputFile = inputPathTS
-  } else if (fs.existsSync(inputPathJS)) {
-    inputFile = inputPathJS
-  } else if (fs.existsSync(inputPathTSX)) {
-    inputFile = inputPathTSX
-  } else if (fs.existsSync(inputPathJSX)) {
-    inputFile = inputPathJSX
-  }
-  if (!inputFile) {
-    throw new Error('Must provide a `.tina/schema.{ts,js,tsx,jsx}`')
-  }
+  const inputFile = getSchemaPath({ projectDir })
 
   const outputPath = path.join(tempDir, 'schema.js')
   await build({
