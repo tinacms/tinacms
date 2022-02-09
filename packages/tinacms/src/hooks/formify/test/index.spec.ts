@@ -533,7 +533,6 @@ test.each(queries)(
         cms,
       })
     )
-    // await waitForNextUpdate()
     await waitForNextUpdate()
 
     expect(result.current.query).toBeSimilarGqlDoc(formifiedQuery)
