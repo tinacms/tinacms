@@ -11,12 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { renderHook } from '@testing-library/react-hooks'
-import { useFormify } from '.'
+import { useFormify } from '..'
 import { TinaCMS } from '@tinacms/toolkit'
 import './to-be-similar-to'
 import * as G from 'graphql'
-// @ts-ignore this file lives outside of rootDir
-import schemaJSON from '../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
+import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
 
 /**
  * We're just mocking the tina api so we can mimic the real-world getSchema
@@ -26,7 +25,7 @@ const cms = new TinaCMS({
     tina: {
       getSchema: async () => {
         // @ts-ignore
-        return G.buildASTSchema(schemaJSON)
+        return G.buildASTSchema(graphqlJSON)
       },
     },
   },

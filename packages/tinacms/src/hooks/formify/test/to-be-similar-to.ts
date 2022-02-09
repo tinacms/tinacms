@@ -1,17 +1,6 @@
 import { ASTNode, parse, DocumentNode, DefinitionNode, print } from 'graphql'
 import { compareNodes } from '@graphql-tools/utils'
 
-declare global {
-  namespace jest {
-    interface Matchers<R, T> {
-      /**
-       * Normalizes whitespace and performs string comparisons
-       */
-      toBeSimilarGqlDoc(expected: string): R
-    }
-  }
-}
-
 function sortRecursive(a: ASTNode) {
   for (const attr in a) {
     if (a[attr] instanceof Array) {
