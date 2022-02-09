@@ -1,0 +1,241 @@
+{
+  "version": {
+    "fullVersion": "0.59.2",
+    "major": "0",
+    "minor": "59",
+    "patch": "2"
+  },
+  "meta": {},
+  "collections": [
+    {
+      "label": "Page Content",
+      "name": "page",
+      "path": "content/pages",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "string",
+          "namespace": [
+            "page",
+            "title"
+          ]
+        },
+        {
+          "name": "body",
+          "label": "Main Content",
+          "type": "string",
+          "isBody": true,
+          "namespace": [
+            "page",
+            "body"
+          ]
+        },
+        {
+          "label": "Related Page",
+          "name": "relatedPage",
+          "type": "reference",
+          "collections": [
+            "blockPage"
+          ],
+          "namespace": [
+            "page",
+            "relatedPage"
+          ]
+        }
+      ],
+      "namespace": [
+        "page"
+      ]
+    },
+    {
+      "label": "Block Page",
+      "name": "blockPage",
+      "path": "content/block-pages",
+      "fields": [
+        {
+          "label": "Title",
+          "name": "title",
+          "type": "string",
+          "namespace": [
+            "blockPage",
+            "title"
+          ]
+        },
+        {
+          "label": "SEO",
+          "name": "seo",
+          "type": "object",
+          "fields": [
+            {
+              "label": "OG Title",
+              "name": "ogTitle",
+              "type": "string",
+              "namespace": [
+                "blockPage",
+                "seo",
+                "ogTitle"
+              ]
+            }
+          ],
+          "namespace": [
+            "blockPage",
+            "seo"
+          ]
+        },
+        {
+          "label": "Social",
+          "name": "social",
+          "list": true,
+          "type": "object",
+          "fields": [
+            {
+              "label": "Handle",
+              "name": "handle",
+              "type": "string",
+              "namespace": [
+                "blockPage",
+                "social",
+                "handle"
+              ]
+            },
+            {
+              "label": "Platform",
+              "name": "platform",
+              "type": "string",
+              "namespace": [
+                "blockPage",
+                "social",
+                "platform"
+              ]
+            },
+            {
+              "label": "Related Page",
+              "name": "relatedPage",
+              "type": "reference",
+              "collections": [
+                "page"
+              ],
+              "namespace": [
+                "blockPage",
+                "social",
+                "relatedPage"
+              ]
+            }
+          ],
+          "namespace": [
+            "blockPage",
+            "social"
+          ]
+        },
+        {
+          "label": "Related Page",
+          "name": "relatedPage",
+          "type": "reference",
+          "collections": [
+            "page"
+          ],
+          "namespace": [
+            "blockPage",
+            "relatedPage"
+          ]
+        },
+        {
+          "label": "Blocks",
+          "name": "blocks",
+          "type": "object",
+          "list": true,
+          "templates": [
+            {
+              "name": "hero",
+              "label": "Hero",
+              "fields": [
+                {
+                  "label": "Title",
+                  "name": "title",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "hero",
+                    "title"
+                  ]
+                },
+                {
+                  "label": "Description",
+                  "name": "description",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "hero",
+                    "description"
+                  ]
+                },
+                {
+                  "label": "Relation",
+                  "name": "relation",
+                  "type": "reference",
+                  "collections": [
+                    "page"
+                  ],
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "hero",
+                    "relation"
+                  ]
+                }
+              ],
+              "namespace": [
+                "blockPage",
+                "blocks",
+                "hero"
+              ]
+            },
+            {
+              "name": "cta",
+              "label": "Cta",
+              "fields": [
+                {
+                  "label": "Title",
+                  "name": "title",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "cta",
+                    "title"
+                  ]
+                },
+                {
+                  "label": "Action",
+                  "name": "action",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "cta",
+                    "action"
+                  ]
+                }
+              ],
+              "namespace": [
+                "blockPage",
+                "blocks",
+                "cta"
+              ]
+            }
+          ],
+          "namespace": [
+            "blockPage",
+            "blocks"
+          ]
+        }
+      ],
+      "namespace": [
+        "blockPage"
+      ]
+    }
+  ]
+}

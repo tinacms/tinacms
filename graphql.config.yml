@@ -19,3 +19,7 @@ projects:
     schema: packages/@tinacms/graphql/src/spec/page-builder/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.page-builder.gql
+  unitTestExample:
+    schema: experimental-examples/unit-test-example/.tina/__generated__/schema.gql
+    documents:
+      - packages/tinacms/src/hooks/formify/**/*.spec.ts
