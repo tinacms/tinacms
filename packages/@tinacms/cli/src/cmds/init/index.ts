@@ -197,15 +197,3 @@ Enjoy Tina 🦙 !
 `)
   next()
 }
-
-// These things can go on the page
-// For more information visit our docs and check out our getting started guide
-
-// Docs: https://tina.io/docs/tina-cloud/
-// Getting starter guide: https://tina.io/guides/tina-cloud/starter/overview/
-
-// \t3. Update the Schema.ts located ${p.join(
-//   baseDir,
-//   '.tina',
-//   'schema.ts'
-// )} to match your content: https://tina.io/docs/tina-cloud/cli/#defineschema
