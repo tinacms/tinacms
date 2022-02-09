@@ -14,6 +14,7 @@ limitations under the License.
 import path from 'path'
 import fs from 'fs-extra'
 import { build } from 'esbuild'
+import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
@@ -82,9 +83,15 @@ const transpile = async (projectDir, tempDir) => {
   const inputPath = path.join(projectDir, 'schema.ts')
   const outputPath = path.join(tempDir, 'schema.js')
   await build({
+    // TODO: only load this plugin when working in the mon repo
+    plugins: [pnpPlugin()],
+    bundle: true,
+    platform: 'node',
+    target: ['node10.4'],
     entryPoints: [inputPath],
-    target: 'es6',
-    treeShaking: true,
+    // TODO: figure all externals based on package.json?
+    external: ['tinacms', '@tinacms/cli', './node_modules/*'],
+    // treeShaking: true,
     outfile: outputPath,
   })
 }
