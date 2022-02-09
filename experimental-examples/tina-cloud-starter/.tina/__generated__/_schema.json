@@ -713,14 +713,6 @@
       "path": "content/pages",
       "fields": [
         {
-          "type": "string",
-          "name": "test",
-          "namespace": [
-            "pages",
-            "test"
-          ]
-        },
-        {
           "type": "object",
           "list": true,
           "name": "blocks",
