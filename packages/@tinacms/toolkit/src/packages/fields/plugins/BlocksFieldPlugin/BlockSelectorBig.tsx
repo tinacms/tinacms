@@ -280,7 +280,7 @@ const CardColumns = ({ children, className = '' }) => {
 const BlockCard = ({ close, name, template }) => {
   return (
     <button
-      className="mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded bg-white shadow overflow-hidden"
+      className="mb-2 mt-2 group relative text-xs font-bold border border-gray-100 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 rounded-md bg-white shadow overflow-hidden"
       style={{ breakInside: 'avoid', transform: 'translateZ(0)' }}
       key={name}
       onClick={() => {
@@ -293,7 +293,11 @@ const BlockCard = ({ close, name, template }) => {
           className="w-full h-auto transition-all ease-out duration-150 group-hover:opacity-50"
         />
       )}
-      <span className="relative flex justify-between items-center gap-4 w-full py-2 px-4 text-left  border-t border-gray-100">
+      <span
+        className={`relative flex justify-between items-center gap-4 w-full px-4 text-left ${
+          template.previewSrc ? `py-2 border-t border-gray-100 ` : `py-3`
+        }`}
+      >
         {template.label ? template.label : name}
         <AddIcon className="w-5 h-auto group-hover:text-blue-500 opacity-30 transition-all ease-out duration-150 group-hover:opacity-80" />
       </span>
