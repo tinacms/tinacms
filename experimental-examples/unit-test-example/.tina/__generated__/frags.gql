@@ -1,0 +1,48 @@
+fragment PageParts on Page {
+  title
+  body
+  relatedPage {
+    ... on Document {
+      id
+    }
+  }
+}
+
+fragment BlockPageParts on BlockPage {
+  title
+  seo {
+    __typename
+    ogTitle
+  }
+  social {
+    __typename
+    handle
+    platform
+    relatedPage {
+      ... on Document {
+        id
+      }
+    }
+  }
+  relatedPage {
+    ... on Document {
+      id
+    }
+  }
+  blocks {
+    __typename
+    ... on BlockPageBlocksHero {
+      title
+      description
+      relation {
+        ... on Document {
+          id
+        }
+      }
+    }
+    ... on BlockPageBlocksCta {
+      title
+      action
+    }
+  }
+}
