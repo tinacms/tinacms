@@ -125,7 +125,11 @@ stack: ${code.stack || 'No stack was provided'}`)
   if (!noWatch && !process.env.CI) {
     chokidar
       .watch([`${rootPath}/**/*.{ts,gql,graphql,js,tsx,jsx}`], {
-        ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+        ignored: [
+          '**/node_modules/**/*',
+          '**/.next/**/*',
+          `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+        ],
       })
       .on('ready', async () => {
         console.log('Generating Tina config')
