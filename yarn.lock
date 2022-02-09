@@ -4962,6 +4962,8 @@ __metadata:
     "@types/progress": ^2.0.3
     "@types/prompts": ^2.0.13
     "@types/yup": ^0.29.11
+    "@yarnpkg/esbuild-plugin-pnp": ^2.0.1-rc.3
+    add: ^2.0.6
     ajv: ^6.12.3
     altair-express-middleware: 4.0.6
     auto-bind: ^4.0.0
@@ -4985,6 +4987,7 @@ __metadata:
     normalize-path: ^3.0.0
     progress: ^2.0.3
     prompts: ^2.4.1
+    yarn: ^1.22.17
     yup: ^0.32.9
   bin:
     tinacms: bin/tinacms
@@ -8538,6 +8541,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@yarnpkg/esbuild-plugin-pnp@npm:^2.0.1-rc.3":
+  version: 2.0.1-rc.3
+  resolution: "@yarnpkg/esbuild-plugin-pnp@npm:2.0.1-rc.3"
+  dependencies:
+    tslib: ^1.13.0
+  peerDependencies:
+    esbuild: ">=0.10.0"
+  checksum: fae47b1853c9247a175c77c2d4a694af5abe6787433514cc63aa218389e8dc8aae10ed3340d1af68adac8fc38c53709566f4e7270d3b21779c251459fa320660
+  languageName: node
+  linkType: hard
+
 "@yarnpkg/fslib@npm:^2.1.0, @yarnpkg/fslib@npm:^2.4.0":
   version: 2.4.0
   resolution: "@yarnpkg/fslib@npm:2.4.0"
@@ -8757,6 +8771,13 @@ __metadata:
   version: 5.2.6
   resolution: "actioncable@npm:5.2.6"
   checksum: 9e99bce6fba320d92c70e46d4af5a7d6b04bc6f833e701aa6eb57ccd0d0683b8cef7620e1f4b6a9737f73353ee7492aefa7f4f819d70f162295e984dc44a8ae7
+  languageName: node
+  linkType: hard
+
+"add@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "add@npm:2.0.6"
+  checksum: 8599798e63565ee9acb4c0d79485501a60450491c47830fa7bee6ad4f311a880e8f8417deeb69804dbb54765246fd704d3e34fa4ab1b57ed70ae00344ee9d00f
   languageName: node
   linkType: hard
 
@@ -32069,6 +32090,16 @@ typescript@^3.8.3:
     y18n: ^5.0.5
     yargs-parser: ^20.2.2
   checksum: a7969b48d2dea129a7d4fcc3f13e88d4f94bacbd24f720b2ce19946fa9facc42cfed89c059d953091241f4e9e9000ed9dbf86e4bb4b6ceb3a26af10ddebdd0b2
+  languageName: node
+  linkType: hard
+
+"yarn@npm:^1.22.17":
+  version: 1.22.17
+  resolution: "yarn@npm:1.22.17"
+  bin:
+    yarn: ./bin/yarn.js
+    yarnpkg: ./bin/yarn.js
+  checksum: 4453b7e9becc660f5223a8a3189ba8040e526d6aaaca138034c5b2a5d0de652e794317250f283c19c1b8c0af403d64f6e682f598db677fa3372123eaeb613026
   languageName: node
   linkType: hard
 
