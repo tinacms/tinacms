@@ -4971,6 +4971,7 @@ __metadata:
     chokidar: ^3.5.1
     commander: 5.1.0
     cors: ^2.8.5
+    esbuild: ^0.14.20
     esm: 3.2.25
     express: ^4.17.1
     fast-glob: ^3.2.4
@@ -4984,7 +4985,6 @@ __metadata:
     normalize-path: ^3.0.0
     progress: ^2.0.3
     prompts: ^2.4.1
-    typescript: ^4.3.5
     yup: ^0.32.9
   bin:
     tinacms: bin/tinacms
@@ -14416,6 +14416,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esbuild-android-arm64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-android-arm64@npm:0.14.20"
+  checksum: 01a7588a75b0961d9722227f7647301c86e1357b7b524e7403459ad994526887fc85d4429175d462273488dba6a9fc9b11d8e327b21c0b30ac72dcff6c8cb746
+  languageName: node
+  linkType: hard
+
+"esbuild-darwin-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-darwin-64@npm:0.14.20"
+  checksum: 96856d3459dd83cc4e5f47b3dcce8ced0dcec7d88c2040d5defce3861081c76a2d0279d5f4ccfcdfce04bf3ce4af188a4823657c8a446faad945bf1fca82f4bc
+  languageName: node
+  linkType: hard
+
+"esbuild-darwin-arm64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-darwin-arm64@npm:0.14.20"
+  checksum: b2cfc71188c38cb15eff2745aaf142fc81096f01bf2e0b9a49e1f14e8e5a546e8c20512210cbbb0e1b770838e147bc7db3040fb30ec8fec1a39f1fb0a6223a3b
+  languageName: node
+  linkType: hard
+
+"esbuild-freebsd-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-freebsd-64@npm:0.14.20"
+  checksum: 1cde936a22f64e47689bda8ec0996c48c05c16fa9e8fb7be18ce0909f167ed1101d914877514440d3c3743761d62c8477a1d91fe3783b3a0b0a119120f594286
+  languageName: node
+  linkType: hard
+
+"esbuild-freebsd-arm64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-freebsd-arm64@npm:0.14.20"
+  checksum: bcae5f7463f1c113510713066f8bd67677538833c177614b1a7ad1b23eb00657fc326e1d353577268228366c67a431a63c8541e1b15ac0cb3f7442d2b7efe46e
+  languageName: node
+  linkType: hard
+
 "esbuild-jest@npm:^0.5.0":
   version: 0.5.0
   resolution: "esbuild-jest@npm:0.5.0"
@@ -14426,6 +14461,97 @@ __metadata:
   peerDependencies:
     esbuild: ">=0.8.50"
   checksum: 6fdd02b3774ccc75580f2105bfd09c8b8b39ffeb127c61eddc1bbd87c60660cdc39ca9ed6addaa7776819a95ee1bf5bd20428f30844989d68863de5563961827
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-32@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-32@npm:0.14.20"
+  checksum: 1c27d82e5def4c7c3952d0137185af16587482a8c0413869023f8a04c9e63882abe0cd04e2951a5108811f1307d98ecd3268adeddddf2869be827d0b86da3775
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-64@npm:0.14.20"
+  checksum: 20bdcb122691ce3e174f47ce1802b7b384fffa6a2a9b2a1938eaaf90399c958ef3612372b0fbe4f0c779927713d06e61da77567e85dba4881345b9737c54f3c4
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-arm64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-arm64@npm:0.14.20"
+  checksum: e659ec2e6ff3cb3c8c05ad31b4e80490b3980d8002d42804919b86e41c66647be1920d9d818789e9933f13322468c228b84c3c1d843a57d2fbf6004f362eae97
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-arm@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-arm@npm:0.14.20"
+  checksum: 0bcbb4356a136439c9ea42f6e08c536903cb3ba697c47bddf8a72f937504c4460776c201582319a2e115f8868133ca46d0a355b2965efc0ebb4e60dd15b07411
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-mips64le@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-mips64le@npm:0.14.20"
+  checksum: e8a15cc644777987adf2a298b863a7a925cbfc771e14a34349cf89af4230b27642c79801f4e80d458025370de8eb5df95ac2c7d832c7bcbd324fcfb05a116fa1
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-ppc64le@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-ppc64le@npm:0.14.20"
+  checksum: 80f07a9bf1f1e6ec788713ec5e8a87c76e1a2fd319a511faa286e395b3b3a8e442b9114edf22444c16860f1287455e02d279d20b2523d3cf321cb61433438ab1
+  languageName: node
+  linkType: hard
+
+"esbuild-linux-s390x@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-linux-s390x@npm:0.14.20"
+  checksum: c381d2ea36eb88af9e3ca133a87faddbf3d80b1bd27172bb0db01f5419e1d65a479aa51be6aac374f79afc05799a00bee741ce6e7b0596de57e2547f5620e9f5
+  languageName: node
+  linkType: hard
+
+"esbuild-netbsd-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-netbsd-64@npm:0.14.20"
+  checksum: 2c23a6394277b863f610f672339ff4ed3c23579e9942520dec4d848303247743ccb67c4acf96789ea3d83469cd09f78808e84a237ae5b770b5047b9d3d71daa2
+  languageName: node
+  linkType: hard
+
+"esbuild-openbsd-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-openbsd-64@npm:0.14.20"
+  checksum: 341dcbb617bf19c80774e3aaaa40bba93adb27a535cc116c9805d79a7e1b05bf596583f44549d00b9b62d16740e39918aa4a1b90fe96371f3d38d88f1b68f1d1
+  languageName: node
+  linkType: hard
+
+"esbuild-sunos-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-sunos-64@npm:0.14.20"
+  checksum: ba65125cf4a9674743d355de4e992ee719a065a71620e076f85ec3266c744f3bf8c5673418fac6d74f77af6c0229241d0c3ea51a6f6b8b954228d968fc8a102b
+  languageName: node
+  linkType: hard
+
+"esbuild-windows-32@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-windows-32@npm:0.14.20"
+  checksum: 7aa26a9e64bc46c87b0aee9085cb1ed61cf6edc4aa1fe34f6979c6c3329e6b6614b585269229a02b4e290a2c217fc01aef15c9bb0fef2a44c4c4400c3f059a31
+  languageName: node
+  linkType: hard
+
+"esbuild-windows-64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-windows-64@npm:0.14.20"
+  checksum: 3ae0cb9ac361e408b94e495ff13f0fc1c7ecf5e678ae8f21d081024c9b0baeb82b019f24bb2adc443d68d0fdaf97d67257e028c06d95e0d1b584eab3c840e780
+  languageName: node
+  linkType: hard
+
+"esbuild-windows-arm64@npm:0.14.20":
+  version: 0.14.20
+  resolution: "esbuild-windows-arm64@npm:0.14.20"
+  checksum: a1a0131d05d498b0d5cd921316c6512740df3405920dfde3842186aee28203c99604a6ac9e713f5f76358a693493cbf1206f1eb453a12078c4c05f2708dac401
   languageName: node
   linkType: hard
 
@@ -14453,6 +14579,71 @@ __metadata:
   bin:
     esbuild: bin/esbuild
   checksum: 22ec14d41c8a9256934b476575f3dbb47437c3c9953c4e4e00560454449075822c0824fa982a51cb545c255c561a781908da9711081d57b4f3bca15341569906
+  languageName: node
+  linkType: hard
+
+"esbuild@npm:^0.14.20":
+  version: 0.14.20
+  resolution: "esbuild@npm:0.14.20"
+  dependencies:
+    esbuild-android-arm64: 0.14.20
+    esbuild-darwin-64: 0.14.20
+    esbuild-darwin-arm64: 0.14.20
+    esbuild-freebsd-64: 0.14.20
+    esbuild-freebsd-arm64: 0.14.20
+    esbuild-linux-32: 0.14.20
+    esbuild-linux-64: 0.14.20
+    esbuild-linux-arm: 0.14.20
+    esbuild-linux-arm64: 0.14.20
+    esbuild-linux-mips64le: 0.14.20
+    esbuild-linux-ppc64le: 0.14.20
+    esbuild-linux-s390x: 0.14.20
+    esbuild-netbsd-64: 0.14.20
+    esbuild-openbsd-64: 0.14.20
+    esbuild-sunos-64: 0.14.20
+    esbuild-windows-32: 0.14.20
+    esbuild-windows-64: 0.14.20
+    esbuild-windows-arm64: 0.14.20
+  dependenciesMeta:
+    esbuild-android-arm64:
+      optional: true
+    esbuild-darwin-64:
+      optional: true
+    esbuild-darwin-arm64:
+      optional: true
+    esbuild-freebsd-64:
+      optional: true
+    esbuild-freebsd-arm64:
+      optional: true
+    esbuild-linux-32:
+      optional: true
+    esbuild-linux-64:
+      optional: true
+    esbuild-linux-arm:
+      optional: true
+    esbuild-linux-arm64:
+      optional: true
+    esbuild-linux-mips64le:
+      optional: true
+    esbuild-linux-ppc64le:
+      optional: true
+    esbuild-linux-s390x:
+      optional: true
+    esbuild-netbsd-64:
+      optional: true
+    esbuild-openbsd-64:
+      optional: true
+    esbuild-sunos-64:
+      optional: true
+    esbuild-windows-32:
+      optional: true
+    esbuild-windows-64:
+      optional: true
+    esbuild-windows-arm64:
+      optional: true
+  bin:
+    esbuild: bin/esbuild
+  checksum: 61566b9e9b824ae5d6ac975d657b3e700e185e45d11a70a231a567ec2bd81c170b74bbc85f0bcb77cc22bfc75d79ba9ed4f7579723a131b0b05e433906d0c31a
   languageName: node
   linkType: hard
 
@@ -25912,7 +26103,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.53.2, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.53.4, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -29546,7 +29737,7 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.53.2
+    react-tinacms-editor: ^0.53.4
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
