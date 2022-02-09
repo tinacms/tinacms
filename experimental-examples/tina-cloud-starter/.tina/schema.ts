@@ -1,6 +1,6 @@
 import { defineSchema } from "@tinacms/cli";
-import { iconSchema } from "./fields";
 import type { TinaTemplate } from "@tinacms/cli";
+import { iconSchema } from "./fields";
 
 const defaultFeature = {
   title: "Here's Another Feature",

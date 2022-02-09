@@ -22,6 +22,7 @@ import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
 
 const tinaPath = path.join(process.cwd(), '.tina')
+const packageJSONFilePath = path.join(process.cwd(), 'package.json')
 const tinaGeneratedPath = path.join(tinaPath, '__generated__')
 const tinaTempPath = path.join(tinaGeneratedPath, 'temp')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
@@ -80,18 +81,27 @@ export const compile = async (_ctx, _next) => {
 
 const transpile = async (projectDir, tempDir) => {
   logger.info(logText('Transpiling...'))
+
+  // TODO: handle when no package.json is present
+  const packageJSON = JSON.parse(
+    fs.readFileSync(packageJSONFilePath).toString() || '{}'
+  )
+  const deps = packageJSON?.dependencies || []
+  const peerDeps = packageJSON?.peerDependencies || []
+  const devDeps = packageJSON?.devDependencies || []
+  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
+
   const inputPath = path.join(projectDir, 'schema.ts')
   const outputPath = path.join(tempDir, 'schema.js')
   await build({
-    // TODO: only load this plugin when working in the mon repo
+    // TODO: only load this plugin when working in the mono repo
     plugins: [pnpPlugin()],
     bundle: true,
     platform: 'node',
     target: ['node10.4'],
     entryPoints: [inputPath],
-    // TODO: figure all externals based on package.json?
-    external: ['tinacms', '@tinacms/cli', './node_modules/*'],
-    // treeShaking: true,
+    external: [...external, './node_modules/*'],
+    treeShaking: true,
     outfile: outputPath,
   })
 }
