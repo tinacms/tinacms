@@ -68,6 +68,14 @@ export const BlockSelectorBig = ({
       ),
     ]
   }, [templates])
+  const hasUncategorized = React.useMemo(() => {
+    return (
+      Object.entries(templates).filter(([name, template]) => {
+        //@ts-ignore
+        return !template.category
+      }).length > 0
+    )
+  }, [templates])
   const uncategorized = React.useMemo(() => {
     return filteredTemplates.filter(([name, template]) => {
       //@ts-ignore
@@ -182,12 +190,17 @@ export const BlockSelectorBig = ({
                             category={category}
                             isLast={
                               index === categories.length - 1 &&
-                              uncategorized.length < 1
+                              !hasUncategorized
                             }
                             close={close}
                           />
                         )
                       })}
+                      {hasUncategorized && uncategorized.length === 0 && (
+                        <div className="relative text-gray-500 block text-left w-full text-base font-bold tracking-wide py-2 truncate pointer-events-none opacity-50">
+                          Uncategorized
+                        </div>
+                      )}
                       {uncategorized.length > 0 && categories.length > 0 && (
                         <BlockGroup
                           templates={uncategorized}
