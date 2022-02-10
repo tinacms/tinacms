@@ -50,6 +50,7 @@ export const ToolbarItem = ({
   onMouseDown,
   icon,
   options,
+  name,
   isLastItem = false,
 }: ToolbarItemType) => {
   const editor = useEditorState()!
@@ -97,6 +98,7 @@ export const ToolbarItem = ({
     return (
       <span className="relative">
         <span
+          data-test={`${name}Button`}
           className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
             active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
           } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
@@ -123,6 +125,7 @@ export const ToolbarItem = ({
     return (
       <span className="relative">
         <span
+          data-test={`${name}Button`}
           className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
             active
               ? 'bg-gray-50 text-blue-500'
@@ -162,6 +165,7 @@ export const ToolbarItem = ({
 
   return (
     <span
+      data-test={`${name}Button`}
       className={`cursor-pointer w-full inline-flex relative justify-center items-center px-2 py-2 border-l border-b border-t border-r-0 border-gray-200 text-sm font-medium  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
         active ? 'bg-gray-50 text-blue-500' : 'bg-white text-gray-600'
       } ${isLastItem ? 'border-r rounded-r-md' : 'border-r-0'}`}
