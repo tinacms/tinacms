@@ -125,14 +125,25 @@ describe('Tina side bar', () => {
               .scrollIntoView({ easing: 'linear', duration: 100 })
               .then((_) => {
                 // Edit Bold
-                cy.get(SLATE_SELECTOR).click('bottomLeft')
+                cy.get(SLATE_SELECTOR).children().first().click()
+                // cy.get(SLATE_SELECTOR).should('have.focus')
+                // cy.pause()
+                // cy.get('[data-test="overflowMenuButton"]').click()
                 cy.get('[data-test="popoverRichTextButton"]').click()
-                cy.get('[data-test="boldButton"]').click({ timeout: 4000 })
+                // cy.pause()
+                cy.get('[data-test="boldOverflowButton"]').click({
+                  timeout: 4000,
+                })
+                // cy.get(SLATE_SELECTOR).should('have.focus')
                 cy.get(SLATE_SELECTOR)
-                  .click('bottomLeft')
+                  .children()
+                  .first()
+                  .click()
+                  // .should('have.focus')
                   .type('This will be a strong block{enter}')
+                // cy.pause()
                 cy.get('[data-test="popoverRichTextButton"]').click()
-                cy.get('[data-test="boldButton"]').click()
+                cy.get('[data-test="boldOverflowButton"]').click()
                 cy.get(RICH_TEXT_BODY_SELECTOR).should(
                   'contain.html',
                   '<strong>This will be a strong block</strong>'
@@ -151,7 +162,7 @@ describe('Tina side bar', () => {
                 cy.get(SLATE_SELECTOR)
                   .click('bottomLeft')
                   .type('This will be a quote')
-                cy.get('[data-testid="quoteButton"').click({ force: true })
+                cy.get('[data-test="quoteButton"').click()
 
                 cy.get(RICH_TEXT_BODY_SELECTOR).should(
                   'contain.html',
@@ -232,39 +243,31 @@ describe('Tina side bar', () => {
           //   .click({ force: true })
         })
 
-        describe('Saving and refresh', () => {
-          cy.get('button').contains('Save').click()
-          cy.wait('@graphQL')
-          // Fake logout
-          localStorage.setItem('tina.isEditing', '')
-          cy.reload().wait('@next')
-          // Do all assertions again on new data
-          // We can add these back in when they are working
-          // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-          //   'contain.html',
-          //   '<s>This will be a strikethrough block</s>'
-          // )
-          // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-          //   'contain.html',
-          //   '<u>This will be a underline block</u>'
-          // )
-          // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-          //   'contain.html',
-          //   '<em>This will be a italic block</em>'
-          // )
+        // describe('Saving and refresh', () => {
+        // cy.get('button').contains('Save').click()
+        // Fake logout
+        // localStorage.setItem('tina.isEditing', 'true')
+        // cy.reload()
+        // Do all assertions again on new data
+        // We can add these back in when they are working
 
-          // TODO: these tests fail because the server is severing stale data.
-          // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-          //   'contain.html',
-          //   '<strong>This will be a strong block</strong>'
-          // )
+        // cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        //   'contain.html',
+        //   '<em>This will be a italic block</em>'
+        // )
 
-          // Not sure why this version has a P and the other one does not
-          // cy.get(RICH_TEXT_BODY_SELECTOR).should(
-          //   'contain.html',
-          //   '<blockquote><p>This will be a quote</p></blockquote>'
-          // )
-        })
+        // TODO: these tests fail because the server is severing stale data.
+        // cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        //   'contain.html',
+        //   '<strong>This will be a strong block</strong>'
+        // )
+
+        // Not sure why this version has a P and the other one does not
+        // cy.get(RICH_TEXT_BODY_SELECTOR).should(
+        //   'contain.html',
+        //   '<blockquote><p>This will be a quote</p></blockquote>'
+        // )
+        // })
       })
 
     // it('Can edit embedded objects', () => {
