@@ -124,7 +124,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch([`${rootPath}/**/*.{ts,gql,graphql,js,tsx,jsx}`], {
+      .watch([`${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`], {
         ignored: [
           '**/node_modules/**/*',
           '**/.next/**/*',
