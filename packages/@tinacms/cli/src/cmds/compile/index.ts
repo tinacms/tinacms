@@ -104,9 +104,8 @@ const transpile = async (projectDir, tempDir) => {
     external: [...external, './node_modules/*'],
     treeShaking: true,
     loader: {
-      ".svg": "text",
-
-    }
+      '.svg': 'text',
+    },
     outfile: outputPath,
   })
 }
