@@ -91,7 +91,6 @@ export const TinaMarkdown = ({
   }
   const nodes = Array.isArray(content) ? content : content.children
   if (!nodes) {
-    console.log(`Expected to find structured content for TinaMarkdown`)
     return null
   }
   return (
