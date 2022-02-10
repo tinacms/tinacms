@@ -19,7 +19,6 @@ import {
   DocumentNode,
   ASTNode,
 } from 'graphql'
-import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
 import React from 'react'
 import * as G from 'graphql'
 import * as util from './util'
@@ -90,7 +89,7 @@ class FormifyError extends Error {
         message = ''
         break
     }
-    super(`${message} ${details}`)
+    super(`${message} ${details || ''}`)
     this.name = 'FormifyError'
   }
 }
@@ -111,13 +110,17 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
     })
   }, [])
   React.useEffect(() => {
-    if (state.status === 'ready') {
-      const formifiedQuery = formify({
-        schema: state.schema,
-        query,
-      })
-      dispatch({ type: 'setQuery', value: formifiedQuery })
+    const run = async () => {
+      if (state.status === 'ready') {
+        const formifiedQuery = await formify({
+          schema: state.schema,
+          query,
+          getOptimizedQuery: cms.api.tina.getOptimizedQuery,
+        })
+        dispatch({ type: 'setQuery', value: formifiedQuery })
+      }
     }
+    run()
   }, [state.status])
 
   return {
@@ -127,13 +130,15 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
   }
 }
 
-export const formify = ({
+export const formify = async ({
   schema,
   query,
+  getOptimizedQuery,
 }: {
   schema: GraphQLSchema
   query: string
-}): DocumentNode => {
+  getOptimizedQuery: (query: DocumentNode) => Promise<DocumentNode>
+}): Promise<DocumentNode> => {
   const documentNode = G.parse(query)
   const visitor2: VisitorType = {
     OperationDefinition: (node) => {
@@ -151,14 +156,7 @@ export const formify = ({
     },
   }
   const documentNodeWithName = visit(documentNode, visitor2)
-
-  const [optimizedQuery] = optimizeDocuments(schema, [documentNodeWithName], {
-    assumeValid: true,
-    // Include actually means to keep them as part of the document.
-    // We want to merge them into the query so there's a single top-level node
-    includeFragments: false,
-    noLocation: true,
-  })
+  const optimizedQuery = await getOptimizedQuery(documentNodeWithName)
   const typeInfo = new G.TypeInfo(schema)
 
   const formifyConnection = ({ namedFieldType, selectionNode }) => {
@@ -348,6 +346,9 @@ export const formify = ({
                 const field = util.getObjectField(namedType, selectionNode)
                 if (!field) {
                   return fieldNode
+                }
+                if (G.isScalarType(G.getNamedType(field.type))) {
+                  return selectionNode
                 }
                 return {
                   ...selectionNode,
