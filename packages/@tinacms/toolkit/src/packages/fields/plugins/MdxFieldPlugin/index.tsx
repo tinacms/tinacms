@@ -25,9 +25,9 @@ export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: (props) => {
     const cms = useCMS()
-    if (cms.flags.get('rich-text-alt')) {
-      return <RichEditorUpdated {...props} />
+    if (cms.flags.get('rich-text-alt') === false) {
+      return <RichEditor {...props} />
     }
-    return <RichEditor {...props} />
+    return <RichEditorUpdated {...props} />
   },
 }
