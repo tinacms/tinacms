@@ -526,15 +526,15 @@ type Test = {
 }
 
 const queries: Test[] = [
-  // basic,
-  // withNestedReference,
+  basic,
+  withNestedReference,
   withNestedReferenceInsideObjectList,
-  // withNestedReferenceInsideObjectList2,
-  // withAListQuery,
-  // withAGenericQuery,
-  // withACollectionQuery,
-  // withACollectionsQuery,
-  // withANodeQuery,
+  withNestedReferenceInsideObjectList2,
+  withAListQuery,
+  withAGenericQuery,
+  withACollectionQuery,
+  withACollectionsQuery,
+  withANodeQuery,
 ]
 
 test.each(queries)(

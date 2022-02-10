@@ -427,7 +427,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -443,6 +443,39 @@
         "value": "Query"
       },
       "fields": [
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "getOptimizedQuery"
+          },
+          "arguments": [
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "queryString"
+              },
+              "type": {
+                "kind": "NonNullType",
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "String"
+                  }
+                }
+              }
+            }
+          ],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
         {
           "kind": "FieldDefinition",
           "name": {
@@ -625,7 +658,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -639,7 +672,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -751,7 +784,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -765,7 +798,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -859,7 +892,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -873,7 +906,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -977,7 +1010,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -1055,13 +1088,10 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
             }
           }
         },
@@ -1194,7 +1224,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             },
@@ -1208,7 +1238,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Int"
+                  "value": "Float"
                 }
               }
             }
@@ -1543,7 +1573,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
@@ -2134,7 +2164,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Int"
+                "value": "Float"
               }
             }
           }
