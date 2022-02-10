@@ -55,11 +55,12 @@ export type Document = {
 
 /** A relay-compliant pagination connection */
 export type Connection = {
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  getOptimizedQuery?: Maybe<Scalars['String']>;
   getCollection: Collection;
   getCollections: Array<Collection>;
   node: Node;
@@ -70,6 +71,11 @@ export type Query = {
   getPageList: PageConnection;
   getBlockPageDocument: BlockPageDocument;
   getBlockPageList: BlockPageConnection;
+};
+
+
+export type QueryGetOptimizedQueryArgs = {
+  queryString: Scalars['String'];
 };
 
 
@@ -92,8 +98,8 @@ export type QueryGetDocumentArgs = {
 export type QueryGetDocumentListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 
@@ -105,8 +111,8 @@ export type QueryGetPageDocumentArgs = {
 export type QueryGetPageListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 
@@ -118,8 +124,8 @@ export type QueryGetBlockPageDocumentArgs = {
 export type QueryGetBlockPageListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 export type DocumentConnectionEdges = {
@@ -131,7 +137,7 @@ export type DocumentConnectionEdges = {
 export type DocumentConnection = Connection & {
   __typename?: 'DocumentConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<DocumentConnectionEdges>>>;
 };
 
@@ -139,7 +145,7 @@ export type Collection = {
   __typename?: 'Collection';
   name: Scalars['String'];
   slug: Scalars['String'];
-  label: Scalars['String'];
+  label?: Maybe<Scalars['String']>;
   path: Scalars['String'];
   format?: Maybe<Scalars['String']>;
   matches?: Maybe<Scalars['String']>;
@@ -152,8 +158,8 @@ export type Collection = {
 export type CollectionDocumentsArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Int']>;
-  last?: Maybe<Scalars['Int']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
 };
 
 export type DocumentNode = PageDocument | BlockPageDocument;
@@ -186,7 +192,7 @@ export type PageConnectionEdges = {
 export type PageConnection = Connection & {
   __typename?: 'PageConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
 };
 
@@ -251,7 +257,7 @@ export type BlockPageConnectionEdges = {
 export type BlockPageConnection = Connection & {
   __typename?: 'BlockPageConnection';
   pageInfo?: Maybe<PageInfo>;
-  totalCount: Scalars['Int'];
+  totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<BlockPageConnectionEdges>>>;
 };
 
@@ -537,16 +543,26 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
   export type Sdk = ReturnType<typeof getSdk>;
 
 // TinaSDK generated code
-import { getStaticPropsForTina } from 'tinacms'
+import { staticRequest } from 'tinacms'
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   doc,
   vars,
   _options
 ) => {
-  // const data = await tinaClient.request(doc, { variables: vars }); 
-  const res = await await getStaticPropsForTina({query: doc, variables: vars})
-  return res
-};
+  let data = {}
+  try {
+    data = await staticRequest({
+      query: doc,
+      variables: vars,
+    })
+  } catch (e) {
+    // swallow errors related to document creation
+    console.warn('Warning: There was an error when fetching data')
+    console.warn(e)
+  }
+
+  return { data, query: doc, variables: vars || {} }
+}
 
 /**
  * @experimental this class can be used but may change in the future
