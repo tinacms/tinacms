@@ -5342,6 +5342,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/graphql@workspace:packages/@tinacms/graphql"
   dependencies:
+    "@graphql-tools/relay-operation-optimizer": ^6.4.1
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
@@ -30027,6 +30028,7 @@ resolve@^2.0.0-next.3:
     react-icons: ^4.3.1
     react-is: ^17.0.2
     react-router-dom: 6
+    relay-compiler: 12.0.0
     styled-components: ^5.2.0
     typescript: ^4.3.5
     url-pattern: ^1.0.3
