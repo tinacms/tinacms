@@ -66,6 +66,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
             }
             return (
               <span
+                data-test={`${toolbarItem.name}OverflowButton`}
                 key={toolbarItem.name}
                 onMouseDown={(event) => {
                   event.preventDefault()
