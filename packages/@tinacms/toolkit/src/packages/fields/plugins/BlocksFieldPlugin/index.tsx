@@ -17,16 +17,13 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '../../forms'
-import styled, { css } from 'styled-components'
-import { FieldsBuilder, useFormPortal } from '../../form-builder'
+import { Field, Form } from '../../../forms'
+import styled from 'styled-components'
+import { FieldsBuilder, useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, DragIcon, ReorderIcon } from '../../icons'
-import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { Dismissible } from '../../react-dismissible'
-import { IconButton } from '../../styles'
-import { Popover, Transition } from '@headlessui/react'
-import { FieldDescription } from './wrapFieldWithMeta'
+import { DragIcon, ReorderIcon } from '../../../icons'
+import { GroupPanel, PanelHeader, PanelBody } from '../GroupFieldPlugin'
+import { FieldDescription } from '../wrapFieldWithMeta'
 import {
   GroupListHeader,
   GroupListMeta,
@@ -34,10 +31,12 @@ import {
   ItemDeleteButton,
   ItemHeader,
   ListPanel,
-} from './GroupListFieldPlugin'
-import { useCMS } from '../../react-core/use-cms'
-import { useEvent } from '../../react-core'
-import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
+} from '../GroupListFieldPlugin'
+import { useCMS } from '../../../react-core/use-cms'
+import { useEvent } from '../../../react-core'
+import { FieldHoverEvent, FieldFocusEvent } from '../../field-events'
+import { BlockSelector } from './BlockSelector'
+import { BlockSelectorBig } from './BlockSelectorBig'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -95,19 +94,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
     [field.name, form.mutators]
   )
 
-  const showFilter = React.useMemo(() => {
-    return Object.entries(field.templates).length > 6
-  }, [field.templates])
-  const [filter, setFilter] = React.useState('')
-  const filteredBlocks = React.useMemo(() => {
-    return Object.entries(field.templates).filter(([name, template]) => {
-      return template.label
-        ? template.label.toLowerCase().includes(filter.toLowerCase()) ||
-            name.toLowerCase().includes(filter.toLowerCase())
-        : name.toLowerCase().includes(filter.toLowerCase())
-    })
-  }, [filter])
-
   const items = input.value || []
 
   return (
@@ -119,74 +105,18 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <Popover>
-          {({ open }) => (
-            <>
-              <Popover.Button as={React.Fragment}>
-                <IconButton
-                  variant={open ? 'secondary' : 'primary'}
-                  size="small"
-                  className={`${open ? `rotate-45 pointer-events-none` : ``}`}
-                >
-                  <AddIcon className="w-5/6 h-auto" />
-                </IconButton>
-              </Popover.Button>
-              <div className="transform translate-y-full absolute -bottom-1 right-0 z-50">
-                <Transition
-                  enter="transition duration-150 ease-out"
-                  enterFrom="transform opacity-0 -translate-y-2"
-                  enterTo="transform opacity-100 translate-y-0"
-                  leave="transition duration-75 ease-in"
-                  leaveFrom="transform opacity-100 translate-y-0"
-                  leaveTo="transform opacity-0 -translate-y-2"
-                >
-                  <Popover.Panel className="relative overflow-hidden rounded-lg shadow-lg bg-white border border-gray-100">
-                    {({ close }) => (
-                      <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full">
-                        {showFilter && (
-                          <div className="sticky top-0 bg-gray-50 p-2 border-b border-gray-100 z-10">
-                            <input
-                              type="text"
-                              className="bg-white text-xs rounded-sm border border-gray-100 shadow-inner py-1 px-2 w-full block placeholder-gray-200"
-                              onClick={(event: any) => {
-                                event.stopPropagation()
-                                event.preventDefault()
-                              }}
-                              value={filter}
-                              onChange={(event: any) => {
-                                setFilter(event.target.value)
-                              }}
-                              placeholder="Filter..."
-                            />
-                          </div>
-                        )}
-                        {filteredBlocks.length === 0 && (
-                          <span className="relative text-center text-xs px-2 py-3 text-gray-300 bg-gray-50 italic">
-                            No matches found
-                          </span>
-                        )}
-                        {filteredBlocks.length > 0 &&
-                          filteredBlocks.map(([name, template]) => (
-                            <button
-                              className="relative text-center text-xs py-2 px-4 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50"
-                              key={name}
-                              onClick={() => {
-                                addItem(name, template)
-                                setFilter('')
-                                close()
-                              }}
-                            >
-                              {template.label ? template.label : name}
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                  </Popover.Panel>
-                </Transition>
-              </div>
-            </>
-          )}
-        </Popover>
+        {/* @ts-ignore */}
+        {!field.visualSelector && (
+          <BlockSelector templates={field.templates} addItem={addItem} />
+        )}
+        {/* @ts-ignore */}
+        {field.visualSelector && (
+          <BlockSelectorBig
+            label={field.label || field.name}
+            templates={field.templates}
+            addItem={addItem}
+          />
+        )}
       </GroupListHeader>
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
