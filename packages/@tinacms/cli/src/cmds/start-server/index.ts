@@ -27,7 +27,8 @@ import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
 import { Telemetry } from '@tinacms/metrics'
 import { handleServerErrors } from './errors'
-
+import { AsyncLock } from './lock'
+const lock = new AsyncLock()
 interface Options {
   port?: number
   command?: string
@@ -51,6 +52,8 @@ export async function startServer(
     noTelemetry,
   }: Options
 ) {
+  lock.disable()
+
   const rootPath = process.cwd()
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
@@ -114,13 +117,24 @@ stack: ${code.stack || 'No stack was provided'}`)
   let ready = false
 
   const build = async (noSDK?: boolean) => {
-    if (!process.env.CI && !noWatch) {
-      await resetGeneratedFolder()
+    // Wait for the lock to be disabled
+    await lock.promise
+    // Enable the lock so that no two builds can happen at once
+    lock.enable()
+    try {
+      if (!process.env.CI && !noWatch) {
+        await resetGeneratedFolder()
+      }
+      const database = await createDatabase({ store, bridge })
+      await compile(null, null)
+      const schema = await buildSchema(rootPath, database)
+      await genTypes({ schema }, () => {}, { noSDK })
+    } catch (error) {
+      throw error
+    } finally {
+      // Enable the lock so a new build can run
+      lock.disable()
     }
-    const database = await createDatabase({ store, bridge })
-    await compile(null, null)
-    const schema = await buildSchema(rootPath, database)
-    await genTypes({ schema }, () => {}, { noSDK })
   }
 
   if (!noWatch && !process.env.CI) {
