@@ -183,18 +183,18 @@ export const formify = async ({
       selectionSet: {
         kind: 'SelectionSet' as const,
         selections: selectionNode.selectionSet.selections.map(
-          (selectionNode) => {
-            switch (selectionNode.kind) {
+          (selectionNode2) => {
+            switch (selectionNode2.kind) {
               case 'Field':
-                if (selectionNode.name.value === EDGES_NODE_NAME) {
+                if (selectionNode2.name.value === EDGES_NODE_NAME) {
                   const edgeField = namedFieldType.getFields()[EDGES_NODE_NAME]
                   const edgeType = G.getNamedType(edgeField.type)
                   util.ensureObjectType(edgeType)
                   return {
-                    ...selectionNode,
+                    ...selectionNode2,
                     selectionSet: {
                       kind: 'SelectionSet' as const,
-                      selections: selectionNode.selectionSet.selections.map(
+                      selections: selectionNode2.selectionSet.selections.map(
                         (subSelectionNode) => {
                           switch (subSelectionNode.kind) {
                             case 'Field':
@@ -206,7 +206,7 @@ export const formify = async ({
                                   type: nodeField.type,
                                   path: [
                                     ...path,
-                                    util.getNameAndAlias(selectionNode),
+                                    util.getNameAndAlias(selectionNode2),
                                     util.getNameAndAlias(
                                       subSelectionNode,
                                       true
@@ -224,7 +224,7 @@ export const formify = async ({
                     },
                   }
                 }
-                return selectionNode
+                return selectionNode2
               default:
                 throw new FormifyError('UNEXPECTED')
             }
@@ -431,13 +431,13 @@ export const formify = async ({
               case 'InlineFragment':
                 util.ensureUnionType(namedType)
                 if (util.isNodeField(namedType)) {
-                  const parentType = util.getSelectedUnionType(
+                  const parentType2 = util.getSelectedUnionType(
                     namedType,
                     selectionNode
                   )
                   return formifyNode({
                     fieldOrInlineFragmentNode: selectionNode,
-                    type: parentType,
+                    type: parentType2,
                     path,
                   })
                 }
