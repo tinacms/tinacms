@@ -14,12 +14,15 @@ limitations under the License.
 import path from 'path'
 import fs from 'fs-extra'
 import { build } from 'esbuild'
+import type { Loader } from 'esbuild'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
 import { getSchemaPath } from '../../lib'
+import chalk from 'chalk'
+import { ExecuteSchemaError, BuildSchemaError } from '../start-server/errors'
 
 const tinaPath = path.join(process.cwd(), '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
@@ -65,7 +68,11 @@ export const compile = async (_ctx, _next) => {
   }
 
   // Turns the schema into JS files so they can be run
-  await transpile(tinaPath, tinaTempPath)
+  try {
+    await transpile(tinaPath, tinaTempPath)
+  } catch (e) {
+    throw new BuildSchemaError(e)
+  }
 
   // Delete the node require cache for .tina temp folder
   Object.keys(require.cache).map((key) => {
@@ -73,18 +80,21 @@ export const compile = async (_ctx, _next) => {
       delete require.cache[require.resolve(key)]
     }
   })
-
-  const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-  const schemaObject: TinaCloudSchema = schemaFunc.default
-  await fs.outputFile(
-    path.join(tinaConfigPath, 'schema.json'),
-    JSON.stringify(schemaObject, null, 2)
-  )
-  await fs.remove(tinaTempPath)
+  try {
+    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
+    const schemaObject: TinaCloudSchema = schemaFunc.default
+    await fs.outputFile(
+      path.join(tinaConfigPath, 'schema.json'),
+      JSON.stringify(schemaObject, null, 2)
+    )
+    await fs.remove(tinaTempPath)
+  } catch (e) {
+    throw new ExecuteSchemaError(e)
+  }
 }
 
 const transpile = async (projectDir, tempDir) => {
-  logger.info(logText('Transpiling...'))
+  logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(
     fs.readFileSync(packageJSONFilePath).toString() || '{}'
@@ -98,18 +108,40 @@ const transpile = async (projectDir, tempDir) => {
   const outputPath = path.join(tempDir, 'schema.js')
   await build({
     bundle: true,
-    platform: 'node',
+    platform: 'neutral',
     target: ['node10.4'],
     entryPoints: [inputFile],
-    external: [...external, './node_modules/*'],
     treeShaking: true,
-    loader: {
-      '.svg': 'text',
-    },
+    external: [...external, './node_modules/*'],
+    loader: loaders,
     outfile: outputPath,
   })
+  logger.info(logText(`Javascript built`))
 }
 
 export const defineSchema = (config: TinaCloudSchema) => {
   return config
+}
+
+const loaders: { [ext: string]: Loader } = {
+  '.aac': 'file',
+  '.css': 'file',
+  '.eot': 'file',
+  '.flac': 'file',
+  '.gif': 'file',
+  '.jpeg': 'file',
+  '.jpg': 'file',
+  '.json': 'json',
+  '.mp3': 'file',
+  '.mp4': 'file',
+  '.ogg': 'file',
+  '.otf': 'file',
+  '.png': 'file',
+  '.svg': 'file',
+  '.ttf': 'file',
+  '.wav': 'file',
+  '.webm': 'file',
+  '.webp': 'file',
+  '.woff': 'file',
+  '.woff2': 'file',
 }

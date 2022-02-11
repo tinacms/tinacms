@@ -26,6 +26,7 @@ import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
 import { Telemetry } from '@tinacms/metrics'
+import { handleServerErrors } from './errors'
 
 interface Options {
   port?: number
@@ -140,7 +141,7 @@ stack: ${code.stack || 'No stack was provided'}`)
           ready = true
           startSubprocess()
         } catch (e) {
-          logger.info(dangerText(`${e.message}`))
+          handleServerErrors(e)
           // FIXME: make this a debug flag
           console.log(e)
           process.exit(0)
@@ -154,11 +155,7 @@ stack: ${code.stack || 'No stack was provided'}`)
               await build(noSDK)
             }
           } catch (e) {
-            logger.info(
-              dangerText(
-                'Compilation failed with errors. Server has not been restarted.'
-              ) + ` see error below \n ${e.message}`
-            )
+            handleServerErrors(e)
             t.submitRecord({
               event: {
                 name: 'tinacms:cli:server:error',
