@@ -132,7 +132,7 @@ stack: ${code.stack || 'No stack was provided'}`)
     } catch (error) {
       throw error
     } finally {
-      // Enable the lock so a new build can run
+      // Disable the lock so a new build can run
       lock.disable()
     }
   }
