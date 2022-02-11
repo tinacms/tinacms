@@ -112,7 +112,7 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
   React.useEffect(() => {
     const run = async () => {
       if (state.status === 'ready') {
-        const formifiedQuery = await formify({
+        const { formifiedQuery } = await formify({
           schema: state.schema,
           query,
           getOptimizedQuery: cms.api.tina.getOptimizedQuery,
@@ -130,6 +130,14 @@ export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
   }
 }
 
+type TinaDocumentField = {
+  path: string[]
+  aliasPath: string[]
+}
+type TinaDocumentNode = {
+  path: { name: string; alias: string; list?: boolean }[]
+}
+
 export const formify = async ({
   schema,
   query,
@@ -138,7 +146,8 @@ export const formify = async ({
   schema: GraphQLSchema
   query: string
   getOptimizedQuery: (query: DocumentNode) => Promise<DocumentNode>
-}): Promise<DocumentNode> => {
+}): Promise<{ formifiedQuery: DocumentNode; nodes: TinaDocumentNode[] }> => {
+  const nodes: TinaDocumentNode[] = []
   const documentNode = G.parse(query)
   const visitor2: VisitorType = {
     OperationDefinition: (node) => {
@@ -159,7 +168,15 @@ export const formify = async ({
   const optimizedQuery = await getOptimizedQuery(documentNodeWithName)
   const typeInfo = new G.TypeInfo(schema)
 
-  const formifyConnection = ({ namedFieldType, selectionNode }) => {
+  const formifyConnection = ({
+    namedFieldType,
+    selectionNode,
+    path,
+  }: {
+    namedFieldType: G.GraphQLNamedType
+    selectionNode: G.FieldNode
+    path: { name: string; alias: string }[]
+  }): G.SelectionNode => {
     util.ensureObjectType(namedFieldType)
     return {
       ...selectionNode,
@@ -178,18 +195,26 @@ export const formify = async ({
                     selectionSet: {
                       kind: 'SelectionSet' as const,
                       selections: selectionNode.selectionSet.selections.map(
-                        (selectionNode) => {
-                          switch (selectionNode.kind) {
+                        (subSelectionNode) => {
+                          switch (subSelectionNode.kind) {
                             case 'Field':
-                              if (selectionNode.name.value === NODE_NAME) {
+                              if (subSelectionNode.name.value === NODE_NAME) {
                                 const nodeField =
                                   edgeType.getFields()[NODE_NAME]
                                 return formifyNode({
-                                  fieldOrInlineFragmentNode: selectionNode,
+                                  fieldOrInlineFragmentNode: subSelectionNode,
                                   parentType: nodeField.type,
+                                  path: [
+                                    ...path,
+                                    util.getNameAndAlias(selectionNode),
+                                    util.getNameAndAlias(
+                                      subSelectionNode,
+                                      true
+                                    ),
+                                  ],
                                 })
                               } else {
-                                return selectionNode
+                                return subSelectionNode
                               }
                             default:
                               throw new FormifyError('NOOP')
@@ -208,23 +233,25 @@ export const formify = async ({
       },
     }
   }
-
   function formifyNode<T extends G.FieldNode | G.InlineFragmentNode>({
     fieldOrInlineFragmentNode,
     parentType,
+    path,
   }: {
     fieldOrInlineFragmentNode: T
     parentType: G.GraphQLOutputType
-  }): T {
+    path: { name: string; alias: string }[]
+  }) {
     let extraFields = []
-    return {
+    const namedParentType = G.getNamedType(parentType)
+
+    const formifiedNode = {
       ...fieldOrInlineFragmentNode,
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
           ...fieldOrInlineFragmentNode.selectionSet.selections.map(
             (selectionNode) => {
-              const namedParentType = G.getNamedType(parentType)
               switch (selectionNode.kind) {
                 /**
                  * An inline fragment will be present when the document result is polymorphic,
@@ -243,6 +270,7 @@ export const formify = async ({
                     return formifyNode({
                       fieldOrInlineFragmentNode: selectionNode,
                       parentType: type,
+                      path,
                     })
                   }
                   util.ensureUnionType(namedParentType)
@@ -253,6 +281,7 @@ export const formify = async ({
                   return formifyNode({
                     fieldOrInlineFragmentNode: selectionNode,
                     parentType: type,
+                    path,
                   })
                 case 'Field':
                   if (selectionNode.name.value === DATA_NODE_NAME) {
@@ -277,9 +306,24 @@ export const formify = async ({
                               (subSelectionNode) => {
                                 switch (subSelectionNode.kind) {
                                   case 'Field':
+                                    const subSelectionField =
+                                      util.getObjectField(
+                                        namedType,
+                                        subSelectionNode
+                                      )
+                                    if (!subSelectionField) {
+                                      return subSelectionNode
+                                    }
                                     return formifyField({
                                       fieldNode: subSelectionNode,
                                       parentType: field.type,
+                                      path: [
+                                        ...path,
+                                        util.getNameAndAlias(
+                                          subSelectionNode,
+                                          G.isListType(subSelectionField.type)
+                                        ),
+                                      ],
                                     })
                                   default:
                                     throw new FormifyError(
@@ -305,14 +349,18 @@ export const formify = async ({
         ],
       },
     }
+
+    return formifiedNode
   }
 
   const formifyField = ({
     fieldNode,
     parentType,
+    path,
   }: {
     fieldNode: G.FieldNode
     parentType: G.GraphQLOutputType
+    path: { name: string; alias: string }[]
   }): G.FieldNode => {
     const namedParentType = G.getNamedType(parentType)
     util.ensureObjectType(namedParentType)
@@ -358,13 +406,17 @@ export const formify = async ({
                       (selectionNode) => {
                         switch (selectionNode.kind) {
                           case 'Field':
-                            return selectionNode
+                            if (selectionNode.name.value === '__typename') {
+                              return selectionNode
+                            }
+                            throw new FormifyError('NOOP')
                           case 'InlineFragment':
                             const namedType = G.getNamedType(field.type)
                             util.ensureNodeField(namedType)
                             return formifyNode({
                               fieldOrInlineFragmentNode: selectionNode,
                               parentType: field.type,
+                              path,
                             })
                           default:
                             throw new FormifyError(
@@ -386,6 +438,7 @@ export const formify = async ({
                   return formifyNode({
                     fieldOrInlineFragmentNode: selectionNode,
                     parentType: parentType,
+                    path,
                   })
                 }
                 return {
@@ -403,6 +456,7 @@ export const formify = async ({
                             return formifyField({
                               fieldNode: subSelectionNode,
                               parentType: parentType,
+                              path,
                             })
                           default:
                             throw new FormifyError(
@@ -425,7 +479,7 @@ export const formify = async ({
       },
     }
   }
-  return {
+  const formifiedQuery: DocumentNode = {
     kind: 'Document',
     definitions: optimizedQuery.definitions.map((definition) => {
       typeInfo.enter(definition)
@@ -453,11 +507,13 @@ export const formify = async ({
                     return formifyNode({
                       fieldOrInlineFragmentNode: selectionNode,
                       parentType: field.type,
+                      path: [util.getNameAndAlias(selectionNode)],
                     })
                   } else if (util.isConnectionField(namedFieldType)) {
                     return formifyConnection({
                       namedFieldType,
                       selectionNode,
+                      path: [util.getNameAndAlias(selectionNode)],
                     })
                   }
 
@@ -490,6 +546,7 @@ export const formify = async ({
                                   return formifyConnection({
                                     namedFieldType: docType,
                                     selectionNode,
+                                    path: [util.getNameAndAlias(selectionNode)],
                                   })
                                 }
                                 return selectionNode
@@ -511,4 +568,27 @@ export const formify = async ({
       }
     }),
   }
+  nodes.map((node) => {
+    const namePath = []
+    const aliasPath = []
+    node.path.forEach((p) => {
+      namePath.push(p.name)
+      aliasPath.push(p.alias)
+      if (p.list) {
+        namePath.push('NUM')
+        aliasPath.push('NUM')
+      }
+    })
+    const stringFormat = JSON.stringify(
+      {
+        namePath: namePath.join('.'),
+        aliasPath: aliasPath.join('.'),
+      },
+      null,
+      2
+    )
+
+    // console.log(stringFormat)
+  })
+  return { formifiedQuery, nodes }
 }

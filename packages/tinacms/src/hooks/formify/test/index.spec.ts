@@ -204,6 +204,21 @@ query GetBlockPageDocument($relativePath: String!) {
   myGet: getBlockPageDocument(relativePath: $relativePath) {
     myData: data {
       __typename
+      seo {
+        ogTitle
+      }
+      social {
+        handle
+        platform
+        relatedPage {
+          __typename
+          ...on PageDocument {
+            data {
+              title
+            }
+          }
+        }
+      }
       blocks {
         __typename
         ...on BlockPageBlocksHero {
@@ -238,6 +253,29 @@ query GetBlockPageDocument($relativePath: String!) {
   myGet: getBlockPageDocument(relativePath: $relativePath) {
     myData: data {
       __typename
+      seo {
+        ogTitle
+      }
+      social {
+        handle
+        platform
+        relatedPage {
+          __typename
+          ...on PageDocument {
+            data {
+              title
+            }
+            _internalSys: sys {
+              path
+              collection {
+                name
+              }
+            }
+            form
+            values
+          }
+        }
+      }
       blocks {
         __typename
         ...on BlockPageBlocksHero {
@@ -526,15 +564,15 @@ type Test = {
 }
 
 const queries: Test[] = [
-  basic,
-  withNestedReference,
-  withNestedReferenceInsideObjectList,
+  // basic,
+  // withNestedReference,
+  // withNestedReferenceInsideObjectList,
   withNestedReferenceInsideObjectList2,
-  withAListQuery,
-  withAGenericQuery,
-  withACollectionQuery,
-  withACollectionsQuery,
-  withANodeQuery,
+  // withAListQuery,
+  // withAGenericQuery,
+  // withACollectionQuery,
+  // withACollectionsQuery,
+  // withANodeQuery,
 ]
 
 test.each(queries)(

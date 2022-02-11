@@ -230,11 +230,12 @@ mutation addPendingDocumentMutation(
     const schema = await this.getSchema()
     let formifiedQuery
     if (useUnstableFormify) {
-      formifiedQuery = await formify2({
+      const res = await formify2({
         schema,
         query: print(query(gql)),
         getOptimizedQuery: this.getOptimizedQuery,
       })
+      formifiedQuery = res.formifiedQuery
     } else {
       formifiedQuery = formify(query(gql), schema)
     }

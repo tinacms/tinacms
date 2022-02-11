@@ -153,7 +153,8 @@ export function useGraphqlForms<T extends object>({
     cms.api.tina
       .requestWithForm((gql) => gql(query), {
         variables,
-        useUnstableFormify: cms.flags.get('use-unstable-formify'),
+        // useUnstableFormify: cms.flags.get('use-unstable-formify'),
+        useUnstableFormify: true,
       })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
