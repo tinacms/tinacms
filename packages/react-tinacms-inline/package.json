@@ -24,8 +24,8 @@
     "@einsteinindustries/tinacms": ">=0.39",
     "@einsteinindustries/tinacms-form-builder": ">=0.39",
     "react": ">=16.8",
-    "react-dropzone": "10.2.1",
-    "react-final-form": ">=6",
+    "react-dropzone": "^11.1.0",
+    "react-final-form": "^6.3.0",
     "styled-components": ">=4.1"
   },
   "devDependencies": {
