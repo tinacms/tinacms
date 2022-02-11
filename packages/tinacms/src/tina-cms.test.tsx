@@ -179,10 +179,8 @@ describe('TinaCMSProvider', () => {
 })
 
 const DummyChild = (props: any) => (
-  <>
-    <p>
-      <h1>My Dummy Header</h1>
-      {JSON.stringify(props)}
-    </p>
-  </>
+  <div>
+    <h1>My Dummy Header</h1>
+    {JSON.stringify(props)}
+  </div>
 )

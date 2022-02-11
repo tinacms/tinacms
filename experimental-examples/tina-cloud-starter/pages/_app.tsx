@@ -29,6 +29,7 @@ const App = ({ Component, pageProps }) => {
                */
               cms.flags.set("tina-admin", true);
 
+              cms.flags.set("use-unstable-formify", true);
               /**
                * An example of a RouteMapping plugin for TinaAdmin
                */
@@ -69,7 +70,7 @@ const App = ({ Component, pageProps }) => {
               },
             }}
             formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
-              if (formConfig.id === "getGlobalDocument") {
+              if (formConfig.id === "content/global/index.json") {
                 return createGlobalForm(formConfig, { layout: "fullscreen" });
               }
 

@@ -2,6 +2,7 @@ import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
 import { useTina } from 'tinacms/dist/edit-state'
+import { FeaturedBlogs } from '../../components/featured-blog'
 
 const query = `{
   getPostList{
@@ -25,7 +26,9 @@ export default function Home(props) {
   const postsList = data.getPostList.edges
   return (
     <Layout>
-      <h1>Posts</h1>
+      <FeaturedBlogs />
+
+      {/* <h1>Posts</h1>
       <div>
         {postsList.map((post) => (
           <div key={post.node.id}>
@@ -34,7 +37,7 @@ export default function Home(props) {
             </Link>
           </div>
         ))}
-      </div>
+      </div> */}
     </Layout>
   )
 }

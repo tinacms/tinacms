@@ -2,8 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["jest", "@testing-library/jest-dom"]
   },
-  "exclude": ["node_modules", "dist", "src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "exclude": ["node_modules", "dist"],
   "include": ["src"]
 }

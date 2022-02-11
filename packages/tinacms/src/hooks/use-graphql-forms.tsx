@@ -26,6 +26,71 @@ import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { BiLinkExternal } from 'react-icons/bi'
+import { useFormify } from './formify'
+
+export function useGraphqlFormsUnstable<T extends object>({
+  variables,
+  onSubmit,
+  query,
+  formify,
+}: {
+  query: string
+  variables: object
+  onSubmit?: (args: onSubmitArgs) => void
+  formify?: formifyCallback
+}): [T, Boolean] {
+  const eventList = React.useRef([])
+
+  React.useEffect(() => {
+    console.log('NOTE: using unstable formify')
+  }, [])
+  const cms = useCMS()
+  // Seems like a bug where no query provided from the useTina work
+  if (!query) {
+    return [{}, true]
+  }
+
+  const state = useFormify({
+    query,
+    cms,
+    variables,
+    formify,
+    eventList: eventList.current,
+    onSubmit: () => {
+      handleSubmit()
+    },
+  })
+
+  const handleSubmit = React.useCallback(() => {
+    const template = `/**
+Copyright 2021 Forestry.io Holdings, Inc.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+const query = \`#graphql
+${state.queryString}\`
+
+const events = ${JSON.stringify(eventList.current, null, 2)}
+
+import { testRunner } from '../runner'
+test('formifies the query and responds correctly to events', async () => {
+  await testRunner(query, events, __dirname)
+})
+    `
+    navigator.clipboard.writeText(template)
+    console.log('events copied to clipboard')
+  }, [state.queryString])
+
+  return [state.data, state.status !== 'done']
+}
 
 export function useGraphqlForms<T extends object>({
   variables,
@@ -434,10 +499,12 @@ const getFieldUpdate = (newUpdate, activeForm, formValues) => {
   return currentFields
 }
 
-const generateFormCreators = (cms: TinaCMS) => {
+export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
   const createForm = (formConfig) => {
     const form = new Form(formConfig)
-    cms.forms.add(form)
+    if (showInSidebar) {
+      cms.forms.add(form)
+    }
     return form
   }
   const createGlobalForm = (
@@ -445,7 +512,11 @@ const generateFormCreators = (cms: TinaCMS) => {
     options?: { icon?: any; layout: 'fullscreen' | 'popup' }
   ) => {
     const form = new Form(formConfig)
-    cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
+    if (showInSidebar) {
+      cms.plugins.add(
+        new GlobalFormPlugin(form, options?.icon, options?.layout)
+      )
+    }
     return form
   }
   return { createForm, createGlobalForm }

@@ -42,6 +42,7 @@ interface Connection {
 }
 
 type Query {
+  getOptimizedQuery(queryString: String!): String
   getCollection(collection: String): Collection!
   getCollections: [Collection!]!
   node(id: String): Node!
@@ -50,6 +51,8 @@ type Query {
   getDocumentFields: JSON!
   getPageDocument(relativePath: String): PageDocument!
   getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
+  getAuthorDocument(relativePath: String): AuthorDocument!
+  getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
   getPostDocument(relativePath: String): PostDocument!
   getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
 }
@@ -77,15 +80,24 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
 }
 
-union DocumentNode = PageDocument | PostDocument
+union DocumentNode = PageDocument | AuthorDocument | PostDocument
 
-type PageSomeObj {
-  thingOne: String!
+union PageBlocksFeaturedBlogsBlogsBlogDocument = PostDocument
+
+type PageBlocksFeaturedBlogsBlogs {
+  blog: PageBlocksFeaturedBlogsBlogsBlogDocument
 }
 
+type PageBlocksFeaturedBlogs {
+  headline: String
+  text: String
+  blogs: [PageBlocksFeaturedBlogsBlogs]
+}
+
+union PageBlocks = PageBlocksFeaturedBlogs
+
 type Page {
-  someObj: PageSomeObj
-  body: JSON
+  blocks: [PageBlocks]
 }
 
 type PageDocument implements Node & Document {
@@ -108,9 +120,38 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
+type Author {
+  name: String
+  avatar: String
+}
+
+type AuthorDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Author!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type AuthorConnectionEdges {
+  cursor: String
+  node: AuthorDocument
+}
+
+type AuthorConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Float!
+  edges: [AuthorConnectionEdges]
+}
+
+union PostAuthorDocument = AuthorDocument
+
 type Post {
   title: String
+  image: String
   topic: [String]
+  author: PostAuthorDocument
   body: JSON
 }
 
@@ -140,27 +181,46 @@ type Mutation {
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
   createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
   createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
 }
 
 input DocumentMutation {
   page: PageMutation
+  author: AuthorMutation
   post: PostMutation
 }
 
-input PageSomeObjMutation {
-  thingOne: String
+input PageBlocksFeaturedBlogsBlogsMutation {
+  blog: String
+}
+
+input PageBlocksFeaturedBlogsMutation {
+  headline: String
+  text: String
+  blogs: [PageBlocksFeaturedBlogsBlogsMutation]
+}
+
+input PageBlocksMutation {
+  featuredBlogs: PageBlocksFeaturedBlogsMutation
 }
 
 input PageMutation {
-  someObj: PageSomeObjMutation
-  body: JSON
+  blocks: [PageBlocksMutation]
+}
+
+input AuthorMutation {
+  name: String
+  avatar: String
 }
 
 input PostMutation {
   title: String
+  image: String
   topic: [String]
+  author: String
   body: JSON
 }
 

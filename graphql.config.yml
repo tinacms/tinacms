@@ -22,5 +22,13 @@ projects:
   unitTestExample:
     schema: experimental-examples/unit-test-example/.tina/__generated__/schema.gql
     documents:
-      - packages/tinacms/src/hooks/formify/**/*.spec.ts
+      - packages/tinacms/src/hooks/formify/**/*.ts
+      - packages/tinacms/src/hooks/formify/**/*.unit-test.gql
       - experimental-examples/unit-test-example/**/*.js
+
+  unitTestExample2:
+    schema: experimental-examples/unit-test-example-2/.tina/__generated__/schema.gql
+    documents:
+      # - packages/tinacms/src/hooks/formify/**/*.ts
+      # - packages/tinacms/src/hooks/formify/**/*.unit-test.gql
+      - experimental-examples/unit-test-example-2/**/*.js

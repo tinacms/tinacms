@@ -4,6 +4,7 @@
     "resolveType": "multiCollectionDocumentList",
     "collections": [
       "page",
+      "author",
       "post"
     ]
   },
@@ -17,6 +18,19 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
+  "PageBlocksFeaturedBlogsBlogsBlogDocument": {
+    "type": "PageBlocksFeaturedBlogsBlogsBlogDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "featuredBlogs": "PageBlocksFeaturedBlogs"
+    }
+  },
   "PageDocument": {
     "type": "PageDocument",
     "resolveType": "collectionDocument",
@@ -28,6 +42,24 @@
     "type": "PageConnection",
     "resolveType": "collectionDocumentList",
     "collection": "page"
+  },
+  "AuthorDocument": {
+    "type": "AuthorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "author",
+    "createAuthorDocument": "create",
+    "updateAuthorDocument": "update"
+  },
+  "AuthorConnection": {
+    "type": "AuthorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "author"
+  },
+  "PostAuthorDocument": {
+    "type": "PostAuthorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "PostDocument": {
     "type": "PostDocument",

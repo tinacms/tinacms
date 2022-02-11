@@ -1,35 +1,64 @@
-import { getStaticPropsForTina } from 'tinacms'
-export default function Home(props) {
-  return <pre>{JSON.stringify(props.data, null, 2)}</pre>
+import { Page, getStatic } from '../components/setup'
+
+export default Page
+
+export const getStaticProps = () => {
+  return getStatic({ query, variables })
 }
 
-export const getStaticProps = async () => {
-  const tinaProps = await getStaticPropsForTina({
-    query,
-    variables: {},
-  })
+const variables = {}
 
-  return {
-    props: {
-      ...tinaProps,
-    },
-  }
-}
+// const query = `#graphql
+// query {
+//   getAuthorDocument(relativePath: "author1.mdx") {
+//     data {
+//       name
+//       soc: social {
+//         hand: handle
+//       }
+//     }
+//     values
+//     # dataJSON
+//   }
+// }
+// `
+// const query = `#graphql
+// query GetBlockPageDocument {
+//   getPostDocument(relativePath: "post1.mdx") {
+//     data {
+//       title
+//       tags
+//       categories
+//       author {
+//         ...on AuthorDocument {
+//           data {
+//             name
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+// `
 
 const query = `#graphql
-query GetBlockPageDocument {
-  myGet: getBlockPageDocument(relativePath: "1.mdx") {
-    myData: data {
-      __typename
-      ...BlockPageData
-    }
-    sys {
-      filename
+query {
+  getBlockPageDocument(relativePath: "blockPage1.mdx") {
+    data {
+      blocks {
+        ...on BlockPageBlocksFeaturedPosts {
+          blogs {
+            item {
+              ...on PostDocument {
+                data {
+                  title
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-}
-
-fragment BlockPageData on BlockPage {
-  title
 }
 `

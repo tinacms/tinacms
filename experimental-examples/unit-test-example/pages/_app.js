@@ -1,12 +1,10 @@
 import dynamic from 'next/dynamic'
+import React from 'react'
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
+import { useRouter } from 'next/router'
 
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
-
-const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID
-const NEXT_PUBLIC_USE_LOCAL_CLIENT =
-  process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT || true
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -15,21 +13,60 @@ const App = ({ Component, pageProps }) => {
         showEditButton={true}
         editMode={
           <TinaCMS
-            branch="main"
-            clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
-            isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
+            cmsCallback={(cms) => {
+              cms.flags.set('use-unstable-formify', true)
+              return cms
+            }}
             {...pageProps}
           >
             {(livePageProps) => {
-              return <Component {...livePageProps} />
+              return (
+                <>
+                  <Nav />
+                  <Component {...livePageProps} />
+                </>
+              )
             }}
           </TinaCMS>
         }
       >
-        <Component {...pageProps} />
+        <>
+          <Nav />
+          <Component {...pageProps} />
+        </>
       </TinaEditProvider>
     </>
   )
 }
 
 export default App
+
+const Nav = () => {
+  const paths = [
+    'basic-query',
+    'basic-query-with-aliases',
+    'basic-query-with-reference',
+    'collection-query',
+    'collections-query',
+    'generic-document',
+    'with-aliases-in-list-object',
+    'with-list',
+    'with-reference-in-list-object',
+    'with-reference-in-poly-object-list',
+  ]
+  const router = useRouter()
+
+  return (
+    <select
+      onChange={(e) => {
+        router.push(e.target.value)
+      }}
+    >
+      {paths.map((p) => (
+        <option key={p} selected={router.pathname === `/${p}`}>
+          {p}
+        </option>
+      ))}
+    </select>
+  )
+}

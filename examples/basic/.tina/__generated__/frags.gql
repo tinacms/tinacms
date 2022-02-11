@@ -1,13 +1,34 @@
 fragment PageParts on Page {
-  someObj {
+  blocks {
     __typename
-    thingOne
+    ... on PageBlocksFeaturedBlogs {
+      headline
+      text
+      blogs {
+        __typename
+        blog {
+          ... on Document {
+            id
+          }
+        }
+      }
+    }
   }
-  body
+}
+
+fragment AuthorParts on Author {
+  name
+  avatar
 }
 
 fragment PostParts on Post {
   title
+  image
   topic
+  author {
+    ... on Document {
+      id
+    }
+  }
   body
 }

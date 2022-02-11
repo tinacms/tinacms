@@ -49,8 +49,10 @@ type Query {
   getDocument(collection: String, relativePath: String): DocumentNode!
   getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
   getDocumentFields: JSON!
-  getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
+  getPostDocument(relativePath: String): PostDocument!
+  getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
+  getAuthorDocument(relativePath: String): AuthorDocument!
+  getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
   getBlockPageDocument(relativePath: String): BlockPageDocument!
   getBlockPageList(before: String, after: String, first: Float, last: Float): BlockPageConnection!
 }
@@ -78,70 +80,98 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
 }
 
-union DocumentNode = PageDocument | BlockPageDocument
+union DocumentNode = PostDocument | AuthorDocument | BlockPageDocument
 
-union PageRelatedPageDocument = BlockPageDocument
+union PostAuthorDocument = AuthorDocument
 
-type Page {
+type Post {
   title: String
-  body: String
-  relatedPage: PageRelatedPageDocument
+  author: PostAuthorDocument
+  tags: [String]
+  categories: [String]
+  published: String
+  featured: Boolean
+  body: JSON
 }
 
-type PageDocument implements Node & Document {
+type PostDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
-  data: Page!
+  data: Post!
   form: JSON!
   values: JSON!
   dataJSON: JSON!
 }
 
-type PageConnectionEdges {
+type PostConnectionEdges {
   cursor: String
-  node: PageDocument
+  node: PostDocument
 }
 
-type PageConnection implements Connection {
+type PostConnection implements Connection {
   pageInfo: PageInfo
   totalCount: Float!
-  edges: [PageConnectionEdges]
+  edges: [PostConnectionEdges]
 }
 
-type BlockPageSeo {
-  ogTitle: String
-}
-
-union BlockPageSocialRelatedPageDocument = PageDocument
-
-type BlockPageSocial {
-  handle: String
+type AuthorSocial {
   platform: String
-  relatedPage: BlockPageSocialRelatedPageDocument
+  handle: String
 }
 
-union BlockPageRelatedPageDocument = PageDocument
+type Author {
+  name: String
+  social: [AuthorSocial]
+  bio: JSON
+}
 
-union BlockPageBlocksHeroRelationDocument = PageDocument
+type AuthorDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Author!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type AuthorConnectionEdges {
+  cursor: String
+  node: AuthorDocument
+}
+
+type AuthorConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Float!
+  edges: [AuthorConnectionEdges]
+}
 
 type BlockPageBlocksHero {
   title: String
   description: String
-  relation: BlockPageBlocksHeroRelationDocument
 }
 
-type BlockPageBlocksCta {
-  title: String
-  action: String
+union BlockPageBlocksBlockQuoteAuthorDocument = AuthorDocument
+
+type BlockPageBlocksBlockQuote {
+  message: JSON
+  author: BlockPageBlocksBlockQuoteAuthorDocument
 }
 
-union BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksCta
+union BlockPageBlocksFeaturedPostsBlogsItemDocument = PostDocument
+
+type BlockPageBlocksFeaturedPostsBlogs {
+  item: BlockPageBlocksFeaturedPostsBlogsItemDocument
+}
+
+type BlockPageBlocksFeaturedPosts {
+  header: String
+  blogs: [BlockPageBlocksFeaturedPostsBlogs]
+}
+
+union BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts
 
 type BlockPage {
   title: String
-  seo: BlockPageSeo
-  social: [BlockPageSocial]
-  relatedPage: BlockPageRelatedPageDocument
   blocks: [BlockPageBlocks]
 }
 
@@ -169,54 +199,68 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   updateBlockPageDocument(relativePath: String!, params: BlockPageMutation!): BlockPageDocument!
   createBlockPageDocument(relativePath: String!, params: BlockPageMutation!): BlockPageDocument!
 }
 
 input DocumentMutation {
-  page: PageMutation
+  post: PostMutation
+  author: AuthorMutation
   blockPage: BlockPageMutation
 }
 
-input PageMutation {
+input PostMutation {
   title: String
-  body: String
-  relatedPage: String
+  author: String
+  tags: [String]
+  categories: [String]
+  published: String
+  featured: Boolean
+  body: JSON
 }
 
-input BlockPageSeoMutation {
-  ogTitle: String
-}
-
-input BlockPageSocialMutation {
-  handle: String
+input AuthorSocialMutation {
   platform: String
-  relatedPage: String
+  handle: String
+}
+
+input AuthorMutation {
+  name: String
+  social: [AuthorSocialMutation]
+  bio: JSON
 }
 
 input BlockPageBlocksHeroMutation {
   title: String
   description: String
-  relation: String
 }
 
-input BlockPageBlocksCtaMutation {
-  title: String
-  action: String
+input BlockPageBlocksBlockQuoteMutation {
+  message: JSON
+  author: String
+}
+
+input BlockPageBlocksFeaturedPostsBlogsMutation {
+  item: String
+}
+
+input BlockPageBlocksFeaturedPostsMutation {
+  header: String
+  blogs: [BlockPageBlocksFeaturedPostsBlogsMutation]
 }
 
 input BlockPageBlocksMutation {
   hero: BlockPageBlocksHeroMutation
-  cta: BlockPageBlocksCtaMutation
+  blockQuote: BlockPageBlocksBlockQuoteMutation
+  featuredPosts: BlockPageBlocksFeaturedPostsMutation
 }
 
 input BlockPageMutation {
   title: String
-  seo: BlockPageSeoMutation
-  social: [BlockPageSocialMutation]
-  relatedPage: String
   blocks: [BlockPageBlocksMutation]
 }
 

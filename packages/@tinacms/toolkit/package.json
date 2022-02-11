@@ -97,6 +97,7 @@
     "express": "^4.17.1",
     "final-form": "^4.20.2",
     "final-form-arrays": "^3.0.1",
+    "final-form-set-field-data": "^1.0.2",
     "is-hotkey": "^0.2.0",
     "lodash.get": "^4.4.2",
     "moment": ">=2 <=3",

@@ -11,7 +11,48 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineSchema } from '@tinacms/cli'
+import { defineSchema, TinaTemplate } from '@tinacms/cli'
+
+const featureBlogList: TinaTemplate = {
+  name: 'featuredBlogs',
+  label: 'Featured Blogs',
+  // ui: {
+  //   defaultItem: {
+  //     headline: 'ok',
+  //   },
+  // },
+  fields: [
+    {
+      type: 'string',
+      label: 'Headline',
+      name: 'headline',
+    },
+    {
+      label: 'Text',
+      name: 'text',
+      type: 'string',
+    },
+    {
+      label: 'Blogs',
+      name: 'blogs',
+      type: 'object',
+      list: true,
+      ui: {
+        defaultItem: {
+          blog: 'content/post/default.md',
+        },
+      },
+      fields: [
+        {
+          label: 'Blog',
+          name: 'blog',
+          type: 'reference',
+          collections: ['post'],
+        },
+      ],
+    },
+  ],
+}
 
 export default defineSchema({
   collections: [
@@ -22,21 +63,33 @@ export default defineSchema({
       format: 'mdx',
       fields: [
         {
+          label: 'Blocks',
+          name: 'blocks',
           type: 'object',
-          name: 'someObj',
-          fields: [
-            {
-              name: 'thingOne',
-              type: 'string',
-              required: true,
-            },
-          ],
+          list: true,
+          templates: [featureBlogList],
+        },
+        // {
+        //   name: 'body',
+        //   label: 'Main Content',
+        //   type: 'rich-text',
+        //   isBody: true,
+        // },
+      ],
+    },
+    {
+      name: 'author',
+      path: 'content/authors',
+      label: 'Author',
+      format: 'md',
+      fields: [
+        {
+          name: 'name',
+          type: 'string',
         },
         {
-          name: 'body',
-          label: 'Main Content',
-          type: 'rich-text',
-          isBody: true,
+          name: 'avatar',
+          type: 'string',
         },
       ],
     },
@@ -53,10 +106,21 @@ export default defineSchema({
         },
         {
           type: 'string',
+          label: 'Image',
+          name: 'image',
+        },
+        {
+          type: 'string',
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
           list: true,
+        },
+        {
+          type: 'reference',
+          label: 'Author',
+          name: 'author',
+          collections: ['author'],
         },
         {
           type: 'rich-text',

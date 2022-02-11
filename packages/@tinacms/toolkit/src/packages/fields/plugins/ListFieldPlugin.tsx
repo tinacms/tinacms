@@ -135,6 +135,9 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   }, [tinaForm, field, index])
   const fields = [
     {
+      // FIXME: this is needed for the new event system, so we know what type to record when we get a change
+      type: field.type,
+      list: field.list,
       ...field.field,
       label: 'Value',
       name: field.name + '.' + index,

@@ -5544,6 +5544,7 @@ __metadata:
     express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
+    final-form-set-field-data: ^1.0.2
     is-hotkey: ^0.2.0
     jest: ^27.0.6
     lodash.get: ^4.4.2
@@ -15997,6 +15998,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"final-form-set-field-data@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "final-form-set-field-data@npm:1.0.2"
+  peerDependencies:
+    final-form: ">=1.2.0"
+  checksum: 03c62e2017f119d598f7b731ed0c7fffc23faef34837b15f5e7196f0dc7b7a7968c4314d808df2e8a3632dce068f992b2953835fd47d1d5d07b1623564257747
+  languageName: node
+  linkType: hard
+
 "final-form@npm:4.20.1":
   version: 4.20.1
   resolution: "final-form@npm:4.20.1"
@@ -16803,7 +16813,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.1.7":
+"glob@npm:^7.1.7, glob@npm:^7.2.0":
   version: 7.2.0
   resolution: "glob@npm:7.2.0"
   dependencies:
@@ -20194,6 +20204,7 @@ fsevents@~2.1.2:
     "@tinacms/cli": "workspace:*"
     eslint: 7
     eslint-config-next: 12.0.3
+    glob: ^7.2.0
     next: 12.0.3
     react: 17.0.2
     react-dom: 17.0.2
@@ -30020,7 +30031,9 @@ resolve@^2.0.0-next.3:
     graphql: ^15.1.0
     graphql-tag: ^2.11.0
     identity-obj-proxy: ^3.0.0
+    isomorphic-fetch: ^3.0.0
     jest: ^27.0.6
+    jest-file-snapshot: ^0.5.0
     lodash.set: ^4.3.2
     next: 9.4.2
     react: 16.14.0
@@ -30028,7 +30041,6 @@ resolve@^2.0.0-next.3:
     react-icons: ^4.3.1
     react-is: ^17.0.2
     react-router-dom: 6
-    relay-compiler: 12.0.0
     styled-components: ^5.2.0
     typescript: ^4.3.5
     url-pattern: ^1.0.3

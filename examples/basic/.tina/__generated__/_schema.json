@@ -14,38 +14,114 @@
       "format": "mdx",
       "fields": [
         {
+          "label": "Blocks",
+          "name": "blocks",
           "type": "object",
-          "name": "someObj",
-          "fields": [
+          "list": true,
+          "templates": [
             {
-              "name": "thingOne",
-              "type": "string",
-              "required": true,
+              "name": "featuredBlogs",
+              "label": "Featured Blogs",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Headline",
+                  "name": "headline",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "featuredBlogs",
+                    "headline"
+                  ]
+                },
+                {
+                  "label": "Text",
+                  "name": "text",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "featuredBlogs",
+                    "text"
+                  ]
+                },
+                {
+                  "label": "Blogs",
+                  "name": "blogs",
+                  "type": "object",
+                  "list": true,
+                  "ui": {
+                    "defaultItem": {
+                      "blog": "content/post/default.md"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "label": "Blog",
+                      "name": "blog",
+                      "type": "reference",
+                      "collections": [
+                        "post"
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "featuredBlogs",
+                        "blogs",
+                        "blog"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "featuredBlogs",
+                    "blogs"
+                  ]
+                }
+              ],
               "namespace": [
                 "page",
-                "someObj",
-                "thingOne"
+                "blocks",
+                "featuredBlogs"
               ]
             }
           ],
           "namespace": [
             "page",
-            "someObj"
-          ]
-        },
-        {
-          "name": "body",
-          "label": "Main Content",
-          "type": "rich-text",
-          "isBody": true,
-          "namespace": [
-            "page",
-            "body"
+            "blocks"
           ]
         }
       ],
       "namespace": [
         "page"
+      ]
+    },
+    {
+      "name": "author",
+      "path": "content/authors",
+      "label": "Author",
+      "format": "md",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "namespace": [
+            "author",
+            "name"
+          ]
+        },
+        {
+          "name": "avatar",
+          "type": "string",
+          "namespace": [
+            "author",
+            "avatar"
+          ]
+        }
+      ],
+      "namespace": [
+        "author"
       ]
     },
     {
@@ -65,6 +141,15 @@
         },
         {
           "type": "string",
+          "label": "Image",
+          "name": "image",
+          "namespace": [
+            "post",
+            "image"
+          ]
+        },
+        {
+          "type": "string",
           "label": "Topic",
           "name": "topic",
           "options": [
@@ -75,6 +160,18 @@
           "namespace": [
             "post",
             "topic"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "author"
+          ],
+          "namespace": [
+            "post",
+            "author"
           ]
         },
         {
