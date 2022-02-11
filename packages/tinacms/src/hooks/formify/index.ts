@@ -190,6 +190,7 @@ export const formify = async ({
                   const edgeField = namedFieldType.getFields()[EDGES_NODE_NAME]
                   const edgeType = G.getNamedType(edgeField.type)
                   util.ensureObjectType(edgeType)
+                  path.push(util.getNameAndAlias(selectionNode2))
                   return {
                     ...selectionNode2,
                     selectionSet: {
@@ -201,17 +202,13 @@ export const formify = async ({
                               if (subSelectionNode.name.value === NODE_NAME) {
                                 const nodeField =
                                   edgeType.getFields()[NODE_NAME]
+                                path.push(
+                                  util.getNameAndAlias(subSelectionNode, true)
+                                )
                                 return formifyNode({
                                   fieldOrInlineFragmentNode: subSelectionNode,
                                   type: nodeField.type,
-                                  path: [
-                                    ...path,
-                                    util.getNameAndAlias(selectionNode2),
-                                    util.getNameAndAlias(
-                                      subSelectionNode,
-                                      true
-                                    ),
-                                  ],
+                                  path,
                                 })
                               } else {
                                 return subSelectionNode
@@ -314,16 +311,16 @@ export const formify = async ({
                                     if (!subSelectionField) {
                                       return subSelectionNode
                                     }
+                                    path.push(
+                                      util.getNameAndAlias(
+                                        subSelectionNode,
+                                        G.isListType(subSelectionField.type)
+                                      )
+                                    )
                                     return formifyField({
                                       fieldNode: subSelectionNode,
                                       parentType: field.type,
-                                      path: [
-                                        ...path,
-                                        util.getNameAndAlias(
-                                          subSelectionNode,
-                                          G.isListType(subSelectionField.type)
-                                        ),
-                                      ],
+                                      path,
                                     })
                                   default:
                                     throw new FormifyError(
