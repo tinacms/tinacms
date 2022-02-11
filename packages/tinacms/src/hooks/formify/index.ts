@@ -391,11 +391,11 @@ export const formify = async ({
                   return selectionNode
                 }
                 util.ensureObjectType(namedType)
-                const field = util.getObjectField(namedType, selectionNode)
-                if (!field) {
+                const subField = util.getObjectField(namedType, selectionNode)
+                if (!subField) {
                   return fieldNode
                 }
-                if (G.isScalarType(G.getNamedType(field.type))) {
+                if (G.isScalarType(G.getNamedType(subField.type))) {
                   return selectionNode
                 }
                 return {
@@ -403,25 +403,25 @@ export const formify = async ({
                   selectionSet: {
                     kind: 'SelectionSet' as const,
                     selections: selectionNode.selectionSet.selections.map(
-                      (selectionNode) => {
-                        switch (selectionNode.kind) {
+                      (subSelectionNode) => {
+                        switch (subSelectionNode.kind) {
                           case 'Field':
-                            if (selectionNode.name.value === '__typename') {
-                              return selectionNode
+                            if (subSelectionNode.name.value === '__typename') {
+                              return subSelectionNode
                             }
                             throw new FormifyError('NOOP')
                           case 'InlineFragment':
-                            const namedType = G.getNamedType(field.type)
-                            util.ensureNodeField(namedType)
+                            const subNamedType = G.getNamedType(subField.type)
+                            util.ensureNodeField(subNamedType)
                             return formifyNode({
-                              fieldOrInlineFragmentNode: selectionNode,
-                              type: field.type,
+                              fieldOrInlineFragmentNode: subSelectionNode,
+                              type: subField.type,
                               path,
                             })
                           default:
                             throw new FormifyError(
                               'UNEXPECTED',
-                              `selection ${selectionNode.kind}`
+                              `selection ${subSelectionNode.kind}`
                             )
                         }
                       }
@@ -530,11 +530,11 @@ export const formify = async ({
                       selectionSet: {
                         kind: 'SelectionSet',
                         selections: selectionNode.selectionSet.selections.map(
-                          (selectionNode) => {
-                            switch (selectionNode.kind) {
+                          (subSelectionNode) => {
+                            switch (subSelectionNode.kind) {
                               case 'Field':
                                 if (
-                                  selectionNode.name.value ===
+                                  subSelectionNode.name.value ===
                                   COLLECTIONS_DOCUMENTS_NAME
                                 ) {
                                   util.ensureObjectType(namedFieldType)
@@ -545,11 +545,13 @@ export const formify = async ({
                                   const docType = G.getNamedType(n.type)
                                   return formifyConnection({
                                     namedFieldType: docType,
-                                    selectionNode,
-                                    path: [util.getNameAndAlias(selectionNode)],
+                                    selectionNode: subSelectionNode,
+                                    path: [
+                                      util.getNameAndAlias(subSelectionNode),
+                                    ],
                                   })
                                 }
-                                return selectionNode
+                                return subSelectionNode
                               default:
                                 throw new FormifyError('NOOP')
                             }
