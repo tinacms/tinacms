@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-core",
-  "version": "0.43.19",
+  "version": "0.43.21",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -21,14 +21,14 @@
     "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-core": "^0.43.19",
-    "@einsteinindustries/tinacms-forms": "^0.43.19"
+    "@einsteinindustries/tinacms-core": "^0.43.21",
+    "@einsteinindustries/tinacms-forms": "^0.43.21"
   },
   "peerDependencies": {
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.19"
+    "@einsteinindustries/tinacms-scripts": "^0.43.21"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
