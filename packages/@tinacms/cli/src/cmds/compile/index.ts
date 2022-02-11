@@ -144,4 +144,7 @@ const loaders: { [ext: string]: Loader } = {
   '.webp': 'file',
   '.woff': 'file',
   '.woff2': 'file',
+  '.js': 'jsx',
+  '.jsx': 'jsx',
+  '.tsx': 'tsx',
 }
