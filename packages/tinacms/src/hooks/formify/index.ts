@@ -203,7 +203,7 @@ export const formify = async ({
                                   edgeType.getFields()[NODE_NAME]
                                 return formifyNode({
                                   fieldOrInlineFragmentNode: subSelectionNode,
-                                  parentType: nodeField.type,
+                                  type: nodeField.type,
                                   path: [
                                     ...path,
                                     util.getNameAndAlias(selectionNode),
@@ -235,15 +235,15 @@ export const formify = async ({
   }
   function formifyNode<T extends G.FieldNode | G.InlineFragmentNode>({
     fieldOrInlineFragmentNode,
-    parentType,
+    type,
     path,
   }: {
     fieldOrInlineFragmentNode: T
-    parentType: G.GraphQLOutputType
+    type: G.GraphQLOutputType
     path: { name: string; alias: string }[]
   }) {
     let extraFields = []
-    const namedParentType = G.getNamedType(parentType)
+    const namedType = G.getNamedType(type)
 
     const formifiedNode = {
       ...fieldOrInlineFragmentNode,
@@ -262,25 +262,25 @@ export const formify = async ({
                   /**
                    * This is a somewhat special use-case for node(id: "")
                    */
-                  if (G.isInterfaceType(namedParentType)) {
-                    const type =
-                      schema.getImplementations(namedParentType).objects[
+                  if (G.isInterfaceType(namedType)) {
+                    const subType =
+                      schema.getImplementations(namedType).objects[
                         selectionNode.typeCondition.name.value
                       ]
                     return formifyNode({
                       fieldOrInlineFragmentNode: selectionNode,
-                      parentType: type,
+                      type: subType,
                       path,
                     })
                   }
-                  util.ensureUnionType(namedParentType)
-                  const type = util.getSelectedUnionType(
-                    namedParentType,
+                  util.ensureUnionType(namedType)
+                  const subType = util.getSelectedUnionType(
+                    namedType,
                     selectionNode
                   )
                   return formifyNode({
                     fieldOrInlineFragmentNode: selectionNode,
-                    parentType: type,
+                    type: subType,
                     path,
                   })
                 case 'Field':
@@ -290,13 +290,13 @@ export const formify = async ({
                      * `form`, `values` and `_internalSys`
                      */
                     extraFields = util.metaFields
-                    if (G.isObjectType(namedParentType)) {
+                    if (G.isObjectType(namedType)) {
                       const field = util.getObjectField(
-                        namedParentType,
+                        namedType,
                         selectionNode
                       )
-                      const namedType = G.getNamedType(field.type)
-                      util.ensureObjectType(namedType)
+                      const namedSubType = G.getNamedType(field.type)
+                      util.ensureObjectType(namedSubType)
                       return {
                         ...selectionNode,
                         selectionSet: {
@@ -308,7 +308,7 @@ export const formify = async ({
                                   case 'Field':
                                     const subSelectionField =
                                       util.getObjectField(
-                                        namedType,
+                                        namedSubType,
                                         subSelectionNode
                                       )
                                     if (!subSelectionField) {
@@ -415,7 +415,7 @@ export const formify = async ({
                             util.ensureNodeField(namedType)
                             return formifyNode({
                               fieldOrInlineFragmentNode: selectionNode,
-                              parentType: field.type,
+                              type: field.type,
                               path,
                             })
                           default:
@@ -437,7 +437,7 @@ export const formify = async ({
                   )
                   return formifyNode({
                     fieldOrInlineFragmentNode: selectionNode,
-                    parentType: parentType,
+                    type: parentType,
                     path,
                   })
                 }
@@ -449,13 +449,13 @@ export const formify = async ({
                       (subSelectionNode) => {
                         switch (subSelectionNode.kind) {
                           case 'Field':
-                            const parentType = util.getSelectedUnionType(
+                            const subType = util.getSelectedUnionType(
                               namedType,
                               selectionNode
                             )
                             return formifyField({
                               fieldNode: subSelectionNode,
-                              parentType: parentType,
+                              parentType: subType,
                               path,
                             })
                           default:
@@ -506,7 +506,7 @@ export const formify = async ({
                   if (util.isNodeField(namedFieldType)) {
                     return formifyNode({
                       fieldOrInlineFragmentNode: selectionNode,
-                      parentType: field.type,
+                      type: field.type,
                       path: [util.getNameAndAlias(selectionNode)],
                     })
                   } else if (util.isConnectionField(namedFieldType)) {

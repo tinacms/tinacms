@@ -11,6 +11,7 @@
   ],
   "plugins": ["@typescript-eslint", "react-hooks", "react"],
   "rules": {
+    "no-shadow": ["error", { "builtinGlobals": false, "hoist": "functions", "allow": [] }],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
