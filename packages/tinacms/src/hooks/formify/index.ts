@@ -190,7 +190,10 @@ export const formify = async ({
                   const edgeField = namedFieldType.getFields()[EDGES_NODE_NAME]
                   const edgeType = G.getNamedType(edgeField.type)
                   util.ensureObjectType(edgeType)
-                  path.push(util.getNameAndAlias(selectionNode2))
+                  const path2 = [
+                    ...path,
+                    util.getNameAndAlias(selectionNode2, true),
+                  ]
                   return {
                     ...selectionNode2,
                     selectionSet: {
@@ -202,13 +205,14 @@ export const formify = async ({
                               if (subSelectionNode.name.value === NODE_NAME) {
                                 const nodeField =
                                   edgeType.getFields()[NODE_NAME]
-                                path.push(
-                                  util.getNameAndAlias(subSelectionNode, true)
-                                )
+                                const path3 = [
+                                  ...path2,
+                                  util.getNameAndAlias(subSelectionNode),
+                                ]
                                 return formifyNode({
                                   fieldOrInlineFragmentNode: subSelectionNode,
                                   type: nodeField.type,
-                                  path,
+                                  path: path3,
                                 })
                               } else {
                                 return subSelectionNode
@@ -241,6 +245,10 @@ export const formify = async ({
   }) {
     let extraFields = []
     const namedType = G.getNamedType(type)
+
+    // console.log(path)
+    // console.log(G.print(fieldOrInlineFragmentNode))
+    nodes.push({ path })
 
     const formifiedNode = {
       ...fieldOrInlineFragmentNode,
@@ -287,6 +295,7 @@ export const formify = async ({
                      * `form`, `values` and `_internalSys`
                      */
                     extraFields = util.metaFields
+                    const path2 = [...path, util.getNameAndAlias(selectionNode)]
                     if (G.isObjectType(namedType)) {
                       const field = util.getObjectField(
                         namedType,
@@ -311,16 +320,16 @@ export const formify = async ({
                                     if (!subSelectionField) {
                                       return subSelectionNode
                                     }
-                                    path.push(
-                                      util.getNameAndAlias(
-                                        subSelectionNode,
-                                        G.isListType(subSelectionField.type)
-                                      )
-                                    )
                                     return formifyField({
                                       fieldNode: subSelectionNode,
                                       parentType: field.type,
-                                      path,
+                                      path: [
+                                        ...path2,
+                                        util.getNameAndAlias(
+                                          subSelectionNode,
+                                          G.isListType(subSelectionField.type)
+                                        ),
+                                      ],
                                     })
                                   default:
                                     throw new FormifyError(
@@ -413,7 +422,10 @@ export const formify = async ({
                             return formifyNode({
                               fieldOrInlineFragmentNode: subSelectionNode,
                               type: subField.type,
-                              path,
+                              path: [
+                                ...path,
+                                util.getNameAndAlias(selectionNode),
+                              ],
                             })
                           default:
                             throw new FormifyError(
@@ -453,7 +465,10 @@ export const formify = async ({
                             return formifyField({
                               fieldNode: subSelectionNode,
                               parentType: subType,
-                              path,
+                              path: [
+                                ...path,
+                                util.getNameAndAlias(subSelectionNode),
+                              ],
                             })
                           default:
                             throw new FormifyError(
@@ -522,6 +537,7 @@ export const formify = async ({
                     selectionNode.name.value === COLLECTION_FIELD_NAME ||
                     selectionNode.name.value === COLLECTIONS_FIELD_NAME
                   ) {
+                    const path = [util.getNameAndAlias(selectionNode)]
                     return {
                       ...selectionNode,
                       selectionSet: {
@@ -544,6 +560,7 @@ export const formify = async ({
                                     namedFieldType: docType,
                                     selectionNode: subSelectionNode,
                                     path: [
+                                      ...path,
                                       util.getNameAndAlias(subSelectionNode),
                                     ],
                                   })
@@ -587,7 +604,7 @@ export const formify = async ({
       2
     )
 
-    // console.log(stringFormat)
+    console.log(stringFormat)
   })
   return { formifiedQuery, nodes }
 }
