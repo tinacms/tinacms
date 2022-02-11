@@ -121,6 +121,14 @@ export function ensureOperationDefinition(
   }
 }
 
+export function getNameAndAlias(fieldNode: G.FieldNode, list?: boolean) {
+  return {
+    name: fieldNode.name.value,
+    alias: fieldNode.alias ? fieldNode.alias.value : fieldNode.name.value,
+    list: !!list,
+  }
+}
+
 /**
  * This is a dummy query which we pull apart and spread
  * back into the the selectionSet for all "Node" fields
