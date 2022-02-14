@@ -32,6 +32,7 @@ const lock = new AsyncLock()
 interface Options {
   port?: number
   command?: string
+  watchFolders?: string[]
   experimentalData?: boolean
   noWatch?: boolean
   noSDK: boolean
@@ -50,6 +51,7 @@ export async function startServer(
     experimentalData,
     noSDK,
     noTelemetry,
+    watchFolders,
   }: Options
 ) {
   lock.disable()
@@ -136,7 +138,10 @@ stack: ${code.stack || 'No stack was provided'}`)
       lock.disable()
     }
   }
+  console.log({ watchFolders })
 
+  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
+  console.log({ foldersToWatch })
   if (!noWatch && !process.env.CI) {
     chokidar
       .watch([`${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`], {

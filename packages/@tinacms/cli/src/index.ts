@@ -66,6 +66,7 @@ const registerCommands = (commands: Command[], noHelp: boolean = false) => {
       logger.info('')
     })
     ;(command.options || []).forEach((option) => {
+      console.log({ option })
       newCmd.option(option.name, option.description)
     })
 

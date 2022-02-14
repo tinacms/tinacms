@@ -62,6 +62,11 @@ const noTelemetryOption = {
   name: '--noTelemetry',
   description: 'Disable anonymous telemetry that is collected',
 }
+const watchFileOption = {
+  name: '-w, --watchFolders [folders...]',
+  description:
+    'a list of folders (relative to where this is being run) that the cli will watch for changes',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -74,6 +79,7 @@ export const baseCmds: Command[] = [
       noWatchOption,
       noSDKCodegenOption,
       noTelemetryOption,
+      watchFileOption,
     ],
     action: (options) => chain([startServer], options),
   },

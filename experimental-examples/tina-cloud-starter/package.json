@@ -3,7 +3,7 @@
   "version": "0.2.7",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\" --noTelemetry",
+    "dev": "yarn tinacms server:start -c \"next dev\" --noTelemetry --watchFolders components pages",
     "dev-data": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry",
     "build": "yarn tinacms server:start -c \"next build\" --noTelemetry",
     "start": "yarn tinacms server:start -c \"next start\" --noTelemetry"
