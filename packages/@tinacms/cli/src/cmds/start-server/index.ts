@@ -140,16 +140,21 @@ stack: ${code.stack || 'No stack was provided'}`)
   }
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
-  console.log({ foldersToWatch })
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch([`${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`], {
-        ignored: [
-          '**/node_modules/**/*',
-          '**/.next/**/*',
-          `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+      .watch(
+        [
+          ...foldersToWatch,
+          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
         ],
-      })
+        {
+          ignored: [
+            '**/node_modules/**/*',
+            '**/.next/**/*',
+            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+          ],
+        }
+      )
       .on('ready', async () => {
         console.log('Generating Tina config')
         try {
