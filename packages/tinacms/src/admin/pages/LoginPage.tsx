@@ -40,6 +40,7 @@ const LoginPage = () => {
           variant="primary"
           size="custom"
           className="text-base h-12 px-6 flex-1"
+          type="submit"
         >
           <BiLogIn className="w-6 h-auto mr-2 opacity-80" /> Edit With Tina
         </Button>
