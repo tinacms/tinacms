@@ -16,6 +16,7 @@ import { BiLogOut } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
 import { setEditing } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
+import { Button } from '@tinacms/toolkit'
 
 const logout = () => {
   setEditing(false)
@@ -24,22 +25,29 @@ const logout = () => {
 
 const LogoutPage = () => {
   return (
-    <AuthTemplate>
-      <a
-        href="/"
-        className="flex-1 text-center inline-flex justify-center items-center px-8 py-3 shadow-sm text-sm leading-4 font-medium rounded-full text-gray-600 border border-gray-150 hover:opacity-80 hover:bg-gray-50 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-      >
-        <MdOutlineArrowBack className="w-6 h-auto mr-1.5 opacity-80" /> Back to
-        site
-      </a>
-      <button
-        type="submit"
-        onClick={() => logout()}
-        className="flex-1 justify-center text-center inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
-        style={{ background: '#0084FF' }}
-      >
-        <BiLogOut className="w-6 h-auto mr-1.5 opacity-80" /> Log out
-      </button>
+    <AuthTemplate heading="Tina &ndash; Log Out">
+      <div className="flex w-full flex-1 gap-4 items-center justify-end">
+        <Button
+          onClick={() => {
+            window.location.href = '/'
+          }}
+          variant="white"
+          size="custom"
+          className="text-base h-12 px-6 flex-shrink-0 flex-grow-0"
+        >
+          <MdOutlineArrowBack className="w-6 h-auto mr-1.5 opacity-80" /> Back
+          To Site
+        </Button>
+        <Button
+          onClick={() => logout()}
+          type="submit"
+          variant="primary"
+          size="custom"
+          className="text-base h-12 px-6 flex-1"
+        >
+          <BiLogOut className="w-6 h-auto mr-1.5 opacity-80" /> Log Out of Tina
+        </Button>
+      </div>
     </AuthTemplate>
   )
 }
