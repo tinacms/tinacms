@@ -138,7 +138,6 @@ stack: ${code.stack || 'No stack was provided'}`)
       lock.disable()
     }
   }
-  console.log({ watchFolders })
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   console.log({ foldersToWatch })
