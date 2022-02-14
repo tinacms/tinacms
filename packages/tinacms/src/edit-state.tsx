@@ -39,6 +39,60 @@ export const TinaEditProvider = ({
   )
 }
 
+// TODO: This name is too long any suggestions for better ones?
+export function useClientSideDataTina<T extends object>({
+  query,
+  variables,
+  token,
+  url,
+}: {
+  query: string
+  variables: object
+  url: string
+  token: string
+}): { data: T | undefined; isLoading: boolean } {
+  // Local state
+  const [clientData, setClientData] = useState<T>()
+  const [isLoadingClientSideFetch, setLoadingClientSideFetch] = useState(false)
+
+  // Tina State
+  const { data: tinaEditData, isLoading: isLoadingInEditMode } = useTina<T>({
+    data: undefined as T,
+    query,
+    variables,
+  })
+
+  const { edit } = useEditState()
+
+  // Fetch data
+  useEffect(() => {
+    setLoadingClientSideFetch(true)
+    // TODO: Maybe we want to make a client that works client side (Same a LocalClient but does not have tinaCMS as a dep)
+    const fetchData = async () => {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          body: JSON.stringify({ query, variables }),
+          headers: {
+            'X-API-KEY': token,
+            'Content-Type': 'application/json',
+          },
+        })
+        console.log({ res })
+        const jsonData = await res.json()
+        setClientData(jsonData)
+        setLoadingClientSideFetch(false)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchData()
+  }, [JSON.stringify(variables), query])
+
+  const isLoading = edit ? isLoadingInEditMode : isLoadingClientSideFetch
+  // Return the live edit data or the client fetched data
+  return { data: edit ? tinaEditData : clientData, isLoading }
+}
 export function useTina<T extends object>({
   query,
   variables,
