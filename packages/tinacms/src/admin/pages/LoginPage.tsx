@@ -22,7 +22,7 @@ const LoginPage = () => {
   const { setEdit } = useEditState()
   const login = () => setEdit(true)
   return (
-    <AuthTemplate heading="Tina &ndash; Log In">
+    <AuthTemplate>
       <div className="flex w-full flex-1 gap-4 items-center justify-end">
         <Button
           onClick={() => {

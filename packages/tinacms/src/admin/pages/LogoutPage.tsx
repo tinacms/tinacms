@@ -25,7 +25,7 @@ const logout = () => {
 
 const LogoutPage = () => {
   return (
-    <AuthTemplate heading="Tina &ndash; Log Out">
+    <AuthTemplate>
       <div className="flex w-full flex-1 gap-4 items-center justify-end">
         <Button
           onClick={() => {
