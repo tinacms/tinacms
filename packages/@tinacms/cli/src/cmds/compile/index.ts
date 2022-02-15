@@ -42,6 +42,32 @@ export const resetGeneratedFolder = async () => {
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
 }
 
+const cleanup = async ({
+  tinaConfigPath,
+  tinaTempPath,
+}: {
+  tinaConfigPath: string
+  tinaTempPath: string
+}) => {
+  // Delete the node require cache for .tina temp folder
+  Object.keys(require.cache).map((key) => {
+    if (key.startsWith(tinaTempPath)) {
+      delete require.cache[require.resolve(key)]
+    }
+  })
+  try {
+    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
+    const schemaObject: TinaCloudSchema = schemaFunc.default
+    await fs.outputFile(
+      path.join(tinaConfigPath, 'schema.json'),
+      JSON.stringify(schemaObject, null, 2)
+    )
+    await fs.remove(tinaTempPath)
+  } catch (e) {
+    throw new ExecuteSchemaError(e)
+  }
+}
+
 export const compile = async (_ctx, _next) => {
   logger.info(logText('Compiling...'))
   let schemaExists = true
@@ -71,26 +97,10 @@ export const compile = async (_ctx, _next) => {
   try {
     await transpile(tinaPath, tinaTempPath)
   } catch (e) {
+    await cleanup({ tinaConfigPath, tinaTempPath })
     throw new BuildSchemaError(e)
   }
-
-  // Delete the node require cache for .tina temp folder
-  Object.keys(require.cache).map((key) => {
-    if (key.startsWith(tinaTempPath)) {
-      delete require.cache[require.resolve(key)]
-    }
-  })
-  try {
-    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-    const schemaObject: TinaCloudSchema = schemaFunc.default
-    await fs.outputFile(
-      path.join(tinaConfigPath, 'schema.json'),
-      JSON.stringify(schemaObject, null, 2)
-    )
-    await fs.remove(tinaTempPath)
-  } catch (e) {
-    throw new ExecuteSchemaError(e)
-  }
+  await cleanup({ tinaConfigPath, tinaTempPath })
 }
 
 const transpile = async (projectDir, tempDir) => {
