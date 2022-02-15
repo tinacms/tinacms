@@ -47,7 +47,7 @@ export const compile = async (_ctx, _next) => {
   let schemaExists = true
   try {
     getSchemaPath({ projectDir: tinaPath })
-  } catch (_) {
+  } catch {
     // getSchemaPath will throw an error if it is not found
     schemaExists = false
   }
