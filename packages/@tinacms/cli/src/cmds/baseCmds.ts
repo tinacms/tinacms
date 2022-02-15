@@ -50,7 +50,7 @@ const noSDKCodegenOption = {
 const cleanOption = {
   name: '--clean',
   description:
-    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.{ts,tsx,js}`',
+    'Updates all content files to remove any data not explicitly permitted by the current schema definition',
 }
 
 const useDefaultValuesOption = {
