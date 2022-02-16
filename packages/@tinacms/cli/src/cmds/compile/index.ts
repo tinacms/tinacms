@@ -64,6 +64,9 @@ const cleanup = async ({
     )
     await fs.remove(tinaTempPath)
   } catch (e) {
+    // Always remove the temp code
+    await fs.remove(tinaTempPath)
+    // Throw an execution error
     throw new ExecuteSchemaError(e)
   }
 }
