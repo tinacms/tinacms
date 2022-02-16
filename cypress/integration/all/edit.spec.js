@@ -13,6 +13,14 @@ limitations under the License.
 
 /// <reference types="cypress" />
 
+// Not really an error? see https://github.com/cypress-io/cypress/issues/8418
+const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/
+Cypress.on('uncaught:exception', (err) => {
+  /* returning false here prevents Cypress from failing the test */
+  if (resizeObserverLoopErrRe.test(err.message)) {
+    return false
+  }
+})
 describe('Have Edit mode button', () => {
   it('should enter edit mode', () => {
     // Start from the index page
@@ -29,7 +37,7 @@ describe('Have Edit mode button', () => {
     cy.visit('/admin')
     cy.get('button[type=submit', { timeout: 3000 }).should(
       'contain',
-      'Enter edit-mode'
+      'Edit With Tina'
     )
     cy.get('button[type=submit')
       .click()

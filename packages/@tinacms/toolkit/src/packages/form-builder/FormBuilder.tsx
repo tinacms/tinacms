@@ -83,6 +83,35 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     [tinaForm]
   )
 
+  /**
+   * Prevent navigation away from the window when the form is dirty
+   */
+  React.useEffect(() => {
+    const onBeforeUnload = (event) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    const unsubscribe = finalForm.subscribe(
+      ({ pristine }) => {
+        if (onPristineChange) {
+          onPristineChange(pristine)
+        }
+
+        if (!pristine) {
+          window.addEventListener('beforeunload', onBeforeUnload)
+        } else {
+          window.removeEventListener('beforeunload', onBeforeUnload)
+        }
+      },
+      { pristine: true }
+    )
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
+      unsubscribe()
+    }
+  }, [finalForm])
+
   return (
     <FinalForm
       form={finalForm}
@@ -92,12 +121,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       {({ handleSubmit, pristine, invalid, submitting }) => {
         return (
           <>
-            <FormSpy
-              subscription={{ pristine: true }}
-              onChange={({ pristine }) => {
-                onPristineChange && onPristineChange(pristine)
-              }}
-            />
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
                 <FormWrapper id={tinaForm.id}>
