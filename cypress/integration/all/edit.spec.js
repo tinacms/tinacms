@@ -37,7 +37,7 @@ describe('Have Edit mode button', () => {
     cy.visit('/admin')
     cy.get('button[type=submit', { timeout: 3000 }).should(
       'contain',
-      'Enter edit-mode'
+      'Edit With Tina'
     )
     cy.get('button[type=submit')
       .click()
