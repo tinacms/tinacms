@@ -16,6 +16,7 @@ const featureBlockShema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
+    previewSrc: "/blocks/features.png",
     defaultItem: {
       items: [defaultFeature, defaultFeature, defaultFeature],
     },
@@ -62,6 +63,7 @@ const contentBlockSchema: TinaTemplate = {
   name: "content",
   label: "Content",
   ui: {
+    previewSrc: "/blocks/content.png",
     defaultItem: {
       body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.",
     },
@@ -92,6 +94,7 @@ const testimonialBlockSchema: TinaTemplate = {
   name: "testimonial",
   label: "Testimonial",
   ui: {
+    previewSrc: "/blocks/testimonial.png",
     defaultItem: {
       quote:
         "There are only two hard things in Computer Science: cache invalidation and naming things.",
@@ -130,6 +133,7 @@ const heroBlockSchema: TinaTemplate = {
   name: "hero",
   label: "Hero",
   ui: {
+    previewSrc: "/blocks/hero.png",
     defaultItem: {
       tagline: "Here's some text above the other text",
       headline: "This Big Text is Totally Awesome",
@@ -555,6 +559,9 @@ export default defineSchema({
           list: true,
           name: "blocks",
           label: "Sections",
+          ui: {
+            visualSelector: true,
+          },
           templates: [
             heroBlockSchema,
             featureBlockShema,

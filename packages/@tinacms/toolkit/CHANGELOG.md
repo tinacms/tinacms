@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.56.14
+
+### Patch Changes
+
+- af9f6c2c2: Prevents hard navigation away from dirty forms
+- 2e14cda5e: Add visual block selector as optional UI
+- 3d4c52a19: Change the default for rich-text to use the newer version
+
 ## 0.56.13
 
 ### Patch Changes
