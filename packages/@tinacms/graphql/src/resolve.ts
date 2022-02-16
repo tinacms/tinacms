@@ -178,7 +178,7 @@ export const resolve = async ({
               )
             })
           }
-          return resolver.resolveCollection(args.collection)
+          return resolver.resolveCollection(args.collection, true)
         }
 
         /**
