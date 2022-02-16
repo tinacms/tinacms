@@ -49,7 +49,10 @@ export class Resolver {
     this.database = init.database
     this.tinaSchema = init.tinaSchema
   }
-  public resolveCollection = async (collectionName: string) => {
+  public resolveCollection = async (
+    collectionName: string,
+    hasDocuments?: boolean
+  ) => {
     const collection = this.tinaSchema.getCollection(collectionName)
     const extraFields = {}
     // const res = this.tinaSchema.getTemplatesForCollectable(collection);
@@ -59,7 +62,11 @@ export class Resolver {
     // if (res.type === "union") {
     //   extraFields["templates"] = res.templates;
     // }
-    const documents = await this.getDocumentsForCollection(collectionName)
+    let documents = {}
+    if (hasDocuments) {
+      console.log('getting all documents')
+      documents = await this.getDocumentsForCollection(collectionName)
+    }
     return {
       documents,
       ...collection,
