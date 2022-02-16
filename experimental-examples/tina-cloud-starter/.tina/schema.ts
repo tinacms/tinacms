@@ -2,15 +2,6 @@ import { defineSchema } from "@tinacms/cli";
 import type { TinaTemplate } from "@tinacms/cli";
 import { iconSchema } from "./fields";
 import { defaultFeature } from "../components/actions";
-// const defaultFeature = {
-//   title: "Here's Another Feature",
-//   text: "This is where you might talk about the feature, if this wasn't just filler text.",
-//   icon: {
-//     color: "",
-//     style: "float",
-//     name: "",
-//   },
-// };
 
 const featureBlockShema: TinaTemplate = {
   name: "features",

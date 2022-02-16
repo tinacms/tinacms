@@ -42,33 +42,9 @@ export const resetGeneratedFolder = async () => {
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
 }
 
-const cleanup = async ({
-  tinaConfigPath,
-  tinaTempPath,
-}: {
-  tinaConfigPath: string
-  tinaTempPath: string
-}) => {
-  // Delete the node require cache for .tina temp folder
-  Object.keys(require.cache).map((key) => {
-    if (key.startsWith(tinaTempPath)) {
-      delete require.cache[require.resolve(key)]
-    }
-  })
-  try {
-    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-    const schemaObject: TinaCloudSchema = schemaFunc.default
-    await fs.outputFile(
-      path.join(tinaConfigPath, 'schema.json'),
-      JSON.stringify(schemaObject, null, 2)
-    )
-    await fs.remove(tinaTempPath)
-  } catch (e) {
-    // Always remove the temp code
-    await fs.remove(tinaTempPath)
-    // Throw an execution error
-    throw new ExecuteSchemaError(e)
-  }
+// Cleanup function that is guaranteed to run
+const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
+  await fs.remove(tinaTempPath)
 }
 
 export const compile = async (_ctx, _next) => {
@@ -100,10 +76,30 @@ export const compile = async (_ctx, _next) => {
   try {
     await transpile(tinaPath, tinaTempPath)
   } catch (e) {
-    await cleanup({ tinaConfigPath, tinaTempPath })
+    await cleanup({ tinaTempPath })
     throw new BuildSchemaError(e)
   }
-  await cleanup({ tinaConfigPath, tinaTempPath })
+
+  // Delete the node require cache for .tina temp folder
+  Object.keys(require.cache).map((key) => {
+    if (key.startsWith(tinaTempPath)) {
+      delete require.cache[require.resolve(key)]
+    }
+  })
+  try {
+    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
+    const schemaObject: TinaCloudSchema = schemaFunc.default
+    await fs.outputFile(
+      path.join(tinaConfigPath, 'schema.json'),
+      JSON.stringify(schemaObject, null, 2)
+    )
+    await cleanup({ tinaTempPath })
+  } catch (e) {
+    // Always remove the temp code
+    await cleanup({ tinaTempPath })
+    // Throw an execution error
+    throw new ExecuteSchemaError(e)
+  }
 }
 
 const transpile = async (projectDir, tempDir) => {
