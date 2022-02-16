@@ -31,7 +31,7 @@ export class ExecuteSchemaError extends Error {
 export const handleServerErrors = (e: Error) => {
   if (e instanceof BuildSchemaError) {
     logger.error(`${dangerText(
-      'ERROR: your schema was not successfully build: see https://tina.io/docs/errors/esbuild-error/ for more details'
+      'ERROR: your schema was not successfully built: see https://tina.io/docs/errors/esbuild-error/ for more details'
     )}
   Error Message Below
   ${e}`)
