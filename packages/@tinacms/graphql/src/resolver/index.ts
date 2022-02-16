@@ -64,7 +64,6 @@ export class Resolver {
     // }
     let documents = {}
     if (hasDocuments) {
-      console.log('getting all documents')
       documents = await this.getDocumentsForCollection(collectionName)
     }
     return {
