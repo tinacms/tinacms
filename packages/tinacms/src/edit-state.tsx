@@ -39,60 +39,11 @@ export const TinaEditProvider = ({
   )
 }
 
-// TODO: This name is too long any suggestions for better ones?
-export function useClientSideDataTina<T extends object>({
-  query,
-  variables,
-  token,
-  url,
-}: {
+type DataFetchFunction<T> = (args: {
   query: string
   variables: object
-  url: string
-  token: string
-}): { data: T | undefined; isLoading: boolean } {
-  // Local state
-  const [clientData, setClientData] = useState<T>()
-  const [isLoadingClientSideFetch, setLoadingClientSideFetch] = useState(false)
+}) => Promise<T>
 
-  // Tina State
-  const { data: tinaEditData, isLoading: isLoadingInEditMode } = useTina<T>({
-    data: undefined as T,
-    query,
-    variables,
-  })
-
-  const { edit } = useEditState()
-
-  // Fetch data
-  useEffect(() => {
-    setLoadingClientSideFetch(true)
-    // TODO: Maybe we want to make a client that works client side (Same a LocalClient but does not have tinaCMS as a dep)
-    const fetchData = async () => {
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify({ query, variables }),
-          headers: {
-            'X-API-KEY': token,
-            'Content-Type': 'application/json',
-          },
-        })
-        console.log({ res })
-        const jsonData = await res.json()
-        setClientData(jsonData)
-        setLoadingClientSideFetch(false)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchData()
-  }, [JSON.stringify(variables), query])
-
-  const isLoading = edit ? isLoadingInEditMode : isLoadingClientSideFetch
-  // Return the live edit data or the client fetched data
-  return { data: edit ? tinaEditData : clientData, isLoading }
-}
 export function useTina<T extends object>({
   query,
   variables,
@@ -100,7 +51,7 @@ export function useTina<T extends object>({
 }: {
   query: string
   variables: object
-  data: T
+  data: T | DataFetchFunction<T>
 }): { data: T; isLoading: boolean } {
   const {
     setRequest,
@@ -112,11 +63,29 @@ export function useTina<T extends object>({
   const [waitForContextRerender, setWaitForContextRerender] = useState<boolean>(
     !isDummyContainer
   )
+  const [clientSideData, setClientSideData] = useState({} as T)
+  const [clientSideLoading, setClientSideLoading] = useState(false)
 
   const isLoading = contextLoading || waitForContextRerender
 
   React.useEffect(() => {
     setRequest({ query, variables })
+    if (typeof data === 'function') {
+      const loadData = async () => {
+        setClientSideLoading(true)
+        // @ts-ignore
+        const clientSideData = await data({ query, variables })
+        setClientSideData(clientSideData)
+        setClientSideLoading(false)
+      }
+      // TODO: wrap in a try catch block and handle errors
+      try {
+        loadData()
+      } catch (error) {
+        console.error(error)
+        throw error
+      }
+    }
   }, [JSON.stringify(variables), query])
 
   // A bit of a hack here
@@ -133,9 +102,21 @@ export function useTina<T extends object>({
     }
   }, [isDummyContainer])
 
-  return {
-    data: isDummyContainer || isLoading ? data : (state.payload as T),
-    isLoading,
+  const initialOrEditData =
+    isDummyContainer || isLoading ? data : (state.payload as T)
+
+  if (typeof initialOrEditData === 'function') {
+    //  client side data fetching
+    return {
+      data: clientSideData as T,
+      isLoading: clientSideLoading,
+    }
+  } else {
+    return {
+      // normal passthrough data or edit data
+      data: initialOrEditData,
+      isLoading,
+    }
   }
 }
 
