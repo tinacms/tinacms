@@ -178,7 +178,24 @@ export const resolve = async ({
               )
             })
           }
-          return resolver.resolveCollection(args.collection, true)
+
+          // The field is `getCollection`
+          const getCollectionNode = info.fieldNodes.find(
+            (x) => x.name.value === 'getCollection'
+          )
+          const hasDocuments = getCollectionNode.selectionSet.selections.find(
+            (x) => {
+              // @ts-ignore
+              return x?.name?.value === 'documents'
+            }
+          )
+          console.log(Boolean(hasDocuments))
+
+          console.log('running')
+          return resolver.resolveCollection(
+            args.collection,
+            Boolean(hasDocuments)
+          )
         }
 
         /**
