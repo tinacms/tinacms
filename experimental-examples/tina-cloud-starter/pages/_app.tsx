@@ -2,7 +2,6 @@ import "../styles.css";
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { RouteMappingPlugin } from "tinacms";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 
