@@ -120,8 +120,6 @@ A new `RouteMappingPlugin` accepts a single argument - the `mapper` function - t
 Below is an example of how a `RouteMappingPlugin` might be added to our `tina-cloud-starter`:
 
 ```tsx
-import { RouteMappingPlugin } from "tinacms";
-
 const App = ({ Component, pageProps }) => {
   return (
     <>
@@ -131,44 +129,46 @@ const App = ({ Component, pageProps }) => {
           <TinaCMS
             ...
             cmsCallback={(cms) => {
-              /**
-               * 1. Define the `RouteMappingPlugin`
-               **/
-              const RouteMapping = new RouteMappingPlugin(
-                (collection, document) => {
-                  /**
-                   * Because the `authors` and `global` collections do not
-                   * have dedicated pages, we return `undefined`.
-                   **/
-                  if (["authors", "global"].includes(collection.name)) {
-                    return undefined;
-                  }
-
-                  /**
-                   * While the `pages` collection does have dedicated pages,
-                   * their URLs are different than their document names.
-                   **/
-                  if (["pages"].includes(collection.name)) {
-                    if (document.sys.filename === "home") {
-                      return `/`;
+              import("tinacms").then(({ RouteMappingPlugin }) => {
+                /**
+                 * 1. Define the `RouteMappingPlugin`
+                 **/
+                const RouteMapping = new RouteMappingPlugin(
+                  (collection, document) => {
+                    /**
+                     * Because the `authors` and `global` collections do not
+                     * have dedicated pages, we return `undefined`.
+                     **/
+                    if (["authors", "global"].includes(collection.name)) {
+                      return undefined;
                     }
-                    if (document.sys.filename === "about") {
-                      return `/about`;
+  
+                    /**
+                     * While the `pages` collection does have dedicated pages,
+                     * their URLs are different than their document names.
+                     **/
+                    if (["pages"].includes(collection.name)) {
+                      if (document.sys.filename === "home") {
+                        return `/`;
+                      }
+                      if (document.sys.filename === "about") {
+                        return `/about`;
+                      }
+                      return undefined;
                     }
-                    return undefined;
+                    /**
+                     * Finally, any other collections (`posts`, for example)
+                     * have URLs based on values in the `collection` and `document`.
+                     **/
+                    return `/${collection.name}/${document.sys.filename}`;
                   }
-                  /**
-                   * Finally, any other collections (`posts`, for example)
-                   * have URLs based on values in the `collection` and `document`.
-                   **/
-                  return `/${collection.name}/${document.sys.filename}`;
-                }
-              );
-
-              /**
-               * 2. Add the `RouteMappingPlugin` to the `cms`.
-               **/
-              cms.plugins.add(RouteMapping);
+                );
+  
+                /**
+                 * 2. Add the `RouteMappingPlugin` to the `cms`.
+                 **/
+                cms.plugins.add(RouteMapping);
+              })
             }}
             ...
           >
