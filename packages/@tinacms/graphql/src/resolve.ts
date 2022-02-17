@@ -189,9 +189,6 @@ export const resolve = async ({
               return x?.name?.value === 'documents'
             }
           )
-          console.log(Boolean(hasDocuments))
-
-          console.log('running')
           return resolver.resolveCollection(
             args.collection,
             Boolean(hasDocuments)
