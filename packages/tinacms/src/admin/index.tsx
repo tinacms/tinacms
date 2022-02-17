@@ -66,7 +66,7 @@ export const TinaAdmin = () => {
               <Router basename={'/admin'}>
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <Sidebar cms={cms} />
-                  <div className="flex-1">
+                  <div className="flex-1 relative">
                     <Routes>
                       <Route
                         path="collections/:collectionName/new"
