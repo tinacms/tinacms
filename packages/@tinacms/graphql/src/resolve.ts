@@ -162,11 +162,37 @@ export const resolve = async ({
             return value
           }
           if (info.fieldName === 'getCollections') {
+            const getCollectionNode = info.fieldNodes.find(
+              (x) => x.name.value === 'getCollections'
+            )
+            const hasDocuments = getCollectionNode.selectionSet.selections.find(
+              (x) => {
+                // @ts-ignore
+                return x?.name?.value === 'documents'
+              }
+            )
             return tinaSchema.getCollections().map((collection) => {
-              return resolver.resolveCollection(collection.name)
+              return resolver.resolveCollection(
+                collection.name,
+                Boolean(hasDocuments)
+              )
             })
           }
-          return resolver.resolveCollection(args.collection)
+
+          // The field is `getCollection`
+          const getCollectionNode = info.fieldNodes.find(
+            (x) => x.name.value === 'getCollection'
+          )
+          const hasDocuments = getCollectionNode.selectionSet.selections.find(
+            (x) => {
+              // @ts-ignore
+              return x?.name?.value === 'documents'
+            }
+          )
+          return resolver.resolveCollection(
+            args.collection,
+            Boolean(hasDocuments)
+          )
         }
 
         /**
