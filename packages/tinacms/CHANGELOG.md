@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.66.4
+
+### Patch Changes
+
+- cc5c8431d: Remove console.log
+- Updated dependencies [af9f6c2c2]
+- Updated dependencies [2e14cda5e]
+- Updated dependencies [3d4c52a19]
+  - @tinacms/toolkit@0.56.14
+
 ## 0.66.3
 
 ### Patch Changes
