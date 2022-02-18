@@ -18,7 +18,12 @@ const App = ({ Component, pageProps }) => {
       <TinaEditProvider
         showEditButton={true}
         editMode={
-          <TinaCMS apiURL={apiURL}>
+          <TinaCMS
+            cmsCallback={(cms) => {
+              cms.flags.set('tina-admin', true)
+            }}
+            apiURL={apiURL}
+          >
             <Component {...pageProps} />
           </TinaCMS>
         }
