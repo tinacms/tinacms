@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.59.7
+
+### Patch Changes
+
+- c730fa1dd: fix: #1452: update indexDocument to handle adding new docs
+- cd0f6f022: Do not resolve all documents in `getCollection` if it is not needed
+
 ## 0.59.6
 
 ### Patch Changes
