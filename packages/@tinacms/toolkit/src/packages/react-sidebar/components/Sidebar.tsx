@@ -75,32 +75,23 @@ interface SidebarProps {
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
 const useFetchCollections = (cms) => {
-  const [info, setInfo] = useState<{
-    loading: boolean
-    error: boolean
-    collections: any[]
-  }>({
-    loading: true,
-    error: false,
-    collections: [],
-  })
+  const [collections, setCollections] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchCollections = async () => {
       const response = await cms.api.admin.fetchCollections()
-      setInfo({
-        loading: false,
-        error: false,
-        collections: response.getCollections,
-      })
+      setCollections(response.getCollections)
+      setLoading(false)
     }
 
     if (cms.api.admin) {
+      setLoading(true)
       fetchCollections()
     }
   }, [cms.api.admin])
 
-  return info
+  return { collections, loading }
 }
 
 const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
