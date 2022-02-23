@@ -159,6 +159,11 @@ export const TinaCloudProvider = (
   if (!cms.api.tina) {
     cms.registerApi('tina', createClient(props))
   }
+
+  if (!cms.api.admin) {
+    cms.registerApi('admin', new TinaAdminApi(cms))
+  }
+
   const setupMedia = async () => {
     if (props.mediaStore) {
       // Check to see if the media was store was passed in?
@@ -191,15 +196,6 @@ export const TinaCloudProvider = (
   }
 
   setupMedia()
-
-  /**
-   * Attaches a new instance of the TinaAdminApi to `cms.api.admin`
-   */
-  React.useMemo(() => {
-    if (cms.flags.get('tina-admin') === true) {
-      cms.registerApi('admin', new TinaAdminApi(cms))
-    }
-  }, [cms, cms.flags.get('tina-admin')])
 
   const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
     cms.flags.get('branch-switcher')
