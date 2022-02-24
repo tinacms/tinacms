@@ -113,9 +113,10 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
   /**
    * Only show ContentCreators when TinaAdmin is disabled
    */
-  const contentCreators = cms.flags.get('tina-admin')
-    ? []
-    : cms.plugins.getType('content-creator').all()
+  const contentCreators =
+    cms.flags.get('tina-admin') || true
+      ? []
+      : cms.plugins.getType('content-creator').all()
 
   const toggleFullscreen = () => {
     if (displayState === 'fullscreen') {
@@ -181,7 +182,7 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
             <Nav
-              showCollections={cms.flags.get('tina-admin')}
+              showCollections={cms.flags.get('tina-admin') || true}
               collectionsInfo={collectionsInfo}
               screens={allScreens}
               contentCreators={contentCreators}
@@ -228,7 +229,7 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
               <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
                   className="rounded-r-md"
-                  showCollections={cms.flags.get('tina-admin')}
+                  showCollections={cms.flags.get('tina-admin') || true}
                   collectionsInfo={collectionsInfo}
                   screens={allScreens}
                   contentCreators={contentCreators}
