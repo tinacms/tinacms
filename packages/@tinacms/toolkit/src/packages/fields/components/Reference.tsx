@@ -92,7 +92,7 @@ export const Reference: React.FC<ReferenceProps> = ({
   options,
 }) => {
   const cms = useCMS()
-  const hasTinaAdmin = cms.flags.get('tina-admin') || true
+  const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
 
   const selectOptions = options || field.options
   return (
