@@ -1,5 +1,16 @@
 # tinacms
 
+## 0.66.5
+
+### Patch Changes
+
+- 43c834565: Adds an activity indicator throughout Admin
+- 53a4550db: Allows RouteMapping to be dynamically imported
+- 731451bee: Adjust the JWT token refresh logic to refresh tokens _before_ they expire.
+- e102d7438: Updated auth modal to use toolkit button components
+- Updated dependencies [43c834565]
+  - @tinacms/toolkit@0.56.15
+
 ## 0.66.4
 
 ### Patch Changes

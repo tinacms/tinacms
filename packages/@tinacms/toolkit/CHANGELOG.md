@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.15
+
+### Patch Changes
+
+- 43c834565: Adds an activity indicator throughout Admin
+
 ## 0.56.14
 
 ### Patch Changes
