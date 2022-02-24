@@ -409,7 +409,11 @@ export const formify = async ({
                             if (selectionNode.name.value === '__typename') {
                               return selectionNode
                             }
-                            throw new FormifyError('NOOP')
+                            return formifyField({
+                              fieldNode: selectionNode,
+                              parentType: field.type,
+                              path,
+                            })
                           case 'InlineFragment':
                             const namedType = G.getNamedType(field.type)
                             util.ensureNodeField(namedType)
