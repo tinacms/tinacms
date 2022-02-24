@@ -58,7 +58,8 @@ export const TinaAdmin = () => {
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
-        const isTinaAdminEnabled = cms.flags.get('tina-admin') || true
+        const isTinaAdminEnabled =
+          cms.flags.get('tina-admin') === false ? false : true
 
         if (isTinaAdminEnabled) {
           return (
