@@ -148,5 +148,5 @@ If you are running into errors while trying to build or run examples here are so
 
 - Make sure the repo is up to date by running `git checkout main` and `git pull origin main`
 - Try cleaning the repo by running `yarn nuke` at the root of the repo. This script removes all build outputs
-- After running `yarn nuke`, `yarn install` and `yarn watch` (or `yarn build`) can be run before doing anything else.
+- After running `yarn nuke`, `yarn install` and `yarn watch` (or `yarn build`) must be run before doing anything else.
 - If you are still having issues feel free to reach out on our [Community Discord](https://discord.com/invite/zumN63Ybpf)
