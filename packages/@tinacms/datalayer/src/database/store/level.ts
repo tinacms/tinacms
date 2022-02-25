@@ -103,7 +103,7 @@ export class LevelStore implements Store {
       query.lt = atob(before)
     }
 
-    if (last && !before) {
+    if (last ) {
       query.reverse = true
     }
 
