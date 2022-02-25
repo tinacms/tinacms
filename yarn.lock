@@ -2071,16 +2071,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime-corejs2@npm:^7.4.5":
-  version: 7.14.8
-  resolution: "@babel/runtime-corejs2@npm:7.14.8"
-  dependencies:
-    core-js: ^2.6.5
-    regenerator-runtime: ^0.13.4
-  checksum: 9014c3d22d3d4aefb33f6bded09ae1a9f2d9c07b86b6c39dd65f2be942b3f85a5f18eddb697e75985406c24162057a97452157f43fc23c92cf3bbd3776417641
-  languageName: node
-  linkType: hard
-
 "@babel/runtime-corejs3@npm:^7.10.2":
   version: 7.14.8
   resolution: "@babel/runtime-corejs3@npm:7.14.8"
@@ -2133,6 +2123,15 @@ __metadata:
   dependencies:
     regenerator-runtime: ^0.13.4
   checksum: ee47a2b6edf56ec25437b34407a98439eb0b71149675e7b2781e5d1b2b6d858772120f590349fd9adbb0f2a186d2eb584b2b3a1819ca673b60dd5959bb02839f
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.15.4":
+  version: 7.17.7
+  resolution: "@babel/runtime@npm:7.17.7"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 8fb856859d85940363235a9fe44432f731c85c5a985a8796b74815abb3924913d19c28d7f92c27c3b38c050bfb6791d6b006a19378264f4bfec37cd8770a9ce0
   languageName: node
   linkType: hard
 
@@ -5291,9 +5290,6 @@ __metadata:
     graphql: ^15.1.0
     jest: ^27.0.6
     js-yaml: ^4.0.0
-    level: ^7.0.1
-    leveldown: ^6.1.0
-    levelup: ^5.1.1
     lodash: ^4.17.19
     lodash.get: ^4.4.2
     log4js: ^6.4.0
@@ -5303,6 +5299,8 @@ __metadata:
     typescript: ^4.3.5
     yarn: ^1.22.17
     yup: ^0.32.9
+  peerDependencies:
+    leveldown: ^6.1.0
   bin:
     tinacms: bin/tinacms
   languageName: unknown
@@ -5337,7 +5335,6 @@ __metadata:
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
     level: ^7.0.1
-    leveldown: ^6.1.0
     levelup: ^5.1.1
     lodash: ^4.17.20
     memdown: ^6.1.1
@@ -5345,6 +5342,8 @@ __metadata:
     prettier: ^2.2.1
     typescript: ^4.3.5
     yup: ^0.32.9
+  peerDependencies:
+    leveldown: ^6.1.0
   languageName: unknown
   linkType: soft
 
@@ -5389,9 +5388,6 @@ __metadata:
     jest-file-snapshot: ^0.5.0
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
-    level: ^7.0.1
-    leveldown: ^6.1.0
-    levelup: ^5.1.1
     lodash: ^4.17.20
     mdast: ^3.0.0
     mdast-util-from-markdown: ^1.0.0
@@ -5419,6 +5415,8 @@ __metadata:
     vfile: ^4.2.0
     ws: ^7.3.1
     yup: ^0.32.9
+  peerDependencies:
+    leveldown: ^6.1.0
   languageName: unknown
   linkType: soft
 
@@ -5564,7 +5562,7 @@ __metadata:
     path: ^0.12.7
     prop-types: 15.7.2
     react: 17.0.2
-    react-beautiful-dnd: ^11.0.5
+    react-beautiful-dnd: ^13.1.0
     react-color: ^2.17.3
     react-datetime: ^2.16.3
     react-dom: 17.0.2
@@ -6581,15 +6579,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-redux@npm:^7.1.16":
-  version: 7.1.18
-  resolution: "@types/react-redux@npm:7.1.18"
+"@types/react-redux@npm:^7.1.20":
+  version: 7.1.23
+  resolution: "@types/react-redux@npm:7.1.23"
   dependencies:
     "@types/hoist-non-react-statics": ^3.3.0
     "@types/react": "*"
     hoist-non-react-statics: ^3.3.0
     redux: ^4.0.0
-  checksum: b247ff7ce31cede226f4606571bf975aeec91fe911e65e72cecaaac7234d4d694a7be0791419bb4259c7012b662a96267f694daaacbc18f3157fc7f955af55c9
+  checksum: aa4f499673a40ba0f1abb237b032663754d4ed9d23b935a7277aa9d14aee40510536adf54294d502426677e99c1b90bf60902dffcc90fa8b094d9e24452dc42c
   languageName: node
   linkType: hard
 
@@ -12891,7 +12889,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-box-model@npm:^1.1.2":
+"css-box-model@npm:^1.2.0":
   version: 1.2.1
   resolution: "css-box-model@npm:1.2.1"
   dependencies:
@@ -21627,7 +21625,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"memoize-one@npm:^5.0.4":
+"memoize-one@npm:^5.1.1":
   version: 5.2.1
   resolution: "memoize-one@npm:5.2.1"
   checksum: 6b7dab7d8d9dca696d500dbc7f6b1445cbc4168d8208ee2746dd1a7f75378445d9bc6a2def7868afee81c87e630294456310f33f3f1eb738f69d748c797d87d5
@@ -25837,7 +25835,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"raf-schd@npm:^4.0.0":
+"raf-schd@npm:^4.0.2":
   version: 4.0.3
   resolution: "raf-schd@npm:4.0.3"
   checksum: b5e28f9ee7f7803ccb067f75f8e93b78d995c16b0b606468e2bd46631e37cea6d8daa6dcede7640dd068413f8a3b85578ec393b59037a98548ba9c73e732624d
@@ -25957,21 +25955,21 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-beautiful-dnd@npm:^11.0.5":
-  version: 11.0.5
-  resolution: "react-beautiful-dnd@npm:11.0.5"
+"react-beautiful-dnd@npm:^13.1.0":
+  version: 13.1.0
+  resolution: "react-beautiful-dnd@npm:13.1.0"
   dependencies:
-    "@babel/runtime-corejs2": ^7.4.5
-    css-box-model: ^1.1.2
-    memoize-one: ^5.0.4
-    raf-schd: ^4.0.0
-    react-redux: ^7.0.3
-    redux: ^4.0.1
-    tiny-invariant: ^1.0.4
-    use-memo-one: ^1.1.0
+    "@babel/runtime": ^7.9.2
+    css-box-model: ^1.2.0
+    memoize-one: ^5.1.1
+    raf-schd: ^4.0.2
+    react-redux: ^7.2.0
+    redux: ^4.0.4
+    use-memo-one: ^1.1.1
   peerDependencies:
-    react: ^16.8.5
-  checksum: 1842c33e9bd18cac75540e108c63bb8fdfbfd16de187a3734eb0dbd22b891393ea30ccfc208c76551c378ff2ef2194f7fa1db275540f38c3f3ca2d5bfa2cf93d
+    react: ^16.8.5 || ^17.0.0
+    react-dom: ^16.8.5 || ^17.0.0
+  checksum: d380b698278000fe39e48f1a257ada3afa4b039ed93a52fa9a476d46a0b5f2ad833b7fee4e5914360172ae45899ca084ef37a1a012fcfb467a7920217cc8a994
   languageName: node
   linkType: hard
 
@@ -26299,7 +26297,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-is@npm:16.13.1, react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.7.0, react-is@npm:^16.8.1, react-is@npm:^16.8.3, react-is@npm:^16.8.6":
+"react-is@npm:16.13.1, react-is@npm:^16.12.0, react-is@npm:^16.7.0, react-is@npm:^16.8.1, react-is@npm:^16.8.3, react-is@npm:^16.8.6":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: 11bcf1267a314a522615f626f3ce3727a3a24cdbf61c4d452add3550a7875326669631326cfb1ba3e92b6f72244c32ffecf93ad21c0cad8455d3e169d0e3f060
@@ -26394,16 +26392,16 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-redux@npm:^7.0.3":
-  version: 7.2.4
-  resolution: "react-redux@npm:7.2.4"
+"react-redux@npm:^7.2.0":
+  version: 7.2.6
+  resolution: "react-redux@npm:7.2.6"
   dependencies:
-    "@babel/runtime": ^7.12.1
-    "@types/react-redux": ^7.1.16
+    "@babel/runtime": ^7.15.4
+    "@types/react-redux": ^7.1.20
     hoist-non-react-statics: ^3.3.2
     loose-envify: ^1.4.0
     prop-types: ^15.7.2
-    react-is: ^16.13.1
+    react-is: ^17.0.2
   peerDependencies:
     react: ^16.8.3 || ^17
   peerDependenciesMeta:
@@ -26411,7 +26409,7 @@ fsevents@~2.1.2:
       optional: true
     react-native:
       optional: true
-  checksum: 24c4dd26dc55c498d0dcec2e2ef1678aa8cb3f2e1c31704363d072b045460c1f60f5b89b508d3984ae680779cba00ee65f1344a4c4c02768a6bec132e33ee815
+  checksum: 32952c3fa1fbc12a28e93a6a116f320319c3d82ded71af053e7d405d760e96bccbc1d939ad06848ed6f088819d490f3180a31975c53ce23248934de906f2b27c
   languageName: node
   linkType: hard
 
@@ -26832,12 +26830,21 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"redux@npm:^4.0.0, redux@npm:^4.0.1":
+"redux@npm:^4.0.0":
   version: 4.1.0
   resolution: "redux@npm:4.1.0"
   dependencies:
     "@babel/runtime": ^7.9.2
   checksum: d939d0df1e12982c66c0ea767c8ec98276ee981ce0381222239b7f823c6ad02ea3e3c622859bcb4934446b3f86d735db35d7bd8b1697d359070e5fbef1f4ad49
+  languageName: node
+  linkType: hard
+
+"redux@npm:^4.0.4":
+  version: 4.1.2
+  resolution: "redux@npm:4.1.2"
+  dependencies:
+    "@babel/runtime": ^7.9.2
+  checksum: 39aba0fc41c0187cb46b38e52dcb9dc039b785cae772bad9c30cd1d24c67942739285fc013bf804d286aad3c660c1d74cdab5923e1c1535839c5f996d1491365
   languageName: node
   linkType: hard
 
@@ -30109,9 +30116,7 @@ resolve@^2.0.0-next.3:
     "@types/styled-components": ^5.1.3
     autoprefixer: ^10.2.6
     date-fns: ^2.23.0
-    level: ^7.0.1
     leveldown: ^6.1.0
-    levelup: ^5.1.1
     next: 10.0.5
     next-svgr: ^0.0.2
     next-tinacms-cloudinary: "workspace:*"
@@ -30193,7 +30198,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"tiny-invariant@npm:^1.0.4, tiny-invariant@npm:^1.0.6":
+"tiny-invariant@npm:^1.0.6":
   version: 1.1.0
   resolution: "tiny-invariant@npm:1.1.0"
   checksum: 64318fbd77c451cfff23b57b9f3aef56594d9cea051a87dc538c9b371f97e8d474eaa2a7cbd60b8aa23f852393152495e8651b197607465fdf9c8ff134043b1b
@@ -31394,7 +31399,7 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-"use-memo-one@npm:^1.1.0":
+"use-memo-one@npm:^1.1.1":
   version: 1.1.2
   resolution: "use-memo-one@npm:1.1.2"
   peerDependencies:

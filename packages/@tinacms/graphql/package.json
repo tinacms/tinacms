@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
+    "@tinacms/datalayer": "workspace:*",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -61,9 +62,6 @@
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",
-    "level": "^7.0.1",
-    "leveldown": "^6.1.0",
-    "levelup": "^5.1.1",
     "lodash": "^4.17.20",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",
@@ -89,6 +87,9 @@
     "vfile": "^4.2.0",
     "ws": "^7.3.1",
     "yup": "^0.32.9"
+  },
+  "peerDependencies": {
+    "leveldown": "^6.1.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

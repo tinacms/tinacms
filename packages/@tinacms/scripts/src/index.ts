@@ -406,7 +406,7 @@ const buildIt = async (entryPoint, packageJSON) => {
   // @ts-ignore
   const peerDeps = packageJSON.peerDependencies
   // TODO brute force level into external
-  const external = [ 'leveldown', 'level', 'levelup', ...Object.keys({ ...deps, ...peerDeps })]
+  const external = Object.keys({ ...deps, ...peerDeps })
   const globals = {}
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
