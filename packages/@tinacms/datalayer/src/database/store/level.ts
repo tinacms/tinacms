@@ -110,6 +110,7 @@ export class LevelStore implements Store {
     // TODO
     // - allow case insensitivity?
     // - how do we handle exists operator in dynamo?
+    // - when using last/before, should we change the hasNextPage/hasPreviousPage and startCursor/endCursor?
 
     const { attributes, db } = this.indexes[index]
 
