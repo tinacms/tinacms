@@ -540,7 +540,7 @@ export class Resolver {
     if (args.filter || args.index) {
       const collection = this.tinaSchema.getCollection(lookup.collection)
       //validate the index exists
-      if (args.index && !collection.indexes[args.index as string]) {
+      if (args.index && (!collection.indexes || collection.indexes.map(index => index.name).indexOf(args.index as string) === -1)) {
         throw new Error(`index '${args.index}' on collection '${collection.name}' does not exist`)
       }
 

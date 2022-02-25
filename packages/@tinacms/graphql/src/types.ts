@@ -44,7 +44,7 @@ interface BaseCollection {
   path: string
   format?: FormatType
   match?: string
-  indexes?: Record<string, TinaIndex>
+  indexes?: TinaIndex[]
 }
 
 type CollectionTemplates<WithNamespace extends boolean> =
@@ -91,6 +91,7 @@ export type TinaFieldInner<WithNamespace extends boolean> =
   | RichType<WithNamespace>
 
 export type TinaIndex = {
+  name: string
   fields: {
     name: string
     default?: string | number

@@ -216,32 +216,62 @@
           ]
         }
       ],
-      "indexes": {
-        "title": {
+      "indexes": [
+        {
+          "name": "title",
           "fields": [
             {
               "name": "title",
-              "default": ""
+              "default": "",
+              "namespace": [
+                "posts",
+                "title",
+                "title"
+              ]
             }
+          ],
+          "namespace": [
+            "posts",
+            "title"
           ]
         },
-        "date": {
+        {
+          "name": "date",
           "fields": [
             {
               "name": "date",
-              "default": ""
+              "default": "",
+              "namespace": [
+                "posts",
+                "date",
+                "date"
+              ]
             }
+          ],
+          "namespace": [
+            "posts",
+            "date"
           ]
         },
-        "published": {
+        {
+          "name": "published",
           "fields": [
             {
               "name": "published",
-              "default": "false"
+              "default": "false",
+              "namespace": [
+                "posts",
+                "published",
+                "published"
+              ]
             }
+          ],
+          "namespace": [
+            "posts",
+            "published"
           ]
         }
-      },
+      ],
       "namespace": [
         "posts"
       ]

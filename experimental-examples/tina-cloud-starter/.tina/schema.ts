@@ -336,26 +336,29 @@ export default defineSchema({
           name: "excerpt",
         },
       ],
-      indexes: {
-        title: {
+      indexes: [
+        {
+          name: 'title',
           fields: [{
             name: 'title',
             default: ''}
           ]
         },
-        date: {
+        {
+          name: 'date',
           fields: [{
             name: 'date',
             default: ''
           }]
         },
-        published: {
+        {
+          name: 'published',
           fields: [{
             name: 'published',
             default: 'false'
           }]
         }
-      },
+      ],
     },
     {
       label: "Global",

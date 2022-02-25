@@ -385,10 +385,10 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
   const indexAttributes = {}
   if (collection.indexes) {
     // build IndexAttributes for each index in the collection schema
-    for (let key of Object.keys(collection.indexes)) {
-      indexAttributes[key] = {
+    for (let index of collection.indexes) {
+      indexAttributes[index.name] = {
         namespace: collection.name,
-        properties: collection.indexes[key].fields.map(indexField => ({
+        properties: index.fields.map(indexField => ({
           field: indexField.name,
           default: indexField.default,
           type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
