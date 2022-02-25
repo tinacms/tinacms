@@ -39,7 +39,7 @@ export const resetGeneratedFolder = async () => {
     console.log(e)
   }
   await fs.mkdir(tinaGeneratedPath)
-  await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
+  await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db*')
 }
 
 // Cleanup function that is guaranteed to run
