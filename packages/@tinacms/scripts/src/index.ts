@@ -405,7 +405,6 @@ const buildIt = async (entryPoint, packageJSON) => {
   const deps = packageJSON.dependencies
   // @ts-ignore
   const peerDeps = packageJSON.peerDependencies
-  // TODO brute force level into external
   const external = Object.keys({ ...deps, ...peerDeps })
   const globals = {}
 
