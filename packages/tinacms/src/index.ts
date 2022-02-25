@@ -24,3 +24,23 @@ export { TinaAdminApi } from './admin/api'
 
 import { TinaCMSProvider2 } from './tina-cms'
 export default TinaCMSProvider2
+
+import type {
+  TinaCloudSchema as TinaCloudSchemaBase,
+  TinaCloudCollection as TinaCloudCollectionBase,
+  TinaCloudTemplateBase as TinaTemplate,
+  TinaFieldBase,
+} from './types'
+
+export type TinaCloudSchema = TinaCloudSchemaBase<false>
+// Alias to remove Cloud
+export type TinaSchema = TinaCloudSchema
+export type TinaCloudCollection = TinaCloudCollectionBase<false>
+// Alias to remove Cloud
+export type TinaCollection = TinaCloudCollectionBase<false>
+export type TinaField = TinaFieldBase
+export type { TinaTemplate }
+
+export const defineSchema = (config: TinaCloudSchema) => {
+  return config
+}
