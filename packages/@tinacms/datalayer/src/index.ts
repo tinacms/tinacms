@@ -21,3 +21,5 @@ export {
 } from './database/store/filesystem'
 export { MemoryStore } from './database/store/memory'
 export { LevelStore } from './database/store/level'
+export type { Store, QueryParams, IndexAttributes, TernaryFilter, BinaryFilter } from './database/store'
+export { OP } from './database/store'

@@ -303,6 +303,11 @@ export default defineSchema({
           name: "title",
         },
         {
+          type: "boolean",
+          label: "Published",
+          name: "published",
+        },
+        {
           type: "reference",
           label: "Author",
           name: "author",
@@ -331,6 +336,26 @@ export default defineSchema({
           name: "excerpt",
         },
       ],
+      indexes: {
+        title: {
+          fields: [{
+            name: 'title',
+            default: ''}
+          ]
+        },
+        date: {
+          fields: [{
+            name: 'date',
+            default: ''
+          }]
+        },
+        published: {
+          fields: [{
+            name: 'published',
+            default: 'false'
+          }]
+        }
+      },
     },
     {
       label: "Global",

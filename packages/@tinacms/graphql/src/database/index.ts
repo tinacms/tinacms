@@ -17,15 +17,15 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
+import type { QueryParams, Store } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type {
   TinaCloudSchemaBase,
   TinaFieldEnriched,
-  Collectable,
+  Collectable, CollectionFieldsWithNamespace, CollectionTemplatesWithNamespace, TinaFieldInner,
 } from '../types'
-import type { Store } from './store'
 import type { Bridge } from './bridge'
 import { flatten, isBoolean } from 'lodash'
 
@@ -109,7 +109,7 @@ export class Database {
     if (this.store.supportsSeeding()) {
       await this.bridge.put(filepath, stringifiedFile)
     }
-    await this.store.put(filepath, payload, keepTemplateKey)
+    await this.store.put(filepath, payload, { keepTemplateKey })
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
@@ -128,7 +128,7 @@ export class Database {
           database: this,
         })
       }
-      await this.store.put(filepath, payload, keepTemplateKey)
+      await this.store.put(filepath, payload, { keepTemplateKey })
     }
     return true
   }
@@ -245,8 +245,9 @@ export class Database {
 
     return true
   }
-  public query = async (queryStrings: string[], hydrator) => {
-    return await this.store.query(queryStrings, hydrator)
+
+  public query = async (queryParams: QueryParams, hydrator) => {
+    return await this.store.query(queryParams, hydrator)
   }
 
   public putConfigFiles = async ({
@@ -297,15 +298,15 @@ export class Database {
     }
   }
 
-  public indexContentByPaths = async (documentPaths: string[]) => {
-    await _indexContent(this, documentPaths)
+  public indexContentByPaths = async (documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
+    await _indexContent(this, documentPaths, collection)
   }
 
   public _indexAllContent = async () => {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(collection.path)
-      await _indexContent(this, documentPaths)
+      await _indexContent(this, documentPaths, collection)
     })
   }
 
@@ -380,14 +381,29 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const _indexContent = async (database: Database, documentPaths: string[]) => {
+const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
+  const indexAttributes = {}
+  if (collection.indexes) {
+    // build IndexAttributes for each index in the collection schema
+    for (let key of Object.keys(collection.indexes)) {
+      indexAttributes[key] = {
+        namespace: collection.name,
+        properties: collection.indexes[key].fields.map(indexField => ({
+          field: indexField.name,
+          default: indexField.default,
+          type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
+        }))
+      }
+    }
+  }
+
   await sequential(documentPaths, async (filepath) => {
     const dataString = await database.bridge.get(filepath)
     const data = parseFile(dataString, path.extname(filepath), (yup) =>
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data)
+      await database.store.seed(filepath, data, { indexAttributes })
     }
     if (database.store.supportsIndexing()) {
       return indexDocument({ filepath, data, database })

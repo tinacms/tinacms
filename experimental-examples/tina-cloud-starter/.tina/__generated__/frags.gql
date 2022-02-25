@@ -1,6 +1,7 @@
 fragment PostsParts on Posts {
   _body
   title
+  published
   author {
     ... on Document {
       id

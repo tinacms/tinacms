@@ -28,6 +28,8 @@ import type {
   TinaCloudCollection,
 } from '../types'
 import { TinaError } from './error'
+import {OP} from '@tinacms/datalayer'
+import {BinaryFilter} from '@tinacms/datalayer/dist'
 
 interface ResolverConfig {
   database: Database
@@ -530,52 +532,114 @@ export class Resolver {
     args,
     lookup,
   }: {
-    args: Record<string, Record<string, object>>
+    args: Record<string, Record<string, object> | string | number>
     lookup: CollectionDocumentListLookup
   }) => {
-    let documents
-    if (args.filter) {
+    let edges
+    let pageInfo
+    if (args.filter || args.index) {
+      const collection = this.tinaSchema.getCollection(lookup.collection)
+      //validate the index exists
+      if (args.index && !collection.indexes[args.index as string]) {
+        throw new Error(`index '${args.index}' on collection '${collection.name}' does not exist`)
+      }
+
       const queries = []
-      const flattenedArgs = flat(args.filter, { delimiter: '#' })
-      Object.entries(flattenedArgs).map(([key, value]) => {
-        const keys = key.split('#')
-        // If the collection has templates, this will be a template name, otherwise it'll be the attribute
-        const maybeTemplateName = keys[0]
-        const realKey = keys.slice(0, keys.length - 1).join('#')
-        const collection = this.tinaSchema.getCollection(lookup.collection)
-        let templateName = collection.name
-        if (collection.templates) {
-          const template = collection.templates.find((template) => {
+      if (args.filter) {
+        const flattenedArgs = flat(args.filter, { delimiter: '#' })
+        Object.entries(flattenedArgs).map(([key, value]) => {
+          const keys = key.split('#')
+          // If the collection has templates, this will be a template name, otherwise it'll be the attribute
+          const maybeTemplateName = keys[0]
+          const realKey = keys.slice(0, keys.length - 1).join('#')
+
+          let templateName = collection.name
+          if (collection.templates) {
+            const template = collection.templates.find((template) => {
+              if (typeof template === 'string') {
+                throw new Error('Global templates not yet supported for queries')
+              }
+              return template.name === maybeTemplateName
+            })
             if (typeof template === 'string') {
               throw new Error('Global templates not yet supported for queries')
             }
-            return template.name === maybeTemplateName
-          })
-          if (typeof template === 'string') {
-            throw new Error('Global templates not yet supported for queries')
+            if (template) {
+              templateName = template.name
+            }
           }
-          if (template) {
-            templateName = template.name
-          }
-        }
-        queries.push(
-          `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
-        )
-      })
+          // TODO not sure what to do with templates?
+          // queries.push(
+          //   `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
+          // )
+          queries.push(value)
+        })
+      }
 
-      documents = await this.database.query(queries, this.getDocument)
+      // TODO can only support one filter in dynamodb - should we define capabilties and allow more?
+      const result = await this.database.query(this.makeQueryParams(args, queries[0]), this.getDocument)
+      edges = result.edges
+      pageInfo = result.pageInfo
     } else {
       const collection = await this.tinaSchema.getCollection(lookup.collection)
-      documents = await this.database.store.glob(
+      edges = (await this.database.store.glob(
         collection.path,
         this.getDocument
-      )
+      )).map((document) => ({
+        node: document
+      }))
     }
+
     return {
-      totalCount: documents.length,
-      edges: documents.map((document) => {
-        return { node: document }
-      }),
+      totalCount: edges.length,
+      edges,
+      pageInfo: pageInfo || {
+        hasPreviousPage: false,
+        hasNextPage: false,
+        startCursor: "",
+        endCursor: ""
+      }
+    }
+  }
+
+  private inferOperatorFromFilter(filter: Record<string, object> | string | number) {
+    const key = Object.keys(filter).pop()
+    if (!filter[key]) {
+      throw new Error(`expected filter for key = ${key}`)
+    }
+    if ('after' in filter[key]) {
+      return OP.GT
+    } else if ('before' in filter[key]) {
+      return OP.LT
+    } else if ('eq' in filter[key]) {
+      return OP.EQ
+    } else if ('startsWith' in filter[key]) {
+      return OP.BEGINS_WITH
+    } else if ('lt' in filter[key]) {
+      return OP.LT
+    } else if ('gt' in filter[key]) {
+      return OP.GT
+    } else if ('gte' in filter[key]) {
+      return OP.GTE
+    } else if ('lte' in filter[key]) {
+      return OP.LTE
+    } else {
+      throw new Error('unsupported filter operator' + filter[key])
+    }
+  }
+
+  private makeQueryParams(args: Record<string, Record<string, object> | string | number>, query: any) {
+    // TODO BETWEEN should be supported in level..
+    return {
+      filter: args.filter ? {
+        rightOperand: query,
+        operator: this.inferOperatorFromFilter(args.filter)
+      } as BinaryFilter : undefined,
+      index: args.index as string,
+      first: args.first as number,
+      last: args.last as number,
+      before: args.before as string,
+      after: args.after as string
     }
   }
 

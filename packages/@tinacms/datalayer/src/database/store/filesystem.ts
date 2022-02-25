@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Store } from '.'
+import {QueryParams, Store} from '.'
 import fs from 'fs-extra'
 import fg from 'fast-glob'
 import path from 'path'
@@ -26,7 +26,7 @@ export class FilesystemStore implements Store {
   constructor({ rootPath }: { rootPath?: string }) {
     this.rootPath = rootPath || ''
   }
-  public async query(queryStrings: string[]): Promise<object[]> {
+  public async query(queryParams: QueryParams, hydrator): Promise<object[]> {
     throw new Error(`Unable to perform query for Filesystem store`)
   }
   public async seed() {
@@ -67,10 +67,10 @@ export class FilesystemStore implements Store {
       return items
     }
   }
-  public async put(filepath: string, data: object, keepTemplateKey: boolean) {
+  public async put(filepath: string, data: object, options?: { keepTemplateKey: boolean }) {
     await fs.outputFileSync(
       path.join(this.rootPath, filepath),
-      stringifyFile(data, path.extname(filepath), keepTemplateKey)
+      stringifyFile(data, path.extname(filepath), options?.keepTemplateKey || false)
     )
   }
 }

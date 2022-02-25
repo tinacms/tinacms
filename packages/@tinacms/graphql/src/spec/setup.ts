@@ -21,7 +21,7 @@ import { createDatabase } from '../database'
 import { Database } from '../database'
 import { FilesystemBridge } from '@tinacms/datalayer'
 
-import type { Store } from '../database/store'
+import type { Store } from '@tinacms/datalayer'
 import type { TinaCloudSchema } from '../types'
 import { sequential } from '../util'
 

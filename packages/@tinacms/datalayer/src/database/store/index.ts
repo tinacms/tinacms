@@ -11,6 +11,46 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// TODO can we leverage the filter types (somehow) for these?
+export enum OP {
+  EQ,
+  GT,
+  LT,
+  GTE,
+  LTE,
+  BEGINS_WITH,
+  BETWEEN
+}
+
+export type BinaryFilter = {
+  rightOperand: string | number
+  operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.BEGINS_WITH
+}
+
+export type TernaryFilter = {
+  leftOperand: string | number
+  rightOperand: string | number
+  operator: OP.BETWEEN
+}
+
+export type QueryParams = {
+  filter?: BinaryFilter | TernaryFilter
+  index?: string
+  first?: number
+  last?: number
+  before?: string
+  after?: string
+}
+
+export type IndexAttributes = {
+  namespace: string
+  properties: {
+    field: string
+    default: number | string
+    type: string
+  }[]
+}
+
 export interface Store {
   glob(
     pattern: string,
@@ -50,10 +90,8 @@ export interface Store {
    * but in something like DynamoDB the query strings may be used to look up the full record,
    * meaning there's no need to "hydrate" the return value
    */
-  query(
-    queryStrings: string[],
-    hydrator?: (fullPath: string) => Promise<object>
-  ): Promise<object[]>
+  // TODO update documentation
+  query(queryParams: QueryParams, hydrator)
 
   /**
    * In this context, seeding is the act of putting records and indexing data into an ephemeral
@@ -69,8 +107,9 @@ export interface Store {
     filepath: string,
     data: object,
     options?: {
-      includeTemplate?: boolean
-    }
+      includeTemplate?: boolean,
+      indexAttributes?: Record<string,IndexAttributes>
+    },
   ): Promise<void>
   supportsSeeding(): boolean
   /**
@@ -81,5 +120,5 @@ export interface Store {
    * user's repo.
    */
   supportsIndexing(): boolean
-  put(filepath: string, data: object, keepTemplateKey: boolean): Promise<void>
+  put(filepath: string, data: object, options?: {keepTemplateKey: boolean, indexAttributes?: Record<string,IndexAttributes>}): Promise<void>
 }

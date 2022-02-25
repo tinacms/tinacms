@@ -1313,6 +1313,10 @@ const listArgs = [
     name: 'last',
     type: astBuilder.TYPES.Number,
   }),
+  astBuilder.InputValueDefinition({
+    name: 'index',
+    type: astBuilder.TYPES.String,
+  }),
 ]
 
 const filterSelections = (arr: any[]) => {

@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type { Store } from './index'
+import type {QueryParams, Store} from './index'
 import fs from 'fs-extra'
 import path from 'path'
 import { sequential } from '../../util'
@@ -38,19 +38,20 @@ export class MemoryStore implements Store {
       },
     }
   }
-  public async query(queryStrings: string[], hydrator) {
-    const resultSets = await sequential(queryStrings, async (queryString) => {
-      const res = await this.get(queryString)
-      return res || []
-    })
-    let items = []
-    if (resultSets.length > 0) {
-      items = resultSets.reduce((p, c) => p.filter((e) => c.includes(e)))
-    }
-
-    return sequential(items, async (documentString) => {
-      return hydrator(documentString)
-    })
+  public async query(queryParams: QueryParams, hydrator) {
+    // const resultSets = await sequential(queryStrings, async (queryString) => {
+    //   const res = await this.get(queryString)
+    //   return res || []
+    // })
+    // let items = []
+    // if (resultSets.length > 0) {
+    //   items = resultSets.reduce((p, c) => p.filter((e) => c.includes(e)))
+    // }
+    //
+    // return sequential(items, async (documentString) => {
+    //   return hydrator(documentString)
+    // })
+    throw new Error('Unable to perform query for memory store')
   }
   public async seed(filepath: string, data: object) {
     await this.put(filepath, data)
