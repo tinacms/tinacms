@@ -55,6 +55,7 @@ export const BlockSelectorBig = ({
 
   const categories = React.useMemo(() => {
     return [
+      //@ts-ignore
       ...new Set(
         Object.entries(templates)
           .filter(([name, template]) => {
