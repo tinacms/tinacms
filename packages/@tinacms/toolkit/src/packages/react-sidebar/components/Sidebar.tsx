@@ -394,7 +394,7 @@ const SidebarCollectionLink = ({
   }
 }) => (
   <a
-    href={`/admin/collections/${collection.name}`}
+    href={`/admin#/collections/${collection.name}`}
     className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
   >
     <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
