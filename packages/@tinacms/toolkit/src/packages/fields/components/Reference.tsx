@@ -117,7 +117,7 @@ export const Reference: React.FC<ReferenceProps> = ({
         <GetReference cms={cms} id={input.value}>
           {(document) => (
             <a
-              href={`/admin/collections/${
+              href={`/admin#/collections/${
                 document.sys.collection.name
               }/${document.sys.breadcrumbs.join('/')}`}
               className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
