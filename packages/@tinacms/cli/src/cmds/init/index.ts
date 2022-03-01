@@ -173,10 +173,10 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   )
   writeFileSync(packagePath, newPack)
 
-  // pages/admin/[[...tina]].tsx
-  const adminPath = p.join(pagesPath, 'admin', '[[...tina]].js')
+  // pages/admin.tsx
+  const adminPath = p.join(pagesPath, 'admin.js')
   if (fs.pathExistsSync(p.join(pagesPath, 'admin'))) {
-    logger.warn(`Unable to add /pages/admin/[[...tina]].js, this path already exists.
+    logger.warn(`Unable to add /pages/admin.js, this path already exists.
 \tLearn more about toggling edit-mode at https://tina.io/docs/tinacms-context/#manually-toggling-edit-mode`)
     return next()
   }
