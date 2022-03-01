@@ -452,6 +452,10 @@
           "arguments": [
             {
               "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "queryString"
+              },
               "type": {
                 "kind": "NonNullType",
                 "type": {
@@ -461,10 +465,6 @@
                     "value": "String"
                   }
                 }
-              },
-              "name": {
-                "kind": "Name",
-                "value": "queryString"
               }
             }
           ],

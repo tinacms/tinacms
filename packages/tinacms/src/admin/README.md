@@ -12,14 +12,14 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
 
 > Make sure you use the latest version of `tinacms` and `@tinacms/cli`!
 
-1. Remove or rename `pages/admin/[[...slug]].tsx`
+1. Remove or rename `pages/admin.tsx`
   * `TinaAdmin` serves as a replacement for this file, offering the same ability to handle enabling and disabled `TinaCMS` while also providing additional UI.
 
-2. Add `pages/admin/[[...tina]].tsx`
-  * `TinaAdmin` leverages a wildcard, catch-all route (`/admin/*`) for all of its routing.  All you need to do is add two lines to this file:
+2. Add `pages/admin.tsx`
+  * `TinaAdmin` leverages a single page route.  All you need to do is add two lines to this file:
   ```tsx
   /**
-   * pages/admin/[[...tina]].tsx
+   * pages/admin.tsx
    **/
   import { TinaAdmin } from "tinacms";
   export default TinaAdmin;
@@ -62,11 +62,11 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
 1. Make sure `/admin` is open and available.
   * For existing sites, we need to ensure there are no routes currently using or conflicting with `/admin`.  In the future, we'd like to make `TinaAdmin`'s base route configurable, but for now, remove or rename any files under `/pages/admin`.
 
-2. Add `pages/admin/[[...tina]].tsx`
-  * `TinaAdmin` leverages a wildcard, catch-all route (`/admin/*`) for all of its routing.  All you need to do is add two lines to this file:
+2. Add `pages/admin.tsx`
+  * `TinaAdmin` leverages a single page route.  All you need to do is add two lines to this file:
   ```tsx
   /**
-   * pages/admin/[[...tina]].tsx
+   * pages/admin.tsx
    **/
   import { TinaAdmin } from "tinacms";
   export default TinaAdmin;
