@@ -25,6 +25,7 @@ import chalk from 'chalk'
 import { tryGitInit } from './util/git'
 import { exit } from 'process'
 import { EXAMPLES, downloadExample } from './examples'
+import { preRunChecks } from './util/preRunChecks'
 
 const program = new Command(name)
 let projectName = ''
@@ -40,6 +41,7 @@ program
   })
 
 export const run = async () => {
+  preRunChecks()
   program.parse(process.argv)
   const opts = program.opts()
   if (opts.dir) {
