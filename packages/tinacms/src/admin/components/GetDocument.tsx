@@ -25,6 +25,7 @@ export const useGetDocument = (
   const api = new TinaAdminApi(cms)
   const [document, setDocument] = useState<DocumentForm>(undefined)
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | undefined>(undefined)
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -33,10 +34,11 @@ export const useGetDocument = (
         setDocument(response.getDocument)
       } catch (error) {
         cms.alerts.error(
-          `[ERROR] GetDocument failed: ${error.message}`,
+          `[${error.name}] GetDocument failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
         setDocument(undefined)
+        setError(error)
       }
 
       setLoading(false)
@@ -46,7 +48,7 @@ export const useGetDocument = (
     fetchDocument()
   }, [cms, collectionName, relativePath])
 
-  return { document, loading }
+  return { document, loading, error }
 }
 
 const GetDocument = ({
@@ -60,13 +62,18 @@ const GetDocument = ({
   relativePath: string
   children: any
 }) => {
-  const { document, loading } = useGetDocument(
+  const { document, loading, error } = useGetDocument(
     cms,
     collectionName,
     relativePath
   )
-  if (!document || loading) {
-    return <LoadingPage />
+  if (!document) {
+    if (loading) {
+      return <LoadingPage />
+    }
+    if (error) {
+      return null
+    }
   }
   return <>{children(document, loading)}</>
 }

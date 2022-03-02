@@ -39,6 +39,7 @@ export const useGetDocumentFields = (
     mutationInfo: undefined,
   })
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | undefined>(undefined)
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
@@ -76,7 +77,7 @@ export const useGetDocumentFields = (
         })
       } catch (error) {
         cms.alerts.error(
-          `[ERROR] GetDocumentFields failed: ${error.message}`,
+          `[${error.name}] GetDocumentFields failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
         setInfo({
@@ -85,6 +86,7 @@ export const useGetDocumentFields = (
           fields: undefined,
           mutationInfo: undefined,
         })
+        setError(error)
       }
 
       setLoading(false)
@@ -94,7 +96,7 @@ export const useGetDocumentFields = (
     fetchDocumentFields()
   }, [cms, collectionName])
 
-  return { ...info, loading }
+  return { ...info, loading, error }
 }
 
 const GetDocumentFields = ({
@@ -108,11 +110,16 @@ const GetDocumentFields = ({
   templateName?: string
   children: any
 }) => {
-  const { collection, template, fields, mutationInfo, loading } =
+  const { collection, template, fields, mutationInfo, loading, error } =
     useGetDocumentFields(cms, collectionName, templateName)
 
-  if (!collection || loading) {
-    return <LoadingPage />
+  if (!collection) {
+    if (loading) {
+      return <LoadingPage />
+    }
+    if (error) {
+      return null
+    }
   }
   return (
     <>{children({ collection, template, fields, mutationInfo, loading })}</>

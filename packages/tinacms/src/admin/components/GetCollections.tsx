@@ -20,6 +20,7 @@ export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
   const [collections, setCollections] = useState<Collection[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | undefined>(undefined)
 
   useEffect(() => {
     const fetchCollections = async () => {
@@ -28,10 +29,11 @@ export const useGetCollections = (cms: TinaCMS) => {
         setCollections(response.getCollections)
       } catch (error) {
         cms.alerts.error(
-          `[ERROR] GetCollections failed: ${error.message}`,
+          `[${error.name}] GetCollections failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
         setCollections([])
+        setError(error)
       }
 
       setLoading(false)
@@ -41,13 +43,15 @@ export const useGetCollections = (cms: TinaCMS) => {
     fetchCollections()
   }, [cms])
 
-  return { collections, loading }
+  return { collections, loading, error }
 }
 
 const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
-  const { collections, loading } = useGetCollections(cms)
-  if (!collections || loading === true) {
-    return null
+  const { collections, loading, error } = useGetCollections(cms)
+  if (!collections) {
+    if (loading || error) {
+      return null
+    }
   }
   return <>{children(collections, loading)}</>
 }

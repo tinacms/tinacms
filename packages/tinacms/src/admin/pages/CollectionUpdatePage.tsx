@@ -108,7 +108,7 @@ const RenderForm = ({
           navigate(`/collections/${collection.name}`)
         } catch (error) {
           cms.alerts.error(
-            `[ERROR] UpdateDocument failed: ${error.message}`,
+            `[${error.name}] UpdateDocument failed: ${error.message}`,
             30 * 1000 // 30 seconds
           )
         }

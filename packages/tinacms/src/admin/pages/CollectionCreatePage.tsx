@@ -115,7 +115,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
           navigate(`/collections/${collection.name}`)
         } catch (error) {
           cms.alerts.error(
-            `[ERROR] CreateDocument failed: ${error.message}`,
+            `[${error.name}] CreateDocument failed: ${error.message}`,
             30 * 1000 // 30 seconds
           )
         }
