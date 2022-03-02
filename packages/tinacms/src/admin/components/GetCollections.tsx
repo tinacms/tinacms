@@ -23,8 +23,17 @@ export const useGetCollections = (cms: TinaCMS) => {
 
   useEffect(() => {
     const fetchCollections = async () => {
-      const response = await api.fetchCollections()
-      setCollections(response.getCollections)
+      try {
+        const response = await api.fetchCollections()
+        setCollections(response.getCollections)
+      } catch (error) {
+        cms.alerts.error(
+          `[ERROR] GetCollections failed: ${error.message}`,
+          30 * 1000 // 30 seconds
+        )
+        setCollections([])
+      }
+
       setLoading(false)
     }
 

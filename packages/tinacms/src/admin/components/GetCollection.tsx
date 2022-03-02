@@ -30,11 +30,20 @@ export const useGetCollection = (
 
   useEffect(() => {
     const fetchCollection = async () => {
-      const response = await api.fetchCollection(
-        collectionName,
-        includeDocuments
-      )
-      setCollection(response.getCollection)
+      try {
+        const response = await api.fetchCollection(
+          collectionName,
+          includeDocuments
+        )
+        setCollection(response.getCollection)
+      } catch (error) {
+        cms.alerts.error(
+          `[ERROR] GetCollection failed: ${error.message}`,
+          30 * 1000 // 30 seconds
+        )
+        setCollection(undefined)
+      }
+
       setLoading(false)
     }
 
@@ -61,7 +70,7 @@ const GetCollection = ({
     collectionName,
     includeDocuments
   )
-  if (!collection || loading === true) {
+  if (!collection || loading) {
     return <LoadingPage />
   }
   return <>{children(collection, loading)}</>

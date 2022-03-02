@@ -42,37 +42,51 @@ export const useGetDocumentFields = (
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
-      const response = await api.fetchDocumentFields()
-      const documentFields = response.getDocumentFields
-      const collection: Object = documentFields[collectionName].collection
-      const mutationInfo: {
-        includeCollection: boolean
-        includeTemplate: boolean
-      } = documentFields[collectionName].mutationInfo
-      let fields: Object[] = undefined
-      let template: { name: string; label: string } = undefined
+      try {
+        const response = await api.fetchDocumentFields()
+        const documentFields = response.getDocumentFields
+        const collection: Object = documentFields[collectionName].collection
+        const mutationInfo: {
+          includeCollection: boolean
+          includeTemplate: boolean
+        } = documentFields[collectionName].mutationInfo
+        let fields: Object[] = undefined
+        let template: { name: string; label: string } = undefined
 
-      /***
-       * Collection `collectionName` has template `templateName`...
-       */
-      if (
-        templateName &&
-        documentFields[collectionName].templates &&
-        documentFields[collectionName].templates[templateName]
-      ) {
-        template =
-          documentFields[collectionName].templates[templateName].template
-        fields = documentFields[collectionName].templates[templateName].fields
-      } else {
-        fields = documentFields[collectionName].fields
+        /***
+         * Collection `collectionName` has template `templateName`...
+         */
+        if (
+          templateName &&
+          documentFields[collectionName].templates &&
+          documentFields[collectionName].templates[templateName]
+        ) {
+          template =
+            documentFields[collectionName].templates[templateName].template
+          fields = documentFields[collectionName].templates[templateName].fields
+        } else {
+          fields = documentFields[collectionName].fields
+        }
+
+        setInfo({
+          collection,
+          template,
+          fields,
+          mutationInfo,
+        })
+      } catch (error) {
+        cms.alerts.error(
+          `[ERROR] GetDocumentFields failed: ${error.message}`,
+          30 * 1000 // 30 seconds
+        )
+        setInfo({
+          collection: undefined,
+          template: undefined,
+          fields: undefined,
+          mutationInfo: undefined,
+        })
       }
 
-      setInfo({
-        collection,
-        template,
-        fields,
-        mutationInfo,
-      })
       setLoading(false)
     }
 

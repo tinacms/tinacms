@@ -28,9 +28,17 @@ export const useGetDocument = (
 
   useEffect(() => {
     const fetchDocument = async () => {
-      const response = await api.fetchDocument(collectionName, relativePath)
+      try {
+        const response = await api.fetchDocument(collectionName, relativePath)
+        setDocument(response.getDocument)
+      } catch (error) {
+        cms.alerts.error(
+          `[ERROR] GetDocument failed: ${error.message}`,
+          30 * 1000 // 30 seconds
+        )
+        setDocument(undefined)
+      }
 
-      setDocument(response.getDocument)
       setLoading(false)
     }
 
