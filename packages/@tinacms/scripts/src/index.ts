@@ -19,6 +19,7 @@ import path from 'path'
 import chalk from 'chalk'
 import tailwind from 'tailwindcss'
 import postcssNested from 'postcss-nested'
+import tailwindNesting from 'tailwindcss/nesting'
 
 const defaultTheme = require('tailwindcss/defaultTheme')
 
@@ -179,9 +180,7 @@ e.g: "forestry types:gen --help"
 
 const config = (cwd = '') => {
   return {
-    mode: 'jit',
-    // prefix: 'tina-',
-    important: true,
+    important: '.tina-tailwind',
     theme: {
       columns: {
         auto: 'auto',
@@ -352,6 +351,7 @@ const config = (cwd = '') => {
           gray: {
             50: '#F6F6F9',
             100: '#EDECF3',
+            150: '#E6E3EF',
             200: '#E1DDEC',
             250: '#C9C5D5',
             300: '#b2adbe',
@@ -387,19 +387,15 @@ const config = (cwd = '') => {
         },
       },
     },
-    variants: {
-      backgroundColor: ['responsive', 'even', 'hover', 'focus'],
-      extend: {
-        animation: ['group-hover'],
-        padding: ['first', 'last'],
-      },
-    },
-    purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
+    content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
       require('@tailwindcss/typography'),
       require('@tailwindcss/line-clamp'),
       require('@tailwindcss/aspect-ratio'),
     ],
+    corePlugins: {
+      preflight: false,
+    },
   }
 }
 
@@ -466,6 +462,7 @@ const buildIt = async (entryPoint, packageJSON) => {
           let plugins = []
 
           const tw = tailwind(config(process.cwd()))
+          plugins.push(tailwindNesting)
           plugins.push(postcssNested)
           plugins.push(tw)
 
