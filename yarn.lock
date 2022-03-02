@@ -6302,6 +6302,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^17.0.21":
+  version: 17.0.21
+  resolution: "@types/node@npm:17.0.21"
+  checksum: 723ec4551e972bee4c888329051be36d94670fdc5516a2870951702276775887bf4b16baf8e8e19382262666cadde15247b5c61b8120947ad5551b57fa0a6d8c
+  languageName: node
+  linkType: hard
+
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.1
   resolution: "@types/normalize-package-data@npm:2.4.1"
@@ -28852,6 +28859,7 @@ resolve@^2.0.0-next.3:
   resolution: "starter-basic@workspace:examples/basic"
   dependencies:
     "@tinacms/cli": "workspace:*"
+    "@types/node": ^17.0.21
     eslint: 7
     eslint-config-next: 12.0.3
     next: 12.0.3

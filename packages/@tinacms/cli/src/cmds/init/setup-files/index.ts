@@ -325,36 +325,21 @@ export const nextPostPage =
 `
 
 export const AppJsContent = (
+  usingSrc: boolean,
   extraImports?: string
-) => `import dynamic from 'next/dynamic'
-import { TinaEditProvider } from 'tinacms/dist/edit-state'
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
+) => `import Tina from '${
+  usingSrc ? '../' : ''
+}../.tina/components/TinaDynamicProvider.js'
+
 ${extraImports || ''}
-
-const branch = process.env.NEXT_PUBLIC_EDIT_BRANCH || "main";
-const apiURL =
-  process.env.NODE_ENV == "development"
-    ? "http://localhost:4001/graphql"
-    : \`https://content.tinajs.io/content/\${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/\${branch}\`;
-
 const App = ({ Component, pageProps }) => {
   return (
-    <>
-      <TinaEditProvider
-        editMode={
-          <TinaCMS
-            apiURL={apiURL}
-
-          >
-            <Component {...pageProps} />
-          </TinaCMS>
-        }
-      >
-        <Component {...pageProps} />
-      </TinaEditProvider>
-    </>
+    <Tina>
+      <Component {...pageProps} />
+    </Tina>
   )
 }
 
 export default App
+
 `
