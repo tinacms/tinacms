@@ -49,7 +49,6 @@ const createDocument = async (
       includeTemplate,
     }
   )
-
   await api.createDocument(collection.name, relativePath, params)
 }
 
@@ -111,8 +110,15 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
         ...fields,
       ],
       onSubmit: async (values) => {
-        await createDocument(cms, collection, template, mutationInfo, values)
-        navigate(`/collections/${collection.name}`)
+        try {
+          await createDocument(cms, collection, template, mutationInfo, values)
+          navigate(`/collections/${collection.name}`)
+        } catch (error) {
+          cms.alerts.error(
+            `[ERROR] CreateDocument failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+        }
       },
     })
   }, [cms, collection, template, fields, mutationInfo])
