@@ -329,7 +329,7 @@ export const AppJsContent = (
   extraImports?: string
 ) => `import Tina from '${
   usingSrc ? '../' : ''
-}../.tina/components/TinaDynamicProvider.jsx'
+}../.tina/components/TinaDynamicProvider.js'
 
 ${extraImports || ''}
 const App = ({ Component, pageProps }) => {
