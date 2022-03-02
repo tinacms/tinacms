@@ -11,18 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import glob from 'fast-glob'
-import normalize from 'normalize-path'
 import path from 'path'
 import fs from 'fs-extra'
-import * as ts from 'typescript'
+import { build } from 'esbuild'
+import type { Loader } from 'esbuild'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
+import { getSchemaPath } from '../../lib'
+import chalk from 'chalk'
+import { ExecuteSchemaError, BuildSchemaError } from '../start-server/errors'
 
 const tinaPath = path.join(process.cwd(), '.tina')
+const packageJSONFilePath = path.join(process.cwd(), 'package.json')
 const tinaGeneratedPath = path.join(tinaPath, '__generated__')
 const tinaTempPath = path.join(tinaGeneratedPath, 'temp')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
@@ -39,13 +42,21 @@ export const resetGeneratedFolder = async () => {
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
 }
 
+// Cleanup function that is guaranteed to run
+const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
+  await fs.remove(tinaTempPath)
+}
+
 export const compile = async (_ctx, _next) => {
   logger.info(logText('Compiling...'))
-  // FIXME: This assume it is a schema.ts file
-  if (
-    !fs.existsSync(tinaPath) ||
-    !fs.existsSync(path.join(tinaPath, 'schema.ts'))
-  ) {
+  let schemaExists = true
+  try {
+    getSchemaPath({ projectDir: tinaPath })
+  } catch {
+    // getSchemaPath will throw an error if it is not found
+    schemaExists = false
+  }
+  if (!schemaExists) {
     // The schema.ts file does not exist
     logger.info(
       dangerText(`
@@ -53,6 +64,7 @@ export const compile = async (_ctx, _next) => {
       See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
       `)
     )
+    // We will default to TS?
     const file = path.join(tinaPath, 'schema.ts')
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
@@ -60,8 +72,13 @@ export const compile = async (_ctx, _next) => {
     await fs.writeFile(file, defaultSchema)
   }
 
-  // Turn the TS files into JS files so they can be exacted
-  await transpile(tinaPath, tinaTempPath)
+  // Turns the schema into JS files so they can be run
+  try {
+    await transpile(tinaPath, tinaTempPath)
+  } catch (e) {
+    await cleanup({ tinaTempPath })
+    throw new BuildSchemaError(e)
+  }
 
   // Delete the node require cache for .tina temp folder
   Object.keys(require.cache).map((key) => {
@@ -69,46 +86,74 @@ export const compile = async (_ctx, _next) => {
       delete require.cache[require.resolve(key)]
     }
   })
-
-  const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-  const schemaObject: TinaCloudSchema = schemaFunc.default
-  await fs.outputFile(
-    path.join(tinaConfigPath, 'schema.json'),
-    JSON.stringify(schemaObject, null, 2)
-  )
-  await fs.remove(tinaTempPath)
+  try {
+    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
+    const schemaObject: TinaCloudSchema = schemaFunc.default
+    await fs.outputFile(
+      path.join(tinaConfigPath, 'schema.json'),
+      JSON.stringify(schemaObject, null, 2)
+    )
+    await cleanup({ tinaTempPath })
+  } catch (e) {
+    // Always remove the temp code
+    await cleanup({ tinaTempPath })
+    // Throw an execution error
+    throw new ExecuteSchemaError(e)
+  }
 }
 
 const transpile = async (projectDir, tempDir) => {
-  logger.info(logText('Transpiling...'))
-  // Make sure that post paths are posix (unix paths). This is necessary on windows.
-  const posixProjectDir = normalize(projectDir)
-  const posixTempDir = normalize(tempDir)
+  logger.info(logText('Building javascript...'))
 
-  return Promise.all(
-    glob
-      // We will replaces \\ with / as required by docs see: https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows
-      .sync(path.join(projectDir, '**', '*.ts').replace(/\\/g, '/'), {
-        ignore: [
-          path
-            .join(projectDir, '__generated__', '**', '*.ts')
-            .replace(/\\/g, '/'),
-        ],
-      })
-      .map(async function (file) {
-        const fullPath = path.resolve(file)
-
-        const contents = await fs.readFileSync(fullPath).toString()
-        const newContent = ts.transpile(contents)
-        const newPath = file
-          .replace(posixProjectDir, posixTempDir)
-          .replace('.ts', '.js')
-        await fs.outputFile(newPath, newContent)
-        return true
-      })
+  const packageJSON = JSON.parse(
+    fs.readFileSync(packageJSONFilePath).toString() || '{}'
   )
+  const deps = packageJSON?.dependencies || []
+  const peerDeps = packageJSON?.peerDependencies || []
+  const devDeps = packageJSON?.devDependencies || []
+  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
+  const inputFile = getSchemaPath({ projectDir })
+
+  const outputPath = path.join(tempDir, 'schema.js')
+  await build({
+    bundle: true,
+    platform: 'neutral',
+    target: ['node10.4'],
+    entryPoints: [inputFile],
+    treeShaking: true,
+    external: [...external, './node_modules/*'],
+    loader: loaders,
+    outfile: outputPath,
+  })
+  logger.info(logText(`Javascript built`))
 }
 
 export const defineSchema = (config: TinaCloudSchema) => {
   return config
+}
+
+const loaders: { [ext: string]: Loader } = {
+  '.aac': 'file',
+  '.css': 'file',
+  '.eot': 'file',
+  '.flac': 'file',
+  '.gif': 'file',
+  '.jpeg': 'file',
+  '.jpg': 'file',
+  '.json': 'json',
+  '.mp3': 'file',
+  '.mp4': 'file',
+  '.ogg': 'file',
+  '.otf': 'file',
+  '.png': 'file',
+  '.svg': 'file',
+  '.ttf': 'file',
+  '.wav': 'file',
+  '.webm': 'file',
+  '.webp': 'file',
+  '.woff': 'file',
+  '.woff2': 'file',
+  '.js': 'jsx',
+  '.jsx': 'jsx',
+  '.tsx': 'tsx',
 }

@@ -2,7 +2,6 @@ import "../styles.css";
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { RouteMappingPlugin } from "tinacms";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 
@@ -19,38 +18,44 @@ const App = ({ Component, pageProps }) => {
               return pack.TinaCloudCloudinaryMediaStore;
             }}
             cmsCallback={(cms) => {
+              /**
+               * Flags
+               */
+              /**
+               * Enables the Tina Admin Experience
+               */
+              cms.flags.set("tina-admin", true);
+              /**
+               * Enables the Branch Switcher
+               */
+              cms.flags.set("branch-switcher", true);
+
+              /**
+               * Plugins
+               */
+              import("tinacms").then(({ RouteMappingPlugin }) => {
+                const RouteMapping = new RouteMappingPlugin(
+                  (collection, document) => {
+                    if (["authors", "global"].includes(collection.name)) {
+                      return undefined;
+                    }
+                    if (["pages"].includes(collection.name)) {
+                      if (document.sys.filename === "home") {
+                        return `/`;
+                      }
+                      if (document.sys.filename === "about") {
+                        return `/about`;
+                      }
+                      return undefined;
+                    }
+                    return `/${collection.name}/${document.sys.filename}`;
+                  }
+                );
+                cms.plugins.add(RouteMapping);
+              });
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
-              cms.flags.set("branch-switcher", true);
-              cms.flags.set("rich-text-alt", true);
-
-              /**
-               * Enables `tina-admin` specific features in the Tina Sidebar
-               */
-              cms.flags.set("tina-admin", true);
-
-              /**
-               * An example of a RouteMapping plugin for TinaAdmin
-               */
-              const RouteMapping = new RouteMappingPlugin(
-                (collection, document) => {
-                  if (["authors", "global"].includes(collection.name)) {
-                    return undefined;
-                  }
-                  if (["pages"].includes(collection.name)) {
-                    if (document.sys.filename === "home") {
-                      return `/`;
-                    }
-                    if (document.sys.filename === "about") {
-                      return `/about`;
-                    }
-                    return undefined;
-                  }
-                  return `/${collection.name}/${document.sys.filename}`;
-                }
-              );
-              cms.plugins.add(RouteMapping);
             }}
             documentCreatorCallback={{
               /**
@@ -71,6 +76,7 @@ const App = ({ Component, pageProps }) => {
             }}
             formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
               if (formConfig.id === "getGlobalDocument") {
+                //@ts-ignore
                 return createGlobalForm(formConfig, { layout: "fullscreen" });
               }
 

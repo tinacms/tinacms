@@ -13,10 +13,15 @@ limitations under the License.
 
 import React, { Fragment } from 'react'
 import { BiEdit, BiPlus } from 'react-icons/bi'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import {
+  useParams,
+  Link,
+  useNavigate,
+  NavigateFunction,
+} from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import { TinaCMS } from '@tinacms/toolkit'
-import type { Collection, Template } from '../types'
+import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
@@ -67,21 +72,43 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   )
 }
 
+const handleNavigate = (
+  navigate: NavigateFunction,
+  cms: TinaCMS,
+  collection: Collection,
+  document: DocumentSys
+) => {
+  /**
+   * Retrieve the RouteMapping Plugin
+   */
+  const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
+  const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
+
+  /**
+   * Determine if the document has a route mapped
+   */
+  const routeOverride = routeMapping
+    ? routeMapping.mapper(collection, document)
+    : undefined
+
+  /**
+   * Redirect the browser if 'yes', else navigate react-router.
+   */
+  if (routeOverride) {
+    window.location.href = routeOverride
+    return null
+  } else {
+    navigate(document.sys.filename)
+  }
+}
+
 const CollectionListPage = () => {
-  const { collectionName } = useParams()
   const navigate = useNavigate()
+  const { collectionName } = useParams()
 
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
-        /**
-         * Retrieve the Route Mapping Plugin, if any.
-         */
-        const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
-        const routeMapping = plugins.find(
-          ({ name }) => name === 'route-mapping'
-        )
-
         return (
           <GetCollection
             cms={cms}
@@ -122,50 +149,33 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
-                                const overrideRoute = routeMapping
-                                  ? routeMapping.mapper(
-                                      collection,
-                                      document.node
-                                    )
-                                  : undefined
                                 return (
                                   <tr
                                     key={`document-${document.node.sys.filename}`}
                                     className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
-                                      {overrideRoute && (
-                                        <a
-                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
-                                          href={`${overrideRoute}`}
-                                        >
-                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                          <span>
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              Filename
-                                            </span>
-                                            <span className="h-5 leading-5 block whitespace-nowrap">
-                                              {document.node.sys.filename}
-                                            </span>
+                                      <a
+                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer"
+                                        onClick={() => {
+                                          handleNavigate(
+                                            navigate,
+                                            cms,
+                                            collection,
+                                            document.node
+                                          )
+                                        }}
+                                      >
+                                        <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                        <span>
+                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                            Filename
                                           </span>
-                                        </a>
-                                      )}
-                                      {!overrideRoute && (
-                                        <Link
-                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
-                                          to={`${document.node.sys.filename}`}
-                                        >
-                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                          <span>
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              Filename
-                                            </span>
-                                            <span className="h-5 leading-5 block whitespace-nowrap">
-                                              {document.node.sys.filename}
-                                            </span>
+                                          <span className="h-5 leading-5 block whitespace-nowrap">
+                                            {document.node.sys.filename}
                                           </span>
-                                        </Link>
-                                      )}
+                                        </span>
+                                      </a>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">

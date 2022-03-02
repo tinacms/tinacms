@@ -26,10 +26,13 @@ import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
 import { Telemetry } from '@tinacms/metrics'
-
+import { handleServerErrors } from './errors'
+import { AsyncLock } from './lock'
+const lock = new AsyncLock()
 interface Options {
   port?: number
   command?: string
+  watchFolders?: string[]
   experimentalData?: boolean
   noWatch?: boolean
   noSDK: boolean
@@ -48,8 +51,11 @@ export async function startServer(
     experimentalData,
     noSDK,
     noTelemetry,
+    watchFolders,
   }: Options
 ) {
+  lock.disable()
+
   const rootPath = process.cwd()
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
@@ -113,20 +119,42 @@ stack: ${code.stack || 'No stack was provided'}`)
   let ready = false
 
   const build = async (noSDK?: boolean) => {
-    if (!process.env.CI && !noWatch) {
-      await resetGeneratedFolder()
+    // Wait for the lock to be disabled
+    await lock.promise
+    // Enable the lock so that no two builds can happen at once
+    lock.enable()
+    try {
+      if (!process.env.CI && !noWatch) {
+        await resetGeneratedFolder()
+      }
+      const database = await createDatabase({ store, bridge })
+      await compile(null, null)
+      const schema = await buildSchema(rootPath, database)
+      await genTypes({ schema }, () => {}, { noSDK })
+    } catch (error) {
+      throw error
+    } finally {
+      // Disable the lock so a new build can run
+      lock.disable()
     }
-    const database = await createDatabase({ store, bridge })
-    await compile(null, null)
-    const schema = await buildSchema(rootPath, database)
-    await genTypes({ schema }, () => {}, { noSDK })
   }
 
+  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch([`${rootPath}/**/*.{ts,gql,graphql}`], {
-        ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
-      })
+      .watch(
+        [
+          ...foldersToWatch,
+          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
+        ],
+        {
+          ignored: [
+            '**/node_modules/**/*',
+            '**/.next/**/*',
+            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+          ],
+        }
+      )
       .on('ready', async () => {
         console.log('Generating Tina config')
         try {
@@ -136,7 +164,7 @@ stack: ${code.stack || 'No stack was provided'}`)
           ready = true
           startSubprocess()
         } catch (e) {
-          logger.info(dangerText(`${e.message}`))
+          handleServerErrors(e)
           // FIXME: make this a debug flag
           console.log(e)
           process.exit(0)
@@ -150,11 +178,7 @@ stack: ${code.stack || 'No stack was provided'}`)
               await build(noSDK)
             }
           } catch (e) {
-            logger.info(
-              dangerText(
-                'Compilation failed with errors. Server has not been restarted.'
-              ) + ` see error below \n ${e.message}`
-            )
+            handleServerErrors(e)
             t.submitRecord({
               event: {
                 name: 'tinacms:cli:server:error',
