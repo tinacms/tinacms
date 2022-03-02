@@ -327,7 +327,9 @@ export const nextPostPage =
 export const AppJsContent = (
   usingSrc: boolean,
   extraImports?: string
-) => `import Tina from '${usingSrc ? '../' : ''}../.tina/components/provider'
+) => `import Tina from '${
+  usingSrc ? '../' : ''
+}../.tina/components/TinaDynamicProvider.jsx'
 
 ${extraImports || ''}
 const App = ({ Component, pageProps }) => {
