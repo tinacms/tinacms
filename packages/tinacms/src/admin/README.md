@@ -12,14 +12,14 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
 
 > Make sure you use the latest version of `tinacms` and `@tinacms/cli`!
 
-1. Remove or rename `pages/admin/[[...slug]].tsx`
+1. Remove or rename `pages/admin.tsx`
   * `TinaAdmin` serves as a replacement for this file, offering the same ability to handle enabling and disabled `TinaCMS` while also providing additional UI.
 
-2. Add `pages/admin/[[...tina]].tsx`
-  * `TinaAdmin` leverages a wildcard, catch-all route (`/admin/*`) for all of its routing.  All you need to do is add two lines to this file:
+2. Add `pages/admin.tsx`
+  * `TinaAdmin` leverages a single page route.  All you need to do is add two lines to this file:
   ```tsx
   /**
-   * pages/admin/[[...tina]].tsx
+   * pages/admin.tsx
    **/
   import { TinaAdmin } from "tinacms";
   export default TinaAdmin;
@@ -62,11 +62,11 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
 1. Make sure `/admin` is open and available.
   * For existing sites, we need to ensure there are no routes currently using or conflicting with `/admin`.  In the future, we'd like to make `TinaAdmin`'s base route configurable, but for now, remove or rename any files under `/pages/admin`.
 
-2. Add `pages/admin/[[...tina]].tsx`
-  * `TinaAdmin` leverages a wildcard, catch-all route (`/admin/*`) for all of its routing.  All you need to do is add two lines to this file:
+2. Add `pages/admin.tsx`
+  * `TinaAdmin` leverages a single page route.  All you need to do is add two lines to this file:
   ```tsx
   /**
-   * pages/admin/[[...tina]].tsx
+   * pages/admin.tsx
    **/
   import { TinaAdmin } from "tinacms";
   export default TinaAdmin;
@@ -120,8 +120,6 @@ A new `RouteMappingPlugin` accepts a single argument - the `mapper` function - t
 Below is an example of how a `RouteMappingPlugin` might be added to our `tina-cloud-starter`:
 
 ```tsx
-import { RouteMappingPlugin } from "tinacms";
-
 const App = ({ Component, pageProps }) => {
   return (
     <>
@@ -131,44 +129,46 @@ const App = ({ Component, pageProps }) => {
           <TinaCMS
             ...
             cmsCallback={(cms) => {
-              /**
-               * 1. Define the `RouteMappingPlugin`
-               **/
-              const RouteMapping = new RouteMappingPlugin(
-                (collection, document) => {
-                  /**
-                   * Because the `authors` and `global` collections do not
-                   * have dedicated pages, we return `undefined`.
-                   **/
-                  if (["authors", "global"].includes(collection.name)) {
-                    return undefined;
-                  }
-
-                  /**
-                   * While the `pages` collection does have dedicated pages,
-                   * their URLs are different than their document names.
-                   **/
-                  if (["pages"].includes(collection.name)) {
-                    if (document.sys.filename === "home") {
-                      return `/`;
+              import("tinacms").then(({ RouteMappingPlugin }) => {
+                /**
+                 * 1. Define the `RouteMappingPlugin`
+                 **/
+                const RouteMapping = new RouteMappingPlugin(
+                  (collection, document) => {
+                    /**
+                     * Because the `authors` and `global` collections do not
+                     * have dedicated pages, we return `undefined`.
+                     **/
+                    if (["authors", "global"].includes(collection.name)) {
+                      return undefined;
                     }
-                    if (document.sys.filename === "about") {
-                      return `/about`;
+  
+                    /**
+                     * While the `pages` collection does have dedicated pages,
+                     * their URLs are different than their document names.
+                     **/
+                    if (["pages"].includes(collection.name)) {
+                      if (document.sys.filename === "home") {
+                        return `/`;
+                      }
+                      if (document.sys.filename === "about") {
+                        return `/about`;
+                      }
+                      return undefined;
                     }
-                    return undefined;
+                    /**
+                     * Finally, any other collections (`posts`, for example)
+                     * have URLs based on values in the `collection` and `document`.
+                     **/
+                    return `/${collection.name}/${document.sys.filename}`;
                   }
-                  /**
-                   * Finally, any other collections (`posts`, for example)
-                   * have URLs based on values in the `collection` and `document`.
-                   **/
-                  return `/${collection.name}/${document.sys.filename}`;
-                }
-              );
-
-              /**
-               * 2. Add the `RouteMappingPlugin` to the `cms`.
-               **/
-              cms.plugins.add(RouteMapping);
+                );
+  
+                /**
+                 * 2. Add the `RouteMappingPlugin` to the `cms`.
+                 **/
+                cms.plugins.add(RouteMapping);
+              })
             }}
             ...
           >

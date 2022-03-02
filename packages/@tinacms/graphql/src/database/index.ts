@@ -406,22 +406,32 @@ const indexDocument = async ({
 }) => {
   const schema = await database.getSchema()
   const collection = await schema.getCollectionByFullPath(filepath)
-  const existingData = await database.get<{ _collection: string }>(filepath)
-  const attributesToFilterOut = await _indexCollectable({
-    record: filepath,
-    value: existingData,
-    field: collection,
-    prefix: collection.name,
-    database,
-  })
-  await sequential(attributesToFilterOut, async (attribute) => {
-    const records = (await database.store.get<string[]>(attribute)) || []
-    await database.store.put(
-      attribute,
-      records.filter((item) => item !== filepath)
-    )
-    return true
-  })
+  let existingData
+  try {
+    existingData = await database.get<{ _collection: string }>(filepath)
+  } catch (err) {
+    if (err.extensions?.['status'] !== 404) {
+      throw err
+    }
+  }
+
+  if (existingData) {
+    const attributesToFilterOut = await _indexCollectable({
+      record: filepath,
+      value: existingData,
+      field: collection,
+      prefix: collection.name,
+      database,
+    })
+    await sequential(attributesToFilterOut, async (attribute) => {
+      const records = (await database.store.get<string[]>(attribute)) || []
+      await database.store.put(
+          attribute,
+          records.filter((item) => item !== filepath)
+      )
+      return true
+    })
+  }
 
   const attributes = await _indexCollectable({
     record: filepath,

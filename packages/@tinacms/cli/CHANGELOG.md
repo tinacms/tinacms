@@ -1,5 +1,30 @@
 # tinacms-cli
 
+## 0.60.6
+
+### Patch Changes
+
+- 98622111d: Use [esbuild](https://esbuild.github.io/) to build the schema instead of typescript.
+
+  This allows the user to
+
+  - use non typescript files like JS, JSX, TS
+  - Import from outside of the tina folder
+
+  The downside
+
+  - Now type errors will still pass (The schema will compile) and one will get an error at runtime instead of compile time
+
+- Updated dependencies [c730fa1dd]
+- Updated dependencies [cd0f6f022]
+  - @tinacms/graphql@0.59.7
+
+## 0.60.5
+
+### Patch Changes
+
+- 399fbf4fa: Fix an issue where builds weren't happening during CI, this is only an issue for the experimental data layer
+
 ## 0.60.4
 
 ### Patch Changes

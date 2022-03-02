@@ -14,6 +14,7 @@ limitations under the License.
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
+import LoadingPage from '../components/LoadingPage'
 import type { Collection } from '../types'
 
 export const useGetCollection = (
@@ -25,6 +26,7 @@ export const useGetCollection = (
   const [collection, setCollection] = useState<Collection | undefined>(
     undefined
   )
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchCollection = async () => {
@@ -33,12 +35,14 @@ export const useGetCollection = (
         includeDocuments
       )
       setCollection(response.getCollection)
+      setLoading(false)
     }
 
+    setLoading(true)
     fetchCollection()
   }, [cms, collectionName])
 
-  return collection
+  return { collection, loading }
 }
 
 const GetCollection = ({
@@ -52,11 +56,15 @@ const GetCollection = ({
   includeDocuments?: boolean
   children: any
 }) => {
-  const collection = useGetCollection(cms, collectionName, includeDocuments)
-  if (!collection) {
-    return null
+  const { collection, loading } = useGetCollection(
+    cms,
+    collectionName,
+    includeDocuments
+  )
+  if (!collection || loading === true) {
+    return <LoadingPage />
   }
-  return <>{children(collection)}</>
+  return <>{children(collection, loading)}</>
 }
 
 export default GetCollection

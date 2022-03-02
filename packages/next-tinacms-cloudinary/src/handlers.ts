@@ -165,7 +165,7 @@ const findErrorMessage = (e: any) => {
 
 async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
   const { media } = req.query
-  const [_media, public_id] = media
+  const [, public_id] = media as string[]
 
   cloudinary.uploader.destroy(public_id as string, {}, (err) => {
     if (err) res.status(500)

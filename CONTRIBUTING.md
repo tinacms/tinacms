@@ -140,3 +140,13 @@ CONTENT_API_OVERRIDE=<URL TO CONTENTAPI>
 ### Import errors
 
 Are you getting lots of import errors in VSCode and yet it builds fine? In VSCode try pressing cmd+shift+p, search for `select typescript version` and choose `use workspace version`.
+
+
+### Troubleshooting
+
+If you are running into errors while trying to build or run examples here are some common fixes to try
+
+- Make sure the repo is up to date by running `git checkout main` and `git pull origin main`
+- Try cleaning the repo by running `yarn nuke` at the root of the repo. This script removes all build outputs
+- After running `yarn nuke`, `yarn install` and `yarn watch` (or `yarn build`) must be run before doing anything else.
+- If you are still having issues feel free to reach out on our [Community Discord](https://discord.com/invite/zumN63Ybpf)

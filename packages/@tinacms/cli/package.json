@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "0.60.4",
+  "version": "0.60.6",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -38,7 +38,8 @@
     "@types/progress": "^2.0.3",
     "@types/prompts": "^2.0.13",
     "@types/yup": "^0.29.11",
-    "jest": "^27.0.6"
+    "jest": "^27.0.6",
+    "typescript": "^4.3.5"
   },
   "scripts": {
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
@@ -59,6 +60,8 @@
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
+    "@yarnpkg/esbuild-plugin-pnp": "^2.0.1-rc.3",
+    "add": "^2.0.6",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
@@ -66,8 +69,9 @@
     "body-parser": "^1.19.0",
     "chalk": "^2.4.2",
     "chokidar": "^3.5.1",
-    "commander": "5.1.0",
+    "commander": "^9.0.0",
     "cors": "^2.8.5",
+    "esbuild": "^0.14.20",
     "esm": "3.2.25",
     "express": "^4.17.1",
     "fast-glob": "^3.2.4",
@@ -80,7 +84,7 @@
     "normalize-path": "^3.0.0",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
-    "typescript": "^4.3.5",
+    "yarn": "^1.22.17",
     "yup": "^0.32.9"
   },
   "publishConfig": {

@@ -153,6 +153,7 @@ export function useGraphqlForms<T extends object>({
     cms.api.tina
       .requestWithForm((gql) => gql(query), {
         variables,
+        useUnstableFormify: cms.flags.get('use-unstable-formify'),
       })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
@@ -438,10 +439,7 @@ const generateFormCreators = (cms: TinaCMS) => {
     cms.forms.add(form)
     return form
   }
-  const createGlobalForm = (
-    formConfig,
-    options?: { icon?: any; layout: 'fullscreen' | 'popup' }
-  ) => {
+  const createGlobalForm: GlobalFormCreator = (formConfig, options) => {
     const form = new Form(formConfig)
     cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
     return form
@@ -450,6 +448,14 @@ const generateFormCreators = (cms: TinaCMS) => {
 }
 
 type FormCreator = (formConfig: FormOptions<any>) => Form
+type GlobalFormCreator = (
+  formConfig: FormOptions<any>,
+  options?: GlobalFormOptions
+) => Form
+interface GlobalFormOptions {
+  icon?: any
+  layout: 'fullscreen' | 'popup'
+}
 export interface FormifyArgs {
   formConfig: FormOptions<any>
   createForm: FormCreator

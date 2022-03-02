@@ -178,10 +178,10 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   )
   writeFileSync(packagePath, newPack)
 
-  // pages/admin/[[...tina]].tsx
-  const adminPath = p.join(pagesPath, 'admin', '[[...tina]].js')
+  // pages/admin.tsx
+  const adminPath = p.join(pagesPath, 'admin.js')
   if (fs.pathExistsSync(p.join(pagesPath, 'admin'))) {
-    logger.warn(`Unable to add /pages/admin/[[...tina]].js, this path already exists.
+    logger.warn(`Unable to add /pages/admin.js, this path already exists.
 \tLearn more about toggling edit-mode at https://tina.io/docs/tinacms-context/#manually-toggling-edit-mode`)
     return next()
   }
@@ -202,15 +202,3 @@ Enjoy Tina 🦙 !
 `)
   next()
 }
-
-// These things can go on the page
-// For more information visit our docs and check out our getting started guide
-
-// Docs: https://tina.io/docs/tina-cloud/
-// Getting starter guide: https://tina.io/guides/tina-cloud/starter/overview/
-
-// \t3. Update the Schema.ts located ${p.join(
-//   baseDir,
-//   '.tina',
-//   'schema.ts'
-// )} to match your content: https://tina.io/docs/tina-cloud/cli/#defineschema
