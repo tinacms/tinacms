@@ -60,6 +60,7 @@ export type Connection = {
 
 export type Query = {
   __typename?: 'Query';
+  getOptimizedQuery?: Maybe<Scalars['String']>;
   getCollection: Collection;
   getCollections: Array<Collection>;
   node: Node;
@@ -70,6 +71,11 @@ export type Query = {
   getPageList: PageConnection;
   getPostDocument: PostDocument;
   getPostList: PostConnection;
+};
+
+
+export type QueryGetOptimizedQueryArgs = {
+  queryString: Scalars['String'];
 };
 
 
