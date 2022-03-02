@@ -94,12 +94,7 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   }
 
   // 2. Create a Tina Provider
-  if (
-    !fs.pathExistsSync(TinaFolder) &&
-    !fs.existsSync(TinaProviderPath) &&
-    !fs.existsSync(TinaDynamicProvider)
-  ) {
-    fs.mkdirpSync(TinaFolder)
+  if (!fs.existsSync(TinaProviderPath) && !fs.existsSync(TinaDynamicProvider)) {
     fs.writeFileSync(TinaProviderPath, TinaProvider)
     fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
   }
