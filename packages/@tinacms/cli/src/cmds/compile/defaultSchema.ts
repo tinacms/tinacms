@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 export const defaultSchema = `
-import { defineSchema } from "@tinacms/cli";
+import { defineSchema } from "tinacms";
 
 export default defineSchema({
   collections: [

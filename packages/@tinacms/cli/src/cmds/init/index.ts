@@ -80,10 +80,11 @@ const baseDir = process.cwd()
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
 const TinaFolder = p.join(baseDir, '.tina')
-const TinaProviderPath = p.join(TinaFolder, 'TinaProvider.js')
-const TinaDynamicProvider = p.join(TinaFolder, 'TinaDynamicProvider.js')
+const componentFolder = p.join(TinaFolder, 'components')
+const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
+const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
 
-export async function tinaSetup(ctx: any, next: () => void, options) {
+export async function tinaSetup(_ctx: any, next: () => void, _options) {
   const useingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
 
   // 1. Create a content/blog Folder and add one or two blog posts
@@ -95,6 +96,7 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
 
   // 2. Create a Tina Provider
   if (!fs.existsSync(TinaProviderPath) && !fs.existsSync(TinaDynamicProvider)) {
+    fs.mkdirpSync(componentFolder)
     fs.writeFileSync(TinaProviderPath, TinaProvider)
     fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
   }
