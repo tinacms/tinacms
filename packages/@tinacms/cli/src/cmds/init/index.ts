@@ -64,7 +64,7 @@ export async function installDeps(ctx: any, next: () => void, options) {
     prog: '',
   })
   const installCMD = `yarn add ${deps.join(' ')}`
-  // await execShellCommand(installCMD)
+  await execShellCommand(installCMD)
 
   // Fake installed used for dev
   // await delay(2000)
