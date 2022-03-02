@@ -53,7 +53,7 @@
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/fs-extra": "^9.0.2",
-    "@types/jest": "^26.0.4",
+    "@types/jest": "^27.4.1",
     "@types/js-yaml": "^3.12.5",
     "@types/level": "^6.0.0",
     "@types/lodash": "^4.14.161",

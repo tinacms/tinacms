@@ -341,8 +341,8 @@ export default defineSchema({
           name: 'title',
           fields: [{
             name: 'title',
-            default: ''}
-          ]
+            default: ''
+          }]
         },
         {
           name: 'date',
@@ -352,10 +352,13 @@ export default defineSchema({
           }]
         },
         {
-          name: 'published',
+          name: 'published-by-date',
           fields: [{
             name: 'published',
             default: 'false'
+          }, {
+            name: 'date',
+            default: ''
           }]
         }
       ],

@@ -69,7 +69,6 @@
     "mdast-util-mdx-expression": "^1.1.0",
     "mdast-util-to-markdown": "^1.2.1",
     "micromark-extension-mdxjs": "^1.0.0",
-    "mocha": "^9.1.1",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "rehype-format": "^3.1.0",

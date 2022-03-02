@@ -254,21 +254,30 @@
           ]
         },
         {
-          "name": "published",
+          "name": "published-by-date",
           "fields": [
             {
               "name": "published",
               "default": "false",
               "namespace": [
                 "posts",
-                "published",
+                "published-by-date",
                 "published"
+              ]
+            },
+            {
+              "name": "date",
+              "default": "",
+              "namespace": [
+                "posts",
+                "published-by-date",
+                "date"
               ]
             }
           ],
           "namespace": [
             "posts",
-            "published"
+            "published-by-date"
           ]
         }
       ],

@@ -382,19 +382,22 @@ type UnionDataLookup = {
 }
 
 const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
-  const indexAttributes = {}
+  const indexDefinitions = {}
   if (collection.indexes) {
-    // build IndexAttributes for each index in the collection schema
+    // build IndexDefinitions for each index in the collection schema
     for (let index of collection.indexes) {
-      indexAttributes[index.name] = {
+      indexDefinitions[index.name] = {
         namespace: collection.name,
-        properties: index.fields.map(indexField => ({
-          field: indexField.name,
+        fields: index.fields.map(indexField => ({
+          name: indexField.name,
           default: indexField.default,
           type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
         }))
       }
     }
+
+    // TODO we could check here to make sure the last field in an indexDefinition is likely to be a problem
+    // TODO for duplicates - ie boolean fields
   }
 
   await sequential(documentPaths, async (filepath) => {
@@ -403,7 +406,7 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, { indexAttributes })
+      await database.store.seed(filepath, data, { indexDefinitions })
     }
     if (database.store.supportsIndexing()) {
       return indexDocument({ filepath, data, database })

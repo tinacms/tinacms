@@ -11,30 +11,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// TODO can we leverage the filter types (somehow) for these?
+import {ScalarValue} from '../../index'
+
 export enum OP {
-  EQ,
-  GT,
-  LT,
-  GTE,
-  LTE,
-  BEGINS_WITH,
-  BETWEEN
+  EQ = 'eq',
+  GT = 'gt',
+  LT = 'lt',
+  GTE = 'gte',
+  LTE = 'lte',
+  BEGINS_WITH = 'begins_with',
 }
 
 export type BinaryFilter = {
-  rightOperand: string | number
-  operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.BEGINS_WITH
+  field: string
+  rightOperand: ScalarValue
+  operator:  OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.BEGINS_WITH
 }
 
 export type TernaryFilter = {
-  leftOperand: string | number
-  rightOperand: string | number
-  operator: OP.BETWEEN
+  field: string
+  leftOperand: ScalarValue
+  rightOperand: ScalarValue
+  leftOperator: OP.GTE | OP.GT
+  rightOperator: OP.LT | OP.LTE
 }
 
 export type QueryParams = {
-  filter?: BinaryFilter | TernaryFilter
+  filterChain?: (BinaryFilter | TernaryFilter)[]
   index?: string
   first?: number
   last?: number
@@ -42,12 +45,12 @@ export type QueryParams = {
   after?: string
 }
 
-export type IndexAttributes = {
+export type IndexDefinition = {
   namespace: string
-  properties: {
-    field: string
-    default: number | string
-    type: string
+  fields: {
+    name: string
+    default?: ScalarValue
+    type?: string
   }[]
 }
 
@@ -108,7 +111,7 @@ export interface Store {
     data: object,
     options?: {
       includeTemplate?: boolean,
-      indexAttributes?: Record<string,IndexAttributes>
+      indexDefinitions?: Record<string,IndexDefinition>
     },
   ): Promise<void>
   supportsSeeding(): boolean
@@ -120,5 +123,122 @@ export interface Store {
    * user's repo.
    */
   supportsIndexing(): boolean
-  put(filepath: string, data: object, options?: {keepTemplateKey: boolean, indexAttributes?: Record<string,IndexAttributes>}): Promise<void>
+  put(filepath: string, data: object, options?: {keepTemplateKey: boolean, indexDefinitions?: Record<string,IndexDefinition>}): Promise<void>
+}
+
+const inferOperatorFromFilter = (filterOperator: string) => {
+  switch(filterOperator) {
+    case 'after':
+      return OP.GT
+
+    case 'before':
+      return OP.LT
+
+    case 'eq':
+      return OP.EQ
+
+    case 'startsWith':
+      return OP.BEGINS_WITH
+
+    case 'lt':
+      return OP.LT
+
+    case 'lte':
+      return OP.LTE
+
+    case 'gt':
+      return OP.GT
+
+    case 'gte':
+      return OP.GTE
+
+    default:
+      throw new Error(`unsupported filter condition: '${filterOperator}'`)
+  }
+}
+
+export const makeFilterChain = ({ filter, index }: {
+  filter?: Record<string,object>,
+  index: IndexDefinition
+}) => {
+  let filterChain: (BinaryFilter | TernaryFilter)[] = []
+  if (filter) {
+    for (const field of index.fields) {
+      const fieldFilter = filter[field.name]
+      if (fieldFilter) {
+        const [key1, key2, ...otherKeys] = Object.keys(fieldFilter)
+        if (otherKeys.length) {
+          throw new Error(`Filter on field '${field.name}' supports at most two conditions: '${[key1, key2, ...otherKeys].join(', ')}'`)
+        }
+
+        if (key1 && key2) {
+          const leftFilterOperator = (fieldFilter['gt'] && 'gt') || (fieldFilter['gte'] && 'gte') || (fieldFilter['after'] && 'after') || undefined
+          const rightFilterOperator = (fieldFilter['lt'] && 'lt') || (fieldFilter['lte'] && 'lte') || (fieldFilter['before'] && 'before') || undefined
+          let leftOperand: ScalarValue
+          let rightOperand: ScalarValue
+          if (rightFilterOperator && leftFilterOperator) {
+            if (key1 === leftFilterOperator) {
+              leftOperand = fieldFilter[key1]
+              rightOperand = fieldFilter[key2]
+            } else {
+              rightOperand = fieldFilter[key1]
+              leftOperand = fieldFilter[key2]
+            }
+
+            filterChain.push({
+              field: field.name,
+              rightOperand,
+              leftOperand,
+              leftOperator: inferOperatorFromFilter(leftFilterOperator) as OP.GT | OP.GTE,
+              rightOperator: inferOperatorFromFilter(rightFilterOperator) as OP.LT | OP.LTE
+            })
+          } else {
+            throw new Error(`Filter on field '${field.name}' has invalid combination of conditions: '${key1}, ${key2}'`)
+          }
+        } else if (key1) {
+          filterChain.push({
+            field: field.name,
+            rightOperand: fieldFilter[key1],
+            operator: inferOperatorFromFilter(key1)
+          })
+        }
+      }
+    }
+  }
+
+  return filterChain
+}
+
+export const validateQueryParams = (queryParams: QueryParams, indexName: string, index: IndexDefinition) => {
+  if (queryParams.filterChain && queryParams.filterChain.length) {
+    const [lastFilter] = queryParams.filterChain.slice(-1)
+    const maxOrder = index.fields.findIndex(field => lastFilter.field === field.name)
+    const indexFields = index.fields.map(field => field.name)
+    const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field, i) => field.name)
+
+    // First make sure that all the query fields are present in the index
+    for (const [i, filter] of Object.entries(queryParams.filterChain)) {
+      if (indexFields.indexOf(filter.field) === -1) {
+        throw new Error(`invalid filter on index '${indexName}' - received: '${filter.field}', expected one of: [${indexFields.join(', ')}]`)
+      }
+
+      // and the order of the filtering makes sense
+      if (filter.field !== referencedFields[Number(i)]) {
+        throw new Error(`expected filter '${referencedFields[i]}' on index '${indexName}' at position ${i} but found '${filter.field}'`)
+      }
+
+      if (Number(i) < maxOrder) {
+        // Lower order fields can not use TernaryFilter
+        if (!(filter as BinaryFilter).operator) {
+          throw new Error(`ternary filter not supported on index '${indexName} for field '${filter.field}`)
+        }
+
+        // Lower order fields must use equality operator
+        const binaryFilter: BinaryFilter = filter as BinaryFilter
+        if (binaryFilter.operator !== OP.EQ) {
+          throw new Error(`specified filter operator '${binaryFilter.operator}' only supported for highest order field in index '${indexName}'`)
+        }
+      }
+    }
+  }
 }

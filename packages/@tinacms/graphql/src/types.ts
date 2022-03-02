@@ -10,7 +10,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 export interface TinaCloudSchema<WithNamespace extends boolean> {
   templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
@@ -94,7 +93,7 @@ export type TinaIndex = {
   name: string
   fields: {
     name: string
-    default?: string | number
+    default?: string | number | boolean
   }[]
 }
 

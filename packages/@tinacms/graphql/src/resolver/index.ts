@@ -28,8 +28,8 @@ import type {
   TinaCloudCollection,
 } from '../types'
 import { TinaError } from './error'
-import {OP} from '@tinacms/datalayer'
-import {BinaryFilter} from '@tinacms/datalayer/dist'
+import {makeFilterChain, validateQueryParams} from '@tinacms/datalayer'
+import type {IndexDefinition} from '@tinacms/datalayer'
 
 interface ResolverConfig {
   database: Database
@@ -537,14 +537,17 @@ export class Resolver {
   }) => {
     let edges
     let pageInfo
+
     if (args.filter || args.index) {
       const collection = this.tinaSchema.getCollection(lookup.collection)
-      //validate the index exists
-      if (args.index && (!collection.indexes || collection.indexes.map(index => index.name).indexOf(args.index as string) === -1)) {
+
+      const queries = []
+      const queryFields: string[] = []
+      const index = collection.indexes.find(index => index.name === args.index as string)
+      if (!index) {
         throw new Error(`index '${args.index}' on collection '${collection.name}' does not exist`)
       }
 
-      const queries = []
       if (args.filter) {
         const flattenedArgs = flat(args.filter, { delimiter: '#' })
         Object.entries(flattenedArgs).map(([key, value]) => {
@@ -572,12 +575,29 @@ export class Resolver {
           // queries.push(
           //   `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
           // )
+          queryFields.push(realKey)
           queries.push(value)
         })
       }
 
-      // TODO can only support one filter in dynamodb - should we define capabilties and allow more?
-      const result = await this.database.query(this.makeQueryParams(args, queries[0]), this.getDocument)
+      const indexDefinition: IndexDefinition = {
+        namespace: collection.name,
+        fields: index.fields
+      }
+      const queryParams = {
+        filterChain: makeFilterChain({
+          filter: args.filter as Record<string, object>,
+          index: indexDefinition
+        }),
+        index: args.index as string,
+        first: args.first as number,
+        last: args.last as number,
+        before: args.before as string,
+        after: args.after as string
+      }
+      validateQueryParams(queryParams, index.name, indexDefinition)
+
+      const result = await this.database.query(queryParams, this.getDocument)
       edges = result.edges
       pageInfo = result.pageInfo
     } else {
@@ -599,47 +619,6 @@ export class Resolver {
         startCursor: "",
         endCursor: ""
       }
-    }
-  }
-
-  private inferOperatorFromFilter(filter: Record<string, object> | string | number) {
-    const key = Object.keys(filter).pop()
-    if (!filter[key]) {
-      throw new Error(`expected filter for key = ${key}`)
-    }
-    if ('after' in filter[key]) {
-      return OP.GT
-    } else if ('before' in filter[key]) {
-      return OP.LT
-    } else if ('eq' in filter[key]) {
-      return OP.EQ
-    } else if ('startsWith' in filter[key]) {
-      return OP.BEGINS_WITH
-    } else if ('lt' in filter[key]) {
-      return OP.LT
-    } else if ('gt' in filter[key]) {
-      return OP.GT
-    } else if ('gte' in filter[key]) {
-      return OP.GTE
-    } else if ('lte' in filter[key]) {
-      return OP.LTE
-    } else {
-      throw new Error('unsupported filter operator' + filter[key])
-    }
-  }
-
-  private makeQueryParams(args: Record<string, Record<string, object> | string | number>, query: any) {
-    // TODO BETWEEN should be supported in level..
-    return {
-      filter: args.filter ? {
-        rightOperand: query,
-        operator: this.inferOperatorFromFilter(args.filter)
-      } as BinaryFilter : undefined,
-      index: args.index as string,
-      first: args.first as number,
-      last: args.last as number,
-      before: args.before as string,
-      after: args.after as string
     }
   }
 

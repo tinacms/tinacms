@@ -19,14 +19,14 @@ import level, {LevelDB} from 'level'
 import levelup from 'levelup'
 import memdown from 'memdown'
 import encode from 'encoding-down'
-import {IndexAttributes} from '.'
+import {IndexDefinition} from '.'
+import {ScalarValue} from '../../index'
 
-type scalar = string | number | boolean
 
 export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
-  public indexes: Record<string,{ db: LevelDB, attributes: IndexAttributes }>
+  public indexes: Record<string,{ db: LevelDB, definition: IndexDefinition }>
   public useMemory: boolean
   constructor(rootPath: string, useMemory: boolean = false) {
     this.rootPath = rootPath || ''
@@ -43,47 +43,126 @@ export class LevelStore implements Store {
     this.indexes = {}
   }
 
-  private makeFilter({ filter,
-                       rightOperand,
-                       dataType
+  private makeFilter({ filterChain,
+                       dataTypes
                      }: {
-    filter?: BinaryFilter | TernaryFilter,
-    rightOperand: scalar
-    dataType: string
-  }): (value: string) => boolean {
-    return (value: string) => {
-      if ((filter as TernaryFilter).leftOperand) {
-        // TODO
-      } else {
-        let leftValue: scalar
-        if (dataType === 'string') {
-          leftValue = value
-        } else if (dataType === 'number' || dataType === 'datetime') {
-          leftValue = Number(value)
-        } else if (dataType === 'boolean') {
-          leftValue = value === 'true' || value === '1'
+    filterChain?: (BinaryFilter | TernaryFilter)[],
+    dataTypes: Record<string, string>
+  }): (values: Record<string, string>) => boolean {
+    return (values: Record<string, string>) => {
+      for (const filter of filterChain) {
+        const stringValue = values[filter.field]
+        const dataType = dataTypes[filter.field]
+
+        if (!stringValue) {
+          return false
         }
 
-        const { operator } = filter
-        switch(operator) {
-          case OP.EQ:
-            return (leftValue === rightOperand)
-          case OP.GT:
-            return (leftValue > rightOperand)
-          case OP.LT:
-            return (leftValue < rightOperand)
-          case OP.GTE:
-            return (leftValue >= rightOperand)
-          case OP.LTE:
-            return (leftValue <= rightOperand)
-          case OP.BEGINS_WITH:
-            return (leftValue as string).startsWith(rightOperand as string)
-            break
-          default:
-            throw new Error(`unexpected operator ${operator}`)
+        let value: ScalarValue
+        if (dataType === 'string') {
+          value = stringValue
+        } else if (dataType === 'number' || dataType === 'datetime') {
+          value = Number(stringValue)
+        } else if (dataType === 'boolean') {
+          value = stringValue === 'true' || stringValue === '1'
+        }
+
+        const { operator } = filter as BinaryFilter
+        if (operator) {
+          switch(operator) {
+            case OP.EQ:
+              if (value !== filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.GT:
+              if (value <= filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.LT:
+              if (value >= filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.GTE:
+              if (value < filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.LTE:
+              if (value > filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.BEGINS_WITH:
+              if (!(value as string).startsWith(filter.rightOperand as string)) {
+                return false
+              }
+              break
+            default:
+              throw new Error(`unexpected operator ${operator}`)
+          }
+        } else {
+
+          const { rightOperator, leftOperator, rightOperand, leftOperand } = filter as TernaryFilter
+
+          if (rightOperator === OP.LTE && value > rightOperand) {
+            return false
+          } else if (rightOperator === OP.LT && value >= rightOperand) {
+            return false
+          }
+
+          if (leftOperator === OP.GTE && value < leftOperand) {
+              return false
+          } else if (leftOperator === OP.GT && value <= leftOperand) {
+              return false
+          }
+        }
+      }
+      return true
+    }
+  }
+
+  private coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFilter)[], dataTypes: Record<string, string>) => {
+    const result: (BinaryFilter | TernaryFilter)[] = []
+    if (filterChain && filterChain.length) {
+      // convert operands by type
+      for (const filter of filterChain) {
+        const dataType: string = dataTypes[filter.field]
+        if (dataType === 'number') {
+          if ((filter as TernaryFilter).leftOperand !== undefined) {
+            result.push({
+              ...filter,
+              rightOperand: Number(filter.rightOperand),
+              leftOperand: Number((filter as TernaryFilter).leftOperand),
+            })
+          } else {
+            result.push({
+              ...filter,
+              rightOperand: Number(filter.rightOperand),
+            })
+          }
+        } else if (dataType === 'datetime') {
+          if ((filter as TernaryFilter).leftOperand !== undefined) {
+            result.push({
+              ...filter,
+              rightOperand: new Date(filter.rightOperand as string).getTime(),
+              leftOperand: new Date((filter as TernaryFilter).leftOperand as string).getTime(),
+            })
+          } else {
+            result.push({
+              ...filter,
+              rightOperand: new Date(filter.rightOperand as string).getTime(),
+            })
+          }
+        } else {
+          result.push({ ...filter })
         }
       }
     }
+
+    return result
   }
 
   public async query(queryParams: QueryParams, hydrator) {
@@ -112,33 +191,25 @@ export class LevelStore implements Store {
     // - how do we handle exists operator in dynamo?
     // - when using last/before, should we change the hasNextPage/hasPreviousPage and startCursor/endCursor?
 
-    const { attributes, db } = this.indexes[index]
+    const { definition, db } = this.indexes[index]
 
     let edges: { key: string, value: string }[] = []
     let startKey: string = ""
     let endKey: string = ""
     let hasPreviousPage = false
     let hasNextPage = false
-    const propertyDescriptor = attributes.properties[0] // TODO handle multi-column filters
 
-    const filter: BinaryFilter | TernaryFilter = queryParams.filter
-    let rightValue: scalar
-    let valueRegex = new RegExp(`^${attributes.namespace}:(.+)##.+`)
-    if (filter) {
-      const { rightOperand } = filter
-      if (propertyDescriptor.type === 'string' || propertyDescriptor.type === 'boolean') {
-        rightValue = rightOperand
-      } else if (propertyDescriptor.type === 'number') {
-        rightValue = Number(rightOperand)
-      } else if (propertyDescriptor.type === 'datetime') {
-        rightValue = new Date(rightOperand).getTime()
-      }
+    const dataTypes: Record<string, string> = {}
+    for (const field of definition.fields) {
+      dataTypes[field.name] = field.type
     }
 
-    const itemFilter = queryParams.filter ? this.makeFilter({
-      dataType: propertyDescriptor.type,
-      filter: queryParams.filter,
-      rightOperand: rightValue
+    const filterChain: (BinaryFilter | TernaryFilter)[] | undefined = this.coerceFilterChainOperands(queryParams.filterChain, dataTypes)
+    let valuesRegex = new RegExp(`^${definition.namespace}${definition.fields.map(p => `:(?<${p.name}>.*)`).join('')}`)
+
+    const itemFilter = filterChain ? this.makeFilter({
+      filterChain,
+      dataTypes
     }) : () => true
 
     await new Promise<void>((resolve, reject) => {
@@ -153,8 +224,8 @@ export class LevelStore implements Store {
 
             this.destroy('limit') //exit by calling destroy with a specific error
           } else {
-            const matcher = valueRegex.exec(data.key)
-            if (!matcher || !itemFilter(matcher[1])) {
+            const matcher = valuesRegex.exec(data.key)
+            if (!matcher || matcher.length !== (definition.fields.length + 1) || !itemFilter(matcher.groups)) {
               return
             }
 
@@ -195,19 +266,19 @@ export class LevelStore implements Store {
     }
   }
 
-  private initIndexes(indexAttributes: Record<string,IndexAttributes>) {
-    for (let name of Object.keys(indexAttributes)) {
+  private initIndexes(indexDefinitions: Record<string,IndexDefinition>) {
+    for (let [name, definition] of Object.entries(indexDefinitions)) {
       if (!this.indexes[name]) {
         this.indexes[name] = { db: this.useMemory ? levelup(encode(memdown(), { valueEncoding: 'json' })) : level(path.join(this.rootPath, `.tina/__generated__/db.index_${name}`), {
           valueEncoding: 'json',
-        }), attributes: indexAttributes[name] }
+        }), definition }
       }
     }
   }
 
-  public async seed(filepath: string, data: object, options?: { indexAttributes?: Record<string,IndexAttributes> }) {
-    if (options?.indexAttributes) {
-      this.initIndexes(options?.indexAttributes)
+  public async seed(filepath: string, data: object, options?: { indexDefinitions?: Record<string,IndexDefinition> }) {
+    if (options?.indexDefinitions) {
+      this.initIndexes(options?.indexDefinitions)
     }
 
     await this.put(filepath, data, { keepTemplateKey: false, ...options })
@@ -284,24 +355,36 @@ export class LevelStore implements Store {
     }
   }
 
-  public async put(filepath: string, data: object, options?: { keepTemplateKey: boolean, indexAttributes?: Record<string,IndexAttributes> } ) {
+  public async put(filepath: string, data: object, options?: { keepTemplateKey: boolean, indexDefinitions?: Record<string,IndexDefinition> } ) {
     await this.db.put(filepath, data)
 
-    if (options?.indexAttributes) {
-      for (let [name, index] of Object.entries(options.indexAttributes)) {
-        const value = index.properties.map(property => {
-          if (data[property.field]) {
-            if (property.type === 'datetime') {
+    if (options?.indexDefinitions) {
+      for (let [name, definition] of Object.entries(options.indexDefinitions)) {
+        const indexedValue = definition.fields.map(field => {
+          if (field.name in data) {
+            if (field.type === 'datetime') {
               // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-              return new Date(data[property.field]).getTime()
+              return new Date(data[field.name]).getTime()
             } else {
-              return String(data[property.field])
+              return String(data[field.name])
             }
           }
-          return property.default || ''
+          return field.default || ''
         }).join(':')
-        // NOTE we append filepath to make entries unique
-        await this.indexes[name].db.put(`${index.namespace}:${value}##${filepath}`, [filepath]) // TODO why is the value an array?
+
+        const key = `${definition.namespace}:${indexedValue}` // This value must be unique for the index
+        await new Promise((resolve, reject) => {
+          this.indexes[name].db.get(key).then(() => {
+            reject(new Error(`Duplicate key error for index '${name}' and key: '${indexedValue}`))
+          }).catch(async (err) => {
+            if (err.name !== 'NotFoundError') {
+              reject(err)
+            } else {
+              await this.indexes[name].db.put(key, [filepath]) // TODO why is the value an array?
+              resolve()
+            }
+          })
+        })
       }
     }
   }

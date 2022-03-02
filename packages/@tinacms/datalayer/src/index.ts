@@ -21,5 +21,7 @@ export {
 } from './database/store/filesystem'
 export { MemoryStore } from './database/store/memory'
 export { LevelStore } from './database/store/level'
-export type { Store, QueryParams, IndexAttributes, TernaryFilter, BinaryFilter } from './database/store'
-export { OP } from './database/store'
+export type { Store, QueryParams, IndexDefinition, TernaryFilter, BinaryFilter } from './database/store'
+export { makeFilterChain, OP, validateQueryParams } from './database/store'
+
+export type ScalarValue = string | number | boolean
