@@ -63,7 +63,7 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
-    const branchData = window.localStorage.getItem('tinacms-current-branch')
+    const branchData = window.localStorage && window.localStorage.getItem('tinacms-current-branch')
     const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {

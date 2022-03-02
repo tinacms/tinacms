@@ -1,0 +1,76 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "page",
+      "blockPage"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PageRelatedPageDocument": {
+    "type": "PageRelatedPageDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
+  },
+  "BlockPageSocialRelatedPageDocument": {
+    "type": "BlockPageSocialRelatedPageDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "BlockPageRelatedPageDocument": {
+    "type": "BlockPageRelatedPageDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "BlockPageBlocksHeroRelationDocument": {
+    "type": "BlockPageBlocksHeroRelationDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "BlockPageBlocks": {
+    "type": "BlockPageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "BlockPageBlocksHero",
+      "cta": "BlockPageBlocksCta"
+    }
+  },
+  "BlockPageDocument": {
+    "type": "BlockPageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "blockPage",
+    "createBlockPageDocument": "create",
+    "updateBlockPageDocument": "update"
+  },
+  "BlockPageConnection": {
+    "type": "BlockPageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "blockPage"
+  }
+}

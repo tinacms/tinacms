@@ -129,7 +129,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
                   to={`/collections/${collection.name}`}
                   className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
                 >
-                  {collection.label}
+                  {collection.label ? collection.label : collection.name}
                 </Link>
                 <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
               </span>

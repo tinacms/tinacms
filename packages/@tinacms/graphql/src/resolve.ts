@@ -34,6 +34,7 @@ import {
 import { createSchema } from './schema'
 import { createResolver } from './resolver'
 import { assertShape } from './util'
+import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
 
 import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
@@ -162,11 +163,37 @@ export const resolve = async ({
             return value
           }
           if (info.fieldName === 'getCollections') {
+            const getCollectionNode = info.fieldNodes.find(
+              (x) => x.name.value === 'getCollections'
+            )
+            const hasDocuments = getCollectionNode.selectionSet.selections.find(
+              (x) => {
+                // @ts-ignore
+                return x?.name?.value === 'documents'
+              }
+            )
             return tinaSchema.getCollections().map((collection) => {
-              return resolver.resolveCollection(collection.name)
+              return resolver.resolveCollection(
+                collection.name,
+                Boolean(hasDocuments)
+              )
             })
           }
-          return resolver.resolveCollection(args.collection)
+
+          // The field is `getCollection`
+          const getCollectionNode = info.fieldNodes.find(
+            (x) => x.name.value === 'getCollection'
+          )
+          const hasDocuments = getCollectionNode.selectionSet.selections.find(
+            (x) => {
+              // @ts-ignore
+              return x?.name?.value === 'documents'
+            }
+          )
+          return resolver.resolveCollection(
+            args.collection,
+            Boolean(hasDocuments)
+          )
         }
 
         /**
@@ -174,6 +201,54 @@ export const resolve = async ({
          */
         if (info.fieldName === 'getDocumentFields') {
           return resolver.getDocumentFields()
+        }
+
+        /**
+         * `getOptimizedQuery`
+         *
+         * Returns a version of the query with fragments inlined. Eg.
+         * ```graphql
+         * {
+         *   getPostDocument(relativePath: "") {
+         *     data {
+         *       ...PostFragment
+         *     }
+         *   }
+         * }
+         *
+         * fragment PostFragment on Post {
+         *   title
+         * }
+         * ```
+         * Turns into
+         * ```graphql
+         * {
+         *   getPostDocument(relativePath: "") {
+         *     data {
+         *       title
+         *     }
+         *   }
+         * }
+         */
+        if (info.fieldName === 'getOptimizedQuery') {
+          try {
+            const [optimizedQuery] = optimizeDocuments(
+              info.schema,
+              [parse(args.queryString)],
+              {
+                assumeValid: true,
+                // Include actually means to keep them as part of the document.
+                // We want to merge them into the query so there's a single top-level node
+                includeFragments: false,
+                noLocation: true,
+              }
+            )
+            return print(optimizedQuery)
+          } catch (e) {
+            throw new Error(
+              `Invalid query provided, Error message: ${e.message}`
+            )
+          }
         }
 
         // We assume the value is already fully resolved

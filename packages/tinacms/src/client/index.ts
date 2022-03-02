@@ -20,9 +20,12 @@ import {
   buildClientSchema,
   getIntrospectionQuery,
   print,
+  parse,
 } from 'graphql'
 
 import { formify } from './formify'
+import { formify as formify2 } from '../hooks/formify'
+
 import gql from 'graphql-tag'
 
 export type TinaIOConfig = {
@@ -179,12 +182,63 @@ mutation addPendingDocumentMutation(
     return this.schema
   }
 
+  /**
+   *
+   * Returns a version of the query with fragments inlined. Eg.
+   * ```graphql
+   * {
+   *   getPostDocument(relativePath: "") {
+   *     data {
+   *       ...PostFragment
+   *     }
+   *   }
+   * }
+   *
+   * fragment PostFragment on Post {
+   *   title
+   * }
+   * ```
+   * Turns into
+   * ```graphql
+   * {
+   *   getPostDocument(relativePath: "") {
+   *     data {
+   *       title
+   *     }
+   *   }
+   * }
+   */
+  getOptimizedQuery = async (documentNode: DocumentNode) => {
+    const data = await this.request<any>(
+      `query GetOptimizedQuery($queryString: String!) {
+        getOptimizedQuery(queryString: $queryString)
+      }`,
+      {
+        variables: { queryString: print(documentNode) },
+      }
+    )
+    return parse(data.getOptimizedQuery)
+  }
+
   async requestWithForm<ReturnType>(
     query: (gqlTag: typeof gql) => DocumentNode,
-    { variables }: { variables }
+    {
+      variables,
+      useUnstableFormify,
+    }: { variables; useUnstableFormify?: boolean }
   ) {
     const schema = await this.getSchema()
-    const formifiedQuery = formify(query(gql), schema)
+    let formifiedQuery
+    if (useUnstableFormify) {
+      const res = await formify2({
+        schema,
+        query: print(query(gql)),
+        getOptimizedQuery: this.getOptimizedQuery,
+      })
+      formifiedQuery = res.formifiedQuery
+    } else {
+      formifiedQuery = formify(query(gql), schema)
+    }
 
     return this.request<ReturnType>(print(formifiedQuery), { variables })
   }
@@ -239,8 +293,8 @@ mutation addPendingDocumentMutation(
     const { access_token, id_token, refresh_token } = JSON.parse(tokens)
     const { exp, iss, client_id } = this.parseJwt(access_token)
 
-    if (Date.now() / 1000 >= exp) {
-      // refresh the token
+    // if the token is going to expire within the next two minutes, refresh it now
+    if (Date.now() / 1000 >= exp - 120) {
       const refreshResponse = await fetch(iss, {
         method: 'POST',
         headers: {

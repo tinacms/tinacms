@@ -1,5 +1,47 @@
 # tinacms
 
+## 0.66.5
+
+### Patch Changes
+
+- 43c834565: Adds an activity indicator throughout Admin
+- 53a4550db: Allows RouteMapping to be dynamically imported
+- 731451bee: Adjust the JWT token refresh logic to refresh tokens _before_ they expire.
+- e102d7438: Updated auth modal to use toolkit button components
+- Updated dependencies [43c834565]
+  - @tinacms/toolkit@0.56.15
+
+## 0.66.4
+
+### Patch Changes
+
+- cc5c8431d: Remove console.log
+- Updated dependencies [af9f6c2c2]
+- Updated dependencies [2e14cda5e]
+- Updated dependencies [3d4c52a19]
+  - @tinacms/toolkit@0.56.14
+
+## 0.66.3
+
+### Patch Changes
+
+- Updated dependencies [e41b709ce]
+  - @tinacms/toolkit@0.56.13
+
+## 0.66.2
+
+### Patch Changes
+
+- 102628c7f: Fixes admin page wrapper scrolling
+- 55cb0c5ec: Updates the relativePath field for clarity
+- 9e77273d2: use collection name as fallback for label
+- Updated dependencies [8c18edd5c]
+- Updated dependencies [0773f6486]
+- Updated dependencies [d8cd60f65]
+- Updated dependencies [9e77273d2]
+- Updated dependencies [63a74aece]
+  - @tinacms/toolkit@0.56.12
+
 ## 0.66.1
 
 ### Patch Changes

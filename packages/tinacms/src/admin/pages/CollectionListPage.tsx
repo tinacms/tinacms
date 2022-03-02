@@ -12,17 +12,18 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiExit } from 'react-icons/bi'
-import { FiMoreVertical } from 'react-icons/fi'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { BiEdit, BiPlus } from 'react-icons/bi'
+import {
+  useParams,
+  Link,
+  useNavigate,
+  NavigateFunction,
+} from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
-
-import type { TinaCMS } from '@tinacms/toolkit'
-
-import type { Collection, Template } from '../types'
+import { TinaCMS } from '@tinacms/toolkit'
+import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 
@@ -71,21 +72,43 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   )
 }
 
+const handleNavigate = (
+  navigate: NavigateFunction,
+  cms: TinaCMS,
+  collection: Collection,
+  document: DocumentSys
+) => {
+  /**
+   * Retrieve the RouteMapping Plugin
+   */
+  const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
+  const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
+
+  /**
+   * Determine if the document has a route mapped
+   */
+  const routeOverride = routeMapping
+    ? routeMapping.mapper(collection, document)
+    : undefined
+
+  /**
+   * Redirect the browser if 'yes', else navigate react-router.
+   */
+  if (routeOverride) {
+    window.location.href = routeOverride
+    return null
+  } else {
+    navigate(document.sys.filename)
+  }
+}
+
 const CollectionListPage = () => {
-  const { collectionName } = useParams()
   const navigate = useNavigate()
+  const { collectionName } = useParams()
 
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
-        /**
-         * Retrieve the Route Mapping Plugin, if any.
-         */
-        const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
-        const routeMapping = plugins.find(
-          ({ name }) => name === 'route-mapping'
-        )
-
         return (
           <GetCollection
             cms={cms}
@@ -102,7 +125,9 @@ const CollectionListPage = () => {
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
                         <h3 className="text-2xl text-gray-700">
-                          {collection.label}
+                          {collection.label
+                            ? collection.label
+                            : collection.name}
                         </h3>
                         {!collection.templates && (
                           <Link
@@ -124,50 +149,33 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
-                                const overrideRoute = routeMapping
-                                  ? routeMapping.mapper(
-                                      collection,
-                                      document.node
-                                    )
-                                  : undefined
                                 return (
                                   <tr
                                     key={`document-${document.node.sys.filename}`}
                                     className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
-                                      {overrideRoute && (
-                                        <a
-                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
-                                          href={`${overrideRoute}`}
-                                        >
-                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                          <span>
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              Filename
-                                            </span>
-                                            <span className="h-5 leading-5 block whitespace-nowrap">
-                                              {document.node.sys.filename}
-                                            </span>
+                                      <a
+                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer"
+                                        onClick={() => {
+                                          handleNavigate(
+                                            navigate,
+                                            cms,
+                                            collection,
+                                            document.node
+                                          )
+                                        }}
+                                      >
+                                        <BiEdit className="inline-block h-6 w-auto opacity-70" />
+                                        <span>
+                                          <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                            Filename
                                           </span>
-                                        </a>
-                                      )}
-                                      {!overrideRoute && (
-                                        <Link
-                                          className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
-                                          to={`${document.node.sys.filename}`}
-                                        >
-                                          <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                          <span>
-                                            <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                              Filename
-                                            </span>
-                                            <span className="h-5 leading-5 block whitespace-nowrap">
-                                              {document.node.sys.filename}
-                                            </span>
+                                          <span className="h-5 leading-5 block whitespace-nowrap">
+                                            {document.node.sys.filename}
                                           </span>
-                                        </Link>
-                                      )}
+                                        </span>
+                                      </a>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
@@ -185,25 +193,6 @@ const CollectionListPage = () => {
                                         {document.node.sys.template}
                                       </span>
                                     </td>
-                                    {/* For now only route-mapped documents need an alternative edit link */}
-                                    {overrideRoute && (
-                                      <td className="w-0">
-                                        <OverflowMenu
-                                          items={[
-                                            {
-                                              label: 'Edit in Admin',
-                                              icon: BiEdit,
-                                              onClick: () => {
-                                                navigate(
-                                                  `${document.node.sys.filename}`,
-                                                  { replace: true }
-                                                )
-                                              },
-                                            },
-                                          ]}
-                                        />
-                                      </td>
-                                    )}
                                   </tr>
                                 )
                               })}
@@ -223,59 +212,60 @@ const CollectionListPage = () => {
   )
 }
 
-const OverflowMenu = ({ items = [] }) => {
-  if (items.length === 0) return null
+// const OverflowMenu = ({ items = [] }) => {
+//   if (items.length === 0) return null
 
-  return (
-    <Menu>
-      {({ open }) => (
-        <div className="relative">
-          <Menu.Button
-            className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
-          >
-            <FiMoreVertical
-              className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
-                open
-                  ? `opacity-100 text-blue-500`
-                  : `opacity-70 group-hover:opacity-100`
-              }`}
-            />
-          </Menu.Button>
-          <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
-            <Transition
-              enter="transition duration-150 ease-out"
-              enterFrom="transform opacity-0 -translate-y-2"
-              enterTo="transform opacity-100 translate-y-0"
-              leave="transition duration-75 ease-in"
-              leaveFrom="transform opacity-100 translate-y-0"
-              leaveTo="transform opacity-0 -translate-y-2"
-            >
-              <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
-                {items.map((item) => {
-                  const Icon = item.icon ? item.icon : BiExit
-                  return (
-                    <Menu.Item key={`menu-item-${item.label}`}>
-                      {({ active }) => (
-                        <button
-                          className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
-                            active && 'text-blue-400 bg-gray-50 opacity-100'
-                          }`}
-                          onClick={item.onClick}
-                        >
-                          <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
-                          {item.label}
-                        </button>
-                      )}
-                    </Menu.Item>
-                  )
-                })}
-              </Menu.Items>
-            </Transition>
-          </div>
-        </div>
-      )}
-    </Menu>
-  )
-}
+//   return (
+//     <Menu>
+//       {({ open }) => (
+//         <div className="relative">
+//           <Menu.Button
+//             className={`flex-1 group px-5 py-3 flex justify-between items-center transition-all duration-300 ease-in-out transform`}
+//           >
+//             <FiMoreVertical
+//               className={`flex-0 w-6 h-full inline-block text-gray-400 transition-all duration-300 ease-in-out transform ${
+//                 open
+//                   ? `opacity-100 text-blue-500`
+//                   : `opacity-70 group-hover:opacity-100`
+//               }`}
+//             />
+//           </Menu.Button>
+//           <div className="transform translate-y-full absolute bottom-2 right-5 z-50">
+//             <Transition
+//               enter="transition duration-150 ease-out"
+//               enterFrom="transform opacity-0 -translate-y-2"
+//               enterTo="transform opacity-100 translate-y-0"
+//               leave="transition duration-75 ease-in"
+//               leaveFrom="transform opacity-100 translate-y-0"
+//               leaveTo="transform opacity-0 -translate-y-2"
+//             >
+//               <Menu.Items className="bg-white border border-gray-150 rounded-lg shadow-lg">
+//                 {items.map((item) => {
+//                   if (!item) return null
+//                   const Icon = item.icon ? item.icon : BiExit
+//                   return (
+//                     <Menu.Item key={`menu-item-${item.label}`}>
+//                       {({ active }) => (
+//                         <button
+//                           className={`w-full text-base px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 ${
+//                             active && 'text-blue-400 bg-gray-50 opacity-100'
+//                           }`}
+//                           onClick={item.onClick}
+//                         >
+//                           <Icon className="w-6 h-auto mr-2 text-blue-400" />{' '}
+//                           {item.label}
+//                         </button>
+//                       )}
+//                     </Menu.Item>
+//                   )
+//                 })}
+//               </Menu.Items>
+//             </Transition>
+//           </div>
+//         </div>
+//       )}
+//     </Menu>
+//   )
+// }
 
 export default CollectionListPage

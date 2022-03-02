@@ -33,6 +33,7 @@ type BaseComponents = {
   code_block?: { lang?: string; children: JSX.Element }
   img?: { url: string; caption?: string; alt?: string }
   hr?: {}
+  maybe_mdx?: { children: JSX.Element }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -90,7 +91,6 @@ export const TinaMarkdown = ({
   }
   const nodes = Array.isArray(content) ? content : content.children
   if (!nodes) {
-    console.log(`Expected to find structured content for TinaMarkdown`)
     return null
   }
   return (
@@ -165,7 +165,7 @@ export const TinaMarkdown = ({
                 // I don't think it's possible to have more than one
                 // child item here
                 // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                return item.children[0].text
+                return item.children[0]?.text || ''
               })
               .join('\n')
             if (components[child.type]) {
@@ -211,6 +211,12 @@ export const TinaMarkdown = ({
                 throw new Error(`No component provided for ${child.name}`)
               }
             }
+          case 'maybe_mdx':
+            /**
+             * We don't want to render this as it's only displayed while editing an mdx node and should
+             * be transformed before form submission
+             */
+            return null
           default:
             // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             if (typeof child.text === 'string') {

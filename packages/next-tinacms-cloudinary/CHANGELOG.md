@@ -1,5 +1,17 @@
 # next-tinacms-cloudinary
 
+## 3.5.9
+
+## 3.5.8
+
+## 3.5.7
+
+## 3.5.6
+
+### Patch Changes
+
+- cdcd49215: fixed a type error
+
 ## 3.5.5
 
 ## 3.5.4

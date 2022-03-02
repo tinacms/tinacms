@@ -14,13 +14,12 @@ limitations under the License.
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
-
-import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
-import { Nav } from '@tinacms/toolkit'
-
-import GetCollections from './GetCollections'
-import type { Collection } from '../types'
 import type { IconType } from 'react-icons/lib'
+
+import { Nav } from '@tinacms/toolkit'
+import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
+
+import { useGetCollections } from './GetCollections'
 
 export const slugify = (text) => {
   return text
@@ -33,37 +32,30 @@ export const slugify = (text) => {
 }
 
 const Sidebar = ({ cms }: { cms: TinaCMS }) => {
+  const collectionsInfo = useGetCollections(cms)
   const screens = cms.plugins.getType<ScreenPlugin>('screen').all()
   return (
-    <GetCollections cms={cms}>
-      {(collections: [Collection], loading: boolean, error: boolean) => (
-        <Nav
-          sidebarWidth={360}
-          showCollections={true}
-          collectionsInfo={{
-            collections,
-            loading,
-            error,
-          }}
-          screens={screens}
-          contentCreators={[]}
-          RenderNavSite={({ view }) => (
-            <SidebarLink
-              label={view.name}
-              to={`screens/${slugify(view.name)}`}
-              Icon={view.Icon ? view.Icon : ImFilesEmpty}
-            />
-          )}
-          RenderNavCollection={({ collection }) => (
-            <SidebarLink
-              label={collection.label}
-              to={`collections/${collection.name}`}
-              Icon={ImFilesEmpty}
-            />
-          )}
+    <Nav
+      sidebarWidth={360}
+      showCollections={true}
+      collectionsInfo={collectionsInfo}
+      screens={screens}
+      contentCreators={[]}
+      RenderNavSite={({ view }) => (
+        <SidebarLink
+          label={view.name}
+          to={`screens/${slugify(view.name)}`}
+          Icon={view.Icon ? view.Icon : ImFilesEmpty}
         />
       )}
-    </GetCollections>
+      RenderNavCollection={({ collection }) => (
+        <SidebarLink
+          label={collection.label ? collection.label : collection.name}
+          to={`collections/${collection.name}`}
+          Icon={ImFilesEmpty}
+        />
+      )}
+    />
   )
 }
 

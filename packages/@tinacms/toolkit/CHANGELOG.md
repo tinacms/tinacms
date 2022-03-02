@@ -1,5 +1,41 @@
 # Change Log
 
+## 0.56.15
+
+### Patch Changes
+
+- 43c834565: Adds an activity indicator throughout Admin
+
+## 0.56.14
+
+### Patch Changes
+
+- af9f6c2c2: Prevents hard navigation away from dirty forms
+- 2e14cda5e: Add visual block selector as optional UI
+- 3d4c52a19: Change the default for rich-text to use the newer version
+
+## 0.56.13
+
+### Patch Changes
+
+- e41b709ce: Fix sidebar position
+
+## 0.56.12
+
+### Patch Changes
+
+- 8c18edd5c: restore event handlers that were detached from most field types
+- 0773f6486: Added filtering to add block menu
+- d8cd60f65: Update rich-text editor with some
+  - Use our own components instead of the out-of-the box ones from Plate
+  - Fix handling focus and selection of block/inline embeds
+  - Fixes inconsistencies with deleting and adding elements for uncollapsed collections
+  - For links, instead of a window prompt to get the value, use a Tina form (like the image field)
+  - Toolbar is now sticky so that it moves down the screen as you scroll
+  - Support for quick action slash command to MDX elements
+- 9e77273d2: use collection name as fallback for label
+- 63a74aece: Fixes form header bug when there's no label
+
 ## 0.56.11
 
 ### Patch Changes

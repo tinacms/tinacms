@@ -50,7 +50,7 @@ const noSDKCodegenOption = {
 const cleanOption = {
   name: '--clean',
   description:
-    'Submit gql mutation to all files to git rid of any data that is not defined in the `schema.ts`',
+    'Updates all content files to remove any data not explicitly permitted by the current schema definition',
 }
 
 const useDefaultValuesOption = {
@@ -61,6 +61,11 @@ const useDefaultValuesOption = {
 const noTelemetryOption = {
   name: '--noTelemetry',
   description: 'Disable anonymous telemetry that is collected',
+}
+const watchFileOption = {
+  name: '-w, --watchFolders [folders...]',
+  description:
+    'a list of folders (relative to where this is being run) that the cli will watch for changes',
 }
 
 export const baseCmds: Command[] = [
@@ -74,6 +79,7 @@ export const baseCmds: Command[] = [
       noWatchOption,
       noSDKCodegenOption,
       noTelemetryOption,
+      watchFileOption,
     ],
     action: (options) => chain([startServer], options),
   },
