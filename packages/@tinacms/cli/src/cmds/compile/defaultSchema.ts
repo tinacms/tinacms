@@ -58,23 +58,22 @@ export const tinaConfig = {
   cmsCallback: (cms) => {
     //  add your CMS callback code here (if you want)
 
-
     // The Route Mapper
     /**
      * 1. Import \`tinacms\` and \`RouteMappingPlugin\`
-    **/
-  import('tinacms').then(({ RouteMappingPlugin }) => {
-
-    /**
-    * 2. Define the \`RouteMappingPlugin\` see https://tina.io/docs/tinacms-context/#the-routemappingplugin for more details
-    **/
-    const RouteMapping = new RouteMappingPlugin(
-      (collection, document) => {
-        return undefined
-      }
-    );
+     **/
+    import("tinacms").then(({ RouteMappingPlugin }) => {
+      /**
+       * 2. Define the \`RouteMappingPlugin\` see https://tina.io/docs/tinacms-context/#the-routemappingplugin for more details
+       **/
+      const RouteMapping = new RouteMappingPlugin((collection, document) => {
+        return undefined;
+      });
+      /**
+       * 3. Add the \`RouteMappingPlugin\` to the \`cms\`.
+       **/
+      cms.plugins.add(RouteMapping);
+    });
   },
-
-}
-
+};
 `
