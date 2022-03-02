@@ -51,7 +51,9 @@ export const indexDB = async ({
     graphQLSchema = await _buildSchema(builder, tinaSchema)
     await database.putConfigFiles({ graphQLSchema, tinaSchema })
   } else {
-    graphQLSchema = JSON.parse(await database.bridge.get('.tina/__generated__/_graphql.json'))
+    graphQLSchema = JSON.parse(
+      await database.bridge.get('.tina/__generated__/_graphql.json')
+    )
   }
   await database.indexContent({ graphQLSchema, tinaSchema })
   if (buildSDK) {
@@ -151,6 +153,20 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
+
+  queryTypeDefinitionFields.push(
+    astBuilder.FieldDefinition({
+      name: 'getOptimizedQuery',
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'queryString',
+          type: astBuilder.TYPES.String,
+          required: true,
+        }),
+      ],
+      type: astBuilder.TYPES.String,
+    })
+  )
 
   /**
    * One-off collection queries

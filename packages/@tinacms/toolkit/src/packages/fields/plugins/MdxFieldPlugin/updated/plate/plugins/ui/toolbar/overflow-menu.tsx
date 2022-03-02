@@ -26,6 +26,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
   return (
     <Popover as="span" className="relative z-10 block w-full">
       <Popover.Button
+        data-test="popoverRichTextButton"
         as="span"
         className={`cursor-pointer relative w-full justify-center inline-flex border border-gray-200 focus:border-blue-500 items-center px-2 py-2 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 pointer-events-auto ${
           showEmbed ? `rounded-none` : `rounded-r-md`
@@ -65,6 +66,7 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
             }
             return (
               <span
+                data-test={`${toolbarItem.name}OverflowButton`}
                 key={toolbarItem.name}
                 onMouseDown={(event) => {
                   event.preventDefault()

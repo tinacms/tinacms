@@ -75,32 +75,23 @@ interface SidebarProps {
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
 const useFetchCollections = (cms) => {
-  const [info, setInfo] = useState<{
-    loading: boolean
-    error: boolean
-    collections: any[]
-  }>({
-    loading: true,
-    error: false,
-    collections: [],
-  })
+  const [collections, setCollections] = useState<any[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchCollections = async () => {
       const response = await cms.api.admin.fetchCollections()
-      setInfo({
-        loading: false,
-        error: false,
-        collections: response.getCollections,
-      })
+      setCollections(response.getCollections)
+      setLoading(false)
     }
 
     if (cms.api.admin) {
+      setLoading(true)
       fetchCollections()
     }
   }, [cms.api.admin])
 
-  return info
+  return { collections, loading }
 }
 
 const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
@@ -119,10 +110,13 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
 
+  const isTinaAdminEnabled =
+    cms.flags.get('tina-admin') === false ? false : true
+
   /**
    * Only show ContentCreators when TinaAdmin is disabled
    */
-  const contentCreators = cms.flags.get('tina-admin')
+  const contentCreators = isTinaAdminEnabled
     ? []
     : cms.plugins.getType('content-creator').all()
 
@@ -190,7 +184,7 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
           <EditButton />
           {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
             <Nav
-              showCollections={cms.flags.get('tina-admin')}
+              showCollections={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
               screens={allScreens}
               contentCreators={contentCreators}
@@ -237,7 +231,7 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
               <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
                   className="rounded-r-md"
-                  showCollections={cms.flags.get('tina-admin')}
+                  showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
                   screens={allScreens}
                   contentCreators={contentCreators}
@@ -403,7 +397,7 @@ const SidebarCollectionLink = ({
   }
 }) => (
   <a
-    href={`/admin/collections/${collection.name}`}
+    href={`/admin#/collections/${collection.name}`}
     className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
   >
     <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}

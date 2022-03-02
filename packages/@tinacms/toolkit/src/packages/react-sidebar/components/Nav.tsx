@@ -35,7 +35,6 @@ interface NavProps {
   collectionsInfo: {
     collections: { label: string; name: string }[]
     loading: boolean
-    error: boolean
   }
   contentCreators?: any
   screens?: ScreenPlugin[]
@@ -173,12 +172,10 @@ export const Nav = ({
 const CollectionsList = ({
   collections,
   loading,
-  error,
   RenderNavCollection,
 }: {
   collections: { label: string; name: string }[]
   loading: boolean
-  error: boolean
   RenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string }
   }>

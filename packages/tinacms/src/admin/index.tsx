@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
@@ -58,15 +58,16 @@ export const TinaAdmin = () => {
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
-        const isTinaAdminEnabled = cms.flags.get('tina-admin')
+        const isTinaAdminEnabled =
+          cms.flags.get('tina-admin') === false ? false : true
 
         if (isTinaAdminEnabled) {
           return (
             <Layout>
-              <Router basename={'/admin'}>
+              <Router>
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <Sidebar cms={cms} />
-                  <div className="flex-1">
+                  <div className="flex-1 relative">
                     <Routes>
                       <Route
                         path="collections/:collectionName/new"
@@ -98,7 +99,7 @@ export const TinaAdmin = () => {
         } else {
           return (
             <Layout>
-              <Router basename={'/admin'}>
+              <Router>
                 <Routes>
                   <Route path="logout" element={<LogoutPage />} />
                   <Route path="/" element={<Redirect />} />

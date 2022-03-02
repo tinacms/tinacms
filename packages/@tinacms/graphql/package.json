@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.59.6",
+  "version": "0.59.7",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -45,6 +45,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",

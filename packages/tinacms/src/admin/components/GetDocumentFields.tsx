@@ -14,6 +14,7 @@ limitations under the License.
 import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
+import LoadingPage from './LoadingPage'
 
 export interface Info {
   collection: Object | undefined
@@ -37,6 +38,7 @@ export const useGetDocumentFields = (
     fields: undefined,
     mutationInfo: undefined,
   })
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
@@ -71,12 +73,14 @@ export const useGetDocumentFields = (
         fields,
         mutationInfo,
       })
+      setLoading(false)
     }
 
+    setLoading(true)
     fetchDocumentFields()
   }, [cms, collectionName])
 
-  return info
+  return { ...info, loading }
 }
 
 const GetDocumentFields = ({
@@ -90,16 +94,15 @@ const GetDocumentFields = ({
   templateName?: string
   children: any
 }) => {
-  const { collection, template, fields, mutationInfo } = useGetDocumentFields(
-    cms,
-    collectionName,
-    templateName
-  )
+  const { collection, template, fields, mutationInfo, loading } =
+    useGetDocumentFields(cms, collectionName, templateName)
 
-  if (!collection) {
-    return null
+  if (!collection || loading) {
+    return <LoadingPage />
   }
-  return <>{children({ collection, template, fields, mutationInfo })}</>
+  return (
+    <>{children({ collection, template, fields, mutationInfo, loading })}</>
+  )
 }
 
 export default GetDocumentFields

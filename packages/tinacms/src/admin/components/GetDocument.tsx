@@ -15,6 +15,7 @@ import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
 import type { DocumentForm } from '../types'
+import LoadingPage from './LoadingPage'
 
 export const useGetDocument = (
   cms: TinaCMS,
@@ -23,18 +24,21 @@ export const useGetDocument = (
 ) => {
   const api = new TinaAdminApi(cms)
   const [document, setDocument] = useState<DocumentForm>(undefined)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchDocument = async () => {
       const response = await api.fetchDocument(collectionName, relativePath)
 
       setDocument(response.getDocument)
+      setLoading(false)
     }
 
+    setLoading(true)
     fetchDocument()
   }, [cms, collectionName, relativePath])
 
-  return document
+  return { document, loading }
 }
 
 const GetDocument = ({
@@ -48,11 +52,15 @@ const GetDocument = ({
   relativePath: string
   children: any
 }) => {
-  const document = useGetDocument(cms, collectionName, relativePath)
-  if (!document) {
-    return null
+  const { document, loading } = useGetDocument(
+    cms,
+    collectionName,
+    relativePath
+  )
+  if (!document || loading) {
+    return <LoadingPage />
   }
-  return <>{children(document)}</>
+  return <>{children(document, loading)}</>
 }
 
 export default GetDocument

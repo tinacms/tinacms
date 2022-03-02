@@ -92,7 +92,7 @@ export const Reference: React.FC<ReferenceProps> = ({
   options,
 }) => {
   const cms = useCMS()
-  const hasTinaAdmin = cms.flags.get('tina-admin')
+  const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
 
   const selectOptions = options || field.options
   return (
@@ -117,13 +117,13 @@ export const Reference: React.FC<ReferenceProps> = ({
         <GetReference cms={cms} id={input.value}>
           {(document) => (
             <a
-              href={`/admin/collections/${
+              href={`/admin#/collections/${
                 document.sys.collection.name
               }/${document.sys.breadcrumbs.join('/')}`}
               className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
             >
               <BiEdit className="h-5 w-auto opacity-80 mr-2" />
-              Edit in Admin
+              Edit in CMS
             </a>
           )}
         </GetReference>

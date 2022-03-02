@@ -1,177 +1,13 @@
 import { defineSchema } from "@tinacms/cli";
-import type { TinaTemplate, TinaField } from "@tinacms/cli";
-
-const iconSchema: TinaField = {
-  type: "object",
-  label: "Icon",
-  name: "icon",
-  fields: [
-    {
-      type: "string",
-      label: "Color",
-      name: "color",
-      options: [
-        {
-          label: "Primary",
-          value: "primary",
-        },
-        {
-          label: "Blue",
-          value: "blue",
-        },
-        {
-          label: "Teal",
-          value: "teal",
-        },
-        {
-          label: "Green",
-          value: "green",
-        },
-        {
-          label: "Red",
-          value: "red",
-        },
-        {
-          label: "Pink",
-          value: "pink",
-        },
-        {
-          label: "Purple",
-          value: "purple",
-        },
-        {
-          label: "Orange",
-          value: "orange",
-        },
-        {
-          label: "Yellow",
-          value: "yellow",
-        },
-      ],
-    },
-    {
-      name: "style",
-      label: "Style",
-      type: "string",
-      options: [
-        {
-          label: "Circle",
-          value: "circle",
-        },
-        {
-          label: "Float",
-          value: "float",
-        },
-      ],
-    },
-    {
-      type: "string",
-      label: "Icon",
-      name: "name",
-      options: [
-        {
-          label: "Random",
-          value: "",
-        },
-        {
-          label: "Aperture",
-          value: "aperture",
-        },
-        {
-          label: "Code Block",
-          value: "code",
-        },
-        {
-          label: "Like",
-          value: "like",
-        },
-        {
-          label: "Map",
-          value: "map",
-        },
-        {
-          label: "Palette",
-          value: "palette",
-        },
-        {
-          label: "Pie Chart",
-          value: "chart",
-        },
-        {
-          label: "Pin",
-          value: "pin",
-        },
-        {
-          label: "Shield",
-          value: "shield",
-        },
-        {
-          label: "Setting Sliders",
-          value: "settings",
-        },
-        {
-          label: "Store",
-          value: "store",
-        },
-        {
-          label: "Tennis Ball",
-          value: "ball",
-        },
-        {
-          label: "Test Tube",
-          value: "tube",
-        },
-        {
-          label: "Trophy",
-          value: "trophy",
-        },
-        {
-          label: "User",
-          value: "user",
-        },
-        {
-          label: "Beer",
-          value: "beer",
-        },
-        {
-          label: "Chat",
-          value: "chat",
-        },
-        {
-          label: "Cloud",
-          value: "cloud",
-        },
-        {
-          label: "Coffee",
-          value: "coffee",
-        },
-        {
-          label: "World",
-          value: "world",
-        },
-        {
-          label: "Tina",
-          value: "tina",
-        },
-      ],
-    },
-  ],
-};
-
-const defaultFeature = {
-  title: "Here's Another Feature",
-  text: "This is where you might talk about the feature, if this wasn't just filler text.",
-  icon: {
-    color: "",
-    style: "float",
-    name: "",
-  },
-};
+import type { TinaTemplate } from "@tinacms/cli";
+import { iconSchema } from "./fields";
+import { defaultFeature } from "../components/actions";
 
 const featureBlockShema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
+    previewSrc: "/blocks/features.png",
     defaultItem: {
       items: [defaultFeature, defaultFeature, defaultFeature],
     },
@@ -218,6 +54,7 @@ const contentBlockSchema: TinaTemplate = {
   name: "content",
   label: "Content",
   ui: {
+    previewSrc: "/blocks/content.png",
     defaultItem: {
       body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.",
     },
@@ -248,6 +85,7 @@ const testimonialBlockSchema: TinaTemplate = {
   name: "testimonial",
   label: "Testimonial",
   ui: {
+    previewSrc: "/blocks/testimonial.png",
     defaultItem: {
       quote:
         "There are only two hard things in Computer Science: cache invalidation and naming things.",
@@ -286,6 +124,7 @@ const heroBlockSchema: TinaTemplate = {
   name: "hero",
   label: "Hero",
   ui: {
+    previewSrc: "/blocks/hero.png",
     defaultItem: {
       tagline: "Here's some text above the other text",
       headline: "This Big Text is Totally Awesome",
@@ -711,6 +550,9 @@ export default defineSchema({
           list: true,
           name: "blocks",
           label: "Sections",
+          ui: {
+            visualSelector: true,
+          },
           templates: [
             heroBlockSchema,
             featureBlockShema,
