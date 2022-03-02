@@ -26,7 +26,7 @@ import {
 import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
-import { TinaProvider, TinaProviderIndex } from './setup-files/tinaProvider'
+import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -79,9 +79,9 @@ const baseDir = process.cwd()
 // TODO: should handle src folder here
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
-const TinaProviderFolder = p.join(baseDir, '.tina', 'components', 'provider')
-const TinaProviderPath = p.join(TinaProviderFolder, '_TinaProvider.js')
-const TinaProviderPathIndex = p.join(TinaProviderFolder, 'index.js')
+const TinaFolder = p.join(baseDir, '.tina')
+const TinaProviderPath = p.join(TinaFolder, 'TinaProvider.js')
+const TinaDynamicProvider = p.join(TinaFolder, 'TinaDynamicProvider.js')
 
 export async function tinaSetup(ctx: any, next: () => void, options) {
   const useingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
@@ -95,13 +95,13 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
 
   // 2. Create a Tina Provider
   if (
-    !fs.pathExistsSync(TinaProviderFolder) &&
+    !fs.pathExistsSync(TinaFolder) &&
     !fs.existsSync(TinaProviderPath) &&
-    !fs.existsSync(TinaProviderPathIndex)
+    !fs.existsSync(TinaDynamicProvider)
   ) {
-    fs.mkdirpSync(TinaProviderFolder)
+    fs.mkdirpSync(TinaFolder)
     fs.writeFileSync(TinaProviderPath, TinaProvider)
-    fs.writeFileSync(TinaProviderPathIndex, TinaProviderIndex)
+    fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
   }
   logger.level = 'info'
 
