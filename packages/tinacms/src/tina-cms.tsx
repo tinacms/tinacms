@@ -63,7 +63,9 @@ class ErrorBoundary extends React.Component {
    * again in the new, hopefully valid, state.
    */
   render() {
-    const branchData = window.localStorage && window.localStorage.getItem('tinacms-current-branch')
+    const branchData =
+      window.localStorage &&
+      window.localStorage.getItem('tinacms-current-branch')
     const hasBranchData = branchData && branchData.length > 0
     // @ts-ignore
     if (this.state.hasError && !this.state.pageRefresh) {
@@ -270,12 +272,16 @@ type QueryProviderProps =
       data?: never
     }
 
+export type TinaCMSProviderDefaultProps = QueryProviderProps &
+  APIProviderProps &
+  BaseProviderProps
+
 export const TinaCMSProvider2 = ({
   query,
   documentCreatorCallback,
   formifyCallback,
   ...props
-}: QueryProviderProps & APIProviderProps & BaseProviderProps) => {
+}: TinaCMSProviderDefaultProps) => {
   const validOldSetup =
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))

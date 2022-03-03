@@ -22,7 +22,8 @@ export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
-import { TinaCMSProvider2 } from './tina-cms'
+import { TinaCMSProvider2, TinaCMSProviderDefaultProps } from './tina-cms'
+export type { TinaCMSProviderDefaultProps }
 export default TinaCMSProvider2
 
 import type {
@@ -42,5 +43,11 @@ export type TinaField = TinaFieldBase
 export type { TinaTemplate }
 
 export const defineSchema = (config: TinaCloudSchema) => {
+  return config
+}
+
+export const defineConfig = (
+  config: Omit<TinaCMSProviderDefaultProps, 'children'>
+) => {
   return config
 }
