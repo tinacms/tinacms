@@ -111,6 +111,7 @@ const RenderForm = ({
             `[${error.name}] UpdateDocument failed: ${error.message}`,
             30 * 1000 // 30 seconds
           )
+          console.error(error)
         }
       },
     })

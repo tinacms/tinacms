@@ -118,6 +118,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
             `[${error.name}] CreateDocument failed: ${error.message}`,
             30 * 1000 // 30 seconds
           )
+          console.error(error)
         }
       },
     })

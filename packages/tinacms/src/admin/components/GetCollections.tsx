@@ -32,6 +32,7 @@ export const useGetCollections = (cms: TinaCMS) => {
           `[${error.name}] GetCollections failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
+        console.error(error)
         setCollections([])
         setError(error)
       }
