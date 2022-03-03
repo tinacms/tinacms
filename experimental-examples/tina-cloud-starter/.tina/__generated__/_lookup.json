@@ -1,0 +1,86 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "posts",
+      "global",
+      "authors",
+      "pages"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostsAuthorDocument": {
+    "type": "PostsAuthorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostsDocument": {
+    "type": "PostsDocument",
+    "resolveType": "collectionDocument",
+    "collection": "posts",
+    "createPostsDocument": "create",
+    "updatePostsDocument": "update"
+  },
+  "PostsConnection": {
+    "type": "PostsConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "posts"
+  },
+  "GlobalDocument": {
+    "type": "GlobalDocument",
+    "resolveType": "collectionDocument",
+    "collection": "global",
+    "createGlobalDocument": "create",
+    "updateGlobalDocument": "update"
+  },
+  "GlobalConnection": {
+    "type": "GlobalConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "global"
+  },
+  "AuthorsDocument": {
+    "type": "AuthorsDocument",
+    "resolveType": "collectionDocument",
+    "collection": "authors",
+    "createAuthorsDocument": "create",
+    "updateAuthorsDocument": "update"
+  },
+  "AuthorsConnection": {
+    "type": "AuthorsConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "authors"
+  },
+  "PagesBlocks": {
+    "type": "PagesBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PagesBlocksHero",
+      "features": "PagesBlocksFeatures",
+      "content": "PagesBlocksContent",
+      "testimonial": "PagesBlocksTestimonial"
+    }
+  },
+  "PagesDocument": {
+    "type": "PagesDocument",
+    "resolveType": "collectionDocument",
+    "collection": "pages",
+    "createPagesDocument": "create",
+    "updatePagesDocument": "update"
+  },
+  "PagesConnection": {
+    "type": "PagesConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "pages"
+  }
+}

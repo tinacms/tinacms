@@ -1,0 +1,1364 @@
+{
+  "version": {
+    "fullVersion": "0.59.7",
+    "major": "0",
+    "minor": "59",
+    "patch": "7"
+  },
+  "meta": {},
+  "collections": [
+    {
+      "label": "Blog Posts",
+      "name": "posts",
+      "path": "content/posts",
+      "format": "mdx",
+      "fields": [
+        {
+          "type": "rich-text",
+          "label": "Body",
+          "name": "_body",
+          "templates": [
+            {
+              "name": "DateTime",
+              "label": "Date & Time",
+              "inline": true,
+              "fields": [
+                {
+                  "name": "format",
+                  "label": "Format",
+                  "type": "string",
+                  "options": [
+                    "utc",
+                    "iso",
+                    "local"
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "DateTime",
+                    "format"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "DateTime"
+              ]
+            },
+            {
+              "name": "BlockQuote",
+              "label": "Block Quote",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "Quote",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "children"
+                  ]
+                },
+                {
+                  "name": "authorName",
+                  "label": "Author",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "authorName"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "BlockQuote"
+              ]
+            },
+            {
+              "name": "NewsletterSignup",
+              "label": "Newsletter Sign Up",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "CTA",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "children"
+                  ]
+                },
+                {
+                  "name": "placeholder",
+                  "label": "Placeholder",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "placeholder"
+                  ]
+                },
+                {
+                  "name": "buttonText",
+                  "label": "Button Text",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "buttonText"
+                  ]
+                },
+                {
+                  "name": "disclaimer",
+                  "label": "Disclaimer",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "disclaimer"
+                  ]
+                }
+              ],
+              "ui": {
+                "defaultItem": {
+                  "placeholder": "Enter your email",
+                  "buttonText": "Notify Me"
+                }
+              },
+              "namespace": [
+                "posts",
+                "_body",
+                "NewsletterSignup"
+              ]
+            }
+          ],
+          "isBody": true,
+          "namespace": [
+            "posts",
+            "_body"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "posts",
+            "title"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "authors"
+          ],
+          "namespace": [
+            "posts",
+            "author"
+          ]
+        },
+        {
+          "type": "datetime",
+          "label": "Posted Date",
+          "name": "date",
+          "ui": {
+            "dateFormat": "MMMM DD YYYY",
+            "timeFormat": "hh:mm A"
+          },
+          "namespace": [
+            "posts",
+            "date"
+          ]
+        },
+        {
+          "type": "image",
+          "name": "heroImg",
+          "label": "Hero Image",
+          "namespace": [
+            "posts",
+            "heroImg"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Excerpt",
+          "ui": {
+            "component": "textarea"
+          },
+          "name": "excerpt",
+          "namespace": [
+            "posts",
+            "excerpt"
+          ]
+        }
+      ],
+      "namespace": [
+        "posts"
+      ]
+    },
+    {
+      "label": "Global",
+      "name": "global",
+      "path": "content/global",
+      "format": "json",
+      "fields": [
+        {
+          "type": "object",
+          "label": "Header",
+          "name": "header",
+          "fields": [
+            {
+              "type": "object",
+              "label": "Icon",
+              "name": "icon",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Color",
+                  "name": "color",
+                  "options": [
+                    {
+                      "label": "Primary",
+                      "value": "primary"
+                    },
+                    {
+                      "label": "Blue",
+                      "value": "blue"
+                    },
+                    {
+                      "label": "Teal",
+                      "value": "teal"
+                    },
+                    {
+                      "label": "Green",
+                      "value": "green"
+                    },
+                    {
+                      "label": "Red",
+                      "value": "red"
+                    },
+                    {
+                      "label": "Pink",
+                      "value": "pink"
+                    },
+                    {
+                      "label": "Purple",
+                      "value": "purple"
+                    },
+                    {
+                      "label": "Orange",
+                      "value": "orange"
+                    },
+                    {
+                      "label": "Yellow",
+                      "value": "yellow"
+                    }
+                  ],
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "color"
+                  ]
+                },
+                {
+                  "name": "style",
+                  "label": "Style",
+                  "type": "string",
+                  "options": [
+                    {
+                      "label": "Circle",
+                      "value": "circle"
+                    },
+                    {
+                      "label": "Float",
+                      "value": "float"
+                    }
+                  ],
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "style"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Icon",
+                  "name": "name",
+                  "options": [
+                    {
+                      "label": "Random",
+                      "value": ""
+                    },
+                    {
+                      "label": "Aperture",
+                      "value": "aperture"
+                    },
+                    {
+                      "label": "Code Block",
+                      "value": "code"
+                    },
+                    {
+                      "label": "Like",
+                      "value": "like"
+                    },
+                    {
+                      "label": "Map",
+                      "value": "map"
+                    },
+                    {
+                      "label": "Palette",
+                      "value": "palette"
+                    },
+                    {
+                      "label": "Pie Chart",
+                      "value": "chart"
+                    },
+                    {
+                      "label": "Pin",
+                      "value": "pin"
+                    },
+                    {
+                      "label": "Shield",
+                      "value": "shield"
+                    },
+                    {
+                      "label": "Setting Sliders",
+                      "value": "settings"
+                    },
+                    {
+                      "label": "Store",
+                      "value": "store"
+                    },
+                    {
+                      "label": "Tennis Ball",
+                      "value": "ball"
+                    },
+                    {
+                      "label": "Test Tube",
+                      "value": "tube"
+                    },
+                    {
+                      "label": "Trophy",
+                      "value": "trophy"
+                    },
+                    {
+                      "label": "User",
+                      "value": "user"
+                    },
+                    {
+                      "label": "Beer",
+                      "value": "beer"
+                    },
+                    {
+                      "label": "Chat",
+                      "value": "chat"
+                    },
+                    {
+                      "label": "Cloud",
+                      "value": "cloud"
+                    },
+                    {
+                      "label": "Coffee",
+                      "value": "coffee"
+                    },
+                    {
+                      "label": "World",
+                      "value": "world"
+                    },
+                    {
+                      "label": "Tina",
+                      "value": "tina"
+                    }
+                  ],
+                  "namespace": [
+                    "global",
+                    "header",
+                    "icon",
+                    "name"
+                  ]
+                }
+              ],
+              "namespace": [
+                "global",
+                "header",
+                "icon"
+              ]
+            },
+            {
+              "type": "string",
+              "label": "Color",
+              "name": "color",
+              "options": [
+                {
+                  "label": "Default",
+                  "value": "default"
+                },
+                {
+                  "label": "Primary",
+                  "value": "primary"
+                }
+              ],
+              "namespace": [
+                "global",
+                "header",
+                "color"
+              ]
+            },
+            {
+              "type": "object",
+              "label": "Nav Links",
+              "name": "nav",
+              "list": true,
+              "ui": {
+                "defaultItem": {
+                  "href": "home",
+                  "label": "Home"
+                }
+              },
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Link",
+                  "name": "href",
+                  "namespace": [
+                    "global",
+                    "header",
+                    "nav",
+                    "href"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Label",
+                  "name": "label",
+                  "namespace": [
+                    "global",
+                    "header",
+                    "nav",
+                    "label"
+                  ]
+                }
+              ],
+              "namespace": [
+                "global",
+                "header",
+                "nav"
+              ]
+            }
+          ],
+          "namespace": [
+            "global",
+            "header"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Footer",
+          "name": "footer",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Color",
+              "name": "color",
+              "options": [
+                {
+                  "label": "Default",
+                  "value": "default"
+                },
+                {
+                  "label": "Primary",
+                  "value": "primary"
+                }
+              ],
+              "namespace": [
+                "global",
+                "footer",
+                "color"
+              ]
+            },
+            {
+              "type": "object",
+              "label": "Social Links",
+              "name": "social",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Facebook",
+                  "name": "facebook",
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "facebook"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Twitter",
+                  "name": "twitter",
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "twitter"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Instagram",
+                  "name": "instagram",
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "instagram"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Github",
+                  "name": "github",
+                  "namespace": [
+                    "global",
+                    "footer",
+                    "social",
+                    "github"
+                  ]
+                }
+              ],
+              "namespace": [
+                "global",
+                "footer",
+                "social"
+              ]
+            }
+          ],
+          "namespace": [
+            "global",
+            "footer"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Theme",
+          "name": "theme",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Primary Color",
+              "name": "color",
+              "options": [
+                {
+                  "label": "Blue",
+                  "value": "blue"
+                },
+                {
+                  "label": "Teal",
+                  "value": "teal"
+                },
+                {
+                  "label": "Green",
+                  "value": "green"
+                },
+                {
+                  "label": "Red",
+                  "value": "red"
+                },
+                {
+                  "label": "Pink",
+                  "value": "pink"
+                },
+                {
+                  "label": "Purple",
+                  "value": "purple"
+                },
+                {
+                  "label": "Orange",
+                  "value": "orange"
+                },
+                {
+                  "label": "Yellow",
+                  "value": "yellow"
+                }
+              ],
+              "namespace": [
+                "global",
+                "theme",
+                "color"
+              ]
+            },
+            {
+              "type": "string",
+              "name": "font",
+              "label": "Font Family",
+              "options": [
+                {
+                  "label": "System Sans",
+                  "value": "sans"
+                },
+                {
+                  "label": "Nunito",
+                  "value": "nunito"
+                },
+                {
+                  "label": "Lato",
+                  "value": "lato"
+                }
+              ],
+              "namespace": [
+                "global",
+                "theme",
+                "font"
+              ]
+            },
+            {
+              "type": "string",
+              "name": "icon",
+              "label": "Icon Set",
+              "options": [
+                {
+                  "label": "Boxicons",
+                  "value": "boxicon"
+                },
+                {
+                  "label": "Heroicons",
+                  "value": "heroicon"
+                }
+              ],
+              "namespace": [
+                "global",
+                "theme",
+                "icon"
+              ]
+            },
+            {
+              "type": "string",
+              "name": "darkMode",
+              "label": "Dark Mode",
+              "options": [
+                {
+                  "label": "System",
+                  "value": "system"
+                },
+                {
+                  "label": "Light",
+                  "value": "light"
+                },
+                {
+                  "label": "Dark",
+                  "value": "dark"
+                }
+              ],
+              "namespace": [
+                "global",
+                "theme",
+                "darkMode"
+              ]
+            }
+          ],
+          "namespace": [
+            "global",
+            "theme"
+          ]
+        }
+      ],
+      "namespace": [
+        "global"
+      ]
+    },
+    {
+      "label": "Authors",
+      "name": "authors",
+      "path": "content/authors",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "authors",
+            "name"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Avatar",
+          "name": "avatar",
+          "namespace": [
+            "authors",
+            "avatar"
+          ]
+        }
+      ],
+      "namespace": [
+        "authors"
+      ]
+    },
+    {
+      "label": "Pages",
+      "name": "pages",
+      "path": "content/pages",
+      "fields": [
+        {
+          "type": "object",
+          "list": true,
+          "name": "blocks",
+          "label": "Sections",
+          "ui": {
+            "visualSelector": true
+          },
+          "templates": [
+            {
+              "name": "hero",
+              "label": "Hero",
+              "ui": {
+                "previewSrc": "/blocks/hero.png",
+                "defaultItem": {
+                  "tagline": "Here's some text above the other text",
+                  "headline": "This Big Text is Totally Awesome",
+                  "text": "Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo."
+                }
+              },
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Tagline",
+                  "name": "tagline",
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "tagline"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Headline",
+                  "name": "headline",
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "headline"
+                  ]
+                },
+                {
+                  "label": "Text",
+                  "name": "text",
+                  "type": "string",
+                  "ui": {
+                    "component": "markdown"
+                  },
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "text"
+                  ]
+                },
+                {
+                  "label": "Actions",
+                  "name": "actions",
+                  "type": "object",
+                  "list": true,
+                  "ui": {
+                    "defaultItem": {
+                      "label": "Action Label",
+                      "type": "button",
+                      "icon": true,
+                      "link": "/"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "label": "Label",
+                      "name": "label",
+                      "type": "string",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "label"
+                      ]
+                    },
+                    {
+                      "label": "Type",
+                      "name": "type",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Button",
+                          "value": "button"
+                        },
+                        {
+                          "label": "Link",
+                          "value": "link"
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "type"
+                      ]
+                    },
+                    {
+                      "label": "Icon",
+                      "name": "icon",
+                      "type": "boolean",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "icon"
+                      ]
+                    },
+                    {
+                      "label": "Link",
+                      "name": "link",
+                      "type": "string",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "link"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "actions"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "label": "Image",
+                  "name": "image",
+                  "fields": [
+                    {
+                      "name": "src",
+                      "label": "Image Source",
+                      "type": "image",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "image",
+                        "src"
+                      ]
+                    },
+                    {
+                      "name": "alt",
+                      "label": "Alt Text",
+                      "type": "string",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "image",
+                        "alt"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "image"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Color",
+                  "name": "color",
+                  "options": [
+                    {
+                      "label": "Default",
+                      "value": "default"
+                    },
+                    {
+                      "label": "Tint",
+                      "value": "tint"
+                    },
+                    {
+                      "label": "Primary",
+                      "value": "primary"
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "color"
+                  ]
+                }
+              ],
+              "namespace": [
+                "pages",
+                "blocks",
+                "hero"
+              ]
+            },
+            {
+              "name": "features",
+              "label": "Features",
+              "ui": {
+                "previewSrc": "/blocks/features.png",
+                "defaultItem": {
+                  "items": [
+                    {
+                      "title": "Here's Another Feature",
+                      "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                      "icon": {
+                        "color": "",
+                        "style": "float",
+                        "name": ""
+                      }
+                    },
+                    {
+                      "title": "Here's Another Feature",
+                      "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                      "icon": {
+                        "color": "",
+                        "style": "float",
+                        "name": ""
+                      }
+                    },
+                    {
+                      "title": "Here's Another Feature",
+                      "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                      "icon": {
+                        "color": "",
+                        "style": "float",
+                        "name": ""
+                      }
+                    }
+                  ]
+                }
+              },
+              "fields": [
+                {
+                  "type": "object",
+                  "label": "Feature Items",
+                  "name": "items",
+                  "list": true,
+                  "ui": {
+                    "defaultItem": {
+                      "title": "Here's Another Feature",
+                      "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                      "icon": {
+                        "color": "",
+                        "style": "float",
+                        "name": ""
+                      }
+                    }
+                  },
+                  "fields": [
+                    {
+                      "type": "object",
+                      "label": "Icon",
+                      "name": "icon",
+                      "fields": [
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            },
+                            {
+                              "label": "Blue",
+                              "value": "blue"
+                            },
+                            {
+                              "label": "Teal",
+                              "value": "teal"
+                            },
+                            {
+                              "label": "Green",
+                              "value": "green"
+                            },
+                            {
+                              "label": "Red",
+                              "value": "red"
+                            },
+                            {
+                              "label": "Pink",
+                              "value": "pink"
+                            },
+                            {
+                              "label": "Purple",
+                              "value": "purple"
+                            },
+                            {
+                              "label": "Orange",
+                              "value": "orange"
+                            },
+                            {
+                              "label": "Yellow",
+                              "value": "yellow"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "features",
+                            "items",
+                            "icon",
+                            "color"
+                          ]
+                        },
+                        {
+                          "name": "style",
+                          "label": "Style",
+                          "type": "string",
+                          "options": [
+                            {
+                              "label": "Circle",
+                              "value": "circle"
+                            },
+                            {
+                              "label": "Float",
+                              "value": "float"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "features",
+                            "items",
+                            "icon",
+                            "style"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Icon",
+                          "name": "name",
+                          "options": [
+                            {
+                              "label": "Random",
+                              "value": ""
+                            },
+                            {
+                              "label": "Aperture",
+                              "value": "aperture"
+                            },
+                            {
+                              "label": "Code Block",
+                              "value": "code"
+                            },
+                            {
+                              "label": "Like",
+                              "value": "like"
+                            },
+                            {
+                              "label": "Map",
+                              "value": "map"
+                            },
+                            {
+                              "label": "Palette",
+                              "value": "palette"
+                            },
+                            {
+                              "label": "Pie Chart",
+                              "value": "chart"
+                            },
+                            {
+                              "label": "Pin",
+                              "value": "pin"
+                            },
+                            {
+                              "label": "Shield",
+                              "value": "shield"
+                            },
+                            {
+                              "label": "Setting Sliders",
+                              "value": "settings"
+                            },
+                            {
+                              "label": "Store",
+                              "value": "store"
+                            },
+                            {
+                              "label": "Tennis Ball",
+                              "value": "ball"
+                            },
+                            {
+                              "label": "Test Tube",
+                              "value": "tube"
+                            },
+                            {
+                              "label": "Trophy",
+                              "value": "trophy"
+                            },
+                            {
+                              "label": "User",
+                              "value": "user"
+                            },
+                            {
+                              "label": "Beer",
+                              "value": "beer"
+                            },
+                            {
+                              "label": "Chat",
+                              "value": "chat"
+                            },
+                            {
+                              "label": "Cloud",
+                              "value": "cloud"
+                            },
+                            {
+                              "label": "Coffee",
+                              "value": "coffee"
+                            },
+                            {
+                              "label": "World",
+                              "value": "world"
+                            },
+                            {
+                              "label": "Tina",
+                              "value": "tina"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "features",
+                            "items",
+                            "icon",
+                            "name"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "features",
+                        "items",
+                        "icon"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "label": "Title",
+                      "name": "title",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "features",
+                        "items",
+                        "title"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "label": "Text",
+                      "name": "text",
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "features",
+                        "items",
+                        "text"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "features",
+                    "items"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Color",
+                  "name": "color",
+                  "options": [
+                    {
+                      "label": "Default",
+                      "value": "default"
+                    },
+                    {
+                      "label": "Tint",
+                      "value": "tint"
+                    },
+                    {
+                      "label": "Primary",
+                      "value": "primary"
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "features",
+                    "color"
+                  ]
+                }
+              ],
+              "namespace": [
+                "pages",
+                "blocks",
+                "features"
+              ]
+            },
+            {
+              "name": "content",
+              "label": "Content",
+              "ui": {
+                "previewSrc": "/blocks/content.png",
+                "defaultItem": {
+                  "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede."
+                }
+              },
+              "fields": [
+                {
+                  "type": "string",
+                  "ui": {
+                    "component": "textarea"
+                  },
+                  "label": "Body",
+                  "name": "body",
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "content",
+                    "body"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Color",
+                  "name": "color",
+                  "options": [
+                    {
+                      "label": "Default",
+                      "value": "default"
+                    },
+                    {
+                      "label": "Tint",
+                      "value": "tint"
+                    },
+                    {
+                      "label": "Primary",
+                      "value": "primary"
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "content",
+                    "color"
+                  ]
+                }
+              ],
+              "namespace": [
+                "pages",
+                "blocks",
+                "content"
+              ]
+            },
+            {
+              "name": "testimonial",
+              "label": "Testimonial",
+              "ui": {
+                "previewSrc": "/blocks/testimonial.png",
+                "defaultItem": {
+                  "quote": "There are only two hard things in Computer Science: cache invalidation and naming things.",
+                  "author": "Phil Karlton",
+                  "color": "primary"
+                }
+              },
+              "fields": [
+                {
+                  "type": "string",
+                  "ui": {
+                    "component": "textarea"
+                  },
+                  "label": "Quote",
+                  "name": "quote",
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "quote"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Author",
+                  "name": "author",
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "author"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Color",
+                  "name": "color",
+                  "options": [
+                    {
+                      "label": "Default",
+                      "value": "default"
+                    },
+                    {
+                      "label": "Tint",
+                      "value": "tint"
+                    },
+                    {
+                      "label": "Primary",
+                      "value": "primary"
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "testimonial",
+                    "color"
+                  ]
+                }
+              ],
+              "namespace": [
+                "pages",
+                "blocks",
+                "testimonial"
+              ]
+            }
+          ],
+          "namespace": [
+            "pages",
+            "blocks"
+          ]
+        }
+      ],
+      "namespace": [
+        "pages"
+      ]
+    }
+  ]
+}
