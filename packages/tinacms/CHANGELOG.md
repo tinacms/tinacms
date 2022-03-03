@@ -1,5 +1,24 @@
 # tinacms
 
+## 0.66.6
+
+### Patch Changes
+
+- becff2a0b: Adds define schema to the `tinacms` package (instead of `@tinacms/cli`. This is done in preparation of the extending tina work)
+- ae1a5a58f: Sets `tina-admin` to default to `true`
+- 3ed4c8727: Add flag for experimental new formify logic
+- 5535a9970: Switches to using HashRouter for Admin
+- 3ff1de06a: Upgrade to Tailwind 3
+- fbdb7be01: Adds a defineConfig function to allow type hints for the tinacms config
+- 24f8b057f: Handles errors better in the CMS
+- Updated dependencies [ae1a5a58f]
+- Updated dependencies [5535a9970]
+- Updated dependencies [3ff1de06a]
+- Updated dependencies [022ccd389]
+- Updated dependencies [24f8b057f]
+  - @tinacms/toolkit@0.56.16
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.66.5
 
 ### Patch Changes
