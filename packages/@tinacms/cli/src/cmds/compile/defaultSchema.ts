@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 export const defaultSchema = `
-import { defineSchema } from "tinacms";
+import { defineSchema, defineConfig } from "tinacms";
 
 export default defineSchema({
   collections: [
@@ -53,7 +53,7 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : \`https://content.tinajs.io/content/\${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/\${branch}\`
 
-export const tinaConfig = {
+export const tinaConfig = defineConfig({
   apiURL,
   cmsCallback: (cms) => {
     //  add your CMS callback code here (if you want)
@@ -75,5 +75,5 @@ export const tinaConfig = {
       cms.plugins.add(RouteMapping);
     });
   },
-};
+});
 `
