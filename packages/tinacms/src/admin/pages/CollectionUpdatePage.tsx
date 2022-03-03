@@ -97,14 +97,22 @@ const RenderForm = ({
       fields: document.form.fields,
       initialValues: document.values,
       onSubmit: async (values) => {
-        await updateDocument(
-          cms,
-          relativePath,
-          collection,
-          mutationInfo,
-          values
-        )
-        navigate(`/collections/${collection.name}`)
+        try {
+          await updateDocument(
+            cms,
+            relativePath,
+            collection,
+            mutationInfo,
+            values
+          )
+          navigate(`/collections/${collection.name}`)
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] UpdateDocument failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          console.error(error)
+        }
       },
     })
   }, [cms, document, relativePath, collection, mutationInfo])
