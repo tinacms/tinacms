@@ -50,28 +50,21 @@ const PlaceholderParagraph = styled.p`
 function createPlaceholder(name: string, pr: string) {
   return (props: any) => {
     return (
-      <FieldMeta name={props.input.name} label={`Deprecated: ${name} Field`}>
+      <FieldMeta name={props.input.name} label={`${name} Field not Registered`}>
         <PlaceholderParagraph>
-          In order to help improve bundle sizes the {name} Field has been
-          removed from the set of default fields.
+          The {name} field is not registered. Some built-in field types are not
+          bundled by default in an effort to control bundle size. Consult the
+          Tina docs to learn how to use this field type.
         </PlaceholderParagraph>
         <PlaceholderParagraph>
-          See the docs to learn how to{' '}
           <a
-            href="https://tinacms.org/docs/cms/plugins#adding-plugins"
+            style={{ textDecoration: 'underline' }}
+            href="https://tina.io/docs/editing/markdown/#registering-the-field-plugins"
             target="_blank"
             rel="noreferrer noopener"
           >
-            add the {name} plugin
-          </a>{' '}
-          to your CMS.
-        </PlaceholderParagraph>
-        <PlaceholderParagraph>
-          Visit the{' '}
-          <a href={pr} target="_blank" rel="noreferrer noopener">
-            Pull Request
-          </a>{' '}
-          to learn more about why this change was made.
+            Tina docs: Registering Field Plugins
+          </a>
         </PlaceholderParagraph>
       </FieldMeta>
     )
