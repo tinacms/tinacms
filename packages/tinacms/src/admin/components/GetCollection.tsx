@@ -42,6 +42,7 @@ export const useGetCollection = (
           `[${error.name}] GetCollection failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
+        console.error(error)
         setCollection(undefined)
         setError(error)
       }

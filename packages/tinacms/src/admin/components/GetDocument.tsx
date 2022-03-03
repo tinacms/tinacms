@@ -37,6 +37,7 @@ export const useGetDocument = (
           `[${error.name}] GetDocument failed: ${error.message}`,
           30 * 1000 // 30 seconds
         )
+        console.error(error)
         setDocument(undefined)
         setError(error)
       }
