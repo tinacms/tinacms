@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.56.16
+
+### Patch Changes
+
+- ae1a5a58f: Sets `tina-admin` to default to `true`
+- 5535a9970: Switches to using HashRouter for Admin
+- 3ff1de06a: Upgrade to Tailwind 3
+- 022ccd389: fix: allow multiword tags
+- 24f8b057f: Handles errors better in the CMS
+  - @tinacms/sharedctx@0.1.0
+
 ## 0.56.15
 
 ### Patch Changes

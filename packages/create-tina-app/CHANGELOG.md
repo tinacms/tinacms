@@ -1,5 +1,12 @@
 # create-tina-app
 
+## 0.1.5
+
+### Patch Changes
+
+- 9f609eb09: Warn user when using node version 15
+  - @tinacms/metrics@0.0.2
+
 ## 0.1.4
 
 ### Patch Changes

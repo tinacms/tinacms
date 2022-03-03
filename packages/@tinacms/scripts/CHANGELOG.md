@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.50.7
+
+### Patch Changes
+
+- 3ff1de06a: Upgrade to Tailwind 3
+
 ## 0.50.6
 
 ### Patch Changes
