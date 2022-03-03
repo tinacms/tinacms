@@ -63,7 +63,7 @@ function createPlaceholder(name: string, pr: string) {
             target="_blank"
             rel="noreferrer noopener"
           >
-            Tina docs: Registering Field Plugins
+            Tina Docs: Registering Field Plugins
           </a>
         </PlaceholderParagraph>
       </FieldMeta>
