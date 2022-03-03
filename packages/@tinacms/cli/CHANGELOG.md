@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 0.60.7
+
+### Patch Changes
+
+- 9e436f145: Update CLI to use defineConfig
+- 851e4be73: Update tina init to use the new way of laying out tina config
+- cc99e4309: update admin file path to /pages/admin.js to support the hash router
+  - @tinacms/datalayer@0.0.2
+  - @tinacms/graphql@0.59.7
+  - @tinacms/metrics@0.0.2
+
 ## 0.60.6
 
 ### Patch Changes
