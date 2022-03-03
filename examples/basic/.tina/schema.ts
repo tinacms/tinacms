@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineSchema } from 'tinacms'
+import { defineSchema, defineConfig } from 'tinacms'
 
 export default defineSchema({
   collections: [
@@ -119,9 +119,10 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
-export const tinaConfig = {
+export const tinaConfig = defineConfig({
   apiURL,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
+    return cms
   },
-}
+})
