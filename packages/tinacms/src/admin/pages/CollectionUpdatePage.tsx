@@ -105,6 +105,10 @@ const RenderForm = ({
             mutationInfo,
             values
           )
+          cms.alerts.success(
+            'Document Updated!',
+            30 * 1000 // 30 seconds
+          )
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] UpdateDocument failed: ${error.message}`,
