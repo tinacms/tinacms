@@ -29,16 +29,14 @@ export const E_CONFIG = new MediaListError({
   title: 'Missing Credentials',
   message:
     'Unable to connect to Cloudinary because one or more environment variables are missing.',
-  docsLink:
-    'https://tina.io/packages/next-tinacms-cloudinary/#connect-with-cloudinary',
+  docsLink: 'https://tina.io/docs/media-cloudinary/',
 })
 
 export const E_KEY_FAIL = new MediaListError({
   title: 'Bad Credentials',
   message:
     'Unable to connect to Cloudinary because one or more environment variables are misconfigured.',
-  docsLink:
-    'https://tina.io/packages/next-tinacms-cloudinary/#connect-with-cloudinary',
+  docsLink: 'https://tina.io/docs/media-cloudinary/',
 })
 
 export const E_BAD_ROUTE = new MediaListError({
