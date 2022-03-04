@@ -112,10 +112,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
       onSubmit: async (values) => {
         try {
           await createDocument(cms, collection, template, mutationInfo, values)
-          cms.alerts.success(
-            'Document Created!',
-            30 * 1000 // 30 seconds
-          )
+          cms.alerts.success('Document created!')
           navigate(`/collections/${collection.name}`)
         } catch (error) {
           cms.alerts.error(
