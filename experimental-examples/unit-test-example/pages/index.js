@@ -50,6 +50,12 @@ query {
           blogs {
             item {
               ...on PostDocument {
+                sys {
+                  filename
+                  collection {
+                    name
+                  }
+                }
                 data {
                   title
                 }
