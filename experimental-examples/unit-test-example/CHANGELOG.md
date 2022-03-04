@@ -1,6 +1,14 @@
 # kitchen-sink
 
 ## null
+
+### Patch Changes
+
+- Updated dependencies [bfada9a09]
+  - tinacms@0.66.7
+
+## null
+
 ### Patch Changes
 
 - Updated dependencies [becff2a0b]
