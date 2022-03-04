@@ -105,7 +105,6 @@ const RenderForm = ({
             mutationInfo,
             values
           )
-          navigate(`/collections/${collection.name}`)
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] UpdateDocument failed: ${error.message}`,
