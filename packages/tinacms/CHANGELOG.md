@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.66.7
+
+### Patch Changes
+
+- bfada9a09: Used success messaging when creating/updating a Document in the CMS
+
 ## 0.66.6
 
 ### Patch Changes
