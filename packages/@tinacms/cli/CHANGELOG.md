@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.60.8
+
+### Patch Changes
+
+- 919f5cb6c: use standard next script names
+
 ## 0.60.7
 
 ### Patch Changes
