@@ -1,5 +1,5 @@
 export function generateGqlScript(scriptValue) {
-  return `yarn tinacms server:start -c "${scriptValue}"`
+  return `tinacms server:start -c "${scriptValue}"`
 }
 
 export function extendNextScripts(scripts) {

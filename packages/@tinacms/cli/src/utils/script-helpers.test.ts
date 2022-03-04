@@ -20,9 +20,9 @@ import { generateGqlScript, extendNextScripts } from './script-helpers'
 
 describe('generateGqlScript', () => {
   it('wraps original script correctly', () => {
-    const newScript = generateGqlScript('yarn dev -p 3000')
+    const newScript = generateGqlScript('next dev -p 3000')
 
-    expect(newScript).toEqual('yarn tinacms server:start -c "yarn dev -p 3000"')
+    expect(newScript).toEqual('tinacms server:start -c "next dev -p 3000"')
   })
 })
 
@@ -38,9 +38,9 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'yarn tinacms server:start -c "next dev -p 3000"',
-        build: 'yarn tinacms server:start -c "next build -p 3000"',
-        start: 'yarn tinacms server:start -c "next start -p 3000"',
+        dev: 'tinacms server:start -c "next dev -p 3000"',
+        build: 'tinacms server:start -c "next build -p 3000"',
+        start: 'tinacms server:start -c "next start -p 3000"',
       })
     })
   })
@@ -53,9 +53,9 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'yarn tinacms server:start -c "next dev"',
-        build: 'yarn tinacms server:start -c "next build"',
-        start: 'yarn tinacms server:start -c "next start"',
+        dev: 'tinacms server:start -c "next dev"',
+        build: 'tinacms server:start -c "next build"',
+        start: 'tinacms server:start -c "next start"',
       })
     })
   })
