@@ -27,7 +27,6 @@ import type {
   DocumentBlueprint,
   State,
 } from './types'
-import { date } from 'yup/lib/locale'
 
 export { formify }
 
@@ -130,27 +129,67 @@ export const useFormify = ({
   }, [state.status])
 
   /**
-   * Once the query has been formified, add
-   * formNodes to the state, which
-   * represent the combination of a document blueprint and form
+   * Once the query has been formified, add formNodes to state
+   * which represent the combination of a document blueprint and form
+   *
+   * For the given _formified_ query and result, we have a few form nodes:
+   *
+   * Query:
+   * {
+   *   getPostDocument {
+   *     data {
+   *       title
+   *       author {
+   *         ...on AuthorDocument {
+   *           data {
+   *             name
+   *           }
+   *         }
+   *       }
+   *     }
+   *   }
+   * }
+   *
+   * Result
+   * {
+   *   "getPostDocument": {
+   *     "id": "content/posts/post1.mdx"
+   *     "data": {
+   *       "author": {
+   *         "id": "content/authors/author1.mdx"
+   *         "data": {
+   *           "name": "Author One"
+   *         }
+   *       }
+   *     }
+   *   }
+   * }
+   *
+   * We'd have 2 formNodes:
+   * # getPostDocument with the document "content/posts/post1.mdx"
+   * # getPostDocument.data.author with the document "content/authors/author1.mdx"
+   *
    */
   React.useEffect(() => {
     const run = async () => {
-      const meh = await cms.api.tina.request(G.print(state.query), {
+      const result = await cms.api.tina.request(G.print(state.query), {
         variables,
       })
 
       state.blueprints.map((blueprint) => {
-        const response = util.getIn2<FormifiedDocumentNode>(
-          meh,
+        const responseAtBlueprint = util.getIn2<FormifiedDocumentNode>(
+          result,
           util.getBlueprintAliasPath(blueprint)
         )
         const location = []
-        const loop = (res: typeof response, location: number[]): void => {
+        const findFormNodes = (
+          res: typeof responseAtBlueprint,
+          location: number[]
+        ): void => {
           if (Array.isArray(res)) {
             res.forEach((item, index) => {
               if (Array.isArray(item)) {
-                loop(item, [...location, index])
+                findFormNodes(item, [...location, index])
               } else {
                 if (item) {
                   const form = util.buildForm(
@@ -194,7 +233,7 @@ export const useFormify = ({
             }
           }
         }
-        loop(response, location)
+        findFormNodes(responseAtBlueprint, location)
       })
       dispatch({ type: 'ready' })
     }

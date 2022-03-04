@@ -25,7 +25,7 @@ const requestList = []
  * at experimental-examples/unit-test-example. Otherwise, the mocks.json
  * in the respective test folder should supply the network mocks
  */
-const SET_MOCKS_FROM_LOCAL_SERVER = true
+const SET_MOCKS_FROM_LOCAL_SERVER = false
 
 export const testRunner = async (query, events, dirname) => {
   if (SET_MOCKS_FROM_LOCAL_SERVER) {
