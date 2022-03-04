@@ -27,6 +27,10 @@ import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
+import {
+  generateGqlScript,
+  extendNextScripts,
+} from '../../utils/script-helpers'
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -163,12 +167,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   const newPack = JSON.stringify(
     {
       ...pack,
-      scripts: {
-        ...oldScripts,
-        'tina-dev': 'yarn tinacms server:start -c "next dev"',
-        'tina-build': 'yarn tinacms server:start -c "next build"',
-        'tina-start': 'yarn tinacms server:start -c "next start"',
-      },
+      scripts: extendNextScripts(oldScripts),
     },
     null,
     2
@@ -191,7 +190,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
 export async function successMessage(ctx: any, next: () => void, options) {
   logger.info(`Tina setup ${chalk.underline.green('done')}  ✅
 \t Start your dev server with ${successText(
-    `yarn tina-dev`
+    `yarn dev`
   )} and go to http://localhost:3000/demo/blog/HelloWorld to ${successText(
     'check it out the page that was created for you'
   )}
