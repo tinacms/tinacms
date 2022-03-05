@@ -1,48 +1,53 @@
-fragment PageParts on Page {
+fragment PostParts on Post {
   title
-  body
-  relatedPage {
+  author {
     ... on Document {
       id
     }
   }
+  tags
+  categories
+  published
+  featured
+  body
+}
+
+fragment AuthorParts on Author {
+  name
+  social {
+    __typename
+    platform
+    handle
+  }
+  bio
 }
 
 fragment BlockPageParts on BlockPage {
   title
-  seo {
-    __typename
-    ogTitle
-  }
-  social {
-    __typename
-    handle
-    platform
-    relatedPage {
-      ... on Document {
-        id
-      }
-    }
-  }
-  relatedPage {
-    ... on Document {
-      id
-    }
-  }
   blocks {
     __typename
     ... on BlockPageBlocksHero {
       title
       description
-      relation {
+    }
+    ... on BlockPageBlocksBlockQuote {
+      message
+      author {
         ... on Document {
           id
         }
       }
     }
-    ... on BlockPageBlocksCta {
-      title
-      action
+    ... on BlockPageBlocksFeaturedPosts {
+      header
+      blogs {
+        __typename
+        item {
+          ... on Document {
+            id
+          }
+        }
+      }
     }
   }
 }

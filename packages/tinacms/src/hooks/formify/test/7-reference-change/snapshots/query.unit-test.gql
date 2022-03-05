@@ -1,0 +1,51 @@
+# Blueprint
+# getPostDocument
+#
+# Documents for blueprint
+# ================
+# content/posts/post1.mdx
+#
+# Field blueprints
+# ================
+# author
+
+# Blueprint
+# getPostDocument.data.author
+#
+# Documents for blueprint
+# ================
+#
+# Field blueprints
+# ================
+# name
+
+
+query GetBlockPageDocument {
+  getPostDocument(relativePath: "post1.mdx") {
+    data {
+      author {
+        ... on AuthorDocument {
+          data {
+            name
+          }
+          _internalSys: sys {
+            path
+            collection {
+              name
+            }
+          }
+          form
+          values
+        }
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}

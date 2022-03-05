@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic'
-
-// @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
+import React from 'react'
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
 
 const App = ({ Component, pageProps }) => {

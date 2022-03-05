@@ -1,0 +1,32 @@
+# Blueprint
+# getAuthorDocument
+#
+# Documents for blueprint
+# ================
+# content/authors/author1.mdx
+#
+# Field blueprints
+# ================
+# social.[]
+# social.[].platform
+# social.[].handle
+
+
+query QueryOperation {
+  getAuthorDocument(relativePath: "author1.mdx") {
+    data {
+      social {
+        platform
+        handle
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}

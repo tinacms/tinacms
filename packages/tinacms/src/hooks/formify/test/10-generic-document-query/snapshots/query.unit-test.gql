@@ -1,0 +1,29 @@
+# Blueprint
+# getDocument
+#
+# Documents for blueprint
+# ================
+# content/authors/author1.mdx
+#
+# Field blueprints
+# ================
+# name
+
+
+query GetBlockPageDocument {
+  getDocument(collection: "author", relativePath: "author1.mdx") {
+    ... on AuthorDocument {
+      data {
+        name
+      }
+      _internalSys: sys {
+        path
+        collection {
+          name
+        }
+      }
+      form
+      values
+    }
+  }
+}
