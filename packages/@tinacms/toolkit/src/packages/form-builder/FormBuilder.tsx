@@ -25,6 +25,8 @@ import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
+import { getIn, FormApi } from 'final-form'
+import { useCMS } from '../react-core'
 
 export interface FormBuilderProps {
   form: Form
@@ -111,6 +113,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       unsubscribe()
     }
   }, [finalForm])
+
+  useOnChangeEventDispatch({ finalForm, tinaForm })
 
   return (
     <FinalForm
@@ -310,6 +314,108 @@ export const FormWrapper = ({ children, id }) => {
       </div>
     </div>
   )
+}
+
+/**
+ *
+ * Subscribes to final form value changes and dispatches an event
+ * with information specific to which field changed.
+ */
+const useOnChangeEventDispatch = ({
+  finalForm,
+  tinaForm,
+}: {
+  finalForm: FormApi<any, Partial<any>>
+  tinaForm: Form
+}) => {
+  const [formValues, setFormValues] = React.useState({})
+  const [newUpdate, setNewUpdate] = React.useState(null)
+
+  const { subscribe } = finalForm
+
+  React.useEffect(() => {
+    subscribe(
+      ({ values }) => {
+        setFormValues(values)
+      },
+      { values: true }
+    )
+  }, [subscribe, setFormValues])
+  const cms = useCMS()
+
+  React.useEffect(() => {
+    if (newUpdate?.name === 'reset') {
+      cms.events.dispatch({
+        type: `forms:reset`,
+        value: null,
+        mutationType: newUpdate.mutationType,
+        formId: tinaForm.id,
+      })
+      setNewUpdate(null)
+    } else if (newUpdate?.name) {
+      const previousValue = newUpdate.field.value
+      const newValue = getIn(formValues, newUpdate?.name)
+      cms.events.dispatch({
+        type: `forms:fields:onChange`,
+        value: newValue,
+        previousValue,
+        mutationType: newUpdate.mutationType,
+        formId: tinaForm.id,
+        field: newUpdate.field,
+      })
+      setNewUpdate(null)
+    }
+  }, [JSON.stringify(formValues), cms])
+
+  const { change, reset } = finalForm
+  const { insert, move, remove, ...moreMutators } = finalForm.mutators
+
+  const prepareNewUpdate = (
+    name: string,
+    mutationType:
+      | { type: 'change' }
+      | { type: 'insert'; at: string }
+      | { type: 'move'; from: string; to: string }
+      | { type: 'remove'; at: string }
+      | { type: 'reset' }
+  ) => {
+    setNewUpdate({
+      name,
+      field: finalForm.getFieldState(name),
+      mutationType,
+    })
+  }
+
+  React.useMemo(() => {
+    finalForm.reset = (initialValues) => {
+      prepareNewUpdate('reset', { type: 'reset' })
+      return reset(initialValues)
+    }
+    finalForm.change = (name, value) => {
+      prepareNewUpdate(name.toString(), { type: 'change' })
+      return change(name, value)
+    }
+
+    finalForm.mutators = {
+      insert: (...args) => {
+        prepareNewUpdate(args[0], { type: 'insert', at: args[1] })
+        insert(...args)
+      },
+      move: (...args) => {
+        prepareNewUpdate(args[0], {
+          type: 'move',
+          from: args[1],
+          to: args[2],
+        })
+        move(...args)
+      },
+      remove: (...args) => {
+        prepareNewUpdate(args[0], { type: 'remove', at: args[1] })
+        remove(...args)
+      },
+      ...moreMutators,
+    }
+  }, [JSON.stringify(formValues)])
 }
 
 const Emoji = styled.span`
