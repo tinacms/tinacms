@@ -1,56 +1,169 @@
 {
   "version": {
-    "fullVersion": "0.59.6",
+    "fullVersion": "0.59.7",
     "major": "0",
     "minor": "59",
-    "patch": "6"
+    "patch": "7"
   },
   "meta": {},
   "collections": [
     {
-      "label": "Page Content",
-      "name": "page",
-      "path": "content/pages",
+      "label": "Post",
+      "name": "post",
+      "path": "content/posts",
+      "format": "mdx",
       "fields": [
         {
           "name": "title",
-          "label": "Title",
           "type": "string",
           "namespace": [
-            "page",
+            "post",
             "title"
           ]
         },
         {
-          "name": "body",
-          "label": "Main Content",
-          "type": "string",
-          "isBody": true,
+          "name": "author",
+          "type": "reference",
+          "collections": [
+            "author"
+          ],
           "namespace": [
-            "page",
-            "body"
+            "post",
+            "author"
           ]
         },
         {
-          "label": "Related Page",
-          "name": "relatedPage",
-          "type": "reference",
-          "collections": [
-            "blockPage"
+          "name": "tags",
+          "type": "string",
+          "list": true,
+          "namespace": [
+            "post",
+            "tags"
+          ]
+        },
+        {
+          "name": "categories",
+          "type": "string",
+          "list": true,
+          "options": [
+            {
+              "value": "movies",
+              "label": "Movies"
+            },
+            {
+              "value": "music",
+              "label": "Music"
+            },
+            {
+              "value": "food",
+              "label": "Foog"
+            },
+            {
+              "value": "art",
+              "label": "Art"
+            }
           ],
           "namespace": [
-            "page",
-            "relatedPage"
+            "post",
+            "categories"
+          ]
+        },
+        {
+          "name": "published",
+          "type": "datetime",
+          "namespace": [
+            "post",
+            "published"
+          ]
+        },
+        {
+          "name": "featured",
+          "type": "boolean",
+          "namespace": [
+            "post",
+            "featured"
+          ]
+        },
+        {
+          "name": "body",
+          "type": "rich-text",
+          "isBody": true,
+          "namespace": [
+            "post",
+            "body"
           ]
         }
       ],
       "namespace": [
-        "page"
+        "post"
+      ]
+    },
+    {
+      "label": "Author",
+      "name": "author",
+      "format": "mdx",
+      "path": "content/authors",
+      "fields": [
+        {
+          "name": "name",
+          "type": "string",
+          "namespace": [
+            "author",
+            "name"
+          ]
+        },
+        {
+          "name": "social",
+          "type": "object",
+          "list": true,
+          "fields": [
+            {
+              "type": "string",
+              "name": "platform",
+              "options": [
+                "twitter",
+                "facebook",
+                "instagram"
+              ],
+              "namespace": [
+                "author",
+                "social",
+                "platform"
+              ]
+            },
+            {
+              "type": "string",
+              "name": "handle",
+              "namespace": [
+                "author",
+                "social",
+                "handle"
+              ]
+            }
+          ],
+          "namespace": [
+            "author",
+            "social"
+          ]
+        },
+        {
+          "name": "bio",
+          "type": "rich-text",
+          "isBody": true,
+          "namespace": [
+            "author",
+            "bio"
+          ]
+        }
+      ],
+      "namespace": [
+        "author"
       ]
     },
     {
       "label": "Block Page",
       "name": "blockPage",
+      "format": "mdx",
       "path": "content/block-pages",
       "fields": [
         {
@@ -63,84 +176,6 @@
           ]
         },
         {
-          "label": "SEO",
-          "name": "seo",
-          "type": "object",
-          "fields": [
-            {
-              "label": "OG Title",
-              "name": "ogTitle",
-              "type": "string",
-              "namespace": [
-                "blockPage",
-                "seo",
-                "ogTitle"
-              ]
-            }
-          ],
-          "namespace": [
-            "blockPage",
-            "seo"
-          ]
-        },
-        {
-          "label": "Social",
-          "name": "social",
-          "list": true,
-          "type": "object",
-          "fields": [
-            {
-              "label": "Handle",
-              "name": "handle",
-              "type": "string",
-              "namespace": [
-                "blockPage",
-                "social",
-                "handle"
-              ]
-            },
-            {
-              "label": "Platform",
-              "name": "platform",
-              "type": "string",
-              "namespace": [
-                "blockPage",
-                "social",
-                "platform"
-              ]
-            },
-            {
-              "label": "Related Page",
-              "name": "relatedPage",
-              "type": "reference",
-              "collections": [
-                "page"
-              ],
-              "namespace": [
-                "blockPage",
-                "social",
-                "relatedPage"
-              ]
-            }
-          ],
-          "namespace": [
-            "blockPage",
-            "social"
-          ]
-        },
-        {
-          "label": "Related Page",
-          "name": "relatedPage",
-          "type": "reference",
-          "collections": [
-            "page"
-          ],
-          "namespace": [
-            "blockPage",
-            "relatedPage"
-          ]
-        },
-        {
           "label": "Blocks",
           "name": "blocks",
           "type": "object",
@@ -149,6 +184,11 @@
             {
               "name": "hero",
               "label": "Hero",
+              "ui": {
+                "defaultItem": {
+                  "title": "some title"
+                }
+              },
               "fields": [
                 {
                   "label": "Title",
@@ -171,20 +211,6 @@
                     "hero",
                     "description"
                   ]
-                },
-                {
-                  "label": "Relation",
-                  "name": "relation",
-                  "type": "reference",
-                  "collections": [
-                    "page"
-                  ],
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "hero",
-                    "relation"
-                  ]
                 }
               ],
               "namespace": [
@@ -194,36 +220,90 @@
               ]
             },
             {
-              "name": "cta",
-              "label": "Cta",
+              "name": "blockQuote",
+              "label": "Block Quote",
               "fields": [
                 {
-                  "label": "Title",
-                  "name": "title",
-                  "type": "string",
+                  "name": "message",
+                  "type": "rich-text",
                   "namespace": [
                     "blockPage",
                     "blocks",
-                    "cta",
-                    "title"
+                    "blockQuote",
+                    "message"
                   ]
                 },
                 {
-                  "label": "Action",
-                  "name": "action",
-                  "type": "string",
+                  "name": "author",
+                  "type": "reference",
+                  "collections": [
+                    "author"
+                  ],
                   "namespace": [
                     "blockPage",
                     "blocks",
-                    "cta",
-                    "action"
+                    "blockQuote",
+                    "author"
                   ]
                 }
               ],
               "namespace": [
                 "blockPage",
                 "blocks",
-                "cta"
+                "blockQuote"
+              ]
+            },
+            {
+              "name": "featuredPosts",
+              "label": "Featured Posts",
+              "ui": {
+                "defaultItem": {
+                  "header": "Featured Posts"
+                }
+              },
+              "fields": [
+                {
+                  "name": "header",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "featuredPosts",
+                    "header"
+                  ]
+                },
+                {
+                  "name": "blogs",
+                  "list": true,
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "item",
+                      "type": "reference",
+                      "collections": [
+                        "post"
+                      ],
+                      "namespace": [
+                        "blockPage",
+                        "blocks",
+                        "featuredPosts",
+                        "blogs",
+                        "item"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "featuredPosts",
+                    "blogs"
+                  ]
+                }
+              ],
+              "namespace": [
+                "blockPage",
+                "blocks",
+                "featuredPosts"
               ]
             }
           ],

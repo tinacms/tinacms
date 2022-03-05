@@ -1,0 +1,29 @@
+# Blueprint
+# node
+#
+# Documents for blueprint
+# ================
+# content/posts/post1.mdx
+#
+# Field blueprints
+# ================
+# title
+
+
+query GetBlockPageDocument {
+  node(id: "content/posts/post1.mdx") {
+    ... on PostDocument {
+      data {
+        title
+      }
+      _internalSys: sys {
+        path
+        collection {
+          name
+        }
+      }
+      form
+      values
+    }
+  }
+}
