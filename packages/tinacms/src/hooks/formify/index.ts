@@ -11,588 +11,673 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  visit,
-  GraphQLSchema,
-  Visitor,
-  ASTKindToNode,
-  DocumentNode,
-  ASTNode,
-} from 'graphql'
 import React from 'react'
 import * as G from 'graphql'
 import * as util from './util'
-
+import { Form } from '@tinacms/toolkit'
 import type { TinaCMS } from '@tinacms/toolkit'
+import { formify, DATA_NODE_NAME } from './formify'
+import { onSubmitArgs } from '../use-graphql-forms'
+import { reducer } from './reducer'
 
-type Action =
-  | {
-      type: 'setSchema'
-      value: G.GraphQLSchema
-    }
-  | {
-      type: 'setQuery'
-      value: G.DocumentNode
-    }
-  | {
-      type: 'addNode'
-      value: DocNode
-    }
+import type {
+  FormifiedDocumentNode,
+  OnChangeEvent,
+  FormNode,
+  DocumentBlueprint,
+  State,
+} from './types'
 
-export type DocNode = {
-  path: readonly (string | number)[]
-}
-export type Dispatch = React.Dispatch<Action>
+export { formify }
 
-type State = {
-  schema: G.GraphQLSchema
-  query: G.DocumentNode
-  status: 'pending' | 'ready' | 'done'
-  nodes: DocNode[]
-}
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case 'setSchema':
-      return { ...state, status: 'ready', schema: action.value }
-    case 'addNode':
-      return { ...state, nodes: [...state.nodes, action.value] }
-    case 'setQuery':
-      return { ...state, status: 'done', query: action.value }
-    default:
-      return state
-  }
-}
+export const useFormify = ({
+  query,
+  cms,
+  variables,
+  onSubmit,
+  formify: formifyFunc,
+  eventList,
+}: {
+  query?: string
+  cms: TinaCMS
+  variables: object
+  onSubmit?: (args: onSubmitArgs) => void
+  formify
+  eventList?: OnChangeEvent[]
+}): State => {
+  /** These will be used to ensure the appropriate forms are removed when we unmount */
+  const formIds = React.useRef<string[]>([])
 
-type VisitorType = Visitor<ASTKindToNode, ASTNode>
-
-const NOOP = 'This is either an error or is not yet supported'
-const UNEXPECTED =
-  'Formify encountered an unexpected error, please contact support'
-const DATA_NODE_NAME = 'data'
-const EDGES_NODE_NAME = 'edges'
-const NODE_NAME = 'node'
-const COLLECTION_FIELD_NAME = 'getCollection'
-const COLLECTIONS_FIELD_NAME = 'getCollections'
-const COLLECTIONS_DOCUMENTS_NAME = 'documents'
-
-class FormifyError extends Error {
-  constructor(code: 'NOOP' | 'UNEXPECTED', details?: string) {
-    let message
-    switch (code) {
-      case 'NOOP':
-        message = NOOP
-        break
-      case 'UNEXPECTED':
-        message = UNEXPECTED
-        break
-      default:
-        message = ''
-        break
-    }
-    super(`${message} ${details || ''}`)
-    this.name = 'FormifyError'
-  }
-}
-
-/**
- * TODO: this is currently only used for testing, `formify` is where the primary logic is housed
- */
-export const useFormify = ({ query, cms }: { query: string; cms: TinaCMS }) => {
   const [state, dispatch] = React.useReducer(reducer, {
-    status: 'pending',
+    status: 'initialized',
     schema: undefined,
-    query: G.parse(query),
-    nodes: [],
+    query: query ? G.parse(query) : null,
+    queryString: query,
+    data: {},
+    changeSets: [],
+    count: 0,
+    blueprints: [],
+    formNodes: [],
+    documentForms: [],
   })
+
+  /**
+   * Setup the data, using the user-supplied query, this is probably redundant
+   * since the `data` is a required parameter of `useGraphQLForms`, so we should be able
+   * to remove this once we match the `useGraphQLForms` API
+   */
   React.useEffect(() => {
-    cms.api.tina.getSchema().then((schema) => {
-      dispatch({ type: 'setSchema', value: schema })
-    })
-  }, [])
-  React.useEffect(() => {
-    const run = async () => {
-      if (state.status === 'ready') {
-        const { formifiedQuery } = await formify({
-          schema: state.schema,
-          query,
-          getOptimizedQuery: cms.api.tina.getOptimizedQuery,
-        })
-        dispatch({ type: 'setQuery', value: formifiedQuery })
-      }
+    if (state.status === 'initialized') {
+      cms.api.tina.request(query, { variables }).then((res) => {
+        // FIXME: remove this from GraphQL
+        // 'paths' was previously used to keep track of which fields were
+        // references, but this is no longer necessary.
+        delete res.paths
+        dispatch({ type: 'setData', value: res })
+      })
     }
-    run()
   }, [state.status])
 
-  return {
-    query: G.print(state.query),
-    status: state.status,
-    nodes: state.nodes,
-  }
-}
-
-type TinaDocumentField = {
-  path: string[]
-  aliasPath: string[]
-}
-type TinaDocumentNode = {
-  path: { name: string; alias: string; list?: boolean }[]
-}
-
-export const formify = async ({
-  schema,
-  query,
-  getOptimizedQuery,
-}: {
-  schema: GraphQLSchema
-  query: string
-  getOptimizedQuery: (query: DocumentNode) => Promise<DocumentNode>
-}): Promise<{ formifiedQuery: DocumentNode; nodes: TinaDocumentNode[] }> => {
-  const nodes: TinaDocumentNode[] = []
-  const documentNode = G.parse(query)
-  const visitor2: VisitorType = {
-    OperationDefinition: (node) => {
-      if (!node.name) {
-        return {
-          ...node,
-          name: {
-            kind: 'Name',
-            // FIXME: add some sort of uuid to this
-            value: `QueryOperation`,
-          },
+  /**
+   * Formify the query, this takes a query like
+   * ```graphql
+   * {
+   *   getPostDocument(relativePath: $relativePath) {
+   *     data {
+   *       title
+   *     }
+   *   }
+   * }
+   * ```
+   * And turns it into
+   * ```graphql
+   * {
+   *   getPostDocument(relativePath: $relativePath) {
+   *     data {
+   *       title
+   *     }
+   *     _internalSys {
+   *       path
+   *     }
+   *     form
+   *     values
+   *   }
+   * }
+   * ```
+   * So we can generate the appropriate form and data
+   */
+  React.useEffect(() => {
+    const run = async () => {
+      const schema = await cms.api.tina.getSchema()
+      if (!query) {
+        // Nothing from the query can be formified
+        dispatch({
+          type: 'done',
+        })
+      } else {
+        try {
+          const result = await formify({
+            schema,
+            query,
+            getOptimizedQuery: cms.api.tina.getOptimizedQuery,
+          })
+          dispatch({
+            type: 'addDocumentBlueprints',
+            value: result,
+          })
+        } catch (e) {
+          console.log(e)
         }
       }
-      return node
-    },
-  }
-  const documentNodeWithName = visit(documentNode, visitor2)
-  const optimizedQuery = await getOptimizedQuery(documentNodeWithName)
-  const typeInfo = new G.TypeInfo(schema)
+    }
+    if (state.status === 'initialized') {
+      run()
+    }
+  }, [state.status])
 
-  const formifyConnection = ({
-    namedFieldType,
-    selectionNode,
-    path,
-  }: {
-    namedFieldType: G.GraphQLNamedType
-    selectionNode: G.FieldNode
-    path: { name: string; alias: string }[]
-  }): G.SelectionNode => {
-    util.ensureObjectType(namedFieldType)
-    return {
-      ...selectionNode,
-      selectionSet: {
-        kind: 'SelectionSet' as const,
-        selections: selectionNode.selectionSet.selections.map(
-          (selectionNode) => {
-            switch (selectionNode.kind) {
-              case 'Field':
-                if (selectionNode.name.value === EDGES_NODE_NAME) {
-                  const edgeField = namedFieldType.getFields()[EDGES_NODE_NAME]
-                  const edgeType = G.getNamedType(edgeField.type)
-                  util.ensureObjectType(edgeType)
-                  return {
-                    ...selectionNode,
-                    selectionSet: {
-                      kind: 'SelectionSet' as const,
-                      selections: selectionNode.selectionSet.selections.map(
-                        (subSelectionNode) => {
-                          switch (subSelectionNode.kind) {
-                            case 'Field':
-                              if (subSelectionNode.name.value === NODE_NAME) {
-                                const nodeField =
-                                  edgeType.getFields()[NODE_NAME]
-                                return formifyNode({
-                                  fieldOrInlineFragmentNode: subSelectionNode,
-                                  parentType: nodeField.type,
-                                  path: [
-                                    ...path,
-                                    util.getNameAndAlias(selectionNode),
-                                    util.getNameAndAlias(
-                                      subSelectionNode,
-                                      true
-                                    ),
-                                  ],
-                                })
-                              } else {
-                                return subSelectionNode
-                              }
-                            default:
-                              throw new FormifyError('NOOP')
-                          }
-                        }
-                      ),
+  /**
+   * Once the query has been formified, add formNodes to state
+   * which represent the combination of a document blueprint and form
+   *
+   * For the given _formified_ query and result, we have a few form nodes:
+   *
+   * Query:
+   * {
+   *   getPostDocument {
+   *     data {
+   *       title
+   *       author {
+   *         ...on AuthorDocument {
+   *           data {
+   *             name
+   *           }
+   *         }
+   *       }
+   *     }
+   *   }
+   * }
+   *
+   * Result
+   * {
+   *   "getPostDocument": {
+   *     "id": "content/posts/post1.mdx"
+   *     "data": {
+   *       "author": {
+   *         "id": "content/authors/author1.mdx"
+   *         "data": {
+   *           "name": "Author One"
+   *         }
+   *       }
+   *     }
+   *   }
+   * }
+   *
+   * We'd have 2 formNodes:
+   * # getPostDocument with the document "content/posts/post1.mdx"
+   * # getPostDocument.data.author with the document "content/authors/author1.mdx"
+   *
+   */
+  React.useEffect(() => {
+    const run = async () => {
+      const result = await cms.api.tina.request(G.print(state.query), {
+        variables,
+      })
+
+      state.blueprints.map((blueprint) => {
+        const responseAtBlueprint = util.getIn2<FormifiedDocumentNode>(
+          result,
+          util.getBlueprintAliasPath(blueprint)
+        )
+        const location = []
+        const findFormNodes = (
+          res: typeof responseAtBlueprint,
+          location: number[]
+        ): void => {
+          if (Array.isArray(res)) {
+            res.forEach((item, index) => {
+              if (Array.isArray(item)) {
+                findFormNodes(item, [...location, index])
+              } else {
+                if (item) {
+                  const form = util.buildForm(
+                    item,
+                    cms,
+                    formifyFunc,
+                    blueprint.showInSidebar,
+                    onSubmit
+                  )
+                  const formNode = buildFormNode(blueprint, form, [
+                    ...location,
+                    index,
+                  ])
+                  dispatch({
+                    type: 'addOrReplaceDocumentFormNode',
+                    value: {
+                      formNode,
+                      documentForm: form,
                     },
-                  }
+                  })
                 }
-                return selectionNode
-              default:
-                throw new FormifyError('UNEXPECTED')
+              }
+            })
+          } else {
+            if (res) {
+              const form = util.buildForm(
+                res,
+                cms,
+                formifyFunc,
+                blueprint.showInSidebar,
+                onSubmit
+              )
+              const formNode = buildFormNode(blueprint, form, location)
+              dispatch({
+                type: 'addOrReplaceDocumentFormNode',
+                value: {
+                  formNode,
+                  documentForm: form,
+                },
+              })
             }
           }
-        ),
-      },
+        }
+        findFormNodes(responseAtBlueprint, location)
+      })
+      dispatch({ type: 'ready' })
     }
-  }
-  function formifyNode<T extends G.FieldNode | G.InlineFragmentNode>({
-    fieldOrInlineFragmentNode,
-    parentType,
-    path,
-  }: {
-    fieldOrInlineFragmentNode: T
-    parentType: G.GraphQLOutputType
-    path: { name: string; alias: string }[]
-  }) {
-    let extraFields = []
-    const namedParentType = G.getNamedType(parentType)
+    if (state.status === 'formified') {
+      run()
+    }
+  }, [state.status])
 
-    const formifiedNode = {
-      ...fieldOrInlineFragmentNode,
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          ...fieldOrInlineFragmentNode.selectionSet.selections.map(
-            (selectionNode) => {
-              switch (selectionNode.kind) {
-                /**
-                 * An inline fragment will be present when the document result is polymorphic,
-                 * when that's the case, we need to "step down" one level with a disambiguator
-                 * (eg. ...on PageDocument), then run formifyNode again at this lower tier
-                 */
-                case 'InlineFragment':
-                  /**
-                   * This is a somewhat special use-case for node(id: "")
-                   */
-                  if (G.isInterfaceType(namedParentType)) {
-                    const type =
-                      schema.getImplementations(namedParentType).objects[
-                        selectionNode.typeCondition.name.value
-                      ]
-                    return formifyNode({
-                      fieldOrInlineFragmentNode: selectionNode,
-                      parentType: type,
-                      path,
-                    })
-                  }
-                  util.ensureUnionType(namedParentType)
-                  const type = util.getSelectedUnionType(
-                    namedParentType,
-                    selectionNode
-                  )
-                  return formifyNode({
-                    fieldOrInlineFragmentNode: selectionNode,
-                    parentType: type,
-                    path,
-                  })
-                case 'Field':
-                  if (selectionNode.name.value === DATA_NODE_NAME) {
-                    /**
-                     * This is the primary purpose of formify, adding fields like
-                     * `form`, `values` and `_internalSys`
-                     */
-                    extraFields = util.metaFields
-                    if (G.isObjectType(namedParentType)) {
-                      const field = util.getObjectField(
-                        namedParentType,
-                        selectionNode
-                      )
-                      const namedType = G.getNamedType(field.type)
-                      util.ensureObjectType(namedType)
-                      return {
-                        ...selectionNode,
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            ...selectionNode.selectionSet.selections.map(
-                              (subSelectionNode) => {
-                                switch (subSelectionNode.kind) {
-                                  case 'Field':
-                                    const subSelectionField =
-                                      util.getObjectField(
-                                        namedType,
-                                        subSelectionNode
-                                      )
-                                    if (!subSelectionField) {
-                                      return subSelectionNode
-                                    }
-                                    return formifyField({
-                                      fieldNode: subSelectionNode,
-                                      parentType: field.type,
-                                      path: [
-                                        ...path,
-                                        util.getNameAndAlias(
-                                          subSelectionNode,
-                                          G.isListType(subSelectionField.type)
-                                        ),
-                                      ],
-                                    })
-                                  default:
-                                    throw new FormifyError(
-                                      'UNEXPECTED',
-                                      `selection ${subSelectionNode.kind}`
-                                    )
-                                }
-                              }
-                            ),
-                          ],
-                        },
-                      }
-                    }
-                    return selectionNode
-                  }
-                  return selectionNode
-                default:
-                  throw new FormifyError('UNEXPECTED')
-              }
-            }
-          ),
-          ...extraFields,
-        ],
-      },
-    }
-
-    return formifiedNode
-  }
-
-  const formifyField = ({
-    fieldNode,
-    parentType,
-    path,
-  }: {
-    fieldNode: G.FieldNode
-    parentType: G.GraphQLOutputType
-    path: { name: string; alias: string }[]
-  }): G.FieldNode => {
-    const namedParentType = G.getNamedType(parentType)
-    util.ensureObjectType(namedParentType)
-    const field = util.getObjectField(namedParentType, fieldNode)
-    if (!field) {
-      if (fieldNode.name.value === '__typename') {
-        return fieldNode
-      } else {
-        throw new FormifyError(
-          'UNEXPECTED',
-          `field with no associated type ${fieldNode.name.value}`
-        )
-      }
-    }
-    const namedType = G.getNamedType(field.type)
-    if (G.isScalarType(namedType)) {
-      return fieldNode
-    }
-    return {
-      ...fieldNode,
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          ...fieldNode.selectionSet.selections.map((selectionNode) => {
-            switch (selectionNode.kind) {
-              case 'Field':
-                if (selectionNode.name.value === '__typename') {
-                  return selectionNode
-                }
-                util.ensureObjectType(namedType)
-                const field = util.getObjectField(namedType, selectionNode)
-                if (!field) {
-                  return fieldNode
-                }
-                if (G.isScalarType(G.getNamedType(field.type))) {
-                  return selectionNode
-                }
-                return {
-                  ...selectionNode,
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: selectionNode.selectionSet.selections.map(
-                      (selectionNode) => {
-                        switch (selectionNode.kind) {
-                          case 'Field':
-                            if (selectionNode.name.value === '__typename') {
-                              return selectionNode
-                            }
-                            return formifyField({
-                              fieldNode: selectionNode,
-                              parentType: field.type,
-                              path,
-                            })
-                          case 'InlineFragment':
-                            const namedType = G.getNamedType(field.type)
-                            util.ensureNodeField(namedType)
-                            return formifyNode({
-                              fieldOrInlineFragmentNode: selectionNode,
-                              parentType: field.type,
-                              path,
-                            })
-                          default:
-                            throw new FormifyError(
-                              'UNEXPECTED',
-                              `selection ${selectionNode.kind}`
-                            )
-                        }
-                      }
-                    ),
-                  },
-                }
-              case 'InlineFragment':
-                util.ensureUnionType(namedType)
-                if (util.isNodeField(namedType)) {
-                  const parentType = util.getSelectedUnionType(
-                    namedType,
-                    selectionNode
-                  )
-                  return formifyNode({
-                    fieldOrInlineFragmentNode: selectionNode,
-                    parentType: parentType,
-                    path,
-                  })
-                }
-                return {
-                  ...selectionNode,
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: selectionNode.selectionSet.selections.map(
-                      (subSelectionNode) => {
-                        switch (subSelectionNode.kind) {
-                          case 'Field':
-                            const parentType = util.getSelectedUnionType(
-                              namedType,
-                              selectionNode
-                            )
-                            return formifyField({
-                              fieldNode: subSelectionNode,
-                              parentType: parentType,
-                              path,
-                            })
-                          default:
-                            throw new FormifyError(
-                              'UNEXPECTED',
-                              `selection ${subSelectionNode.kind}`
-                            )
-                        }
-                      }
-                    ),
-                  },
-                }
-              default:
-                throw new FormifyError(
-                  'UNEXPECTED',
-                  `selection ${selectionNode.kind}`
-                )
-            }
-          }),
-        ],
-      },
-    }
-  }
-  const formifiedQuery: DocumentNode = {
-    kind: 'Document',
-    definitions: optimizedQuery.definitions.map((definition) => {
-      typeInfo.enter(definition)
-      util.ensureOperationDefinition(definition)
-      const type = typeInfo.getType()
-      const namedType = G.getNamedType(type)
-      util.ensureObjectType(namedType)
-      return {
-        ...definition,
-        selectionSet: {
-          kind: 'SelectionSet',
-          selections: definition.selectionSet.selections.map(
-            (selectionNode) => {
-              switch (selectionNode.kind) {
-                case 'Field':
-                  const parentType = type
-                  const namedParentType = G.getNamedType(parentType)
-                  util.ensureObjectType(namedParentType)
-                  const field = util.getObjectField(
-                    namedParentType,
-                    selectionNode
-                  )
-                  const namedFieldType = G.getNamedType(field.type)
-                  if (util.isNodeField(namedFieldType)) {
-                    return formifyNode({
-                      fieldOrInlineFragmentNode: selectionNode,
-                      parentType: field.type,
-                      path: [util.getNameAndAlias(selectionNode)],
-                    })
-                  } else if (util.isConnectionField(namedFieldType)) {
-                    return formifyConnection({
-                      namedFieldType,
-                      selectionNode,
-                      path: [util.getNameAndAlias(selectionNode)],
-                    })
-                  }
-
-                  /**
-                   * `getCollection` and `getColletions` include a `documents` list field
-                   * which can possibly be formified.
-                   */
-                  if (
-                    selectionNode.name.value === COLLECTION_FIELD_NAME ||
-                    selectionNode.name.value === COLLECTIONS_FIELD_NAME
-                  ) {
-                    return {
-                      ...selectionNode,
-                      selectionSet: {
-                        kind: 'SelectionSet',
-                        selections: selectionNode.selectionSet.selections.map(
-                          (selectionNode) => {
-                            switch (selectionNode.kind) {
-                              case 'Field':
-                                if (
-                                  selectionNode.name.value ===
-                                  COLLECTIONS_DOCUMENTS_NAME
-                                ) {
-                                  util.ensureObjectType(namedFieldType)
-                                  const n =
-                                    namedFieldType.getFields()[
-                                      COLLECTIONS_DOCUMENTS_NAME
-                                    ]
-                                  const docType = G.getNamedType(n.type)
-                                  return formifyConnection({
-                                    namedFieldType: docType,
-                                    selectionNode,
-                                    path: [util.getNameAndAlias(selectionNode)],
-                                  })
-                                }
-                                return selectionNode
-                              default:
-                                throw new FormifyError('NOOP')
-                            }
+  /**
+   * Register the forms and subscribe to field-level changes
+   */
+  React.useEffect(() => {
+    if (state.status === 'ready') {
+      cms.events.subscribe(`forms:reset`, (event: OnChangeEvent) => {
+        dispatch({ type: 'formOnReset', value: { event } })
+      })
+      cms.events.subscribe(
+        `forms:fields:onChange`,
+        async (event: OnChangeEvent) => {
+          if (eventList) {
+            eventList.push(util.printEvent(event))
+          }
+          if (event.field.data.tinaField.type === 'reference') {
+            let form: Form
+            if (event.value && typeof event.value === 'string') {
+              const existingForm = cms.forms.find(event.value)
+              if (existingForm) {
+                form = existingForm
+              } else {
+                const formInfo = await cms.api.tina.request(
+                  `#graphql
+                    query Node($id: String!) {
+                      node(id: $id) {
+                        ...on Document {
+                          form
+                          values
+                          _internalSys: sys {
+                            path
                           }
-                        ),
-                      },
+                        }
+                      }
                     }
-                  }
-                  throw new FormifyError('NOOP')
-                default:
-                  throw new FormifyError('UNEXPECTED')
+                    `,
+                  { variables: { id: event.value } }
+                )
+                form = util.buildForm(
+                  formInfo.node,
+                  cms,
+                  formifyFunc,
+                  false,
+                  onSubmit
+                )
               }
             }
-          ),
-        },
-      }
-    }),
-  }
-  nodes.map((node) => {
-    const namePath = []
-    const aliasPath = []
-    node.path.forEach((p) => {
-      namePath.push(p.name)
-      aliasPath.push(p.alias)
-      if (p.list) {
-        namePath.push('NUM')
-        aliasPath.push('NUM')
+            dispatch({
+              type: 'onFieldChange',
+              value: {
+                event: {
+                  ...event,
+                  mutationType: { type: 'referenceChange' },
+                },
+                form,
+              },
+            })
+          } else {
+            dispatch({ type: 'onFieldChange', value: { event } })
+          }
+        }
+      )
+      dispatch({ type: 'done' })
+    }
+  }, [state.status])
+
+  /**
+   * Process changesets. By the time we receive a new changeset,
+   * we know exactly where the new field's value should go and what
+   * that value is. It could be assumed that when we have this information
+   * we should just go ahead and update the state with each new value,
+   * but because a new value might contain nested values, which themselves
+   * need to be resolved, we can instead add this additional layer of
+   * indirection so we're able to process each changeset with async
+   * logic, and only resolve the value to State once every subfield
+   * has settled. This allows us to support block-like items which may
+   * have references in them which need to be resolved, for example.
+   */
+  React.useEffect(() => {
+    state.changeSets.forEach((changeSet) => {
+      if (changeSet.mutationType.type === 'reset') {
+        const form = cms.forms.find(changeSet.formId)
+        valuesToData({
+          formNode: changeSet.formNode,
+          form: form,
+        }).then((res) => {
+          dispatch({
+            type: 'setIn',
+            value: {
+              value: res,
+              path: changeSet.path,
+            },
+          })
+        })
+        return
+      } else if (changeSet.mutationType.type === 'insert') {
+        if (changeSet.fieldDefinition.type === 'object') {
+          const fieldName = changeSet.fieldDefinition.list
+            ? `${changeSet.name}.[]`
+            : changeSet.name
+
+          const { fields, __typename } = util.getSubFields(changeSet)
+
+          valuesToData({
+            formNode: changeSet.formNode,
+            prefix: util.replaceRealNum(fieldName),
+            loc: util.stripIndices(changeSet.path),
+            form: {
+              fields,
+              /**
+               * Insert logic only deals with the first item
+               */
+              values: changeSet.value[0],
+            },
+          }).then((res) => {
+            const extra = {}
+            if (__typename) {
+              extra['__typename'] = __typename
+            }
+            dispatch({
+              type: 'setIn',
+              value: {
+                displaceIndex: true,
+                ...changeSet,
+                value: {
+                  ...res,
+                  ...extra,
+                },
+              },
+            })
+          })
+        } else {
+          dispatch({
+            type: 'setIn',
+            value: {
+              displaceIndex: true,
+              ...changeSet,
+              value: changeSet.value[0],
+            },
+          })
+        }
+      } else {
+        if (changeSet.mutationType.type === 'referenceChange') {
+          const { formNode } = changeSet
+          const blueprint = util.getFormNodeBlueprint(formNode, state)
+          cms.api.tina
+            .request(
+              `
+              query Node($id: String!) {
+                node(id: $id) {
+                  ${G.print(blueprint.selection)}
+                }
+              }
+            `,
+              { variables: { id: changeSet.value } }
+            )
+            .then(async (res) => {
+              const form = state.documentForms.find(
+                (documentForm) => documentForm.id === formNode.documentFormId
+              )
+              const data = await valuesToData({
+                formNode,
+                form,
+                loc: formNode.location,
+              })
+              dispatch({
+                type: 'setIn',
+                value: {
+                  ...changeSet,
+                  value: {
+                    ...res.node,
+                    // FIXME: assumes `data` field instead of alias
+                    data,
+                  },
+                },
+              })
+            })
+            .catch((e) => {
+              cms.alerts.error(`Unexpected error fetching reference`)
+              console.log(e)
+            })
+        } else {
+          dispatch({ type: 'setIn', value: changeSet })
+        }
       }
     })
-    const stringFormat = JSON.stringify(
-      {
-        namePath: namePath.join('.'),
-        aliasPath: aliasPath.join('.'),
-      },
-      null,
-      2
-    )
+  }, [state.changeSets.length])
 
-    // console.log(stringFormat)
-  })
-  return { formifiedQuery, nodes }
+  /**
+   * NOTE: we're mimicking `componentWillUnmount` by keeping track of
+   * form ids that have been registered in a ref, in the useEffect hook
+   * below we use an empty depency array so it only runs with the entire
+   * hook unmounts. This isn't ideal, but since cms.forms state isn't
+   * React state it's not as trivial as it may seem
+   */
+  React.useEffect(() => {
+    formIds.current = state.documentForms.map((df) => df.id)
+  }, [state.documentForms.length])
+  React.useEffect(() => {
+    return () => {
+      formIds.current.forEach((formId) => {
+        const form = cms.forms.find(formId)
+        if (form) {
+          cms.plugins.remove(form)
+        }
+      })
+    }
+  }, [])
+
+  /**
+   * Takes a form node and populates all locations in the graph with the appropriate
+   * values. This resolves each field, including asynchronous fields before updating
+   * the `state.data` with the value.
+   */
+  const valuesToData = React.useCallback(
+    async (args: {
+      formNode: FormNode
+      prefix?: string
+      loc?: number[]
+      form: Pick<Form, 'values' | 'fields'>
+    }) => {
+      const { form, formNode, prefix, loc } = args
+      const data = {}
+      await util.sequential(form.fields, async (field) => {
+        const value = form.values[field.name]
+
+        const fieldName = field.list ? `${field.name}.[]` : field.name
+        const blueprint = util.getFormNodeBlueprint(formNode, state)
+        const blueprintName = util.getBlueprintNamePath(blueprint)
+        const extra = []
+        if (prefix) {
+          extra.push(prefix)
+        }
+        const matchName = [
+          blueprintName,
+          DATA_NODE_NAME,
+          ...extra,
+          fieldName,
+        ].join('.')
+        const fieldBlueprints = blueprint.fields.filter((fieldBlueprint) => {
+          return matchName === util.getBlueprintNamePath(fieldBlueprint)
+        })
+
+        switch (field.type) {
+          case 'object':
+            if (field.templates) {
+              if (Array.isArray(value)) {
+                await util.sequential(
+                  fieldBlueprints,
+                  async (fieldBlueprint) => {
+                    const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+                    if (!value) {
+                      data[keyName] = null
+                      return true
+                    }
+                    const d = []
+                    await util.sequential(value, async (item) => {
+                      const template = field.templates[item._template]
+                      const d2 = await valuesToData({
+                        formNode,
+                        form: { fields: template.fields, values: item },
+                        prefix: [prefix, fieldName].join('.'),
+                        loc,
+                      })
+                      d.push(d2)
+                    })
+                    data[keyName] = d
+                  }
+                )
+              } else {
+                throw new Error('blocks without list true is not yet supported')
+              }
+            } else {
+              if (Array.isArray(value)) {
+                await util.sequential(
+                  fieldBlueprints,
+                  async (fieldBlueprint) => {
+                    const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+                    if (!value) {
+                      data[keyName] = null
+                      return true
+                    }
+                    const d = []
+                    await util.sequential(value, async (item) => {
+                      const d2 = await valuesToData({
+                        formNode,
+                        form: { fields: field.fields, values: item },
+                        prefix: [prefix, fieldName].join('.'),
+                        loc,
+                      })
+                      d.push(d2)
+                      return true
+                    })
+                    data[keyName] = d
+                    return true
+                  }
+                )
+              } else {
+                await util.sequential(
+                  fieldBlueprints,
+                  async (fieldBlueprint) => {
+                    const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+                    if (!value) {
+                      data[keyName] = null
+                      return true
+                    }
+                    const d = await valuesToData({
+                      formNode,
+                      form: { fields: field.fields, values: value },
+                      prefix: [prefix, fieldName].join('.'),
+                      loc,
+                    })
+                    data[keyName] = d
+                    return true
+                  }
+                )
+              }
+            }
+            break
+          case 'reference':
+            let form: Form
+            if (typeof value === 'string') {
+              const existingForm = cms.forms.find(value)
+              if (existingForm) {
+                form = existingForm
+              } else {
+                const formInfo = await cms.api.tina.request(
+                  `#graphql
+                      query Node($id: String!) {
+                        node(id: $id) {
+                          ...on Document {
+                            form
+                            values
+                            _internalSys: sys {
+                              path
+                            }
+                          }
+                        }
+                      }
+                    `,
+                  { variables: { id: value } }
+                )
+                form = util.buildForm(
+                  formInfo.node,
+                  cms,
+                  formifyFunc,
+                  false,
+                  onSubmit
+                )
+              }
+            }
+
+            await util.sequential(fieldBlueprints, async (fieldBlueprint) => {
+              const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+              if (!value) {
+                data[keyName] = null
+                return true
+              }
+
+              const documentBlueprint = state.blueprints.find(
+                (dp) => util.getBlueprintNamePath(dp) === matchName
+              )
+              const location = [...formNode.location]
+              if (loc) {
+                loc.forEach((item) => location.push(item))
+              }
+              const subDocumentFormNode = buildFormNode(
+                documentBlueprint,
+                form,
+                location
+              )
+
+              dispatch({
+                type: 'addOrReplaceDocumentFormNode',
+                value: {
+                  formNode: subDocumentFormNode,
+                  documentForm: form,
+                },
+              })
+
+              const res = await cms.api.tina.request(
+                `
+                    query Node($id: String!) {
+                      node(id: $id) {
+                        ${G.print(documentBlueprint.selection)}
+                      }
+                    }
+                  `,
+                { variables: { id: value } }
+              )
+              const d = await valuesToData({
+                formNode: subDocumentFormNode,
+                form,
+                loc: location,
+              })
+              data[keyName] = { ...res.node, data: d }
+            })
+
+            break
+          default:
+            fieldBlueprints.forEach((fieldBlueprint) => {
+              const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+              if (!value) {
+                data[keyName] = null
+              } else {
+                data[keyName] = value
+              }
+            })
+            break
+        }
+        return true
+      })
+      return data
+    },
+    [cms, JSON.stringify(state), dispatch]
+  )
+  return {
+    ...state,
+    queryString: G.print(state.query),
+  }
+}
+
+const buildFormNode = (
+  documentBlueprint: DocumentBlueprint,
+  form: Form,
+  location: number[]
+): FormNode => {
+  return {
+    documentBlueprintId: documentBlueprint.id,
+    documentFormId: form.id,
+    location,
+  }
 }
