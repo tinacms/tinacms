@@ -1,0 +1,25 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "first line"
+        },
+        {
+          "type": "hard_break"
+        },
+        {
+          "type": "text",
+          "text": "second line"
+        }
+      ]
+    }
+  ]
+}
