@@ -82,21 +82,10 @@ ${JSON.stringify(after, null, 2)}
   return markdown
 }
 
-import type { State } from '../'
 export { printState } from '../util'
 
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-export const printOutput2 = async (current: State, event, callback) => {
-  const previous = { ...current.data }
-  callback()
-  await sleep(1000)
-  const after = { ...current.data }
-  console.log(JSON.stringify(after))
-
-  return printOutput(event, previous, after)
 }
 
 export { cms }
