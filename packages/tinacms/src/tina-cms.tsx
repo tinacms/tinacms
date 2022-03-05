@@ -12,7 +12,10 @@ limitations under the License.
 */
 
 import React, { useState } from 'react'
-import { useGraphqlForms } from './hooks/use-graphql-forms'
+import {
+  useGraphqlForms,
+  useGraphqlFormsUnstable,
+} from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
@@ -391,6 +394,13 @@ export const TinaDataProvider = ({
     payload: undefined,
     isLoading: true,
   })
+  const cms = useCMS()
+  const useUnstableFormify = React.useMemo(() => {
+    if (cms.flags.get('use-unstable-formify')) {
+      return true
+    }
+    return false
+  }, [cms.flags])
 
   return (
     <TinaDataContext.Provider
@@ -400,12 +410,21 @@ export const TinaDataProvider = ({
         state: { payload: state.payload },
       }}
     >
-      <FormRegistrar
-        key={request?.query} // unload on page/query change
-        request={request}
-        formifyCallback={formifyCallback}
-        onPayloadStateChange={setState}
-      />
+      {useUnstableFormify ? (
+        <FormRegistrarUnstable
+          key={request?.query} // unload on page/query change
+          request={request}
+          formifyCallback={formifyCallback}
+          onPayloadStateChange={setState}
+        />
+      ) : (
+        <FormRegistrar
+          key={request?.query} // unload on page/query change
+          request={request}
+          formifyCallback={formifyCallback}
+          onPayloadStateChange={setState}
+        />
+      )}
       {children}
     </TinaDataContext.Provider>
   )
@@ -423,6 +442,40 @@ const FormRegistrar = ({
   const cms = useCMS()
 
   const [payload, isLoading] = useGraphqlForms({
+    query: request?.query,
+    variables: request?.variables,
+    formify: (args) => {
+      if (formifyCallback) {
+        return formifyCallback(args, cms)
+      } else {
+        return args.createForm(args.formConfig)
+      }
+    },
+  })
+
+  React.useEffect(() => {
+    onPayloadStateChange({ payload, isLoading })
+  }, [JSON.stringify(payload), isLoading])
+
+  return isLoading ? (
+    <Loader>
+      <></>
+    </Loader>
+  ) : null
+}
+
+const FormRegistrarUnstable = ({
+  request,
+  formifyCallback,
+  onPayloadStateChange,
+}: {
+  request: { query: string; variables: object }
+  formifyCallback: formifyCallback
+  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
+}) => {
+  const cms = useCMS()
+
+  const [payload, isLoading] = useGraphqlFormsUnstable({
     query: request?.query,
     variables: request?.variables,
     formify: (args) => {
