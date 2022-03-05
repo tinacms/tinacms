@@ -26,7 +26,7 @@ import type { RichTypeInner } from '../types'
 import { isNull } from 'lodash'
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
-  const tree = unified().use(markdown).use(mdx).parse(value)
+  const tree = unified().use(markdown, { commonmark: true }).use(mdx).parse(value)
   return parseMDXInner(tree, field)
 }
 /**
@@ -364,6 +364,7 @@ export interface NodeTypes {
   delete_mark: string
   inline_code_mark: string
   thematic_break: string
+  hard_break: string
 }
 
 export type SlateNodeType =
@@ -435,8 +436,11 @@ export type SlateNodeType =
       caption: string
     }
   | {
-      type: 'thematic_break'
-    }
+    type: 'thematic_break'
+  }
+  | {
+    type: 'hard_break'
+  }
 //   block_quote: 'block_quote',
 //   code_block: 'code_block',
 //   link: 'link',
@@ -511,6 +515,7 @@ export const plateElements = {
   ELEMENT_H5: 'h5',
   ELEMENT_H6: 'h6',
   ELEMENT_HR: 'hr',
+  ELEMENT_BR: 'br',
   ELEMENT_ALIGN_CENTER: 'align_center',
   ELEMENT_ALIGN_JUSTIFY: 'align_justify',
   ELEMENT_ALIGN_LEFT: 'align_left',
@@ -561,6 +566,7 @@ export const defaultNodeTypes: NodeTypes = {
   delete_mark: plateElements.MARK_STRIKETHROUGH,
   inline_code_mark: plateElements.ELEMENT_CODE_LINE,
   thematic_break: plateElements.ELEMENT_HR,
+  hard_break: plateElements.ELEMENT_BR,
   image: plateElements.ELEMENT_IMAGE,
 }
 
@@ -672,6 +678,12 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'thematicBreak':
       return {
         type: types.thematic_break,
+        children: [{ type: 'text', text: '' }],
+      }
+    case 'break':
+    // case 'hardBreak':
+      return {
+        type: types.hard_break,
         children: [{ type: 'text', text: '' }],
       }
     case 'text':

@@ -18,6 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import { ELEMENT_HR } from '@udecode/plate-horizontal-rule'
+import { ELEMENT_BR } from '@udecode/plate-break'
 import { ELEMENT_LINK } from '@udecode/plate-link'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
@@ -47,7 +48,7 @@ import { useSelected } from 'slate-react'
  * based on .prose styles. These classes aim to normalize
  * blocks behavior so they take up the same space
  */
-const blockClasses = 'mt-0.5'
+const blockClasses = 'mt-2'
 /** prose sets a bold font, making bold marks impossible to see */
 const headerClasses = 'font-normal'
 
@@ -231,5 +232,19 @@ export const components = () => {
         </div>
       )
     },
+    [ELEMENT_BR]: ({
+      attributes,
+      className,
+      editor,
+      element,
+      children,
+      ...props
+    }) => (
+      <br
+        {...attributes}
+        className={className}
+        {...props}
+      />
+    ),
   }
 }

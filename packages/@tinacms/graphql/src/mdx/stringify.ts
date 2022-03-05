@@ -197,6 +197,10 @@ export const stringify = (
       return {
         type: 'thematicBreak',
       }
+    case plateElements.ELEMENT_BR:
+      return {
+        type: 'hardBreak',
+      }
     case plateElements.ELEMENT_LINK:
       return {
         type: 'link',

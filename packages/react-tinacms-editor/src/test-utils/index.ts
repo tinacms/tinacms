@@ -172,6 +172,11 @@ export class PMTestHarness {
 
   hr = () => this.nodes.horizontal_rule.create()
 
+  br = () => {
+    console.info('dbg: br')
+    return this.nodes.hard_break.create()
+  }
+
   heading = (level: number, ...nodes: Node[]) =>
     this.nodes.heading.create({ level }, nodes)
 }

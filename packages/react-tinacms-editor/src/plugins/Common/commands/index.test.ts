@@ -18,9 +18,9 @@ limitations under the License.
 
 import { PMTestHarness } from '../../../test-utils'
 import { defaultSchema } from '../../../test-utils/test-schema'
-import { insertHr } from '.'
+import { insertHr, insertBr } from '.'
 
-const { forDoc, doc, p, text, hr } = new PMTestHarness(defaultSchema)
+const { forDoc, doc, p, text, hr, br } = new PMTestHarness(defaultSchema)
 
 describe('insertHr', () => {
   it('should insert an hr at the cursor', () => {
@@ -37,5 +37,23 @@ describe('insertHr', () => {
       .withTextSelection(2, 4) // [2, 4)
       .apply(insertHr)
       .expect(doc(p(text('t')), hr(), p(text('t'))))
+  })
+})
+
+describe('insertBr', () => {
+  it('should insert an br at the cursor', () => {
+    //         0       12345
+    forDoc(doc(p(text('test'))))
+      .withTextSelection(3)
+      .apply(insertBr)
+      .expect(doc(p(text('te')), br(), p(text('st'))))
+  })
+
+  it('should replace selection with HR', () => {
+    //         0       12345
+    forDoc(doc(p(text('test'))))
+      .withTextSelection(2, 4) // [2, 4)
+      .apply(insertBr)
+      .expect(doc(p(text('t')), br(), p(text('t'))))
   })
 })

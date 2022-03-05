@@ -21,6 +21,7 @@ import {
   ELEMENT_CODE_BLOCK,
 } from '@udecode/plate-code-block'
 import { ELEMENT_HR } from '@udecode/plate-horizontal-rule'
+import { ELEMENT_BR } from '@udecode/plate-break'
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
 import {
   ELEMENT_H1,
@@ -103,6 +104,19 @@ export const autoformatBlocks: AutoformatRule[] = [
     match: ['---', '—-', '___ '],
     format: (editor) => {
       setNodes(editor, { type: ELEMENT_HR })
+      insertNodes(editor, {
+        type: ELEMENT_DEFAULT,
+        children: [{ text: '' }],
+      })
+    },
+  },
+  // that probably should not be here...
+  {
+    mode: 'inline',
+    type: ELEMENT_BR,
+    match: ['  \n'],
+    format: (editor) => {
+      setNodes(editor, { type: ELEMENT_BR })
       insertNodes(editor, {
         type: ELEMENT_DEFAULT,
         children: [{ text: '' }],

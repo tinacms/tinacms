@@ -33,6 +33,7 @@ type BaseComponents = {
   code_block?: { lang?: string; children: JSX.Element }
   img?: { url: string; caption?: string; alt?: string }
   hr?: {}
+  br?: {}
   maybe_mdx?: { children: JSX.Element }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
@@ -190,6 +191,13 @@ export const TinaMarkdown = ({
               return <Component key={key} {...props} />
             }
             return <hr key={key} />
+          case 'br':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+              return <Component key={key} {...props} />
+            }
+            return <br key={key} />
           case 'text':
             // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             return <Leaf key={key} components={components} {...child} />

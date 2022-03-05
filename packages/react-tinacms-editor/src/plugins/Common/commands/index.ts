@@ -28,3 +28,12 @@ export function insertHr(state: EditorState, dispatch: Dispatch | null) {
   }
   return true
 }
+
+export function insertBr(state: EditorState, dispatch: Dispatch | null) {
+  console.info('dbg: insertBr', state)
+  const type = state.schema.nodes.hard_break
+  if (dispatch) {
+    dispatch(state.tr.replaceSelectionWith(type.create()).scrollIntoView())
+  }
+  return true
+}
