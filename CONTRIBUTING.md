@@ -150,3 +150,15 @@ If you are running into errors while trying to build or run examples here are so
 - Try cleaning the repo by running `yarn nuke` at the root of the repo. This script removes all build outputs
 - After running `yarn nuke`, `yarn install` and `yarn watch` (or `yarn build`) must be run before doing anything else.
 - If you are still having issues feel free to reach out on our [Community Discord](https://discord.com/invite/zumN63Ybpf)
+
+## E2E tests
+
+In order to run the Cypress E2E tests:
+
+1. Build and start the E2E test project
+   ```sh
+   NEXT_PUBLIC_USE_LOCAL_CLIENT=1
+   yarn build:e2e
+   yarn start:e2e
+   ```
+2. Run the tests in a separate terminal `yarn test:dev` or `yarn test:e2e`
