@@ -40,8 +40,14 @@ const updateDocument = async (
     includeCollection,
     includeTemplate,
   })
-
-  await api.updateDocument(collection.name, relativePath, params)
+  if (await api.isAuthenticated()) {
+    await api.updateDocument(collection.name, relativePath, params)
+  } else {
+    const authMessage = `[Error] UpdateDocument failed: User is no longer authenticated; please login and try again.`
+    cms.alerts.error(authMessage, 30 * 1000)
+    console.error(authMessage)
+    return false
+  }
 }
 
 const CollectionUpdatePage = () => {
