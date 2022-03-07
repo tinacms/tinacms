@@ -4,7 +4,7 @@ const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
 
 const App = ({ Component, pageProps }) => {
   return (
-    <TinaCMS {...pageProps}>
+    <TinaCMS {...pageProps} useUnstableFormify={true}>
       {(livePageProps) => {
         return <Component {...livePageProps} />
       }}
