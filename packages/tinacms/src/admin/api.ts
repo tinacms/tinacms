@@ -17,9 +17,14 @@ import type { Collection, DocumentForm, GetDocumentFields } from './types'
 export class TinaAdminApi {
   api: {
     request: (query: string, { variables }: { variables: object }) => any
+    isAuthenticated: () => boolean
   }
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
+  }
+
+  async isAuthenticated() {
+    return await this.api.isAuthenticated()
   }
 
   async fetchCollections() {

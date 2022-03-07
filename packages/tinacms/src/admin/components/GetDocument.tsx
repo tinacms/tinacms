@@ -29,20 +29,22 @@ export const useGetDocument = (
 
   useEffect(() => {
     const fetchDocument = async () => {
-      try {
-        const response = await api.fetchDocument(collectionName, relativePath)
-        setDocument(response.getDocument)
-      } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetDocument failed: ${error.message}`,
-          30 * 1000 // 30 seconds
-        )
-        console.error(error)
-        setDocument(undefined)
-        setError(error)
-      }
+      if (api.isAuthenticated()) {
+        try {
+          const response = await api.fetchDocument(collectionName, relativePath)
+          setDocument(response.getDocument)
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetDocument failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          console.error(error)
+          setDocument(undefined)
+          setError(error)
+        }
 
-      setLoading(false)
+        setLoading(false)
+      }
     }
 
     setLoading(true)
@@ -68,14 +70,15 @@ const GetDocument = ({
     collectionName,
     relativePath
   )
-  if (!document) {
-    if (loading) {
-      return <LoadingPage />
-    }
-    if (error) {
-      return null
-    }
+
+  if (error) {
+    return null
   }
+
+  if (loading) {
+    return <LoadingPage />
+  }
+
   return <>{children(document, loading)}</>
 }
 
