@@ -396,11 +396,11 @@ export const TinaDataProvider = ({
   })
   const cms = useCMS()
   const useUnstableFormify = React.useMemo(() => {
-    if (cms.flags.get('use-unstable-formify')) {
+    if (cms?.flags.get('use-unstable-formify')) {
       return true
     }
     return false
-  }, [cms.flags])
+  }, [cms?.flags])
 
   return (
     <TinaDataContext.Provider
