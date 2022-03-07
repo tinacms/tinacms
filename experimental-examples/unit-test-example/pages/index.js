@@ -1,5 +1,5 @@
 import React from 'react'
-import { useGraphqlFormsUnstable } from 'tinacms'
+import { useGraphqlFormsUnstable, getStaticPropsForTina } from 'tinacms'
 
 export default function Page(props) {
   const eventList = React.useRef([])
@@ -64,6 +64,7 @@ const query = `#graphql
 query {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {
+      title
       blocks {
         ...on BlockPageBlocksFeaturedPosts {
           blogs {
