@@ -330,7 +330,7 @@ export const useFormify = ({
     state.changeSets.forEach((changeSet) => {
       if (changeSet.mutationType.type === 'reset') {
         const form = cms.forms.find(changeSet.formId)
-        valuesToData({
+        resolveSubFields({
           formNode: changeSet.formNode,
           form: form,
         }).then((res) => {
@@ -351,7 +351,7 @@ export const useFormify = ({
 
           const { fields, __typename } = util.getSubFields(changeSet)
 
-          valuesToData({
+          resolveSubFields({
             formNode: changeSet.formNode,
             prefix: util.replaceRealNum(fieldName),
             loc: util.stripIndices(changeSet.path),
@@ -408,7 +408,7 @@ export const useFormify = ({
               const form = state.documentForms.find(
                 (documentForm) => documentForm.id === formNode.documentFormId
               )
-              const data = await valuesToData({
+              const data = await resolveSubFields({
                 formNode,
                 form,
                 loc: formNode.location,
@@ -462,7 +462,7 @@ export const useFormify = ({
    * values. This resolves each field, including asynchronous fields before updating
    * the `state.data` with the value.
    */
-  const valuesToData = React.useCallback(
+  const resolveSubFields = React.useCallback(
     async (args: {
       formNode: FormNode
       prefix?: string
@@ -506,7 +506,7 @@ export const useFormify = ({
                     const d = []
                     await util.sequential(value, async (item) => {
                       const template = field.templates[item._template]
-                      const d2 = await valuesToData({
+                      const d2 = await resolveSubFields({
                         formNode,
                         form: { fields: template.fields, values: item },
                         prefix: [prefix, fieldName].join('.'),
@@ -532,7 +532,7 @@ export const useFormify = ({
                     }
                     const d = []
                     await util.sequential(value, async (item) => {
-                      const d2 = await valuesToData({
+                      const d2 = await resolveSubFields({
                         formNode,
                         form: { fields: field.fields, values: item },
                         prefix: [prefix, fieldName].join('.'),
@@ -554,7 +554,7 @@ export const useFormify = ({
                       data[keyName] = null
                       return true
                     }
-                    const d = await valuesToData({
+                    const d = await resolveSubFields({
                       formNode,
                       form: { fields: field.fields, values: value },
                       prefix: [prefix, fieldName].join('.'),
@@ -638,7 +638,7 @@ export const useFormify = ({
                   `,
                 { variables: { id: value } }
               )
-              const d = await valuesToData({
+              const d = await resolveSubFields({
                 formNode: subDocumentFormNode,
                 form,
                 loc: location,
