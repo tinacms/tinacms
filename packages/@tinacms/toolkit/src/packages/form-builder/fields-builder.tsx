@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { Form, Field } from '../forms'
-import { useCMS } from '../react-core'
+import { useCMS, useEventSubscription } from '../react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
 import styled, { css } from 'styled-components'
@@ -28,23 +28,34 @@ export interface FieldsBuilderProps {
   fields: Field[]
 }
 
-const InnerField = ({ field, form }) => {
+export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   const cms = useCMS()
 
-  /**
-   * We double-render form builders for some reason which reults in useMemo not working here
-   */
-  React.useEffect(() => {
-    form.mutators.setFieldData(field.name, {
-      tinaField: field,
-    })
-  }, [form, field])
+  // re-build fields when new field plugins are registered
+  const [fieldPlugins, setFieldPlugins] = React.useState<FieldPlugin[]>([])
+  const updateFieldPlugins = React.useCallback(() => {
+    const fieldPlugins = cms.plugins.getType<FieldPlugin>('field').all()
+    setFieldPlugins(fieldPlugins)
+  }, [setFieldPlugins])
+  React.useEffect(() => updateFieldPlugins(), [])
+  useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
 
+  return (
+    // @ts-ignore FIXME twind
+    <FieldsGroup>
+      {fields.map((field: Field) => (
+        <InnerField field={field} form={form} fieldPlugins={fieldPlugins} />
+      ))}
+    </FieldsGroup>
+  )
+}
+
+const InnerField = ({ field, form, fieldPlugins }) => {
   if (field.component === null) return null
 
-  const plugin = cms.plugins
-    .findOrCreateMap<FieldPlugin>('field')
-    .find(field.component as string)
+  const plugin = fieldPlugins.find(
+    (plugin: FieldPlugin) => plugin.name === field.component
+  )
 
   let type: string | undefined
   if (plugin && plugin.type) {
@@ -114,17 +125,6 @@ const InnerField = ({ field, form }) => {
         return <p>Unrecognized field type</p>
       }}
     </FinalField>
-  )
-}
-
-export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
-  return (
-    // @ts-ignore FIXME twind
-    <FieldsGroup>
-      {fields.map((field: Field) => {
-        return <InnerField form={form} field={field} />
-      })}
-    </FieldsGroup>
   )
 }
 
