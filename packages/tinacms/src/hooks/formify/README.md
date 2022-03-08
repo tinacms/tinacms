@@ -2,10 +2,10 @@
 
 To make query data "live", Tina does a few things:
 
-1. Formify the query - adds extra metadata to the query at each "node"
+1. "Formify the query" - adds extra metadata to the query at each "node"
 2. Record a mapping of the query to where each "node" is (or where one could exist when values change)
-3. Generate forms for each document in the query payload
-4. Generating and resolving a changeset - how form changes make their way to the `data` property
+3. Generate forms for each node in the query result
+4. Listen to `onChange` events and update the appropriate section of the query result.
 
 
 ## Formifying the query
@@ -128,3 +128,5 @@ __do not__ represent the actual data in all cases. For the author in the example
 put into a queue and resolved asynchronously. Once a changeset is resolved, the reolved value will then be passed in as the new
 value. For reference fields and objects it's important to note that the values are fully resolved before they are set in the
 `data` property.
+
+![](https://raw.githubusercontent.com/tinacms/tinacms/use-graphql-froms-refactor-4/packages/tinacms/src/hooks/formify/formify-diagram.png)
