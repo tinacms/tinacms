@@ -47,7 +47,7 @@ You can also modify the schema as needed to test things that aren't covered yet.
 
 You can make whatever changes you'd like to test in the form. Hitting "Save" will copy a test to your clipboard.
 
-4. Create a new file, for now the convention is `#-some-test-description/index.spec.ts`. This isn't ideal but is great
+4. From within `tinacms` formify module (packages/tinacms/src/hooks/formify), create a new file, for now the convention is `test/#-some-test-description/index.spec.ts`. This isn't ideal but is great
    for moving quickly. Pase the event that was copied to your clipboard after saving the form.
 
 5. In a separate terminal go to `packages/tinacms` and run the test with `yarn test --watch`. The test will fail.
