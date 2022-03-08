@@ -3,11 +3,10 @@ import React from 'react'
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
 
 const App = ({ Component, pageProps }) => {
+  const { query, variables, data, ...rest } = pageProps
   return (
-    <TinaCMS {...pageProps} useUnstableFormify={true}>
-      {(livePageProps) => {
-        return <Component {...livePageProps} />
-      }}
+    <TinaCMS {...rest}>
+      <Component {...rest} query={query} variables={variables} data={data} />
     </TinaCMS>
   )
 }
