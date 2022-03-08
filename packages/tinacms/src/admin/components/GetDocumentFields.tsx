@@ -43,54 +43,57 @@ export const useGetDocumentFields = (
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
-      try {
-        const response = await api.fetchDocumentFields()
-        const documentFields = response.getDocumentFields
-        const collection: Object = documentFields[collectionName].collection
-        const mutationInfo: {
-          includeCollection: boolean
-          includeTemplate: boolean
-        } = documentFields[collectionName].mutationInfo
-        let fields: Object[] = undefined
-        let template: { name: string; label: string } = undefined
+      if (await api.isAuthenticated()) {
+        try {
+          const response = await api.fetchDocumentFields()
+          const documentFields = response.getDocumentFields
+          const collection: Object = documentFields[collectionName].collection
+          const mutationInfo: {
+            includeCollection: boolean
+            includeTemplate: boolean
+          } = documentFields[collectionName].mutationInfo
+          let fields: Object[] = undefined
+          let template: { name: string; label: string } = undefined
 
-        /***
-         * Collection `collectionName` has template `templateName`...
-         */
-        if (
-          templateName &&
-          documentFields[collectionName].templates &&
-          documentFields[collectionName].templates[templateName]
-        ) {
-          template =
-            documentFields[collectionName].templates[templateName].template
-          fields = documentFields[collectionName].templates[templateName].fields
-        } else {
-          fields = documentFields[collectionName].fields
+          /***
+           * Collection `collectionName` has template `templateName`...
+           */
+          if (
+            templateName &&
+            documentFields[collectionName].templates &&
+            documentFields[collectionName].templates[templateName]
+          ) {
+            template =
+              documentFields[collectionName].templates[templateName].template
+            fields =
+              documentFields[collectionName].templates[templateName].fields
+          } else {
+            fields = documentFields[collectionName].fields
+          }
+
+          setInfo({
+            collection,
+            template,
+            fields,
+            mutationInfo,
+          })
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetDocumentFields failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          console.error(error)
+          setInfo({
+            collection: undefined,
+            template: undefined,
+            fields: undefined,
+            mutationInfo: undefined,
+          })
+          setError(error)
         }
 
-        setInfo({
-          collection,
-          template,
-          fields,
-          mutationInfo,
-        })
-      } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetDocumentFields failed: ${error.message}`,
-          30 * 1000 // 30 seconds
-        )
-        console.error(error)
-        setInfo({
-          collection: undefined,
-          template: undefined,
-          fields: undefined,
-          mutationInfo: undefined,
-        })
-        setError(error)
+        setLoading(false)
       }
-
-      setLoading(false)
     }
 
     setLoading(true)
@@ -114,14 +117,14 @@ const GetDocumentFields = ({
   const { collection, template, fields, mutationInfo, loading, error } =
     useGetDocumentFields(cms, collectionName, templateName)
 
-  if (!collection) {
-    if (loading) {
-      return <LoadingPage />
-    }
-    if (error) {
-      return null
-    }
+  if (error) {
+    return null
   }
+
+  if (loading) {
+    return <LoadingPage />
+  }
+
   return (
     <>{children({ collection, template, fields, mutationInfo, loading })}</>
   )

@@ -80,18 +80,20 @@ const useFetchCollections = (cms) => {
 
   useEffect(() => {
     const fetchCollections = async () => {
-      try {
-        const response = await cms.api.admin.fetchCollections()
-        setCollections(response.getCollections)
-      } catch (error) {
-        cms.alerts.error(
-          `[ERROR] GetCollections failed: ${error.message}`,
-          30 * 1000 // 30 seconds
-        )
-        setCollections([])
-      }
+      if (await cms.api.admin.isAuthenticated()) {
+        try {
+          const response = await cms.api.admin.fetchCollections()
+          setCollections(response.getCollections)
+        } catch (error) {
+          cms.alerts.error(
+            `[ERROR] GetCollections failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          setCollections([])
+        }
 
-      setLoading(false)
+        setLoading(false)
+      }
     }
 
     if (cms.api.admin) {
