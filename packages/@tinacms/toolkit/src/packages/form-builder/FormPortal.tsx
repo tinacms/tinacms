@@ -38,11 +38,11 @@ export const FormPortalProvider: React.FC = ({ children }) => {
 
   const FormPortal = React.useCallback(
     (props: any) => {
-      const portalZIndex = React.useMemo<number>(() => {
+      const portalZIndex = () => {
         const value = zIndexRef.current
         zIndexRef.current += 1
         return value
-      }, [])
+      }
 
       if (!wrapperRef.current) return null
 
