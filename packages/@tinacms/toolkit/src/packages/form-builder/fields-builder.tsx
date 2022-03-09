@@ -51,6 +51,15 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 }
 
 const InnerField = ({ field, form, fieldPlugins }) => {
+  /**
+   * We double-render form builders for some reason which reults in useMemo not working here
+   */
+  React.useEffect(() => {
+    form.mutators.setFieldData(field.name, {
+      tinaField: field,
+    })
+  }, [form, field])
+
   if (field.component === null) return null
 
   const plugin = fieldPlugins.find(
