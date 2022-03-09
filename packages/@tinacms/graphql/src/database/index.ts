@@ -445,32 +445,24 @@ const indexDocument = async ({
 }) => {
   const schema = await database.getSchema()
   const collection = await schema.getCollectionByFullPath(filepath)
-  let existingData
-  try {
-    existingData = await database.get<{ _collection: string }>(filepath)
-  } catch (err) {
-    if (err.extensions?.['status'] !== 404) {
-      throw err
-    }
-  }
+  // TODO need to handle updates to indexes
 
-  if (existingData) {
-    const attributesToFilterOut = await _indexCollectable({
-      record: filepath,
-      value: existingData,
-      field: collection,
-      prefix: collection.name,
-      database,
-    })
-    await sequential(attributesToFilterOut, async (attribute) => {
-      const records = (await database.store.get<string[]>(attribute)) || []
-      await database.store.put(
-          attribute,
-          records.filter((item) => item !== filepath)
-      )
-      return true
-    })
-  }
+  // const existingData = await database.get<{ _collection: string }>(filepath)
+  // const attributesToFilterOut = await _indexCollectable({
+  //   record: filepath,
+  //   value: existingData,
+  //   field: collection,
+  //   prefix: collection.name,
+  //   database,
+  // })
+  // await sequential(attributesToFilterOut, async (attribute) => {
+  //   const records = (await database.store.get<string[]>(attribute)) || []
+  //   await database.store.put(
+  //     attribute,
+  //     records.filter((item) => item !== filepath)
+  //   )
+  //   return true
+  // })
 
   const attributes = await _indexCollectable({
     record: filepath,
@@ -480,14 +472,14 @@ const indexDocument = async ({
     prefix: `${lastItem(collection.namespace)}`,
     database,
   })
-  await sequential(attributes, async (fieldName) => {
-    const existingRecords =
-      (await database.store.get<string[]>(fieldName)) || []
-    // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
-    // // @ts-ignore
-    const uniqueItems = [...new Set([...existingRecords, filepath])]
-    await database.store.put(fieldName, uniqueItems)
-  })
+  // await sequential(attributes, async (fieldName) => {
+  //   const existingRecords =
+  //     (await database.store.get<string[]>(fieldName)) || []
+  //   // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
+  //   // // @ts-ignore
+  //   const uniqueItems = [...new Set([...existingRecords, filepath])]
+  //   await database.store.put(fieldName, uniqueItems)
+  // })
 }
 
 const _indexCollectable = async ({
