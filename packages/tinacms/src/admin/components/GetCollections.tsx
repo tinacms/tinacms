@@ -24,20 +24,22 @@ export const useGetCollections = (cms: TinaCMS) => {
 
   useEffect(() => {
     const fetchCollections = async () => {
-      try {
-        const response = await api.fetchCollections()
-        setCollections(response.getCollections)
-      } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollections failed: ${error.message}`,
-          30 * 1000 // 30 seconds
-        )
-        console.error(error)
-        setCollections([])
-        setError(error)
-      }
+      if (await api.isAuthenticated()) {
+        try {
+          const response = await api.fetchCollections()
+          setCollections(response.getCollections)
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetCollections failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          console.error(error)
+          setCollections([])
+          setError(error)
+        }
 
-      setLoading(false)
+        setLoading(false)
+      }
     }
 
     setLoading(true)
@@ -49,11 +51,11 @@ export const useGetCollections = (cms: TinaCMS) => {
 
 const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
   const { collections, loading, error } = useGetCollections(cms)
-  if (!collections) {
-    if (loading || error) {
-      return null
-    }
+
+  if (loading || error) {
+    return null
   }
+
   return <>{children(collections, loading)}</>
 }
 

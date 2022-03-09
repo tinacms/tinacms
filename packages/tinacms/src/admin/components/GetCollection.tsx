@@ -31,23 +31,25 @@ export const useGetCollection = (
 
   useEffect(() => {
     const fetchCollection = async () => {
-      try {
-        const response = await api.fetchCollection(
-          collectionName,
-          includeDocuments
-        )
-        setCollection(response.getCollection)
-      } catch (error) {
-        cms.alerts.error(
-          `[${error.name}] GetCollection failed: ${error.message}`,
-          30 * 1000 // 30 seconds
-        )
-        console.error(error)
-        setCollection(undefined)
-        setError(error)
-      }
+      if (await api.isAuthenticated()) {
+        try {
+          const response = await api.fetchCollection(
+            collectionName,
+            includeDocuments
+          )
+          setCollection(response.getCollection)
+        } catch (error) {
+          cms.alerts.error(
+            `[${error.name}] GetCollection failed: ${error.message}`,
+            30 * 1000 // 30 seconds
+          )
+          console.error(error)
+          setCollection(undefined)
+          setError(error)
+        }
 
-      setLoading(false)
+        setLoading(false)
+      }
     }
 
     setLoading(true)
@@ -73,13 +75,13 @@ const GetCollection = ({
     collectionName,
     includeDocuments
   )
-  if (!collection) {
-    if (loading) {
-      return <LoadingPage />
-    }
-    if (error) {
-      return null
-    }
+
+  if (error) {
+    return null
+  }
+
+  if (loading) {
+    return <LoadingPage />
   }
 
   return <>{children(collection, loading)}</>
