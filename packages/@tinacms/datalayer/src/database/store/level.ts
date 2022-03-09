@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type {BinaryFilter, QueryParams, Store, TernaryFilter} from './index'
-import {OP} from './index'
+import type {BinaryFilter, PutOptions, QueryParams, Store, TernaryFilter} from './index'
+import {OP, isIndexed} from './index'
 import path from 'path'
 import {atob, btoa, sequential} from '../../util'
 import level, {LevelDB} from 'level'
@@ -20,13 +20,14 @@ import levelup from 'levelup'
 import memdown from 'memdown'
 import encode from 'encoding-down'
 import {IndexDefinition} from '.'
-import {ScalarValue} from '../../index'
+import {FilterOperand} from '../../index'
 
+const defaultPrefix = '_ROOT_'
 
 export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
-  public indexes: Record<string,{ db: LevelDB, definition: IndexDefinition }>
+  public indexes: Record<string, {fields: {name: string, type: string}[], indexDefinitions: Record<string, IndexDefinition>}> = {}
   public useMemory: boolean
   constructor(rootPath: string, useMemory: boolean = false) {
     this.rootPath = rootPath || ''
@@ -40,9 +41,9 @@ export class LevelStore implements Store {
       })
       this.db = db
     }
-    this.indexes = {}
   }
 
+  // TODO move this up so it can be used by other stores
   private makeFilter({ filterChain,
                        dataTypes
                      }: {
@@ -58,8 +59,8 @@ export class LevelStore implements Store {
           return false
         }
 
-        let value: ScalarValue
-        if (dataType === 'string') {
+        let value: FilterOperand
+        if (dataType === 'string' || dataType === 'reference') {
           value = stringValue
         } else if (dataType === 'number' || dataType === 'datetime') {
           value = Number(stringValue)
@@ -92,6 +93,11 @@ export class LevelStore implements Store {
               break
             case OP.LTE:
               if (value > filter.rightOperand) {
+                return false
+              }
+              break
+            case OP.IN:
+              if ((filter.rightOperand as any[]).indexOf(value) === -1) {
                 return false
               }
               break
@@ -130,20 +136,7 @@ export class LevelStore implements Store {
       // convert operands by type
       for (const filter of filterChain) {
         const dataType: string = dataTypes[filter.field]
-        if (dataType === 'number') {
-          if ((filter as TernaryFilter).leftOperand !== undefined) {
-            result.push({
-              ...filter,
-              rightOperand: Number(filter.rightOperand),
-              leftOperand: Number((filter as TernaryFilter).leftOperand),
-            })
-          } else {
-            result.push({
-              ...filter,
-              rightOperand: Number(filter.rightOperand),
-            })
-          }
-        } else if (dataType === 'datetime') {
+        if (dataType === 'datetime') {
           if ((filter as TernaryFilter).leftOperand !== undefined) {
             result.push({
               ...filter,
@@ -151,10 +144,14 @@ export class LevelStore implements Store {
               leftOperand: new Date((filter as TernaryFilter).leftOperand as string).getTime(),
             })
           } else {
-            result.push({
-              ...filter,
-              rightOperand: new Date(filter.rightOperand as string).getTime(),
-            })
+            if (Array.isArray(filter.rightOperand)) {
+              (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
+            } else {
+              result.push({
+                ...filter,
+                rightOperand: new Date(filter.rightOperand as string).getTime(),
+              })
+            }
           }
         } else {
           result.push({ ...filter })
@@ -166,8 +163,8 @@ export class LevelStore implements Store {
   }
 
   public async query(queryParams: QueryParams, hydrator) {
-    let { first, after, last, before, index } = queryParams
-    const query: { gt?: string, lt?: string, reverse?: boolean } = {}
+    let { first, after, last, before, sort, collection } = queryParams
+    const query: { gt?: string, gte?: string, lt?: string, lte?: string, reverse?: boolean } = {}
     let limit = 10 // default
 
     if (first) {
@@ -176,10 +173,25 @@ export class LevelStore implements Store {
       limit = last
     }
 
+    const { fields, indexDefinitions } = this.indexes[collection]
+    const indexDefinition = sort && indexDefinitions[sort]
+    const indexed = indexDefinition && isIndexed(queryParams, indexDefinition)
+
     if (after) {
       query.gt = atob(after)
     } else if (before) {
       query.lt = atob(before)
+    }
+
+    const indexPrefix = indexDefinition ? `${indexDefinition.collection}:${sort}` : `${defaultPrefix}:`
+
+    // // TODO does this properly handle DESC ?
+    if (!query.gt && !query.gte) {
+      query.gt = indexPrefix
+    }
+
+    if (!query.lt && !query.lte) {
+      query.lt = `${indexPrefix}\xFF`
     }
 
     if (last ) {
@@ -191,70 +203,58 @@ export class LevelStore implements Store {
     // - how do we handle exists operator in dynamo?
     // - when using last/before, should we change the hasNextPage/hasPreviousPage and startCursor/endCursor?
 
-    const { definition, db } = this.indexes[index]
-
-    let edges: { key: string, value: string }[] = []
-    let startKey: string = ""
-    let endKey: string = ""
+    let edges: { cursor: string, path: string }[] = []
+    let startKey: string = ''
+    let endKey: string = ''
     let hasPreviousPage = false
     let hasNextPage = false
 
     const dataTypes: Record<string, string> = {}
-    for (const field of definition.fields) {
+    for (const field of indexed ? indexDefinition.fields : fields) {
       dataTypes[field.name] = field.type
     }
 
     const filterChain: (BinaryFilter | TernaryFilter)[] | undefined = this.coerceFilterChainOperands(queryParams.filterChain, dataTypes)
-    let valuesRegex = new RegExp(`^${definition.namespace}${definition.fields.map(p => `:(?<${p.name}>.*)`).join('')}`)
+    let valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
 
     const itemFilter = filterChain ? this.makeFilter({
       filterChain,
       dataTypes
     }) : () => true
 
-    await new Promise<void>((resolve, reject) => {
-      db.createReadStream(query).on('data', function(data) {
-        try {
-          if (edges.length >= limit) {
-            if (last) {
-              hasPreviousPage = true
-            } else {
-              hasNextPage = true
-            }
+    const { db } = this
 
-            this.destroy('limit') //exit by calling destroy with a specific error
-          } else {
-            const matcher = valuesRegex.exec(data.key)
-            if (!matcher || matcher.length !== (definition.fields.length + 1) || !itemFilter(matcher.groups)) {
-              return
-            }
+    for await (const [key, value] of (db as any).iterator(query)) { //TODO why is typescript unhappy?
+      const matcher = valuesRegex.exec(key)
+      if (!matcher || (indexDefinition && matcher.length !== (indexDefinition.fields.length + 2))) {
+        continue
+      }
+      const filepath = matcher.groups['_filepath_']
+      if (!itemFilter(indexed ? matcher.groups : (indexDefinition ? await db.get(`${defaultPrefix}:${filepath}`) : value))) {
+        continue
+      }
 
-            startKey = startKey || data.key || ""
-            endKey = data.key || ""
-            edges = [...edges, { key: data.key, value: data.value.pop() }]
-          }
-        } catch (err) {
-          reject(err)
-        }
-      })
-      .on('error', (message) => {
-        if (message === 'limit') {
-          resolve()
+      if (limit !== -1 && edges.length >= limit) {
+        if (last) {
+          hasPreviousPage = true
         } else {
-          reject(message)
+          hasNextPage = true
         }
-      })
-      .on('end', function () {
-        resolve()
-      })
-    })
+
+        break
+      }
+
+      startKey = startKey || key || ''
+      endKey = key || ''
+      edges = [...edges, { cursor: key, path: filepath }]
+    }
 
     return {
       edges: await sequential(edges, async (edge) => {
-        const node = await hydrator(edge.value)
+        const node = await hydrator(edge.path)
         return {
           node,
-          cursor: btoa(edge.key)
+          cursor: btoa(edge.cursor)
         }
       }),
       pageInfo: {
@@ -266,19 +266,18 @@ export class LevelStore implements Store {
     }
   }
 
-  private initIndexes(indexDefinitions: Record<string,IndexDefinition>) {
-    for (let [name, definition] of Object.entries(indexDefinitions)) {
-      if (!this.indexes[name]) {
-        this.indexes[name] = { db: this.useMemory ? levelup(encode(memdown(), { valueEncoding: 'json' })) : level(path.join(this.rootPath, `.tina/__generated__/db.index_${name}`), {
-          valueEncoding: 'json',
-        }), definition }
+  public async seed(filepath: string, data: object, options?: PutOptions) {
+    if (options?.indexDefinitions || options?.fields) {
+      if (!options?.collection) {
+        throw new Error('collection must be specified with fields or indexDefinitions')
       }
-    }
-  }
 
-  public async seed(filepath: string, data: object, options?: { indexDefinitions?: Record<string,IndexDefinition> }) {
-    if (options?.indexDefinitions) {
-      this.initIndexes(options?.indexDefinitions)
+      if (!this.indexes[options?.collection]) {
+        this.indexes[options?.collection] = {
+          indexDefinitions: options?.indexDefinitions,
+          fields: options?.fields
+        }
+      }
     }
 
     await this.put(filepath, data, { keepTemplateKey: false, ...options })
@@ -313,9 +312,6 @@ export class LevelStore implements Store {
   }
   public async clear() {
     await this.db.clear()
-    await Promise.all(
-        Object.values(this.indexes).map(
-            index => index.db.clear()))
   }
 
   public async glob(pattern: string, callback) {
@@ -323,11 +319,11 @@ export class LevelStore implements Store {
     const p = new Promise((resolve, reject) => {
       this.db
         .createKeyStream({
-          gte: pattern,
-          lte: pattern + '\xFF', // stop at the last key with the prefix
+          gte: `${defaultPrefix}:${pattern}`,
+          lte: `${defaultPrefix}:${pattern}\xFF`, // stop at the last key with the prefix
         })
         .on('data', (data) => {
-          strings.push(data)
+          strings.push(data.split(`${defaultPrefix}:`)[1])
         })
         .on('error', (message) => {
           reject(message)
@@ -348,18 +344,18 @@ export class LevelStore implements Store {
   }
   public async get(filepath: string) {
     try {
-      const content = await this.db.get(filepath)
+      const content = await this.db.get(`${defaultPrefix}:${filepath}`)
       return content
     } catch (e) {
       return undefined
     }
   }
 
-  public async put(filepath: string, data: object, options?: { keepTemplateKey: boolean, indexDefinitions?: Record<string,IndexDefinition> } ) {
-    await this.db.put(filepath, data)
+  public async put(filepath: string, data: object, options?: PutOptions ) {
+    await this.db.put(`${defaultPrefix}:${filepath}`, data)
 
     if (options?.indexDefinitions) {
-      for (let [name, definition] of Object.entries(options.indexDefinitions)) {
+      for (let [sort, definition] of Object.entries(options.indexDefinitions)) {
         const indexedValue = definition.fields.map(field => {
           if (field.name in data) {
             if (field.type === 'datetime') {
@@ -372,19 +368,7 @@ export class LevelStore implements Store {
           return field.default || ''
         }).join(':')
 
-        const key = `${definition.namespace}:${indexedValue}` // This value must be unique for the index
-        await new Promise((resolve, reject) => {
-          this.indexes[name].db.get(key).then(() => {
-            reject(new Error(`Duplicate key error for index '${name}' and key: '${indexedValue}`))
-          }).catch(async (err) => {
-            if (err.name !== 'NotFoundError') {
-              reject(err)
-            } else {
-              await this.indexes[name].db.put(key, [filepath]) // TODO why is the value an array?
-              resolve()
-            }
-          })
-        })
+        await this.db.put(`${definition.collection}:${sort}:${indexedValue}:${filepath}`, '')
       }
     }
   }

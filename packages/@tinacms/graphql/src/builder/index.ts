@@ -917,6 +917,11 @@ export class Builder {
                 name: 'exists',
                 type: astBuilder.TYPES.Boolean,
               }),
+              astBuilder.InputValueDefinition({
+                name: 'in',
+                type: astBuilder.TYPES.Number,
+                list: true
+              }),
             ],
           }),
         })
@@ -942,6 +947,11 @@ export class Builder {
                 name: 'exists',
                 type: astBuilder.TYPES.Boolean,
               }),
+              astBuilder.InputValueDefinition({
+                name: 'in',
+                type: astBuilder.TYPES.String,
+                list: true
+              }),
             ],
           }),
         })
@@ -963,6 +973,11 @@ export class Builder {
               astBuilder.InputValueDefinition({
                 name: 'exists',
                 type: astBuilder.TYPES.Boolean,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'in',
+                type: astBuilder.TYPES.String,
+                list: true
               }),
             ],
           }),
@@ -1314,7 +1329,7 @@ const listArgs = [
     type: astBuilder.TYPES.Number,
   }),
   astBuilder.InputValueDefinition({
-    name: 'index',
+    name: 'sort',
     type: astBuilder.TYPES.String,
   }),
 ]

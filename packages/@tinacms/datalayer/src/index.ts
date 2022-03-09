@@ -22,6 +22,6 @@ export {
 export { MemoryStore } from './database/store/memory'
 export { LevelStore } from './database/store/level'
 export type { Store, QueryParams, IndexDefinition, TernaryFilter, BinaryFilter } from './database/store'
-export { makeFilterChain, OP, validateQueryParams } from './database/store'
+export { makeFilterChain, OP } from './database/store'
 
-export type ScalarValue = string | number | boolean
+export type FilterOperand = string | number | boolean | string[] | number[]

@@ -170,6 +170,15 @@
           ]
         },
         {
+          "type": "number",
+          "label": "Rating",
+          "name": "rating",
+          "namespace": [
+            "posts",
+            "rating"
+          ]
+        },
+        {
           "type": "reference",
           "label": "Author",
           "name": "author",
@@ -198,6 +207,7 @@
           "type": "image",
           "name": "heroImg",
           "label": "Hero Image",
+          "indexed": false,
           "namespace": [
             "posts",
             "heroImg"
@@ -217,42 +227,6 @@
         }
       ],
       "indexes": [
-        {
-          "name": "title",
-          "fields": [
-            {
-              "name": "title",
-              "default": "",
-              "namespace": [
-                "posts",
-                "title",
-                "title"
-              ]
-            }
-          ],
-          "namespace": [
-            "posts",
-            "title"
-          ]
-        },
-        {
-          "name": "date",
-          "fields": [
-            {
-              "name": "date",
-              "default": "",
-              "namespace": [
-                "posts",
-                "date",
-                "date"
-              ]
-            }
-          ],
-          "namespace": [
-            "posts",
-            "date"
-          ]
-        },
         {
           "name": "published-by-date",
           "fields": [

@@ -106,6 +106,7 @@ interface TinaField {
   description?: string
   required?: boolean
   list?: boolean
+  indexed?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.
    * NOTE: only serializable values are supported, so functions like `validate`

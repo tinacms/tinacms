@@ -104,7 +104,7 @@ export type QueryGetDocumentListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<DocumentFilter>;
 };
 
@@ -119,7 +119,7 @@ export type QueryGetPostsListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<PostsFilter>;
 };
 
@@ -134,7 +134,7 @@ export type QueryGetGlobalListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<GlobalFilter>;
 };
 
@@ -149,7 +149,7 @@ export type QueryGetAuthorsListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<AuthorsFilter>;
 };
 
@@ -164,7 +164,7 @@ export type QueryGetPagesListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<PagesFilter>;
 };
 
@@ -172,6 +172,7 @@ export type StringFilter = {
   startsWith?: Maybe<Scalars['String']>;
   eq?: Maybe<Scalars['String']>;
   exists?: Maybe<Scalars['Boolean']>;
+  in?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type Posts_BodyDateTimeFilter = {
@@ -207,6 +208,16 @@ export type BooleanFilter = {
   exists?: Maybe<Scalars['Boolean']>;
 };
 
+export type NumberFilter = {
+  lt?: Maybe<Scalars['Float']>;
+  lte?: Maybe<Scalars['Float']>;
+  gte?: Maybe<Scalars['Float']>;
+  gt?: Maybe<Scalars['Float']>;
+  eq?: Maybe<Scalars['Float']>;
+  exists?: Maybe<Scalars['Boolean']>;
+  in?: Maybe<Array<Maybe<Scalars['Float']>>>;
+};
+
 export type AuthorsFilter = {
   name?: Maybe<StringFilter>;
   avatar?: Maybe<StringFilter>;
@@ -221,18 +232,21 @@ export type DatetimeFilter = {
   before?: Maybe<Scalars['String']>;
   eq?: Maybe<Scalars['String']>;
   exists?: Maybe<Scalars['Boolean']>;
+  in?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type ImageFilter = {
   startsWith?: Maybe<Scalars['String']>;
   eq?: Maybe<Scalars['String']>;
   exists?: Maybe<Scalars['Boolean']>;
+  in?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type PostsFilter = {
   _body?: Maybe<Posts_BodyFilter>;
   title?: Maybe<StringFilter>;
   published?: Maybe<BooleanFilter>;
+  rating?: Maybe<NumberFilter>;
   author?: Maybe<PostsAuthorFilter>;
   date?: Maybe<DatetimeFilter>;
   heroImg?: Maybe<ImageFilter>;
@@ -380,7 +394,7 @@ export type CollectionDocumentsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
-  index?: Maybe<Scalars['String']>;
+  sort?: Maybe<Scalars['String']>;
   filter?: Maybe<DocumentFilter>;
 };
 
@@ -393,6 +407,7 @@ export type Posts = {
   _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   published?: Maybe<Scalars['Boolean']>;
+  rating?: Maybe<Scalars['Float']>;
   author?: Maybe<PostsAuthorDocument>;
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
@@ -705,6 +720,7 @@ export type PostsMutation = {
   _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   published?: Maybe<Scalars['Boolean']>;
+  rating?: Maybe<Scalars['Float']>;
   author?: Maybe<Scalars['String']>;
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
@@ -837,9 +853,9 @@ export type BlogPostQueryQueryVariables = Exact<{
 }>;
 
 
-export type BlogPostQueryQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } }, getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', name?: Maybe<string>, color?: Maybe<string>, style?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, icon?: Maybe<string>, font?: Maybe<string>, darkMode?: Maybe<string> }> } } };
+export type BlogPostQueryQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, rating?: Maybe<number>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } }, getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', name?: Maybe<string>, color?: Maybe<string>, style?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, icon?: Maybe<string>, font?: Maybe<string>, darkMode?: Maybe<string> }> } } };
 
-export type PostsPartsFragment = { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> };
+export type PostsPartsFragment = { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, rating?: Maybe<number>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> };
 
 export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
 
@@ -852,12 +868,12 @@ export type GetPostsDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsDocumentQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } } };
+export type GetPostsDocumentQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, rating?: Maybe<number>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } } };
 
 export type GetPostsListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPostsListQuery = { __typename?: 'Query', getPostsList: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'PostsDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } }> }>>> } };
+export type GetPostsListQuery = { __typename?: 'Query', getPostsList: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'PostsDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Posts', _body?: Maybe<any>, title?: Maybe<string>, published?: Maybe<boolean>, rating?: Maybe<number>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } }> }>>> } };
 
 export type GetGlobalDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -935,6 +951,7 @@ export const PostsPartsFragmentDoc = gql`
   _body
   title
   published
+  rating
   author {
     ... on Document {
       id

@@ -28,8 +28,9 @@ import type {
   TinaCloudCollection,
 } from '../types'
 import { TinaError } from './error'
-import {makeFilterChain, validateQueryParams} from '@tinacms/datalayer'
+import {makeFilterChain} from '@tinacms/datalayer'
 import type {IndexDefinition} from '@tinacms/datalayer'
+import {TinaFieldInner} from '../types'
 
 interface ResolverConfig {
   database: Database
@@ -530,25 +531,57 @@ export class Resolver {
 
   public resolveCollectionConnection = async ({
     args,
-    lookup,
+    collection,
+    hydrator,
   }: {
     args: Record<string, Record<string, object> | string | number>
-    lookup: CollectionDocumentListLookup
+    collection: TinaCloudCollection<true>,
+    hydrator?: (string) => any
   }) => {
     let edges
     let pageInfo
 
-    if (args.filter || args.index) {
-      const collection = this.tinaSchema.getCollection(lookup.collection)
-
+    if (args.filter || args.sort) {
       const queries = []
       const queryFields: string[] = []
-      const index = collection.indexes.find(index => index.name === args.index as string)
-      if (!index) {
-        throw new Error(`index '${args.index}' on collection '${collection.name}' does not exist`)
-      }
-
       if (args.filter) {
+        for (const field of Object.keys(args.filter)) {
+          const fieldDefinition = (collection.fields as TinaFieldInner<true>[]).find(f => f.name === field)
+          // resolve top level references
+          if (fieldDefinition && fieldDefinition.type === 'reference') {
+            const referencedCollection = this.tinaSchema.getCollection(fieldDefinition.collections[0]) // TODO why collections an array?
+            if (referencedCollection) {
+              const resolvedCollectionConnection = await this.resolveCollectionConnection({
+                args: {
+                  sort: Object.keys(args.filter[fieldDefinition.name][referencedCollection.name])[0], // TODO what happens if you have multiple values here? Ideally I think we want to sort by the field being queried for nested queries
+                  filter: {
+                  ...args.filter[fieldDefinition.name][referencedCollection.name]
+                }, first: -1},
+                collection: referencedCollection, // TODO should be the right lookup for the referenced collection
+                hydrator: (path) => path
+              })
+              const { edges } = resolvedCollectionConnection
+              const values = edges.map(edge => edge.node)
+              if (edges.length === 1) {
+                args.filter[field] = {
+                  eq: values[0]
+                }
+              } else if (edges.length > 1) {
+                args.filter[field] = {
+                  in: values
+                }
+              } else {
+                // TODO is there a better way to short-circuit this? For an AND filter we can just give up here but OR would just ignore this
+                args.filter[field] = {
+                  eq: '___null___'
+                }
+              }
+            } else {
+              throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
+            }
+          }
+        }
+
         const flattenedArgs = flat(args.filter, { delimiter: '#' })
         Object.entries(flattenedArgs).map(([key, value]) => {
           const keys = key.split('#')
@@ -580,28 +613,23 @@ export class Resolver {
         })
       }
 
-      const indexDefinition: IndexDefinition = {
-        namespace: collection.name,
-        fields: index.fields
-      }
       const queryParams = {
         filterChain: makeFilterChain({
           filter: args.filter as Record<string, object>,
-          index: indexDefinition
+          fields: collection.fields
         }),
-        index: args.index as string,
+        collection: collection.name,
+        sort: args.sort as string,
         first: args.first as number,
         last: args.last as number,
         before: args.before as string,
-        after: args.after as string
+        after: args.after as string,
       }
-      validateQueryParams(queryParams, index.name, indexDefinition)
 
-      const result = await this.database.query(queryParams, this.getDocument)
+      const result = await this.database.query(queryParams, hydrator ? hydrator : this.getDocument)
       edges = result.edges
       pageInfo = result.pageInfo
     } else {
-      const collection = await this.tinaSchema.getCollection(lookup.collection)
       edges = (await this.database.store.glob(
         collection.path,
         this.getDocument

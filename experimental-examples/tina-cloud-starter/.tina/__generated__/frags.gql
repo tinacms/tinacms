@@ -2,6 +2,7 @@ fragment PostsParts on Posts {
   _body
   title
   published
+  rating
   author {
     ... on Document {
       id

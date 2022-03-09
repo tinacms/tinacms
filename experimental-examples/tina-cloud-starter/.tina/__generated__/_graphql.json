@@ -680,7 +680,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -834,7 +834,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -970,7 +970,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -1106,7 +1106,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -1242,7 +1242,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -1326,6 +1326,23 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         }
@@ -1599,6 +1616,116 @@
       "kind": "InputObjectTypeDefinition",
       "name": {
         "kind": "Name",
+        "value": "NumberFilter"
+      },
+      "fields": [
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "lt"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "lte"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "gte"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "gt"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "eq"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "exists"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Float"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "kind": "InputObjectTypeDefinition",
+      "name": {
+        "kind": "Name",
         "value": "AuthorsFilter"
       },
       "fields": [
@@ -1717,6 +1844,23 @@
               "value": "Boolean"
             }
           }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
         }
       ]
     },
@@ -1768,6 +1912,23 @@
               "value": "Boolean"
             }
           }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
         }
       ]
     },
@@ -1817,6 +1978,20 @@
             "name": {
               "kind": "Name",
               "value": "BooleanFilter"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "rating"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "NumberFilter"
             }
           }
         },
@@ -3132,7 +3307,7 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "index"
+                "value": "sort"
               },
               "type": {
                 "kind": "NamedType",
@@ -3276,6 +3451,21 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "rating"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
             }
           }
         },
@@ -6040,6 +6230,20 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "rating"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
             }
           }
         },

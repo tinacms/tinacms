@@ -59,7 +59,7 @@ describe('LevelDB store', () => {
         }
         mockIndexes = {
             titleIdx: {
-                namespace,
+                collection: namespace,
                 fields: [{
                     type: 'string',
                     name: 'title',
@@ -67,7 +67,7 @@ describe('LevelDB store', () => {
                 }]
             },
             dateIdx: {
-                namespace,
+                collection: namespace,
                 fields: [{
                     type: 'datetime',
                     name: 'date',
@@ -75,7 +75,7 @@ describe('LevelDB store', () => {
                 }]
             },
             idIdx: {
-                namespace,
+                collection: namespace,
                 fields: [{
                     type: 'number',
                     name: 'id',
@@ -83,7 +83,7 @@ describe('LevelDB store', () => {
                 }]
             },
             publishedDateIdx: {
-                namespace: 'posts',
+                collection: 'posts',
                 fields: [{
                     type: 'boolean',
                     name: 'published',
@@ -112,7 +112,7 @@ describe('LevelDB store', () => {
                     await store.seed(path, document, {
                         indexDefinitions: {
                             published: {
-                                namespace: 'posts',
+                                collection: 'posts',
                                 fields: [{
                                     type: 'boolean',
                                     name: 'published',
@@ -125,7 +125,7 @@ describe('LevelDB store', () => {
                     await expect(store.seed(path, document, {
                         indexDefinitions: {
                             published: {
-                                namespace: 'posts',
+                                collection: 'posts',
                                 fields: [{
                                     type: 'boolean',
                                     name: 'published',

@@ -218,7 +218,7 @@ describe('datalayer store', () => {
               },
             },
             index: {
-              namespace,
+              collection: namespace,
               fields: [
                 {
                   name: 'published',
@@ -243,7 +243,7 @@ describe('datalayer store', () => {
             },
 
             index: {
-              namespace,
+              collection: namespace,
               fields: [
                 {
                   name: 'published',
@@ -272,7 +272,7 @@ describe('datalayer store', () => {
             },
           },
           index: {
-            namespace,
+            collection: namespace,
             fields: [
               {
                 name: 'date',
@@ -309,7 +309,7 @@ describe('datalayer store', () => {
             },
           },
           index: {
-            namespace,
+            collection: namespace,
             fields: [
               {
                 name: 'published',
@@ -351,7 +351,7 @@ describe('datalayer store', () => {
             },
           },
           index: {
-            namespace,
+            collection: namespace,
             fields: [
               {
                 name: 'published',
@@ -382,7 +382,7 @@ describe('datalayer store', () => {
           },
 
           index: {
-            namespace,
+            collection: namespace,
             fields: [
               {
                 name: 'published',
@@ -406,7 +406,7 @@ describe('datalayer store', () => {
           },
 
           index: {
-            namespace,
+            collection: namespace,
             fields: [
               {
                 name: 'published',

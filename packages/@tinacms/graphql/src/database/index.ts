@@ -383,11 +383,29 @@ type UnionDataLookup = {
 
 const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
   const indexDefinitions = {}
+  for (const field of (collection.fields as TinaFieldInner<true>[])) {
+    if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object') {
+      continue
+    }
+
+    indexDefinitions[field.name] = {
+      collection: collection.name,
+      fields: [
+        {
+          name: field.name,
+          default: '', // TODO do we need a proper default for these?
+          type: field.type
+        }
+      ]
+    }
+  }
+
   if (collection.indexes) {
     // build IndexDefinitions for each index in the collection schema
+    // TODO don't these have to be ordered in dynamodb to map to GSIs?
     for (let index of collection.indexes) {
       indexDefinitions[index.name] = {
-        namespace: collection.name,
+        collection: collection.name,
         fields: index.fields.map(indexField => ({
           name: indexField.name,
           default: indexField.default,
@@ -395,9 +413,11 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
         }))
       }
     }
+  }
 
-    // TODO we could check here to make sure the last field in an indexDefinition is likely to be a problem
-    // TODO for duplicates - ie boolean fields
+  const numIndexes = Object.keys(indexDefinitions).length
+  if ( numIndexes > 20) {
+    throw new Error(`A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`)
   }
 
   await sequential(documentPaths, async (filepath) => {
@@ -406,7 +426,7 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, { indexDefinitions })
+      await database.store.seed(filepath, data, { collection: collection.name, fields: (collection.fields as TinaFieldInner<true>[]).map(field => ({name: field.name, type: field.type})), indexDefinitions })
     }
     if (database.store.supportsIndexing()) {
       return indexDocument({ filepath, data, database })
