@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import arrayMutators from 'final-form-arrays'
+import setFieldData from 'final-form-set-field-data'
 import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
 import { Plugin } from '../core'
 import { Field, AnyField } from './field'
@@ -74,6 +75,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       onSubmit: this.handleSubmit,
       mutators: {
         ...arrayMutators,
+        setFieldData,
         ...options.mutators,
       },
     })

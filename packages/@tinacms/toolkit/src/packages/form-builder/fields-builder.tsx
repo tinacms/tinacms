@@ -43,87 +43,97 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   return (
     // @ts-ignore FIXME twind
     <FieldsGroup>
-      {fields.map((field: Field) => {
-        if (field.component === null) return null
-
-        const plugin = fieldPlugins.find(
-          (plugin: FieldPlugin) => plugin.name === field.component
-        )
-
-        let type: string | undefined
-        if (plugin && plugin.type) {
-          type = plugin.type
-        }
-
-        const parse = getProp('parse', field, plugin)
-        const validate = getProp('validate', field, plugin)
-
-        let format = field.format
-
-        if (!format && plugin && plugin.format) {
-          format = plugin.format
-        }
-
-        let defaultValue = field.defaultValue
-
-        if (!parse && plugin && plugin.defaultValue) {
-          defaultValue = plugin.defaultValue
-        }
-
-        return (
-          <FinalField
-            name={field.name}
-            key={field.name}
-            type={type}
-            parse={
-              parse
-                ? (value: any, name: string) => parse!(value, name, field)
-                : undefined
-            }
-            format={
-              format
-                ? (value: any, name: string) => format!(value, name, field)
-                : undefined
-            }
-            defaultValue={defaultValue}
-            validate={(value, values, meta) => {
-              if (validate) {
-                return validate(value, values, meta, field)
-              }
-            }}
-          >
-            {(fieldProps) => {
-              if (
-                typeof field.component !== 'string' &&
-                field.component !== null
-              ) {
-                return (
-                  <field.component
-                    {...fieldProps}
-                    form={form.finalForm}
-                    tinaForm={form}
-                    field={field}
-                  />
-                )
-              }
-
-              if (plugin) {
-                return (
-                  <plugin.Component
-                    {...fieldProps}
-                    form={form.finalForm}
-                    tinaForm={form}
-                    field={field}
-                  />
-                )
-              }
-
-              return <p>Unrecognized field type</p>
-            }}
-          </FinalField>
-        )
-      })}
+      {fields.map((field: Field) => (
+        <InnerField field={field} form={form} fieldPlugins={fieldPlugins} />
+      ))}
     </FieldsGroup>
+  )
+}
+
+const InnerField = ({ field, form, fieldPlugins }) => {
+  /**
+   * We double-render form builders for some reason which reults in useMemo not working here
+   */
+  React.useEffect(() => {
+    form.mutators.setFieldData(field.name, {
+      tinaField: field,
+    })
+  }, [form, field])
+
+  if (field.component === null) return null
+
+  const plugin = fieldPlugins.find(
+    (plugin: FieldPlugin) => plugin.name === field.component
+  )
+
+  let type: string | undefined
+  if (plugin && plugin.type) {
+    type = plugin.type
+  }
+
+  const parse = getProp('parse', field, plugin)
+  const validate = getProp('validate', field, plugin)
+
+  let format = field.format
+
+  if (!format && plugin && plugin.format) {
+    format = plugin.format
+  }
+
+  let defaultValue = field.defaultValue
+
+  if (!parse && plugin && plugin.defaultValue) {
+    defaultValue = plugin.defaultValue
+  }
+
+  return (
+    <FinalField
+      name={field.name}
+      key={field.name}
+      type={type}
+      parse={
+        parse
+          ? (value: any, name: string) => parse!(value, name, field)
+          : undefined
+      }
+      format={
+        format
+          ? (value: any, name: string) => format!(value, name, field)
+          : undefined
+      }
+      defaultValue={defaultValue}
+      validate={(value, values, meta) => {
+        if (validate) {
+          return validate(value, values, meta, field)
+        }
+      }}
+    >
+      {(fieldProps) => {
+        if (typeof field.component !== 'string' && field.component !== null) {
+          return (
+            <field.component
+              {...fieldProps}
+              form={form.finalForm}
+              tinaForm={form}
+              field={field}
+            />
+          )
+        }
+
+        if (plugin) {
+          return (
+            <plugin.Component
+              {...fieldProps}
+              form={form.finalForm}
+              tinaForm={form}
+              field={field}
+            />
+          )
+        }
+
+        return <p>Unrecognized field type</p>
+      }}
+    </FinalField>
   )
 }
 
