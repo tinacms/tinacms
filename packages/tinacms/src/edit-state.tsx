@@ -127,7 +127,15 @@ const ToggleButton = () => {
 
 const TinaEditProviderInner = ({ children, editMode }) => {
   const { edit } = useEditState()
-  if (edit) {
+  const [isBrowser, setIsBrowser] = React.useState(false)
+
+  // Ensure Tina doesn't initialize server-side to prevent:
+  // "Warning: Did not expect server HTML to contain a <div> in <div>."
+  React.useEffect(() => {
+    setIsBrowser(true)
+  }, [])
+
+  if (edit && isBrowser) {
     return editMode
   }
 
