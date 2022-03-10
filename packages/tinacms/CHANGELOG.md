@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.66.8
+
+### Patch Changes
+
+- 4923a2d66: Checks isAuthenticated() before making requests to the GraphQL client
+- Updated dependencies [106549814]
+- Updated dependencies [4923a2d66]
+- Updated dependencies [a07ff39bb]
+  - @tinacms/toolkit@0.56.17
+
 ## 0.66.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.11
+
+### Patch Changes
+
+- d6f0cc835: fix: fix broken link in CMS placeholder screen
+
 ## 3.5.10
 
 ## 3.5.9
