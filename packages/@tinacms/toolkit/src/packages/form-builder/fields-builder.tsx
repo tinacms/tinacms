@@ -44,21 +44,21 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
     // @ts-ignore FIXME twind
     <FieldsGroup>
       {fields.map((field: Field) => (
-        <InnerField field={field} form={form} fieldPlugins={fieldPlugins} />
+        <InnerField
+          key={field.name}
+          field={field}
+          form={form}
+          fieldPlugins={fieldPlugins}
+        />
       ))}
     </FieldsGroup>
   )
 }
 
+import { BlockPathContext } from '../fields/plugins/BlocksFieldPlugin'
+
 const InnerField = ({ field, form, fieldPlugins }) => {
-  /**
-   * We double-render form builders for some reason which reults in useMemo not working here
-   */
-  React.useEffect(() => {
-    form.mutators.setFieldData(field.name, {
-      tinaField: field,
-    })
-  }, [form, field])
+  const pathContext = React.useContext(BlockPathContext)
 
   if (field.component === null) return null
 
@@ -70,6 +70,16 @@ const InnerField = ({ field, form, fieldPlugins }) => {
   if (plugin && plugin.type) {
     type = plugin.type
   }
+
+  /**
+   * We double-render form builders for some reason which reults in useMemo not working here
+   */
+  React.useEffect(() => {
+    form.mutators.setFieldData(field.name, {
+      tinaField: field,
+      path: pathContext.path,
+    })
+  }, [form, field])
 
   const parse = getProp('parse', field, plugin)
   const validate = getProp('validate', field, plugin)

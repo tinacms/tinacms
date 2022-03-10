@@ -64,24 +64,9 @@ const query = `#graphql
 query {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {
-      title
       blocks {
-        ...on BlockPageBlocksFeaturedPosts {
-          blogs {
-            item {
-              ...on PostDocument {
-                sys {
-                  filename
-                  collection {
-                    name
-                  }
-                }
-                data {
-                  title
-                }
-              }
-            }
-          }
+        ...on BlockPageBlocksHero {
+          title
         }
       }
     }

@@ -99,6 +99,7 @@ export type OnChangeEvent = {
   formId: string
   field: {
     data: {
+      path?: { level: number; type: string }[]
       tinaField: {
         name: string
         type: 'string' | 'reference' | 'object'
@@ -128,6 +129,7 @@ export type ChangeSet = {
 export type BlueprintPath = {
   name: string
   alias: string
+  disambiguator?: string
   list?: boolean
   isNode?: boolean
 }

@@ -125,7 +125,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
               {items.length === 0 && <EmptyState />}
               {items.map((block: any, index: any) => {
                 const template = field.templates[block._template]
-
                 if (!template) {
                   return (
                     <InvalidBlockListItem
@@ -175,6 +174,8 @@ interface BlockListItemProps {
   label?: string
 }
 
+export const BlockPathContext = React.createContext({ path: [] })
+
 const BlockListItem = ({
   label,
   tinaForm,
@@ -191,64 +192,88 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
+  // console.log(block._template)
+  // console.log(field.typeMap[block._template])
+  // console.log(index)
+
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
 
-  return (
-    <Draggable
-      key={index}
-      type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
-      {(provider, snapshot) => (
-        <>
-          <ItemHeader
-            ref={provider.innerRef}
-            isDragging={snapshot.isDragging}
-            {...provider.draggableProps}
-            {...provider.dragHandleProps}
-          >
-            <DragHandle />
-            <ItemClickTarget
-              onClick={() => {
-                const state = tinaForm.finalForm.getState()
-                if (state.invalid === true) {
-                  // @ts-ignore
-                  cms.alerts.error('Cannot navigate away from an invalid form.')
-                  return
-                }
+  const currentPath = React.useContext(BlockPathContext).path
 
-                setExpanded(true)
-                setFocusedField({ fieldName: `${field.name}.${index}` })
-              }}
-              onMouseOver={() =>
-                setHoveredField({ fieldName: `${field.name}.${index}` })
-              }
-              onMouseOut={() => setHoveredField({ fieldName: null })}
+  // console.log(field.name.split('.'))
+  let level = 0
+  field.name.split('.').forEach((item) => {
+    if (isNaN(item)) {
+    } else {
+      level = level + 1
+    }
+  })
+
+  const path = {
+    index,
+    level,
+    type: field.typeMap[block._template],
+  }
+  return (
+    <BlockPathContext.Provider value={{ path: [...currentPath, path] }}>
+      <Draggable
+        key={index}
+        type={field.name}
+        draggableId={`${field.name}.${index}`}
+        index={index}
+      >
+        {(provider, snapshot) => (
+          <>
+            <ItemHeader
+              ref={provider.innerRef}
+              isDragging={snapshot.isDragging}
+              {...provider.draggableProps}
+              {...provider.dragHandleProps}
             >
-              <GroupLabel>{label || template.label}</GroupLabel>
-            </ItemClickTarget>
-            <ItemDeleteButton onClick={removeItem} />
-          </ItemHeader>
-          <FormPortal>
-            {({ zIndexShift }) => (
-              <Panel
-                zIndexShift={zIndexShift}
-                isExpanded={isExpanded}
-                setExpanded={setExpanded}
-                field={field}
-                item={block}
-                index={index}
-                tinaForm={tinaForm}
-                label={label || template.label}
-                template={template}
-              />
-            )}
-          </FormPortal>
-        </>
-      )}
-    </Draggable>
+              <DragHandle />
+              <ItemClickTarget
+                onClick={() => {
+                  const state = tinaForm.finalForm.getState()
+                  if (state.invalid === true) {
+                    // @ts-ignore
+                    cms.alerts.error(
+                      'Cannot navigate away from an invalid form.'
+                    )
+                    return
+                  }
+
+                  setExpanded(true)
+                  setFocusedField({ fieldName: `${field.name}.${index}` })
+                }}
+                onMouseOver={() =>
+                  setHoveredField({ fieldName: `${field.name}.${index}` })
+                }
+                onMouseOut={() => setHoveredField({ fieldName: null })}
+              >
+                <GroupLabel>{label || template.label}</GroupLabel>
+              </ItemClickTarget>
+              <ItemDeleteButton onClick={removeItem} />
+            </ItemHeader>
+            <FormPortal>
+              {({ zIndexShift }) => (
+                <Panel
+                  zIndexShift={zIndexShift}
+                  isExpanded={isExpanded}
+                  setExpanded={setExpanded}
+                  field={field}
+                  item={block}
+                  index={index}
+                  tinaForm={tinaForm}
+                  label={label || template.label}
+                  template={template}
+                />
+              )}
+            </FormPortal>
+          </>
+        )}
+      </Draggable>
+    </BlockPathContext.Provider>
   )
 }
 
@@ -386,7 +411,7 @@ const Panel = function Panel({
   }, [field.name, index, template.fields])
 
   return (
-    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 100 }}>
+    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
       <PanelHeader
         onClick={() => {
           const state = tinaForm.finalForm.getState()

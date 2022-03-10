@@ -1,0 +1,130 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "localeInfo",
+      "news",
+      "footer",
+      "theme",
+      "navigation",
+      "page"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "LocaleInfoDocument": {
+    "type": "LocaleInfoDocument",
+    "resolveType": "collectionDocument",
+    "collection": "localeInfo",
+    "createLocaleInfoDocument": "create",
+    "updateLocaleInfoDocument": "update"
+  },
+  "LocaleInfoConnection": {
+    "type": "LocaleInfoConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "localeInfo"
+  },
+  "NewsDocument": {
+    "type": "NewsDocument",
+    "resolveType": "collectionDocument",
+    "collection": "news",
+    "createNewsDocument": "create",
+    "updateNewsDocument": "update"
+  },
+  "NewsConnection": {
+    "type": "NewsConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "news"
+  },
+  "FooterDocument": {
+    "type": "FooterDocument",
+    "resolveType": "collectionDocument",
+    "collection": "footer",
+    "createFooterDocument": "create",
+    "updateFooterDocument": "update"
+  },
+  "FooterConnection": {
+    "type": "FooterConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "footer"
+  },
+  "ThemeDocument": {
+    "type": "ThemeDocument",
+    "resolveType": "collectionDocument",
+    "collection": "theme",
+    "createThemeDocument": "create",
+    "updateThemeDocument": "update"
+  },
+  "ThemeConnection": {
+    "type": "ThemeConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "theme"
+  },
+  "NavigationItemsPageDocument": {
+    "type": "NavigationItemsPageDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "NavigationDocument": {
+    "type": "NavigationDocument",
+    "resolveType": "collectionDocument",
+    "collection": "navigation",
+    "createNavigationDocument": "create",
+    "updateNavigationDocument": "update"
+  },
+  "NavigationConnection": {
+    "type": "NavigationConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "navigation"
+  },
+  "PageBlocksNewsNewsItemsArticleDocument": {
+    "type": "PageBlocksNewsNewsItemsArticleDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PageBlocksComparisonTableItemsMeta": {
+    "type": "PageBlocksComparisonTableItemsMeta",
+    "resolveType": "unionData",
+    "typeMap": {
+      "a": "PageBlocksComparisonTableItemsMetaA",
+      "b": "PageBlocksComparisonTableItemsMetaB"
+    }
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "news": "PageBlocksNews",
+      "statsWithImage": "PageBlocksStatsWithImage",
+      "hero": "PageBlocksHero",
+      "slideshow": "PageBlocksSlideshow",
+      "comparisonTable": "PageBlocksComparisonTable",
+      "feature": "PageBlocksFeature",
+      "fullScreenLogo": "PageBlocksFullScreenLogo",
+      "fullScreenHeader": "PageBlocksFullScreenHeader"
+    }
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
+  }
+}

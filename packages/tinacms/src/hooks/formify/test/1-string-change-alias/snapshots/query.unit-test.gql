@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# t
+# getBlockPageDocument.data.title
 
 
 query GetBlockPageDocument {

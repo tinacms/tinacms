@@ -7,8 +7,8 @@
 #
 # Field blueprints
 # ================
-# blocks.[]
-# blocks.[].title
+# getBlockPageDocument.data.blocks.[]
+# getBlockPageDocument.data.blocks.[].BlockPageBlocksHero.title
 
 
 query QueryOperation {

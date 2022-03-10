@@ -11,14 +11,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import * as G from 'graphql'
 import { Form, Field, TinaCMS } from '@tinacms/toolkit'
-import { setIn, getIn } from 'final-form'
+import { getIn } from 'final-form'
 
 import type {
   DocumentBlueprint,
   FieldBlueprint,
-  BlueprintPath,
   FormifiedDocumentNode,
   OnChangeEvent,
   FormNode,
@@ -35,204 +33,27 @@ import {
 interface RecursiveFormifiedDocumentNode<T extends object>
   extends Array<RecursiveFormifiedDocumentNode<T> | T> {}
 
-export const isNodeField = (type: G.GraphQLNamedType) => {
-  if (G.isUnionType(type)) {
-    return type.getTypes().every((type) => {
-      return type.getInterfaces().find((intfc) => intfc.name === 'Node')
-    })
-  } else if (G.isObjectType(type)) {
-    return !!type.getInterfaces().find((intfc) => intfc.name === 'Node')
-  } else if (G.isInterfaceType(type)) {
-    if (type.name === 'Node') {
-      return true
-    }
-  } else {
-    return false
-  }
-}
-
-export const isConnectionField = (type: G.GraphQLNamedType) => {
-  if (G.isObjectType(type)) {
-    return !!type.getInterfaces().find((intfc) => intfc.name === 'Connection')
-  } else {
-    throw new Error(`Expected GraphQLObjectType for isConnectionField check`)
-  }
-}
-
 /**
- * Selects the appropriate field from a GraphQLObject based on the selection's name
- */
-export const getObjectField = (
-  object: G.GraphQLObjectType<any, any>,
-  selectionNode: G.FieldNode
-) => {
-  return object.getFields()[selectionNode.name.value]
-}
-
-/**
- * Selects the appropriate type from a union based on the selection's typeCondition
- *
- * ```graphql
- * post {
- *    # would return PostDocument
- *   ...on PostDocument { ... }
+ * Gets the value from an object for a given blueprint for _all_ possible values.
+ * eg. If the blueprint is `getCollection.documents.edges.[].node` and the value is:
+ * ```
+ * {
+ *   getCollection: {
+ *      documents: {
+ *        edges: [{
+ *          node: valueA
+ *        },
+ *        {
+ *          node: valueB
+ *        }]
+ *      }
+ *   }
  * }
  * ```
- */
-export const getSelectedUnionType = (
-  unionType: G.GraphQLUnionType,
-  selectionNode: G.InlineFragmentNode
-) => {
-  return unionType
-    .getTypes()
-    .find((type) => type.name === selectionNode.typeCondition.name.value)
-}
-
-/**
- * Checks if the given type is a list type. Even though
- * this function is built-in to GraphQL it doesn't handle
- * the scenario where the list type is wrapped in a non-null
- * type, so the extra check here is needed.
- */
-export function isListType(type: unknown) {
-  if (G.isListType(type)) {
-    return true
-  } else if (G.isNonNullType(type)) {
-    if (G.isListType(type.ofType)) {
-      return true
-    }
-  }
-  return false
-}
-
-/**
- *
- * Throws an error if the provided type is no a GraphQLUnionType
- */
-export function ensureNodeField(field: G.GraphQLNamedType) {
-  if (!isNodeField(field)) {
-    throw new Error(`Expected field to implement Node interface`)
-  }
-}
-
-/**
- *
- * Throws an error if the provided type is no a GraphQLUnionType
- */
-export function ensureUnionType(
-  type: unknown
-): asserts type is G.GraphQLUnionType {
-  if (!G.isUnionType(type)) {
-    throw new Error(`Expected type to be GraphQLUnionType`)
-  }
-}
-
-/**
- *
- * Throws an error if the provided type is no a GraphQLUnionType
- */
-export function ensureObjectType(
-  type: unknown
-): asserts type is G.GraphQLObjectType {
-  if (!G.isObjectType(type)) {
-    console.log(type)
-    throw new Error(`Expected type to be GraphQLObjectType`)
-  }
-}
-
-/**
- *
- * Throws an error if the provided type is no a GraphQLUnionType
- */
-export function ensureOperationDefinition(
-  type: G.DefinitionNode
-): asserts type is G.OperationDefinitionNode {
-  if (type.kind !== 'OperationDefinition') {
-    throw new Error(
-      `Expected top-level definition to be an OperationDefinition node, ensure your query has been optimized before calling formify`
-    )
-  }
-}
-
-export function getNameAndAlias(
-  fieldNode: G.FieldNode,
-  list: boolean,
-  isNode: boolean
-) {
-  return {
-    name: fieldNode.name.value,
-    alias: fieldNode.alias ? fieldNode.alias.value : fieldNode.name.value,
-    list: !!list,
-    isNode: !!isNode,
-  }
-}
-
-/**
- * This is a dummy query which we pull apart and spread
- * back into the the selectionSet for all "Node" fields
- */
-const node = G.parse(`
- query Sample {
-   _internalSys: sys {
-     path
-     collection {
-       name
-     }
-   }
-   form
-   values
- }`)
-export const metaFields: G.SelectionNode[] =
-  // @ts-ignore
-  node.definitions[0].selectionSet.selections
-
-export const getRelativeBlueprint = (path: BlueprintPath[]) => {
-  let indexOfLastNode = 0
-  path.forEach((item, i) => {
-    if (item.isNode) {
-      if (i === path.length - 1) {
-        // skip if the item is a node, we still want to treat it as a field for the parent
-      } else {
-        indexOfLastNode = i
-      }
-    }
-  })
-
-  const documentBlueprintPath = path.slice(0, indexOfLastNode + 1)
-  return getBlueprintNamePath({ path: documentBlueprintPath })
-}
-
-export const getFieldAliasForBlueprint = (path: BlueprintPath[]) => {
-  const reversePath = [...path].reverse()
-  const accum = []
-  reversePath.every((item, index) => {
-    if (index === 0) {
-      if (item.list) {
-        accum.push('[]')
-      }
-      accum.push(item.alias)
-    } else {
-      if (item.isNode) {
-        return false
-      }
-      if (item.list) {
-        accum.push('[]')
-      }
-      accum.push(item.alias)
-    }
-    return true
-  })
-  return accum.reverse().slice(1).join('.')
-}
-
-/**
- *
- *
- * ./index utilities
- *
+ * The response would be an array containing `valueA` and `valueB`
  *
  */
-export const getIn2 = <T extends object>(
+export const getValueForBlueprint = <T extends object>(
   state: object,
   path: string
 ): RecursiveFormifiedDocumentNode<T> | T => {
@@ -245,7 +66,7 @@ export const getIn2 = <T extends object>(
         const next = []
         if (Array.isArray(latest)) {
           latest.forEach((latest2, index) => {
-            const res = getIn2(latest2, restOfItems.join('.'))
+            const res = getValueForBlueprint(latest2, restOfItems.join('.'))
             next.push(res)
           })
         } else {
@@ -452,21 +273,6 @@ export const sequential = async <A, B>(
   return accum
 }
 
-export const getBlueprintId = (path: BlueprintPath[]) => {
-  const namePath = []
-  const aliasPath = []
-  path.forEach((p) => {
-    namePath.push(p.name)
-    aliasPath.push(p.alias)
-    if (p.list) {
-      namePath.push('[]')
-      aliasPath.push('[]')
-    }
-  })
-
-  return namePath.join('.')
-}
-
 const getFormNodesStartingWith = (string: string, state: State) => {
   return state.formNodes.filter((subFormNode) => {
     return subFormNode.documentBlueprintId.startsWith(string)
@@ -489,55 +295,6 @@ export const getFormNodesForField = (
   return { pathToChange, formNodes, eventLocation, existing }
 }
 
-export const matchLocation = (eventLocation: number[], formNode: FormNode) => {
-  return eventLocation.every((item, index) => item === formNode.location[index])
-}
-
-export const bumpLocation = (location: number[]) => {
-  return location.map((item, index) => {
-    // Bump the last item in the location array by 1, assuming "at" is always 0
-    if (index === location.length - 1) {
-      return item + 1
-    }
-    return item
-  })
-}
-
-export const maybeLowerLocation = (location: number[], at: number) => {
-  return location.map((item, index) => {
-    // Bump the last item in the location array by 1, assuming "at" is always 0
-    if (index === location.length - 1) {
-      return item < at ? item : item - 1
-    }
-    return item
-  })
-}
-
-export const matchesAt = (location: number[], at: number) => {
-  let matches = false
-  location.map((item, index) => {
-    // Bump the last item in the location array by 1, assuming "at" is always 0
-    if (index === location.length - 1) {
-      if (item === at) {
-        matches = true
-      }
-    }
-  })
-  return matches
-}
-
-export const swapLocation = (
-  location: number[],
-  mapping: { [key: number]: number }
-) => {
-  return location.map((item, index) => {
-    if (index === location.length - 1) {
-      return mapping[item]
-    }
-    return item
-  })
-}
-
 export const getBlueprintAliasPath = (blueprint: DocumentBlueprint) => {
   const namePath = []
   const aliasPath = []
@@ -558,25 +315,83 @@ export const getBlueprintFieldsForEvent = (
   event: OnChangeEvent
 ) => {
   return blueprint.fields.filter((fbp) => {
-    return getBlueprintNamePath(fbp) === getEventPath(event, blueprint)
+    if (getBlueprintNamePath(fbp, true) === getEventPath(event, blueprint)) {
+      return true
+    }
   })
 }
 
+/**
+ *
+ * Returns the human-readable path to a blueprint or blueprint field.
+ * Optionally, appends a disambiguator to the string where necessary.
+ *
+ * eg. if a blocks field is polymporphic, specifying `true` for the disambiguator
+ *
+ * ```
+ * getPageDocument.data.blocks[].PageBlocksCta.title
+ * ```
+ */
 export const getBlueprintNamePath = (
-  blueprint: Pick<DocumentBlueprint, 'path'>
+  blueprint: Pick<DocumentBlueprint, 'path'>,
+  disambiguator?: boolean
 ) => {
   const namePath = []
-  const aliasPath = []
   blueprint.path.forEach((p) => {
+    if (disambiguator) {
+      if (p.disambiguator) {
+        namePath.push(p.disambiguator)
+      }
+    }
     namePath.push(p.name)
-    aliasPath.push(p.alias)
     if (p.list) {
       namePath.push('[]')
-      aliasPath.push('[]')
     }
   })
 
   return namePath.join('.')
+}
+
+/**
+ *
+ * Returns the path for the event, which uses `data.tinaField` metadata to
+ * determine the shape of the field. For polymorphic objects it's necessary
+ * to build-in the name of the GraphQL type that's receiving the change.
+ *
+ * Eg. when the title of a blocks "cta" template is changed, we might see an
+ * event path like:
+ * ```
+ * getPageDocument.data.blocks.0.PageBlocksCta.title
+ * ```
+ */
+const getEventPath = (
+  event: OnChangeEvent,
+  blueprint: DocumentBlueprint | FieldBlueprint
+) => {
+  const stringArray = event.field.name.split('.')
+  let counter = 0
+  const eventPath = stringArray
+    .map((item) => {
+      if (isNaN(Number(item))) {
+        return item
+      }
+      counter = counter + 1
+      const foundType = event.field.data?.path?.find(
+        (p) => p.level === counter - 1
+      )
+      if (foundType) {
+        const meh = `[].${foundType.type}`
+        return meh
+      }
+      return `[]`
+    })
+    .join('.')
+  const items = [blueprint.id, DATA_NODE_NAME, eventPath]
+  const isList = event.field.data.tinaField.list
+  if (isList && !eventPath.endsWith('[]')) {
+    items.push(`[]`)
+  }
+  return items.join('.')
 }
 
 export const stripIndices = (string) => {
@@ -602,6 +417,19 @@ export const replaceRealNum = (string) => {
       return '[]'
     })
     .join('.')
+}
+
+export const getMatchName = ({ field, prefix, blueprint }) => {
+  const fieldName = field.list ? `${field.name}.[]` : field.name
+  const blueprintName = getBlueprintNamePath(blueprint)
+  const extra = []
+  if (prefix) {
+    extra.push(prefix)
+  }
+  const matchName = [blueprintName, DATA_NODE_NAME, ...extra, fieldName].join(
+    '.'
+  )
+  return { matchName, fieldName }
 }
 
 export const getFormNodesFromEvent = (state: State, event: OnChangeEvent) => {
@@ -636,7 +464,8 @@ export const printState = (state: State) => {
     blueprint.fields
       .filter((fbp) => fbp.documentBlueprintId === blueprint.id)
       .forEach((fbp) => {
-        bpString = bpString + `\n# ${getFieldAliasForBlueprint(fbp.path)}`
+        // bpString = bpString + `\n# ${getFieldAliasForBlueprint(fbp.path)}`
+        bpString = bpString + `\n# ${getBlueprintNamePath(fbp, true)}`
         // bpString = bpString + `\n# ${fbp.id}`
       })
     string = string + `${bpString}\n`
@@ -648,21 +477,6 @@ export const printState = (state: State) => {
 }
 
 const DATA_NODE_NAME = 'data'
-
-const getEventPath = (
-  event: OnChangeEvent,
-  blueprint: DocumentBlueprint | FieldBlueprint
-) => {
-  const eventPath = replaceRealNum(event.field.name)
-  const items = [blueprint.id, DATA_NODE_NAME, eventPath]
-  const isList = event.field.data.tinaField.list
-  // FIXME: there are some inconsistencies on what kind of shape the field is
-  // when calling this, `list: true` for scalar vs object might be kind of off
-  if (isList && !eventPath.endsWith('[]')) {
-    items.push('[]')
-  }
-  return items.join('.')
-}
 
 export const printEvent = (event: OnChangeEvent) => {
   return {
@@ -734,24 +548,53 @@ export const getMoveMapping = (existing, from, to) => {
   return newOrderObject
 }
 
-export const getPathsToChange = (
-  event: OnChangeEvent,
-  state: State
-): {
-  formNode: FormNode
-  pathToChange: string
-}[] => {
-  const pathsToChange: { pathToChange: string; formNode: FormNode }[] = []
-  const formNodes = getFormNodesFromEvent(state, event)
+export const matchLocation = (eventLocation: number[], formNode: FormNode) => {
+  return eventLocation.every((item, index) => item === formNode.location[index])
+}
 
-  formNodes.forEach((formNode) => {
-    const blueprint = getFormNodeBlueprint(formNode, state)
-    getBlueprintFieldsForEvent(blueprint, event).forEach((fieldBlueprint) => {
-      const pathToChange = getPathToChange(fieldBlueprint, formNode, event)
-      pathsToChange.push({ pathToChange, formNode })
-    })
+export const bumpLocation = (location: number[]) => {
+  return location.map((item, index) => {
+    // Bump the last item in the location array by 1, assuming "at" is always 0
+    if (index === location.length - 1) {
+      return item + 1
+    }
+    return item
   })
-  return pathsToChange
+}
+
+export const maybeLowerLocation = (location: number[], at: number) => {
+  return location.map((item, index) => {
+    // Bump the last item in the location array by 1, assuming "at" is always 0
+    if (index === location.length - 1) {
+      return item < at ? item : item - 1
+    }
+    return item
+  })
+}
+
+export const matchesAt = (location: number[], at: number) => {
+  let matches = false
+  location.map((item, index) => {
+    // Bump the last item in the location array by 1, assuming "at" is always 0
+    if (index === location.length - 1) {
+      if (item === at) {
+        matches = true
+      }
+    }
+  })
+  return matches
+}
+
+export const swapLocation = (
+  location: number[],
+  mapping: { [key: number]: number }
+) => {
+  return location.map((item, index) => {
+    if (index === location.length - 1) {
+      return mapping[item]
+    }
+    return item
+  })
 }
 
 /**

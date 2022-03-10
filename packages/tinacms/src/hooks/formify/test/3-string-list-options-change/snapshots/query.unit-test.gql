@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# categories.[]
+# getPostDocument.data.categories.[]
 
 
 query GetBlockPageDocument {

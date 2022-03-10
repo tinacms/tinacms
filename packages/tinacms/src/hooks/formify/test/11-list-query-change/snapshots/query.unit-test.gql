@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# name
+# getAuthorList.edges.[].node.data.name
 
 
 query QueryOperation {

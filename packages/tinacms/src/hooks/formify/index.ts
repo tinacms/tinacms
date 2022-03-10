@@ -19,6 +19,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import { formify, DATA_NODE_NAME } from './formify'
 import { onSubmitArgs } from '../use-graphql-forms'
 import { reducer } from './reducer'
+import { sample } from './sample'
 
 import type {
   FormifiedDocumentNode,
@@ -109,26 +110,15 @@ export const useFormify = ({
   React.useEffect(() => {
     const run = async () => {
       const schema = await cms.api.tina.getSchema()
-      if (!query) {
-        // Nothing from the query can be formified
-        dispatch({
-          type: 'done',
-        })
-      } else {
-        try {
-          const result = await formify({
-            schema,
-            query,
-            getOptimizedQuery: cms.api.tina.getOptimizedQuery,
-          })
-          dispatch({
-            type: 'addDocumentBlueprints',
-            value: result,
-          })
-        } catch (e) {
-          console.log(e)
-        }
-      }
+      const result = await formify({
+        schema,
+        query,
+        getOptimizedQuery: cms.api.tina.getOptimizedQuery,
+      })
+      dispatch({
+        type: 'addDocumentBlueprints',
+        value: result,
+      })
     }
     if (state.status === 'initialized') {
       run()
@@ -179,15 +169,25 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     const run = async () => {
+      if (process.env.NODE_ENV === 'production') {
+        if (util.printState(state) !== sample) {
+          console.log('you broke it')
+          console.log(util.printState(state))
+        } else {
+          console.log('formify ok')
+        }
+      }
+      // console.log(meh)
       const result = await cms.api.tina.request(G.print(state.query), {
         variables,
       })
 
       state.blueprints.map((blueprint) => {
-        const responseAtBlueprint = util.getIn2<FormifiedDocumentNode>(
-          result,
-          util.getBlueprintAliasPath(blueprint)
-        )
+        const responseAtBlueprint =
+          util.getValueForBlueprint<FormifiedDocumentNode>(
+            result,
+            util.getBlueprintAliasPath(blueprint)
+          )
         const location = []
         const findFormNodes = (
           res: typeof responseAtBlueprint,
@@ -354,7 +354,7 @@ export const useFormify = ({
           resolveSubFields({
             formNode: changeSet.formNode,
             prefix: util.replaceRealNum(fieldName),
-            loc: util.stripIndices(changeSet.path),
+            loc: [...util.stripIndices(changeSet.path), 0],
             form: {
               fields,
               /**
@@ -393,42 +393,52 @@ export const useFormify = ({
         if (changeSet.mutationType.type === 'referenceChange') {
           const { formNode } = changeSet
           const blueprint = util.getFormNodeBlueprint(formNode, state)
-          cms.api.tina
-            .request(
-              `
+          if (!changeSet.value) {
+            dispatch({
+              type: 'setIn',
+              value: {
+                ...changeSet,
+                value: null,
+              },
+            })
+          } else {
+            cms.api.tina
+              .request(
+                `
               query Node($id: String!) {
                 node(id: $id) {
                   ${G.print(blueprint.selection)}
                 }
               }
             `,
-              { variables: { id: changeSet.value } }
-            )
-            .then(async (res) => {
-              const form = state.documentForms.find(
-                (documentForm) => documentForm.id === formNode.documentFormId
+                { variables: { id: changeSet.value } }
               )
-              const data = await resolveSubFields({
-                formNode,
-                form,
-                loc: formNode.location,
-              })
-              dispatch({
-                type: 'setIn',
-                value: {
-                  ...changeSet,
+              .then(async (res) => {
+                const form = state.documentForms.find(
+                  (documentForm) => documentForm.id === formNode.documentFormId
+                )
+                const data = await resolveSubFields({
+                  formNode,
+                  form,
+                  loc: formNode.location,
+                })
+                dispatch({
+                  type: 'setIn',
                   value: {
-                    ...res.node,
-                    // FIXME: assumes `data` field instead of alias
-                    data,
+                    ...changeSet,
+                    value: {
+                      ...res.node,
+                      // FIXME: assumes `data` field instead of alias
+                      data,
+                    },
                   },
-                },
+                })
               })
-            })
-            .catch((e) => {
-              cms.alerts.error(`Unexpected error fetching reference`)
-              console.log(e)
-            })
+              .catch((e) => {
+                cms.alerts.error(`Unexpected error fetching reference`)
+                console.log(e)
+              })
+          }
         } else {
           dispatch({ type: 'setIn', value: changeSet })
         }
@@ -474,19 +484,12 @@ export const useFormify = ({
       await util.sequential(form.fields, async (field) => {
         const value = form.values[field.name]
 
-        const fieldName = field.list ? `${field.name}.[]` : field.name
         const blueprint = util.getFormNodeBlueprint(formNode, state)
-        const blueprintName = util.getBlueprintNamePath(blueprint)
-        const extra = []
-        if (prefix) {
-          extra.push(prefix)
-        }
-        const matchName = [
-          blueprintName,
-          DATA_NODE_NAME,
-          ...extra,
-          fieldName,
-        ].join('.')
+        const { matchName, fieldName } = util.getMatchName({
+          field,
+          prefix,
+          blueprint,
+        })
         const fieldBlueprints = blueprint.fields.filter((fieldBlueprint) => {
           return matchName === util.getBlueprintNamePath(fieldBlueprint)
         })
@@ -494,7 +497,7 @@ export const useFormify = ({
         switch (field.type) {
           case 'object':
             if (field.templates) {
-              if (Array.isArray(value)) {
+              if (field.list) {
                 await util.sequential(
                   fieldBlueprints,
                   async (fieldBlueprint) => {
@@ -503,25 +506,30 @@ export const useFormify = ({
                       data[keyName] = null
                       return true
                     }
-                    const d = []
-                    await util.sequential(value, async (item) => {
-                      const template = field.templates[item._template]
-                      const d2 = await resolveSubFields({
-                        formNode,
-                        form: { fields: template.fields, values: item },
-                        prefix: [prefix, fieldName].join('.'),
-                        loc,
-                      })
-                      d.push(d2)
-                    })
-                    data[keyName] = d
+                    if (!Array.isArray(value)) {
+                      throw new Error(
+                        `Expected value for object list field to be an array`
+                      )
+                    }
+                    data[keyName] = await util.sequential(
+                      value,
+                      async (item, index) => {
+                        const template = field.templates[item._template]
+                        return resolveSubFields({
+                          formNode,
+                          form: { fields: template.fields, values: item },
+                          prefix: [prefix, fieldName].join('.'),
+                          loc: [...loc, index],
+                        })
+                      }
+                    )
                   }
                 )
               } else {
                 throw new Error('blocks without list true is not yet supported')
               }
             } else {
-              if (Array.isArray(value)) {
+              if (field.list) {
                 await util.sequential(
                   fieldBlueprints,
                   async (fieldBlueprint) => {
@@ -530,18 +538,22 @@ export const useFormify = ({
                       data[keyName] = null
                       return true
                     }
-                    const d = []
-                    await util.sequential(value, async (item) => {
-                      const d2 = await resolveSubFields({
-                        formNode,
-                        form: { fields: field.fields, values: item },
-                        prefix: [prefix, fieldName].join('.'),
-                        loc,
-                      })
-                      d.push(d2)
-                      return true
-                    })
-                    data[keyName] = d
+                    if (!Array.isArray(value)) {
+                      throw new Error(
+                        `Expected value for object list field to be an array`
+                      )
+                    }
+                    data[keyName] = await util.sequential(
+                      value,
+                      async (item, index) => {
+                        return resolveSubFields({
+                          formNode,
+                          form: { fields: field.fields, values: item },
+                          prefix: [prefix, fieldName].join('.'),
+                          loc: [...loc, index],
+                        })
+                      }
+                    )
                     return true
                   }
                 )
@@ -554,13 +566,12 @@ export const useFormify = ({
                       data[keyName] = null
                       return true
                     }
-                    const d = await resolveSubFields({
+                    data[keyName] = await resolveSubFields({
                       formNode,
                       form: { fields: field.fields, values: value },
                       prefix: [prefix, fieldName].join('.'),
                       loc,
                     })
-                    data[keyName] = d
                     return true
                   }
                 )
@@ -638,12 +649,14 @@ export const useFormify = ({
                   `,
                 { variables: { id: value } }
               )
-              const d = await resolveSubFields({
-                formNode: subDocumentFormNode,
-                form,
-                loc: location,
-              })
-              data[keyName] = { ...res.node, data: d }
+              data[keyName] = {
+                ...res.node,
+                data: await resolveSubFields({
+                  formNode: subDocumentFormNode,
+                  form,
+                  loc: location,
+                }),
+              }
             })
 
             break

@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# tags.[]
+# getPostDocument.data.tags.[]
 
 
 query GetBlockPageDocument {

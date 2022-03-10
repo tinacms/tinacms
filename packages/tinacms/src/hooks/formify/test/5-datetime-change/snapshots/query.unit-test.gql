@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# published
+# getPostDocument.data.published
 
 
 query GetBlockPageDocument {

@@ -47,7 +47,7 @@ export const FormPortalProvider: React.FC = ({ children }) => {
       if (!wrapperRef.current) return null
 
       return createPortal(
-        props.children({ zIndexShift: portalZIndex }),
+        props.children({ zIndexShift: (zIndexRef.current += 1) }),
         wrapperRef.current
       )
     },

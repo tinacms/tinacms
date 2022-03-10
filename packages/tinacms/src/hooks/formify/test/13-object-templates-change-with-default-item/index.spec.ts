@@ -96,10 +96,6 @@ const events = [
                   ],
                 },
               ],
-              defaultItem: {
-                message: 'some title',
-                author: 'content/authors/1.md',
-              },
             },
             featuredPosts: {
               label: 'Featured Posts',
@@ -147,6 +143,7 @@ const events = [
           },
           component: 'blocks',
         },
+        path: [],
       },
       name: 'blocks',
     },
@@ -167,6 +164,13 @@ const events = [
           name: 'blocks.0.title',
           type: 'string',
         },
+        path: [
+          {
+            index: 0,
+            level: 0,
+            type: 'BlockPageBlocksHero',
+          },
+        ],
       },
       name: 'blocks.0.title',
     },

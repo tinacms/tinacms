@@ -7,9 +7,9 @@
 #
 # Field blueprints
 # ================
-# blocks.[]
-# blocks.[].blogs.[]
-# blocks.[].blogs.[].item
+# getBlockPageDocument.data.blocks.[]
+# getBlockPageDocument.data.blocks.[].BlockPageBlocksFeaturedPosts.blogs.[]
+# getBlockPageDocument.data.blocks.[].BlockPageBlocksFeaturedPosts.blogs.[].item
 
 # Blueprint
 # getBlockPageDocument.data.blocks.[].blogs.[].item
@@ -19,7 +19,7 @@
 #
 # Field blueprints
 # ================
-# title
+# getBlockPageDocument.data.blocks.[].BlockPageBlocksFeaturedPosts.blogs.[].item.data.title
 
 
 query QueryOperation {
