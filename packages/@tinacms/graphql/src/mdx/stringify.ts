@@ -52,6 +52,9 @@ const allChildrenEmpty = (children: any[]) => {
 }
 
 const stringifyChildren = (children: any[], field) => {
+  if (!children) {
+    return []
+  }
   return (
     children
       .map((child) => stringify(child, field))
