@@ -115,7 +115,7 @@ export const TinaMarkdown = ({
             if (components[child.type]) {
               const Component = components[child.type]
               return (
-                <Component key={key} {...props} childrenRaw={children}>
+                <Component key={key} {...props}>
                   <TinaMarkdown components={components} content={children} />
                 </Component>
               )
@@ -172,7 +172,7 @@ export const TinaMarkdown = ({
               const Component = components[child.type]
               return (
                 // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                <Component key={key} {...props} childrenRaw={children}>
+                <Component key={key} {...props}>
                   {/* @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types */}
                   {value}
                 </Component>
