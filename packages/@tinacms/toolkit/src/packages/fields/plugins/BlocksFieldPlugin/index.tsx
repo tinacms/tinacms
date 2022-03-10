@@ -386,7 +386,7 @@ const Panel = function Panel({
   }, [field.name, index, template.fields])
 
   return (
-    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 100 }}>
+    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
       <PanelHeader
         onClick={() => {
           const state = tinaForm.finalForm.getState()
