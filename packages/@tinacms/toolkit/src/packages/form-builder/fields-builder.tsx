@@ -44,7 +44,12 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
     // @ts-ignore FIXME twind
     <FieldsGroup>
       {fields.map((field: Field) => (
-        <InnerField field={field} form={form} fieldPlugins={fieldPlugins} />
+        <InnerField
+          key={field.name}
+          field={field}
+          form={form}
+          fieldPlugins={fieldPlugins}
+        />
       ))}
     </FieldsGroup>
   )
