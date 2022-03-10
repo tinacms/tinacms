@@ -1,5 +1,24 @@
 # Change Log
 
+## 0.56.17
+
+### Patch Changes
+
+- 106549814: Add a CMS event for when a field's value changes. To listen for events:
+
+  ```ts
+  cms.events.subscribe(`forms:fields:onChange`, event => console.log(event))
+  ```
+
+  Add a CMS event for when a field is reset. To listen for form resets:
+
+  ```ts
+  cms.events.subscribe(`forms:reset`, event => console.log(event))
+  ```
+
+- 4923a2d66: Checks isAuthenticated() before making requests to the GraphQL client
+- a07ff39bb: Fixed z index issue with nested forms
+
 ## 0.56.16
 
 ### Patch Changes
