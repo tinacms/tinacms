@@ -129,4 +129,4 @@ put into a queue and resolved asynchronously. Once a changeset is resolved, the 
 value. For reference fields and objects it's important to note that the values are fully resolved before they are set in the
 `data` property.
 
-![](https://raw.githubusercontent.com/tinacms/tinacms/use-graphql-froms-refactor-4/packages/tinacms/src/hooks/formify/Screen Shot 2022-03-11 at 11.04.17 AM.png)
+![](https://raw.githubusercontent.com/tinacms/tinacms/use-graphql-froms-refactor-4/packages/tinacms/src/hooks/formify/formify-diagram-2.png)
