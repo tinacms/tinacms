@@ -1,0 +1,27 @@
+# Blueprint
+# getPostDocument
+#
+# Documents for blueprint
+# ================
+# content/posts/post1.mdx
+#
+# Field blueprints
+# ================
+# tags.[]
+
+
+query GetBlockPageDocument {
+  getPostDocument(relativePath: "post1.mdx") {
+    data {
+      tags
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}

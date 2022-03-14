@@ -1,0 +1,31 @@
+# Blueprint
+# getAuthorList.edges.[].node
+#
+# Documents for blueprint
+# ================
+# content/authors/author1.mdx [0]
+#
+# Field blueprints
+# ================
+# name
+
+
+query QueryOperation {
+  getAuthorList {
+    edges {
+      node {
+        data {
+          name
+        }
+        _internalSys: sys {
+          path
+          collection {
+            name
+          }
+        }
+        form
+        values
+      }
+    }
+  }
+}

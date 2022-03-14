@@ -1,0 +1,32 @@
+# Blueprint
+# getBlockPageDocument
+#
+# Documents for blueprint
+# ================
+# content/block-pages/blockPage1.mdx
+#
+# Field blueprints
+# ================
+# blocks.[]
+# blocks.[].title
+
+
+query QueryOperation {
+  getBlockPageDocument(relativePath: "blockPage1.mdx") {
+    data {
+      blocks {
+        ... on BlockPageBlocksHero {
+          title
+        }
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}

@@ -1,0 +1,59 @@
+# Blueprint
+# getBlockPageDocument
+#
+# Documents for blueprint
+# ================
+# content/block-pages/blockPage1.mdx
+#
+# Field blueprints
+# ================
+# blocks.[]
+# blocks.[].blogs.[]
+# blocks.[].blogs.[].item
+
+# Blueprint
+# getBlockPageDocument.data.blocks.[].blogs.[].item
+#
+# Documents for blueprint
+# ================
+#
+# Field blueprints
+# ================
+# title
+
+
+query QueryOperation {
+  getBlockPageDocument(relativePath: "blockPage1.mdx") {
+    data {
+      blocks {
+        ... on BlockPageBlocksFeaturedPosts {
+          blogs {
+            item {
+              ... on PostDocument {
+                data {
+                  title
+                }
+                _internalSys: sys {
+                  path
+                  collection {
+                    name
+                  }
+                }
+                form
+                values
+              }
+            }
+          }
+        }
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}
