@@ -11,23 +11,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type {BinaryFilter, PutOptions, QueryParams, Store, TernaryFilter} from './index'
-import {OP, isIndexed} from './index'
+import type {PutOptions, Store} from './index'
+import {coerceFilterChainOperands, isIndexed, KeyValueQueryParams, makeFilter} from './index'
 import path from 'path'
-import {atob, btoa, sequential} from '../../util'
+import {sequential} from '../../util'
 import level, {LevelDB} from 'level'
 import levelup from 'levelup'
 import memdown from 'memdown'
 import encode from 'encoding-down'
 import {IndexDefinition} from '.'
-import {FilterOperand} from '../../index'
 
 const defaultPrefix = '_ROOT_'
+const filepathSortKey = 'filepath'
 
 export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
-  public indexes: Record<string, {fields: {name: string, type: string}[], indexDefinitions: Record<string, IndexDefinition>}> = {}
+  public indexes: Record<string, {indexDefinitions: Record<string, IndexDefinition>}> = {}
   public useMemory: boolean
   constructor(rootPath: string, useMemory: boolean = false) {
     this.rootPath = rootPath || ''
@@ -43,147 +43,20 @@ export class LevelStore implements Store {
     }
   }
 
-  // TODO move this up so it can be used by other stores
-  private makeFilter({ filterChain,
-                       dataTypes
-                     }: {
-    filterChain?: (BinaryFilter | TernaryFilter)[],
-    dataTypes: Record<string, string>
-  }): (values: Record<string, string>) => boolean {
-    return (values: Record<string, string>) => {
-      for (const filter of filterChain) {
-        const stringValue = values[filter.field]
-        const dataType = dataTypes[filter.field]
+  public async query(queryParams: KeyValueQueryParams) {
+    let { filterChain, sort = filepathSortKey, collection, ...query } = queryParams
 
-        if (!stringValue) {
-          return false
-        }
+    let { limit: resultLimit } = query
 
-        let value: FilterOperand
-        if (dataType === 'string' || dataType === 'reference') {
-          value = stringValue
-        } else if (dataType === 'number' || dataType === 'datetime') {
-          value = Number(stringValue)
-        } else if (dataType === 'boolean') {
-          value = stringValue === 'true' || stringValue === '1'
-        }
-
-        const { operator } = filter as BinaryFilter
-        if (operator) {
-          switch(operator) {
-            case OP.EQ:
-              if (value !== filter.rightOperand) {
-                return false
-              }
-              break
-            case OP.GT:
-              if (value <= filter.rightOperand) {
-                return false
-              }
-              break
-            case OP.LT:
-              if (value >= filter.rightOperand) {
-                return false
-              }
-              break
-            case OP.GTE:
-              if (value < filter.rightOperand) {
-                return false
-              }
-              break
-            case OP.LTE:
-              if (value > filter.rightOperand) {
-                return false
-              }
-              break
-            case OP.IN:
-              if ((filter.rightOperand as any[]).indexOf(value) === -1) {
-                return false
-              }
-              break
-            case OP.BEGINS_WITH:
-              if (!(value as string).startsWith(filter.rightOperand as string)) {
-                return false
-              }
-              break
-            default:
-              throw new Error(`unexpected operator ${operator}`)
-          }
-        } else {
-
-          const { rightOperator, leftOperator, rightOperand, leftOperand } = filter as TernaryFilter
-
-          if (rightOperator === OP.LTE && value > rightOperand) {
-            return false
-          } else if (rightOperator === OP.LT && value >= rightOperand) {
-            return false
-          }
-
-          if (leftOperator === OP.GTE && value < leftOperand) {
-              return false
-          } else if (leftOperator === OP.GT && value <= leftOperand) {
-              return false
-          }
-        }
-      }
-      return true
-    }
-  }
-
-  private coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFilter)[], dataTypes: Record<string, string>) => {
-    const result: (BinaryFilter | TernaryFilter)[] = []
-    if (filterChain && filterChain.length) {
-      // convert operands by type
-      for (const filter of filterChain) {
-        const dataType: string = dataTypes[filter.field]
-        if (dataType === 'datetime') {
-          if ((filter as TernaryFilter).leftOperand !== undefined) {
-            result.push({
-              ...filter,
-              rightOperand: new Date(filter.rightOperand as string).getTime(),
-              leftOperand: new Date((filter as TernaryFilter).leftOperand as string).getTime(),
-            })
-          } else {
-            if (Array.isArray(filter.rightOperand)) {
-              (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
-            } else {
-              result.push({
-                ...filter,
-                rightOperand: new Date(filter.rightOperand as string).getTime(),
-              })
-            }
-          }
-        } else {
-          result.push({ ...filter })
-        }
-      }
+    // modify the query to fetch one more item to correctly set hasNextPage
+    if (resultLimit !== -1) {
+      query.limit = resultLimit + 1
     }
 
-    return result
-  }
-
-  public async query(queryParams: QueryParams, hydrator) {
-    let { first, after, last, before, sort, collection } = queryParams
-    const query: { gt?: string, gte?: string, lt?: string, lte?: string, reverse?: boolean } = {}
-    let limit = 10 // default
-
-    if (first) {
-      limit = first
-    } else if (last) {
-      limit = last
-    }
-
-    const { fields, indexDefinitions } = this.indexes[collection]
+    const { indexDefinitions } = this.indexes[collection]
     const indexDefinition = sort && indexDefinitions[sort]
     const indexed = indexDefinition && isIndexed(queryParams, indexDefinition)
-
-    if (after) {
-      query.gt = atob(after)
-    } else if (before) {
-      query.lt = atob(before)
-    }
-
-    const indexPrefix = indexDefinition ? `${indexDefinition.collection}:${sort}` : `${defaultPrefix}:`
+    const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
     // // TODO does this properly handle DESC ?
     if (!query.gt && !query.gte) {
@@ -194,53 +67,34 @@ export class LevelStore implements Store {
       query.lt = `${indexPrefix}\xFF`
     }
 
-    if (last ) {
-      query.reverse = true
-    }
-
-    // TODO
-    // - allow case insensitivity?
-    // - how do we handle exists operator in dynamo?
-    // - when using last/before, should we change the hasNextPage/hasPreviousPage and startCursor/endCursor?
-
     let edges: { cursor: string, path: string }[] = []
     let startKey: string = ''
     let endKey: string = ''
     let hasPreviousPage = false
     let hasNextPage = false
 
-    const dataTypes: Record<string, string> = {}
-    for (const field of indexed ? indexDefinition.fields : fields) {
-      dataTypes[field.name] = field.type
-    }
-
-    const filterChain: (BinaryFilter | TernaryFilter)[] | undefined = this.coerceFilterChainOperands(queryParams.filterChain, dataTypes)
-    let valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
-
-    const itemFilter = filterChain ? this.makeFilter({
-      filterChain,
-      dataTypes
+    const fieldsPattern = indexDefinition?.fields?.length ? `${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:` : ':'
+    let valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
+    const itemFilter = filterChain ? makeFilter({
+      filterChain: coerceFilterChainOperands(filterChain),
     }) : () => true
 
-    const { db } = this
-
-    for await (const [key, value] of (db as any).iterator(query)) { //TODO why is typescript unhappy?
+    for await (const [key, value] of (this.db as any).iterator(query)) { //TODO why is typescript unhappy?
       const matcher = valuesRegex.exec(key)
       if (!matcher || (indexDefinition && matcher.length !== (indexDefinition.fields.length + 2))) {
         continue
       }
       const filepath = matcher.groups['_filepath_']
-      if (!itemFilter(indexed ? matcher.groups : (indexDefinition ? await db.get(`${defaultPrefix}:${filepath}`) : value))) {
+      if (!itemFilter(indexed ? matcher.groups : (indexDefinition ? await this.db.get(`${defaultPrefix}:${filepath}`) : value))) {
         continue
       }
 
-      if (limit !== -1 && edges.length >= limit) {
-        if (last) {
+      if (resultLimit !== -1 && edges.length >= resultLimit) {
+        if (query.reverse) {
           hasPreviousPage = true
         } else {
           hasNextPage = true
         }
-
         break
       }
 
@@ -250,32 +104,29 @@ export class LevelStore implements Store {
     }
 
     return {
-      edges: await sequential(edges, async (edge) => {
-        const node = await hydrator(edge.path)
-        return {
-          node,
-          cursor: btoa(edge.cursor)
-        }
-      }),
+      edges,
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
-        startCursor: btoa(startKey),
-        endCursor: btoa(endKey)
+        startCursor: startKey,
+        endCursor: endKey
       }
     }
   }
 
   public async seed(filepath: string, data: object, options?: PutOptions) {
-    if (options?.indexDefinitions || options?.fields) {
+    if (options?.indexDefinitions) {
       if (!options?.collection) {
         throw new Error('collection must be specified with fields or indexDefinitions')
       }
 
       if (!this.indexes[options?.collection]) {
         this.indexes[options?.collection] = {
-          indexDefinitions: options?.indexDefinitions,
-          fields: options?.fields
+          indexDefinitions: options?.indexDefinitions
+        }
+        // default index definition
+        this.indexes[options?.collection]['indexDefinitions'][filepathSortKey] = {
+          fields: []
         }
       }
     }
@@ -368,7 +219,11 @@ export class LevelStore implements Store {
           return field.default || ''
         }).join(':')
 
-        await this.db.put(`${definition.collection}:${sort}:${indexedValue}:${filepath}`, '')
+        if (sort === filepathSortKey) {
+          await this.db.put(`${options.collection}:${sort}:${filepath}`, '')
+        } else {
+          await this.db.put(`${options.collection}:${sort}:${indexedValue}:${filepath}`, '')
+        }
       }
     }
   }

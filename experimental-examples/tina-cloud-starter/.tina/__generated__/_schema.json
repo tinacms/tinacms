@@ -753,10 +753,54 @@
             "authors",
             "avatar"
           ]
+        },
+        {
+          "label": "Details",
+          "name": "details",
+          "type": "object",
+          "list": true,
+          "fields": [
+            {
+              "type": "reference",
+              "label": "Zodiac",
+              "name": "zodiac",
+              "collections": [
+                "zodiacs"
+              ],
+              "namespace": [
+                "authors",
+                "details",
+                "zodiac"
+              ]
+            }
+          ],
+          "namespace": [
+            "authors",
+            "details"
+          ]
         }
       ],
       "namespace": [
         "authors"
+      ]
+    },
+    {
+      "label": "Zodiacs",
+      "name": "zodiacs",
+      "path": "content/zodiacs",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "zodiacs",
+            "name"
+          ]
+        }
+      ],
+      "namespace": [
+        "zodiacs"
       ]
     },
     {

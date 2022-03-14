@@ -52,6 +52,18 @@ fragment GlobalParts on Global {
 fragment AuthorsParts on Authors {
   name
   avatar
+  details {
+    __typename
+    zodiac {
+      ... on Document {
+        id
+      }
+    }
+  }
+}
+
+fragment ZodiacsParts on Zodiacs {
+  name
 }
 
 fragment PagesParts on Pages {

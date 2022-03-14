@@ -17,7 +17,7 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
-import type { QueryParams, Store } from '@tinacms/datalayer'
+import type { KeyValueQueryParams, QueryParams, Store } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
@@ -28,6 +28,7 @@ import type {
 } from '../types'
 import type { Bridge } from './bridge'
 import { flatten, isBoolean } from 'lodash'
+import {atob, btoa} from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -247,7 +248,55 @@ export class Database {
   }
 
   public query = async (queryParams: QueryParams, hydrator) => {
-    return await this.store.query(queryParams, hydrator)
+    let { first, after, last, before, sort, collection, filterChain } = queryParams
+    const kvParams: KeyValueQueryParams = { sort, collection, filterChain }
+
+    if (first) {
+      kvParams.limit = first
+    } else if (last) {
+      kvParams.limit = last
+    } else {
+      kvParams.limit = 10
+    }
+
+    if (after) {
+      kvParams.gt = atob(after)
+    } else if (before) {
+      kvParams.lt = atob(before)
+    }
+
+    if (last) {
+      kvParams.reverse = true
+    }
+
+    const { edges, pageInfo: {
+      hasPreviousPage,
+        hasNextPage,
+        startCursor,
+        endCursor
+    }}: { edges: { path: string, cursor: string }[], pageInfo: {
+      hasPreviousPage: boolean,
+        hasNextPage: boolean,
+        startCursor: string,
+        endCursor: string
+      }} = await this.store.query(kvParams)
+
+
+    return {
+      edges: await sequential(edges, async (edge) => {
+        const node = await hydrator(edge.path)
+        return {
+          node,
+          cursor: btoa(edge.cursor)
+        }
+      }),
+      pageInfo: {
+        hasPreviousPage,
+        hasNextPage,
+        startCursor: btoa(startCursor),
+        endCursor: btoa(endCursor)
+      }
+    }
   }
 
   public putConfigFiles = async ({
@@ -389,11 +438,10 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
     }
 
     indexDefinitions[field.name] = {
-      collection: collection.name,
       fields: [
         {
           name: field.name,
-          default: '', // TODO do we need a proper default for these?
+          default: '',
           type: field.type
         }
       ]
@@ -405,7 +453,6 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
     // TODO don't these have to be ordered in dynamodb to map to GSIs?
     for (let index of collection.indexes) {
       indexDefinitions[index.name] = {
-        collection: collection.name,
         fields: index.fields.map(indexField => ({
           name: indexField.name,
           default: indexField.default,
@@ -426,7 +473,7 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, { collection: collection.name, fields: (collection.fields as TinaFieldInner<true>[]).map(field => ({name: field.name, type: field.type})), indexDefinitions })
+      await database.store.seed(filepath, data, { collection: collection.name, indexDefinitions })
     }
     if (database.store.supportsIndexing()) {
       return indexDocument({ filepath, data, database })

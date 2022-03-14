@@ -55,6 +55,8 @@ type Query {
   getGlobalList(before: String, after: String, first: Float, last: Float, sort: String, filter: GlobalFilter): GlobalConnection!
   getAuthorsDocument(relativePath: String): AuthorsDocument!
   getAuthorsList(before: String, after: String, first: Float, last: Float, sort: String, filter: AuthorsFilter): AuthorsConnection!
+  getZodiacsDocument(relativePath: String): ZodiacsDocument!
+  getZodiacsList(before: String, after: String, first: Float, last: Float, sort: String, filter: ZodiacsFilter): ZodiacsConnection!
   getPagesDocument(relativePath: String): PagesDocument!
   getPagesList(before: String, after: String, first: Float, last: Float, sort: String, filter: PagesFilter): PagesConnection!
 }
@@ -109,9 +111,22 @@ input NumberFilter {
   in: [Float]
 }
 
+input ZodiacsFilter {
+  name: StringFilter
+}
+
+input AuthorsDetailsZodiacFilter {
+  zodiacs: ZodiacsFilter
+}
+
+input AuthorsDetailsFilter {
+  zodiac: AuthorsDetailsZodiacFilter
+}
+
 input AuthorsFilter {
   name: StringFilter
   avatar: StringFilter
+  details: AuthorsDetailsFilter
 }
 
 input PostsAuthorFilter {
@@ -250,6 +265,7 @@ input DocumentFilter {
   posts: PostsFilter
   global: GlobalFilter
   authors: AuthorsFilter
+  zodiacs: ZodiacsFilter
   pages: PagesFilter
 }
 
@@ -276,7 +292,7 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
+union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsDocument | PagesDocument
 
 union PostsAuthorDocument = AuthorsDocument
 
@@ -373,9 +389,16 @@ type GlobalConnection implements Connection {
   edges: [GlobalConnectionEdges]
 }
 
+union AuthorsDetailsZodiacDocument = ZodiacsDocument
+
+type AuthorsDetails {
+  zodiac: AuthorsDetailsZodiacDocument
+}
+
 type Authors {
   name: String
   avatar: String
+  details: [AuthorsDetails]
 }
 
 type AuthorsDocument implements Node & Document {
@@ -396,6 +419,30 @@ type AuthorsConnection implements Connection {
   pageInfo: PageInfo
   totalCount: Float!
   edges: [AuthorsConnectionEdges]
+}
+
+type Zodiacs {
+  name: String
+}
+
+type ZodiacsDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Zodiacs!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type ZodiacsConnectionEdges {
+  cursor: String
+  node: ZodiacsDocument
+}
+
+type ZodiacsConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Float!
+  edges: [ZodiacsConnectionEdges]
 }
 
 type PagesBlocksHeroActions {
@@ -483,6 +530,8 @@ type Mutation {
   createGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
   updateAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
   createAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  updateZodiacsDocument(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
+  createZodiacsDocument(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
   updatePagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
   createPagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
 }
@@ -491,6 +540,7 @@ input DocumentMutation {
   posts: PostsMutation
   global: GlobalMutation
   authors: AuthorsMutation
+  zodiacs: ZodiacsMutation
   pages: PagesMutation
 }
 
@@ -547,9 +597,18 @@ input GlobalMutation {
   theme: GlobalThemeMutation
 }
 
+input AuthorsDetailsMutation {
+  zodiac: String
+}
+
 input AuthorsMutation {
   name: String
   avatar: String
+  details: [AuthorsDetailsMutation]
+}
+
+input ZodiacsMutation {
+  name: String
 }
 
 input PagesBlocksHeroActionsMutation {

@@ -5298,6 +5298,7 @@ __metadata:
     jest-file-snapshot: ^0.5.0
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
+    jsonpath-plus: ^6.0.1
     level: ^7.0.1
     levelup: ^5.1.1
     lodash: ^4.17.20
@@ -19782,6 +19783,13 @@ fsevents@~2.1.2:
     graceful-fs:
       optional: true
   checksum: 9419c886abc6f8a5088cbb222b7bc17c76e8ee9f6c0e5c38781a4e09488166084f25247bc0b58e025b08c43064c82ae860ad89a992e35fc8cfae639323b7edbc
+  languageName: node
+  linkType: hard
+
+"jsonpath-plus@npm:^6.0.1":
+  version: 6.0.1
+  resolution: "jsonpath-plus@npm:6.0.1"
+  checksum: d23808c28ee39e1feb0e203069efb230ddcadd2a24ea3dcd042135b4e12e466590b8eae53d0070d4b94ce459d3fd08fa3d5ced06c9a284df4ad34ed93ca931cd
   languageName: node
   linkType: hard
 

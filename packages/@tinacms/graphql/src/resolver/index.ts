@@ -13,24 +13,24 @@ limitations under the License.
 
 import _ from 'lodash'
 import path from 'path'
-import { TinaSchema } from '../schema'
-import { assertShape, sequential, lastItem } from '../util'
-import { NAMER } from '../ast-builder'
-import { Database, CollectionDocumentListLookup } from '../database'
+import {TinaSchema} from '../schema'
+import {assertShape, lastItem, sequential} from '../util'
+import {NAMER} from '../ast-builder'
+import {Database} from '../database'
 import isValid from 'date-fns/isValid'
-import { parseMDX, stringifyMDX } from '../mdx'
-import flat from 'flat'
+import {parseMDX, stringifyMDX} from '../mdx'
 
 import type {
-  Templateable,
-  TinaFieldEnriched,
   Collectable,
+  ReferenceTypeWithNamespace,
+  Templateable,
   TinaCloudCollection,
+  TinaFieldEnriched,
 } from '../types'
-import { TinaError } from './error'
-import {makeFilterChain} from '@tinacms/datalayer'
-import type {IndexDefinition} from '@tinacms/datalayer'
 import {TinaFieldInner} from '../types'
+import {TinaError} from './error'
+import {FilterCondition, makeFilterChain} from '@tinacms/datalayer'
+import {collectConditionsForField, resolveReferences} from './filter-utils'
 
 interface ResolverConfig {
   database: Database
@@ -529,6 +529,28 @@ export class Resolver {
     return this.database.store.glob(collection.path, this.getDocument)
   }
 
+  private referenceResolver = async (filter: Record<string, object>, fieldDefinition: ReferenceTypeWithNamespace) => {
+    const referencedCollection = this.tinaSchema.getCollection(fieldDefinition.collections[0])
+    if (!referencedCollection) {
+      throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
+    }
+
+    const resolvedCollectionConnection = await this.resolveCollectionConnection({
+      args: {
+        sort: Object.keys(filter[fieldDefinition.name][referencedCollection.name])[0], // TODO what happens if you have multiple values here? Ideally I think we want to sort by the field being queried for nested queries
+        filter: {
+          ...filter[fieldDefinition.name][referencedCollection.name]
+        }, first: -1
+      },
+      collection: referencedCollection, // TODO should be the right lookup for the referenced collection
+      hydrator: (path) => path // just return the path
+    })
+
+    const {edges} = resolvedCollectionConnection
+    const values = edges.map(edge => edge.node)
+    return {edges, values}
+  }
+
   public resolveCollectionConnection = async ({
     args,
     collection,
@@ -542,81 +564,32 @@ export class Resolver {
     let pageInfo
 
     if (args.filter || args.sort) {
-      const queries = []
-      const queryFields: string[] = []
+      const conditions: FilterCondition[] = []
       if (args.filter) {
-        for (const field of Object.keys(args.filter)) {
-          const fieldDefinition = (collection.fields as TinaFieldInner<true>[]).find(f => f.name === field)
-          // resolve top level references
-          if (fieldDefinition && fieldDefinition.type === 'reference') {
-            const referencedCollection = this.tinaSchema.getCollection(fieldDefinition.collections[0]) // TODO why collections an array?
-            if (referencedCollection) {
-              const resolvedCollectionConnection = await this.resolveCollectionConnection({
-                args: {
-                  sort: Object.keys(args.filter[fieldDefinition.name][referencedCollection.name])[0], // TODO what happens if you have multiple values here? Ideally I think we want to sort by the field being queried for nested queries
-                  filter: {
-                  ...args.filter[fieldDefinition.name][referencedCollection.name]
-                }, first: -1},
-                collection: referencedCollection, // TODO should be the right lookup for the referenced collection
-                hydrator: (path) => path
-              })
-              const { edges } = resolvedCollectionConnection
-              const values = edges.map(edge => edge.node)
-              if (edges.length === 1) {
-                args.filter[field] = {
-                  eq: values[0]
-                }
-              } else if (edges.length > 1) {
-                args.filter[field] = {
-                  in: values
-                }
-              } else {
-                // TODO is there a better way to short-circuit this? For an AND filter we can just give up here but OR would just ignore this
-                args.filter[field] = {
-                  eq: '___null___'
-                }
-              }
-            } else {
-              throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
-            }
+        await resolveReferences(args.filter, collection.fields as TinaFieldInner<true>[], this.referenceResolver)
+
+        const conditionCollector = (condition: FilterCondition) => {
+          if (!condition.filterPath) {
+            throw new Error('Error parsing filter - unable to generate filterPath')
           }
+          if (!condition.filterExpression) {
+            throw new Error(`Error parsing filter - missing expression for ${condition.filterPath}`)
+          }
+          conditions.push(condition)
         }
 
-        const flattenedArgs = flat(args.filter, { delimiter: '#' })
-        Object.entries(flattenedArgs).map(([key, value]) => {
-          const keys = key.split('#')
-          // If the collection has templates, this will be a template name, otherwise it'll be the attribute
-          const maybeTemplateName = keys[0]
-          const realKey = keys.slice(0, keys.length - 1).join('#')
-
-          let templateName = collection.name
-          if (collection.templates) {
-            const template = collection.templates.find((template) => {
-              if (typeof template === 'string') {
-                throw new Error('Global templates not yet supported for queries')
-              }
-              return template.name === maybeTemplateName
-            })
-            if (typeof template === 'string') {
-              throw new Error('Global templates not yet supported for queries')
-            }
-            if (template) {
-              templateName = template.name
-            }
+        for (const fieldName of Object.keys(args.filter)) {
+          const field = (collection.fields as any[]).find(field => field.name === fieldName) as any
+          if (!field) {
+            throw new Error(`${fieldName} not found in collection ${collection.name}`)
           }
-          // TODO not sure what to do with templates?
-          // queries.push(
-          //   `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
-          // )
-          queryFields.push(realKey)
-          queries.push(value)
-        })
+          collectConditionsForField(fieldName, field, args.filter[fieldName], '', conditionCollector)
+        }
       }
 
       const queryParams = {
         filterChain: makeFilterChain({
-          filter: args.filter as Record<string, object>,
-          fields: collection.fields
+          conditions
         }),
         collection: collection.name,
         sort: args.sort as string,

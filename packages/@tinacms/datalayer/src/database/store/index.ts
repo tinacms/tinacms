@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import {JSONPath} from 'jsonpath-plus'
+
 import {FilterOperand} from '../../index'
 
 export enum OP {
@@ -24,17 +26,31 @@ export enum OP {
 }
 
 export type BinaryFilter = {
-  field: string
+  pathExpression: string
   rightOperand: FilterOperand
   operator:  OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.BEGINS_WITH | OP.IN
+  type: string
 }
 
 export type TernaryFilter = {
-  field: string
+  pathExpression: string
   leftOperand: FilterOperand
   rightOperand: FilterOperand
   leftOperator: OP.GTE | OP.GT
   rightOperator: OP.LT | OP.LTE
+  type: string
+}
+
+export type KeyValueQueryParams = {
+  collection?: string,
+  filterChain: (BinaryFilter | TernaryFilter)[],
+  sort?: string,
+  gt?: string,
+  gte?: string,
+  lt?: string,
+  lte?: string,
+  reverse?: boolean,
+  limit?: number
 }
 
 export type QueryParams = {
@@ -45,11 +61,9 @@ export type QueryParams = {
   last?: number
   before?: string
   after?: string
-  simple?: boolean
 }
 
 export type IndexDefinition = {
-  collection: string
   fields: {
     name: string
     default?: string
@@ -59,7 +73,6 @@ export type IndexDefinition = {
 
 export type PutOptions = {
   collection?: string,
-  fields?: {name: string, type: string}[]
   indexDefinitions?: Record<string,IndexDefinition>,
   includeTemplate?: boolean,
   keepTemplateKey?: boolean,
@@ -105,7 +118,7 @@ export interface Store {
    * meaning there's no need to "hydrate" the return value
    */
   // TODO update documentation
-  query(queryParams: QueryParams, hydrator)
+  query(queryParams: KeyValueQueryParams)
 
   /**
    * In this context, seeding is the act of putting records and indexing data into an ephemeral
@@ -172,76 +185,223 @@ const inferOperatorFromFilter = (filterOperator: string) => {
   }
 }
 
-export const makeFilterChain = ({ filter, fields }: {
-  filter?: Record<string,object>,
-  fields: {
-    name: string
-    type?: string
-  }[]
-}) => {
+export type FilterCondition = {
+  filterExpression: Record<string,FilterOperand>,
+  filterPath: string
+}
+
+export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}) => {
   let filterChain: (BinaryFilter | TernaryFilter)[] = []
-  if (filter) {
-    for (const field of fields) {
-      const fieldFilter = filter[field.name]
-      if (fieldFilter) {
-        const [key1, key2, ...otherKeys] = Object.keys(fieldFilter)
-        if (otherKeys.length) {
-          throw new Error(`Filter on field '${field.name}' supports at most two conditions: '${[key1, key2, ...otherKeys].join(', ')}'`)
+  if (!conditions) {
+    return filterChain
+  }
+
+  for (const condition of conditions) {
+    const { filterPath, filterExpression } = condition
+    const { _type, ...keys } = filterExpression
+    const [key1, key2, ...extraKeys] = Object.keys(keys)
+    if (extraKeys.length) {
+      throw new Error(`Unexpected keys: [${extraKeys.join(',')}] in filter expression`)
+    }
+
+    if (key1 && !key2) {
+      filterChain.push({
+        pathExpression: filterPath,
+        rightOperand: filterExpression[key1],
+        operator: inferOperatorFromFilter(key1),
+        type: _type as string
+      })
+    } else if (key1 && key2) {
+      const leftFilterOperator = (filterExpression['gt'] && 'gt') || (filterExpression['gte'] && 'gte') || (filterExpression['after'] && 'after') || undefined
+      const rightFilterOperator = (filterExpression['lt'] && 'lt') || (filterExpression['lte'] && 'lte') || (filterExpression['before'] && 'before') || undefined
+      let leftOperand: FilterOperand
+      let rightOperand: FilterOperand
+      if (rightFilterOperator && leftFilterOperator) {
+        if (key1 === leftFilterOperator) {
+          leftOperand = filterExpression[key1]
+          rightOperand = filterExpression[key2]
+        } else {
+          rightOperand = filterExpression[key1]
+          leftOperand = filterExpression[key2]
         }
 
-        if (key1 && key2) {
-          const leftFilterOperator = (fieldFilter['gt'] && 'gt') || (fieldFilter['gte'] && 'gte') || (fieldFilter['after'] && 'after') || undefined
-          const rightFilterOperator = (fieldFilter['lt'] && 'lt') || (fieldFilter['lte'] && 'lte') || (fieldFilter['before'] && 'before') || undefined
-          let leftOperand: FilterOperand
-          let rightOperand: FilterOperand
-          if (rightFilterOperator && leftFilterOperator) {
-            if (key1 === leftFilterOperator) {
-              leftOperand = fieldFilter[key1]
-              rightOperand = fieldFilter[key2]
-            } else {
-              rightOperand = fieldFilter[key1]
-              leftOperand = fieldFilter[key2]
+        filterChain.push({
+          pathExpression: filterPath,
+          rightOperand,
+          leftOperand,
+          leftOperator: inferOperatorFromFilter(leftFilterOperator) as OP.GT | OP.GTE,
+          rightOperator: inferOperatorFromFilter(rightFilterOperator) as OP.LT | OP.LTE,
+          type: _type as string
+        })
+      } else {
+        throw new Error(`Filter on field '${filterPath}' has invalid combination of conditions: '${key1}, ${key2}'`)
+      }
+    }
+  }
+  return filterChain
+}
+
+export const makeFilter = ({ filterChain }: {
+  filterChain?: (BinaryFilter | TernaryFilter)[]
+}): (values: Record<string, object>) => boolean => {
+  return (values: Record<string, object>) => {
+    for (const filter of filterChain) {
+      const dataType = filter.type
+      // TODO how do nested values work with the JSONPath, would we ever have an index with a nested path
+      const resolvedValues = JSONPath({path: filter.pathExpression, json: values})
+      if (!resolvedValues || !resolvedValues.length) {
+        return false
+      }
+
+      let operands: FilterOperand[]
+      if (dataType === 'string' || dataType === 'reference') {
+        operands = resolvedValues
+      } else if (dataType === 'number' || dataType === 'datetime') {
+        operands = resolvedValues.map(resolvedValue => Number(resolvedValue))
+      } else if (dataType === 'boolean') {
+        operands = resolvedValues.map(resolvedValue => resolvedValue === 'true' || resolvedValue === '1')
+      }
+
+      const { operator } = filter as BinaryFilter
+      let matches = false
+      if (operator) {
+        switch(operator) {
+          case OP.EQ:
+            if (operands.findIndex(operand => operand === filter.rightOperand) >= 0) {
+              matches = true
             }
-
-            filterChain.push({
-              field: field.name,
-              rightOperand,
-              leftOperand,
-              leftOperator: inferOperatorFromFilter(leftFilterOperator) as OP.GT | OP.GTE,
-              rightOperator: inferOperatorFromFilter(rightFilterOperator) as OP.LT | OP.LTE
-            })
-          } else {
-            throw new Error(`Filter on field '${field.name}' has invalid combination of conditions: '${key1}, ${key2}'`)
-          }
-        } else if (key1) {
-          filterChain.push({
-            field: field.name,
-            rightOperand: fieldFilter[key1],
-            operator: inferOperatorFromFilter(key1)
-          })
+            break
+          case OP.GT:
+            for (const operand of operands) {
+              if (operand > filter.rightOperand) {
+                matches = true
+                break
+              }
+            }
+            break
+          case OP.LT:
+            for (const operand of operands) {
+              if (operand < filter.rightOperand) {
+                matches = true
+                break
+              }
+            }
+            break
+          case OP.GTE:
+            for (const operand of operands) {
+              if (operand >= filter.rightOperand) {
+                matches = true
+                break
+              }
+            }
+            break
+          case OP.LTE:
+            for (const operand of operands) {
+              if (operand <= filter.rightOperand) {
+                matches = true
+                break
+              }
+            }
+            break
+          case OP.IN:
+            for (const operand of operands) {
+              if ((filter.rightOperand as any[]).indexOf(operand) >= 0) {
+                matches = true
+                break
+              }
+            }
+            break
+          case OP.BEGINS_WITH:
+            for (const operand of operands) {
+              if ((operand as string).startsWith(filter.rightOperand as string)) {
+                matches = true
+                break
+              }
+            }
+            break
+          default:
+            throw new Error(`unexpected operator ${operator}`)
         }
+
+      } else {
+        const { rightOperator, leftOperator, rightOperand, leftOperand } = filter as TernaryFilter
+        for (const operand of operands) {
+          let rightMatches = false
+          let leftMatches = false
+          if (rightOperator === OP.LTE && operand <= rightOperand) {
+            rightMatches = true
+          } else if (rightOperator === OP.LT && operand < rightOperand) {
+            rightMatches = true
+          }
+
+          if (leftOperator === OP.GTE && operand >= leftOperand) {
+            leftMatches = true
+          } else if (leftOperator === OP.GT && operand > leftOperand) {
+            leftMatches = true
+          }
+
+          if (rightMatches && leftMatches) {
+            matches = true
+            break
+          }
+        }
+      }
+
+      if (!matches) {
+        return false
+      }
+    }
+    return true
+  }
+}
+
+export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFilter)[]) => {
+  const result: (BinaryFilter | TernaryFilter)[] = []
+  if (filterChain && filterChain.length) {
+    // convert operands by type
+    for (const filter of filterChain) {
+      const dataType: string = filter.type
+      if (dataType === 'datetime') {
+        if ((filter as TernaryFilter).leftOperand !== undefined) {
+          result.push({
+            ...filter,
+            rightOperand: new Date(filter.rightOperand as string).getTime(),
+            leftOperand: new Date((filter as TernaryFilter).leftOperand as string).getTime(),
+          })
+        } else {
+          if (Array.isArray(filter.rightOperand)) {
+            (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
+          } else {
+            result.push({
+              ...filter,
+              rightOperand: new Date(filter.rightOperand as string).getTime(),
+            })
+          }
+        }
+      } else {
+        result.push({ ...filter })
       }
     }
   }
 
-  return filterChain
+  return result
 }
 
 export const isIndexed = (queryParams: QueryParams, index: IndexDefinition) => {
   if (queryParams.filterChain && queryParams.filterChain.length) {
     const [lastFilter] = queryParams.filterChain.slice(-1)
-    const maxOrder = index.fields.findIndex(field => lastFilter.field === field.name)
+    const maxOrder = index.fields.findIndex(field => lastFilter.pathExpression === field.name)
     const indexFields = index.fields.map(field => field.name)
     const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field, i) => field.name)
 
     // First make sure that all the query fields are present in the index
     for (const [i, filter] of Object.entries(queryParams.filterChain)) {
-      if (indexFields.indexOf(filter.field) === -1) {
+      if (indexFields.indexOf(filter.pathExpression) === -1) {
         return false
       }
 
       // and the order of the filtering makes sense
-      if (filter.field !== referencedFields[Number(i)]) {
+      if (filter.pathExpression !== referencedFields[Number(i)]) {
         return false
       }
 

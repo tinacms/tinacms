@@ -561,6 +561,32 @@ export default defineSchema({
           label: "Avatar",
           name: "avatar",
         },
+        {
+          label: "Details",
+          name: "details",
+          type: "object",
+          list: true,
+          fields: [
+            {
+              type: "reference",
+              label: "Zodiac",
+              name: "zodiac",
+              collections: ["zodiacs"],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Zodiacs",
+      name: "zodiacs",
+      path: "content/zodiacs",
+      fields: [
+        {
+          type: "string",
+          label: "Name",
+          name: "name",
+        },
       ],
     },
     {
