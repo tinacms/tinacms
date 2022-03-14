@@ -1,0 +1,30 @@
+# Blueprint
+# getAuthorDocument
+#
+# Documents for blueprint
+# ================
+# content/authors/author1.mdx
+#
+# Field blueprints
+# ================
+# soc.[]
+# soc.[].hand
+
+
+query QueryOperation {
+  getAuthorDocument(relativePath: "author1.mdx") {
+    data {
+      soc: social {
+        hand: handle
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}
