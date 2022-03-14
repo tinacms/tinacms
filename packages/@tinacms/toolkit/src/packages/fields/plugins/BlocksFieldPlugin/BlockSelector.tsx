@@ -48,7 +48,7 @@ export const BlockSelector = ({
     <Popover>
       {({ open }) => (
         <>
-          <Popover.Button as={React.Fragment}>
+          <Popover.Button as={'span'}>
             <IconButton
               variant={open ? 'secondary' : 'primary'}
               size="small"
