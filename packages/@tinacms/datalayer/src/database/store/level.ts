@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type {PutOptions, Store} from './index'
+import type {PutOptions, SeedOptions, Store} from './index'
 import {coerceFilterChainOperands, isIndexed, KeyValueQueryParams, makeFilter} from './index'
 import path from 'path'
 import {sequential} from '../../util'
@@ -114,7 +114,7 @@ export class LevelStore implements Store {
     }
   }
 
-  public async seed(filepath: string, data: object, options?: PutOptions) {
+  public async seed(filepath: string, data: object, options?: SeedOptions) {
     if (options?.indexDefinitions) {
       if (!options?.collection) {
         throw new Error('collection must be specified with fields or indexDefinitions')
@@ -131,7 +131,7 @@ export class LevelStore implements Store {
       }
     }
 
-    await this.put(filepath, data, { keepTemplateKey: false, ...options })
+    await this.put(filepath, data, { keepTemplateKey: false, seed: true, ...options })
   }
   public supportsSeeding() {
     return true
@@ -202,28 +202,54 @@ export class LevelStore implements Store {
     }
   }
 
+  private parseValueForKey(definition: IndexDefinition, data: object) {
+    return definition.fields.map(field => {
+      if (field.name in data) {
+        if (field.type === 'datetime') {
+          // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
+          return new Date(data[field.name]).getTime()
+        } else {
+          return String(data[field.name])
+        }
+      }
+      return [field.default || '']
+    }).join(':')
+  }
+
+  public async close() {
+    await this.db.close()
+  }
+
   public async put(filepath: string, data: object, options?: PutOptions ) {
+    let existingData
+    try {
+      existingData = !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`, data) : null
+    } catch (err) {
+      if (!err.notFound) {
+        throw err
+      }
+    }
     await this.db.put(`${defaultPrefix}:${filepath}`, data)
 
     if (options?.indexDefinitions) {
       for (let [sort, definition] of Object.entries(options.indexDefinitions)) {
-        const indexedValue = definition.fields.map(field => {
-          if (field.name in data) {
-            if (field.type === 'datetime') {
-              // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-              return new Date(data[field.name]).getTime()
-            } else {
-              return String(data[field.name])
-            }
-          }
-          return field.default || ''
-        }).join(':')
+        const indexedValue = this.parseValueForKey(definition, data)
+        let existingIndexedValue = existingData ? this.parseValueForKey(definition, existingData) : null
 
+        let indexKey
+        let existingIndexKey = null
         if (sort === filepathSortKey) {
-          await this.db.put(`${options.collection}:${sort}:${filepath}`, '')
+          indexKey = `${options.collection}:${sort}:${filepath}`
+          existingIndexKey = indexKey
         } else {
-          await this.db.put(`${options.collection}:${sort}:${indexedValue}:${filepath}`, '')
+          indexKey = `${options.collection}:${sort}:${indexedValue}:${filepath}`
+          existingIndexKey = `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
         }
+
+        if (indexKey != existingIndexKey) {
+          await this.db.del(existingIndexKey)
+        }
+        await this.db.put(indexKey, '')
       }
     }
   }

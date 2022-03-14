@@ -71,12 +71,14 @@ export type IndexDefinition = {
   }[]
 }
 
-export type PutOptions = {
+export type SeedOptions = {
   collection?: string,
   indexDefinitions?: Record<string,IndexDefinition>,
   includeTemplate?: boolean,
   keepTemplateKey?: boolean,
 }
+
+export type PutOptions = SeedOptions & {seed?: boolean}
 
 export interface Store {
   glob(
@@ -86,6 +88,8 @@ export interface Store {
   get<T extends object>(filepath: string): Promise<T>
   // delete(filepath: string): Promise<void>
   clear(): void
+  close(): void
+  open(): void
   /**
    *
    * @param queryStrings

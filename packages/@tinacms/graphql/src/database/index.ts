@@ -23,12 +23,11 @@ import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type {
   TinaCloudSchemaBase,
-  TinaFieldEnriched,
-  Collectable, CollectionFieldsWithNamespace, CollectionTemplatesWithNamespace, TinaFieldInner,
+  CollectionFieldsWithNamespace, CollectionTemplatesWithNamespace, TinaFieldInner,
 } from '../types'
 import type { Bridge } from './bridge'
-import { flatten, isBoolean } from 'lodash'
 import {atob, btoa} from '@tinacms/datalayer'
+import {IndexDefinition} from '@tinacms/datalayer/dist'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -46,6 +45,7 @@ export class Database {
   public bridge: Bridge
   public store: Store
   private tinaSchema: TinaSchema | undefined
+  private collectionIndexDefinitions: Record<string,Record<string,IndexDefinition>> | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   private _graphql: DocumentNode | undefined
   private _tinaSchema: TinaCloudSchemaBase | undefined
@@ -121,13 +121,6 @@ export class Database {
         await this.stringifyFile(filepath, data)
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
-      }
-      if (this.store.supportsIndexing()) {
-        await indexDocument({
-          filepath: filepath,
-          data,
-          database: this,
-        })
       }
       await this.store.put(filepath, payload, { keepTemplateKey })
     }
@@ -234,6 +227,48 @@ export class Database {
     const schema = await this.getTinaSchema()
     this.tinaSchema = await createSchema({ schema })
     return this.tinaSchema
+  }
+
+  public getIndexDefinitions = async (collectionName: string): Promise<Record<string,IndexDefinition>> => {
+    if (!this.collectionIndexDefinitions) {
+      const schema = await this.getSchema()
+      const collections = schema.getCollections()
+      for (const collection of collections) {
+        const indexDefinitions = {}
+        for (const field of (collection.fields as TinaFieldInner<true>[])) {
+          if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object') {
+            continue
+          }
+
+          indexDefinitions[field.name] = {
+            fields: [
+              {
+                name: field.name,
+                default: '',
+                type: field.type
+              }
+            ]
+          }
+        }
+
+        if (collection.indexes) {
+          // build IndexDefinitions for each index in the collection schema
+          // TODO don't these have to be ordered in dynamodb to map to GSIs?
+          for (let index of collection.indexes) {
+            indexDefinitions[index.name] = {
+              fields: index.fields.map(indexField => ({
+                name: indexField.name,
+                default: indexField.default,
+                type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
+              }))
+            }
+          }
+        }
+        this.collectionIndexDefinitions[collectionName] = indexDefinitions
+      }
+    }
+
+    return this.collectionIndexDefinitions[collectionName]
   }
 
   public documentExists = async (fullpath: unknown) => {
@@ -431,37 +466,7 @@ type UnionDataLookup = {
 }
 
 const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
-  const indexDefinitions = {}
-  for (const field of (collection.fields as TinaFieldInner<true>[])) {
-    if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object') {
-      continue
-    }
-
-    indexDefinitions[field.name] = {
-      fields: [
-        {
-          name: field.name,
-          default: '',
-          type: field.type
-        }
-      ]
-    }
-  }
-
-  if (collection.indexes) {
-    // build IndexDefinitions for each index in the collection schema
-    // TODO don't these have to be ordered in dynamodb to map to GSIs?
-    for (let index of collection.indexes) {
-      indexDefinitions[index.name] = {
-        fields: index.fields.map(indexField => ({
-          name: indexField.name,
-          default: indexField.default,
-          type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
-        }))
-      }
-    }
-  }
-
+  const indexDefinitions = await this.getIndexDefinitions(collection.name)
   const numIndexes = Object.keys(indexDefinitions).length
   if ( numIndexes > 20) {
     throw new Error(`A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`)
@@ -475,151 +480,5 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
     if (database.store.supportsSeeding()) {
       await database.store.seed(filepath, data, { collection: collection.name, indexDefinitions })
     }
-    if (database.store.supportsIndexing()) {
-      return indexDocument({ filepath, data, database })
-    }
   })
-}
-
-const indexDocument = async ({
-  filepath,
-  data,
-  database,
-}: {
-  filepath: string
-  data: object
-  database: Database
-}) => {
-  const schema = await database.getSchema()
-  const collection = await schema.getCollectionByFullPath(filepath)
-  // TODO need to handle updates to indexes
-
-  // const existingData = await database.get<{ _collection: string }>(filepath)
-  // const attributesToFilterOut = await _indexCollectable({
-  //   record: filepath,
-  //   value: existingData,
-  //   field: collection,
-  //   prefix: collection.name,
-  //   database,
-  // })
-  // await sequential(attributesToFilterOut, async (attribute) => {
-  //   const records = (await database.store.get<string[]>(attribute)) || []
-  //   await database.store.put(
-  //     attribute,
-  //     records.filter((item) => item !== filepath)
-  //   )
-  //   return true
-  // })
-
-  const attributes = await _indexCollectable({
-    record: filepath,
-    //@ts-ignore
-    field: collection,
-    value: data,
-    prefix: `${lastItem(collection.namespace)}`,
-    database,
-  })
-  // await sequential(attributes, async (fieldName) => {
-  //   const existingRecords =
-  //     (await database.store.get<string[]>(fieldName)) || []
-  //   // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
-  //   // // @ts-ignore
-  //   const uniqueItems = [...new Set([...existingRecords, filepath])]
-  //   await database.store.put(fieldName, uniqueItems)
-  // })
-}
-
-const _indexCollectable = async ({
-  field,
-  value,
-  ...rest
-}: {
-  record: string
-  value: object
-  prefix: string
-  field: Collectable
-  database: Database
-}): Promise<string[]> => {
-  let template
-  let extra = ''
-  if (field.templates) {
-    template = field.templates.find((t) => {
-      if (typeof t === 'string') {
-        throw new Error(`Global templates not yet supported`)
-      }
-      if (hasOwnProperty(value, '_template')) {
-        return t.name === value._template
-      } else {
-        throw new Error(
-          `Expected value for collectable with multiple templates to have property _template`
-        )
-      }
-    })
-    extra = `#${lastItem(template.namespace)}`
-  } else {
-    template = field
-  }
-  const atts = await _indexAttributes({
-    record: rest.record,
-    data: value,
-    prefix: `${rest.prefix}${extra}#${template.name}`,
-    fields: template.fields,
-    database: rest.database,
-  })
-  // @ts-ignore FIXME: filter doesn't do enough to tell Typescript we're only returning strings
-  return flatten(atts).filter((item) => !isBoolean(item))
-}
-
-const _indexAttributes = async ({
-  data,
-  fields,
-  ...rest
-}: {
-  record: string
-  data: object
-  prefix: string
-  fields: TinaFieldEnriched[]
-  database: Database
-}) => {
-  return sequential(fields, async (field) => {
-    const value = data[field.name]
-    if (!value) {
-      return true
-    }
-
-    switch (field.type) {
-      case 'boolean':
-      case 'string':
-      case 'number':
-      case 'datetime':
-        return _indexAttribute({ value, field, ...rest })
-      case 'object':
-        if (field.list) {
-          await sequential(value, async (item) => {
-            // @ts-ignore
-            return _indexCollectable({ field, value: item, ...rest })
-          })
-        } else {
-          return _indexCollectable({ field, value, ...rest })
-        }
-        return true
-      case 'reference':
-        return _indexAttribute({ value, field, ...rest })
-    }
-    return true
-  })
-}
-
-const _indexAttribute = async ({
-  value,
-  prefix,
-  field,
-}: {
-  value: string
-  prefix: string
-  field: TinaFieldEnriched
-}) => {
-  const stringValue = value.toString().substr(0, 100)
-  const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
-  return fieldName
 }
