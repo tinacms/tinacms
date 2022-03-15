@@ -7,7 +7,54 @@ import {
   TinaCloudSchemaBase,
   CollectionTemplateable,
 } from '../types'
-import { assertShape } from '..'
+
+export function addNamespaceToSchemaFrontEnd<T extends object | string>(
+  maybeNode: T,
+  namespace: string[] = []
+): T {
+  if (typeof maybeNode === 'string') {
+    return maybeNode
+  }
+  if (typeof maybeNode === 'boolean') {
+    return maybeNode
+  }
+
+  // @ts-ignore
+  const newNode: {
+    [key in keyof T]: (T & { namespace?: string[] }) | string
+  } = maybeNode
+  // Traverse node's properties first
+  const keys = Object.keys(maybeNode)
+  Object.values(maybeNode).map((m, index) => {
+    const key = keys[index]
+    if (Array.isArray(m)) {
+      // @ts-ignore
+      newNode[key] = m.map((element) => {
+        if (!element) {
+          return
+        }
+        if (!element.hasOwnProperty('name')) {
+          return element
+        }
+        const value = element.name || element.value // options field accepts an object with `value`  instead of `name`
+        return addNamespaceToSchemaFrontEnd(element, [...namespace, value])
+      })
+    } else {
+      if (!m) {
+        return
+      }
+      if (!m.hasOwnProperty('name')) {
+        // @ts-ignore
+        newNode[key] = m
+      } else {
+        // @ts-ignore
+        newNode[key] = addNamespaceToSchemaFrontEnd(m, [...namespace, m.name])
+      }
+    }
+  })
+  // @ts-ignore
+  return { ...newNode, namespace: namespace }
+}
 
 type Version = {
   fullVersion: string
@@ -154,9 +201,9 @@ export class TinaSchema {
       case 'object':
         return templateInfo.template
       case 'union':
-        assertShape<{ _template: string }>(data, (yup) =>
-          yup.object({ _template: yup.string().required() })
-        )
+        // assertShape<{ _template: string }>(data, (yup) =>
+        //   yup.object({ _template: yup.string().required() })
+        // )
         const template = templateInfo.templates.find(
           (template) =>
             template.namespace[template.namespace.length - 1] === data._template
@@ -299,6 +346,9 @@ export const sequential = async <A, B>(
 }
 
 export const lastItem = (arr: (number | string)[]) => {
+  if (typeof arr === 'undefined') {
+    throw new Error('Can not call lastItem when arr is undefined')
+  }
   return arr[arr.length - 1]
 }
 
@@ -369,6 +419,7 @@ export const resolveForm = async ({
   schema,
 }: ResolveFormArgs) => {
   return {
+    id: basename,
     label: collection.label,
     name: basename,
     fields: await sequential(template.fields, async (field) => {
@@ -385,6 +436,7 @@ export const resolveField = async (
   schema: TinaSchema
 ): Promise<unknown> => {
   const extraFields = field.ui || {}
+  // console.log({ type: field.type })
   switch (field.type) {
     case 'number':
       return {
@@ -498,6 +550,9 @@ export const resolveField = async (
           throw new Error(`Global templates not yet supported for rich-text`)
         } else {
           const extraFields = template.ui || {}
+          // console.log({ namespace: template.namespace })
+
+          // template.namespace is undefined
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
           templates[lastItem(template.namespace)] = {

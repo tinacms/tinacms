@@ -11,9 +11,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { defineSchema, defineConfig } from 'tinacms'
+import {
+  defineSchema,
+  defineConfig,
+  resolveForm,
+  TinaSchema,
+  sequential,
+  addNamespaceToSchemaFrontEnd,
+} from 'tinacms'
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       name: 'page',
@@ -126,3 +133,14 @@ export const tinaConfig = defineConfig({
     return cms
   },
 })
+
+export const enrichedSchema = new TinaSchema({
+  version: { fullVersion: '', major: '', minor: '', patch: '' },
+  meta: { flags: [] },
+  // ...schema,
+  // ...schemaJSON,
+  ...addNamespaceToSchemaFrontEnd(schema, []),
+})
+// console.log({ enrichedSchema })
+
+export default schema
