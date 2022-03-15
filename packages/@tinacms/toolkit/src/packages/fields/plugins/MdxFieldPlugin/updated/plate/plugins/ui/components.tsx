@@ -163,7 +163,11 @@ export const components = () => {
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
       <ul
-        className={classNames(blockClasses, className, 'mb-4 last:mb-0')}
+        className={classNames(
+          blockClasses,
+          className,
+          'mb-4 list-disc last:mb-0'
+        )}
         {...attributes}
         {...props}
       />
@@ -236,7 +240,7 @@ export const components = () => {
         <div
           className={classNames(
             className,
-            'cursor-pointer relative border bg-gray-200 my-2'
+            'cursor-pointer relative border bg-gray-200 my-4 first:mt-0 last:mb-0'
           )}
           {...attributes}
           {...props}
