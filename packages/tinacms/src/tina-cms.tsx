@@ -29,6 +29,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 import { TinaDataContext } from '@tinacms/sharedctx'
 import { useTina } from './edit-state'
+import type { TinaCloudSchema } from './types'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -251,6 +252,7 @@ interface BaseProviderProps {
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
+  schema?: TinaCloudSchema<false>
 }
 
 type QueryProviderProps =
@@ -283,6 +285,7 @@ export const TinaCMSProvider2 = ({
   query,
   documentCreatorCallback,
   formifyCallback,
+  schema,
   ...props
 }: TinaCMSProviderDefaultProps) => {
   const validOldSetup =
@@ -311,6 +314,7 @@ export const TinaCMSProvider2 = ({
         isLocalClient={isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
+        schema={schema}
       >
         <style>{styles}</style>
         <ErrorBoundary>

@@ -14,6 +14,7 @@ limitations under the License.
 import { Client, LocalClient } from '../client'
 import type { TinaIOConfig } from '../client'
 import * as yup from 'yup'
+import { TinaCloudSchema } from '../types'
 
 export interface CreateClientProps {
   clientId?: string
@@ -22,20 +23,24 @@ export interface CreateClientProps {
   owner?: string
   repo?: string
   branch?: string
+  schema?: TinaCloudSchema<false>
 }
 export const createClient = ({
   clientId,
   isLocalClient = true,
   branch,
   tinaioConfig,
+  schema,
 }: CreateClientProps) => {
+  console.log({ schema })
   return isLocalClient
-    ? new LocalClient()
+    ? new LocalClient({ schema })
     : new Client({
         clientId: clientId || '',
         branch: branch || 'main',
         tokenStorage: 'LOCAL_STORAGE',
         tinaioConfig,
+        schema,
       })
 }
 

@@ -27,6 +27,8 @@ import { formify } from './formify'
 import { formify as formify2 } from '../hooks/formify'
 
 import gql from 'graphql-tag'
+import { TinaSchema, addNamespaceToSchemaFrontEnd } from '../schema'
+import { TinaCloudSchema } from '../types'
 
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
@@ -34,6 +36,7 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
+  schema?: TinaCloudSchema<false>
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -52,7 +55,8 @@ export class Client {
   frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
-  schema: GraphQLSchema
+  gqlSchema: GraphQLSchema
+  schema?: TinaSchema
   clientId: string
   contentApiBase: string
   query: string
@@ -64,6 +68,14 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
+    if (options.schema) {
+      const enrichedSchema = new TinaSchema({
+        version: { fullVersion: '', major: '', minor: '', patch: '' },
+        meta: { flags: [] },
+        ...addNamespaceToSchemaFrontEnd(options.schema, []),
+      })
+      this.schema = enrichedSchema
+    }
     this.options = options
     this.setBranch(options.branch)
     this.events.subscribe<BranchChangeEvent>(
@@ -171,15 +183,15 @@ mutation addPendingDocumentMutation(
   }
 
   getSchema = async () => {
-    if (!this.schema) {
+    if (!this.gqlSchema) {
       const data = await this.request<any>(getIntrospectionQuery(), {
         variables: {},
       })
 
-      this.schema = buildClientSchema(data)
+      this.gqlSchema = buildClientSchema(data)
     }
 
-    return this.schema
+    return this.gqlSchema
   }
 
   /**
@@ -422,6 +434,7 @@ export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 export class LocalClient extends Client {
   constructor(props?: { customContentApiUrl?: string }) {
     const clientProps = {
+      ...props,
       clientId: '',
       branch: '',
       customContentApiUrl:

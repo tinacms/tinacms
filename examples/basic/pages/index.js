@@ -30,7 +30,7 @@ const EditOnly = () => {
         const templateInfo =
           enrichedSchema.getTemplatesForCollectable(collection)
 
-        console.log({ collection: JSON.stringify(collection, null, 2) })
+        // console.log({ collection: JSON.stringify(collection, null, 2) })
         // const asdf = enrichedSchema.getCollectionAndTemplateByFullPath(col.path)
         // console.log({ asdf })
         const form = await resolveForm({
@@ -40,7 +40,7 @@ const EditOnly = () => {
           template: templateInfo.template,
         })
         const formReal = new Form(form)
-        console.log({ formReal })
+        // console.log({ formReal })
         forms.push(formReal)
       })
       forms.forEach((x) => {
@@ -53,17 +53,17 @@ const EditOnly = () => {
 }
 export default function Home(props) {
   const { edit } = useEditState()
-  // const { data } = useTina({
-  //   query,
-  //   variables: {},
-  //   data: props.data,
-  // })
-  const data = props.data
+  const { data } = useTina({
+    query,
+    variables: {},
+    data: props.data,
+  })
+  // const data = props.data
 
   const content = data.getPageDocument.data.body
   return (
     <Layout>
-      {edit && <EditOnly />}
+      {/* {edit && <EditOnly />} */}
       <TinaMarkdown content={content} />
     </Layout>
   )
