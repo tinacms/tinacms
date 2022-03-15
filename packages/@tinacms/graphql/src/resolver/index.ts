@@ -96,6 +96,8 @@ export class Resolver {
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
       const breadcrumbs = filename.split('/')
+
+      // This is where the form is generated
       const form = {
         label: collection.label,
         name: basename,
