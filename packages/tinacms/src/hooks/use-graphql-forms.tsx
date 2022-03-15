@@ -197,6 +197,7 @@ export function useGraphqlForms<T extends object>({
             `Unable to build form shape for fields at ${queryName}`
           )
 
+          // Maybe we store a list of possible fields from the front end?
           const formConfig = {
             id: queryName,
             label: result.form.label,
