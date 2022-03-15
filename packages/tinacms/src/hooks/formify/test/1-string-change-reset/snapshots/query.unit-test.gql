@@ -1,0 +1,27 @@
+# Blueprint
+# getPostDocument
+#
+# Documents for blueprint
+# ================
+# content/posts/post1.mdx
+#
+# Field blueprints
+# ================
+# title
+
+
+query MyQuery {
+  getPostDocument(relativePath: "post1.mdx") {
+    data {
+      title
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}

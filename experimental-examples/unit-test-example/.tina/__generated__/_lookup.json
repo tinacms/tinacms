@@ -3,7 +3,8 @@
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
     "collections": [
-      "page",
+      "post",
+      "author",
       "blockPage"
     ]
   },
@@ -17,38 +18,44 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PageRelatedPageDocument": {
-    "type": "PageRelatedPageDocument",
+  "PostAuthorDocument": {
+    "type": "PostAuthorDocument",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PageDocument": {
-    "type": "PageDocument",
+  "PostDocument": {
+    "type": "PostDocument",
     "resolveType": "collectionDocument",
-    "collection": "page",
-    "createPageDocument": "create",
-    "updatePageDocument": "update"
+    "collection": "post",
+    "createPostDocument": "create",
+    "updatePostDocument": "update"
   },
-  "PageConnection": {
-    "type": "PageConnection",
+  "PostConnection": {
+    "type": "PostConnection",
     "resolveType": "collectionDocumentList",
-    "collection": "page"
+    "collection": "post"
   },
-  "BlockPageSocialRelatedPageDocument": {
-    "type": "BlockPageSocialRelatedPageDocument",
+  "AuthorDocument": {
+    "type": "AuthorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "author",
+    "createAuthorDocument": "create",
+    "updateAuthorDocument": "update"
+  },
+  "AuthorConnection": {
+    "type": "AuthorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "author"
+  },
+  "BlockPageBlocksBlockQuoteAuthorDocument": {
+    "type": "BlockPageBlocksBlockQuoteAuthorDocument",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "BlockPageRelatedPageDocument": {
-    "type": "BlockPageRelatedPageDocument",
-    "resolveType": "multiCollectionDocument",
-    "createDocument": "create",
-    "updateDocument": "update"
-  },
-  "BlockPageBlocksHeroRelationDocument": {
-    "type": "BlockPageBlocksHeroRelationDocument",
+  "BlockPageBlocksFeaturedPostsBlogsItemDocument": {
+    "type": "BlockPageBlocksFeaturedPostsBlogsItemDocument",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
@@ -58,7 +65,8 @@
     "resolveType": "unionData",
     "typeMap": {
       "hero": "BlockPageBlocksHero",
-      "cta": "BlockPageBlocksCta"
+      "blockQuote": "BlockPageBlocksBlockQuote",
+      "featuredPosts": "BlockPageBlocksFeaturedPosts"
     }
   },
   "BlockPageDocument": {

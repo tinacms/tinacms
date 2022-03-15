@@ -29,6 +29,7 @@ const App = ({ Component, pageProps }) => {
                * Enables the Branch Switcher
                */
               cms.flags.set("branch-switcher", true);
+              cms.flags.set("use-unstable-formify", true);
 
               /**
                * Plugins
@@ -75,7 +76,7 @@ const App = ({ Component, pageProps }) => {
               },
             }}
             formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
-              if (formConfig.id === "getGlobalDocument") {
+              if (formConfig.id === "content/global/index.json") {
                 //@ts-ignore
                 return createGlobalForm(formConfig, { layout: "fullscreen" });
               }
