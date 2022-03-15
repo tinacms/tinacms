@@ -2,4 +2,4 @@
 '@tinacms/toolkit': patch
 ---
 
-added margin to rich text elements
+add spacing and link styles to rich text field
