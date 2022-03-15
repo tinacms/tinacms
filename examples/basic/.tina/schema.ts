@@ -126,14 +126,6 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
-export const tinaConfig = defineConfig({
-  apiURL,
-  cmsCallback: (cms) => {
-    cms.flags.set('tina-admin', true)
-    return cms
-  },
-})
-
 export const enrichedSchema = new TinaSchema({
   version: { fullVersion: '', major: '', minor: '', patch: '' },
   meta: { flags: [] },
@@ -142,5 +134,15 @@ export const enrichedSchema = new TinaSchema({
   ...addNamespaceToSchemaFrontEnd(schema, []),
 })
 // console.log({ enrichedSchema })
+
+export const tinaConfig = defineConfig({
+  apiURL,
+  cmsCallback: (cms) => {
+    cms.flags.set('tina-admin', true)
+    cms.api.schema = enrichedSchema
+
+    return cms
+  },
+})
 
 export default schema

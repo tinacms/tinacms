@@ -36,7 +36,7 @@ import type {
   TinaFieldBase,
 } from './types'
 
-export * from './some-folder-to- move/resolveForm'
+export * from './schema'
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
 // export type TinaSchema = TinaCloudSchema

@@ -27,6 +27,7 @@ import { assertShape, safeAssertShape } from '../utils'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { BiLinkExternal } from 'react-icons/bi'
 import { useFormify } from './formify'
+import { TinaSchema, resolveForm } from '../schema'
 
 export function useGraphqlFormsUnstable<T extends object>({
   variables,
@@ -198,7 +199,7 @@ export function useGraphqlForms<T extends object>({
         setData(payload)
         setInitialData(payload)
         setIsLoading(false)
-        Object.entries(payload).map(([queryName, result]) => {
+        Object.entries(payload).map(async ([queryName, result]) => {
           formIds.push(queryName)
           const canBeFormified = safeAssertShape<{
             form: { mutationInfo: string }
@@ -234,12 +235,31 @@ export function useGraphqlForms<T extends object>({
             `Unable to build form shape for fields at ${queryName}`
           )
 
-          // Maybe we store a list of possible fields from the front end?
+          // Uncomment this to test this work.
+          // const enrichedSchema: TinaSchema = cms.api.tina.schema
+          // const collection = enrichedSchema.getCollection(
+          //   result._internalSys.collection.name
+          // )
+          // const template = await enrichedSchema.getTemplateForData({
+          //   collection,
+          //   data: result.values,
+          // })
+
+          // const formInfo = await resolveForm({
+          //   collection,
+          //   basename: collection.name,
+          //   schema: enrichedSchema,
+          //   template,
+          // })
+
           const formConfig = {
             id: queryName,
-            label: result.form.label,
             initialValues: result.values,
+            label: result.form.label,
             fields: result.form.fields,
+            // Uncomment this to test this work.
+            // label: formInfo.label,
+            // fields: formInfo.fields,
 
             reset: () => {
               setPendingReset(queryName)
