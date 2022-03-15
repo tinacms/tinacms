@@ -200,7 +200,16 @@ export const components = () => {
       nodeProps,
       className,
       ...props
-    }) => <a className={classNames(className)} {...attributes} {...props} />,
+    }) => (
+      <a
+        className={classNames(
+          className,
+          'text-blue-500 hover:text-blue-600 transition-color ease-out duration-150 underline'
+        )}
+        {...attributes}
+        {...props}
+      />
+    ),
     [MARK_CODE]: ({ editor, leaf, text, attributes, className, ...props }) => (
       <code
         className={classNames('bg-gray-100 p-1 rounded-sm', className)}
