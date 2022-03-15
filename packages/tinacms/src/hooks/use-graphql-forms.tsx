@@ -26,6 +26,43 @@ import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { BiLinkExternal } from 'react-icons/bi'
+import { useFormify } from './formify'
+
+export function useGraphqlFormsUnstable<T extends object>({
+  variables,
+  onSubmit,
+  query,
+  formify,
+  eventList,
+}: {
+  query: string
+  variables: object
+  onSubmit?: (args: onSubmitArgs) => void
+  formify?: formifyCallback
+  /**
+   * This is a test utility which allows us to keep track of all the events
+   * received by this hook. See `experimental-examples/unit-test-example/pages/index.js
+   * for usage.
+   */
+  eventList?: []
+}): [T, Boolean] {
+  const cms = useCMS()
+
+  React.useEffect(() => {
+    console.log('NOTE: using unstable formify')
+  }, [])
+
+  const state = useFormify({
+    query,
+    cms,
+    variables,
+    formify,
+    eventList: eventList,
+    onSubmit,
+  })
+
+  return [state.data as T, state.status !== 'done']
+}
 
 export function useGraphqlForms<T extends object>({
   variables,
@@ -443,6 +480,32 @@ const generateFormCreators = (cms: TinaCMS) => {
   const createGlobalForm: GlobalFormCreator = (formConfig, options) => {
     const form = new Form(formConfig)
     cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
+    return form
+  }
+  return { createForm, createGlobalForm }
+}
+
+export const generateFormCreatorsUnstable = (
+  cms: TinaCMS,
+  showInSidebar?: boolean
+) => {
+  const createForm = (formConfig) => {
+    const form = new Form(formConfig)
+    if (showInSidebar) {
+      cms.forms.add(form)
+    }
+    return form
+  }
+  const createGlobalForm: GlobalFormCreator = (
+    formConfig,
+    options?: { icon?: any; layout: 'fullscreen' | 'popup' }
+  ) => {
+    const form = new Form(formConfig)
+    if (showInSidebar) {
+      cms.plugins.add(
+        new GlobalFormPlugin(form, options?.icon, options?.layout)
+      )
+    }
     return form
   }
   return { createForm, createGlobalForm }
