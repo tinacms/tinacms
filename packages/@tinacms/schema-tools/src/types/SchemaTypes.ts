@@ -230,6 +230,7 @@ interface ObjectTemplatesInner<WithNamespace extends boolean>
    */
   templates: (string | Template<WithNamespace>)[]
   fields?: undefined
+  // TODO: item props should only be present with list is true
   ui?:
     | object
     | ({

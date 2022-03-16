@@ -1,7 +1,8 @@
 fragment PageParts on Page {
-  someObj {
+  thingOne
+  test {
     __typename
-    thingOne
+    asdf
   }
   body
 }

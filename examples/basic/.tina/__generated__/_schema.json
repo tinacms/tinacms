@@ -14,23 +14,32 @@
       "format": "mdx",
       "fields": [
         {
+          "name": "thingOne",
+          "type": "string",
+          "namespace": [
+            "page",
+            "thingOne"
+          ]
+        },
+        {
           "type": "object",
-          "name": "someObj",
+          "label": "Test",
+          "name": "test",
           "fields": [
             {
-              "name": "thingOne",
-              "type": "string",
-              "required": true,
+              "label": "Asdf",
+              "name": "asdf",
+              "type": "number",
               "namespace": [
                 "page",
-                "someObj",
-                "thingOne"
+                "test",
+                "asdf"
               ]
             }
           ],
           "namespace": [
             "page",
-            "someObj"
+            "test"
           ]
         },
         {
