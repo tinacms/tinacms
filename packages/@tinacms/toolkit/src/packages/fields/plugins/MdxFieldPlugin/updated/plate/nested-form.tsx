@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 import React from 'react'
-import { useFormPortal, FormBuilder } from '../../../../form-builder'
-import { PanelHeader, GroupPanel } from '../../GroupFieldPlugin'
-import { Form, Field } from '../../../../forms'
+import { useFormPortal, FormBuilder } from '../../../../../form-builder'
+import { PanelHeader, GroupPanel } from '../../../GroupFieldPlugin'
+import { Form, Field } from '../../../../../forms'
 import { uuid } from './plugins/ui/helpers'
 
 export const NestedForm = (props: {

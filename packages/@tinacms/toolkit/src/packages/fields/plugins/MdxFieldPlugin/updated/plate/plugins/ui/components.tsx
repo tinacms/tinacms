@@ -59,7 +59,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-4xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-4xl font-medium'
         )}
         {...attributes}
         {...props}
@@ -71,7 +71,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-3xl font-medium mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-3xl font-medium'
         )}
         {...attributes}
         {...props}
@@ -83,7 +83,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-2xl font-semibold mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-2xl font-semibold'
         )}
         {...attributes}
         {...props}
@@ -95,7 +95,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-xl font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-xl font-bold'
         )}
         {...attributes}
         {...props}
@@ -108,7 +108,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-lg font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-lg font-bold'
         )}
         {...attributes}
         {...props}
@@ -120,7 +120,7 @@ export const components = () => {
           headerClasses,
           blockClasses,
           className,
-          'text-base font-bold mb-4 last:mb-0 mt-6 first:mt-0'
+          'text-base font-bold'
         )}
         {...attributes}
         {...props}
@@ -134,11 +134,7 @@ export const components = () => {
       ...props
     }) => (
       <p
-        className={classNames(
-          blockClasses,
-          className,
-          `text-base font-normal mb-4 last:mb-0`
-        )}
+        className={classNames(blockClasses, className, `text-base font-normal`)}
         {...attributes}
         {...props}
       />
@@ -151,11 +147,7 @@ export const components = () => {
       ...props
     }) => (
       <blockquote
-        className={classNames(
-          'not-italic mb-4 last:mb-0',
-          blockClasses,
-          className
-        )}
+        className={classNames('not-italic', blockClasses, className)}
         {...attributes}
         {...props}
       />
@@ -163,11 +155,7 @@ export const components = () => {
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
       <ul
-        className={classNames(
-          blockClasses,
-          className,
-          'mb-4 list-disc last:mb-0'
-        )}
+        className={classNames(blockClasses, className)}
         {...attributes}
         {...props}
       />
@@ -188,7 +176,7 @@ export const components = () => {
     ),
     [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
       <li
-        className={classNames('mt-0 mb-2 last:mb-0', className)}
+        className={classNames('mt-0 mb-1', className)}
         {...attributes}
         {...props}
       />
@@ -204,16 +192,7 @@ export const components = () => {
       nodeProps,
       className,
       ...props
-    }) => (
-      <a
-        className={classNames(
-          className,
-          'text-blue-500 hover:text-blue-600 transition-color ease-out duration-150 underline'
-        )}
-        {...attributes}
-        {...props}
-      />
-    ),
+    }) => <a className={classNames(className)} {...attributes} {...props} />,
     [MARK_CODE]: ({ editor, leaf, text, attributes, className, ...props }) => (
       <code
         className={classNames('bg-gray-100 p-1 rounded-sm', className)}
@@ -240,7 +219,7 @@ export const components = () => {
         <div
           className={classNames(
             className,
-            'cursor-pointer relative border bg-gray-200 my-4 first:mt-0 last:mb-0'
+            'cursor-pointer relative border bg-gray-200 my-4'
           )}
           {...attributes}
           {...props}

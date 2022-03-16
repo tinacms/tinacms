@@ -17,7 +17,7 @@ import { insertNodes } from '@udecode/plate-core'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
-import { DeleteImageButton } from '../../../../../components'
+import { DeleteImageButton } from '../../../../../../components'
 
 const Wrapper = ({ inline, children }) => {
   const Component = inline ? 'span' : 'div'

@@ -12,108 +12,180 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plate, createPlugins, usePlateEditorState } from '@udecode/plate-core'
-import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
-import { components } from './plugins/ui/components'
-import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
-import { formattingPlugins, commonPlugins } from './plugins/core'
-import { helpers } from './plugins/core/common'
+import styled from 'styled-components'
 import {
-  createMdxBlockPlugin,
-  createMdxInlinePlugin,
-} from './plugins/create-mdx-plugins'
-import { createImgPlugin } from './plugins/create-img-plugin'
-import { createSlashPlugin } from './plugins/create-slash-plugin'
-import { createLinkPlugin } from './plugins/create-link-plugin'
-import { EditorContext } from './editor-context'
+  Plate,
+  createReactPlugin,
+  createHistoryPlugin,
+  createParagraphPlugin,
+  createBlockquotePlugin,
+  createCodeBlockPlugin,
+  createHeadingPlugin,
+  createBoldPlugin,
+  createItalicPlugin,
+  createUnderlinePlugin,
+  createStrikethroughPlugin,
+  createCodePlugin,
+  createPlateComponents,
+  createIndentPlugin,
+  createNormalizeTypesPlugin,
+  createPlateOptions,
+  createLinkPlugin,
+  createImagePlugin,
+  createBasicMarkPlugins,
+  createListPlugin,
+  createAutoformatPlugin,
+  createResetNodePlugin,
+  createTrailingBlockPlugin,
+  createHorizontalRulePlugin,
+  createSelectOnBackspacePlugin,
+  createSoftBreakPlugin,
+  createExitBreakPlugin,
+  useEditorRef,
+} from '@udecode/plate'
+import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
-import type { MdxTemplate } from './types'
-import type { InputProps } from '../../../components'
-import { uuid, classNames } from './plugins/ui/helpers'
+import { CONFIG } from './config'
+import { ToolbarButtons } from './toolbar'
+import { createTinaImagePlugin, Img } from './image'
+import { createMDXPlugin, createMDXTextPlugin, MdxElement } from './mdx'
+
+import { InputProps } from '../../../components'
+
+const options = createPlateOptions()
+
+const wrapValue = (value) => {
+  return value.children
+    ? [
+        ...value.children?.map(normalize),
+        { type: 'p', children: [{ type: 'text', text: '' }] },
+      ]
+    : // Empty values need at least one item
+      [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+}
 
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
-  { templates: MdxTemplate[] }
+  { templates: unknown[] }
 >((props) => {
+  /**
+   * FIXME: this is storing the initial value as a way to determine if we should reset the
+   * slate editor. Since slate holds onto its own state, treating it as a traditional
+   * controlled component doesn't work.
+   */
   const initialValue = React.useMemo(
-    () =>
-      props.input.value?.children?.length
-        ? props.input.value.children.map(helpers.normalize)
-        : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
+    () => JSON.stringify(props.input.value),
     []
   )
+  /**
+   * Used to refresh slate's state
+   */
+  const [key, setKey] = React.useState(0)
 
-  const plugins = React.useMemo(
-    () =>
-      createPlugins(
-        [
-          ...formattingPlugins,
-          ...commonPlugins,
-          createMdxBlockPlugin(),
-          createMdxInlinePlugin(),
-          createImgPlugin(),
-          createLinkPlugin(),
-          createSlashPlugin(),
-        ],
-        {
-          components: components(),
-        }
-      ),
-    []
-  )
+  React.useEffect(() => {
+    /**
+     * If we get a new value from props.input.value and it's equal
+     * to our current value, odds are that it's a reset from the form.
+     * Note that this would also happen if the editor adds some text then
+     * deletes it, but that's ok, a refresh to slate won't do any harm in that case
+     */
+    if (initialValue === JSON.stringify(props.input.value)) {
+      setKey((key) => key + 1)
+    }
+  }, [JSON.stringify(props.input.value)])
 
-  // This should be a plugin customization
-  const withToolbar = true
-  const tempId = [props.tinaForm.id, props.input.name].join('.')
-  const id = React.useMemo(() => uuid(), [tempId])
+  const templates = props.field.templates
+  const name = props.input.name
+
+  const components = createPlateComponents({
+    img: (props) => <Img {...props} name={name} />,
+    mdxJsxTextElement: (props) => {
+      return <MdxElement {...props} templates={templates} inline={true} />
+    },
+    mdxJsxFlowElement: (props) => {
+      return <MdxElement {...props} templates={templates} inline={false} />
+    },
+  })
+
+  const pluginsBasic = [
+    createTinaImagePlugin(),
+    createMDXPlugin(),
+    createMDXTextPlugin(),
+    createReactPlugin(),
+    createHistoryPlugin(),
+    createHorizontalRulePlugin(),
+    createParagraphPlugin(),
+    createBlockquotePlugin(),
+    createCodeBlockPlugin(),
+    createHeadingPlugin(),
+    createLinkPlugin(),
+    createListPlugin(),
+    createImagePlugin(),
+    createBoldPlugin(),
+    createItalicPlugin(),
+    createUnderlinePlugin(),
+    createStrikethroughPlugin(),
+    createCodePlugin(),
+    ...createBasicMarkPlugins(),
+    createIndentPlugin(CONFIG.indent),
+    createAutoformatPlugin(CONFIG.autoformat),
+    createResetNodePlugin(CONFIG.resetBlockType),
+    createSoftBreakPlugin(CONFIG.softBreak),
+    createExitBreakPlugin(CONFIG.exitBreak),
+    createNormalizeTypesPlugin(CONFIG.forceLayout),
+    createTrailingBlockPlugin(CONFIG.trailingBlock),
+    createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
+  ]
   return (
-    <EditorContext.Provider value={{ templates: props.field.templates }}>
-      <div className={withToolbar ? 'with-toolbar' : ''}>
-        <div
-          className={classNames(
-            withToolbar ? 'min-h-[100px]' : 'min-h-auto',
-            'max-w-full prose relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5'
-          )}
-        >
-          <Plate
-            id={id}
-            initialValue={initialValue}
-            plugins={plugins}
-            onChange={(value) => {
-              // console.log(JSON.stringify(value, null, 2))
-              props.input.onChange({ type: 'root', children: value })
-            }}
-          >
-            {withToolbar ? (
-              <Toolbar templates={props.field.templates} inlineOnly={false} />
-            ) : (
-              <FloatingToolbar templates={props.field.templates} />
-            )}
-            <Reset form={props.form} initialValue={initialValue} />
-            <FloatingLink />
-          </Plate>
-        </div>
-      </div>
-    </EditorContext.Provider>
+    <>
+      <ToolbarButtons name={props.input.name} templates={templates} />
+      <RichTextInput>
+        <Plate
+          id={props.input.name}
+          initialValue={wrapValue(props.input.value)}
+          key={key}
+          plugins={pluginsBasic}
+          components={components}
+          options={options}
+          onChange={(value) => {
+            props.input.onChange({ type: 'root', children: value })
+          }}
+        />
+      </RichTextInput>
+    </>
   )
 })
 
-/**
- * Since slate keeps track of it's own state, and that state is an object rather
- * than something easily memoizable like a string it can be tricky to ensure
- * resets are properly handled. So we sneak in a callback to the form's reset
- * logic that updates slate's internal values imperatively.
- */
-const Reset = ({ form, initialValue }: { form; initialValue }) => {
-  const editor = usePlateEditorState()
-
-  React.useMemo(() => {
-    const { reset } = form
-    form.reset = (initialValues) => {
-      editor.children = initialValue
-      return reset(initialValues)
+const normalize = (node: any) => {
+  if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'img'].includes(node.type)) {
+    return {
+      ...node,
+      children: [{ type: 'text', text: '' }],
     }
-  }, [])
+  }
+  if (node.children) {
+    if (node.children.length > 0) {
+      return {
+        ...node,
+        children: node.children.map(normalize),
+      }
+    } else {
+      return {
+        ...node,
+        children: [{ type: 'text', text: '' }],
+      }
+    }
+  }
+  return node
+}
 
-  return null
+export const RichTextInput = ({ children }) => {
+  return (
+    <div
+      className="prose shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md p-5 mb-5"
+      style={{ minHeight: '100px', maxWidth: `100%` }}
+    >
+      {children}
+    </div>
+  )
 }
