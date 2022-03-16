@@ -231,12 +231,13 @@ export class Database {
 
   public getIndexDefinitions = async (collectionName: string): Promise<Record<string,IndexDefinition>> => {
     if (!this.collectionIndexDefinitions) {
+      this.collectionIndexDefinitions = {}
       const schema = await this.getSchema()
       const collections = schema.getCollections()
       for (const collection of collections) {
         const indexDefinitions = {}
         for (const field of (collection.fields as TinaFieldInner<true>[])) {
-          if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object') {
+          if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
             continue
           }
 
@@ -253,8 +254,7 @@ export class Database {
 
         if (collection.indexes) {
           // build IndexDefinitions for each index in the collection schema
-          // TODO don't these have to be ordered in dynamodb to map to GSIs?
-          for (let index of collection.indexes) {
+          for (const index of collection.indexes) {
             indexDefinitions[index.name] = {
               fields: index.fields.map(indexField => ({
                 name: indexField.name,
@@ -268,7 +268,7 @@ export class Database {
       }
     }
 
-    return this.collectionIndexDefinitions[collectionName]
+    return this.collectionIndexDefinitions[collectionName] || {}
   }
 
   public documentExists = async (fullpath: unknown) => {
@@ -283,7 +283,7 @@ export class Database {
   }
 
   public query = async (queryParams: QueryParams, hydrator) => {
-    let { first, after, last, before, sort, collection, filterChain } = queryParams
+    const { first, after, last, before, sort, collection, filterChain } = queryParams
     const kvParams: KeyValueQueryParams = { sort, collection, filterChain }
 
     if (first) {
@@ -466,7 +466,7 @@ type UnionDataLookup = {
 }
 
 const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
-  const indexDefinitions = await this.getIndexDefinitions(collection.name)
+  const indexDefinitions = await database.getIndexDefinitions(collection.name)
   const numIndexes = Object.keys(indexDefinitions).length
   if ( numIndexes > 20) {
     throw new Error(`A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`)

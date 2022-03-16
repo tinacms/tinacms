@@ -21,14 +21,14 @@ export enum OP {
   LT = 'lt',
   GTE = 'gte',
   LTE = 'lte',
-  BEGINS_WITH = 'begins_with', // TODO Change to STARTS_WITH
+  STARTS_WITH = 'startsWith',
   IN = 'in',
 }
 
 export type BinaryFilter = {
   pathExpression: string
   rightOperand: FilterOperand
-  operator:  OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.BEGINS_WITH | OP.IN
+  operator:  OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN
   type: string
 }
 
@@ -167,7 +167,7 @@ const inferOperatorFromFilter = (filterOperator: string) => {
       return OP.EQ
 
     case 'startsWith':
-      return OP.BEGINS_WITH
+      return OP.STARTS_WITH
 
     case 'lt':
       return OP.LT
@@ -195,7 +195,7 @@ export type FilterCondition = {
 }
 
 export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}) => {
-  let filterChain: (BinaryFilter | TernaryFilter)[] = []
+  const filterChain: (BinaryFilter | TernaryFilter)[] = []
   if (!conditions) {
     return filterChain
   }
@@ -247,11 +247,10 @@ export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}
 
 export const makeFilter = ({ filterChain }: {
   filterChain?: (BinaryFilter | TernaryFilter)[]
-}): (values: Record<string, object>) => boolean => {
+}): (values: Record<string, object | FilterOperand>) => boolean => {
   return (values: Record<string, object>) => {
     for (const filter of filterChain) {
       const dataType = filter.type
-      // TODO how do nested values work with the JSONPath, would we ever have an index with a nested path
       const resolvedValues = JSONPath({path: filter.pathExpression, json: values})
       if (!resolvedValues || !resolvedValues.length) {
         return false
@@ -263,7 +262,9 @@ export const makeFilter = ({ filterChain }: {
       } else if (dataType === 'number' || dataType === 'datetime') {
         operands = resolvedValues.map(resolvedValue => Number(resolvedValue))
       } else if (dataType === 'boolean') {
-        operands = resolvedValues.map(resolvedValue => resolvedValue === 'true' || resolvedValue === '1')
+        operands = resolvedValues.map(resolvedValue => (typeof resolvedValue === 'boolean' && resolvedValue) || resolvedValue === 'true' || resolvedValue === '1')
+      } else {
+        throw new Error(`Unexpected datatype ${dataType}`)
       }
 
       const { operator } = filter as BinaryFilter
@@ -315,7 +316,7 @@ export const makeFilter = ({ filterChain }: {
               }
             }
             break
-          case OP.BEGINS_WITH:
+          case OP.STARTS_WITH:
             for (const operand of operands) {
               if ((operand as string).startsWith(filter.rightOperand as string)) {
                 matches = true
@@ -361,7 +362,7 @@ export const makeFilter = ({ filterChain }: {
 
 export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFilter)[]) => {
   const result: (BinaryFilter | TernaryFilter)[] = []
-  if (filterChain && filterChain.length) {
+  if (filterChain.length) {
     // convert operands by type
     for (const filter of filterChain) {
       const dataType: string = filter.type
@@ -374,7 +375,10 @@ export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFi
           })
         } else {
           if (Array.isArray(filter.rightOperand)) {
-            (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
+            result.push({
+              ...filter,
+              rightOperand: (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
+            })
           } else {
             result.push({
               ...filter,
@@ -396,7 +400,7 @@ export const isIndexed = (queryParams: QueryParams, index: IndexDefinition) => {
     const [lastFilter] = queryParams.filterChain.slice(-1)
     const maxOrder = index.fields.findIndex(field => lastFilter.pathExpression === field.name)
     const indexFields = index.fields.map(field => field.name)
-    const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field, i) => field.name)
+    const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field) => field.name)
 
     // First make sure that all the query fields are present in the index
     for (const [i, filter] of Object.entries(queryParams.filterChain)) {

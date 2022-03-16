@@ -205,7 +205,7 @@ describe('LevelDB store', () => {
                         {
                             field: 'title',
                             rightOperand: titlePrefix,
-                            operator: OP.BEGINS_WITH
+                            operator: OP.STARTS_WITH
                         }],
                     first,
                     index: 'titleIdx'
