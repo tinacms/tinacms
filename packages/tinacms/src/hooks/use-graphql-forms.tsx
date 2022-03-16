@@ -235,30 +235,30 @@ export function useGraphqlForms<T extends object>({
           )
 
           // Uncomment this to test this work.
-          const enrichedSchema: TinaSchema = cms.api.tina.schema
-          const collection = enrichedSchema.getCollection(
-            result._internalSys.collection.name
-          )
-          const template = await enrichedSchema.getTemplateForData({
-            collection,
-            data: result.values,
-          })
+          // const enrichedSchema: TinaSchema = cms.api.tina.schema
+          // const collection = enrichedSchema.getCollection(
+          // result._internalSys.collection.name
+          // )
+          // const template = await enrichedSchema.getTemplateForData({
+          //   collection,
+          //   data: result.values,
+          // })
 
-          const formInfo = await resolveForm({
-            collection,
-            basename: collection.name,
-            schema: enrichedSchema,
-            template,
-          })
+          // const formInfo = await resolveForm({
+          //   collection,
+          //   basename: collection.name,
+          //   schema: enrichedSchema,
+          //   template,
+          // })
 
           const formConfig = {
             id: queryName,
             initialValues: result.values,
-            // label: result.form.label,
-            // fields: result.form.fields,
+            label: result.form.label,
+            fields: result.form.fields,
             // Uncomment this to test this work.
-            label: formInfo.label,
-            fields: formInfo.fields,
+            // label: formInfo.label,
+            // fields: formInfo.fields,
 
             reset: () => {
               setPendingReset(queryName)
