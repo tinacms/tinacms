@@ -39,6 +39,23 @@ const schema = defineSchema({
           ],
         },
         {
+          label: 'Title',
+          name: 'Title',
+          type: 'string',
+          ui: {
+            defaultValue: 'Title',
+            // Examples of how you COULD use a custom form
+            // component: ({ form, field, input }) => {
+            //   return <input {...input}></input>
+            // },
+            // validate: (val) => {
+            //   if (val?.length > 5) {
+            //     return 'Too Long!!!'
+            //   }
+            // },
+          },
+        },
+        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',
