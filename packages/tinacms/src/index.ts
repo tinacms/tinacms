@@ -34,9 +34,8 @@ import type {
   TinaCloudCollection as TinaCloudCollectionBase,
   TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
-} from './types'
+} from '@tinacms/schema-tools'
 
-export * from './schema'
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
 // export type TinaSchema = TinaCloudSchema

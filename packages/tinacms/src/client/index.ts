@@ -27,8 +27,11 @@ import { formify } from './formify'
 import { formify as formify2 } from '../hooks/formify'
 
 import gql from 'graphql-tag'
-import { TinaSchema, addNamespaceToSchemaFrontEnd } from '../schema'
-import { TinaCloudSchema } from '../types'
+import {
+  TinaSchema,
+  addNamespaceToSchema,
+  TinaCloudSchema,
+} from '@tinacms/schema-tools'
 
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
@@ -72,7 +75,7 @@ export class Client {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
         meta: { flags: [] },
-        ...addNamespaceToSchemaFrontEnd(options.schema, []),
+        ...addNamespaceToSchema(options.schema, []),
       })
       this.schema = enrichedSchema
     }
