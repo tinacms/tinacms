@@ -99,7 +99,7 @@ export type OnChangeEvent = {
   formId: string
   field: {
     data: {
-      path?: { level: number; type: string }[]
+      typename?: string
       tinaField: {
         name: string
         type: 'string' | 'reference' | 'object'

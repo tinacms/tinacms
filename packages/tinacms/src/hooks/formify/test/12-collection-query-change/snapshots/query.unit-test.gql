@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# getCollection.documents.edges.[].node.data.name
+# name
 
 
 query QueryOperation {

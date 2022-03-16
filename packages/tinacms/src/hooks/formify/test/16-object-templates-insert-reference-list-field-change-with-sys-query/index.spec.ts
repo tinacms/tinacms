@@ -196,13 +196,7 @@ const events = [
           ],
           component: 'group-list',
         },
-        path: [
-          {
-            index: 0,
-            level: 0,
-            type: 'BlockPageBlocksFeaturedPosts',
-          },
-        ],
+        typename: 'BlockPageBlocksFeaturedPosts',
       },
       name: 'blocks.0.blogs',
     },
@@ -232,13 +226,7 @@ const events = [
             },
           ],
         },
-        path: [
-          {
-            index: 0,
-            level: 0,
-            type: 'BlockPageBlocksFeaturedPosts',
-          },
-        ],
+        typename: 'BlockPageBlocksFeaturedPosts',
       },
       name: 'blocks.0.blogs.0.item',
     },

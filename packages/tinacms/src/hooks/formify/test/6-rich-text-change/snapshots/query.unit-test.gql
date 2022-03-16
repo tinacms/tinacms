@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# getPostDocument.data.body
+# body
 
 
 query GetBlockPageDocument {

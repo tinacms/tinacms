@@ -7,9 +7,9 @@
 #
 # Field blueprints
 # ================
-# getAuthorDocument.data.social.[]
-# getAuthorDocument.data.social.[].platform
-# getAuthorDocument.data.social.[].handle
+# social.[]
+# social.[].platform
+# social.[].handle
 
 
 query QueryOperation {

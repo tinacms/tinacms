@@ -172,12 +172,11 @@ export const useFormify = ({
       if (process.env.NODE_ENV === 'production') {
         if (util.printState(state) !== sample) {
           console.log('you broke it')
-          console.log(util.printState(state))
+          // console.log(util.printState(state))
         } else {
           console.log('formify ok')
         }
       }
-      // console.log(meh)
       const result = await cms.api.tina.request(G.print(state.query), {
         variables,
       })

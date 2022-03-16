@@ -22,6 +22,7 @@ import type {
   FormNode,
   State,
   ChangeSet,
+  BlueprintPath,
 } from './types'
 
 import {
@@ -310,15 +311,67 @@ export const getBlueprintAliasPath = (blueprint: DocumentBlueprint) => {
   return aliasPath.join('.')
 }
 
+export const getFieldAliasForBlueprint = (path: BlueprintPath[]) => {
+  const reversePath = [...path].reverse()
+  const accum = []
+  reversePath.every((item, index) => {
+    if (index === 0) {
+      if (item.list) {
+        accum.push('[]')
+      }
+      accum.push(item.alias)
+    } else {
+      if (item.isNode) {
+        return false
+      }
+      if (item.list) {
+        accum.push('[]')
+      }
+      accum.push(item.alias)
+    }
+    return true
+  })
+  return accum.reverse().slice(1).join('.')
+}
+
+/**
+ *
+ * Determines the appropriate fields which should recieve an update from a form change
+ *
+ * In cases where there's polymorphic blocks, it's possible that an update would affect
+ * multiple locations that it shouldn't.
+ *
+ * An OnChange event name can look like: `blocks.2.title`, but if there are 2 block elements
+ * with a field of the same name, an event name it wouldn't be enough information for us.
+ *
+ * To get around this, the event sends the current `typename` along with it, and we use that
+ * to determine where in our blueprint the value should be updated.
+ *
+ */
 export const getBlueprintFieldsForEvent = (
   blueprint: DocumentBlueprint,
   event: OnChangeEvent
 ) => {
-  return blueprint.fields.filter((fbp) => {
-    if (getBlueprintNamePath(fbp, true) === getEventPath(event, blueprint)) {
-      return true
-    }
-  })
+  return blueprint.fields
+    .filter((fbp) => {
+      if (getBlueprintNamePath(fbp) === getEventPath(event, blueprint)) {
+        return true
+      }
+    })
+    .filter((fbp) => {
+      let lastDisambiguator: string
+
+      fbp.path.forEach((path) => {
+        if (path.disambiguator) {
+          lastDisambiguator = path.disambiguator
+        }
+      })
+      if (lastDisambiguator) {
+        return event.field.data.typename === lastDisambiguator
+      } else {
+        return true
+      }
+    })
 }
 
 /**
@@ -333,16 +386,10 @@ export const getBlueprintFieldsForEvent = (
  * ```
  */
 export const getBlueprintNamePath = (
-  blueprint: Pick<DocumentBlueprint, 'path'>,
-  disambiguator?: boolean
+  blueprint: Pick<DocumentBlueprint, 'path'>
 ) => {
   const namePath = []
   blueprint.path.forEach((p) => {
-    if (disambiguator) {
-      if (p.disambiguator) {
-        namePath.push(p.disambiguator)
-      }
-    }
     namePath.push(p.name)
     if (p.list) {
       namePath.push('[]')
@@ -369,19 +416,10 @@ const getEventPath = (
   blueprint: DocumentBlueprint | FieldBlueprint
 ) => {
   const stringArray = event.field.name.split('.')
-  let counter = 0
   const eventPath = stringArray
     .map((item) => {
       if (isNaN(Number(item))) {
         return item
-      }
-      counter = counter + 1
-      const foundType = event.field.data?.path?.find(
-        (p) => p.level === counter - 1
-      )
-      if (foundType) {
-        const meh = `[].${foundType.type}`
-        return meh
       }
       return `[]`
     })
@@ -464,8 +502,8 @@ export const printState = (state: State) => {
     blueprint.fields
       .filter((fbp) => fbp.documentBlueprintId === blueprint.id)
       .forEach((fbp) => {
-        // bpString = bpString + `\n# ${getFieldAliasForBlueprint(fbp.path)}`
-        bpString = bpString + `\n# ${getBlueprintNamePath(fbp, true)}`
+        bpString = bpString + `\n# ${getFieldAliasForBlueprint(fbp.path)}`
+        // bpString = bpString + `\n# ${getBlueprintAliasPath(fbp)}`
         // bpString = bpString + `\n# ${fbp.id}`
       })
     string = string + `${bpString}\n`

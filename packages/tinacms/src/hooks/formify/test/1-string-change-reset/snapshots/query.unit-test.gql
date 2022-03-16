@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# getPostDocument.data.title
+# title
 
 
 query MyQuery {

@@ -37,11 +37,21 @@ import { useEvent } from '../../../react-core'
 import { FieldHoverEvent, FieldFocusEvent } from '../../field-events'
 import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
+import { BlockTypenameContext } from './TypenameContext'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
   templates: {
     [key: string]: BlockTemplate
+  }
+  /**
+   * Used to keep track of the CMS's __typename property when
+   * new elements are added.
+   *
+   * More info: https://github.com/tinacms/tinacms/issues/2698
+   */
+  typeMap?: {
+    [key: string]: string
   }
 }
 
@@ -174,8 +184,6 @@ interface BlockListItemProps {
   label?: string
 }
 
-export const BlockPathContext = React.createContext({ path: [] })
-
 const BlockListItem = ({
   label,
   tinaForm,
@@ -192,31 +200,13 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
-  // console.log(block._template)
-  // console.log(field.typeMap[block._template])
-  // console.log(index)
-
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
 
-  const currentPath = React.useContext(BlockPathContext).path
-
-  // console.log(field.name.split('.'))
-  let level = 0
-  field.name.split('.').forEach((item) => {
-    if (isNaN(item)) {
-    } else {
-      level = level + 1
-    }
-  })
-
-  const path = {
-    index,
-    level,
-    type: field.typeMap[block._template],
-  }
   return (
-    <BlockPathContext.Provider value={{ path: [...currentPath, path] }}>
+    <BlockTypenameContext.Provider
+      value={{ typename: field.typeMap[block._template] }}
+    >
       <Draggable
         key={index}
         type={field.name}
@@ -273,7 +263,7 @@ const BlockListItem = ({
           </>
         )}
       </Draggable>
-    </BlockPathContext.Provider>
+    </BlockTypenameContext.Provider>
   )
 }
 

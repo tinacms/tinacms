@@ -164,13 +164,7 @@ const events = [
           name: 'blocks.0.title',
           type: 'string',
         },
-        path: [
-          {
-            index: 0,
-            level: 0,
-            type: 'BlockPageBlocksHero',
-          },
-        ],
+        typename: 'BlockPageBlocksHero',
       },
       name: 'blocks.0.title',
     },

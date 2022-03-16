@@ -7,7 +7,7 @@
 #
 # Field blueprints
 # ================
-# getPostDocument.data.author
+# author
 
 # Blueprint
 # getPostDocument.data.author
@@ -17,7 +17,7 @@
 #
 # Field blueprints
 # ================
-# getPostDocument.data.author.data.name
+# name
 
 
 query GetBlockPageDocument {

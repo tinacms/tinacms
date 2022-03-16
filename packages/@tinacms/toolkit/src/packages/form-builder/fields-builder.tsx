@@ -22,6 +22,7 @@ import { useCMS, useEventSubscription } from '../react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
 import styled, { css } from 'styled-components'
+import { useCurrentTypename } from '../fields/plugins/BlocksFieldPlugin/TypenameContext'
 
 export interface FieldsBuilderProps {
   form: Form
@@ -55,10 +56,8 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   )
 }
 
-import { BlockPathContext } from '../fields/plugins/BlocksFieldPlugin'
-
 const InnerField = ({ field, form, fieldPlugins }) => {
-  const pathContext = React.useContext(BlockPathContext)
+  const typename = useCurrentTypename()
 
   if (field.component === null) return null
 
@@ -77,7 +76,7 @@ const InnerField = ({ field, form, fieldPlugins }) => {
   React.useEffect(() => {
     form.mutators.setFieldData(field.name, {
       tinaField: field,
-      path: pathContext.path,
+      typename,
     })
   }, [form, field])
 
