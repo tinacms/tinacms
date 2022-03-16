@@ -1286,24 +1286,21 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "PageSomeObj"
+        "value": "PageTest"
       },
       "fields": [
         {
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "thingOne"
+            "value": "asdf"
           },
           "arguments": [],
           "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Float"
             }
           }
         }
@@ -1322,14 +1319,29 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "someObj"
+            "value": "thingOne"
           },
           "arguments": [],
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PageSomeObj"
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "test"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "PageTest"
             }
           }
         },
@@ -2364,20 +2376,20 @@
       "kind": "InputObjectTypeDefinition",
       "name": {
         "kind": "Name",
-        "value": "PageSomeObjMutation"
+        "value": "PageTestMutation"
       },
       "fields": [
         {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "thingOne"
+            "value": "asdf"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "String"
+              "value": "Float"
             }
           }
         }
@@ -2394,13 +2406,27 @@
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "someObj"
+            "value": "thingOne"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PageSomeObjMutation"
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "test"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "PageTestMutation"
             }
           }
         },

@@ -80,12 +80,13 @@ type Collection {
 
 union DocumentNode = PageDocument | PostDocument
 
-type PageSomeObj {
-  thingOne: String!
+type PageTest {
+  asdf: Float
 }
 
 type Page {
-  someObj: PageSomeObj
+  thingOne: String
+  test: PageTest
   body: JSON
 }
 
@@ -150,12 +151,13 @@ input DocumentMutation {
   post: PostMutation
 }
 
-input PageSomeObjMutation {
-  thingOne: String
+input PageTestMutation {
+  asdf: Float
 }
 
 input PageMutation {
-  someObj: PageSomeObjMutation
+  thingOne: String
+  test: PageTestMutation
   body: JSON
 }
 

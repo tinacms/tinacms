@@ -20,6 +20,7 @@ import {
   GlobalFormPlugin,
   FormMetaPlugin,
   useBranchData,
+  AnyField,
 } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
@@ -233,32 +234,10 @@ export function useGraphqlForms<T extends object>({
               }),
             `Unable to build form shape for fields at ${queryName}`
           )
-
-          // Uncomment this to test this work.
-          // const enrichedSchema: TinaSchema = cms.api.tina.schema
-          // const collection = enrichedSchema.getCollection(
-          //   result._internalSys.collection.name
-          // )
-          // const template = await enrichedSchema.getTemplateForData({
-          //   collection,
-          //   data: result.values,
-          // })
-
-          // const formInfo = await resolveForm({
-          //   collection,
-          //   basename: collection.name,
-          //   schema: enrichedSchema,
-          //   template,
-          // })
-
-          const formConfig = {
+          let formConfig = {} as FormOptions<any, AnyField>
+          const formCommon = {
             id: queryName,
             initialValues: result.values,
-            label: result.form.label,
-            fields: result.form.fields,
-            // Uncomment this to test this work.
-            // label: formInfo.label,
-            // fields: formInfo.fields,
 
             reset: () => {
               setPendingReset(queryName)
@@ -294,6 +273,35 @@ export function useGraphqlForms<T extends object>({
               }
             },
           }
+          if (cms.api.tina.schema) {
+            const enrichedSchema: TinaSchema = cms.api.tina.schema
+            const collection = enrichedSchema.getCollection(
+              result._internalSys.collection.name
+            )
+            const template = await enrichedSchema.getTemplateForData({
+              collection,
+              data: result.values,
+            })
+            const formInfo = await resolveForm({
+              collection,
+              basename: collection.name,
+              schema: enrichedSchema,
+              template,
+            })
+            formConfig = {
+              label: formInfo.label,
+              // TODO: return correct type
+              fields: formInfo.fields as any,
+              ...formCommon,
+            }
+          } else {
+            formConfig = {
+              label: result.form.label,
+              fields: result.form.fields,
+              ...formCommon,
+            }
+          }
+
           const { createForm, createGlobalForm } = generateFormCreators(cms)
           const SKIPPED = 'SKIPPED'
           let form

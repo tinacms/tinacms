@@ -11,14 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  defineSchema,
-  defineConfig,
-  resolveForm,
-  TinaSchema,
-  sequential,
-  addNamespaceToSchemaFrontEnd,
-} from 'tinacms'
+import { defineSchema, defineConfig } from 'tinacms'
 
 const schema = defineSchema({
   collections: [
@@ -29,12 +22,18 @@ const schema = defineSchema({
       format: 'mdx',
       fields: [
         {
+          name: 'thingOne',
+          type: 'string',
+        },
+        {
           type: 'object',
-          name: 'someObj',
+          label: 'Test',
+          name: 'test',
           fields: [
             {
-              name: 'thingOne',
-              type: 'string',
+              label: 'Asdf',
+              name: 'asdf',
+              type: 'number',
               required: true,
             },
           ],
@@ -126,21 +125,10 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
-export const enrichedSchema = new TinaSchema({
-  version: { fullVersion: '', major: '', minor: '', patch: '' },
-  meta: { flags: [] },
-  // ...schema,
-  // ...schemaJSON,
-  ...addNamespaceToSchemaFrontEnd(schema, []),
-})
-// console.log({ enrichedSchema })
-
 export const tinaConfig = defineConfig({
   apiURL,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
-    cms.api.schema = enrichedSchema
-
     return cms
   },
 })
