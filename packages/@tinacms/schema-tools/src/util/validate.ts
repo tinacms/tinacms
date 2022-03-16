@@ -12,10 +12,11 @@ limitations under the License.
 */
 
 import * as yup from 'yup'
+import type { Schema } from 'yup'
 
 export function assertShape<T extends unknown>(
   value: unknown,
-  yupSchema: (args: typeof yup) => yup.AnySchema,
+  yupSchema: (args: typeof yup) => Schema<any, any>,
   errorMessage?: string
 ): asserts value is T {
   const shape = yupSchema(yup)

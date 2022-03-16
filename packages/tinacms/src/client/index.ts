@@ -435,7 +435,10 @@ mutation addPendingDocumentMutation(
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
 export class LocalClient extends Client {
-  constructor(props?: { customContentApiUrl?: string }) {
+  constructor(props?: {
+    customContentApiUrl?: string
+    schema?: TinaCloudSchema<false>
+  }) {
     const clientProps = {
       ...props,
       clientId: '',
