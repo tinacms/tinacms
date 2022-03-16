@@ -77,7 +77,12 @@ export const FieldMeta = ({
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldLabel>
       {children}
-      {error && <FieldError>{error}</FieldError>}
+      {/*
+      FIXME: when a object field has a sub-field with a validation (eg. required)
+             AND the object field is not pristine (eg. you've touched other fields)
+             the error will be an object (eg {mySubField: "required"}).
+     */}
+      {error && typeof error === 'string' && <FieldError>{error}</FieldError>}
     </FieldWrapper>
   )
 }
