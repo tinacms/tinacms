@@ -46,7 +46,7 @@ export class LevelStore implements Store {
   public async query(queryParams: KeyValueQueryParams) {
     let { filterChain, sort = filepathSortKey, collection, ...query } = queryParams
 
-    let { limit: resultLimit } = query
+    let { limit: resultLimit = 10 } = query
 
     // modify the query to fetch one more item to correctly set hasNextPage
     if (resultLimit !== -1) {
@@ -58,7 +58,6 @@ export class LevelStore implements Store {
     const indexed = indexDefinition && isIndexed(queryParams, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
-    // // TODO does this properly handle DESC ?
     if (!query.gt && !query.gte) {
       query.gt = indexPrefix
     }
@@ -75,9 +74,9 @@ export class LevelStore implements Store {
 
     const fieldsPattern = indexDefinition?.fields?.length ? `${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:` : ':'
     let valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
-    const itemFilter = filterChain ? makeFilter({
+    const itemFilter = makeFilter({
       filterChain: coerceFilterChainOperands(filterChain),
-    }) : () => true
+    })
 
     for await (const [key, value] of (this.db as any).iterator(query)) { //TODO why is typescript unhappy?
       const matcher = valuesRegex.exec(key)
