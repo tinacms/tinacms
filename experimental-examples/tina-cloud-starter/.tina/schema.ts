@@ -3,7 +3,7 @@ import type { TinaTemplate } from "tinacms";
 import { iconSchema } from "./fields";
 import { defaultFeature } from "../components/actions";
 
-const featureBlockShema: TinaTemplate = {
+const featureBlockSchema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
@@ -555,7 +555,7 @@ export default defineSchema({
           },
           templates: [
             heroBlockSchema,
-            featureBlockShema,
+            featureBlockSchema,
             contentBlockSchema,
             testimonialBlockSchema,
           ],

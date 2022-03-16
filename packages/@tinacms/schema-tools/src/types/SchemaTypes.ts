@@ -136,10 +136,10 @@ type TinaScalarField =
   | ImageField
 
 type Field<F extends Field = any, Shape = any> = {
-  name: string
+  name?: string
   label?: string
   description?: string
-  component: FC<any> | string | null
+  component?: FC<any> | string | null
   // inlineComponent?: FC<any>
   parse?: (value: Shape, name: string, field: F) => any
   format?: (value: Shape, name: string, field: F) => any
@@ -216,9 +216,31 @@ type ObjectTemplates<WithNamespace extends boolean> = WithNamespace extends true
   ? ObjectTemplatesWithNamespace<WithNamespace>
   : ObjectTemplatesInner<WithNamespace>
 
-interface ObjectTemplatesInner<WithNamespace extends boolean>
+type ObjectTemplatesInner<WithNamespace extends boolean> =
+  | ObjectTemplatesInnerWithList<WithNamespace>
+  | ObjectTemplatesInnerWithoutList<WithNamespace>
+interface ObjectTemplatesInnerWithList<WithNamespace extends boolean>
+  extends ObjectTemplatesInnerBase<WithNamespace> {
+  list?: true
+  ui?:
+    | object
+    | ({
+        itemProps?(item: object): {
+          key?: string
+          label?: string
+        }
+      } & Field<any, string>)
+}
+interface ObjectTemplatesInnerWithoutList<WithNamespace extends boolean>
+  extends ObjectTemplatesInnerBase<WithNamespace> {
+  list?: false
+  ui?: object | Field<any, string>
+}
+
+interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  visualSelector?: boolean
   required?: false
   /**
    * templates can either be an array of Tina templates or a reference to
@@ -230,20 +252,12 @@ interface ObjectTemplatesInner<WithNamespace extends boolean>
    */
   templates: (string | Template<WithNamespace>)[]
   fields?: undefined
-  // TODO: item props should only be present with list is true
-  ui?:
-    | object
-    | ({
-        itemProps?(item: object): {
-          key?: string
-          label?: string
-        }
-      } & Field<any, string>)
 }
 
 interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  visualSelector?: boolean
   required?: false
   /**
    * templates can either be an array of Tina templates or a reference to
@@ -264,6 +278,7 @@ type ObjectFields<WithNamespace extends boolean> = WithNamespace extends true
 
 interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
+  visualSelector?: boolean
   required?: false
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
@@ -278,6 +293,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
 interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   extends TinaField {
   type: 'object'
+  visualSelector?: boolean
   required?: false
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
@@ -300,14 +316,14 @@ export type GlobalTemplate<WithNamespace extends boolean> =
     ? {
         label: string
         name: string
-        ui?: object
+        ui?: object | (Field<any, any> & { previewSrc: string })
         fields: TinaFieldInner<WithNamespace>[]
         namespace: WithNamespace extends true ? string[] : undefined
       }
     : {
         label: string
         name: string
-        ui?: object
+        ui?: object | (Field<any, any> & { previewSrc: string })
         fields: TinaFieldInner<WithNamespace>[]
       }
 
@@ -321,13 +337,13 @@ export type Template<WithNamespace extends boolean> = WithNamespace extends true
       label: string
       name: string
       fields: TinaFieldInner<WithNamespace>[]
-      ui?: object
+      ui?: object | (Field<any, any> & { previewSrc: string })
       namespace: WithNamespace extends true ? string[] : undefined
     }
   : {
       label: string
       name: string
-      ui?: object
+      ui?: object | (Field<any, any> & { previewSrc: string })
       fields: TinaFieldInner<WithNamespace>[]
     }
 
@@ -340,6 +356,7 @@ export type CollectionTemplateableUnion = {
 export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
+  visualSelector?: boolean
   required?: false
   template: Templateable
 }
