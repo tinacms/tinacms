@@ -4,6 +4,7 @@ fragment PageParts on Page {
     __typename
     asdf
   }
+  Title
   body
 }
 

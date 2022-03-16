@@ -81,12 +81,13 @@ type Collection {
 union DocumentNode = PageDocument | PostDocument
 
 type PageTest {
-  asdf: Float
+  asdf: Float!
 }
 
 type Page {
   thingOne: String
   test: PageTest
+  Title: String
   body: JSON
 }
 
@@ -158,6 +159,7 @@ input PageTestMutation {
 input PageMutation {
   thingOne: String
   test: PageTestMutation
+  Title: String
   body: JSON
 }
 
