@@ -74,6 +74,8 @@ export const tinaConfig = defineConfig({
        **/
       cms.plugins.add(RouteMapping);
     });
+
+    return cms;
   },
 });
 `
