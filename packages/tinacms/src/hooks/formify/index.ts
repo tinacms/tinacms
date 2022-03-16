@@ -19,7 +19,6 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import { formify, DATA_NODE_NAME } from './formify'
 import { onSubmitArgs } from '../use-graphql-forms'
 import { reducer } from './reducer'
-import { sample } from './sample'
 
 import type {
   FormifiedDocumentNode,
@@ -169,14 +168,6 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     const run = async () => {
-      if (process.env.NODE_ENV === 'production') {
-        if (util.printState(state) !== sample) {
-          console.log('you broke it')
-          // console.log(util.printState(state))
-        } else {
-          console.log('formify ok')
-        }
-      }
       const result = await cms.api.tina.request(G.print(state.query), {
         variables,
       })
