@@ -237,7 +237,7 @@ export function useGraphqlForms<T extends object>({
           // Uncomment this to test this work.
           // const enrichedSchema: TinaSchema = cms.api.tina.schema
           // const collection = enrichedSchema.getCollection(
-          // result._internalSys.collection.name
+          //   result._internalSys.collection.name
           // )
           // const template = await enrichedSchema.getTemplateForData({
           //   collection,

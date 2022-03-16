@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import { TinaSchema } from '../schema'
+import type { FC } from 'react'
 
 export interface TinaCloudSchema<WithNamespace extends boolean> {
   templates?: GlobalTemplate<WithNamespace>[]
@@ -134,23 +135,46 @@ type TinaScalarField =
   | NumberField
   | ImageField
 
+type Field<F extends Field = any, Shape = any> = {
+  name: string
+  label?: string
+  description?: string
+  component: FC<any> | string | null
+  // inlineComponent?: FC<any>
+  parse?: (value: Shape, name: string, field: F) => any
+  format?: (value: Shape, name: string, field: F) => any
+  validate?(
+    value: Shape,
+    allValues: any,
+    meta: any,
+    field: Field
+  ): string | object | undefined
+  defaultValue?: Shape
+  // fields?: F[]
+}
+
 type StringField = {
   type: 'string'
   isBody?: boolean
+  ui?: object | Field<any, string>
 }
 type BooleanField = {
   type: 'boolean'
+  ui?: object | Field<any, boolean>
 }
 type NumberField = {
   type: 'number'
+  ui?: object | Field<any, number>
 }
 type DateTimeField = {
   type: 'datetime'
   dateFormat?: string
   timeFormat?: string
+  ui?: object | Field<any, string>
 }
 type ImageField = {
   type: 'image'
+  ui?: object | Field<any, string>
 }
 
 export type ReferenceType<WithNamespace extends boolean> =
@@ -206,6 +230,14 @@ interface ObjectTemplatesInner<WithNamespace extends boolean>
    */
   templates: (string | Template<WithNamespace>)[]
   fields?: undefined
+  ui?:
+    | object
+    | ({
+        itemProps?(item: object): {
+          key?: string
+          label?: string
+        }
+      } & Field<any, string>)
 }
 
 interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
