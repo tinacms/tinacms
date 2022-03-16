@@ -6,6 +6,11 @@ echo "Adding Licenses..."
 
 declare -a ignoreFiles=(
   ".pnp.js"
+  "examples"
+  "experimental-examples"
+  "deprecated-packages"
+  ".yarn"
+  "build"
   )
 
 for file in `find $PWD \( -name .yarn -prune \) -or \( -name "*.js" -or -name "*.ts" -or -name "*.tsx" \) -print  -type f`
