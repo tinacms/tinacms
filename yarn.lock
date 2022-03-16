@@ -5440,8 +5440,10 @@ __metadata:
     "@tinacms/scripts": "workspace:*"
     "@types/yup": ^0.29.10
     jest: ^27.0.6
+    react: 16.14.0
     typescript: ^4.3.5
   peerDependencies:
+    react: ">=16.14.0"
     yup: ^0.32.0
   languageName: unknown
   linkType: soft
