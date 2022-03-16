@@ -29,7 +29,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 import { TinaDataContext } from '@tinacms/sharedctx'
 import { useTina } from './edit-state'
-import type { TinaCloudSchema } from './types'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
 
 const errorButtonStyles = {
   background: '#eb6337',
