@@ -6,14 +6,9 @@ echo "Adding Licenses..."
 
 declare -a ignoreFiles=(
   ".pnp.js"
-  "examples"
-  "experimental-examples"
-  "deprecated-packages"
-  ".yarn"
-  "build"
   )
 
-for file in `find $PWD \( -name .yarn -prune \) -or \( -name "*.js" -or -name "*.ts" -or -name "*.tsx" \) -print  -type f`
+for file in `find $PWD \( -name .yarn -prune \) -or \( -name "*.js" -or -name "*.ts" -or -name "*.tsx" \) -not -path "*/examples/*" -not -path "*/experimental-examples/*" -not -path "*/build/*" -not -path "*/.yarn/*" -not -path "*/deprecated-packages/*"    -print  -type f`
 do
   if [[ $file == *"${ignoreFiles[*]}"* ]]
   then
@@ -29,6 +24,4 @@ do
   
 done
 echo "Licenses have been added."
-© 2022 GitHub, Inc.
-Terms
-Privacy
+
