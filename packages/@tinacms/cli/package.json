@@ -87,9 +87,6 @@
     "yarn": "^1.22.17",
     "yup": "^0.32.9"
   },
-  "peerDependencies": {
-    "leveldown": "^6.1.0"
-  },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
