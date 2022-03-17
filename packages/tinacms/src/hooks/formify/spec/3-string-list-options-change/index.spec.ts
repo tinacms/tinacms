@@ -180,6 +180,7 @@ const events = [
 ]
 
 import { testRunner } from '../runner'
+// @ts-ignore jest: Cannot find name 'test'
 test('formifies the query and responds correctly to events', async () => {
   await testRunner(query, events, __dirname)
 })
