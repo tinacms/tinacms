@@ -52,6 +52,7 @@ export class Database {
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge
     this.store = config.store
+    this.collectionIndexDefinitions
   }
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
@@ -229,7 +230,7 @@ export class Database {
     return this.tinaSchema
   }
 
-  public getIndexDefinitions = async (collectionName: string): Promise<Record<string,IndexDefinition>> => {
+  public getIndexDefinitions = async (): Promise<Record<string,Record<string,IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
       this.collectionIndexDefinitions = {}
       const schema = await this.getSchema()
@@ -264,11 +265,11 @@ export class Database {
             }
           }
         }
-        this.collectionIndexDefinitions[collectionName] = indexDefinitions
+        this.collectionIndexDefinitions[collection.name] = indexDefinitions
       }
     }
 
-    return this.collectionIndexDefinitions[collectionName] || {}
+    return this.collectionIndexDefinitions
   }
 
   public documentExists = async (fullpath: unknown) => {
@@ -466,8 +467,13 @@ type UnionDataLookup = {
 }
 
 const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
-  const indexDefinitions = await database.getIndexDefinitions(collection.name)
-  const numIndexes = Object.keys(indexDefinitions).length
+  const indexDefinitions = await database.getIndexDefinitions()
+  const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+  if (!collectionIndexDefinitions) {
+    throw new Error(`No indexDefinitions for collection ${collection.name}`)
+  }
+
+  const numIndexes = Object.keys(collectionIndexDefinitions).length
   if ( numIndexes > 20) {
     throw new Error(`A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`)
   }
@@ -478,7 +484,7 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, { collection: collection.name, indexDefinitions })
+      await database.store.seed(filepath, data, { collection: collection.name, indexDefinitions: collectionIndexDefinitions })
     }
   })
 }
