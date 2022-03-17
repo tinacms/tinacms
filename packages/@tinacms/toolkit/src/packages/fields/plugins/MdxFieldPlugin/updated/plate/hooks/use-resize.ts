@@ -20,7 +20,6 @@ import React from 'react'
 
 export const useResize = (ref, callback) => {
   React.useEffect(() => {
-    //@ts-ignore
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         callback(entry)
