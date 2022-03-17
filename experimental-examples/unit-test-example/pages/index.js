@@ -26,6 +26,7 @@ const query = \`${query}\`
 const events = ${JSON.stringify(eventList.current, null, 2)}
 
 import { testRunner } from '../runner'
+// @ts-ignore jest: Cannot find name 'test'
 test('formifies the query and responds correctly to events', async () => {
   await testRunner(query, events, __dirname)
 })

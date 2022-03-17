@@ -29,6 +29,7 @@ describe('EventBus', () => {
 
     expect(listener).toHaveBeenCalledWith(event)
   })
+  // @ts-ignore jest: Cannot find name 'test'
   test('for an array of eventscalls listeners and passes it the dispatched event', () => {
     const listener = jest.fn()
     const events = new EventBus()
