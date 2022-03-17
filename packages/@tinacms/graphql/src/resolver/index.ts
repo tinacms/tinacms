@@ -768,7 +768,6 @@ export class Resolver {
     field.parentTypename = NAMER.dataTypeName(
       field.namespace.filter((_, i) => i < field.namespace.length - 1)
     )
-    delete field.namespace
     switch (field.type) {
       case 'number':
         return {

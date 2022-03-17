@@ -24,53 +24,55 @@ const fixtures: Fixture[] = [
     description: "Querying a list with 'eq'",
     assert: 'output',
   },
-  {
-    name: 'getMovieList2',
-    description: "Querying a list with 'startsWith'",
-    assert: 'output',
-  },
-  {
-    name: 'getCrewList',
-    description: 'Querying a collection with templates works',
-    assert: 'output',
-  },
-  {
-    name: 'getDirectorList',
-    assert: 'output',
-  },
+  // {
+  //   name: 'getMovieList2',
+  //   description: "Querying a list with 'startsWith'",
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getCrewList',
+  //   description: 'Querying a collection with templates works',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'getDirectorList',
+  //   assert: 'output',
+  // },
 ]
 
 const mutationFixtures: Fixture[] = [
-  {
-    name: 'addPendingDocument',
-    description: 'Adding a document',
-    assert: 'output',
-  },
-  {
-    name: 'addPendingDocumentExisting',
-    description: 'Adding a document when one already exists',
-    assert: 'output',
-    expectError: true,
-  },
-  {
-    name: 'updateMovieDocument',
-    description: 'Updating an existing document',
-    assert: 'file',
-    filename: 'content/movies/star-wars.md',
-  },
-  {
-    name: 'updateMovieDocumentNonExisting',
-    description: 'Updating an existing document',
-    assert: 'output',
-    expectError: true,
-  },
+  // {
+  //   name: 'addPendingDocument',
+  //   description: 'Adding a document',
+  //   assert: 'output',
+  // },
+  // {
+  //   name: 'addPendingDocumentExisting',
+  //   description: 'Adding a document when one already exists',
+  //   assert: 'output',
+  //   expectError: true,
+  // },
+  // {
+  //   name: 'updateMovieDocument',
+  //   description: 'Updating an existing document',
+  //   assert: 'file',
+  //   filename: 'content/movies/star-wars.md',
+  // },
+  // {
+  //   name: 'updateMovieDocumentNonExisting',
+  //   description: 'Updating an existing document',
+  //   assert: 'output',
+  //   expectError: true,
+  // },
 ]
 
 let consoleErrMock
 beforeEach(() => {
   consoleErrMock = jest
     .spyOn(console, 'error')
-    .mockImplementation((message) => {})
+    .mockImplementation((message) => {
+      console.log(message)
+    })
 })
 
 afterEach(() => {
