@@ -45,6 +45,7 @@
     "workspace": "^0.0.1-preview.1"
   },
   "devDependencies": {
-    "@types/jest": "^27.4.1"
+    "@types/jest": "^27.4.1",
+    "cypress": "9.2.0"
   }
 }
