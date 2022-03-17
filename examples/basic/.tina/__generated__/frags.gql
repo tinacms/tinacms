@@ -1,13 +1,19 @@
 fragment PageParts on Page {
-  someObj {
+  thingOne
+  test {
     __typename
-    thingOne
+    asdf
   }
+  Title
   body
 }
 
 fragment PostParts on Post {
   title
+  foo {
+    __typename
+    bar
+  }
   topic
   body
 }

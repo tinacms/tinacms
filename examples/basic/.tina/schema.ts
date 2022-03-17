@@ -13,7 +13,7 @@ limitations under the License.
 
 import { defineSchema, defineConfig } from 'tinacms'
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       name: 'page',
@@ -22,15 +22,38 @@ export default defineSchema({
       format: 'mdx',
       fields: [
         {
+          name: 'thingOne',
+          type: 'string',
+        },
+        {
           type: 'object',
-          name: 'someObj',
+          label: 'Test',
+          name: 'test',
           fields: [
             {
-              name: 'thingOne',
-              type: 'string',
+              label: 'Asdf',
+              name: 'asdf',
+              type: 'number',
               required: true,
             },
           ],
+        },
+        {
+          label: 'Title',
+          name: 'Title',
+          type: 'string',
+          ui: {
+            defaultValue: 'Title',
+            // Examples of how you COULD use a custom form
+            // component: ({ form, field, input }) => {
+            //   return <input {...input}></input>
+            // },
+            // validate: (val) => {
+            //   if (val?.length > 5) {
+            //     return 'Too Long!!!'
+            //   }
+            // },
+          },
         },
         {
           name: 'body',
@@ -50,9 +73,26 @@ export default defineSchema({
           type: 'string',
           label: 'Title',
           name: 'title',
+          list: false,
+          ui: {
+            validate: (vals) => {},
+          },
+        },
+        {
+          type: 'object',
+          label: 'Something',
+          name: 'foo',
+          fields: [
+            {
+              name: 'bar',
+              label: 'Bar',
+              type: 'string',
+            },
+          ],
         },
         {
           type: 'string',
+
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
@@ -127,3 +167,5 @@ export const tinaConfig = defineConfig({
     return cms
   },
 })
+
+export default schema

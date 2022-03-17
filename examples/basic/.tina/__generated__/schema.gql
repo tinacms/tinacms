@@ -80,12 +80,14 @@ type Collection {
 
 union DocumentNode = PageDocument | PostDocument
 
-type PageSomeObj {
-  thingOne: String!
+type PageTest {
+  asdf: Float!
 }
 
 type Page {
-  someObj: PageSomeObj
+  thingOne: String
+  test: PageTest
+  Title: String
   body: JSON
 }
 
@@ -109,8 +111,13 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
+type PostFoo {
+  bar: String
+}
+
 type Post {
   title: String
+  foo: PostFoo
   topic: [String]
   body: JSON
 }
@@ -150,17 +157,24 @@ input DocumentMutation {
   post: PostMutation
 }
 
-input PageSomeObjMutation {
-  thingOne: String
+input PageTestMutation {
+  asdf: Float
 }
 
 input PageMutation {
-  someObj: PageSomeObjMutation
+  thingOne: String
+  test: PageTestMutation
+  Title: String
   body: JSON
+}
+
+input PostFooMutation {
+  bar: String
 }
 
 input PostMutation {
   title: String
+  foo: PostFooMutation
   topic: [String]
   body: JSON
 }

@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Reference } from '../components'
+import { Reference } from './../components/Reference'
 import { parse } from './textFormat'
 
 export const ReferenceField = wrapFieldsWithMeta(Reference)

@@ -5254,6 +5254,7 @@ __metadata:
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
     "@tinacms/metrics": "workspace:*"
+    "@tinacms/schema-tools": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
@@ -5428,6 +5429,21 @@ __metadata:
     typescript: ^4.3.5
   peerDependencies:
     fs-extra: ^9.0.1
+  languageName: unknown
+  linkType: soft
+
+"@tinacms/schema-tools@workspace:*, @tinacms/schema-tools@workspace:packages/@tinacms/schema-tools":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/schema-tools@workspace:packages/@tinacms/schema-tools"
+  dependencies:
+    "@tinacms/scripts": "workspace:*"
+    "@types/yup": ^0.29.10
+    jest: ^27.0.6
+    react: 16.14.0
+    typescript: ^4.3.5
+  peerDependencies:
+    react: ">=16.14.0"
+    yup: ^0.32.0
   languageName: unknown
   linkType: soft
 
@@ -30143,6 +30159,7 @@ resolve@^2.0.0-next.3:
     "@testing-library/react": ^12.0.0
     "@testing-library/react-hooks": ^7.0.2
     "@testing-library/user-event": ^12.7.0
+    "@tinacms/schema-tools": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@tinacms/sharedctx": "workspace:*"
     "@tinacms/toolkit": "workspace:*"

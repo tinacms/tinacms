@@ -13,7 +13,6 @@ limitations under the License.
 
 import React from 'react'
 import gql from 'graphql-tag'
-import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
 import {
   useCMS,
@@ -21,12 +20,14 @@ import {
   GlobalFormPlugin,
   FormMetaPlugin,
   useBranchData,
+  AnyField,
 } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { BiLinkExternal } from 'react-icons/bi'
 import { useFormify } from './formify'
+import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 export function useGraphqlFormsUnstable<T extends object>({
   variables,
@@ -198,7 +199,7 @@ export function useGraphqlForms<T extends object>({
         setData(payload)
         setInitialData(payload)
         setIsLoading(false)
-        Object.entries(payload).map(([queryName, result]) => {
+        Object.entries(payload).map(async ([queryName, result]) => {
           formIds.push(queryName)
           const canBeFormified = safeAssertShape<{
             form: { mutationInfo: string }
@@ -233,12 +234,10 @@ export function useGraphqlForms<T extends object>({
               }),
             `Unable to build form shape for fields at ${queryName}`
           )
-
-          const formConfig = {
+          let formConfig = {} as FormOptions<any, AnyField>
+          const formCommon = {
             id: queryName,
-            label: result.form.label,
             initialValues: result.values,
-            fields: result.form.fields,
 
             reset: () => {
               setPendingReset(queryName)
@@ -274,6 +273,35 @@ export function useGraphqlForms<T extends object>({
               }
             },
           }
+          if (cms.api.tina.schema) {
+            const enrichedSchema: TinaSchema = cms.api.tina.schema
+            const collection = enrichedSchema.getCollection(
+              result._internalSys.collection.name
+            )
+            const template = await enrichedSchema.getTemplateForData({
+              collection,
+              data: result.values,
+            })
+            const formInfo = await resolveForm({
+              collection,
+              basename: collection.name,
+              schema: enrichedSchema,
+              template,
+            })
+            formConfig = {
+              label: formInfo.label,
+              // TODO: return correct type
+              fields: formInfo.fields as any,
+              ...formCommon,
+            }
+          } else {
+            formConfig = {
+              label: result.form.label,
+              fields: result.form.fields,
+              ...formCommon,
+            }
+          }
+
           const { createForm, createGlobalForm } = generateFormCreators(cms)
           const SKIPPED = 'SKIPPED'
           let form

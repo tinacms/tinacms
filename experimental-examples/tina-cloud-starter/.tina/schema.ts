@@ -1,9 +1,9 @@
-import { defineSchema } from "@tinacms/cli";
-import type { TinaTemplate } from "@tinacms/cli";
+import { defineSchema } from "tinacms";
+import type { TinaTemplate } from "tinacms";
 import { iconSchema } from "./fields";
 import { defaultFeature } from "../components/actions";
 
-const featureBlockShema: TinaTemplate = {
+const featureBlockSchema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
@@ -29,6 +29,12 @@ const featureBlockShema: TinaTemplate = {
           type: "string",
           label: "Title",
           name: "title",
+          list: true,
+          ui: {
+            validate: (val) => {
+              val;
+            },
+          },
         },
         {
           type: "string",
@@ -301,6 +307,11 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          ui: {
+            validate: (val) => {
+              val;
+            },
+          },
         },
         {
           type: "reference",
@@ -555,7 +566,7 @@ export default defineSchema({
           },
           templates: [
             heroBlockSchema,
-            featureBlockShema,
+            featureBlockSchema,
             contentBlockSchema,
             testimonialBlockSchema,
           ],
