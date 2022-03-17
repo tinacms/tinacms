@@ -111,8 +111,13 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
+type PostFoo {
+  bar: String
+}
+
 type Post {
   title: String
+  foo: PostFoo
   topic: [String]
   body: JSON
 }
@@ -163,8 +168,13 @@ input PageMutation {
   body: JSON
 }
 
+input PostFooMutation {
+  bar: String
+}
+
 input PostMutation {
   title: String
+  foo: PostFooMutation
   topic: [String]
   body: JSON
 }

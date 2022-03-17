@@ -29,6 +29,12 @@ const featureBlockSchema: TinaTemplate = {
           type: "string",
           label: "Title",
           name: "title",
+          list: true,
+          ui: {
+            validate: (val) => {
+              val;
+            },
+          },
         },
         {
           type: "string",
@@ -301,6 +307,11 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          ui: {
+            validate: (val) => {
+              val;
+            },
+          },
         },
         {
           type: "reference",

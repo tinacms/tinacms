@@ -13,7 +13,9 @@ limitations under the License.
 
 import { TinaSchema } from '../schema'
 import type { FC } from 'react'
-
+type ArrayBasedOnGeneric<T, List extends boolean = false> = List extends false
+  ? T
+  : T[]
 export type UIField<F extends UIField = any, Shape = any> = {
   name?: string
   label?: string
@@ -118,7 +120,7 @@ interface TinaField {
   label?: string
   description?: string
   required?: boolean
-  list?: boolean
+  // list?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.
    * NOTE: only serializable values are supported, so functions like `validate`
@@ -153,28 +155,90 @@ type TinaScalarField =
   | NumberField
   | ImageField
 
-type StringField = {
+type StringField =
+  | {
+      type: 'string'
+      isBody?: boolean
+      ui?: object | UIField<any, string>
+    }
+  | StringFieldInner<true>
+  | StringFieldInner<false>
+
+type StringFieldInner<List extends boolean> = {
   type: 'string'
   isBody?: boolean
-  ui?: object | UIField<any, string>
+  list?: List
+  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
 }
-type BooleanField = {
+
+const bla: ScalarTypeInner = {
+  name: 'asdf',
+  type: 'string',
+  list: false,
+  ui: {
+    validate: (val) => {
+      console.log({ val })
+    },
+  },
+}
+
+type BooleanField =
+  | {
+      type: 'boolean'
+      ui?: object | UIField<any, boolean>
+    }
+  | BooleanFieldInner<false>
+  | BooleanFieldInner<true>
+
+type BooleanFieldInner<List extends boolean> = {
   type: 'boolean'
-  ui?: object | UIField<any, boolean>
+  list?: List
+  ui?: object | UIField<any, ArrayBasedOnGeneric<boolean, List>>
 }
-type NumberField = {
+
+type NumberField =
+  | {
+      type: 'number'
+      ui?: object | UIField<any, number>
+    }
+  | NumberFieldInner<true>
+  | NumberFieldInner<false>
+
+type NumberFieldInner<List extends boolean> = {
   type: 'number'
-  ui?: object | UIField<any, number>
+  list?: List
+  ui?: object | UIField<any, ArrayBasedOnGeneric<number, List>>
 }
-type DateTimeField = {
+
+type DateTimeField =
+  | {
+      type: 'datetime'
+      dateFormat?: string
+      timeFormat?: string
+      ui?: object | UIField<any, string>
+    }
+  | DateTimeFieldInner<true>
+  | DateTimeFieldInner<false>
+
+type DateTimeFieldInner<List extends boolean> = {
   type: 'datetime'
+  list?: List
   dateFormat?: string
   timeFormat?: string
-  ui?: object | UIField<any, string>
+  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
 }
-type ImageField = {
+
+type ImageField =
+  | {
+      type: 'image'
+      ui?: object | UIField<any, string>
+    }
+  | ImageFieldInner<true>
+  | ImageFieldInner<false>
+
+type ImageFieldInner<List extends boolean> = {
   type: 'image'
-  ui?: object | UIField<any, string>
+  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
 }
 
 export type ReferenceType<WithNamespace extends boolean> =
@@ -185,11 +249,13 @@ export type RichType<WithNamespace extends boolean> = WithNamespace extends true
   : RichTypeInner
 export interface ReferenceTypeInner extends TinaField {
   type: 'reference'
+  list?: boolean
   reverseLookup?: { label: string; name: string }
   collections: string[]
 }
 export interface ReferenceTypeWithNamespace extends TinaField {
   type: 'reference'
+  list?: boolean
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
@@ -242,6 +308,7 @@ interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  list?: boolean
   /**
    * templates can either be an array of Tina templates or a reference to
    * global template definition.
@@ -259,6 +326,7 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  list?: boolean
   /**
    * templates can either be an array of Tina templates or a reference to
    * global template definition.
@@ -288,6 +356,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
    */
   fields: string | TinaFieldInner<WithNamespace>[]
   templates?: undefined
+  list?: boolean
 }
 
 interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
@@ -304,6 +373,7 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   fields: string | TinaFieldInner<WithNamespace>[]
   templates?: undefined
   namespace: WithNamespace extends true ? string[] : undefined
+  list?: boolean
 }
 
 /**

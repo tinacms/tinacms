@@ -73,9 +73,26 @@ const schema = defineSchema({
           type: 'string',
           label: 'Title',
           name: 'title',
+          list: false,
+          ui: {
+            validate: (vals) => {},
+          },
+        },
+        {
+          type: 'object',
+          label: 'Something',
+          name: 'foo',
+          fields: [
+            {
+              name: 'bar',
+              label: 'Bar',
+              type: 'string',
+            },
+          ],
         },
         {
           type: 'string',
+
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
