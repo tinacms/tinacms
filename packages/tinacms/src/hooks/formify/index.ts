@@ -517,7 +517,9 @@ export const useFormify = ({
                         return resolveSubFields({
                           formNode,
                           form: { fields: template.fields, values: item },
-                          prefix: [prefix, fieldName].join('.'),
+                          prefix: prefix
+                            ? [prefix, fieldName].join('.')
+                            : fieldName,
                           loc: [...loc, index],
                         })
                       }
