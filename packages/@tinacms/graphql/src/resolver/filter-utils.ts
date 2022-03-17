@@ -11,19 +11,19 @@
  limitations under the License.
  */
 
-import {ObjectType, ReferenceTypeWithNamespace, TinaFieldInner} from '../types'
+import {ObjectType, ReferenceTypeInner, TinaFieldInner} from '../types'
 import type { FilterCondition } from '@tinacms/datalayer'
 
-export type ReferenceResolver = (filter: Record<string, object>, fieldDefinition: ReferenceTypeWithNamespace) => Promise<{
+export type ReferenceResolver = (filter: Record<string, object>, fieldDefinition: ReferenceTypeInner) => Promise<{
     edges: {
        node: any
     }[],
     values: any[]
 }>
 
-export const resolveReferences = async (filter: any, fields: TinaFieldInner<true>[], resolver: ReferenceResolver) => {
+export const resolveReferences = async (filter: any, fields: TinaFieldInner<false>[], resolver: ReferenceResolver) => {
     for (const fieldKey of Object.keys(filter)) {
-        const fieldDefinition = (fields as TinaFieldInner<true>[]).find(f => f.name === fieldKey)
+        const fieldDefinition = (fields as TinaFieldInner<false>[]).find(f => f.name === fieldKey)
         // resolve top level references
         if (fieldDefinition) {
             if (fieldDefinition.type === 'reference') {
@@ -46,13 +46,13 @@ export const resolveReferences = async (filter: any, fields: TinaFieldInner<true
             } else if (fieldDefinition.type === 'object') {
                 if (fieldDefinition.templates) {
                     for (const templateName of Object.keys(filter[fieldKey])) {
-                        const template = (fieldDefinition as ObjectType<true>).templates.find(template => !(typeof template === 'string') && template.name === templateName) as any
+                        const template = (fieldDefinition as ObjectType<false>).templates.find(template => !(typeof template === 'string') && template.name === templateName) as any
                         if (template) {
                             await resolveReferences(filter[fieldKey][templateName], template.fields, resolver)
                         }
                     }
                 } else {
-                    await resolveReferences(filter[fieldKey], fieldDefinition.fields as TinaFieldInner<true>[], resolver)
+                    await resolveReferences(filter[fieldKey], fieldDefinition.fields as TinaFieldInner<false>[], resolver)
                 }
             }
         } else {
@@ -63,7 +63,7 @@ export const resolveReferences = async (filter: any, fields: TinaFieldInner<true
 
 const collectConditionsForChildFields = (
     filterNode: Record<string,object>,
-    fields: TinaFieldInner<true>[],
+    fields: TinaFieldInner<false>[],
     pathExpression: string,
     collectCondition: (condition: FilterCondition) => void
 ) => {
@@ -85,14 +85,14 @@ const collectConditionsForChildFields = (
 
 const collectConditionsForObjectField = (
     fieldName: string,
-    field: ObjectType<true>,
+    field: ObjectType<false>,
     filterNode: Record<string,object>,
     pathExpression: string,
     collectCondition: (condition: FilterCondition) => void
 ) => {
     if (field.list && field.templates) {
         const globalTemplates = {}
-        for (let template of field.templates) {
+        for (const template of field.templates) {
             if (typeof template === 'string') {
                 globalTemplates[template] = 1
             }
@@ -116,13 +116,13 @@ const collectConditionsForObjectField = (
         const jsonPath = `${fieldName}${field.list ? '[*]' : ''}`
         const filterPath = pathExpression ? `${pathExpression}.${jsonPath}` : `${jsonPath}`
 
-        collectConditionsForChildFields(filterNode, (field.fields as TinaFieldInner<true>[]), filterPath, collectCondition)
+        collectConditionsForChildFields(filterNode, (field.fields as TinaFieldInner<false>[]), filterPath, collectCondition)
     }
 }
 
 export const collectConditionsForField = (
     fieldName: string,
-    field: TinaFieldInner<true>,
+    field: TinaFieldInner<false>,
     filterNode: Record<string,object>,
     pathExpression: string,
     collectCondition: (condition: FilterCondition) => void

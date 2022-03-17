@@ -566,7 +566,7 @@ export class Resolver {
     if (args.filter || args.sort) {
       const conditions: FilterCondition[] = []
       if (args.filter) {
-        await resolveReferences(args.filter, collection.fields as TinaFieldInner<true>[], this.referenceResolver)
+        await resolveReferences(args.filter, collection.fields as TinaFieldInner<false>[], this.referenceResolver)
 
         const conditionCollector = (condition: FilterCondition) => {
           if (!condition.filterPath) {
