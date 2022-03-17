@@ -34,7 +34,7 @@ export interface ReferenceFieldProps {
   options: (Option | string)[]
 }
 
-interface ReferenceProps {
+export interface ReferenceProps {
   name: string
   input: any
   field: ReferenceFieldProps
