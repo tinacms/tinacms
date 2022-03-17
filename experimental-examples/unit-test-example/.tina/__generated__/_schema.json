@@ -305,6 +305,126 @@
                 "blocks",
                 "featuredPosts"
               ]
+            },
+            {
+              "name": "featureList",
+              "label": "Feature List",
+              "fields": [
+                {
+                  "label": "Title",
+                  "name": "title",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "featureList",
+                    "title"
+                  ]
+                },
+                {
+                  "label": "Features",
+                  "name": "items",
+                  "type": "object",
+                  "list": true,
+                  "fields": [
+                    {
+                      "label": "Title",
+                      "name": "title",
+                      "type": "string",
+                      "namespace": [
+                        "blockPage",
+                        "blocks",
+                        "featureList",
+                        "items",
+                        "title"
+                      ]
+                    },
+                    {
+                      "label": "description",
+                      "name": "description",
+                      "type": "string",
+                      "namespace": [
+                        "blockPage",
+                        "blocks",
+                        "featureList",
+                        "items",
+                        "description"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "featureList",
+                    "items"
+                  ]
+                }
+              ],
+              "namespace": [
+                "blockPage",
+                "blocks",
+                "featureList"
+              ]
+            },
+            {
+              "name": "slideshow",
+              "label": "Slideshow",
+              "fields": [
+                {
+                  "label": "Title",
+                  "name": "title",
+                  "type": "string",
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "slideshow",
+                    "title"
+                  ]
+                },
+                {
+                  "label": "Items",
+                  "name": "items",
+                  "type": "object",
+                  "list": true,
+                  "fields": [
+                    {
+                      "label": "Title",
+                      "name": "title",
+                      "type": "string",
+                      "namespace": [
+                        "blockPage",
+                        "blocks",
+                        "slideshow",
+                        "items",
+                        "title"
+                      ]
+                    },
+                    {
+                      "label": "URL",
+                      "name": "url",
+                      "type": "string",
+                      "namespace": [
+                        "blockPage",
+                        "blocks",
+                        "slideshow",
+                        "items",
+                        "url"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "blockPage",
+                    "blocks",
+                    "slideshow",
+                    "items"
+                  ]
+                }
+              ],
+              "namespace": [
+                "blockPage",
+                "blocks",
+                "slideshow"
+              ]
             }
           ],
           "namespace": [

@@ -177,6 +177,7 @@ export const buildForm = (
     label: doc.form.label,
     initialValues: doc.values,
     onSubmit: async (payload) => {
+      console.log(doc)
       try {
         const params = transformDocumentIntoMutationRequestPayload(
           payload,
@@ -359,19 +360,29 @@ export const getBlueprintFieldsForEvent = (
       }
     })
     .filter((fbp) => {
-      let lastDisambiguator: string
-
-      fbp.path.forEach((path) => {
-        if (path.disambiguator) {
-          lastDisambiguator = path.disambiguator
-        }
-      })
-      if (lastDisambiguator) {
-        return event.field.data.typename === lastDisambiguator
-      } else {
-        return true
-      }
+      return filterFieldBlueprintsByParentTypename(
+        fbp,
+        event.field.data.tinaField.parentTypename
+      )
     })
+}
+
+export const filterFieldBlueprintsByParentTypename = (
+  fbp: FieldBlueprint,
+  typename
+) => {
+  let lastDisambiguator: string
+
+  fbp.path.forEach((path) => {
+    if (path.parentTypename) {
+      lastDisambiguator = path.parentTypename
+    }
+  })
+  if (lastDisambiguator) {
+    return typename === lastDisambiguator
+  } else {
+    return true
+  }
 }
 
 /**
@@ -386,10 +397,16 @@ export const getBlueprintFieldsForEvent = (
  * ```
  */
 export const getBlueprintNamePath = (
-  blueprint: Pick<DocumentBlueprint, 'path'>
+  blueprint: Pick<DocumentBlueprint, 'path'>,
+  disambiguator?: boolean
 ) => {
   const namePath = []
   blueprint.path.forEach((p) => {
+    if (disambiguator) {
+      if (p.parentTypename) {
+        namePath.push(p.parentTypename)
+      }
+    }
     namePath.push(p.name)
     if (p.list) {
       namePath.push('[]')

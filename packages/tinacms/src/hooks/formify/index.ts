@@ -245,6 +245,9 @@ export const useFormify = ({
   React.useEffect(() => {
     if (state.status === 'ready') {
       cms.events.subscribe(`forms:reset`, (event: OnChangeEvent) => {
+        if (eventList) {
+          eventList.push(util.printEvent(event))
+        }
         dispatch({ type: 'formOnReset', value: { event } })
       })
       cms.events.subscribe(
@@ -480,10 +483,16 @@ export const useFormify = ({
           prefix,
           blueprint,
         })
-        const fieldBlueprints = blueprint.fields.filter((fieldBlueprint) => {
-          return matchName === util.getBlueprintNamePath(fieldBlueprint)
-        })
-
+        const fieldBlueprints = blueprint.fields
+          .filter((fieldBlueprint) => {
+            return matchName === util.getBlueprintNamePath(fieldBlueprint)
+          })
+          .filter((fbp) =>
+            util.filterFieldBlueprintsByParentTypename(
+              fbp,
+              field.parentTypename
+            )
+          )
         switch (field.type) {
           case 'object':
             if (field.templates) {

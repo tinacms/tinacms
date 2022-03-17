@@ -161,6 +161,64 @@ export default defineSchema({
                 },
               ],
             },
+            {
+              name: 'featureList',
+              label: 'Feature List',
+              fields: [
+                {
+                  label: 'Title',
+                  name: 'title',
+                  type: 'string',
+                },
+                {
+                  label: 'Features',
+                  name: 'items',
+                  type: 'object',
+                  list: true,
+                  fields: [
+                    {
+                      label: 'Title',
+                      name: 'title',
+                      type: 'string',
+                    },
+                    {
+                      label: 'description',
+                      name: 'description',
+                      type: 'string',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'slideshow',
+              label: 'Slideshow',
+              fields: [
+                {
+                  label: 'Title',
+                  name: 'title',
+                  type: 'string',
+                },
+                {
+                  label: 'Items',
+                  name: 'items',
+                  type: 'object',
+                  list: true,
+                  fields: [
+                    {
+                      label: 'Title',
+                      name: 'title',
+                      type: 'string',
+                    },
+                    {
+                      label: 'URL',
+                      name: 'url',
+                      type: 'string',
+                    },
+                  ],
+                },
+              ],
+            },
           ],
         },
       ],

@@ -246,7 +246,7 @@ export const formify = async ({
                     inlineFragmentNode: selectionNode,
                     type: subType,
                     path,
-                    showInSidebar: false,
+                    showInSidebar: true,
                   })
                 }
                 return formifyInlineFragmentNode({
@@ -304,12 +304,10 @@ export const formify = async ({
     fieldNode,
     parentType,
     path,
-    disambiguator,
   }: {
     fieldNode: G.FieldNode
     parentType: G.GraphQLOutputType
     path: BlueprintPath[]
-    disambiguator?: boolean
   }) => {
     if (fieldNode.name.value === '__typename') {
       return fieldNode
@@ -327,7 +325,7 @@ export const formify = async ({
     const fieldPath = util.buildPath({
       fieldNode,
       type: field.type,
-      disambiguator: disambiguator ? G.getNamedType(parentType).name : null,
+      parentTypename: G.getNamedType(parentType).name,
       path,
     })
 
@@ -406,7 +404,6 @@ export const formify = async ({
                   fieldNode: selectionNode,
                   parentType: type,
                   path,
-                  disambiguator: true,
                 })
               default:
                 throw new FormifyError(

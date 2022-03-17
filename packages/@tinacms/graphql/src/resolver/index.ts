@@ -763,11 +763,12 @@ export class Resolver {
     return args.params
   }
 
-  private resolveField = async ({
-    namespace,
-    ...field
-  }: TinaFieldEnriched): Promise<unknown> => {
+  private resolveField = async (field: TinaFieldEnriched): Promise<unknown> => {
     const extraFields = field.ui || {}
+    field.parentTypename = NAMER.dataTypeName(
+      field.namespace.filter((_, i) => i < field.namespace.length - 1)
+    )
+    delete field.namespace
     switch (field.type) {
       case 'number':
         return {
@@ -832,10 +833,7 @@ export class Resolver {
           ...extraFields,
         }
       case 'object':
-        const templateInfo = this.tinaSchema.getTemplatesForCollectable({
-          ...field,
-          namespace,
-        })
+        const templateInfo = this.tinaSchema.getTemplatesForCollectable(field)
         if (templateInfo.type === 'object') {
           // FIXME: need to finish group/group-list
           return {

@@ -139,6 +139,8 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       type: field.type,
       // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
       list: field.list,
+      // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
+      parentTypename: field.parentTypename,
       ...field.field,
       label: 'Value',
       name: field.name + '.' + index,

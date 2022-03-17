@@ -37,7 +37,6 @@ import { useEvent } from '../../../react-core'
 import { FieldHoverEvent, FieldFocusEvent } from '../../field-events'
 import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
-import { BlockTypenameContext } from './TypenameContext'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -204,66 +203,60 @@ const BlockListItem = ({
   const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
 
   return (
-    <BlockTypenameContext.Provider
-      value={{ typename: field.typeMap[block._template] }}
+    <Draggable
+      key={index}
+      type={field.name}
+      draggableId={`${field.name}.${index}`}
+      index={index}
     >
-      <Draggable
-        key={index}
-        type={field.name}
-        draggableId={`${field.name}.${index}`}
-        index={index}
-      >
-        {(provider, snapshot) => (
-          <>
-            <ItemHeader
-              ref={provider.innerRef}
-              isDragging={snapshot.isDragging}
-              {...provider.draggableProps}
-              {...provider.dragHandleProps}
-            >
-              <DragHandle />
-              <ItemClickTarget
-                onClick={() => {
-                  const state = tinaForm.finalForm.getState()
-                  if (state.invalid === true) {
-                    // @ts-ignore
-                    cms.alerts.error(
-                      'Cannot navigate away from an invalid form.'
-                    )
-                    return
-                  }
-
-                  setExpanded(true)
-                  setFocusedField({ fieldName: `${field.name}.${index}` })
-                }}
-                onMouseOver={() =>
-                  setHoveredField({ fieldName: `${field.name}.${index}` })
+      {(provider, snapshot) => (
+        <>
+          <ItemHeader
+            ref={provider.innerRef}
+            isDragging={snapshot.isDragging}
+            {...provider.draggableProps}
+            {...provider.dragHandleProps}
+          >
+            <DragHandle />
+            <ItemClickTarget
+              onClick={() => {
+                const state = tinaForm.finalForm.getState()
+                if (state.invalid === true) {
+                  // @ts-ignore
+                  cms.alerts.error('Cannot navigate away from an invalid form.')
+                  return
                 }
-                onMouseOut={() => setHoveredField({ fieldName: null })}
-              >
-                <GroupLabel>{label || template.label}</GroupLabel>
-              </ItemClickTarget>
-              <ItemDeleteButton onClick={removeItem} />
-            </ItemHeader>
-            <FormPortal>
-              {({ zIndexShift }) => (
-                <Panel
-                  zIndexShift={zIndexShift}
-                  isExpanded={isExpanded}
-                  setExpanded={setExpanded}
-                  field={field}
-                  item={block}
-                  index={index}
-                  tinaForm={tinaForm}
-                  label={label || template.label}
-                  template={template}
-                />
-              )}
-            </FormPortal>
-          </>
-        )}
-      </Draggable>
-    </BlockTypenameContext.Provider>
+
+                setExpanded(true)
+                setFocusedField({ fieldName: `${field.name}.${index}` })
+              }}
+              onMouseOver={() =>
+                setHoveredField({ fieldName: `${field.name}.${index}` })
+              }
+              onMouseOut={() => setHoveredField({ fieldName: null })}
+            >
+              <GroupLabel>{label || template.label}</GroupLabel>
+            </ItemClickTarget>
+            <ItemDeleteButton onClick={removeItem} />
+          </ItemHeader>
+          <FormPortal>
+            {({ zIndexShift }) => (
+              <Panel
+                zIndexShift={zIndexShift}
+                isExpanded={isExpanded}
+                setExpanded={setExpanded}
+                field={field}
+                item={block}
+                index={index}
+                tinaForm={tinaForm}
+                label={label || template.label}
+                template={template}
+              />
+            )}
+          </FormPortal>
+        </>
+      )}
+    </Draggable>
   )
 }
 

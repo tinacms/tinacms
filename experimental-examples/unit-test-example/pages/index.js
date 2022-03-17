@@ -21,8 +21,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const query = \`#graphql
-${query}\`
+const query = \`${query}\`
 
 const events = ${JSON.stringify(eventList.current, null, 2)}
 
@@ -65,8 +64,16 @@ query {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {
       blocks {
-        ...on BlockPageBlocksHero {
-          title
+        __typename
+        ...on BlockPageBlocksFeatureList {
+          items {
+            title
+          }
+        }
+        ...on BlockPageBlocksSlideshow {
+          items {
+            title
+          }
         }
       }
     }

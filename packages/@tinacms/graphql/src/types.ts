@@ -124,6 +124,7 @@ type ScalarTypeWithNamespace = TinaField &
   TinaScalarField & {
     options?: Option[]
     namespace: string[]
+    parentTypename: string
   }
 type TinaScalarField =
   | StringField
@@ -167,11 +168,13 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
+  parentTypename: string
 }
 
 export interface RichTypeWithNamespace extends TinaField {
   type: 'rich-text'
   namespace: string[]
+  parentTypename: string
   isBody?: boolean
   templates?: (string | (Template<true> & { inline?: boolean }))[]
 }
@@ -221,6 +224,7 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   templates: (string | Template<WithNamespace>)[]
   fields?: undefined
   namespace: WithNamespace extends true ? string[] : undefined
+  parentTypename: string
 }
 
 type ObjectFields<WithNamespace extends boolean> = WithNamespace extends true
@@ -253,6 +257,7 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   fields: string | TinaFieldInner<WithNamespace>[]
   templates?: undefined
   namespace: WithNamespace extends true ? string[] : undefined
+  parentTypename: WithNamespace extends true ? string : undefined
 }
 
 /**

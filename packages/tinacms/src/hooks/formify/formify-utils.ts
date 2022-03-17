@@ -139,12 +139,12 @@ export function ensureOperationDefinition(
 export function buildPath({
   fieldNode,
   type,
-  disambiguator,
+  parentTypename,
   path,
 }: {
   fieldNode: G.FieldNode
   type: G.GraphQLOutputType
-  disambiguator?: string
+  parentTypename?: string
   path?: BlueprintPath[]
 }): BlueprintPath[] {
   const p = path || []
@@ -155,7 +155,7 @@ export function buildPath({
     {
       name: fieldNode.name.value,
       alias: fieldNode.alias ? fieldNode.alias.value : fieldNode.name.value,
-      disambiguator: disambiguator || null,
+      parentTypename: parentTypename,
       list: !!list,
       isNode: !!isNode,
     },
