@@ -80,9 +80,32 @@
           "type": "string",
           "label": "Title",
           "name": "title",
+          "list": false,
+          "ui": {},
           "namespace": [
             "post",
             "title"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Something",
+          "name": "foo",
+          "fields": [
+            {
+              "name": "bar",
+              "label": "Bar",
+              "type": "string",
+              "namespace": [
+                "post",
+                "foo",
+                "bar"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "foo"
           ]
         },
         {

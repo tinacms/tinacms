@@ -10,6 +10,10 @@ fragment PageParts on Page {
 
 fragment PostParts on Post {
   title
+  foo {
+    __typename
+    bar
+  }
   topic
   body
 }
