@@ -17,7 +17,7 @@
 
 /* if the last block has margin-bottom it makes the text box larger but some of it isn't clickable */
 .prose [data-slate-editor='true'] {
-  padding-bottom: 1em;
+  padding-bottom: 0.5em;
 }
 /* prose adds backticks, which look like they should be editable */
 .prose [data-slate-editor='true'] .slate-code::before {
@@ -40,5 +40,5 @@
 
 /* experimental floating toolbar doesn't need a large text area */
 .with-toolbar [data-slate-editor='true'] {
-  min-height: 100px;
+  min-height: 72px;
 }

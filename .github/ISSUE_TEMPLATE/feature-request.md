@@ -1,7 +1,7 @@
 ---
 name: Feature Request 💡
 about: Suggest a new idea for the project.
-labels: enhancement
+labels: enhancement, NEEDS POINTS
 ---
 
 <!--
@@ -12,12 +12,15 @@ labels: enhancement
 
 ## Summary
 
-Brief explanation of the feature.
+As a [ ...describe the who... ] I want to [ ...describe what is needed... ] so that [ ...describe the why... ]
 
-### Basic example
+### Expected Results
 
-If the proposal involves a new or changed API, include a basic code example. Omit this section if it's not applicable.
+* result 1
+* result 2
+* example output
+* UI/UX
 
-### Motivation
+### Notes
 
 Why are we doing this? What use cases does it support? What is the expected outcome?
