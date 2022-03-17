@@ -490,9 +490,9 @@ export const generateFormCreatorsUnstable = (
 ) => {
   const createForm = (formConfig) => {
     const form = new Form(formConfig)
-    // if (showInSidebar) {
-    cms.forms.add(form)
-    // }
+    if (showInSidebar) {
+      cms.forms.add(form)
+    }
     return form
   }
   const createGlobalForm: GlobalFormCreator = (
