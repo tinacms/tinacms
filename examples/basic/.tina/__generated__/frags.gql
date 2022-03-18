@@ -1,9 +1,4 @@
 fragment PageParts on Page {
-  thingOne
-  test {
-    __typename
-    asdf
-  }
   Title
   body
 }
@@ -17,6 +12,7 @@ fragment PostParts on Post {
         id
       }
     }
+    label
   }
   foo {
     __typename
