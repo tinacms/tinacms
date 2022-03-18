@@ -33,20 +33,18 @@ export class LevelStore implements Store {
     this.rootPath = rootPath || ''
     this.useMemory = useMemory
     if (useMemory) {
-      const db = levelup(encode(memdown(), { valueEncoding: 'json' }))
-      this.db = db
+      this.db = levelup(encode(memdown(), { valueEncoding: 'json' }))
     } else {
-      const db = level(path.join(rootPath, '.tina/__generated__/db'), {
+      this.db = level(path.join(rootPath, '.tina/__generated__/db'), {
         valueEncoding: 'json',
       })
-      this.db = db
     }
   }
 
   public async query(queryParams: KeyValueQueryParams) {
-    let { filterChain, sort = filepathSortKey, collection, ...query } = queryParams
+    const { filterChain, sort = filepathSortKey, collection, ...query } = queryParams
 
-    let { limit: resultLimit = 10 } = query
+    const { limit: resultLimit = 10 } = query
 
     // modify the query to fetch one more item to correctly set hasNextPage
     if (resultLimit !== -1) {
@@ -73,7 +71,7 @@ export class LevelStore implements Store {
     let hasNextPage = false
 
     const fieldsPattern = indexDefinition?.fields?.length ? `${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:` : ':'
-    let valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
+    const valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
     const itemFilter = makeFilter({
       filterChain: coerceFilterChainOperands(filterChain),
     })
@@ -194,8 +192,7 @@ export class LevelStore implements Store {
   }
   public async get(filepath: string) {
     try {
-      const content = await this.db.get(`${defaultPrefix}:${filepath}`)
-      return content
+      return await this.db.get(`${defaultPrefix}:${filepath}`)
     } catch (e) {
       return undefined
     }
@@ -222,7 +219,7 @@ export class LevelStore implements Store {
   public async put(filepath: string, data: object, options?: PutOptions ) {
     let existingData
     try {
-      existingData = !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`, data) : null
+      existingData = !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`) : null
     } catch (err) {
       if (!err.notFound) {
         throw err
@@ -231,9 +228,9 @@ export class LevelStore implements Store {
     await this.db.put(`${defaultPrefix}:${filepath}`, data)
 
     if (options?.indexDefinitions) {
-      for (let [sort, definition] of Object.entries(options.indexDefinitions)) {
+      for (const [sort, definition] of Object.entries(options.indexDefinitions)) {
         const indexedValue = this.parseValueForKey(definition, data)
-        let existingIndexedValue = existingData ? this.parseValueForKey(definition, existingData) : null
+        const existingIndexedValue = existingData ? this.parseValueForKey(definition, existingData) : null
 
         let indexKey
         let existingIndexKey = null

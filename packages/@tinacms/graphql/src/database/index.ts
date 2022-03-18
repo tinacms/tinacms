@@ -237,19 +237,22 @@ export class Database {
       const collections = schema.getCollections()
       for (const collection of collections) {
         const indexDefinitions = {}
-        for (const field of (collection.fields as TinaFieldInner<true>[])) {
-          if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
-            continue
-          }
 
-          indexDefinitions[field.name] = {
-            fields: [
-              {
-                name: field.name,
-                default: '',
-                type: field.type
-              }
-            ]
+        if (collection.fields) {
+          for (const field of (collection.fields as TinaFieldInner<true>[])) {
+            if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
+              continue
+            }
+
+            indexDefinitions[field.name] = {
+              fields: [
+                {
+                  name: field.name,
+                  default: '',
+                  type: field.type
+                }
+              ]
+            }
           }
         }
 
