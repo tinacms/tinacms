@@ -159,7 +159,6 @@ type StringField =
   | {
       type: 'string'
       isBody?: boolean
-      list?: boolean
       ui?: object | UIField<any, string>
     }
   | StringFieldInner<true>
@@ -170,17 +169,6 @@ type StringFieldInner<List extends boolean> = {
   isBody?: boolean
   list?: List
   ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
-}
-
-const bla: ScalarTypeInner = {
-  name: 'asdf',
-  type: 'string',
-  list: false,
-  ui: {
-    validate: (val) => {
-      console.log({ val })
-    },
-  },
 }
 
 type BooleanField =

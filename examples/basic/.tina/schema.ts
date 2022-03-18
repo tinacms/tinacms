@@ -73,10 +73,26 @@ const schema = defineSchema({
           type: 'string',
           label: 'Title',
           name: 'title',
-          list: false,
+        },
+        {
+          type: 'object',
+          label: 'Related Posts',
+          name: 'posts',
+          list: true,
           ui: {
-            validate: (vals) => {},
+            itemProps: (item: any) => {
+              if (typeof item.id === 'string') {
+                return { label: item.post }
+              }
+            },
           },
+          fields: [
+            {
+              name: 'post',
+              type: 'reference',
+              collections: ['post'],
+            },
+          ],
         },
         {
           type: 'object',

@@ -126,6 +126,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
         {optionSets.length > 0 &&
           optionSets.map(({ collection, edges }: OptionSet) => (
             <optgroup key={`${collection}-group`} label={collection}>
+              <option value={''}>Choose an option</option>
               {edges.map(({ node: { id } }) => (
                 <option key={`${id}-option`} value={id}>
                   {id}
