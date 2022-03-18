@@ -15,9 +15,12 @@ import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
-import { MemoryStore } from '@tinacms/datalayer'
+import { LevelStore } from '@tinacms/datalayer'
 
-class FilesystemStoreTest extends MemoryStore {
+class FilesystemStoreTest extends LevelStore {
+  constructor(rootPath: string, useMemory: boolean = false) {
+    super(rootPath, useMemory)
+  }
   public supportsSeeding() {
     return true
   }
@@ -26,7 +29,7 @@ class FilesystemStoreTest extends MemoryStore {
   }
 }
 
-const store = new FilesystemStoreTest(rootPath)
+const store = new FilesystemStoreTest(rootPath, true)
 
 const fixtures: Fixture[] = [
   {
