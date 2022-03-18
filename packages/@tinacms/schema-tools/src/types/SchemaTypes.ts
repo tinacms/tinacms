@@ -159,6 +159,7 @@ type StringField =
   | {
       type: 'string'
       isBody?: boolean
+      list?: boolean
       ui?: object | UIField<any, string>
     }
   | StringFieldInner<true>
