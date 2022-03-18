@@ -48,11 +48,11 @@ const schema = defineSchema({
             // component: ({ form, field, input }) => {
             //   return <input {...input}></input>
             // },
-            // validate: (val) => {
-            //   if (val?.length > 5) {
-            //     return 'Too Long!!!'
-            //   }
-            // },
+            validate: (val) => {
+              if (val?.length > 5) {
+                return 'Too Long!!!'
+              }
+            },
           },
         },
         {
