@@ -363,7 +363,11 @@ export default defineSchema({
               label: "Nav Links",
               name: "nav",
               list: true,
+
               ui: {
+                itemProps: (item) => {
+                  return { label: item.label };
+                },
                 defaultItem: {
                   href: "home",
                   label: "Home",
