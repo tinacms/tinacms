@@ -80,11 +80,34 @@
           "type": "string",
           "label": "Title",
           "name": "title",
-          "list": false,
-          "ui": {},
           "namespace": [
             "post",
             "title"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Related Posts",
+          "name": "posts",
+          "list": true,
+          "ui": {},
+          "fields": [
+            {
+              "name": "post",
+              "type": "reference",
+              "collections": [
+                "post"
+              ],
+              "namespace": [
+                "post",
+                "posts",
+                "post"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "posts"
           ]
         },
         {

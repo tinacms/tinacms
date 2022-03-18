@@ -10,6 +10,14 @@ fragment PageParts on Page {
 
 fragment PostParts on Post {
   title
+  posts {
+    __typename
+    post {
+      ... on Document {
+        id
+      }
+    }
+  }
   foo {
     __typename
     bar

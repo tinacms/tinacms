@@ -29,12 +29,6 @@ const featureBlockSchema: TinaTemplate = {
           type: "string",
           label: "Title",
           name: "title",
-          list: true,
-          ui: {
-            validate: (val) => {
-              val;
-            },
-          },
         },
         {
           type: "string",
