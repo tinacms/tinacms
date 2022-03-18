@@ -27,7 +27,7 @@ import type {
   TinaCloudCollection,
   TinaFieldEnriched,
 } from '../types'
-import {TinaFieldInner} from '../types'
+import {Template, TinaFieldInner} from '../types'
 import {TinaError} from './error'
 import {FilterCondition, makeFilterChain} from '@tinacms/datalayer'
 import {collectConditionsForField, resolveReferences} from './filter-utils'
@@ -551,6 +551,31 @@ export class Resolver {
     return {edges, values}
   }
 
+  private async resolveFilterConditions(filter: Record<string, Record<string, object>>, fields: TinaFieldInner<false>[], collectionName) {
+    const conditions: FilterCondition[] = []
+    const conditionCollector = (condition: FilterCondition) => {
+      if (!condition.filterPath) {
+        throw new Error('Error parsing filter - unable to generate filterPath')
+      }
+      if (!condition.filterExpression) {
+        throw new Error(`Error parsing filter - missing expression for ${condition.filterPath}`)
+      }
+      conditions.push(condition)
+    }
+
+    await resolveReferences(filter, fields, this.referenceResolver)
+
+    for (const fieldName of Object.keys(filter)) {
+      const field = (fields as any[]).find(field => field.name === fieldName) as any
+      if (!field) {
+        throw new Error(`${fieldName} not found in collection ${collectionName}`)
+      }
+      collectConditionsForField(fieldName, field, filter[fieldName], '', conditionCollector)
+    }
+
+    return conditions
+  }
+
   public resolveCollectionConnection = async ({
     args,
     collection,
@@ -564,32 +589,26 @@ export class Resolver {
     let pageInfo
 
     if (args.filter || args.sort) {
-      const conditions: FilterCondition[] = []
+      let conditions: FilterCondition[]
       if (args.filter) {
-        await resolveReferences(args.filter, collection.fields as TinaFieldInner<false>[], this.referenceResolver)
+        if (collection.fields) {
+          conditions = await this.resolveFilterConditions(args.filter as Record<string,Record<string,object>>, collection.fields as TinaFieldInner<false>[], collection.name)
+        } else if (collection.templates) {
+          for (const templateName of Object.keys(args.filter)) {
+            const template = (collection.templates as Template<false>[]).find(template => template.name === templateName)
 
-        const conditionCollector = (condition: FilterCondition) => {
-          if (!condition.filterPath) {
-            throw new Error('Error parsing filter - unable to generate filterPath')
+            if (template) {
+              conditions = await this.resolveFilterConditions(args.filter[templateName], template.fields as TinaFieldInner<false>[], `${collection.name}.${templateName}`)
+            } else {
+              throw new Error(`Error template not found: ${templateName} in collection ${collection.name}`)
+            }
           }
-          if (!condition.filterExpression) {
-            throw new Error(`Error parsing filter - missing expression for ${condition.filterPath}`)
-          }
-          conditions.push(condition)
-        }
-
-        for (const fieldName of Object.keys(args.filter)) {
-          const field = (collection.fields as any[]).find(field => field.name === fieldName) as any
-          if (!field) {
-            throw new Error(`${fieldName} not found in collection ${collection.name}`)
-          }
-          collectConditionsForField(fieldName, field, args.filter[fieldName], '', conditionCollector)
         }
       }
 
       const queryParams = {
         filterChain: makeFilterChain({
-          conditions
+          conditions: conditions || []
         }),
         collection: collection.name,
         sort: args.sort as string,
@@ -622,6 +641,8 @@ export class Resolver {
       }
     }
   }
+
+
 
   private buildFieldMutations = (
     fieldParams: FieldParams,
