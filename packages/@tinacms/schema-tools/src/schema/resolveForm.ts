@@ -15,7 +15,7 @@ import { sequential } from '../util'
 import { resolveField } from './resolveField'
 import type { ResolveFormArgs } from '../types'
 
-export const resolveForm = async ({
+export const resolveForm = ({
   collection,
   basename,
   template,
@@ -25,7 +25,7 @@ export const resolveForm = async ({
     id: basename,
     label: collection.label,
     name: basename,
-    fields: await sequential(template.fields, async (field) => {
+    fields: template.fields.map((field) => {
       return resolveField(field, schema)
     }),
   }

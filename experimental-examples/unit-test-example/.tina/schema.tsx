@@ -1,6 +1,6 @@
-import { defineSchema } from '@tinacms/cli'
+import { defineSchema, defineConfig } from 'tinacms'
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       label: 'Post',
@@ -174,12 +174,20 @@ export default defineSchema({
                   label: 'Features',
                   name: 'items',
                   type: 'object',
+                  ui: {
+                    component: (props) => {
+                      return <div>Hi</div>
+                    },
+                  },
                   list: true,
                   fields: [
                     {
                       label: 'Title',
                       name: 'title',
                       type: 'string',
+                      ui: {
+                        defaultValue: 'Okok',
+                      },
                     },
                     {
                       label: 'description',
@@ -225,3 +233,22 @@ export default defineSchema({
     },
   ],
 })
+
+const branch = 'main'
+// When working locally, hit our local filesystem.
+// On a Vercel deployment, hit the Tina Cloud API
+const apiURL =
+  process.env.NODE_ENV == 'development'
+    ? 'http://localhost:4001/graphql'
+    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
+
+export const tinaConfig = defineConfig({
+  apiURL,
+  cmsCallback: (cms) => {
+    cms.flags.set('tina-admin', true)
+    cms.flags.set('use-unstable-formify', true)
+    return cms
+  },
+})
+
+export default schema

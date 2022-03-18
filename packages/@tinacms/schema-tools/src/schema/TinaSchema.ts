@@ -102,7 +102,7 @@ export class TinaSchema {
     }
     return globalTemplate
   }
-  public getCollectionByFullPath = async (filepath: string) => {
+  public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
       return filepath.replace('\\', '/').startsWith(collection.path)
     })
@@ -155,13 +155,13 @@ export class TinaSchema {
 
     return { collection: collection, template: template }
   }
-  public getTemplateForData = async ({
+  public getTemplateForData = ({
     data,
     collection,
   }: {
     data?: unknown
     collection: Collectable
-  }): Promise<Templateable> => {
+  }): Templateable => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':

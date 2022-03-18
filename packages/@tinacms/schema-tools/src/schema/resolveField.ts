@@ -15,11 +15,14 @@ import { TinaFieldEnriched } from '../types'
 import { TinaSchema } from './TinaSchema'
 import { sequential, lastItem, NAMER } from '../util'
 
-export const resolveField = async (
+export const resolveField = (
   { namespace, ...field }: TinaFieldEnriched,
   schema: TinaSchema
-): Promise<unknown> => {
+): unknown => {
   const extraFields = field.ui || {}
+  field.parentTypename = NAMER.dataTypeName(
+    namespace.filter((_, i) => i < namespace.length - 1)
+  )
   switch (field.type) {
     case 'number':
       return {
@@ -90,16 +93,15 @@ export const resolveField = async (
         return {
           ...field,
           component: field.list ? 'group-list' : 'group',
-          fields: await sequential(
-            templateInfo.template.fields,
-            async (field) => await resolveField(field, schema)
-          ),
+          fields: templateInfo.template.fields.map((field) => {
+            return resolveField(field, schema)
+          }),
           ...extraFields,
         }
       } else if (templateInfo.type === 'union') {
         const templates: { [key: string]: object } = {}
         const typeMap: { [key: string]: string } = {}
-        await sequential(templateInfo.templates, async (template) => {
+        templateInfo.templates.forEach((template) => {
           const extraFields = template.ui || {}
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
@@ -107,10 +109,13 @@ export const resolveField = async (
             // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
-            fields: await sequential(
-              template.fields,
-              async (field) => await resolveField(field, schema)
-            ),
+            fields: template.fields.map((field) => {
+              return resolveField(field, schema)
+            }),
+            // fields: await sequential(
+            //   template.fields,
+            //   async (field) => await resolveField(field, schema)
+            // ),
             ...extraFields,
           }
           return true
@@ -128,7 +133,7 @@ export const resolveField = async (
     case 'rich-text':
       const templates: { [key: string]: object } = {}
       const typeMap: { [key: string]: string } = {}
-      await sequential(field.templates, async (template) => {
+      field?.templates?.forEach((template) => {
         if (typeof template === 'string') {
           throw new Error(`Global templates not yet supported for rich-text`)
         } else {
@@ -144,10 +149,13 @@ export const resolveField = async (
             key: templateName,
             inline: template.inline,
             name: templateName,
-            fields: await sequential(
-              template.fields,
-              async (field) => await resolveField(field, schema)
-            ),
+            fields: template.fields.map((field) => {
+              return resolveField(field, schema)
+            }),
+            // fields: await sequential(
+            //   template.fields,
+            //   async (field) => await resolveField(field, schema)
+            // ),
             ...extraFields,
           }
           return true

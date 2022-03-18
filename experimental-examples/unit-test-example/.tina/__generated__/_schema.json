@@ -325,12 +325,16 @@
                   "label": "Features",
                   "name": "items",
                   "type": "object",
+                  "ui": {},
                   "list": true,
                   "fields": [
                     {
                       "label": "Title",
                       "name": "title",
                       "type": "string",
+                      "ui": {
+                        "defaultValue": "Okok"
+                      },
                       "namespace": [
                         "blockPage",
                         "blocks",

@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Form, Field, TinaCMS } from '@tinacms/toolkit'
+import { Form, Field, FormOptions, TinaCMS, AnyField } from '@tinacms/toolkit'
 import { getIn } from 'final-form'
 
 import type {
@@ -24,6 +24,7 @@ import type {
   ChangeSet,
   BlueprintPath,
 } from './types'
+import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 import {
   generateFormCreatorsUnstable,
@@ -171,13 +172,11 @@ export const buildForm = (
   if (skipped) return
 
   const id = doc._internalSys.path
-  const formConfig = {
+  const formCommon = {
     id,
-    ...doc.form,
     label: doc.form.label,
     initialValues: doc.values,
     onSubmit: async (payload) => {
-      console.log(doc)
       try {
         const params = transformDocumentIntoMutationRequestPayload(
           payload,
@@ -208,6 +207,38 @@ export const buildForm = (
       }
     },
   }
+  let formConfig = {} as FormOptions<any, AnyField>
+
+  if (cms.api.tina.schema) {
+    const enrichedSchema: TinaSchema = cms.api.tina.schema
+    const collection = enrichedSchema.getCollection(
+      doc._internalSys.collection.name
+    )
+    const template = enrichedSchema.getTemplateForData({
+      collection,
+      data: doc.values,
+    })
+    const formInfo = resolveForm({
+      collection,
+      basename: collection.name,
+      schema: enrichedSchema,
+      template,
+    })
+    console.log('usit', formInfo)
+    formConfig = {
+      label: formInfo.label,
+      // TODO: return correct type
+      fields: formInfo.fields as any,
+      ...formCommon,
+    }
+  } else {
+    formConfig = {
+      label: doc.form.label,
+      fields: doc.form.fields,
+      ...formCommon,
+    }
+  }
+
   if (formify) {
     form = formify(
       {
