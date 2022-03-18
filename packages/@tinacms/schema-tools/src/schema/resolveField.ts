@@ -57,6 +57,8 @@ export const resolveField = (
       }
     case 'string':
       if (field.options) {
+        // TODO: correct the type
+        // @ts-ignore
         if (field.list) {
           return {
             component: 'checkbox-group',
@@ -72,6 +74,8 @@ export const resolveField = (
           options: [{ label: `Choose an option`, value: '' }, ...field.options],
         }
       }
+      // TODO: correct the type
+      // @ts-ignore
       if (field.list) {
         return {
           // Allows component to be overridden for scalars
