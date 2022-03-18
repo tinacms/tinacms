@@ -7,6 +7,20 @@ const query = `query getPost($relativePath: String!) {
     data {
       title
       body
+      posts {
+        __typename
+        ... on PostPosts {
+          post {
+            __typename
+            ... on PostDocument {
+              data {
+                title
+                body
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
