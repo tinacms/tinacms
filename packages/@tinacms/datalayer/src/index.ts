@@ -22,7 +22,7 @@ export {
 export { LevelStore } from './database/store/level'
 export type { Store, QueryParams, IndexDefinition, TernaryFilter, BinaryFilter } from './database/store'
 export { makeFilterChain, OP } from './database/store'
-export type { FilterCondition, KeyValueQueryParams } from './database/store'
+export type { FilterCondition, KeyValueQueryParams, SeedOptions, PutOptions } from './database/store'
 
 export type FilterOperand = string | number | boolean | string[] | number[]
 
