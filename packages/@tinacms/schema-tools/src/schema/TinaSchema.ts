@@ -155,13 +155,13 @@ export class TinaSchema {
 
     return { collection: collection, template: template }
   }
-  public getTemplateForData = async ({
+  public getTemplateForData = ({
     data,
     collection,
   }: {
     data?: unknown
     collection: Collectable
-  }): Promise<Templateable> => {
+  }): Templateable => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':

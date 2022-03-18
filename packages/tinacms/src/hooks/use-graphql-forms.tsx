@@ -199,7 +199,7 @@ export function useGraphqlForms<T extends object>({
         setData(payload)
         setInitialData(payload)
         setIsLoading(false)
-        Object.entries(payload).map(async ([queryName, result]) => {
+        Object.entries(payload).map(([queryName, result]) => {
           formIds.push(queryName)
           const canBeFormified = safeAssertShape<{
             form: { mutationInfo: string }
@@ -278,11 +278,11 @@ export function useGraphqlForms<T extends object>({
             const collection = enrichedSchema.getCollection(
               result._internalSys.collection.name
             )
-            const template = await enrichedSchema.getTemplateForData({
+            const template = enrichedSchema.getTemplateForData({
               collection,
               data: result.values,
             })
-            const formInfo = await resolveForm({
+            const formInfo = resolveForm({
               collection,
               basename: collection.name,
               schema: enrichedSchema,
