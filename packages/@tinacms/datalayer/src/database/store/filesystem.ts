@@ -20,65 +20,65 @@ import { stringifyFile, parseFile } from '../util'
 import { sequential } from '../../util'
 
 export class FilesystemStore implements Store {
-    rootPath: string
-    public async clear() {}
-    public async print() {}
-    constructor({ rootPath }: { rootPath?: string }) {
-        this.rootPath = rootPath || ''
-    }
-    public async query(queryParams: KeyValueQueryParams): Promise<object[]> {
-        throw new Error(`Unable to perform query for Filesystem store`)
-    }
-    public async seed() {
-        throw new Error(`Seeding data is not possible for Filesystem store`)
-    }
+  rootPath: string
+  public async clear() {}
+  public async print() {}
+  constructor({ rootPath }: { rootPath?: string }) {
+    this.rootPath = rootPath || ''
+  }
+  public async query(queryParams: KeyValueQueryParams): Promise<object[]> {
+    throw new Error(`Unable to perform query for Filesystem store`)
+  }
+  public async seed() {
+    throw new Error(`Seeding data is not possible for Filesystem store`)
+  }
 
-    public async get<T extends object>(filepath: string): Promise<T> {
-        return parseFile(
-            await fs.readFileSync(path.join(this.rootPath, filepath)).toString(),
-            path.extname(filepath),
-            (yup) => yup.object()
-        )
-    }
+  public async get<T extends object>(filepath: string): Promise<T> {
+    return parseFile(
+      await fs.readFileSync(path.join(this.rootPath, filepath)).toString(),
+      path.extname(filepath),
+      (yup) => yup.object()
+    )
+  }
 
-    public supportsSeeding() {
-        return false
+  public supportsSeeding() {
+    return false
+  }
+  public supportsIndexing() {
+    return false
+  }
+  public async glob(pattern: string, callback) {
+    const basePath = path.join(this.rootPath, ...pattern.split('/'))
+    const itemsRaw = await fg(
+      path.join(basePath, '**', '/*').replace(/\\/g, '/'),
+      {
+        dot: true,
+      }
+    )
+    const posixRootPath = normalize(this.rootPath)
+    const items = itemsRaw.map((item) => {
+      return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
+    })
+    if (callback) {
+      return sequential(items, async (item) => {
+        return callback(item)
+      })
+    } else {
+      return items
     }
-    public supportsIndexing() {
-        return false
-    }
-    public async glob(pattern: string, callback) {
-        const basePath = path.join(this.rootPath, ...pattern.split('/'))
-        const itemsRaw = await fg(
-            path.join(basePath, '**', '/*').replace(/\\/g, '/'),
-            {
-                dot: true,
-            }
-        )
-        const posixRootPath = normalize(this.rootPath)
-        const items = itemsRaw.map((item) => {
-            return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
-        })
-        if (callback) {
-            return sequential(items, async (item) => {
-                return callback(item)
-            })
-        } else {
-            return items
-        }
-    }
-    public async put(filepath: string, data: object, options?: PutOptions) {
-        await fs.outputFileSync(
-            path.join(this.rootPath, filepath),
-            stringifyFile(data, path.extname(filepath), options.keepTemplateKey)
-        )
-    }
-    public async open() {}
-    public async close() {}
+  }
+  public async put(filepath: string, data: object, options?: PutOptions) {
+    await fs.outputFileSync(
+      path.join(this.rootPath, filepath),
+      stringifyFile(data, path.extname(filepath), options.keepTemplateKey)
+    )
+  }
+  public async open() {}
+  public async close() {}
 }
 
 export class AuditFilesystemStore extends FilesystemStore {
-    public async put(_filepath: string, _data: object) {
-        return
-    }
+  public async put(_filepath: string, _data: object) {
+    return
+  }
 }
