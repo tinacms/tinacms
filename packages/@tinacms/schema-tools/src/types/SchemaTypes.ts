@@ -280,7 +280,8 @@ interface ObjectTemplatesInnerWithList<WithNamespace extends boolean>
   ui?:
     | object
     | ({
-        itemProps?(item: object): {
+        // TODO: we could Type item based on fields or templates? (might be hard)
+        itemProps?(item: Record<string, any>): {
           key?: string
           label?: string
         }
