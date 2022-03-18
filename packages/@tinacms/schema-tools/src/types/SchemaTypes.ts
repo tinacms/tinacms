@@ -30,7 +30,7 @@ export type UIField<F extends UIField = any, Shape = any> = {
     allValues: any,
     meta: any,
     field: UIField<F, Shape>
-  ): string | object | undefined | null
+  ): string | object | undefined | void
   defaultValue?: Shape
   // fields?: F[]
 }
