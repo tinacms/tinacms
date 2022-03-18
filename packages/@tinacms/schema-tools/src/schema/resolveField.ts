@@ -15,6 +15,15 @@ import { TinaFieldEnriched } from '../types'
 import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
+/**
+ *
+ * Turns a field the schema (schema.{js,ts} file) into a valid front end FieldConfig
+ *
+ *
+ * @param  {TinaFieldEnriched} field. The field that will be transformed
+ * @param  {TinaSchema} schema the entireT Tina Schema
+ * @returns unknown
+ */
 export const resolveField = (
   { namespace, ...field }: TinaFieldEnriched,
   schema: TinaSchema
@@ -93,31 +102,11 @@ export const resolveField = (
           fields: templateInfo.template.fields.map((field) =>
             resolveField(field, schema)
           ),
-          // fields: await sequential(
-          //   templateInfo.template.fields,
-          //   async (field) => await resolveField(field, schema)
-          // ),
           ...extraFields,
         }
       } else if (templateInfo.type === 'union') {
         const templates: { [key: string]: object } = {}
         const typeMap: { [key: string]: string } = {}
-        // await sequential(templateInfo.templates, async (template) => {
-        //   const extraFields = template.ui || {}
-        //   const templateName = lastItem(template.namespace)
-        //   typeMap[templateName] = NAMER.dataTypeName(template.namespace)
-        //   templates[lastItem(template.namespace)] = {
-        //     // @ts-ignore FIXME `Templateable` should have name and label properties
-        //     label: template.label || templateName,
-        //     key: templateName,
-        //     fields: await sequential(
-        //       template.fields,
-        //       async (field) => await resolveField(field, schema)
-        //     ),
-        //     ...extraFields,
-        //   }
-        //   return true
-        // })
         templateInfo.templates.forEach((template) => {
           const extraFields = template.ui || {}
           const templateName = lastItem(template.namespace)
@@ -126,10 +115,6 @@ export const resolveField = (
             // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
-            // fields: await sequential(
-            //   template.fields,
-            //   async (field) => await resolveField(field, schema)
-            // ),
             fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }
@@ -149,31 +134,6 @@ export const resolveField = (
     case 'rich-text':
       const templates: { [key: string]: object } = {}
       const typeMap: { [key: string]: string } = {}
-      // await sequential(field.templates, async (template) => {
-      //   if (typeof template === 'string') {
-      //     throw new Error(`Global templates not yet supported for rich-text`)
-      //   } else {
-      //     const extraFields = template.ui || {}
-      //     // console.log({ namespace: template.namespace })
-
-      //     // template.namespace is undefined
-      //     const templateName = lastItem(template.namespace)
-      //     typeMap[templateName] = NAMER.dataTypeName(template.namespace)
-      //     templates[lastItem(template.namespace)] = {
-      //       // @ts-ignore FIXME `Templateable` should have name and label properties
-      //       label: template.label || templateName,
-      //       key: templateName,
-      //       inline: template.inline,
-      //       name: templateName,
-      //       fields: await sequential(
-      //         template.fields,
-      //         async (field) => await resolveField(field, schema)
-      //       ),
-      //       ...extraFields,
-      //     }
-      //     return true
-      //   }
-      // })
       field.templates?.forEach((template) => {
         if (typeof template === 'string') {
           throw new Error(`Global templates not yet supported for rich-text`)
@@ -210,7 +170,6 @@ export const resolveField = (
       return {
         ...field,
         component: 'reference',
-        //   TODO: This is where we can pass args to reference
         ...extraFields,
       }
     default:

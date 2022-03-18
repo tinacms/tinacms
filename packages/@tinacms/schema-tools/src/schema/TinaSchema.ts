@@ -36,9 +36,16 @@ type Meta = {
 /**
  * TinaSchema is responsible for allowing you to look up certain
  * properties of the user-provided schema with ease.
+ *
  */
 export class TinaSchema {
   public schema: TinaCloudSchemaEnriched
+  /**
+   *
+   * Create a schema class from a user defined schema object
+   *
+   * @param  {{version?:Version;meta?:Meta}&TinaCloudSchemaBase} config
+   */
   constructor(
     public config: { version?: Version; meta?: Meta } & TinaCloudSchemaBase
   ) {
@@ -180,13 +187,6 @@ export class TinaSchema {
             `Expected to find template named '${
               data._template
             }' for collection '${lastItem(collection.namespace)}'`
-            // {
-            //   collection: lastItem(collection.namespace),
-            //   possibleTemplates: templateInfo.templates.map((template) =>
-            //     lastItem(template.namespace)
-            //   ),
-            //   data: data,
-            // }
           )
         }
         return template

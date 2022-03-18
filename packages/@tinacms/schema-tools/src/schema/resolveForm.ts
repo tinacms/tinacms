@@ -14,6 +14,9 @@ limitations under the License.
 import { resolveField } from './resolveField'
 import type { ResolveFormArgs } from '../types'
 
+/**
+ *  Given a collection, basename, template and schema. This will transform the given information into a valid frontend form config
+ */
 export const resolveForm = ({
   collection,
   basename,
@@ -24,9 +27,6 @@ export const resolveForm = ({
     id: basename,
     label: collection.label,
     name: basename,
-    // fields: await sequential(template.fields, async (field) => {
-    //   return resolveField(field, schema)
-    // }),
     fields: template.fields.map((field) => {
       return resolveField(field, schema)
     }),
