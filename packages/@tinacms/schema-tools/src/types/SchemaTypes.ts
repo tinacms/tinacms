@@ -17,9 +17,10 @@ type ArrayBasedOnGeneric<T, List extends boolean = false> = List extends false
   ? T
   : T[]
 export type UIField<F extends UIField = any, Shape = any> = {
-  name?: string
+  // name?: string
   label?: string
   description?: string
+  // TODO type component
   component?: FC<any> | string | null
   // inlineComponent?: FC<any>
   parse?: (value: Shape, name: string, field: F) => any
@@ -28,7 +29,7 @@ export type UIField<F extends UIField = any, Shape = any> = {
     value: Shape,
     allValues: any,
     meta: any,
-    field: UIField
+    field: UIField<F, Shape>
   ): string | object | undefined
   defaultValue?: Shape
   // fields?: F[]
