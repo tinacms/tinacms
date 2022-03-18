@@ -13,9 +13,7 @@ limitations under the License.
 
 import { TinaSchema } from '../schema'
 import type { FC } from 'react'
-type ArrayBasedOnGeneric<T, List extends boolean = false> = List extends false
-  ? T
-  : T[]
+
 export type UIField<F extends UIField = any, Shape = any> = {
   // name?: string
   label?: string
