@@ -21,38 +21,30 @@ const schema = defineSchema({
       label: 'Page',
       format: 'mdx',
       fields: [
-        {
-          name: 'thingOne',
-          type: 'string',
-        },
-        {
-          type: 'object',
-          label: 'Test',
-          name: 'test',
-          fields: [
-            {
-              label: 'Asdf',
-              name: 'asdf',
-              type: 'number',
-              required: true,
-            },
-          ],
-        },
+        // {
+        //   name: 'thingOne',
+        //   type: 'string',
+        // },
         {
           label: 'Title',
           name: 'Title',
           type: 'string',
           ui: {
-            defaultValue: 'Title',
+            // defaultValue: 'Title',
             // Examples of how you COULD use a custom form
-            // component: ({ form, field, input }) => {
-            //   return <input {...input}></input>
-            // },
-            validate: (val) => {
-              if (val?.length > 5) {
-                return 'Too Long!!!'
-              }
+            component: ({ form, field, input }) => {
+              return (
+                <div>
+                  <label>This is a test</label>
+                  <input {...input}></input>
+                </div>
+              )
             },
+            // validate: (val) => {
+            //   if (val?.length > 5) {
+            //     return 'Too Long!!!'
+            //   }
+            // },
           },
         },
         {
@@ -80,10 +72,8 @@ const schema = defineSchema({
           name: 'posts',
           list: true,
           ui: {
-            itemProps: (item: any) => {
-              if (typeof item.id === 'string') {
-                return { label: item.post }
-              }
+            itemProps: (item) => {
+              return { label: item?.label }
             },
           },
           fields: [
@@ -91,6 +81,10 @@ const schema = defineSchema({
               name: 'post',
               type: 'reference',
               collections: ['post'],
+            },
+            {
+              name: 'label',
+              type: 'string',
             },
           ],
         },
@@ -175,12 +169,13 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
-export const tinaConfig = defineConfig({
+export const tinaConfig = {
+  schema,
   apiURL,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
     return cms
   },
-})
+}
 
 export default schema

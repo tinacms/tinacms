@@ -94,7 +94,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
     }
 
     if (cms && collections.length > 0) {
-      setTimeout(() => fetchOptionSets(), 5000)
+      fetchOptionSets()
     } else {
       setOptionSets([])
     }
@@ -123,10 +123,10 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
         className={selectFieldClasses}
         {...input}
       >
+        <option value={''}>Choose an option</option>
         {optionSets.length > 0 &&
           optionSets.map(({ collection, edges }: OptionSet) => (
             <optgroup key={`${collection}-group`} label={collection}>
-              <option value={''}>Choose an option</option>
               {edges.map(({ node: { id } }) => (
                 <option key={`${id}-option`} value={id}>
                   {id}
