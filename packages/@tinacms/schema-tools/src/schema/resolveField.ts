@@ -13,12 +13,12 @@ limitations under the License.
 
 import { TinaFieldEnriched } from '../types'
 import { TinaSchema } from './TinaSchema'
-import { sequential, lastItem, NAMER } from '../util'
+import { lastItem, NAMER } from '../util'
 
-export const resolveField = async (
+export const resolveField = (
   { namespace, ...field }: TinaFieldEnriched,
   schema: TinaSchema
-): Promise<unknown> => {
+): unknown => {
   const extraFields = field.ui || {}
   switch (field.type) {
     case 'number':
@@ -90,16 +90,35 @@ export const resolveField = async (
         return {
           ...field,
           component: field.list ? 'group-list' : 'group',
-          fields: await sequential(
-            templateInfo.template.fields,
-            async (field) => await resolveField(field, schema)
+          fields: templateInfo.template.fields.map((field) =>
+            resolveField(field, schema)
           ),
+          // fields: await sequential(
+          //   templateInfo.template.fields,
+          //   async (field) => await resolveField(field, schema)
+          // ),
           ...extraFields,
         }
       } else if (templateInfo.type === 'union') {
         const templates: { [key: string]: object } = {}
         const typeMap: { [key: string]: string } = {}
-        await sequential(templateInfo.templates, async (template) => {
+        // await sequential(templateInfo.templates, async (template) => {
+        //   const extraFields = template.ui || {}
+        //   const templateName = lastItem(template.namespace)
+        //   typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+        //   templates[lastItem(template.namespace)] = {
+        //     // @ts-ignore FIXME `Templateable` should have name and label properties
+        //     label: template.label || templateName,
+        //     key: templateName,
+        //     fields: await sequential(
+        //       template.fields,
+        //       async (field) => await resolveField(field, schema)
+        //     ),
+        //     ...extraFields,
+        //   }
+        //   return true
+        // })
+        templateInfo.templates.forEach((template) => {
           const extraFields = template.ui || {}
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
@@ -107,14 +126,16 @@ export const resolveField = async (
             // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
-            fields: await sequential(
-              template.fields,
-              async (field) => await resolveField(field, schema)
-            ),
+            // fields: await sequential(
+            //   template.fields,
+            //   async (field) => await resolveField(field, schema)
+            // ),
+            fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }
           return true
         })
+
         return {
           ...field,
           typeMap,
@@ -128,7 +149,32 @@ export const resolveField = async (
     case 'rich-text':
       const templates: { [key: string]: object } = {}
       const typeMap: { [key: string]: string } = {}
-      await sequential(field.templates, async (template) => {
+      // await sequential(field.templates, async (template) => {
+      //   if (typeof template === 'string') {
+      //     throw new Error(`Global templates not yet supported for rich-text`)
+      //   } else {
+      //     const extraFields = template.ui || {}
+      //     // console.log({ namespace: template.namespace })
+
+      //     // template.namespace is undefined
+      //     const templateName = lastItem(template.namespace)
+      //     typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+      //     templates[lastItem(template.namespace)] = {
+      //       // @ts-ignore FIXME `Templateable` should have name and label properties
+      //       label: template.label || templateName,
+      //       key: templateName,
+      //       inline: template.inline,
+      //       name: templateName,
+      //       fields: await sequential(
+      //         template.fields,
+      //         async (field) => await resolveField(field, schema)
+      //       ),
+      //       ...extraFields,
+      //     }
+      //     return true
+      //   }
+      // })
+      field.templates?.forEach((template) => {
         if (typeof template === 'string') {
           throw new Error(`Global templates not yet supported for rich-text`)
         } else {
@@ -144,10 +190,11 @@ export const resolveField = async (
             key: templateName,
             inline: template.inline,
             name: templateName,
-            fields: await sequential(
-              template.fields,
-              async (field) => await resolveField(field, schema)
-            ),
+            // fields: await sequential(
+            //   template.fields,
+            //   async (field) => await resolveField(field, schema)
+            // ),
+            fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }
           return true
@@ -160,26 +207,10 @@ export const resolveField = async (
         ...extraFields,
       }
     case 'reference':
-      // const documents = _.flatten(
-      //   await sequential(field.collections, async (collectionName) => {
-      //     const collection = schema.getCollection(collectionName)
-      //     return this.database.store.glob(collection.path)
-      //   })
-      // )
-
       return {
         ...field,
         component: 'reference',
         //   TODO: This is where we can pass args to reference
-        //   options: [
-        // { label: 'Choose an option', value: '' },
-        // ...documents.map((document) => {
-        //   return {
-        //     value: document,
-        //     label: document,
-        //   }
-        // }),
-        //   ],
         ...extraFields,
       }
     default:
