@@ -301,6 +301,9 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          ui: {
+            validate: (val) => {},
+          },
           // ui: {
           //   validate: (val) => {
           //     console.log({ val });
@@ -541,6 +544,7 @@ export default defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          ui: {},
         },
         {
           type: "string",

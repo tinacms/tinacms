@@ -30,7 +30,7 @@ export type UIField<F extends UIField = any, Shape = any> = {
     allValues: any,
     meta: any,
     field: UIField<F, Shape>
-  ): string | object | undefined
+  ): string | object | undefined | null
   defaultValue?: Shape
   // fields?: F[]
 }
@@ -160,76 +160,67 @@ type StringField =
   | {
       type: 'string'
       isBody?: boolean
-      ui?: object | UIField<any, string>
+      list?: false
+      ui?: UIField<any, string>
     }
-  | StringFieldInner<true>
-  | StringFieldInner<false>
-
-type StringFieldInner<List extends boolean> = {
-  type: 'string'
-  isBody?: boolean
-  list?: List
-  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
-}
+  | {
+      type: 'string'
+      isBody?: boolean
+      list: true
+      ui?: UIField<any, string[]>
+    }
 
 type BooleanField =
   | {
       type: 'boolean'
+      list?: false
       ui?: object | UIField<any, boolean>
     }
-  | BooleanFieldInner<false>
-  | BooleanFieldInner<true>
-
-type BooleanFieldInner<List extends boolean> = {
-  type: 'boolean'
-  list?: List
-  ui?: object | UIField<any, ArrayBasedOnGeneric<boolean, List>>
-}
+  | {
+      type: 'boolean'
+      list: true
+      ui?: object | UIField<any, boolean[]>
+    }
 
 type NumberField =
   | {
       type: 'number'
+      list?: false
       ui?: object | UIField<any, number>
     }
-  | NumberFieldInner<true>
-  | NumberFieldInner<false>
-
-type NumberFieldInner<List extends boolean> = {
-  type: 'number'
-  list?: List
-  ui?: object | UIField<any, ArrayBasedOnGeneric<number, List>>
-}
+  | {
+      type: 'number'
+      list: true
+      ui?: object | UIField<any, number[]>
+    }
 
 type DateTimeField =
   | {
       type: 'datetime'
       dateFormat?: string
       timeFormat?: string
+      list?: false
       ui?: object | UIField<any, string>
     }
-  | DateTimeFieldInner<true>
-  | DateTimeFieldInner<false>
-
-type DateTimeFieldInner<List extends boolean> = {
-  type: 'datetime'
-  list?: List
-  dateFormat?: string
-  timeFormat?: string
-  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
-}
+  | {
+      type: 'datetime'
+      dateFormat?: string
+      timeFormat?: string
+      list: true
+      ui?: object | UIField<any, string[]>
+    }
 
 type ImageField =
   | {
       type: 'image'
+      list?: false
       ui?: object | UIField<any, string>
     }
-  | ImageFieldInner<true>
-  | ImageFieldInner<false>
-
-type ImageFieldInner<List extends boolean> = {
-  type: 'image'
-  ui?: object | UIField<any, ArrayBasedOnGeneric<string, List>>
-}
+  | {
+      type: 'image'
+      list: true
+      ui?: object | UIField<any, string[]>
+    }
 
 export type ReferenceType<WithNamespace extends boolean> =
   WithNamespace extends true ? ReferenceTypeWithNamespace : ReferenceTypeInner
@@ -447,16 +438,3 @@ export type ResolveFormArgs = {
   template: Templateable
   schema: TinaSchema
 }
-
-const test: TinaFieldInner<false> = {
-  name: 'asdf',
-  type: 'string',
-  list: false,
-  ui: {
-    validate: (val) => {
-      console.log({ val })
-    },
-  },
-}
-
-console.log({ test })

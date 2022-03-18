@@ -1,4 +1,4 @@
-import { TinaField } from "@tinacms/cli";
+import type { TinaField } from "tinacms";
 
 export const iconSchema: TinaField = {
   type: "object",
