@@ -301,11 +301,11 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
-          ui: {
-            validate: (val) => {
-              val;
-            },
-          },
+          // ui: {
+          //   validate: (val) => {
+          //     console.log({ val });
+          //   },
+          // },
         },
         {
           type: "reference",

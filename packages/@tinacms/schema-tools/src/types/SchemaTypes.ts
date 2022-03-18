@@ -121,7 +121,7 @@ interface TinaField {
   label?: string
   description?: string
   required?: boolean
-  list?: boolean
+  // list?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.
    * NOTE: only serializable values are supported, so functions like `validate`
@@ -255,12 +255,14 @@ export interface RichTypeWithNamespace extends TinaField {
   type: 'rich-text'
   namespace: string[]
   isBody?: boolean
+  list?: boolean
   templates?: (string | (Template<true> & { inline?: boolean }))[]
 }
 
 export interface RichTypeInner extends TinaField {
   type: 'rich-text'
   isBody?: boolean
+  list?: boolean
   templates?: (string | (Template<false> & { inline?: boolean }))[]
 }
 
@@ -445,3 +447,16 @@ export type ResolveFormArgs = {
   template: Templateable
   schema: TinaSchema
 }
+
+const test: TinaFieldInner<false> = {
+  name: 'asdf',
+  type: 'string',
+  list: false,
+  ui: {
+    validate: (val) => {
+      console.log({ val })
+    },
+  },
+}
+
+console.log({ test })
