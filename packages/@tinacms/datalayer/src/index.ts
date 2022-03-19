@@ -21,7 +21,7 @@ export {
 } from './database/store/filesystem'
 export { LevelStore } from './database/store/level'
 export type { Store, QueryParams, IndexDefinition, TernaryFilter, BinaryFilter } from './database/store'
-export { makeFilterChain, OP } from './database/store'
+export { buildKeyForField, coerceFilterChainOperands, makeFilter, makeFilterChain, OP, isIndexed } from './database/store'
 export type { FilterCondition, KeyValueQueryParams, SeedOptions, PutOptions } from './database/store'
 
 export type FilterOperand = string | number | boolean | string[] | number[]

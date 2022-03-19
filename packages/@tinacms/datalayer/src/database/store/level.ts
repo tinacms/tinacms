@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import type {PutOptions, SeedOptions, Store} from './index'
-import {coerceFilterChainOperands, isIndexed, KeyValueQueryParams, makeFilter} from './index'
+import {coerceFilterChainOperands, isIndexed, KeyValueQueryParams, makeFilter, buildKeyForField} from './index'
 import path from 'path'
 import {sequential} from '../../util'
 import level, {LevelDB} from 'level'
@@ -198,20 +198,6 @@ export class LevelStore implements Store {
     }
   }
 
-  private parseValueForKey(definition: IndexDefinition, data: object) {
-    return definition.fields.map(field => {
-      if (field.name in data) {
-        if (field.type === 'datetime') {
-          // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-          return new Date(data[field.name]).getTime()
-        } else {
-          return String(data[field.name])
-        }
-      }
-      return [field.default || '']
-    }).join(':')
-  }
-
   public async close() {
     await this.db.close()
   }
@@ -219,7 +205,7 @@ export class LevelStore implements Store {
   public async put(filepath: string, data: object, options?: PutOptions ) {
     let existingData
     try {
-      existingData = !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`) : null
+      existingData = options && !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`) : null
     } catch (err) {
       if (!err.notFound) {
         throw err
@@ -229,8 +215,8 @@ export class LevelStore implements Store {
 
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(options.indexDefinitions)) {
-        const indexedValue = this.parseValueForKey(definition, data)
-        const existingIndexedValue = existingData ? this.parseValueForKey(definition, existingData) : null
+        const indexedValue = buildKeyForField(definition, data)
+        const existingIndexedValue = existingData ? buildKeyForField(definition, existingData) : null
 
         let indexKey
         let existingIndexKey = null

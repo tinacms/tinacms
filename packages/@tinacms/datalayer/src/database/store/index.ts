@@ -42,7 +42,7 @@ export type TernaryFilter = {
 }
 
 export type KeyValueQueryParams = {
-  collection?: string,
+  collection: string,
   filterChain: (BinaryFilter | TernaryFilter)[],
   sort?: string,
   gt?: string,
@@ -433,4 +433,18 @@ export const isIndexed = (queryParams: QueryParams, index: IndexDefinition) => {
     }
   }
   return true
+}
+
+export const buildKeyForField = (definition: IndexDefinition, data: object) => {
+  return definition.fields.map(field => {
+    if (field.name in data) {
+      if (field.type === 'datetime') {
+        // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
+        return new Date(data[field.name]).getTime()
+      } else {
+        return String(data[field.name])
+      }
+    }
+    return [field.default || '']
+  }).join(':')
 }
