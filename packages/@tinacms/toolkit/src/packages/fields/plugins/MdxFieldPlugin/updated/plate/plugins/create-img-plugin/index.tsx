@@ -16,6 +16,7 @@ import { ImgEmbed } from './component'
 import { createPluginFactory, setNodes } from '@udecode/plate-core'
 import { Editor } from 'slate'
 import { ReactEditor } from 'slate-react'
+import { withImageUpload } from '@udecode/plate-image'
 import { insertBlockElement } from '../core/common'
 
 export const ELEMENT_IMG = 'img'
@@ -23,8 +24,13 @@ export const ELEMENT_IMG = 'img'
 export const createImgPlugin = createPluginFactory({
   key: ELEMENT_IMG,
   isVoid: true,
+  // FIXME: our parser returns images inside `<p>` tags, and while
+  // images in html aren't blocks, it's sort of easier for them to behave
+  // like them. However slate inserts `div` elements in the children
+  // prop so there's a console error for a div being inside a p
   isInline: false,
   isElement: true,
+  withOverrides: withImageUpload,
   component: (props) => {
     const handleChange = (values) => {
       const path = ReactEditor.findPath(props.editor, props.element)
