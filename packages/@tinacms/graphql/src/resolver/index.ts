@@ -607,7 +607,7 @@ export class Resolver {
         }
       }
 
-      const queryParams = {
+      const queryOptions = {
         filterChain: makeFilterChain({
           conditions: conditions || []
         }),
@@ -619,7 +619,7 @@ export class Resolver {
         after: args.after as string,
       }
 
-      const result = await this.database.query(queryParams, hydrator ? hydrator : this.getDocument)
+      const result = await this.database.query(queryOptions, hydrator ? hydrator : this.getDocument)
       edges = result.edges
       pageInfo = result.pageInfo
     } else {
