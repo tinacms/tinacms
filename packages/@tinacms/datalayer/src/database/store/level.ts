@@ -52,7 +52,7 @@ export class LevelStore implements Store {
     }
 
     const { indexDefinitions } = this.indexes[collection]
-    const indexDefinition = sort && indexDefinitions[sort]
+    const indexDefinition = (sort && indexDefinitions[sort]) as IndexDefinition | undefined
     const indexed = indexDefinition && isIndexed(queryParams, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
