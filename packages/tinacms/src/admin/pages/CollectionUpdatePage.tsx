@@ -51,7 +51,8 @@ const updateDocument = async (
 }
 
 const CollectionUpdatePage = () => {
-  const { collectionName, filename } = useParams()
+  const { collectionName, ...rest } = useParams()
+  const { '*': filename } = rest
 
   return (
     <GetCMS>
@@ -93,7 +94,6 @@ const RenderForm = ({
   collection,
   mutationInfo,
 }) => {
-  const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
 
   const form = useMemo(() => {

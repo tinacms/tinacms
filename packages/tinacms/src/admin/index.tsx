@@ -78,7 +78,7 @@ export const TinaAdmin = () => {
                         element={<CollectionCreatePage />}
                       />
                       <Route
-                        path="collections/:collectionName/:filename"
+                        path="collections/:collectionName/*"
                         element={<CollectionUpdatePage />}
                       />
                       <Route
