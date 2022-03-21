@@ -17,7 +17,7 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
-import type { KeyValueQueryParams, QueryParams, Store } from '@tinacms/datalayer'
+import type { BinaryFilter, IndexDefinition, StoreQueryOptions, Store, TernaryFilter } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
@@ -27,7 +27,6 @@ import type {
 } from '../types'
 import type { Bridge } from './bridge'
 import {atob, btoa} from '@tinacms/datalayer'
-import {IndexDefinition} from '@tinacms/datalayer/dist'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -40,6 +39,24 @@ export const createDatabase = async (config: CreateDatabase) => {
 }
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
 const GENERATED_FOLDER = path.join('.tina', '__generated__')
+
+/** Options for {@link Database.query} **/
+export type QueryOptions = {
+  /* collection name */
+  collection: string
+  /* filters to apply to the query */
+  filterChain?: (BinaryFilter | TernaryFilter)[]
+  /* sort (either field or index) */
+  sort?: string
+  /* limit results to first N items */
+  first?: number
+  /* limit results to last N items */
+  last?: number
+  /* specify cursor to start results at */
+  after?: string
+  /* specify cursor to end results at */
+  before?: string
+}
 
 export class Database {
   public bridge: Bridge
@@ -286,26 +303,26 @@ export class Database {
     return true
   }
 
-  public query = async (queryParams: QueryParams, hydrator) => {
-    const { first, after, last, before, sort, collection, filterChain } = queryParams
-    const kvParams: KeyValueQueryParams = { sort, collection, filterChain }
+  public query = async (queryOptions: QueryOptions, hydrator) => {
+    const { first, after, last, before, sort, collection, filterChain } = queryOptions
+    const storeQueryOptions: StoreQueryOptions = { sort, collection, filterChain }
 
     if (first) {
-      kvParams.limit = first
+      storeQueryOptions.limit = first
     } else if (last) {
-      kvParams.limit = last
+      storeQueryOptions.limit = last
     } else {
-      kvParams.limit = 10
+      storeQueryOptions.limit = 10
     }
 
     if (after) {
-      kvParams.gt = atob(after)
+      storeQueryOptions.gt = atob(after)
     } else if (before) {
-      kvParams.lt = atob(before)
+      storeQueryOptions.lt = atob(before)
     }
 
     if (last) {
-      kvParams.reverse = true
+      storeQueryOptions.reverse = true
     }
 
     const { edges, pageInfo: {
@@ -318,8 +335,7 @@ export class Database {
         hasNextPage: boolean,
         startCursor: string,
         endCursor: string
-      }} = await this.store.query(kvParams)
-
+      }} = await this.store.query(storeQueryOptions)
 
     return {
       edges: await sequential(edges, async (edge) => {

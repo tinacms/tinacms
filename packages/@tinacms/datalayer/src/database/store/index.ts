@@ -41,26 +41,38 @@ export type TernaryFilter = {
   type: string
 }
 
-export type KeyValueQueryParams = {
+/** Options for {@link Store.query} */
+export type StoreQueryOptions = {
+  /* collection name */
   collection: string,
+  /* filters to apply to the query */
   filterChain: (BinaryFilter | TernaryFilter)[],
+  /* sort (either field or index) */
   sort?: string,
+  /* starting key exclusive */
   gt?: string,
+  /* starting key inclusive */
   gte?: string,
+  /* ending key exclusive */
   lt?: string,
+  /* ending key inclusive */
   lte?: string,
+  /* if true, returns results in reverse order */
   reverse?: boolean,
+  /* limits result set */
   limit?: number
 }
 
-export type QueryParams = {
-  filterChain?: (BinaryFilter | TernaryFilter)[]
-  collection?: string
-  sort?: string
-  first?: number
-  last?: number
-  before?: string
-  after?: string
+export type PageInfo = {
+  hasPreviousPage: boolean,
+  hasNextPage: boolean,
+  startCursor: string,
+  endCursor: string
+}
+
+export type StoreQueryResponse = {
+  edges: { cursor: string, path: string }[],
+  pageInfo: PageInfo
 }
 
 export type IndexDefinition = {
@@ -91,38 +103,11 @@ export interface Store {
   close(): void
   open(): void
   /**
-   *
-   * @param queryStrings
-   * Queries are currently structured as prefixed keys where that last portion
-   * of the key is the value provided by the query
-   * ```graphql
-   * {
-   *   getPostsList(filter: {
-   *     title: {
-   *       eq: "Hello, World"
-   *     }
-   *   }) {
-   *      ...
-   *   }
-   * }
-   * ```
-   * Would equate to a query string of:
-   * ```
-   * __attribute__#posts#posts#title#Hello, World
-   * ```
-   * This can be used by a data store as a secondary index of sorts
-   *
-   * It's important to note that for now each query string acts as an "AND" clause,
-   * meaning the resulting records need to be present in _each_ query string.
-   *
-   * @param hydrator
-   * hydrator is an optional callback, which may be useful depending on the storage mechanism.
-   * For example, the in-memory storage only stores the path to its records as its value,
-   * but in something like DynamoDB the query strings may be used to look up the full record,
-   * meaning there's no need to "hydrate" the return value
+   * Executes a query against a collection
+   * @param queryOptions - options for the query
+   * @returns the results of the query
    */
-  // TODO update documentation
-  query(queryParams: KeyValueQueryParams)
+  query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse>
 
   /**
    * In this context, seeding is the act of putting records and indexing data into an ephemeral
@@ -395,15 +380,15 @@ export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFi
   return result
 }
 
-export const isIndexed = (queryParams: QueryParams, index: IndexDefinition) => {
-  if (queryParams.filterChain && queryParams.filterChain.length) {
-    const [lastFilter] = queryParams.filterChain.slice(-1)
+export const isIndexed = (queryOptions: StoreQueryOptions, index: IndexDefinition) => {
+  if (queryOptions.filterChain && queryOptions.filterChain.length) {
+    const [lastFilter] = queryOptions.filterChain.slice(-1)
     const maxOrder = index.fields.findIndex(field => lastFilter.pathExpression === field.name)
     const indexFields = index.fields.map(field => field.name)
     const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field) => field.name)
 
     // First make sure that all the query fields are present in the index
-    for (const [i, filter] of Object.entries(queryParams.filterChain)) {
+    for (const [i, filter] of Object.entries(queryOptions.filterChain)) {
       if (indexFields.indexOf(filter.pathExpression) === -1) {
         return false
       }

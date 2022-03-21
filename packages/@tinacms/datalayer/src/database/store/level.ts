@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type {PutOptions, SeedOptions, Store} from './index'
-import {coerceFilterChainOperands, isIndexed, KeyValueQueryParams, makeFilter, buildKeyForField} from './index'
+import type {StoreQueryOptions, StoreQueryResponse, PutOptions, SeedOptions, Store} from './index'
+import {coerceFilterChainOperands, isIndexed, makeFilter, buildKeyForField} from './index'
 import path from 'path'
 import {sequential} from '../../util'
 import level, {LevelDB} from 'level'
@@ -41,8 +41,8 @@ export class LevelStore implements Store {
     }
   }
 
-  public async query(queryParams: KeyValueQueryParams) {
-    const { filterChain, sort = filepathSortKey, collection, ...query } = queryParams
+  public async query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse> {
+    const { filterChain, sort = filepathSortKey, collection, ...query } = queryOptions
 
     const { limit: resultLimit = 10 } = query
 
@@ -53,7 +53,7 @@ export class LevelStore implements Store {
 
     const { indexDefinitions } = this.indexes[collection]
     const indexDefinition = (sort && indexDefinitions[sort]) as IndexDefinition | undefined
-    const indexed = indexDefinition && isIndexed(queryParams, indexDefinition)
+    const indexed = indexDefinition && isIndexed(queryOptions, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
     if (!query.gt && !query.gte) {
