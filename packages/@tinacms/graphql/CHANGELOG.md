@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.59.8
+
+### Patch Changes
+
+- e7b27ba3b: Fix issue where un-normalized rich-text fields which send `null` values to the server on save would cause a parsing error
+- 11d55f441: Add experimental useGraphQLForms hook
+
 ## 0.59.7
 
 ### Patch Changes
