@@ -169,13 +169,13 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
-export const tinaConfig = {
+export const tinaConfig = defineConfig({
   schema,
   apiURL,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
     return cms
   },
-}
+})
 
 export default schema
