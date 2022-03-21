@@ -24,14 +24,12 @@ title: Vote For Pedro
 
 # Dixi gaude Arethusa
 
-## Oscula mihi
-
-Lorem markdownum numerabilis armentorum platanus, cultros coniunx sibi per
+<PageSection heading="Oscula mihi" content="Lorem markdownum numerabilis armentorum platanus, cultros coniunx sibi per
 silvas, nostris clausit sequemur diverso scopulosque. Fecit tum alta sed non
 falcato murmura, geminas donata Amyntore, quoque Nox. Invitam inquit, modo
 nocte; ut ignis faciemque manes in imagine sinistra ut mucrone non ramos
 sepulcro supplex. Crescentesque populos motura, fit cumque. Verumque est; retro
-sibi tristia bracchia Aetola telae caruerunt et.
+sibi tristia bracchia Aetola telae caruerunt et."/>
 
 
 ## Mutato fefellimus sit demisit aut alterius sollicito
@@ -54,6 +52,7 @@ export const nextPostPage =
   import Head from "next/head";
   import { createGlobalStyle } from "styled-components";
   import { useTina } from "tinacms/dist/edit-state";
+  import { TinaMarkdown } from 'tinacms/dist/rich-text'
 
   const query = gql\`
     query BlogPostQuery($relativePath: String!) {
@@ -99,7 +98,6 @@ export const nextPostPage =
     text-decoration: underline;
   }
   \`;
-  const defaultMarked = (markdown) => markdown;
   // Use the props returned by get static props (this can be deleted when the edit provider and tina-wrapper are moved to _app.js)
   const BlogPage = (props) => {
     const { data } = useTina({
@@ -135,12 +133,9 @@ export const nextPostPage =
             <h1 className="text-3xl m-8 text-center leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               {data.getPostsDocument.data.title}
             </h1>
-            {/* Convert markdown to html in the browser only */}
-            {typeof window !== "undefined" && (
-              <ContentSection
-                content={window.marked.parse(data.getPostsDocument.data.body)}
-              ></ContentSection>
-            )}
+            <ContentSection
+              content={data.getPostsDocument.data.body}
+            ></ContentSection>
           </div>
           <div className="bg-green-100 text-center">
             Lost and looking for a place to start?
@@ -205,6 +200,19 @@ export const nextPostPage =
   };
   
   export default BlogPage;
+
+  const PageSection = props => {
+    return (
+      <>
+        <h2>{ props.heading }</h2>
+        <p>{ props.content }</p>
+      </>
+    )
+  }
+
+  const components = {
+    PageSection: PageSection,
+  }
   
   const ContentSection = ({ content }) => {
     return (
@@ -314,7 +322,7 @@ export const nextPostPage =
         </div>
         <div className="relative px-4 sm:px-6 lg:px-8">
           <div className="text-lg max-w-prose mx-auto">
-            <div dangerouslySetInnerHTML={{ __html: content }}></div>
+            <TinaMarkdown components={components} content={content}/>
             <GlobalStyle />
           </div>
         </div>
