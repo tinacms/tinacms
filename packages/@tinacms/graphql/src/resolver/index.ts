@@ -88,14 +88,18 @@ export class Resolver {
         collection,
       })
 
-      const basename = path.basename(fullPath)
-      const extension = path.extname(fullPath)
-      const filename = basename.replace(extension, '')
+      const {
+        base: basename,
+        ext: extension,
+        name: filename,
+      } = path.parse(fullPath)
+
       const relativePath = fullPath
         .replace('\\', '/')
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
-      const breadcrumbs = filename.split('/')
+
+      const breadcrumbs = relativePath.replace(extension, '').split('/')
 
       // This is where the form is generated
       const form = {

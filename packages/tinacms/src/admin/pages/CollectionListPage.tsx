@@ -98,7 +98,7 @@ const handleNavigate = (
     window.location.href = routeOverride
     return null
   } else {
-    navigate(document.sys.filename)
+    navigate(document.sys.breadcrumbs.join('/'))
   }
 }
 
@@ -149,9 +149,13 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
+                                const subfolders = document.node.sys.breadcrumbs
+                                  .slice(0, -1)
+                                  .join('/')
+
                                 return (
                                   <tr
-                                    key={`document-${document.node.sys.filename}`}
+                                    key={`document-${document.node.sys.relativePath}`}
                                     className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
@@ -172,7 +176,14 @@ const CollectionListPage = () => {
                                             Filename
                                           </span>
                                           <span className="h-5 leading-5 block whitespace-nowrap">
-                                            {document.node.sys.filename}
+                                            {subfolders && (
+                                              <span className="text-xs text-gray-400">
+                                                {`${subfolders}/`}
+                                              </span>
+                                            )}
+                                            <span>
+                                              {document.node.sys.filename}
+                                            </span>
                                           </span>
                                         </span>
                                       </a>
