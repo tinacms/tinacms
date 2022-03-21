@@ -57,14 +57,40 @@ export async function initTina(ctx: any, next: () => void, options) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+// https://stackoverflow.com/questions/60454251/how-to-know-the-version-of-currently-installed-package-from-yarn-lock
+const getPackageVersionYarn1 = async (packageName: string) => {
+  const { spawnSync } = require('child_process')
+  const whyBuffer = spawnSync('yarn', ['why', packageName])
+  const grepBuffer = spawnSync('grep', ['Found'], { input: whyBuffer.stdout })
+  const outputArray = grepBuffer.stdout.toString().split('\n')
+  const parsedOutputArray = outputArray
+    .filter((output) => output.length > 0)
+    .map((output) => output.split('@')[1].replace('"', ''))
+  return parsedOutputArray[0]
+}
+
+const getPackageVersionYarn2 = async (packageName: string) => {
+  const packageInfo = JSON.parse(
+    await execShellCommand(`yarn info ${packageName} --json`)
+  )
+  return packageInfo.children.Version
+}
+
 export async function checkDeps(ctx: any, next: () => void, options) {
   const bar = new Progress('Checking dependencies. :prog', 1)
-  const reactInfo = JSON.parse(await execShellCommand(`yarn info react --json`))
-  const reactDOMInfo = JSON.parse(
-    await execShellCommand(`yarn info react-dom --json`)
-  )
-  const reactVersion = reactInfo.children.Version
-  const reactDOMVersion = reactDOMInfo.children.Version
+
+  let reactVersion
+  let reactDOMVersion
+
+  process.chdir('/Users/jeffsee/code/tina-playground')
+  const yarnVersion = await execShellCommand(`yarn --version`)
+  if (yarnVersion.startsWith('2')) {
+    reactVersion = await getPackageVersionYarn2('react')
+    reactDOMVersion = await getPackageVersionYarn2('react-dom')
+  } else {
+    reactVersion = await getPackageVersionYarn1('react')
+    reactDOMVersion = await getPackageVersionYarn1('react-dom')
+  }
   if (!checkVersion(reactVersion) || !checkVersion(reactDOMVersion)) {
     const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
       "react@>=16.14.0"
