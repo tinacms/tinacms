@@ -32,7 +32,6 @@ export const createClient = ({
   tinaioConfig,
   schema,
 }: CreateClientProps) => {
-  console.log({ schema })
   return isLocalClient
     ? new LocalClient({ schema })
     : new Client({

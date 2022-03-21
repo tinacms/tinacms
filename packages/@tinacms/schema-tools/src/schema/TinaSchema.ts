@@ -109,7 +109,7 @@ export class TinaSchema {
     }
     return globalTemplate
   }
-  public getCollectionByFullPath = async (filepath: string) => {
+  public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
       return filepath.replace('\\', '/').startsWith(collection.path)
     })

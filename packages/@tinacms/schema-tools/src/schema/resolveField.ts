@@ -154,10 +154,6 @@ export const resolveField = (
             key: templateName,
             inline: template.inline,
             name: templateName,
-            // fields: await sequential(
-            //   template.fields,
-            //   async (field) => await resolveField(field, schema)
-            // ),
             fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }
