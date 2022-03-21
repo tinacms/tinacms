@@ -689,6 +689,7 @@
           "type": "string",
           "label": "Name",
           "name": "name",
+          "ui": {},
           "namespace": [
             "authors",
             "name"
