@@ -168,7 +168,27 @@ type BlockPageBlocksFeaturedPosts {
   blogs: [BlockPageBlocksFeaturedPostsBlogs]
 }
 
-union BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts
+type BlockPageBlocksFeatureListItems {
+  title: String
+  description: String
+}
+
+type BlockPageBlocksFeatureList {
+  title: String
+  items: [BlockPageBlocksFeatureListItems]
+}
+
+type BlockPageBlocksSlideshowItems {
+  title: String
+  url: String
+}
+
+type BlockPageBlocksSlideshow {
+  title: String
+  items: [BlockPageBlocksSlideshowItems]
+}
+
+union BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts | BlockPageBlocksFeatureList | BlockPageBlocksSlideshow
 
 type BlockPage {
   title: String
@@ -253,10 +273,32 @@ input BlockPageBlocksFeaturedPostsMutation {
   blogs: [BlockPageBlocksFeaturedPostsBlogsMutation]
 }
 
+input BlockPageBlocksFeatureListItemsMutation {
+  title: String
+  description: String
+}
+
+input BlockPageBlocksFeatureListMutation {
+  title: String
+  items: [BlockPageBlocksFeatureListItemsMutation]
+}
+
+input BlockPageBlocksSlideshowItemsMutation {
+  title: String
+  url: String
+}
+
+input BlockPageBlocksSlideshowMutation {
+  title: String
+  items: [BlockPageBlocksSlideshowItemsMutation]
+}
+
 input BlockPageBlocksMutation {
   hero: BlockPageBlocksHeroMutation
   blockQuote: BlockPageBlocksBlockQuoteMutation
   featuredPosts: BlockPageBlocksFeaturedPostsMutation
+  featureList: BlockPageBlocksFeatureListMutation
+  slideshow: BlockPageBlocksSlideshowMutation
 }
 
 input BlockPageMutation {
