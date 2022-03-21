@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.56.18
+
+### Patch Changes
+
+- e9a0c82cf: Updated sidebar nav component to allow scrolling if needed
+- d4fdeaa9f: Fix console warning about a ref being passed to a function component
+- ed85f2594: Update version of react-beautiful-dnd to silence red herrings in the console
+
+  See https://github.com/atlassian/react-beautiful-dnd/issues/1108
+
+- d86e515ba: Ensure `error` is a string before rendering it from field meta component. In situations where an object's sub-field was invalid, touching the sub-field would trigger this error to be an object at the parent, React throws an error when trying to render an object
+- db0dab1d4: add spacing and link styles to rich text field
+
 ## 0.56.17
 
 ### Patch Changes
