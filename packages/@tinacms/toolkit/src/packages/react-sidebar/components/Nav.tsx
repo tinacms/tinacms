@@ -130,7 +130,7 @@ export const Nav = ({
         </Menu>
       </div>
       {children}
-      <div className="px-6 flex-1">
+      <div className="px-6 flex-1 overflow-auto">
         {showCollections && (
           <>
             <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">

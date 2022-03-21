@@ -101,6 +101,7 @@ export class Resolver {
 
       const breadcrumbs = relativePath.replace(extension, '').split('/')
 
+      // This is where the form is generated
       const form = {
         label: collection.label,
         name: basename,
