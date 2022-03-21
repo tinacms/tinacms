@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.6",
+    "fullVersion": "0.59.7",
     "major": "0",
     "minor": "59",
-    "patch": "6"
+    "patch": "7"
   },
   "meta": {},
   "collections": [
