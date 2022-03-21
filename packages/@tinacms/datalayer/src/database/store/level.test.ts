@@ -143,17 +143,6 @@ describe('LevelDB store', () => {
         })
       }
     })
-
-    it('fails without collection', async () => {
-      const store = new LevelStore('', true)
-
-      const path = Object.keys(mockDocuments)[0]
-      await expect(
-        store.seed(path, mockDocuments[path], { indexDefinitions: mockIndexes })
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"collection must be specified with fields or indexDefinitions"`
-      )
-    })
   })
 
   describe('query', () => {
@@ -282,6 +271,7 @@ describe('LevelDB store', () => {
         const result = await store.query({
           collection,
           filterChain: [],
+          indexDefinitions: mockIndexes,
           limit,
           sort: 'date',
         })
@@ -297,6 +287,7 @@ describe('LevelDB store', () => {
         const result = await store.query({
           collection,
           filterChain: [],
+          indexDefinitions: mockIndexes,
           limit,
           sort: 'date',
           reverse: true,
@@ -319,6 +310,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'date',
         })
 
@@ -346,6 +338,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'date',
         })
 
@@ -371,6 +364,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'date',
         })
 
@@ -396,6 +390,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'date',
         })
 
@@ -421,6 +416,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'date',
         })
 
@@ -739,6 +735,7 @@ describe('LevelDB store', () => {
               type: 'boolean',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -760,6 +757,7 @@ describe('LevelDB store', () => {
               type: 'boolean',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
           reverse: true,
         })
@@ -793,6 +791,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -828,6 +827,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -860,6 +860,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
           reverse: true,
         })
@@ -896,6 +897,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
           reverse: true,
         })
@@ -941,6 +943,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -986,6 +989,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -1030,6 +1034,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 
@@ -1074,6 +1079,7 @@ describe('LevelDB store', () => {
               type: 'datetime',
             },
           ],
+          indexDefinitions: mockIndexes,
           sort: 'publishedDateIdx',
         })
 

@@ -49,7 +49,7 @@ export class LevelStore implements Store {
       query.limit = resultLimit + 1
     }
 
-    const indexDefinition = (sort && indexDefinitions[sort]) as IndexDefinition | undefined
+    const indexDefinition = (sort && indexDefinitions?.[sort]) as IndexDefinition | undefined
     const indexed = indexDefinition && isIndexed(queryOptions, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
