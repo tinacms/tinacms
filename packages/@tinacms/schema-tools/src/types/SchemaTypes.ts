@@ -112,7 +112,13 @@ export type TinaFieldInner<WithNamespace extends boolean> =
   | RichType<WithNamespace>
 
 export type TinaFieldBase = TinaFieldInner<false>
-export type TinaFieldEnriched = TinaFieldInner<true>
+export type TinaFieldEnriched = TinaFieldInner<true> & {
+  /**
+   * The parentTypename will always be an object type, either the type of a
+   * collection (ie. `Post`) or of an object field (ie. `PageBlocks`).
+   */
+  parentTypename?: string
+}
 
 interface TinaField {
   name: string
