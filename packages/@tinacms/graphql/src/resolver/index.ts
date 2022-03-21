@@ -535,14 +535,15 @@ export class Resolver {
       throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
     }
 
+    const sortKeys = Object.keys(filter[fieldDefinition.name][referencedCollection.name])
     const resolvedCollectionConnection = await this.resolveCollectionConnection({
       args: {
-        sort: Object.keys(filter[fieldDefinition.name][referencedCollection.name])[0], // TODO what happens if you have multiple values here? Ideally I think we want to sort by the field being queried for nested queries
+        sort: sortKeys.length === 1 ? sortKeys[0] : undefined,
         filter: {
           ...filter[fieldDefinition.name][referencedCollection.name]
         }, first: -1
       },
-      collection: referencedCollection, // TODO should be the right lookup for the referenced collection
+      collection: referencedCollection,
       hydrator: (path) => path // just return the path
     })
 
