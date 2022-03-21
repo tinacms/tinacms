@@ -33,7 +33,6 @@ but otherwise behave like a non-data "stores", see [here](https://github.com/tin
 
 ### Stores that don't support seeding/indexing
 
-#TODO update this
 For now, we need to support API requests which have _not_ been indexed into a persisted store. For that reason,
 `FilesystemStore` and `GithubStore` exist. They sort of mock out what a store _would_ do if it were able to
 persist things. You'll notice that the flags `supportsSeeding` and `supportsIndexing` are `false`. In the
