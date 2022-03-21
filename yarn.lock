@@ -28971,6 +28971,20 @@ resolve@^2.0.0-next.3:
   languageName: unknown
   linkType: soft
 
+"starter-empty@workspace:examples/empty":
+  version: 0.0.0-use.local
+  resolution: "starter-empty@workspace:examples/empty"
+  dependencies:
+    "@types/node": ^17.0.21
+    eslint: 7
+    eslint-config-next: 12.0.3
+    next: 12.0.3
+    react: 17.0.2
+    react-dom: 17.0.2
+    react-is: ^17.0.2
+  languageName: unknown
+  linkType: soft
+
 "state-toggle@npm:^1.0.0":
   version: 1.0.3
   resolution: "state-toggle@npm:1.0.3"
