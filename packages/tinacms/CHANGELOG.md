@@ -1,5 +1,24 @@
 # tinacms
 
+## 0.66.9
+
+### Patch Changes
+
+- 91d5a6073: Allow "." in file names
+- 11d55f441: Add experimental useGraphQLForms hook
+- f41bd62ea: Ensure client-side Tina code only runs on the browser. Without this check, we'd see a server/client mismatch like:
+
+  ```
+  warning.js:33 Warning: Expected server HTML to contain a matching <div> in <body>.
+  ```
+
+- Updated dependencies [e9a0c82cf]
+- Updated dependencies [d4fdeaa9f]
+- Updated dependencies [ed85f2594]
+- Updated dependencies [d86e515ba]
+- Updated dependencies [db0dab1d4]
+  - @tinacms/toolkit@0.56.18
+
 ## 0.66.8
 
 ### Patch Changes
