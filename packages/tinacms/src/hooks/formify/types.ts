@@ -103,6 +103,7 @@ export type OnChangeEvent = {
         name: string
         type: 'string' | 'reference' | 'object'
         list?: boolean
+        parentTypename: string
       }
     }
     name: string
@@ -128,6 +129,7 @@ export type ChangeSet = {
 export type BlueprintPath = {
   name: string
   alias: string
+  parentTypename?: string
   list?: boolean
   isNode?: boolean
 }
