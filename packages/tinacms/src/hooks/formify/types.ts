@@ -58,9 +58,9 @@ export type FormifiedDocumentNode = {
   id: string
   _internalSys: {
     path: string
-  }
-  collection: {
-    name
+    collection: {
+      name
+    }
   }
   form: {
     mutationInfo: {
