@@ -57,6 +57,50 @@ export async function initTina(ctx: any, next: () => void, options) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export async function checkDeps(ctx: any, next: () => void, options) {
+  const bar = new Progress('Checking dependencies. :prog', 1)
+  const reactInfo = JSON.parse(await execShellCommand(`yarn info react --json`))
+  const reactDOMInfo = JSON.parse(
+    await execShellCommand(`yarn info react-dom --json`)
+  )
+  const reactVersion = reactInfo.children.Version
+  const reactDOMVersion = reactDOMInfo.children.Version
+  if (!checkVersion(reactVersion) || !checkVersion(reactDOMVersion)) {
+    const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
+      "react@>=16.14.0"
+      "react-dom@>=16.14.0"
+
+  Then re-rerun "@tinacms/cli init"`
+    throw new Error(message)
+  }
+
+  bar.tick({
+    prog: '✅',
+  })
+  logger.level = 'fatal'
+  next()
+}
+
+const checkVersion = (version) => {
+  const majorMin = 16
+  const minorMin = 14
+  const parts = version.split('.')
+  const major = Number(parts[0])
+  const minor = Number(parts[1])
+
+  if (major > majorMin) {
+    return true
+  } else if (major === majorMin) {
+    if (minor >= minorMin) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false
+  }
+}
+
 export async function installDeps(ctx: any, next: () => void, options) {
   const bar = new Progress(
     'Installing Tina packages. This might take a moment... :prog',
