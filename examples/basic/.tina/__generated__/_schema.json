@@ -14,23 +14,13 @@
       "format": "mdx",
       "fields": [
         {
-          "type": "object",
-          "name": "someObj",
-          "fields": [
-            {
-              "name": "thingOne",
-              "type": "string",
-              "required": true,
-              "namespace": [
-                "page",
-                "someObj",
-                "thingOne"
-              ]
-            }
-          ],
+          "label": "Title",
+          "name": "Title",
+          "type": "string",
+          "ui": {},
           "namespace": [
             "page",
-            "someObj"
+            "Title"
           ]
         },
         {
@@ -61,6 +51,61 @@
           "namespace": [
             "post",
             "title"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Related Posts",
+          "name": "posts",
+          "list": true,
+          "ui": {},
+          "fields": [
+            {
+              "name": "post",
+              "type": "reference",
+              "collections": [
+                "post"
+              ],
+              "namespace": [
+                "post",
+                "posts",
+                "post"
+              ]
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "namespace": [
+                "post",
+                "posts",
+                "label"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "posts"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "Something",
+          "name": "foo",
+          "fields": [
+            {
+              "name": "bar",
+              "label": "Bar",
+              "type": "string",
+              "namespace": [
+                "post",
+                "foo",
+                "bar"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "foo"
           ]
         },
         {

@@ -34,7 +34,7 @@
   "dependencies": {
     "@changesets/cli": "2.18.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
-    "@typescript-eslint/parser": "^2.3.0",
+    "@typescript-eslint/parser": "5.15.0",
     "@yarnpkg/pnpify": "^2.0.0-rc.20",
     "cypress": "9.2.0",
     "danger": "^10.6.4",
@@ -42,7 +42,7 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^2.0.1",
-    "typescript": "^3.8.3",
+    "typescript": "4.3.5",
     "workspace": "^0.0.1-preview.1"
   }
 }
