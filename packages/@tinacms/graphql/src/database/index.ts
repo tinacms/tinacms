@@ -26,7 +26,7 @@ import type {
   CollectionFieldsWithNamespace, CollectionTemplatesWithNamespace, TinaFieldInner,
 } from '../types'
 import type { Bridge } from './bridge'
-import {atob, btoa} from '@tinacms/datalayer'
+import {atob, btoa, DEFAULT_COLLECTION_SORT_KEY} from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -253,7 +253,9 @@ export class Database {
       const schema = await this.getSchema()
       const collections = schema.getCollections()
       for (const collection of collections) {
-        const indexDefinitions = {}
+        const indexDefinitions = {
+          [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] } // provide a default sort key which is the file sort
+        }
 
         if (collection.fields) {
           for (const field of (collection.fields as TinaFieldInner<true>[])) {
@@ -321,6 +323,12 @@ export class Database {
 
     if (last) {
       storeQueryOptions.reverse = true
+    }
+
+    const indexDefinitions = await this.getIndexDefinitions()
+    storeQueryOptions.indexDefinitions = indexDefinitions?.[queryOptions.collection]
+    if (!storeQueryOptions.indexDefinitions) {
+      throw new Error(`No indexDefinitions for collection ${queryOptions.collection}`)
     }
 
     const { edges, pageInfo: {

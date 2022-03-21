@@ -15,6 +15,8 @@ import {JSONPath} from 'jsonpath-plus'
 
 import {FilterOperand} from '../../index'
 
+export const DEFAULT_COLLECTION_SORT_KEY = 'filepath'
+
 export enum OP {
   EQ = 'eq',
   GT = 'gt',
@@ -45,6 +47,8 @@ export type TernaryFilter = {
 export type StoreQueryOptions = {
   /* collection name */
   collection: string,
+  /* index definitions for specified collection */
+  indexDefinitions?: Record<string,IndexDefinition>,
   /* filters to apply to the query */
   filterChain: (BinaryFilter | TernaryFilter)[],
   /* sort (either field or index) */

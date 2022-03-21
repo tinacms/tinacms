@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import type {StoreQueryOptions, StoreQueryResponse, PutOptions, SeedOptions, Store} from './index'
-import {coerceFilterChainOperands, isIndexed, makeFilter, buildKeyForField} from './index'
+import {coerceFilterChainOperands, isIndexed, makeFilter, buildKeyForField, DEFAULT_COLLECTION_SORT_KEY} from './index'
 import path from 'path'
 import {sequential} from '../../util'
 import level, {LevelDB} from 'level'
@@ -22,12 +22,10 @@ import encode from 'encoding-down'
 import {IndexDefinition} from '.'
 
 const defaultPrefix = '_ROOT_'
-const filepathSortKey = 'filepath'
 
 export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
-  public indexes: Record<string, {indexDefinitions: Record<string, IndexDefinition>}> = {}
   public useMemory: boolean
   constructor(rootPath: string, useMemory: boolean = false) {
     this.rootPath = rootPath || ''
@@ -42,7 +40,7 @@ export class LevelStore implements Store {
   }
 
   public async query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse> {
-    const { filterChain, sort = filepathSortKey, collection, ...query } = queryOptions
+    const { filterChain, sort = DEFAULT_COLLECTION_SORT_KEY, collection, indexDefinitions, ...query } = queryOptions
 
     const { limit: resultLimit = 10 } = query
 
@@ -51,7 +49,6 @@ export class LevelStore implements Store {
       query.limit = resultLimit + 1
     }
 
-    const { indexDefinitions } = this.indexes[collection]
     const indexDefinition = (sort && indexDefinitions[sort]) as IndexDefinition | undefined
     const indexed = indexDefinition && isIndexed(queryOptions, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
@@ -112,22 +109,6 @@ export class LevelStore implements Store {
   }
 
   public async seed(filepath: string, data: object, options?: SeedOptions) {
-    if (options?.indexDefinitions) {
-      if (!options?.collection) {
-        throw new Error('collection must be specified with fields or indexDefinitions')
-      }
-
-      if (!this.indexes[options?.collection]) {
-        this.indexes[options?.collection] = {
-          indexDefinitions: options?.indexDefinitions
-        }
-        // default index definition
-        this.indexes[options?.collection]['indexDefinitions'][filepathSortKey] = {
-          fields: []
-        }
-      }
-    }
-
     await this.put(filepath, data, { keepTemplateKey: false, seed: true, ...options })
   }
   public supportsSeeding() {
@@ -220,7 +201,7 @@ export class LevelStore implements Store {
 
         let indexKey
         let existingIndexKey = null
-        if (sort === filepathSortKey) {
+        if (sort === DEFAULT_COLLECTION_SORT_KEY) {
           indexKey = `${options.collection}:${sort}:${filepath}`
           existingIndexKey = indexKey
         } else {
