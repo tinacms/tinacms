@@ -17,7 +17,7 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
-import type { BinaryFilter, IndexDefinition, StoreQueryOptions, Store, TernaryFilter } from '@tinacms/datalayer'
+import type { BinaryFilter, IndexDefinition, PageInfo, StoreQueryOptions, Store, TernaryFilter } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
@@ -265,7 +265,6 @@ export class Database {
               fields: [
                 {
                   name: field.name,
-                  default: '',
                   type: field.type
                 }
               ]
@@ -279,7 +278,6 @@ export class Database {
             indexDefinitions[index.name] = {
               fields: index.fields.map(indexField => ({
                 name: indexField.name,
-                default: indexField.default,
                 type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
               }))
             }
@@ -330,12 +328,7 @@ export class Database {
         hasNextPage,
         startCursor,
         endCursor
-    }}: { edges: { path: string, cursor: string }[], pageInfo: {
-      hasPreviousPage: boolean,
-        hasNextPage: boolean,
-        startCursor: string,
-        endCursor: string
-      }} = await this.store.query(storeQueryOptions)
+    }}: { edges: { path: string, cursor: string }[], pageInfo: PageInfo } = await this.store.query(storeQueryOptions)
 
     return {
       edges: await sequential(edges, async (edge) => {

@@ -60,13 +60,14 @@ describe('datalayer store', () => {
     }
     describe('for valid params', () => {
       it('passes without filterChain', () => {
-        expect(isIndexed({}, singleBooleanIndexDefn)).toBeTruthy()
+        expect(isIndexed({ collection: 'posts', filterChain: [] }, singleBooleanIndexDefn)).toBeTruthy()
       })
 
       it('passes with single binary filter', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',
@@ -85,6 +86,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'published',
@@ -111,6 +113,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',
@@ -129,6 +132,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',
@@ -147,6 +151,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',
@@ -171,6 +176,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',
@@ -180,7 +186,6 @@ describe('datalayer store', () => {
                   rightOperator: OP.LTE,
                   type: 'number',
                 },
-
                 {
                   pathExpression: 'published',
                   rightOperand: true,
@@ -198,6 +203,7 @@ describe('datalayer store', () => {
         expect(
           isIndexed(
             {
+              collection: 'posts',
               filterChain: [
                 {
                   pathExpression: 'id',

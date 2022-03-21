@@ -20,7 +20,6 @@ export {
   AuditFilesystemStore,
 } from './database/store/filesystem'
 export {LevelStore} from './database/store/level'
-export type {} from './database/store'
 export {buildKeyForField, coerceFilterChainOperands, makeFilter, makeFilterChain, OP, isIndexed} from './database/store'
 export type {
   BinaryFilter,
@@ -28,6 +27,7 @@ export type {
   IndexDefinition,
   StoreQueryOptions,
   StoreQueryResponse,
+  PageInfo,
   PutOptions,
   SeedOptions,
   Store,

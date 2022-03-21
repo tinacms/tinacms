@@ -78,7 +78,6 @@ export type StoreQueryResponse = {
 export type IndexDefinition = {
   fields: {
     name: string
-    default?: string
     type?: string
   }[]
 }
@@ -420,16 +419,16 @@ export const isIndexed = (queryOptions: StoreQueryOptions, index: IndexDefinitio
   return true
 }
 
-export const buildKeyForField = (definition: IndexDefinition, data: object) => {
-  return definition.fields.map(field => {
+export const buildKeyForField = (definition: IndexDefinition, data: object): string | null => {
+  const valueParts = []
+  for (const field of definition.fields) {
     if (field.name in data) {
-      if (field.type === 'datetime') {
-        // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-        return new Date(data[field.name]).getTime()
-      } else {
-        return String(data[field.name])
-      }
+      // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
+      valueParts.push(String(field.type === 'datetime' ? new Date(data[field.name]).getTime() : data[field.name]))
+    } else {
+      return null // tell caller that one of the fields is missing and we can't index
     }
-    return [field.default || '']
-  }).join(':')
+  }
+
+  return valueParts.join(':')
 }

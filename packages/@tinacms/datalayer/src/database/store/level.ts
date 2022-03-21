@@ -224,14 +224,16 @@ export class LevelStore implements Store {
           indexKey = `${options.collection}:${sort}:${filepath}`
           existingIndexKey = indexKey
         } else {
-          indexKey = `${options.collection}:${sort}:${indexedValue}:${filepath}`
-          existingIndexKey = `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
+          indexKey = indexedValue ? `${options.collection}:${sort}:${indexedValue}:${filepath}` : null
+          existingIndexKey = existingIndexedValue ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}` : null
         }
 
-        if (indexKey != existingIndexKey) {
-          await this.db.del(existingIndexKey)
+        if (indexKey) {
+          if (existingIndexKey && indexKey != existingIndexKey) {
+            await this.db.del(existingIndexKey)
+          }
+          await this.db.put(indexKey, '')
         }
-        await this.db.put(indexKey, '')
       }
     }
   }

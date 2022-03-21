@@ -56,7 +56,6 @@ const validateResult = (result: any, expectedDocs: any[], limit?: number) => {
 }
 
 describe('LevelDB store', () => {
-  let mockHydrator: (path: string) => Promise<any>
   let mockDocuments: Record<
     string,
     {
@@ -68,7 +67,6 @@ describe('LevelDB store', () => {
   >
   let mockIndexes: Record<string, IndexDefinition>
   beforeEach(() => {
-    mockHydrator = async (path) => Promise.resolve(mockDocuments[path])
     mockDocuments = {
       'posts/document_1': {
         title: `${titlePrefix} 1`,
@@ -101,7 +99,6 @@ describe('LevelDB store', () => {
           {
             type: 'string',
             name: 'title',
-            default: '',
           },
         ],
       },
@@ -110,7 +107,6 @@ describe('LevelDB store', () => {
           {
             type: 'datetime',
             name: 'date',
-            default: '',
           },
         ],
       },
@@ -119,7 +115,6 @@ describe('LevelDB store', () => {
           {
             type: 'number',
             name: 'id',
-            default: '',
           },
         ],
       },
@@ -128,12 +123,10 @@ describe('LevelDB store', () => {
           {
             type: 'boolean',
             name: 'published',
-            default: 'false',
           },
           {
             type: 'datetime',
             name: 'date',
-            default: '',
           },
         ],
       },
@@ -337,7 +330,7 @@ describe('LevelDB store', () => {
       it('filters by GT', async () => {
         const sortedDocs = Object.entries(mockDocuments).sort(dateAscSort)
         const cutoffDate = sortedDocs[0][1].date
-        let expectedDocs = sortedDocs
+        const expectedDocs = sortedDocs
           .filter(
             (doc) =>
               new Date(doc[1].date).getTime() > new Date(cutoffDate).getTime()
@@ -362,7 +355,7 @@ describe('LevelDB store', () => {
       it('filters by GTE', async () => {
         const sortedDocs = Object.entries(mockDocuments).sort(dateAscSort)
         const cutoffDate = sortedDocs[0][1].date
-        let expectedDocs = sortedDocs
+        const expectedDocs = sortedDocs
           .filter(
             (doc) =>
               new Date(doc[1].date).getTime() >= new Date(cutoffDate).getTime()
@@ -387,7 +380,7 @@ describe('LevelDB store', () => {
       it('filters by LT', async () => {
         const sortedDocs = Object.entries(mockDocuments).sort(dateAscSort)
         const cutoffDate = sortedDocs[0][1].date
-        let expectedDocs = sortedDocs
+        const expectedDocs = sortedDocs
           .filter(
             (doc) =>
               new Date(doc[1].date).getTime() < new Date(cutoffDate).getTime()
@@ -412,7 +405,7 @@ describe('LevelDB store', () => {
       it('filters by LTE', async () => {
         const sortedDocs = Object.entries(mockDocuments).sort(dateAscSort)
         const cutoffDate = sortedDocs[0][1].date
-        let expectedDocs = sortedDocs
+        const expectedDocs = sortedDocs
           .filter(
             (doc) =>
               new Date(doc[1].date).getTime() <= new Date(cutoffDate).getTime()
