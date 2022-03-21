@@ -1,13 +1,13 @@
 import dynamic from 'next/dynamic'
 import React from 'react'
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
+import Tina from '../.tina/components/TinaProvider.jsx'
 
 const App = ({ Component, pageProps }) => {
   const { query, variables, data, ...rest } = pageProps
   return (
-    <TinaCMS {...rest}>
+    <Tina>
       <Component {...rest} query={query} variables={variables} data={data} />
-    </TinaCMS>
+    </Tina>
   )
 }
 

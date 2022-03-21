@@ -49,5 +49,21 @@ fragment BlockPageParts on BlockPage {
         }
       }
     }
+    ... on BlockPageBlocksFeatureList {
+      title
+      items {
+        __typename
+        title
+        description
+      }
+    }
+    ... on BlockPageBlocksSlideshow {
+      title
+      items {
+        __typename
+        title
+        url
+      }
+    }
   }
 }
