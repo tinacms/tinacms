@@ -18,10 +18,8 @@ import {
 } from '@udecode/plate-core'
 import { autoformatRules } from './autoformat/autoformatRules'
 import { createAutoformatPlugin } from '@udecode/plate-autoformat'
-import {
-  createExitBreakPlugin,
-  createSoftBreakPlugin,
-} from '@udecode/plate-break'
+import { createExitBreakPlugin } from '@udecode/plate-break'
+import { createSoftBreakPlugin } from '../soft-break'
 import { createResetNodePlugin } from '@udecode/plate-reset-node'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
@@ -109,11 +107,11 @@ export const plugins = [
           hotkey: 'Enter',
           predicate: isBlockAboveEmpty,
         },
-        {
-          ...resetBlockTypesCommonRule,
-          hotkey: 'Backspace',
-          predicate: isSelectionAtBlockStart,
-        },
+        // {
+        //   ...resetBlockTypesCommonRule,
+        //   hotkey: 'Backspace',
+        //   predicate: isSelectionAtBlockStart,
+        // },
       ],
     },
   }),
