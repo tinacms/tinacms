@@ -15,15 +15,52 @@ import {
   FilterCondition,
   makeFilterChain,
   OP,
-  isIndexed,
+  makeFilterSuffixes,
   makeFilter,
+  makeKeyForField,
   coerceFilterChainOperands,
   TernaryFilter,
   BinaryFilter,
 } from '.'
 
-describe('datalayer store', () => {
-  describe('validateQueryParams', () => {
+describe('datalayer store helper functions', () => {
+  describe('buildKeyForField', () => {
+    it('succeeds with non-datetime', () => {
+      const expected = 'bar'
+      const result = makeKeyForField({
+        fields: [{
+          name: 'foo',
+          type: 'string'
+        }]
+      }, { foo: expected })
+      expect(result).toEqual(expected)
+    })
+
+    it('succeeds with datetime', () => {
+      const now = new Date()
+      const expected = String(now.getTime())
+      const result = makeKeyForField({
+        fields: [{
+          name: 'foo',
+          type: 'datetime'
+        }]
+      }, { foo: now.toISOString() })
+      expect(result).toEqual(expected)
+    })
+
+    it('fails with missing field', () => {
+      const expected = null
+      const result = makeKeyForField({
+        fields: [{
+          name: 'foo',
+          type: 'string'
+        }]
+      }, { bar: 'foo' })
+      expect(result).toEqual(expected)
+    })
+  })
+
+  describe('buildFilterSuffixes', () => {
     const singleBooleanIndexDefn = {
       fields: [
         {
@@ -60,69 +97,115 @@ describe('datalayer store', () => {
     }
     describe('for valid params', () => {
       it('passes without filterChain', () => {
-        expect(isIndexed({ collection: 'posts', filterChain: [] }, singleBooleanIndexDefn)).toBeTruthy()
+        expect(makeFilterSuffixes([], singleBooleanIndexDefn)).toBeTruthy()
       })
 
-      it('passes with single binary filter', () => {
-        expect(
-          isIndexed(
+      it('passes with single binary filter GT', () => {
+        const expectedLeft = '1'
+        const { left, right } = makeFilterSuffixes(
+          [
             {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  operator: OP.GT,
-                  type: 'number',
-                },
-              ],
+              pathExpression: 'id',
+              rightOperand: Number(expectedLeft),
+              operator: OP.GT,
+              type: 'number',
             },
-            singleNumericIndexDefn
-          )
-        ).toBeTruthy()
+          ],
+          singleNumericIndexDefn
+        )
+        expect(left).toEqual(expectedLeft)
+        expect(right).toBeUndefined()
+      })
+
+      it('passes with single binary filter LT', () => {
+        const expectedRight = '1'
+        const { left, right } = makeFilterSuffixes(
+          [
+            {
+              pathExpression: 'id',
+              rightOperand: Number(expectedRight),
+              operator: OP.LT,
+              type: 'number',
+            },
+          ],
+          singleNumericIndexDefn
+        )
+        expect(right).toEqual(expectedRight)
+        expect(left).toBeUndefined()
+      })
+
+      it('passes with ternary filter', () => {
+        const expectedLeft = '1'
+        const expectedRight = '2'
+        const { left, right } = makeFilterSuffixes(
+          [
+            {
+              pathExpression: 'id',
+              rightOperand: Number(expectedRight),
+              leftOperand: Number(expectedLeft),
+              rightOperator: OP.LT,
+              leftOperator: OP.GT,
+              type: 'number',
+            },
+          ],
+          singleNumericIndexDefn
+        )
+        expect(right).toEqual(expectedRight)
+        expect(left).toEqual(expectedLeft)
+      })
+
+      it('passes with single binary filter EQ', () => {
+        const expectedLeft = '1'
+        const { left, right } = makeFilterSuffixes(
+          [
+            {
+              pathExpression: 'id',
+              rightOperand: Number(expectedLeft),
+              operator: OP.EQ,
+              type: 'number',
+            },
+          ],
+          singleNumericIndexDefn
+        )
+        expect(left).toEqual(expectedLeft)
+        expect(right).toEqual(expectedLeft)
       })
 
       it('passes with multiple filter', () => {
-        expect(
-          isIndexed(
+        const { left, right } = makeFilterSuffixes(
+          [
             {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'published',
-                  rightOperand: true,
-                  operator: OP.EQ,
-                  type: 'boolean',
-                },
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  operator: OP.GT,
-                  type: 'number',
-                },
-              ],
+              pathExpression: 'published',
+              rightOperand: true,
+              operator: OP.EQ,
+              type: 'boolean',
             },
-            publishedIdIndexDefn
-          )
-        ).toBeTruthy()
+            {
+              pathExpression: 'id',
+              rightOperand: 1,
+              operator: OP.GT,
+              type: 'number',
+            },
+          ],
+          publishedIdIndexDefn
+        )
+        expect(left).toEqual('true:1')
+        expect(right).toBeUndefined()
       })
     })
 
     describe('for invalid params', () => {
       it('fails for unreferenced field', () => {
         expect(
-          isIndexed(
-            {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  operator: OP.GT,
-                  type: 'number',
-                },
-              ],
-            },
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'id',
+                rightOperand: 1,
+                operator: OP.GT,
+                type: 'number',
+              },
+            ],
             singleBooleanIndexDefn
           )
         ).toBeFalsy()
@@ -130,43 +213,47 @@ describe('datalayer store', () => {
 
       it('fails for IN operator', () => {
         expect(
-          isIndexed(
-            {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: [1, 2, 3, 4],
-                  operator: OP.IN,
-                  type: 'number',
-                },
-              ],
-            },
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'id',
+                rightOperand: [1, 2, 3, 4],
+                operator: OP.IN,
+                type: 'number',
+              },
+            ],
             singleNumericIndexDefn
           )
         ).toBeFalsy()
       })
 
-      it('fails for mis-ordered fields', () => {
+      it('lower order non-EQ operator', () => {
         expect(
-          isIndexed(
-            {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  operator: OP.GT,
-                  type: 'number',
-                },
-                {
-                  pathExpression: 'published',
-                  rightOperand: true,
-                  operator: OP.EQ,
-                  type: 'number',
-                },
-              ],
-            },
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'published',
+                rightOperand: true,
+                operator: OP.GT,
+                type: 'boolean',
+              }
+            ],
+            publishedIdIndexDefn
+          )
+        ).toBeFalsy()
+      })
+
+      it('fails for filter with gap', () => {
+        expect(
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'id',
+                rightOperand: 1,
+                operator: OP.EQ,
+                type: 'number',
+              }
+            ],
             publishedIdIndexDefn
           )
         ).toBeFalsy()
@@ -174,26 +261,25 @@ describe('datalayer store', () => {
 
       it('fails with low order ternary filter', () => {
         expect(
-          isIndexed(
-            {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  leftOperand: 2,
-                  leftOperator: OP.GTE,
-                  rightOperator: OP.LTE,
-                  type: 'number',
-                },
-                {
-                  pathExpression: 'published',
-                  rightOperand: true,
-                  operator: OP.EQ,
-                  type: 'number',
-                },
-              ],
-            },
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'id',
+                rightOperand: 1,
+                leftOperand: 2,
+                leftOperator: OP.GTE,
+                rightOperator: OP.LTE,
+                type: 'number',
+              },
+              {
+                pathExpression: 'published',
+                leftOperand: false,
+                rightOperand: true,
+                leftOperator: OP.GTE,
+                rightOperator: OP.LTE,
+                type: 'number',
+              },
+            ],
             idPublishedIndexDefn
           )
         ).toBeFalsy()
@@ -201,24 +287,21 @@ describe('datalayer store', () => {
 
       it('fails with low order non-equality operator', () => {
         expect(
-          isIndexed(
-            {
-              collection: 'posts',
-              filterChain: [
-                {
-                  pathExpression: 'id',
-                  rightOperand: 1,
-                  operator: OP.LT,
-                  type: 'number',
-                },
-                {
-                  pathExpression: 'published',
-                  rightOperand: true,
-                  operator: OP.EQ,
-                  type: 'boolean',
-                },
-              ],
-            },
+          makeFilterSuffixes(
+            [
+              {
+                pathExpression: 'id',
+                rightOperand: 1,
+                operator: OP.LT,
+                type: 'number',
+              },
+              {
+                pathExpression: 'published',
+                rightOperand: true,
+                operator: OP.LT,
+                type: 'boolean',
+              },
+            ],
             idPublishedIndexDefn
           )
         ).toBeFalsy()

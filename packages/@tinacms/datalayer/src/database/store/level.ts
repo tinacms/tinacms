@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import type {StoreQueryOptions, StoreQueryResponse, PutOptions, SeedOptions, Store} from './index'
-import {coerceFilterChainOperands, isIndexed, makeFilter, buildKeyForField, DEFAULT_COLLECTION_SORT_KEY} from './index'
+import {coerceFilterChainOperands, makeFilterSuffixes, makeFilter, makeKeyForField, DEFAULT_COLLECTION_SORT_KEY} from './index'
 import path from 'path'
 import {sequential} from '../../util'
 import level, {LevelDB} from 'level'
@@ -40,25 +40,19 @@ export class LevelStore implements Store {
   }
 
   public async query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse> {
-    const { filterChain, sort = DEFAULT_COLLECTION_SORT_KEY, collection, indexDefinitions, ...query } = queryOptions
+    const { filterChain: rawFilterChain, sort = DEFAULT_COLLECTION_SORT_KEY, collection, indexDefinitions, limit = 10, ...query } = queryOptions
 
-    const { limit: resultLimit = 10 } = query
-
-    // modify the query to fetch one more item to correctly set hasNextPage
-    if (resultLimit !== -1) {
-      query.limit = resultLimit + 1
-    }
-
+    const filterChain = coerceFilterChainOperands(rawFilterChain)
     const indexDefinition = (sort && indexDefinitions?.[sort]) as IndexDefinition | undefined
-    const indexed = indexDefinition && isIndexed(queryOptions, indexDefinition)
+    const filterSuffixes = indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
     const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
 
     if (!query.gt && !query.gte) {
-      query.gt = indexPrefix
+      query.gte = filterSuffixes?.left ? `${indexPrefix}:${filterSuffixes.left}` : indexPrefix
     }
 
     if (!query.lt && !query.lte) {
-      query.lt = `${indexPrefix}\xFF`
+      query.lte = filterSuffixes?.right ? `${indexPrefix}:${filterSuffixes.right}\xFF` : `${indexPrefix}\xFF`
     }
 
     let edges: { cursor: string, path: string }[] = []
@@ -69,9 +63,7 @@ export class LevelStore implements Store {
 
     const fieldsPattern = indexDefinition?.fields?.length ? `${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:` : ':'
     const valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
-    const itemFilter = makeFilter({
-      filterChain: coerceFilterChainOperands(filterChain),
-    })
+    const itemFilter = makeFilter({ filterChain })
 
     for await (const [key, value] of (this.db as any).iterator(query)) { //TODO why is typescript unhappy?
       const matcher = valuesRegex.exec(key)
@@ -79,11 +71,11 @@ export class LevelStore implements Store {
         continue
       }
       const filepath = matcher.groups['_filepath_']
-      if (!itemFilter(indexed ? matcher.groups : (indexDefinition ? await this.db.get(`${defaultPrefix}:${filepath}`) : value))) {
+      if (!itemFilter(filterSuffixes ? matcher.groups : (indexDefinition ? await this.db.get(`${defaultPrefix}:${filepath}`) : value))) {
         continue
       }
 
-      if (resultLimit !== -1 && edges.length >= resultLimit) {
+      if (limit !== -1 && edges.length >= limit) {
         if (query.reverse) {
           hasPreviousPage = true
         } else {
@@ -196,8 +188,8 @@ export class LevelStore implements Store {
 
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(options.indexDefinitions)) {
-        const indexedValue = buildKeyForField(definition, data)
-        const existingIndexedValue = existingData ? buildKeyForField(definition, existingData) : null
+        const indexedValue = makeKeyForField(definition, data)
+        const existingIndexedValue = existingData ? makeKeyForField(definition, existingData) : null
 
         let indexKey
         let existingIndexKey = null

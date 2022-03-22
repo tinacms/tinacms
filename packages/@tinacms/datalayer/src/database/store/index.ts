@@ -383,47 +383,81 @@ export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFi
   return result
 }
 
-export const isIndexed = (queryOptions: StoreQueryOptions, index: IndexDefinition) => {
-  if (queryOptions.filterChain && queryOptions.filterChain.length) {
-    const [lastFilter] = queryOptions.filterChain.slice(-1)
-    const maxOrder = index.fields.findIndex(field => lastFilter.pathExpression === field.name)
+export const makeFilterSuffixes = (filterChain: (BinaryFilter | TernaryFilter)[], index: IndexDefinition): { left?: string, right?: string } | undefined => {
+  if (filterChain && filterChain.length) {
     const indexFields = index.fields.map(field => field.name)
-    const referencedFields = index.fields.filter((field, i) => { return i <= maxOrder }).map((field) => field.name)
-
-    // First make sure that all the query fields are present in the index
-    for (const [i, filter] of Object.entries(queryOptions.filterChain)) {
-      if (indexFields.indexOf(filter.pathExpression) === -1) {
-        return false
+    const orderedFilterChain = []
+    for (const filter of filterChain) {
+      const idx = indexFields.indexOf(filter.pathExpression)
+      if (idx === -1) {
+        // filter chain path expression not present on index
+        return
       }
 
-      // and the order of the filtering makes sense
-      if (filter.pathExpression !== referencedFields[Number(i)]) {
-        return false
-      }
-
-      // Indexes do not support filtering with IN operator
       if ((filter as BinaryFilter).operator && (filter as BinaryFilter).operator === OP.IN) {
-        return false
+        // Indexes do not support filtering with IN operator
+        return
       }
 
-      if (Number(i) < maxOrder) {
-        // Lower order fields can not use TernaryFilter
+      orderedFilterChain[idx] = filter
+    }
+
+    const baseFragments = []
+    let rightSuffix
+    let leftSuffix
+    let ternaryFilter = false
+    if (orderedFilterChain[filterChain.length - 1] && !orderedFilterChain[filterChain.length - 1].operator) {
+      ternaryFilter = true
+    }
+    for (const [i, filter] of Object.entries(filterChain)) {
+      if (Number(i) < indexFields.length - 1) {
         if (!(filter as BinaryFilter).operator) {
-          return false
+          // Lower order fields can not use TernaryFilter
+          return
         }
 
         // Lower order fields must use equality operator
         const binaryFilter: BinaryFilter = filter as BinaryFilter
         if (binaryFilter.operator !== OP.EQ) {
-          return false
+          return
+        }
+
+        if (!orderedFilterChain[i]) {
+          // ensure no gaps in the prefix
+          return
+        }
+
+        baseFragments.push(orderedFilterChain[i].rightOperand)
+      } else {
+        if (ternaryFilter) {
+          leftSuffix = orderedFilterChain[i].leftOperand
+          rightSuffix = orderedFilterChain[i].rightOperand
+        } else {
+          const op = orderedFilterChain[i].operator
+          const operand = orderedFilterChain[i].rightOperand
+          if (op === OP.LT || op === OP.LTE) {
+            rightSuffix = operand
+          } else if (op === OP.GT || op === OP.GTE) {
+            leftSuffix = operand
+          } else {
+            // STARTS_WITH or EQ
+            rightSuffix = operand
+            leftSuffix = operand
+          }
         }
       }
     }
+
+    return {
+      left: leftSuffix && [...baseFragments, leftSuffix].join(':') || undefined,
+      right: rightSuffix && [...baseFragments, rightSuffix].join(':') || undefined
+    }
+  } else {
+    return {}
   }
-  return true
 }
 
-export const buildKeyForField = (definition: IndexDefinition, data: object): string | null => {
+export const makeKeyForField = (definition: IndexDefinition, data: object): string | null => {
   const valueParts = []
   for (const field of definition.fields) {
     if (field.name in data) {

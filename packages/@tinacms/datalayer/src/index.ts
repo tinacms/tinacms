@@ -20,7 +20,7 @@ export {
   AuditFilesystemStore,
 } from './database/store/filesystem'
 export {LevelStore} from './database/store/level'
-export {buildKeyForField, coerceFilterChainOperands, DEFAULT_COLLECTION_SORT_KEY, makeFilter, makeFilterChain, OP, isIndexed} from './database/store'
+export {coerceFilterChainOperands, DEFAULT_COLLECTION_SORT_KEY, makeFilter, makeFilterChain, makeFilterSuffixes, makeKeyForField, OP} from './database/store'
 export type {
   BinaryFilter,
   FilterCondition,
