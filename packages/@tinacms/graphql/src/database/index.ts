@@ -249,7 +249,6 @@ export class Database {
   public getIndexDefinitions = async (): Promise<Record<string,Record<string,IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
       await new Promise(async (resolve) => {
-        this.collectionIndexDefinitions = {}
         const schema = await this.getSchema()
         const collections = schema.getCollections()
         for (const collection of collections) {
@@ -285,7 +284,7 @@ export class Database {
               }
             }
           }
-
+          this.collectionIndexDefinitions = this.collectionIndexDefinitions || {}
           this.collectionIndexDefinitions[collection.name] = indexDefinitions
         }
         resolve()
