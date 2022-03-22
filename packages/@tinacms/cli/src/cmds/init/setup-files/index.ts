@@ -98,7 +98,7 @@ export const nextPostPage =
     text-decoration: underline;
   }
   \`;
-  // Use the props returned by get static props (this can be deleted when the edit provider and tina-wrapper are moved to _app.js)
+  
   const BlogPage = (props) => {
     const { data } = useTina({
       query,
@@ -116,12 +116,6 @@ export const nextPostPage =
             integrity="sha512-y6ZMKFUQrn+UUEVoqYe8ApScqbjuhjqzTuwUMEGMDuhS2niI8KA3vhH2LenreqJXQS+iIXVTRL2iaNfJbDNA1Q=="
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
-          />
-          {/* Marked CDN */}
-          <script
-            type="text/javascript"
-            crossOrigin="anonymous"
-            src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.0/marked.min.js"
           />
         </Head>
         <div>
