@@ -248,44 +248,48 @@ export class Database {
 
   public getIndexDefinitions = async (): Promise<Record<string,Record<string,IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
-      const schema = await this.getSchema()
-      const collections = schema.getCollections()
-      for (const collection of collections) {
-        const indexDefinitions = {
-          [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] } // provide a default sort key which is the file sort
-        }
+      await new Promise(async (resolve) => {
+        this.collectionIndexDefinitions = {}
+        const schema = await this.getSchema()
+        const collections = schema.getCollections()
+        for (const collection of collections) {
+          const indexDefinitions = {
+            [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] } // provide a default sort key which is the file sort
+          }
 
-        if (collection.fields) {
-          for (const field of (collection.fields as TinaFieldInner<true>[])) {
-            if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
-              continue
-            }
+          if (collection.fields) {
+            for (const field of (collection.fields as TinaFieldInner<true>[])) {
+              if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
+                continue
+              }
 
-            indexDefinitions[field.name] = {
-              fields: [
-                {
-                  name: field.name,
-                  type: field.type
-                }
-              ]
+              indexDefinitions[field.name] = {
+                fields: [
+                  {
+                    name: field.name,
+                    type: field.type
+                  }
+                ]
+              }
             }
           }
-        }
 
-        if (collection.indexes) {
-          // build IndexDefinitions for each index in the collection schema
-          for (const index of collection.indexes) {
-            indexDefinitions[index.name] = {
-              fields: index.fields.map(indexField => ({
-                name: indexField.name,
-                type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
-              }))
+          if (collection.indexes) {
+            // build IndexDefinitions for each index in the collection schema
+            for (const index of collection.indexes) {
+              indexDefinitions[index.name] = {
+                fields: index.fields.map(indexField => ({
+                  name: indexField.name,
+                  type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
+                }))
+              }
             }
           }
+
+          this.collectionIndexDefinitions[collection.name] = indexDefinitions
         }
-        this.collectionIndexDefinitions = this.collectionIndexDefinitions || {}
-        this.collectionIndexDefinitions[collection.name] = indexDefinitions
-      }
+        resolve()
+      })
     }
 
     return this.collectionIndexDefinitions
