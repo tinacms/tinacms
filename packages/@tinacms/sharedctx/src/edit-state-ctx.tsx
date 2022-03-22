@@ -81,7 +81,7 @@ export const useEditState = () => {
   const { edit, setEdit } = useContext(EditContext)
   if (!setEdit) {
     throw new Error(
-      'Unable to find `TinaProvider`; did you forget to add the TinaCMS container to your _app layout?  See our setup docs: https://tina.io/docs/introduction/tina-init/#adding-tina'
+      'Unable to find `TinaProvider`; did you forget to add the TinaCMS container to your app root?  See our setup docs: https://tina.io/docs/introduction/tina-init/#adding-tina'
     )
   }
   return { edit, setEdit }
