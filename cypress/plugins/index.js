@@ -25,6 +25,9 @@ limitations under the License.
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+const fs = require('fs')
+const path = require('path')
+
 /**
  * @type {Cypress.PluginConfig}
  */
@@ -32,4 +35,21 @@ limitations under the License.
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
+
+  const getAbsPath = (relativePath) =>
+    path.resolve(
+      config.projectRoot,
+      'experimental-examples/kitchen-sink/content/page',
+      relativePath
+    )
+
+  on('task', {
+    readrawmdx(relativePath = 'home.mdx') {
+      return fs.readFileSync(getAbsPath(relativePath), 'utf8')
+    },
+    writemdx(markdown, relativePath = 'home.mdx') {
+      fs.writeFileSync(getAbsPath(relativePath), markdown, 'utf8')
+      return true
+    },
+  })
 }
