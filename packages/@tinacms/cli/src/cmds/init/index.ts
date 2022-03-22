@@ -57,41 +57,16 @@ export async function initTina(ctx: any, next: () => void, options) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// https://stackoverflow.com/questions/60454251/how-to-know-the-version-of-currently-installed-package-from-yarn-lock
-const getPackageVersionYarn1 = async (packageName: string) => {
-  const { spawnSync } = require('child_process')
-  const whyBuffer = spawnSync('yarn', ['why', packageName])
-  const grepBuffer = spawnSync('grep', ['Found'], { input: whyBuffer.stdout })
-  const outputArray = grepBuffer.stdout.toString().split('\n')
-  const parsedOutputArray = outputArray
-    .filter((output) => output.length > 0)
-    .map((output) => output.split('@')[1].replace('"', ''))
-  return parsedOutputArray[0]
-}
-
-const getPackageVersionYarn2 = async (packageName: string) => {
-  const packageInfo = JSON.parse(
-    await execShellCommand(`yarn info ${packageName} --json`)
-  )
-  return packageInfo.children.Version
-}
-
 export async function checkDeps(ctx: any, next: () => void, options) {
   const bar = new Progress('Checking dependencies. :prog', 1)
 
-  let reactVersion
-  let reactDOMVersion
-
-  process.chdir('/Users/jeffsee/code/tina-playground')
-  const yarnVersion = await execShellCommand(`yarn --version`)
-  if (yarnVersion.startsWith('2')) {
-    reactVersion = await getPackageVersionYarn2('react')
-    reactDOMVersion = await getPackageVersionYarn2('react-dom')
-  } else {
-    reactVersion = await getPackageVersionYarn1('react')
-    reactDOMVersion = await getPackageVersionYarn1('react-dom')
-  }
-  if (!checkVersion(reactVersion) || !checkVersion(reactDOMVersion)) {
+  const packageJSON = JSON.parse(
+    (await fs.readFileSync(packageJSONPath)).toString()
+  )
+  if (
+    !checkPackage(packageJSON, 'react') ||
+    !checkPackage(packageJSON, 'react-dom')
+  ) {
     const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
       "react@>=16.14.0"
       "react-dom@>=16.14.0"
@@ -107,12 +82,34 @@ export async function checkDeps(ctx: any, next: () => void, options) {
   next()
 }
 
+export const checkPackage = (packageJSON, packageName) => {
+  let strippedVersion
+  Object.entries(packageJSON.dependencies).map(
+    ([depPackageName, version]: [string, string]) => {
+      if (depPackageName === packageName) {
+        strippedVersion = version.replace(/^[^a-zA-Z0-9]*|[^a-zA-Z0-9]*$/g, '')
+      }
+    }
+  )
+  return checkVersion(strippedVersion)
+}
+
 const checkVersion = (version) => {
   const majorMin = 16
   const minorMin = 14
   const parts = version.split('.')
   const major = Number(parts[0])
   const minor = Number(parts[1])
+
+  if (parts.length === 1) {
+    if (isNaN(major)) {
+      return true
+    } else if (major > majorMin) {
+      return true
+    } else {
+      return false
+    }
+  }
 
   if (major > majorMin) {
     return true
@@ -151,6 +148,7 @@ export async function installDeps(ctx: any, next: () => void, options) {
 
 const baseDir = process.cwd()
 // TODO: should handle src folder here
+const packageJSONPath = p.join(baseDir, 'package.json')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
 const TinaFolder = p.join(baseDir, '.tina')
