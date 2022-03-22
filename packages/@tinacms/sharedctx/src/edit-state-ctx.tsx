@@ -20,9 +20,10 @@ const isSSR = typeof window === 'undefined'
 
 export const isEditing = (): boolean => {
   if (!isSSR) {
-    // localStorage may be intentionally disabled for site visitors, 
+    // localStorage may be intentionally disabled for site visitors,
     // in that case Tina can't be used so just return false
-    const isEdit = window.localStorage && window.localStorage.getItem(LOCALSTORAGEKEY)
+    const isEdit =
+      window.localStorage && window.localStorage.getItem(LOCALSTORAGEKEY)
     return isEdit && isEdit === 'true'
   }
   // assume not editing if SSR
@@ -79,7 +80,9 @@ export const EditProvider: React.FC = ({ children }) => {
 export const useEditState = () => {
   const { edit, setEdit } = useContext(EditContext)
   if (!setEdit) {
-    throw new Error('No `TinaEditProvider` found')
+    throw new Error(
+      'Unable to find `TinaProvider`; did you forget to add the TinaCMS container to your app root?  See our setup docs: https://tina.io/docs/introduction/tina-init/#adding-tina'
+    )
   }
   return { edit, setEdit }
 }
