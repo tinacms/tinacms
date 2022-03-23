@@ -364,6 +364,7 @@ export interface NodeTypes {
   delete_mark: string
   inline_code_mark: string
   thematic_break: string
+  break: string
 }
 
 export type SlateNodeType =
@@ -561,6 +562,7 @@ export const defaultNodeTypes: NodeTypes = {
   delete_mark: plateElements.MARK_STRIKETHROUGH,
   inline_code_mark: plateElements.ELEMENT_CODE_LINE,
   thematic_break: plateElements.ELEMENT_HR,
+  break: 'break',
   image: plateElements.ELEMENT_IMAGE,
 }
 
@@ -682,6 +684,8 @@ export default function remarkToSlate(node: MdxAstNode) {
         ...node,
         children: undefined,
       }
+    case 'break':
+      return { type: types.break, children: [{ type: 'text', text: '' }] }
     default:
       console.log('unknown', node)
       return { type: 'text', text: '' }

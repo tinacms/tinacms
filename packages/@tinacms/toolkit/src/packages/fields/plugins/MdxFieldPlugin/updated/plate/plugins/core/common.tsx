@@ -125,7 +125,6 @@ export const insertBlockElement = (editor, blockElement) => {
     setTimeout(() => {
       // If empty, replace the current block
       if (isCurrentBlockEmpty(editor)) {
-        console.log('itsempty')
         setNodes(editor, blockElement)
       } else {
         insertNodes(editor, [blockElement])
