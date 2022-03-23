@@ -15,7 +15,7 @@ import {JSONPath} from 'jsonpath-plus'
 
 import {FilterOperand} from '../../index'
 
-export const DEFAULT_COLLECTION_SORT_KEY = 'filepath'
+export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 
 export enum OP {
   EQ = 'eq',
