@@ -173,10 +173,11 @@ export const useFormify = ({
       })
 
       state.blueprints.map((blueprint) => {
-        const responseAtBlueprint = util.getIn2<FormifiedDocumentNode>(
-          result,
-          util.getBlueprintAliasPath(blueprint)
-        )
+        const responseAtBlueprint =
+          util.getValueForBlueprint<FormifiedDocumentNode>(
+            result,
+            util.getBlueprintAliasPath(blueprint)
+          )
         const location = []
         const findFormNodes = (
           res: typeof responseAtBlueprint,
@@ -244,6 +245,9 @@ export const useFormify = ({
   React.useEffect(() => {
     if (state.status === 'ready') {
       cms.events.subscribe(`forms:reset`, (event: OnChangeEvent) => {
+        if (eventList) {
+          eventList.push(util.printEvent(event))
+        }
         dispatch({ type: 'formOnReset', value: { event } })
       })
       cms.events.subscribe(
@@ -473,23 +477,22 @@ export const useFormify = ({
       await util.sequential(form.fields, async (field) => {
         const value = form.values[field.name]
 
-        const fieldName = field.list ? `${field.name}.[]` : field.name
         const blueprint = util.getFormNodeBlueprint(formNode, state)
-        const blueprintName = util.getBlueprintNamePath(blueprint)
-        const extra = []
-        if (prefix) {
-          extra.push(prefix)
-        }
-        const matchName = [
-          blueprintName,
-          DATA_NODE_NAME,
-          ...extra,
-          fieldName,
-        ].join('.')
-        const fieldBlueprints = blueprint.fields.filter((fieldBlueprint) => {
-          return matchName === util.getBlueprintNamePath(fieldBlueprint)
+        const { matchName, fieldName } = util.getMatchName({
+          field,
+          prefix,
+          blueprint,
         })
-
+        const fieldBlueprints = blueprint.fields
+          .filter((fieldBlueprint) => {
+            return matchName === util.getBlueprintNamePath(fieldBlueprint)
+          })
+          .filter((fbp) =>
+            util.filterFieldBlueprintsByParentTypename(
+              fbp,
+              field.parentTypename
+            )
+          )
         switch (field.type) {
           case 'object':
             if (field.templates) {
@@ -507,18 +510,20 @@ export const useFormify = ({
                         `Expected value for object list field to be an array`
                       )
                     }
-                    const d = []
-                    await util.sequential(value, async (item, index) => {
-                      const template = field.templates[item._template]
-                      const d2 = await resolveSubFields({
-                        formNode,
-                        form: { fields: template.fields, values: item },
-                        prefix: [prefix, fieldName].join('.'),
-                        loc: [...loc, index],
-                      })
-                      d.push(d2)
-                    })
-                    data[keyName] = d
+                    data[keyName] = await util.sequential(
+                      value,
+                      async (item, index) => {
+                        const template = field.templates[item._template]
+                        return resolveSubFields({
+                          formNode,
+                          form: { fields: template.fields, values: item },
+                          prefix: prefix
+                            ? [prefix, fieldName].join('.')
+                            : fieldName,
+                          loc: [...loc, index],
+                        })
+                      }
+                    )
                   }
                 )
               } else {
@@ -539,18 +544,17 @@ export const useFormify = ({
                         `Expected value for object list field to be an array`
                       )
                     }
-                    const d = []
-                    await util.sequential(value, async (item, index) => {
-                      const d2 = await resolveSubFields({
-                        formNode,
-                        form: { fields: field.fields, values: item },
-                        prefix: [prefix, fieldName].join('.'),
-                        loc: [...loc, index],
-                      })
-                      d.push(d2)
-                      return true
-                    })
-                    data[keyName] = d
+                    data[keyName] = await util.sequential(
+                      value,
+                      async (item, index) => {
+                        return resolveSubFields({
+                          formNode,
+                          form: { fields: field.fields, values: item },
+                          prefix: [prefix, fieldName].join('.'),
+                          loc: [...loc, index],
+                        })
+                      }
+                    )
                     return true
                   }
                 )
@@ -563,13 +567,12 @@ export const useFormify = ({
                       data[keyName] = null
                       return true
                     }
-                    const d = await resolveSubFields({
+                    data[keyName] = await resolveSubFields({
                       formNode,
                       form: { fields: field.fields, values: value },
                       prefix: [prefix, fieldName].join('.'),
                       loc,
                     })
-                    data[keyName] = d
                     return true
                   }
                 )
@@ -647,12 +650,14 @@ export const useFormify = ({
                   `,
                 { variables: { id: value } }
               )
-              const d = await resolveSubFields({
-                formNode: subDocumentFormNode,
-                form,
-                loc: location,
-              })
-              data[keyName] = { ...res.node, data: d }
+              data[keyName] = {
+                ...res.node,
+                data: await resolveSubFields({
+                  formNode: subDocumentFormNode,
+                  form,
+                  loc: location,
+                }),
+              }
             })
 
             break

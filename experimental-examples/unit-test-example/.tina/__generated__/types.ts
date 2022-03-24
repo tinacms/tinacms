@@ -278,7 +278,31 @@ export type BlockPageBlocksFeaturedPosts = {
   blogs?: Maybe<Array<Maybe<BlockPageBlocksFeaturedPostsBlogs>>>;
 };
 
-export type BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts;
+export type BlockPageBlocksFeatureListItems = {
+  __typename?: 'BlockPageBlocksFeatureListItems';
+  title?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+};
+
+export type BlockPageBlocksFeatureList = {
+  __typename?: 'BlockPageBlocksFeatureList';
+  title?: Maybe<Scalars['String']>;
+  items?: Maybe<Array<Maybe<BlockPageBlocksFeatureListItems>>>;
+};
+
+export type BlockPageBlocksSlideshowItems = {
+  __typename?: 'BlockPageBlocksSlideshowItems';
+  title?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type BlockPageBlocksSlideshow = {
+  __typename?: 'BlockPageBlocksSlideshow';
+  title?: Maybe<Scalars['String']>;
+  items?: Maybe<Array<Maybe<BlockPageBlocksSlideshowItems>>>;
+};
+
+export type BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts | BlockPageBlocksFeatureList | BlockPageBlocksSlideshow;
 
 export type BlockPage = {
   __typename?: 'BlockPage';
@@ -425,10 +449,32 @@ export type BlockPageBlocksFeaturedPostsMutation = {
   blogs?: Maybe<Array<Maybe<BlockPageBlocksFeaturedPostsBlogsMutation>>>;
 };
 
+export type BlockPageBlocksFeatureListItemsMutation = {
+  title?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+};
+
+export type BlockPageBlocksFeatureListMutation = {
+  title?: Maybe<Scalars['String']>;
+  items?: Maybe<Array<Maybe<BlockPageBlocksFeatureListItemsMutation>>>;
+};
+
+export type BlockPageBlocksSlideshowItemsMutation = {
+  title?: Maybe<Scalars['String']>;
+  url?: Maybe<Scalars['String']>;
+};
+
+export type BlockPageBlocksSlideshowMutation = {
+  title?: Maybe<Scalars['String']>;
+  items?: Maybe<Array<Maybe<BlockPageBlocksSlideshowItemsMutation>>>;
+};
+
 export type BlockPageBlocksMutation = {
   hero?: Maybe<BlockPageBlocksHeroMutation>;
   blockQuote?: Maybe<BlockPageBlocksBlockQuoteMutation>;
   featuredPosts?: Maybe<BlockPageBlocksFeaturedPostsMutation>;
+  featureList?: Maybe<BlockPageBlocksFeatureListMutation>;
+  slideshow?: Maybe<BlockPageBlocksSlideshowMutation>;
 };
 
 export type BlockPageMutation = {
@@ -440,7 +486,7 @@ export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, ta
 
 export type AuthorPartsFragment = { __typename?: 'Author', name?: Maybe<string>, bio?: Maybe<any>, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> };
 
-export type BlockPagePartsFragment = { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> }>>> };
+export type BlockPagePartsFragment = { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> };
 
 export type GetPostDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -471,12 +517,12 @@ export type GetBlockPageDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetBlockPageDocumentQuery = { __typename?: 'Query', getBlockPageDocument: { __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> }>>> } } };
+export type GetBlockPageDocumentQuery = { __typename?: 'Query', getBlockPageDocument: { __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> } } };
 
 export type GetBlockPageListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBlockPageListQuery = { __typename?: 'Query', getBlockPageList: { __typename?: 'BlockPageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'BlockPageConnectionEdges', node?: Maybe<{ __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> }>>> } }> }>>> } };
+export type GetBlockPageListQuery = { __typename?: 'Query', getBlockPageList: { __typename?: 'BlockPageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'BlockPageConnectionEdges', node?: Maybe<{ __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> } }> }>>> } };
 
 export const PostPartsFragmentDoc = gql`
     fragment PostParts on Post {
@@ -530,6 +576,22 @@ export const BlockPagePartsFragmentDoc = gql`
             id
           }
         }
+      }
+    }
+    ... on BlockPageBlocksFeatureList {
+      title
+      items {
+        __typename
+        title
+        description
+      }
+    }
+    ... on BlockPageBlocksSlideshow {
+      title
+      items {
+        __typename
+        title
+        url
       }
     }
   }
