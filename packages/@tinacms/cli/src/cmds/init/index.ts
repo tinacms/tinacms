@@ -57,6 +57,8 @@ export async function initTina(ctx: any, next: () => void, options) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export const MIN_REACT_VERSION = '>=16.14.0'
+
 export async function checkDeps(ctx: any, next: () => void, options) {
   const bar = new Progress('Checking dependencies. :prog', 1)
 
@@ -68,8 +70,8 @@ export async function checkDeps(ctx: any, next: () => void, options) {
     !checkPackage(packageJSON, 'react-dom')
   ) {
     const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
-      "react@>=16.14.0"
-      "react-dom@>=16.14.0"
+      "react@=${MIN_REACT_VERSION}"
+      "react-dom@${MIN_REACT_VERSION}"
 
   Then re-rerun "@tinacms/cli init"`
     throw new Error(message)
@@ -94,6 +96,9 @@ export const checkPackage = (packageJSON, packageName) => {
   return checkVersion(strippedVersion)
 }
 
+/**
+ * Checks for MIN_REACT_VERSION of 16.14.0
+ */
 const checkVersion = (version) => {
   const majorMin = 16
   const minorMin = 14
