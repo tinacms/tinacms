@@ -32,7 +32,7 @@ export const EditorModeProvider = ({ children }: any) => {
   const [mode, setMode] = useState('wysiwyg')
 
   useEffect(() => {
-    document.addEventListener('keydown', event => {
+    document.addEventListener('keydown', (event) => {
       if (
         event.altKey &&
         event.shiftKey &&

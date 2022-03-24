@@ -89,9 +89,7 @@ const FormFieldRenderer = ({ form }: FormFieldRendererProps) => {
         >
           {field && field.inlineComponent ? (
             <field.inlineComponent name={field.name} />
-          ) : (
-            undefined
-          )}
+          ) : undefined}
         </FieldOverlay>
       ) : null}
     </>
@@ -104,7 +102,7 @@ export const InlineFieldsRenderer = () => {
 
   return (
     <>
-      {forms.map(form => (
+      {forms.map((form) => (
         <FormFieldRenderer form={form} />
       ))}
     </>

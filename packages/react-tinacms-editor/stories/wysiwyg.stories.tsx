@@ -71,8 +71,8 @@ const WithImage = () => {
       imageProps={{
         upload: (files: File[]) => {
           console.log(files)
-          return new Promise(resolve => {
-            setTimeout(function() {
+          return new Promise((resolve) => {
+            setTimeout(function () {
               resolve([
                 'https://i.imgur.com/2FCfbgg.jpg',
                 'https://i7.fnp.com/images/pr/l/v20180606180223/white-n-red-floral-beauty_1.jpg',

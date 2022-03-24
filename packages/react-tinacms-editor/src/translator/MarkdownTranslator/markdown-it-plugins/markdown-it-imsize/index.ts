@@ -23,7 +23,7 @@ import { parseImageSize } from './helpers/parse_image_size'
 import { parseLinkDestination } from '../helpers/parseLinkDestination'
 
 function image_with_size(md: any) {
-  return function(state: any, silent: any) {
+  return function (state: any, silent: any) {
     let attrs,
       code,
       label,
