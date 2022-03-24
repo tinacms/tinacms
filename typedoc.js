@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-module.exports = packageJson => {
+module.exports = (packageJson) => {
   const gitRevision = `${packageJson.name}@${packageJson.version}`
   const outDir = `${__dirname}/docs/${gitRevision}`
 

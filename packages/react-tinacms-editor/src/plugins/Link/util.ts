@@ -27,11 +27,12 @@ import { Fragment, Node } from 'prosemirror-model'
  */
 export const IMG_REGEX = /\.(jpe?g|png)/
 
-export const HTTP_LINK_REGEX = /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
+export const HTTP_LINK_REGEX =
+  /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
 
-export const linkify = function(fragment: Fragment): Fragment {
+export const linkify = function (fragment: Fragment): Fragment {
   const linkified: Node[] = []
-  fragment.forEach(function(child: Node) {
+  fragment.forEach(function (child: Node) {
     if (child.isText) {
       const text = child.text as string
       let pos = 0

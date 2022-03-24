@@ -147,7 +147,7 @@ export function orderedListRule(nodeType: NodeType) {
   return wrappingInputRule(
     /^(\d+)\.\s$/,
     nodeType,
-    match => ({ order: +match[1] }),
+    (match) => ({ order: +match[1] }),
     (match, node) => node.childCount + node.attrs.order == +match[1]
   )
 }
@@ -170,7 +170,7 @@ export function bulletListRule(nodeType: NodeType) {
 // Given a code block node type, returns an input rule that turns a
 // textblock starting with three backticks into a code block.
 export function codeBlockRule(nodeType: NodeType) {
-  return textblockTypeInputRule(/^```([a-zA-Z]*)? $/, nodeType, match => {
+  return textblockTypeInputRule(/^```([a-zA-Z]*)? $/, nodeType, (match) => {
     const language = match[1]
     if (language) {
       return { params: language }
@@ -188,7 +188,7 @@ export function headingRule(nodeType: NodeType, maxLevel: number) {
   return textblockTypeInputRule(
     new RegExp('^(#{1,' + maxLevel + '})\\s$'),
     nodeType,
-    match => ({
+    (match) => ({
       level: match[1].length,
     })
   )

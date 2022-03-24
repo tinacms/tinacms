@@ -23,7 +23,7 @@ limitations under the License.
 import { parseLinkDestination } from '../helpers/parseLinkDestination'
 
 function _link(md: any) {
-  return function(state: any, silent: any) {
+  return function (state: any, silent: any) {
     const normalizeReference = state.md.utils.normalizeReference
     const isSpace = state.md.utils.isSpace
 

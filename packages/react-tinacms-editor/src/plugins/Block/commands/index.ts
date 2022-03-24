@@ -56,7 +56,7 @@ export function toggleHeader(
   fallBackNodeType: NodeType,
   fallbackAttrs: any
 ) {
-  return function(state: EditorState, dispatch: Dispatch | null) {
+  return function (state: EditorState, dispatch: Dispatch | null) {
     const { from, to } = state.selection
     let firstTextblock: Node | null = null
     let firstPos = -1
@@ -85,12 +85,9 @@ export function toggleHeader(
 
     if (dispatch) {
       dispatch(
-        (state.tr.setBlockType(
-          from,
-          to,
-          nextNodeType,
-          nextAttrs
-        ) as any).scrollIntoView()
+        (
+          state.tr.setBlockType(from, to, nextNodeType, nextAttrs) as any
+        ).scrollIntoView()
       )
     }
 

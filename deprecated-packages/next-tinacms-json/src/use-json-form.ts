@@ -70,7 +70,7 @@ export function useJsonForm<T = any>(
         }
         return cms.api.git.reset({ files: [id] })
       },
-      onChange: formState => {
+      onChange: (formState) => {
         if (options.onChange) {
           options.onChange(formState.values)
         }

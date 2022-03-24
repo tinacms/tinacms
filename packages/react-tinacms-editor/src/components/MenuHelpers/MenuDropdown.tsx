@@ -29,8 +29,10 @@ export const MenuDropdown = styled(
 
     React.useEffect(() => {
       if (triggerRef.current && menuPortalRef.current) {
-        const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
-        const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
+        const menuDropdownBoundingBox =
+          triggerRef.current.getBoundingClientRect()
+        const menuPortalBoundingBox =
+          menuPortalRef.current.getBoundingClientRect()
         setMenuOffset(menuDropdownBoundingBox.x - menuPortalBoundingBox.x)
       }
     }, [triggerRef.current, menuPortalRef.current])
@@ -63,7 +65,7 @@ export const MenuDropdown = styled(
   z-index: 10;
   white-space: nowrap;
 
-  ${props =>
+  ${(props) =>
     props.open &&
     css`
       opacity: 1;
@@ -74,5 +76,5 @@ export const MenuDropdown = styled(
 
 const Offset = styled.div<{ offset: number }>`
   position: absolute;
-  left: ${props => props.offset}px;
+  left: ${(props) => props.offset}px;
 `

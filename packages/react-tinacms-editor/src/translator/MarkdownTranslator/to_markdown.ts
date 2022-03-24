@@ -222,7 +222,7 @@ export class MarkdownSerializerState {
     const progress = (node: Node | null, _?: any, index: number = 0) => {
       let marks = node ? node.marks : []
 
-      const indexOfCode = marks.findIndex(p => p.type.name === 'code')
+      const indexOfCode = marks.findIndex((p) => p.type.name === 'code')
       if (indexOfCode >= 0 && marks.length > 1) {
         marks = [
           ...marks.slice(0, indexOfCode),
@@ -386,9 +386,10 @@ export class MarkdownSerializerState {
   // Get leading and trailing whitespace from a string. Values of
   // leading or trailing property of the return object will be undefined
   // if there is no match.
-  getEnclosingWhitespace(
-    text: string
-  ): { leading?: string; trailing?: string } {
+  getEnclosingWhitespace(text: string): {
+    leading?: string
+    trailing?: string
+  } {
     return {
       leading: (text.match(/^(\s+)/) || [])[0],
       trailing: (text.match(/(\s+)$/) || [])[0],
