@@ -122,13 +122,21 @@ export class Database {
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    console.log('database.addPendingDocument', filepath)
     const { stringifiedFile, payload, keepTemplateKey } =
       await this.stringifyFile(filepath, data)
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find(
+      (collection) => filepath.startsWith(collection.path)
+    )
+    let collectionIndexDefinitions
+    if (collection) {
+      const indexDefinitions = await this.getIndexDefinitions()
+      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    }
     if (this.store.supportsSeeding()) {
       await this.bridge.put(filepath, stringifiedFile)
     }
-    await this.store.put(filepath, payload, { keepTemplateKey })
+    await this.store.put(filepath, payload, { keepTemplateKey, collection: collection.name, indexDefinitions: collectionIndexDefinitions })
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
