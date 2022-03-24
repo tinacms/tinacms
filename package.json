@@ -28,6 +28,7 @@
     "push-tags": "changeset tag && git pull && git push --follow-tags",
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include starter-basic run g:swap",
+    "format": "prettier --write .",
     "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js",
     "g:test-run-bin": "yarn workspace create-tina-app run test-run-bin -- --dir=$INIT_CWD"
   },
@@ -42,6 +43,7 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^2.0.1",
+    "prettier": "^2.6.0",
     "typescript": "4.3.5",
     "workspace": "^0.0.1-preview.1"
   }
