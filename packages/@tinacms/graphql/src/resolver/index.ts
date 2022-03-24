@@ -13,21 +13,24 @@ limitations under the License.
 
 import _ from 'lodash'
 import path from 'path'
-import { TinaSchema } from '../schema'
-import { assertShape, sequential, lastItem } from '../util'
-import { NAMER } from '../ast-builder'
-import { Database, CollectionDocumentListLookup } from '../database'
+import {TinaSchema} from '../schema'
+import {assertShape, lastItem, sequential} from '../util'
+import {NAMER} from '../ast-builder'
+import {Database} from '../database'
 import isValid from 'date-fns/isValid'
-import { parseMDX, stringifyMDX } from '../mdx'
-import flat from 'flat'
+import {parseMDX, stringifyMDX} from '../mdx'
 
 import type {
-  Templateable,
-  TinaFieldEnriched,
   Collectable,
+  ReferenceTypeWithNamespace,
+  Templateable,
   TinaCloudCollection,
+  TinaFieldEnriched,
 } from '../types'
-import { TinaError } from './error'
+import {Template, TinaFieldInner} from '../types'
+import {TinaError} from './error'
+import {FilterCondition, makeFilterChain} from '@tinacms/datalayer'
+import {collectConditionsForField, resolveReferences} from './filter-utils'
 
 interface ResolverConfig {
   database: Database
@@ -88,14 +91,20 @@ export class Resolver {
         collection,
       })
 
-      const basename = path.basename(fullPath)
-      const extension = path.extname(fullPath)
-      const filename = basename.replace(extension, '')
+      const {
+        base: basename,
+        ext: extension,
+        name: filename,
+      } = path.parse(fullPath)
+
       const relativePath = fullPath
         .replace('\\', '/')
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
-      const breadcrumbs = filename.split('/')
+
+      const breadcrumbs = relativePath.replace(extension, '').split('/')
+
+      // This is where the form is generated
       const form = {
         label: collection.label,
         name: basename,
@@ -526,58 +535,121 @@ export class Resolver {
     return this.database.store.glob(collection.path, this.getDocument)
   }
 
+  private referenceResolver = async (filter: Record<string, object>, fieldDefinition: ReferenceTypeWithNamespace) => {
+    const referencedCollection = this.tinaSchema.getCollection(fieldDefinition.collections[0])
+    if (!referencedCollection) {
+      throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
+    }
+
+    const sortKeys = Object.keys(filter[fieldDefinition.name][referencedCollection.name])
+    const resolvedCollectionConnection = await this.resolveCollectionConnection({
+      args: {
+        sort: sortKeys.length === 1 ? sortKeys[0] : undefined,
+        filter: {
+          ...filter[fieldDefinition.name][referencedCollection.name]
+        }, first: -1
+      },
+      collection: referencedCollection,
+      hydrator: (path) => path // just return the path
+    })
+
+    const {edges} = resolvedCollectionConnection
+    const values = edges.map(edge => edge.node)
+    return {edges, values}
+  }
+
+  private async resolveFilterConditions(filter: Record<string, Record<string, object>>, fields: TinaFieldInner<false>[], collectionName) {
+    const conditions: FilterCondition[] = []
+    const conditionCollector = (condition: FilterCondition) => {
+      if (!condition.filterPath) {
+        throw new Error('Error parsing filter - unable to generate filterPath')
+      }
+      if (!condition.filterExpression) {
+        throw new Error(`Error parsing filter - missing expression for ${condition.filterPath}`)
+      }
+      conditions.push(condition)
+    }
+
+    await resolveReferences(filter, fields, this.referenceResolver)
+
+    for (const fieldName of Object.keys(filter)) {
+      const field = (fields as any[]).find(field => field.name === fieldName) as any
+      if (!field) {
+        throw new Error(`${fieldName} not found in collection ${collectionName}`)
+      }
+      collectConditionsForField(fieldName, field, filter[fieldName], '', conditionCollector)
+    }
+
+    return conditions
+  }
+
   public resolveCollectionConnection = async ({
     args,
-    lookup,
+    collection,
+    hydrator,
   }: {
-    args: Record<string, Record<string, object>>
-    lookup: CollectionDocumentListLookup
+    args: Record<string, Record<string, object> | string | number>
+    collection: TinaCloudCollection<true>,
+    hydrator?: (string) => any
   }) => {
-    let documents
-    if (args.filter) {
-      const queries = []
-      const flattenedArgs = flat(args.filter, { delimiter: '#' })
-      Object.entries(flattenedArgs).map(([key, value]) => {
-        const keys = key.split('#')
-        // If the collection has templates, this will be a template name, otherwise it'll be the attribute
-        const maybeTemplateName = keys[0]
-        const realKey = keys.slice(0, keys.length - 1).join('#')
-        const collection = this.tinaSchema.getCollection(lookup.collection)
-        let templateName = collection.name
-        if (collection.templates) {
-          const template = collection.templates.find((template) => {
-            if (typeof template === 'string') {
-              throw new Error('Global templates not yet supported for queries')
+    let edges
+    let pageInfo
+
+    if (args.filter || args.sort) {
+      let conditions: FilterCondition[]
+      if (args.filter) {
+        if (collection.fields) {
+          conditions = await this.resolveFilterConditions(args.filter as Record<string,Record<string,object>>, collection.fields as TinaFieldInner<false>[], collection.name)
+        } else if (collection.templates) {
+          for (const templateName of Object.keys(args.filter)) {
+            const template = (collection.templates as Template<false>[]).find(template => template.name === templateName)
+
+            if (template) {
+              conditions = await this.resolveFilterConditions(args.filter[templateName], template.fields as TinaFieldInner<false>[], `${collection.name}.${templateName}`)
+            } else {
+              throw new Error(`Error template not found: ${templateName} in collection ${collection.name}`)
             }
-            return template.name === maybeTemplateName
-          })
-          if (typeof template === 'string') {
-            throw new Error('Global templates not yet supported for queries')
-          }
-          if (template) {
-            templateName = template.name
           }
         }
-        queries.push(
-          `__attribute__${lookup.collection}#${templateName}#${realKey}#${value}`
-        )
-      })
+      }
 
-      documents = await this.database.query(queries, this.getDocument)
+      const queryOptions = {
+        filterChain: makeFilterChain({
+          conditions: conditions || []
+        }),
+        collection: collection.name,
+        sort: args.sort as string,
+        first: args.first as number,
+        last: args.last as number,
+        before: args.before as string,
+        after: args.after as string,
+      }
+
+      const result = await this.database.query(queryOptions, hydrator ? hydrator : this.getDocument)
+      edges = result.edges
+      pageInfo = result.pageInfo
     } else {
-      const collection = await this.tinaSchema.getCollection(lookup.collection)
-      documents = await this.database.store.glob(
+      edges = (await this.database.store.glob(
         collection.path,
         this.getDocument
-      )
+      )).map((document) => ({
+        node: document
+      }))
     }
+
     return {
-      totalCount: documents.length,
-      edges: documents.map((document) => {
-        return { node: document }
-      }),
+      totalCount: edges.length,
+      edges,
+      pageInfo: pageInfo || {
+        hasPreviousPage: false,
+        hasNextPage: false,
+        startCursor: "",
+        endCursor: ""
+      }
     }
   }
+
+
 
   private buildFieldMutations = (
     fieldParams: FieldParams,
@@ -767,6 +839,11 @@ export class Resolver {
     namespace,
     ...field
   }: TinaFieldEnriched): Promise<unknown> => {
+    // @ts-ignore FIXME: `resolveField` will soon be deprecated in favor of client-side field builder
+    field.parentTypename = NAMER.dataTypeName(
+      // Get the type of the parent namespace
+      namespace.filter((_, i) => i < namespace.length - 1)
+    )
     const extraFields = field.ui || {}
     switch (field.type) {
       case 'number':

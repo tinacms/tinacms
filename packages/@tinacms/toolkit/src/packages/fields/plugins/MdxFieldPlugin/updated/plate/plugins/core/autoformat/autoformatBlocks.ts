@@ -40,6 +40,7 @@ import {
   getPluginType,
 } from '@udecode/plate-core'
 import { preFormat } from './autoformatUtils'
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -83,6 +84,20 @@ export const autoformatBlocks: AutoformatRule[] = [
     type: ELEMENT_BLOCKQUOTE,
     match: '> ',
     preFormat,
+    format: (editor) => {
+      /**
+       * Blockquotes need to wrap `p` elements to adhere to the remark spec
+       */
+      insertNodes(editor, {
+        type: ELEMENT_BLOCKQUOTE,
+        children: [
+          {
+            type: ELEMENT_PARAGRAPH,
+            children: [{ text: '' }],
+          },
+        ],
+      })
+    },
   },
   {
     mode: 'block',

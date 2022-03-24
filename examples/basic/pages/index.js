@@ -10,7 +10,6 @@ const query = `{
     }
   }
 }`
-
 export default function Home(props) {
   const { data } = useTina({
     query,

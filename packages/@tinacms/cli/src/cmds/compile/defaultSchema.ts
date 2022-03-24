@@ -27,13 +27,31 @@ export default defineSchema({
           name: "title",
         },
         {
-          type: "string",
+          type: "rich-text",
           label: "Blog Post Body",
           name: "body",
           isBody: true,
-          ui: {
-            component: "textarea"
-          },
+          templates: [
+            {
+              name: "PageSection",
+              label: "Page Section",
+              fields: [
+                {
+                  type: "string",
+                  name: "heading",
+                  label: "Heading",
+                },
+                {
+                  type: "string",
+                  name: "content",
+                  label: "Content",
+                  ui: {
+                    component: "textarea"
+                  }
+                }
+              ],
+            },
+          ]
         },
       ],
     },

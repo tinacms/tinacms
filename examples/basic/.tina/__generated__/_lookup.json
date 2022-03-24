@@ -29,6 +29,12 @@
     "resolveType": "collectionDocumentList",
     "collection": "page"
   },
+  "PostPostsPostDocument": {
+    "type": "PostPostsPostDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
   "PostDocument": {
     "type": "PostDocument",
     "resolveType": "collectionDocument",

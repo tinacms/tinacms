@@ -1,9 +1,9 @@
-import { defineSchema } from "@tinacms/cli";
-import type { TinaTemplate } from "@tinacms/cli";
+import { defineSchema } from "tinacms";
+import type { TinaTemplate } from "tinacms";
 import { iconSchema } from "./fields";
 import { defaultFeature } from "../components/actions";
 
-const featureBlockShema: TinaTemplate = {
+const featureBlockSchema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
@@ -46,7 +46,7 @@ const featureBlockShema: TinaTemplate = {
         { label: "Tint", value: "tint" },
         { label: "Primary", value: "primary" },
       ],
-    },
+    }
   ],
 };
 
@@ -301,6 +301,24 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          ui: {
+            validate: (val) => {},
+          },
+          // ui: {
+          //   validate: (val) => {
+          //     console.log({ val });
+          //   },
+          // },
+        },
+        {
+          type: "boolean",
+          label: "Published",
+          name: "published",
+        },
+        {
+          type: "number",
+          label: "Rating",
+          name: "rating",
         },
         {
           type: "reference",
@@ -321,6 +339,7 @@ export default defineSchema({
           type: "image",
           name: "heroImg",
           label: "Hero Image",
+          indexed: false
         },
         {
           type: "string",
@@ -330,6 +349,18 @@ export default defineSchema({
           },
           name: "excerpt",
         },
+      ],
+      indexes: [
+        {
+          name: 'published-by-date',
+          fields: [{
+            name: 'published',
+            default: 'false'
+          }, {
+            name: 'date',
+            default: ''
+          }]
+        }
       ],
     },
     {
@@ -358,7 +389,11 @@ export default defineSchema({
               label: "Nav Links",
               name: "nav",
               list: true,
+
               ui: {
+                itemProps: (item) => {
+                  return { label: item.label };
+                },
                 defaultItem: {
                   href: "home",
                   label: "Home",
@@ -532,11 +567,38 @@ export default defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          ui: {},
         },
         {
           type: "string",
           label: "Avatar",
           name: "avatar",
+        },
+        {
+          label: "Details",
+          name: "details",
+          type: "object",
+          list: true,
+          fields: [
+            {
+              type: "reference",
+              label: "Zodiac",
+              name: "zodiac",
+              collections: ["zodiacs"],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Zodiacs",
+      name: "zodiacs",
+      path: "content/zodiacs",
+      fields: [
+        {
+          type: "string",
+          label: "Name",
+          name: "name",
         },
       ],
     },
@@ -555,7 +617,7 @@ export default defineSchema({
           },
           templates: [
             heroBlockSchema,
-            featureBlockShema,
+            featureBlockSchema,
             contentBlockSchema,
             testimonialBlockSchema,
           ],

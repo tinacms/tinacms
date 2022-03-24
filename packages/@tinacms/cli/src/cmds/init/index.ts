@@ -57,6 +57,78 @@ export async function initTina(ctx: any, next: () => void, options) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export const MIN_REACT_VERSION = '>=16.14.0'
+
+export async function checkDeps(ctx: any, next: () => void, options) {
+  const bar = new Progress('Checking dependencies. :prog', 1)
+
+  const packageJSON = JSON.parse(
+    (await fs.readFileSync(packageJSONPath)).toString()
+  )
+  if (
+    !checkPackage(packageJSON, 'react') ||
+    !checkPackage(packageJSON, 'react-dom')
+  ) {
+    const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
+      "react@${MIN_REACT_VERSION}"
+      "react-dom@${MIN_REACT_VERSION}"
+
+  Then re-rerun "@tinacms/cli init"`
+    throw new Error(message)
+  }
+
+  bar.tick({
+    prog: '✅',
+  })
+  logger.level = 'fatal'
+  next()
+}
+
+export const checkPackage = (packageJSON, packageName) => {
+  let strippedVersion
+  Object.entries(packageJSON.dependencies).map(
+    ([depPackageName, version]: [string, string]) => {
+      if (depPackageName === packageName) {
+        strippedVersion = version.replace(/^[^a-zA-Z0-9]*|[^a-zA-Z0-9]*$/g, '')
+      }
+    }
+  )
+  return checkVersion(strippedVersion)
+}
+
+/**
+ * Checks for MIN_REACT_VERSION of 16.14.0
+ */
+const checkVersion = (version) => {
+  const majorMin = 16
+  const minorMin = 14
+  const parts = version.split('.')
+  const major = Number(parts[0])
+  const minor = Number(parts[1])
+
+  if (parts.length === 1) {
+    if (isNaN(major)) {
+      return true
+    } else if (major > majorMin) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  if (major > majorMin) {
+    return true
+  } else if (major === majorMin) {
+    if (minor >= minorMin) {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false
+  }
+}
+
 export async function installDeps(ctx: any, next: () => void, options) {
   const bar = new Progress(
     'Installing Tina packages. This might take a moment... :prog',
@@ -81,6 +153,7 @@ export async function installDeps(ctx: any, next: () => void, options) {
 
 const baseDir = process.cwd()
 // TODO: should handle src folder here
+const packageJSONPath = p.join(baseDir, 'package.json')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
 const TinaFolder = p.join(baseDir, '.tina')

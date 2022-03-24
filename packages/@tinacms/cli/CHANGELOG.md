@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.60.9
+
+### Patch Changes
+
+- 048538625: fix: return cms on cmsCallback codegen (to fix broken typing)
+- Updated dependencies [e7b27ba3b]
+- Updated dependencies [11d55f441]
+  - @tinacms/graphql@0.59.8
+
 ## 0.60.8
 
 ### Patch Changes

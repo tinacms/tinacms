@@ -99,7 +99,14 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
-          description: `A unique filename for the content.  Example: My_Document`,
+          description: (
+            <span>
+              A unique filename for the content.
+              <br />
+              Examples: <code>My_Document</code>, <code>My_Document.en</code>,{' '}
+              <code>sub-folder/My_Document</code>
+            </span>
+          ),
           placeholder: `My_Document`,
           validate: (value, allValues, meta) => {
             if (!value) {
@@ -109,9 +116,9 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
               return true
             }
 
-            const isValid = /^[_a-zA-Z][.,-,_a-zA-Z0-9]*$/.test(value)
+            const isValid = /^[_a-zA-Z][\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
-              return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, -, ., or _'
+              return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
             }
           },
         },

@@ -441,6 +441,10 @@ ${out}
         console.log(e)
       }
 
+    case 'break':
+      return {
+        type: 'break',
+      }
     case 'text':
       // Inline code cannot have other marks like bold and emphasis
       if (node?.code) {

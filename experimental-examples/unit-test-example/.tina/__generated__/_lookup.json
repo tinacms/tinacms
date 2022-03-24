@@ -66,7 +66,9 @@
     "typeMap": {
       "hero": "BlockPageBlocksHero",
       "blockQuote": "BlockPageBlocksBlockQuote",
-      "featuredPosts": "BlockPageBlocksFeaturedPosts"
+      "featuredPosts": "BlockPageBlocksFeaturedPosts",
+      "featureList": "BlockPageBlocksFeatureList",
+      "slideshow": "BlockPageBlocksSlideshow"
     }
   },
   "BlockPageDocument": {

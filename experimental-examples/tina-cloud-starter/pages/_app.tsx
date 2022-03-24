@@ -4,6 +4,7 @@ import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
+import schema from "../.tina/schema.ts";
 
 const App = ({ Component, pageProps }) => {
   return (
@@ -12,6 +13,7 @@ const App = ({ Component, pageProps }) => {
         showEditButton={true}
         editMode={
           <TinaCMS
+            schema={schema}
             apiURL={process.env.NEXT_PUBLIC_TINA_API_URL}
             mediaStore={async () => {
               const pack = await import("next-tinacms-cloudinary");

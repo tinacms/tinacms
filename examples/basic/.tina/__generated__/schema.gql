@@ -80,12 +80,8 @@ type Collection {
 
 union DocumentNode = PageDocument | PostDocument
 
-type PageSomeObj {
-  thingOne: String!
-}
-
 type Page {
-  someObj: PageSomeObj
+  Title: String
   body: JSON
 }
 
@@ -109,8 +105,21 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
+union PostPostsPostDocument = PostDocument
+
+type PostPosts {
+  post: PostPostsPostDocument
+  label: String
+}
+
+type PostFoo {
+  bar: String
+}
+
 type Post {
   title: String
+  posts: [PostPosts]
+  foo: PostFoo
   topic: [String]
   body: JSON
 }
@@ -150,17 +159,24 @@ input DocumentMutation {
   post: PostMutation
 }
 
-input PageSomeObjMutation {
-  thingOne: String
+input PageMutation {
+  Title: String
+  body: JSON
 }
 
-input PageMutation {
-  someObj: PageSomeObjMutation
-  body: JSON
+input PostPostsMutation {
+  post: String
+  label: String
+}
+
+input PostFooMutation {
+  bar: String
 }
 
 input PostMutation {
   title: String
+  posts: [PostPostsMutation]
+  foo: PostFooMutation
   topic: [String]
   body: JSON
 }

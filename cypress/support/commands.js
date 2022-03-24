@@ -36,3 +36,65 @@ limitations under the License.
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('getRTE', () => {
+  return cy.get(
+    `[role="textbox"][data-slate-editor="true"][contenteditable="true"]`
+  )
+})
+
+Cypress.Commands.add('focusRTE', () => {
+  return cy.getRTE().children().first().click('bottomLeft')
+})
+
+Cypress.Commands.add('getPageRTEBody', () => {
+  return cy.get(`[data-test="rich-text-body"]`)
+})
+
+Cypress.Commands.add('login', () => {
+  // Fake Login
+  localStorage.setItem('tina.isEditing', 'true')
+
+  cy.reload()
+})
+
+Cypress.Commands.add('logout', () => {
+  // Fake Logout
+  localStorage.removeItem('tina.isEditing')
+
+  cy.reload()
+})
+
+Cypress.Commands.add('getSaveButton', () => {
+  return cy.get('.tina-tailwind .flex-1 > .text-white')
+})
+
+Cypress.Commands.add('save', () => {
+  cy.getSaveButton().click()
+})
+
+Cypress.Commands.add(
+  'assertRTE',
+  (markdown = '', typed = '', wantedHTML = '', wantedMD = '') => {
+    if (markdown !== null) cy.task('writemdx', markdown)
+
+    cy.visit('/')
+
+    cy.login()
+
+    cy.focusRTE()
+
+    if (typed) cy.getRTE().type(typed)
+
+    cy.getPageRTEBody().should('contain.html', wantedHTML)
+
+    if (!wantedMD) return
+
+    cy.save()
+
+    cy.task('readrawmdx').then((content) => {
+      console.info('readrawmdx', content)
+      expect(content).to.contain(wantedMD)
+    })
+  }
+)
