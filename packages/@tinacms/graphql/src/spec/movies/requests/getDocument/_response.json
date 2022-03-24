@@ -14,12 +14,8 @@
     },
     "paths": [
       {
-        "path": [
-          "data"
-        ],
-        "dataPath": [
-          "getDocument"
-        ],
+        "path": ["data"],
+        "dataPath": ["getDocument"],
         "queryString": "query GetNode($id: String!) {\n  node(id: $id) {\n    ... on MovieDocument {\n      id\n      data {\n        title\n        genre\n        director {\n          ... on DirectorDocument {\n            data {\n              name\n            }\n          }\n        }\n      }\n    }\n  }\n}"
       }
     ]

@@ -2,11 +2,7 @@
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
-    "collections": [
-      "post",
-      "author",
-      "blockPage"
-    ]
+    "collections": ["post", "author", "blockPage"]
   },
   "Node": {
     "type": "Node",

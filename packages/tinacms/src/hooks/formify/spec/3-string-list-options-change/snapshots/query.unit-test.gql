@@ -9,7 +9,6 @@
 # ================
 # categories.[]
 
-
 query GetBlockPageDocument {
   getPostDocument(relativePath: "post1.mdx") {
     data {

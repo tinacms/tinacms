@@ -16,30 +16,19 @@
         {
           "name": "title",
           "type": "string",
-          "namespace": [
-            "post",
-            "title"
-          ]
+          "namespace": ["post", "title"]
         },
         {
           "name": "author",
           "type": "reference",
-          "collections": [
-            "author"
-          ],
-          "namespace": [
-            "post",
-            "author"
-          ]
+          "collections": ["author"],
+          "namespace": ["post", "author"]
         },
         {
           "name": "tags",
           "type": "string",
           "list": true,
-          "namespace": [
-            "post",
-            "tags"
-          ]
+          "namespace": ["post", "tags"]
         },
         {
           "name": "categories",
@@ -63,40 +52,26 @@
               "label": "Art"
             }
           ],
-          "namespace": [
-            "post",
-            "categories"
-          ]
+          "namespace": ["post", "categories"]
         },
         {
           "name": "published",
           "type": "datetime",
-          "namespace": [
-            "post",
-            "published"
-          ]
+          "namespace": ["post", "published"]
         },
         {
           "name": "featured",
           "type": "boolean",
-          "namespace": [
-            "post",
-            "featured"
-          ]
+          "namespace": ["post", "featured"]
         },
         {
           "name": "body",
           "type": "rich-text",
           "isBody": true,
-          "namespace": [
-            "post",
-            "body"
-          ]
+          "namespace": ["post", "body"]
         }
       ],
-      "namespace": [
-        "post"
-      ]
+      "namespace": ["post"]
     },
     {
       "label": "Author",
@@ -107,10 +82,7 @@
         {
           "name": "name",
           "type": "string",
-          "namespace": [
-            "author",
-            "name"
-          ]
+          "namespace": ["author", "name"]
         },
         {
           "name": "social",
@@ -120,45 +92,25 @@
             {
               "type": "string",
               "name": "platform",
-              "options": [
-                "twitter",
-                "facebook",
-                "instagram"
-              ],
-              "namespace": [
-                "author",
-                "social",
-                "platform"
-              ]
+              "options": ["twitter", "facebook", "instagram"],
+              "namespace": ["author", "social", "platform"]
             },
             {
               "type": "string",
               "name": "handle",
-              "namespace": [
-                "author",
-                "social",
-                "handle"
-              ]
+              "namespace": ["author", "social", "handle"]
             }
           ],
-          "namespace": [
-            "author",
-            "social"
-          ]
+          "namespace": ["author", "social"]
         },
         {
           "name": "bio",
           "type": "rich-text",
           "isBody": true,
-          "namespace": [
-            "author",
-            "bio"
-          ]
+          "namespace": ["author", "bio"]
         }
       ],
-      "namespace": [
-        "author"
-      ]
+      "namespace": ["author"]
     },
     {
       "label": "Block Page",
@@ -170,10 +122,7 @@
           "label": "Title",
           "name": "title",
           "type": "string",
-          "namespace": [
-            "blockPage",
-            "title"
-          ]
+          "namespace": ["blockPage", "title"]
         },
         {
           "label": "Blocks",
@@ -194,30 +143,16 @@
                   "label": "Title",
                   "name": "title",
                   "type": "string",
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "hero",
-                    "title"
-                  ]
+                  "namespace": ["blockPage", "blocks", "hero", "title"]
                 },
                 {
                   "label": "Description",
                   "name": "description",
                   "type": "string",
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "hero",
-                    "description"
-                  ]
+                  "namespace": ["blockPage", "blocks", "hero", "description"]
                 }
               ],
-              "namespace": [
-                "blockPage",
-                "blocks",
-                "hero"
-              ]
+              "namespace": ["blockPage", "blocks", "hero"]
             },
             {
               "name": "blockQuote",
@@ -226,32 +161,16 @@
                 {
                   "name": "message",
                   "type": "rich-text",
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "blockQuote",
-                    "message"
-                  ]
+                  "namespace": ["blockPage", "blocks", "blockQuote", "message"]
                 },
                 {
                   "name": "author",
                   "type": "reference",
-                  "collections": [
-                    "author"
-                  ],
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "blockQuote",
-                    "author"
-                  ]
+                  "collections": ["author"],
+                  "namespace": ["blockPage", "blocks", "blockQuote", "author"]
                 }
               ],
-              "namespace": [
-                "blockPage",
-                "blocks",
-                "blockQuote"
-              ]
+              "namespace": ["blockPage", "blocks", "blockQuote"]
             },
             {
               "name": "featuredPosts",
@@ -280,9 +199,7 @@
                     {
                       "name": "item",
                       "type": "reference",
-                      "collections": [
-                        "post"
-                      ],
+                      "collections": ["post"],
                       "namespace": [
                         "blockPage",
                         "blocks",
@@ -292,19 +209,10 @@
                       ]
                     }
                   ],
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "featuredPosts",
-                    "blogs"
-                  ]
+                  "namespace": ["blockPage", "blocks", "featuredPosts", "blogs"]
                 }
               ],
-              "namespace": [
-                "blockPage",
-                "blocks",
-                "featuredPosts"
-              ]
+              "namespace": ["blockPage", "blocks", "featuredPosts"]
             },
             {
               "name": "featureList",
@@ -314,12 +222,7 @@
                   "label": "Title",
                   "name": "title",
                   "type": "string",
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "featureList",
-                    "title"
-                  ]
+                  "namespace": ["blockPage", "blocks", "featureList", "title"]
                 },
                 {
                   "label": "Features",
@@ -356,19 +259,10 @@
                       ]
                     }
                   ],
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "featureList",
-                    "items"
-                  ]
+                  "namespace": ["blockPage", "blocks", "featureList", "items"]
                 }
               ],
-              "namespace": [
-                "blockPage",
-                "blocks",
-                "featureList"
-              ]
+              "namespace": ["blockPage", "blocks", "featureList"]
             },
             {
               "name": "slideshow",
@@ -378,12 +272,7 @@
                   "label": "Title",
                   "name": "title",
                   "type": "string",
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "slideshow",
-                    "title"
-                  ]
+                  "namespace": ["blockPage", "blocks", "slideshow", "title"]
                 },
                 {
                   "label": "Items",
@@ -416,30 +305,16 @@
                       ]
                     }
                   ],
-                  "namespace": [
-                    "blockPage",
-                    "blocks",
-                    "slideshow",
-                    "items"
-                  ]
+                  "namespace": ["blockPage", "blocks", "slideshow", "items"]
                 }
               ],
-              "namespace": [
-                "blockPage",
-                "blocks",
-                "slideshow"
-              ]
+              "namespace": ["blockPage", "blocks", "slideshow"]
             }
           ],
-          "namespace": [
-            "blockPage",
-            "blocks"
-          ]
+          "namespace": ["blockPage", "blocks"]
         }
       ],
-      "namespace": [
-        "blockPage"
-      ]
+      "namespace": ["blockPage"]
     }
   ]
 }

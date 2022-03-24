@@ -10,7 +10,6 @@
 # soc.[]
 # soc.[].hand
 
-
 query QueryOperation {
   getAuthorDocument(relativePath: "author1.mdx") {
     data {

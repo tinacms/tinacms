@@ -8,9 +8,7 @@
           "column": 3
         }
       ],
-      "path": [
-        "updateMovieDocument"
-      ]
+      "path": ["updateMovieDocument"]
     }
   ],
   "data": null

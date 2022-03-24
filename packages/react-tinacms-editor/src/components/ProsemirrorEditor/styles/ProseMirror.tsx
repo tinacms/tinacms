@@ -92,9 +92,9 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: ${controlSize}px;
     width: calc(100% + ${borderWidth * 2}px);
-    transform: translate(${(borderWidth + paddingX) * -1}px, ${(controlSize +
-  paddingY) *
-  -1}px);
+    transform: translate(${(borderWidth + paddingX) * -1}px, ${
+  (controlSize + paddingY) * -1
+}px);
     cursor: pointer;
     z-index: 1;
     user-select: none;
@@ -111,9 +111,9 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: calc(100% + ${borderWidth * 2}px);
     width: ${controlSize}px;
-    transform: translate(${(controlSize + paddingX) * -1}px, ${(borderWidth +
-  paddingY) *
-  -1}px);
+    transform: translate(${(controlSize + paddingX) * -1}px, ${
+  (borderWidth + paddingY) * -1
+}px);
     cursor: pointer;
     z-index: 1;
     user-select: none;
@@ -130,9 +130,9 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: ${controlSize}px;
     width: ${controlSize}px;
-    transform: translate(${(controlSize + paddingX) * -1}px, ${(controlSize +
-  paddingY) *
-  -1}px);
+    transform: translate(${(controlSize + paddingX) * -1}px, ${
+  (controlSize + paddingY) * -1
+}px);
     border-radius: 5px 0 0 0;
     z-index: 1;
     cursor: pointer;

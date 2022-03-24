@@ -29,6 +29,7 @@ What actually happened?
 ### Environment
 
 #### Tinacms Package Versions
+
 <!--
 Run the following command to get the list of tinacms-package versions in your node_modules:
 
@@ -49,4 +50,3 @@ Run the following command to get the list of tinacms-package versions in your no
 | os      |         |
 | node    |         |
 | npm     |         |
-

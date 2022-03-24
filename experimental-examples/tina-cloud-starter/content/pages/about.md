@@ -4,4 +4,3 @@ blocks:
     color: default
     _template: content
 ---
-

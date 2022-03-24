@@ -47,7 +47,7 @@ export function buildKeymap(schema: Schema) {
   bind('Enter', chainCommands(createParagraphNear, liftEmptyBlock, splitBlock))
 
   findPlugins<KeymapPlugin>('wysiwyg:keymap', KEYMAP_PLUGINS).forEach(
-    plugin => {
+    (plugin) => {
       let skip = false
 
       // Exit early if this is a Mac, and it shouldn't be added for Mac.
@@ -58,7 +58,7 @@ export function buildKeymap(schema: Schema) {
 
       // Exit early if it is for a node type that doesn't exist.
       if (plugin.ifNode && !schema.nodes[plugin.ifNode]) skip = true
-      if (plugin.ifNodes && !plugin.ifNodes.some(n => schema.nodes[n]))
+      if (plugin.ifNodes && !plugin.ifNodes.some((n) => schema.nodes[n]))
         skip = true
 
       // Exit if condition not met

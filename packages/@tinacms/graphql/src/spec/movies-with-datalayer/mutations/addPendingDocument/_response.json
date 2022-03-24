@@ -5,12 +5,8 @@
     },
     "paths": [
       {
-        "path": [
-          "data"
-        ],
-        "dataPath": [
-          "addPendingDocument"
-        ],
+        "path": ["data"],
+        "dataPath": ["addPendingDocument"],
         "queryString": "query GetNode($id: String!) {\n  node(id: $id) {\n    __typename\n  }\n}"
       }
     ]

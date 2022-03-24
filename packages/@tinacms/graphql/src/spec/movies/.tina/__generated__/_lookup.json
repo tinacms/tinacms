@@ -2,11 +2,7 @@
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
-    "collections": [
-      "movie",
-      "director",
-      "actor"
-    ]
+    "collections": ["movie", "director", "actor"]
   },
   "Node": {
     "type": "Node",

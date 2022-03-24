@@ -16,10 +16,10 @@ As a [ ...describe the who... ] I want to [ ...describe what is needed... ] so t
 
 ### Expected Results
 
-* result 1
-* result 2
-* example output
-* UI/UX
+- result 1
+- result 2
+- example output
+- UI/UX
 
 ### Notes
 

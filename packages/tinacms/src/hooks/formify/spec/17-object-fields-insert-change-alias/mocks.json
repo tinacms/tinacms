@@ -1,1 +1,79 @@
-[{"queryString":"{\"query\":\"#graphql\\nquery {\\n  getAuthorDocument(relativePath: \\\"author1.mdx\\\") {\\n    data {\\n      soc: social {\\n        hand: handle\\n      }\\n    }\\n  }\\n}\\n\",\"variables\":{}}","response":{"data":{"getAuthorDocument":{"data":{"soc":null}}}}},{"queryString":"{\"query\":\"query QueryOperation {\\n  getAuthorDocument(relativePath: \\\"author1.mdx\\\") {\\n    data {\\n      soc: social {\\n        hand: handle\\n      }\\n    }\\n    _internalSys: sys {\\n      path\\n      collection {\\n        name\\n      }\\n    }\\n    form\\n    values\\n  }\\n}\\n\",\"variables\":{}}","response":{"data":{"getAuthorDocument":{"data":{"soc":null},"_internalSys":{"path":"content/authors/author1.mdx","collection":{"name":"author"}},"form":{"label":"Author","name":"author1.mdx","fields":[{"component":"text","name":"name","type":"string","parentTypename":"Author"},{"name":"social","type":"object","list":true,"fields":[{"component":"select","type":"string","name":"platform","options":[{"label":"Choose an option","value":""},"twitter","facebook","instagram"],"parentTypename":"AuthorSocial"},{"component":"text","type":"string","name":"handle","parentTypename":"AuthorSocial"}],"parentTypename":"Author","component":"group-list"},{"name":"bio","type":"rich-text","isBody":true,"parentTypename":"Author","templates":[],"component":"rich-text"}],"mutationInfo":{"path":["data","getAuthorDocument","form"],"string":"\nmutation UpdateDocument($params: AuthorMutation!) {\n  updateAuthorDocument(relativePath: \"author1.mdx\", params: $params) {\n    data {\n      soc: social {\n        hand: handle\n      }\n    }\n    _internalSys: sys {\n      path\n      collection {\n        name\n      }\n    }\n    form\n    values\n  }\n}","includeCollection":false,"includeTemplate":false}},"values":{"_collection":"author","_template":"author","name":"Author One","bio":{"type":"root","children":[]}}}}}}]
+[
+  {
+    "queryString": "{\"query\":\"#graphql\\nquery {\\n  getAuthorDocument(relativePath: \\\"author1.mdx\\\") {\\n    data {\\n      soc: social {\\n        hand: handle\\n      }\\n    }\\n  }\\n}\\n\",\"variables\":{}}",
+    "response": { "data": { "getAuthorDocument": { "data": { "soc": null } } } }
+  },
+  {
+    "queryString": "{\"query\":\"query QueryOperation {\\n  getAuthorDocument(relativePath: \\\"author1.mdx\\\") {\\n    data {\\n      soc: social {\\n        hand: handle\\n      }\\n    }\\n    _internalSys: sys {\\n      path\\n      collection {\\n        name\\n      }\\n    }\\n    form\\n    values\\n  }\\n}\\n\",\"variables\":{}}",
+    "response": {
+      "data": {
+        "getAuthorDocument": {
+          "data": { "soc": null },
+          "_internalSys": {
+            "path": "content/authors/author1.mdx",
+            "collection": { "name": "author" }
+          },
+          "form": {
+            "label": "Author",
+            "name": "author1.mdx",
+            "fields": [
+              {
+                "component": "text",
+                "name": "name",
+                "type": "string",
+                "parentTypename": "Author"
+              },
+              {
+                "name": "social",
+                "type": "object",
+                "list": true,
+                "fields": [
+                  {
+                    "component": "select",
+                    "type": "string",
+                    "name": "platform",
+                    "options": [
+                      { "label": "Choose an option", "value": "" },
+                      "twitter",
+                      "facebook",
+                      "instagram"
+                    ],
+                    "parentTypename": "AuthorSocial"
+                  },
+                  {
+                    "component": "text",
+                    "type": "string",
+                    "name": "handle",
+                    "parentTypename": "AuthorSocial"
+                  }
+                ],
+                "parentTypename": "Author",
+                "component": "group-list"
+              },
+              {
+                "name": "bio",
+                "type": "rich-text",
+                "isBody": true,
+                "parentTypename": "Author",
+                "templates": [],
+                "component": "rich-text"
+              }
+            ],
+            "mutationInfo": {
+              "path": ["data", "getAuthorDocument", "form"],
+              "string": "\nmutation UpdateDocument($params: AuthorMutation!) {\n  updateAuthorDocument(relativePath: \"author1.mdx\", params: $params) {\n    data {\n      soc: social {\n        hand: handle\n      }\n    }\n    _internalSys: sys {\n      path\n      collection {\n        name\n      }\n    }\n    form\n    values\n  }\n}",
+              "includeCollection": false,
+              "includeTemplate": false
+            }
+          },
+          "values": {
+            "_collection": "author",
+            "_template": "author",
+            "name": "Author One",
+            "bio": { "type": "root", "children": [] }
+          }
+        }
+      }
+    }
+  }
+]

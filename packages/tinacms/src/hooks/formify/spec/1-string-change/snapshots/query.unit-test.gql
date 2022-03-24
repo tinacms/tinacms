@@ -9,7 +9,6 @@
 # ================
 # title
 
-
 query GetBlockPageDocument {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {

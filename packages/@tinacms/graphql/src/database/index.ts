@@ -426,8 +426,8 @@ const indexDocument = async ({
     await sequential(attributesToFilterOut, async (attribute) => {
       const records = (await database.store.get<string[]>(attribute)) || []
       await database.store.put(
-          attribute,
-          records.filter((item) => item !== filepath)
+        attribute,
+        records.filter((item) => item !== filepath)
       )
       return true
     })

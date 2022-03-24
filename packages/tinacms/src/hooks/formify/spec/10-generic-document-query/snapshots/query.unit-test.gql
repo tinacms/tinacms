@@ -9,7 +9,6 @@
 # ================
 # name
 
-
 query GetBlockPageDocument {
   getDocument(collection: "author", relativePath: "author1.mdx") {
     ... on AuthorDocument {

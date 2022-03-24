@@ -1,5 +1,3 @@
 {
-	"recommendations": [
-    "graphql.vscode-graphql",
-	]
+  "recommendations": ["graphql.vscode-graphql"]
 }

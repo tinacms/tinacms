@@ -19,7 +19,7 @@ Tina doesn't impact your website performance. This starter comes with default pe
 ## Table of contents
 
 - ❓ [What is this?](#what-is-this)
-- 🍴 [Fork and Clone](#fork-this-repository)   
+- 🍴 [Fork and Clone](#fork-this-repository)
 - ⬇️ [Install](#install)
 - 🌎 [Run the project locally](#run-the-project-locally)
 - 📝 [Edit content locally](#edit-content-locally)
@@ -55,7 +55,7 @@ This is a [TinaCMS](https://tina.io)-enabled Next.js app, so you can edit your c
 
 ## Fork this repository
 
- ⚠️⚠️ Start by **forking** the repository and then pull it down to your computer. ⚠️⚠️
+⚠️⚠️ Start by **forking** the repository and then pull it down to your computer. ⚠️⚠️
 
 ## Install
 
@@ -90,6 +90,7 @@ Open [`http://localhost:3000`](http://localhost:3000) in your browser to see you
 We need to define some local environment variables in order to edit content with Tina.
 
 Copy `.env.local.sample` to `.env.local`:
+
 ```sh
 cp .env.local.sample .env.local
 
@@ -116,7 +117,7 @@ you'll obviously want other editors and collaborators to be able to make changes
 
 > ℹ️ Changes in edit mode show up on your home page after your site finishes a rebuild.
 
-## Register your local application with Tina 
+## Register your local application with Tina
 
 1. Visit [app.tina.io](https://app.tina.io/register) and sign in.
 2. Create a new app in Tina which connects to the GitHub repository you've just forked. Once your app is created, click on the app to get to the app settings and copy the client ID.
@@ -127,11 +128,11 @@ In the `env.local` file set:
 
 - `NEXT_PUBLIC_USE_LOCAL_CLIENT` to `0`.
 - `NEXT_PUBLIC_TINA_CLIENT_ID` to the Client ID displayed in your Tina Cloud App.
-- `NEXT_PUBLIC_SHOW_EDIT_BTN` to `0` or `1`, `0` means there is no "enter edit 
+- `NEXT_PUBLIC_SHOW_EDIT_BTN` to `0` or `1`, `0` means there is no "enter edit
 - `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` to your Cloudinary cloud name
 - `NEXT_PUBLIC_CLOUDINARY_API_KEY` to your Cloudinary API key
 - `CLOUDINARY_API_SECRET` to your Cloudinary API secret
-mode" and you will have to visit [`/admin`](http://localhost/admin)  to enter edit mode.
+  mode" and you will have to visit [`/admin`](http://localhost/admin) to enter edit mode.
 
 > **NOTE:** You can read more about the `next-tinacms-cloudinary` package in [this blog post](https://tina.io/blog/manage-your-media-with-cloudinary/) and in the [package docs](https://tina.io/packages/next-tinacms-cloudinary/
 
@@ -212,14 +213,13 @@ Tina Cloud Starter is a [Next.js](https://nextjs.org) application. The file-base
 
 This page can be seen at `http://localhost:3000/`, it loads the content from a markdown file which can be found in this repository at `/content/marketing-pages/index.md`. You can edit this page at by clicking the "enter edit mode" button in the top right hand corner
 
-
-We wrap the site in a small `EditProvider` component, that stores whether or not we are in edit mode in React state and localstorage. When we are in edit mode it triggers authentication when needed, and then one is in edit mode. 
+We wrap the site in a small `EditProvider` component, that stores whether or not we are in edit mode in React state and localstorage. When we are in edit mode it triggers authentication when needed, and then one is in edit mode.
 
 What makes this possible is `getStaticProps`: you can notice that every editable page exports a `query` prop and a data prop from `getStaticProps`. When we are not in `editMode` we use the data prop to render the site. When we are in edit mode we use the query to fetch the latest data from Tina Cloud and create the sidebar form.
 
 ### `pages/posts/[filename].tsx`
 
-The posts are stored in the `content/posts` directory of this repository, and their routes are built with `getStaticPaths` dynamically at build time. To go in edit mode, click the "edit this site" button. This  re-renders your site  by wrapping it when a `TinaProvider` component, this only happens in edit mode to make sure Tina is not added to your production bundle.
+The posts are stored in the `content/posts` directory of this repository, and their routes are built with `getStaticPaths` dynamically at build time. To go in edit mode, click the "edit this site" button. This re-renders your site by wrapping it when a `TinaProvider` component, this only happens in edit mode to make sure Tina is not added to your production bundle.
 
 ### `components`
 
@@ -303,12 +303,12 @@ When your run the server locally, you can browse the GraphQL docs and test your 
 
 Tina Cloud is in public beta, you might face issues, to provide feedback or get help with any challenges you may have:
 
--   Read the [Tina Cloud documentation](https://tina.io/docs/tina-cloud/).
--   [Join our Discord](https://discord.gg/zumN63Ybpf).
--   Visit the [community forum](https://community.tinacms.org/) to ask questions.
--   Reach out to us on Twitter at [@tina_cms](https://twitter.com/tina_cms).
--   [Email us](mailto:support@tina.io) to schedule a call with our team and share more about your context and what you're trying to achieve.
--   Get support through the chat widget on the Tina Cloud Dashboard
+- Read the [Tina Cloud documentation](https://tina.io/docs/tina-cloud/).
+- [Join our Discord](https://discord.gg/zumN63Ybpf).
+- Visit the [community forum](https://community.tinacms.org/) to ask questions.
+- Reach out to us on Twitter at [@tina_cms](https://twitter.com/tina_cms).
+- [Email us](mailto:support@tina.io) to schedule a call with our team and share more about your context and what you're trying to achieve.
+- Get support through the chat widget on the Tina Cloud Dashboard
 
 ## LICENSE
 

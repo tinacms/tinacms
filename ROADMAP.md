@@ -25,9 +25,8 @@ perspective, and plan the next 6 week period.
 
 ### Cycle 5: Jan 11th to Feb 19th
 
-
-| Begins        | Ends           |
-| ------------- | -------------- |
+| Begins            | Ends               |
+| ----------------- | ------------------ |
 | January 11th 2021 | February 19th 2021 |
 
 As a result of last cycle's dogfooding, we have identified some specific things that we want to improve with how inline editing is used. We will be focused on two priorities:
@@ -39,28 +38,28 @@ For elaboration on our thinking regarding these priorities, checkout [our cycle 
 
 ### Cycle 4: Nov 2nd to Dec 11th
 
-| Begins        | Ends           |
-| ------------- | -------------- |
+| Begins            | Ends               |
+| ----------------- | ------------------ |
 | November 2nd 2020 | December 11th 2020 |
 
 For this cycle, we don't have any specific features planned. We are dogfooding Tina by working on a flexible, blocks-based starter project with what we believe are the best practices for using Tina right now. We expect some improvements to come to Tina in the process, with a particular focus on:
+
 - Inline Editing
 - Using Tina with a componentized design system
 - Minimizing the impact of Tina on page weight when not editing
 
 ### Cycle 3: Sept 7th to October 16th
 
-| Begins        | Ends           |
-| ------------- | -------------- |
+| Begins             | Ends              |
+| ------------------ | ----------------- |
 | September 7th 2020 | October 16th 2020 |
 
 This cycle we are working on adding a true media manager to TinaCMS as detailed in [RFC 0003](https://github.com/tinacms/rfcs/blob/master/0003-media-api.md). Media management is a fundamental feature of a CMS. Websites today contain more dog GIFs and landscape hero photos than ever. Content editors need a way to work with that media when creating and updating web pages, blogs, or articles. Currently media changes are handled solely through image fields. By clicking on the field, the editors can upload new images from their local filesystem. There is a 'store' uploading and handling previously added images under the hood, but editors have no way of interacting with that store.
 
-
 ### Cycle 2: July 13th to August 21st
 
-| Begins        | Ends           |
-| ------------- | -------------- |
+| Begins         | Ends             |
+| -------------- | ---------------- |
 | July 13th 2020 | August 21st 2020 |
 
 As the project has grown the website's structure has proved problematic for contributors.
@@ -68,7 +67,6 @@ Deciding where to put new docs and where to look for files to be changed has bee
 challenging. We've also found that our messaging around Tina has lead to some misconceptions
 that we would like to correct. **This cycle we are focussing on improving the documentation and
 messaging around TinaCMS.**
-
 
 ### Cycle 1: May 18th to June 26th
 

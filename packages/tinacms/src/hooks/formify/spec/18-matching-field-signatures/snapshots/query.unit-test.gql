@@ -13,7 +13,6 @@
 # blocks.[].items.[]
 # blocks.[].items.[].title
 
-
 query QueryOperation {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {

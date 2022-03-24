@@ -21,7 +21,6 @@
 # ================
 # title
 
-
 query QueryOperation {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {

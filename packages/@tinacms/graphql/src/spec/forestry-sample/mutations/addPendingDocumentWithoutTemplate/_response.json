@@ -8,9 +8,7 @@
           "column": 3
         }
       ],
-      "path": [
-        "addPendingDocument"
-      ]
+      "path": ["addPendingDocument"]
     }
   ],
   "data": null

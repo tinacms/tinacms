@@ -5,9 +5,7 @@
       "sys": {
         "filename": "star-wars",
         "basename": "star-wars.md",
-        "breadcrumbs": [
-          "star-wars"
-        ],
+        "breadcrumbs": ["star-wars"],
         "path": "content/movies/star-wars.md",
         "relativePath": "star-wars.md",
         "extension": ".md",
@@ -62,9 +60,7 @@
               "name": "BlockQuote",
               "props": {
                 "author": "Darth Vader",
-                "categories": [
-                  "spoiler"
-                ],
+                "categories": ["spoiler"],
                 "children": {
                   "type": "root",
                   "children": [
