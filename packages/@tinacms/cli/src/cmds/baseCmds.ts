@@ -16,7 +16,13 @@ import { chain } from '../middleware'
 import { genTypes, attachSchema } from './query-gen'
 import { startServer } from './start-server'
 import { compile } from './compile'
-import { initTina, installDeps, tinaSetup, successMessage } from './init'
+import {
+  initTina,
+  installDeps,
+  checkDeps,
+  tinaSetup,
+  successMessage,
+} from './init'
 import { audit, printFinalMessage } from './audit'
 import { logger } from '../logger'
 import chalk from 'chalk'
@@ -103,6 +109,7 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
+          checkDeps,
           initTina,
           installDeps,
           async (_ctx, next) => {
