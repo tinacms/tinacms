@@ -12,8 +12,8 @@ limitations under the License.
 */
 
 import * as G from 'graphql'
-import * as util from './util'
-import type { DocumentBlueprint } from './types'
+import * as util from './formify-utils'
+import type { DocumentBlueprint, BlueprintPath } from './types'
 
 type VisitorType = G.Visitor<G.ASTKindToNode, G.ASTNode>
 
@@ -61,15 +61,14 @@ export const formify = async ({
   const typeInfo = new G.TypeInfo(schema)
 
   const formifyConnection = ({
-    namedFieldType,
+    parentType,
     selectionNode,
     path,
   }: {
-    namedFieldType: G.GraphQLNamedType
+    parentType: G.GraphQLOutputType
     selectionNode: G.FieldNode
-    path: { name: string; alias: string }[]
+    path?: { name: string; alias: string }[]
   }): G.SelectionNode => {
-    util.ensureObjectType(namedFieldType)
     return {
       ...selectionNode,
       selectionSet: {
@@ -79,13 +78,15 @@ export const formify = async ({
             switch (selectionNode2.kind) {
               case 'Field':
                 if (selectionNode2.name.value === EDGES_NODE_NAME) {
-                  const edgeField = namedFieldType.getFields()[EDGES_NODE_NAME]
-                  const edgeType = G.getNamedType(edgeField.type)
-                  util.ensureObjectType(edgeType)
-                  const path2 = [
-                    ...path,
-                    util.getNameAndAlias(selectionNode2, true, false),
-                  ]
+                  const edgeField = util.getObjectField(
+                    parentType,
+                    selectionNode2
+                  )
+                  const edgesPath = util.buildPath({
+                    fieldNode: selectionNode2,
+                    type: edgeField.type,
+                    path,
+                  })
                   return {
                     ...selectionNode2,
                     selectionSet: {
@@ -95,20 +96,19 @@ export const formify = async ({
                           switch (subSelectionNode.kind) {
                             case 'Field':
                               if (subSelectionNode.name.value === NODE_NAME) {
-                                const nodeField =
-                                  edgeType.getFields()[NODE_NAME]
-                                const path3 = [
-                                  ...path2,
-                                  util.getNameAndAlias(
-                                    subSelectionNode,
-                                    false,
-                                    true
-                                  ),
-                                ]
-                                return formifyNode({
-                                  fieldOrInlineFragmentNode: subSelectionNode,
+                                const nodeField = util.getObjectField(
+                                  edgeField.type,
+                                  subSelectionNode
+                                )
+
+                                return formifyFieldNodeDocument({
+                                  fieldNode: subSelectionNode,
                                   type: nodeField.type,
-                                  path: path3,
+                                  path: util.buildPath({
+                                    fieldNode: subSelectionNode,
+                                    type: nodeField.type,
+                                    path: edgesPath,
+                                  }),
                                   showInSidebar: false,
                                 })
                               } else {
@@ -131,25 +131,61 @@ export const formify = async ({
       },
     }
   }
-  function formifyNode<T extends G.FieldNode | G.InlineFragmentNode>({
-    fieldOrInlineFragmentNode,
+
+  type SelectionDocument<T extends G.InlineFragmentNode | G.FieldNode> =
+    T extends G.InlineFragmentNode
+      ? {
+          inlineFragmentNode: T
+          type: G.GraphQLOutputType
+          path: BlueprintPath[]
+          showInSidebar: boolean
+        }
+      : {
+          fieldNode: T
+          type: G.GraphQLOutputType
+          path: BlueprintPath[]
+          showInSidebar: boolean
+        }
+
+  function formifyInlineFragmentDocument({
+    inlineFragmentNode,
+    type,
+    path,
+    showInSidebar = false,
+  }: SelectionDocument<G.InlineFragmentNode>): G.InlineFragmentNode {
+    return formifyDocument({
+      selection: inlineFragmentNode,
+      type,
+      path,
+      showInSidebar,
+    })
+  }
+  function formifyFieldNodeDocument({
+    fieldNode,
+    type,
+    path,
+    showInSidebar = false,
+  }: SelectionDocument<G.FieldNode>): G.FieldNode {
+    return formifyDocument({ selection: fieldNode, type, path, showInSidebar })
+  }
+
+  function formifyDocument<T extends G.InlineFragmentNode | G.FieldNode>({
+    selection,
     type,
     path,
     showInSidebar = false,
   }: {
-    // FIXME: this generic isn't working
-    fieldOrInlineFragmentNode: T
+    selection: T
     type: G.GraphQLOutputType
-    path: { name: string; alias: string }[]
+    path: BlueprintPath[]
     showInSidebar: boolean
-  }) {
+  }): T {
     let extraFields = []
-    const namedType = G.getNamedType(type)
 
     let hasDataJSONField = false
     let hasValuesField = false
     let shouldFormify = false
-    fieldOrInlineFragmentNode.selectionSet.selections.forEach((selection) => {
+    selection.selectionSet.selections.forEach((selection) => {
       if (selection.kind === 'Field') {
         if (selection.name.value === 'dataJSON') {
           shouldFormify = true
@@ -169,7 +205,7 @@ export const formify = async ({
       blueprints.push({
         id: util.getBlueprintId(path),
         path,
-        selection: fieldOrInlineFragmentNode,
+        selection: selection,
         fields: [],
         showInSidebar: showInSidebar,
         hasDataJSONField,
@@ -182,158 +218,124 @@ export const formify = async ({
       extraFields = util.metaFields
     }
 
-    const formifiedNode = {
-      ...fieldOrInlineFragmentNode,
+    return {
+      ...selection,
       selectionSet: {
         kind: 'SelectionSet',
         selections: [
-          ...fieldOrInlineFragmentNode.selectionSet.selections.map(
-            (selectionNode) => {
-              switch (selectionNode.kind) {
+          ...selection.selectionSet.selections.map((selectionNode) => {
+            switch (selectionNode.kind) {
+              /**
+               * An inline fragment will be present when the document result is polymorphic,
+               * when that's the case, we need to "step down" one level with a disambiguator
+               * (eg. ...on PageDocument), then run formifyFieldNodeDocument again at this lower tier
+               */
+              case 'InlineFragment': {
                 /**
-                 * An inline fragment will be present when the document result is polymorphic,
-                 * when that's the case, we need to "step down" one level with a disambiguator
-                 * (eg. ...on PageDocument), then run formifyNode again at this lower tier
+                 * This is a somewhat special use-case for node(id: "")
                  */
-                case 'InlineFragment':
-                  /**
-                   * This is a somewhat special use-case for node(id: "")
-                   */
-                  if (G.isInterfaceType(namedType)) {
-                    const subType = schema
-                      .getImplementations(namedType)
-                      .objects.find(
-                        (item) =>
-                          item.name === selectionNode.typeCondition.name.value
-                      )
-                    return formifyNode({
-                      fieldOrInlineFragmentNode: selectionNode,
-                      type: subType,
-                      path,
-                      showInSidebar: false,
-                    })
-                  }
-                  util.ensureUnionType(namedType)
-                  const subType = util.getSelectedUnionType(
-                    namedType,
-                    selectionNode
-                  )
-
-                  return formifyNode({
-                    fieldOrInlineFragmentNode: selectionNode,
+                const namedType = G.getNamedType(type)
+                if (G.isInterfaceType(namedType)) {
+                  const subType = schema
+                    .getImplementations(namedType)
+                    .objects.find(
+                      (item) =>
+                        item.name === selectionNode.typeCondition.name.value
+                    )
+                  return formifyInlineFragmentDocument({
+                    inlineFragmentNode: selectionNode,
                     type: subType,
                     path,
-                    showInSidebar,
+                    showInSidebar: true,
                   })
-                case 'Field':
-                  if (selectionNode.name.value === DATA_NODE_NAME) {
-                    const path2 = [
-                      ...path,
-                      util.getNameAndAlias(selectionNode, false, false),
-                    ]
-                    if (G.isObjectType(namedType)) {
-                      const field = util.getObjectField(
-                        namedType,
-                        selectionNode
-                      )
-                      const namedSubType = G.getNamedType(field.type)
-                      util.ensureObjectType(namedSubType)
-                      return {
-                        ...selectionNode,
-                        selectionSet: {
-                          kind: 'SelectionSet',
-                          selections: [
-                            ...selectionNode.selectionSet.selections.map(
-                              (subSelectionNode) => {
-                                switch (subSelectionNode.kind) {
-                                  case 'Field':
-                                    const subSelectionField =
-                                      util.getObjectField(
-                                        namedSubType,
-                                        subSelectionNode
-                                      )
-                                    if (!subSelectionField) {
-                                      return subSelectionNode
-                                    }
-                                    const subSelectionType = G.getNamedType(
-                                      subSelectionField.type
-                                    )
-                                    return formifyField({
-                                      fieldNode: subSelectionNode,
-                                      parentType: field.type,
-                                      path: [
-                                        ...path2,
-                                        util.getNameAndAlias(
-                                          subSelectionNode,
-                                          util.isListType(
-                                            subSelectionField.type
-                                          ),
-                                          util.isNodeField(subSelectionType)
-                                        ),
-                                      ],
-                                    })
-                                  default:
-                                    throw new FormifyError(
-                                      'UNEXPECTED',
-                                      `selection ${subSelectionNode.kind}`
-                                    )
-                                }
-                              }
-                            ),
-                          ],
-                        },
-                      }
-                    }
-                    throw new FormifyError('UNEXPECTED')
-                  }
-                  return selectionNode
-                default:
-                  throw new FormifyError('UNEXPECTED')
+                }
+                return formifyInlineFragmentNode({
+                  inlineFragmentNode: selectionNode,
+                  parentType: type,
+                  path,
+                })
               }
+              case 'Field': {
+                if (selectionNode.name.value === DATA_NODE_NAME) {
+                  const field = util.getObjectField(type, selectionNode)
+                  return {
+                    ...selectionNode,
+                    selectionSet: {
+                      kind: 'SelectionSet',
+                      selections: [
+                        ...selectionNode.selectionSet.selections.map(
+                          (subSelectionNode) => {
+                            switch (subSelectionNode.kind) {
+                              case 'Field':
+                                return formifyFieldNode({
+                                  fieldNode: subSelectionNode,
+                                  parentType: field.type,
+                                  path: util.buildPath({
+                                    fieldNode: selectionNode,
+                                    type: field.type,
+                                    path,
+                                  }),
+                                })
+                              default:
+                                throw new FormifyError(
+                                  'UNEXPECTED',
+                                  `selection ${subSelectionNode.kind}`
+                                )
+                            }
+                          }
+                        ),
+                      ],
+                    },
+                  }
+                }
+                return selectionNode
+              }
+              default:
+                throw new FormifyError('UNEXPECTED')
             }
-          ),
+          }),
           ...extraFields,
         ],
       },
     }
-
-    return formifiedNode
   }
 
-  const formifyField = ({
+  const formifyFieldNode = ({
     fieldNode,
     parentType,
     path,
   }: {
     fieldNode: G.FieldNode
     parentType: G.GraphQLOutputType
-    path: { name: string; alias: string }[]
-  }): G.FieldNode => {
-    const namedParentType = G.getNamedType(parentType)
-    util.ensureObjectType(namedParentType)
-    const field = util.getObjectField(namedParentType, fieldNode)
+    path: BlueprintPath[]
+  }) => {
+    if (fieldNode.name.value === '__typename') {
+      return fieldNode
+    }
+    const field = util.getObjectField(parentType, fieldNode)
+
     if (!field) {
-      if (fieldNode.name.value === '__typename') {
-        return fieldNode
-      } else {
-        throw new FormifyError(
-          'UNEXPECTED',
-          `field with no associated type ${fieldNode.name.value}`
-        )
-      }
+      return fieldNode
     }
-    const namedType = G.getNamedType(field.type)
-    const fieldBlueprint = {
-      id: util.getBlueprintId([...path]),
-      documentBlueprintId: util.getRelativeBlueprint(path),
-      path: [...path],
-    }
+
     const blueprint = blueprints.find(
       (blueprint) => blueprint.id === util.getRelativeBlueprint(path)
     )
-    blueprint.fields.push(fieldBlueprint)
 
-    if (G.isScalarType(namedType)) {
+    const fieldPath = util.buildPath({
+      fieldNode,
+      type: field.type,
+      parentTypename: G.getNamedType(parentType).name,
+      path,
+    })
+
+    blueprint.fields.push({
+      id: util.getBlueprintId(fieldPath),
+      documentBlueprintId: blueprint.id,
+      path: fieldPath,
+    })
+
+    if (util.isScalarType(field.type)) {
       return fieldNode
     }
 
@@ -344,181 +346,20 @@ export const formify = async ({
         selections: [
           ...fieldNode.selectionSet.selections.map((selectionNode) => {
             switch (selectionNode.kind) {
-              case 'Field':
-                if (selectionNode.name.value === '__typename') {
-                  return selectionNode
-                }
-                util.ensureObjectType(namedType)
-                const subField = util.getObjectField(namedType, selectionNode)
-                if (!subField) {
-                  return fieldNode
-                }
-                if (G.isScalarType(G.getNamedType(subField.type))) {
-                  const newPath = [
-                    ...path,
-                    util.getNameAndAlias(
-                      selectionNode,
-                      util.isListType(subField.type),
-                      false
-                    ),
-                  ]
-                  const fieldBlueprint = {
-                    id: util.getBlueprintId(newPath),
-                    documentBlueprintId: util.getRelativeBlueprint(newPath),
-                    path: newPath,
-                  }
-                  const blueprint = blueprints.find(
-                    (blueprint) =>
-                      blueprint.id === util.getRelativeBlueprint(path)
-                  )
-                  blueprint.fields.push(fieldBlueprint)
-                  return selectionNode
-                }
-                const subFieldType = subField.type
-                const namedSubFieldType = G.getNamedType(subFieldType)
-
-                const newPath = [
-                  ...path,
-                  util.getNameAndAlias(
-                    selectionNode,
-                    util.isListType(subFieldType),
-                    util.isNodeField(namedSubFieldType)
-                  ),
-                ]
-                const fieldBlueprint = {
-                  id: util.getBlueprintId(newPath),
-                  documentBlueprintId: util.getRelativeBlueprint(newPath),
-                  path: newPath,
-                }
-                const blueprint = blueprints.find(
-                  (blueprint) =>
-                    blueprint.id === util.getRelativeBlueprint(path)
-                )
-                blueprint.fields.push(fieldBlueprint)
-
-                return {
-                  ...selectionNode,
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: selectionNode.selectionSet.selections.map(
-                      (subSelectionNode) => {
-                        switch (subSelectionNode.kind) {
-                          case 'Field':
-                            if (subSelectionNode.name.value === '__typename') {
-                              return subSelectionNode
-                            }
-                            util.ensureObjectType(namedSubFieldType)
-                            const subField1 = util.getObjectField(
-                              namedSubFieldType,
-                              subSelectionNode
-                            )
-                            const subType1 = subField1.type
-                            const namedSubType2 = G.getNamedType(subType1)
-                            return formifyField({
-                              fieldNode: subSelectionNode,
-                              parentType: subFieldType,
-                              path: [
-                                ...path,
-                                util.getNameAndAlias(
-                                  subSelectionNode,
-                                  util.isListType(subType1),
-                                  util.isNodeField(namedSubType2)
-                                ),
-                              ],
-                            })
-                          case 'InlineFragment':
-                            const subNamedType = G.getNamedType(subField.type)
-                            util.ensureNodeField(subNamedType)
-                            util.ensureUnionType(subNamedType)
-
-                            const subType = util.getSelectedUnionType(
-                              subNamedType,
-                              subSelectionNode
-                            )
-
-                            const newPath = [
-                              ...path,
-                              util.getNameAndAlias(
-                                selectionNode,
-                                util.isListType(subField.type),
-                                true
-                              ),
-                            ]
-                            return formifyNode({
-                              fieldOrInlineFragmentNode: subSelectionNode,
-                              type: subType,
-                              path: newPath,
-                              showInSidebar: false,
-                            })
-                          default:
-                            throw new FormifyError(
-                              'UNEXPECTED',
-                              `selection ${subSelectionNode.kind}`
-                            )
-                        }
-                      }
-                    ),
-                  },
-                }
-              case 'InlineFragment':
-                util.ensureUnionType(namedType)
-                if (util.isNodeField(namedType)) {
-                  const parentType2 = util.getSelectedUnionType(
-                    namedType,
-                    selectionNode
-                  )
-
-                  return formifyNode({
-                    fieldOrInlineFragmentNode: selectionNode,
-                    type: parentType2,
-                    path,
-                    showInSidebar: false,
-                  })
-                }
-
-                const subType = util.getSelectedUnionType(
-                  namedType,
-                  selectionNode
-                )
-                const namedSubType = G.getNamedType(subType)
-
-                return {
-                  ...selectionNode,
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: selectionNode.selectionSet.selections.map(
-                      (subSelectionNode) => {
-                        switch (subSelectionNode.kind) {
-                          case 'Field':
-                            util.ensureObjectType(namedSubType)
-                            const subField = util.getObjectField(
-                              namedSubType,
-                              subSelectionNode
-                            )
-                            const subType2 = subField.type
-                            const namedSubType2 = G.getNamedType(subType2)
-                            return formifyField({
-                              fieldNode: subSelectionNode,
-                              parentType: subType,
-                              path: [
-                                ...path,
-                                util.getNameAndAlias(
-                                  subSelectionNode,
-                                  util.isListType(subType2),
-                                  util.isNodeField(namedSubType2)
-                                ),
-                              ],
-                            })
-                          default:
-                            throw new FormifyError(
-                              'UNEXPECTED',
-                              `selection ${subSelectionNode.kind}`
-                            )
-                        }
-                      }
-                    ),
-                  },
-                }
+              case 'Field': {
+                return formifyFieldNode({
+                  fieldNode: selectionNode,
+                  parentType: field.type,
+                  path: fieldPath,
+                })
+              }
+              case 'InlineFragment': {
+                return formifyInlineFragmentNode({
+                  inlineFragmentNode: selectionNode,
+                  parentType: field.type,
+                  path: fieldPath,
+                })
+              }
               default:
                 throw new FormifyError(
                   'UNEXPECTED',
@@ -530,14 +371,59 @@ export const formify = async ({
       },
     }
   }
+
+  const formifyInlineFragmentNode = ({
+    inlineFragmentNode,
+    parentType,
+    path,
+  }: {
+    inlineFragmentNode: G.InlineFragmentNode
+    parentType: G.GraphQLOutputType
+    path: BlueprintPath[]
+  }) => {
+    const type = util.getSelectedUnionType(parentType, inlineFragmentNode)
+
+    if (util.isDocumentField(type)) {
+      return formifyInlineFragmentDocument({
+        inlineFragmentNode: inlineFragmentNode,
+        type,
+        path,
+        showInSidebar: false,
+      })
+    }
+
+    return {
+      ...inlineFragmentNode,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections: inlineFragmentNode.selectionSet.selections.map(
+          (selectionNode) => {
+            switch (selectionNode.kind) {
+              case 'Field':
+                return formifyFieldNode({
+                  fieldNode: selectionNode,
+                  parentType: type,
+                  path,
+                })
+              default:
+                throw new FormifyError(
+                  'UNEXPECTED',
+                  `selection ${selectionNode.kind}`
+                )
+            }
+          }
+        ),
+      },
+    }
+  }
+
   const formifiedQuery: G.DocumentNode = {
     kind: 'Document',
     definitions: optimizedQuery.definitions.map((definition) => {
       typeInfo.enter(definition)
       util.ensureOperationDefinition(definition)
-      const type = typeInfo.getType()
-      const namedType = G.getNamedType(type)
-      util.ensureObjectType(namedType)
+      const parentType = typeInfo.getType()
+
       return {
         ...definition,
         selectionSet: {
@@ -546,28 +432,25 @@ export const formify = async ({
             (selectionNode) => {
               switch (selectionNode.kind) {
                 case 'Field':
-                  const parentType = type
-                  const namedParentType = G.getNamedType(parentType)
-                  util.ensureObjectType(namedParentType)
-                  const field = util.getObjectField(
-                    namedParentType,
-                    selectionNode
-                  )
-                  const namedFieldType = G.getNamedType(field.type)
-                  if (util.isNodeField(namedFieldType)) {
-                    return formifyNode({
-                      fieldOrInlineFragmentNode: selectionNode,
+                  const field = util.getObjectField(parentType, selectionNode)
+                  const path = util.buildPath({
+                    fieldNode: selectionNode,
+                    type: field.type,
+                  })
+                  if (util.isDocumentField(field.type)) {
+                    return formifyFieldNodeDocument({
+                      fieldNode: selectionNode,
                       type: field.type,
-                      path: [util.getNameAndAlias(selectionNode, false, true)],
+                      path,
                       // NOTE: for now, only top-level, non-list queries are
                       // shown in the sidebar
                       showInSidebar: true,
                     })
-                  } else if (util.isConnectionField(namedFieldType)) {
+                  } else if (util.isConnectionField(field.type)) {
                     return formifyConnection({
-                      namedFieldType,
+                      parentType: field.type,
                       selectionNode,
-                      path: [util.getNameAndAlias(selectionNode, false, false)],
+                      path,
                     })
                   }
 
@@ -579,9 +462,10 @@ export const formify = async ({
                     selectionNode.name.value === COLLECTION_FIELD_NAME ||
                     selectionNode.name.value === COLLECTIONS_FIELD_NAME
                   ) {
-                    const path = [
-                      util.getNameAndAlias(selectionNode, false, false),
-                    ]
+                    const path = util.buildPath({
+                      fieldNode: selectionNode,
+                      type: field.type,
+                    })
                     return {
                       ...selectionNode,
                       selectionSet: {
@@ -594,23 +478,18 @@ export const formify = async ({
                                   subSelectionNode.name.value ===
                                   COLLECTIONS_DOCUMENTS_NAME
                                 ) {
-                                  util.ensureObjectType(namedFieldType)
-                                  const n =
-                                    namedFieldType.getFields()[
-                                      COLLECTIONS_DOCUMENTS_NAME
-                                    ]
-                                  const docType = G.getNamedType(n.type)
+                                  const subField = util.getObjectField(
+                                    field.type,
+                                    subSelectionNode
+                                  )
                                   return formifyConnection({
-                                    namedFieldType: docType,
+                                    parentType: subField.type,
                                     selectionNode: subSelectionNode,
-                                    path: [
-                                      ...path,
-                                      util.getNameAndAlias(
-                                        subSelectionNode,
-                                        util.isListType(docType),
-                                        util.isNodeField(docType)
-                                      ),
-                                    ],
+                                    path: util.buildPath({
+                                      fieldNode: subSelectionNode,
+                                      type: subField.type,
+                                      path,
+                                    }),
                                   })
                                 }
                                 return subSelectionNode

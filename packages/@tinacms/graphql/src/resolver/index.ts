@@ -773,6 +773,11 @@ export class Resolver {
     namespace,
     ...field
   }: TinaFieldEnriched): Promise<unknown> => {
+    // @ts-ignore FIXME: `resolveField` will soon be deprecated in favor of client-side field builder
+    field.parentTypename = NAMER.dataTypeName(
+      // Get the type of the parent namespace
+      namespace.filter((_, i) => i < namespace.length - 1)
+    )
     const extraFields = field.ui || {}
     switch (field.type) {
       case 'number':

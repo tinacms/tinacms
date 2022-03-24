@@ -106,8 +106,14 @@ export function reducer(state: State, action: Action): State {
         if (event.mutationType.type === 'change') {
           if (!action.value.form) {
             util
-              .getPathsToChange(event, state)
-              .forEach(({ formNode, pathToChange }) => {
+              .getBlueprintFieldsForEvent(blueprint, event)
+              .forEach((fieldBlueprint) => {
+                const { pathToChange } = util.getFormNodesForField(
+                  fieldBlueprint,
+                  formNode,
+                  event,
+                  state
+                )
                 changeSets.push({
                   path: pathToChange,
                   ...buildChangeSet(event, formNode),
@@ -118,13 +124,16 @@ export function reducer(state: State, action: Action): State {
           util
             .getBlueprintFieldsForEvent(blueprint, event)
             .forEach((fieldBlueprint) => {
-              const { pathToChange, formNodes, eventLocation } =
-                util.getFormNodesForField(
-                  fieldBlueprint,
-                  formNode,
-                  event,
-                  state
-                )
+              const {
+                pathToChange,
+                formNodes: subFormNodes,
+                eventLocation,
+              } = util.getFormNodesForField(
+                fieldBlueprint,
+                formNode,
+                event,
+                state
+              )
 
               if (action.value.form) {
                 const newFormNode: FormNode = {
@@ -138,8 +147,15 @@ export function reducer(state: State, action: Action): State {
                   ...buildChangeSet(event, newFormNode),
                 })
               }
-              formNodes.forEach((subFormNode) => {
+              subFormNodes.forEach((subFormNode) => {
                 if (util.matchLocation(eventLocation, subFormNode)) {
+                  if (!action.value.form) {
+                    changeSets.push({
+                      path: pathToChange,
+                      ...buildChangeSet(event, subFormNode),
+                      value: null,
+                    })
+                  }
                   formNodesToReplace.push(subFormNode)
                 }
               })

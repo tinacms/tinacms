@@ -28,6 +28,10 @@ export const resolveField = (
   { namespace, ...field }: TinaFieldEnriched,
   schema: TinaSchema
 ): unknown => {
+  field.parentTypename = NAMER.dataTypeName(
+    // Get the type of the parent namespace
+    namespace.filter((_, i) => i < namespace.length - 1)
+  )
   const extraFields = field.ui || {}
   switch (field.type) {
     case 'number':

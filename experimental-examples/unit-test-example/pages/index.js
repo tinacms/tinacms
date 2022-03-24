@@ -21,12 +21,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const query = \`#graphql
-${query}\`
+const query = \`${query}\`
 
 const events = ${JSON.stringify(eventList.current, null, 2)}
 
 import { testRunner } from '../runner'
+// @ts-ignore jest: Cannot find name 'test'
 test('formifies the query and responds correctly to events', async () => {
   await testRunner(query, events, __dirname)
 })
@@ -64,23 +64,16 @@ const query = `#graphql
 query {
   getBlockPageDocument(relativePath: "blockPage1.mdx") {
     data {
-      title
       blocks {
-        ...on BlockPageBlocksFeaturedPosts {
-          blogs {
-            item {
-              ...on PostDocument {
-                sys {
-                  filename
-                  collection {
-                    name
-                  }
-                }
-                data {
-                  title
-                }
-              }
-            }
+        __typename
+        ...on BlockPageBlocksFeatureList {
+          items {
+            title
+          }
+        }
+        ...on BlockPageBlocksSlideshow {
+          items {
+            title
           }
         }
       }
