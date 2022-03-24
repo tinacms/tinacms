@@ -11,7 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { checkPackage } from '.'
+import { checkPackage, MIN_REACT_VERSION } from '.'
+import tinaPackageJSON from '../../../../../tinacms/package.json'
+
+/**
+ * Ensure our CLI dependency check uses the min
+ * peer dep we specify in `tinacms`
+ */
+describe('MIN_REACT_VERSION', () => {
+  it('matches the min peer dep on tinacms', () => {
+    expect(tinaPackageJSON.peerDependencies.react).toEqual(MIN_REACT_VERSION)
+    expect(tinaPackageJSON.peerDependencies['react-dom']).toEqual(
+      MIN_REACT_VERSION
+    )
+  })
+})
 
 describe('checkPackage', () => {
   it('returns false for lower minor versions', () => {
