@@ -10,7 +10,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 export interface TinaCloudSchema<WithNamespace extends boolean> {
   templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
@@ -44,6 +43,7 @@ interface BaseCollection {
   path: string
   format?: FormatType
   match?: string
+  indexes?: TinaIndex[]
 }
 
 type CollectionTemplates<WithNamespace extends boolean> =
@@ -89,6 +89,14 @@ export type TinaFieldInner<WithNamespace extends boolean> =
   | ReferenceType<WithNamespace>
   | RichType<WithNamespace>
 
+export type TinaIndex = {
+  name: string
+  fields: {
+    name: string
+    default?: string | number | boolean
+  }[]
+}
+
 export type TinaFieldBase = TinaFieldInner<false>
 export type TinaFieldEnriched = TinaFieldInner<true>
 
@@ -98,6 +106,7 @@ interface TinaField {
   description?: string
   required?: boolean
   list?: boolean
+  indexed?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.
    * NOTE: only serializable values are supported, so functions like `validate`
