@@ -70,7 +70,7 @@ export async function checkDeps(ctx: any, next: () => void, options) {
     !checkPackage(packageJSON, 'react-dom')
   ) {
     const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
-      "react@=${MIN_REACT_VERSION}"
+      "react@${MIN_REACT_VERSION}"
       "react-dom@${MIN_REACT_VERSION}"
 
   Then re-rerun "@tinacms/cli init"`
