@@ -311,6 +311,16 @@ export default defineSchema({
           // },
         },
         {
+          type: "boolean",
+          label: "Published",
+          name: "published",
+        },
+        {
+          type: "number",
+          label: "Rating",
+          name: "rating",
+        },
+        {
           type: "reference",
           label: "Author",
           name: "author",
@@ -329,6 +339,7 @@ export default defineSchema({
           type: "image",
           name: "heroImg",
           label: "Hero Image",
+          indexed: false,
         },
         {
           type: "string",
@@ -337,6 +348,21 @@ export default defineSchema({
             component: "textarea",
           },
           name: "excerpt",
+        },
+      ],
+      indexes: [
+        {
+          name: "published-by-date",
+          fields: [
+            {
+              name: "published",
+              default: "false",
+            },
+            {
+              name: "date",
+              default: "",
+            },
+          ],
         },
       ],
     },
@@ -550,6 +576,32 @@ export default defineSchema({
           type: "string",
           label: "Avatar",
           name: "avatar",
+        },
+        {
+          label: "Details",
+          name: "details",
+          type: "object",
+          list: true,
+          fields: [
+            {
+              type: "reference",
+              label: "Zodiac",
+              name: "zodiac",
+              collections: ["zodiacs"],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Zodiacs",
+      name: "zodiacs",
+      path: "content/zodiacs",
+      fields: [
+        {
+          type: "string",
+          label: "Name",
+          name: "name",
         },
       ],
     },
