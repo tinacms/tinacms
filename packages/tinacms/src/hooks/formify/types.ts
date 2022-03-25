@@ -16,6 +16,10 @@ import type { Form, Field } from '@tinacms/toolkit'
 
 export type Action =
   | {
+      type: 'restart'
+      value: { query: string }
+    }
+  | {
       type: 'setData'
       value: object
     }
