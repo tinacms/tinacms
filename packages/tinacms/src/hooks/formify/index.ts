@@ -62,6 +62,15 @@ export const useFormify = ({
   })
 
   /**
+   * Restart the entire process when the query or variables change
+   */
+  React.useEffect(() => {
+    if (query) {
+      dispatch({ type: 'restart', value: { query } })
+    }
+  }, [query, JSON.stringify(variables)])
+
+  /**
    * Setup the data, using the user-supplied query, this is probably redundant
    * since the `data` is a required parameter of `useGraphQLForms`, so we should be able
    * to remove this once we match the `useGraphQLForms` API
@@ -326,6 +335,7 @@ export const useFormify = ({
         resolveSubFields({
           formNode: changeSet.formNode,
           form: form,
+          loc: [],
         }).then((res) => {
           dispatch({
             type: 'setIn',
@@ -469,7 +479,7 @@ export const useFormify = ({
     async (args: {
       formNode: FormNode
       prefix?: string
-      loc?: number[]
+      loc: number[]
       form: Pick<Form, 'values' | 'fields'>
     }) => {
       const { form, formNode, prefix, loc } = args
@@ -514,14 +524,17 @@ export const useFormify = ({
                       value,
                       async (item, index) => {
                         const template = field.templates[item._template]
-                        return resolveSubFields({
-                          formNode,
-                          form: { fields: template.fields, values: item },
-                          prefix: prefix
-                            ? [prefix, fieldName].join('.')
-                            : fieldName,
-                          loc: [...loc, index],
-                        })
+                        return {
+                          ...(await resolveSubFields({
+                            formNode,
+                            form: { fields: template.fields, values: item },
+                            prefix: prefix
+                              ? [prefix, fieldName].join('.')
+                              : fieldName,
+                            loc: [...loc, index],
+                          })),
+                          __typename: field.typeMap[item._template],
+                        }
                       }
                     )
                   }
