@@ -21,11 +21,14 @@ import { createDatabase } from '../database'
 import { Database } from '../database'
 import { FilesystemBridge } from '@tinacms/datalayer'
 
-import type { Store } from '../database/store'
+import type { Store } from '@tinacms/datalayer'
 import type { TinaCloudSchema } from '../types'
 import { sequential } from '../util'
 
 class MockFilesystemBridge extends FilesystemBridge {
+  constructor(rootPath: string) {
+    super(rootPath)
+  }
   async put(filepath: string, data: string) {
     // noop
   }
@@ -52,6 +55,7 @@ export const setup = async (
   })
   const bridge = new MockFilesystemBridge(rootPath)
   const database = await createDatabase({
+    // @ts-ignore
     bridge,
     store,
   })
