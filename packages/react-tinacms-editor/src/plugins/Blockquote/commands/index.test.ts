@@ -20,15 +20,8 @@ import { PMTestHarness } from '../../../test-utils'
 import { defaultSchema } from '../../../test-utils/test-schema'
 import { liftBlockquote } from '.'
 
-const {
-  forDoc,
-  doc,
-  p,
-  orderedList,
-  bulletList,
-  text,
-  blockquote,
-} = new PMTestHarness(defaultSchema)
+const { forDoc, doc, p, orderedList, bulletList, text, blockquote } =
+  new PMTestHarness(defaultSchema)
 
 describe('liftBlockquote', () => {
   it('should do nothing to paragraph', () => {

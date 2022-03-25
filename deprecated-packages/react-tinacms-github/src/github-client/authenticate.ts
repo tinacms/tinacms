@@ -23,20 +23,18 @@ export const authenticate = (
   codeExchangeRoute: string,
   scope: string = 'public_repo'
 ): Promise<void> => {
-  const authState = Math.random()
-    .toString(36)
-    .substring(7)
+  const authState = Math.random().toString(36).substring(7)
 
   const url = `https://github.com/login/oauth/authorize?scope=${scope}&client_id=${clientId}&state=${authState}`
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     // @ts-ignore
     let authTab: Window | undefined
-    window.addEventListener('storage', function(e: StorageEvent) {
+    window.addEventListener('storage', function (e: StorageEvent) {
       if (e.key == GITHUB_AUTH_CODE_KEY) {
         fetch(`${codeExchangeRoute}?code=${e.newValue}&state=${authState}`)
-          .then(response => response.json())
-          .then(data => {
+          .then((response) => response.json())
+          .then((data) => {
             const token = data.signedToken || null
             if (token) {
               // for implementations using the csrf mitigation

@@ -17,17 +17,25 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
+import type {
+  BinaryFilter,
+  IndexDefinition,
+  PageInfo,
+  StoreQueryOptions,
+  Store,
+  TernaryFilter,
+} from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type {
   TinaCloudSchemaBase,
-  TinaFieldEnriched,
-  Collectable,
+  CollectionFieldsWithNamespace,
+  CollectionTemplatesWithNamespace,
+  TinaFieldInner,
 } from '../types'
-import type { Store } from './store'
 import type { Bridge } from './bridge'
-import { flatten, isBoolean } from 'lodash'
+import { atob, btoa, DEFAULT_COLLECTION_SORT_KEY } from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -41,10 +49,31 @@ export const createDatabase = async (config: CreateDatabase) => {
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
 const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
+/** Options for {@link Database.query} **/
+export type QueryOptions = {
+  /* collection name */
+  collection: string
+  /* filters to apply to the query */
+  filterChain?: (BinaryFilter | TernaryFilter)[]
+  /* sort (either field or index) */
+  sort?: string
+  /* limit results to first N items */
+  first?: number
+  /* limit results to last N items */
+  last?: number
+  /* specify cursor to start results at */
+  after?: string
+  /* specify cursor to end results at */
+  before?: string
+}
+
 export class Database {
   public bridge: Bridge
   public store: Store
   private tinaSchema: TinaSchema | undefined
+  private collectionIndexDefinitions:
+    | Record<string, Record<string, IndexDefinition>>
+    | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   private _graphql: DocumentNode | undefined
   private _tinaSchema: TinaCloudSchemaBase | undefined
@@ -106,29 +135,49 @@ export class Database {
   ) => {
     const { stringifiedFile, payload, keepTemplateKey } =
       await this.stringifyFile(filepath, data)
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
+    )
+    let collectionIndexDefinitions
+    if (collection) {
+      const indexDefinitions = await this.getIndexDefinitions()
+      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    }
     if (this.store.supportsSeeding()) {
       await this.bridge.put(filepath, stringifiedFile)
     }
-    await this.store.put(filepath, payload, keepTemplateKey)
+    await this.store.put(filepath, payload, {
+      keepTemplateKey,
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    })
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
+      const tinaSchema = await this.getSchema()
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        filepath.startsWith(collection.path)
+      )
+      let collectionIndexDefinitions
+      if (collection) {
+        const indexDefinitions = await this.getIndexDefinitions()
+        collectionIndexDefinitions = indexDefinitions?.[collection.name]
+      }
+
       const { stringifiedFile, payload, keepTemplateKey } =
         await this.stringifyFile(filepath, data)
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
       }
-      if (this.store.supportsIndexing()) {
-        await indexDocument({
-          filepath: filepath,
-          data,
-          database: this,
-        })
-      }
-      await this.store.put(filepath, payload, keepTemplateKey)
+      await this.store.put(filepath, payload, {
+        keepTemplateKey,
+        collection: collection.name,
+        indexDefinitions: collectionIndexDefinitions,
+      })
     }
     return true
   }
@@ -235,6 +284,67 @@ export class Database {
     return this.tinaSchema
   }
 
+  public getIndexDefinitions = async (): Promise<
+    Record<string, Record<string, IndexDefinition>>
+  > => {
+    if (!this.collectionIndexDefinitions) {
+      await new Promise<void>(async (resolve, reject) => {
+        try {
+          const schema = await this.getSchema()
+          const collections = schema.getCollections()
+          for (const collection of collections) {
+            const indexDefinitions = {
+              [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] }, // provide a default sort key which is the file sort
+            }
+
+            if (collection.fields) {
+              for (const field of collection.fields as TinaFieldInner<true>[]) {
+                if (
+                  (field.indexed !== undefined && field.indexed === false) ||
+                  field.type ===
+                    'object' /* TODO do we want indexes on objects? */
+                ) {
+                  continue
+                }
+
+                indexDefinitions[field.name] = {
+                  fields: [
+                    {
+                      name: field.name,
+                      type: field.type,
+                    },
+                  ],
+                }
+              }
+            }
+
+            if (collection.indexes) {
+              // build IndexDefinitions for each index in the collection schema
+              for (const index of collection.indexes) {
+                indexDefinitions[index.name] = {
+                  fields: index.fields.map((indexField) => ({
+                    name: indexField.name,
+                    type: (collection.fields as TinaFieldInner<true>[]).find(
+                      (field) => indexField.name === field.name
+                    )?.type,
+                  })),
+                }
+              }
+            }
+            this.collectionIndexDefinitions =
+              this.collectionIndexDefinitions || {}
+            this.collectionIndexDefinitions[collection.name] = indexDefinitions
+          }
+          resolve()
+        } catch (err) {
+          reject(err)
+        }
+      })
+    }
+
+    return this.collectionIndexDefinitions
+  }
+
   public documentExists = async (fullpath: unknown) => {
     try {
       // @ts-ignore assert is string
@@ -245,8 +355,64 @@ export class Database {
 
     return true
   }
-  public query = async (queryStrings: string[], hydrator) => {
-    return await this.store.query(queryStrings, hydrator)
+
+  public query = async (queryOptions: QueryOptions, hydrator) => {
+    const { first, after, last, before, sort, collection, filterChain } =
+      queryOptions
+    const storeQueryOptions: StoreQueryOptions = {
+      sort,
+      collection,
+      filterChain,
+    }
+
+    if (first) {
+      storeQueryOptions.limit = first
+    } else if (last) {
+      storeQueryOptions.limit = last
+    } else {
+      storeQueryOptions.limit = 10
+    }
+
+    if (after) {
+      storeQueryOptions.gt = atob(after)
+    } else if (before) {
+      storeQueryOptions.lt = atob(before)
+    }
+
+    if (last) {
+      storeQueryOptions.reverse = true
+    }
+
+    const indexDefinitions = await this.getIndexDefinitions()
+    storeQueryOptions.indexDefinitions =
+      indexDefinitions?.[queryOptions.collection]
+    if (!storeQueryOptions.indexDefinitions) {
+      throw new Error(
+        `No indexDefinitions for collection ${queryOptions.collection}`
+      )
+    }
+
+    const {
+      edges,
+      pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
+    }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
+      await this.store.query(storeQueryOptions)
+
+    return {
+      edges: await sequential(edges, async (edge) => {
+        const node = await hydrator(edge.path)
+        return {
+          node,
+          cursor: btoa(edge.cursor),
+        }
+      }),
+      pageInfo: {
+        hasPreviousPage,
+        hasNextPage,
+        startCursor: btoa(startCursor),
+        endCursor: btoa(endCursor),
+      },
+    }
   }
 
   public putConfigFiles = async ({
@@ -297,15 +463,20 @@ export class Database {
     }
   }
 
-  public indexContentByPaths = async (documentPaths: string[]) => {
-    await _indexContent(this, documentPaths)
+  public indexContentByPaths = async (
+    documentPaths: string[],
+    collection:
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+  ) => {
+    await _indexContent(this, documentPaths, collection)
   }
 
   public _indexAllContent = async () => {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(collection.path)
-      await _indexContent(this, documentPaths)
+      await _indexContent(this, documentPaths, collection)
     })
   }
 
@@ -380,168 +551,36 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const _indexContent = async (database: Database, documentPaths: string[]) => {
+const _indexContent = async (
+  database: Database,
+  documentPaths: string[],
+  collection:
+    | CollectionFieldsWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>
+) => {
+  const indexDefinitions = await database.getIndexDefinitions()
+  const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+  if (!collectionIndexDefinitions) {
+    throw new Error(`No indexDefinitions for collection ${collection.name}`)
+  }
+
+  const numIndexes = Object.keys(collectionIndexDefinitions).length
+  if (numIndexes > 20) {
+    throw new Error(
+      `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
+    )
+  }
+
   await sequential(documentPaths, async (filepath) => {
     const dataString = await database.bridge.get(filepath)
     const data = parseFile(dataString, path.extname(filepath), (yup) =>
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data)
-    }
-    if (database.store.supportsIndexing()) {
-      return indexDocument({ filepath, data, database })
+      await database.store.seed(filepath, data, {
+        collection: collection.name,
+        indexDefinitions: collectionIndexDefinitions,
+      })
     }
   })
-}
-
-const indexDocument = async ({
-  filepath,
-  data,
-  database,
-}: {
-  filepath: string
-  data: object
-  database: Database
-}) => {
-  const schema = await database.getSchema()
-  const collection = await schema.getCollectionByFullPath(filepath)
-  let existingData
-  try {
-    existingData = await database.get<{ _collection: string }>(filepath)
-  } catch (err) {
-    if (err.extensions?.['status'] !== 404) {
-      throw err
-    }
-  }
-
-  if (existingData) {
-    const attributesToFilterOut = await _indexCollectable({
-      record: filepath,
-      value: existingData,
-      field: collection,
-      prefix: collection.name,
-      database,
-    })
-    await sequential(attributesToFilterOut, async (attribute) => {
-      const records = (await database.store.get<string[]>(attribute)) || []
-      await database.store.put(
-          attribute,
-          records.filter((item) => item !== filepath)
-      )
-      return true
-    })
-  }
-
-  const attributes = await _indexCollectable({
-    record: filepath,
-    //@ts-ignore
-    field: collection,
-    value: data,
-    prefix: `${lastItem(collection.namespace)}`,
-    database,
-  })
-  await sequential(attributes, async (fieldName) => {
-    const existingRecords =
-      (await database.store.get<string[]>(fieldName)) || []
-    // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
-    // // @ts-ignore
-    const uniqueItems = [...new Set([...existingRecords, filepath])]
-    await database.store.put(fieldName, uniqueItems)
-  })
-}
-
-const _indexCollectable = async ({
-  field,
-  value,
-  ...rest
-}: {
-  record: string
-  value: object
-  prefix: string
-  field: Collectable
-  database: Database
-}): Promise<string[]> => {
-  let template
-  let extra = ''
-  if (field.templates) {
-    template = field.templates.find((t) => {
-      if (typeof t === 'string') {
-        throw new Error(`Global templates not yet supported`)
-      }
-      if (hasOwnProperty(value, '_template')) {
-        return t.name === value._template
-      } else {
-        throw new Error(
-          `Expected value for collectable with multiple templates to have property _template`
-        )
-      }
-    })
-    extra = `#${lastItem(template.namespace)}`
-  } else {
-    template = field
-  }
-  const atts = await _indexAttributes({
-    record: rest.record,
-    data: value,
-    prefix: `${rest.prefix}${extra}#${template.name}`,
-    fields: template.fields,
-    database: rest.database,
-  })
-  // @ts-ignore FIXME: filter doesn't do enough to tell Typescript we're only returning strings
-  return flatten(atts).filter((item) => !isBoolean(item))
-}
-
-const _indexAttributes = async ({
-  data,
-  fields,
-  ...rest
-}: {
-  record: string
-  data: object
-  prefix: string
-  fields: TinaFieldEnriched[]
-  database: Database
-}) => {
-  return sequential(fields, async (field) => {
-    const value = data[field.name]
-    if (!value) {
-      return true
-    }
-
-    switch (field.type) {
-      case 'boolean':
-      case 'string':
-      case 'number':
-      case 'datetime':
-        return _indexAttribute({ value, field, ...rest })
-      case 'object':
-        if (field.list) {
-          await sequential(value, async (item) => {
-            // @ts-ignore
-            return _indexCollectable({ field, value: item, ...rest })
-          })
-        } else {
-          return _indexCollectable({ field, value, ...rest })
-        }
-        return true
-      case 'reference':
-        return _indexAttribute({ value, field, ...rest })
-    }
-    return true
-  })
-}
-
-const _indexAttribute = async ({
-  value,
-  prefix,
-  field,
-}: {
-  value: string
-  prefix: string
-  field: TinaFieldEnriched
-}) => {
-  const stringValue = value.toString().substr(0, 100)
-  const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
-  return fieldName
 }

@@ -38,7 +38,7 @@ export function liftBlockquote(state: EditorState, dispatch: Dispatch | null) {
 
 const getRangeForType = (state: EditorState, listType: NodeType) => {
   const { $from, $to } = state.selection
-  const range = $from.blockRange($to, node => {
+  const range = $from.blockRange($to, (node) => {
     return node.type == listType
   })
   return range

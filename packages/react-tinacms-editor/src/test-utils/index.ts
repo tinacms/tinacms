@@ -90,7 +90,7 @@ export class PMTestHarness {
   }
 
   apply = (command: Command, ...args: any[]) => {
-    command(this.state, tr => (this.state = this.state.apply(tr)), ...args)
+    command(this.state, (tr) => (this.state = this.state.apply(tr)), ...args)
     return this
   }
 

@@ -16,7 +16,6 @@ import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { LevelStore } from '@tinacms/datalayer'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
-const store = new LevelStore(rootPath, true)
 
 const fixtures: Fixture[] = [
   {
@@ -78,6 +77,10 @@ afterEach(() => {
 })
 
 describe('A schema with indexing', () => {
+  let store
+  beforeEach(() => {
+    store = new LevelStore(rootPath, true)
+  })
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
       const { responses, expectedResponsePaths } = await setupFixture(

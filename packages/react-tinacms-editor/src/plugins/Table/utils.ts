@@ -120,7 +120,7 @@ const buildExtendedColumnHeaders = (
     if (
       colSelection &&
       selection.ranges.some(
-        r => r.$from.pos === tableNode.start + cellMap[i] + 1
+        (r) => r.$from.pos === tableNode.start + cellMap[i] + 1
       )
     ) {
       div.classList.add('tina_table_header_ext_top_selected')
@@ -145,7 +145,7 @@ const buildExtendedRowHeaders = (
     if (
       rowSelection &&
       selection.ranges.some(
-        r => r.$from.pos === tableNode.start + cellMap[i * tableMap.width] + 1
+        (r) => r.$from.pos === tableNode.start + cellMap[i * tableMap.width] + 1
       )
     ) {
       div.classList.add('tina_table_header_ext_left_selected')
