@@ -67,6 +67,12 @@ export const useFormify = ({
   React.useEffect(() => {
     if (query) {
       dispatch({ type: 'restart', value: { query } })
+      formIds.current.forEach((formId) => {
+        const form = cms.forms.find(formId)
+        if (form) {
+          cms.plugins.remove(form)
+        }
+      })
     }
   }, [query, JSON.stringify(variables)])
 
@@ -281,6 +287,9 @@ export const useFormify = ({
                           values
                           _internalSys: sys {
                             path
+                            collection {
+                              name
+                            }
                           }
                         }
                       }
@@ -337,6 +346,7 @@ export const useFormify = ({
           form: form,
           loc: [],
         }).then((res) => {
+          console.log(res)
           dispatch({
             type: 'setIn',
             value: {
@@ -608,6 +618,9 @@ export const useFormify = ({
                             values
                             _internalSys: sys {
                               path
+                              collection {
+                                name
+                              }
                             }
                           }
                         }
