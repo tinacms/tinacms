@@ -23,46 +23,44 @@ import qs from 'qs'
 import axios from 'axios'
 import { serialize } from 'cookie'
 
-export const createAuthHandler = (
-  clientId: string,
-  secret: string,
-  signingKey: string
-) => (req: any, res: any) => {
-  if (!signingKey) {
-    const message =
-      'next-tinacms-github: createAuthHandler was called without a signing key.'
-    console.error(message)
-    return res.status(500).json({ message })
-  }
-
-  createAccessToken(clientId, secret, req.query.code, req.query.state).then(
-    (tokenResp: any) => {
-      const { access_token, error } = qs.parse(tokenResp.data)
-      if (error) {
-        res.status(400).json({ error })
-      } else {
-        // Generate the csrf token
-        const csrfToken = uuidv4()
-
-        // Sign the amalgamated token
-        const unsignedToken = `${csrfToken}.${access_token}`
-        const signedToken = AES.encrypt(unsignedToken, signingKey).toString()
-
-        // Set the csrf token as an httpOnly cookie
-        res.setHeader(
-          'Set-Cookie',
-          serialize(CSRF_TOKEN_KEY, csrfToken, {
-            path: '/',
-            httpOnly: true,
-          })
-        )
-
-        // Return the amalgamated token
-        res.status(200).json({ signedToken })
-      }
+export const createAuthHandler =
+  (clientId: string, secret: string, signingKey: string) =>
+  (req: any, res: any) => {
+    if (!signingKey) {
+      const message =
+        'next-tinacms-github: createAuthHandler was called without a signing key.'
+      console.error(message)
+      return res.status(500).json({ message })
     }
-  )
-}
+
+    createAccessToken(clientId, secret, req.query.code, req.query.state).then(
+      (tokenResp: any) => {
+        const { access_token, error } = qs.parse(tokenResp.data)
+        if (error) {
+          res.status(400).json({ error })
+        } else {
+          // Generate the csrf token
+          const csrfToken = uuidv4()
+
+          // Sign the amalgamated token
+          const unsignedToken = `${csrfToken}.${access_token}`
+          const signedToken = AES.encrypt(unsignedToken, signingKey).toString()
+
+          // Set the csrf token as an httpOnly cookie
+          res.setHeader(
+            'Set-Cookie',
+            serialize(CSRF_TOKEN_KEY, csrfToken, {
+              path: '/',
+              httpOnly: true,
+            })
+          )
+
+          // Return the amalgamated token
+          res.status(200).json({ signedToken })
+        }
+      }
+    )
+  }
 
 const createAccessToken = (
   clientId: string,

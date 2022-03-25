@@ -16,9 +16,10 @@ import * as React from 'react'
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = React.useState(initialValue)
   React.useEffect(() => {
-    // localStorage may be intentionally disabled for site visitors, 
+    // localStorage may be intentionally disabled for site visitors,
     // in that case Tina can't be used so just bail out of value storing
-    const valueFromStorage = window.localStorage && window.localStorage.getItem(key)
+    const valueFromStorage =
+      window.localStorage && window.localStorage.getItem(key)
     if (valueFromStorage != null && valueFromStorage != undefined) {
       setStoredValue(JSON.parse(valueFromStorage))
     }

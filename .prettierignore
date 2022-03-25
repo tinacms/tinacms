@@ -1,4 +1,9 @@
 **/*.mdx
+**/*.md
+**/*.gql
+**/*.json
+__generated__
+
 packages/**/*.md
 .yarn
 .pnp.js

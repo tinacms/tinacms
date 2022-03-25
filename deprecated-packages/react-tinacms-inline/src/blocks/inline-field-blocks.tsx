@@ -71,9 +71,8 @@ export interface InlineBlocksActions {
   max?: number
 }
 
-export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
-  null
-)
+export const InlineBlocksContext =
+  React.createContext<InlineBlocksActions | null>(null)
 
 export function useInlineBlocks() {
   const inlineBlocksContext = React.useContext(InlineBlocksContext)
@@ -156,7 +155,7 @@ export function InlineBlocks({
               {allData.length < 1 && cms.enabled && (
                 <BlocksEmptyState>
                   <AddBlockMenu
-                    addBlock={block => insert(0, block)}
+                    addBlock={(block) => insert(0, block)}
                     blocks={blocks}
                   />
                 </BlocksEmptyState>

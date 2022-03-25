@@ -15,7 +15,6 @@ import childProcess from 'child_process'
 import path from 'path'
 import { buildSchema, createDatabase } from '@tinacms/graphql'
 import {
-  MemoryStore,
   FilesystemStore,
   FilesystemBridge,
   LevelStore,

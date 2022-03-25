@@ -52,7 +52,7 @@ export function InlineImageUpload({
   )
 }
 
-const ImagePlaceholder = styled(styleProps => {
+const ImagePlaceholder = styled((styleProps) => {
   return (
     <div {...styleProps}>
       Drag 'n' drop some files here,
