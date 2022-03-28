@@ -30,8 +30,8 @@
     "type": "AuthorDocument",
     "resolveType": "collectionDocument",
     "collection": "author",
-    "createAuthorDocument": "create",
-    "updateAuthorDocument": "update"
+    "createAuthor": "create",
+    "updateAuthor": "update"
   },
   "AuthorConnection": {
     "type": "AuthorConnection",
@@ -55,8 +55,8 @@
     "type": "PostDocument",
     "resolveType": "collectionDocument",
     "collection": "post",
-    "createPostDocument": "create",
-    "updatePostDocument": "update"
+    "createPost": "create",
+    "updatePost": "update"
   },
   "PostConnection": {
     "type": "PostConnection",
@@ -75,8 +75,8 @@
     "type": "PageDocument",
     "resolveType": "collectionDocument",
     "collection": "page",
-    "createPageDocument": "create",
-    "updatePageDocument": "update"
+    "createPage": "create",
+    "updatePage": "update"
   },
   "PageConnection": {
     "type": "PageConnection",
@@ -96,8 +96,8 @@
     "type": "StuffDocument",
     "resolveType": "collectionDocument",
     "collection": "stuff",
-    "createStuffDocument": "create",
-    "updateStuffDocument": "update"
+    "createStuff": "create",
+    "updateStuff": "update"
   },
   "StuffConnection": {
     "type": "StuffConnection",

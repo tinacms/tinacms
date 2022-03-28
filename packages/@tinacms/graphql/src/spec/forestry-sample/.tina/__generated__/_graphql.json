@@ -3310,7 +3310,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateAuthorDocument"
+            "value": "updateAuthor"
           },
           "arguments": [
             {
@@ -3363,7 +3363,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createAuthorDocument"
+            "value": "createAuthor"
           },
           "arguments": [
             {
@@ -3416,7 +3416,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePostDocument"
+            "value": "updatePost"
           },
           "arguments": [
             {
@@ -3469,7 +3469,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPostDocument"
+            "value": "createPost"
           },
           "arguments": [
             {
@@ -3522,7 +3522,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateStuffDocument"
+            "value": "updateStuff"
           },
           "arguments": [
             {
@@ -3575,7 +3575,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createStuffDocument"
+            "value": "createStuff"
           },
           "arguments": [
             {
@@ -3628,7 +3628,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePageDocument"
+            "value": "updatePage"
           },
           "arguments": [
             {
@@ -3681,7 +3681,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPageDocument"
+            "value": "createPage"
           },
           "arguments": [
             {

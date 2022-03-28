@@ -227,14 +227,14 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  updateStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
-  createStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
-  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  updateAuthor(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  createAuthor(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  updatePost(relativePath: String!, params: PostMutation!): PostDocument!
+  createPost(relativePath: String!, params: PostMutation!): PostDocument!
+  updateStuff(relativePath: String!, params: StuffMutation!): StuffDocument!
+  createStuff(relativePath: String!, params: StuffMutation!): StuffDocument!
+  updatePage(relativePath: String!, params: PageMutation!): PageDocument!
+  createPage(relativePath: String!, params: PageMutation!): PageDocument!
 }
 
 input DocumentMutation {

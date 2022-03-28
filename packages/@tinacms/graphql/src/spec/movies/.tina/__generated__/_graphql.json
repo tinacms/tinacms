@@ -2614,7 +2614,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateMovieDocument"
+            "value": "updateMovie"
           },
           "arguments": [
             {
@@ -2667,7 +2667,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createMovieDocument"
+            "value": "createMovie"
           },
           "arguments": [
             {
@@ -2720,7 +2720,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateDirectorDocument"
+            "value": "updateDirector"
           },
           "arguments": [
             {
@@ -2773,7 +2773,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createDirectorDocument"
+            "value": "createDirector"
           },
           "arguments": [
             {
@@ -2826,7 +2826,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateActorDocument"
+            "value": "updateActor"
           },
           "arguments": [
             {
@@ -2879,7 +2879,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createActorDocument"
+            "value": "createActor"
           },
           "arguments": [
             {
