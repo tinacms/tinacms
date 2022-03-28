@@ -570,7 +570,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocument"
+            "value": "document"
           },
           "arguments": [
             {

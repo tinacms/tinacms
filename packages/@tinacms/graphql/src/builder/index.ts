@@ -222,7 +222,7 @@ export class Builder {
   public multiCollectionDocument = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
-    const name = 'getDocument'
+    const name = NAMER.documentQueryName()
     const args = [
       astBuilder.InputValueDefinition({
         name: 'collection',

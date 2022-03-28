@@ -45,7 +45,7 @@ type Query {
   getCollection(collection: String): Collection!
   getCollections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
+  document(collection: String, relativePath: String): DocumentNode!
   getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
   movie(relativePath: String): MovieDocument!
