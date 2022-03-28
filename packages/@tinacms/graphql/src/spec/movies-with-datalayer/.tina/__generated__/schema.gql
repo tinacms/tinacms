@@ -41,26 +41,28 @@ interface Connection {
 }
 
 type Query {
+  getOptimizedQuery(queryString: String!): String
   getCollection(collection: String): Collection!
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float, filter: DocumentFilter): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   getDocumentFields: JSON!
-  getMovieDocument(relativePath: String): MovieDocument!
-  getMovieList(before: String, after: String, first: Float, last: Float, filter: MovieFilter): MovieConnection!
-  getDirectorDocument(relativePath: String): DirectorDocument!
-  getDirectorList(before: String, after: String, first: Float, last: Float, filter: DirectorFilter): DirectorConnection!
-  getCrewDocument(relativePath: String): CrewDocument!
-  getCrewList(before: String, after: String, first: Float, last: Float, filter: CrewFilter): CrewConnection!
-  getActorDocument(relativePath: String): ActorDocument!
-  getActorList(before: String, after: String, first: Float, last: Float, filter: ActorFilter): ActorConnection!
+  movie(relativePath: String): MovieDocument!
+  getMovieList(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
+  director(relativePath: String): DirectorDocument!
+  getDirectorList(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
+  crew(relativePath: String): CrewDocument!
+  getCrewList(before: String, after: String, first: Float, last: Float, sort: String, filter: CrewFilter): CrewConnection!
+  actor(relativePath: String): ActorDocument!
+  getActorList(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
 }
 
 input StringFilter {
   startsWith: String
   eq: String
   exists: Boolean
+  in: [String]
 }
 
 input DatetimeFilter {
@@ -68,6 +70,7 @@ input DatetimeFilter {
   before: String
   eq: String
   exists: Boolean
+  in: [String]
 }
 
 input NumberFilter {
@@ -77,6 +80,7 @@ input NumberFilter {
   gt: Float
   eq: Float
   exists: Boolean
+  in: [Float]
 }
 
 input BooleanFilter {
@@ -147,7 +151,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, filter: DocumentFilter): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument

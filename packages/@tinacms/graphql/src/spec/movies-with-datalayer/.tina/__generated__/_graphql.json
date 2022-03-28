@@ -447,6 +447,39 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
+            "value": "getOptimizedQuery"
+          },
+          "arguments": [
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "queryString"
+              },
+              "type": {
+                "kind": "NonNullType",
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "String"
+                  }
+                }
+              }
+            }
+          ],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
             "value": "getCollection"
           },
           "arguments": [
@@ -647,6 +680,20 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
                 "value": "filter"
               },
               "type": {
@@ -691,7 +738,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getMovieDocument"
+            "value": "movie"
           },
           "arguments": [
             {
@@ -787,6 +834,20 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
                 "value": "filter"
               },
               "type": {
@@ -813,7 +874,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDirectorDocument"
+            "value": "director"
           },
           "arguments": [
             {
@@ -909,6 +970,20 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
                 "value": "filter"
               },
               "type": {
@@ -935,7 +1010,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCrewDocument"
+            "value": "crew"
           },
           "arguments": [
             {
@@ -1031,6 +1106,20 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
                 "value": "filter"
               },
               "type": {
@@ -1057,7 +1146,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getActorDocument"
+            "value": "actor"
           },
           "arguments": [
             {
@@ -1153,6 +1242,20 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
                 "value": "filter"
               },
               "type": {
@@ -1225,6 +1328,23 @@
               "value": "Boolean"
             }
           }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
         }
       ]
     },
@@ -1288,6 +1408,23 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         }
@@ -1381,6 +1518,23 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Float"
+              }
             }
           }
         }
@@ -2076,6 +2230,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
