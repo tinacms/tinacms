@@ -6,7 +6,7 @@ import { ExperimentalGetTinaClient } from "../.tina/__generated__/types";
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  const posts = props.data.getPostsList.edges;
+  const posts = props.data.postsConnection.edges;
 
   return (
     <Section className="flex-1">

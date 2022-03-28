@@ -480,7 +480,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollection"
+            "value": "collection"
           },
           "arguments": [
             {
@@ -513,7 +513,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollections"
+            "value": "collections"
           },
           "arguments": [],
           "type": {
@@ -617,7 +617,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocumentList"
+            "value": "documentConnection"
           },
           "arguments": [
             {

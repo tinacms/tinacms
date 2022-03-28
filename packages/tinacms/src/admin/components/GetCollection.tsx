@@ -37,7 +37,7 @@ export const useGetCollection = (
             collectionName,
             includeDocuments
           )
-          setCollection(response.getCollection)
+          setCollection(response.collection)
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`,

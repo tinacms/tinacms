@@ -32,7 +32,7 @@ export const useGetDocument = (
       if (api.isAuthenticated()) {
         try {
           const response = await api.fetchDocument(collectionName, relativePath)
-          setDocument(response.getDocument)
+          setDocument(response.document)
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetDocument failed: ${error.message}`,
