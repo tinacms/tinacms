@@ -271,14 +271,14 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
-  createCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
-  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
+  createCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
+  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
+  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
 }
 
 input DocumentMutation {
