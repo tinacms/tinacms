@@ -13,11 +13,33 @@ limitations under the License.
 
 import * as util from './util'
 import { setIn, getIn } from 'final-form'
+import * as G from 'graphql'
 
 import { FormNode, ChangeSet, State, Action, OnChangeEvent } from './types'
 
+const defaultState: State = {
+  status: 'idle',
+  schema: undefined,
+  query: null,
+  queryString: null,
+  data: {},
+  changeSets: [],
+  count: 0,
+  blueprints: [],
+  formNodes: [],
+  documentForms: [],
+}
+
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'start':
+      return {
+        ...state,
+        ...defaultState,
+        query: action.value.query ? G.parse(action.value.query) : null,
+        queryString: action.value.query,
+        status: 'initialized',
+      }
     /**
      * Add document blueprints, used on the initial setup only
      *
