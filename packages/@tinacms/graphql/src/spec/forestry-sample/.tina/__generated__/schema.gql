@@ -49,13 +49,13 @@ type Query {
   getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
   author(relativePath: String): AuthorDocument!
-  getAuthorList(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
+  authorConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
   post(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
   stuff(relativePath: String): StuffDocument!
-  getStuffList(before: String, after: String, first: Float, last: Float, sort: String): StuffConnection!
+  stuffConnection(before: String, after: String, first: Float, last: Float, sort: String): StuffConnection!
   page(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
 }
 
 type DocumentConnectionEdges {

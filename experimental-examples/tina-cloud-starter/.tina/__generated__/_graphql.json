@@ -757,7 +757,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPostsList"
+            "value": "postsConnection"
           },
           "arguments": [
             {
@@ -879,7 +879,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getGlobalList"
+            "value": "globalConnection"
           },
           "arguments": [
             {
@@ -1001,7 +1001,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getAuthorsList"
+            "value": "authorsConnection"
           },
           "arguments": [
             {
@@ -1123,7 +1123,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getZodiacsList"
+            "value": "zodiacsConnection"
           },
           "arguments": [
             {
@@ -1245,7 +1245,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPagesList"
+            "value": "pagesConnection"
           },
           "arguments": [
             {

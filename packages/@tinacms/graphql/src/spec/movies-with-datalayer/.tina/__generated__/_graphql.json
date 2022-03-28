@@ -771,7 +771,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getMovieList"
+            "value": "movieConnection"
           },
           "arguments": [
             {
@@ -907,7 +907,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDirectorList"
+            "value": "directorConnection"
           },
           "arguments": [
             {
@@ -1043,7 +1043,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCrewList"
+            "value": "crewConnection"
           },
           "arguments": [
             {
@@ -1179,7 +1179,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getActorList"
+            "value": "actorConnection"
           },
           "arguments": [
             {

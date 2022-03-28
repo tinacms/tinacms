@@ -757,7 +757,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getAuthorList"
+            "value": "authorConnection"
           },
           "arguments": [
             {
@@ -879,7 +879,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPostList"
+            "value": "postConnection"
           },
           "arguments": [
             {
@@ -1001,7 +1001,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getStuffList"
+            "value": "stuffConnection"
           },
           "arguments": [
             {
@@ -1123,7 +1123,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPageList"
+            "value": "pageConnection"
           },
           "arguments": [
             {
