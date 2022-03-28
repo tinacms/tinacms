@@ -12,10 +12,10 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(props.data.getPostDocument.data, null, 2)}
+          {JSON.stringify(props.data.post.data, null, 2)}
         </pre>
       </code>
-      <TinaMarkdown content={props.data.getPostDocument.data.body} />
+      <TinaMarkdown content={props.data.post.data.body} />
     </Layout>
   )
 }
@@ -50,7 +50,7 @@ export const getStaticProps = async (ctx) => {
   }
   const client = ExperimentalGetTinaClient()
 
-  const res = await client.getPostDocument(variables)
+  const res = await client.post(variables)
 
   return {
     props: {
