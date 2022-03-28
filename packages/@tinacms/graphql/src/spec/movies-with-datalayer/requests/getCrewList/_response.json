@@ -1,6 +1,6 @@
 {
   "data": {
-    "getCrewList": {
+    "crewConnection": {
       "edges": [
         {
           "node": {

@@ -1,19 +1,19 @@
 query {
-  getMovieList(filter: { title: { eq: "Star Wars" }, archived: { eq: true } }) {
+  movieConnection(filter: { title: { eq: "Star Wars" }, archived: { eq: true } }) {
     edges {
       node {
         id
       }
     }
   }
-  b: getMovieList(filter: { title: { startsWith: "Star" } }) {
+  b: movieConnection(filter: { title: { startsWith: "Star" } }) {
     edges {
       node {
         id
       }
     }
   }
-  c: getActorList(filter: { name: { eq: "Harrison Ford" } }) {
+  c: actorConnection(filter: { name: { eq: "Harrison Ford" } }) {
     edges {
       node {
         id

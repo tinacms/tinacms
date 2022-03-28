@@ -15,8 +15,8 @@ query posts($relativePath: String!) {
   }
 }
 
-query getPostsList {
-  getPostsList {
+query postsConnection {
+  postsConnection {
     totalCount
     edges {
       node {
@@ -54,8 +54,8 @@ query global($relativePath: String!) {
   }
 }
 
-query getGlobalList {
-  getGlobalList {
+query globalConnection {
+  globalConnection {
     totalCount
     edges {
       node {
@@ -93,8 +93,8 @@ query authors($relativePath: String!) {
   }
 }
 
-query getAuthorsList {
-  getAuthorsList {
+query authorsConnection {
+  authorsConnection {
     totalCount
     edges {
       node {
@@ -132,8 +132,8 @@ query zodiacs($relativePath: String!) {
   }
 }
 
-query getZodiacsList {
-  getZodiacsList {
+query zodiacsConnection {
+  zodiacsConnection {
     totalCount
     edges {
       node {
@@ -171,8 +171,8 @@ query pages($relativePath: String!) {
   }
 }
 
-query getPagesList {
-  getPagesList {
+query pagesConnection {
+  pagesConnection {
     totalCount
     edges {
       node {

@@ -68,15 +68,15 @@ export type Query = {
   getDocumentList: DocumentConnection;
   getDocumentFields: Scalars['JSON'];
   posts: PostsDocument;
-  getPostsList: PostsConnection;
+  postsConnection: PostsConnection;
   global: GlobalDocument;
-  getGlobalList: GlobalConnection;
+  globalConnection: GlobalConnection;
   authors: AuthorsDocument;
-  getAuthorsList: AuthorsConnection;
+  authorsConnection: AuthorsConnection;
   zodiacs: ZodiacsDocument;
-  getZodiacsList: ZodiacsConnection;
+  zodiacsConnection: ZodiacsConnection;
   pages: PagesDocument;
-  getPagesList: PagesConnection;
+  pagesConnection: PagesConnection;
 };
 
 
@@ -115,7 +115,7 @@ export type QueryPostsArgs = {
 };
 
 
-export type QueryGetPostsListArgs = {
+export type QueryPostsConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
@@ -129,7 +129,7 @@ export type QueryGlobalArgs = {
 };
 
 
-export type QueryGetGlobalListArgs = {
+export type QueryGlobalConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
@@ -143,7 +143,7 @@ export type QueryAuthorsArgs = {
 };
 
 
-export type QueryGetAuthorsListArgs = {
+export type QueryAuthorsConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
@@ -157,7 +157,7 @@ export type QueryZodiacsArgs = {
 };
 
 
-export type QueryGetZodiacsListArgs = {
+export type QueryZodiacsConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
@@ -171,7 +171,7 @@ export type QueryPagesArgs = {
 };
 
 
-export type QueryGetPagesListArgs = {
+export type QueryPagesConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;

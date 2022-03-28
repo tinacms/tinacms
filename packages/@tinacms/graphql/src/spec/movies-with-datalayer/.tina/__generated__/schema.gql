@@ -49,13 +49,13 @@ type Query {
   getDocumentList(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   getDocumentFields: JSON!
   movie(relativePath: String): MovieDocument!
-  getMovieList(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
+  movieConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
   director(relativePath: String): DirectorDocument!
-  getDirectorList(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
+  directorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
   crew(relativePath: String): CrewDocument!
-  getCrewList(before: String, after: String, first: Float, last: Float, sort: String, filter: CrewFilter): CrewConnection!
+  crewConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: CrewFilter): CrewConnection!
   actor(relativePath: String): ActorDocument!
-  getActorList(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
+  actorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
 }
 
 input StringFilter {
