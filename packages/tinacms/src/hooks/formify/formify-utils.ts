@@ -16,7 +16,36 @@ import * as G from 'graphql'
 import type { BlueprintPath } from './types'
 import { getBlueprintNamePath } from './util'
 
-export const isDocumentField = (t: G.GraphQLOutputType) => {
+/**
+ *
+ * This check ensures that at type is a Document, but only one
+ * that can be "formified". When using `Node` or `Document`, those
+ * query fields should not have forms generated since they can't contain
+ * fields.
+ *
+ * ```graphql
+ * # Can be formified
+ * {
+ *   getPostDocument(relativePath: "") {
+ *     data {
+ *       title
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * ```graphql
+ * # cannot be formified, even though it is a document field
+ * {
+ *   getPostDocument(relativePath: "") {
+ *     ...on Document {
+ *       id
+ *     }
+ *   }
+ * }
+ * ```
+ */
+export const isFormifiableDocument = (t: G.GraphQLOutputType) => {
   const type = G.getNamedType(t)
   if (G.isUnionType(type)) {
     return type.getTypes().every((type) => {
@@ -24,10 +53,6 @@ export const isDocumentField = (t: G.GraphQLOutputType) => {
     })
   } else if (G.isObjectType(type)) {
     return !!type.getInterfaces().find((intfc) => intfc.name === 'Node')
-  } else if (G.isInterfaceType(type)) {
-    if (type.name === 'Node') {
-      return true
-    }
   } else {
     return false
   }
@@ -55,7 +80,7 @@ export const getObjectField = (
   selectionNode: G.FieldNode
 ) => {
   const namedType = G.getNamedType(object)
-  ensureObjectType(namedType)
+  ensureObjectOrInterfaceType(namedType)
   return namedType.getFields()[selectionNode.name.value]
 }
 
@@ -75,9 +100,18 @@ export const getSelectedUnionType = (
 ) => {
   const namedType = G.getNamedType(unionType)
   ensureUnionType(namedType)
-  return namedType
-    .getTypes()
-    .find((type) => type.name === selectionNode.typeCondition.name.value)
+  const types = namedType.getTypes()
+
+  const typeCondition = selectionNode.typeCondition.name.value
+  let intfc
+  types.forEach((type) => {
+    intfc = type.getInterfaces().find((intfc) => intfc.name === typeCondition)
+  })
+  if (intfc) {
+    return intfc
+  }
+
+  return namedType.getTypes().find((type) => type.name === typeCondition)
 }
 
 /**
@@ -99,7 +133,7 @@ export function isListType(type: unknown) {
 
 /**
  *
- * Throws an error if the provided type is no a GraphQLUnionType
+ * Throws an error if the provided type is not a GraphQLUnionType
  */
 function ensureUnionType(type: unknown): asserts type is G.GraphQLUnionType {
   if (!G.isUnionType(type)) {
@@ -109,18 +143,26 @@ function ensureUnionType(type: unknown): asserts type is G.GraphQLUnionType {
 
 /**
  *
- * Throws an error if the provided type is no a GraphQLUnionType
+ * Throws an error if the provided type is not a GraphQLObjectType or GraphQLInterfaceType
  */
-function ensureObjectType(type: unknown): asserts type is G.GraphQLObjectType {
-  if (!G.isObjectType(type)) {
-    console.log(type)
-    throw new Error(`Expected type to be GraphQLObjectType`)
+function ensureObjectOrInterfaceType(
+  type: unknown
+): asserts type is G.GraphQLObjectType | G.GraphQLInterfaceType {
+  if (G.isInterfaceType(type) || G.isObjectType(type)) {
+  } else {
+    console.log(
+      'Expected type to be GraphQLObjectType or GraphQLInterfaceType',
+      type
+    )
+    throw new Error(
+      `Expected type to be GraphQLObjectType or GraphQLInterfaceType`
+    )
   }
 }
 
 /**
  *
- * Throws an error if the provided type is no a GraphQLUnionType
+ * Throws an error if the provided type is not a GraphQLUnionType
  */
 export function ensureOperationDefinition(
   type: G.DefinitionNode
@@ -149,7 +191,7 @@ export function buildPath({
 }): BlueprintPath[] {
   const p = path || []
   const list = isListType(type)
-  const isNode = isDocumentField(type)
+  const isNode = isFormifiableDocument(type)
   return [
     ...p,
     {
