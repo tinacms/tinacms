@@ -911,6 +911,9 @@ export const NAMER = {
   createName: (namespace: string[]) => {
     return 'create' + generateNamespacedFieldName(namespace)
   },
+  documentQueryName: () => {
+    return 'document'
+  },
   queryName: (namespace: string[]) => {
     return String(lastItem(namespace))
   },

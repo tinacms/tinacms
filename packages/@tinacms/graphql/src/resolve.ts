@@ -297,9 +297,11 @@ export const resolve = async ({
               })
             }
             if (
-              ['getDocument', 'createDocument', 'updateDocument'].includes(
-                info.fieldName
-              )
+              [
+                NAMER.documentQueryName(),
+                'createDocument',
+                'updateDocument',
+              ].includes(info.fieldName)
             ) {
               /**
                * `getDocument`/`createDocument`/`updateDocument`

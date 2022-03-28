@@ -570,7 +570,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocument"
+            "value": "document"
           },
           "arguments": [
             {
@@ -724,7 +724,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPostsDocument"
+            "value": "posts"
           },
           "arguments": [
             {
@@ -846,7 +846,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getGlobalDocument"
+            "value": "global"
           },
           "arguments": [
             {
@@ -968,7 +968,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getAuthorsDocument"
+            "value": "authors"
           },
           "arguments": [
             {
@@ -1090,7 +1090,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getZodiacsDocument"
+            "value": "zodiacs"
           },
           "arguments": [
             {
@@ -1212,7 +1212,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPagesDocument"
+            "value": "pages"
           },
           "arguments": [
             {
@@ -4369,7 +4369,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePostsDocument"
+            "value": "updatePosts"
           },
           "arguments": [
             {
@@ -4422,7 +4422,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPostsDocument"
+            "value": "createPosts"
           },
           "arguments": [
             {
@@ -4475,7 +4475,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateGlobalDocument"
+            "value": "updateGlobal"
           },
           "arguments": [
             {
@@ -4528,7 +4528,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createGlobalDocument"
+            "value": "createGlobal"
           },
           "arguments": [
             {
@@ -4581,7 +4581,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateAuthorsDocument"
+            "value": "updateAuthors"
           },
           "arguments": [
             {
@@ -4634,7 +4634,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createAuthorsDocument"
+            "value": "createAuthors"
           },
           "arguments": [
             {
@@ -4687,7 +4687,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateZodiacsDocument"
+            "value": "updateZodiacs"
           },
           "arguments": [
             {
@@ -4740,7 +4740,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createZodiacsDocument"
+            "value": "createZodiacs"
           },
           "arguments": [
             {
@@ -4793,7 +4793,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePagesDocument"
+            "value": "updatePages"
           },
           "arguments": [
             {
@@ -4846,7 +4846,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPagesDocument"
+            "value": "createPages"
           },
           "arguments": [
             {
