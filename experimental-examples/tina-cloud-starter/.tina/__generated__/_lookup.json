@@ -30,8 +30,8 @@
     "type": "PostsDocument",
     "resolveType": "collectionDocument",
     "collection": "posts",
-    "createPostsDocument": "create",
-    "updatePostsDocument": "update"
+    "createPosts": "create",
+    "updatePosts": "update"
   },
   "PostsConnection": {
     "type": "PostsConnection",
@@ -42,8 +42,8 @@
     "type": "GlobalDocument",
     "resolveType": "collectionDocument",
     "collection": "global",
-    "createGlobalDocument": "create",
-    "updateGlobalDocument": "update"
+    "createGlobal": "create",
+    "updateGlobal": "update"
   },
   "GlobalConnection": {
     "type": "GlobalConnection",
@@ -60,8 +60,8 @@
     "type": "AuthorsDocument",
     "resolveType": "collectionDocument",
     "collection": "authors",
-    "createAuthorsDocument": "create",
-    "updateAuthorsDocument": "update"
+    "createAuthors": "create",
+    "updateAuthors": "update"
   },
   "AuthorsConnection": {
     "type": "AuthorsConnection",
@@ -72,8 +72,8 @@
     "type": "ZodiacsDocument",
     "resolveType": "collectionDocument",
     "collection": "zodiacs",
-    "createZodiacsDocument": "create",
-    "updateZodiacsDocument": "update"
+    "createZodiacs": "create",
+    "updateZodiacs": "update"
   },
   "ZodiacsConnection": {
     "type": "ZodiacsConnection",
@@ -94,8 +94,8 @@
     "type": "PagesDocument",
     "resolveType": "collectionDocument",
     "collection": "pages",
-    "createPagesDocument": "create",
-    "updatePagesDocument": "update"
+    "createPages": "create",
+    "updatePages": "update"
   },
   "PagesConnection": {
     "type": "PagesConnection",
