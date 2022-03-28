@@ -224,7 +224,6 @@ export const buildForm = (
       schema: enrichedSchema,
       template,
     })
-    console.log('usit', formInfo)
     formConfig = {
       label: formInfo.label,
       // TODO: return correct type

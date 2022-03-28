@@ -49,7 +49,7 @@ export const useFormify = ({
   const formIds = React.useRef<string[]>([])
 
   const [state, dispatch] = React.useReducer(reducer, {
-    status: 'initialized',
+    status: 'idle',
     schema: undefined,
     query: query ? G.parse(query) : null,
     queryString: query,
@@ -60,6 +60,21 @@ export const useFormify = ({
     formNodes: [],
     documentForms: [],
   })
+
+  /**
+   * Restart the entire process when the query or variables change
+   */
+  React.useEffect(() => {
+    if (query) {
+      dispatch({ type: 'start', value: { query } })
+      formIds.current.forEach((formId) => {
+        const form = cms.forms.find(formId)
+        if (form) {
+          cms.plugins.remove(form)
+        }
+      })
+    }
+  }, [query, JSON.stringify(variables)])
 
   /**
    * Setup the data, using the user-supplied query, this is probably redundant
@@ -272,6 +287,9 @@ export const useFormify = ({
                           values
                           _internalSys: sys {
                             path
+                            collection {
+                              name
+                            }
                           }
                         }
                       }
@@ -326,6 +344,7 @@ export const useFormify = ({
         resolveSubFields({
           formNode: changeSet.formNode,
           form: form,
+          loc: [],
         }).then((res) => {
           dispatch({
             type: 'setIn',
@@ -469,7 +488,7 @@ export const useFormify = ({
     async (args: {
       formNode: FormNode
       prefix?: string
-      loc?: number[]
+      loc: number[]
       form: Pick<Form, 'values' | 'fields'>
     }) => {
       const { form, formNode, prefix, loc } = args
@@ -514,14 +533,17 @@ export const useFormify = ({
                       value,
                       async (item, index) => {
                         const template = field.templates[item._template]
-                        return resolveSubFields({
-                          formNode,
-                          form: { fields: template.fields, values: item },
-                          prefix: prefix
-                            ? [prefix, fieldName].join('.')
-                            : fieldName,
-                          loc: [...loc, index],
-                        })
+                        return {
+                          ...(await resolveSubFields({
+                            formNode,
+                            form: { fields: template.fields, values: item },
+                            prefix: prefix
+                              ? [prefix, fieldName].join('.')
+                              : fieldName,
+                            loc: [...loc, index],
+                          })),
+                          __typename: field.typeMap[item._template],
+                        }
                       }
                     )
                   }
@@ -595,6 +617,9 @@ export const useFormify = ({
                             values
                             _internalSys: sys {
                               path
+                              collection {
+                                name
+                              }
                             }
                           }
                         }
