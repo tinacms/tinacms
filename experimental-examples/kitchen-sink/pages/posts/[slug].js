@@ -23,7 +23,7 @@ export default function Home(props) {
 export const getStaticPaths = async () => {
   const tinaProps = await staticRequest({
     query: `{
-        getPostList{
+        postConnection {
           edges {
             node {
               sys {
@@ -35,7 +35,7 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.getPostList.edges.map((x) => {
+  const paths = tinaProps.postConnection.edges.map((x) => {
     return { params: { slug: x.node.sys.filename } }
   })
 

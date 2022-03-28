@@ -1,5 +1,5 @@
-query getPageDocument($relativePath: String!) {
-  getPageDocument(relativePath: $relativePath) {
+query page($relativePath: String!) {
+  page(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -15,8 +15,8 @@ query getPageDocument($relativePath: String!) {
   }
 }
 
-query getPageList {
-  getPageList {
+query pageConnection {
+  pageConnection {
     totalCount
     edges {
       node {
@@ -37,8 +37,8 @@ query getPageList {
   }
 }
 
-query getPostDocument($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
+query post($relativePath: String!) {
+  post(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -54,8 +54,8 @@ query getPostDocument($relativePath: String!) {
   }
 }
 
-query getPostList {
-  getPostList {
+query postConnection {
+  postConnection {
     totalCount
     edges {
       node {
