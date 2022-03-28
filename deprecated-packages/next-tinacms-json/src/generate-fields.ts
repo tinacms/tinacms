@@ -20,7 +20,7 @@ import { JsonFile } from './use-json-form'
 import { Field } from 'tinacms'
 
 export function generateFields(jsonFile: JsonFile): Field[] {
-  return Object.keys(jsonFile.data).map(key => {
+  return Object.keys(jsonFile.data).map((key) => {
     return {
       component: 'text',
       name: `${key}`,

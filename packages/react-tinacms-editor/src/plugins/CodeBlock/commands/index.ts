@@ -65,13 +65,15 @@ export function deleteEmptyCodeblock(cm: any) {
       // I hate my life
       const { schema, tr } = state
       dispatch(
-        (tr
-          // Replace the entire codeblock with an empty paragraph
-          .replaceRangeWith(
-            $from.pos - 1,
-            $from.pos + code.length + 1,
-            schema.nodes.paragraph.create()
-          ) as any)
+        (
+          tr
+            // Replace the entire codeblock with an empty paragraph
+            .replaceRangeWith(
+              $from.pos - 1,
+              $from.pos + code.length + 1,
+              schema.nodes.paragraph.create()
+            ) as any
+        )
           // Set the seleciton to be at the start of the paragram
           .setSelection(new TextSelection(tr.doc.resolve($from.pos)))
       )

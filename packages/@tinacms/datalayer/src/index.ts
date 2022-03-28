@@ -19,8 +19,16 @@ export {
   FilesystemStore,
   AuditFilesystemStore,
 } from './database/store/filesystem'
-export {LevelStore} from './database/store/level'
-export {coerceFilterChainOperands, DEFAULT_COLLECTION_SORT_KEY, makeFilter, makeFilterChain, makeFilterSuffixes, makeKeyForField, OP} from './database/store'
+export { LevelStore } from './database/store/level'
+export {
+  coerceFilterChainOperands,
+  DEFAULT_COLLECTION_SORT_KEY,
+  makeFilter,
+  makeFilterChain,
+  makeFilterSuffixes,
+  makeKeyForField,
+  OP,
+} from './database/store'
 export type {
   BinaryFilter,
   FilterCondition,
@@ -31,9 +39,9 @@ export type {
   PutOptions,
   SeedOptions,
   Store,
-  TernaryFilter
+  TernaryFilter,
 } from './database/store'
 
 export type FilterOperand = string | number | boolean | string[] | number[]
 
-export {atob, btoa} from './util'
+export { atob, btoa } from './util'

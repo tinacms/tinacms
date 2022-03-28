@@ -46,7 +46,7 @@ const featureBlockSchema: TinaTemplate = {
         { label: "Tint", value: "tint" },
         { label: "Primary", value: "primary" },
       ],
-    }
+    },
   ],
 };
 
@@ -339,7 +339,7 @@ export default defineSchema({
           type: "image",
           name: "heroImg",
           label: "Hero Image",
-          indexed: false
+          indexed: false,
         },
         {
           type: "string",
@@ -352,15 +352,18 @@ export default defineSchema({
       ],
       indexes: [
         {
-          name: 'published-by-date',
-          fields: [{
-            name: 'published',
-            default: 'false'
-          }, {
-            name: 'date',
-            default: ''
-          }]
-        }
+          name: "published-by-date",
+          fields: [
+            {
+              name: "published",
+              default: "false",
+            },
+            {
+              name: "date",
+              default: "",
+            },
+          ],
+        },
       ],
     },
     {

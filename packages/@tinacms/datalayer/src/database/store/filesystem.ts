@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {StoreQueryOptions, PutOptions, Store, StoreQueryResponse} from '.'
+import { StoreQueryOptions, PutOptions, Store, StoreQueryResponse } from '.'
 import fs from 'fs-extra'
 import fg from 'fast-glob'
 import path from 'path'
@@ -26,7 +26,9 @@ export class FilesystemStore implements Store {
   constructor({ rootPath }: { rootPath?: string }) {
     this.rootPath = rootPath || ''
   }
-  public async query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse> {
+  public async query(
+    queryOptions: StoreQueryOptions
+  ): Promise<StoreQueryResponse> {
     throw new Error(`Unable to perform query for Filesystem store`)
   }
   public async seed() {

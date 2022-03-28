@@ -11,42 +11,57 @@
  limitations under the License.
  */
 
-import {ObjectType, ReferenceTypeInner, Template, TinaFieldInner} from '../types'
-import type {FilterCondition} from '@tinacms/datalayer'
+import {
+  ObjectType,
+  ReferenceTypeInner,
+  Template,
+  TinaFieldInner,
+} from '../types'
+import type { FilterCondition } from '@tinacms/datalayer'
 
-export type ReferenceResolver = (filter: Record<string, object>, fieldDefinition: ReferenceTypeInner) => Promise<{
+export type ReferenceResolver = (
+  filter: Record<string, object>,
+  fieldDefinition: ReferenceTypeInner
+) => Promise<{
   edges: {
     node: any
-  }[],
+  }[]
   values: any[]
 }>
 
-export const resolveReferences = async (filter: any, fields: TinaFieldInner<false>[], resolver: ReferenceResolver) => {
+export const resolveReferences = async (
+  filter: any,
+  fields: TinaFieldInner<false>[],
+  resolver: ReferenceResolver
+) => {
   for (const fieldKey of Object.keys(filter)) {
-    const fieldDefinition = (fields as TinaFieldInner<false>[]).find(f => f.name === fieldKey)
+    const fieldDefinition = (fields as TinaFieldInner<false>[]).find(
+      (f) => f.name === fieldKey
+    )
     // resolve top level references
     if (fieldDefinition) {
       if (fieldDefinition.type === 'reference') {
-        const {edges, values} = await resolver(filter, fieldDefinition)
+        const { edges, values } = await resolver(filter, fieldDefinition)
 
         if (edges.length === 1) {
           filter[fieldKey] = {
-            eq: values[0]
+            eq: values[0],
           }
         } else if (edges.length > 1) {
           filter[fieldKey] = {
-            in: values
+            in: values,
           }
         } else {
           // TODO is there a better way to short-circuit this? For an AND filter we can just give up here but OR would just ignore this
           filter[fieldKey] = {
-            eq: '___null___'
+            eq: '___null___',
           }
         }
       } else if (fieldDefinition.type === 'object') {
         if (fieldDefinition.templates) {
           const globalTemplates = {}
-          for (const template of (fieldDefinition as ObjectType<false>).templates) {
+          for (const template of (fieldDefinition as ObjectType<false>)
+            .templates) {
             if (typeof template === 'string') {
               globalTemplates[template] = 1
             }
@@ -56,15 +71,29 @@ export const resolveReferences = async (filter: any, fields: TinaFieldInner<fals
               throw new Error('Global templates not yet supported for queries')
             }
 
-            const template = (fieldDefinition as ObjectType<false>).templates.find(template => !(typeof template === 'string') && template.name === templateName) as any
+            const template = (
+              fieldDefinition as ObjectType<false>
+            ).templates.find(
+              (template) =>
+                !(typeof template === 'string') &&
+                template.name === templateName
+            ) as any
             if (template) {
-              await resolveReferences(filter[fieldKey][templateName], template.fields, resolver)
+              await resolveReferences(
+                filter[fieldKey][templateName],
+                template.fields,
+                resolver
+              )
             } else {
               throw new Error(`Template ${templateName} not found`)
             }
           }
         } else {
-          await resolveReferences(filter[fieldKey], fieldDefinition.fields as TinaFieldInner<false>[], resolver)
+          await resolveReferences(
+            filter[fieldKey],
+            fieldDefinition.fields as TinaFieldInner<false>[],
+            resolver
+          )
         }
       }
     } else {
@@ -80,7 +109,7 @@ const collectConditionsForChildFields = (
   collectCondition: (condition: FilterCondition) => void
 ) => {
   for (const childFieldName of Object.keys(filterNode)) {
-    const childField = fields.find(field => field.name === childFieldName)
+    const childField = fields.find((field) => field.name === childFieldName)
     if (!childField) {
       throw new Error(`Unable to find type for field ${childFieldName}`)
     }
@@ -114,17 +143,34 @@ const collectConditionsForObjectField = (
       if (filterKey in globalTemplates) {
         throw new Error('Global templates not yet supported for queries')
       }
-      const template = field.templates.find(template => !(typeof template === 'string') && template.name === filterKey) as Template<false>
+      const template = field.templates.find(
+        (template) =>
+          !(typeof template === 'string') && template.name === filterKey
+      ) as Template<false>
       const jsonPath = `${fieldName}[?(@._template=="${filterKey}")]`
-      const filterPath = pathExpression ? `${pathExpression}.${jsonPath}` : jsonPath
+      const filterPath = pathExpression
+        ? `${pathExpression}.${jsonPath}`
+        : jsonPath
 
-      collectConditionsForChildFields(childFilterNode as Record<string, object>, template.fields, filterPath, collectCondition)
+      collectConditionsForChildFields(
+        childFilterNode as Record<string, object>,
+        template.fields,
+        filterPath,
+        collectCondition
+      )
     }
   } else {
     const jsonPath = `${fieldName}${field.list ? '[*]' : ''}`
-    const filterPath = pathExpression ? `${pathExpression}.${jsonPath}` : `${jsonPath}`
+    const filterPath = pathExpression
+      ? `${pathExpression}.${jsonPath}`
+      : `${jsonPath}`
 
-    collectConditionsForChildFields(filterNode, (field.fields as TinaFieldInner<false>[]), filterPath, collectCondition)
+    collectConditionsForChildFields(
+      filterNode,
+      field.fields as TinaFieldInner<false>[],
+      filterPath,
+      collectCondition
+    )
   }
 }
 
@@ -148,8 +194,8 @@ export const collectConditionsForField = (
       filterPath: pathExpression ? `${pathExpression}.${fieldName}` : fieldName,
       filterExpression: {
         _type: field.type,
-        ...filterNode
-      }
+        ...filterNode,
+      },
     })
   }
 }

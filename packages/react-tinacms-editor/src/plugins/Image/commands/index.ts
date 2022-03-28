@@ -42,7 +42,7 @@ export function insertImageList(
   if (dispatch) {
     const nodeType = state.schema.nodes['image']
     const { tr } = state
-    imageSrc.forEach(src => {
+    imageSrc.forEach((src) => {
       const image = nodeType.createAndFill({ src, alt: '', title: '' })
       tr.replaceSelectionWith(image)
     })

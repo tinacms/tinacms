@@ -51,7 +51,7 @@ export function InlineField({
 
   return (
     <Field name={fieldName} parse={parse} format={format}>
-      {fieldProps => {
+      {(fieldProps) => {
         return children({
           ...fieldProps,
           ...formState,

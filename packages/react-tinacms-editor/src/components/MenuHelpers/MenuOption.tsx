@@ -38,7 +38,7 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
     fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
-  ${props =>
+  ${(props) =>
     props.active &&
     css`
       color: var(--tina-color-primary);

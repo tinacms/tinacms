@@ -30,7 +30,7 @@ const isDirectory = (...files: string[]) =>
   fs.lstatSync(pathOf(...files)).isDirectory()
 
 describe('Markdown Translators', () => {
-  flavours.forEach(flavour => {
+  flavours.forEach((flavour) => {
     if (flavour !== 'commonmark') {
       return
     }
@@ -43,7 +43,7 @@ describe('Markdown Translators', () => {
 
       const tests = fs.readdirSync(pathOf(flavour, '__tests__'))
 
-      tests.forEach(test => {
+      tests.forEach((test) => {
         if (test.startsWith('skip_')) {
           return
         }

@@ -920,7 +920,7 @@ export class Builder {
               astBuilder.InputValueDefinition({
                 name: 'in',
                 type: astBuilder.TYPES.Number,
-                list: true
+                list: true,
               }),
             ],
           }),
@@ -950,7 +950,7 @@ export class Builder {
               astBuilder.InputValueDefinition({
                 name: 'in',
                 type: astBuilder.TYPES.String,
-                list: true
+                list: true,
               }),
             ],
           }),
@@ -977,7 +977,7 @@ export class Builder {
               astBuilder.InputValueDefinition({
                 name: 'in',
                 type: astBuilder.TYPES.String,
-                list: true
+                list: true,
               }),
             ],
           }),

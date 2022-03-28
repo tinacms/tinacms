@@ -33,7 +33,7 @@ function aliasTinaDev(config, pathToTina, packagesToAlias) {
   const pathToTinaPackages = path.resolve(pathToTina, `packages`)
 
   if (packagesToAlias) {
-    packagesToAlias.forEach(packageToAlias => {
+    packagesToAlias.forEach((packageToAlias) => {
       aliasRelative(
         config,
         packageToAlias,
@@ -43,7 +43,7 @@ function aliasTinaDev(config, pathToTina, packagesToAlias) {
   } else {
     const files = fs.readdirSync(pathToTinaPackages)
 
-    files.forEach(packageToAlias => {
+    files.forEach((packageToAlias) => {
       aliasRelative(
         config,
         packageToAlias,

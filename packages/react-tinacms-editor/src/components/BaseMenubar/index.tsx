@@ -79,9 +79,8 @@ export const BaseMenubar = ({
           setMenuFixed(false)
         }
       }
-      scrollAnimationRef.current = window.requestAnimationFrame(
-        handleStickyMenu
-      )
+      scrollAnimationRef.current =
+        window.requestAnimationFrame(handleStickyMenu)
     }
 
     const handleResize = () => {
@@ -113,9 +112,8 @@ export const BaseMenubar = ({
 
     function requestTick() {
       if (!ticking) {
-        scrollAnimationRef.current = window.requestAnimationFrame(
-          handleStickyMenu
-        )
+        scrollAnimationRef.current =
+          window.requestAnimationFrame(handleStickyMenu)
       }
       ticking = true
     }

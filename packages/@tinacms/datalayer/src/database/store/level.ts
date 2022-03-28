@@ -11,15 +11,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type {StoreQueryOptions, StoreQueryResponse, PutOptions, SeedOptions, Store} from './index'
-import {coerceFilterChainOperands, makeFilterSuffixes, makeFilter, makeKeyForField, DEFAULT_COLLECTION_SORT_KEY} from './index'
+import type {
+  StoreQueryOptions,
+  StoreQueryResponse,
+  PutOptions,
+  SeedOptions,
+  Store,
+} from './index'
+import {
+  coerceFilterChainOperands,
+  makeFilterSuffixes,
+  makeFilter,
+  makeKeyForField,
+  DEFAULT_COLLECTION_SORT_KEY,
+} from './index'
 import path from 'path'
-import {sequential} from '../../util'
-import level, {LevelDB} from 'level'
+import { sequential } from '../../util'
+import level, { LevelDB } from 'level'
 import levelup from 'levelup'
 import memdown from 'memdown'
 import encode from 'encoding-down'
-import {IndexDefinition} from '.'
+import { IndexDefinition } from '.'
 
 const defaultPrefix = '_ROOT_'
 
@@ -39,39 +51,74 @@ export class LevelStore implements Store {
     }
   }
 
-  public async query(queryOptions: StoreQueryOptions): Promise<StoreQueryResponse> {
-    const { filterChain: rawFilterChain, sort = DEFAULT_COLLECTION_SORT_KEY, collection, indexDefinitions, limit = 10, ...query } = queryOptions
+  public async query(
+    queryOptions: StoreQueryOptions
+  ): Promise<StoreQueryResponse> {
+    const {
+      filterChain: rawFilterChain,
+      sort = DEFAULT_COLLECTION_SORT_KEY,
+      collection,
+      indexDefinitions,
+      limit = 10,
+      ...query
+    } = queryOptions
 
     const filterChain = coerceFilterChainOperands(rawFilterChain)
-    const indexDefinition = (sort && indexDefinitions?.[sort]) as IndexDefinition | undefined
-    const filterSuffixes = indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
-    const indexPrefix = indexDefinition ? `${collection}:${sort}` : `${defaultPrefix}:`
+    const indexDefinition = (sort && indexDefinitions?.[sort]) as
+      | IndexDefinition
+      | undefined
+    const filterSuffixes =
+      indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
+    const indexPrefix = indexDefinition
+      ? `${collection}:${sort}`
+      : `${defaultPrefix}:`
 
     if (!query.gt && !query.gte) {
-      query.gte = filterSuffixes?.left ? `${indexPrefix}:${filterSuffixes.left}` : indexPrefix
+      query.gte = filterSuffixes?.left
+        ? `${indexPrefix}:${filterSuffixes.left}`
+        : indexPrefix
     }
 
     if (!query.lt && !query.lte) {
-      query.lte = filterSuffixes?.right ? `${indexPrefix}:${filterSuffixes.right}\xFF` : `${indexPrefix}\xFF`
+      query.lte = filterSuffixes?.right
+        ? `${indexPrefix}:${filterSuffixes.right}\xFF`
+        : `${indexPrefix}\xFF`
     }
 
-    let edges: { cursor: string, path: string }[] = []
+    let edges: { cursor: string; path: string }[] = []
     let startKey: string = ''
     let endKey: string = ''
     let hasPreviousPage = false
     let hasNextPage = false
 
-    const fieldsPattern = indexDefinition?.fields?.length ? `${indexDefinition.fields.map(p => `:(?<${p.name}>.+)`).join('')}:` : ':'
-    const valuesRegex = indexDefinition ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`) : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
+    const fieldsPattern = indexDefinition?.fields?.length
+      ? `${indexDefinition.fields.map((p) => `:(?<${p.name}>.+)`).join('')}:`
+      : ':'
+    const valuesRegex = indexDefinition
+      ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`)
+      : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
     const itemFilter = makeFilter({ filterChain })
 
-    for await (const [key, value] of (this.db as any).iterator(query)) { //TODO why is typescript unhappy?
+    for await (const [key, value] of (this.db as any).iterator(query)) {
+      //TODO why is typescript unhappy?
       const matcher = valuesRegex.exec(key)
-      if (!matcher || (indexDefinition && matcher.length !== (indexDefinition.fields.length + 2))) {
+      if (
+        !matcher ||
+        (indexDefinition &&
+          matcher.length !== indexDefinition.fields.length + 2)
+      ) {
         continue
       }
       const filepath = matcher.groups['_filepath_']
-      if (!itemFilter(filterSuffixes ? matcher.groups : (indexDefinition ? await this.db.get(`${defaultPrefix}:${filepath}`) : value))) {
+      if (
+        !itemFilter(
+          filterSuffixes
+            ? matcher.groups
+            : indexDefinition
+            ? await this.db.get(`${defaultPrefix}:${filepath}`)
+            : value
+        )
+      ) {
         continue
       }
 
@@ -95,13 +142,17 @@ export class LevelStore implements Store {
         hasPreviousPage,
         hasNextPage,
         startCursor: startKey,
-        endCursor: endKey
-      }
+        endCursor: endKey,
+      },
     }
   }
 
   public async seed(filepath: string, data: object, options?: SeedOptions) {
-    await this.put(filepath, data, { keepTemplateKey: false, seed: true, ...options })
+    await this.put(filepath, data, {
+      keepTemplateKey: false,
+      seed: true,
+      ...options,
+    })
   }
   public supportsSeeding() {
     return true
@@ -175,10 +226,13 @@ export class LevelStore implements Store {
     await this.db.close()
   }
 
-  public async put(filepath: string, data: object, options?: PutOptions ) {
+  public async put(filepath: string, data: object, options?: PutOptions) {
     let existingData
     try {
-      existingData = options && !options.seed ? await this.db.get(`${defaultPrefix}:${filepath}`) : null
+      existingData =
+        options && !options.seed
+          ? await this.db.get(`${defaultPrefix}:${filepath}`)
+          : null
     } catch (err) {
       if (!err.notFound) {
         throw err
@@ -187,9 +241,13 @@ export class LevelStore implements Store {
     await this.db.put(`${defaultPrefix}:${filepath}`, data)
 
     if (options?.indexDefinitions) {
-      for (const [sort, definition] of Object.entries(options.indexDefinitions)) {
+      for (const [sort, definition] of Object.entries(
+        options.indexDefinitions
+      )) {
         const indexedValue = makeKeyForField(definition, data)
-        const existingIndexedValue = existingData ? makeKeyForField(definition, existingData) : null
+        const existingIndexedValue = existingData
+          ? makeKeyForField(definition, existingData)
+          : null
 
         let indexKey
         let existingIndexKey = null
@@ -197,8 +255,12 @@ export class LevelStore implements Store {
           indexKey = `${options.collection}:${sort}:${filepath}`
           existingIndexKey = indexKey
         } else {
-          indexKey = indexedValue ? `${options.collection}:${sort}:${indexedValue}:${filepath}` : null
-          existingIndexKey = existingIndexedValue ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}` : null
+          indexKey = indexedValue
+            ? `${options.collection}:${sort}:${indexedValue}:${filepath}`
+            : null
+          existingIndexKey = existingIndexedValue
+            ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
+            : null
         }
 
         if (indexKey) {

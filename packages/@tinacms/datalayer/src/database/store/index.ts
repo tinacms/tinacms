@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {JSONPath} from 'jsonpath-plus'
+import { JSONPath } from 'jsonpath-plus'
 
-import {FilterOperand} from '../../index'
+import { FilterOperand } from '../../index'
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 
@@ -30,7 +30,7 @@ export enum OP {
 export type BinaryFilter = {
   pathExpression: string
   rightOperand: FilterOperand
-  operator:  OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN
+  operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN
   type: string
 }
 
@@ -46,36 +46,36 @@ export type TernaryFilter = {
 /** Options for {@link Store.query} */
 export type StoreQueryOptions = {
   /* collection name */
-  collection: string,
+  collection: string
   /* index definitions for specified collection */
-  indexDefinitions?: Record<string,IndexDefinition>,
+  indexDefinitions?: Record<string, IndexDefinition>
   /* filters to apply to the query */
-  filterChain: (BinaryFilter | TernaryFilter)[],
+  filterChain: (BinaryFilter | TernaryFilter)[]
   /* sort (either field or index) */
-  sort?: string,
+  sort?: string
   /* starting key exclusive */
-  gt?: string,
+  gt?: string
   /* starting key inclusive */
-  gte?: string,
+  gte?: string
   /* ending key exclusive */
-  lt?: string,
+  lt?: string
   /* ending key inclusive */
-  lte?: string,
+  lte?: string
   /* if true, returns results in reverse order */
-  reverse?: boolean,
+  reverse?: boolean
   /* limits result set */
   limit?: number
 }
 
 export type PageInfo = {
-  hasPreviousPage: boolean,
-  hasNextPage: boolean,
-  startCursor: string,
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+  startCursor: string
   endCursor: string
 }
 
 export type StoreQueryResponse = {
-  edges: { cursor: string, path: string }[],
+  edges: { cursor: string; path: string }[]
   pageInfo: PageInfo
 }
 
@@ -87,13 +87,13 @@ export type IndexDefinition = {
 }
 
 export type SeedOptions = {
-  collection?: string,
-  indexDefinitions?: Record<string,IndexDefinition>,
-  includeTemplate?: boolean,
-  keepTemplateKey?: boolean,
+  collection?: string
+  indexDefinitions?: Record<string, IndexDefinition>
+  includeTemplate?: boolean
+  keepTemplateKey?: boolean
 }
 
-export type PutOptions = SeedOptions & {seed?: boolean}
+export type PutOptions = SeedOptions & { seed?: boolean }
 
 export interface Store {
   glob(
@@ -122,11 +122,7 @@ export interface Store {
    * At this time it seems that it would never make sense to be able to "query" without "seed"-ing, and
    * there'd be no value in "seeding" without "query"-ing.
    */
-  seed(
-    filepath: string,
-    data: object,
-    options?: PutOptions,
-  ): Promise<void>
+  seed(filepath: string, data: object, options?: PutOptions): Promise<void>
   supportsSeeding(): boolean
   /**
    * Whether this store supports the ability to index data.
@@ -136,15 +132,11 @@ export interface Store {
    * user's repo.
    */
   supportsIndexing(): boolean
-  put(
-    filepath: string,
-    data: object,
-    options?: PutOptions
-  ): Promise<void>
+  put(filepath: string, data: object, options?: PutOptions): Promise<void>
 }
 
 const inferOperatorFromFilter = (filterOperator: string) => {
-  switch(filterOperator) {
+  switch (filterOperator) {
     case 'after':
       return OP.GT
 
@@ -178,11 +170,15 @@ const inferOperatorFromFilter = (filterOperator: string) => {
 }
 
 export type FilterCondition = {
-  filterExpression: Record<string,FilterOperand>,
+  filterExpression: Record<string, FilterOperand>
   filterPath: string
 }
 
-export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}) => {
+export const makeFilterChain = ({
+  conditions,
+}: {
+  conditions: FilterCondition[]
+}) => {
   const filterChain: (BinaryFilter | TernaryFilter)[] = []
   if (!conditions) {
     return filterChain
@@ -193,7 +189,9 @@ export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}
     const { _type, ...keys } = filterExpression
     const [key1, key2, ...extraKeys] = Object.keys(keys)
     if (extraKeys.length) {
-      throw new Error(`Unexpected keys: [${extraKeys.join(',')}] in filter expression`)
+      throw new Error(
+        `Unexpected keys: [${extraKeys.join(',')}] in filter expression`
+      )
     }
 
     if (key1 && !key2) {
@@ -201,11 +199,19 @@ export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}
         pathExpression: filterPath,
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
-        type: _type as string
+        type: _type as string,
       })
     } else if (key1 && key2) {
-      const leftFilterOperator = (filterExpression['gt'] && 'gt') || (filterExpression['gte'] && 'gte') || (filterExpression['after'] && 'after') || undefined
-      const rightFilterOperator = (filterExpression['lt'] && 'lt') || (filterExpression['lte'] && 'lte') || (filterExpression['before'] && 'before') || undefined
+      const leftFilterOperator =
+        (filterExpression['gt'] && 'gt') ||
+        (filterExpression['gte'] && 'gte') ||
+        (filterExpression['after'] && 'after') ||
+        undefined
+      const rightFilterOperator =
+        (filterExpression['lt'] && 'lt') ||
+        (filterExpression['lte'] && 'lte') ||
+        (filterExpression['before'] && 'before') ||
+        undefined
       let leftOperand: FilterOperand
       let rightOperand: FilterOperand
       if (rightFilterOperator && leftFilterOperator) {
@@ -221,25 +227,36 @@ export const makeFilterChain = ({ conditions }: { conditions: FilterCondition[]}
           pathExpression: filterPath,
           rightOperand,
           leftOperand,
-          leftOperator: inferOperatorFromFilter(leftFilterOperator) as OP.GT | OP.GTE,
-          rightOperator: inferOperatorFromFilter(rightFilterOperator) as OP.LT | OP.LTE,
-          type: _type as string
+          leftOperator: inferOperatorFromFilter(leftFilterOperator) as
+            | OP.GT
+            | OP.GTE,
+          rightOperator: inferOperatorFromFilter(rightFilterOperator) as
+            | OP.LT
+            | OP.LTE,
+          type: _type as string,
         })
       } else {
-        throw new Error(`Filter on field '${filterPath}' has invalid combination of conditions: '${key1}, ${key2}'`)
+        throw new Error(
+          `Filter on field '${filterPath}' has invalid combination of conditions: '${key1}, ${key2}'`
+        )
       }
     }
   }
   return filterChain
 }
 
-export const makeFilter = ({ filterChain }: {
+export const makeFilter = ({
+  filterChain,
+}: {
   filterChain?: (BinaryFilter | TernaryFilter)[]
-}): (values: Record<string, object | FilterOperand>) => boolean => {
+}): ((values: Record<string, object | FilterOperand>) => boolean) => {
   return (values: Record<string, object>) => {
     for (const filter of filterChain) {
       const dataType = filter.type
-      const resolvedValues = JSONPath({path: filter.pathExpression, json: values})
+      const resolvedValues = JSONPath({
+        path: filter.pathExpression,
+        json: values,
+      })
       if (!resolvedValues || !resolvedValues.length) {
         return false
       }
@@ -248,9 +265,14 @@ export const makeFilter = ({ filterChain }: {
       if (dataType === 'string' || dataType === 'reference') {
         operands = resolvedValues
       } else if (dataType === 'number' || dataType === 'datetime') {
-        operands = resolvedValues.map(resolvedValue => Number(resolvedValue))
+        operands = resolvedValues.map((resolvedValue) => Number(resolvedValue))
       } else if (dataType === 'boolean') {
-        operands = resolvedValues.map(resolvedValue => (typeof resolvedValue === 'boolean' && resolvedValue) || resolvedValue === 'true' || resolvedValue === '1')
+        operands = resolvedValues.map(
+          (resolvedValue) =>
+            (typeof resolvedValue === 'boolean' && resolvedValue) ||
+            resolvedValue === 'true' ||
+            resolvedValue === '1'
+        )
       } else {
         throw new Error(`Unexpected datatype ${dataType}`)
       }
@@ -258,9 +280,13 @@ export const makeFilter = ({ filterChain }: {
       const { operator } = filter as BinaryFilter
       let matches = false
       if (operator) {
-        switch(operator) {
+        switch (operator) {
           case OP.EQ:
-            if (operands.findIndex(operand => operand === filter.rightOperand) >= 0) {
+            if (
+              operands.findIndex(
+                (operand) => operand === filter.rightOperand
+              ) >= 0
+            ) {
               matches = true
             }
             break
@@ -306,7 +332,9 @@ export const makeFilter = ({ filterChain }: {
             break
           case OP.STARTS_WITH:
             for (const operand of operands) {
-              if ((operand as string).startsWith(filter.rightOperand as string)) {
+              if (
+                (operand as string).startsWith(filter.rightOperand as string)
+              ) {
                 matches = true
                 break
               }
@@ -315,9 +343,9 @@ export const makeFilter = ({ filterChain }: {
           default:
             throw new Error(`unexpected operator ${operator}`)
         }
-
       } else {
-        const { rightOperator, leftOperator, rightOperand, leftOperand } = filter as TernaryFilter
+        const { rightOperator, leftOperator, rightOperand, leftOperand } =
+          filter as TernaryFilter
         for (const operand of operands) {
           let rightMatches = false
           let leftMatches = false
@@ -348,7 +376,9 @@ export const makeFilter = ({ filterChain }: {
   }
 }
 
-export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFilter)[]) => {
+export const coerceFilterChainOperands = (
+  filterChain: (BinaryFilter | TernaryFilter)[]
+) => {
   const result: (BinaryFilter | TernaryFilter)[] = []
   if (filterChain.length) {
     // convert operands by type
@@ -359,13 +389,17 @@ export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFi
           result.push({
             ...filter,
             rightOperand: new Date(filter.rightOperand as string).getTime(),
-            leftOperand: new Date((filter as TernaryFilter).leftOperand as string).getTime(),
+            leftOperand: new Date(
+              (filter as TernaryFilter).leftOperand as string
+            ).getTime(),
           })
         } else {
           if (Array.isArray(filter.rightOperand)) {
             result.push({
               ...filter,
-              rightOperand: (filter.rightOperand as string[]).map(operand => new Date(operand).getTime())
+              rightOperand: (filter.rightOperand as string[]).map((operand) =>
+                new Date(operand).getTime()
+              ),
             })
           } else {
             result.push({
@@ -383,9 +417,12 @@ export const coerceFilterChainOperands = (filterChain: (BinaryFilter | TernaryFi
   return result
 }
 
-export const makeFilterSuffixes = (filterChain: (BinaryFilter | TernaryFilter)[], index: IndexDefinition): { left?: string, right?: string } | undefined => {
+export const makeFilterSuffixes = (
+  filterChain: (BinaryFilter | TernaryFilter)[],
+  index: IndexDefinition
+): { left?: string; right?: string } | undefined => {
   if (filterChain && filterChain.length) {
-    const indexFields = index.fields.map(field => field.name)
+    const indexFields = index.fields.map((field) => field.name)
     const orderedFilterChain = []
     for (const filter of filterChain) {
       const idx = indexFields.indexOf(filter.pathExpression)
@@ -394,7 +431,10 @@ export const makeFilterSuffixes = (filterChain: (BinaryFilter | TernaryFilter)[]
         return
       }
 
-      if ((filter as BinaryFilter).operator && (filter as BinaryFilter).operator === OP.IN) {
+      if (
+        (filter as BinaryFilter).operator &&
+        (filter as BinaryFilter).operator === OP.IN
+      ) {
         // Indexes do not support filtering with IN operator
         return
       }
@@ -406,7 +446,10 @@ export const makeFilterSuffixes = (filterChain: (BinaryFilter | TernaryFilter)[]
     let rightSuffix
     let leftSuffix
     let ternaryFilter = false
-    if (orderedFilterChain[filterChain.length - 1] && !orderedFilterChain[filterChain.length - 1].operator) {
+    if (
+      orderedFilterChain[filterChain.length - 1] &&
+      !orderedFilterChain[filterChain.length - 1].operator
+    ) {
       ternaryFilter = true
     }
     for (const [i, filter] of Object.entries(filterChain)) {
@@ -449,20 +492,31 @@ export const makeFilterSuffixes = (filterChain: (BinaryFilter | TernaryFilter)[]
     }
 
     return {
-      left: leftSuffix && [...baseFragments, leftSuffix].join(':') || undefined,
-      right: rightSuffix && [...baseFragments, rightSuffix].join(':') || undefined
+      left:
+        (leftSuffix && [...baseFragments, leftSuffix].join(':')) || undefined,
+      right:
+        (rightSuffix && [...baseFragments, rightSuffix].join(':')) || undefined,
     }
   } else {
     return {}
   }
 }
 
-export const makeKeyForField = (definition: IndexDefinition, data: object): string | null => {
+export const makeKeyForField = (
+  definition: IndexDefinition,
+  data: object
+): string | null => {
   const valueParts = []
   for (const field of definition.fields) {
     if (field.name in data) {
       // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-      valueParts.push(String(field.type === 'datetime' ? new Date(data[field.name]).getTime() : data[field.name]))
+      valueParts.push(
+        String(
+          field.type === 'datetime'
+            ? new Date(data[field.name]).getTime()
+            : data[field.name]
+        )
+      )
     } else {
       return null // tell caller that one of the fields is missing and we can't index
     }
