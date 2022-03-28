@@ -32,6 +32,7 @@ import {
   OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
+import { lastItem } from '../util'
 
 const SysFieldDefinition = {
   kind: 'Field' as const,
@@ -911,7 +912,7 @@ export const NAMER = {
     return 'create' + generateNamespacedFieldName(namespace, 'Document')
   },
   queryName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'Document')
+    return String(lastItem(namespace))
   },
   generateQueryListName: (namespace: string[]) => {
     return 'get' + generateNamespacedFieldName(namespace, 'List')

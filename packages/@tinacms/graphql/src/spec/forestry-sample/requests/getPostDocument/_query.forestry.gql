@@ -1,5 +1,5 @@
 query {
-  getPostDocument(relativePath: "hello-world.md") {
+  post(relativePath: "hello-world.md") {
     ... on PostDocument {
       data {
         ... on PostPost {

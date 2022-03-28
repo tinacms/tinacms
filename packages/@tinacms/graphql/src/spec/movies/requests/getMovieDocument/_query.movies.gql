@@ -1,5 +1,5 @@
 query {
-  getMovieDocument(relativePath: "star-wars.md") {
+  movie(relativePath: "star-wars.md") {
     id
     sys {
       filename

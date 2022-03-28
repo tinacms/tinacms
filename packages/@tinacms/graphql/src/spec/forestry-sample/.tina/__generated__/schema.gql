@@ -41,20 +41,21 @@ interface Connection {
 }
 
 type Query {
+  getOptimizedQuery(queryString: String!): String
   getCollection(collection: String): Collection!
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
-  getAuthorDocument(relativePath: String): AuthorDocument!
-  getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
-  getPostDocument(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
-  getStuffDocument(relativePath: String): StuffDocument!
-  getStuffList(before: String, after: String, first: Float, last: Float): StuffConnection!
-  getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
+  author(relativePath: String): AuthorDocument!
+  getAuthorList(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
+  post(relativePath: String): PostDocument!
+  getPostList(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  stuff(relativePath: String): StuffDocument!
+  getStuffList(before: String, after: String, first: Float, last: Float, sort: String): StuffConnection!
+  page(relativePath: String): PageDocument!
+  getPageList(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
 }
 
 type DocumentConnectionEdges {
@@ -77,7 +78,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
 union DocumentNode = AuthorDocument | PostDocument | StuffDocument | PageDocument
