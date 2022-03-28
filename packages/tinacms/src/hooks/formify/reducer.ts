@@ -31,8 +31,6 @@ const defaultState: State = {
 }
 
 export function reducer(state: State, action: Action): State {
-  console.log('status', state.status)
-  console.log('action', action.type)
   switch (action.type) {
     case 'start':
       return {
