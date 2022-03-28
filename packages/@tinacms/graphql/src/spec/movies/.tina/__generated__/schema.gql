@@ -49,11 +49,11 @@ type Query {
   getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
   movie(relativePath: String): MovieDocument!
-  getMovieList(before: String, after: String, first: Float, last: Float, sort: String): MovieConnection!
+  movieConnection(before: String, after: String, first: Float, last: Float, sort: String): MovieConnection!
   director(relativePath: String): DirectorDocument!
-  getDirectorList(before: String, after: String, first: Float, last: Float, sort: String): DirectorConnection!
+  directorConnection(before: String, after: String, first: Float, last: Float, sort: String): DirectorConnection!
   actor(relativePath: String): ActorDocument!
-  getActorList(before: String, after: String, first: Float, last: Float, sort: String): ActorConnection!
+  actorConnection(before: String, after: String, first: Float, last: Float, sort: String): ActorConnection!
 }
 
 type DocumentConnectionEdges {

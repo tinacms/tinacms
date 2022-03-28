@@ -918,7 +918,7 @@ export const NAMER = {
     return String(lastItem(namespace))
   },
   generateQueryListName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'List')
+    return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '') + 'Parts'

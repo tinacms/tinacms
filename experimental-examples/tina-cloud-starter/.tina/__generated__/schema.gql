@@ -50,15 +50,15 @@ type Query {
   getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
   posts(relativePath: String): PostsDocument!
-  getPostsList(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
+  postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
   global(relativePath: String): GlobalDocument!
-  getGlobalList(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
+  globalConnection(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
   authors(relativePath: String): AuthorsDocument!
-  getAuthorsList(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
+  authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
   zodiacs(relativePath: String): ZodiacsDocument!
-  getZodiacsList(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
+  zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
   pages(relativePath: String): PagesDocument!
-  getPagesList(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
+  pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
 }
 
 type DocumentConnectionEdges {
