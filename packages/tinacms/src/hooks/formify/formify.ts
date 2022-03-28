@@ -383,7 +383,7 @@ export const formify = async ({
   }) => {
     const type = util.getSelectedUnionType(parentType, inlineFragmentNode)
 
-    if (util.isDocumentField(type)) {
+    if (util.isFormifiableDocument(type)) {
       return formifyInlineFragmentDocument({
         inlineFragmentNode: inlineFragmentNode,
         type,
@@ -437,7 +437,7 @@ export const formify = async ({
                     fieldNode: selectionNode,
                     type: field.type,
                   })
-                  if (util.isDocumentField(field.type)) {
+                  if (util.isFormifiableDocument(field.type)) {
                     return formifyFieldNodeDocument({
                       fieldNode: selectionNode,
                       type: field.type,
