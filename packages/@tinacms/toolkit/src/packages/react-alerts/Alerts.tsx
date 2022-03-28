@@ -11,16 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
-import styled, { css, keyframes } from 'styled-components'
-import { Alerts as AlertsCollection, AlertLevel } from '../alerts'
 import {
   AlertIcon,
+  CloseIcon,
+  ErrorIcon,
   InfoIcon,
   WarningIcon,
-  ErrorIcon,
-  CloseIcon,
 } from '../icons'
+import { AlertLevel, Alerts as AlertsCollection } from '../alerts'
+import styled, { css, keyframes } from 'styled-components'
+
+import React from 'react'
 import { useSubscribable } from '../react-core'
 
 export interface AlertsProps {
@@ -50,7 +51,7 @@ export function Alerts({ alerts }: AlertsProps) {
             {alert.level === 'success' && <AlertIcon />}
             {alert.level === 'warn' && <WarningIcon />}
             {alert.level === 'error' && <ErrorIcon />}
-            <p>{alert.message}</p>
+            <p dangerouslySetInnerHTML={{ __html: alert.message }} />
             <CloseAlert />
           </Alert>
         )
