@@ -16,7 +16,7 @@ import type { Form, Field } from '@tinacms/toolkit'
 
 export type Action =
   | {
-      type: 'restart'
+      type: 'start'
       value: { query: string }
     }
   | {
@@ -173,7 +173,7 @@ export type State = {
   schema: G.GraphQLSchema
   query: G.DocumentNode
   queryString: string
-  status: 'initialized' | 'formified' | 'ready' | 'done'
+  status: 'idle' | 'initialized' | 'formified' | 'ready' | 'done'
   count: number
   data: object
   changeSets: ChangeSet[]
