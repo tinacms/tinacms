@@ -17,16 +17,25 @@ import { createSchema } from '../schema'
 import { lastItem } from '../util'
 import { parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
-import type { BinaryFilter, IndexDefinition, PageInfo, StoreQueryOptions, Store, TernaryFilter } from '@tinacms/datalayer'
+import type {
+  BinaryFilter,
+  IndexDefinition,
+  PageInfo,
+  StoreQueryOptions,
+  Store,
+  TernaryFilter,
+} from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type {
   TinaCloudSchemaBase,
-  CollectionFieldsWithNamespace, CollectionTemplatesWithNamespace, TinaFieldInner,
+  CollectionFieldsWithNamespace,
+  CollectionTemplatesWithNamespace,
+  TinaFieldInner,
 } from '../types'
 import type { Bridge } from './bridge'
-import {atob, btoa, DEFAULT_COLLECTION_SORT_KEY} from '@tinacms/datalayer'
+import { atob, btoa, DEFAULT_COLLECTION_SORT_KEY } from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -62,7 +71,9 @@ export class Database {
   public bridge: Bridge
   public store: Store
   private tinaSchema: TinaSchema | undefined
-  private collectionIndexDefinitions: Record<string,Record<string,IndexDefinition>> | undefined
+  private collectionIndexDefinitions:
+    | Record<string, Record<string, IndexDefinition>>
+    | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   private _graphql: DocumentNode | undefined
   private _tinaSchema: TinaCloudSchemaBase | undefined
@@ -125,8 +136,8 @@ export class Database {
     const { stringifiedFile, payload, keepTemplateKey } =
       await this.stringifyFile(filepath, data)
     const tinaSchema = await this.getSchema()
-    const collection = tinaSchema.schema.collections.find(
-      (collection) => filepath.startsWith(collection.path)
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
     )
     let collectionIndexDefinitions
     if (collection) {
@@ -136,7 +147,11 @@ export class Database {
     if (this.store.supportsSeeding()) {
       await this.bridge.put(filepath, stringifiedFile)
     }
-    await this.store.put(filepath, payload, { keepTemplateKey, collection: collection.name, indexDefinitions: collectionIndexDefinitions })
+    await this.store.put(filepath, payload, {
+      keepTemplateKey,
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    })
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
@@ -144,8 +159,8 @@ export class Database {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
-      const collection = tinaSchema.schema.collections.find(
-        (collection) => filepath.startsWith(collection.path)
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        filepath.startsWith(collection.path)
       )
       let collectionIndexDefinitions
       if (collection) {
@@ -158,7 +173,11 @@ export class Database {
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
       }
-      await this.store.put(filepath, payload, { keepTemplateKey,  collection: collection.name, indexDefinitions: collectionIndexDefinitions })
+      await this.store.put(filepath, payload, {
+        keepTemplateKey,
+        collection: collection.name,
+        indexDefinitions: collectionIndexDefinitions,
+      })
     }
     return true
   }
@@ -265,7 +284,9 @@ export class Database {
     return this.tinaSchema
   }
 
-  public getIndexDefinitions = async (): Promise<Record<string,Record<string,IndexDefinition>>> => {
+  public getIndexDefinitions = async (): Promise<
+    Record<string, Record<string, IndexDefinition>>
+  > => {
     if (!this.collectionIndexDefinitions) {
       await new Promise<void>(async (resolve, reject) => {
         try {
@@ -273,12 +294,16 @@ export class Database {
           const collections = schema.getCollections()
           for (const collection of collections) {
             const indexDefinitions = {
-              [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] } // provide a default sort key which is the file sort
+              [DEFAULT_COLLECTION_SORT_KEY]: { fields: [] }, // provide a default sort key which is the file sort
             }
 
             if (collection.fields) {
-              for (const field of (collection.fields as TinaFieldInner<true>[])) {
-                if ((field.indexed !== undefined && field.indexed === false) || field.type === 'object' /* TODO do we want indexes on objects? */) {
+              for (const field of collection.fields as TinaFieldInner<true>[]) {
+                if (
+                  (field.indexed !== undefined && field.indexed === false) ||
+                  field.type ===
+                    'object' /* TODO do we want indexes on objects? */
+                ) {
                   continue
                 }
 
@@ -286,9 +311,9 @@ export class Database {
                   fields: [
                     {
                       name: field.name,
-                      type: field.type
-                    }
-                  ]
+                      type: field.type,
+                    },
+                  ],
                 }
               }
             }
@@ -297,14 +322,17 @@ export class Database {
               // build IndexDefinitions for each index in the collection schema
               for (const index of collection.indexes) {
                 indexDefinitions[index.name] = {
-                  fields: index.fields.map(indexField => ({
+                  fields: index.fields.map((indexField) => ({
                     name: indexField.name,
-                    type: (collection.fields as TinaFieldInner<true>[]).find((field) => indexField.name === field.name)?.type
-                  }))
+                    type: (collection.fields as TinaFieldInner<true>[]).find(
+                      (field) => indexField.name === field.name
+                    )?.type,
+                  })),
                 }
               }
             }
-            this.collectionIndexDefinitions = this.collectionIndexDefinitions || {}
+            this.collectionIndexDefinitions =
+              this.collectionIndexDefinitions || {}
             this.collectionIndexDefinitions[collection.name] = indexDefinitions
           }
           resolve()
@@ -329,8 +357,13 @@ export class Database {
   }
 
   public query = async (queryOptions: QueryOptions, hydrator) => {
-    const { first, after, last, before, sort, collection, filterChain } = queryOptions
-    const storeQueryOptions: StoreQueryOptions = { sort, collection, filterChain }
+    const { first, after, last, before, sort, collection, filterChain } =
+      queryOptions
+    const storeQueryOptions: StoreQueryOptions = {
+      sort,
+      collection,
+      filterChain,
+    }
 
     if (first) {
       storeQueryOptions.limit = first
@@ -351,32 +384,34 @@ export class Database {
     }
 
     const indexDefinitions = await this.getIndexDefinitions()
-    storeQueryOptions.indexDefinitions = indexDefinitions?.[queryOptions.collection]
+    storeQueryOptions.indexDefinitions =
+      indexDefinitions?.[queryOptions.collection]
     if (!storeQueryOptions.indexDefinitions) {
-      throw new Error(`No indexDefinitions for collection ${queryOptions.collection}`)
+      throw new Error(
+        `No indexDefinitions for collection ${queryOptions.collection}`
+      )
     }
 
-    const { edges, pageInfo: {
-      hasPreviousPage,
-        hasNextPage,
-        startCursor,
-        endCursor
-    }}: { edges: { path: string, cursor: string }[], pageInfo: PageInfo } = await this.store.query(storeQueryOptions)
+    const {
+      edges,
+      pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
+    }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
+      await this.store.query(storeQueryOptions)
 
     return {
       edges: await sequential(edges, async (edge) => {
         const node = await hydrator(edge.path)
         return {
           node,
-          cursor: btoa(edge.cursor)
+          cursor: btoa(edge.cursor),
         }
       }),
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
         startCursor: btoa(startCursor),
-        endCursor: btoa(endCursor)
-      }
+        endCursor: btoa(endCursor),
+      },
     }
   }
 
@@ -428,7 +463,12 @@ export class Database {
     }
   }
 
-  public indexContentByPaths = async (documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
+  public indexContentByPaths = async (
+    documentPaths: string[],
+    collection:
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+  ) => {
     await _indexContent(this, documentPaths, collection)
   }
 
@@ -511,7 +551,13 @@ type UnionDataLookup = {
   typeMap: { [templateName: string]: string }
 }
 
-const _indexContent = async (database: Database, documentPaths: string[], collection: CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>) => {
+const _indexContent = async (
+  database: Database,
+  documentPaths: string[],
+  collection:
+    | CollectionFieldsWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>
+) => {
   const indexDefinitions = await database.getIndexDefinitions()
   const collectionIndexDefinitions = indexDefinitions?.[collection.name]
   if (!collectionIndexDefinitions) {
@@ -519,8 +565,10 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
   }
 
   const numIndexes = Object.keys(collectionIndexDefinitions).length
-  if ( numIndexes > 20) {
-    throw new Error(`A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`)
+  if (numIndexes > 20) {
+    throw new Error(
+      `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
+    )
   }
 
   await sequential(documentPaths, async (filepath) => {
@@ -529,7 +577,10 @@ const _indexContent = async (database: Database, documentPaths: string[], collec
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, { collection: collection.name, indexDefinitions: collectionIndexDefinitions })
+      await database.store.seed(filepath, data, {
+        collection: collection.name,
+        indexDefinitions: collectionIndexDefinitions,
+      })
     }
   })
 }

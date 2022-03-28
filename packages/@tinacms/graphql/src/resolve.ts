@@ -379,7 +379,10 @@ export const resolve = async ({
            * eg. `getPageList`
            */
           case 'collectionDocumentList':
-            return resolver.resolveCollectionConnection({ args, collection: tinaSchema.getCollection(lookup.collection) })
+            return resolver.resolveCollectionConnection({
+              args,
+              collection: tinaSchema.getCollection(lookup.collection),
+            })
           /**
            * A polymorphic data set, it can be from a document's data
            * of any nested object which can be one of many shapes

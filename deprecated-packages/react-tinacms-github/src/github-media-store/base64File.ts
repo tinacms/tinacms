@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 export default function base64File(file: Blob): Promise<string | ArrayBuffer> {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onload = () => {

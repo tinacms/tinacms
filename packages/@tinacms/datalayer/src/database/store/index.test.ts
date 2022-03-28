@@ -27,35 +27,50 @@ describe('datalayer store helper functions', () => {
   describe('buildKeyForField', () => {
     it('succeeds with non-datetime', () => {
       const expected = 'bar'
-      const result = makeKeyForField({
-        fields: [{
-          name: 'foo',
-          type: 'string'
-        }]
-      }, { foo: expected })
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'string',
+            },
+          ],
+        },
+        { foo: expected }
+      )
       expect(result).toEqual(expected)
     })
 
     it('succeeds with datetime', () => {
       const now = new Date()
       const expected = String(now.getTime())
-      const result = makeKeyForField({
-        fields: [{
-          name: 'foo',
-          type: 'datetime'
-        }]
-      }, { foo: now.toISOString() })
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'datetime',
+            },
+          ],
+        },
+        { foo: now.toISOString() }
+      )
       expect(result).toEqual(expected)
     })
 
     it('fails with missing field', () => {
       const expected = null
-      const result = makeKeyForField({
-        fields: [{
-          name: 'foo',
-          type: 'string'
-        }]
-      }, { bar: 'foo' })
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'string',
+            },
+          ],
+        },
+        { bar: 'foo' }
+      )
       expect(result).toEqual(expected)
     })
   })
@@ -236,7 +251,7 @@ describe('datalayer store helper functions', () => {
                 rightOperand: true,
                 operator: OP.GT,
                 type: 'boolean',
-              }
+              },
             ],
             publishedIdIndexDefn
           )
@@ -252,7 +267,7 @@ describe('datalayer store helper functions', () => {
                 rightOperand: 1,
                 operator: OP.EQ,
                 type: 'number',
-              }
+              },
             ],
             publishedIdIndexDefn
           )

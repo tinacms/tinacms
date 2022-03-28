@@ -11,9 +11,9 @@
  limitations under the License.
  */
 
-import {collectConditionsForField, resolveReferences} from './filter-utils'
-import {ReferenceTypeInner, TinaFieldInner} from '../types'
-import {FilterCondition} from '@tinacms/datalayer'
+import { collectConditionsForField, resolveReferences } from './filter-utils'
+import { ReferenceTypeInner, TinaFieldInner } from '../types'
+import { FilterCondition } from '@tinacms/datalayer'
 
 describe('resolveReferences', () => {
   it('resolves reference to single item', async () => {
@@ -342,17 +342,19 @@ describe('resolveReferences', () => {
       {
         type: 'object',
         name: 'details',
-        templates: [{
-          label: 'Author',
-          fields: [
-            {
-              type: 'reference',
-              name: 'author',
-              collections: ['authors'],
-            },
-          ],
-          name: 'authorTemplate',
-        },],
+        templates: [
+          {
+            label: 'Author',
+            fields: [
+              {
+                type: 'reference',
+                name: 'author',
+                collections: ['authors'],
+              },
+            ],
+            name: 'authorTemplate',
+          },
+        ],
       },
     ]
 
@@ -503,10 +505,12 @@ describe('collectConditionsForField', () => {
         {
           type: 'object',
           name: childFieldName,
-          fields: [{
-            type,
-            name: grandchildFieldName,
-          }]
+          fields: [
+            {
+              type,
+              name: grandchildFieldName,
+            },
+          ],
         },
       ],
     }
@@ -516,7 +520,7 @@ describe('collectConditionsForField', () => {
     const filterNode = {
       person: {
         age: filterExpression,
-      }
+      },
     }
     const expectedCondition: FilterCondition = {
       filterPath: `${parentFieldName}.${childFieldName}.${grandchildFieldName}`,
@@ -529,7 +533,6 @@ describe('collectConditionsForField', () => {
     expect(conditions).toHaveLength(1)
     expect(conditions[0]).toEqual(expectedCondition)
   })
-
 
   it('fails to collect conditions for nested list object filter with non-existent field', () => {
     const conditions: FilterCondition[] = []
@@ -622,23 +625,25 @@ describe('collectConditionsForField', () => {
     const field: TinaFieldInner<false> = {
       type: 'object',
       name: rootFieldName,
-      fields: [{
-        type: 'object',
-        name: parentFieldName,
-        list: true,
-        templates: [
-          {
-            name: templateName,
-            label: templateName,
-            fields: [
-              {
-                type: childType,
-                name: childFieldName,
-              },
-            ],
-          },
-        ],
-      }]
+      fields: [
+        {
+          type: 'object',
+          name: parentFieldName,
+          list: true,
+          templates: [
+            {
+              name: templateName,
+              label: templateName,
+              fields: [
+                {
+                  type: childType,
+                  name: childFieldName,
+                },
+              ],
+            },
+          ],
+        },
+      ],
     }
     const filterExpression: Record<string, any> = {
       gte: 18,
@@ -648,7 +653,7 @@ describe('collectConditionsForField', () => {
         [templateName]: {
           age: filterExpression,
         },
-      }
+      },
     }
     const expectedCondition: FilterCondition = {
       filterPath: `${rootFieldName}.${parentFieldName}[?(@._template=="${templateName}")].${childFieldName}`,

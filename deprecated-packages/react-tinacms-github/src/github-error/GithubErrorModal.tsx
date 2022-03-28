@@ -36,10 +36,8 @@ interface Props {
 // When an open authoring error is caught, we don't immedietly know the cause
 // We have to perform a few extra checks and render a modal with options
 const GithubErrorModal = (props: Props) => {
-  const [
-    errorModalProps,
-    setErrorModalProps,
-  ] = useState<ActionableModalOptions | null>(null)
+  const [errorModalProps, setErrorModalProps] =
+    useState<ActionableModalOptions | null>(null)
   const { github } = useCMS().api
 
   const cms = useCMS()

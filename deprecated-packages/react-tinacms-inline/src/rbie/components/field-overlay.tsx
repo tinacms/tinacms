@@ -35,7 +35,7 @@ export function FieldOverlay({
   children?: JSX.Element
 }) {
   const [, setState] = React.useState(0)
-  useWindowResize(() => setState(s => s + 1))
+  useWindowResize(() => setState((s) => s + 1))
   if (!targetNode) return null
 
   const styles = attention

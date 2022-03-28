@@ -21,38 +21,40 @@ import React from 'react'
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuButton } from './MenuButton'
 
-export const commandControl = (
-  command: any,
-  Icon: any, // Fix type
-  _title: string,
-  tooltip: string,
-  focusOnCreate: boolean = true
-) => () => {
-  const { editorView } = useEditorStateContext()
-  const onClick = () => {
-    if (canDo()) {
-      const view = editorView!.view
-      command(view.state, view.dispatch)
+export const commandControl =
+  (
+    command: any,
+    Icon: any, // Fix type
+    _title: string,
+    tooltip: string,
+    focusOnCreate: boolean = true
+  ) =>
+  () => {
+    const { editorView } = useEditorStateContext()
+    const onClick = () => {
+      if (canDo()) {
+        const view = editorView!.view
+        command(view.state, view.dispatch)
 
-      if (focusOnCreate) {
-        view.focus()
+        if (focusOnCreate) {
+          view.focus()
+        }
       }
     }
-  }
-  const canDo = () => command(editorView!.view.state)
+    const canDo = () => command(editorView!.view.state)
 
-  return (
-    <MenuButton
-      data-tooltip={tooltip}
-      title={tooltip}
-      onClick={onClick}
-      disabled={!canDo()}
-      onMouseDown={evt => {
-        evt.preventDefault()
-        evt.stopPropagation()
-      }}
-    >
-      <Icon />
-    </MenuButton>
-  )
-}
+    return (
+      <MenuButton
+        data-tooltip={tooltip}
+        title={tooltip}
+        onClick={onClick}
+        disabled={!canDo()}
+        onMouseDown={(evt) => {
+          evt.preventDefault()
+          evt.stopPropagation()
+        }}
+      >
+        <Icon />
+      </MenuButton>
+    )
+  }

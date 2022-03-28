@@ -72,20 +72,20 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'Mod-b',
     ifMark: 'strong',
-    command: schema => toggleMark(schema.marks.strong),
+    command: (schema) => toggleMark(schema.marks.strong),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod-i',
     ifMark: 'em',
-    command: schema => toggleMark(schema.marks.em),
+    command: (schema) => toggleMark(schema.marks.em),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod-k',
     ifMark: 'link',
     command: () => {
-      return function(state: any, dispatch: any) {
+      return function (state: any, dispatch: any) {
         return openLinkPopup(state, dispatch)
       }
     },
@@ -168,7 +168,7 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod-Alt-9',
-    command: schema => liftListItem(schema.nodes.list_item),
+    command: (schema) => liftListItem(schema.nodes.list_item),
     onCondition(schema) {
       return !!(schema.nodes.bullet_list || schema.nodes.ordered_list)
     },
@@ -176,7 +176,7 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod-Alt-0',
-    command: schema => setBlockType(schema.nodes.code_block),
+    command: (schema) => setBlockType(schema.nodes.code_block),
     ifNode: 'code_block',
   },
   {
@@ -207,13 +207,13 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'Mod-0',
     ifMark: 'code',
-    command: schema => toggleMark(schema.marks.code),
+    command: (schema) => toggleMark(schema.marks.code),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod->',
     ifNode: 'blockquote',
-    command: schema => wrapIn(schema.nodes.blockquote),
+    command: (schema) => wrapIn(schema.nodes.blockquote),
   },
   {
     __type: 'wysiwyg:keymap',
@@ -225,13 +225,13 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'Mod-Alt-9',
     ifNode: 'paragraph',
-    command: schema => setBlockType(schema.nodes.paragraph),
+    command: (schema) => setBlockType(schema.nodes.paragraph),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Shift-Ctrl-0',
     ifNode: 'paragraph',
-    command: schema => setBlockType(schema.nodes.paragraph),
+    command: (schema) => setBlockType(schema.nodes.paragraph),
   },
   {
     __type: 'wysiwyg:keymap',
@@ -243,19 +243,19 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'Enter',
     ifNode: 'list_item',
-    command: schema => splitListItem(schema.nodes.list_item),
+    command: (schema) => splitListItem(schema.nodes.list_item),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Tab',
     ifNode: 'list_item',
-    command: schema => sinkListItem(schema.nodes.list_item),
+    command: (schema) => sinkListItem(schema.nodes.list_item),
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'Shift-Tab',
     ifNode: 'list_item',
-    command: schema => liftListItem(schema.nodes.list_item),
+    command: (schema) => liftListItem(schema.nodes.list_item),
   },
 ]
 
@@ -303,11 +303,11 @@ function goToCell(dir: number) {
 }
 
 export function isListType(listType: NodeType) {
-  return function(state: EditorState) {
+  return function (state: EditorState) {
     const { $from, $to } = state.selection
     const range = $from.blockRange(
       $to,
-      node => !!(node.firstChild && node.firstChild.type == listType)
+      (node) => !!(node.firstChild && node.firstChild.type == listType)
     )
     return range && state.doc.child(range.start).type == listType
   }
@@ -318,7 +318,7 @@ export function isNotAList(state: EditorState) {
   const { $from, $to } = state.selection
   const range = $from.blockRange(
     $to,
-    node =>
+    (node) =>
       !!(
         node.firstChild &&
         (node.firstChild.type == ordered_list ||
@@ -333,12 +333,12 @@ export function isNotAList(state: EditorState) {
 }
 
 export function switchListType(listType: NodeType) {
-  return function(state: EditorState, dispatch: any) {
+  return function (state: EditorState, dispatch: any) {
     const itemType = state.schema.nodes.list_item
     const { $from, $to } = state.selection
     const range = $from.blockRange(
       $to,
-      node => !!(node.firstChild && node.firstChild.type == itemType)
+      (node) => !!(node.firstChild && node.firstChild.type == itemType)
     )
     if (!range) return false
     if (!dispatch) return true

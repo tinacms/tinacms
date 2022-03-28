@@ -37,7 +37,7 @@ export function docAttrs(attrs: any) {
 }
 
 export function getAttrsWith(attrs: object) {
-  return function(dom: HTMLElement) {
+  return function (dom: HTMLElement) {
     return {
       ...attrs,
       ...getAttrs(dom),

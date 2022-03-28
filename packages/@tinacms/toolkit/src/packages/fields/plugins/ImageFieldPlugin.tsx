@@ -93,7 +93,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             ? // @ts-ignore
               cms.media.store.parse(media)
             : media
-        
+
         props.input.onChange(parsedValue)
       }
     }
@@ -124,7 +124,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           if (media) {
             try {
               await onChange(media)
-            } catch(error) {
+            } catch (error) {
               console.error('Error uploading media asset: ', error)
             } finally {
               setIsImgUploading(false)

@@ -154,7 +154,7 @@ const NODES: Nodes = {
     const start = node.attrs.order || 1
     const maxW = String(start + node.childCount - 1).length
     const space = state.repeat(' ', maxW + 2)
-    state.renderList(node, space, i => {
+    state.renderList(node, space, (i) => {
       const nStr = String(start + i)
       return state.repeat(' ', maxW - nStr.length) + nStr + '. '
     })
@@ -210,7 +210,7 @@ const NODES: Nodes = {
   table(state: MarkdownSerializerState, node: Node) {
     let inHead = true
 
-    node.forEach(row => {
+    node.forEach((row) => {
       const nextRowIsInBody = row.content.child(0).type.name === 'table_cell'
 
       if (inHead && nextRowIsInBody) {

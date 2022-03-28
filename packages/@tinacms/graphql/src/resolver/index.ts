@@ -13,12 +13,12 @@ limitations under the License.
 
 import _ from 'lodash'
 import path from 'path'
-import {TinaSchema} from '../schema'
-import {assertShape, lastItem, sequential} from '../util'
-import {NAMER} from '../ast-builder'
-import {Database} from '../database'
+import { TinaSchema } from '../schema'
+import { assertShape, lastItem, sequential } from '../util'
+import { NAMER } from '../ast-builder'
+import { Database } from '../database'
 import isValid from 'date-fns/isValid'
-import {parseMDX, stringifyMDX} from '../mdx'
+import { parseMDX, stringifyMDX } from '../mdx'
 
 import type {
   Collectable,
@@ -27,10 +27,10 @@ import type {
   TinaCloudCollection,
   TinaFieldEnriched,
 } from '../types'
-import {Template, TinaFieldInner} from '../types'
-import {TinaError} from './error'
-import {FilterCondition, makeFilterChain} from '@tinacms/datalayer'
-import {collectConditionsForField, resolveReferences} from './filter-utils'
+import { Template, TinaFieldInner } from '../types'
+import { TinaError } from './error'
+import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
+import { collectConditionsForField, resolveReferences } from './filter-utils'
 
 interface ResolverConfig {
   database: Database
@@ -535,37 +535,55 @@ export class Resolver {
     return this.database.store.glob(collection.path, this.getDocument)
   }
 
-  private referenceResolver = async (filter: Record<string, object>, fieldDefinition: ReferenceTypeWithNamespace) => {
-    const referencedCollection = this.tinaSchema.getCollection(fieldDefinition.collections[0])
+  private referenceResolver = async (
+    filter: Record<string, object>,
+    fieldDefinition: ReferenceTypeWithNamespace
+  ) => {
+    const referencedCollection = this.tinaSchema.getCollection(
+      fieldDefinition.collections[0]
+    )
     if (!referencedCollection) {
-      throw new Error(`Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`)
+      throw new Error(
+        `Unable to find collection for ${fieldDefinition.collections[0]} querying ${fieldDefinition.name}`
+      )
     }
 
-    const sortKeys = Object.keys(filter[fieldDefinition.name][referencedCollection.name])
-    const resolvedCollectionConnection = await this.resolveCollectionConnection({
-      args: {
-        sort: sortKeys.length === 1 ? sortKeys[0] : undefined,
-        filter: {
-          ...filter[fieldDefinition.name][referencedCollection.name]
-        }, first: -1
-      },
-      collection: referencedCollection,
-      hydrator: (path) => path // just return the path
-    })
+    const sortKeys = Object.keys(
+      filter[fieldDefinition.name][referencedCollection.name]
+    )
+    const resolvedCollectionConnection = await this.resolveCollectionConnection(
+      {
+        args: {
+          sort: sortKeys.length === 1 ? sortKeys[0] : undefined,
+          filter: {
+            ...filter[fieldDefinition.name][referencedCollection.name],
+          },
+          first: -1,
+        },
+        collection: referencedCollection,
+        hydrator: (path) => path, // just return the path
+      }
+    )
 
-    const {edges} = resolvedCollectionConnection
-    const values = edges.map(edge => edge.node)
-    return {edges, values}
+    const { edges } = resolvedCollectionConnection
+    const values = edges.map((edge) => edge.node)
+    return { edges, values }
   }
 
-  private async resolveFilterConditions(filter: Record<string, Record<string, object>>, fields: TinaFieldInner<false>[], collectionName) {
+  private async resolveFilterConditions(
+    filter: Record<string, Record<string, object>>,
+    fields: TinaFieldInner<false>[],
+    collectionName
+  ) {
     const conditions: FilterCondition[] = []
     const conditionCollector = (condition: FilterCondition) => {
       if (!condition.filterPath) {
         throw new Error('Error parsing filter - unable to generate filterPath')
       }
       if (!condition.filterExpression) {
-        throw new Error(`Error parsing filter - missing expression for ${condition.filterPath}`)
+        throw new Error(
+          `Error parsing filter - missing expression for ${condition.filterPath}`
+        )
       }
       conditions.push(condition)
     }
@@ -573,11 +591,21 @@ export class Resolver {
     await resolveReferences(filter, fields, this.referenceResolver)
 
     for (const fieldName of Object.keys(filter)) {
-      const field = (fields as any[]).find(field => field.name === fieldName) as any
+      const field = (fields as any[]).find(
+        (field) => field.name === fieldName
+      ) as any
       if (!field) {
-        throw new Error(`${fieldName} not found in collection ${collectionName}`)
+        throw new Error(
+          `${fieldName} not found in collection ${collectionName}`
+        )
       }
-      collectConditionsForField(fieldName, field, filter[fieldName], '', conditionCollector)
+      collectConditionsForField(
+        fieldName,
+        field,
+        filter[fieldName],
+        '',
+        conditionCollector
+      )
     }
 
     return conditions
@@ -589,7 +617,7 @@ export class Resolver {
     hydrator,
   }: {
     args: Record<string, Record<string, object> | string | number>
-    collection: TinaCloudCollection<true>,
+    collection: TinaCloudCollection<true>
     hydrator?: (string) => any
   }) => {
     let edges
@@ -599,15 +627,27 @@ export class Resolver {
       let conditions: FilterCondition[]
       if (args.filter) {
         if (collection.fields) {
-          conditions = await this.resolveFilterConditions(args.filter as Record<string,Record<string,object>>, collection.fields as TinaFieldInner<false>[], collection.name)
+          conditions = await this.resolveFilterConditions(
+            args.filter as Record<string, Record<string, object>>,
+            collection.fields as TinaFieldInner<false>[],
+            collection.name
+          )
         } else if (collection.templates) {
           for (const templateName of Object.keys(args.filter)) {
-            const template = (collection.templates as Template<false>[]).find(template => template.name === templateName)
+            const template = (collection.templates as Template<false>[]).find(
+              (template) => template.name === templateName
+            )
 
             if (template) {
-              conditions = await this.resolveFilterConditions(args.filter[templateName], template.fields as TinaFieldInner<false>[], `${collection.name}.${templateName}`)
+              conditions = await this.resolveFilterConditions(
+                args.filter[templateName],
+                template.fields as TinaFieldInner<false>[],
+                `${collection.name}.${templateName}`
+              )
             } else {
-              throw new Error(`Error template not found: ${templateName} in collection ${collection.name}`)
+              throw new Error(
+                `Error template not found: ${templateName} in collection ${collection.name}`
+              )
             }
           }
         }
@@ -615,7 +655,7 @@ export class Resolver {
 
       const queryOptions = {
         filterChain: makeFilterChain({
-          conditions: conditions || []
+          conditions: conditions || [],
         }),
         collection: collection.name,
         sort: args.sort as string,
@@ -625,15 +665,17 @@ export class Resolver {
         after: args.after as string,
       }
 
-      const result = await this.database.query(queryOptions, hydrator ? hydrator : this.getDocument)
+      const result = await this.database.query(
+        queryOptions,
+        hydrator ? hydrator : this.getDocument
+      )
       edges = result.edges
       pageInfo = result.pageInfo
     } else {
-      edges = (await this.database.store.glob(
-        collection.path,
-        this.getDocument
-      )).map((document) => ({
-        node: document
+      edges = (
+        await this.database.store.glob(collection.path, this.getDocument)
+      ).map((document) => ({
+        node: document,
       }))
     }
 
@@ -643,13 +685,11 @@ export class Resolver {
       pageInfo: pageInfo || {
         hasPreviousPage: false,
         hasNextPage: false,
-        startCursor: "",
-        endCursor: ""
-      }
+        startCursor: '',
+        endCursor: '',
+      },
     }
   }
-
-
 
   private buildFieldMutations = (
     fieldParams: FieldParams,

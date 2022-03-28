@@ -1,3 +1,26 @@
 **/*.mdx
+**/*.md
+**/*.gql
+**/*.json
+__generated__
+
 packages/**/*.md
 .yarn
+.pnp.js
+.yarnrc.yml
+node_modules
+.build*
+yarn.lock
+package-lock.json
+.changeset
+js/dashboard/build
+js/dashboard/src/styles.css
+coverage
+identity/CHANGELOG.md
+js/dashboard/CHANGELOG.md
+js/content-api/CHANGELOG.md
+**/dist/
+terraform/**/.terraform
+**/*.tfstate
+# Ignore any .next folder
+**/.next/**
