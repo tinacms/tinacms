@@ -107,7 +107,6 @@ export type QueryGetDocumentListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 
@@ -122,7 +121,6 @@ export type QueryGetPostsListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<PostsFilter>;
 };
 
 
@@ -137,7 +135,6 @@ export type QueryGetGlobalListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<GlobalFilter>;
 };
 
 
@@ -152,7 +149,6 @@ export type QueryGetAuthorsListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<AuthorsFilter>;
 };
 
 
@@ -167,7 +163,6 @@ export type QueryGetZodiacsListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<ZodiacsFilter>;
 };
 
 
@@ -182,215 +177,6 @@ export type QueryGetPagesListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<PagesFilter>;
-};
-
-export type StringFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type Posts_BodyDateTimeFilter = {
-  format?: Maybe<StringFilter>;
-};
-
-export type RichTextFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-};
-
-export type Posts_BodyBlockQuoteFilter = {
-  children?: Maybe<RichTextFilter>;
-  authorName?: Maybe<StringFilter>;
-};
-
-export type Posts_BodyNewsletterSignupFilter = {
-  children?: Maybe<RichTextFilter>;
-  placeholder?: Maybe<StringFilter>;
-  buttonText?: Maybe<StringFilter>;
-  disclaimer?: Maybe<RichTextFilter>;
-};
-
-export type Posts_BodyFilter = {
-  DateTime?: Maybe<Posts_BodyDateTimeFilter>;
-  BlockQuote?: Maybe<Posts_BodyBlockQuoteFilter>;
-  NewsletterSignup?: Maybe<Posts_BodyNewsletterSignupFilter>;
-};
-
-export type BooleanFilter = {
-  eq?: Maybe<Scalars['Boolean']>;
-  exists?: Maybe<Scalars['Boolean']>;
-};
-
-export type NumberFilter = {
-  lt?: Maybe<Scalars['Float']>;
-  lte?: Maybe<Scalars['Float']>;
-  gte?: Maybe<Scalars['Float']>;
-  gt?: Maybe<Scalars['Float']>;
-  eq?: Maybe<Scalars['Float']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['Float']>>>;
-};
-
-export type ZodiacsFilter = {
-  name?: Maybe<StringFilter>;
-};
-
-export type AuthorsDetailsZodiacFilter = {
-  zodiacs?: Maybe<ZodiacsFilter>;
-};
-
-export type AuthorsDetailsFilter = {
-  zodiac?: Maybe<AuthorsDetailsZodiacFilter>;
-};
-
-export type AuthorsFilter = {
-  name?: Maybe<StringFilter>;
-  avatar?: Maybe<StringFilter>;
-  details?: Maybe<AuthorsDetailsFilter>;
-};
-
-export type PostsAuthorFilter = {
-  authors?: Maybe<AuthorsFilter>;
-};
-
-export type DatetimeFilter = {
-  after?: Maybe<Scalars['String']>;
-  before?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type ImageFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type PostsFilter = {
-  _body?: Maybe<Posts_BodyFilter>;
-  title?: Maybe<StringFilter>;
-  published?: Maybe<BooleanFilter>;
-  rating?: Maybe<NumberFilter>;
-  author?: Maybe<PostsAuthorFilter>;
-  date?: Maybe<DatetimeFilter>;
-  heroImg?: Maybe<ImageFilter>;
-  excerpt?: Maybe<StringFilter>;
-};
-
-export type GlobalHeaderIconFilter = {
-  color?: Maybe<StringFilter>;
-  style?: Maybe<StringFilter>;
-  name?: Maybe<StringFilter>;
-};
-
-export type GlobalHeaderNavFilter = {
-  href?: Maybe<StringFilter>;
-  label?: Maybe<StringFilter>;
-};
-
-export type GlobalHeaderFilter = {
-  icon?: Maybe<GlobalHeaderIconFilter>;
-  color?: Maybe<StringFilter>;
-  nav?: Maybe<GlobalHeaderNavFilter>;
-};
-
-export type GlobalFooterSocialFilter = {
-  facebook?: Maybe<StringFilter>;
-  twitter?: Maybe<StringFilter>;
-  instagram?: Maybe<StringFilter>;
-  github?: Maybe<StringFilter>;
-};
-
-export type GlobalFooterFilter = {
-  color?: Maybe<StringFilter>;
-  social?: Maybe<GlobalFooterSocialFilter>;
-};
-
-export type GlobalThemeFilter = {
-  color?: Maybe<StringFilter>;
-  font?: Maybe<StringFilter>;
-  icon?: Maybe<StringFilter>;
-  darkMode?: Maybe<StringFilter>;
-};
-
-export type GlobalFilter = {
-  header?: Maybe<GlobalHeaderFilter>;
-  footer?: Maybe<GlobalFooterFilter>;
-  theme?: Maybe<GlobalThemeFilter>;
-};
-
-export type PagesBlocksHeroActionsFilter = {
-  label?: Maybe<StringFilter>;
-  type?: Maybe<StringFilter>;
-  icon?: Maybe<BooleanFilter>;
-  link?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksHeroImageFilter = {
-  src?: Maybe<ImageFilter>;
-  alt?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksHeroFilter = {
-  tagline?: Maybe<StringFilter>;
-  headline?: Maybe<StringFilter>;
-  text?: Maybe<StringFilter>;
-  actions?: Maybe<PagesBlocksHeroActionsFilter>;
-  image?: Maybe<PagesBlocksHeroImageFilter>;
-  color?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksFeaturesItemsIconFilter = {
-  color?: Maybe<StringFilter>;
-  style?: Maybe<StringFilter>;
-  name?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksFeaturesItemsFilter = {
-  icon?: Maybe<PagesBlocksFeaturesItemsIconFilter>;
-  title?: Maybe<StringFilter>;
-  text?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksFeaturesFilter = {
-  items?: Maybe<PagesBlocksFeaturesItemsFilter>;
-  color?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksContentFilter = {
-  body?: Maybe<StringFilter>;
-  color?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksTestimonialFilter = {
-  quote?: Maybe<StringFilter>;
-  author?: Maybe<StringFilter>;
-  color?: Maybe<StringFilter>;
-};
-
-export type PagesBlocksFilter = {
-  hero?: Maybe<PagesBlocksHeroFilter>;
-  features?: Maybe<PagesBlocksFeaturesFilter>;
-  content?: Maybe<PagesBlocksContentFilter>;
-  testimonial?: Maybe<PagesBlocksTestimonialFilter>;
-};
-
-export type PagesFilter = {
-  blocks?: Maybe<PagesBlocksFilter>;
-};
-
-export type DocumentFilter = {
-  posts?: Maybe<PostsFilter>;
-  global?: Maybe<GlobalFilter>;
-  authors?: Maybe<AuthorsFilter>;
-  zodiacs?: Maybe<ZodiacsFilter>;
-  pages?: Maybe<PagesFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -426,7 +212,6 @@ export type CollectionDocumentsArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 export type DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsDocument | PagesDocument;

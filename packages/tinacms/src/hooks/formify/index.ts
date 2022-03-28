@@ -49,7 +49,7 @@ export const useFormify = ({
   const formIds = React.useRef<string[]>([])
 
   const [state, dispatch] = React.useReducer(reducer, {
-    status: 'initialized',
+    status: 'idle',
     schema: undefined,
     query: query ? G.parse(query) : null,
     queryString: query,
@@ -66,7 +66,7 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     if (query) {
-      dispatch({ type: 'restart', value: { query } })
+      dispatch({ type: 'start', value: { query } })
       formIds.current.forEach((formId) => {
         const form = cms.forms.find(formId)
         if (form) {
@@ -346,7 +346,6 @@ export const useFormify = ({
           form: form,
           loc: [],
         }).then((res) => {
-          console.log(res)
           dispatch({
             type: 'setIn',
             value: {

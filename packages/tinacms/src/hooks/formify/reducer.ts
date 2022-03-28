@@ -18,7 +18,7 @@ import * as G from 'graphql'
 import { FormNode, ChangeSet, State, Action, OnChangeEvent } from './types'
 
 const defaultState: State = {
-  status: 'initialized',
+  status: 'idle',
   schema: undefined,
   query: null,
   queryString: null,
@@ -31,13 +31,16 @@ const defaultState: State = {
 }
 
 export function reducer(state: State, action: Action): State {
+  console.log('status', state.status)
+  console.log('action', action.type)
   switch (action.type) {
-    case 'restart':
+    case 'start':
       return {
         ...state,
         ...defaultState,
         query: action.value.query ? G.parse(action.value.query) : null,
         queryString: action.value.query,
+        status: 'initialized',
       }
     /**
      * Add document blueprints, used on the initial setup only
