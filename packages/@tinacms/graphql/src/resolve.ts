@@ -162,9 +162,9 @@ export const resolve = async ({
           if (value) {
             return value
           }
-          if (info.fieldName === 'getCollections') {
+          if (info.fieldName === 'collections') {
             const getCollectionNode = info.fieldNodes.find(
-              (x) => x.name.value === 'getCollections'
+              (x) => x.name.value === 'collections'
             )
             const hasDocuments = getCollectionNode.selectionSet.selections.find(
               (x) => {
@@ -182,7 +182,7 @@ export const resolve = async ({
 
           // The field is `getCollection`
           const getCollectionNode = info.fieldNodes.find(
-            (x) => x.name.value === 'getCollection'
+            (x) => x.name.value === 'collection'
           )
           const hasDocuments = getCollectionNode.selectionSet.selections.find(
             (x) => {

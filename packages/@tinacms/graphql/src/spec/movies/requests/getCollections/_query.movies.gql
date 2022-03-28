@@ -1,5 +1,5 @@
 query {
-  getCollections {
+  collections {
     name
   }
 }

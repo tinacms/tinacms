@@ -22,8 +22,8 @@ const UNEXPECTED =
   'Formify encountered an unexpected error, please contact support'
 const EDGES_NODE_NAME = 'edges'
 const NODE_NAME = 'node'
-const COLLECTION_FIELD_NAME = 'getCollection'
-const COLLECTIONS_FIELD_NAME = 'getCollections'
+const COLLECTION_FIELD_NAME = 'collection'
+const COLLECTIONS_FIELD_NAME = 'collections'
 const COLLECTIONS_DOCUMENTS_NAME = 'documents'
 export const DATA_NODE_NAME = 'data'
 

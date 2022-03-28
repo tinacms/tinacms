@@ -1,11 +1,10 @@
-import { staticRequest } from "tinacms";
 import { Blocks } from "../components/blocks";
 import { ExperimentalGetTinaClient } from "../.tina/__generated__/types";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  return <Blocks {...props.data.getPagesDocument.data} />;
+  return <Blocks {...props.data.pages.data} />;
 }
 
 export const getStaticProps = async ({ params }) => {
@@ -22,9 +21,9 @@ export const getStaticProps = async ({ params }) => {
 
 export const getStaticPaths = async () => {
   const client = ExperimentalGetTinaClient();
-  const pagesListData = await client.getPagesList();
+  const pagesListData = await client.pagesConnection();
   return {
-    paths: pagesListData.data.getPagesList.edges.map((page) => ({
+    paths: pagesListData.data.pagesConnection.edges.map((page) => ({
       params: { filename: page.node.sys.filename },
     })),
     fallback: false,

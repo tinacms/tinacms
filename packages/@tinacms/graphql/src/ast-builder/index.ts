@@ -914,6 +914,15 @@ export const NAMER = {
   documentQueryName: () => {
     return 'document'
   },
+  documentConnectionQueryName: () => {
+    return 'documentConnection'
+  },
+  collectionQueryName: () => {
+    return 'collection'
+  },
+  collectionListQueryName: () => {
+    return 'collections'
+  },
   queryName: (namespace: string[]) => {
     return String(lastItem(namespace))
   },

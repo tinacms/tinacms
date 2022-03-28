@@ -1,6 +1,6 @@
 query PageQuery {
   ...LayoutQueryFragment
-  getPostsList {
+  postsConnection {
     edges {
       node {
         id
@@ -24,7 +24,7 @@ query PageQuery {
 
 query ContentQuery($relativePath: String!) {
   ...LayoutQueryFragment
-  getPagesDocument(relativePath: $relativePath) {
+  pages(relativePath: $relativePath) {
     data {
       ...PagesParts
     }
@@ -33,7 +33,7 @@ query ContentQuery($relativePath: String!) {
 
 query BlogPostQuery($relativePath: String!) {
   ...LayoutQueryFragment
-  getPostsDocument(relativePath: $relativePath) {
+  posts(relativePath: $relativePath) {
     data {
       ...PostsParts
       author {
