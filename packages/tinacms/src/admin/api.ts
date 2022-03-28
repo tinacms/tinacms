@@ -28,13 +28,13 @@ export class TinaAdminApi {
   }
 
   async fetchCollections() {
-    const response: { getCollections: Collection[] } = await this.api.request(
+    const response: { collections: Collection[] } = await this.api.request(
       `#graphql
-      query{ 
-        getCollections { 
-          label, 
-          name 
-        } 
+      query{
+        collections {
+          label,
+          name
+        }
       }`,
       { variables: {} }
     )
@@ -43,10 +43,10 @@ export class TinaAdminApi {
   }
 
   async fetchCollection(collectionName: string, includeDocuments: boolean) {
-    const response: { getCollection: Collection } = await this.api.request(
+    const response: { collection: Collection } = await this.api.request(
       `#graphql
       query($collection: String!, $includeDocuments: Boolean!){
-        getCollection(collection: $collection){
+        collection(collection: $collection){
           name
           label
           format
@@ -78,10 +78,10 @@ export class TinaAdminApi {
   }
 
   async fetchDocument(collectionName: string, relativePath: string) {
-    const response: { getDocument: DocumentForm } = await this.api.request(
+    const response: { document: DocumentForm } = await this.api.request(
       `#graphql
       query($collection: String!, $relativePath: String!) {
-        getDocument(collection:$collection, relativePath:$relativePath) {
+        document(collection:$collection, relativePath:$relativePath) {
           ... on Document {
             form
             values
@@ -97,8 +97,8 @@ export class TinaAdminApi {
   async fetchDocumentFields() {
     const response: GetDocumentFields = await this.api.request(
       `#graphql
-      query { 
-        getDocumentFields 
+      query {
+        getDocumentFields
       }`,
       { variables: {} }
     )
@@ -140,7 +140,7 @@ export class TinaAdminApi {
     const response = await this.api.request(
       `#graphql
       mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-        updateDocument( 
+        updateDocument(
           collection: $collection,
           relativePath: $relativePath,
           params: $params
