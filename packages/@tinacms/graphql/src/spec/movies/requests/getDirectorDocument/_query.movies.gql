@@ -1,5 +1,5 @@
 query {
-  getDirectorDocument(relativePath: "george.md") {
+  director (relativePath: "george.md") {
     id
     data {
       name

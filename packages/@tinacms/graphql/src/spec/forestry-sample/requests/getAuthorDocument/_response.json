@@ -1,6 +1,6 @@
 {
   "data": {
-    "getAuthorDocument": {
+    "author": {
       "__typename": "AuthorDocument",
       "data": {
         "name": "Homer J Simpson",

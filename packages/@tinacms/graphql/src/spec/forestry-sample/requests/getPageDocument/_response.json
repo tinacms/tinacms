@@ -1,6 +1,6 @@
 {
   "data": {
-    "getPageDocument": {
+    "page": {
       "id": "content/pages/home.md",
       "data": {
         "title": "Welcome",
