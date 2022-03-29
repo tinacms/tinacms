@@ -100,7 +100,6 @@ const BranchSelector = ({
 }) => {
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
-  const displayBranches = branchList.find((branch) => branch.name === filter)
   const filteredBranchList = branchList.filter(
     (branch) => !filter || branch.name.includes(filter)
   )
@@ -126,7 +125,7 @@ const BranchSelector = ({
           </button>
         )}
       </div>
-      {!displayBranches && filter && (
+      {filteredBranchList.length === 0 && (
         <div className="block relative text-gray-300 italic py-1">
           No branches to display
         </div>
