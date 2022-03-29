@@ -1,0 +1,32 @@
+# Blueprint
+# getPostDocument
+#
+# Documents for blueprint
+# ================
+# content/posts/post1.mdx
+#
+# Field blueprints
+# ================
+# author
+# 
+
+
+query QueryOperation {
+  getPostDocument(relativePath: "post1.mdx") {
+    data {
+      author {
+        ... on Document {
+          id
+        }
+      }
+    }
+    _internalSys: sys {
+      path
+      collection {
+        name
+      }
+    }
+    form
+    values
+  }
+}
