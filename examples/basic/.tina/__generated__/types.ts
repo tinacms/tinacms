@@ -100,6 +100,7 @@ export type QueryGetDocumentListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 
@@ -113,6 +114,7 @@ export type QueryGetPageListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 
@@ -126,6 +128,7 @@ export type QueryGetPostListArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 export type DocumentConnectionEdges = {
@@ -160,6 +163,7 @@ export type CollectionDocumentsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 export type DocumentNode = PageDocument | PostDocument;

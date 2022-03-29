@@ -32,19 +32,19 @@ const schema = defineSchema({
           ui: {
             // defaultValue: 'Title',
             // Examples of how you COULD use a custom form
-            component: ({ form, field, input }) => {
-              return (
-                <div>
-                  <label>This is a test</label>
-                  <input {...input}></input>
-                </div>
-              )
-            },
-            // validate: (val) => {
-            //   if (val?.length > 5) {
-            //     return 'Too Long!!!'
-            //   }
+            // component: ({ form, field, input }) => {
+            //   return (
+            //     <div>
+            //       <label>This is a test</label>
+            //       <input {...input}></input>
+            //     </div>
+            //   )
             // },
+            validate: (val) => {
+              if (val?.length > 5) {
+                return 'Too Long!!!'
+              }
+            },
           },
         },
         {
