@@ -472,10 +472,6 @@ export class Database {
         (collection) => documentPath.startsWith(collection.path)
       )
 
-      if (!collection) {
-        throw new Error(`Unable to find collection for ${documentPath}`)
-      }
-
       if (!pathsByCollection[collection.name]) {
         pathsByCollection[collection.name] = []
       }
@@ -570,21 +566,29 @@ type UnionDataLookup = {
 const _indexContent = async (
   database: Database,
   documentPaths: string[],
-  collection:
+  collection?:
     | CollectionFieldsWithNamespace<true>
     | CollectionTemplatesWithNamespace<true>
 ) => {
-  const indexDefinitions = await database.getIndexDefinitions()
-  const collectionIndexDefinitions = indexDefinitions?.[collection.name]
-  if (!collectionIndexDefinitions) {
-    throw new Error(`No indexDefinitions for collection ${collection.name}`)
-  }
+  let seedOptions: object | undefined = undefined
+  if (collection) {
+    const indexDefinitions = await database.getIndexDefinitions()
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    if (!collectionIndexDefinitions) {
+      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+    }
 
-  const numIndexes = Object.keys(collectionIndexDefinitions).length
-  if (numIndexes > 20) {
-    throw new Error(
-      `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
-    )
+    const numIndexes = Object.keys(collectionIndexDefinitions).length
+    if (numIndexes > 20) {
+      throw new Error(
+        `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
+      )
+    }
+
+    seedOptions = {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    }
   }
 
   await sequential(documentPaths, async (filepath) => {
@@ -593,10 +597,7 @@ const _indexContent = async (
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, {
-        collection: collection.name,
-        indexDefinitions: collectionIndexDefinitions,
-      })
+      await database.store.seed(filepath, data, seedOptions)
     }
   })
 }
