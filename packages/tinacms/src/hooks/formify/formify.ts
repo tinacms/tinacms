@@ -382,6 +382,9 @@ export const formify = async ({
     path: BlueprintPath[]
   }) => {
     const type = util.getSelectedUnionType(parentType, inlineFragmentNode)
+    if (!type) {
+      return inlineFragmentNode
+    }
 
     if (util.isFormifiableDocument(type)) {
       return formifyInlineFragmentDocument({

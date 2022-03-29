@@ -27,7 +27,12 @@ const requestList = []
  */
 const SET_MOCKS_FROM_LOCAL_SERVER = false
 
-export const testRunner = async (query, events, dirname) => {
+export const testRunner = async (
+  query,
+  events,
+  dirname,
+  expectNoChange?: boolean
+) => {
   if (SET_MOCKS_FROM_LOCAL_SERVER) {
     const { fetch: origFetch } = global
     // @ts-ignore
@@ -107,8 +112,20 @@ export const testRunner = async (query, events, dirname) => {
             return result.current.changeSets.length > 0
           })
         } catch (e) {
+          // We didn't expect any changes, so that's good
+          if (expectNoChange) {
+            return
+          }
           throw new Error(
             `No changesets generated from event #${i + 1}, type: ${
+              event.mutationType.type
+            }`
+          )
+        }
+        // We didn't expect any changes, but we received one
+        if (expectNoChange) {
+          throw new Error(
+            `Expected no change but got changeset for event #${i + 1}, type: ${
               event.mutationType.type
             }`
           )
