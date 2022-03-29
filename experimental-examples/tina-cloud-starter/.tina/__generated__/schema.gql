@@ -30,15 +30,15 @@ interface Node {
 
 """"""
 interface Document {
-  sys: SystemInfo
   id: ID!
-  form: JSON!
-  values: JSON!
+  _sys: SystemInfo
+  _values: JSON!
 }
 
 """A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Float!
+  pageInfo: PageInfo!
 }
 
 type Query {
@@ -46,28 +46,27 @@ type Query {
   collection(collection: String): Collection!
   collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
-  getDocumentFields: JSON!
-  getPostsDocument(relativePath: String): PostsDocument!
-  getPostsList(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
-  getGlobalDocument(relativePath: String): GlobalDocument!
-  getGlobalList(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
-  getAuthorsDocument(relativePath: String): AuthorsDocument!
-  getAuthorsList(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
-  getZodiacsDocument(relativePath: String): ZodiacsDocument!
-  getZodiacsList(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
-  getPagesDocument(relativePath: String): PagesDocument!
-  getPagesList(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  posts(relativePath: String): PostsDocument!
+  postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
+  global(relativePath: String): GlobalDocument!
+  globalConnection(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
+  authors(relativePath: String): AuthorsDocument!
+  authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
+  zodiacs(relativePath: String): ZodiacsDocument!
+  zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
+  pages(relativePath: String): PagesDocument!
+  pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
 }
 
 type DocumentConnectionEdges {
-  cursor: String
+  cursor: String!
   node: DocumentNode
 }
 
 type DocumentConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DocumentConnectionEdges]
 }
@@ -88,7 +87,7 @@ union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsD
 
 union PostsAuthorDocument = AuthorsDocument
 
-type Posts {
+type PostsDocument implements Node & Document {
   _body: JSON
   title: String
   published: Boolean
@@ -97,24 +96,18 @@ type Posts {
   date: String
   heroImg: String
   excerpt: String
-}
-
-type PostsDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Posts!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type PostsConnectionEdges {
-  cursor: String
+  cursor: String!
   node: PostsDocument
 }
 
 type PostsConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [PostsConnectionEdges]
 }
@@ -155,28 +148,22 @@ type GlobalTheme {
   darkMode: String
 }
 
-type Global {
+type GlobalDocument implements Node & Document {
   header: GlobalHeader
   footer: GlobalFooter
   theme: GlobalTheme
-}
-
-type GlobalDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Global!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type GlobalConnectionEdges {
-  cursor: String
+  cursor: String!
   node: GlobalDocument
 }
 
 type GlobalConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [GlobalConnectionEdges]
 }
@@ -187,52 +174,40 @@ type AuthorsDetails {
   zodiac: AuthorsDetailsZodiacDocument
 }
 
-type Authors {
+type AuthorsDocument implements Node & Document {
   name: String
   avatar: String
   details: [AuthorsDetails]
-}
-
-type AuthorsDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Authors!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type AuthorsConnectionEdges {
-  cursor: String
+  cursor: String!
   node: AuthorsDocument
 }
 
 type AuthorsConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [AuthorsConnectionEdges]
 }
 
-type Zodiacs {
-  name: String
-}
-
 type ZodiacsDocument implements Node & Document {
+  name: String
   id: ID!
-  sys: SystemInfo!
-  data: Zodiacs!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type ZodiacsConnectionEdges {
-  cursor: String
+  cursor: String!
   node: ZodiacsDocument
 }
 
 type ZodiacsConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [ZodiacsConnectionEdges]
 }
@@ -288,34 +263,28 @@ type PagesBlocksTestimonial {
 
 union PagesBlocks = PagesBlocksHero | PagesBlocksFeatures | PagesBlocksContent | PagesBlocksTestimonial
 
-type Pages {
-  blocks: [PagesBlocks]
-}
-
 type PagesDocument implements Node & Document {
+  blocks: [PagesBlocks]
   id: ID!
-  sys: SystemInfo!
-  data: Pages!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type PagesConnectionEdges {
-  cursor: String
+  cursor: String!
   node: PagesDocument
 }
 
 type PagesConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [PagesConnectionEdges]
 }
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  update(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  create(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePosts(relativePath: String!, params: PostsMutation!): PostsDocument!
   createPosts(relativePath: String!, params: PostsMutation!): PostsDocument!
   updateGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
