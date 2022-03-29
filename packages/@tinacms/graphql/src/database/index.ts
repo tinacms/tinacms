@@ -465,6 +465,7 @@ export class Database {
 
   public indexContentByPaths = async (documentPaths: string[]) => {
     const pathsByCollection: Record<string,string[]> = {}
+    const nonCollectionPaths: string[] = []
     const collections: Record<string,CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>> = {}
     const tinaSchema = await this.getSchema()
     for (const documentPath of documentPaths) {
@@ -472,16 +473,21 @@ export class Database {
         (collection) => documentPath.startsWith(collection.path)
       )
 
-      if (!pathsByCollection[collection.name]) {
-        pathsByCollection[collection.name] = []
+      if (collection) {
+        if (!pathsByCollection[collection.name]) {
+          pathsByCollection[collection.name] = []
+        }
+        collections[collection.name] = collection
+        pathsByCollection[collection.name].push(documentPath)
+      } else {
+        nonCollectionPaths.push(documentPath)
       }
-
-      pathsByCollection[collection.name].push(documentPath)
     }
 
     for (const collection of Object.keys(pathsByCollection)) {
       await _indexContent(this, pathsByCollection[collection], collections[collection])
     }
+    await _indexContent(this, nonCollectionPaths)
   }
 
   public _indexAllContent = async () => {
