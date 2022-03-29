@@ -463,13 +463,29 @@ export class Database {
     }
   }
 
-  public indexContentByPaths = async (
-    documentPaths: string[],
-    collection:
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-  ) => {
-    await _indexContent(this, documentPaths, collection)
+  public indexContentByPaths = async (documentPaths: string[]) => {
+    const pathsByCollection: Record<string,string[]> = {}
+    const collections: Record<string,CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>> = {}
+    const tinaSchema = await this.getSchema()
+    for (const documentPath of documentPaths) {
+      const collection = tinaSchema.schema.collections.find(
+        (collection) => documentPath.startsWith(collection.path)
+      )
+
+      if (!collection) {
+        throw new Error(`Unable to find collection for ${documentPath}`)
+      }
+
+      if (!pathsByCollection[collection.name]) {
+        pathsByCollection[collection.name] = []
+      }
+
+      pathsByCollection[collection.name].push(documentPath)
+    }
+
+    for (const collection of Object.keys(pathsByCollection)) {
+      await _indexContent(this, pathsByCollection[collection], collections[collection])
+    }
   }
 
   public _indexAllContent = async () => {
