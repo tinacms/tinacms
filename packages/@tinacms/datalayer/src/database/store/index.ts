@@ -11,9 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { JSONPath } from 'jsonpath-plus'
-
 import { FilterOperand } from '../../index'
+import { JSONPath } from 'jsonpath-plus'
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 
@@ -174,6 +173,13 @@ export type FilterCondition = {
   filterPath: string
 }
 
+const getFilterOperator = (
+  expression: Record<string, FilterOperand>,
+  operand: string
+) => {
+  return (expression[operand] || expression[operand] === 0) && operand
+}
+
 export const makeFilterChain = ({
   conditions,
 }: {
@@ -203,15 +209,17 @@ export const makeFilterChain = ({
       })
     } else if (key1 && key2) {
       const leftFilterOperator =
-        (filterExpression['gt'] && 'gt') ||
-        (filterExpression['gte'] && 'gte') ||
-        (filterExpression['after'] && 'after') ||
+        getFilterOperator(filterExpression, 'gt') ||
+        getFilterOperator(filterExpression, 'gte') ||
+        getFilterOperator(filterExpression, 'after') ||
         undefined
+
       const rightFilterOperator =
-        (filterExpression['lt'] && 'lt') ||
-        (filterExpression['lte'] && 'lte') ||
-        (filterExpression['before'] && 'before') ||
+        getFilterOperator(filterExpression, 'lt') ||
+        getFilterOperator(filterExpression, 'lte') ||
+        getFilterOperator(filterExpression, 'before') ||
         undefined
+
       let leftOperand: FilterOperand
       let rightOperand: FilterOperand
       if (rightFilterOperator && leftFilterOperator) {
