@@ -64,12 +64,12 @@ const mutationFixtures: Fixture[] = [
     assert: 'file',
     filename: 'content/stuff/my-stuff.md',
   },
-  {
-    name: 'updateDocument',
-    description: 'Updating a document works',
-    assert: 'file',
-    filename: 'content/posts/hello-world.md',
-  },
+  // {
+  //   name: 'updateDocument',
+  //   description: 'Updating a document works',
+  //   assert: 'file',
+  //   filename: 'content/posts/hello-world.md',
+  // },
 ]
 
 beforeEach(async () => {

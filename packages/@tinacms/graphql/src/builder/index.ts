@@ -39,6 +39,7 @@ import type {
   Template,
 } from '../types'
 import { TinaSchema } from '../schema'
+import { TinaCollection } from '..'
 
 export const createBuilder = async ({
   database,
@@ -307,7 +308,7 @@ export class Builder {
     collections: TinaCloudCollectionEnriched[]
   ) => {
     return astBuilder.FieldDefinition({
-      name: 'create',
+      name: 'createDocument',
       args: [
         astBuilder.InputValueDefinition({
           name: 'collection',
@@ -350,7 +351,7 @@ export class Builder {
     collections: TinaCloudCollectionEnriched[]
   ) => {
     return astBuilder.FieldDefinition({
-      name: 'update',
+      name: 'updateDocument',
       args: [
         astBuilder.InputValueDefinition({
           name: 'collection',
@@ -697,9 +698,35 @@ export class Builder {
     const documentTypeName = NAMER.documentTypeName(collection.namespace)
     const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection)
     if (templateInfo.type === 'union') {
-      return this._buildObjectOrUnionData({
-        ...templateInfo,
-      })
+      return this._buildObjectOrUnionData(
+        {
+          ...templateInfo,
+        },
+        [
+          astBuilder.FieldDefinition({
+            name: 'id',
+            required: true,
+            type: astBuilder.TYPES.ID,
+          }),
+          astBuilder.FieldDefinition({
+            name: '_sys',
+            required: true,
+            type: astBuilder.TYPES.SystemInfo,
+          }),
+          ...extraFields,
+          astBuilder.FieldDefinition({
+            name: '_values',
+            required: true,
+            type: 'JSON',
+          }),
+        ],
+        [
+          astBuilder.NamedType({ name: astBuilder.TYPES.Node }),
+          astBuilder.NamedType({ name: astBuilder.TYPES.Document }),
+          ...extraInterfaces,
+        ],
+        collection
+      )
     }
     const fields = templateInfo.template.fields
     const templateFields = await sequential(fields, async (field) => {
@@ -1092,7 +1119,10 @@ export class Builder {
   }
 
   private _buildObjectOrUnionData = async (
-    collectableTemplate: CollectionTemplateable
+    collectableTemplate: CollectionTemplateable,
+    extraFields = [],
+    extraInterfaces = [],
+    collection?: TinaCloudCollectionEnriched
   ): Promise<UnionTypeDefinitionNode | ObjectTypeDefinitionNode> => {
     if (collectableTemplate.type === 'union') {
       const name = NAMER.dataTypeName(collectableTemplate.namespace)
@@ -1100,7 +1130,11 @@ export class Builder {
       const types = await sequential(
         collectableTemplate.templates,
         async (template) => {
-          const type = await this._buildTemplateData(template)
+          const type = await this._buildTemplateData(
+            template,
+            extraFields,
+            extraInterfaces
+          )
           typeMap[template.namespace[template.namespace.length - 1]] =
             type.name.value
           return type
@@ -1110,6 +1144,7 @@ export class Builder {
       await this.database.addToLookupMap({
         type: name,
         resolveType: 'unionData',
+        collection: collection?.name,
         typeMap,
       })
 
@@ -1297,12 +1332,20 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
     }
   }
 
-  private _buildTemplateData = async ({ namespace, fields }: Templateable) => {
+  private _buildTemplateData = async (
+    { namespace, fields }: Templateable,
+    extraFields = [],
+    extraInterfaces = []
+  ) => {
     return astBuilder.ObjectTypeDefinition({
       name: NAMER.dataTypeName(namespace),
-      fields: await sequential(fields, async (field) => {
-        return this._buildDataField(field)
-      }),
+      interfaces: extraInterfaces || [],
+      fields: [
+        ...(await sequential(fields, async (field) => {
+          return this._buildDataField(field)
+        })),
+        ...extraFields,
+      ],
     })
   }
 }

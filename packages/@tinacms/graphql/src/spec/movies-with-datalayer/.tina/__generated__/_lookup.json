@@ -52,17 +52,11 @@
   "Crew": {
     "type": "Crew",
     "resolveType": "unionData",
+    "collection": "crew",
     "typeMap": {
       "costumeDesigner": "CrewCostumeDesigner",
       "stuntPerson": "CrewStuntPerson"
     }
-  },
-  "CrewDocument": {
-    "type": "CrewDocument",
-    "resolveType": "collectionDocument",
-    "collection": "crew",
-    "createCrew": "create",
-    "updateCrew": "update"
   },
   "CrewConnection": {
     "type": "CrewConnection",
@@ -80,5 +74,32 @@
     "type": "ActorConnection",
     "resolveType": "collectionDocumentList",
     "collection": "actor"
+  },
+  "MovieDirector": {
+    "type": "MovieDirector",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "Movie": {
+    "type": "Movie",
+    "resolveType": "collectionDocument",
+    "collection": "movie",
+    "createMovie": "create",
+    "updateMovie": "update"
+  },
+  "Director": {
+    "type": "Director",
+    "resolveType": "collectionDocument",
+    "collection": "director",
+    "createDirector": "create",
+    "updateDirector": "update"
+  },
+  "Actor": {
+    "type": "Actor",
+    "resolveType": "collectionDocument",
+    "collection": "actor",
+    "createActor": "create",
+    "updateActor": "update"
   }
 }

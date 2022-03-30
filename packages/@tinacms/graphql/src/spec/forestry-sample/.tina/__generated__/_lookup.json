@@ -22,6 +22,7 @@
   "Author": {
     "type": "Author",
     "resolveType": "unionData",
+    "collection": "author",
     "typeMap": {
       "author": "AuthorAuthor"
     }
@@ -47,6 +48,7 @@
   "Post": {
     "type": "Post",
     "resolveType": "unionData",
+    "collection": "post",
     "typeMap": {
       "post": "PostPost"
     }
@@ -86,6 +88,7 @@
   "Stuff": {
     "type": "Stuff",
     "resolveType": "unionData",
+    "collection": "stuff",
     "typeMap": {
       "template_1": "StuffTemplate_1",
       "template_2": "StuffTemplate_2",
@@ -103,5 +106,18 @@
     "type": "StuffConnection",
     "resolveType": "collectionDocumentList",
     "collection": "stuff"
+  },
+  "PostPostAuthor": {
+    "type": "PostPostAuthor",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "Page": {
+    "type": "Page",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPage": "create",
+    "updatePage": "update"
   }
 }

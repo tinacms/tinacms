@@ -113,7 +113,9 @@ export class Resolver {
       )
 
       return {
-        __typename: NAMER.documentTypeName([rawData._collection]),
+        __typename: collection.fields
+          ? NAMER.documentTypeName(collection.namespace)
+          : NAMER.documentTypeName(template.namespace),
         id: fullPath,
         ...data,
         _sys: {

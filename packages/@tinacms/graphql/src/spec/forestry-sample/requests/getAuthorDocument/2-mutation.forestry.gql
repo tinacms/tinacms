@@ -8,11 +8,9 @@ mutation {
       }
     }
   ) {
-    id
-    data {
-      ... on AuthorAuthor {
-        name
-      }
+    ... on AuthorAuthor {
+      id
+      name
     }
   }
 }

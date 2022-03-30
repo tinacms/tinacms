@@ -301,6 +301,18 @@ export const resolve = async ({
             // `unionData` is used by the typeResolver, need to keep this check in-place
             // This is an array in many cases so it's easier to just pass it through
             // to be handled by the `typeResolver`
+            if (!value) {
+              // FIXME: unionData doesn't have enough info
+              const result = await resolver.resolveDocument({
+                args,
+                collection: lookup.collection,
+                isMutation,
+                isCreation,
+                isAddPendingDocument: false,
+                isCollectionSpecific: true,
+              })
+              return result
+            }
             return value
           default:
             console.error(lookup)

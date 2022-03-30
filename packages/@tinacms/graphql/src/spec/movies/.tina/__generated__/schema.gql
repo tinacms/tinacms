@@ -29,15 +29,15 @@ interface Node {
 
 """"""
 interface Document {
-  sys: SystemInfo
   id: ID!
-  form: JSON!
-  values: JSON!
+  _sys: SystemInfo
+  _values: JSON!
 }
 
 """A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Float!
+  pageInfo: PageInfo!
 }
 
 type Query {
@@ -47,22 +47,21 @@ type Query {
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
   documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
-  getDocumentFields: JSON!
-  movie(relativePath: String): MovieDocument!
+  movie(relativePath: String): Movie!
   movieConnection(before: String, after: String, first: Float, last: Float, sort: String): MovieConnection!
-  director(relativePath: String): DirectorDocument!
+  director(relativePath: String): Director!
   directorConnection(before: String, after: String, first: Float, last: Float, sort: String): DirectorConnection!
-  actor(relativePath: String): ActorDocument!
+  actor(relativePath: String): Actor!
   actorConnection(before: String, after: String, first: Float, last: Float, sort: String): ActorConnection!
 }
 
 type DocumentConnectionEdges {
-  cursor: String
+  cursor: String!
   node: DocumentNode
 }
 
 type DocumentConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DocumentConnectionEdges]
 }
@@ -79,85 +78,67 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
+union DocumentNode = Movie | Director | Actor
 
-union MovieDirectorDocument = DirectorDocument
+union MovieDirector = Director
 
-type Movie {
+type Movie implements Node & Document {
   title: String
   releaseDate: String
   rating: Float
   archived: Boolean
   genre: String
-  director: MovieDirectorDocument
+  director: MovieDirector
   body: JSON
-}
-
-type MovieDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Movie!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type MovieConnectionEdges {
-  cursor: String
-  node: MovieDocument
+  cursor: String!
+  node: Movie
 }
 
 type MovieConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [MovieConnectionEdges]
 }
 
-type Director {
+type Director implements Node & Document {
   name: String
-}
-
-type DirectorDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Director!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type DirectorConnectionEdges {
-  cursor: String
-  node: DirectorDocument
+  cursor: String!
+  node: Director
 }
 
 type DirectorConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DirectorConnectionEdges]
 }
 
-type Actor {
+type Actor implements Node & Document {
   name: String
   body: String
-}
-
-type ActorDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Actor!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type ActorConnectionEdges {
-  cursor: String
-  node: ActorDocument
+  cursor: String!
+  node: Actor
 }
 
 type ActorConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [ActorConnectionEdges]
 }
@@ -166,12 +147,12 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateMovie(relativePath: String!, params: MovieMutation!): Movie!
+  createMovie(relativePath: String!, params: MovieMutation!): Movie!
+  updateDirector(relativePath: String!, params: DirectorMutation!): Director!
+  createDirector(relativePath: String!, params: DirectorMutation!): Director!
+  updateActor(relativePath: String!, params: ActorMutation!): Actor!
+  createActor(relativePath: String!, params: ActorMutation!): Actor!
 }
 
 input DocumentMutation {

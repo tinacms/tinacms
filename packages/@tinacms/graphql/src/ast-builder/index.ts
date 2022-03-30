@@ -936,7 +936,7 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Collection')
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Document')
+    return generateNamespacedFieldName(namespace)
   },
   dataTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '')
