@@ -97,30 +97,26 @@ const RenderForm = ({
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
-  let schemaFields = document.form.fields
-
-  if (schema) {
-    // the schema is being passed in from the frontend so we can use that
-    const schemaCollection = schema.getCollection(collection.name)
-    const template = schema.getTemplateForData({
-      collection: schemaCollection,
-      data: document.value,
-    })
-    const formInfo = resolveForm({
-      collection: schemaCollection,
-      basename: schemaCollection.name,
-      schema: schema,
-      template,
-    })
-    schemaFields = formInfo.fields
-  }
+  // the schema is being passed in from the frontend so we can use that
+  const schemaCollection = schema.getCollection(collection.name)
+  const template = schema.getTemplateForData({
+    collection: schemaCollection,
+    data: document.value,
+  })
+  const formInfo = resolveForm({
+    collection: schemaCollection,
+    basename: schemaCollection.name,
+    schema: schema,
+    template,
+  })
+  const schemaFields = formInfo.fields
 
   const form = useMemo(() => {
     return new Form({
       id: 'update-form',
       label: 'form',
       fields: schemaFields,
-      initialValues: document.values,
+      initialValues: document._values,
       onSubmit: async (values) => {
         try {
           await updateDocument(

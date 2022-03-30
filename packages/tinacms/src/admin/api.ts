@@ -56,7 +56,7 @@ export class TinaAdminApi {
             edges {
               node {
                 ... on Document {
-                  sys {
+                  _sys {
                     template
                     breadcrumbs
                     path
@@ -83,24 +83,11 @@ export class TinaAdminApi {
       query($collection: String!, $relativePath: String!) {
         document(collection:$collection, relativePath:$relativePath) {
           ... on Document {
-            form
-            values
+            _values
           }
         }
       }`,
       { variables: { collection: collectionName, relativePath } }
-    )
-
-    return response
-  }
-
-  async fetchDocumentFields() {
-    const response: GetDocumentFields = await this.api.request(
-      `#graphql
-      query {
-        getDocumentFields
-      }`,
-      { variables: {} }
     )
 
     return response

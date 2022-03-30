@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import React, { useState, useEffect } from 'react'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { TinaAdminApi } from '../api'
 import LoadingPage from './LoadingPage'
@@ -40,18 +41,20 @@ export const useGetDocumentFields = (
   })
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
+  const schema: TinaSchema | undefined = cms.api.tina.schema
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
       if (await api.isAuthenticated()) {
         try {
-          const response = await api.fetchDocumentFields()
-          const documentFields = response.getDocumentFields
-          const collection: Object = documentFields[collectionName].collection
+          const collection = schema.getCollection(collectionName)
           const mutationInfo: {
             includeCollection: boolean
             includeTemplate: boolean
-          } = documentFields[collectionName].mutationInfo
+          } = {
+            includeCollection: true,
+            includeTemplate: !!collection.templates,
+          }
           let fields: Object[] = undefined
           let template: { name: string; label: string } = undefined
 
@@ -60,15 +63,13 @@ export const useGetDocumentFields = (
            */
           if (
             templateName &&
-            documentFields[collectionName].templates &&
-            documentFields[collectionName].templates[templateName]
+            collection.templates &&
+            collection.templates[templateName]
           ) {
-            template =
-              documentFields[collectionName].templates[templateName].template
-            fields =
-              documentFields[collectionName].templates[templateName].fields
+            template = collection.templates[templateName].template
+            fields = collection.templates[templateName].fields
           } else {
-            fields = documentFields[collectionName].fields
+            fields = collection.fields
           }
 
           setInfo({

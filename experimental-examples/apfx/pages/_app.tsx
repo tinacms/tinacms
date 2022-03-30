@@ -7,6 +7,14 @@ import { useTina } from 'tinacms/dist/edit-state'
 import Tina from '../.tina/components/TinaDynamicProvider'
 
 const App = (props) => {
+  const { pathname } = useRouter()
+  if (pathname.includes('admin')) {
+    return (
+      <Tina>
+        <props.Component {...props.pageProps} />
+      </Tina>
+    )
+  }
   return (
     <Tina>
       <Page {...props} />

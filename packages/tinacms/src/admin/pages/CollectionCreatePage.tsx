@@ -87,27 +87,23 @@ const CollectionCreatePage = () => {
   )
 }
 
-const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
+const RenderForm = ({ cms, collection, fields, mutationInfo }) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
-  let schemaFields = fields
-
-  if (schema) {
-    // the schema is being passed in from the frontend so we can use that
-    const schemaCollection = schema.getCollection(collection.name)
-    const template = schema.getTemplateForData({
-      collection: schemaCollection,
-      data: {},
-    })
-    const formInfo = resolveForm({
-      collection: schemaCollection,
-      basename: schemaCollection.name,
-      schema: schema,
-      template,
-    })
-    schemaFields = formInfo.fields
-  }
+  // the schema is being passed in from the frontend so we can use that
+  const schemaCollection = schema.getCollection(collection.name)
+  const template = schema.getTemplateForData({
+    collection: schemaCollection,
+    data: {},
+  })
+  const formInfo = resolveForm({
+    collection: schemaCollection,
+    basename: schemaCollection.name,
+    schema: schema,
+    template,
+  })
+  const schemaFields = formInfo.fields
 
   const form = useMemo(() => {
     return new Form({

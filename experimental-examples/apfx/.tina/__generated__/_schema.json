@@ -212,7 +212,7 @@
           "name": "publishDate",
           "type": "datetime",
           "ui": {
-            "defaultValue": "2022-03-30T19:50:07.345Z"
+            "defaultValue": "2022-03-30T22:53:59.329Z"
           },
           "namespace": [
             "news",
