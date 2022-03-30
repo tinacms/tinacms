@@ -31,7 +31,6 @@ const App = ({ Component, pageProps }) => {
                * Enables the Branch Switcher
                */
               cms.flags.set("branch-switcher", true);
-              cms.flags.set("use-unstable-formify", true);
 
               /**
                * Plugins
