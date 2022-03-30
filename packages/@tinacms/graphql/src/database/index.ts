@@ -463,13 +463,31 @@ export class Database {
     }
   }
 
-  public indexContentByPaths = async (
-    documentPaths: string[],
-    collection:
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-  ) => {
-    await _indexContent(this, documentPaths, collection)
+  public indexContentByPaths = async (documentPaths: string[]) => {
+    const pathsByCollection: Record<string,string[]> = {}
+    const nonCollectionPaths: string[] = []
+    const collections: Record<string,CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>> = {}
+    const tinaSchema = await this.getSchema()
+    for (const documentPath of documentPaths) {
+      const collection = tinaSchema.schema.collections.find(
+        (collection) => documentPath.startsWith(collection.path)
+      )
+
+      if (collection) {
+        if (!pathsByCollection[collection.name]) {
+          pathsByCollection[collection.name] = []
+        }
+        collections[collection.name] = collection
+        pathsByCollection[collection.name].push(documentPath)
+      } else {
+        nonCollectionPaths.push(documentPath)
+      }
+    }
+
+    for (const collection of Object.keys(pathsByCollection)) {
+      await _indexContent(this, pathsByCollection[collection], collections[collection])
+    }
+    await _indexContent(this, nonCollectionPaths)
   }
 
   public _indexAllContent = async () => {
@@ -554,21 +572,29 @@ type UnionDataLookup = {
 const _indexContent = async (
   database: Database,
   documentPaths: string[],
-  collection:
+  collection?:
     | CollectionFieldsWithNamespace<true>
     | CollectionTemplatesWithNamespace<true>
 ) => {
-  const indexDefinitions = await database.getIndexDefinitions()
-  const collectionIndexDefinitions = indexDefinitions?.[collection.name]
-  if (!collectionIndexDefinitions) {
-    throw new Error(`No indexDefinitions for collection ${collection.name}`)
-  }
+  let seedOptions: object | undefined = undefined
+  if (collection) {
+    const indexDefinitions = await database.getIndexDefinitions()
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    if (!collectionIndexDefinitions) {
+      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+    }
 
-  const numIndexes = Object.keys(collectionIndexDefinitions).length
-  if (numIndexes > 20) {
-    throw new Error(
-      `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
-    )
+    const numIndexes = Object.keys(collectionIndexDefinitions).length
+    if (numIndexes > 20) {
+      throw new Error(
+        `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
+      )
+    }
+
+    seedOptions = {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    }
   }
 
   await sequential(documentPaths, async (filepath) => {
@@ -577,10 +603,7 @@ const _indexContent = async (
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, {
-        collection: collection.name,
-        indexDefinitions: collectionIndexDefinitions,
-      })
+      await database.store.seed(filepath, data, seedOptions)
     }
   })
 }
