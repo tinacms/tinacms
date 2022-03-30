@@ -1,0 +1,235 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Adren';
+  src: url('/fonts/Adren-black.otf');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ardent';
+  src: url('/fonts/Ardent-Sans bold.otf');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ardent';
+  src: url('/fonts/Ardent-Sans regular.otf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Ardent';
+  src: url('/fonts/Ardent-Sans light.otf');
+  font-style: thin;
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Article';
+  src: url('/fonts/Article-light.otf');
+  font-style: thin;
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Article';
+  src: url('/fonts/Article-regular.otf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Article';
+  src: url('/fonts/Article-bold.otf');
+  font-style: bold;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pulse';
+  src: url('/fonts/Pulse light.otf');
+  font-style: thin;
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pulse';
+  src: url('/fonts/Pulse regular.otf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pulse';
+  src: url('/fonts/Pulse bold.otf');
+  font-style: bold;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bristan Rought';
+  src: url('/fonts/BristainRought.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Berlin';
+  src: url('/fonts/Berlin-Bold.woff2');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Brooklyn';
+  src: url('/fonts/Brooklyn-Bold.ttf');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lumiera';
+  src: url('/fonts/Lumiera.woff');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Moneta';
+  src: url('/fonts/Moneta-Bold.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Nord';
+  src: url('/fonts/Nord-Bold.ttf');
+  font-style: black;
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Quart';
+  src: url('/fonts/Quart-Regular.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Recoleta';
+  src: url('/fonts/Recoleta-Medium.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Wensley';
+  src: url('/fonts/Wensley-Bold.woff');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a.hover-smooth {
+  position: relative;
+  text-decoration: none;
+}
+
+a.hover-smooth::before {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: top left;
+  transition: transform 0.3s ease;
+}
+
+a.hover-smooth.active::before {
+  transform: scaleX(1);
+}
+a.hover-smooth:hover::before {
+  transform: scaleX(1);
+}
+
+.slideshow-text {
+  @apply pl-0;
+}
+@media (min-width: 768px) {
+  .slideshow-text {
+    @apply pl-96;
+  }
+}
+/* @media (min-width: 1800px) {
+  .slideshow-text {
+    @apply pl-72;
+  }
+} */
+@media (min-width: 2400px) {
+  .slideshow-text {
+    @apply pl-0;
+  }
+}
+
+.fade-in-text {
+  animation: fadeIn 5s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-ms-keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

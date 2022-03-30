@@ -20,14 +20,14 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PostsAuthorDocument": {
-    "type": "PostsAuthorDocument",
+  "PostsAuthor": {
+    "type": "PostsAuthor",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PostsDocument": {
-    "type": "PostsDocument",
+  "Posts": {
+    "type": "Posts",
     "resolveType": "collectionDocument",
     "collection": "posts",
     "createPosts": "create",
@@ -38,8 +38,8 @@
     "resolveType": "collectionDocumentList",
     "collection": "posts"
   },
-  "GlobalDocument": {
-    "type": "GlobalDocument",
+  "Global": {
+    "type": "Global",
     "resolveType": "collectionDocument",
     "collection": "global",
     "createGlobal": "create",
@@ -50,14 +50,14 @@
     "resolveType": "collectionDocumentList",
     "collection": "global"
   },
-  "AuthorsDetailsZodiacDocument": {
-    "type": "AuthorsDetailsZodiacDocument",
+  "AuthorsDetailsZodiac": {
+    "type": "AuthorsDetailsZodiac",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "AuthorsDocument": {
-    "type": "AuthorsDocument",
+  "Authors": {
+    "type": "Authors",
     "resolveType": "collectionDocument",
     "collection": "authors",
     "createAuthors": "create",
@@ -68,8 +68,8 @@
     "resolveType": "collectionDocumentList",
     "collection": "authors"
   },
-  "ZodiacsDocument": {
-    "type": "ZodiacsDocument",
+  "Zodiacs": {
+    "type": "Zodiacs",
     "resolveType": "collectionDocument",
     "collection": "zodiacs",
     "createZodiacs": "create",
@@ -90,8 +90,8 @@
       "testimonial": "PagesBlocksTestimonial"
     }
   },
-  "PagesDocument": {
-    "type": "PagesDocument",
+  "Pages": {
+    "type": "Pages",
     "resolveType": "collectionDocument",
     "collection": "pages",
     "createPages": "create",

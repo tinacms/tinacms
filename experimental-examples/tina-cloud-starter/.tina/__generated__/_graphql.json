@@ -730,7 +730,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostsDocument"
+                "value": "Posts"
               }
             }
           }
@@ -852,7 +852,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "GlobalDocument"
+                "value": "Global"
               }
             }
           }
@@ -974,7 +974,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "AuthorsDocument"
+                "value": "Authors"
               }
             }
           }
@@ -1096,7 +1096,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "ZodiacsDocument"
+                "value": "Zodiacs"
               }
             }
           }
@@ -1218,7 +1218,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PagesDocument"
+                "value": "Pages"
               }
             }
           }
@@ -1678,35 +1678,35 @@
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "PostsDocument"
+            "value": "Posts"
           }
         },
         {
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "GlobalDocument"
+            "value": "Global"
           }
         },
         {
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "AuthorsDocument"
+            "value": "Authors"
           }
         },
         {
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "ZodiacsDocument"
+            "value": "Zodiacs"
           }
         },
         {
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "PagesDocument"
+            "value": "Pages"
           }
         }
       ]
@@ -1715,7 +1715,7 @@
       "kind": "UnionTypeDefinition",
       "name": {
         "kind": "Name",
-        "value": "PostsAuthorDocument"
+        "value": "PostsAuthor"
       },
       "directives": [],
       "types": [
@@ -1723,7 +1723,7 @@
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "AuthorsDocument"
+            "value": "Authors"
           }
         }
       ]
@@ -1749,7 +1749,7 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "PostsDocument"
+        "value": "Posts"
       },
       "fields": [
         {
@@ -1823,7 +1823,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PostsAuthorDocument"
+              "value": "PostsAuthor"
             }
           }
         },
@@ -1966,7 +1966,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PostsDocument"
+              "value": "Posts"
             }
           }
         }
@@ -2405,7 +2405,7 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "GlobalDocument"
+        "value": "Global"
       },
       "fields": [
         {
@@ -2547,7 +2547,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "GlobalDocument"
+              "value": "Global"
             }
           }
         }
@@ -2630,7 +2630,7 @@
       "kind": "UnionTypeDefinition",
       "name": {
         "kind": "Name",
-        "value": "AuthorsDetailsZodiacDocument"
+        "value": "AuthorsDetailsZodiac"
       },
       "directives": [],
       "types": [
@@ -2638,7 +2638,7 @@
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "ZodiacsDocument"
+            "value": "Zodiacs"
           }
         }
       ]
@@ -2663,7 +2663,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "AuthorsDetailsZodiacDocument"
+              "value": "AuthorsDetailsZodiac"
             }
           }
         }
@@ -2690,7 +2690,7 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "AuthorsDocument"
+        "value": "Authors"
       },
       "fields": [
         {
@@ -2835,7 +2835,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "AuthorsDocument"
+              "value": "Authors"
             }
           }
         }
@@ -2935,7 +2935,7 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "ZodiacsDocument"
+        "value": "Zodiacs"
       },
       "fields": [
         {
@@ -3047,7 +3047,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "ZodiacsDocument"
+              "value": "Zodiacs"
             }
           }
         }
@@ -3654,7 +3654,7 @@
       "directives": [],
       "name": {
         "kind": "Name",
-        "value": "PagesDocument"
+        "value": "Pages"
       },
       "fields": [
         {
@@ -3769,7 +3769,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PagesDocument"
+              "value": "Pages"
             }
           }
         }
@@ -3928,7 +3928,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "update"
+            "value": "updateDocument"
           },
           "arguments": [
             {
@@ -3995,7 +3995,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "create"
+            "value": "createDocument"
           },
           "arguments": [
             {
@@ -4106,7 +4106,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostsDocument"
+                "value": "Posts"
               }
             }
           }
@@ -4159,7 +4159,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostsDocument"
+                "value": "Posts"
               }
             }
           }
@@ -4212,7 +4212,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "GlobalDocument"
+                "value": "Global"
               }
             }
           }
@@ -4265,7 +4265,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "GlobalDocument"
+                "value": "Global"
               }
             }
           }
@@ -4318,7 +4318,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "AuthorsDocument"
+                "value": "Authors"
               }
             }
           }
@@ -4371,7 +4371,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "AuthorsDocument"
+                "value": "Authors"
               }
             }
           }
@@ -4424,7 +4424,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "ZodiacsDocument"
+                "value": "Zodiacs"
               }
             }
           }
@@ -4477,7 +4477,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "ZodiacsDocument"
+                "value": "Zodiacs"
               }
             }
           }
@@ -4530,7 +4530,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PagesDocument"
+                "value": "Pages"
               }
             }
           }
@@ -4583,7 +4583,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PagesDocument"
+                "value": "Pages"
               }
             }
           }

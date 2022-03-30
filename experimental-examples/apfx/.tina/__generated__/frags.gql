@@ -1,0 +1,220 @@
+fragment LocaleInfoParts on LocaleInfo {
+  au {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+  us {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+  gb {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+}
+
+fragment NewsParts on News {
+  title
+  subTitle
+  image
+  publishDate
+  category
+  body
+}
+
+fragment FooterParts on Footer {
+  offices {
+    __typename
+    location
+    address
+    phone
+  }
+  disclaimers {
+    __typename
+    body
+  }
+}
+
+fragment ThemeParts on Theme {
+  displayFont
+  colorMode
+}
+
+fragment NavigationParts on Navigation {
+  items {
+    __typename
+    page {
+      ... on Document {
+        id
+      }
+    }
+  }
+}
+
+fragment PageParts on Page {
+  title
+  link
+  seo {
+    __typename
+    title
+    image
+    description
+  }
+  blocks {
+    __typename
+    ... on PageBlocksNews {
+      title
+      subTitle
+      description
+      newsItems {
+        __typename
+        article {
+          ... on Document {
+            id
+          }
+        }
+      }
+    }
+    ... on PageBlocksStatsWithImage {
+      title
+      subTitle
+      description
+      image
+      stats {
+        __typename
+        title
+        subTitle
+        description
+      }
+    }
+    ... on PageBlocksHero {
+      title
+      subTitle
+      description
+      image
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+    }
+    ... on PageBlocksSlideshow {
+      items {
+        __typename
+        title
+        subTitle
+        description
+        action {
+          __typename
+          callToAction
+          linkText
+          link
+          linkOverride
+          secondaryText
+          secondaryLink
+          secondaryLinkOverride
+        }
+        overlay {
+          __typename
+          image
+          overlayColor
+          overlayOpacity
+        }
+      }
+    }
+    ... on PageBlocksComparisonTable {
+      title
+      subTitle
+      description
+      items {
+        __typename
+        title
+        subTitle
+        description
+        bulletPoints
+        meta {
+          __typename
+          ... on PageBlocksComparisonTableItemsMetaA {
+            aOne
+          }
+          ... on PageBlocksComparisonTableItemsMetaB {
+            bOne
+          }
+        }
+      }
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+    }
+    ... on PageBlocksFeature {
+      title
+      subTitle
+      description
+      featureStyle
+      features {
+        __typename
+        icon
+        name
+        description
+      }
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+    ... on PageBlocksFullScreenLogo {
+      slogan
+      link
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+    ... on PageBlocksFullScreenHeader {
+      title
+      subTitle
+      description
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+  }
+}
