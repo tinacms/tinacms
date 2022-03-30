@@ -17,7 +17,9 @@ query {
     data {
       author {
         ...on Document {
-          id
+          sys {
+            filename
+          }
         }
       }
     }

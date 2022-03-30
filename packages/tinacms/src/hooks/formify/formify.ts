@@ -321,6 +321,13 @@ export const formify = async ({
     const blueprint = blueprints.find(
       (blueprint) => blueprint.id === util.getRelativeBlueprint(path)
     )
+    /**
+     * This would be a field like sys.filename
+     * which has no need to be formified, so exit.
+     */
+    if (!blueprint) {
+      return fieldNode
+    }
 
     const fieldPath = util.buildPath({
       fieldNode,
@@ -347,6 +354,7 @@ export const formify = async ({
           ...fieldNode.selectionSet.selections.map((selectionNode) => {
             switch (selectionNode.kind) {
               case 'Field': {
+                console.log(selectionNode.name.value)
                 return formifyFieldNode({
                   fieldNode: selectionNode,
                   parentType: field.type,
