@@ -237,6 +237,7 @@ export interface ReferenceTypeInner extends TinaField {
   list?: boolean
   reverseLookup?: { label: string; name: string }
   collections: string[]
+  ui?: UIField<any, string[]>
 }
 export interface ReferenceTypeWithNamespace extends TinaField {
   type: 'reference'
@@ -244,6 +245,7 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
+  ui?: UIField<any, string[]>
 }
 
 export interface RichTypeWithNamespace extends TinaField {
