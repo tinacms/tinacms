@@ -162,7 +162,7 @@ export function HeroWithSlantImage(props: Hero) {
   )
 }
 
-export const getLinksFromAction = (action: Action) => {
+export const useLinksFromAction = (action: Action) => {
   const localeInfo = useLocaleInfo()
   const link = action.linkOverride
     ? action.linkOverride
@@ -179,7 +179,7 @@ export const getLinksFromAction = (action: Action) => {
 }
 
 export const ActionBox = (props: { action: Action }) => {
-  const { link, secondaryLink } = getLinksFromAction(props.action)
+  const { link, secondaryLink } = useLinksFromAction(props.action)
   return (
     <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
       <div className="rounded-md shadow">

@@ -3,7 +3,7 @@ import { CheckIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import { Markdown } from '../markdown'
 import { DisplayText } from '../typographqy'
-import { Action, action, getLinksFromAction, actionQuery } from './hero'
+import { Action, action, useLinksFromAction, actionQuery } from './hero'
 import type { TinaTemplate } from 'tinacms'
 import { Selector } from '../../zeus'
 import { Response } from '../util'
@@ -185,7 +185,7 @@ export function Pricing(props: ComparisonTableType) {
 }
 
 function ActionButtons(props) {
-  const { link, secondaryLink } = getLinksFromAction(props.action)
+  const { link, secondaryLink } = useLinksFromAction(props.action)
   return (
     <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
       <div className="inline-flex rounded-md shadow">

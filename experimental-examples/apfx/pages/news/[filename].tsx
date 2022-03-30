@@ -14,32 +14,22 @@ type AsyncReturnType<T extends (...args: any) => Promise<any>> = T extends (
 type HomeProps = AsyncReturnType<typeof getStaticProps>['props']
 
 export default function Home(props: HomeProps) {
-  if (!props.data.getNewsDocument) {
+  if (!props.data.news) {
     return null
   }
   return (
     <>
       <Head>
-        <title>{props.data.getNewsDocument.data.title}</title>
-        <meta
-          property="og:title"
-          content={props.data.getNewsDocument.data.title}
-        />
+        <title>{props.data.news.title}</title>
+        <meta property="og:title" content={props.data.news.title} />
         <meta name="description" property="og:description" content={''} />
-        <meta
-          property="og:image"
-          content={props.data.getNewsDocument.data.image}
-        />
+        <meta property="og:image" content={props.data.news.image} />
       </Head>
 
       <main>
-        {props.data.getNavigationDocument.data && (
-          <Nav {...props.data.getNavigationDocument.data} />
-        )}
-        <News {...props.data.getNewsDocument.data} />
-        {props.data.getFooterDocument.data && (
-          <Footer {...props.data.getFooterDocument.data} />
-        )}
+        {props.data.navigation && <Nav {...props.data.navigation} />}
+        <News {...props.data.news} />
+        {props.data.footer && <Footer {...props.data.footer} />}
       </main>
     </>
   )
@@ -52,29 +42,27 @@ export const getStaticProps = async ({
 }) => {
   const { filename } = params
   const props = await request().query({
-    getLocaleInfoDocument: [
+    localeInfo: [
       {
         relativePath: 'main.md',
       },
       localeQuery,
     ],
-    getNavigationDocument: [{ relativePath: 'main.md' }, navQuery],
-    getFooterDocument: [{ relativePath: 'main.md' }, footerQuery],
-    getThemeDocument: [
+    navigation: [{ relativePath: 'main.md' }, navQuery],
+    footer: [{ relativePath: 'main.md' }, footerQuery],
+    theme: [
       { relativePath: 'main.json' },
       {
-        dataJSON: true,
+        _values: true,
       },
     ],
-    getNewsDocument: [
+    news: [
       { relativePath: `${filename}.md` },
       {
-        data: {
-          title: true,
-          image: true,
-          subTitle: true,
-          body: true,
-        },
+        title: true,
+        image: true,
+        subTitle: true,
+        body: true,
       },
     ],
   })
@@ -86,12 +74,12 @@ export const getStaticProps = async ({
 export const getStaticPaths = async () => {
   const chain = Chain('http://localhost:4001/graphql', {})
   const paths = await chain('query')({
-    getNewsList: [
+    newsConnection: [
       {},
       {
         edges: {
           node: {
-            sys: {
+            _sys: {
               filename: true,
             },
           },
@@ -99,8 +87,8 @@ export const getStaticPaths = async () => {
       },
     ],
   })
-  const paths2 = paths.getNewsList.edges.map((edge) => {
-    return { params: { filename: edge.node.sys.filename } }
+  const paths2 = paths.newsConnection.edges.map((edge) => {
+    return { params: { filename: edge.node._sys.filename } }
   })
   const paths3 = []
   ;['en-us', 'en-gb', 'en-au'].forEach((locale) => {

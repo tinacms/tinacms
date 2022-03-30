@@ -1,6 +1,5 @@
 import Head from 'next/head'
 import { Chain, Zeus } from '../../zeus'
-import { getTinaField } from '../util'
 import { heroTemplate, blockHeroQuery, HeroWithSlantImage } from './hero'
 import {
   TwoWideGrid,
@@ -203,9 +202,9 @@ export const getStaticProps = async ({
   relativePath: string
 }) => {
   try {
-    return { props: await run({ variables: { relativePath } }) }
+    const res = await run({ variables: { relativePath } })
+    return { props: res }
   } catch (e) {
-    console.log(e)
     return {
       props: JSON.parse(JSON.stringify(e)).response,
     }
@@ -257,7 +256,6 @@ const run = async ({ variables }) => {
           id: true,
           title: true,
           seo: {
-            // @ts-ignore not sure why it's not getting updated
             title: true,
             description: true,
             image: true,
