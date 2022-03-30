@@ -12,15 +12,15 @@
  */
 
 import {
-  FilterCondition,
-  makeFilterChain,
-  OP,
-  makeFilterSuffixes,
-  makeFilter,
-  makeKeyForField,
-  coerceFilterChainOperands,
-  TernaryFilter,
   BinaryFilter,
+  FilterCondition,
+  OP,
+  TernaryFilter,
+  coerceFilterChainOperands,
+  makeFilter,
+  makeFilterChain,
+  makeFilterSuffixes,
+  makeKeyForField,
 } from '.'
 
 describe('datalayer store helper functions', () => {
@@ -429,6 +429,33 @@ describe('datalayer store helper functions', () => {
           leftOperator: OP.GT,
           rightOperator: OP.LT,
           type: 'datetime',
+        }
+        const filterCondition: FilterCondition = {
+          filterExpression: {
+            [expected.rightOperator.toLowerCase()]: expected.rightOperand,
+            [expected.leftOperator.toLowerCase()]: expected.leftOperand,
+            _type: expected.type,
+          },
+          filterPath: pathExpression,
+        }
+        const filterChain = makeFilterChain({
+          conditions: [filterCondition],
+        })
+
+        expect(filterChain).toBeDefined()
+        expect(filterChain).toHaveLength(1)
+        expect(filterChain[0]).toEqual(expected)
+      })
+
+      it('numerical ternary filter with 0 as operand', () => {
+        const pathExpression = 'foo.bar'
+        const expected = {
+          pathExpression,
+          rightOperand: 0,
+          leftOperand: 1,
+          leftOperator: OP.GT,
+          rightOperator: OP.LT,
+          type: 'number',
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
