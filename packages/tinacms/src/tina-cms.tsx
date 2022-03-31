@@ -116,7 +116,6 @@ class ErrorBoundary extends React.Component {
               encountering this error. There is a bigger issue with the site.
               Please reach out to your site admin.
             </p>
-            <br />
             <p>
               See our{' '}
               <a
@@ -152,7 +151,6 @@ class ErrorBoundary extends React.Component {
                   the button below to switch back to the default branch for this
                   deployment.
                 </p>
-                <br />
                 <p>
                   See our{' '}
                   <a
