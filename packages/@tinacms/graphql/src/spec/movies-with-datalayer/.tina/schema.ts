@@ -67,6 +67,10 @@ const tinaSchema: TinaCloudSchema<false> = {
           isBody: true,
         },
       ],
+      indexes: [{
+        name: 'archived-releaseDate',
+        fields: [{ name: 'archived' }, {name: 'releaseDate' }]
+      }]
     },
     {
       label: 'Director',
@@ -77,6 +81,36 @@ const tinaSchema: TinaCloudSchema<false> = {
           type: 'string',
           label: 'Name',
           name: 'name',
+        },
+        {
+          type: 'datetime',
+          label: 'Birthday',
+          name: 'birthday',
+        },
+        {
+          type: 'number',
+          label: 'Height',
+          name: 'height',
+        },
+        {
+          label: "Relatives",
+          name: "relatives",
+          type: "object",
+          list: false,
+          fields: [
+            {
+              type: "reference",
+              label: "Spouses",
+              name: "spouse",
+              collections: ["relative"],
+            },
+            {
+              type: "reference",
+              label: "Child",
+              name: "child",
+              collections: ["relative"],
+            },
+          ],
         },
       ],
     },
@@ -124,6 +158,18 @@ const tinaSchema: TinaCloudSchema<false> = {
           type: 'string',
           label: 'Body',
           name: 'body',
+        },
+      ],
+    },
+    {
+      label: 'Relative',
+      name: 'relative',
+      path: 'content/relative',
+      fields: [
+        {
+          type: 'string',
+          label: 'Name',
+          name: 'name',
         },
       ],
     },

@@ -35,7 +35,7 @@ import type {
   TinaFieldInner,
 } from '../types'
 import type { Bridge } from './bridge'
-import { atob, btoa, DEFAULT_COLLECTION_SORT_KEY } from '@tinacms/datalayer'
+import { atob, btoa, DEFAULT_COLLECTION_SORT_KEY, DEFAULT_NUMERIC_LPAD } from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -312,6 +312,7 @@ export class Database {
                     {
                       name: field.name,
                       type: field.type,
+                      pad: field.type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined,
                     },
                   ],
                 }
