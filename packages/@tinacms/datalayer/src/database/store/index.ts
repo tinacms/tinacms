@@ -506,7 +506,13 @@ export const makeFilterSuffixes = (
     ) {
       ternaryFilter = true
     }
-    for (const [i, filter] of Object.entries(orderedFilterChain)) {
+    for (let i = 0; i < orderedFilterChain.length; i++) {
+      const filter = orderedFilterChain[i]
+      if (!filter) {
+        // ensure no gaps in the prefix
+        return
+      }
+
       if (Number(i) < indexFields.length - 1) {
         if (!(filter as BinaryFilter).operator) {
           // Lower order fields can not use TernaryFilter
@@ -516,11 +522,6 @@ export const makeFilterSuffixes = (
         // Lower order fields must use equality operator
         const binaryFilter: BinaryFilter = filter as BinaryFilter
         if (binaryFilter.operator !== OP.EQ) {
-          return
-        }
-
-        if (!orderedFilterChain[i]) {
-          // ensure no gaps in the prefix
           return
         }
 

@@ -21,8 +21,10 @@ import {
   makeFilterChain,
   makeFilterSuffixes,
   makeKeyForField,
-  INDEX_KEY_FIELD_SEPARATOR,
+  INDEX_KEY_FIELD_SEPARATOR, makeStringEscaper, DEFAULT_NUMERIC_LPAD,
 } from '.'
+
+const escapeStr = makeStringEscaper(new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'), encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR))
 
 describe('datalayer store helper functions', () => {
   describe('buildKeyForField', () => {
@@ -37,7 +39,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { foo: expected }
+        { foo: expected },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -54,7 +57,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { foo: now.toISOString() }
+        { foo: now.toISOString() },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -70,7 +74,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { bar: 'foo' }
+        { bar: 'foo' },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -362,6 +367,10 @@ describe('datalayer store helper functions', () => {
           rightOperand: 5,
           operator: OP.GT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD
+          }
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -386,6 +395,10 @@ describe('datalayer store helper functions', () => {
           rightOperand: 5,
           operator: OP.LT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD
+          }
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -457,6 +470,10 @@ describe('datalayer store helper functions', () => {
           leftOperator: OP.GT,
           rightOperator: OP.LT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD
+          }
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -840,13 +857,13 @@ describe('datalayer store helper functions', () => {
         operator: OP.EQ,
         type: 'string',
       }
-      const coerced = coerceFilterChainOperands([expected])
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
     })
 
     it('coerces empty chain', () => {
-      const coerced = coerceFilterChainOperands([])
+      const coerced = coerceFilterChainOperands([], escapeStr)
       expect(coerced.length).toEqual(0)
     })
 
@@ -862,7 +879,7 @@ describe('datalayer store helper functions', () => {
           ...expected,
           rightOperand: new Date(expected.rightOperand as number).toISOString(),
         },
-      ])
+      ], escapeStr)
 
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
@@ -882,7 +899,7 @@ describe('datalayer store helper functions', () => {
             new Date(expected.rightOperand[0] as number).toISOString(),
           ],
         },
-      ])
+      ], escapeStr)
 
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
@@ -903,7 +920,7 @@ describe('datalayer store helper functions', () => {
           rightOperand: new Date(expected.rightOperand as number).toISOString(),
           leftOperand: new Date(expected.leftOperand as number).toISOString(),
         },
-      ])
+      ], escapeStr)
 
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
