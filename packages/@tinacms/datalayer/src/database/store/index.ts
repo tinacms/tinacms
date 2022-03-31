@@ -16,8 +16,6 @@ import { JSONPath } from 'jsonpath-plus'
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 export const INDEX_KEY_FIELD_SEPARATOR = '#'
-const ESCAPED_INDEX_KEY_FIELD_SEPARATOR = encodeURIComponent('#')
-const escapeRegex = new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm')
 
 export enum OP {
   EQ = 'eq',
@@ -387,16 +385,21 @@ export const makeFilter = ({
   }
 }
 
-const escapeStr = (input: string | string[]) => {
-  if (Array.isArray(input)) {
-    return (input as string[]).map(val => val.replace(escapeRegex, ESCAPED_INDEX_KEY_FIELD_SEPARATOR))
-  } else {
-    return input.replace(escapeRegex, ESCAPED_INDEX_KEY_FIELD_SEPARATOR)
+type StringEscaper = <T extends string | string[]>(input: T) => T
+
+export const makeStringEscaper = (regex: RegExp, replacement: string): StringEscaper => {
+  return <T extends string | string[]>(input: T): T => {
+    if (Array.isArray(input)) {
+      return (input as string[]).map(val => val.replace(regex, replacement)) as T
+    } else {
+      return (input as string).replace(regex, replacement) as T
+    }
   }
 }
 
 export const coerceFilterChainOperands = (
-  filterChain: (BinaryFilter | TernaryFilter)[]
+  filterChain: (BinaryFilter | TernaryFilter)[],
+  stringEscaper: StringEscaper
 ) => {
   const result: (BinaryFilter | TernaryFilter)[] = []
   if (filterChain.length) {
@@ -430,12 +433,12 @@ export const coerceFilterChainOperands = (
       } else if (dataType === 'string') {
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({ ...filter,
-            rightOperand: escapeStr(filter.rightOperand as string | string[]),
-            leftOperand: escapeStr((filter as TernaryFilter).leftOperand as string | string[])
+            rightOperand: stringEscaper(filter.rightOperand as string | string[]),
+            leftOperand: stringEscaper((filter as TernaryFilter).leftOperand as string | string[])
           })
         } else {
           result.push({ ...filter,
-            rightOperand: escapeStr(filter.rightOperand as string | string[])
+            rightOperand: stringEscaper(filter.rightOperand as string | string[])
           })
         }
       } else {
@@ -534,7 +537,8 @@ export const makeFilterSuffixes = (
 
 export const makeKeyForField = (
   definition: IndexDefinition,
-  data: object
+  data: object,
+  stringEscaper: StringEscaper
 ): string | null => {
   const valueParts = []
   for (const field of definition.fields) {
@@ -544,7 +548,7 @@ export const makeKeyForField = (
         String(
           field.type === 'datetime'
             ? new Date(data[field.name]).getTime()
-            : field.type === 'string' ? escapeStr(data[field.name] as string | string[]) : data[field.name]
+            : field.type === 'string' ? stringEscaper(data[field.name] as string | string[]) : data[field.name]
         )
       )
     } else {

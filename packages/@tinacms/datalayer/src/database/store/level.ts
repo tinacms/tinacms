@@ -23,6 +23,7 @@ import {
   makeFilterSuffixes,
   makeFilter,
   makeKeyForField,
+  makeStringEscaper,
   DEFAULT_COLLECTION_SORT_KEY,
   INDEX_KEY_FIELD_SEPARATOR
 } from './index'
@@ -35,6 +36,7 @@ import encode from 'encoding-down'
 import { IndexDefinition } from '.'
 
 const defaultPrefix = '_ROOT_'
+const escapeStr = makeStringEscaper(new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'), encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR))
 
 export class LevelStore implements Store {
   public rootPath
@@ -64,7 +66,7 @@ export class LevelStore implements Store {
       ...query
     } = queryOptions
 
-    const filterChain = coerceFilterChainOperands(rawFilterChain)
+    const filterChain = coerceFilterChainOperands(rawFilterChain, escapeStr)
     const indexDefinition = (sort && indexDefinitions?.[sort]) as
       | IndexDefinition
       | undefined
@@ -244,9 +246,9 @@ export class LevelStore implements Store {
       for (const [sort, definition] of Object.entries(
         options.indexDefinitions
       )) {
-        const indexedValue = makeKeyForField(definition, data)
+        const indexedValue = makeKeyForField(definition, data, escapeStr)
         const existingIndexedValue = existingData
-          ? makeKeyForField(definition, existingData)
+          ? makeKeyForField(definition, existingData, escapeStr)
           : null
 
         let indexKey

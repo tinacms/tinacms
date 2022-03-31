@@ -28,6 +28,7 @@ export {
   makeFilterChain,
   makeFilterSuffixes,
   makeKeyForField,
+  makeStringEscaper,
   OP,
 } from './database/store'
 export type {
