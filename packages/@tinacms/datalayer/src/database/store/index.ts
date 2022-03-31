@@ -15,6 +15,9 @@ import { FilterOperand } from '../../index'
 import { JSONPath } from 'jsonpath-plus'
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
+export const INDEX_KEY_FIELD_SEPARATOR = '#'
+const ESCAPED_INDEX_KEY_FIELD_SEPARATOR = encodeURIComponent('#')
+const escapeRegex = new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm')
 
 export enum OP {
   EQ = 'eq',
@@ -384,6 +387,14 @@ export const makeFilter = ({
   }
 }
 
+const escapeStr = (input: string | string[]) => {
+  if (Array.isArray(input)) {
+    return (input as string[]).map(val => val.replace(escapeRegex, ESCAPED_INDEX_KEY_FIELD_SEPARATOR))
+  } else {
+    return input.replace(escapeRegex, ESCAPED_INDEX_KEY_FIELD_SEPARATOR)
+  }
+}
+
 export const coerceFilterChainOperands = (
   filterChain: (BinaryFilter | TernaryFilter)[]
 ) => {
@@ -415,6 +426,17 @@ export const coerceFilterChainOperands = (
               rightOperand: new Date(filter.rightOperand as string).getTime(),
             })
           }
+        }
+      } else if (dataType === 'string') {
+        if ((filter as TernaryFilter).leftOperand !== undefined) {
+          result.push({ ...filter,
+            rightOperand: escapeStr(filter.rightOperand as string | string[]),
+            leftOperand: escapeStr((filter as TernaryFilter).leftOperand as string | string[])
+          })
+        } else {
+          result.push({ ...filter,
+            rightOperand: escapeStr(filter.rightOperand as string | string[])
+          })
         }
       } else {
         result.push({ ...filter })
@@ -501,9 +523,9 @@ export const makeFilterSuffixes = (
 
     return {
       left:
-        (leftSuffix && [...baseFragments, leftSuffix].join(':')) || undefined,
+        (leftSuffix && [...baseFragments, leftSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) || undefined,
       right:
-        (rightSuffix && [...baseFragments, rightSuffix].join(':')) || undefined,
+        (rightSuffix && [...baseFragments, rightSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) || undefined,
     }
   } else {
     return {}
@@ -522,7 +544,7 @@ export const makeKeyForField = (
         String(
           field.type === 'datetime'
             ? new Date(data[field.name]).getTime()
-            : data[field.name]
+            : field.type === 'string' ? escapeStr(data[field.name] as string | string[]) : data[field.name]
         )
       )
     } else {
@@ -530,5 +552,5 @@ export const makeKeyForField = (
     }
   }
 
-  return valueParts.join(':')
+  return valueParts.join(INDEX_KEY_FIELD_SEPARATOR)
 }

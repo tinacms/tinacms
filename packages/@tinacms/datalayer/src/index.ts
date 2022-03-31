@@ -23,6 +23,7 @@ export { LevelStore } from './database/store/level'
 export {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
+  INDEX_KEY_FIELD_SEPARATOR,
   makeFilter,
   makeFilterChain,
   makeFilterSuffixes,
