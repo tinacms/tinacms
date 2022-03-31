@@ -16,6 +16,7 @@ import { JSONPath } from 'jsonpath-plus'
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 export const INDEX_KEY_FIELD_SEPARATOR = '#'
+export const DEFAULT_NUMERIC_LPAD = 4
 
 export enum OP {
   EQ = 'eq',
@@ -27,11 +28,16 @@ export enum OP {
   IN = 'in',
 }
 
+export type PadDefinition = {
+  fillString: string, maxLength: number
+}
+
 export type BinaryFilter = {
   pathExpression: string
   rightOperand: FilterOperand
   operator: OP.EQ | OP.GT | OP.LT | OP.GTE | OP.LTE | OP.STARTS_WITH | OP.IN
   type: string
+  pad?: PadDefinition
 }
 
 export type TernaryFilter = {
@@ -41,6 +47,7 @@ export type TernaryFilter = {
   leftOperator: OP.GTE | OP.GT
   rightOperator: OP.LT | OP.LTE
   type: string
+  pad?: PadDefinition
 }
 
 /** Options for {@link Store.query} */
@@ -83,6 +90,7 @@ export type IndexDefinition = {
   fields: {
     name: string
     type?: string
+    pad?: PadDefinition
   }[]
 }
 
@@ -207,6 +215,7 @@ export const makeFilterChain = ({
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
         type: _type as string,
+        pad: _type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined
       })
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -243,6 +252,7 @@ export const makeFilterChain = ({
             | OP.LT
             | OP.LTE,
           type: _type as string,
+          pad: _type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined
         })
       } else {
         throw new Error(
@@ -397,6 +407,17 @@ export const makeStringEscaper = (regex: RegExp, replacement: string): StringEsc
   }
 }
 
+const applyPadding = (input: any, pad?: PadDefinition) => {
+  if (pad) {
+    if (Array.isArray(input)) {
+      return (input as any[]).map(val => String(val).padStart(pad.maxLength, pad.fillString))
+    } else {
+      return String(input).padStart(pad.maxLength, pad.fillString)
+    }
+  }
+  return input
+}
+
 export const coerceFilterChainOperands = (
   filterChain: (BinaryFilter | TernaryFilter)[],
   stringEscaper: StringEscaper
@@ -433,12 +454,12 @@ export const coerceFilterChainOperands = (
       } else if (dataType === 'string') {
         if ((filter as TernaryFilter).leftOperand !== undefined) {
           result.push({ ...filter,
-            rightOperand: stringEscaper(filter.rightOperand as string | string[]),
-            leftOperand: stringEscaper((filter as TernaryFilter).leftOperand as string | string[])
+            rightOperand: applyPadding(stringEscaper(filter.rightOperand as string | string[]), filter.pad),
+            leftOperand: applyPadding(stringEscaper((filter as TernaryFilter).leftOperand as string | string[]), filter.pad),
           })
         } else {
           result.push({ ...filter,
-            rightOperand: stringEscaper(filter.rightOperand as string | string[])
+            rightOperand: applyPadding(stringEscaper(filter.rightOperand as string | string[]), filter.pad)
           })
         }
       } else {
@@ -485,7 +506,7 @@ export const makeFilterSuffixes = (
     ) {
       ternaryFilter = true
     }
-    for (const [i, filter] of Object.entries(filterChain)) {
+    for (const [i, filter] of Object.entries(orderedFilterChain)) {
       if (Number(i) < indexFields.length - 1) {
         if (!(filter as BinaryFilter).operator) {
           // Lower order fields can not use TernaryFilter
@@ -503,14 +524,14 @@ export const makeFilterSuffixes = (
           return
         }
 
-        baseFragments.push(orderedFilterChain[i].rightOperand)
+        baseFragments.push(applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad))
       } else {
         if (ternaryFilter) {
-          leftSuffix = orderedFilterChain[i].leftOperand
-          rightSuffix = orderedFilterChain[i].rightOperand
+          leftSuffix = applyPadding(orderedFilterChain[i].leftOperand, orderedFilterChain[i].pad)
+          rightSuffix = applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad)
         } else {
           const op = orderedFilterChain[i].operator
-          const operand = orderedFilterChain[i].rightOperand
+          const operand = applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad)
           if (op === OP.LT || op === OP.LTE) {
             rightSuffix = operand
           } else if (op === OP.GT || op === OP.GTE) {
@@ -544,13 +565,12 @@ export const makeKeyForField = (
   for (const field of definition.fields) {
     if (field.name in data) {
       // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
-      valueParts.push(
-        String(
-          field.type === 'datetime'
-            ? new Date(data[field.name]).getTime()
-            : field.type === 'string' ? stringEscaper(data[field.name] as string | string[]) : data[field.name]
-        )
+      const resolvedValue = String(
+        field.type === 'datetime'
+          ? new Date(data[field.name]).getTime()
+          : field.type === 'string' ? stringEscaper(data[field.name] as string | string[]) : data[field.name]
       )
+      valueParts.push(applyPadding(resolvedValue, field.pad))
     } else {
       return null // tell caller that one of the fields is missing and we can't index
     }

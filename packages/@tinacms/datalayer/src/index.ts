@@ -23,6 +23,7 @@ export { LevelStore } from './database/store/level'
 export {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
+  DEFAULT_NUMERIC_LPAD,
   INDEX_KEY_FIELD_SEPARATOR,
   makeFilter,
   makeFilterChain,
@@ -35,6 +36,7 @@ export type {
   BinaryFilter,
   FilterCondition,
   IndexDefinition,
+  PadDefinition,
   StoreQueryOptions,
   StoreQueryResponse,
   PageInfo,
