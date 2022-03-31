@@ -19,6 +19,11 @@ projects:
     schema: packages/@tinacms/graphql/src/spec/page-builder/.tina/__generated__/schema.gql
     documents:
       - packages/**/*.page-builder.gql
+  apfx:
+    schema: experimental-examples/apfx/.tina/__generated__/schema.gql
+    documents:
+      - experimental-examples/apfx/**/*.gql
+      - experimental-examples/apfx/**/*.tsx
   unitTestExample:
     schema: experimental-examples/unit-test-example/.tina/__generated__/schema.gql
     documents:

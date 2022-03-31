@@ -1,6 +1,6 @@
 query localeInfo($relativePath: String!) {
   localeInfo(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,9 +9,7 @@ query localeInfo($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...LocaleInfoParts
-    }
+    ...LocaleInfoParts
   }
 }
 
@@ -21,7 +19,7 @@ query localeInfoConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,9 +27,7 @@ query localeInfoConnection {
           relativePath
           extension
         }
-        data {
-          ...LocaleInfoParts
-        }
+        ...LocaleInfoParts
       }
     }
   }
@@ -39,7 +35,7 @@ query localeInfoConnection {
 
 query news($relativePath: String!) {
   news(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,9 +44,7 @@ query news($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...NewsParts
-    }
+    ...NewsParts
   }
 }
 
@@ -60,7 +54,7 @@ query newsConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,9 +62,7 @@ query newsConnection {
           relativePath
           extension
         }
-        data {
-          ...NewsParts
-        }
+        ...NewsParts
       }
     }
   }
@@ -78,7 +70,7 @@ query newsConnection {
 
 query footer($relativePath: String!) {
   footer(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -87,9 +79,7 @@ query footer($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...FooterParts
-    }
+    ...FooterParts
   }
 }
 
@@ -99,7 +89,7 @@ query footerConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -107,9 +97,7 @@ query footerConnection {
           relativePath
           extension
         }
-        data {
-          ...FooterParts
-        }
+        ...FooterParts
       }
     }
   }
@@ -117,7 +105,7 @@ query footerConnection {
 
 query theme($relativePath: String!) {
   theme(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -126,9 +114,7 @@ query theme($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...ThemeParts
-    }
+    ...ThemeParts
   }
 }
 
@@ -138,7 +124,7 @@ query themeConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -146,9 +132,7 @@ query themeConnection {
           relativePath
           extension
         }
-        data {
-          ...ThemeParts
-        }
+        ...ThemeParts
       }
     }
   }
@@ -156,7 +140,7 @@ query themeConnection {
 
 query navigation($relativePath: String!) {
   navigation(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -165,9 +149,7 @@ query navigation($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...NavigationParts
-    }
+    ...NavigationParts
   }
 }
 
@@ -177,7 +159,7 @@ query navigationConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -185,9 +167,7 @@ query navigationConnection {
           relativePath
           extension
         }
-        data {
-          ...NavigationParts
-        }
+        ...NavigationParts
       }
     }
   }
@@ -195,7 +175,7 @@ query navigationConnection {
 
 query page($relativePath: String!) {
   page(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -204,9 +184,7 @@ query page($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PageParts
-    }
+    ...PageParts
   }
 }
 
@@ -216,7 +194,7 @@ query pageConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -224,9 +202,7 @@ query pageConnection {
           relativePath
           extension
         }
-        data {
-          ...PageParts
-        }
+        ...PageParts
       }
     }
   }

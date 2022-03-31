@@ -38,7 +38,7 @@ const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
-    value: 'sys',
+    value: '_sys',
   },
   arguments: [],
   directives: [],
@@ -609,26 +609,12 @@ export const astBuilder = {
                   directives: [],
                 },
                 {
-                  kind: 'Field',
+                  kind: 'FragmentSpread',
                   name: {
                     kind: 'Name',
-                    value: 'data',
+                    value: fragName,
                   },
-                  arguments: [],
                   directives: [],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: {
-                          kind: 'Name',
-                          value: fragName,
-                        },
-                        directives: [],
-                      },
-                    ],
-                  },
                 },
               ],
             },
@@ -710,26 +696,12 @@ export const astBuilder = {
                             },
                             SysFieldDefinition,
                             {
-                              kind: 'Field',
+                              kind: 'FragmentSpread',
                               name: {
                                 kind: 'Name',
-                                value: 'data',
+                                value: fragName,
                               },
-                              arguments: [],
                               directives: [],
-                              selectionSet: {
-                                kind: 'SelectionSet',
-                                selections: [
-                                  {
-                                    kind: 'FragmentSpread',
-                                    name: {
-                                      kind: 'Name',
-                                      value: fragName,
-                                    },
-                                    directives: [],
-                                  },
-                                ],
-                              },
                             },
                           ],
                         },

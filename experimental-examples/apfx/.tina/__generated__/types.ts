@@ -108,7 +108,6 @@ export type QueryDocumentConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 
@@ -123,7 +122,6 @@ export type QueryLocaleInfoConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<LocaleInfoFilter>;
 };
 
 
@@ -138,7 +136,6 @@ export type QueryNewsConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<NewsFilter>;
 };
 
 
@@ -153,7 +150,6 @@ export type QueryFooterConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<FooterFilter>;
 };
 
 
@@ -168,7 +164,6 @@ export type QueryThemeConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<ThemeFilter>;
 };
 
 
@@ -183,7 +178,6 @@ export type QueryNavigationConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<NavigationFilter>;
 };
 
 
@@ -198,307 +192,6 @@ export type QueryPageConnectionArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<PageFilter>;
-};
-
-export type StringFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type LocaleInfoAuFilter = {
-  tel?: Maybe<StringFilter>;
-  signUpLink?: Maybe<StringFilter>;
-  signUpLinkPersonal?: Maybe<StringFilter>;
-  signInLink?: Maybe<StringFilter>;
-};
-
-export type LocaleInfoUsFilter = {
-  tel?: Maybe<StringFilter>;
-  signUpLink?: Maybe<StringFilter>;
-  signUpLinkPersonal?: Maybe<StringFilter>;
-  signInLink?: Maybe<StringFilter>;
-};
-
-export type LocaleInfoGbFilter = {
-  tel?: Maybe<StringFilter>;
-  signUpLink?: Maybe<StringFilter>;
-  signUpLinkPersonal?: Maybe<StringFilter>;
-  signInLink?: Maybe<StringFilter>;
-};
-
-export type LocaleInfoFilter = {
-  au?: Maybe<LocaleInfoAuFilter>;
-  us?: Maybe<LocaleInfoUsFilter>;
-  gb?: Maybe<LocaleInfoGbFilter>;
-};
-
-export type DatetimeFilter = {
-  after?: Maybe<Scalars['String']>;
-  before?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type RichTextFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-};
-
-export type NewsFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  image?: Maybe<StringFilter>;
-  publishDate?: Maybe<DatetimeFilter>;
-  category?: Maybe<StringFilter>;
-  body?: Maybe<RichTextFilter>;
-};
-
-export type FooterOfficesFilter = {
-  location?: Maybe<StringFilter>;
-  address?: Maybe<StringFilter>;
-  phone?: Maybe<StringFilter>;
-};
-
-export type FooterDisclaimersFilter = {
-  body?: Maybe<RichTextFilter>;
-};
-
-export type FooterFilter = {
-  offices?: Maybe<FooterOfficesFilter>;
-  disclaimers?: Maybe<FooterDisclaimersFilter>;
-};
-
-export type ThemeFilter = {
-  displayFont?: Maybe<StringFilter>;
-  colorMode?: Maybe<StringFilter>;
-};
-
-export type PageSeoFilter = {
-  title?: Maybe<StringFilter>;
-  image?: Maybe<StringFilter>;
-  description?: Maybe<StringFilter>;
-};
-
-export type PageBlocksNewsNewsItemsArticleFilter = {
-  news?: Maybe<NewsFilter>;
-};
-
-export type PageBlocksNewsNewsItemsFilter = {
-  article?: Maybe<PageBlocksNewsNewsItemsArticleFilter>;
-};
-
-export type PageBlocksNewsFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  newsItems?: Maybe<PageBlocksNewsNewsItemsFilter>;
-};
-
-export type PageBlocksStatsWithImageStatsFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-};
-
-export type PageBlocksStatsWithImageFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  image?: Maybe<StringFilter>;
-  stats?: Maybe<PageBlocksStatsWithImageStatsFilter>;
-};
-
-export type ImageFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type PageBlocksHeroActionFilter = {
-  callToAction?: Maybe<StringFilter>;
-  linkText?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  linkOverride?: Maybe<StringFilter>;
-  secondaryText?: Maybe<StringFilter>;
-  secondaryLink?: Maybe<StringFilter>;
-  secondaryLinkOverride?: Maybe<StringFilter>;
-};
-
-export type PageBlocksHeroFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  image?: Maybe<ImageFilter>;
-  action?: Maybe<PageBlocksHeroActionFilter>;
-};
-
-export type PageBlocksSlideshowItemsActionFilter = {
-  callToAction?: Maybe<StringFilter>;
-  linkText?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  linkOverride?: Maybe<StringFilter>;
-  secondaryText?: Maybe<StringFilter>;
-  secondaryLink?: Maybe<StringFilter>;
-  secondaryLinkOverride?: Maybe<StringFilter>;
-};
-
-export type PageBlocksSlideshowItemsOverlayFilter = {
-  image?: Maybe<ImageFilter>;
-  overlayColor?: Maybe<StringFilter>;
-  overlayOpacity?: Maybe<StringFilter>;
-};
-
-export type PageBlocksSlideshowItemsFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  action?: Maybe<PageBlocksSlideshowItemsActionFilter>;
-  overlay?: Maybe<PageBlocksSlideshowItemsOverlayFilter>;
-};
-
-export type PageBlocksSlideshowFilter = {
-  items?: Maybe<PageBlocksSlideshowItemsFilter>;
-};
-
-export type PageBlocksComparisonTableItemsMetaAFilter = {
-  aOne?: Maybe<StringFilter>;
-};
-
-export type PageBlocksComparisonTableItemsMetaBFilter = {
-  bOne?: Maybe<StringFilter>;
-};
-
-export type PageBlocksComparisonTableItemsMetaFilter = {
-  a?: Maybe<PageBlocksComparisonTableItemsMetaAFilter>;
-  b?: Maybe<PageBlocksComparisonTableItemsMetaBFilter>;
-};
-
-export type PageBlocksComparisonTableItemsFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  bulletPoints?: Maybe<StringFilter>;
-  meta?: Maybe<PageBlocksComparisonTableItemsMetaFilter>;
-};
-
-export type PageBlocksComparisonTableActionFilter = {
-  callToAction?: Maybe<StringFilter>;
-  linkText?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  linkOverride?: Maybe<StringFilter>;
-  secondaryText?: Maybe<StringFilter>;
-  secondaryLink?: Maybe<StringFilter>;
-  secondaryLinkOverride?: Maybe<StringFilter>;
-};
-
-export type PageBlocksComparisonTableFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  items?: Maybe<PageBlocksComparisonTableItemsFilter>;
-  action?: Maybe<PageBlocksComparisonTableActionFilter>;
-};
-
-export type PageBlocksFeatureFeaturesFilter = {
-  icon?: Maybe<StringFilter>;
-  name?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-};
-
-export type PageBlocksFeatureOverlayFilter = {
-  image?: Maybe<ImageFilter>;
-  overlayColor?: Maybe<StringFilter>;
-  overlayOpacity?: Maybe<StringFilter>;
-};
-
-export type PageBlocksFeatureFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  featureStyle?: Maybe<StringFilter>;
-  features?: Maybe<PageBlocksFeatureFeaturesFilter>;
-  overlay?: Maybe<PageBlocksFeatureOverlayFilter>;
-};
-
-export type PageBlocksFullScreenLogoOverlayFilter = {
-  image?: Maybe<ImageFilter>;
-  overlayColor?: Maybe<StringFilter>;
-  overlayOpacity?: Maybe<StringFilter>;
-};
-
-export type PageBlocksFullScreenLogoFilter = {
-  slogan?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  overlay?: Maybe<PageBlocksFullScreenLogoOverlayFilter>;
-};
-
-export type PageBlocksFullScreenHeaderActionFilter = {
-  callToAction?: Maybe<StringFilter>;
-  linkText?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  linkOverride?: Maybe<StringFilter>;
-  secondaryText?: Maybe<StringFilter>;
-  secondaryLink?: Maybe<StringFilter>;
-  secondaryLinkOverride?: Maybe<StringFilter>;
-};
-
-export type PageBlocksFullScreenHeaderOverlayFilter = {
-  image?: Maybe<ImageFilter>;
-  overlayColor?: Maybe<StringFilter>;
-  overlayOpacity?: Maybe<StringFilter>;
-};
-
-export type PageBlocksFullScreenHeaderFilter = {
-  title?: Maybe<StringFilter>;
-  subTitle?: Maybe<StringFilter>;
-  description?: Maybe<RichTextFilter>;
-  action?: Maybe<PageBlocksFullScreenHeaderActionFilter>;
-  overlay?: Maybe<PageBlocksFullScreenHeaderOverlayFilter>;
-};
-
-export type PageBlocksFilter = {
-  news?: Maybe<PageBlocksNewsFilter>;
-  statsWithImage?: Maybe<PageBlocksStatsWithImageFilter>;
-  hero?: Maybe<PageBlocksHeroFilter>;
-  slideshow?: Maybe<PageBlocksSlideshowFilter>;
-  comparisonTable?: Maybe<PageBlocksComparisonTableFilter>;
-  feature?: Maybe<PageBlocksFeatureFilter>;
-  fullScreenLogo?: Maybe<PageBlocksFullScreenLogoFilter>;
-  fullScreenHeader?: Maybe<PageBlocksFullScreenHeaderFilter>;
-};
-
-export type PageFilter = {
-  title?: Maybe<StringFilter>;
-  link?: Maybe<StringFilter>;
-  seo?: Maybe<PageSeoFilter>;
-  blocks?: Maybe<PageBlocksFilter>;
-};
-
-export type NavigationItemsPageFilter = {
-  page?: Maybe<PageFilter>;
-};
-
-export type NavigationItemsFilter = {
-  page?: Maybe<NavigationItemsPageFilter>;
-};
-
-export type NavigationFilter = {
-  items?: Maybe<NavigationItemsFilter>;
-};
-
-export type DocumentFilter = {
-  localeInfo?: Maybe<LocaleInfoFilter>;
-  news?: Maybe<NewsFilter>;
-  footer?: Maybe<FooterFilter>;
-  theme?: Maybe<ThemeFilter>;
-  navigation?: Maybe<NavigationFilter>;
-  page?: Maybe<PageFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -534,7 +227,6 @@ export type CollectionDocumentsArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 export type DocumentNode = LocaleInfo | News | Footer | Theme | Navigation | Page;
@@ -1294,11 +986,578 @@ export type PageMutation = {
   blocks?: Maybe<Array<Maybe<PageBlocksMutation>>>;
 };
 
+export type LocaleInfoPartsFragment = { __typename?: 'LocaleInfo', au?: Maybe<{ __typename: 'LocaleInfoAu', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, us?: Maybe<{ __typename: 'LocaleInfoUs', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, gb?: Maybe<{ __typename: 'LocaleInfoGb', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }> };
 
+export type NewsPartsFragment = { __typename?: 'News', title: string, subTitle?: Maybe<string>, image?: Maybe<string>, publishDate?: Maybe<string>, category?: Maybe<string>, body?: Maybe<any> };
+
+export type FooterPartsFragment = { __typename?: 'Footer', offices?: Maybe<Array<Maybe<{ __typename: 'FooterOffices', location: string, address: string, phone: string }>>>, disclaimers: Array<{ __typename: 'FooterDisclaimers', body?: Maybe<any> }> };
+
+export type ThemePartsFragment = { __typename?: 'Theme', displayFont?: Maybe<string>, colorMode?: Maybe<string> };
+
+export type NavigationPartsFragment = { __typename?: 'Navigation', items: Array<{ __typename: 'NavigationItems', page?: Maybe<{ __typename?: 'Page', id: string }> }> };
+
+export type PagePartsFragment = { __typename?: 'Page', title: string, link: string, seo?: Maybe<{ __typename: 'PageSeo', title?: Maybe<string>, image?: Maybe<string>, description: string }>, blocks?: Maybe<Array<Maybe<{ __typename: 'PageBlocksNews', title: string, subTitle?: Maybe<string>, description: any, newsItems: Array<{ __typename: 'PageBlocksNewsNewsItems', article: { __typename?: 'News', id: string } }> } | { __typename: 'PageBlocksStatsWithImage', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, stats?: Maybe<Array<Maybe<{ __typename: 'PageBlocksStatsWithImageStats', title: string, subTitle?: Maybe<string>, description: any }>>> } | { __typename: 'PageBlocksHero', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, action?: Maybe<{ __typename: 'PageBlocksHeroAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksSlideshow', items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksSlideshowItems', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksSlideshowItemsAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksSlideshowItemsOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> } | { __typename: 'PageBlocksComparisonTable', title: string, subTitle?: Maybe<string>, description: any, items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItems', title: string, subTitle?: Maybe<string>, description: any, bulletPoints?: Maybe<Array<Maybe<string>>>, meta?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItemsMetaA', aOne?: Maybe<string> } | { __typename: 'PageBlocksComparisonTableItemsMetaB', bOne?: Maybe<string> }>>> }>>>, action?: Maybe<{ __typename: 'PageBlocksComparisonTableAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksFeature', title: string, subTitle?: Maybe<string>, description: any, featureStyle?: Maybe<string>, features: Array<{ __typename: 'PageBlocksFeatureFeatures', icon: string, name: string, description: any }>, overlay?: Maybe<{ __typename: 'PageBlocksFeatureOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenLogo', slogan?: Maybe<string>, link?: Maybe<string>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenLogoOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenHeader', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> };
+
+export type LocaleInfoQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type LocaleInfoQuery = { __typename?: 'Query', localeInfo: { __typename?: 'LocaleInfo', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, au?: Maybe<{ __typename: 'LocaleInfoAu', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, us?: Maybe<{ __typename: 'LocaleInfoUs', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, gb?: Maybe<{ __typename: 'LocaleInfoGb', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }> } };
+
+export type LocaleInfoConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LocaleInfoConnectionQuery = { __typename?: 'Query', localeInfoConnection: { __typename?: 'LocaleInfoConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'LocaleInfoConnectionEdges', node?: Maybe<{ __typename?: 'LocaleInfo', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, au?: Maybe<{ __typename: 'LocaleInfoAu', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, us?: Maybe<{ __typename: 'LocaleInfoUs', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }>, gb?: Maybe<{ __typename: 'LocaleInfoGb', tel?: Maybe<string>, signUpLink?: Maybe<string>, signUpLinkPersonal?: Maybe<string>, signInLink?: Maybe<string> }> }> }>>> } };
+
+export type NewsQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type NewsQuery = { __typename?: 'Query', news: { __typename?: 'News', id: string, title: string, subTitle?: Maybe<string>, image?: Maybe<string>, publishDate?: Maybe<string>, category?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+
+export type NewsConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NewsConnectionQuery = { __typename?: 'Query', newsConnection: { __typename?: 'NewsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'NewsConnectionEdges', node?: Maybe<{ __typename?: 'News', id: string, title: string, subTitle?: Maybe<string>, image?: Maybe<string>, publishDate?: Maybe<string>, category?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
+
+export type FooterQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type FooterQuery = { __typename?: 'Query', footer: { __typename?: 'Footer', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, offices?: Maybe<Array<Maybe<{ __typename: 'FooterOffices', location: string, address: string, phone: string }>>>, disclaimers: Array<{ __typename: 'FooterDisclaimers', body?: Maybe<any> }> } };
+
+export type FooterConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FooterConnectionQuery = { __typename?: 'Query', footerConnection: { __typename?: 'FooterConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'FooterConnectionEdges', node?: Maybe<{ __typename?: 'Footer', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, offices?: Maybe<Array<Maybe<{ __typename: 'FooterOffices', location: string, address: string, phone: string }>>>, disclaimers: Array<{ __typename: 'FooterDisclaimers', body?: Maybe<any> }> }> }>>> } };
+
+export type ThemeQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type ThemeQuery = { __typename?: 'Query', theme: { __typename?: 'Theme', id: string, displayFont?: Maybe<string>, colorMode?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+
+export type ThemeConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ThemeConnectionQuery = { __typename?: 'Query', themeConnection: { __typename?: 'ThemeConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'ThemeConnectionEdges', node?: Maybe<{ __typename?: 'Theme', id: string, displayFont?: Maybe<string>, colorMode?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
+
+export type NavigationQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type NavigationQuery = { __typename?: 'Query', navigation: { __typename?: 'Navigation', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, items: Array<{ __typename: 'NavigationItems', page?: Maybe<{ __typename?: 'Page', id: string }> }> } };
+
+export type NavigationConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type NavigationConnectionQuery = { __typename?: 'Query', navigationConnection: { __typename?: 'NavigationConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'NavigationConnectionEdges', node?: Maybe<{ __typename?: 'Navigation', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, items: Array<{ __typename: 'NavigationItems', page?: Maybe<{ __typename?: 'Page', id: string }> }> }> }>>> } };
+
+export type PageQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, title: string, link: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, seo?: Maybe<{ __typename: 'PageSeo', title?: Maybe<string>, image?: Maybe<string>, description: string }>, blocks?: Maybe<Array<Maybe<{ __typename: 'PageBlocksNews', title: string, subTitle?: Maybe<string>, description: any, newsItems: Array<{ __typename: 'PageBlocksNewsNewsItems', article: { __typename?: 'News', id: string } }> } | { __typename: 'PageBlocksStatsWithImage', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, stats?: Maybe<Array<Maybe<{ __typename: 'PageBlocksStatsWithImageStats', title: string, subTitle?: Maybe<string>, description: any }>>> } | { __typename: 'PageBlocksHero', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, action?: Maybe<{ __typename: 'PageBlocksHeroAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksSlideshow', items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksSlideshowItems', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksSlideshowItemsAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksSlideshowItemsOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> } | { __typename: 'PageBlocksComparisonTable', title: string, subTitle?: Maybe<string>, description: any, items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItems', title: string, subTitle?: Maybe<string>, description: any, bulletPoints?: Maybe<Array<Maybe<string>>>, meta?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItemsMetaA', aOne?: Maybe<string> } | { __typename: 'PageBlocksComparisonTableItemsMetaB', bOne?: Maybe<string> }>>> }>>>, action?: Maybe<{ __typename: 'PageBlocksComparisonTableAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksFeature', title: string, subTitle?: Maybe<string>, description: any, featureStyle?: Maybe<string>, features: Array<{ __typename: 'PageBlocksFeatureFeatures', icon: string, name: string, description: any }>, overlay?: Maybe<{ __typename: 'PageBlocksFeatureOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenLogo', slogan?: Maybe<string>, link?: Maybe<string>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenLogoOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenHeader', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> } };
+
+export type PageConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'Page', id: string, title: string, link: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, seo?: Maybe<{ __typename: 'PageSeo', title?: Maybe<string>, image?: Maybe<string>, description: string }>, blocks?: Maybe<Array<Maybe<{ __typename: 'PageBlocksNews', title: string, subTitle?: Maybe<string>, description: any, newsItems: Array<{ __typename: 'PageBlocksNewsNewsItems', article: { __typename?: 'News', id: string } }> } | { __typename: 'PageBlocksStatsWithImage', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, stats?: Maybe<Array<Maybe<{ __typename: 'PageBlocksStatsWithImageStats', title: string, subTitle?: Maybe<string>, description: any }>>> } | { __typename: 'PageBlocksHero', title: string, subTitle?: Maybe<string>, description: any, image?: Maybe<string>, action?: Maybe<{ __typename: 'PageBlocksHeroAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksSlideshow', items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksSlideshowItems', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksSlideshowItemsAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksSlideshowItemsOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> } | { __typename: 'PageBlocksComparisonTable', title: string, subTitle?: Maybe<string>, description: any, items?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItems', title: string, subTitle?: Maybe<string>, description: any, bulletPoints?: Maybe<Array<Maybe<string>>>, meta?: Maybe<Array<Maybe<{ __typename: 'PageBlocksComparisonTableItemsMetaA', aOne?: Maybe<string> } | { __typename: 'PageBlocksComparisonTableItemsMetaB', bOne?: Maybe<string> }>>> }>>>, action?: Maybe<{ __typename: 'PageBlocksComparisonTableAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }> } | { __typename: 'PageBlocksFeature', title: string, subTitle?: Maybe<string>, description: any, featureStyle?: Maybe<string>, features: Array<{ __typename: 'PageBlocksFeatureFeatures', icon: string, name: string, description: any }>, overlay?: Maybe<{ __typename: 'PageBlocksFeatureOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenLogo', slogan?: Maybe<string>, link?: Maybe<string>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenLogoOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> } | { __typename: 'PageBlocksFullScreenHeader', title: string, subTitle?: Maybe<string>, description: any, action?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderAction', callToAction?: Maybe<string>, linkText?: Maybe<string>, link?: Maybe<string>, linkOverride?: Maybe<string>, secondaryText?: Maybe<string>, secondaryLink?: Maybe<string>, secondaryLinkOverride?: Maybe<string> }>, overlay?: Maybe<{ __typename: 'PageBlocksFullScreenHeaderOverlay', image?: Maybe<string>, overlayColor?: Maybe<string>, overlayOpacity?: Maybe<string> }> }>>> }> }>>> } };
+
+export const LocaleInfoPartsFragmentDoc = gql`
+    fragment LocaleInfoParts on LocaleInfo {
+  au {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+  us {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+  gb {
+    __typename
+    tel
+    signUpLink
+    signUpLinkPersonal
+    signInLink
+  }
+}
+    `;
+export const NewsPartsFragmentDoc = gql`
+    fragment NewsParts on News {
+  title
+  subTitle
+  image
+  publishDate
+  category
+  body
+}
+    `;
+export const FooterPartsFragmentDoc = gql`
+    fragment FooterParts on Footer {
+  offices {
+    __typename
+    location
+    address
+    phone
+  }
+  disclaimers {
+    __typename
+    body
+  }
+}
+    `;
+export const ThemePartsFragmentDoc = gql`
+    fragment ThemeParts on Theme {
+  displayFont
+  colorMode
+}
+    `;
+export const NavigationPartsFragmentDoc = gql`
+    fragment NavigationParts on Navigation {
+  items {
+    __typename
+    page {
+      ... on Document {
+        id
+      }
+    }
+  }
+}
+    `;
+export const PagePartsFragmentDoc = gql`
+    fragment PageParts on Page {
+  title
+  link
+  seo {
+    __typename
+    title
+    image
+    description
+  }
+  blocks {
+    __typename
+    ... on PageBlocksNews {
+      title
+      subTitle
+      description
+      newsItems {
+        __typename
+        article {
+          ... on Document {
+            id
+          }
+        }
+      }
+    }
+    ... on PageBlocksStatsWithImage {
+      title
+      subTitle
+      description
+      image
+      stats {
+        __typename
+        title
+        subTitle
+        description
+      }
+    }
+    ... on PageBlocksHero {
+      title
+      subTitle
+      description
+      image
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+    }
+    ... on PageBlocksSlideshow {
+      items {
+        __typename
+        title
+        subTitle
+        description
+        action {
+          __typename
+          callToAction
+          linkText
+          link
+          linkOverride
+          secondaryText
+          secondaryLink
+          secondaryLinkOverride
+        }
+        overlay {
+          __typename
+          image
+          overlayColor
+          overlayOpacity
+        }
+      }
+    }
+    ... on PageBlocksComparisonTable {
+      title
+      subTitle
+      description
+      items {
+        __typename
+        title
+        subTitle
+        description
+        bulletPoints
+        meta {
+          __typename
+          ... on PageBlocksComparisonTableItemsMetaA {
+            aOne
+          }
+          ... on PageBlocksComparisonTableItemsMetaB {
+            bOne
+          }
+        }
+      }
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+    }
+    ... on PageBlocksFeature {
+      title
+      subTitle
+      description
+      featureStyle
+      features {
+        __typename
+        icon
+        name
+        description
+      }
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+    ... on PageBlocksFullScreenLogo {
+      slogan
+      link
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+    ... on PageBlocksFullScreenHeader {
+      title
+      subTitle
+      description
+      action {
+        __typename
+        callToAction
+        linkText
+        link
+        linkOverride
+        secondaryText
+        secondaryLink
+        secondaryLinkOverride
+      }
+      overlay {
+        __typename
+        image
+        overlayColor
+        overlayOpacity
+      }
+    }
+  }
+}
+    `;
+export const LocaleInfoDocument = gql`
+    query localeInfo($relativePath: String!) {
+  localeInfo(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...LocaleInfoParts
+  }
+}
+    ${LocaleInfoPartsFragmentDoc}`;
+export const LocaleInfoConnectionDocument = gql`
+    query localeInfoConnection {
+  localeInfoConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...LocaleInfoParts
+      }
+    }
+  }
+}
+    ${LocaleInfoPartsFragmentDoc}`;
+export const NewsDocument = gql`
+    query news($relativePath: String!) {
+  news(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...NewsParts
+  }
+}
+    ${NewsPartsFragmentDoc}`;
+export const NewsConnectionDocument = gql`
+    query newsConnection {
+  newsConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...NewsParts
+      }
+    }
+  }
+}
+    ${NewsPartsFragmentDoc}`;
+export const FooterDocument = gql`
+    query footer($relativePath: String!) {
+  footer(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...FooterParts
+  }
+}
+    ${FooterPartsFragmentDoc}`;
+export const FooterConnectionDocument = gql`
+    query footerConnection {
+  footerConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...FooterParts
+      }
+    }
+  }
+}
+    ${FooterPartsFragmentDoc}`;
+export const ThemeDocument = gql`
+    query theme($relativePath: String!) {
+  theme(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...ThemeParts
+  }
+}
+    ${ThemePartsFragmentDoc}`;
+export const ThemeConnectionDocument = gql`
+    query themeConnection {
+  themeConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...ThemeParts
+      }
+    }
+  }
+}
+    ${ThemePartsFragmentDoc}`;
+export const NavigationDocument = gql`
+    query navigation($relativePath: String!) {
+  navigation(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...NavigationParts
+  }
+}
+    ${NavigationPartsFragmentDoc}`;
+export const NavigationConnectionDocument = gql`
+    query navigationConnection {
+  navigationConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...NavigationParts
+      }
+    }
+  }
+}
+    ${NavigationPartsFragmentDoc}`;
+export const PageDocument = gql`
+    query page($relativePath: String!) {
+  page(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    ...PageParts
+  }
+}
+    ${PagePartsFragmentDoc}`;
+export const PageConnectionDocument = gql`
+    query pageConnection {
+  pageConnection {
+    totalCount
+    edges {
+      node {
+        id
+        _sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        ...PageParts
+      }
+    }
+  }
+}
+    ${PagePartsFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
   export function getSdk<C>(requester: Requester<C>) {
     return {
-  
+      localeInfo(variables: LocaleInfoQueryVariables, options?: C): Promise<{data: LocaleInfoQuery, variables: LocaleInfoQueryVariables, query: string}> {
+        return requester<{data: LocaleInfoQuery, variables: LocaleInfoQueryVariables, query: string}, LocaleInfoQueryVariables>(LocaleInfoDocument, variables, options);
+      },
+    localeInfoConnection(variables?: LocaleInfoConnectionQueryVariables, options?: C): Promise<{data: LocaleInfoConnectionQuery, variables: LocaleInfoConnectionQueryVariables, query: string}> {
+        return requester<{data: LocaleInfoConnectionQuery, variables: LocaleInfoConnectionQueryVariables, query: string}, LocaleInfoConnectionQueryVariables>(LocaleInfoConnectionDocument, variables, options);
+      },
+    news(variables: NewsQueryVariables, options?: C): Promise<{data: NewsQuery, variables: NewsQueryVariables, query: string}> {
+        return requester<{data: NewsQuery, variables: NewsQueryVariables, query: string}, NewsQueryVariables>(NewsDocument, variables, options);
+      },
+    newsConnection(variables?: NewsConnectionQueryVariables, options?: C): Promise<{data: NewsConnectionQuery, variables: NewsConnectionQueryVariables, query: string}> {
+        return requester<{data: NewsConnectionQuery, variables: NewsConnectionQueryVariables, query: string}, NewsConnectionQueryVariables>(NewsConnectionDocument, variables, options);
+      },
+    footer(variables: FooterQueryVariables, options?: C): Promise<{data: FooterQuery, variables: FooterQueryVariables, query: string}> {
+        return requester<{data: FooterQuery, variables: FooterQueryVariables, query: string}, FooterQueryVariables>(FooterDocument, variables, options);
+      },
+    footerConnection(variables?: FooterConnectionQueryVariables, options?: C): Promise<{data: FooterConnectionQuery, variables: FooterConnectionQueryVariables, query: string}> {
+        return requester<{data: FooterConnectionQuery, variables: FooterConnectionQueryVariables, query: string}, FooterConnectionQueryVariables>(FooterConnectionDocument, variables, options);
+      },
+    theme(variables: ThemeQueryVariables, options?: C): Promise<{data: ThemeQuery, variables: ThemeQueryVariables, query: string}> {
+        return requester<{data: ThemeQuery, variables: ThemeQueryVariables, query: string}, ThemeQueryVariables>(ThemeDocument, variables, options);
+      },
+    themeConnection(variables?: ThemeConnectionQueryVariables, options?: C): Promise<{data: ThemeConnectionQuery, variables: ThemeConnectionQueryVariables, query: string}> {
+        return requester<{data: ThemeConnectionQuery, variables: ThemeConnectionQueryVariables, query: string}, ThemeConnectionQueryVariables>(ThemeConnectionDocument, variables, options);
+      },
+    navigation(variables: NavigationQueryVariables, options?: C): Promise<{data: NavigationQuery, variables: NavigationQueryVariables, query: string}> {
+        return requester<{data: NavigationQuery, variables: NavigationQueryVariables, query: string}, NavigationQueryVariables>(NavigationDocument, variables, options);
+      },
+    navigationConnection(variables?: NavigationConnectionQueryVariables, options?: C): Promise<{data: NavigationConnectionQuery, variables: NavigationConnectionQueryVariables, query: string}> {
+        return requester<{data: NavigationConnectionQuery, variables: NavigationConnectionQueryVariables, query: string}, NavigationConnectionQueryVariables>(NavigationConnectionDocument, variables, options);
+      },
+    page(variables: PageQueryVariables, options?: C): Promise<{data: PageQuery, variables: PageQueryVariables, query: string}> {
+        return requester<{data: PageQuery, variables: PageQueryVariables, query: string}, PageQueryVariables>(PageDocument, variables, options);
+      },
+    pageConnection(variables?: PageConnectionQueryVariables, options?: C): Promise<{data: PageConnectionQuery, variables: PageConnectionQueryVariables, query: string}> {
+        return requester<{data: PageConnectionQuery, variables: PageConnectionQueryVariables, query: string}, PageConnectionQueryVariables>(PageConnectionDocument, variables, options);
+      }
     };
   }
   export type Sdk = ReturnType<typeof getSdk>;
