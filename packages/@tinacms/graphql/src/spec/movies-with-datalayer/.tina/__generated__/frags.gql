@@ -14,6 +14,21 @@ fragment MovieParts on Movie {
 
 fragment DirectorParts on Director {
   name
+  birthday
+  height
+  relatives {
+    __typename
+    spouse {
+      ... on Document {
+        id
+      }
+    }
+    child {
+      ... on Document {
+        id
+      }
+    }
+  }
 }
 
 fragment CrewParts on Crew {
@@ -28,4 +43,8 @@ fragment CrewParts on Crew {
 fragment ActorParts on Actor {
   name
   body
+}
+
+fragment RelativeParts on Relative {
+  name
 }
