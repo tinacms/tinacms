@@ -21,6 +21,7 @@ import {
   makeFilterChain,
   makeFilterSuffixes,
   makeKeyForField,
+  INDEX_KEY_FIELD_SEPARATOR,
 } from '.'
 
 describe('datalayer store helper functions', () => {
@@ -204,7 +205,7 @@ describe('datalayer store helper functions', () => {
           ],
           publishedIdIndexDefn
         )
-        expect(left).toEqual('true:1')
+        expect(left).toEqual(`true${INDEX_KEY_FIELD_SEPARATOR}1`)
         expect(right).toBeUndefined()
       })
     })
