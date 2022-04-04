@@ -48,15 +48,15 @@ type Query {
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
   documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
-  posts(relativePath: String): PostsDocument!
+  posts(relativePath: String): Posts!
   postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
-  global(relativePath: String): GlobalDocument!
+  global(relativePath: String): Global!
   globalConnection(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
-  authors(relativePath: String): AuthorsDocument!
+  authors(relativePath: String): Authors!
   authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
-  zodiacs(relativePath: String): ZodiacsDocument!
+  zodiacs(relativePath: String): Zodiacs!
   zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
-  pages(relativePath: String): PagesDocument!
+  pages(relativePath: String): Pages!
   pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
 }
 
@@ -83,16 +83,16 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsDocument | PagesDocument
+union DocumentNode = Posts | Global | Authors | Zodiacs | Pages
 
-union PostsAuthorDocument = AuthorsDocument
+union PostsAuthor = Authors
 
-type PostsDocument implements Node & Document {
+type Posts implements Node & Document {
   _body: JSON
   title: String
   published: Boolean
   rating: Float
-  author: PostsAuthorDocument
+  author: PostsAuthor
   date: String
   heroImg: String
   excerpt: String
@@ -103,7 +103,7 @@ type PostsDocument implements Node & Document {
 
 type PostsConnectionEdges {
   cursor: String!
-  node: PostsDocument
+  node: Posts
 }
 
 type PostsConnection implements Connection {
@@ -148,7 +148,7 @@ type GlobalTheme {
   darkMode: String
 }
 
-type GlobalDocument implements Node & Document {
+type Global implements Node & Document {
   header: GlobalHeader
   footer: GlobalFooter
   theme: GlobalTheme
@@ -159,7 +159,7 @@ type GlobalDocument implements Node & Document {
 
 type GlobalConnectionEdges {
   cursor: String!
-  node: GlobalDocument
+  node: Global
 }
 
 type GlobalConnection implements Connection {
@@ -168,13 +168,13 @@ type GlobalConnection implements Connection {
   edges: [GlobalConnectionEdges]
 }
 
-union AuthorsDetailsZodiacDocument = ZodiacsDocument
+union AuthorsDetailsZodiac = Zodiacs
 
 type AuthorsDetails {
-  zodiac: AuthorsDetailsZodiacDocument
+  zodiac: AuthorsDetailsZodiac
 }
 
-type AuthorsDocument implements Node & Document {
+type Authors implements Node & Document {
   name: String
   avatar: String
   details: [AuthorsDetails]
@@ -185,7 +185,7 @@ type AuthorsDocument implements Node & Document {
 
 type AuthorsConnectionEdges {
   cursor: String!
-  node: AuthorsDocument
+  node: Authors
 }
 
 type AuthorsConnection implements Connection {
@@ -194,7 +194,7 @@ type AuthorsConnection implements Connection {
   edges: [AuthorsConnectionEdges]
 }
 
-type ZodiacsDocument implements Node & Document {
+type Zodiacs implements Node & Document {
   name: String
   id: ID!
   _sys: SystemInfo!
@@ -203,7 +203,7 @@ type ZodiacsDocument implements Node & Document {
 
 type ZodiacsConnectionEdges {
   cursor: String!
-  node: ZodiacsDocument
+  node: Zodiacs
 }
 
 type ZodiacsConnection implements Connection {
@@ -263,7 +263,7 @@ type PagesBlocksTestimonial {
 
 union PagesBlocks = PagesBlocksHero | PagesBlocksFeatures | PagesBlocksContent | PagesBlocksTestimonial
 
-type PagesDocument implements Node & Document {
+type Pages implements Node & Document {
   blocks: [PagesBlocks]
   id: ID!
   _sys: SystemInfo!
@@ -272,7 +272,7 @@ type PagesDocument implements Node & Document {
 
 type PagesConnectionEdges {
   cursor: String!
-  node: PagesDocument
+  node: Pages
 }
 
 type PagesConnection implements Connection {
@@ -283,18 +283,18 @@ type PagesConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  update(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  create(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePosts(relativePath: String!, params: PostsMutation!): PostsDocument!
-  createPosts(relativePath: String!, params: PostsMutation!): PostsDocument!
-  updateGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  createGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  updateAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  createAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  updateZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
-  createZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
-  updatePages(relativePath: String!, params: PagesMutation!): PagesDocument!
-  createPages(relativePath: String!, params: PagesMutation!): PagesDocument!
+  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updatePosts(relativePath: String!, params: PostsMutation!): Posts!
+  createPosts(relativePath: String!, params: PostsMutation!): Posts!
+  updateGlobal(relativePath: String!, params: GlobalMutation!): Global!
+  createGlobal(relativePath: String!, params: GlobalMutation!): Global!
+  updateAuthors(relativePath: String!, params: AuthorsMutation!): Authors!
+  createAuthors(relativePath: String!, params: AuthorsMutation!): Authors!
+  updateZodiacs(relativePath: String!, params: ZodiacsMutation!): Zodiacs!
+  createZodiacs(relativePath: String!, params: ZodiacsMutation!): Zodiacs!
+  updatePages(relativePath: String!, params: PagesMutation!): Pages!
+  createPages(relativePath: String!, params: PagesMutation!): Pages!
 }
 
 input DocumentMutation {
@@ -436,3 +436,4 @@ schema {
   query: Query
   mutation: Mutation
 }
+  

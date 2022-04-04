@@ -17,7 +17,7 @@ import * as G from 'graphql'
 import * as util from './util'
 import { Form } from '@tinacms/toolkit'
 import type { TinaCMS } from '@tinacms/toolkit'
-import { formify, DATA_NODE_NAME } from './formify'
+import { formify } from './formify'
 import { onSubmitArgs } from '../use-graphql-forms'
 import { reducer } from './reducer'
 
@@ -84,6 +84,7 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     if (state.status === 'initialized') {
+      console.log(query)
       cms.api.tina.request(query, { variables }).then((res) => {
         // FIXME: remove this from GraphQL
         // 'paths' was previously used to keep track of which fields were
@@ -284,9 +285,8 @@ export const useFormify = ({
                     query Node($id: String!) {
                       node(id: $id) {
                         ...on Document {
-                          form
-                          values
-                          _internalSys: sys {
+                          _values
+                          _internalSys: _sys {
                             path
                             collection {
                               name
@@ -441,8 +441,7 @@ export const useFormify = ({
                     ...changeSet,
                     value: {
                       ...res.node,
-                      // FIXME: assumes `data` field instead of alias
-                      data,
+                      ...data,
                     },
                   },
                 })
@@ -614,9 +613,8 @@ export const useFormify = ({
                       query Node($id: String!) {
                         node(id: $id) {
                           ...on Document {
-                            form
-                            values
-                            _internalSys: sys {
+                            _values
+                            _internalSys: _sys {
                               path
                               collection {
                                 name
@@ -678,11 +676,16 @@ export const useFormify = ({
               )
               data[keyName] = {
                 ...res.node,
-                data: await resolveSubFields({
+                ...(await resolveSubFields({
                   formNode: subDocumentFormNode,
                   form,
                   loc: location,
-                }),
+                })),
+                // data: await resolveSubFields({
+                //   formNode: subDocumentFormNode,
+                //   form,
+                //   loc: location,
+                // }),
               }
             })
 

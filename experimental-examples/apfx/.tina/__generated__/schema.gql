@@ -47,19 +47,319 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
-  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   localeInfo(relativePath: String): LocaleInfo!
-  localeInfoConnection(before: String, after: String, first: Float, last: Float, sort: String): LocaleInfoConnection!
+  localeInfoConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: LocaleInfoFilter): LocaleInfoConnection!
   news(relativePath: String): News!
-  newsConnection(before: String, after: String, first: Float, last: Float, sort: String): NewsConnection!
+  newsConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: NewsFilter): NewsConnection!
   footer(relativePath: String): Footer!
-  footerConnection(before: String, after: String, first: Float, last: Float, sort: String): FooterConnection!
+  footerConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: FooterFilter): FooterConnection!
   theme(relativePath: String): Theme!
-  themeConnection(before: String, after: String, first: Float, last: Float, sort: String): ThemeConnection!
+  themeConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ThemeFilter): ThemeConnection!
   navigation(relativePath: String): Navigation!
-  navigationConnection(before: String, after: String, first: Float, last: Float, sort: String): NavigationConnection!
+  navigationConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: NavigationFilter): NavigationConnection!
   page(relativePath: String): Page!
-  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
+}
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input LocaleInfoAuFilter {
+  tel: StringFilter
+  signUpLink: StringFilter
+  signUpLinkPersonal: StringFilter
+  signInLink: StringFilter
+}
+
+input LocaleInfoUsFilter {
+  tel: StringFilter
+  signUpLink: StringFilter
+  signUpLinkPersonal: StringFilter
+  signInLink: StringFilter
+}
+
+input LocaleInfoGbFilter {
+  tel: StringFilter
+  signUpLink: StringFilter
+  signUpLinkPersonal: StringFilter
+  signInLink: StringFilter
+}
+
+input LocaleInfoFilter {
+  au: LocaleInfoAuFilter
+  us: LocaleInfoUsFilter
+  gb: LocaleInfoGbFilter
+}
+
+input DatetimeFilter {
+  after: String
+  before: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input NewsFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  image: StringFilter
+  publishDate: DatetimeFilter
+  category: StringFilter
+  body: RichTextFilter
+}
+
+input FooterOfficesFilter {
+  location: StringFilter
+  address: StringFilter
+  phone: StringFilter
+}
+
+input FooterDisclaimersFilter {
+  body: RichTextFilter
+}
+
+input FooterFilter {
+  offices: FooterOfficesFilter
+  disclaimers: FooterDisclaimersFilter
+}
+
+input ThemeFilter {
+  displayFont: StringFilter
+  colorMode: StringFilter
+}
+
+input PageSeoFilter {
+  title: StringFilter
+  image: StringFilter
+  description: StringFilter
+}
+
+input PageBlocksNewsNewsItemsArticleFilter {
+  news: NewsFilter
+}
+
+input PageBlocksNewsNewsItemsFilter {
+  article: PageBlocksNewsNewsItemsArticleFilter
+}
+
+input PageBlocksNewsFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  newsItems: PageBlocksNewsNewsItemsFilter
+}
+
+input PageBlocksStatsWithImageStatsFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+}
+
+input PageBlocksStatsWithImageFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  image: StringFilter
+  stats: PageBlocksStatsWithImageStatsFilter
+}
+
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PageBlocksHeroActionFilter {
+  callToAction: StringFilter
+  linkText: StringFilter
+  link: StringFilter
+  linkOverride: StringFilter
+  secondaryText: StringFilter
+  secondaryLink: StringFilter
+  secondaryLinkOverride: StringFilter
+}
+
+input PageBlocksHeroFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  image: ImageFilter
+  action: PageBlocksHeroActionFilter
+}
+
+input PageBlocksSlideshowItemsActionFilter {
+  callToAction: StringFilter
+  linkText: StringFilter
+  link: StringFilter
+  linkOverride: StringFilter
+  secondaryText: StringFilter
+  secondaryLink: StringFilter
+  secondaryLinkOverride: StringFilter
+}
+
+input PageBlocksSlideshowItemsOverlayFilter {
+  image: ImageFilter
+  overlayColor: StringFilter
+  overlayOpacity: StringFilter
+}
+
+input PageBlocksSlideshowItemsFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  action: PageBlocksSlideshowItemsActionFilter
+  overlay: PageBlocksSlideshowItemsOverlayFilter
+}
+
+input PageBlocksSlideshowFilter {
+  items: PageBlocksSlideshowItemsFilter
+}
+
+input PageBlocksComparisonTableItemsMetaAFilter {
+  aOne: StringFilter
+}
+
+input PageBlocksComparisonTableItemsMetaBFilter {
+  bOne: StringFilter
+}
+
+input PageBlocksComparisonTableItemsMetaFilter {
+  a: PageBlocksComparisonTableItemsMetaAFilter
+  b: PageBlocksComparisonTableItemsMetaBFilter
+}
+
+input PageBlocksComparisonTableItemsFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  bulletPoints: StringFilter
+  meta: PageBlocksComparisonTableItemsMetaFilter
+}
+
+input PageBlocksComparisonTableActionFilter {
+  callToAction: StringFilter
+  linkText: StringFilter
+  link: StringFilter
+  linkOverride: StringFilter
+  secondaryText: StringFilter
+  secondaryLink: StringFilter
+  secondaryLinkOverride: StringFilter
+}
+
+input PageBlocksComparisonTableFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  items: PageBlocksComparisonTableItemsFilter
+  action: PageBlocksComparisonTableActionFilter
+}
+
+input PageBlocksFeatureFeaturesFilter {
+  icon: StringFilter
+  name: StringFilter
+  description: RichTextFilter
+}
+
+input PageBlocksFeatureOverlayFilter {
+  image: ImageFilter
+  overlayColor: StringFilter
+  overlayOpacity: StringFilter
+}
+
+input PageBlocksFeatureFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  featureStyle: StringFilter
+  features: PageBlocksFeatureFeaturesFilter
+  overlay: PageBlocksFeatureOverlayFilter
+}
+
+input PageBlocksFullScreenLogoOverlayFilter {
+  image: ImageFilter
+  overlayColor: StringFilter
+  overlayOpacity: StringFilter
+}
+
+input PageBlocksFullScreenLogoFilter {
+  slogan: StringFilter
+  link: StringFilter
+  overlay: PageBlocksFullScreenLogoOverlayFilter
+}
+
+input PageBlocksFullScreenHeaderActionFilter {
+  callToAction: StringFilter
+  linkText: StringFilter
+  link: StringFilter
+  linkOverride: StringFilter
+  secondaryText: StringFilter
+  secondaryLink: StringFilter
+  secondaryLinkOverride: StringFilter
+}
+
+input PageBlocksFullScreenHeaderOverlayFilter {
+  image: ImageFilter
+  overlayColor: StringFilter
+  overlayOpacity: StringFilter
+}
+
+input PageBlocksFullScreenHeaderFilter {
+  title: StringFilter
+  subTitle: StringFilter
+  description: RichTextFilter
+  action: PageBlocksFullScreenHeaderActionFilter
+  overlay: PageBlocksFullScreenHeaderOverlayFilter
+}
+
+input PageBlocksFilter {
+  news: PageBlocksNewsFilter
+  statsWithImage: PageBlocksStatsWithImageFilter
+  hero: PageBlocksHeroFilter
+  slideshow: PageBlocksSlideshowFilter
+  comparisonTable: PageBlocksComparisonTableFilter
+  feature: PageBlocksFeatureFilter
+  fullScreenLogo: PageBlocksFullScreenLogoFilter
+  fullScreenHeader: PageBlocksFullScreenHeaderFilter
+}
+
+input PageFilter {
+  title: StringFilter
+  link: StringFilter
+  seo: PageSeoFilter
+  blocks: PageBlocksFilter
+}
+
+input NavigationItemsPageFilter {
+  page: PageFilter
+}
+
+input NavigationItemsFilter {
+  page: NavigationItemsPageFilter
+}
+
+input NavigationFilter {
+  items: NavigationItemsFilter
+}
+
+input DocumentFilter {
+  localeInfo: LocaleInfoFilter
+  news: NewsFilter
+  footer: FooterFilter
+  theme: ThemeFilter
+  navigation: NavigationFilter
+  page: PageFilter
 }
 
 type DocumentConnectionEdges {
@@ -82,7 +382,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = LocaleInfo | News | Footer | Theme | Navigation | Page

@@ -25,7 +25,6 @@ const NODE_NAME = 'node'
 const COLLECTION_FIELD_NAME = 'collection'
 const COLLECTIONS_FIELD_NAME = 'collections'
 const COLLECTIONS_DOCUMENTS_NAME = 'documents'
-export const DATA_NODE_NAME = 'data'
 
 export const formify = async ({
   schema,
@@ -187,17 +186,18 @@ export const formify = async ({
     let shouldFormify = false
     selection.selectionSet.selections.forEach((selection) => {
       if (selection.kind === 'Field') {
-        if (selection.name.value === 'dataJSON') {
-          shouldFormify = true
-          hasDataJSONField = true
-        }
-        if (selection.name.value === 'values') {
+        // Deprecated
+        // if (selection.name.value === 'dataJSON') {
+        //   shouldFormify = true
+        //   hasDataJSONField = true
+        // }
+        if (selection.name.value === '_values') {
           shouldFormify = true
           hasValuesField = true
         }
-        if (selection.name.value === 'data') {
-          shouldFormify = true
-        }
+        // if (selection.name.value === 'data') {
+        shouldFormify = true
+        // }
       }
     })
 
@@ -256,39 +256,11 @@ export const formify = async ({
                 })
               }
               case 'Field': {
-                if (selectionNode.name.value === DATA_NODE_NAME) {
-                  const field = util.getObjectField(type, selectionNode)
-                  return {
-                    ...selectionNode,
-                    selectionSet: {
-                      kind: 'SelectionSet',
-                      selections: [
-                        ...selectionNode.selectionSet.selections.map(
-                          (subSelectionNode) => {
-                            switch (subSelectionNode.kind) {
-                              case 'Field':
-                                return formifyFieldNode({
-                                  fieldNode: subSelectionNode,
-                                  parentType: field.type,
-                                  path: util.buildPath({
-                                    fieldNode: selectionNode,
-                                    type: field.type,
-                                    path,
-                                  }),
-                                })
-                              default:
-                                throw new FormifyError(
-                                  'UNEXPECTED',
-                                  `selection ${subSelectionNode.kind}`
-                                )
-                            }
-                          }
-                        ),
-                      ],
-                    },
-                  }
-                }
-                return selectionNode
+                return formifyFieldNode({
+                  fieldNode: selectionNode,
+                  parentType: type,
+                  path,
+                })
               }
               default:
                 throw new FormifyError('UNEXPECTED')
@@ -354,7 +326,6 @@ export const formify = async ({
           ...fieldNode.selectionSet.selections.map((selectionNode) => {
             switch (selectionNode.kind) {
               case 'Field': {
-                console.log(selectionNode.name.value)
                 return formifyFieldNode({
                   fieldNode: selectionNode,
                   parentType: field.type,

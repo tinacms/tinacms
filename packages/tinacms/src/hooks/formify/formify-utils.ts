@@ -212,14 +212,13 @@ export function buildPath({
  */
 const node = G.parse(`
  query Sample {
-   _internalSys: sys {
+   _internalSys: _sys {
      path
      collection {
        name
      }
    }
-   form
-   values
+   _values
  }`)
 export const metaFields: G.SelectionNode[] =
   // @ts-ignore

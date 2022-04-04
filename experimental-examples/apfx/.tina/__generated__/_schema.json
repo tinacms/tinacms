@@ -5,7 +5,11 @@
     "minor": "59",
     "patch": "8"
   },
-  "meta": {},
+  "meta": {
+    "flags": [
+      "experimentalData"
+    ]
+  },
   "collections": [
     {
       "label": "Locale Information",
@@ -208,7 +212,7 @@
           "name": "publishDate",
           "type": "datetime",
           "ui": {
-            "defaultValue": "2022-03-30T23:54:39.648Z"
+            "defaultValue": "2022-03-31T00:49:41.048Z"
           },
           "namespace": [
             "news",
