@@ -38,13 +38,6 @@ const validSchema: TinaCloudSchema<false> = {
           label: 'Title',
           name: 'Title',
           type: 'string',
-          ui: {
-            validate: (val) => {
-              if (val?.length > 5) {
-                return 'Too Long!!!'
-              }
-            },
-          },
         },
         {
           name: 'body',

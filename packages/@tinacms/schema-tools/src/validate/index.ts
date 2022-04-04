@@ -10,11 +10,23 @@ export const validateSchema = ({
     TinaCloudSchemaZod.parse(config)
   } catch (e) {
     if (e instanceof ZodError) {
-      //   console.log(e.issues)
-      // TODO parse the ZodIssue to provide a better error
-      //   e.errors.forEach((error) => {
-      //     console.log({ error })
-      //   })
+      const errors = e.flatten((issue) => {
+        const moreInfo = []
+        if (issue.code === 'invalid_union') {
+          // TODO: should probably change this to be a recursive function that iterates over the entire nested error object instead of just one level deep
+          moreInfo.push(issue.unionErrors.map((x) => x.flatten()))
+        }
+        return {
+          message: issue.message,
+          code: issue.code || 'no code provided',
+          path: issue.path.join('.'),
+          moreInfo,
+        }
+      })
+      console.error(
+        '!!! Error when trying to validate `.tina/schema file`!!!,\n' +
+          JSON.stringify(errors, null, 2)
+      )
     }
     throw e
   }

@@ -14,7 +14,7 @@ const TypeName = [
 ] as const
 
 const typeTypeError = `type must be one of ${TypeName.join(', ')}`
-const typeReqiredError = `type is required and must be one of ${TypeName.join(
+const typeRequiredError = `type is required and must be one of ${TypeName.join(
   ', '
 )}`
 
@@ -43,32 +43,32 @@ const TinaScalerBase = FieldWithList.extend({
 const StringField = TinaScalerBase.extend({
   type: z.literal(TypeNameEnum.Values.string, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
 })
 const BooleanField = TinaScalerBase.extend({
   type: z.literal('boolean' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
 })
 const NumberField = TinaScalerBase.extend({
   type: z.literal('number' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
 })
 const ImageField = TinaScalerBase.extend({
   type: z.literal('image' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
 })
 
 const DateTimeField = TinaScalerBase.extend({
   type: z.literal('datetime' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
   dateFormat: z.string().optional(),
   timeFormat: z.string().optional(),
@@ -80,10 +80,12 @@ const DateTimeField = TinaScalerBase.extend({
 const ReferenceField = FieldWithList.extend({
   type: z.literal('reference' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   }),
 })
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// @ts-ignore --- Not sure why this is giving a type error here
 export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
   // needs to be redefined here to avoid circle deps
   const TemplateTemp = z
@@ -98,7 +100,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
 
   const ObjectLiteral = z.literal('object' as const, {
     invalid_type_error: typeTypeError,
-    required_error: typeReqiredError,
+    required_error: typeRequiredError,
   })
   const ObjectFieldWithFields = FieldWithList.extend({
     type: ObjectLiteral,
@@ -116,7 +118,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
   const RichTextField = FieldWithList.extend({
     type: z.literal('rich-text' as const, {
       invalid_type_error: typeTypeError,
-      required_error: typeReqiredError,
+      required_error: typeRequiredError,
     }),
   })
 
