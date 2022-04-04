@@ -1,4 +1,4 @@
-query {
+{
   getDirectorList {
     edges {
       node {
@@ -7,5 +7,23 @@ query {
         }
       }
     }
-  }
+  },
+  sortedByHeight: getDirectorList(sort: "height") {
+    edges {
+      node {
+        data {
+          name
+        }
+      }
+    }
+  },
+  sofiaParent: getDirectorList(sort: "name", filter: { relatives: { child: { relative: { name: { eq: "Sofia Coppolla" } } } } }) {
+    edges {
+      node {
+        data {
+          name
+        }
+      }
+    }
+  },
 }

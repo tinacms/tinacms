@@ -66,7 +66,7 @@ describe('Tina side bar', () => {
     // Delete all text in rich text editor
     // Best practice is to clean up state BEFORE the test: https://docs.cypress.io/guides/references/best-practices#Using-after-or-afterEach-hooks
 
-    // cy.get('[data-test="form:getPageDocument"]')
+    // cy.get('[data-test="form:content/page/home.mdx"]')
     //   .first()
     //   .scrollTo('bottomLeft', {
     //     easing: 'linear',
@@ -87,7 +87,7 @@ describe('Tina side bar', () => {
     // cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
-    cy.get('[data-test="form:getPageDocument"]')
+    cy.get('[data-test="form:content/page/home.mdx"]')
       .first()
       .scrollTo('top', {
         easing: 'linear',
@@ -100,7 +100,7 @@ describe('Tina side bar', () => {
           .type(SUBTITLE_TEXT)
         cy.get('[data-test="subtitle"]').should('contain', SUBTITLE_TEXT)
 
-        // cy.get('[data-test="form:getPageDocument"]').first().scrollTo('top')
+        // cy.get('[data-test="form:content/page/home.mdx"]').first().scrollTo('top')
         // Editing heading
         cy.get('input[name="heading"]', { timeout: 3000 })
           .click()
@@ -110,7 +110,7 @@ describe('Tina side bar', () => {
   })
 
   it('Can edit rich text', () => {
-    cy.get('[data-test="form:getPageDocument"]')
+    cy.get('[data-test="form:content/page/home.mdx"]')
       .first()
       .scrollTo('bottom', {
         easing: 'linear',
