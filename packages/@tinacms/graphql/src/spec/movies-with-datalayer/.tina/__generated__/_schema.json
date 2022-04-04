@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.5",
+    "fullVersion": "0.59.8",
     "major": "0",
     "minor": "59",
-    "patch": "5"
+    "patch": "8"
   },
   "meta": {
     "flags": [
@@ -92,6 +92,33 @@
           ]
         }
       ],
+      "indexes": [
+        {
+          "name": "archived-releaseDate",
+          "fields": [
+            {
+              "name": "archived",
+              "namespace": [
+                "movie",
+                "archived-releaseDate",
+                "archived"
+              ]
+            },
+            {
+              "name": "releaseDate",
+              "namespace": [
+                "movie",
+                "archived-releaseDate",
+                "releaseDate"
+              ]
+            }
+          ],
+          "namespace": [
+            "movie",
+            "archived-releaseDate"
+          ]
+        }
+      ],
       "namespace": [
         "movie"
       ]
@@ -108,6 +135,62 @@
           "namespace": [
             "director",
             "name"
+          ]
+        },
+        {
+          "type": "datetime",
+          "label": "Birthday",
+          "name": "birthday",
+          "namespace": [
+            "director",
+            "birthday"
+          ]
+        },
+        {
+          "type": "number",
+          "label": "Height",
+          "name": "height",
+          "namespace": [
+            "director",
+            "height"
+          ]
+        },
+        {
+          "label": "Relatives",
+          "name": "relatives",
+          "type": "object",
+          "list": false,
+          "fields": [
+            {
+              "type": "reference",
+              "label": "Spouses",
+              "name": "spouse",
+              "collections": [
+                "relative"
+              ],
+              "namespace": [
+                "director",
+                "relatives",
+                "spouse"
+              ]
+            },
+            {
+              "type": "reference",
+              "label": "Child",
+              "name": "child",
+              "collections": [
+                "relative"
+              ],
+              "namespace": [
+                "director",
+                "relatives",
+                "child"
+              ]
+            }
+          ],
+          "namespace": [
+            "director",
+            "relatives"
           ]
         }
       ],
@@ -195,6 +278,25 @@
       ],
       "namespace": [
         "actor"
+      ]
+    },
+    {
+      "label": "Relative",
+      "name": "relative",
+      "path": "content/relative",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "relative",
+            "name"
+          ]
+        }
+      ],
+      "namespace": [
+        "relative"
       ]
     }
   ]

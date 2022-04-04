@@ -153,3 +153,42 @@ query getActorList {
     }
   }
 }
+
+query getRelativeDocument($relativePath: String!) {
+  getRelativeDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...RelativeParts
+    }
+  }
+}
+
+query getRelativeList {
+  getRelativeList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...RelativeParts
+        }
+      }
+    }
+  }
+}
