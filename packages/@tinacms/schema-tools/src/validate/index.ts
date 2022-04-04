@@ -1,3 +1,4 @@
+import { ZodError } from 'zod'
 import { TinaCloudSchema } from '../types'
 import { TinaCloudSchemaZod } from './schema'
 export const validateSchema = ({
@@ -5,5 +6,16 @@ export const validateSchema = ({
 }: {
   config: TinaCloudSchema<false>
 }) => {
-  TinaCloudSchemaZod.parse(config)
+  try {
+    TinaCloudSchemaZod.parse(config)
+  } catch (e) {
+    if (e instanceof ZodError) {
+      //   console.log(e.issues)
+      // TODO parse the ZodIssue to provide a better error
+      //   e.errors.forEach((error) => {
+      //     console.log({ error })
+      //   })
+    }
+    throw e
+  }
 }

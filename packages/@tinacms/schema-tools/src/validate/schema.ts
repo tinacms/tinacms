@@ -1,35 +1,50 @@
 import { z } from 'zod'
+import { hasDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 
-const Template = z.object({
-  label: z.string(),
-  name: z.string(),
-  fields: TinaFieldZod,
-})
+const Template = z
+  .object({
+    label: z.string(),
+    name: z.string(),
+    fields: z.array(TinaFieldZod),
+  })
+  .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
+    message: 'Fields must have a unique name',
+  })
 
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
   name: z.string(),
-  format: z.union([
-    z.literal('json'),
-    z.literal('md'),
-    z.literal('markdown'),
-    z.literal('mdx'),
-  ]),
+  format: z
+    .union([
+      z.literal('json'),
+      z.literal('md'),
+      z.literal('markdown'),
+      z.literal('mdx'),
+    ])
+    .optional(),
 })
 
 const CollectionWithFields = TinaCloudCollectionBase.extend({
-  fields: z.array(TinaFieldZod),
+  fields: z.array(TinaFieldZod).min(1),
   templates: z.undefined(),
+}).refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
+  message: 'Fields must have a unique name',
 })
 
 const CollectionsWithTemplates = TinaCloudCollectionBase.extend({
   fields: z.undefined(),
   templates: z.array(Template),
+}).refine((val) => !hasDuplicates(val.templates?.map((x) => x.name)), {
+  message: 'Templates must have a unique name',
 })
 
 const TinaCloudCollection = CollectionWithFields.or(CollectionsWithTemplates)
 
-export const TinaCloudSchemaZod = z.object({
-  collections: z.array(TinaCloudCollection),
-})
+export const TinaCloudSchemaZod = z
+  .object({
+    collections: z.array(TinaCloudCollection),
+  })
+  .refine((val) => !hasDuplicates(val.collections.map((x) => x.name)), {
+    message: 'can not have two collections with the same name',
+  })
