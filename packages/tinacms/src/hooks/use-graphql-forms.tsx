@@ -49,10 +49,6 @@ export function useGraphqlFormsUnstable<T extends object>({
 }): [T, Boolean] {
   const cms = useCMS()
 
-  React.useEffect(() => {
-    console.log('NOTE: using unstable formify')
-  }, [])
-
   const state = useFormify({
     query,
     cms,
@@ -186,12 +182,15 @@ export function useGraphqlForms<T extends object>({
       return
     }
 
+    const useUnstableFormify =
+      cms?.flags.get('use-unstable-formify') === false ? false : true
+
     const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina
       .requestWithForm((gql) => gql(query), {
         variables,
-        useUnstableFormify: cms.flags.get('use-unstable-formify'),
+        useUnstableFormify,
       })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
