@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { hasDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
+const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
 
 const Template = z
   .object({
@@ -15,14 +16,7 @@ const Template = z
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
   name: z.string(),
-  format: z
-    .union([
-      z.literal('json'),
-      z.literal('md'),
-      z.literal('markdown'),
-      z.literal('mdx'),
-    ])
-    .optional(),
+  format: z.enum(FORMATS).optional(),
 })
 
 const CollectionWithFields = TinaCloudCollectionBase.extend({
