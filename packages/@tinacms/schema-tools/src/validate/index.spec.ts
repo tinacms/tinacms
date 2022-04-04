@@ -8,6 +8,24 @@ beforeEach(() => {
 afterEach(() => {
   consoleErrMock.mockRestore()
 })
+const validSchemaWithTemplates: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'page',
+      path: 'content/page',
+      label: 'Page',
+      format: 'mdx',
+      templates: [
+        {
+          name: 'foo',
+          label: 'bar',
+          fields: [{ type: 'string', name: 'foo' }],
+        },
+      ],
+    },
+  ],
+}
+
 const validSchema: TinaCloudSchema<false> = {
   collections: [
     {
@@ -16,25 +34,11 @@ const validSchema: TinaCloudSchema<false> = {
       label: 'Page',
       format: 'mdx',
       fields: [
-        // {
-        //   name: 'thingOne',
-        //   type: 'string',
-        // },
         {
           label: 'Title',
           name: 'Title',
           type: 'string',
           ui: {
-            // defaultValue: 'Title',
-            // Examples of how you COULD use a custom form
-            // component: ({ form, field, input }) => {
-            //   return (
-            //     <div>
-            //       <label>This is a test</label>
-            //       <input {...input}></input>
-            //     </div>
-            //   )
-            // },
             validate: (val) => {
               if (val?.length > 5) {
                 return 'Too Long!!!'
@@ -76,6 +80,50 @@ const validSchema: TinaCloudSchema<false> = {
               name: 'post',
               type: 'reference',
               collections: ['post'],
+            },
+            {
+              type: 'object',
+              label: 'Something',
+              name: 'foo',
+              fields: [
+                {
+                  name: 'bar',
+                  type: 'string',
+                },
+                {
+                  type: 'object',
+                  label: 'Something',
+                  name: 'foo',
+                  fields: [
+                    {
+                      name: 'bar',
+                      type: 'string',
+                    },
+                    {
+                      type: 'object',
+                      label: 'Something',
+                      name: 'foo',
+                      fields: [
+                        {
+                          name: 'bar',
+                          type: 'string',
+                        },
+                        {
+                          type: 'object',
+                          label: 'Something',
+                          name: 'foo',
+                          fields: [
+                            {
+                              name: 'bar',
+                              type: 'string',
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
             {
               name: 'label',
@@ -165,6 +213,7 @@ const schemaWithBadFormat = {
     },
   ],
 }
+
 const schemaWitNoName = {
   collections: [
     {
@@ -174,9 +223,98 @@ const schemaWitNoName = {
     },
   ],
 }
+const schemaWithDuplicateName: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ name: 'foo', type: 'string' }],
+    },
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ name: 'foo', type: 'string' }],
+    },
+  ],
+}
+
+const schemaWithDuplicateTemplates: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      templates: [
+        {
+          name: 'foo',
+          label: 'foo',
+          fields: [{ name: 'foo', type: 'string' }],
+        },
+        {
+          name: 'foo',
+          label: 'foo',
+          fields: [{ name: 'foo', type: 'string' }],
+        },
+      ],
+    },
+  ],
+}
+
+const schemaWithDeeplyNestedError: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [
+        {
+          type: 'object',
+          label: 'Something',
+          name: 'foo',
+          fields: [
+            {
+              type: 'object',
+              label: 'Something',
+              name: 'foo',
+              fields: [
+                {
+                  name: 'bar',
+                  type: 'string',
+                },
+                {
+                  type: 'object',
+                  label: 'Something',
+                  name: 'foo',
+                  fields: [
+                    {
+                      name: 'bar',
+                      type: 'string',
+                    },
+                    {
+                      type: 'object',
+                      label: 'Something',
+                      name: 'foo',
+                      fields: [
+                        {
+                          name: 'bar',
+                          // @ts-ignore
+                          type: 'not a type',
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
 describe('validateSchema', () => {
   it('Passes on a valid schema', () => {
     validateSchema({ config: validSchema })
+    expect(consoleErrMock).not.toHaveBeenCalled()
+    validateSchema({ config: validSchemaWithTemplates })
     expect(consoleErrMock).not.toHaveBeenCalled()
   })
   it('fails when a bad format is given', () => {
@@ -187,6 +325,22 @@ describe('validateSchema', () => {
   it('fails when a no name is given', () => {
     expect(() => {
       validateSchema({ config: schemaWitNoName })
+    }).toThrow()
+  })
+  it('fails when two collections have the same name', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithDuplicateName })
+    }).toThrow()
+  })
+
+  it('fails when two templates have the same name', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithDuplicateTemplates })
+    }).toThrow()
+  })
+  it('fails on deeply nested incorrect object', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithDeeplyNestedError })
     }).toThrow()
   })
 })

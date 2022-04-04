@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { TinaFieldInner } from '../types/SchemaTypes'
+import { hasDuplicates } from '../util'
 
 const TypeName = [
   'string',
@@ -32,6 +33,10 @@ const TinaField = z.object({
 })
 
 const FieldWithList = TinaField.extend({ list: z.boolean().optional() })
+
+// ==========
+// Scaler fields
+// ==========
 const TinaScalerBase = FieldWithList.extend({
   options: z.array(Option).optional(),
 })
@@ -69,20 +74,52 @@ const DateTimeField = TinaScalerBase.extend({
   timeFormat: z.string().optional(),
 })
 
-const ScalarTypeZod = z.union([
-  StringField,
-  BooleanField,
-  NumberField,
-  ImageField,
-  DateTimeField,
-])
-
+// ==========
+// Non Scaler fields
+// ==========
 const ReferenceField = FieldWithList.extend({
-  type: z.literal('reference' as const),
-  collections: z.array(z.string()),
+  type: z.literal('reference' as const, {
+    invalid_type_error: typeTypeError,
+    required_error: typeReqiredError,
+  }),
 })
 
 export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
+  // needs to be redefined here to avoid circle deps
+  const TemplateTemp = z
+    .object({
+      label: z.string(),
+      name: z.string(),
+      fields: z.array(TinaFieldZod),
+    })
+    .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
+      message: 'Fields must have a unique name',
+    })
+
+  const ObjectLiteral = z.literal('object' as const, {
+    invalid_type_error: typeTypeError,
+    required_error: typeReqiredError,
+  })
+  const ObjectFieldWithFields = FieldWithList.extend({
+    type: ObjectLiteral,
+    fields: z.array(TinaFieldZod),
+    templates: z.undefined(),
+  })
+  const ObjectFieldWithTemplates = FieldWithList.extend({
+    type: ObjectLiteral,
+    fields: z.undefined(),
+    templates: z.array(TemplateTemp),
+  })
+
+  const ObjectField = ObjectFieldWithFields.or(ObjectFieldWithTemplates)
+
+  const RichTextField = FieldWithList.extend({
+    type: z.literal('rich-text' as const, {
+      invalid_type_error: typeTypeError,
+      required_error: typeReqiredError,
+    }),
+  })
+
   return z.union([
     StringField,
     BooleanField,
@@ -90,23 +127,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
     ImageField,
     DateTimeField,
     ReferenceField,
-    TinaField.extend({
-      type: z.literal('object' as const, {
-        invalid_type_error: typeTypeError,
-        required_error: typeReqiredError,
-      }),
-    }),
-    TinaField.extend({
-      type: z.literal('reference' as const, {
-        invalid_type_error: typeTypeError,
-        required_error: typeReqiredError,
-      }),
-    }),
-    TinaField.extend({
-      type: z.literal('rich-text' as const, {
-        invalid_type_error: typeTypeError,
-        required_error: typeReqiredError,
-      }),
-    }),
+    ObjectField,
+    RichTextField,
   ])
 })
