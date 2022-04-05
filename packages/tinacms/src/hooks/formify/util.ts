@@ -192,13 +192,14 @@ export const buildForm = (
             }
           }
         `
+        console.log(doc)
         if (onSubmit) {
           onSubmit({
             queryString: mutationString,
             mutationString,
             variables: {
               collection: doc._internalSys.collection.name,
-              relativePath: doc.id,
+              relativePath: doc._internalSys.relativePath,
               params: { [doc._internalSys.collection.name]: variables },
             },
           })
@@ -207,8 +208,7 @@ export const buildForm = (
             await cms.api.tina.request(mutationString, {
               variables: {
                 collection: doc._internalSys.collection.name,
-                // relativePath: doc.id,
-                relativePath: 'home.md',
+                relativePath: doc._internalSys.relativePath,
                 params: {
                   [doc._internalSys.collection.name]: variables.params,
                 },

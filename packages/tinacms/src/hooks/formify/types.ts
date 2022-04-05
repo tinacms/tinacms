@@ -62,6 +62,7 @@ export type FormifiedDocumentNode = {
   id: string
   _internalSys: {
     path: string
+    relativePath: string
     collection: {
       name
     }

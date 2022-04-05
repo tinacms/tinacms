@@ -114,6 +114,7 @@ export const useFormify = ({
    *       title
    *     }
    *     _internalSys {
+   *       relativePath
    *       path
    *     }
    *     form
@@ -288,6 +289,7 @@ export const useFormify = ({
                           _values
                           _internalSys: _sys {
                             path
+                            relativePath
                             collection {
                               name
                             }
@@ -616,6 +618,7 @@ export const useFormify = ({
                             _values
                             _internalSys: _sys {
                               path
+                              relativePath
                               collection {
                                 name
                               }

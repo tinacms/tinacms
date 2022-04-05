@@ -1,11 +1,6 @@
 ---
 title: 5 tips to trade better with companies in China
 subTitle: Doing business with China
-description: >-
-  The U.S. Dollar is aiming to close the week with another half-percent barely
-  gained as volatility this week has caused swings between losses and gains
-  because of markets trying to find guidance in the midst of trouble for the
-  global economic recovery.
 image: >-
   https://images.unsplash.com/photo-1532270239525-86620e182354?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=3302&q=80
 publishDate: '2022-03-26T18:25:28.208Z'

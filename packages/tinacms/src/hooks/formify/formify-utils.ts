@@ -214,6 +214,7 @@ const node = G.parse(`
  query Sample {
    _internalSys: _sys {
      path
+     relativePath
      collection {
        name
      }
