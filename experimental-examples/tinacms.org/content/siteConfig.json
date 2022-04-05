@@ -1,0 +1,16 @@
+{
+  "title": "Tina",
+  "sidebarTitle": "Tina",
+  "seoDefaultTitle": "Build contextual editing into your site",
+  "description": "Open-source visual editing experience, backed by git.",
+  "siteUrl": "https://tinacms.org",
+  "roadmapUrl": "https://github.com/tinacms/tinacms/blob/master/ROADMAP.md",
+  "licenseUrl": "https://github.com/tinacms/tinacms/blob/master/LICENSE",
+  "keywords": "nextjs, react, cms, next",
+  "social": {
+    "twitterHandle": "@tina_cms",
+    "twitter": "https://twitter.com/tina_cms",
+    "github": "https://github.com/tinacms/tinacms",
+    "forum": "https://community.tinacms.org/"
+  }
+}

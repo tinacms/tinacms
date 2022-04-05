@@ -1,0 +1,76 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "page",
+      "post"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PageBlocksFeaturesItems": {
+    "type": "PageBlocksFeaturesItems",
+    "resolveType": "unionData",
+    "typeMap": {
+      "feature": "PageBlocksFeaturesItemsFeature"
+    }
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PageBlocksHero",
+      "features": "PageBlocksFeatures",
+      "flying": "PageBlocksFlying",
+      "pricing": "PageBlocksPricing",
+      "faq": "PageBlocksFaq",
+      "content": "PageBlocksContent",
+      "columns": "PageBlocksColumns"
+    }
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
+  },
+  "PostPrevDocument": {
+    "type": "PostPrevDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostNextDocument": {
+    "type": "PostNextDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "PostDocument": {
+    "type": "PostDocument",
+    "resolveType": "collectionDocument",
+    "collection": "post",
+    "createPostDocument": "create",
+    "updatePostDocument": "update"
+  },
+  "PostConnection": {
+    "type": "PostConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "post"
+  }
+}

@@ -1,0 +1,2509 @@
+{
+  "version": {
+    "fullVersion": "0.59.10",
+    "major": "0",
+    "minor": "59",
+    "patch": "10"
+  },
+  "meta": {},
+  "collections": [
+    {
+      "label": "Pages",
+      "name": "page",
+      "path": "content/blocksPages",
+      "format": "json",
+      "fields": [
+        {
+          "type": "object",
+          "name": "seo",
+          "label": "SEO Information",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Title",
+              "name": "title",
+              "namespace": [
+                "page",
+                "seo",
+                "title"
+              ]
+            },
+            {
+              "type": "string",
+              "label": " Description",
+              "name": "description",
+              "ui": {
+                "component": "textarea"
+              },
+              "namespace": [
+                "page",
+                "seo",
+                "description"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "seo"
+          ]
+        },
+        {
+          "label": "Page Sections",
+          "name": "blocks",
+          "type": "object",
+          "list": true,
+          "ui": {
+            "visualSelector": true
+          },
+          "templates": [
+            {
+              "label": "Hero",
+              "name": "hero",
+              "ui": {
+                "previewSrc": "/img/blocks/hero.png",
+                "defaultItem": {
+                  "headline": "Next Gen Content Management",
+                  "text": "Tina is an open-source, Git-backed CMS with the ability to add visual editing to your NextJS site",
+                  "actions": [
+                    {
+                      "variant": "orange",
+                      "label": "Primary Action",
+                      "icon": true,
+                      "url": "/"
+                    },
+                    {
+                      "variant": "",
+                      "label": "Secondary Action",
+                      "icon": false,
+                      "url": "/"
+                    }
+                  ]
+                }
+              },
+              "fields": [
+                {
+                  "name": "headline",
+                  "label": "Headline",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "headline"
+                  ]
+                },
+                {
+                  "name": "text",
+                  "label": "Text",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "text"
+                  ]
+                },
+                {
+                  "label": "Actions",
+                  "name": "actions",
+                  "type": "object",
+                  "list": true,
+                  "ui": {
+                    "defaultItem": {
+                      "variant": "default",
+                      "label": "Secondary Action",
+                      "icon": false,
+                      "url": "/"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "name": "label",
+                      "label": "Label",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "label"
+                      ]
+                    },
+                    {
+                      "name": "icon",
+                      "label": "Icon",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "icon"
+                      ]
+                    },
+                    {
+                      "name": "variant",
+                      "label": "Variant",
+                      "type": "string",
+                      "options": [
+                        {
+                          "value": "default",
+                          "label": "Default"
+                        },
+                        {
+                          "value": "orange",
+                          "label": "Orange"
+                        },
+                        {
+                          "value": "ghost",
+                          "label": "Ghost"
+                        },
+                        {
+                          "value": "command",
+                          "label": "Command"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "variant"
+                      ]
+                    },
+                    {
+                      "name": "url",
+                      "label": "URL",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "hero",
+                        "actions",
+                        "url"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "actions"
+                  ]
+                },
+                {
+                  "name": "videoSrc",
+                  "label": "Video Source",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "videoSrc"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "hero"
+              ]
+            },
+            {
+              "label": "Features",
+              "name": "features",
+              "ui": {
+                "previewSrc": "/img/blocks/features.png"
+              },
+              "fields": [
+                {
+                  "name": "items",
+                  "label": "Feature Items",
+                  "type": "object",
+                  "list": true,
+                  "templates": [
+                    {
+                      "label": "Feature",
+                      "name": "feature",
+                      "fields": [
+                        {
+                          "name": "headline",
+                          "label": "Headline",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "features",
+                            "items",
+                            "feature",
+                            "headline"
+                          ]
+                        },
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "ui": {
+                            "component": "textarea"
+                          },
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "features",
+                            "items",
+                            "feature",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "media",
+                          "label": "Media",
+                          "type": "object",
+                          "fields": [
+                            {
+                              "name": "src",
+                              "label": "Image Source",
+                              "type": "string",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "media",
+                                "src"
+                              ]
+                            },
+                            {
+                              "name": "videoSrc",
+                              "label": "Video Source",
+                              "type": "string",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "media",
+                                "videoSrc"
+                              ]
+                            },
+                            {
+                              "name": "cli",
+                              "label": "CLI",
+                              "type": "boolean",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "media",
+                                "cli"
+                              ]
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "features",
+                            "items",
+                            "feature",
+                            "media"
+                          ]
+                        },
+                        {
+                          "label": "Actions",
+                          "name": "actions",
+                          "type": "object",
+                          "list": true,
+                          "ui": {
+                            "defaultItem": {
+                              "variant": "default",
+                              "label": "Secondary Action",
+                              "icon": false,
+                              "url": "/"
+                            }
+                          },
+                          "fields": [
+                            {
+                              "name": "label",
+                              "label": "Label",
+                              "type": "string",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "actions",
+                                "label"
+                              ]
+                            },
+                            {
+                              "name": "icon",
+                              "label": "Icon",
+                              "type": "boolean",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "actions",
+                                "icon"
+                              ]
+                            },
+                            {
+                              "name": "variant",
+                              "label": "Variant",
+                              "type": "string",
+                              "options": [
+                                {
+                                  "value": "default",
+                                  "label": "Default"
+                                },
+                                {
+                                  "value": "orange",
+                                  "label": "Orange"
+                                },
+                                {
+                                  "value": "ghost",
+                                  "label": "Ghost"
+                                },
+                                {
+                                  "value": "command",
+                                  "label": "Command"
+                                }
+                              ],
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "actions",
+                                "variant"
+                              ]
+                            },
+                            {
+                              "name": "url",
+                              "label": "URL",
+                              "type": "string",
+                              "namespace": [
+                                "page",
+                                "blocks",
+                                "features",
+                                "items",
+                                "feature",
+                                "actions",
+                                "url"
+                              ]
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "features",
+                            "items",
+                            "feature",
+                            "actions"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "features",
+                        "items",
+                        "feature"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "features",
+                    "items"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "features"
+              ]
+            },
+            {
+              "name": "flying",
+              "label": "Flying",
+              "ui": {
+                "previewSrc": "/img/blocks/flying.png"
+              },
+              "fields": [
+                {
+                  "name": "headline",
+                  "label": "Headline",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "flying",
+                    "headline"
+                  ]
+                },
+                {
+                  "name": "text",
+                  "label": "Text",
+                  "ui": {
+                    "component": "textarea"
+                  },
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "flying",
+                    "text"
+                  ]
+                },
+                {
+                  "label": "Actions",
+                  "name": "actions",
+                  "type": "object",
+                  "list": true,
+                  "ui": {
+                    "defaultItem": {
+                      "variant": "default",
+                      "label": "Secondary Action",
+                      "icon": false,
+                      "url": "/"
+                    }
+                  },
+                  "fields": [
+                    {
+                      "name": "label",
+                      "label": "Label",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "flying",
+                        "actions",
+                        "label"
+                      ]
+                    },
+                    {
+                      "name": "icon",
+                      "label": "Icon",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "flying",
+                        "actions",
+                        "icon"
+                      ]
+                    },
+                    {
+                      "name": "variant",
+                      "label": "Variant",
+                      "type": "string",
+                      "options": [
+                        {
+                          "value": "default",
+                          "label": "Default"
+                        },
+                        {
+                          "value": "orange",
+                          "label": "Orange"
+                        },
+                        {
+                          "value": "ghost",
+                          "label": "Ghost"
+                        },
+                        {
+                          "value": "command",
+                          "label": "Command"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "flying",
+                        "actions",
+                        "variant"
+                      ]
+                    },
+                    {
+                      "name": "url",
+                      "label": "URL",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "flying",
+                        "actions",
+                        "url"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "flying",
+                    "actions"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "flying"
+              ]
+            },
+            {
+              "name": "pricing",
+              "label": "Pricing",
+              "ui": {
+                "previewSrc": "/img/blocks/pricing.png",
+                "defaultItem": {
+                  "intro": "**No surprises. **Predictable pricing for every project. Complete control of your content, forever.\n\nTina’s source code is open-source. Your content lives in accessible formats right in your Git repository.\n"
+                }
+              },
+              "fields": [
+                {
+                  "name": "intro",
+                  "label": "Intro Text",
+                  "type": "rich-text",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "intro"
+                  ]
+                },
+                {
+                  "name": "tierOne",
+                  "label": "Tier One",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "name",
+                      "label": "Name",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "name"
+                      ]
+                    },
+                    {
+                      "name": "price",
+                      "label": "Price",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "price"
+                      ]
+                    },
+                    {
+                      "name": "interval",
+                      "label": "Interval",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "interval"
+                      ]
+                    },
+                    {
+                      "name": "body",
+                      "label": "Body",
+                      "type": "rich-text",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "body"
+                      ]
+                    },
+                    {
+                      "name": "large",
+                      "label": "Large",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "large"
+                      ]
+                    },
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierOne",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierOne",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierOne",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierOne",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierOne",
+                        "actions"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "tierOne"
+                  ]
+                },
+                {
+                  "name": "segue",
+                  "label": "Segue Text",
+                  "type": "rich-text",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "segue"
+                  ]
+                },
+                {
+                  "name": "tierTwo",
+                  "label": "Tier Two",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "name",
+                      "label": "Name",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "name"
+                      ]
+                    },
+                    {
+                      "name": "price",
+                      "label": "Price",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "price"
+                      ]
+                    },
+                    {
+                      "name": "interval",
+                      "label": "Interval",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "interval"
+                      ]
+                    },
+                    {
+                      "name": "body",
+                      "label": "Body",
+                      "type": "rich-text",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "body"
+                      ]
+                    },
+                    {
+                      "name": "large",
+                      "label": "Large",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "large"
+                      ]
+                    },
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierTwo",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierTwo",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierTwo",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierTwo",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierTwo",
+                        "actions"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "tierTwo"
+                  ]
+                },
+                {
+                  "name": "tierThree",
+                  "label": "Tier Three",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "name",
+                      "label": "Name",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "name"
+                      ]
+                    },
+                    {
+                      "name": "price",
+                      "label": "Price",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "price"
+                      ]
+                    },
+                    {
+                      "name": "interval",
+                      "label": "Interval",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "interval"
+                      ]
+                    },
+                    {
+                      "name": "body",
+                      "label": "Body",
+                      "type": "rich-text",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "body"
+                      ]
+                    },
+                    {
+                      "name": "large",
+                      "label": "Large",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "large"
+                      ]
+                    },
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierThree",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierThree",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierThree",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierThree",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierThree",
+                        "actions"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "tierThree"
+                  ]
+                },
+                {
+                  "name": "tierFour",
+                  "label": "Tier Four",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "name",
+                      "label": "Name",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "name"
+                      ]
+                    },
+                    {
+                      "name": "price",
+                      "label": "Price",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "price"
+                      ]
+                    },
+                    {
+                      "name": "interval",
+                      "label": "Interval",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "interval"
+                      ]
+                    },
+                    {
+                      "name": "body",
+                      "label": "Body",
+                      "type": "rich-text",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "body"
+                      ]
+                    },
+                    {
+                      "name": "large",
+                      "label": "Large",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "large"
+                      ]
+                    },
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierFour",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierFour",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierFour",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "pricing",
+                            "tierFour",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "pricing",
+                        "tierFour",
+                        "actions"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "pricing",
+                    "tierFour"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "pricing"
+              ]
+            },
+            {
+              "label": "FAQ",
+              "name": "faq",
+              "ui": {
+                "previewSrc": "/img/blocks/faq.png",
+                "defaultItem": {
+                  "title": "Frequently Asked Questions",
+                  "questions": [
+                    {
+                      "question": "What is Tina?",
+                      "answer": "Tina is a Git-backed headless content management system that enables developers and content creators to collaborate seamlessly. With Tina, developers can create a custom visual editing experience that is perfectly tailored to their site.\n"
+                    }
+                  ],
+                  "color": "seafoam"
+                }
+              },
+              "fields": [
+                {
+                  "name": "title",
+                  "label": "Title",
+                  "type": "string",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "faq",
+                    "title"
+                  ]
+                },
+                {
+                  "name": "intro",
+                  "label": "Introduction",
+                  "type": "rich-text",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "faq",
+                    "intro"
+                  ]
+                },
+                {
+                  "name": "questions",
+                  "label": "Questions",
+                  "type": "object",
+                  "list": true,
+                  "fields": [
+                    {
+                      "name": "question",
+                      "label": "Question",
+                      "type": "string",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "faq",
+                        "questions",
+                        "question"
+                      ]
+                    },
+                    {
+                      "name": "answer",
+                      "label": "Answer",
+                      "type": "rich-text",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "faq",
+                        "questions",
+                        "answer"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "faq",
+                    "questions"
+                  ]
+                },
+                {
+                  "name": "color",
+                  "label": "Color",
+                  "type": "string",
+                  "options": [
+                    {
+                      "label": "Seafoam",
+                      "value": "seafoam"
+                    },
+                    {
+                      "label": "White",
+                      "value": "white"
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "faq",
+                    "color"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "faq"
+              ]
+            },
+            {
+              "label": "Content",
+              "name": "content",
+              "ui": {
+                "previewSrc": "/img/blocks/content.png"
+              },
+              "fields": [
+                {
+                  "name": "options",
+                  "label": "Options",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "narrow",
+                      "label": "Narrow",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "options",
+                        "narrow"
+                      ]
+                    },
+                    {
+                      "name": "color",
+                      "label": "Color",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Seafoam",
+                          "value": "seafoam"
+                        },
+                        {
+                          "label": "White",
+                          "value": "white"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "options",
+                        "color"
+                      ]
+                    },
+                    {
+                      "name": "align",
+                      "label": "Align Content",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Left",
+                          "value": "left"
+                        },
+                        {
+                          "label": "Center",
+                          "value": "center"
+                        },
+                        {
+                          "label": "Right",
+                          "value": "right"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "options",
+                        "align"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "content",
+                    "options"
+                  ]
+                },
+                {
+                  "name": "content",
+                  "label": "Content",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "content",
+                        "actions"
+                      ]
+                    },
+                    {
+                      "name": "social",
+                      "label": "Social Links",
+                      "ui": {
+                        "defaultItem": {
+                          "tina": "https://github.com/tinacms/tinacms/discussions",
+                          "discord": "https://discord.com/invite/zumN63Ybpf",
+                          "github": "https://github.com/tinacms/tinacms",
+                          "twitter": "https://twitter.com/tina_cms"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "name": "tina",
+                          "label": "Tina",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "social",
+                            "tina"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "discord",
+                          "label": "Discord",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "social",
+                            "discord"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "github",
+                          "label": "Github",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "social",
+                            "github"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "twitter",
+                          "label": "Twitter",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "social",
+                            "twitter"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "content",
+                        "social"
+                      ]
+                    },
+                    {
+                      "name": "newsletter",
+                      "label": "Newsletter Signup",
+                      "ui": {
+                        "defaultItem": {
+                          "style": "default"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "style",
+                          "label": "Style",
+                          "type": "string",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Small",
+                              "value": "small"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "content",
+                            "content",
+                            "newsletter",
+                            "style"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "content",
+                        "content",
+                        "newsletter"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "content",
+                    "content"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "content"
+              ]
+            },
+            {
+              "label": "Columns",
+              "name": "columns",
+              "ui": {
+                "previewSrc": "/img/blocks/columns.png"
+              },
+              "fields": [
+                {
+                  "name": "options",
+                  "label": "Options",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "columns",
+                      "label": "Column Sizes",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Default",
+                          "value": "default"
+                        },
+                        {
+                          "label": "Not Default",
+                          "value": "notDefault"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "options",
+                        "columns"
+                      ]
+                    },
+                    {
+                      "name": "narrow",
+                      "label": "Narrow",
+                      "type": "boolean",
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "options",
+                        "narrow"
+                      ]
+                    },
+                    {
+                      "name": "color",
+                      "label": "Color",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Seafoam",
+                          "value": "seafoam"
+                        },
+                        {
+                          "label": "White",
+                          "value": "white"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "options",
+                        "color"
+                      ]
+                    },
+                    {
+                      "name": "align",
+                      "label": "Align Content",
+                      "type": "string",
+                      "options": [
+                        {
+                          "label": "Left",
+                          "value": "left"
+                        },
+                        {
+                          "label": "Center",
+                          "value": "center"
+                        },
+                        {
+                          "label": "Right",
+                          "value": "right"
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "options",
+                        "align"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "columns",
+                    "options"
+                  ]
+                },
+                {
+                  "name": "columnOne",
+                  "label": "Column One",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnOne",
+                        "actions"
+                      ]
+                    },
+                    {
+                      "name": "social",
+                      "label": "Social Links",
+                      "ui": {
+                        "defaultItem": {
+                          "tina": "https://github.com/tinacms/tinacms/discussions",
+                          "discord": "https://discord.com/invite/zumN63Ybpf",
+                          "github": "https://github.com/tinacms/tinacms",
+                          "twitter": "https://twitter.com/tina_cms"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "name": "tina",
+                          "label": "Tina",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "social",
+                            "tina"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "discord",
+                          "label": "Discord",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "social",
+                            "discord"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "github",
+                          "label": "Github",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "social",
+                            "github"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "twitter",
+                          "label": "Twitter",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "social",
+                            "twitter"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnOne",
+                        "social"
+                      ]
+                    },
+                    {
+                      "name": "newsletter",
+                      "label": "Newsletter Signup",
+                      "ui": {
+                        "defaultItem": {
+                          "style": "default"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "style",
+                          "label": "Style",
+                          "type": "string",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Small",
+                              "value": "small"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnOne",
+                            "newsletter",
+                            "style"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnOne",
+                        "newsletter"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "columns",
+                    "columnOne"
+                  ]
+                },
+                {
+                  "name": "columnTwo",
+                  "label": "Column Two",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "label": "Actions",
+                      "name": "actions",
+                      "type": "object",
+                      "list": true,
+                      "ui": {
+                        "defaultItem": {
+                          "variant": "default",
+                          "label": "Secondary Action",
+                          "icon": false,
+                          "url": "/"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "label",
+                          "label": "Label",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "actions",
+                            "label"
+                          ]
+                        },
+                        {
+                          "name": "icon",
+                          "label": "Icon",
+                          "type": "boolean",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "actions",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "name": "variant",
+                          "label": "Variant",
+                          "type": "string",
+                          "options": [
+                            {
+                              "value": "default",
+                              "label": "Default"
+                            },
+                            {
+                              "value": "orange",
+                              "label": "Orange"
+                            },
+                            {
+                              "value": "ghost",
+                              "label": "Ghost"
+                            },
+                            {
+                              "value": "command",
+                              "label": "Command"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "actions",
+                            "variant"
+                          ]
+                        },
+                        {
+                          "name": "url",
+                          "label": "URL",
+                          "type": "string",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "actions",
+                            "url"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnTwo",
+                        "actions"
+                      ]
+                    },
+                    {
+                      "name": "social",
+                      "label": "Social Links",
+                      "ui": {
+                        "defaultItem": {
+                          "tina": "https://github.com/tinacms/tinacms/discussions",
+                          "discord": "https://discord.com/invite/zumN63Ybpf",
+                          "github": "https://github.com/tinacms/tinacms",
+                          "twitter": "https://twitter.com/tina_cms"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "name": "tina",
+                          "label": "Tina",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "social",
+                            "tina"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "discord",
+                          "label": "Discord",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "social",
+                            "discord"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "github",
+                          "label": "Github",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "social",
+                            "github"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "name": "twitter",
+                          "label": "Twitter",
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "social",
+                            "twitter"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnTwo",
+                        "social"
+                      ]
+                    },
+                    {
+                      "name": "newsletter",
+                      "label": "Newsletter Signup",
+                      "ui": {
+                        "defaultItem": {
+                          "style": "default"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "name": "style",
+                          "label": "Style",
+                          "type": "string",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Small",
+                              "value": "small"
+                            }
+                          ],
+                          "namespace": [
+                            "page",
+                            "blocks",
+                            "columns",
+                            "columnTwo",
+                            "newsletter",
+                            "style"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "page",
+                        "blocks",
+                        "columns",
+                        "columnTwo",
+                        "newsletter"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "columns",
+                    "columnTwo"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "columns"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "blocks"
+          ]
+        }
+      ],
+      "namespace": [
+        "page"
+      ]
+    },
+    {
+      "name": "post",
+      "label": "Blog Posts",
+      "path": "content/blog",
+      "format": "md",
+      "fields": [
+        {
+          "type": "string",
+          "name": "title",
+          "label": "Title",
+          "namespace": [
+            "post",
+            "title"
+          ]
+        },
+        {
+          "type": "datetime",
+          "name": "date",
+          "label": "Date Created",
+          "namespace": [
+            "post",
+            "date"
+          ]
+        },
+        {
+          "type": "datetime",
+          "name": "last_edited",
+          "label": "Last Edited",
+          "namespace": [
+            "post",
+            "last_edited"
+          ]
+        },
+        {
+          "type": "string",
+          "name": "author",
+          "label": "Author",
+          "namespace": [
+            "post",
+            "author"
+          ]
+        },
+        {
+          "type": "reference",
+          "name": "prev",
+          "label": "Previous Post",
+          "description": "(Optional) link to an earlier post at the bottom of this one",
+          "collections": [
+            "post"
+          ],
+          "namespace": [
+            "post",
+            "prev"
+          ]
+        },
+        {
+          "type": "reference",
+          "name": "next",
+          "label": "Next Post",
+          "description": "(Optional) link to a later post at the bottom of this one",
+          "collections": [
+            "post"
+          ],
+          "namespace": [
+            "post",
+            "next"
+          ]
+        },
+        {
+          "type": "rich-text",
+          "name": "body",
+          "label": "Body",
+          "isBody": true,
+          "templates": [
+            {
+              "name": "Youtube",
+              "label": "Youtube Embed",
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "embedSrc",
+                  "label": "Embed URL",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Youtube",
+                    "embedSrc"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "Youtube"
+              ]
+            },
+            {
+              "name": "CreateAppCta",
+              "label": "\"Create Tina App\" Call-to-action",
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "ctaText",
+                  "label": "Button Text",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "CreateAppCta",
+                    "ctaText"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "cliText",
+                  "label": "CLI Command Example",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "CreateAppCta",
+                    "cliText"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "CreateAppCta"
+              ]
+            },
+            {
+              "name": "Callout",
+              "label": "Callout",
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "title",
+                  "label": "Title",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Callout",
+                    "title"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "description",
+                  "label": "Description",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Callout",
+                    "description"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "url",
+                  "label": "URL",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Callout",
+                    "url"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "buttonText",
+                  "label": "Button Text",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Callout",
+                    "buttonText"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "Callout"
+              ]
+            },
+            {
+              "name": "Codesandbox",
+              "label": "Codesandbox embed",
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "embedSrc",
+                  "label": "Embed URL",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Codesandbox",
+                    "embedSrc"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "title",
+                  "label": "A11y Title",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Codesandbox",
+                    "title"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "Codesandbox"
+              ]
+            },
+            {
+              "name": "Diagram",
+              "label": "Diagram",
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "src",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Diagram",
+                    "src"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "name": "alt",
+                  "namespace": [
+                    "post",
+                    "body",
+                    "Diagram",
+                    "alt"
+                  ]
+                }
+              ],
+              "namespace": [
+                "post",
+                "body",
+                "Diagram"
+              ]
+            },
+            {
+              "name": "CustomFieldComponentDemo",
+              "label": "Field Component Demo [do not use]",
+              "fields": [],
+              "namespace": [
+                "post",
+                "body",
+                "CustomFieldComponentDemo"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "body"
+          ]
+        }
+      ],
+      "namespace": [
+        "post"
+      ]
+    }
+  ]
+}

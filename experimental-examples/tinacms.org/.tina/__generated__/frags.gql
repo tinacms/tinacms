@@ -1,0 +1,167 @@
+fragment PageParts on Page {
+  seo {
+    __typename
+    title
+    description
+  }
+  blocks {
+    __typename
+    ... on PageBlocksHero {
+      headline
+      text
+      actions {
+        __typename
+        label
+        icon
+        variant
+        url
+      }
+      videoSrc
+    }
+    ... on PageBlocksFeatures {
+      items {
+        __typename
+        ... on PageBlocksFeaturesItemsFeature {
+          headline
+          text
+          media {
+            __typename
+            src
+            videoSrc
+            cli
+          }
+          actions {
+            __typename
+            label
+            icon
+            variant
+            url
+          }
+        }
+      }
+    }
+    ... on PageBlocksFlying {
+      headline
+      text
+      actions {
+        __typename
+        label
+        icon
+        variant
+        url
+      }
+    }
+    ... on PageBlocksPricing {
+      intro
+      tierOne {
+        __typename
+        name
+        price
+        interval
+        body
+        large
+        actions {
+          __typename
+          label
+          icon
+          variant
+          url
+        }
+      }
+      segue
+      tierTwo {
+        __typename
+        name
+        price
+        interval
+        body
+        large
+        actions {
+          __typename
+          label
+          icon
+          variant
+          url
+        }
+      }
+      tierThree {
+        __typename
+        name
+        price
+        interval
+        body
+        large
+        actions {
+          __typename
+          label
+          icon
+          variant
+          url
+        }
+      }
+      tierFour {
+        __typename
+        name
+        price
+        interval
+        body
+        large
+        actions {
+          __typename
+          label
+          icon
+          variant
+          url
+        }
+      }
+    }
+    ... on PageBlocksFaq {
+      title
+      intro
+      questions {
+        __typename
+        question
+        answer
+      }
+      color
+    }
+    ... on PageBlocksContent {
+      options {
+        __typename
+        narrow
+        color
+        align
+      }
+      content
+    }
+    ... on PageBlocksColumns {
+      options {
+        __typename
+        columns
+        narrow
+        color
+        align
+      }
+      columnOne
+      columnTwo
+    }
+  }
+}
+
+fragment PostParts on Post {
+  title
+  date
+  last_edited
+  author
+  prev {
+    ... on Document {
+      id
+    }
+  }
+  next {
+    ... on Document {
+      id
+    }
+  }
+  body
+}

@@ -1,0 +1,36 @@
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: yarn install, build, and test
+        run: |
+          yarn install
+          yarn build
+          yarn lint
+          yarn test
+        env:
+          CI: true
+      - name: yarn export
+        run: |
+          yarn export
+        env:
+          CI: true
+      - name: 📉 Check HTML
+        uses: chabad360/htmlproofer@master
+        with:
+          directory: './out'
+          arguments: --only-4xx --assume-extension --check-favicon --check-html --http-status-ignore "400, 403, 409, 429" --allow-hash-href --timeframe "1w" --file-ignore "/.+\/(blog|404)\/.+/"

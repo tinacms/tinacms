@@ -1,0 +1,37 @@
+{
+  "title": "Community",
+  "headline": "Join the club",
+  "description": "Tina is open source, extensible and community driven. Join the club.",
+  "gif": {
+    "src": "/img/rico-replacement.jpg",
+    "alt": "Join the club"
+  },
+  "supporting_headline": "Open-source, extensible and community driven",
+  "supporting_body": "Tina is made better by the wisdom of crowds. If you find a bug or have ideas about a feature, please open an issue on [GitHub](https://github.com/tinacms/tinacms/issues). If you have a question about how to use Tina or want to engage in broader discussions, add to our [GitHub Discussion](https://github.com/tinacms/tinacms/discussions) or chat with us on [Discord](https://discord.com/invite/zumN63Ybpf).\n\nCheck out our [contribution guidelines](https://tinacms.org/docs/contributing/guidelines) for more info on how to get involved with development. If you are excited about TinaCMS, help us grow the community by ⭐️' ing the [repo on GitHub](https://github.com/tinacms/tinacms).",
+  "default": {
+    "title": "",
+    "headline": "Open-source, extensible and community driven",
+    "gif": {
+      "src": "/img/rico-replacement.jpg",
+      "alt": "Join the club"
+    },
+    "supporting_headline": "",
+    "supporting_body": "",
+    "default": {
+      "title": "",
+      "headline": "Join the club",
+      "gif": {
+        "src": "/img/rico-replacement.jpg",
+        "alt": "Join the club"
+      },
+      "supporting_headline": "",
+      "supporting_body": ""
+    }
+  },
+  "newsletter_header": "Newsletter ✌️",
+  "newsletter_cta": "We move quick. Stay up to date.",
+  "img": {
+    "src": "/img/rico-replacement.jpg",
+    "alt": "Join the club"
+  }
+}
