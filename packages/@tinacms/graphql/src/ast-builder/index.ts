@@ -906,10 +906,10 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace)
+    return `update${generateNamespacedFieldName(namespace)}`
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace)
+    return `create${generateNamespacedFieldName(namespace)}`
   },
   documentQueryName: () => {
     return 'document'
@@ -930,7 +930,7 @@ export const NAMER = {
     return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '') + 'Parts'
+    return `${generateNamespacedFieldName(namespace, '')}Parts`
   },
   collectionTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Collection')

@@ -304,7 +304,6 @@ export const FormStatus = ({ pristine }) => {
 }
 
 export const FormWrapper = ({ children, id }) => {
-  console.log('form id', id)
   return (
     <div
       data-test={`form:${id}`}
