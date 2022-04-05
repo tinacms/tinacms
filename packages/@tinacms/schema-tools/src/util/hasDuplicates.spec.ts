@@ -19,4 +19,7 @@ describe('hasDuplicates', () => {
   it('returns false when does not have duplicates', () => {
     expect(hasDuplicates(['a', 'f', 'v'])).toEqual(false)
   })
+  it('returns false when undefined is passed', () => {
+    expect(hasDuplicates(undefined)).toEqual(false)
+  })
 })

@@ -31,6 +31,11 @@ const typeRequiredError = `type is required and must be one of ${TypeName.join(
   ', '
 )}`
 
+const nameProp = z.string({
+  required_error: 'Name must be provided',
+  invalid_type_error: 'Name must be a sting',
+})
+
 const TypeNameEnum = z.enum(TypeName)
 
 const Option = z.union([
@@ -38,8 +43,7 @@ const Option = z.union([
   z.object({ label: z.string(), value: z.string() }),
 ])
 const TinaField = z.object({
-  type: TypeNameEnum,
-  name: z.string(),
+  name: nameProp,
   label: z.string().optional(),
   description: z.string().optional(),
   required: z.boolean().optional(),
@@ -54,7 +58,7 @@ const TinaScalerBase = FieldWithList.extend({
   options: z.array(Option).optional(),
 })
 const StringField = TinaScalerBase.extend({
-  type: z.literal(TypeNameEnum.Values.string, {
+  type: z.literal('string', {
     invalid_type_error: typeTypeError,
     required_error: typeRequiredError,
   }),
@@ -104,29 +108,34 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
   const TemplateTemp = z
     .object({
       label: z.string(),
-      name: z.string(),
+      name: nameProp,
       fields: z.array(TinaFieldZod),
     })
     .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
       message: 'Fields must have a unique name',
     })
 
-  const ObjectLiteral = z.literal('object' as const, {
-    invalid_type_error: typeTypeError,
-    required_error: typeRequiredError,
+  const ObjectField = FieldWithList.extend({
+    // needs to be redefined here to avoid circle deps
+    type: z.literal('object' as const, {
+      invalid_type_error: typeTypeError,
+      required_error: typeRequiredError,
+    }),
+    fields: z
+      .array(TinaFieldZod)
+      .min(1)
+      .optional()
+      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
+        message: 'Fields must have a unique name',
+      }),
+    templates: z
+      .array(TemplateTemp)
+      .min(1)
+      .optional()
+      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
+        message: 'Templates must have a unique name',
+      }),
   })
-  const ObjectFieldWithFields = FieldWithList.extend({
-    type: ObjectLiteral,
-    fields: z.array(TinaFieldZod),
-    templates: z.undefined(),
-  })
-  const ObjectFieldWithTemplates = FieldWithList.extend({
-    type: ObjectLiteral,
-    fields: z.undefined(),
-    templates: z.array(TemplateTemp),
-  })
-
-  const ObjectField = ObjectFieldWithFields.or(ObjectFieldWithTemplates)
 
   const RichTextField = FieldWithList.extend({
     type: z.literal('rich-text' as const, {
@@ -135,14 +144,32 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
     }),
   })
 
-  return z.union([
-    StringField,
-    BooleanField,
-    NumberField,
-    ImageField,
-    DateTimeField,
-    ReferenceField,
-    ObjectField,
-    RichTextField,
-  ])
+  return z
+    .discriminatedUnion('type', [
+      StringField,
+      BooleanField,
+      NumberField,
+      ImageField,
+      DateTimeField,
+      ReferenceField,
+      ObjectField,
+      RichTextField,
+    ])
+    .refine(
+      (val) => {
+        // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
+        if (val.type === 'object') {
+          let isValid = Boolean(val?.templates) || Boolean(val?.fields)
+          if (!isValid) {
+            return false
+          } else {
+            isValid = !(val?.templates && val?.fields)
+            return isValid
+          }
+        } else {
+          return true
+        }
+      },
+      { message: 'Must provide templates or fields in your object field' }
+    )
 })
