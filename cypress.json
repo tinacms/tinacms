@@ -3,5 +3,9 @@
   "experimentalStudio": true,
   "chromeWebSecurity": false,
   "viewportWidth": 1000,
-  "viewportHeight": 660
+  "viewportHeight": 660,
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
+  }
 }
