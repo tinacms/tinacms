@@ -29,7 +29,9 @@ export const validateSchema = ({
         '!!! Error when trying to validate `.tina/schema file`!!!,\n' +
           JSON.stringify(errors, null, 2)
       )
+      throw new Error(JSON.stringify(errors, null, 2))
+    } else {
+      throw new Error(e)
     }
-    throw new Error(e)
   }
 }

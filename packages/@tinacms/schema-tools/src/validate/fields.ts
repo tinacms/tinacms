@@ -170,6 +170,6 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
           return true
         }
       },
-      { message: 'Must provide templates or fields in your object field' }
+      { message: 'Must provide one of templates or fields in your collection' }
     )
 })
