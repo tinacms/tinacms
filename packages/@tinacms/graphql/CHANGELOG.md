@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.59.10
+
+### Patch Changes
+
+- cf33bcec1: Fix issue where store.clear() was not being awaited causing an invalid state after reindex
+
 ## 0.59.9
 
 ### Patch Changes
