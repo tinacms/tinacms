@@ -18,14 +18,6 @@
       {
         "href": "posts",
         "label": "Blog"
-      },
-      {
-        "href": "posts/anotherPost",
-        "label": "Another Post"
-      },
-      {
-        "href": "posts/salmonAndMoonshine",
-        "label": "Salmon and Moonshine"
       }
     ]
   },

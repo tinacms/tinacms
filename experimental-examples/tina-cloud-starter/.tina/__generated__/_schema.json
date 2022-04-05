@@ -1,9 +1,9 @@
 {
   "version": {
-    "fullVersion": "0.59.9",
+    "fullVersion": "0.59.10",
     "major": "0",
     "minor": "59",
-    "patch": "9"
+    "patch": "10"
   },
   "meta": {},
   "collections": [
@@ -13,6 +13,58 @@
       "path": "content/posts",
       "format": "mdx",
       "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "posts",
+            "title"
+          ]
+        },
+        {
+          "type": "image",
+          "name": "heroImg",
+          "label": "Hero Image",
+          "namespace": [
+            "posts",
+            "heroImg"
+          ]
+        },
+        {
+          "type": "rich-text",
+          "label": "Excerpt",
+          "name": "excerpt",
+          "namespace": [
+            "posts",
+            "excerpt"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "authors"
+          ],
+          "namespace": [
+            "posts",
+            "author"
+          ]
+        },
+        {
+          "type": "datetime",
+          "label": "Posted Date",
+          "name": "date",
+          "ui": {
+            "dateFormat": "MMMM DD YYYY",
+            "timeFormat": "hh:mm A"
+          },
+          "namespace": [
+            "posts",
+            "date"
+          ]
+        },
         {
           "type": "rich-text",
           "label": "Body",
@@ -145,110 +197,6 @@
           "namespace": [
             "posts",
             "_body"
-          ]
-        },
-        {
-          "type": "string",
-          "label": "Title",
-          "name": "title",
-          "ui": {},
-          "namespace": [
-            "posts",
-            "title"
-          ]
-        },
-        {
-          "type": "boolean",
-          "label": "Published",
-          "name": "published",
-          "namespace": [
-            "posts",
-            "published"
-          ]
-        },
-        {
-          "type": "number",
-          "label": "Rating",
-          "name": "rating",
-          "namespace": [
-            "posts",
-            "rating"
-          ]
-        },
-        {
-          "type": "reference",
-          "label": "Author",
-          "name": "author",
-          "collections": [
-            "authors"
-          ],
-          "namespace": [
-            "posts",
-            "author"
-          ]
-        },
-        {
-          "type": "datetime",
-          "label": "Posted Date",
-          "name": "date",
-          "ui": {
-            "dateFormat": "MMMM DD YYYY",
-            "timeFormat": "hh:mm A"
-          },
-          "namespace": [
-            "posts",
-            "date"
-          ]
-        },
-        {
-          "type": "image",
-          "name": "heroImg",
-          "label": "Hero Image",
-          "indexed": false,
-          "namespace": [
-            "posts",
-            "heroImg"
-          ]
-        },
-        {
-          "type": "string",
-          "label": "Excerpt",
-          "ui": {
-            "component": "textarea"
-          },
-          "name": "excerpt",
-          "namespace": [
-            "posts",
-            "excerpt"
-          ]
-        }
-      ],
-      "indexes": [
-        {
-          "name": "published-by-date",
-          "fields": [
-            {
-              "name": "published",
-              "default": "false",
-              "namespace": [
-                "posts",
-                "published-by-date",
-                "published"
-              ]
-            },
-            {
-              "name": "date",
-              "default": "",
-              "namespace": [
-                "posts",
-                "published-by-date",
-                "date"
-              ]
-            }
-          ],
-          "namespace": [
-            "posts",
-            "published-by-date"
           ]
         }
       ],
@@ -732,12 +680,12 @@
       "label": "Authors",
       "name": "authors",
       "path": "content/authors",
+      "format": "md",
       "fields": [
         {
           "type": "string",
           "label": "Name",
           "name": "name",
-          "ui": {},
           "namespace": [
             "authors",
             "name"
@@ -751,54 +699,10 @@
             "authors",
             "avatar"
           ]
-        },
-        {
-          "label": "Details",
-          "name": "details",
-          "type": "object",
-          "list": true,
-          "fields": [
-            {
-              "type": "reference",
-              "label": "Zodiac",
-              "name": "zodiac",
-              "collections": [
-                "zodiacs"
-              ],
-              "namespace": [
-                "authors",
-                "details",
-                "zodiac"
-              ]
-            }
-          ],
-          "namespace": [
-            "authors",
-            "details"
-          ]
         }
       ],
       "namespace": [
         "authors"
-      ]
-    },
-    {
-      "label": "Zodiacs",
-      "name": "zodiacs",
-      "path": "content/zodiacs",
-      "fields": [
-        {
-          "type": "string",
-          "label": "Name",
-          "name": "name",
-          "namespace": [
-            "zodiacs",
-            "name"
-          ]
-        }
-      ],
-      "namespace": [
-        "zodiacs"
       ]
     },
     {
@@ -852,10 +756,7 @@
                 {
                   "label": "Text",
                   "name": "text",
-                  "type": "string",
-                  "ui": {
-                    "component": "markdown"
-                  },
+                  "type": "rich-text",
                   "namespace": [
                     "pages",
                     "blocks",
@@ -1270,6 +1171,9 @@
                       "type": "string",
                       "label": "Text",
                       "name": "text",
+                      "ui": {
+                        "component": "textarea"
+                      },
                       "namespace": [
                         "pages",
                         "blocks",
@@ -1329,10 +1233,7 @@
               },
               "fields": [
                 {
-                  "type": "string",
-                  "ui": {
-                    "component": "textarea"
-                  },
+                  "type": "rich-text",
                   "label": "Body",
                   "name": "body",
                   "namespace": [

@@ -115,45 +115,6 @@ query getAuthorsList {
   }
 }
 
-query getZodiacsDocument($relativePath: String!) {
-  getZodiacsDocument(relativePath: $relativePath) {
-    sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
-    data {
-      ...ZodiacsParts
-    }
-  }
-}
-
-query getZodiacsList {
-  getZodiacsList {
-    totalCount
-    edges {
-      node {
-        id
-        sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
-        data {
-          ...ZodiacsParts
-        }
-      }
-    }
-  }
-}
-
 query getPagesDocument($relativePath: String!) {
   getPagesDocument(relativePath: $relativePath) {
     sys {
