@@ -316,6 +316,45 @@ const schemaWithDeeplyNestedError: TinaCloudSchema<false> = {
     },
   ],
 }
+const schemaWithTemplatesAndFields = {
+  collections: [
+    {
+      name: 'foo',
+      label: 'Foo',
+      path: '/foo',
+      fields: [{ name: 'foo', type: 'string' }],
+      templates: [
+        {
+          name: 'bar',
+          label: 'Bar',
+          fields: [{ name: 'foo', type: 'string' }],
+        },
+      ],
+    },
+  ],
+}
+
+const schemaWithEmptyFields: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      label: 'Foo',
+      path: '/foo',
+      fields: [],
+    },
+  ],
+}
+
+const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      label: 'Foo',
+      path: '/foo',
+      templates: [],
+    },
+  ],
+}
 describe('validateSchema', () => {
   it('Passes on a valid schema', () => {
     validateSchema({ config: validSchema })
@@ -347,6 +386,21 @@ describe('validateSchema', () => {
   it('fails on deeply nested incorrect object', () => {
     expect(() => {
       validateSchema({ config: schemaWithDeeplyNestedError })
+    }).toThrow()
+  })
+  it('fails when templates and fields are provided', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithTemplatesAndFields })
+    }).toThrow()
+  })
+  it('fails when fields is empty', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithEmptyFields })
+    }).toThrow()
+  })
+  it('fails when templates is empty', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithEmptyTemplates })
     }).toThrow()
   })
 })

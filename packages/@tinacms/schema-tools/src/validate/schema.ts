@@ -32,20 +32,7 @@ const TinaCloudCollectionBase = z.object({
   format: z.enum(FORMATS).optional(),
 })
 
-// const CollectionWithFields = TinaCloudCollectionBase.extend({
-//   fields: z.array(TinaFieldZod).min(1),
-// }).refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
-//   message: 'Fields must have a unique name',
-// })
-
-// const CollectionsWithTemplates = TinaCloudCollectionBase.extend({
-//   templates: z.array(Template).min(1),
-// }).refine((val) => !hasDuplicates(val.templates?.map((x) => x.name)), {
-//   message: 'Templates must have a unique name',
-// })
-
 // Zod did not handel this union very well so we will handle it ourselves
-
 const TinaCloudCollection = TinaCloudCollectionBase.extend({
   fields: z
     .array(TinaFieldZod)
