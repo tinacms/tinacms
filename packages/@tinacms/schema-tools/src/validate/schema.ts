@@ -58,7 +58,7 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
       return isValid
     }
   },
-  { message: 'Must provide templates or fields in your collection' }
+  { message: 'Must provide one of templates or fields in your collection' }
 )
 
 export const TinaCloudSchemaZod = z
