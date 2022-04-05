@@ -83,7 +83,7 @@ const useFetchCollections = (cms) => {
       if (await cms.api.admin.isAuthenticated()) {
         try {
           const response = await cms.api.admin.fetchCollections()
-          setCollections(response.getCollections)
+          setCollections(response.collections)
         } catch (error) {
           cms.alerts.error(
             `[ERROR] GetCollections failed: ${error.message}`,

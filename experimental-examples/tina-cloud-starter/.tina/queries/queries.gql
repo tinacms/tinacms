@@ -4,17 +4,13 @@ query PageQuery {
     edges {
       node {
         id
-        values
-        data {
-          author {
-            ... on AuthorsDocument {
-              data {
-                ...AuthorsParts
-              }
-            }
+        _values
+        author {
+          ... on Authors {
+            ...AuthorsParts
           }
         }
-        sys {
+        _sys {
           filename
         }
       }
@@ -25,24 +21,18 @@ query PageQuery {
 query ContentQuery($relativePath: String!) {
   ...LayoutQueryFragment
   pages(relativePath: $relativePath) {
-    data {
-      ...PagesParts
-    }
+    ...PagesParts
   }
 }
 
 query BlogPostQuery($relativePath: String!) {
   ...LayoutQueryFragment
   posts(relativePath: $relativePath) {
-    data {
-      ...PostsParts
+    ...PostsParts
       author {
-        ... on AuthorsDocument {
-          data {
-            name
-            avatar
-          }
-        }
+      ... on Authors {
+          name
+          avatar
       }
     }
   }

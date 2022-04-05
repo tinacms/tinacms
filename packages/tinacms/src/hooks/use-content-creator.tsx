@@ -91,7 +91,7 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
       ]
 
       if (values.collection) {
-        const filteredCollection = res.getCollections.find(
+        const filteredCollection = res.collections.find(
           (c) => c.slug === values.collection
         )
         filteredCollection?.templates?.forEach((template) => {

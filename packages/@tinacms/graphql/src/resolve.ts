@@ -78,17 +78,17 @@ export const resolve = async ({
         const value = source[info.fieldName]
 
         /**
-         * `getCollection`
+         * `collection`
          */
         if (returnType === 'Collection') {
           if (value) {
             return value
           }
           if (info.fieldName === 'collections') {
-            const getCollectionNode = info.fieldNodes.find(
+            const collectionNode = info.fieldNodes.find(
               (x) => x.name.value === 'collections'
             )
-            const hasDocuments = getCollectionNode.selectionSet.selections.find(
+            const hasDocuments = collectionNode.selectionSet.selections.find(
               (x) => {
                 // @ts-ignore
                 return x?.name?.value === 'documents'
@@ -103,10 +103,10 @@ export const resolve = async ({
           }
 
           // The field is `getCollection`
-          const getCollectionNode = info.fieldNodes.find(
+          const collectionNode = info.fieldNodes.find(
             (x) => x.name.value === 'collection'
           )
-          const hasDocuments = getCollectionNode.selectionSet.selections.find(
+          const hasDocuments = collectionNode.selectionSet.selections.find(
             (x) => {
               // @ts-ignore
               return x?.name?.value === 'documents'

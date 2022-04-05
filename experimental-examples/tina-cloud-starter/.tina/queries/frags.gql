@@ -1,33 +1,31 @@
 fragment LayoutQueryFragment on Query {
   global(relativePath: "index.json") {
-    data {
-      header {
-        icon {
-          name
-          color
-          style
-        }
+    header {
+      icon {
+        name
         color
-        nav {
-          href
-          label
-        }
+        style
       }
-      footer {
-        color
-        social {
-          facebook
-          twitter
-          instagram
-          github
-        }
+      color
+      nav {
+        href
+        label
       }
-      theme {
-        color
-        icon
-        font
-        darkMode
+    }
+    footer {
+      color
+      social {
+        facebook
+        twitter
+        instagram
+        github
       }
+    }
+    theme {
+      color
+      icon
+      font
+      darkMode
     }
   }
 }
