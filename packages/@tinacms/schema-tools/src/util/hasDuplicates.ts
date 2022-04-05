@@ -12,5 +12,9 @@ limitations under the License.
 */
 
 export function hasDuplicates<T = any>(array: T[]) {
-  return new Set(array).size !== array.length
+  if (!array) {
+    return false
+  } else {
+    return new Set(array).size !== array.length
+  }
 }
