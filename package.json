@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
-    "cypress": "9.2.0",
+    "cypress": "9.5.3",
     "husky": "^7.0.0"
   }
 }
