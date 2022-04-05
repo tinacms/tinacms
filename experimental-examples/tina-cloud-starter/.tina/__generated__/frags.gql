@@ -1,16 +1,14 @@
 fragment PostsParts on Posts {
-  _body
   title
-  published
-  rating
+  heroImg
+  excerpt
   author {
     ... on Document {
       id
     }
   }
   date
-  heroImg
-  excerpt
+  _body
 }
 
 fragment GlobalParts on Global {
@@ -52,18 +50,6 @@ fragment GlobalParts on Global {
 fragment AuthorsParts on Authors {
   name
   avatar
-  details {
-    __typename
-    zodiac {
-      ... on Document {
-        id
-      }
-    }
-  }
-}
-
-fragment ZodiacsParts on Zodiacs {
-  name
 }
 
 fragment PagesParts on Pages {
