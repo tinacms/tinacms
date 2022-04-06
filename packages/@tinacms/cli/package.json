@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "0.60.9",
+  "version": "0.60.11",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -65,7 +65,7 @@
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
-    "axios": "0.19.0",
+    "axios": "0.21.2",
     "body-parser": "^1.19.0",
     "chalk": "^2.4.2",
     "chokidar": "^3.5.1",
