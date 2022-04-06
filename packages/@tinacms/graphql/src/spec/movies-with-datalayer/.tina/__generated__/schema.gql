@@ -41,26 +41,28 @@ interface Connection {
 }
 
 type Query {
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  getOptimizedQuery(queryString: String!): String
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float, filter: DocumentFilter): DocumentConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   getDocumentFields: JSON!
-  getMovieDocument(relativePath: String): MovieDocument!
-  getMovieList(before: String, after: String, first: Float, last: Float, filter: MovieFilter): MovieConnection!
-  getDirectorDocument(relativePath: String): DirectorDocument!
-  getDirectorList(before: String, after: String, first: Float, last: Float, filter: DirectorFilter): DirectorConnection!
-  getCrewDocument(relativePath: String): CrewDocument!
-  getCrewList(before: String, after: String, first: Float, last: Float, filter: CrewFilter): CrewConnection!
-  getActorDocument(relativePath: String): ActorDocument!
-  getActorList(before: String, after: String, first: Float, last: Float, filter: ActorFilter): ActorConnection!
+  movie(relativePath: String): MovieDocument!
+  movieConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
+  director(relativePath: String): DirectorDocument!
+  directorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
+  crew(relativePath: String): CrewDocument!
+  crewConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: CrewFilter): CrewConnection!
+  actor(relativePath: String): ActorDocument!
+  actorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
 }
 
 input StringFilter {
   startsWith: String
   eq: String
   exists: Boolean
+  in: [String]
 }
 
 input DatetimeFilter {
@@ -68,6 +70,7 @@ input DatetimeFilter {
   before: String
   eq: String
   exists: Boolean
+  in: [String]
 }
 
 input NumberFilter {
@@ -77,6 +80,7 @@ input NumberFilter {
   gt: Float
   eq: Float
   exists: Boolean
+  in: [Float]
 }
 
 input BooleanFilter {
@@ -147,7 +151,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, filter: DocumentFilter): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument
@@ -267,14 +271,14 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
-  createCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
-  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
+  createCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
+  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
+  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
 }
 
 input DocumentMutation {

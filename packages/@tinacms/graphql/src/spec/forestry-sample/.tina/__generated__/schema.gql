@@ -41,20 +41,21 @@ interface Connection {
 }
 
 type Query {
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  getOptimizedQuery(queryString: String!): String
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
-  getAuthorDocument(relativePath: String): AuthorDocument!
-  getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
-  getPostDocument(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
-  getStuffDocument(relativePath: String): StuffDocument!
-  getStuffList(before: String, after: String, first: Float, last: Float): StuffConnection!
-  getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
+  author(relativePath: String): AuthorDocument!
+  authorConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
+  post(relativePath: String): PostDocument!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  stuff(relativePath: String): StuffDocument!
+  stuffConnection(before: String, after: String, first: Float, last: Float, sort: String): StuffConnection!
+  page(relativePath: String): PageDocument!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
 }
 
 type DocumentConnectionEdges {
@@ -77,7 +78,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
 union DocumentNode = AuthorDocument | PostDocument | StuffDocument | PageDocument
@@ -226,14 +227,14 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  updateStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
-  createStuffDocument(relativePath: String!, params: StuffMutation!): StuffDocument!
-  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  updateAuthor(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  createAuthor(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  updatePost(relativePath: String!, params: PostMutation!): PostDocument!
+  createPost(relativePath: String!, params: PostMutation!): PostDocument!
+  updateStuff(relativePath: String!, params: StuffMutation!): StuffDocument!
+  createStuff(relativePath: String!, params: StuffMutation!): StuffDocument!
+  updatePage(relativePath: String!, params: PageMutation!): PageDocument!
+  createPage(relativePath: String!, params: PageMutation!): PageDocument!
 }
 
 input DocumentMutation {

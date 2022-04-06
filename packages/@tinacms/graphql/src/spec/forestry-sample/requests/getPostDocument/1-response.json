@@ -1,6 +1,6 @@
 {
   "data": {
-    "getPostDocument": {
+    "post": {
       "data": {
         "title": "Hello, again!",
         "author": {

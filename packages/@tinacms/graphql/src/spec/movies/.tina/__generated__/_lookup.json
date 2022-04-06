@@ -28,8 +28,8 @@
     "type": "MovieDocument",
     "resolveType": "collectionDocument",
     "collection": "movie",
-    "createMovieDocument": "create",
-    "updateMovieDocument": "update"
+    "createMovie": "create",
+    "updateMovie": "update"
   },
   "MovieConnection": {
     "type": "MovieConnection",
@@ -40,8 +40,8 @@
     "type": "DirectorDocument",
     "resolveType": "collectionDocument",
     "collection": "director",
-    "createDirectorDocument": "create",
-    "updateDirectorDocument": "update"
+    "createDirector": "create",
+    "updateDirector": "update"
   },
   "DirectorConnection": {
     "type": "DirectorConnection",
@@ -52,8 +52,8 @@
     "type": "ActorDocument",
     "resolveType": "collectionDocument",
     "collection": "actor",
-    "createActorDocument": "create",
-    "updateActorDocument": "update"
+    "createActor": "create",
+    "updateActor": "update"
   },
   "ActorConnection": {
     "type": "ActorConnection",

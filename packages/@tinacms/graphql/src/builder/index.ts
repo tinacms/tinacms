@@ -80,7 +80,7 @@ export class Builder {
   public buildCollectionDefinition = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
-    const name = 'getCollection'
+    const name = NAMER.collectionQueryName()
     const typeName = 'Collection'
     const args = [
       astBuilder.InputValueDefinition({
@@ -162,7 +162,7 @@ export class Builder {
   public buildMultiCollectionDefinition = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
-    const name = 'getCollections'
+    const name = NAMER.collectionListQueryName()
     const typeName = 'Collection'
 
     return astBuilder.FieldDefinition({
@@ -222,7 +222,7 @@ export class Builder {
   public multiCollectionDocument = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
-    const name = 'getDocument'
+    const name = NAMER.documentQueryName()
     const args = [
       astBuilder.InputValueDefinition({
         name: 'collection',
@@ -408,7 +408,7 @@ export class Builder {
     collections: TinaCloudCollectionEnriched[]
   ) => {
     return this._buildMultiCollectionDocumentListDefinition({
-      fieldName: 'getDocumentList',
+      fieldName: NAMER.documentConnectionQueryName(),
       namespace: ['document'],
       nodeType: astBuilder.TYPES.MultiCollectionDocument,
       collections: collections,

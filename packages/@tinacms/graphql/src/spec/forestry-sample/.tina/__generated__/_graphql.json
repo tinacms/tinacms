@@ -447,7 +447,40 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollection"
+            "value": "getOptimizedQuery"
+          },
+          "arguments": [
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "queryString"
+              },
+              "type": {
+                "kind": "NonNullType",
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "String"
+                  }
+                }
+              }
+            }
+          ],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "collection"
           },
           "arguments": [
             {
@@ -480,7 +513,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollections"
+            "value": "collections"
           },
           "arguments": [],
           "type": {
@@ -537,7 +570,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocument"
+            "value": "document"
           },
           "arguments": [
             {
@@ -584,7 +617,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocumentList"
+            "value": "documentConnection"
           },
           "arguments": [
             {
@@ -640,6 +673,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             }
@@ -677,7 +724,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getAuthorDocument"
+            "value": "author"
           },
           "arguments": [
             {
@@ -710,7 +757,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getAuthorList"
+            "value": "authorConnection"
           },
           "arguments": [
             {
@@ -768,6 +815,20 @@
                   "value": "Float"
                 }
               }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
             }
           ],
           "type": {
@@ -785,7 +846,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPostDocument"
+            "value": "post"
           },
           "arguments": [
             {
@@ -818,7 +879,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPostList"
+            "value": "postConnection"
           },
           "arguments": [
             {
@@ -876,6 +937,20 @@
                   "value": "Float"
                 }
               }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
             }
           ],
           "type": {
@@ -893,7 +968,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getStuffDocument"
+            "value": "stuff"
           },
           "arguments": [
             {
@@ -926,7 +1001,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getStuffList"
+            "value": "stuffConnection"
           },
           "arguments": [
             {
@@ -984,6 +1059,20 @@
                   "value": "Float"
                 }
               }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
+                }
+              }
             }
           ],
           "type": {
@@ -1001,7 +1090,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPageDocument"
+            "value": "page"
           },
           "arguments": [
             {
@@ -1034,7 +1123,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getPageList"
+            "value": "pageConnection"
           },
           "arguments": [
             {
@@ -1090,6 +1179,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             }
@@ -1422,6 +1525,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             }
@@ -3193,7 +3310,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateAuthorDocument"
+            "value": "updateAuthor"
           },
           "arguments": [
             {
@@ -3246,7 +3363,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createAuthorDocument"
+            "value": "createAuthor"
           },
           "arguments": [
             {
@@ -3299,7 +3416,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePostDocument"
+            "value": "updatePost"
           },
           "arguments": [
             {
@@ -3352,7 +3469,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPostDocument"
+            "value": "createPost"
           },
           "arguments": [
             {
@@ -3405,7 +3522,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateStuffDocument"
+            "value": "updateStuff"
           },
           "arguments": [
             {
@@ -3458,7 +3575,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createStuffDocument"
+            "value": "createStuff"
           },
           "arguments": [
             {
@@ -3511,7 +3628,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updatePageDocument"
+            "value": "updatePage"
           },
           "arguments": [
             {
@@ -3564,7 +3681,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createPageDocument"
+            "value": "createPage"
           },
           "arguments": [
             {

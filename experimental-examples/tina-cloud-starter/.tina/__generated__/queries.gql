@@ -1,5 +1,5 @@
-query getPostsDocument($relativePath: String!) {
-  getPostsDocument(relativePath: $relativePath) {
+query posts($relativePath: String!) {
+  posts(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -15,8 +15,8 @@ query getPostsDocument($relativePath: String!) {
   }
 }
 
-query getPostsList {
-  getPostsList {
+query postsConnection {
+  postsConnection {
     totalCount
     edges {
       node {
@@ -37,8 +37,8 @@ query getPostsList {
   }
 }
 
-query getGlobalDocument($relativePath: String!) {
-  getGlobalDocument(relativePath: $relativePath) {
+query global($relativePath: String!) {
+  global(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -54,8 +54,8 @@ query getGlobalDocument($relativePath: String!) {
   }
 }
 
-query getGlobalList {
-  getGlobalList {
+query globalConnection {
+  globalConnection {
     totalCount
     edges {
       node {
@@ -76,8 +76,8 @@ query getGlobalList {
   }
 }
 
-query getAuthorsDocument($relativePath: String!) {
-  getAuthorsDocument(relativePath: $relativePath) {
+query authors($relativePath: String!) {
+  authors(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -93,8 +93,8 @@ query getAuthorsDocument($relativePath: String!) {
   }
 }
 
-query getAuthorsList {
-  getAuthorsList {
+query authorsConnection {
+  authorsConnection {
     totalCount
     edges {
       node {
@@ -115,8 +115,8 @@ query getAuthorsList {
   }
 }
 
-query getZodiacsDocument($relativePath: String!) {
-  getZodiacsDocument(relativePath: $relativePath) {
+query zodiacs($relativePath: String!) {
+  zodiacs(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -132,8 +132,8 @@ query getZodiacsDocument($relativePath: String!) {
   }
 }
 
-query getZodiacsList {
-  getZodiacsList {
+query zodiacsConnection {
+  zodiacsConnection {
     totalCount
     edges {
       node {
@@ -154,8 +154,8 @@ query getZodiacsList {
   }
 }
 
-query getPagesDocument($relativePath: String!) {
-  getPagesDocument(relativePath: $relativePath) {
+query pages($relativePath: String!) {
+  pages(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -171,8 +171,8 @@ query getPagesDocument($relativePath: String!) {
   }
 }
 
-query getPagesList {
-  getPagesList {
+query pagesConnection {
+  pagesConnection {
     totalCount
     edges {
       node {

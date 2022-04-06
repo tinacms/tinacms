@@ -1,5 +1,5 @@
 mutation {
-  updatePageDocument(
+  updatePage(
     relativePath: "home.md"
     params: {
       title: "Welcome back"

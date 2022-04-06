@@ -43,22 +43,22 @@ interface Connection {
 
 type Query {
   getOptimizedQuery(queryString: String!): String
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
-  getPostsDocument(relativePath: String): PostsDocument!
-  getPostsList(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
-  getGlobalDocument(relativePath: String): GlobalDocument!
-  getGlobalList(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
-  getAuthorsDocument(relativePath: String): AuthorsDocument!
-  getAuthorsList(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
-  getZodiacsDocument(relativePath: String): ZodiacsDocument!
-  getZodiacsList(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
-  getPagesDocument(relativePath: String): PagesDocument!
-  getPagesList(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
+  posts(relativePath: String): PostsDocument!
+  postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
+  global(relativePath: String): GlobalDocument!
+  globalConnection(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
+  authors(relativePath: String): AuthorsDocument!
+  authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
+  zodiacs(relativePath: String): ZodiacsDocument!
+  zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
+  pages(relativePath: String): PagesDocument!
+  pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
 }
 
 type DocumentConnectionEdges {
@@ -316,16 +316,16 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
-  createPostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
-  updateGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  createGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  updateAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  createAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  updateZodiacsDocument(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
-  createZodiacsDocument(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
-  updatePagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
-  createPagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
+  updatePosts(relativePath: String!, params: PostsMutation!): PostsDocument!
+  createPosts(relativePath: String!, params: PostsMutation!): PostsDocument!
+  updateGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  createGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  updateAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  createAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  updateZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
+  createZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
+  updatePages(relativePath: String!, params: PagesMutation!): PagesDocument!
+  createPages(relativePath: String!, params: PagesMutation!): PagesDocument!
 }
 
 input DocumentMutation {
@@ -467,4 +467,3 @@ schema {
   query: Query
   mutation: Mutation
 }
-  

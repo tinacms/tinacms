@@ -32,6 +32,7 @@ import {
   OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
+import { lastItem } from '../util'
 
 const SysFieldDefinition = {
   kind: 'Field' as const,
@@ -905,19 +906,31 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace, 'Document')
+    return `update${generateNamespacedFieldName(namespace)}`
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace, 'Document')
+    return `create${generateNamespacedFieldName(namespace)}`
+  },
+  documentQueryName: () => {
+    return 'document'
+  },
+  documentConnectionQueryName: () => {
+    return 'documentConnection'
+  },
+  collectionQueryName: () => {
+    return 'collection'
+  },
+  collectionListQueryName: () => {
+    return 'collections'
   },
   queryName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'Document')
+    return String(lastItem(namespace))
   },
   generateQueryListName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'List')
+    return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, '') + 'Parts'
+    return `${generateNamespacedFieldName(namespace, '')}Parts`
   },
   collectionTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Collection')

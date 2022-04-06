@@ -5,8 +5,8 @@ import { ExperimentalGetTinaClient } from "../../.tina/__generated__/types";
 export default function BlogPostPage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  if (props.data && props.data.getPostsDocument) {
-    return <Post {...props.data.getPostsDocument} />;
+  if (props.data && props.data.posts) {
+    return <Post {...props.data.posts} />;
   }
   return <div>No data</div>;
 }
@@ -32,9 +32,10 @@ export const getStaticProps = async ({ params }) => {
  */
 export const getStaticPaths = async () => {
   const client = ExperimentalGetTinaClient();
-  const postsListData = await client.getPostsList();
+  const postsListData = await client.postsConnection();
+  console.log(postsListData);
   return {
-    paths: postsListData.data.getPostsList.edges.map((post) => ({
+    paths: postsListData.data.postsConnection.edges.map((post) => ({
       params: { filename: post.node.sys.filename },
     })),
     fallback: true,

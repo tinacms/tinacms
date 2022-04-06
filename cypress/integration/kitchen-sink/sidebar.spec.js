@@ -44,7 +44,7 @@ describe('Tina side bar', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updatePageDocument(relativePath: "home.mdx", params: { heading: "" subtitle: "" body: ""  }) {
+          updatePage(relativePath: "home.mdx", params: { heading: "" subtitle: "" body: ""  }) {
             __typename
           }
         }`,
@@ -87,7 +87,7 @@ describe('Tina side bar', () => {
     // cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()
   })
   it('Can edit text', () => {
-    cy.get('[data-test="form:getPageDocument"]')
+    cy.get('[data-test="form:page"]')
       .first()
       .scrollTo('top', {
         easing: 'linear',
@@ -110,7 +110,7 @@ describe('Tina side bar', () => {
   })
 
   it('Can edit rich text', () => {
-    cy.get('[data-test="form:getPageDocument"]')
+    cy.get('[data-test="form:page"]')
       .first()
       .scrollTo('bottom', {
         easing: 'linear',

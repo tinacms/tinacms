@@ -1,5 +1,5 @@
 mutation {
-  updateMovieDocument(
+  updateMovie(
     relativePath: "star-wars.md"
     params: {
       title: "Star War" # change the title

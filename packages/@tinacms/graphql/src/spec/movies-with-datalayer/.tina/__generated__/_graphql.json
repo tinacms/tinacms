@@ -447,7 +447,40 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollection"
+            "value": "getOptimizedQuery"
+          },
+          "arguments": [
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "queryString"
+              },
+              "type": {
+                "kind": "NonNullType",
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "String"
+                  }
+                }
+              }
+            }
+          ],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "collection"
           },
           "arguments": [
             {
@@ -480,7 +513,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCollections"
+            "value": "collections"
           },
           "arguments": [],
           "type": {
@@ -537,7 +570,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocument"
+            "value": "document"
           },
           "arguments": [
             {
@@ -584,7 +617,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDocumentList"
+            "value": "documentConnection"
           },
           "arguments": [
             {
@@ -640,6 +673,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -691,7 +738,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getMovieDocument"
+            "value": "movie"
           },
           "arguments": [
             {
@@ -724,7 +771,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getMovieList"
+            "value": "movieConnection"
           },
           "arguments": [
             {
@@ -780,6 +827,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -813,7 +874,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDirectorDocument"
+            "value": "director"
           },
           "arguments": [
             {
@@ -846,7 +907,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getDirectorList"
+            "value": "directorConnection"
           },
           "arguments": [
             {
@@ -902,6 +963,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -935,7 +1010,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCrewDocument"
+            "value": "crew"
           },
           "arguments": [
             {
@@ -968,7 +1043,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getCrewList"
+            "value": "crewConnection"
           },
           "arguments": [
             {
@@ -1024,6 +1099,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -1057,7 +1146,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getActorDocument"
+            "value": "actor"
           },
           "arguments": [
             {
@@ -1090,7 +1179,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "getActorList"
+            "value": "actorConnection"
           },
           "arguments": [
             {
@@ -1146,6 +1235,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -1225,6 +1328,23 @@
               "value": "Boolean"
             }
           }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
         }
       ]
     },
@@ -1288,6 +1408,23 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         }
@@ -1381,6 +1518,23 @@
             "name": {
               "kind": "Name",
               "value": "Boolean"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "in"
+          },
+          "type": {
+            "kind": "ListType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Float"
+              }
             }
           }
         }
@@ -2076,6 +2230,20 @@
                 "name": {
                   "kind": "Name",
                   "value": "Float"
+                }
+              }
+            },
+            {
+              "kind": "InputValueDefinition",
+              "name": {
+                "kind": "Name",
+                "value": "sort"
+              },
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "String"
                 }
               }
             },
@@ -3618,7 +3786,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateMovieDocument"
+            "value": "updateMovie"
           },
           "arguments": [
             {
@@ -3671,7 +3839,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createMovieDocument"
+            "value": "createMovie"
           },
           "arguments": [
             {
@@ -3724,7 +3892,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateDirectorDocument"
+            "value": "updateDirector"
           },
           "arguments": [
             {
@@ -3777,7 +3945,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createDirectorDocument"
+            "value": "createDirector"
           },
           "arguments": [
             {
@@ -3830,7 +3998,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateCrewDocument"
+            "value": "updateCrew"
           },
           "arguments": [
             {
@@ -3883,7 +4051,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createCrewDocument"
+            "value": "createCrew"
           },
           "arguments": [
             {
@@ -3936,7 +4104,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "updateActorDocument"
+            "value": "updateActor"
           },
           "arguments": [
             {
@@ -3989,7 +4157,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "createActorDocument"
+            "value": "createActor"
           },
           "arguments": [
             {

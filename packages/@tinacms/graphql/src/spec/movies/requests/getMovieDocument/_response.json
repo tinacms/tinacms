@@ -1,6 +1,6 @@
 {
   "data": {
-    "getMovieDocument": {
+    "movie": {
       "id": "content/movies/star-wars.md",
       "sys": {
         "filename": "star-wars",
