@@ -57,7 +57,7 @@ export async function startServer(
 ) {
   lock.disable()
 
-  const rootPath = path.join(process.cwd(), pathToTinaConfig)
+  const rootPath = path.join(process.cwd(), pathToTinaConfig || '')
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
     event: {
