@@ -20,15 +20,32 @@ export const parseZodError = ({ zodError }: { zodError: ZodError }) => {
       issue.unionErrors.map((unionError) => {
         moreInfo.push(parseZodError({ zodError: unionError }))
       })
-      moreInfo.push(issue.unionErrors.map((x) => x.flatten()))
+      // moreInfo.push(issue.unionErrors.map((x) => x.flatten()))
     }
-    return {
-      message: issue.message,
-      code: issue.code || 'no code provided',
-      path: issue.path.join('.'),
-      moreInfo,
-    }
-  })
+    const errorMessage = `Error ${issue?.message} at path ${issue.path.join(
+      '.'
+    )}`
+    const errorMessages = [errorMessage, ...moreInfo]
 
-  return errors
+    return {
+      errors: errorMessages as string[],
+    }
+
+    // return {
+    //   message: issue.message,
+    //   code: issue.code || 'no code provided',
+    //   path: issue.path.join('.'),
+    //   moreInfo,
+    // }
+  })
+  // console.log({ errors })
+  const formErrors = errors.formErrors.flatMap((x) => x.errors)
+
+  const parsedErrors = [
+    ...(errors.fieldErrors?.collections.flatMap((x) => x.errors) || []),
+    ...formErrors,
+  ]
+  return parsedErrors
+
+  // return errors
 }

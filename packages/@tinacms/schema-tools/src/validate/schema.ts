@@ -12,14 +12,18 @@ limitations under the License.
 */
 
 import { z } from 'zod'
+import { name } from './properties'
 import { hasDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
 
 const Template = z
   .object({
-    label: z.string(),
-    name: z.string(),
+    label: z.string({
+      invalid_type_error: 'label must be a string',
+      required_error: 'label was not provided but is required',
+    }),
+    name: name,
     fields: z.array(TinaFieldZod),
   })
   .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
@@ -28,7 +32,7 @@ const Template = z
 
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
-  name: z.string(),
+  name: name,
   format: z.enum(FORMATS).optional(),
 })
 
