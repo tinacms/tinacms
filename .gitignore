@@ -12,7 +12,6 @@
 packages/cli/forestry/.env
 *.tgz
 .DS_Store
-**/docs/
 .idea/
 **/.cache/
 **/package-lock.json
