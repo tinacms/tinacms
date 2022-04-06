@@ -21,10 +21,6 @@ const schema = defineSchema({
       label: 'Page',
       format: 'mdx',
       fields: [
-        // {
-        //   name: 'thingOne',
-        //   type: 'string',
-        // },
         {
           label: 'Title',
           name: 'Title',
