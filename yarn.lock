@@ -6760,10 +6760,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinonjs__fake-timers@npm:^6.0.2":
-  version: 6.0.4
-  resolution: "@types/sinonjs__fake-timers@npm:6.0.4"
-  checksum: d2f3d2b6461794e20ec6c2ae4d68b63603ab55f2f55c4920299d3c1c2c2d366b50a54d9f91de07f069a9f7b7e86a953e3f26aedf03637a99e23aa405b9844149
+"@types/sinonjs__fake-timers@npm:8.1.1":
+  version: 8.1.1
+  resolution: "@types/sinonjs__fake-timers@npm:8.1.1"
+  checksum: 78a47b7e7911d9ffe71cd08db37553e1a7897d691dfc2863d505b6671241d25349c704b4d96f5e36e8f8fe7399a170719b33c93c7d9093c56eeae7ce88668393
   languageName: node
   linkType: hard
 
@@ -10923,7 +10923,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bluebird@npm:3.7.2, bluebird@npm:^3.3.5, bluebird@npm:^3.5.5":
+"bluebird@npm:^3.3.5, bluebird@npm:^3.5.5, bluebird@npm:^3.7.2":
   version: 3.7.2
   resolution: "bluebird@npm:3.7.2"
   checksum: 4f2288662f3d4eadbb82d4daa4a7d7976a28fa3c7eb4102c9b4033b03e5be4574ba123ac52a7c103cde4cb7b2d2afc1dbe41817ca15a29ff21ecd258d0286047
@@ -11269,7 +11269,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^5.5.0":
+"buffer@npm:^5.5.0, buffer@npm:^5.6.0":
   version: 5.7.1
   resolution: "buffer@npm:5.7.1"
   dependencies:
@@ -12116,7 +12116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-table3@npm:~0.6.0":
+"cli-table3@npm:~0.6.1":
   version: 0.6.1
   resolution: "cli-table3@npm:0.6.1"
   dependencies:
@@ -13408,23 +13408,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:9.2.0":
-  version: 9.2.0
-  resolution: "cypress@npm:9.2.0"
+"cypress@npm:9.5.3":
+  version: 9.5.3
+  resolution: "cypress@npm:9.5.3"
   dependencies:
     "@cypress/request": ^2.88.10
     "@cypress/xvfb": ^1.2.4
     "@types/node": ^14.14.31
-    "@types/sinonjs__fake-timers": ^6.0.2
+    "@types/sinonjs__fake-timers": 8.1.1
     "@types/sizzle": ^2.3.2
     arch: ^2.2.0
     blob-util: ^2.0.2
-    bluebird: 3.7.2
+    bluebird: ^3.7.2
+    buffer: ^5.6.0
     cachedir: ^2.3.0
     chalk: ^4.1.0
     check-more-types: ^2.24.0
     cli-cursor: ^3.1.0
-    cli-table3: ~0.6.0
+    cli-table3: ~0.6.1
     commander: ^5.1.0
     common-tags: ^1.8.0
     dayjs: ^1.10.4
@@ -13443,19 +13444,19 @@ __metadata:
     listr2: ^3.8.3
     lodash: ^4.17.21
     log-symbols: ^4.0.0
-    minimist: ^1.2.5
+    minimist: ^1.2.6
     ospath: ^1.2.2
     pretty-bytes: ^5.6.0
     proxy-from-env: 1.0.0
     request-progress: ^3.0.0
+    semver: ^7.3.2
     supports-color: ^8.1.1
     tmp: ~0.2.1
     untildify: ^4.0.0
-    url: ^0.11.0
     yauzl: ^2.10.0
   bin:
     cypress: bin/cypress
-  checksum: c08ae2371f4be6ca62aed645db5a52591073f7f23afbc458103aa8c0f4a0c48c98ab84a555e7ac83895991dc8caf71d3e166f40ede43971d1a81e4761e55bfcf
+  checksum: 305910d76f32e33e4b1b8ce6e63cce7d5811d10a000572654e4874757260872f7ae3b5c63ad220cd04e725fd545250e3c95ad0aafbc4562795172eea3d2d2e63
   languageName: node
   linkType: hard
 
@@ -22539,6 +22540,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"minimist@npm:^1.2.6":
+  version: 1.2.6
+  resolution: "minimist@npm:1.2.6"
+  checksum: 56b3aeedcc7776139f72ca9dce0dae06825437f71ebd823d97dc49a34f3280e627909d54aca6fa81c47e17f11e5affc7357bfb8fd8140ca6138e80f946dd0dbc
+  languageName: node
+  linkType: hard
+
 "minipass-collect@npm:^1.0.2":
   version: 1.0.2
   resolution: "minipass-collect@npm:1.0.2"
@@ -27800,7 +27808,7 @@ resolve@^2.0.0-next.3:
     "@typescript-eslint/eslint-plugin": ^2.3.0
     "@typescript-eslint/parser": 5.15.0
     "@yarnpkg/pnpify": ^2.0.0-rc.20
-    cypress: 9.2.0
+    cypress: 9.5.3
     danger: ^10.6.4
     eslint: ^6.8.0
     eslint-config-prettier: ^6.3.0

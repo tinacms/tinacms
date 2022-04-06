@@ -446,7 +446,7 @@ export class Database {
       await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
     )
     if (this.store.supportsSeeding()) {
-      this.store.clear()
+      await this.store.clear()
       await this.store.seed(
         path.join(GENERATED_FOLDER, '_graphql.json'),
         graphQLSchema

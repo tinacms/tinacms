@@ -246,7 +246,6 @@ export const tinaConfig = defineConfig({
   apiURL,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
-    cms.flags.set('use-unstable-formify', true)
     return cms
   },
 })
