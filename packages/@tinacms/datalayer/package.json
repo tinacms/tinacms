@@ -19,7 +19,7 @@
   },
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "yarn tinacms-scripts build",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {

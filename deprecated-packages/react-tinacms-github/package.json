@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "watch": "tinacms-scripts watch",
-    "build": "tinacms-scripts build",
+    "build": "yarn tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "types": "yarn tsc",
     "test": "jest --env=jsdom --passWithNoTests"

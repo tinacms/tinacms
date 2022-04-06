@@ -6839,6 +6839,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/auth@workspace:packages/@tinacms/auth"
   dependencies:
+    "@tinacms/scripts": "workspace:*"
     "@types/cors": ^2.8.7
     "@types/express": ^4.17.8
     "@types/fs-extra": ^9.0.2
@@ -26859,6 +26860,7 @@ fsevents@~2.1.2:
   version: 0.0.0-use.local
   resolution: "next-tinacms-cloudinary@workspace:packages/next-tinacms-cloudinary"
   dependencies:
+    "@tinacms/scripts": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
     "@types/crypto-js": ^3.1.47
     "@types/js-cookie": ^2.2.6

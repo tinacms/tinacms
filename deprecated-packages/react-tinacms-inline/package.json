@@ -12,7 +12,7 @@
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
     "types": "yarn tsc",
-    "build": "tinacms-scripts build"
+    "build": "yarn tinacms-scripts build"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",

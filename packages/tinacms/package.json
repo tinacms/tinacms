@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "yarn tinacms-scripts build",
     "test": "jest --env=jsdom --passWithNoTests",
     "test-watch": "jest --env=jsdom --passWithNoTests --watch"
   },

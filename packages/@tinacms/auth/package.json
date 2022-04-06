@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "yarn tinacms-scripts build",
     "test": "jest --passWithNoTests"
   },
   "publishConfig": {
@@ -26,6 +26,7 @@
     "react-dom": ">=16.14.0"
   },
   "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/express": "^4.17.8",
     "@types/fs-extra": "^9.0.2",

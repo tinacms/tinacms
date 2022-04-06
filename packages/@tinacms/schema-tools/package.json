@@ -27,7 +27,7 @@
     "yup": "^0.32.0"
   },
   "scripts": {
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "yarn tinacms-scripts build",
     "test": "jest --passWithNoTests",
     "types": "yarn tsc",
     "test-watch": "jest  --passWithNoTests --watch",
