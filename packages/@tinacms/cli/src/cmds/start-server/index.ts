@@ -52,12 +52,13 @@ export async function startServer(
     noSDK,
     noTelemetry,
     watchFolders,
-    pathToTinaConfig,
+    pathToTinaConfig = '',
   }: Options
 ) {
   lock.disable()
 
-  const rootPath = path.join(process.cwd(), pathToTinaConfig || '')
+  console.log('pathToTinaConfig:', pathToTinaConfig)
+  const rootPath = path.join(process.cwd(), pathToTinaConfig)
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
     event: {
