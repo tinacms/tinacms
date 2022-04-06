@@ -25,10 +25,6 @@ export const validateSchema = ({
   } catch (e) {
     if (e instanceof ZodError) {
       const errors = parseZodError({ zodError: e })
-      console.error(
-        '!!! Error when trying to validate `.tina/schema file`!!!,\n' +
-          errors.join(', ')
-      )
       throw new Error(errors.join(', '))
     } else {
       throw new Error(e)
