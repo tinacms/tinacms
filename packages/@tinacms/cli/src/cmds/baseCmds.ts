@@ -68,6 +68,10 @@ const noTelemetryOption = {
   name: '--noTelemetry',
   description: 'Disable anonymous telemetry that is collected',
 }
+const pathToTinaConfig = {
+  name: '--pathToTinaConfig',
+  description: 'relative path to the .tina directory.',
+}
 const watchFileOption = {
   name: '-w, --watchFolders [folders...]',
   description:
@@ -85,6 +89,7 @@ export const baseCmds: Command[] = [
       noWatchOption,
       noSDKCodegenOption,
       noTelemetryOption,
+      pathToTinaConfig,
       watchFileOption,
     ],
     action: (options) => chain([startServer], options),

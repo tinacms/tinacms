@@ -36,6 +36,7 @@ interface Options {
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
+  pathToTinaConfig?: string
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -51,11 +52,12 @@ export async function startServer(
     noSDK,
     noTelemetry,
     watchFolders,
+    pathToTinaConfig,
   }: Options
 ) {
   lock.disable()
 
-  const rootPath = process.cwd()
+  const rootPath = path.join(process.cwd(), pathToTinaConfig)
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
     event: {
