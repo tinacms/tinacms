@@ -136,21 +136,6 @@ export async function init(args: any) {
       ],
       action: (options) => run(options),
     },
-    {
-      command: 'build:all',
-      description: 'Build all packages',
-      options: [
-        {
-          name: '--watch',
-          description: 'Watch for file changes and rebuild',
-        },
-        {
-          name: '--lines',
-          description: 'add the lines',
-        },
-      ],
-      action: (options) => all(options),
-    },
   ])
 
   program.usage('command [options]')
@@ -540,60 +525,6 @@ const buildIt = async (entryPoint, packageJSON) => {
     `export * from "../${entry.replace(extension, '')}"`
   )
   return true
-}
-
-import pnp from 'pnpapi'
-import chokidar from 'chokidar'
-
-const all = async (args: { watch?: boolean; dir?: string }) => {
-  const workspacePackageNames = []
-  await sequential(pnp.getDependencyTreeRoots(), async (locator) => {
-    const pkg = pnp.getPackageInformation(locator)
-    const packageJSON = JSON.parse(
-      await fs
-        .readFileSync(path.join(pkg.packageLocation, 'package.json'))
-        .toString()
-    )
-    workspacePackageNames.push(packageJSON.name)
-  })
-  const workspacePkgs = []
-  await sequential(pnp.getDependencyTreeRoots(), async (locator) => {
-    const pkg = pnp.getPackageInformation(locator)
-    const packageJSON = JSON.parse(
-      await fs
-        .readFileSync(path.join(pkg.packageLocation, 'package.json'))
-        .toString()
-    )
-    if (!packageJSON.private) {
-      workspacePkgs.push(path.join(pkg.packageLocation, 'src'))
-    }
-  })
-  if (args.watch) {
-    console.log(`${chalk.blue(`Watching workspaces...`)}`)
-    chokidar
-      .watch(workspacePkgs, {
-        ignored: '**/spec/**/*', // ignore dotfiles
-      })
-      .on('change', async (path) => {
-        const packageLocator = pnp.findPackageLocator(path)
-        const packageInformation = pnp.getPackageInformation(packageLocator)
-        await run({ dir: packageInformation.packageLocation })
-      })
-  } else {
-    console.log(`${chalk.blue(`Building workspaces...`)}`)
-    const packagePathsToBuild = await fs
-      .readFileSync(path.resolve('../../../topologicalDeps.txt'))
-      .toString()
-      .split('\n')
-      .filter((stdout) => {
-        return stdout.includes('packages')
-      })
-      .map((line) => line.split(' ').pop())
-
-    await sequential(packagePathsToBuild, async (packagePath) => {
-      await run({ dir: packagePath })
-    })
-  }
 }
 
 export const sequential = async <A, B>(
