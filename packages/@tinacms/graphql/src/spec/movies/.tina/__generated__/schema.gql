@@ -41,18 +41,19 @@ interface Connection {
 }
 
 type Query {
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  getOptimizedQuery(queryString: String!): String
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
-  getMovieDocument(relativePath: String): MovieDocument!
-  getMovieList(before: String, after: String, first: Float, last: Float): MovieConnection!
-  getDirectorDocument(relativePath: String): DirectorDocument!
-  getDirectorList(before: String, after: String, first: Float, last: Float): DirectorConnection!
-  getActorDocument(relativePath: String): ActorDocument!
-  getActorList(before: String, after: String, first: Float, last: Float): ActorConnection!
+  movie(relativePath: String): MovieDocument!
+  movieConnection(before: String, after: String, first: Float, last: Float, sort: String): MovieConnection!
+  director(relativePath: String): DirectorDocument!
+  directorConnection(before: String, after: String, first: Float, last: Float, sort: String): DirectorConnection!
+  actor(relativePath: String): ActorDocument!
+  actorConnection(before: String, after: String, first: Float, last: Float, sort: String): ActorConnection!
 }
 
 type DocumentConnectionEdges {
@@ -75,7 +76,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
 union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
@@ -165,12 +166,12 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
+  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
 }
 
 input DocumentMutation {

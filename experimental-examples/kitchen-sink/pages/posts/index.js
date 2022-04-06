@@ -2,7 +2,7 @@ import { getStaticPropsForTina } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
 export default function Home(props) {
-  const postsList = props.data.getPostList.edges
+  const postsList = props.data.postConnection.edges
   return (
     <Layout>
       <h1>Posts</h1>
@@ -22,7 +22,7 @@ export default function Home(props) {
 export const getStaticProps = async () => {
   const tinaProps = await getStaticPropsForTina({
     query: `{
-        getPostList{
+        postConnection{
           edges {
             node {
               id

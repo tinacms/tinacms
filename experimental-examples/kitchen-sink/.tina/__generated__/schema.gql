@@ -43,16 +43,16 @@ interface Connection {
 
 type Query {
   getOptimizedQuery(queryString: String!): String
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
-  getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float): PageConnection!
-  getPostDocument(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
+  page(relativePath: String): PageDocument!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  post(relativePath: String): PostDocument!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
 }
 
 type DocumentConnectionEdges {
@@ -75,7 +75,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
 union DocumentNode = PageDocument | PostDocument
@@ -135,10 +135,10 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  updatePage(relativePath: String!, params: PageMutation!): PageDocument!
+  createPage(relativePath: String!, params: PageMutation!): PageDocument!
+  updatePost(relativePath: String!, params: PostMutation!): PostDocument!
+  createPost(relativePath: String!, params: PostMutation!): PostDocument!
 }
 
 input DocumentMutation {
