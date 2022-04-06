@@ -69,7 +69,7 @@ const noTelemetryOption = {
   description: 'Disable anonymous telemetry that is collected',
 }
 const pathToTinaConfig = {
-  name: '--pathToTinaConfig',
+  name: '--pathToTinaConfig <pathToTinaConfig>',
   description: 'relative path to the .tina directory.',
 }
 const watchFileOption = {
