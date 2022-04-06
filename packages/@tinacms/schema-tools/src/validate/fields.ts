@@ -142,34 +142,79 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
       invalid_type_error: typeTypeError,
       required_error: typeRequiredError,
     }),
+    templates: z
+      .array(TemplateTemp)
+      .optional()
+      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
+        message: 'Templates must have a unique name',
+      }),
   })
 
   return z
-    .discriminatedUnion('type', [
-      StringField,
-      BooleanField,
-      NumberField,
-      ImageField,
-      DateTimeField,
-      ReferenceField,
-      ObjectField,
-      RichTextField,
-    ])
-    .refine(
-      (val) => {
+    .discriminatedUnion(
+      'type',
+      [
+        StringField,
+        BooleanField,
+        NumberField,
+        ImageField,
+        DateTimeField,
+        ReferenceField,
+        ObjectField,
+        RichTextField,
+      ],
+      {
+        errorMap: (issue, ctx) => {
+          // Add a better error message for invalid_union_discriminator
+          if (issue.code === 'invalid_union_discriminator') {
+            return {
+              message: `Invalid \`type\` property. In the schema is 'type: ${
+                ctx.data?.type
+              }' and expected one of ${TypeName.join(', ')}`,
+            }
+          }
+          return {
+            message: issue.message,
+          }
+        },
+      }
+    )
+    .superRefine(
+      (val, ctx) => {
         // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
         if (val.type === 'object') {
+          // TODO: Maybe clean up this code its sorta messy
+          const message =
+            'Must provide one of templates or fields in your collection'
           let isValid = Boolean(val?.templates) || Boolean(val?.fields)
           if (!isValid) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message,
+            })
             return false
           } else {
             isValid = !(val?.templates && val?.fields)
+            if (!isValid) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message,
+              })
+            }
             return isValid
           }
-        } else {
-          return true
         }
-      },
-      { message: 'Must provide one of templates or fields in your collection' }
+
+        return true
+      }
+      // (val) => {
+
+      //   if (val.type === 'object') {
+      //     return {
+      //       message:
+      //         'Must provide one of templates or fields in your collection',
+      //     }
+      //   }
+      // }
     )
 })

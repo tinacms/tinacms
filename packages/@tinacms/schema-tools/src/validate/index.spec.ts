@@ -224,7 +224,6 @@ const schemaWitNoName = {
   collections: [
     {
       path: 'foo/bar',
-      format: 'not a format',
       fields: [{ name: 'foo', type: 'string' }],
     },
   ],
@@ -355,6 +354,51 @@ const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
     },
   ],
 }
+const schemaWithInvalidFiledNesterUnderRichText: TinaCloudSchema<false> = {
+  collections: [
+    {
+      name: 'foo',
+      label: 'Foo',
+      path: '/foo',
+      fields: [
+        {
+          type: 'rich-text',
+          label: 'Blog Post Body',
+          name: 'body',
+          isBody: true,
+          templates: [
+            {
+              name: 'Gallery',
+              label: 'Gallery',
+              fields: [
+                {
+                  type: 'strung',
+                  name: 'alignment',
+                  label: 'Alignment',
+                  options: ['left', 'center', 'right'],
+                },
+                {
+                  type: 'string',
+                  name: 'gap',
+                  label: 'Gap',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+const schemaWithBadType = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'strung', name: 'foo' }],
+    },
+  ],
+}
 describe('validateSchema', () => {
   it('Passes on a valid schema', () => {
     validateSchema({ config: validSchema })
@@ -401,6 +445,16 @@ describe('validateSchema', () => {
   it('fails when templates is empty', () => {
     expect(() => {
       validateSchema({ config: schemaWithEmptyTemplates })
+    }).toThrow()
+  })
+  it('fails when a deeply nested field under a template is invalid', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithInvalidFiledNesterUnderRichText })
+    }).toThrow()
+  })
+  it('fails when a invalid type is given', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithBadType })
     }).toThrow()
   })
 })
