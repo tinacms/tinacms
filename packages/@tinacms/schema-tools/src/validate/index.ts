@@ -15,6 +15,14 @@ import { ZodError } from 'zod'
 import { TinaCloudSchema } from '../types'
 import { parseZodError } from '../util/parseZodErrors'
 import { TinaCloudSchemaZod } from './schema'
+
+export class TinaSchemaValidationError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = 'TinaSchemaValidationError'
+  }
+}
+
 export const validateSchema = ({
   config,
 }: {
@@ -25,7 +33,7 @@ export const validateSchema = ({
   } catch (e) {
     if (e instanceof ZodError) {
       const errors = parseZodError({ zodError: e })
-      throw new Error(errors.join(', '))
+      throw new TinaSchemaValidationError(errors.join(', '))
     } else {
       throw new Error(e)
     }
