@@ -2,4 +2,4 @@
 '@tinacms/graphql': patch
 ---
 
-Modify putConfig to write \_graphql.json without whitespace to reduce file size
+Modify database to write config json files without whitespace to reduce file sizes
