@@ -2,6 +2,8 @@ import { Actions } from "../actions";
 import { Section } from "../section";
 import { Container } from "../container";
 import { Icon } from "../icon";
+import type { TinaTemplate } from "tinacms";
+import { iconSchema } from "../icon";
 
 export const Feature = ({ featuresColor, data, tinaField }) => {
   return (
@@ -59,4 +61,64 @@ export const Features = ({ data, parentField }) => {
       </Container>
     </Section>
   );
+};
+
+const defaultFeature = {
+  title: "Here's Another Feature",
+  text: "This is where you might talk about the feature, if this wasn't just filler text.",
+  icon: {
+    color: "",
+    style: "float",
+    name: "",
+  },
+};
+
+export const featureBlockShema: TinaTemplate = {
+  name: "features",
+  label: "Features",
+  ui: {
+    previewSrc: "/blocks/features.png",
+    defaultItem: {
+      items: [defaultFeature, defaultFeature, defaultFeature],
+    },
+  },
+  fields: [
+    {
+      type: "object",
+      label: "Feature Items",
+      name: "items",
+      list: true,
+      ui: {
+        defaultItem: {
+          ...defaultFeature,
+        },
+      },
+      fields: [
+        iconSchema,
+        {
+          type: "string",
+          label: "Title",
+          name: "title",
+        },
+        {
+          type: "string",
+          label: "Text",
+          name: "text",
+          ui: {
+            component: "textarea",
+          },
+        },
+      ],
+    },
+    {
+      type: "string",
+      label: "Color",
+      name: "color",
+      options: [
+        { label: "Default", value: "default" },
+        { label: "Tint", value: "tint" },
+        { label: "Primary", value: "primary" },
+      ],
+    },
+  ],
 };
