@@ -41,6 +41,23 @@ export class TinaAdminApi {
 
     return response
   }
+  async deleteDocument({
+    collection,
+    relativePath,
+  }: {
+    collection: string
+    relativePath: string
+  }) {
+    await this.api.request(
+      `#graphql
+      mutation DeleteDocument($collection: String!, $relativePath: String!  ){
+  deleteDocument(collection: $collection, relativePath: $relativePath){
+    __typename
+  }
+}`,
+      { variables: { collection, relativePath } }
+    )
+  }
 
   async fetchCollection(collectionName: string, includeDocuments: boolean) {
     const response: { collection: Collection } = await this.api.request(
