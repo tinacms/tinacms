@@ -116,7 +116,7 @@ const CollectionListPage = () => {
             collectionName={collectionName}
             includeDocuments
           >
-            {(collection: Collection) => {
+            {(collection: Collection, _loading, refresh) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
@@ -217,11 +217,21 @@ const CollectionListPage = () => {
                                               document.node.sys.filename +
                                               document.node.sys.extension,
                                           }
+                                          // TODO should we add a model?
                                           admin
                                             .deleteDocument(vars)
-                                            .then((event) => {
-                                              // TODO: refresh client side
-                                              location.reload()
+                                            .then((_) => {
+                                              cms.alerts.info(
+                                                'Document was successfully deleted'
+                                              )
+                                              refresh()
+                                            })
+                                            .catch((e) => {
+                                              cms.alerts.warn(
+                                                'Document was not deleted, ask a developer for help or check the console'
+                                              )
+                                              console.error(e)
+                                              throw e
                                             })
                                         }}
                                       >

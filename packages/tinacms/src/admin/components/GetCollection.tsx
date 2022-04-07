@@ -26,6 +26,8 @@ export const useGetCollection = (
   const [collection, setCollection] = useState<Collection | undefined>(
     undefined
   )
+  // A dummy var  to tell the the the hook to update collections
+  const [x, setRefresh] = useState(0)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
 
@@ -54,9 +56,16 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
-  }, [cms, collectionName])
+  }, [cms, collectionName, x])
 
-  return { collection, loading, error }
+  return {
+    collection,
+    loading,
+    error,
+    refresh: () => {
+      setRefresh((x) => x + 1)
+    },
+  }
 }
 
 const GetCollection = ({
@@ -70,7 +79,7 @@ const GetCollection = ({
   includeDocuments?: boolean
   children: any
 }) => {
-  const { collection, loading, error } = useGetCollection(
+  const { collection, loading, error, refresh } = useGetCollection(
     cms,
     collectionName,
     includeDocuments
@@ -84,7 +93,7 @@ const GetCollection = ({
     return <LoadingPage />
   }
 
-  return <>{children(collection, loading)}</>
+  return <>{children(collection, loading, refresh)}</>
 }
 
 export default GetCollection
