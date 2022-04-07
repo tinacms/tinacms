@@ -36,12 +36,17 @@ const nameProp = z.string({
   invalid_type_error: 'Name must be a sting',
 })
 
-const TypeNameEnum = z.enum(TypeName)
-
-const Option = z.union([
-  z.string(),
-  z.object({ label: z.string(), value: z.string() }),
-])
+const Option = z.union(
+  [z.string(), z.object({ label: z.string(), value: z.string() })],
+  {
+    errorMap: () => {
+      return {
+        message:
+          'Invalid option array. Must be a string[] or {label: string, value: string}[]',
+      }
+    },
+  }
+)
 const TinaField = z.object({
   name: nameProp,
   label: z.string().optional(),
