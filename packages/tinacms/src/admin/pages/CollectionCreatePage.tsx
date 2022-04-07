@@ -11,21 +11,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useState, useMemo } from 'react'
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { HiChevronRight } from 'react-icons/hi'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useMemo, useState } from 'react'
+import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
-import type { TinaCMS } from '@tinacms/toolkit'
-import { LocalWarning } from '@tinacms/toolkit'
-
-import { TinaAdminApi } from '../api'
 import GetCMS from '../components/GetCMS'
 import GetDocumentFields from '../components/GetDocumentFields'
-
+import { HiChevronRight } from 'react-icons/hi'
+import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
+import { TinaAdminApi } from '../api'
+import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
-import { resolveForm, TinaSchema } from '@tinacms/schema-tools'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -149,11 +147,11 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
           cms.alerts.success('Document created!')
           navigate(`/collections/${collection.name}`)
         } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] CreateDocument failed: ${error.message}`,
-            30 * 1000 // 30 seconds
-          )
           console.error(error)
+
+          throw new Error(
+            `[${error.name}] CreateDocument failed: ${error.message}`
+          )
         }
       },
     })
