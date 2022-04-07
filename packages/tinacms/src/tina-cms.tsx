@@ -12,24 +12,24 @@ limitations under the License.
 */
 
 import React, { useState } from 'react'
+import { TinaCloudMediaStoreClass, TinaCloudProvider } from './auth'
 import {
   useGraphqlForms,
   useGraphqlFormsUnstable,
 } from './hooks/use-graphql-forms'
-import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
+
 import { LocalClient } from './client/index'
+import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { TinaDataContext } from '@tinacms/sharedctx'
 import type { TinaIOConfig } from './client/index'
-import { useCMS } from '@tinacms/toolkit'
 import UrlPattern from 'url-pattern'
+import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
 import styles from './styles.css'
-
-import type { TinaCMS } from '@tinacms/toolkit'
-import type { formifyCallback } from './hooks/use-graphql-forms'
-import { TinaDataContext } from '@tinacms/sharedctx'
+import { useCMS } from '@tinacms/toolkit'
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { useTina } from './edit-state'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -116,7 +116,19 @@ class ErrorBoundary extends React.Component {
               encountering this error. There is a bigger issue with the site.
               Please reach out to your site admin.
             </p>
-
+            <p>
+              See our{' '}
+              <a
+                className="text-gray-600"
+                style={{ textDecoration: 'underline' }}
+                href="https://tina.io/docs/errors/faq/"
+                target="_blank"
+              >
+                {' '}
+                Error FAQ{' '}
+              </a>{' '}
+              for more information.
+            </p>
             <button
               style={errorButtonStyles as any}
               onClick={() => {
@@ -138,6 +150,19 @@ class ErrorBoundary extends React.Component {
                   compatible with the latest version of the site's layout. Click
                   the button below to switch back to the default branch for this
                   deployment.
+                </p>
+                <p>
+                  See our{' '}
+                  <a
+                    className="text-gray-600"
+                    style={{ textDecoration: 'underline' }}
+                    href="https://tina.io/docs/errors/faq/"
+                    target="_blank"
+                  >
+                    {' '}
+                    Error FAQ{' '}
+                  </a>{' '}
+                  for more information.
                 </p>
                 <button
                   style={errorButtonStyles as any}
@@ -173,6 +198,8 @@ const parseURL = (url: string): { branch; isLocalClient; clientId } => {
   const params = new URL(url)
   const pattern = new UrlPattern('/content/:clientId/github/:branch')
   const result = pattern.match(params.pathname)
+
+  // TODO if !result || !result.clientId || !result.branch, throw an error
 
   if (params.host !== tinaHost) {
     throw new Error(
