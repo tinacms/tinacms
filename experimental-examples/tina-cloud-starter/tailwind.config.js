@@ -74,6 +74,7 @@ module.exports = {
       "5xl": "3.25rem",
       "6xl": "4rem",
       "7xl": "5rem",
+      "8xl": "6rem",
     },
     borderWidth: {
       DEFAULT: "3px",
@@ -83,6 +84,7 @@ module.exports = {
       4: "4px",
     },
     extend: {
+      textDecoration: ["active"],
       opacity: {
         7: ".075",
         15: ".15",
@@ -134,13 +136,24 @@ module.exports = {
           },
         },
         lg: {
-          css: [
-            {
-              pre: {
-                lineHeight: 1.5,
-              },
+          css: {
+            pre: {
+              lineHeight: 1.5,
             },
-          ],
+            "p:first-of-type": {
+              fontSize: "1.365rem",
+            },
+          },
+        },
+        xl: {
+          css: {
+            pre: {
+              lineHeight: 1.5,
+            },
+            "p:first-of-type": {
+              fontSize: "1.365rem",
+            },
+          },
         },
         dark: {
           css: {

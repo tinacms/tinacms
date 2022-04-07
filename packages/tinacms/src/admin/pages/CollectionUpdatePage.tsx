@@ -11,22 +11,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useMemo, useState } from 'react'
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { HiChevronRight } from 'react-icons/hi'
-
-import type { TinaCMS } from '@tinacms/toolkit'
-import { LocalWarning } from '@tinacms/toolkit'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useMemo, useState } from 'react'
+import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
-import GetDocumentFields from '../components/GetDocumentFields'
 import GetDocument from '../components/GetDocument'
-import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
-
+import GetDocumentFields from '../components/GetDocumentFields'
+import { HiChevronRight } from 'react-icons/hi'
+import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
-import { resolveForm, TinaSchema } from '@tinacms/schema-tools'
+import type { TinaCMS } from '@tinacms/toolkit'
+import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -132,11 +130,10 @@ const RenderForm = ({
           )
           cms.alerts.success('Document updated!')
         } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] UpdateDocument failed: ${error.message}`,
-            30 * 1000 // 30 seconds
-          )
           console.error(error)
+          throw new Error(
+            `[${error.name}] UpdateDocument failed: ${error.message}`
+          )
         }
       },
     })
