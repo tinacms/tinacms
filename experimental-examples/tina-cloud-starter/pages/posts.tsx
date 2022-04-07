@@ -2,6 +2,7 @@ import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { ExperimentalGetTinaClient } from "../.tina/__generated__/types";
+import { Layout } from "../components/layout";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
@@ -9,11 +10,13 @@ export default function HomePage(
   const posts = props.data.getPostsList.edges;
 
   return (
-    <Section className="flex-1">
-      <Container size="large">
-        <Posts data={posts} />
-      </Container>
-    </Section>
+    <Layout>
+      <Section className="flex-1">
+        <Container size="large">
+          <Posts data={posts} />
+        </Container>
+      </Section>
+    </Layout>
   );
 }
 

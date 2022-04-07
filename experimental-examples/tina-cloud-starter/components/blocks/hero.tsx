@@ -1,9 +1,10 @@
 import * as React from "react";
-import Markdown from "react-markdown";
 import { Actions } from "../actions";
 import { Container } from "../container";
 import { Section } from "../section";
 import { ThemeContext } from "../theme";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
+import type { TinaTemplate } from "tinacms";
 
 export const Hero = ({ data, parentField }) => {
   const theme = React.useContext(ThemeContext);
@@ -57,7 +58,7 @@ export const Hero = ({ data, parentField }) => {
                 data.color === "primary" ? `prose-primary` : `dark:prose-dark`
               }`}
             >
-              <Markdown>{data.text}</Markdown>
+              <TinaMarkdown content={data.text} />
             </div>
           )}
           {data.actions && (
@@ -84,4 +85,101 @@ export const Hero = ({ data, parentField }) => {
       </Container>
     </Section>
   );
+};
+
+export const heroBlockSchema: TinaTemplate = {
+  name: "hero",
+  label: "Hero",
+  ui: {
+    previewSrc: "/blocks/hero.png",
+    defaultItem: {
+      tagline: "Here's some text above the other text",
+      headline: "This Big Text is Totally Awesome",
+      text: "Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo.",
+    },
+  },
+  fields: [
+    {
+      type: "string",
+      label: "Tagline",
+      name: "tagline",
+    },
+    {
+      type: "string",
+      label: "Headline",
+      name: "headline",
+    },
+    {
+      label: "Text",
+      name: "text",
+      type: "rich-text",
+    },
+    {
+      label: "Actions",
+      name: "actions",
+      type: "object",
+      list: true,
+      ui: {
+        defaultItem: {
+          label: "Action Label",
+          type: "button",
+          icon: true,
+          link: "/",
+        },
+      },
+      fields: [
+        {
+          label: "Label",
+          name: "label",
+          type: "string",
+        },
+        {
+          label: "Type",
+          name: "type",
+          type: "string",
+          options: [
+            { label: "Button", value: "button" },
+            { label: "Link", value: "link" },
+          ],
+        },
+        {
+          label: "Icon",
+          name: "icon",
+          type: "boolean",
+        },
+        {
+          label: "Link",
+          name: "link",
+          type: "string",
+        },
+      ],
+    },
+    {
+      type: "object",
+      label: "Image",
+      name: "image",
+      fields: [
+        {
+          name: "src",
+          label: "Image Source",
+          type: "image",
+        },
+        {
+          name: "alt",
+          label: "Alt Text",
+          type: "string",
+        },
+      ],
+    },
+    {
+      type: "string",
+      label: "Color",
+      name: "color",
+      options: [
+        { label: "Default", value: "default" },
+        { label: "Tint", value: "tint" },
+        { label: "Primary", value: "primary" },
+      ],
+    },
+  ],
 };
