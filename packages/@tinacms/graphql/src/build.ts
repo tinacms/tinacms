@@ -191,6 +191,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     await builder.buildUpdateCollectionDocumentMutation(collections)
   )
   mutationTypeDefinitionFields.push(
+    await builder.buildDeleteCollectionDocumentMutation(collections)
+  )
+  mutationTypeDefinitionFields.push(
     await builder.buildCreateCollectionDocumentMutation(collections)
   )
   queryTypeDefinitionFields.push(

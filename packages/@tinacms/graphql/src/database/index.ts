@@ -464,13 +464,17 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    const pathsByCollection: Record<string,string[]> = {}
+    const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
-    const collections: Record<string,CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>> = {}
+    const collections: Record<
+      string,
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+    > = {}
     const tinaSchema = await this.getSchema()
     for (const documentPath of documentPaths) {
-      const collection = tinaSchema.schema.collections.find(
-        (collection) => documentPath.startsWith(collection.path)
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        documentPath.startsWith(collection.path)
       )
 
       if (collection) {
@@ -485,9 +489,19 @@ export class Database {
     }
 
     for (const collection of Object.keys(pathsByCollection)) {
-      await _indexContent(this, pathsByCollection[collection], collections[collection])
+      await _indexContent(
+        this,
+        pathsByCollection[collection],
+        collections[collection]
+      )
     }
     await _indexContent(this, nonCollectionPaths)
+  }
+
+  public delete = async (filepath: string) => {
+    // TODO: Add delete to database. We probably need to re-index and such
+
+    await this.store.delete(filepath)
   }
 
   public _indexAllContent = async () => {

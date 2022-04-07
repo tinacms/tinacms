@@ -160,9 +160,9 @@ export class LevelStore implements Store {
   public supportsIndexing() {
     return true
   }
-  // public async delete(filepath: string) {
-  //   await this.db.del(filepath)
-  // }
+  public async delete(filepath: string) {
+    await this.db.del(filepath)
+  }
   public async print() {
     this.db
       .createReadStream()

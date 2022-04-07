@@ -132,6 +132,7 @@ export interface Store {
    */
   supportsIndexing(): boolean
   put(filepath: string, data: object, options?: PutOptions): Promise<void>
+  delete(filepath: string): Promise<void>
 }
 
 const inferOperatorFromFilter = (filterOperator: string) => {

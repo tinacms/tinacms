@@ -301,6 +301,7 @@ export const resolve = async ({
                 NAMER.documentQueryName(),
                 'createDocument',
                 'updateDocument',
+                'deleteDocument',
               ].includes(info.fieldName)
             ) {
               /**
@@ -311,6 +312,8 @@ export const resolve = async ({
                 collection: args.collection,
                 isMutation,
                 isCreation,
+                // Right now this is the only case for deletion
+                isDeletion: info.fieldName === 'deleteDocument',
                 isAddPendingDocument: false,
                 isCollectionSpecific: false,
               })
