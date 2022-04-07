@@ -295,7 +295,7 @@ export const makeFilter = ({
       } else if (dataType === 'datetime') {
         operands = resolvedValues.map((resolvedValue) => {
           const coerced = new Date(resolvedValue).getTime()
-          return isNaN(coerced) ? resolvedValue : coerced
+          return isNaN(coerced) ? Number(resolvedValue) : coerced
         })
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map(
