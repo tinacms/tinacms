@@ -35,7 +35,12 @@ import type {
   TinaFieldInner,
 } from '../types'
 import type { Bridge } from './bridge'
-import { atob, btoa, DEFAULT_COLLECTION_SORT_KEY, DEFAULT_NUMERIC_LPAD } from '@tinacms/datalayer'
+import {
+  atob,
+  btoa,
+  DEFAULT_COLLECTION_SORT_KEY,
+  DEFAULT_NUMERIC_LPAD,
+} from '@tinacms/datalayer'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -312,7 +317,10 @@ export class Database {
                     {
                       name: field.name,
                       type: field.type,
-                      pad: field.type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined,
+                      pad:
+                        field.type === 'number'
+                          ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+                          : undefined,
                     },
                   ],
                 }
@@ -426,11 +434,11 @@ export class Database {
     if (this.bridge.supportsBuilding()) {
       await this.bridge.putConfig(
         path.join(GENERATED_FOLDER, `_graphql.json`),
-        JSON.stringify(graphQLSchema, null, 2)
+        JSON.stringify(graphQLSchema)
       )
       await this.bridge.putConfig(
         path.join(GENERATED_FOLDER, `_schema.json`),
-        JSON.stringify(tinaSchema.schema, null, 2)
+        JSON.stringify(tinaSchema.schema)
       )
     }
   }
@@ -465,13 +473,17 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    const pathsByCollection: Record<string,string[]> = {}
+    const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
-    const collections: Record<string,CollectionFieldsWithNamespace<true> | CollectionTemplatesWithNamespace<true>> = {}
+    const collections: Record<
+      string,
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+    > = {}
     const tinaSchema = await this.getSchema()
     for (const documentPath of documentPaths) {
-      const collection = tinaSchema.schema.collections.find(
-        (collection) => documentPath.startsWith(collection.path)
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        documentPath.startsWith(collection.path)
       )
 
       if (collection) {
@@ -486,7 +498,11 @@ export class Database {
     }
 
     for (const collection of Object.keys(pathsByCollection)) {
-      await _indexContent(this, pathsByCollection[collection], collections[collection])
+      await _indexContent(
+        this,
+        pathsByCollection[collection],
+        collections[collection]
+      )
     }
     await _indexContent(this, nonCollectionPaths)
   }
@@ -511,10 +527,7 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-    await this.bridge.putConfig(
-      lookupPath,
-      JSON.stringify(updatedLookup, null, 2)
-    )
+    await this.bridge.putConfig(lookupPath, JSON.stringify(updatedLookup))
   }
 }
 
