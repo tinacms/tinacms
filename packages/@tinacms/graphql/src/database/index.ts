@@ -438,7 +438,7 @@ export class Database {
       )
       await this.bridge.putConfig(
         path.join(GENERATED_FOLDER, `_schema.json`),
-        JSON.stringify(tinaSchema.schema, null, 2)
+        JSON.stringify(tinaSchema.schema)
       )
     }
   }
@@ -527,10 +527,7 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-    await this.bridge.putConfig(
-      lookupPath,
-      JSON.stringify(updatedLookup, null, 2)
-    )
+    await this.bridge.putConfig(lookupPath, JSON.stringify(updatedLookup))
   }
 }
 
