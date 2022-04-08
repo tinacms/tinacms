@@ -32,8 +32,8 @@ const typeRequiredError = `type is required and must be one of ${TypeName.join(
 )}`
 
 const nameProp = z.string({
-  required_error: 'Name must be provided',
-  invalid_type_error: 'Name must be a sting',
+  required_error: 'name must be provided',
+  invalid_type_error: 'name must be a sting',
 })
 
 const Option = z.union(
