@@ -33,7 +33,7 @@ export const validateSchema = ({
   } catch (e) {
     if (e instanceof ZodError) {
       const errors = parseZodError({ zodError: e })
-      throw new TinaSchemaValidationError(errors.join(', '))
+      throw new TinaSchemaValidationError(errors.join(', \n'))
     } else {
       throw new Error(e)
     }
