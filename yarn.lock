@@ -6454,6 +6454,7 @@ __metadata:
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
     "@tinacms/metrics": "workspace:*"
+    "@tinacms/schema-tools": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
@@ -6641,6 +6642,8 @@ __metadata:
     jest: ^27.0.6
     react: 16.14.0
     typescript: ^4.3.5
+    yup: ^0.32.0
+    zod: ^3.14.3
   peerDependencies:
     react: ">=16.14.0"
     yup: ^0.32.0
@@ -34129,6 +34132,13 @@ resolve@^2.0.0-next.3:
   version: 0.8.15
   resolution: "zen-observable@npm:0.8.15"
   checksum: 7d155f8a75b9314f9f31e70a31edcd897b0e8a1313737502ab84a573e49d2c333b738e415c156334a6e910c363ce546b59fa7921eff61440285caa99c843df74
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.14.3":
+  version: 3.14.3
+  resolution: "zod@npm:3.14.3"
+  checksum: f9272d20b6b4eb9ac98c53817d2f2d1864729f8e9e7d145c206e43dffd20c838d2f3c9c3f7dfb46868a533110ab831af716e5620122abbc626611a4e45ceccee
   languageName: node
   linkType: hard
 
