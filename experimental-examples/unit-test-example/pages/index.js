@@ -61,21 +61,11 @@ export const getStaticProps = async () => {
 const variables = {}
 
 const query = `#graphql
-query {
-  getBlockPageDocument(relativePath: "blockPage1.mdx") {
-    data {
-      blocks {
-        __typename
-        ...on BlockPageBlocksFeatureList {
-          items {
-            title
-          }
-        }
-        ...on BlockPageBlocksSlideshow {
-          items {
-            title
-          }
-        }
+query GetBlockPageDocument {
+  post(relativePath: "post1.mdx") {
+    author {
+      ...on Author {
+        bio
       }
     }
   }

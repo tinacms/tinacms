@@ -373,7 +373,7 @@ export const getFieldAliasForBlueprint = (path: BlueprintPath[]) => {
     }
     return true
   })
-  return accum.reverse().slice(1).join('.')
+  return accum.reverse().join('.')
 }
 
 /**
@@ -555,6 +555,7 @@ export const printState = (state: State) => {
     bpString = bpString + `\n#`
     bpString = bpString + `\n# Field blueprints`
     bpString = bpString + `\n# ================`
+    // console.log(blueprint)
     blueprint.fields
       .filter((fbp) => fbp.documentBlueprintId === blueprint.id)
       .forEach((fbp) => {

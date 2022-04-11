@@ -30,40 +30,39 @@ interface Node {
 
 """"""
 interface Document {
-  sys: SystemInfo
   id: ID!
-  form: JSON!
-  values: JSON!
+  _sys: SystemInfo
+  _values: JSON!
 }
 
 """A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Float!
+  pageInfo: PageInfo!
 }
 
 type Query {
   getOptimizedQuery(queryString: String!): String
-  getCollection(collection: String): Collection!
-  getCollections: [Collection!]!
+  collection(collection: String): Collection!
+  collections: [Collection!]!
   node(id: String): Node!
-  getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float): DocumentConnection!
-  getDocumentFields: JSON!
-  getPostDocument(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float): PostConnection!
-  getAuthorDocument(relativePath: String): AuthorDocument!
-  getAuthorList(before: String, after: String, first: Float, last: Float): AuthorConnection!
-  getBlockPageDocument(relativePath: String): BlockPageDocument!
-  getBlockPageList(before: String, after: String, first: Float, last: Float): BlockPageConnection!
+  document(collection: String, relativePath: String): DocumentNode!
+  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  post(relativePath: String): Post!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  author(relativePath: String): Author!
+  authorConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
+  blockPage(relativePath: String): BlockPage!
+  blockPageConnection(before: String, after: String, first: Float, last: Float, sort: String): BlockPageConnection!
 }
 
 type DocumentConnectionEdges {
-  cursor: String
+  cursor: String!
   node: DocumentNode
 }
 
 type DocumentConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DocumentConnectionEdges]
 }
@@ -77,39 +76,33 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = PostDocument | AuthorDocument | BlockPageDocument
+union DocumentNode = Post | Author | BlockPage
 
-union PostAuthorDocument = AuthorDocument
+union PostAuthor = Author
 
-type Post {
+type Post implements Node & Document {
   title: String
-  author: PostAuthorDocument
+  author: PostAuthor
   tags: [String]
   categories: [String]
   published: String
   featured: Boolean
   body: JSON
-}
-
-type PostDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Post!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type PostConnectionEdges {
-  cursor: String
-  node: PostDocument
+  cursor: String!
+  node: Post
 }
 
 type PostConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [PostConnectionEdges]
 }
@@ -119,28 +112,22 @@ type AuthorSocial {
   handle: String
 }
 
-type Author {
+type Author implements Node & Document {
   name: String
   social: [AuthorSocial]
   bio: JSON
-}
-
-type AuthorDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Author!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type AuthorConnectionEdges {
-  cursor: String
-  node: AuthorDocument
+  cursor: String!
+  node: Author
 }
 
 type AuthorConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [AuthorConnectionEdges]
 }
@@ -150,17 +137,17 @@ type BlockPageBlocksHero {
   description: String
 }
 
-union BlockPageBlocksBlockQuoteAuthorDocument = AuthorDocument
+union BlockPageBlocksBlockQuoteAuthor = Author
 
 type BlockPageBlocksBlockQuote {
   message: JSON
-  author: BlockPageBlocksBlockQuoteAuthorDocument
+  author: BlockPageBlocksBlockQuoteAuthor
 }
 
-union BlockPageBlocksFeaturedPostsBlogsItemDocument = PostDocument
+union BlockPageBlocksFeaturedPostsBlogsItem = Post
 
 type BlockPageBlocksFeaturedPostsBlogs {
-  item: BlockPageBlocksFeaturedPostsBlogsItemDocument
+  item: BlockPageBlocksFeaturedPostsBlogsItem
 }
 
 type BlockPageBlocksFeaturedPosts {
@@ -190,27 +177,21 @@ type BlockPageBlocksSlideshow {
 
 union BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts | BlockPageBlocksFeatureList | BlockPageBlocksSlideshow
 
-type BlockPage {
+type BlockPage implements Node & Document {
   title: String
   blocks: [BlockPageBlocks]
-}
-
-type BlockPageDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: BlockPage!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type BlockPageConnectionEdges {
-  cursor: String
-  node: BlockPageDocument
+  cursor: String!
+  node: BlockPage
 }
 
 type BlockPageConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [BlockPageConnectionEdges]
 }
@@ -219,12 +200,12 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
-  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
-  updateBlockPageDocument(relativePath: String!, params: BlockPageMutation!): BlockPageDocument!
-  createBlockPageDocument(relativePath: String!, params: BlockPageMutation!): BlockPageDocument!
+  updatePost(relativePath: String!, params: PostMutation!): Post!
+  createPost(relativePath: String!, params: PostMutation!): Post!
+  updateAuthor(relativePath: String!, params: AuthorMutation!): Author!
+  createAuthor(relativePath: String!, params: AuthorMutation!): Author!
+  updateBlockPage(relativePath: String!, params: BlockPageMutation!): BlockPage!
+  createBlockPage(relativePath: String!, params: BlockPageMutation!): BlockPage!
 }
 
 input DocumentMutation {

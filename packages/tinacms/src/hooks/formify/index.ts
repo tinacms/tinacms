@@ -84,7 +84,6 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     if (state.status === 'initialized') {
-      console.log(query)
       cms.api.tina.request(query, { variables }).then((res) => {
         // FIXME: remove this from GraphQL
         // 'paths' was previously used to keep track of which fields were
@@ -190,6 +189,7 @@ export const useFormify = ({
         variables,
       })
 
+      // console.log(util.printState(state))
       state.blueprints.map((blueprint) => {
         const responseAtBlueprint =
           util.getValueForBlueprint<FormifiedDocumentNode>(

@@ -13,10 +13,8 @@ limitations under the License.
 
 const query = `#graphql
 query MyQuery {
-  getPostDocument(relativePath: "post1.mdx") {
-    data {
-      title
-    }
+  post(relativePath: "post1.mdx") {
+    title
   }
 }
 `

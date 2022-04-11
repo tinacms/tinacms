@@ -18,44 +18,44 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PostAuthorDocument": {
-    "type": "PostAuthorDocument",
+  "PostAuthor": {
+    "type": "PostAuthor",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PostDocument": {
-    "type": "PostDocument",
+  "Post": {
+    "type": "Post",
     "resolveType": "collectionDocument",
     "collection": "post",
-    "createPostDocument": "create",
-    "updatePostDocument": "update"
+    "createPost": "create",
+    "updatePost": "update"
   },
   "PostConnection": {
     "type": "PostConnection",
     "resolveType": "collectionDocumentList",
     "collection": "post"
   },
-  "AuthorDocument": {
-    "type": "AuthorDocument",
+  "Author": {
+    "type": "Author",
     "resolveType": "collectionDocument",
     "collection": "author",
-    "createAuthorDocument": "create",
-    "updateAuthorDocument": "update"
+    "createAuthor": "create",
+    "updateAuthor": "update"
   },
   "AuthorConnection": {
     "type": "AuthorConnection",
     "resolveType": "collectionDocumentList",
     "collection": "author"
   },
-  "BlockPageBlocksBlockQuoteAuthorDocument": {
-    "type": "BlockPageBlocksBlockQuoteAuthorDocument",
+  "BlockPageBlocksBlockQuoteAuthor": {
+    "type": "BlockPageBlocksBlockQuoteAuthor",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "BlockPageBlocksFeaturedPostsBlogsItemDocument": {
-    "type": "BlockPageBlocksFeaturedPostsBlogsItemDocument",
+  "BlockPageBlocksFeaturedPostsBlogsItem": {
+    "type": "BlockPageBlocksFeaturedPostsBlogsItem",
     "resolveType": "multiCollectionDocument",
     "createDocument": "create",
     "updateDocument": "update"
@@ -71,12 +71,12 @@
       "slideshow": "BlockPageBlocksSlideshow"
     }
   },
-  "BlockPageDocument": {
-    "type": "BlockPageDocument",
+  "BlockPage": {
+    "type": "BlockPage",
     "resolveType": "collectionDocument",
     "collection": "blockPage",
-    "createBlockPageDocument": "create",
-    "updateBlockPageDocument": "update"
+    "createBlockPage": "create",
+    "updateBlockPage": "update"
   },
   "BlockPageConnection": {
     "type": "BlockPageConnection",

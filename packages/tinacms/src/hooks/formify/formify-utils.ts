@@ -241,6 +241,23 @@ export const getRelativeBlueprint = (path: BlueprintPath[]) => {
   return getBlueprintNamePath({ path: documentBlueprintPath })
 }
 
+export const isSysField = (fieldNode: G.FieldNode) => {
+  if (fieldNode.name.value === '__typename') {
+    return true
+  }
+  if (fieldNode.name.value === '_sys') {
+    return true
+  }
+  if (fieldNode.name.value === '_values') {
+    return true
+  }
+  if (fieldNode.name.value === 'id') {
+    return true
+  }
+
+  return false
+}
+
 export const getBlueprintId = (path: BlueprintPath[]) => {
   const namePath = []
   const aliasPath = []
@@ -254,27 +271,4 @@ export const getBlueprintId = (path: BlueprintPath[]) => {
   })
 
   return namePath.join('.')
-}
-
-export const getFieldAliasForBlueprint = (path: BlueprintPath[]) => {
-  const reversePath = [...path].reverse()
-  const accum = []
-  reversePath.every((item, index) => {
-    if (index === 0) {
-      if (item.list) {
-        accum.push('[]')
-      }
-      accum.push(item.alias)
-    } else {
-      if (item.isNode) {
-        return false
-      }
-      if (item.list) {
-        accum.push('[]')
-      }
-      accum.push(item.alias)
-    }
-    return true
-  })
-  return accum.reverse().slice(1).join('.')
 }

@@ -174,11 +174,6 @@ const schema = defineSchema({
                   label: 'Features',
                   name: 'items',
                   type: 'object',
-                  ui: {
-                    component: (props) => {
-                      return <div>Hi</div>
-                    },
-                  },
                   list: true,
                   fields: [
                     {

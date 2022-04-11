@@ -20,6 +20,7 @@ import { LocalClient } from '../../../client'
 
 // @ts-ignore FIXME: violates ts rootDir config
 import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
+import schema from '../../../../../../experimental-examples/unit-test-example/.tina/schema'
 
 expect.extend({ toMatchFile })
 
@@ -50,7 +51,7 @@ class TestClient extends LocalClient {
 const cms = new TinaCMS({
   apis: {
     // tina: tina,
-    tina: new TestClient(),
+    tina: new TestClient({ schema }),
     tina2: {
       getSchema: async () => {
         // @ts-ignore

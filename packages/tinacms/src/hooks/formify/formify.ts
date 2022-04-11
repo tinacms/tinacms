@@ -290,8 +290,14 @@ export const formify = async ({
       return fieldNode
     }
 
+    const fieldPath = util.buildPath({
+      fieldNode,
+      type: field.type,
+      parentTypename: G.getNamedType(parentType).name,
+      path,
+    })
     const blueprint = blueprints.find(
-      (blueprint) => blueprint.id === util.getRelativeBlueprint(path)
+      (blueprint) => blueprint.id === util.getRelativeBlueprint(fieldPath)
     )
     /**
      * This would be a field like sys.filename
@@ -301,12 +307,9 @@ export const formify = async ({
       return fieldNode
     }
 
-    const fieldPath = util.buildPath({
-      fieldNode,
-      type: field.type,
-      parentTypename: G.getNamedType(parentType).name,
-      path,
-    })
+    if (util.isSysField(fieldNode)) {
+      return fieldNode
+    }
 
     blueprint.fields.push({
       id: util.getBlueprintId(fieldPath),

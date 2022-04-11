@@ -1,5 +1,5 @@
 # Blueprint
-# getAuthorDocument
+# author
 #
 # Documents for blueprint
 # ================
@@ -13,20 +13,18 @@
 
 
 query QueryOperation {
-  getAuthorDocument(relativePath: "author1.mdx") {
-    data {
-      social {
-        platform
-        handle
-      }
+  author(relativePath: "author1.mdx") {
+    social {
+      platform
+      handle
     }
-    _internalSys: sys {
+    _internalSys: _sys {
       path
+      relativePath
       collection {
         name
       }
     }
-    form
-    values
+    _values
   }
 }
