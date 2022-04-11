@@ -6,45 +6,5 @@
       "page",
       "post"
     ]
-  },
-  "Node": {
-    "type": "Node",
-    "resolveType": "nodeDocument"
-  },
-  "DocumentNode": {
-    "type": "DocumentNode",
-    "resolveType": "multiCollectionDocument",
-    "createDocument": "create",
-    "updateDocument": "update"
-  },
-  "PageDocument": {
-    "type": "PageDocument",
-    "resolveType": "collectionDocument",
-    "collection": "page",
-    "createPage": "create",
-    "updatePage": "update"
-  },
-  "PageConnection": {
-    "type": "PageConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "page"
-  },
-  "PostPostsPostDocument": {
-    "type": "PostPostsPostDocument",
-    "resolveType": "multiCollectionDocument",
-    "createDocument": "create",
-    "updateDocument": "update"
-  },
-  "PostDocument": {
-    "type": "PostDocument",
-    "resolveType": "collectionDocument",
-    "collection": "post",
-    "createPost": "create",
-    "updatePost": "update"
-  },
-  "PostConnection": {
-    "type": "PostConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "post"
   }
 }

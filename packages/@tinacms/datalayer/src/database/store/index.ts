@@ -93,6 +93,7 @@ export type SeedOptions = {
 }
 
 export type PutOptions = SeedOptions & { seed?: boolean }
+export type DeleteOptions = SeedOptions & { seed?: boolean }
 
 export interface Store {
   glob(
@@ -100,7 +101,7 @@ export interface Store {
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<string[]>
   get<T extends object>(filepath: string): Promise<T>
-  // delete(filepath: string): Promise<void>
+  delete(filepath: string, options?: DeleteOptions): Promise<void>
   clear(): void
   close(): void
   open(): void
@@ -132,7 +133,6 @@ export interface Store {
    */
   supportsIndexing(): boolean
   put(filepath: string, data: object, options?: PutOptions): Promise<void>
-  delete(filepath: string): Promise<void>
 }
 
 const inferOperatorFromFilter = (filterOperator: string) => {

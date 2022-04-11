@@ -17,6 +17,7 @@ import type {
   PutOptions,
   SeedOptions,
   Store,
+  DeleteOptions,
 } from './index'
 import {
   coerceFilterChainOperands,
@@ -160,8 +161,43 @@ export class LevelStore implements Store {
   public supportsIndexing() {
     return true
   }
-  public async delete(filepath: string) {
-    await this.db.del(filepath)
+  public async delete(filepath: string, options: DeleteOptions) {
+    const data = this.db.get(`${defaultPrefix}:${filepath}`)
+
+    if (options?.indexDefinitions) {
+      for (const [sort, definition] of Object.entries(
+        options.indexDefinitions
+      )) {
+        const indexedValue = makeKeyForField(definition, data)
+
+        // const existingIndexedValue = existingData
+        //   ? makeKeyForField(definition, existingData)
+        //   : null
+
+        let indexKey
+        // let existingIndexKey = null
+        if (sort === DEFAULT_COLLECTION_SORT_KEY) {
+          indexKey = `${options.collection}:${sort}:${filepath}`
+          // existingIndexKey = indexKey
+        } else {
+          indexKey = indexedValue
+            ? `${options.collection}:${sort}:${indexedValue}:${filepath}`
+            : null
+          // existingIndexKey = existingIndexedValue
+          //   ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
+          //   : null
+        }
+
+        if (indexKey) {
+          // if (existingIndexKey && indexKey != existingIndexKey) {
+          //   await this.db.del(existingIndexKey)
+          // }
+          // await this.db.del(indexKey)
+        }
+      }
+    }
+    // Delete the file definition
+    await this.db.del(`${defaultPrefix}:${filepath}`)
   }
   public async print() {
     this.db
