@@ -36,6 +36,8 @@ import type {
   TinaFieldBase,
 } from '@tinacms/schema-tools'
 
+import { validateSchema } from '@tinacms/schema-tools'
+
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
 // export type TinaSchema = TinaCloudSchema
@@ -46,6 +48,7 @@ export type TinaField = TinaFieldBase
 export type { TinaTemplate }
 
 export const defineSchema = (config: TinaCloudSchema) => {
+  validateSchema({ config })
   return config
 }
 
