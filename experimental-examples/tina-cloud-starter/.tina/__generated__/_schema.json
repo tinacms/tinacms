@@ -5,7 +5,11 @@
     "minor": "59",
     "patch": "8"
   },
-  "meta": {},
+  "meta": {
+    "flags": [
+      "experimentalData"
+    ]
+  },
   "collections": [
     {
       "label": "Blog Posts",

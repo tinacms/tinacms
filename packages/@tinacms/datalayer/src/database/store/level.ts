@@ -162,7 +162,7 @@ export class LevelStore implements Store {
     return true
   }
   public async delete(filepath: string, options: DeleteOptions) {
-    const data = this.db.get(`${defaultPrefix}:${filepath}`)
+    const data = await this.db.get(`${defaultPrefix}:${filepath}`)
 
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(
@@ -170,29 +170,18 @@ export class LevelStore implements Store {
       )) {
         const indexedValue = makeKeyForField(definition, data)
 
-        // const existingIndexedValue = existingData
-        //   ? makeKeyForField(definition, existingData)
-        //   : null
-
         let indexKey
         // let existingIndexKey = null
         if (sort === DEFAULT_COLLECTION_SORT_KEY) {
           indexKey = `${options.collection}:${sort}:${filepath}`
-          // existingIndexKey = indexKey
         } else {
           indexKey = indexedValue
             ? `${options.collection}:${sort}:${indexedValue}:${filepath}`
             : null
-          // existingIndexKey = existingIndexedValue
-          //   ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
-          //   : null
         }
 
         if (indexKey) {
-          // if (existingIndexKey && indexKey != existingIndexKey) {
-          //   await this.db.del(existingIndexKey)
-          // }
-          // await this.db.del(indexKey)
+          await this.db.del(indexKey)
         }
       }
     }

@@ -499,25 +499,23 @@ export class Database {
   }
 
   public delete = async (filepath: string) => {
-    // TODO: Add delete to database. We probably need to re-index and such
-    // const tinaSchema = await this.getSchema()
-    // const collection = tinaSchema.schema.collections.find((collection) =>
-    //   filepath.startsWith(collection.path)
-    // )
-    // let collectionIndexDefinitions
-    // if (collection) {
-    //   const indexDefinitions = await this.getIndexDefinitions()
-    //   collectionIndexDefinitions = indexDefinitions?.[collection.name]
-    // }
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
+    )
+    let collectionIndexDefinitions
+    if (collection) {
+      const indexDefinitions = await this.getIndexDefinitions()
+      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    }
 
-    // const { stringifiedFile, payload, keepTemplateKey } =
-    //   await this.stringifyFile(filepath, data)
-
-    // if (this.store.supportsSeeding()) {
-    //   await this.bridge.delete(filepath, stringifiedFile)
-    // }
-
-    await this.store.delete(filepath)
+    await this.store.delete(filepath, {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    })
+    if (this.store.supportsSeeding()) {
+      await this.bridge.delete(filepath)
+    }
   }
 
   public _indexAllContent = async () => {
