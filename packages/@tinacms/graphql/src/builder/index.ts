@@ -396,7 +396,6 @@ export class Builder {
   public multiCollectionDocumentList = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
-    console.log(collections)
     return this._buildMultiCollectionDocumentListDefinition({
       fieldName: NAMER.documentConnectionQueryName(),
       namespace: ['document'],
