@@ -29,7 +29,8 @@ export enum OP {
 }
 
 export type PadDefinition = {
-  fillString: string, maxLength: number
+  fillString: string
+  maxLength: number
 }
 
 export type BinaryFilter = {
@@ -215,7 +216,10 @@ export const makeFilterChain = ({
         rightOperand: filterExpression[key1],
         operator: inferOperatorFromFilter(key1),
         type: _type as string,
-        pad: _type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined
+        pad:
+          _type === 'number'
+            ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+            : undefined,
       })
     } else if (key1 && key2) {
       const leftFilterOperator =
@@ -252,7 +256,10 @@ export const makeFilterChain = ({
             | OP.LT
             | OP.LTE,
           type: _type as string,
-          pad: _type === 'number' ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD } : undefined
+          pad:
+            _type === 'number'
+              ? { fillString: '0', maxLength: DEFAULT_NUMERIC_LPAD }
+              : undefined,
         })
       } else {
         throw new Error(
@@ -283,8 +290,13 @@ export const makeFilter = ({
       let operands: FilterOperand[]
       if (dataType === 'string' || dataType === 'reference') {
         operands = resolvedValues
-      } else if (dataType === 'number' || dataType === 'datetime') {
+      } else if (dataType === 'number') {
         operands = resolvedValues.map((resolvedValue) => Number(resolvedValue))
+      } else if (dataType === 'datetime') {
+        operands = resolvedValues.map((resolvedValue) => {
+          const coerced = new Date(resolvedValue).getTime()
+          return isNaN(coerced) ? Number(resolvedValue) : coerced
+        })
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map(
           (resolvedValue) =>
@@ -397,10 +409,15 @@ export const makeFilter = ({
 
 type StringEscaper = <T extends string | string[]>(input: T) => T
 
-export const makeStringEscaper = (regex: RegExp, replacement: string): StringEscaper => {
+export const makeStringEscaper = (
+  regex: RegExp,
+  replacement: string
+): StringEscaper => {
   return <T extends string | string[]>(input: T): T => {
     if (Array.isArray(input)) {
-      return (input as string[]).map(val => val.replace(regex, replacement)) as T
+      return (input as string[]).map((val) =>
+        val.replace(regex, replacement)
+      ) as T
     } else {
       return (input as string).replace(regex, replacement) as T
     }
@@ -410,7 +427,9 @@ export const makeStringEscaper = (regex: RegExp, replacement: string): StringEsc
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {
     if (Array.isArray(input)) {
-      return (input as any[]).map(val => String(val).padStart(pad.maxLength, pad.fillString))
+      return (input as any[]).map((val) =>
+        String(val).padStart(pad.maxLength, pad.fillString)
+      )
     } else {
       return String(input).padStart(pad.maxLength, pad.fillString)
     }
@@ -453,13 +472,26 @@ export const coerceFilterChainOperands = (
         }
       } else if (dataType === 'string') {
         if ((filter as TernaryFilter).leftOperand !== undefined) {
-          result.push({ ...filter,
-            rightOperand: applyPadding(stringEscaper(filter.rightOperand as string | string[]), filter.pad),
-            leftOperand: applyPadding(stringEscaper((filter as TernaryFilter).leftOperand as string | string[]), filter.pad),
+          result.push({
+            ...filter,
+            rightOperand: applyPadding(
+              stringEscaper(filter.rightOperand as string | string[]),
+              filter.pad
+            ),
+            leftOperand: applyPadding(
+              stringEscaper(
+                (filter as TernaryFilter).leftOperand as string | string[]
+              ),
+              filter.pad
+            ),
           })
         } else {
-          result.push({ ...filter,
-            rightOperand: applyPadding(stringEscaper(filter.rightOperand as string | string[]), filter.pad)
+          result.push({
+            ...filter,
+            rightOperand: applyPadding(
+              stringEscaper(filter.rightOperand as string | string[]),
+              filter.pad
+            ),
           })
         }
       } else {
@@ -525,14 +557,28 @@ export const makeFilterSuffixes = (
           return
         }
 
-        baseFragments.push(applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad))
+        baseFragments.push(
+          applyPadding(
+            orderedFilterChain[i].rightOperand,
+            orderedFilterChain[i].pad
+          )
+        )
       } else {
         if (ternaryFilter) {
-          leftSuffix = applyPadding(orderedFilterChain[i].leftOperand, orderedFilterChain[i].pad)
-          rightSuffix = applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad)
+          leftSuffix = applyPadding(
+            orderedFilterChain[i].leftOperand,
+            orderedFilterChain[i].pad
+          )
+          rightSuffix = applyPadding(
+            orderedFilterChain[i].rightOperand,
+            orderedFilterChain[i].pad
+          )
         } else {
           const op = orderedFilterChain[i].operator
-          const operand = applyPadding(orderedFilterChain[i].rightOperand, orderedFilterChain[i].pad)
+          const operand = applyPadding(
+            orderedFilterChain[i].rightOperand,
+            orderedFilterChain[i].pad
+          )
           if (op === OP.LT || op === OP.LTE) {
             rightSuffix = operand
           } else if (op === OP.GT || op === OP.GTE) {
@@ -548,9 +594,13 @@ export const makeFilterSuffixes = (
 
     return {
       left:
-        (leftSuffix && [...baseFragments, leftSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) || undefined,
+        (leftSuffix &&
+          [...baseFragments, leftSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) ||
+        undefined,
       right:
-        (rightSuffix && [...baseFragments, rightSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) || undefined,
+        (rightSuffix &&
+          [...baseFragments, rightSuffix].join(INDEX_KEY_FIELD_SEPARATOR)) ||
+        undefined,
     }
   } else {
     return {}
@@ -569,7 +619,9 @@ export const makeKeyForField = (
       const resolvedValue = String(
         field.type === 'datetime'
           ? new Date(data[field.name]).getTime()
-          : field.type === 'string' ? stringEscaper(data[field.name] as string | string[]) : data[field.name]
+          : field.type === 'string'
+          ? stringEscaper(data[field.name] as string | string[])
+          : data[field.name]
       )
       valueParts.push(applyPadding(resolvedValue, field.pad))
     } else {

@@ -776,6 +776,21 @@ describe('datalayer store helper functions', () => {
         expect(itemFilter({ rating: 3 })).toBeTruthy()
         expect(itemFilter({ rating: 5 })).toBeFalsy()
       })
+
+      it('filters with datetime after', () => {
+        const itemFilter = makeFilter({
+          filterChain: [
+            {
+              pathExpression: 'date',
+              rightOperand: 1623481200000,
+              operator: OP.GT,
+              type: 'datetime',
+            },
+          ],
+        })
+        expect(itemFilter({ date: '2021-04-03T20:30:00.000Z' })).toBeFalsy()
+        expect(itemFilter({ date: '2021-07-03T20:30:00.000Z' })).toBeTruthy()
+      })
     })
 
     describe('ternary', () => {
