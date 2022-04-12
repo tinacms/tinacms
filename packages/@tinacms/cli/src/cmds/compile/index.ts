@@ -50,7 +50,7 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
 export const compile = async (_ctx, _next, options) => {
   logger.info(logText('Compiling...'))
 
-  const { schemaFileType: requestedSchemaFileType = 'ts' } = options
+  const { schemaFileType: requestedSchemaFileType = 'ts' } = options || {}
   const schemaFileType =
     ((requestedSchemaFileType === 'ts' || requestedSchemaFileType === 'tsx') &&
       'ts') ||
