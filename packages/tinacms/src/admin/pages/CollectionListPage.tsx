@@ -26,6 +26,7 @@ import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
+import { TinaAdminApi } from '../api'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -118,6 +119,7 @@ const CollectionListPage = () => {
             {(collection: Collection) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
+              const admin: TinaAdminApi = cms.api.admin
 
               return (
                 <PageWrapper>
@@ -203,6 +205,39 @@ const CollectionListPage = () => {
                                       <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
                                         {document.node.sys.template}
                                       </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <button
+                                        className="bg-red-600 text-white rounded-lg p-5"
+                                        onClick={(e) => {
+                                          e.preventDefault()
+                                          const vars = {
+                                            collection: collectionName,
+                                            relativePath:
+                                              document.node.sys.filename +
+                                              document.node.sys.extension,
+                                          }
+                                          // TODO should we add a model?
+                                          admin
+                                            .deleteDocument(vars)
+                                            .then((_) => {
+                                              cms.alerts.info(
+                                                'Document was successfully deleted'
+                                              )
+                                              // TODO: this should be done client side
+                                              location.reload()
+                                            })
+                                            .catch((e) => {
+                                              cms.alerts.warn(
+                                                'Document was not deleted, ask a developer for help or check the console'
+                                              )
+                                              console.error(e)
+                                              throw e
+                                            })
+                                        }}
+                                      >
+                                        Delete
+                                      </button>
                                     </td>
                                   </tr>
                                 )

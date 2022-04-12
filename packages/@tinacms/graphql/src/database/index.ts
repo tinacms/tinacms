@@ -507,6 +507,26 @@ export class Database {
     await _indexContent(this, nonCollectionPaths)
   }
 
+  public delete = async (filepath: string) => {
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
+    )
+    let collectionIndexDefinitions
+    if (collection) {
+      const indexDefinitions = await this.getIndexDefinitions()
+      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    }
+    await this.store.delete(filepath, {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    })
+
+    if (this.store.supportsSeeding()) {
+      await this.bridge.delete(filepath)
+    }
+  }
+
   public _indexAllContent = async () => {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {

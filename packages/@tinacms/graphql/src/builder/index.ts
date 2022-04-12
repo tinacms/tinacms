@@ -387,6 +387,40 @@ export class Builder {
       type: astBuilder.TYPES.MultiCollectionDocument,
     })
   }
+  /**
+   * ```graphql
+   * # ex.
+   * {
+   *   deleteDocument(relativePath: $relativePath, params: $params) {
+   *     id
+   *     data {...}
+   *   }
+   * }
+   * ```
+   *
+   * @param collections
+   */
+  public buildDeleteCollectionDocumentMutation = async (
+    collections: TinaCloudCollectionEnriched[]
+  ) => {
+    return astBuilder.FieldDefinition({
+      name: 'deleteDocument',
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: false,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'relativePath',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+      ],
+      required: true,
+      type: astBuilder.TYPES.MultiCollectionDocument,
+    })
+  }
 
   /**
    * ```graphql
