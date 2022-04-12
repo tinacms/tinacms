@@ -47,10 +47,14 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
   await fs.remove(tinaTempPath)
 }
 
-export const compile = async (_ctx, _next, options) => {
+export const compile = async (
+  _ctx,
+  _next,
+  options = { schemaFileType: 'ts' }
+) => {
   logger.info(logText('Compiling...'))
 
-  const { schemaFileType: requestedSchemaFileType = 'ts' } = options || {}
+  const { schemaFileType: requestedSchemaFileType = 'ts' } = options
   const schemaFileType =
     ((requestedSchemaFileType === 'ts' || requestedSchemaFileType === 'tsx') &&
       'ts') ||
