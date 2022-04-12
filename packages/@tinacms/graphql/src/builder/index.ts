@@ -97,6 +97,7 @@ export class Builder {
         collections,
         connectionNamespace: ['document'],
       })
+
     const type = astBuilder.ObjectTypeDefinition({
       name: typeName,
       fields: [
@@ -143,7 +144,12 @@ export class Builder {
         documentsType,
       ],
     })
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({
+      type,
+      name,
+      args,
+      required: true,
+    })
   }
 
   /**
@@ -1180,7 +1186,8 @@ export class Builder {
             return astBuilder.InputValueDefinition({
               // @ts-ignore
               name: collection.name,
-              type: await this._filterCollectionDocumentType(collection),
+              // type: await this._filterCollectionDocumentType(collection),
+              type: NAMER.dataFilterTypeName(collection.namespace),
             })
           }),
         }),

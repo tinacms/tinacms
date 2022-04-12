@@ -167,7 +167,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       type: astBuilder.TYPES.String,
     })
   )
-
   /**
    * One-off collection queries
    */

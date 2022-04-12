@@ -47,12 +47,17 @@ type Query {
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   getDocumentFields: JSON!
   getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  getPageList(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
   getPostDocument(relativePath: String): PostDocument!
-  getPostList(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  getPostList(before: String, after: String, first: Float, last: Float, sort: String, filter: PostFilter): PostConnection!
+}
+
+input DocumentFilter {
+  page: PageFilter
+  post: PostFilter
 }
 
 type DocumentConnectionEdges {
@@ -75,7 +80,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = PageDocument | PostDocument
@@ -94,6 +99,24 @@ type PageDocument implements Node & Document {
   dataJSON: JSON!
 }
 
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input PageFilter {
+  Title: StringFilter
+  body: RichTextFilter
+}
+
 type PageConnectionEdges {
   cursor: String
   node: PageDocument
@@ -105,10 +128,10 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
-union PostPostsPostDocument = PostDocument
+union PostRelatedPostsPostDocument = PageDocument | PostDocument
 
-type PostPosts {
-  post: PostPostsPostDocument
+type PostRelatedPosts {
+  post: PostRelatedPostsPostDocument
   label: String
 }
 
@@ -118,7 +141,7 @@ type PostFoo {
 
 type Post {
   title: String
-  posts: [PostPosts]
+  relatedPosts: [PostRelatedPosts]
   foo: PostFoo
   topic: [String]
   body: JSON
@@ -131,6 +154,51 @@ type PostDocument implements Node & Document {
   form: JSON!
   values: JSON!
   dataJSON: JSON!
+}
+
+input PostRelatedPostsPostFilter {
+  page: PageFilter
+  post: PostFilter
+}
+
+input PostRelatedPostsFilter {
+  post: PostRelatedPostsPostFilter
+  label: StringFilter
+}
+
+input PostFooFilter {
+  bar: StringFilter
+}
+
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PostBodyGalleryImagesFilter {
+  src: ImageFilter
+  width: StringFilter
+  height: StringFilter
+}
+
+input PostBodyGalleryFilter {
+  images: PostBodyGalleryImagesFilter
+  alignment: StringFilter
+  gap: StringFilter
+}
+
+input PostBodyFilter {
+  Gallery: PostBodyGalleryFilter
+}
+
+input PostFilter {
+  title: StringFilter
+  relatedPosts: PostRelatedPostsFilter
+  foo: PostFooFilter
+  topic: StringFilter
+  body: PostBodyFilter
 }
 
 type PostConnectionEdges {
@@ -147,6 +215,7 @@ type PostConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
   createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
@@ -164,7 +233,7 @@ input PageMutation {
   body: JSON
 }
 
-input PostPostsMutation {
+input PostRelatedPostsMutation {
   post: String
   label: String
 }
@@ -175,7 +244,7 @@ input PostFooMutation {
 
 input PostMutation {
   title: String
-  posts: [PostPostsMutation]
+  relatedPosts: [PostRelatedPostsMutation]
   foo: PostFooMutation
   topic: [String]
   body: JSON
