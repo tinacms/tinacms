@@ -15,6 +15,7 @@ import type {
   StoreQueryOptions,
   StoreQueryResponse,
   PutOptions,
+  DeleteOptions,
   SeedOptions,
   Store,
 } from './index'
@@ -25,7 +26,7 @@ import {
   makeKeyForField,
   makeStringEscaper,
   DEFAULT_COLLECTION_SORT_KEY,
-  INDEX_KEY_FIELD_SEPARATOR
+  INDEX_KEY_FIELD_SEPARATOR,
 } from './index'
 import path from 'path'
 import { sequential } from '../../util'
@@ -36,7 +37,10 @@ import encode from 'encoding-down'
 import { IndexDefinition } from '.'
 
 const defaultPrefix = '_ROOT_'
-const escapeStr = makeStringEscaper(new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'), encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR))
+const escapeStr = makeStringEscaper(
+  new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'),
+  encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR)
+)
 
 export class LevelStore implements Store {
   public rootPath
@@ -95,14 +99,19 @@ export class LevelStore implements Store {
     let hasNextPage = false
 
     const fieldsPattern = indexDefinition?.fields?.length
-      ? `${indexDefinition.fields.map((p) => `${INDEX_KEY_FIELD_SEPARATOR}(?<${p.name}>.+)`).join('')}${INDEX_KEY_FIELD_SEPARATOR}`
+      ? `${indexDefinition.fields
+          .map((p) => `${INDEX_KEY_FIELD_SEPARATOR}(?<${p.name}>.+)`)
+          .join('')}${INDEX_KEY_FIELD_SEPARATOR}`
       : INDEX_KEY_FIELD_SEPARATOR
     const valuesRegex = indexDefinition
       ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`)
       : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
     const itemFilter = makeFilter({ filterChain })
 
-    for await (const [key, value] of (this.db as any /*TODO why is typescript unhappy?*/).iterator(query)) {
+    for await (const [key, value] of (
+      this.db as any
+    ) /*TODO why is typescript unhappy?*/
+      .iterator(query)) {
       const matcher = valuesRegex.exec(key)
       if (
         !matcher ||
@@ -117,7 +126,9 @@ export class LevelStore implements Store {
           filterSuffixes
             ? matcher.groups
             : indexDefinition
-            ? await this.db.get(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`)
+            ? await this.db.get(
+                `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+              )
             : value
         )
       ) {
@@ -162,9 +173,35 @@ export class LevelStore implements Store {
   public supportsIndexing() {
     return true
   }
-  // public async delete(filepath: string) {
-  //   await this.db.del(filepath)
-  // }
+  public async delete(filepath: string, options: DeleteOptions) {
+    const data = await this.db.get(
+      `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+    )
+
+    if (options?.indexDefinitions) {
+      for (const [sort, definition] of Object.entries(
+        options.indexDefinitions
+      )) {
+        const indexedValue = makeKeyForField(definition, data, escapeStr)
+
+        let indexKey
+        // let existingIndexKey = null
+        if (sort === DEFAULT_COLLECTION_SORT_KEY) {
+          indexKey = `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+        } else {
+          indexKey = indexedValue
+            ? `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${indexedValue}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+            : null
+        }
+
+        if (indexKey) {
+          await this.db.del(indexKey)
+        }
+      }
+    }
+    // Delete the file definition
+    await this.db.del(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`)
+  }
   public async print() {
     this.db
       .createReadStream()
@@ -197,7 +234,9 @@ export class LevelStore implements Store {
           lte: `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${pattern}\xFF`, // stop at the last key with the prefix
         })
         .on('data', (data) => {
-          strings.push(data.split(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}`)[1])
+          strings.push(
+            data.split(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}`)[1]
+          )
         })
         .on('error', (message) => {
           reject(message)
@@ -218,7 +257,9 @@ export class LevelStore implements Store {
   }
   public async get(filepath: string) {
     try {
-      return await this.db.get(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`)
+      return await this.db.get(
+        `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+      )
     } catch (e) {
       return undefined
     }
@@ -233,14 +274,19 @@ export class LevelStore implements Store {
     try {
       existingData =
         options && !options.seed
-          ? await this.db.get(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`)
+          ? await this.db.get(
+              `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+            )
           : null
     } catch (err) {
       if (!err.notFound) {
         throw err
       }
     }
-    await this.db.put(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`, data)
+    await this.db.put(
+      `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
+      data
+    )
 
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(
