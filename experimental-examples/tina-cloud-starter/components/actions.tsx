@@ -2,15 +2,7 @@ import Link from "next/link";
 import * as React from "react";
 import { BiRightArrowAlt } from "react-icons/bi";
 import { ThemeContext } from "./theme";
-export const defaultFeature = {
-  title: "Here's Another Feature",
-  text: "This is where you might talk about the feature, if this wasn't just filler text.",
-  icon: {
-    color: "",
-    style: "float",
-    name: "",
-  },
-};
+
 export const Actions = ({
   parentColor = "default",
   parentField = "",

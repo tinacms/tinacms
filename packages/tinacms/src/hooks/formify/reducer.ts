@@ -157,7 +157,12 @@ export function reducer(state: State, action: Action): State {
                 state
               )
 
-              if (action.value.form) {
+              if (
+                action.value.form &&
+                state.blueprints.find(
+                  (blueprint) => blueprint.id === fieldBlueprint.id
+                )
+              ) {
                 const newFormNode: FormNode = {
                   documentBlueprintId: fieldBlueprint.id,
                   documentFormId: action.value.form.id,

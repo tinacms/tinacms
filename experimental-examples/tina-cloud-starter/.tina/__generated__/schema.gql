@@ -49,6 +49,7 @@ type Query {
   document(collection: String, relativePath: String): DocumentNode!
   documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
   getDocumentFields: JSON!
+<<<<<<< HEAD
   posts(relativePath: String): PostsDocument!
   postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
   global(relativePath: String): GlobalDocument!
@@ -59,6 +60,16 @@ type Query {
   zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String): ZodiacsConnection!
   pages(relativePath: String): PagesDocument!
   pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
+=======
+  getPostsDocument(relativePath: String): PostsDocument!
+  getPostsList(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
+  getGlobalDocument(relativePath: String): GlobalDocument!
+  getGlobalList(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
+  getAuthorsDocument(relativePath: String): AuthorsDocument!
+  getAuthorsList(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
+  getPagesDocument(relativePath: String): PagesDocument!
+  getPagesList(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
+>>>>>>> main
 }
 
 type DocumentConnectionEdges {
@@ -84,19 +95,17 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsDocument | PagesDocument
+union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
 
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
-  _body: JSON
   title: String
-  published: Boolean
-  rating: Float
+  heroImg: String
+  excerpt: JSON
   author: PostsAuthorDocument
   date: String
-  heroImg: String
-  excerpt: String
+  _body: JSON
 }
 
 type PostsDocument implements Node & Document {
@@ -181,16 +190,9 @@ type GlobalConnection implements Connection {
   edges: [GlobalConnectionEdges]
 }
 
-union AuthorsDetailsZodiacDocument = ZodiacsDocument
-
-type AuthorsDetails {
-  zodiac: AuthorsDetailsZodiacDocument
-}
-
 type Authors {
   name: String
   avatar: String
-  details: [AuthorsDetails]
 }
 
 type AuthorsDocument implements Node & Document {
@@ -213,30 +215,6 @@ type AuthorsConnection implements Connection {
   edges: [AuthorsConnectionEdges]
 }
 
-type Zodiacs {
-  name: String
-}
-
-type ZodiacsDocument implements Node & Document {
-  id: ID!
-  sys: SystemInfo!
-  data: Zodiacs!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
-}
-
-type ZodiacsConnectionEdges {
-  cursor: String
-  node: ZodiacsDocument
-}
-
-type ZodiacsConnection implements Connection {
-  pageInfo: PageInfo
-  totalCount: Float!
-  edges: [ZodiacsConnectionEdges]
-}
-
 type PagesBlocksHeroActions {
   label: String
   type: String
@@ -252,7 +230,7 @@ type PagesBlocksHeroImage {
 type PagesBlocksHero {
   tagline: String
   headline: String
-  text: String
+  text: JSON
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -276,7 +254,7 @@ type PagesBlocksFeatures {
 }
 
 type PagesBlocksContent {
-  body: String
+  body: JSON
   color: String
 }
 
@@ -316,6 +294,7 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+<<<<<<< HEAD
   updatePosts(relativePath: String!, params: PostsMutation!): PostsDocument!
   createPosts(relativePath: String!, params: PostsMutation!): PostsDocument!
   updateGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
@@ -326,25 +305,32 @@ type Mutation {
   createZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
   updatePages(relativePath: String!, params: PagesMutation!): PagesDocument!
   createPages(relativePath: String!, params: PagesMutation!): PagesDocument!
+=======
+  updatePostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
+  createPostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
+  updateGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  createGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  updateAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  createAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  updatePagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
+  createPagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
+>>>>>>> main
 }
 
 input DocumentMutation {
   posts: PostsMutation
   global: GlobalMutation
   authors: AuthorsMutation
-  zodiacs: ZodiacsMutation
   pages: PagesMutation
 }
 
 input PostsMutation {
-  _body: JSON
   title: String
-  published: Boolean
-  rating: Float
+  heroImg: String
+  excerpt: JSON
   author: String
   date: String
-  heroImg: String
-  excerpt: String
+  _body: JSON
 }
 
 input GlobalHeaderIconMutation {
@@ -389,18 +375,9 @@ input GlobalMutation {
   theme: GlobalThemeMutation
 }
 
-input AuthorsDetailsMutation {
-  zodiac: String
-}
-
 input AuthorsMutation {
   name: String
   avatar: String
-  details: [AuthorsDetailsMutation]
-}
-
-input ZodiacsMutation {
-  name: String
 }
 
 input PagesBlocksHeroActionsMutation {
@@ -418,7 +395,7 @@ input PagesBlocksHeroImageMutation {
 input PagesBlocksHeroMutation {
   tagline: String
   headline: String
-  text: String
+  text: JSON
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String
@@ -442,7 +419,7 @@ input PagesBlocksFeaturesMutation {
 }
 
 input PagesBlocksContentMutation {
-  body: String
+  body: JSON
   color: String
 }
 

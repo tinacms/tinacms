@@ -93,7 +93,7 @@ type CollectionFields<WithNamespace extends boolean> =
 
 export interface CollectionFieldsWithNamespace<WithNamespace extends boolean>
   extends BaseCollection {
-  fields: string | TinaFieldInner<WithNamespace>[]
+  fields: TinaFieldInner<WithNamespace>[]
   templates?: undefined
   references?: ReferenceType<WithNamespace>[]
   namespace: string[]
@@ -101,7 +101,7 @@ export interface CollectionFieldsWithNamespace<WithNamespace extends boolean>
 
 interface CollectionFieldsInner<WithNamespace extends boolean>
   extends BaseCollection {
-  fields: string | TinaFieldInner<WithNamespace>[]
+  fields: TinaFieldInner<WithNamespace>[]
   templates?: undefined
 }
 
@@ -131,7 +131,7 @@ interface TinaField {
    * NOTE: only serializable values are supported, so functions like `validate`
    * will be ignored.
    */
-  ui?: object
+  ui?: Record<string, any>
 }
 
 type ScalarType<WithNamespace extends boolean> = WithNamespace extends true
@@ -237,6 +237,7 @@ export interface ReferenceTypeInner extends TinaField {
   list?: boolean
   reverseLookup?: { label: string; name: string }
   collections: string[]
+  ui?: UIField<any, string[]>
 }
 export interface ReferenceTypeWithNamespace extends TinaField {
   type: 'reference'
@@ -244,6 +245,7 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
+  ui?: UIField<any, string[]>
 }
 
 export interface RichTypeWithNamespace extends TinaField {

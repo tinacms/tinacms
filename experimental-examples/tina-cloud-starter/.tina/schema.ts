@@ -1,224 +1,9 @@
-import { defineSchema } from "tinacms";
-import type { TinaTemplate } from "tinacms";
-import { iconSchema } from "./fields";
-import { defaultFeature } from "../components/actions";
-
-const featureBlockSchema: TinaTemplate = {
-  name: "features",
-  label: "Features",
-  ui: {
-    previewSrc: "/blocks/features.png",
-    defaultItem: {
-      items: [defaultFeature, defaultFeature, defaultFeature],
-    },
-  },
-  fields: [
-    {
-      type: "object",
-      label: "Feature Items",
-      name: "items",
-      list: true,
-      ui: {
-        defaultItem: {
-          ...defaultFeature,
-        },
-      },
-      fields: [
-        iconSchema,
-        {
-          type: "string",
-          label: "Title",
-          name: "title",
-        },
-        {
-          type: "string",
-          label: "Text",
-          name: "text",
-        },
-      ],
-    },
-    {
-      type: "string",
-      label: "Color",
-      name: "color",
-      options: [
-        { label: "Default", value: "default" },
-        { label: "Tint", value: "tint" },
-        { label: "Primary", value: "primary" },
-      ],
-    },
-  ],
-};
-
-const contentBlockSchema: TinaTemplate = {
-  name: "content",
-  label: "Content",
-  ui: {
-    previewSrc: "/blocks/content.png",
-    defaultItem: {
-      body: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.",
-    },
-  },
-  fields: [
-    {
-      type: "string",
-      ui: {
-        component: "textarea",
-      },
-      label: "Body",
-      name: "body",
-    },
-    {
-      type: "string",
-      label: "Color",
-      name: "color",
-      options: [
-        { label: "Default", value: "default" },
-        { label: "Tint", value: "tint" },
-        { label: "Primary", value: "primary" },
-      ],
-    },
-  ],
-};
-
-const testimonialBlockSchema: TinaTemplate = {
-  name: "testimonial",
-  label: "Testimonial",
-  ui: {
-    previewSrc: "/blocks/testimonial.png",
-    defaultItem: {
-      quote:
-        "There are only two hard things in Computer Science: cache invalidation and naming things.",
-      author: "Phil Karlton",
-      color: "primary",
-    },
-  },
-  fields: [
-    {
-      type: "string",
-      ui: {
-        component: "textarea",
-      },
-      label: "Quote",
-      name: "quote",
-    },
-    {
-      type: "string",
-      label: "Author",
-      name: "author",
-    },
-    {
-      type: "string",
-      label: "Color",
-      name: "color",
-      options: [
-        { label: "Default", value: "default" },
-        { label: "Tint", value: "tint" },
-        { label: "Primary", value: "primary" },
-      ],
-    },
-  ],
-};
-
-const heroBlockSchema: TinaTemplate = {
-  name: "hero",
-  label: "Hero",
-  ui: {
-    previewSrc: "/blocks/hero.png",
-    defaultItem: {
-      tagline: "Here's some text above the other text",
-      headline: "This Big Text is Totally Awesome",
-      text: "Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo.",
-    },
-  },
-  fields: [
-    {
-      type: "string",
-      label: "Tagline",
-      name: "tagline",
-    },
-    {
-      type: "string",
-      label: "Headline",
-      name: "headline",
-    },
-    {
-      label: "Text",
-      name: "text",
-      type: "string",
-      ui: {
-        component: "markdown",
-      },
-    },
-    {
-      label: "Actions",
-      name: "actions",
-      type: "object",
-      list: true,
-      ui: {
-        defaultItem: {
-          label: "Action Label",
-          type: "button",
-          icon: true,
-          link: "/",
-        },
-      },
-      fields: [
-        {
-          label: "Label",
-          name: "label",
-          type: "string",
-        },
-        {
-          label: "Type",
-          name: "type",
-          type: "string",
-          options: [
-            { label: "Button", value: "button" },
-            { label: "Link", value: "link" },
-          ],
-        },
-        {
-          label: "Icon",
-          name: "icon",
-          type: "boolean",
-        },
-        {
-          label: "Link",
-          name: "link",
-          type: "string",
-        },
-      ],
-    },
-    {
-      type: "object",
-      label: "Image",
-      name: "image",
-      fields: [
-        {
-          name: "src",
-          label: "Image Source",
-          type: "image",
-        },
-        {
-          name: "alt",
-          label: "Alt Text",
-          type: "string",
-        },
-      ],
-    },
-    {
-      type: "string",
-      label: "Color",
-      name: "color",
-      options: [
-        { label: "Default", value: "default" },
-        { label: "Tint", value: "tint" },
-        { label: "Primary", value: "primary" },
-      ],
-    },
-  ],
-};
+import { defineSchema, defineConfig } from "tinacms";
+import { contentBlockSchema } from "../components/blocks/content";
+import { featureBlockShema } from "../components/blocks/features";
+import { heroBlockSchema } from "../components/blocks/hero";
+import { testimonialBlockSchema } from "../components/blocks/testimonial";
+import { iconSchema } from "../components/icon";
 
 export default defineSchema({
   collections: [
@@ -228,6 +13,36 @@ export default defineSchema({
       path: "content/posts",
       format: "mdx",
       fields: [
+        {
+          type: "string",
+          label: "Title",
+          name: "title",
+        },
+        {
+          type: "image",
+          name: "heroImg",
+          label: "Hero Image",
+        },
+        {
+          type: "rich-text",
+          label: "Excerpt",
+          name: "excerpt",
+        },
+        {
+          type: "reference",
+          label: "Author",
+          name: "author",
+          collections: ["authors"],
+        },
+        {
+          type: "datetime",
+          label: "Posted Date",
+          name: "date",
+          ui: {
+            dateFormat: "MMMM DD YYYY",
+            timeFormat: "hh:mm A",
+          },
+        },
         {
           type: "rich-text",
           label: "Body",
@@ -297,73 +112,6 @@ export default defineSchema({
           ],
           isBody: true,
         },
-        {
-          type: "string",
-          label: "Title",
-          name: "title",
-          ui: {
-            validate: (val) => {},
-          },
-          // ui: {
-          //   validate: (val) => {
-          //     console.log({ val });
-          //   },
-          // },
-        },
-        {
-          type: "boolean",
-          label: "Published",
-          name: "published",
-        },
-        {
-          type: "number",
-          label: "Rating",
-          name: "rating",
-        },
-        {
-          type: "reference",
-          label: "Author",
-          name: "author",
-          collections: ["authors"],
-        },
-        {
-          type: "datetime",
-          label: "Posted Date",
-          name: "date",
-          ui: {
-            dateFormat: "MMMM DD YYYY",
-            timeFormat: "hh:mm A",
-          },
-        },
-        {
-          type: "image",
-          name: "heroImg",
-          label: "Hero Image",
-          indexed: false,
-        },
-        {
-          type: "string",
-          label: "Excerpt",
-          ui: {
-            component: "textarea",
-          },
-          name: "excerpt",
-        },
-      ],
-      indexes: [
-        {
-          name: "published-by-date",
-          fields: [
-            {
-              name: "published",
-              default: "false",
-            },
-            {
-              name: "date",
-              default: "",
-            },
-          ],
-        },
       ],
     },
     {
@@ -392,11 +140,7 @@ export default defineSchema({
               label: "Nav Links",
               name: "nav",
               list: true,
-
               ui: {
-                itemProps: (item) => {
-                  return { label: item.label };
-                },
                 defaultItem: {
                   href: "home",
                   label: "Home",
@@ -565,43 +309,17 @@ export default defineSchema({
       label: "Authors",
       name: "authors",
       path: "content/authors",
+      format: "md",
       fields: [
         {
           type: "string",
           label: "Name",
           name: "name",
-          ui: {},
         },
         {
           type: "string",
           label: "Avatar",
           name: "avatar",
-        },
-        {
-          label: "Details",
-          name: "details",
-          type: "object",
-          list: true,
-          fields: [
-            {
-              type: "reference",
-              label: "Zodiac",
-              name: "zodiac",
-              collections: ["zodiacs"],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      label: "Zodiacs",
-      name: "zodiacs",
-      path: "content/zodiacs",
-      fields: [
-        {
-          type: "string",
-          label: "Name",
-          name: "name",
         },
       ],
     },
@@ -620,7 +338,7 @@ export default defineSchema({
           },
           templates: [
             heroBlockSchema,
-            featureBlockSchema,
+            featureBlockShema,
             contentBlockSchema,
             testimonialBlockSchema,
           ],
@@ -628,4 +346,55 @@ export default defineSchema({
       ],
     },
   ],
+});
+
+const branch = "main";
+const apiURL =
+  process.env.NODE_ENV == "development"
+    ? "http://localhost:4001/graphql"
+    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`;
+
+export const tinaConfig = defineConfig({
+  apiURL,
+  mediaStore: async () => {
+    const pack = await import("next-tinacms-cloudinary");
+    return pack.TinaCloudCloudinaryMediaStore;
+  },
+  cmsCallback: (cms) => {
+    /**
+     * Enables experimental branch switcher
+     */
+    cms.flags.set("branch-switcher", true);
+
+    /**
+     * When `tina-admin` is enabled, this plugin configures contextual editing for collections
+     */
+    import("tinacms").then(({ RouteMappingPlugin }) => {
+      const RouteMapping = new RouteMappingPlugin((collection, document) => {
+        if (["authors", "global"].includes(collection.name)) {
+          return undefined;
+        }
+        if (["pages"].includes(collection.name)) {
+          if (document.sys.filename === "home") {
+            return `/`;
+          }
+          if (document.sys.filename === "about") {
+            return `/about`;
+          }
+          return undefined;
+        }
+        return `/${collection.name}/${document.sys.filename}`;
+      });
+      cms.plugins.add(RouteMapping);
+    });
+
+    return cms;
+  },
+  formifyCallback: ({ formConfig, createForm, createGlobalForm }) => {
+    if (formConfig.id === "getGlobalDocument") {
+      return createGlobalForm(formConfig);
+    }
+
+    return createForm(formConfig);
+  },
 });

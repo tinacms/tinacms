@@ -6,7 +6,6 @@
       "posts",
       "global",
       "authors",
-      "zodiacs",
       "pages"
     ]
   },
@@ -50,12 +49,6 @@
     "resolveType": "collectionDocumentList",
     "collection": "global"
   },
-  "AuthorsDetailsZodiacDocument": {
-    "type": "AuthorsDetailsZodiacDocument",
-    "resolveType": "multiCollectionDocument",
-    "createDocument": "create",
-    "updateDocument": "update"
-  },
   "AuthorsDocument": {
     "type": "AuthorsDocument",
     "resolveType": "collectionDocument",
@@ -68,6 +61,7 @@
     "resolveType": "collectionDocumentList",
     "collection": "authors"
   },
+<<<<<<< HEAD
   "ZodiacsDocument": {
     "type": "ZodiacsDocument",
     "resolveType": "collectionDocument",
@@ -80,6 +74,8 @@
     "resolveType": "collectionDocumentList",
     "collection": "zodiacs"
   },
+=======
+>>>>>>> main
   "PagesBlocks": {
     "type": "PagesBlocks",
     "resolveType": "unionData",

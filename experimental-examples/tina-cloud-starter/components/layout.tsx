@@ -5,7 +5,11 @@ import { Footer } from "./footer";
 import layoutData from "../content/global/index.json";
 import { Theme } from "./theme";
 
-export const Layout = ({ rawData = "", data = layoutData, children }) => {
+export const Layout = ({
+  rawData = {},
+  data = layoutData as any,
+  children,
+}) => {
   return (
     <>
       <Head>

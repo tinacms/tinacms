@@ -166,7 +166,7 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          'mb-4 list-disc last:mb-0'
+          'mb-4 pl-2 list-disc list-inside last:mb-0'
         )}
         {...attributes}
         {...props}
@@ -174,21 +174,25 @@ export const components = () => {
     ),
     [ELEMENT_LI]: ({ attributes, editor, className, element, ...props }) => (
       <li
-        className={classNames(blockClasses, className)}
+        className={classNames('p-0 mt-0 mb-2 last:mb-0', className)}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_OL]: ({ attributes, editor, className, element, ...props }) => (
       <ol
-        className={classNames(blockClasses, className)}
+        className={classNames(
+          blockClasses,
+          className,
+          'mb-4 pl-2 list-decimal list-inside last:mb-0'
+        )}
         {...attributes}
         {...props}
       />
     ),
     [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
       <li
-        className={classNames('mt-0 mb-2 last:mb-0', className)}
+        className={classNames('p-0 mt-0 mb-2 last:mb-0', className)}
         {...attributes}
         {...props}
       />

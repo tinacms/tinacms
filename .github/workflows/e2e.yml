@@ -3,15 +3,20 @@ on: [push]
 jobs:
   cypress-run:
     runs-on: ubuntu-20.04
+    # There is currently a bug on chrome 100 that adds an extra space in the editor.=
+    # container: cypress/browsers:node14.17.6-chrome100-ff98
     container: cypress/browsers:node14.17.0-chrome88-ff89
-    name: E2E on Chrome
+    name: E2E on Tests
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
     steps:
       - uses: actions/checkout@v2
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
           install-command: yarn install
-          browser: chrome
+          browser: ${{ matrix.browser }}
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build:e2e
           command: yarn test:e2e
