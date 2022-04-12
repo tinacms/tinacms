@@ -17,11 +17,11 @@ import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
+import { TinaSchemaValidationError } from '@tinacms/schema-tools'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
 import { getSchemaPath } from '../../lib'
-import chalk from 'chalk'
 import { ExecuteSchemaError, BuildSchemaError } from '../start-server/errors'
 
 const tinaPath = path.join(process.cwd(), '.tina')
@@ -97,6 +97,14 @@ export const compile = async (_ctx, _next) => {
   } catch (e) {
     // Always remove the temp code
     await cleanup({ tinaTempPath })
+
+    // Keep TinaSchemaValidationErrors around
+    if (e instanceof Error) {
+      if (e.name === 'TinaSchemaValidationError') {
+        throw e
+      }
+    }
+
     // Throw an execution error
     throw new ExecuteSchemaError(e)
   }

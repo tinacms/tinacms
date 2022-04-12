@@ -1,5 +1,55 @@
 # tinacms-cli
 
+## 0.60.11
+
+### Patch Changes
+
+- Updated dependencies [cf33bcec1]
+  - @tinacms/graphql@0.59.10
+
+## 0.60.10
+
+### Patch Changes
+
+- 6154d12b8: Check for appropriate versions of react and react-dom before initializing with tinacms init
+- 8c23d69a2: Adds an MDX example when you run @tinacms/cli init
+- abf25c673: The schema can now to used on the frontend (optional for now but will be the main path moving forward).
+
+  ### How to migrate.
+
+  If you gone though the `tinacms init` process there should be a file called `.tina/components/TinaProvider`. In that file you can import the schema from `schema.ts` and add it to the TinaCMS wrapper component.
+
+  ```tsx
+  import TinaCMS from 'tinacms'
+  import schema, { tinaConfig } from '../schema.ts'
+
+  // Importing the TinaProvider directly into your page will cause Tina to be added to the production bundle.
+  // Instead, import the tina/provider/index default export to have it dynamially imported in edit-moode
+  /**
+   *
+   * @private Do not import this directly, please import the dynamic provider instead
+   */
+  const TinaProvider = ({ children }) => {
+    return (
+      <TinaCMS {...tinaConfig} schema={schema}>
+        {children}
+      </TinaCMS>
+    )
+  }
+
+  export default TinaProvider
+  ```
+
+- Updated dependencies [8b3be903f]
+- Updated dependencies [82174ff50]
+- Updated dependencies [a87e1e6fa]
+- Updated dependencies [abf25c673]
+- Updated dependencies [591640db0]
+- Updated dependencies [e8b0de1f7]
+- Updated dependencies [b01f2e382]
+  - @tinacms/datalayer@0.1.0
+  - @tinacms/graphql@0.59.9
+
 ## 0.60.9
 
 ### Patch Changes

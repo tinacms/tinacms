@@ -24,7 +24,9 @@ import {
   makeFilterSuffixes,
   makeFilter,
   makeKeyForField,
+  makeStringEscaper,
   DEFAULT_COLLECTION_SORT_KEY,
+  INDEX_KEY_FIELD_SEPARATOR,
 } from './index'
 import path from 'path'
 import { sequential } from '../../util'
@@ -35,6 +37,10 @@ import encode from 'encoding-down'
 import { IndexDefinition } from '.'
 
 const defaultPrefix = '_ROOT_'
+const escapeStr = makeStringEscaper(
+  new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'),
+  encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR)
+)
 
 export class LevelStore implements Store {
   public rootPath
@@ -64,25 +70,25 @@ export class LevelStore implements Store {
       ...query
     } = queryOptions
 
-    const filterChain = coerceFilterChainOperands(rawFilterChain)
+    const filterChain = coerceFilterChainOperands(rawFilterChain, escapeStr)
     const indexDefinition = (sort && indexDefinitions?.[sort]) as
       | IndexDefinition
       | undefined
     const filterSuffixes =
       indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
     const indexPrefix = indexDefinition
-      ? `${collection}:${sort}`
-      : `${defaultPrefix}:`
+      ? `${collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}`
+      : `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}`
 
     if (!query.gt && !query.gte) {
       query.gte = filterSuffixes?.left
-        ? `${indexPrefix}:${filterSuffixes.left}`
+        ? `${indexPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filterSuffixes.left}`
         : indexPrefix
     }
 
     if (!query.lt && !query.lte) {
       query.lte = filterSuffixes?.right
-        ? `${indexPrefix}:${filterSuffixes.right}\xFF`
+        ? `${indexPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filterSuffixes.right}\xFF`
         : `${indexPrefix}\xFF`
     }
 
@@ -93,15 +99,19 @@ export class LevelStore implements Store {
     let hasNextPage = false
 
     const fieldsPattern = indexDefinition?.fields?.length
-      ? `${indexDefinition.fields.map((p) => `:(?<${p.name}>.+)`).join('')}:`
-      : ':'
+      ? `${indexDefinition.fields
+          .map((p) => `${INDEX_KEY_FIELD_SEPARATOR}(?<${p.name}>.+)`)
+          .join('')}${INDEX_KEY_FIELD_SEPARATOR}`
+      : INDEX_KEY_FIELD_SEPARATOR
     const valuesRegex = indexDefinition
       ? new RegExp(`^${indexPrefix}${fieldsPattern}(?<_filepath_>.+)`)
       : new RegExp(`^${indexPrefix}(?<_filepath_>.+)`)
     const itemFilter = makeFilter({ filterChain })
 
-    for await (const [key, value] of (this.db as any).iterator(query)) {
-      //TODO why is typescript unhappy?
+    for await (const [key, value] of (
+      this.db as any
+    ) /*TODO why is typescript unhappy?*/
+      .iterator(query)) {
       const matcher = valuesRegex.exec(key)
       if (
         !matcher ||
@@ -116,7 +126,9 @@ export class LevelStore implements Store {
           filterSuffixes
             ? matcher.groups
             : indexDefinition
-            ? await this.db.get(`${defaultPrefix}:${filepath}`)
+            ? await this.db.get(
+                `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+              )
             : value
         )
       ) {
@@ -216,11 +228,13 @@ export class LevelStore implements Store {
     const p = new Promise((resolve, reject) => {
       this.db
         .createKeyStream({
-          gte: `${defaultPrefix}:${pattern}`,
-          lte: `${defaultPrefix}:${pattern}\xFF`, // stop at the last key with the prefix
+          gte: `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${pattern}`,
+          lte: `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${pattern}\xFF`, // stop at the last key with the prefix
         })
         .on('data', (data) => {
-          strings.push(data.split(`${defaultPrefix}:`)[1])
+          strings.push(
+            data.split(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}`)[1]
+          )
         })
         .on('error', (message) => {
           reject(message)
@@ -241,7 +255,9 @@ export class LevelStore implements Store {
   }
   public async get(filepath: string) {
     try {
-      return await this.db.get(`${defaultPrefix}:${filepath}`)
+      return await this.db.get(
+        `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+      )
     } catch (e) {
       return undefined
     }
@@ -256,35 +272,40 @@ export class LevelStore implements Store {
     try {
       existingData =
         options && !options.seed
-          ? await this.db.get(`${defaultPrefix}:${filepath}`)
+          ? await this.db.get(
+              `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+            )
           : null
     } catch (err) {
       if (!err.notFound) {
         throw err
       }
     }
-    await this.db.put(`${defaultPrefix}:${filepath}`, data)
+    await this.db.put(
+      `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`,
+      data
+    )
 
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(
         options.indexDefinitions
       )) {
-        const indexedValue = makeKeyForField(definition, data)
+        const indexedValue = makeKeyForField(definition, data, escapeStr)
         const existingIndexedValue = existingData
-          ? makeKeyForField(definition, existingData)
+          ? makeKeyForField(definition, existingData, escapeStr)
           : null
 
         let indexKey
         let existingIndexKey = null
         if (sort === DEFAULT_COLLECTION_SORT_KEY) {
-          indexKey = `${options.collection}:${sort}:${filepath}`
+          indexKey = `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
           existingIndexKey = indexKey
         } else {
           indexKey = indexedValue
-            ? `${options.collection}:${sort}:${indexedValue}:${filepath}`
+            ? `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${indexedValue}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
             : null
           existingIndexKey = existingIndexedValue
-            ? `${options.collection}:${sort}:${existingIndexedValue}:${filepath}`
+            ? `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${existingIndexedValue}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
             : null
         }
 

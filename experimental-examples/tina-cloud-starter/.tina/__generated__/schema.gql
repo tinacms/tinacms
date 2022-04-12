@@ -54,9 +54,13 @@ type Query {
   global(relativePath: String): GlobalDocument!
   globalConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: GlobalFilter): GlobalConnection!
   authors(relativePath: String): AuthorsDocument!
+<<<<<<< HEAD
   authorsConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: AuthorsFilter): AuthorsConnection!
   zodiacs(relativePath: String): ZodiacsDocument!
   zodiacsConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ZodiacsFilter): ZodiacsConnection!
+=======
+  authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
+>>>>>>> simplify-graphql-names-merge-main
   pages(relativePath: String): PagesDocument!
   pagesConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PagesFilter): PagesConnection!
 }
@@ -292,19 +296,17 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | ZodiacsDocument | PagesDocument
+union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
 
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
-  _body: JSON
   title: String
-  published: Boolean
-  rating: Float
+  heroImg: String
+  excerpt: JSON
   author: PostsAuthorDocument
   date: String
-  heroImg: String
-  excerpt: String
+  _body: JSON
 }
 
 type PostsDocument implements Node & Document {
@@ -389,16 +391,9 @@ type GlobalConnection implements Connection {
   edges: [GlobalConnectionEdges]
 }
 
-union AuthorsDetailsZodiacDocument = ZodiacsDocument
-
-type AuthorsDetails {
-  zodiac: AuthorsDetailsZodiacDocument
-}
-
 type Authors {
   name: String
   avatar: String
-  details: [AuthorsDetails]
 }
 
 type AuthorsDocument implements Node & Document {
@@ -421,30 +416,6 @@ type AuthorsConnection implements Connection {
   edges: [AuthorsConnectionEdges]
 }
 
-type Zodiacs {
-  name: String
-}
-
-type ZodiacsDocument implements Node & Document {
-  id: ID!
-  sys: SystemInfo!
-  data: Zodiacs!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
-}
-
-type ZodiacsConnectionEdges {
-  cursor: String
-  node: ZodiacsDocument
-}
-
-type ZodiacsConnection implements Connection {
-  pageInfo: PageInfo
-  totalCount: Float!
-  edges: [ZodiacsConnectionEdges]
-}
-
 type PagesBlocksHeroActions {
   label: String
   type: String
@@ -460,7 +431,7 @@ type PagesBlocksHeroImage {
 type PagesBlocksHero {
   tagline: String
   headline: String
-  text: String
+  text: JSON
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -484,7 +455,7 @@ type PagesBlocksFeatures {
 }
 
 type PagesBlocksContent {
-  body: String
+  body: JSON
   color: String
 }
 
@@ -531,8 +502,6 @@ type Mutation {
   createGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
   updateAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
   createAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  updateZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
-  createZodiacs(relativePath: String!, params: ZodiacsMutation!): ZodiacsDocument!
   updatePages(relativePath: String!, params: PagesMutation!): PagesDocument!
   createPages(relativePath: String!, params: PagesMutation!): PagesDocument!
 }
@@ -541,19 +510,16 @@ input DocumentMutation {
   posts: PostsMutation
   global: GlobalMutation
   authors: AuthorsMutation
-  zodiacs: ZodiacsMutation
   pages: PagesMutation
 }
 
 input PostsMutation {
-  _body: JSON
   title: String
-  published: Boolean
-  rating: Float
+  heroImg: String
+  excerpt: JSON
   author: String
   date: String
-  heroImg: String
-  excerpt: String
+  _body: JSON
 }
 
 input GlobalHeaderIconMutation {
@@ -598,18 +564,9 @@ input GlobalMutation {
   theme: GlobalThemeMutation
 }
 
-input AuthorsDetailsMutation {
-  zodiac: String
-}
-
 input AuthorsMutation {
   name: String
   avatar: String
-  details: [AuthorsDetailsMutation]
-}
-
-input ZodiacsMutation {
-  name: String
 }
 
 input PagesBlocksHeroActionsMutation {
@@ -627,7 +584,7 @@ input PagesBlocksHeroImageMutation {
 input PagesBlocksHeroMutation {
   tagline: String
   headline: String
-  text: String
+  text: JSON
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String
@@ -651,7 +608,7 @@ input PagesBlocksFeaturesMutation {
 }
 
 input PagesBlocksContentMutation {
-  body: String
+  body: JSON
   color: String
 }
 

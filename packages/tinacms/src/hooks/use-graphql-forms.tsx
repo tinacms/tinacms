@@ -11,23 +11,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import {
+  AnyField,
+  Form,
+  FormMetaPlugin,
+  GlobalFormPlugin,
+  useBranchData,
+  useCMS,
+} from '@tinacms/toolkit'
+import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
+import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { assertShape, safeAssertShape } from '../utils'
+import { getIn, setIn } from 'final-form'
+
+import { BiLinkExternal } from 'react-icons/bi'
 import React from 'react'
 import gql from 'graphql-tag'
-import { getIn, setIn } from 'final-form'
-import {
-  useCMS,
-  Form,
-  GlobalFormPlugin,
-  FormMetaPlugin,
-  useBranchData,
-  AnyField,
-} from '@tinacms/toolkit'
-import { assertShape, safeAssertShape } from '../utils'
-
-import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
-import { BiLinkExternal } from 'react-icons/bi'
 import { useFormify } from './formify'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 export function useGraphqlFormsUnstable<T extends object>({
   variables,
@@ -48,10 +48,6 @@ export function useGraphqlFormsUnstable<T extends object>({
   eventList?: []
 }): [T, Boolean] {
   const cms = useCMS()
-
-  React.useEffect(() => {
-    console.log('NOTE: using unstable formify')
-  }, [])
 
   const state = useFormify({
     query,
@@ -186,12 +182,15 @@ export function useGraphqlForms<T extends object>({
       return
     }
 
+    const useUnstableFormify =
+      cms?.flags.get('use-unstable-formify') === false ? false : true
+
     const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina
       .requestWithForm((gql) => gql(query), {
         variables,
-        useUnstableFormify: cms.flags.get('use-unstable-formify'),
+        useUnstableFormify,
       })
       .then((payload) => {
         cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
@@ -398,10 +397,10 @@ export function useGraphqlForms<T extends object>({
         })
       })
       .catch((e) => {
-        cms.alerts.error('There was a problem setting up forms for your query')
-        console.error('There was a problem setting up forms for your query')
-        console.error(e)
         setIsLoading(false)
+        throw new Error(
+          `There was a problem setting up forms for your query: ${e.message}`
+        )
       })
 
     return () => {

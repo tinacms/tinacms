@@ -13,6 +13,261 @@
           }
         }
       ]
+    },
+    "sortedByReleaseDate": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "releaseDateAfter": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
+    },
+    "releaseDateBefore": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "releaseDateBetween": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "releaseDateNotArchivedAfter": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
+    },
+    "releaseDateArchivedBefore": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "ratingIN": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
+    },
+    "ratingBetween": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    },
+    "ratingGTE": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    },
+    "ratingGT": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    },
+    "ratingLTE": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "ratingLT": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
+    },
+    "titleEQ": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "titleStartsWith": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ]
+    },
+    "paginatedAsc": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": true,
+        "endCursor": "bW92aWUjcmVsZWFzZURhdGUjMjMzMzkxNjAwMDAwI2NvbnRlbnQvbW92aWVzL3N0YXItd2Fycy5tZA=="
+      }
+    },
+    "paginatedAscPage2": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": true,
+        "endCursor": "bW92aWUjcmVsZWFzZURhdGUjMzYxMTc3MjAwMDAwI2NvbnRlbnQvbW92aWVzL2luZGlhbmEtam9uZXMubWQ="
+      }
+    },
+    "paginatedDesc": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ],
+      "pageInfo": {
+        "hasPreviousPage": true,
+        "endCursor": "bW92aWUjcmVsZWFzZURhdGUjODM0MTMwODAwMDAwI2NvbnRlbnQvbW92aWVzL3RoZS1yb2NrLm1k"
+      }
+    },
+    "paginatedDescPage2": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        }
+      ],
+      "pageInfo": {
+        "hasPreviousPage": true,
+        "endCursor": "bW92aWUjcmVsZWFzZURhdGUjMzYxMTc3MjAwMDAwI2NvbnRlbnQvbW92aWVzL2luZGlhbmEtam9uZXMubWQ="
+      }
+    },
+    "moviesByGeorgeLucas": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/indiana-jones.md"
+          }
+        },
+        {
+          "node": {
+            "id": "content/movies/star-wars.md"
+          }
+        }
+      ]
+    },
+    "moviesByCoppolla": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
+    },
+    "moviesBySofiasParent": {
+      "edges": [
+        {
+          "node": {
+            "id": "content/movies/the-rock.md"
+          }
+        }
+      ]
     }
   }
 }
