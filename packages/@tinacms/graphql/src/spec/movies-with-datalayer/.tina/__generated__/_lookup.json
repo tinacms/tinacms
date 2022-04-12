@@ -6,7 +6,8 @@
       "movie",
       "director",
       "crew",
-      "actor"
+      "actor",
+      "relative"
     ]
   },
   "Node": {
@@ -80,5 +81,60 @@
     "type": "ActorConnection",
     "resolveType": "collectionDocumentList",
     "collection": "actor"
+  },
+  "DirectorChildDocument": {
+    "type": "DirectorChildDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "ChildDocument": {
+    "type": "ChildDocument",
+    "resolveType": "collectionDocument",
+    "collection": "child",
+    "createChildDocument": "create",
+    "updateChildDocument": "update"
+  },
+  "ChildConnection": {
+    "type": "ChildConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "child"
+  },
+  "DirectorRelativesSpouseDocument": {
+    "type": "DirectorRelativesSpouseDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "DirectorRelativesChildrenConnection": {
+    "type": "DirectorRelativesChildrenConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "relative"
+    ]
+  },
+  "RelativeDocument": {
+    "type": "RelativeDocument",
+    "resolveType": "collectionDocument",
+    "collection": "relative",
+    "createRelativeDocument": "create",
+    "updateRelativeDocument": "update"
+  },
+  "RelativeConnection": {
+    "type": "RelativeConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "relative"
+  },
+  "DirectorRelativesChildrenDocument": {
+    "type": "DirectorRelativesChildrenDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "DirectorRelativesChildDocument": {
+    "type": "DirectorRelativesChildDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   }
 }

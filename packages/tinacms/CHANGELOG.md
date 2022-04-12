@@ -1,5 +1,77 @@
 # tinacms
 
+## 0.67.0
+
+### Minor Changes
+
+- 86651039b: Updates to the way forms are generated in contextual editing. This lays the groundwork for
+  future updates but doesn't offer new behavior yet. It does come with a small breaking change:
+
+  [BREAKING]: The `id` of forms is now the actual document `path`. Previously this was the name of the GraphQL query node (eg. `getPostDocument`).
+  If you're using the [`formifyCallback`](https://tina.io/docs/advanced/customizing-forms/#customizing-a-form) prop to create global forms, you'll probably need to update the callback to check for the appropriate id.
+
+  Eg. `formConfig.id === 'getSiteNavsDocument'` should be something like `formConfig.id === 'content/navs/mynav.md'`
+
+  If you're experiencing any issues with contextual editing, you can disable this flag for now by specifying `cms.flags.set('use-unstable-formify', false)`.
+
+## 0.66.10
+
+### Patch Changes
+
+- 39a8c4f7d: Fix issue with unstableFormify where `Document` interface fields were not being formified properly
+- ec28a129b: Update to tina admin to use the frontend schema
+- a28b787c5: With the rich-text editor, inserting a soft-break (`shift+enter`), this will now result in a `<br>` tag being inserted. Note that this will save the markdown with a backslash to indicate line break (instead of multiple empty spaces):
+
+  ```markdown
+  123 Abc St\
+  Charlottetown, PEI
+  ```
+
+- 93363dfc2: Prevent error on reset when nested blocks have changed in unstable formify hook
+- abf25c673: The schema can now to used on the frontend (optional for now but will be the main path moving forward).
+
+  ### How to migrate.
+
+  If you gone though the `tinacms init` process there should be a file called `.tina/components/TinaProvider`. In that file you can import the schema from `schema.ts` and add it to the TinaCMS wrapper component.
+
+  ```tsx
+  import TinaCMS from 'tinacms'
+  import schema, { tinaConfig } from '../schema.ts'
+
+  // Importing the TinaProvider directly into your page will cause Tina to be added to the production bundle.
+  // Instead, import the tina/provider/index default export to have it dynamially imported in edit-moode
+  /**
+   *
+   * @private Do not import this directly, please import the dynamic provider instead
+   */
+  const TinaProvider = ({ children }) => {
+    return (
+      <TinaCMS {...tinaConfig} schema={schema}>
+        {children}
+      </TinaCMS>
+    )
+  }
+
+  export default TinaProvider
+  ```
+
+- 591640db0: Fixes a bug with `breadcrumbs` to account for subfolders (instead of just the `filename`) and allows Documents to be created and updated within subfolders.
+
+  Before this fix, `breadcrumbs` was only the `basename` of the file minus the `extension`. So `my-folder-a/my-folder-b/my-file.md` would have `breadcrumbs` of `['my-file']`. With this change, `breadcrumbs` will be `['my-folder-a','my-folder-b','my-file']` (leaving out the `content/<collection>`).
+
+- 875779ac6: Don't attempt to formify nodes which don't have data fields (ie. ...on Node)
+- e8b0de1f7: Add `parentTypename` to fields to allow us to disambiguate between fields which have the same field names but different types. Example, an event from field name of `blocks.0.title` could belong to a `Cta` block or a `Hero` block, both of which have a `title` field.
+- Updated dependencies [429d8e93e]
+- Updated dependencies [6c517b5da]
+- Updated dependencies [e81cf8867]
+- Updated dependencies [abf25c673]
+- Updated dependencies [801f39f62]
+- Updated dependencies [0e270d878]
+- Updated dependencies [e8b0de1f7]
+  - @tinacms/sharedctx@0.1.1
+  - @tinacms/toolkit@0.56.19
+  - @tinacms/schema-tools@0.0.2
+
 ## 0.66.9
 
 ### Patch Changes

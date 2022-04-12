@@ -480,7 +480,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "collection"
+            "value": "getCollection"
           },
           "arguments": [
             {

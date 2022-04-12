@@ -99,7 +99,9 @@ export const getSelectedUnionType = (
   selectionNode: G.InlineFragmentNode
 ) => {
   const namedType = G.getNamedType(unionType)
-  ensureUnionType(namedType)
+  if (!G.isUnionType(namedType)) {
+    return
+  }
   const types = namedType.getTypes()
 
   const typeCondition = selectionNode.typeCondition.name.value

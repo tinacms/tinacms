@@ -88,8 +88,28 @@ input BooleanFilter {
   exists: Boolean
 }
 
+input RelativeFilter {
+  name: StringFilter
+}
+
+input DirectorRelativesSpouseFilter {
+  relative: RelativeFilter
+}
+
+input DirectorRelativesChildFilter {
+  relative: RelativeFilter
+}
+
+input DirectorRelativesFilter {
+  spouse: DirectorRelativesSpouseFilter
+  child: DirectorRelativesChildFilter
+}
+
 input DirectorFilter {
   name: StringFilter
+  birthday: DatetimeFilter
+  height: NumberFilter
+  relatives: DirectorRelativesFilter
 }
 
 input MovieDirectorFilter {
@@ -129,6 +149,7 @@ input DocumentFilter {
   director: DirectorFilter
   crew: CrewFilter
   actor: ActorFilter
+  relative: RelativeFilter
 }
 
 type DocumentConnectionEdges {
@@ -154,7 +175,7 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument
+union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument | RelativeDocument
 
 union MovieDirectorDocument = DirectorDocument
 
@@ -188,8 +209,20 @@ type MovieConnection implements Connection {
   edges: [MovieConnectionEdges]
 }
 
+union DirectorRelativesSpouseDocument = RelativeDocument
+
+union DirectorRelativesChildDocument = RelativeDocument
+
+type DirectorRelatives {
+  spouse: DirectorRelativesSpouseDocument
+  child: DirectorRelativesChildDocument
+}
+
 type Director {
   name: String
+  birthday: String
+  height: Float
+  relatives: DirectorRelatives
 }
 
 type DirectorDocument implements Node & Document {
@@ -267,18 +300,44 @@ type ActorConnection implements Connection {
   edges: [ActorConnectionEdges]
 }
 
+type Relative {
+  name: String
+}
+
+type RelativeDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Relative!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type RelativeConnectionEdges {
+  cursor: String
+  node: RelativeDocument
+}
+
+type RelativeConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Float!
+  edges: [RelativeConnectionEdges]
+}
+
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
-  createCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
-  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
+  createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  createDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
+  createCrewDocument(relativePath: String!, params: CrewMutation!): CrewDocument!
+  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  createActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
+  updateRelativeDocument(relativePath: String!, params: RelativeMutation!): RelativeDocument!
+  createRelativeDocument(relativePath: String!, params: RelativeMutation!): RelativeDocument!
 }
 
 input DocumentMutation {
@@ -286,6 +345,7 @@ input DocumentMutation {
   director: DirectorMutation
   crew: CrewMutation
   actor: ActorMutation
+  relative: RelativeMutation
 }
 
 input MovieMutation {
@@ -298,8 +358,16 @@ input MovieMutation {
   body: String
 }
 
+input DirectorRelativesMutation {
+  spouse: String
+  child: String
+}
+
 input DirectorMutation {
   name: String
+  birthday: String
+  height: Float
+  relatives: DirectorRelativesMutation
 }
 
 input CrewCostumeDesignerMutation {
@@ -318,4 +386,8 @@ input CrewMutation {
 input ActorMutation {
   name: String
   body: String
+}
+
+input RelativeMutation {
+  name: String
 }

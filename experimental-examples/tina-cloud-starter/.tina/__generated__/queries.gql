@@ -115,6 +115,7 @@ query authorsConnection {
   }
 }
 
+<<<<<<< HEAD
 query zodiacs($relativePath: String!) {
   zodiacs(relativePath: $relativePath) {
     sys {
@@ -156,6 +157,10 @@ query zodiacsConnection {
 
 query pages($relativePath: String!) {
   pages(relativePath: $relativePath) {
+=======
+query getPagesDocument($relativePath: String!) {
+  getPagesDocument(relativePath: $relativePath) {
+>>>>>>> main
     sys {
       filename
       basename
