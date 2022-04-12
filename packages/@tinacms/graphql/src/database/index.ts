@@ -472,6 +472,43 @@ export class Database {
     }
   }
 
+  public deleteContentByPaths = async (documentPaths: string[]) => {
+    const pathsByCollection: Record<string, string[]> = {}
+    const nonCollectionPaths: string[] = []
+    const collections: Record<
+      string,
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+    > = {}
+    const tinaSchema = await this.getSchema()
+    for (const documentPath of documentPaths) {
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        documentPath.startsWith(collection.path)
+      )
+
+      if (collection) {
+        if (!pathsByCollection[collection.name]) {
+          pathsByCollection[collection.name] = []
+        }
+        collections[collection.name] = collection
+        pathsByCollection[collection.name].push(documentPath)
+      } else {
+        nonCollectionPaths.push(documentPath)
+      }
+    }
+
+    for (const collection of Object.keys(pathsByCollection)) {
+      await _indexContent(
+        this,
+        pathsByCollection[collection],
+        collections[collection],
+        true
+      )
+    }
+
+    await _indexContent(this, nonCollectionPaths, null, true)
+  }
+
   public indexContentByPaths = async (documentPaths: string[]) => {
     const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
@@ -608,9 +645,11 @@ const _indexContent = async (
   documentPaths: string[],
   collection?:
     | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>,
+  deleteContentItems?: boolean
 ) => {
   let seedOptions: object | undefined = undefined
+  const deleteContentItemsValue = deleteContentItems ?? false
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions()
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
@@ -637,7 +676,11 @@ const _indexContent = async (
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, seedOptions)
+      if (deleteContentItemsValue) {
+        database.store.delete(filepath, seedOptions)
+      } else {
+        await database.store.seed(filepath, data, seedOptions)
+      }
     }
   })
 }
