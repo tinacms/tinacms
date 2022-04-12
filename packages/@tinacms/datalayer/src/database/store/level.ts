@@ -180,7 +180,7 @@ export class LevelStore implements Store {
       for (const [sort, definition] of Object.entries(
         options.indexDefinitions
       )) {
-        const indexedValue = makeKeyForField(definition, data)
+        const indexedValue = makeKeyForField(definition, data, escapeStr)
 
         let indexKey
         // let existingIndexKey = null
