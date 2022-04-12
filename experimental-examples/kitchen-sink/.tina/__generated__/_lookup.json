@@ -17,8 +17,8 @@
     "createDocument": "create",
     "updateDocument": "update"
   },
-  "PageDocument": {
-    "type": "PageDocument",
+  "Page": {
+    "type": "Page",
     "resolveType": "collectionDocument",
     "collection": "page",
     "createPage": "create",
@@ -29,8 +29,8 @@
     "resolveType": "collectionDocumentList",
     "collection": "page"
   },
-  "PostDocument": {
-    "type": "PostDocument",
+  "Post": {
+    "type": "Post",
     "resolveType": "collectionDocument",
     "collection": "post",
     "createPost": "create",

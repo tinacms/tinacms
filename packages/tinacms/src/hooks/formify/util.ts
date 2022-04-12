@@ -234,7 +234,7 @@ export const buildForm = (
   )
   const template = enrichedSchema.getTemplateForData({
     collection,
-    data: doc.values,
+    data: doc._values,
   })
   const formInfo = resolveForm({
     collection,

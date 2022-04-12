@@ -115,6 +115,7 @@ const RenderForm = ({
     return new Form({
       id: 'update-form',
       label: 'form',
+      // @ts-ignore
       fields: schemaFields,
       initialValues: document._values,
       onSubmit: async (values) => {

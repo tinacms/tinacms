@@ -69,6 +69,9 @@ export const useGetDocumentFields = (
             template = collection.templates[templateName].template
             fields = collection.templates[templateName].fields
           } else {
+            if (typeof collection.fields === 'string') {
+              throw new Error(`Global templates not supported`)
+            }
             fields = collection.fields
           }
 

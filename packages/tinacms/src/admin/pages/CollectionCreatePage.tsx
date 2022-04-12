@@ -72,11 +72,10 @@ const CollectionCreatePage = () => {
           collectionName={collectionName}
           templateName={templateName}
         >
-          {({ collection, template, fields, mutationInfo }) => (
+          {({ collection, fields, mutationInfo }) => (
             <RenderForm
               cms={cms}
               collection={collection}
-              template={template}
               fields={fields}
               mutationInfo={mutationInfo}
             />
@@ -114,6 +113,7 @@ const RenderForm = ({ cms, collection, fields, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
+          // @ts-ignore
           description: (
             <span>
               A unique filename for the content.
@@ -123,6 +123,7 @@ const RenderForm = ({ cms, collection, fields, mutationInfo }) => {
             </span>
           ),
           placeholder: `My_Document`,
+          // @ts-ignore
           validate: (value, allValues, meta) => {
             if (!value) {
               if (meta.dirty) {
@@ -137,6 +138,7 @@ const RenderForm = ({ cms, collection, fields, mutationInfo }) => {
             }
           },
         },
+        // @ts-ignore
         ...schemaFields,
       ],
       onSubmit: async (values) => {

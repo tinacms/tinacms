@@ -334,21 +334,6 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "sys"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "SystemInfo"
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
             "value": "id"
           },
           "arguments": [],
@@ -367,17 +352,14 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "form"
+            "value": "_sys"
           },
           "arguments": [],
           "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "SystemInfo"
             }
           }
         },
@@ -385,7 +367,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "values"
+            "value": "_values"
           },
           "arguments": [],
           "type": {
@@ -428,6 +410,24 @@
               "name": {
                 "kind": "Name",
                 "value": "Float"
+              }
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "pageInfo"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageInfo"
               }
             }
           }
@@ -617,113 +617,6 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "documentConnection"
-          },
-          "arguments": [
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "before"
-              },
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "String"
-                }
-              }
-            },
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "after"
-              },
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "String"
-                }
-              }
-            },
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "first"
-              },
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "Float"
-                }
-              }
-            },
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "last"
-              },
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "Float"
-                }
-              }
-            },
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "sort"
-              },
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "String"
-                }
-              }
-            }
-          ],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "DocumentConnection"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "getDocumentFields"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
             "value": "page"
           },
           "arguments": [
@@ -748,7 +641,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PageDocument"
+                "value": "Page"
               }
             }
           }
@@ -870,7 +763,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostDocument"
+                "value": "Post"
               }
             }
           }
@@ -983,10 +876,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         },
@@ -1032,10 +928,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "PageInfo"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageInfo"
+              }
             }
           }
         },
@@ -1324,21 +1223,36 @@
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "PageDocument"
+            "value": "Page"
           }
         },
         {
           "kind": "NamedType",
           "name": {
             "kind": "Name",
-            "value": "PostDocument"
+            "value": "Post"
           }
         }
       ]
     },
     {
       "kind": "ObjectTypeDefinition",
-      "interfaces": [],
+      "interfaces": [
+        {
+          "kind": "NamedType",
+          "name": {
+            "kind": "Name",
+            "value": "Node"
+          }
+        },
+        {
+          "kind": "NamedType",
+          "name": {
+            "kind": "Name",
+            "value": "Document"
+          }
+        }
+      ],
       "directives": [],
       "name": {
         "kind": "Name",
@@ -1389,33 +1303,7 @@
               "value": "JSON"
             }
           }
-        }
-      ]
-    },
-    {
-      "kind": "ObjectTypeDefinition",
-      "interfaces": [
-        {
-          "kind": "NamedType",
-          "name": {
-            "kind": "Name",
-            "value": "Node"
-          }
         },
-        {
-          "kind": "NamedType",
-          "name": {
-            "kind": "Name",
-            "value": "Document"
-          }
-        }
-      ],
-      "directives": [],
-      "name": {
-        "kind": "Name",
-        "value": "PageDocument"
-      },
-      "fields": [
         {
           "kind": "FieldDefinition",
           "name": {
@@ -1438,7 +1326,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "sys"
+            "value": "_sys"
           },
           "arguments": [],
           "type": {
@@ -1456,61 +1344,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "data"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Page"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "form"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "values"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "dataJSON"
+            "value": "_values"
           },
           "arguments": [],
           "type": {
@@ -1543,10 +1377,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         },
@@ -1561,7 +1398,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PageDocument"
+              "value": "Page"
             }
           }
         }
@@ -1592,10 +1429,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "PageInfo"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageInfo"
+              }
             }
           }
         },
@@ -1639,7 +1479,22 @@
     },
     {
       "kind": "ObjectTypeDefinition",
-      "interfaces": [],
+      "interfaces": [
+        {
+          "kind": "NamedType",
+          "name": {
+            "kind": "Name",
+            "value": "Node"
+          }
+        },
+        {
+          "kind": "NamedType",
+          "name": {
+            "kind": "Name",
+            "value": "Document"
+          }
+        }
+      ],
       "directives": [],
       "name": {
         "kind": "Name",
@@ -1675,33 +1530,7 @@
               "value": "JSON"
             }
           }
-        }
-      ]
-    },
-    {
-      "kind": "ObjectTypeDefinition",
-      "interfaces": [
-        {
-          "kind": "NamedType",
-          "name": {
-            "kind": "Name",
-            "value": "Node"
-          }
         },
-        {
-          "kind": "NamedType",
-          "name": {
-            "kind": "Name",
-            "value": "Document"
-          }
-        }
-      ],
-      "directives": [],
-      "name": {
-        "kind": "Name",
-        "value": "PostDocument"
-      },
-      "fields": [
         {
           "kind": "FieldDefinition",
           "name": {
@@ -1724,7 +1553,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "sys"
+            "value": "_sys"
           },
           "arguments": [],
           "type": {
@@ -1742,61 +1571,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "data"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Post"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "form"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "values"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NonNullType",
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "JSON"
-              }
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "dataJSON"
+            "value": "_values"
           },
           "arguments": [],
           "type": {
@@ -1829,10 +1604,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
             }
           }
         },
@@ -1847,7 +1625,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "PostDocument"
+              "value": "Post"
             }
           }
         }
@@ -1878,10 +1656,13 @@
           },
           "arguments": [],
           "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "PageInfo"
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageInfo"
+              }
             }
           }
         },
@@ -2181,7 +1962,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PageDocument"
+                "value": "Page"
               }
             }
           }
@@ -2234,7 +2015,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PageDocument"
+                "value": "Page"
               }
             }
           }
@@ -2287,7 +2068,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostDocument"
+                "value": "Post"
               }
             }
           }
@@ -2340,7 +2121,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "PostDocument"
+                "value": "Post"
               }
             }
           }

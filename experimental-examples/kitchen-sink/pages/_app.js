@@ -15,6 +15,10 @@ const App = ({ Component, pageProps }) => {
         showEditButton={true}
         editMode={
           <TinaCMS
+            cmsCallback={(cms) => {
+              cms.flags.set('use-unstable-formify', true)
+              return cms
+            }}
             branch="main"
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
