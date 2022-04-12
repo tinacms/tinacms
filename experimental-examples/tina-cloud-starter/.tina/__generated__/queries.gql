@@ -115,52 +115,8 @@ query authorsConnection {
   }
 }
 
-<<<<<<< HEAD
-query zodiacs($relativePath: String!) {
-  zodiacs(relativePath: $relativePath) {
-    sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
-    data {
-      ...ZodiacsParts
-    }
-  }
-}
-
-query zodiacsConnection {
-  zodiacsConnection {
-    totalCount
-    edges {
-      node {
-        id
-        sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
-        data {
-          ...ZodiacsParts
-        }
-      }
-    }
-  }
-}
-
 query pages($relativePath: String!) {
   pages(relativePath: $relativePath) {
-=======
-query getPagesDocument($relativePath: String!) {
-  getPagesDocument(relativePath: $relativePath) {
->>>>>>> main
     sys {
       filename
       basename
