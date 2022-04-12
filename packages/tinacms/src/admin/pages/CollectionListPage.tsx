@@ -207,7 +207,7 @@ const CollectionListPage = () => {
                                       </span>
                                     </td>
                                     {/* ADD THIS BACK IN TO TEST DELETE DOCUMENTS */}
-                                    {/* <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-6 py-4 whitespace-nowrap">
                                       <button
                                         className="bg-red-600 text-white rounded-lg p-5"
                                         onClick={(e) => {
@@ -239,7 +239,7 @@ const CollectionListPage = () => {
                                       >
                                         Delete
                                       </button>
-                                    </td> */}
+                                    </td>
                                   </tr>
                                 )
                               })}
