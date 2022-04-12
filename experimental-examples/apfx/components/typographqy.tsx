@@ -37,7 +37,7 @@ export const DisplayText = ({
   const fontSize = size || 'text-4xl sm:text-5xl lg:text-6xl'
   return (
     <h1
-      data-tinaField={tinaField}
+      data-tinafield={tinaField}
       className={`${fontSize} font-display tracking-wider ${classNames} ${
         headingColor[variant] || headingColor.light
       }`}

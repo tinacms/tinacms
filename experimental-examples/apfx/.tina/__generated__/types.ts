@@ -65,7 +65,6 @@ export type Query = {
   collections: Array<Collection>;
   node: Node;
   document: DocumentNode;
-  documentConnection: DocumentConnection;
   localeInfo: LocaleInfo;
   localeInfoConnection: LocaleInfoConnection;
   news: News;
@@ -99,16 +98,6 @@ export type QueryNodeArgs = {
 export type QueryDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryDocumentConnectionArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 

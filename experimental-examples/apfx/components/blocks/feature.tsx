@@ -181,18 +181,18 @@ export function TwoWideGrid(props: FeatureProps) {
               <div key={feature.name + index} className="relative">
                 <dt>
                   <div
-                    data-tinaField={getTinaField(feature, 'icon')}
+                    data-tinafield={getTinaField(feature, 'icon')}
                     className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-indigo-500 text-white"
                   >
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </div>
-                  <div data-tinaField={getTinaField(feature, 'name')}>
+                  <div data-tinafield={getTinaField(feature, 'name')}>
                     <FeatureName classNames={`ml-16`}>
                       {feature.name}
                     </FeatureName>
                   </div>
                 </dt>
-                <div data-tinaField={getTinaField(feature, 'description')}>
+                <div data-tinafield={getTinaField(feature, 'description')}>
                   <Markdown className="mt-2 ml-16 text-base text-gray-100">
                     {feature.description}
                   </Markdown>

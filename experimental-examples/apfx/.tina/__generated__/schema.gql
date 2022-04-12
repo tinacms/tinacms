@@ -47,7 +47,6 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
-  documentConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
   localeInfo(relativePath: String): LocaleInfo!
   localeInfoConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: LocaleInfoFilter): LocaleInfoConnection!
   news(relativePath: String): News!

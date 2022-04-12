@@ -153,7 +153,7 @@ export default function Home(props: HomeProps) {
         {props.data.navigation && <Nav {...props.data.navigation} />}
         {props.data.page.blocks?.map((block, i) => {
           return (
-            // <div key={i} data-tinaField={getTinaField(block)}>
+            // <div key={i} data-tinafield={getTinaField(block)}>
             <div key={i}>
               <Block {...block} />
             </div>
