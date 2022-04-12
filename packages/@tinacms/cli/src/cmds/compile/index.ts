@@ -66,6 +66,7 @@ export const compile = async (
       `Requested schema file type '${requestedSchemaFileType}' is not valid. Supported schema file types: 'ts, js, tsx, jsx'`
     )
   }
+  _ctx.schemaFileType = schemaFileType
 
   let schemaExists = true
   try {

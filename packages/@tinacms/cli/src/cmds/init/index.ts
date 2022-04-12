@@ -179,7 +179,13 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   // 2. Create a Tina Provider
   if (!fs.existsSync(TinaProviderPath) && !fs.existsSync(TinaDynamicProvider)) {
     fs.mkdirpSync(componentFolder)
-    fs.writeFileSync(TinaProviderPath, TinaProvider)
+    fs.writeFileSync(
+      TinaProviderPath,
+      TinaProvider.replace(
+        /'\.\.\/schema\.ts'/,
+        `'../schema.${_ctx.schemaFileType || 'ts'}'`
+      )
+    )
     fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
   }
   logger.level = 'info'
