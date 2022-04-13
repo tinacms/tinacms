@@ -41,6 +41,10 @@ const experimentalDatalayer = {
   name: '--experimentalData',
   description: 'Build the server with additional data querying capabilities',
 }
+const schemaFileType = {
+  name: '--schemaFileType [fileType]',
+  description: 'The file type to use for the Tina schema',
+}
 const subCommand = {
   name: '-c, --command <command>',
   description: 'The sub-command to run',
@@ -104,7 +108,7 @@ export const baseCmds: Command[] = [
   },
   {
     command: INIT,
-    options: [experimentalDatalayer, noTelemetryOption],
+    options: [experimentalDatalayer, noTelemetryOption, schemaFileType],
     description: 'Add Tina Cloud to an existing project',
     action: (options) =>
       chain(
@@ -112,8 +116,8 @@ export const baseCmds: Command[] = [
           checkDeps,
           initTina,
           installDeps,
-          async (_ctx, next) => {
-            await compile(_ctx, next)
+          async (_ctx, next, options) => {
+            await compile(_ctx, next, options)
             next()
           },
           attachSchema,
@@ -137,7 +141,7 @@ export const baseCmds: Command[] = [
             next()
           },
           async (_ctx, next) => {
-            await compile(_ctx, next)
+            await compile(_ctx, next, options)
             next()
           },
           attachSchema,

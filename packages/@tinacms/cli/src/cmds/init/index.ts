@@ -51,7 +51,12 @@ function execShellCommand(cmd): Promise<string> {
 
 export async function initTina(ctx: any, next: () => void, options) {
   const telemetry = new Telemetry({ disabled: options.noTelemetry })
-  await telemetry.submitRecord({ event: { name: 'tinacms:cli:init:invoke' } })
+  await telemetry.submitRecord({
+    event: {
+      name: 'tinacms:cli:init:invoke',
+      schemaFileType: options.schemaFileType || 'ts',
+    },
+  })
   logger.info(successText('Setting up Tina...'))
   next()
 }
@@ -162,7 +167,7 @@ const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
 const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
 
 export async function tinaSetup(_ctx: any, next: () => void, _options) {
-  const useingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
+  const usingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
 
   // 1. Create a content/blog Folder and add one or two blog posts
   if (!fs.pathExistsSync(blogPostPath)) {
@@ -174,13 +179,19 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   // 2. Create a Tina Provider
   if (!fs.existsSync(TinaProviderPath) && !fs.existsSync(TinaDynamicProvider)) {
     fs.mkdirpSync(componentFolder)
-    fs.writeFileSync(TinaProviderPath, TinaProvider)
+    fs.writeFileSync(
+      TinaProviderPath,
+      TinaProvider.replace(
+        /'\.\.\/schema\.ts'/,
+        `'../schema.${_ctx.schemaFileType || 'ts'}'`
+      )
+    )
     fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
   }
   logger.level = 'info'
 
   // 3. Create an _app.js
-  const pagesPath = p.join(baseDir, useingSrc ? 'src' : '', 'pages')
+  const pagesPath = p.join(baseDir, usingSrc ? 'src' : '', 'pages')
   const appPath = p.join(pagesPath, '_app.js')
   const appPathTS = p.join(pagesPath, '_app.tsx')
   const appExtension = fs.existsSync(appPath) ? '.js' : '.tsx'
@@ -188,7 +199,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   if (!fs.pathExistsSync(appPath) && !fs.pathExistsSync(appPathTS)) {
     // if they don't have a _app.js or an _app.tsx just make one
     logger.info(logText('Adding _app.js ... ✅'))
-    fs.writeFileSync(appPath, AppJsContent(useingSrc))
+    fs.writeFileSync(appPath, AppJsContent(usingSrc))
   } else {
     // Ask the user if they want to update there _app.js
     const override = await prompts({
@@ -212,13 +223,13 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
       const primaryMatches = matches.map((x) => x[0])
       fs.writeFileSync(
         appPathWithExtension,
-        AppJsContent(useingSrc, primaryMatches.join('\n'))
+        AppJsContent(usingSrc, primaryMatches.join('\n'))
       )
     } else {
       logger.info(
         dangerText(
           `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
-          warnText(AppJsContent(useingSrc))
+          warnText(AppJsContent(usingSrc))
         )
       )
     }
