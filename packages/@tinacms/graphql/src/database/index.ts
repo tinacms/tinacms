@@ -681,8 +681,7 @@ const _deleteIndexContent = async (
   documentPaths: string[],
   collection?:
     | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>,
-  deleteContentItems?: boolean
+    | CollectionTemplatesWithNamespace<true>
 ) => {
   let deleteOptions: object | undefined = undefined
   if (collection) {
