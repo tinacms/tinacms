@@ -25,7 +25,7 @@ const iconEl = {
   italic: <ItalicIcon />,
 }
 
-export const ToolbarIcon = ({ name }: { name: keyof typeof iconEl }) => {
+export const ToolbarIcon = ({ name }: { name: string }) => {
   return iconEl[name]
 }
 
