@@ -1186,7 +1186,6 @@ export class Builder {
             return astBuilder.InputValueDefinition({
               // @ts-ignore
               name: collection.name,
-              // type: await this._filterCollectionDocumentType(collection),
               type: NAMER.dataFilterTypeName(collection.namespace),
             })
           }),

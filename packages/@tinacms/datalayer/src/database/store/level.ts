@@ -177,7 +177,9 @@ export class LevelStore implements Store {
     const data = await this.db.get(
       `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
     )
-
+    if (!data) {
+      return
+    }
     if (options?.indexDefinitions) {
       for (const [sort, definition] of Object.entries(
         options.indexDefinitions
