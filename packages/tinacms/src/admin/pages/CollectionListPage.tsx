@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus } from 'react-icons/bi'
+import { BiEdit, BiPlus, BiTrash } from 'react-icons/bi'
 import {
   useParams,
   Link,
@@ -20,7 +20,16 @@ import {
   NavigateFunction,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
-import { TinaCMS } from '@tinacms/toolkit'
+import {
+  Button,
+  Modal,
+  ModalActions,
+  ModalBody,
+  ModalHeader,
+  ModalPopup,
+  TinaCMS,
+  OverflowMenu,
+} from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -106,6 +115,11 @@ const handleNavigate = (
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
+  const [open, setOpen] = React.useState(false)
+  const [vars, setVars] = React.useState({
+    collection: collectionName,
+    relativePath: '',
+  })
 
   return (
     <GetCMS>
@@ -124,6 +138,27 @@ const CollectionListPage = () => {
               return (
                 <PageWrapper>
                   <>
+                    {open && (
+                      <DeleteModal
+                        filename={vars.relativePath}
+                        deleteFunc={async () => {
+                          try {
+                            await admin.deleteDocument(vars)
+                            cms.alerts.info('Document was successfully deleted')
+                            // TODO: this could be done client side
+                            location.reload()
+                          } catch (error) {
+                            cms.alerts.warn(
+                              'Document was not deleted, ask a developer for help or check the console for an error message'
+                            )
+                            console.error(error)
+                            throw error
+                          }
+                        }}
+                        close={() => setOpen(false)}
+                      />
+                    )}
+
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
                         <h3 className="text-2xl text-gray-700">
@@ -206,40 +241,43 @@ const CollectionListPage = () => {
                                         {document.node.sys.template}
                                       </span>
                                     </td>
-                                    {/* ADD THIS BACK IN TO TEST DELETE DOCUMENTS */}
-                                    {/* <td className="px-6 py-4 whitespace-nowrap">
-                                      <button
-                                        className="bg-red-600 text-white rounded-lg p-5"
-                                        onClick={(e) => {
-                                          e.preventDefault()
-                                          const vars = {
-                                            collection: collectionName,
-                                            relativePath:
-                                              document.node.sys.filename +
-                                              document.node.sys.extension,
-                                          }
-                                          // TODO should we add a model?
-                                          admin
-                                            .deleteDocument(vars)
-                                            .then((_) => {
-                                              cms.alerts.info(
-                                                'Document was successfully deleted'
+                                    <td className="w-0">
+                                      <OverflowMenu
+                                        showEmbed={true}
+                                        toolbarItems={[
+                                          {
+                                            name: 'edit',
+                                            label: 'Edit in Admin',
+                                            Icon: <BiEdit size="1.3rem" />,
+                                            onMouseDown: () => {
+                                              navigate(
+                                                `${document.node.sys.filename}`,
+                                                { replace: true }
                                               )
-                                              // TODO: this should be done client side
-                                              location.reload()
-                                            })
-                                            .catch((e) => {
-                                              cms.alerts.warn(
-                                                'Document was not deleted, ask a developer for help or check the console'
-                                              )
-                                              console.error(e)
-                                              throw e
-                                            })
-                                        }}
-                                      >
-                                        Delete
-                                      </button>
-                                    </td> */}
+                                            },
+                                          },
+                                          {
+                                            name: 'delete',
+                                            label: 'Delete',
+                                            Icon: (
+                                              <BiTrash
+                                                size="1.3rem"
+                                                className="text-red-500"
+                                              />
+                                            ),
+                                            onMouseDown: () => {
+                                              setVars({
+                                                collection: collectionName,
+                                                relativePath:
+                                                  document.node.sys.filename +
+                                                  document.node.sys.extension,
+                                              })
+                                              setOpen(true)
+                                            },
+                                          },
+                                        ]}
+                                      />
+                                    </td>
                                   </tr>
                                 )
                               })}
@@ -258,5 +296,37 @@ const CollectionListPage = () => {
     </GetCMS>
   )
 }
+interface ResetModalProps {
+  close(): void
+  deleteFunc(): void
+  filename: string
+}
 
+const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
+  return (
+    <Modal>
+      <ModalPopup>
+        <ModalHeader close={close}>Reset</ModalHeader>
+        <ModalBody padded={true}>
+          <p>{`Are you sure you want to delete ${filename}?`}</p>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="danger"
+            onClick={async () => {
+              await deleteFunc()
+              close()
+            }}
+          >
+            Delete
+          </Button>
+        </ModalActions>
+      </ModalPopup>
+    </Modal>
+  )
+}
 export default CollectionListPage
