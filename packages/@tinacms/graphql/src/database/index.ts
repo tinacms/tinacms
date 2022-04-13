@@ -496,10 +496,8 @@ export class Database {
         nonCollectionPaths.push(documentPath)
       }
     }
-    console.log({ pathsByCollection })
 
     for (const collection of Object.keys(pathsByCollection)) {
-      console.log({ collection })
       await _deleteIndexContent(
         this,
         pathsByCollection[collection],
@@ -690,10 +688,7 @@ const _deleteIndexContent = async (
 ) => {
   let seedOptions: object | undefined = undefined
   const deleteContentItemsValue = deleteContentItems ?? false
-  console.log({ deleteContentItems })
   if (collection) {
-    console.log({ collectionFromFunc: collection })
-
     const indexDefinitions = await database.getIndexDefinitions()
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
     if (!collectionIndexDefinitions) {
@@ -715,7 +710,6 @@ const _deleteIndexContent = async (
 
   await sequential(documentPaths, async (filepath) => {
     if (database.store.supportsSeeding()) {
-      console.log({ deleteContentItemsValue })
       database.store.delete(filepath, seedOptions)
     }
   })
