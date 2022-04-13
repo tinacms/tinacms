@@ -500,15 +500,14 @@ export class Database {
 
     for (const collection of Object.keys(pathsByCollection)) {
       console.log({ collection })
-      await _indexContent(
+      await _deleteIndexContent(
         this,
         pathsByCollection[collection],
-        collections[collection],
-        true
+        collections[collection]
       )
     }
 
-    await _indexContent(this, nonCollectionPaths, null, true)
+    await _deleteIndexContent(this, nonCollectionPaths, null)
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
@@ -647,6 +646,45 @@ const _indexContent = async (
   documentPaths: string[],
   collection?:
     | CollectionFieldsWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>
+) => {
+  let seedOptions: object | undefined = undefined
+  if (collection) {
+    const indexDefinitions = await database.getIndexDefinitions()
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    if (!collectionIndexDefinitions) {
+      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+    }
+
+    const numIndexes = Object.keys(collectionIndexDefinitions).length
+    if (numIndexes > 20) {
+      throw new Error(
+        `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
+      )
+    }
+
+    seedOptions = {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    }
+  }
+
+  await sequential(documentPaths, async (filepath) => {
+    const dataString = await database.bridge.get(filepath)
+    const data = parseFile(dataString, path.extname(filepath), (yup) =>
+      yup.object({})
+    )
+    if (database.store.supportsSeeding()) {
+      await database.store.seed(filepath, data, seedOptions)
+    }
+  })
+}
+
+const _deleteIndexContent = async (
+  database: Database,
+  documentPaths: string[],
+  collection?:
+    | CollectionFieldsWithNamespace<true>
     | CollectionTemplatesWithNamespace<true>,
   deleteContentItems?: boolean
 ) => {
@@ -676,19 +714,9 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
-    const dataString = await database.bridge.get(filepath)
-    const data = parseFile(dataString, path.extname(filepath), (yup) =>
-      yup.object({})
-    )
     if (database.store.supportsSeeding()) {
       console.log({ deleteContentItemsValue })
-
-      if (deleteContentItemsValue) {
-        console.log({ filepath })
-        database.store.delete(filepath, seedOptions)
-      } else {
-        await database.store.seed(filepath, data, seedOptions)
-      }
+      database.store.delete(filepath, seedOptions)
     }
   })
 }
