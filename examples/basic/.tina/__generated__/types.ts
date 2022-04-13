@@ -101,7 +101,6 @@ export type QueryGetDocumentListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 
@@ -116,7 +115,6 @@ export type QueryGetPageListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<PageFilter>;
 };
 
 
@@ -131,12 +129,6 @@ export type QueryGetPostListArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<PostFilter>;
-};
-
-export type DocumentFilter = {
-  page?: Maybe<PageFilter>;
-  post?: Maybe<PostFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -172,7 +164,6 @@ export type CollectionDocumentsArgs = {
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
   sort?: Maybe<Scalars['String']>;
-  filter?: Maybe<DocumentFilter>;
 };
 
 export type DocumentNode = PageDocument | PostDocument;
@@ -191,24 +182,6 @@ export type PageDocument = Node & Document & {
   form: Scalars['JSON'];
   values: Scalars['JSON'];
   dataJSON: Scalars['JSON'];
-};
-
-export type StringFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type RichTextFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-};
-
-export type PageFilter = {
-  Title?: Maybe<StringFilter>;
-  body?: Maybe<RichTextFilter>;
 };
 
 export type PageConnectionEdges = {
@@ -254,51 +227,6 @@ export type PostDocument = Node & Document & {
   form: Scalars['JSON'];
   values: Scalars['JSON'];
   dataJSON: Scalars['JSON'];
-};
-
-export type PostRelatedPostsPostFilter = {
-  page?: Maybe<PageFilter>;
-  post?: Maybe<PostFilter>;
-};
-
-export type PostRelatedPostsFilter = {
-  post?: Maybe<PostRelatedPostsPostFilter>;
-  label?: Maybe<StringFilter>;
-};
-
-export type PostFooFilter = {
-  bar?: Maybe<StringFilter>;
-};
-
-export type ImageFilter = {
-  startsWith?: Maybe<Scalars['String']>;
-  eq?: Maybe<Scalars['String']>;
-  exists?: Maybe<Scalars['Boolean']>;
-  in?: Maybe<Array<Maybe<Scalars['String']>>>;
-};
-
-export type PostBodyGalleryImagesFilter = {
-  src?: Maybe<ImageFilter>;
-  width?: Maybe<StringFilter>;
-  height?: Maybe<StringFilter>;
-};
-
-export type PostBodyGalleryFilter = {
-  images?: Maybe<PostBodyGalleryImagesFilter>;
-  alignment?: Maybe<StringFilter>;
-  gap?: Maybe<StringFilter>;
-};
-
-export type PostBodyFilter = {
-  Gallery?: Maybe<PostBodyGalleryFilter>;
-};
-
-export type PostFilter = {
-  title?: Maybe<StringFilter>;
-  relatedPosts?: Maybe<PostRelatedPostsFilter>;
-  foo?: Maybe<PostFooFilter>;
-  topic?: Maybe<StringFilter>;
-  body?: Maybe<PostBodyFilter>;
 };
 
 export type PostConnectionEdges = {
