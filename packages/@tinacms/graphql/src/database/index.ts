@@ -558,9 +558,7 @@ export class Database {
       indexDefinitions: collectionIndexDefinitions,
     })
 
-    if (this.store.supportsSeeding()) {
-      await this.bridge.delete(filepath)
-    }
+    await this.bridge.delete(filepath)
   }
 
   public _indexAllContent = async () => {
@@ -686,8 +684,7 @@ const _deleteIndexContent = async (
     | CollectionTemplatesWithNamespace<true>,
   deleteContentItems?: boolean
 ) => {
-  let seedOptions: object | undefined = undefined
-  const deleteContentItemsValue = deleteContentItems ?? false
+  let deleteOptions: object | undefined = undefined
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions()
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
@@ -695,22 +692,13 @@ const _deleteIndexContent = async (
       throw new Error(`No indexDefinitions for collection ${collection.name}`)
     }
 
-    const numIndexes = Object.keys(collectionIndexDefinitions).length
-    if (numIndexes > 20) {
-      throw new Error(
-        `A maximum of 20 indexes are allowed per field. Currently collection ${collection.name} has ${numIndexes} indexes. Add 'indexed: false' to exclude a field from indexing.`
-      )
-    }
-
-    seedOptions = {
+    deleteOptions = {
       collection: collection.name,
       indexDefinitions: collectionIndexDefinitions,
     }
   }
 
   await sequential(documentPaths, async (filepath) => {
-    if (database.store.supportsSeeding()) {
-      database.store.delete(filepath, seedOptions)
-    }
+    database.store.delete(filepath, deleteOptions)
   })
 }

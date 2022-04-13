@@ -44,7 +44,7 @@ export class FilesystemBridge implements Bridge {
     return true
   }
   public async delete(filepath: string) {
-    await fs.removeSync(path.join(this.rootPath, filepath))
+    await fs.remove(path.join(this.rootPath, filepath))
   }
   public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
