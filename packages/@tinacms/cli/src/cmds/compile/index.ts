@@ -47,8 +47,30 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
   await fs.remove(tinaTempPath)
 }
 
-export const compile = async (_ctx, _next) => {
+export const compile = async (
+  _ctx,
+  _next,
+  options = { schemaFileType: 'ts' }
+) => {
   logger.info(logText('Compiling...'))
+
+  const { schemaFileType: requestedSchemaFileType = 'ts' } = options
+  const schemaFileType =
+    ((requestedSchemaFileType === 'ts' || requestedSchemaFileType === 'tsx') &&
+      'ts') ||
+    ((requestedSchemaFileType === 'js' || requestedSchemaFileType === 'jsx') &&
+      'js')
+
+  if (!schemaFileType) {
+    throw new Error(
+      `Requested schema file type '${requestedSchemaFileType}' is not valid. Supported schema file types: 'ts, js, tsx, jsx'`
+    )
+  }
+
+  if (_ctx) {
+    _ctx.schemaFileType = schemaFileType
+  }
+
   let schemaExists = true
   try {
     getSchemaPath({ projectDir: tinaPath })
@@ -60,12 +82,12 @@ export const compile = async (_ctx, _next) => {
     // The schema.ts file does not exist
     logger.info(
       dangerText(`
-      .tina/schema.ts not found, Creating one for you...
+      .tina/schema.${schemaFileType} not found, Creating one for you...
       See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
       `)
     )
     // We will default to TS?
-    const file = path.join(tinaPath, 'schema.ts')
+    const file = path.join(tinaPath, `schema.${schemaFileType}`)
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
     // Write a basic schema to it
