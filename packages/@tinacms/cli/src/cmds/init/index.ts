@@ -226,6 +226,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
         AppJsContent(usingSrc, primaryMatches.join('\n'))
       )
     } else {
+      _ctx.overwrite = 'NOOOOOOO'
       logger.info(
         dangerText(
           `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
@@ -272,6 +273,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
 }
 
 export async function successMessage(ctx: any, next: () => void, options) {
+  logger.info(`${ctx.overwrite}`)
   logger.info(`Tina setup ${chalk.underline.green('done')} ✅\n`)
 
   logger.info(`${chalk.bold('Run your site with Tina')}`)
