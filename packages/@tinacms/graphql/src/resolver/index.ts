@@ -368,8 +368,8 @@ export class Resolver {
       collection
     )
 
-    // @ts-ignore
     console.log('calling put3', realPath)
+    // @ts-ignore
     await this.database.put(realPath, params)
     return this.getDocument(realPath)
   }
@@ -434,8 +434,8 @@ export class Resolver {
       isCollectionSpecific ? args.params : args.params[collection.name],
       collection
     )
-    //@ts-ignore
     console.log('calling put2', realPath)
+    //@ts-ignore
     await this.database.put(realPath, params)
     return this.getDocument(realPath)
   }
