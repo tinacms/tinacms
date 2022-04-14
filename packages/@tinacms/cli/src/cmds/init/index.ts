@@ -1,3 +1,16 @@
+import { AppJsContent, adminPage, blogPost, nextPostPage } from './setup-files'
+import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
+import {
+  cmdText,
+  dangerText,
+  logText,
+  successText,
+  warnText,
+} from '../../utils/theme'
+import {
+  extendNextScripts,
+  generateGqlScript,
+} from '../../utils/script-helpers'
 /**
 Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,27 +23,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import fs, { readFileSync, writeFileSync, outputFileSync } from 'fs-extra'
-import p from 'path'
-import Progress from 'progress'
-import prompts from 'prompts'
-import { Telemetry } from '@tinacms/metrics'
+import fs, { outputFileSync, readFileSync, writeFileSync } from 'fs-extra'
 
-import {
-  successText,
-  logText,
-  cmdText,
-  warnText,
-  dangerText,
-} from '../../utils/theme'
-import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
-import { logger } from '../../logger'
+import Progress from 'progress'
+import { Telemetry } from '@tinacms/metrics'
 import chalk from 'chalk'
-import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
-import {
-  generateGqlScript,
-  extendNextScripts,
-} from '../../utils/script-helpers'
+import { logger } from '../../logger'
+import p from 'path'
+import prompts from 'prompts'
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -272,13 +272,16 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
 }
 
 export async function successMessage(ctx: any, next: () => void, options) {
-  logger.info(`Tina setup ${chalk.underline.green('done')}  ✅
-\t Start your dev server with ${successText(
-    `yarn dev`
-  )} and go to http://localhost:3000/demo/blog/HelloWorld to ${successText(
-    'check it out the page that was created for you'
-  )}
-Enjoy Tina 🦙 !
-`)
+  logger.info(`Tina setup ${chalk.underline.green('done')} ✅`)
+
+  logger.info(`${chalk.bold('Run your site with Tina')}`)
+  logger.info(`  yarn dev`)
+  logger.info(`${chalk.bold('Start Editing')}`)
+  logger.info(`  Go to 'http://localhost:3000/admin'`)
+  logger.info(`${chalk.bold('Read the docs')}`)
+  logger.info(
+    `  Check out 'https://tina.io/docs/introduction/tina-init/#adding-tina' for help getting started with Tina`
+  )
+
   next()
 }
