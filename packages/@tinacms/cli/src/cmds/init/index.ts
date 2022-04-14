@@ -209,7 +209,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
         `override`
       )} your _app${appExtension}?`,
     })
-    if (_ctx.override.res) {
+    if (_ctx.overrideApp.res) {
       logger.info(logText(`Adding _app${appExtension} ... ✅`))
       const appPathWithExtension = p.join(pagesPath, `_app${appExtension}`)
       const fileContent = fs.pathExistsSync(appPath)
