@@ -148,6 +148,7 @@ const transpile = async (projectDir, tempDir) => {
   await build({
     bundle: true,
     platform: 'neutral',
+    format: 'cjs',
     target: ['node10.4'],
     entryPoints: [inputFile],
     treeShaking: true,
