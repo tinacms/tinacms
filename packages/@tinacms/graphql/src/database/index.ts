@@ -160,11 +160,11 @@ export class Database {
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
+    console.log('Database.put', filepath, data)
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
-      console.log('Database.put', filepath)
       const collection = tinaSchema.schema.collections.find((collection) =>
         filepath.startsWith(collection.path)
       )

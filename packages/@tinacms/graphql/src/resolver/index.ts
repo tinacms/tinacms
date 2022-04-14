@@ -369,6 +369,7 @@ export class Resolver {
     )
 
     // @ts-ignore
+    console.log('calling put3', realPath)
     await this.database.put(realPath, params)
     return this.getDocument(realPath)
   }
@@ -401,6 +402,7 @@ export class Resolver {
               params,
               templateInfo.template
             )
+            console.log('calling put', realPath)
             await this.database.put(realPath, values)
           }
           break
@@ -419,6 +421,7 @@ export class Resolver {
                 ...this.buildFieldMutations(templateParams, template),
                 _template: lastItem(template.namespace),
               }
+              console.log('calling put4', realPath)
               await this.database.put(realPath, values)
             }
           })
@@ -432,6 +435,7 @@ export class Resolver {
       collection
     )
     //@ts-ignore
+    console.log('calling put2', realPath)
     await this.database.put(realPath, params)
     return this.getDocument(realPath)
   }
