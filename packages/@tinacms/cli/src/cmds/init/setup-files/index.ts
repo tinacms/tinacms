@@ -334,13 +334,12 @@ export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {
   )
 
   return `${importLine}
-
   ${extraImports || ''}
 
   const App = ({ Component, pageProps }) => {
   return (
     ${chalk.green('+ <Tina>')}
-      <Component {...pageProps} />
+        <Component {...pageProps} />
     ${chalk.green('+ </Tina>')}
   )
 }
