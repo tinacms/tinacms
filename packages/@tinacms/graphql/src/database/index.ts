@@ -164,11 +164,14 @@ export class Database {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
+      console.log('Database.put', filepath)
       const collection = tinaSchema.schema.collections.find((collection) =>
         filepath.startsWith(collection.path)
       )
+      console.log('Database.put', collection)
       let collectionIndexDefinitions
       if (collection) {
+        console.log(collection?.name)
         const indexDefinitions = await this.getIndexDefinitions()
         collectionIndexDefinitions = indexDefinitions?.[collection.name]
       }
