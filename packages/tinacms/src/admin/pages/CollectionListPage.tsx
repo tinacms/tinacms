@@ -130,7 +130,7 @@ const CollectionListPage = () => {
             collectionName={collectionName}
             includeDocuments
           >
-            {(collection: Collection) => {
+            {(collection: Collection, _loading, reFetchCollection) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
@@ -145,8 +145,7 @@ const CollectionListPage = () => {
                           try {
                             await admin.deleteDocument(vars)
                             cms.alerts.info('Document was successfully deleted')
-                            // TODO: this could be done client side
-                            location.reload()
+                            reFetchCollection()
                           } catch (error) {
                             cms.alerts.warn(
                               'Document was not deleted, ask a developer for help or check the console for an error message'
