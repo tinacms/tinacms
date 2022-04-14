@@ -272,7 +272,7 @@ export async function successMessage(ctx: any, next: () => void, options) {
 
   logger.info('Next Steps: \n')
 
-  if (ctx.overrideApp) {
+  if (!ctx.overrideApp) {
     logger.info(`${chalk.bold('Add the Tina wrapper')}`)
     logger.info(
       `⚠️ Before using Tina, you will NEED to add the Tina wrapper to your _app.jsx`
