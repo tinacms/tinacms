@@ -41,6 +41,7 @@ export type {
   StoreQueryResponse,
   PageInfo,
   PutOptions,
+  DeleteOptions,
   SeedOptions,
   Store,
   TernaryFilter,

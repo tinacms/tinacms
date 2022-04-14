@@ -105,10 +105,10 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
-union PostPostsPostDocument = PostDocument
+union PostRelatedPostsPostDocument = PageDocument | PostDocument
 
-type PostPosts {
-  post: PostPostsPostDocument
+type PostRelatedPosts {
+  post: PostRelatedPostsPostDocument
   label: String
 }
 
@@ -118,7 +118,7 @@ type PostFoo {
 
 type Post {
   title: String
-  posts: [PostPosts]
+  relatedPosts: [PostRelatedPosts]
   foo: PostFoo
   topic: [String]
   body: JSON
@@ -147,6 +147,7 @@ type PostConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
   createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
@@ -164,7 +165,7 @@ input PageMutation {
   body: JSON
 }
 
-input PostPostsMutation {
+input PostRelatedPostsMutation {
   post: String
   label: String
 }
@@ -175,7 +176,7 @@ input PostFooMutation {
 
 input PostMutation {
   title: String
-  posts: [PostPostsMutation]
+  relatedPosts: [PostRelatedPostsMutation]
   foo: PostFooMutation
   topic: [String]
   body: JSON

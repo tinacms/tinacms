@@ -77,6 +77,9 @@ export class FilesystemStore implements Store {
   }
   public async open() {}
   public async close() {}
+  public async delete(filepath) {
+    await fs.remove(path.join(this.rootPath, filepath))
+  }
 }
 
 export class AuditFilesystemStore extends FilesystemStore {

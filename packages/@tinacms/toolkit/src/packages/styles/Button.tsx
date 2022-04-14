@@ -19,7 +19,7 @@ import * as React from 'react'
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'white' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger'
   size?: 'small' | 'medium' | 'custom'
   busy?: boolean
   rounded?: 'full' | 'left' | 'right'
@@ -45,6 +45,7 @@ export const Button = ({
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
     white: `shadow text-gray-500 hover:text-blue-500 bg-white hover:bg-gray-50 border border-gray-200`,
     ghost: `text-gray-500 hover:text-blue-500 hover:shadow border border-transparent hover:border-gray-200 bg-transparent`,
+    danger: `shadow text-white bg-red-500 hover:bg-red-600 focus:ring-red-500`,
   }
   const state = busy ? `busy` : disabled ? `disabled` : `default`
   const stateClasses = {

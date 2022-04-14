@@ -97,6 +97,7 @@ export class Builder {
         collections,
         connectionNamespace: ['document'],
       })
+
     const type = astBuilder.ObjectTypeDefinition({
       name: typeName,
       fields: [
@@ -143,7 +144,12 @@ export class Builder {
         documentsType,
       ],
     })
-    return astBuilder.FieldDefinition({ type, name, args, required: true })
+    return astBuilder.FieldDefinition({
+      type,
+      name,
+      args,
+      required: true,
+    })
   }
 
   /**
@@ -381,6 +387,40 @@ export class Builder {
             namespace: ['document'],
             collections: collections.map((collection) => collection.name),
           }),
+        }),
+      ],
+      required: true,
+      type: astBuilder.TYPES.MultiCollectionDocument,
+    })
+  }
+  /**
+   * ```graphql
+   * # ex.
+   * {
+   *   deleteDocument(relativePath: $relativePath, params: $params) {
+   *     id
+   *     data {...}
+   *   }
+   * }
+   * ```
+   *
+   * @param collections
+   */
+  public buildDeleteCollectionDocumentMutation = async (
+    collections: TinaCloudCollectionEnriched[]
+  ) => {
+    return astBuilder.FieldDefinition({
+      name: 'deleteDocument',
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: false,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'relativePath',
+          required: true,
+          type: astBuilder.TYPES.String,
         }),
       ],
       required: true,
@@ -1146,7 +1186,7 @@ export class Builder {
             return astBuilder.InputValueDefinition({
               // @ts-ignore
               name: collection.name,
-              type: await this._filterCollectionDocumentType(collection),
+              type: NAMER.dataFilterTypeName(collection.namespace),
             })
           }),
         }),
