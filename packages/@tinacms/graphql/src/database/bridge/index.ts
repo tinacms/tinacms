@@ -16,6 +16,7 @@ export interface Bridge {
   glob(pattern: string): Promise<string[]>
   get(filepath: string): Promise<string>
   put(filepath: string, data: string): Promise<void>
+  delete(filepath: string): Promise<void>
   /**
    * Whether this bridge supports the ability to build the schema.
    */

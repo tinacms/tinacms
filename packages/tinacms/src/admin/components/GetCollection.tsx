@@ -28,6 +28,7 @@ export const useGetCollection = (
   )
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
+  const [resetState, setResetSate] = useState(0)
 
   useEffect(() => {
     const fetchCollection = async () => {
@@ -54,9 +55,11 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
-  }, [cms, collectionName])
+  }, [cms, collectionName, resetState])
 
-  return { collection, loading, error }
+  const reFetchCollection = () => setResetSate((x) => x + 1)
+
+  return { collection, loading, error, reFetchCollection }
 }
 
 const GetCollection = ({
@@ -70,7 +73,7 @@ const GetCollection = ({
   includeDocuments?: boolean
   children: any
 }) => {
-  const { collection, loading, error } = useGetCollection(
+  const { collection, loading, error, reFetchCollection } = useGetCollection(
     cms,
     collectionName,
     includeDocuments
@@ -84,7 +87,7 @@ const GetCollection = ({
     return <LoadingPage />
   }
 
-  return <>{children(collection, loading)}</>
+  return <>{children(collection, loading, reFetchCollection)}</>
 }
 
 export default GetCollection

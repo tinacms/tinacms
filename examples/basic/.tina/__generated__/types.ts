@@ -197,11 +197,11 @@ export type PageConnection = Connection & {
   edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
 };
 
-export type PostPostsPostDocument = PostDocument;
+export type PostRelatedPostsPostDocument = PageDocument | PostDocument;
 
-export type PostPosts = {
-  __typename?: 'PostPosts';
-  post?: Maybe<PostPostsPostDocument>;
+export type PostRelatedPosts = {
+  __typename?: 'PostRelatedPosts';
+  post?: Maybe<PostRelatedPostsPostDocument>;
   label?: Maybe<Scalars['String']>;
 };
 
@@ -213,7 +213,7 @@ export type PostFoo = {
 export type Post = {
   __typename?: 'Post';
   title?: Maybe<Scalars['String']>;
-  posts?: Maybe<Array<Maybe<PostPosts>>>;
+  relatedPosts?: Maybe<Array<Maybe<PostRelatedPosts>>>;
   foo?: Maybe<PostFoo>;
   topic?: Maybe<Array<Maybe<Scalars['String']>>>;
   body?: Maybe<Scalars['JSON']>;
@@ -246,6 +246,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
+  deleteDocument: DocumentNode;
   createDocument: DocumentNode;
   updatePageDocument: PageDocument;
   createPageDocument: PageDocument;
@@ -265,6 +266,12 @@ export type MutationUpdateDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
+};
+
+
+export type MutationDeleteDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
+  relativePath: Scalars['String'];
 };
 
 
@@ -308,7 +315,7 @@ export type PageMutation = {
   body?: Maybe<Scalars['JSON']>;
 };
 
-export type PostPostsMutation = {
+export type PostRelatedPostsMutation = {
   post?: Maybe<Scalars['String']>;
   label?: Maybe<Scalars['String']>;
 };
@@ -319,7 +326,7 @@ export type PostFooMutation = {
 
 export type PostMutation = {
   title?: Maybe<Scalars['String']>;
-  posts?: Maybe<Array<Maybe<PostPostsMutation>>>;
+  relatedPosts?: Maybe<Array<Maybe<PostRelatedPostsMutation>>>;
   foo?: Maybe<PostFooMutation>;
   topic?: Maybe<Array<Maybe<Scalars['String']>>>;
   body?: Maybe<Scalars['JSON']>;
@@ -327,7 +334,7 @@ export type PostMutation = {
 
 export type PagePartsFragment = { __typename?: 'Page', Title?: Maybe<string>, body?: Maybe<any> };
 
-export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, posts?: Maybe<Array<Maybe<{ __typename: 'PostPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> };
+export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, relatedPosts?: Maybe<Array<Maybe<{ __typename: 'PostRelatedPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PageDocument', id: string } | { __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> };
 
 export type GetPageDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -346,12 +353,12 @@ export type GetPostDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPostDocumentQuery = { __typename?: 'Query', getPostDocument: { __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, posts?: Maybe<Array<Maybe<{ __typename: 'PostPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> } } };
+export type GetPostDocumentQuery = { __typename?: 'Query', getPostDocument: { __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, relatedPosts?: Maybe<Array<Maybe<{ __typename: 'PostRelatedPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PageDocument', id: string } | { __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> } } };
 
 export type GetPostListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPostListQuery = { __typename?: 'Query', getPostList: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, posts?: Maybe<Array<Maybe<{ __typename: 'PostPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> } }> }>>> } };
+export type GetPostListQuery = { __typename?: 'Query', getPostList: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, relatedPosts?: Maybe<Array<Maybe<{ __typename: 'PostRelatedPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'PageDocument', id: string } | { __typename?: 'PostDocument', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> } }> }>>> } };
 
 export const PagePartsFragmentDoc = gql`
     fragment PageParts on Page {
@@ -362,7 +369,7 @@ export const PagePartsFragmentDoc = gql`
 export const PostPartsFragmentDoc = gql`
     fragment PostParts on Post {
   title
-  posts {
+  relatedPosts {
     __typename
     post {
       ... on Document {

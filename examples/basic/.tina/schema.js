@@ -36,11 +36,11 @@ const schema = defineSchema({
             //     </div>
             //   )
             // },
-            validate: (val) => {
-              if (val?.length > 5) {
-                return 'Too Long!!!'
-              }
-            },
+            // validate: (val) => {
+            //   if (val?.length > 5) {
+            //     return 'Too Long!!!'
+            //   }
+            // },
           },
         },
         {
@@ -65,7 +65,7 @@ const schema = defineSchema({
         {
           type: 'object',
           label: 'Related Posts',
-          name: 'posts',
+          name: 'relatedPosts',
           list: true,
           ui: {
             itemProps: (item) => {
@@ -76,7 +76,7 @@ const schema = defineSchema({
             {
               name: 'post',
               type: 'reference',
-              collections: ['post'],
+              collections: ['post', 'page'],
             },
             {
               name: 'label',
