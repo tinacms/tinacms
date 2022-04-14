@@ -201,15 +201,16 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
     logger.info(logText('Adding _app.js ... ✅'))
     fs.writeFileSync(appPath, AppJsContent(usingSrc))
   } else {
-    // Ask the user if they want to update there _app.js
-    _ctx.overrideApp = await prompts({
+    const override = await prompts({
       name: 'res',
       type: 'confirm',
       message: `do you want us to ${chalk.bold(
         `override`
       )} your _app${appExtension}?`,
     })
-    if (_ctx.overrideApp.res) {
+    // Ask the user if they want to update there _app.js
+    _ctx.overrideApp = override.res
+    if (override.res) {
       logger.info(logText(`Adding _app${appExtension} ... ✅`))
       const appPathWithExtension = p.join(pagesPath, `_app${appExtension}`)
       const fileContent = fs.pathExistsSync(appPath)
