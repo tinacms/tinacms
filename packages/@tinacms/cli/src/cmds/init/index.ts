@@ -277,7 +277,7 @@ export async function successMessage(ctx: any, next: () => void, options) {
     logger.info(
       `⚠️ Before using Tina, you will NEED to add the Tina wrapper to your _app.jsx`
     )
-    warnText(AppJsContent(usingSrc))
+    logger.info(`${warnText(AppJsContent(usingSrc))} \n`)
   }
 
   logger.info(`${chalk.bold('Run your site with Tina')}`)
