@@ -202,14 +202,14 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
     fs.writeFileSync(appPath, AppJsContent(usingSrc))
   } else {
     // Ask the user if they want to update there _app.js
-    const override = await prompts({
+    _ctx.overrideApp = await prompts({
       name: 'res',
       type: 'confirm',
       message: `do you want us to ${chalk.bold(
         `override`
       )} your _app${appExtension}?`,
     })
-    if (override.res) {
+    if (_ctx.override.res) {
       logger.info(logText(`Adding _app${appExtension} ... ✅`))
       const appPathWithExtension = p.join(pagesPath, `_app${appExtension}`)
       const fileContent = fs.pathExistsSync(appPath)
@@ -224,14 +224,6 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
       fs.writeFileSync(
         appPathWithExtension,
         AppJsContent(usingSrc, primaryMatches.join('\n'))
-      )
-    } else {
-      _ctx.overwrite = 'NOOOOOOO'
-      logger.info(
-        dangerText(
-          `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
-          warnText(AppJsContent(usingSrc))
-        )
       )
     }
   }
@@ -273,8 +265,19 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
 }
 
 export async function successMessage(ctx: any, next: () => void, options) {
-  logger.info(`${ctx.overwrite}`)
+  const usingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
+
   logger.info(`Tina setup ${chalk.underline.green('done')} ✅\n`)
+
+  logger.info('Next Steps: \n')
+
+  if (ctx.overrideApp) {
+    logger.info(`${chalk.bold('Add the Tina wrapper')}`)
+    logger.info(
+      `⚠️ Before using Tina, you will NEED to add the Tina wrapper to your _app.jsx`
+    )
+    warnText(AppJsContent(usingSrc))
+  }
 
   logger.info(`${chalk.bold('Run your site with Tina')}`)
   logger.info(`  yarn dev \n`)
