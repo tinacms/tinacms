@@ -368,9 +368,8 @@ export class Resolver {
       collection
     )
 
-    console.log('calling put3', realPath)
     // @ts-ignore
-    await this.database.put(realPath, params)
+    await this.database.put(realPath, params, collection.name)
     return this.getDocument(realPath)
   }
 
@@ -402,8 +401,7 @@ export class Resolver {
               params,
               templateInfo.template
             )
-            console.log('calling put', realPath)
-            await this.database.put(realPath, values)
+            await this.database.put(realPath, values, collection.name)
           }
           break
         case 'union':
@@ -421,8 +419,7 @@ export class Resolver {
                 ...this.buildFieldMutations(templateParams, template),
                 _template: lastItem(template.namespace),
               }
-              console.log('calling put4', realPath)
-              await this.database.put(realPath, values)
+              await this.database.put(realPath, values, collection.name)
             }
           })
       }
@@ -434,9 +431,8 @@ export class Resolver {
       isCollectionSpecific ? args.params : args.params[collection.name],
       collection
     )
-    console.log('calling put2', realPath)
     //@ts-ignore
-    await this.database.put(realPath, params)
+    await this.database.put(realPath, params, collection.name)
     return this.getDocument(realPath)
   }
 
