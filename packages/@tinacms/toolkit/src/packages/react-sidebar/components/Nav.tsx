@@ -57,7 +57,8 @@ export const Nav = ({
   RenderNavCollection,
   ...props
 }: NavProps) => {
-  const { setEdit } = useEditState()
+  // const { setEdit } = useEditState()
+  const setEdit = () => {}
 
   return (
     <div

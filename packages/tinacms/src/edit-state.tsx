@@ -31,6 +31,7 @@ export const TinaEditProvider = ({
   children: React.ReactNode
   editMode: React.ReactNode
 }) => {
+  console.log(EditProvider)
   return (
     <EditProvider>
       {showEditButton && <ToggleButton />}
