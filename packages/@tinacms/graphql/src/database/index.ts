@@ -87,6 +87,43 @@ export class Database {
     this.store = config.store
   }
 
+  private collectionForPath = async (
+    filepath: string
+  ): Promise<
+    | CollectionFieldsWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>
+    | undefined
+  > => {
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
+    )
+    return collection
+  }
+
+  private async partitionPathsByCollection(documentPaths: string[]) {
+    const pathsByCollection: Record<string, string[]> = {}
+    const nonCollectionPaths: string[] = []
+    const collections: Record<
+      string,
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+    > = {}
+    for (const documentPath of documentPaths) {
+      const collection = await this.collectionForPath(documentPath)
+      if (collection) {
+        if (!pathsByCollection[collection.name]) {
+          pathsByCollection[collection.name] = []
+        }
+        collections[collection.name] = collection
+        pathsByCollection[collection.name].push(documentPath)
+      } else {
+        nonCollectionPaths.push(documentPath)
+      }
+    }
+    return { pathsByCollection, nonCollectionPaths, collections }
+  }
+
   public get = async <T extends object>(filepath: string): Promise<T> => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected get for config file ${filepath}`)
@@ -140,10 +177,7 @@ export class Database {
   ) => {
     const { stringifiedFile, payload, keepTemplateKey } =
       await this.stringifyFile(filepath, data)
-    const tinaSchema = await this.getSchema()
-    const collection = tinaSchema.schema.collections.find((collection) =>
-      filepath.startsWith(collection.path)
-    )
+    const collection = await this.collectionForPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
       const indexDefinitions = await this.getIndexDefinitions()
@@ -154,27 +188,23 @@ export class Database {
     }
     await this.store.put(filepath, payload, {
       keepTemplateKey,
-      collection: collection.name,
+      collection: collection?.name,
       indexDefinitions: collectionIndexDefinitions,
     })
   }
 
-  public put = async (filepath: string, data: { [key: string]: unknown }) => {
-    console.log('Database.put', filepath, data)
+  public put = async (
+    filepath: string,
+    data: { [key: string]: unknown },
+    collection?: string
+  ) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
-      const tinaSchema = await this.getSchema()
-      console.log('collections', tinaSchema.schema.collections)
-      const collection = tinaSchema.schema.collections.find((collection) => {
-        console.log(filepath, collection.path)
-        return filepath.startsWith(collection.path)
-      })
-      console.log('Database.put', collection)
       let collectionIndexDefinitions
       if (collection) {
         const indexDefinitions = await this.getIndexDefinitions()
-        collectionIndexDefinitions = indexDefinitions?.[collection.name]
+        collectionIndexDefinitions = indexDefinitions?.[collection]
       }
 
       const { stringifiedFile, payload, keepTemplateKey } =
@@ -184,7 +214,7 @@ export class Database {
       }
       await this.store.put(filepath, payload, {
         keepTemplateKey,
-        collection: collection?.name,
+        collection: collection,
         indexDefinitions: collectionIndexDefinitions,
       })
     }
@@ -477,29 +507,8 @@ export class Database {
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
-    const pathsByCollection: Record<string, string[]> = {}
-    const nonCollectionPaths: string[] = []
-    const collections: Record<
-      string,
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-    > = {}
-    const tinaSchema = await this.getSchema()
-    for (const documentPath of documentPaths) {
-      const collection = tinaSchema.schema.collections.find((collection) =>
-        documentPath.startsWith(collection.path)
-      )
-
-      if (collection) {
-        if (!pathsByCollection[collection.name]) {
-          pathsByCollection[collection.name] = []
-        }
-        collections[collection.name] = collection
-        pathsByCollection[collection.name].push(documentPath)
-      } else {
-        nonCollectionPaths.push(documentPath)
-      }
-    }
+    const { pathsByCollection, nonCollectionPaths, collections } =
+      await this.partitionPathsByCollection(documentPaths)
 
     for (const collection of Object.keys(pathsByCollection)) {
       await _deleteIndexContent(
@@ -513,29 +522,8 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    const pathsByCollection: Record<string, string[]> = {}
-    const nonCollectionPaths: string[] = []
-    const collections: Record<
-      string,
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-    > = {}
-    const tinaSchema = await this.getSchema()
-    for (const documentPath of documentPaths) {
-      const collection = tinaSchema.schema.collections.find((collection) =>
-        documentPath.startsWith(collection.path)
-      )
-
-      if (collection) {
-        if (!pathsByCollection[collection.name]) {
-          pathsByCollection[collection.name] = []
-        }
-        collections[collection.name] = collection
-        pathsByCollection[collection.name].push(documentPath)
-      } else {
-        nonCollectionPaths.push(documentPath)
-      }
-    }
+    const { pathsByCollection, nonCollectionPaths, collections } =
+      await this.partitionPathsByCollection(documentPaths)
 
     for (const collection of Object.keys(pathsByCollection)) {
       await _indexContent(
