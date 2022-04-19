@@ -17,21 +17,23 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useState, useEffect } from 'react'
-import { FormsView } from './SidebarBody'
+
 import { BiMenu, BiPencil } from 'react-icons/bi'
 import { BsArrowsAngleContract, BsArrowsAngleExpand } from 'react-icons/bs'
-import { MdOutlineArrowBackIos } from 'react-icons/md'
-import { ImFilesEmpty } from 'react-icons/im'
-import { Button } from '../../styles'
 import { ScreenPlugin, ScreenPluginModal } from '../../react-screens'
-import { useSubscribable, useCMS } from '../../react-core'
-import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarStateOptions } from '../sidebar'
-import { LocalWarning } from './LocalWarning'
-import { Nav } from './Nav'
-import { Transition } from '@headlessui/react'
+import { useCMS, useSubscribable } from '../../react-core'
+import { useEffect, useState } from 'react'
+
+import { Button } from '../../styles'
+import { FormsView } from './SidebarBody'
+import { ImFilesEmpty } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
+import { LocalWarning } from './LocalWarning'
+import { MdOutlineArrowBackIos } from 'react-icons/md'
+import { Nav } from './Nav'
+import { ResizeHandle } from './ResizeHandle'
+import { Transition } from '@headlessui/react'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -85,11 +87,10 @@ const useFetchCollections = (cms) => {
           const collections = await cms.api.admin.fetchCollections()
           setCollections(collections)
         } catch (error) {
-          cms.alerts.error(
-            `[ERROR] GetCollections failed: ${error.message}`,
-            30 * 1000 // 30 seconds
-          )
           setCollections([])
+          throw new Error(
+            `[${error.name}] GetCollections failed: ${error.message}`
+          )
         }
 
         setLoading(false)

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import Markdown from "react-markdown";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
 import { BsArrowRight } from "react-icons/bs";
 import { ThemeContext } from "./theme";
 
@@ -42,7 +42,7 @@ export const Posts = ({ data }) => {
                 </span>
               </h3>
               <div className="prose dark:prose-dark prose-lg w-full max-w-none mb-5">
-                <Markdown>{post.values.excerpt}</Markdown>
+                <TinaMarkdown content={post.values.excerpt} />
               </div>
               <div className="flex items-center -mb-2">
                 <div className="flex-shrink-0 mr-2">

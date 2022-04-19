@@ -321,6 +321,13 @@ export const formify = async ({
     const blueprint = blueprints.find(
       (blueprint) => blueprint.id === util.getRelativeBlueprint(path)
     )
+    /**
+     * This would be a field like sys.filename
+     * which has no need to be formified, so exit.
+     */
+    if (!blueprint) {
+      return fieldNode
+    }
 
     const fieldPath = util.buildPath({
       fieldNode,
@@ -382,6 +389,9 @@ export const formify = async ({
     path: BlueprintPath[]
   }) => {
     const type = util.getSelectedUnionType(parentType, inlineFragmentNode)
+    if (!type) {
+      return inlineFragmentNode
+    }
 
     if (util.isFormifiableDocument(type)) {
       return formifyInlineFragmentDocument({

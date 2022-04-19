@@ -5,5 +5,168 @@ query {
         id
       }
     }
+  },
+  sortedByReleaseDate: movieConnection(filter: { archived: { eq: true } }, sort: "releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  releaseDateAfter: movieConnection(filter: { releaseDate: { after: "1990-01-01T07:00:00.000Z" } }, sort: "releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  releaseDateBefore: movieConnection(filter: { releaseDate: { before: "1990-01-01T07:00:00.000Z" } }, sort: "releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  releaseDateBetween: movieConnection(filter: { releaseDate: { after: "1980-01-01T07:00:00.000Z", before: "1990-01-01T07:00:00.000Z" } }, sort: "releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  releaseDateNotArchivedAfter: movieConnection(filter: { archived: { eq: false }, releaseDate: { after: "1990-01-01T07:00:00.000Z" } }, sort: "archived-releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  releaseDateArchivedBefore: movieConnection(filter: { archived: { eq: true }, releaseDate: { before: "1990-01-01T07:00:00.000Z" } }, sort: "archived-releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingIN: movieConnection(filter: { rating: { in: [7, 10] } }, sort: "releaseDate") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingBetween: movieConnection(filter: { rating: { gt: 7, lte: 10 } }, sort: "rating") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingGTE: movieConnection(filter: { rating: { gte: 7 } }, sort: "rating") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingGT: movieConnection(filter: { rating: { gt: 7 } }, sort: "rating") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingLTE: movieConnection(filter: { rating: { lte: 8 } }, sort: "rating") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  ratingLT: movieConnection(filter: { rating: { lt: 8 } }, sort: "rating") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  titleEQ: movieConnection(filter: { title: { eq: "Raiders of the Lost Ark" } }, sort: "title") {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  titleStartsWith: movieConnection(filter: { title: { startsWith: "Raiders" } }, sort: "title") {
+   edges {
+     node {
+       id
+     }
+   }
+  },
+  paginatedAsc: movieConnection(sort: "releaseDate", first: 1) {
+    edges {
+      node {
+        id
+      }
+    }
+    pageInfo {
+        hasNextPage
+        endCursor
+    }
+  },
+  paginatedAscPage2: movieConnection(sort: "releaseDate", first: 1, after: "bW92aWUjcmVsZWFzZURhdGUjMjMzMzkxNjAwMDAwI2NvbnRlbnQvbW92aWVzL3N0YXItd2Fycy5tZA==") {
+    edges {
+      node {
+        id
+      }
+    }
+    pageInfo {
+        hasNextPage
+        endCursor
+    }
+  },
+  paginatedDesc: movieConnection(sort: "releaseDate", last: 1) {
+    edges {
+      node {
+        id
+      }
+    }
+    pageInfo {
+        hasPreviousPage
+        endCursor
+    }
+  },
+  paginatedDescPage2: movieConnection(sort: "releaseDate", last: 1, before: "bW92aWUjcmVsZWFzZURhdGUjODM0MTMwODAwMDAwI2NvbnRlbnQvbW92aWVzL3RoZS1yb2NrLm1k") {
+    edges {
+      node {
+        id
+      }
+    }
+    pageInfo {
+        hasPreviousPage
+        endCursor
+    }
+  },
+  moviesByGeorgeLucas: movieConnection(filter: { director: { director: { name: { eq: "George Lucas" } } } }) {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  moviesByCoppolla: movieConnection(filter: { director: { director: { name: { eq: "Francis Ford Coppolla" } } } }) {
+    edges {
+      node {
+        id
+      }
+    }
+  },
+  moviesBySofiasParent: movieConnection(sort: "director", filter: { director: { director: { relatives: { child: { relative: { name: { eq: "Sofia Coppolla" } } } } } } }) {
+    edges {
+      node {
+        id
+      }
+    }
   }
 }
