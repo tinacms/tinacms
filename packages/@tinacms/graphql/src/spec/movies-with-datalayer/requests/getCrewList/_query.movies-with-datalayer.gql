@@ -2,7 +2,9 @@
   crewConnection (filter: { costumeDesigner: { favoriteColor: { eq: "blue" } } }) {
     edges {
       node {
-        id
+        ...on Document {
+          id
+        }
       }
     }
   }
@@ -11,7 +13,9 @@
   ) {
     edges {
       node {
-        id
+        ...on Document {
+          id
+        }
       }
     }
   }

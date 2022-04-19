@@ -2,9 +2,7 @@ query {
   directorConnection {
     edges {
       node {
-        data {
-          name
-        }
+        name
       }
     }
   }

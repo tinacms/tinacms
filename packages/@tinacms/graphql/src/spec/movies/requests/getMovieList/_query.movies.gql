@@ -1,6 +1,6 @@
 query {
   # intentional error
-  getMovieList(filter: { archived: { eq: true } }) {
+  movieConnectionZ(filter: { archived: { eq: true } }) {
     edges {
       node {
         id

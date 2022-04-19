@@ -3,10 +3,8 @@ mutation {
     relativePath: "hello-world.md"
     params: { post: { title: "Ok" } }
   ) {
-    data {
-      ... on PostPost {
-        title
-      }
+    ... on PostPost {
+      title
     }
   }
 }

@@ -1,13 +1,9 @@
 {
   "data": {
     "post": {
-      "data": {
-        "title": "Hello, World!",
-        "author": {
-          "data": {
-            "name": "Homer J Simpson"
-          }
-        }
+      "title": "Hello, World!",
+      "author": {
+        "name": "Homer J Simpson"
       }
     }
   }
