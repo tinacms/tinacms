@@ -61,18 +61,11 @@ export interface DocumentSys {
 export interface Collection {
   label: string
   name: string
+  slug: string
   format?: string
   templates?: Template[]
   documents?: {
     totalCount?: number
     edges?: DocumentNode[]
-  }
-}
-
-export interface GetDocumentFields {
-  [collectionName: string]: {
-    collection: Object
-    templates?: Object[]
-    fields?: Object[]
   }
 }

@@ -12,8 +12,8 @@ export default function HomePage(
     data: props.data,
   });
   return (
-    <Layout rawData={data} data={data.getGlobalDocument.data}>
-      <Blocks {...data.getPagesDocument.data} />
+    <Layout rawData={data} data={data.global.data}>
+      <Blocks {...data.pages.data} />
     </Layout>
   );
 }

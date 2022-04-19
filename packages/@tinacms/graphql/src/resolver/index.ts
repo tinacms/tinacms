@@ -747,7 +747,6 @@ export class Resolver {
     const value = rawData[field.name]
     switch (field.type) {
       case 'datetime':
-        // See you in March ;)
         if (value instanceof Date) {
           accumulator[field.name] = value.toISOString()
         } else {

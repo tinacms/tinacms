@@ -27,8 +27,8 @@ export const useGetCollections = (cms: TinaCMS) => {
     const fetchCollections = async () => {
       if (await api.isAuthenticated()) {
         try {
-          const response = await api.fetchCollections()
-          setCollections(response.collections)
+          const collections = await api.fetchCollections()
+          setCollections(collections)
         } catch (error) {
           console.error(error)
           setCollections([])
