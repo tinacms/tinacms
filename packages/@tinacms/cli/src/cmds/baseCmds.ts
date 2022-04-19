@@ -95,6 +95,7 @@ export const baseCmds: Command[] = [
       noSDKCodegenOption,
       noTelemetryOption,
       watchFileOption,
+      verboseOption,
     ],
     action: (options) => chain([startServer], options),
   },
