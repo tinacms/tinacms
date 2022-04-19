@@ -43,12 +43,12 @@ export const Header = ({ data }) => {
   // If we're on an admin path, other links should also link to their admin paths
   const [prefix, setPrefix] = React.useState("");
   const [windowUrl, setUrl] = React.useState("");
+  const isBrowser = typeof window !== "undefined";
+  const hasUrl = isBrowser ? window.location.href : "";
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      setUrl(window.location.href);
-    }
-  }, []);
+    setUrl(hasUrl);
+  }, [hasUrl]);
 
   React.useEffect(() => {
     if (window.location.pathname.startsWith("/admin")) {
@@ -103,7 +103,7 @@ export const Header = ({ data }) => {
           className={`absolute h-1 bg-gradient-to-r from-transparent ${
             data.color === "primary" ? `via-white` : `via-black dark:via-white`
           } to-transparent bottom-0 left-4 right-4 -z-1 opacity-5`}
-        ></div>
+        />
       </Container>
     </div>
   );

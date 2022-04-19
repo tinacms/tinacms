@@ -1,15 +1,15 @@
 /**
- Copyright 2021 Forestry.io Holdings, Inc.
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- */
+Copyright 2021 Forestry.io Holdings, Inc.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 import {
   BinaryFilter,
@@ -21,7 +21,15 @@ import {
   makeFilterChain,
   makeFilterSuffixes,
   makeKeyForField,
+  INDEX_KEY_FIELD_SEPARATOR,
+  makeStringEscaper,
+  DEFAULT_NUMERIC_LPAD,
 } from '.'
+
+const escapeStr = makeStringEscaper(
+  new RegExp(INDEX_KEY_FIELD_SEPARATOR, 'gm'),
+  encodeURIComponent(INDEX_KEY_FIELD_SEPARATOR)
+)
 
 describe('datalayer store helper functions', () => {
   describe('buildKeyForField', () => {
@@ -36,7 +44,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { foo: expected }
+        { foo: expected },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -53,7 +62,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { foo: now.toISOString() }
+        { foo: now.toISOString() },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -69,7 +79,8 @@ describe('datalayer store helper functions', () => {
             },
           ],
         },
-        { bar: 'foo' }
+        { bar: 'foo' },
+        escapeStr
       )
       expect(result).toEqual(expected)
     })
@@ -204,7 +215,7 @@ describe('datalayer store helper functions', () => {
           ],
           publishedIdIndexDefn
         )
-        expect(left).toEqual('true:1')
+        expect(left).toEqual(`true${INDEX_KEY_FIELD_SEPARATOR}1`)
         expect(right).toBeUndefined()
       })
     })
@@ -361,6 +372,10 @@ describe('datalayer store helper functions', () => {
           rightOperand: 5,
           operator: OP.GT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD,
+          },
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -385,6 +400,10 @@ describe('datalayer store helper functions', () => {
           rightOperand: 5,
           operator: OP.LT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD,
+          },
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -456,6 +475,10 @@ describe('datalayer store helper functions', () => {
           leftOperator: OP.GT,
           rightOperator: OP.LT,
           type: 'number',
+          pad: {
+            fillString: '0',
+            maxLength: DEFAULT_NUMERIC_LPAD,
+          },
         }
         const filterCondition: FilterCondition = {
           filterExpression: {
@@ -833,19 +856,77 @@ describe('datalayer store helper functions', () => {
 
   describe('coerceFilterChainOperands', () => {
     it('coerces string', () => {
+      const operand = 'foo'
+      const expected: BinaryFilter = {
+        pathExpression: 'title',
+        rightOperand: operand.padStart(10, ' '),
+        operator: OP.EQ,
+        type: 'string',
+        pad: {
+          fillString: ' ',
+          maxLength: 10,
+        },
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces string', () => {
       const expected: BinaryFilter = {
         pathExpression: 'title',
         rightOperand: 'foo',
         operator: OP.EQ,
         type: 'string',
       }
-      const coerced = coerceFilterChainOperands([expected])
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces string[]', () => {
+      const expected: BinaryFilter = {
+        pathExpression: 'titles',
+        rightOperand: ['foo', 'bar'],
+        operator: OP.IN,
+        type: 'string',
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces string[] with padding', () => {
+      const operand = ['foo', 'bar']
+      const expected: BinaryFilter = {
+        pathExpression: 'titles',
+        rightOperand: operand.map((val) => val.padStart(10, ' ')),
+        operator: OP.IN,
+        type: 'string',
+        pad: {
+          fillString: ' ',
+          maxLength: 10,
+        },
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces number', () => {
+      const expected: BinaryFilter = {
+        pathExpression: 'rating',
+        rightOperand: 10,
+        operator: OP.EQ,
+        type: 'number',
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
     })
 
     it('coerces empty chain', () => {
-      const coerced = coerceFilterChainOperands([])
+      const coerced = coerceFilterChainOperands([], escapeStr)
       expect(coerced.length).toEqual(0)
     })
 
@@ -856,12 +937,17 @@ describe('datalayer store helper functions', () => {
         operator: OP.GT,
         type: 'datetime',
       }
-      const coerced = coerceFilterChainOperands([
-        {
-          ...expected,
-          rightOperand: new Date(expected.rightOperand as number).toISOString(),
-        },
-      ])
+      const coerced = coerceFilterChainOperands(
+        [
+          {
+            ...expected,
+            rightOperand: new Date(
+              expected.rightOperand as number
+            ).toISOString(),
+          },
+        ],
+        escapeStr
+      )
 
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
@@ -874,14 +960,17 @@ describe('datalayer store helper functions', () => {
         operator: OP.IN,
         type: 'datetime',
       }
-      const coerced = coerceFilterChainOperands([
-        {
-          ...expected,
-          rightOperand: [
-            new Date(expected.rightOperand[0] as number).toISOString(),
-          ],
-        },
-      ])
+      const coerced = coerceFilterChainOperands(
+        [
+          {
+            ...expected,
+            rightOperand: [
+              new Date(expected.rightOperand[0] as number).toISOString(),
+            ],
+          },
+        ],
+        escapeStr
+      )
 
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
@@ -896,14 +985,33 @@ describe('datalayer store helper functions', () => {
         rightOperator: OP.LT,
         type: 'datetime',
       }
-      const coerced = coerceFilterChainOperands([
-        {
-          ...expected,
-          rightOperand: new Date(expected.rightOperand as number).toISOString(),
-          leftOperand: new Date(expected.leftOperand as number).toISOString(),
-        },
-      ])
+      const coerced = coerceFilterChainOperands(
+        [
+          {
+            ...expected,
+            rightOperand: new Date(
+              expected.rightOperand as number
+            ).toISOString(),
+            leftOperand: new Date(expected.leftOperand as number).toISOString(),
+          },
+        ],
+        escapeStr
+      )
 
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces ternary string filter', () => {
+      const expected: TernaryFilter = {
+        pathExpression: 'title',
+        leftOperand: 'foo',
+        rightOperand: 'bar',
+        leftOperator: OP.GT,
+        rightOperator: OP.LT,
+        type: 'string',
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
     })
