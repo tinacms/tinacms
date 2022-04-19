@@ -12,12 +12,6 @@ limitations under the License.
 */
 
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
-import { useParams, Link } from 'react-router-dom'
-import { HiChevronRight } from 'react-icons/hi'
-
-import type { TinaCMS } from '@tinacms/toolkit'
-import { LocalWarning } from '@tinacms/toolkit'
-
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { Link, useParams } from 'react-router-dom'
