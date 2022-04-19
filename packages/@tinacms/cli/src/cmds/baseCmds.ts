@@ -11,21 +11,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Command } from '../command'
-import { chain } from '../middleware'
-import { genTypes, attachSchema } from './query-gen'
-import { startServer } from './start-server'
-import { compile } from './compile'
+import { attachSchema, genTypes } from './query-gen'
+import { audit, printFinalMessage } from './audit'
 import {
+  checkDeps,
   initTina,
   installDeps,
-  checkDeps,
-  tinaSetup,
   successMessage,
+  tinaSetup,
 } from './init'
-import { audit, printFinalMessage } from './audit'
-import { logger } from '../logger'
+
+import { Command } from '../command'
+import { chain } from '../middleware'
 import chalk from 'chalk'
+import { compile } from './compile'
+import { logger } from '../logger'
+import { startServer } from './start-server'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -76,6 +77,10 @@ const watchFileOption = {
   name: '-w, --watchFolders [folders...]',
   description:
     'a list of folders (relative to where this is being run) that the cli will watch for changes',
+}
+const verboseOption = {
+  name: '-v, --verbose',
+  description: 'increase verbosity of logged output',
 }
 
 export const baseCmds: Command[] = [
