@@ -213,7 +213,9 @@ stack: ${code.stack || 'No stack was provided'}`)
       const altairUrl = `http://localhost:${port}/altair/`
       if (verbose)
         logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-      logger.info(`Visit the playground at ${chalk.blueBright(altairUrl)}\n`)
+      logger.info(
+        `Visit the playground at ${chalk.underline.blueBright(altairUrl)}\n`
+      )
     })
     state.server.on('error', function (e) {
       if (e.code === 'EADDRINUSE') {
