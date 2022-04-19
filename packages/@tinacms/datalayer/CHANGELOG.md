@@ -1,5 +1,16 @@
 # tina-graphql
 
+## 0.1.0
+
+### Minor Changes
+
+- a87e1e6fa: Enable query filtering, pagination, sorting
+
+### Patch Changes
+
+- 8b3be903f: Escape index field separator in input strings
+- b01f2e382: Fixed an issue where `0` as a numerical operand was being evaluated as falsy.
+
 ## 0.0.2
 
 ### Patch Changes

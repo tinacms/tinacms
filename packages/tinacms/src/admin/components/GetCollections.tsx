@@ -11,10 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useState, useEffect } from 'react'
-import type { TinaCMS } from '@tinacms/toolkit'
-import { TinaAdminApi } from '../api'
+import React, { useEffect, useState } from 'react'
+
 import type { Collection } from '../types'
+import { TinaAdminApi } from '../api'
+import type { TinaCMS } from '@tinacms/toolkit'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
@@ -29,13 +30,12 @@ export const useGetCollections = (cms: TinaCMS) => {
           const collections = await api.fetchCollections()
           setCollections(collections)
         } catch (error) {
-          cms.alerts.error(
-            `[${error.name}] GetCollections failed: ${error.message}`,
-            30 * 1000 // 30 seconds
-          )
           console.error(error)
           setCollections([])
           setError(error)
+          throw new Error(
+            `[${error.name}] GetCollections failed: ${error.message}`
+          )
         }
 
         setLoading(false)
