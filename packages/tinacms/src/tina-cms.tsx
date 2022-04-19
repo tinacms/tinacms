@@ -305,6 +305,11 @@ export const TinaCMSProvider2 = ({
         isLocalClient: props.isLocalClient,
       }
 
+  // schema is now required as the Global Nav and CMS utilize it
+  if (!schema) {
+    throw new Error('`schema` is a required field')
+  }
+
   return (
     <>
       <TinaCloudProvider
