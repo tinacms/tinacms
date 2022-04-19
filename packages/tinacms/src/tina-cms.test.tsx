@@ -58,6 +58,9 @@ describe('TinaCMSProvider', () => {
           query="my-query"
           variables={{ foo: 'my-variable-val' }}
           data={{ foo: 'my-data' }}
+          schema={{
+            collections: [],
+          }}
           fakeProp={'blahbalh'}
         >
           {(liveProps) => <DummyChild {...liveProps} />}
@@ -82,7 +85,12 @@ describe('TinaCMSProvider', () => {
         data: { foo: 'my-data' },
       }
       render(
-        <TinaCMSProvider2 {...request}>
+        <TinaCMSProvider2
+          {...request}
+          schema={{
+            collections: [],
+          }}
+        >
           {(liveProps) => <DummyChild {...liveProps} />}
         </TinaCMSProvider2>
       )
@@ -100,7 +108,12 @@ describe('TinaCMSProvider', () => {
         data: { foo: 'my-data' },
       }
       const { queryByText } = render(
-        <TinaCMSProvider2 {...request}>
+        <TinaCMSProvider2
+          {...request}
+          schema={{
+            collections: [],
+          }}
+        >
           {(liveProps) => <DummyChild {...liveProps} />}
         </TinaCMSProvider2>
       )
@@ -119,7 +132,12 @@ describe('TinaCMSProvider', () => {
         documentCreatorCallback: mockDocumentCreatorCallback,
       }
       render(
-        <TinaCMSProvider2 {...request}>
+        <TinaCMSProvider2
+          {...request}
+          schema={{
+            collections: [],
+          }}
+        >
           {(liveProps) => <DummyChild {...liveProps} />}
         </TinaCMSProvider2>
       )
@@ -141,7 +159,12 @@ describe('TinaCMSProvider', () => {
           data: { foo: 'my-data' },
         }
         const { queryByText } = render(
-          <TinaCMSProvider2 {...request}>
+          <TinaCMSProvider2
+            {...request}
+            schema={{
+              collections: [],
+            }}
+          >
             {(liveProps) => <DummyChild {...liveProps} />}
           </TinaCMSProvider2>
         )
@@ -156,7 +179,12 @@ describe('TinaCMSProvider', () => {
   describe('with ReactNode children', () => {
     it('render children', () => {
       const { queryByText } = render(
-        <TinaCMSProvider2 apiURL={'http://localhost:3000'}>
+        <TinaCMSProvider2
+          apiURL={'http://localhost:3000'}
+          schema={{
+            collections: [],
+          }}
+        >
           <DummyChild />
         </TinaCMSProvider2>
       )
@@ -168,7 +196,11 @@ describe('TinaCMSProvider', () => {
 
     it('doesnt register form', () => {
       render(
-        <TinaCMSProvider2>
+        <TinaCMSProvider2
+          schema={{
+            collections: [],
+          }}
+        >
           <DummyChild />
         </TinaCMSProvider2>
       )
