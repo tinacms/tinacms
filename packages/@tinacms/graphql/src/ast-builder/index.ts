@@ -38,7 +38,7 @@ const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
-    value: 'sys',
+    value: '_sys',
   },
   arguments: [],
   directives: [],
@@ -609,26 +609,12 @@ export const astBuilder = {
                   directives: [],
                 },
                 {
-                  kind: 'Field',
+                  kind: 'FragmentSpread',
                   name: {
                     kind: 'Name',
-                    value: 'data',
+                    value: fragName,
                   },
-                  arguments: [],
                   directives: [],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: {
-                          kind: 'Name',
-                          value: fragName,
-                        },
-                        directives: [],
-                      },
-                    ],
-                  },
                 },
               ],
             },
@@ -710,26 +696,12 @@ export const astBuilder = {
                             },
                             SysFieldDefinition,
                             {
-                              kind: 'Field',
+                              kind: 'FragmentSpread',
                               name: {
                                 kind: 'Name',
-                                value: 'data',
+                                value: fragName,
                               },
-                              arguments: [],
                               directives: [],
-                              selectionSet: {
-                                kind: 'SelectionSet',
-                                selections: [
-                                  {
-                                    kind: 'FragmentSpread',
-                                    name: {
-                                      kind: 'Name',
-                                      value: fragName,
-                                    },
-                                    directives: [],
-                                  },
-                                ],
-                              },
                             },
                           ],
                         },
@@ -906,10 +878,10 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return `update${generateNamespacedFieldName(namespace)}`
+    return 'update' + generateNamespacedFieldName(namespace)
   },
   createName: (namespace: string[]) => {
-    return `create${generateNamespacedFieldName(namespace)}`
+    return 'create' + generateNamespacedFieldName(namespace)
   },
   documentQueryName: () => {
     return 'document'
@@ -930,13 +902,13 @@ export const NAMER = {
     return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
-    return `${generateNamespacedFieldName(namespace, '')}Parts`
+    return generateNamespacedFieldName(namespace, '') + 'Parts'
   },
   collectionTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Collection')
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Document')
+    return generateNamespacedFieldName(namespace)
   },
   dataTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '')
