@@ -93,7 +93,6 @@ export type TinaIndex = {
   name: string
   fields: {
     name: string
-    default?: string | number | boolean
   }[]
 }
 
