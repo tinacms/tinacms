@@ -36,7 +36,7 @@ const gqlServer = async (database) => {
       # We've got a simple query set up for you to get started
       # but there's plenty more for you to explore on your own!
       query MyQuery {
-        getCollections {
+        collections {
           documents {
             id
             sys {

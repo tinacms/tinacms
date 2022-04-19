@@ -29,13 +29,13 @@ export const auditCollection = async (args: AuditArgs) => {
   const { collection, database, rootPath } = args
   logger.info(`Checking collection ${collection.name}`)
   const query = `query {
-        getCollection(collection: "${collection.name}") {
+        collection(collection: "${collection.name}") {
           format
           documents {
             edges {
               node {
                 ...on Document {
-                  sys {
+                  _sys {
                     extension
                     path
                   }
@@ -51,21 +51,21 @@ export const auditCollection = async (args: AuditArgs) => {
     query,
     variables: {},
   })
-  const format = result.data.getCollection.format
-  const docs = result.data.getCollection.documents.edges
+  const format = result.data.collection.format
+  const docs = result.data.collection.documents.edges
 
   // validate file extension
   docs.forEach((x) => {
     const node = x.node
-    if (node.sys.extension.replace('.', '') !== format) {
+    if (node._sys.extension.replace('.', '') !== format) {
       warning = true
       logger.warn(
         chalk.yellowBright(
           `WARNING: there is a file with extension \`${
-            node.sys.extension
+            node._sys.extension
           }\` but in your schema it is defined to be \`.${format}\`\n\n\location: ${p.join(
             rootPath,
-            node.sys.path
+            node._sys.path
           )}`
         )
       )
@@ -78,14 +78,14 @@ export const auditCollection = async (args: AuditArgs) => {
 export const auditDocuments = async (args: AuditArgs) => {
   const { collection, database, rootPath, useDefaultValues } = args
   const query = `query {
-        getCollection(collection: "${collection.name}") {
+        collection(collection: "${collection.name}") {
           format
           slug
           documents {
             edges {
               node {
                 ...on Document {
-                  sys {
+                  _sys {
                     extension
                     path
                     relativePath
@@ -103,16 +103,16 @@ export const auditDocuments = async (args: AuditArgs) => {
     variables: {},
   })
   let error = false
-  const documents: any[] = result.data.getCollection.documents.edges
+  const documents: any[] = result.data.collection.documents.edges
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
-    const fullPath = p.join(rootPath, node.sys.path)
+    const fullPath = p.join(rootPath, node._sys.path)
     logger.info(`Checking document: ${fullPath}`)
     const documentQuery = `query {
-        getDocument(collection: "${collection.name}", relativePath: "${node.sys.relativePath}") {
+        document(collection: "${collection.name}", relativePath: "${node._sys.relativePath}") {
           __typename
           ...on Document {
-            values
+            _values
           }
         }
       }`
@@ -135,7 +135,7 @@ export const auditDocuments = async (args: AuditArgs) => {
         })
     }
     const params = transformDocumentIntoMutationRequestPayload(
-      docResult.data.getDocument.values,
+      docResult.data.document._values,
       {
         includeCollection: true,
         includeTemplate: typeof collection.templates !== 'undefined',
@@ -157,7 +157,7 @@ export const auditDocuments = async (args: AuditArgs) => {
       variables: {
         params,
         collection: collection.name,
-        relativePath: node.sys.relativePath,
+        relativePath: node._sys.relativePath,
       },
       silenceErrors: true,
     })
