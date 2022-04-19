@@ -33,11 +33,11 @@ export const useGetCollection = (
     const fetchCollection = async () => {
       if (await api.isAuthenticated()) {
         try {
-          const response = await api.fetchCollection(
+          const collection = await api.fetchCollection(
             collectionName,
             includeDocuments
           )
-          setCollection(response.collection)
+          setCollection(collection)
         } catch (error) {
           cms.alerts.error(
             `[${error.name}] GetCollection failed: ${error.message}`,
