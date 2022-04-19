@@ -30,15 +30,15 @@ interface Node {
 
 """"""
 interface Document {
-  sys: SystemInfo
   id: ID!
-  form: JSON!
-  values: JSON!
+  _sys: SystemInfo
+  _values: JSON!
 }
 
 """A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Float!
+  pageInfo: PageInfo!
 }
 
 type Query {
@@ -47,25 +47,23 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
-  documentConnection(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
-  getDocumentFields: JSON!
-  posts(relativePath: String): PostsDocument!
+  posts(relativePath: String): Posts!
   postsConnection(before: String, after: String, first: Float, last: Float, sort: String): PostsConnection!
-  global(relativePath: String): GlobalDocument!
+  global(relativePath: String): Global!
   globalConnection(before: String, after: String, first: Float, last: Float, sort: String): GlobalConnection!
-  authors(relativePath: String): AuthorsDocument!
+  authors(relativePath: String): Authors!
   authorsConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorsConnection!
-  pages(relativePath: String): PagesDocument!
+  pages(relativePath: String): Pages!
   pagesConnection(before: String, after: String, first: Float, last: Float, sort: String): PagesConnection!
 }
 
 type DocumentConnectionEdges {
-  cursor: String
+  cursor: String!
   node: DocumentNode
 }
 
 type DocumentConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DocumentConnectionEdges]
 }
@@ -82,35 +80,29 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
+union DocumentNode = Posts | Global | Authors | Pages
 
-union PostsAuthorDocument = AuthorsDocument
+union PostsAuthor = Authors
 
-type Posts {
+type Posts implements Node & Document {
   title: String
   heroImg: String
   excerpt: JSON
-  author: PostsAuthorDocument
+  author: PostsAuthor
   date: String
   _body: JSON
-}
-
-type PostsDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Posts!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type PostsConnectionEdges {
-  cursor: String
-  node: PostsDocument
+  cursor: String!
+  node: Posts
 }
 
 type PostsConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [PostsConnectionEdges]
 }
@@ -151,53 +143,41 @@ type GlobalTheme {
   darkMode: String
 }
 
-type Global {
+type Global implements Node & Document {
   header: GlobalHeader
   footer: GlobalFooter
   theme: GlobalTheme
-}
-
-type GlobalDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Global!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type GlobalConnectionEdges {
-  cursor: String
-  node: GlobalDocument
+  cursor: String!
+  node: Global
 }
 
 type GlobalConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [GlobalConnectionEdges]
 }
 
-type Authors {
+type Authors implements Node & Document {
   name: String
   avatar: String
-}
-
-type AuthorsDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Authors!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type AuthorsConnectionEdges {
-  cursor: String
-  node: AuthorsDocument
+  cursor: String!
+  node: Authors
 }
 
 type AuthorsConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [AuthorsConnectionEdges]
 }
@@ -253,26 +233,20 @@ type PagesBlocksTestimonial {
 
 union PagesBlocks = PagesBlocksHero | PagesBlocksFeatures | PagesBlocksContent | PagesBlocksTestimonial
 
-type Pages {
+type Pages implements Node & Document {
   blocks: [PagesBlocks]
-}
-
-type PagesDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Pages!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type PagesConnectionEdges {
-  cursor: String
-  node: PagesDocument
+  cursor: String!
+  node: Pages
 }
 
 type PagesConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [PagesConnectionEdges]
 }
@@ -281,14 +255,14 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePosts(relativePath: String!, params: PostsMutation!): PostsDocument!
-  createPosts(relativePath: String!, params: PostsMutation!): PostsDocument!
-  updateGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  createGlobal(relativePath: String!, params: GlobalMutation!): GlobalDocument!
-  updateAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  createAuthors(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
-  updatePages(relativePath: String!, params: PagesMutation!): PagesDocument!
-  createPages(relativePath: String!, params: PagesMutation!): PagesDocument!
+  updatePosts(relativePath: String!, params: PostsMutation!): Posts!
+  createPosts(relativePath: String!, params: PostsMutation!): Posts!
+  updateGlobal(relativePath: String!, params: GlobalMutation!): Global!
+  createGlobal(relativePath: String!, params: GlobalMutation!): Global!
+  updateAuthors(relativePath: String!, params: AuthorsMutation!): Authors!
+  createAuthors(relativePath: String!, params: AuthorsMutation!): Authors!
+  updatePages(relativePath: String!, params: PagesMutation!): Pages!
+  createPages(relativePath: String!, params: PagesMutation!): Pages!
 }
 
 input DocumentMutation {

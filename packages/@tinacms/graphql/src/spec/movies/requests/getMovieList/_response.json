@@ -1,7 +1,7 @@
 {
   "errors": [
     {
-      "message": "Cannot query field \"getMovieList\" on type \"Query\".",
+      "message": "Cannot query field \"movieConnectionZ\" on type \"Query\". Did you mean \"movieConnection\" or \"actorConnection\"?",
       "locations": [
         {
           "line": 3,

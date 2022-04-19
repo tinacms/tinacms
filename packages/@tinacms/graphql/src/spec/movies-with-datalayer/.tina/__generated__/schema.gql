@@ -29,15 +29,15 @@ interface Node {
 
 """"""
 interface Document {
-  sys: SystemInfo
   id: ID!
-  form: JSON!
-  values: JSON!
+  _sys: SystemInfo
+  _values: JSON!
 }
 
 """A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Float!
+  pageInfo: PageInfo!
 }
 
 type Query {
@@ -46,17 +46,15 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
-  documentConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
-  getDocumentFields: JSON!
-  movie(relativePath: String): MovieDocument!
+  movie(relativePath: String): Movie!
   movieConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
-  director(relativePath: String): DirectorDocument!
+  director(relativePath: String): Director!
   directorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
-  crew(relativePath: String): CrewDocument!
+  crew(relativePath: String): Crew!
   crewConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: CrewFilter): CrewConnection!
-  actor(relativePath: String): ActorDocument!
+  actor(relativePath: String): Actor!
   actorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
-  relative(relativePath: String): RelativeDocument!
+  relative(relativePath: String): Relative!
   relativeConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: RelativeFilter): RelativeConnection!
 }
 
@@ -155,12 +153,12 @@ input DocumentFilter {
 }
 
 type DocumentConnectionEdges {
-  cursor: String
+  cursor: String!
   node: DocumentNode
 }
 
 type DocumentConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DocumentConnectionEdges]
 }
@@ -177,151 +175,124 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = MovieDocument | DirectorDocument | CrewDocument | ActorDocument | RelativeDocument
+union DocumentNode = Movie | Director | CrewCostumeDesigner | CrewStuntPerson | Actor | Relative
 
-union MovieDirectorDocument = DirectorDocument
+union MovieDirector = Director
 
-type Movie {
+type Movie implements Node & Document {
   title: String
   releaseDate: String
   rating: Float!
   archived: Boolean
   genre: String
-  director: MovieDirectorDocument
+  director: MovieDirector
   body: String
-}
-
-type MovieDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Movie!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type MovieConnectionEdges {
-  cursor: String
-  node: MovieDocument
+  cursor: String!
+  node: Movie
 }
 
 type MovieConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [MovieConnectionEdges]
 }
 
-union DirectorRelativesSpouseDocument = RelativeDocument
+union DirectorRelativesSpouse = Relative
 
-union DirectorRelativesChildDocument = RelativeDocument
+union DirectorRelativesChild = Relative
 
 type DirectorRelatives {
-  spouse: DirectorRelativesSpouseDocument
-  child: DirectorRelativesChildDocument
+  spouse: DirectorRelativesSpouse
+  child: DirectorRelativesChild
 }
 
-type Director {
+type Director implements Node & Document {
   name: String
   birthday: String
   height: Float
   relatives: DirectorRelatives
-}
-
-type DirectorDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Director!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type DirectorConnectionEdges {
-  cursor: String
-  node: DirectorDocument
+  cursor: String!
+  node: Director
 }
 
 type DirectorConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [DirectorConnectionEdges]
 }
 
-type CrewCostumeDesigner {
+type CrewCostumeDesigner implements Node & Document {
   favoriteColor: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
-type CrewStuntPerson {
+type CrewStuntPerson implements Node & Document {
   bestMove: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 union Crew = CrewCostumeDesigner | CrewStuntPerson
 
-type CrewDocument implements Node & Document {
-  id: ID!
-  sys: SystemInfo!
-  data: Crew!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
-}
-
 type CrewConnectionEdges {
-  cursor: String
-  node: CrewDocument
+  cursor: String!
+  node: Crew
 }
 
 type CrewConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [CrewConnectionEdges]
 }
 
-type Actor {
+type Actor implements Node & Document {
   name: String
   body: String
-}
-
-type ActorDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Actor!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type ActorConnectionEdges {
-  cursor: String
-  node: ActorDocument
+  cursor: String!
+  node: Actor
 }
 
 type ActorConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [ActorConnectionEdges]
 }
 
-type Relative {
+type Relative implements Node & Document {
   name: String
-}
-
-type RelativeDocument implements Node & Document {
   id: ID!
-  sys: SystemInfo!
-  data: Relative!
-  form: JSON!
-  values: JSON!
-  dataJSON: JSON!
+  _sys: SystemInfo!
+  _values: JSON!
 }
 
 type RelativeConnectionEdges {
-  cursor: String
-  node: RelativeDocument
+  cursor: String!
+  node: Relative
 }
 
 type RelativeConnection implements Connection {
-  pageInfo: PageInfo
+  pageInfo: PageInfo!
   totalCount: Float!
   edges: [RelativeConnectionEdges]
 }
@@ -330,16 +301,16 @@ type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updateMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  createMovie(relativePath: String!, params: MovieMutation!): MovieDocument!
-  updateDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  createDirector(relativePath: String!, params: DirectorMutation!): DirectorDocument!
-  updateCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
-  createCrew(relativePath: String!, params: CrewMutation!): CrewDocument!
-  updateActor(relativePath: String!, params: ActorMutation!): ActorDocument!
-  createActor(relativePath: String!, params: ActorMutation!): ActorDocument!
-  updateRelative(relativePath: String!, params: RelativeMutation!): RelativeDocument!
-  createRelative(relativePath: String!, params: RelativeMutation!): RelativeDocument!
+  updateMovie(relativePath: String!, params: MovieMutation!): Movie!
+  createMovie(relativePath: String!, params: MovieMutation!): Movie!
+  updateDirector(relativePath: String!, params: DirectorMutation!): Director!
+  createDirector(relativePath: String!, params: DirectorMutation!): Director!
+  updateCrew(relativePath: String!, params: CrewMutation!): Crew!
+  createCrew(relativePath: String!, params: CrewMutation!): Crew!
+  updateActor(relativePath: String!, params: ActorMutation!): Actor!
+  createActor(relativePath: String!, params: ActorMutation!): Actor!
+  updateRelative(relativePath: String!, params: RelativeMutation!): Relative!
+  createRelative(relativePath: String!, params: RelativeMutation!): Relative!
 }
 
 input DocumentMutation {

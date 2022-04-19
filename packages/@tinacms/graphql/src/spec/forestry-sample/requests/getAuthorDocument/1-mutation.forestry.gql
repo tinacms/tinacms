@@ -8,6 +8,8 @@ mutation {
       }
     }
   ) {
-    id
+    ...on Document {
+      id
+    }
   }
 }

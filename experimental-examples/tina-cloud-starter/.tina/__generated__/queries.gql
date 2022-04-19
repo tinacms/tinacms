@@ -1,6 +1,6 @@
 query posts($relativePath: String!) {
   posts(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,9 +9,7 @@ query posts($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PostsParts
-    }
+    ...PostsParts
   }
 }
 
@@ -21,7 +19,7 @@ query postsConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,9 +27,7 @@ query postsConnection {
           relativePath
           extension
         }
-        data {
-          ...PostsParts
-        }
+        ...PostsParts
       }
     }
   }
@@ -39,7 +35,7 @@ query postsConnection {
 
 query global($relativePath: String!) {
   global(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,9 +44,7 @@ query global($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...GlobalParts
-    }
+    ...GlobalParts
   }
 }
 
@@ -60,7 +54,7 @@ query globalConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,9 +62,7 @@ query globalConnection {
           relativePath
           extension
         }
-        data {
-          ...GlobalParts
-        }
+        ...GlobalParts
       }
     }
   }
@@ -78,7 +70,7 @@ query globalConnection {
 
 query authors($relativePath: String!) {
   authors(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -87,9 +79,7 @@ query authors($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...AuthorsParts
-    }
+    ...AuthorsParts
   }
 }
 
@@ -99,7 +89,7 @@ query authorsConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -107,9 +97,7 @@ query authorsConnection {
           relativePath
           extension
         }
-        data {
-          ...AuthorsParts
-        }
+        ...AuthorsParts
       }
     }
   }
@@ -117,7 +105,7 @@ query authorsConnection {
 
 query pages($relativePath: String!) {
   pages(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -126,9 +114,7 @@ query pages($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PagesParts
-    }
+    ...PagesParts
   }
 }
 
@@ -138,7 +124,7 @@ query pagesConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -146,9 +132,7 @@ query pagesConnection {
           relativePath
           extension
         }
-        data {
-          ...PagesParts
-        }
+        ...PagesParts
       }
     }
   }

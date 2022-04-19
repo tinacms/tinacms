@@ -12,11 +12,9 @@ mutation {
   ) {
     ... on MovieDocument {
       id
-      data {
-        releaseDate
-        archived
-        genre
-      }
+      releaseDate
+      archived
+      genre
     }
   }
 }

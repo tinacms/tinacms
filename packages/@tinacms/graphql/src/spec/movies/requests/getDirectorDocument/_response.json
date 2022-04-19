@@ -2,9 +2,7 @@
   "data": {
     "director": {
       "id": "content/directors/george.md",
-      "data": {
-        "name": "George Lucas"
-      }
+      "name": "George Lucas"
     }
   }
 }
