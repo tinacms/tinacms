@@ -4217,23 +4217,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "@headlessui/react@npm:1.4.1"
+"@headlessui/react@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@headlessui/react@npm:1.5.0"
   peerDependencies:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
-  checksum: f883749ff2dc40d00b3823301c330f18a0864aa5b8847d07c65d1a8fddd3b993ba90dbb81bd8b0743fe6b050ba0be4e56f7d1d9ab43a324de56766139826ebe2
-  languageName: node
-  linkType: hard
-
-"@headlessui/react@npm:^1.4.2":
-  version: 1.4.2
-  resolution: "@headlessui/react@npm:1.4.2"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: b9987c9331aa1dccd2c72bc042cbbc1b74481523f49fa1fbd333d562dbfebc54c3cb49d6b3a93050f817caf1d77c8e30ac79eef215a34f94fcfec832e07d3ea8
+  checksum: a177711f60ed0053844e0f0ce8dbcf0a47b1ac62eee6ea29760ecf81599c20e5b0be6d0c4749979c65e24a120c7d54f5612a5a57db8999b9db19cd1abebc5c2b
   languageName: node
   linkType: hard
 
@@ -6707,7 +6697,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/starter@workspace:experimental-examples/tina-cloud-starter"
   dependencies:
-    "@headlessui/react": ^1.4.1
+    "@headlessui/react": ^1.5.0
     "@svgr/webpack": ^6.2.1
     "@tailwindcss/typography": ^0.4.1
     "@tinacms/auth": "workspace:*"
@@ -6742,7 +6732,7 @@ __metadata:
   dependencies:
     "@floating-ui/dom": ^0.1.7
     "@floating-ui/react-dom": ^0.3.3
-    "@headlessui/react": ^1.4.2
+    "@headlessui/react": ^1.5.0
     "@heroicons/react": ^1.0.5
     "@react-aria/i18n": ^3.3.4
     "@react-aria/listbox": 3.3.0
@@ -31747,7 +31737,7 @@ resolve@^2.0.0-next.3:
   dependencies:
     "@graphql-tools/relay-operation-optimizer": ^6.4.1
     "@graphql-tools/utils": ^8.6.1
-    "@headlessui/react": ^1.4.1
+    "@headlessui/react": ^1.5.0
     "@heroicons/react": ^1.0.4
     "@testing-library/jest-dom": ^5.11.9
     "@testing-library/react": ^12.0.0
