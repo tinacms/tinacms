@@ -12,8 +12,8 @@ export default function HomePage(
     data: props.data,
   });
   return (
-    <Layout rawData={data} data={data.global.data}>
-      <Blocks {...data.pages.data} />
+    <Layout rawData={data} data={data.global}>
+      <Blocks {...data.pages} />
     </Layout>
   );
 }
@@ -37,7 +37,7 @@ export const getStaticPaths = async () => {
   const pagesListData = await client.pagesConnection();
   return {
     paths: pagesListData.data.pagesConnection.edges.map((page) => ({
-      params: { filename: page.node.sys.filename },
+      params: { filename: page.node._sys.filename },
     })),
     fallback: false,
   };
