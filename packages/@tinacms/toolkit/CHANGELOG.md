@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.20
+
+### Patch Changes
+
+- 40afac061: updated @headlessui/react
+
 ## 0.56.19
 
 ### Patch Changes
