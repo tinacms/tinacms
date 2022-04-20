@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.67.2
+
+### Patch Changes
+
+- 40afac061: updated @headlessui/react
+- Updated dependencies [40afac061]
+  - @tinacms/toolkit@0.56.20
+
 ## 0.67.1
 
 ### Patch Changes
