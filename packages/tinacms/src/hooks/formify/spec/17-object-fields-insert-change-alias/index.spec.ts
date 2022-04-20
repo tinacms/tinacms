@@ -13,11 +13,9 @@ limitations under the License.
 
 const query = `#graphql
 query {
-  getAuthorDocument(relativePath: "author1.mdx") {
-    data {
-      soc: social {
-        hand: handle
-      }
+  author (relativePath: "author1.mdx") {
+    soc: social {
+      hand: handle
     }
   }
 }
