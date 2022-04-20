@@ -15,6 +15,7 @@ import type {
   StoreQueryOptions,
   StoreQueryResponse,
   PutOptions,
+  DeleteOptions,
   SeedOptions,
   Store,
 } from './index'
@@ -172,9 +173,37 @@ export class LevelStore implements Store {
   public supportsIndexing() {
     return true
   }
-  // public async delete(filepath: string) {
-  //   await this.db.del(filepath)
-  // }
+  public async delete(filepath: string, options: DeleteOptions) {
+    const data = await this.db.get(
+      `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+    )
+    if (!data) {
+      return
+    }
+    if (options?.indexDefinitions) {
+      for (const [sort, definition] of Object.entries(
+        options.indexDefinitions
+      )) {
+        const indexedValue = makeKeyForField(definition, data, escapeStr)
+
+        let indexKey
+        // let existingIndexKey = null
+        if (sort === DEFAULT_COLLECTION_SORT_KEY) {
+          indexKey = `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+        } else {
+          indexKey = indexedValue
+            ? `${options.collection}${INDEX_KEY_FIELD_SEPARATOR}${sort}${INDEX_KEY_FIELD_SEPARATOR}${indexedValue}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
+            : null
+        }
+
+        if (indexKey) {
+          await this.db.del(indexKey)
+        }
+      }
+    }
+    // Delete the file definition
+    await this.db.del(`${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`)
+  }
   public async print() {
     this.db
       .createReadStream()

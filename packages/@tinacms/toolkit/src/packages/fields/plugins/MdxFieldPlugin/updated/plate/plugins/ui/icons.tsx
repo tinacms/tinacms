@@ -12,21 +12,20 @@ limitations under the License.
 */
 
 import React from 'react'
+const iconEl = {
+  heading: <HeadingIcon />,
+  link: <LinkIcon />,
+  quote: <QuoteIcon />,
+  image: <ImageIcon />,
+  ul: <UnorderedListIcon />,
+  ol: <OrderedListIcon />,
+  code: <CodeIcon />,
+  codeBlock: <CodeBlockIcon />,
+  bold: <BoldIcon />,
+  italic: <ItalicIcon />,
+}
 
-export const ToolbarIcon = ({ name }) => {
-  const iconEl = {
-    heading: <HeadingIcon />,
-    link: <LinkIcon />,
-    quote: <QuoteIcon />,
-    image: <ImageIcon />,
-    ul: <UnorderedListIcon />,
-    ol: <OrderedListIcon />,
-    code: <CodeIcon />,
-    codeBlock: <CodeBlockIcon />,
-    bold: <BoldIcon />,
-    italic: <ItalicIcon />,
-  }
-
+export const ToolbarIcon = ({ name }: { name: string }) => {
   return iconEl[name]
 }
 

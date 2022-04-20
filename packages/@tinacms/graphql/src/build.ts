@@ -167,7 +167,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       type: astBuilder.TYPES.String,
     })
   )
-
   /**
    * One-off collection queries
    */
@@ -189,6 +188,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   )
   mutationTypeDefinitionFields.push(
     await builder.buildUpdateCollectionDocumentMutation(collections)
+  )
+  mutationTypeDefinitionFields.push(
+    await builder.buildDeleteCollectionDocumentMutation(collections)
   )
   mutationTypeDefinitionFields.push(
     await builder.buildCreateCollectionDocumentMutation(collections)
