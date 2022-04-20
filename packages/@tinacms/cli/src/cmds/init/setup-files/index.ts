@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+import chalk from 'chalk'
 export const adminPage = `import { TinaAdmin } from 'tinacms';
 export default TinaAdmin;
 `
@@ -326,22 +326,24 @@ export const nextPostPage =
   
 `
 
-export const AppJsContent = (
-  usingSrc: boolean,
-  extraImports?: string
-) => `import Tina from '${
-  usingSrc ? '../' : ''
-}../.tina/components/TinaDynamicProvider.js'
+export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {
+  const importLine = chalk.green(
+    `+ import Tina from '${
+      usingSrc ? '../' : ''
+    }../.tina/components/TinaDynamicProvider.js'`
+  )
 
-${extraImports || ''}
-const App = ({ Component, pageProps }) => {
+  return `${importLine}
+  ${extraImports || ''}
+
+  const App = ({ Component, pageProps }) => {
   return (
-    <Tina>
-      <Component {...pageProps} />
-    </Tina>
+    ${chalk.green('+ <Tina>')}
+        <Component {...pageProps} />
+    ${chalk.green('+ </Tina>')}
   )
 }
-
+  
 export default App
-
 `
+}
