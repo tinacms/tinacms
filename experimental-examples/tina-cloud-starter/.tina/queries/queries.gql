@@ -31,8 +31,8 @@ query BlogPostQuery($relativePath: String!) {
       ...PostsParts
       author {
         ... on Authors {
-            name
-            avatar
+          name
+          avatar
         }
       }
   }
