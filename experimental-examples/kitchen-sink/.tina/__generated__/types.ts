@@ -47,15 +47,15 @@ export type Node = {
 };
 
 export type Document = {
-  sys?: Maybe<SystemInfo>;
   id: Scalars['ID'];
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
+  _sys?: Maybe<SystemInfo>;
+  _values: Scalars['JSON'];
 };
 
 /** A relay-compliant pagination connection */
 export type Connection = {
   totalCount: Scalars['Float'];
+  pageInfo: PageInfo;
 };
 
 export type Query = {
@@ -65,11 +65,9 @@ export type Query = {
   collections: Array<Collection>;
   node: Node;
   document: DocumentNode;
-  documentConnection: DocumentConnection;
-  getDocumentFields: Scalars['JSON'];
-  page: PageDocument;
+  page: Page;
   pageConnection: PageConnection;
-  post: PostDocument;
+  post: Post;
   postConnection: PostConnection;
 };
 
@@ -92,15 +90,6 @@ export type QueryNodeArgs = {
 export type QueryDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryDocumentConnectionArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
 };
 
 
@@ -133,13 +122,13 @@ export type QueryPostConnectionArgs = {
 
 export type DocumentConnectionEdges = {
   __typename?: 'DocumentConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
+  cursor: Scalars['String'];
   node?: Maybe<DocumentNode>;
 };
 
 export type DocumentConnection = Connection & {
   __typename?: 'DocumentConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<DocumentConnectionEdges>>>;
 };
@@ -166,63 +155,49 @@ export type CollectionDocumentsArgs = {
   sort?: Maybe<Scalars['String']>;
 };
 
-export type DocumentNode = PageDocument | PostDocument;
+export type DocumentNode = Page | Post;
 
-export type Page = {
+export type Page = Node & Document & {
   __typename?: 'Page';
   heading?: Maybe<Scalars['String']>;
   subtitle?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
-};
-
-export type PageDocument = Node & Document & {
-  __typename?: 'PageDocument';
   id: Scalars['ID'];
-  sys: SystemInfo;
-  data: Page;
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
-  dataJSON: Scalars['JSON'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
 };
 
 export type PageConnectionEdges = {
   __typename?: 'PageConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<PageDocument>;
+  cursor: Scalars['String'];
+  node?: Maybe<Page>;
 };
 
 export type PageConnection = Connection & {
   __typename?: 'PageConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
 };
 
-export type Post = {
+export type Post = Node & Document & {
   __typename?: 'Post';
   title?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['JSON']>;
-};
-
-export type PostDocument = Node & Document & {
-  __typename?: 'PostDocument';
   id: Scalars['ID'];
-  sys: SystemInfo;
-  data: Post;
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
-  dataJSON: Scalars['JSON'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
 };
 
 export type PostConnectionEdges = {
   __typename?: 'PostConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<PostDocument>;
+  cursor: Scalars['String'];
+  node?: Maybe<Post>;
 };
 
 export type PostConnection = Connection & {
   __typename?: 'PostConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PostConnectionEdges>>>;
 };
@@ -232,10 +207,10 @@ export type Mutation = {
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
   createDocument: DocumentNode;
-  updatePage: PageDocument;
-  createPage: PageDocument;
-  updatePost: PostDocument;
-  createPost: PostDocument;
+  updatePage: Page;
+  createPage: Page;
+  updatePost: Post;
+  createPost: Post;
 };
 
 
@@ -308,24 +283,24 @@ export type PageQueryVariables = Exact<{
 }>;
 
 
-export type PageQuery = { __typename?: 'Query', page: { __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } } };
+export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PageConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'PageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> } }> }>>> } };
+export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'Page', id: string, heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export type PostQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type PostQuery = { __typename?: 'Query', post: { __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, body?: Maybe<any> } } };
+export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PostConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, body?: Maybe<any> } }> }>>> } };
+export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'Post', id: string, title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export const PagePartsFragmentDoc = gql`
     fragment PageParts on Page {
@@ -343,7 +318,7 @@ export const PostPartsFragmentDoc = gql`
 export const PageDocument = gql`
     query page($relativePath: String!) {
   page(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -352,9 +327,7 @@ export const PageDocument = gql`
       extension
     }
     id
-    data {
-      ...PageParts
-    }
+    ...PageParts
   }
 }
     ${PagePartsFragmentDoc}`;
@@ -365,7 +338,7 @@ export const PageConnectionDocument = gql`
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -373,9 +346,7 @@ export const PageConnectionDocument = gql`
           relativePath
           extension
         }
-        data {
-          ...PageParts
-        }
+        ...PageParts
       }
     }
   }
@@ -384,7 +355,7 @@ export const PageConnectionDocument = gql`
 export const PostDocument = gql`
     query post($relativePath: String!) {
   post(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -393,9 +364,7 @@ export const PostDocument = gql`
       extension
     }
     id
-    data {
-      ...PostParts
-    }
+    ...PostParts
   }
 }
     ${PostPartsFragmentDoc}`;
@@ -406,7 +375,7 @@ export const PostConnectionDocument = gql`
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -414,9 +383,7 @@ export const PostConnectionDocument = gql`
           relativePath
           extension
         }
-        data {
-          ...PostParts
-        }
+        ...PostParts
       }
     }
   }
