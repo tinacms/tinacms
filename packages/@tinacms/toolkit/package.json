@@ -110,7 +110,7 @@
     "react-dropzone": "10.1.8",
     "react-final-form": "^6.3.0",
     "react-icons": "^4.3.1",
-    "simple-git": "1.126.0",
+    "simple-git": "3.5.0",
     "slate": "^0.66.0",
     "slate-history": "^0.66.0",
     "slate-hyperscript": "^0.66.0",
