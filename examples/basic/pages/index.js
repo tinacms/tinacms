@@ -4,10 +4,8 @@ import { Layout } from '../components/Layout'
 import { useTina } from 'tinacms/dist/edit-state'
 
 const query = `{
-  getPageDocument(relativePath: "home.mdx"){
-    data{
-      body
-    }
+  page(relativePath: "home.mdx"){
+    body
   }
 }`
 export default function Home(props) {
@@ -17,7 +15,7 @@ export default function Home(props) {
     data: props.data,
   })
 
-  const content = data.getPageDocument.data.body
+  const content = data.page.body
   return (
     <Layout>
       <TinaMarkdown content={content} />
