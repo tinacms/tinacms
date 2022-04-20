@@ -212,14 +212,14 @@ export function buildPath({
  */
 const node = G.parse(`
  query Sample {
-   _internalSys: sys {
+   _internalSys: _sys {
      path
+     relativePath
      collection {
        name
      }
    }
-   form
-   values
+   _values
  }`)
 export const metaFields: G.SelectionNode[] =
   // @ts-ignore
@@ -239,6 +239,23 @@ export const getRelativeBlueprint = (path: BlueprintPath[]) => {
 
   const documentBlueprintPath = path.slice(0, indexOfLastNode + 1)
   return getBlueprintNamePath({ path: documentBlueprintPath })
+}
+
+export const isSysField = (fieldNode: G.FieldNode) => {
+  if (fieldNode.name.value === '__typename') {
+    return true
+  }
+  if (fieldNode.name.value === '_sys') {
+    return true
+  }
+  if (fieldNode.name.value === '_values') {
+    return true
+  }
+  if (fieldNode.name.value === 'id') {
+    return true
+  }
+
+  return false
 }
 
 export const getBlueprintId = (path: BlueprintPath[]) => {

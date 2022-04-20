@@ -34,6 +34,7 @@ query MyQuery($relativePath: String!) {
     values
     _internalSys {
       path
+      relativePath
       collection {
         name
       }
@@ -74,6 +75,7 @@ query MyQuery($relativePath: String!) {
         values
         _internalSys {
           path
+          relativePath
           collection {
             name
           }
@@ -84,6 +86,7 @@ query MyQuery($relativePath: String!) {
     values
     _internalSys {
       path
+      relativePath
       collection {
         name
       }

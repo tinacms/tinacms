@@ -174,26 +174,43 @@ export const buildForm = (
   const id = doc._internalSys.path
   const formCommon = {
     id,
-    label: doc.form.label,
-    initialValues: doc.values,
+    label: id,
+    initialValues: doc._values,
     onSubmit: async (payload) => {
       try {
-        const params = transformDocumentIntoMutationRequestPayload(
-          payload,
-          doc.form.mutationInfo
-        )
+        // TODO: this all probably needs to come from TinaSchema
+        const params = transformDocumentIntoMutationRequestPayload(payload, {
+          includeCollection: false,
+          includeTemplate: false,
+        })
         const variables = { params }
-        const mutationString = doc.form.mutationInfo.string
+        const mutationString = `#graphql
+          mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+            updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {
+              __typename
+            }
+          }
+        `
         if (onSubmit) {
           onSubmit({
             queryString: mutationString,
             mutationString,
-            variables,
+            variables: {
+              collection: doc._internalSys.collection.name,
+              relativePath: doc._internalSys.relativePath,
+              params: { [doc._internalSys.collection.name]: variables },
+            },
           })
         } else {
           try {
             await cms.api.tina.request(mutationString, {
-              variables,
+              variables: {
+                collection: doc._internalSys.collection.name,
+                relativePath: doc._internalSys.relativePath,
+                params: {
+                  [doc._internalSys.collection.name]: variables.params,
+                },
+              },
             })
             cms.alerts.success('Document saved!')
           } catch (e) {
@@ -209,33 +226,25 @@ export const buildForm = (
   }
   let formConfig = {} as FormOptions<any, AnyField>
 
-  if (cms.api.tina.schema) {
-    const enrichedSchema: TinaSchema = cms.api.tina.schema
-    const collection = enrichedSchema.getCollection(
-      doc._internalSys.collection.name
-    )
-    const template = enrichedSchema.getTemplateForData({
-      collection,
-      data: doc.values,
-    })
-    const formInfo = resolveForm({
-      collection,
-      basename: collection.name,
-      schema: enrichedSchema,
-      template,
-    })
-    formConfig = {
-      label: formInfo.label,
-      // TODO: return correct type
-      fields: formInfo.fields as any,
-      ...formCommon,
-    }
-  } else {
-    formConfig = {
-      label: doc.form.label,
-      fields: doc.form.fields,
-      ...formCommon,
-    }
+  const enrichedSchema: TinaSchema = cms.api.tina.schema
+  const collection = enrichedSchema.getCollection(
+    doc._internalSys.collection.name
+  )
+  const template = enrichedSchema.getTemplateForData({
+    collection,
+    data: doc._values,
+  })
+  const formInfo = resolveForm({
+    collection,
+    basename: collection.name,
+    schema: enrichedSchema,
+    template,
+  })
+  formConfig = {
+    label: formInfo.label,
+    // TODO: return correct type
+    fields: formInfo.fields as any,
+    ...formCommon,
   }
 
   if (formify) {
@@ -362,7 +371,7 @@ export const getFieldAliasForBlueprint = (path: BlueprintPath[]) => {
     }
     return true
   })
-  return accum.reverse().slice(1).join('.')
+  return accum.reverse().join('.')
 }
 
 /**
@@ -471,7 +480,7 @@ const getEventPath = (
       return `[]`
     })
     .join('.')
-  const items = [blueprint.id, DATA_NODE_NAME, eventPath]
+  const items = [blueprint.id, eventPath]
   const isList = event.field.data.tinaField.list
   if (isList && !eventPath.endsWith('[]')) {
     items.push(`[]`)
@@ -511,9 +520,7 @@ export const getMatchName = ({ field, prefix, blueprint }) => {
   if (prefix) {
     extra.push(prefix)
   }
-  const matchName = [blueprintName, DATA_NODE_NAME, ...extra, fieldName].join(
-    '.'
-  )
+  const matchName = [blueprintName, ...extra, fieldName].join('.')
   return { matchName, fieldName }
 }
 
@@ -560,8 +567,6 @@ export const printState = (state: State) => {
 
   return string
 }
-
-const DATA_NODE_NAME = 'data'
 
 export const printEvent = (event: OnChangeEvent) => {
   return {
