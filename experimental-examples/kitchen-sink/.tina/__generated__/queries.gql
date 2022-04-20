@@ -1,6 +1,6 @@
 query page($relativePath: String!) {
   page(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,9 +9,7 @@ query page($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PageParts
-    }
+    ...PageParts
   }
 }
 
@@ -21,7 +19,7 @@ query pageConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,9 +27,7 @@ query pageConnection {
           relativePath
           extension
         }
-        data {
-          ...PageParts
-        }
+        ...PageParts
       }
     }
   }
@@ -39,7 +35,7 @@ query pageConnection {
 
 query post($relativePath: String!) {
   post(relativePath: $relativePath) {
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,9 +44,7 @@ query post($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PostParts
-    }
+    ...PostParts
   }
 }
 
@@ -60,7 +54,7 @@ query postConnection {
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,9 +62,7 @@ query postConnection {
           relativePath
           extension
         }
-        data {
-          ...PostParts
-        }
+        ...PostParts
       }
     }
   }

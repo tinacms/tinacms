@@ -12,10 +12,10 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(props.data.post.data, null, 2)}
+          {JSON.stringify(props.data.post, null, 2)}
         </pre>
       </code>
-      <TinaMarkdown content={props.data.post.data.body} />
+      <TinaMarkdown content={props.data.post.body} />
     </Layout>
   )
 }
@@ -26,7 +26,7 @@ export const getStaticPaths = async () => {
         postConnection {
           edges {
             node {
-              sys {
+              _sys {
                 filename
               }
             }
@@ -36,7 +36,7 @@ export const getStaticPaths = async () => {
     variables: {},
   })
   const paths = tinaProps.postConnection.edges.map((x) => {
-    return { params: { slug: x.node.sys.filename } }
+    return { params: { slug: x.node._sys.filename } }
   })
 
   return {

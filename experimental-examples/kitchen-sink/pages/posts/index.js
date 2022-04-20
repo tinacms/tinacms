@@ -9,8 +9,8 @@ export default function Home(props) {
       <div>
         {postsList.map((post) => (
           <div key={post.node.id}>
-            <Link href={`/posts/${post.node.sys.filename}`}>
-              <a>{post.node.sys.filename}</a>
+            <Link href={`/posts/${post.node._sys.filename}`}>
+              <a>{post.node._sys.filename}</a>
             </Link>
           </div>
         ))}
@@ -26,7 +26,7 @@ export const getStaticProps = async () => {
           edges {
             node {
               id
-              sys {
+              _sys {
                 filename
               }
             }

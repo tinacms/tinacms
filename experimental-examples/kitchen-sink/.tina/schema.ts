@@ -1,4 +1,4 @@
-import { defineSchema } from '@tinacms/cli'
+import { defineSchema } from 'tinacms'
 
 export default defineSchema({
   collections: [
@@ -73,9 +73,6 @@ export default defineSchema({
           label: 'Blog Post Body',
           name: 'body',
           isBody: true,
-          ui: {
-            component: 'textarea',
-          },
         },
       ],
     },
