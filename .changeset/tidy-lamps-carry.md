@@ -3,4 +3,4 @@
 'tinacms': patch
 ---
 
-updated @headlesu/react
+updated @headlessui/react
