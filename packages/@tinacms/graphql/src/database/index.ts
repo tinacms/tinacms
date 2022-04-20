@@ -472,6 +472,42 @@ export class Database {
     }
   }
 
+  public deleteContentByPaths = async (documentPaths: string[]) => {
+    const pathsByCollection: Record<string, string[]> = {}
+    const nonCollectionPaths: string[] = []
+    const collections: Record<
+      string,
+      | CollectionFieldsWithNamespace<true>
+      | CollectionTemplatesWithNamespace<true>
+    > = {}
+    const tinaSchema = await this.getSchema()
+    for (const documentPath of documentPaths) {
+      const collection = tinaSchema.schema.collections.find((collection) =>
+        documentPath.startsWith(collection.path)
+      )
+
+      if (collection) {
+        if (!pathsByCollection[collection.name]) {
+          pathsByCollection[collection.name] = []
+        }
+        collections[collection.name] = collection
+        pathsByCollection[collection.name].push(documentPath)
+      } else {
+        nonCollectionPaths.push(documentPath)
+      }
+    }
+
+    for (const collection of Object.keys(pathsByCollection)) {
+      await _deleteIndexContent(
+        this,
+        pathsByCollection[collection],
+        collections[collection]
+      )
+    }
+
+    await _deleteIndexContent(this, nonCollectionPaths, null)
+  }
+
   public indexContentByPaths = async (documentPaths: string[]) => {
     const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
@@ -505,6 +541,24 @@ export class Database {
       )
     }
     await _indexContent(this, nonCollectionPaths)
+  }
+
+  public delete = async (filepath: string) => {
+    const tinaSchema = await this.getSchema()
+    const collection = tinaSchema.schema.collections.find((collection) =>
+      filepath.startsWith(collection.path)
+    )
+    let collectionIndexDefinitions
+    if (collection) {
+      const indexDefinitions = await this.getIndexDefinitions()
+      collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    }
+    await this.store.delete(filepath, {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    })
+
+    await this.bridge.delete(filepath)
   }
 
   public _indexAllContent = async () => {
@@ -620,5 +674,31 @@ const _indexContent = async (
     if (database.store.supportsSeeding()) {
       await database.store.seed(filepath, data, seedOptions)
     }
+  })
+}
+
+const _deleteIndexContent = async (
+  database: Database,
+  documentPaths: string[],
+  collection?:
+    | CollectionFieldsWithNamespace<true>
+    | CollectionTemplatesWithNamespace<true>
+) => {
+  let deleteOptions: object | undefined = undefined
+  if (collection) {
+    const indexDefinitions = await database.getIndexDefinitions()
+    const collectionIndexDefinitions = indexDefinitions?.[collection.name]
+    if (!collectionIndexDefinitions) {
+      throw new Error(`No indexDefinitions for collection ${collection.name}`)
+    }
+
+    deleteOptions = {
+      collection: collection.name,
+      indexDefinitions: collectionIndexDefinitions,
+    }
+  }
+
+  await sequential(documentPaths, async (filepath) => {
+    database.store.delete(filepath, deleteOptions)
   })
 }

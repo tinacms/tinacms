@@ -776,6 +776,21 @@ describe('datalayer store helper functions', () => {
         expect(itemFilter({ rating: 3 })).toBeTruthy()
         expect(itemFilter({ rating: 5 })).toBeFalsy()
       })
+
+      it('filters with datetime after', () => {
+        const itemFilter = makeFilter({
+          filterChain: [
+            {
+              pathExpression: 'date',
+              rightOperand: 1623481200000,
+              operator: OP.GT,
+              type: 'datetime',
+            },
+          ],
+        })
+        expect(itemFilter({ date: '2021-04-03T20:30:00.000Z' })).toBeFalsy()
+        expect(itemFilter({ date: '2021-07-03T20:30:00.000Z' })).toBeTruthy()
+      })
     })
 
     describe('ternary', () => {
@@ -998,6 +1013,20 @@ describe('datalayer store helper functions', () => {
         escapeStr
       )
 
+      expect(coerced.length).toEqual(1)
+      expect(coerced[0]).toEqual(expected)
+    })
+
+    it('coerces ternary string filter', () => {
+      const expected: TernaryFilter = {
+        pathExpression: 'title',
+        leftOperand: 'foo',
+        rightOperand: 'bar',
+        leftOperator: OP.GT,
+        rightOperator: OP.LT,
+        type: 'string',
+      }
+      const coerced = coerceFilterChainOperands([expected], escapeStr)
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
     })

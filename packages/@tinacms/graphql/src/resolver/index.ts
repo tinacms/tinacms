@@ -140,6 +140,13 @@ export class Resolver {
       throw e
     }
   }
+  public deleteDocument = async (fullPath: unknown) => {
+    if (typeof fullPath !== 'string') {
+      throw new Error(`fullPath must be of type string for getDocument request`)
+    }
+
+    await this.database.delete(fullPath)
+  }
 
   public buildObjectMutations = (fieldValue: any, field: Collectable) => {
     if (field.fields) {
@@ -354,6 +361,7 @@ export class Resolver {
     collection: collectionName,
     isMutation,
     isCreation,
+    isDeletion,
     isAddPendingDocument,
     isCollectionSpecific,
   }: {
@@ -361,6 +369,7 @@ export class Resolver {
     collection?: string
     isMutation: boolean
     isCreation?: boolean
+    isDeletion?: boolean
     isAddPendingDocument?: boolean
     isCollectionSpecific?: boolean
   }) => {
@@ -416,6 +425,16 @@ export class Resolver {
           args,
           isAddPendingDocument,
         })
+      }
+      if (isDeletion) {
+        if (!alreadyExists) {
+          throw new Error(
+            `Unable to delete document, ${realPath} does not exist`
+          )
+        }
+        const doc = await this.getDocument(realPath)
+        await this.deleteDocument(realPath)
+        return doc
       }
       /**
        * updateDocument, update<Collection>Document

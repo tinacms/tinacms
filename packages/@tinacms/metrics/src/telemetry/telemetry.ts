@@ -34,7 +34,9 @@ export class Telemetry {
   constructor({ disabled }: { disabled: any }) {
     // this.config = new Conf({ projectName: 'tinacms', cwd: dir })
     this.projectIDRaw = getID()
-    this._disabled = Boolean(disabled)
+    const { NO_TELEMETRY } = process.env
+    this._disabled =
+      NO_TELEMETRY === '1' || NO_TELEMETRY === 'true' || Boolean(disabled)
   }
   private oneWayHash = (payload: BinaryLike): string => {
     const hash = createHash('sha256')

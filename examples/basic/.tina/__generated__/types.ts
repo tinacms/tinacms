@@ -195,7 +195,7 @@ export type PostFoo = {
 export type Post = Node & Document & {
   __typename?: 'Post';
   title?: Maybe<Scalars['String']>;
-  posts?: Maybe<Array<Maybe<PostPosts>>>;
+  relatedPosts?: Maybe<Array<Maybe<PostRelatedPosts>>>;
   foo?: Maybe<PostFoo>;
   topic?: Maybe<Array<Maybe<Scalars['String']>>>;
   body?: Maybe<Scalars['JSON']>;
@@ -221,6 +221,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
+  deleteDocument: DocumentNode;
   createDocument: DocumentNode;
   updatePage: Page;
   createPage: Page;
@@ -240,6 +241,12 @@ export type MutationUpdateDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
+};
+
+
+export type MutationDeleteDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
+  relativePath: Scalars['String'];
 };
 
 
@@ -283,7 +290,7 @@ export type PageMutation = {
   body?: Maybe<Scalars['JSON']>;
 };
 
-export type PostPostsMutation = {
+export type PostRelatedPostsMutation = {
   post?: Maybe<Scalars['String']>;
   label?: Maybe<Scalars['String']>;
 };
@@ -294,7 +301,7 @@ export type PostFooMutation = {
 
 export type PostMutation = {
   title?: Maybe<Scalars['String']>;
-  posts?: Maybe<Array<Maybe<PostPostsMutation>>>;
+  relatedPosts?: Maybe<Array<Maybe<PostRelatedPostsMutation>>>;
   foo?: Maybe<PostFooMutation>;
   topic?: Maybe<Array<Maybe<Scalars['String']>>>;
   body?: Maybe<Scalars['JSON']>;
@@ -337,7 +344,7 @@ export const PagePartsFragmentDoc = gql`
 export const PostPartsFragmentDoc = gql`
     fragment PostParts on Post {
   title
-  posts {
+  relatedPosts {
     __typename
     post {
       ... on Document {

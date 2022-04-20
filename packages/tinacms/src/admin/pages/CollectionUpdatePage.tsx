@@ -14,11 +14,10 @@ limitations under the License.
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
-import { Link, useParams } from 'react-router-dom'
+import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
-
-import GetDocument from '../components/GetDocument'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'

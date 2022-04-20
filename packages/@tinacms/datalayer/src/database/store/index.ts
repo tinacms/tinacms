@@ -103,6 +103,7 @@ export type SeedOptions = {
 }
 
 export type PutOptions = SeedOptions & { seed?: boolean }
+export type DeleteOptions = SeedOptions & { seed?: boolean }
 
 export interface Store {
   glob(
@@ -110,7 +111,7 @@ export interface Store {
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<string[]>
   get<T extends object>(filepath: string): Promise<T>
-  // delete(filepath: string): Promise<void>
+  delete(filepath: string, options?: DeleteOptions): Promise<void>
   clear(): void
   close(): void
   open(): void
@@ -290,8 +291,13 @@ export const makeFilter = ({
       let operands: FilterOperand[]
       if (dataType === 'string' || dataType === 'reference') {
         operands = resolvedValues
-      } else if (dataType === 'number' || dataType === 'datetime') {
+      } else if (dataType === 'number') {
         operands = resolvedValues.map((resolvedValue) => Number(resolvedValue))
+      } else if (dataType === 'datetime') {
+        operands = resolvedValues.map((resolvedValue) => {
+          const coerced = new Date(resolvedValue).getTime()
+          return isNaN(coerced) ? Number(resolvedValue) : coerced
+        })
       } else if (dataType === 'boolean') {
         operands = resolvedValues.map(
           (resolvedValue) =>

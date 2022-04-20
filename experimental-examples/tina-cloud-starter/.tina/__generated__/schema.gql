@@ -254,6 +254,7 @@ type PagesConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePosts(relativePath: String!, params: PostsMutation!): Posts!
   createPosts(relativePath: String!, params: PostsMutation!): Posts!
@@ -392,4 +393,3 @@ schema {
   query: Query
   mutation: Mutation
 }
-  

@@ -5,7 +5,7 @@ fragment PageParts on Page {
 
 fragment PostParts on Post {
   title
-  posts {
+  relatedPosts {
     __typename
     post {
       ... on Document {

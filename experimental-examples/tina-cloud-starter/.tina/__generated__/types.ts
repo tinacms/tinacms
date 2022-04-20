@@ -388,6 +388,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
+  deleteDocument: DocumentNode;
   createDocument: DocumentNode;
   updatePosts: Posts;
   createPosts: Posts;
@@ -411,6 +412,12 @@ export type MutationUpdateDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
+};
+
+
+export type MutationDeleteDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
+  relativePath: Scalars['String'];
 };
 
 
