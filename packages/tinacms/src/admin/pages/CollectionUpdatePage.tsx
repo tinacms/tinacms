@@ -109,7 +109,7 @@ const RenderForm = ({
 
   const template = schema.getTemplateForData({
     collection: schemaCollection,
-    data: document.values,
+    data: document._values,
   })
   const formInfo = resolveForm({
     collection: schemaCollection,
@@ -123,7 +123,7 @@ const RenderForm = ({
       id: 'update-form',
       label: 'form',
       fields: formInfo.fields as any,
-      initialValues: document.values,
+      initialValues: document._values,
       onSubmit: async (values) => {
         try {
           await updateDocument(
