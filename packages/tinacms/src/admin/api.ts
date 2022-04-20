@@ -43,32 +43,32 @@ export class TinaAdminApi {
     if (includeDocuments === true) {
       const response: { collection: Collection } = await this.api.request(
         `#graphql
-        query($collection: String!, $includeDocuments: Boolean!){
-          collection(collection: $collection){
-            name
-            label
-            format
-            templates
-            documents @include(if: $includeDocuments) {
-              totalCount
-              edges {
-                node {
-                  ... on Document {
-                    sys {
-                      template
-                      breadcrumbs
-                      path
-                      basename
-                      relativePath
-                      filename
-                      extension
-                    }
+      query($collection: String!, $includeDocuments: Boolean!){
+        collection(collection: $collection){
+          name
+          label
+          format
+          templates
+          documents @include(if: $includeDocuments) {
+            totalCount
+            edges {
+              node {
+                ... on Document {
+                  _sys {
+                    template
+                    breadcrumbs
+                    path
+                    basename
+                    relativePath
+                    filename
+                    extension
                   }
                 }
               }
             }
           }
-        }`,
+        }
+      }`,
         { variables: { collection: collectionName, includeDocuments } }
       )
 
@@ -92,8 +92,7 @@ export class TinaAdminApi {
       query($collection: String!, $relativePath: String!) {
         document(collection:$collection, relativePath:$relativePath) {
           ... on Document {
-            form
-            values
+            _values
           }
         }
       }`,
