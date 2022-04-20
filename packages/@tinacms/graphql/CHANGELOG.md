@@ -1,5 +1,18 @@
 # tina-graphql
 
+## 0.59.11
+
+### Patch Changes
+
+- 4da32454b: Modify database to write config json files without whitespace to reduce file sizes
+- 921709a7e: Adds validation to the schema instead of only using typescript types
+- 558cc4368: Make schema init platform-aware and refactor database put requests
+- 06666d39f: Link to MDX documentation when unregistered component error occurs
+- 3e2d9e43a: Adds new GraphQL `deleteDocument` mutation and logic
+- Updated dependencies [a2906d6fe]
+- Updated dependencies [3e2d9e43a]
+  - @tinacms/datalayer@0.1.1
+
 ## 0.59.10
 
 ### Patch Changes
