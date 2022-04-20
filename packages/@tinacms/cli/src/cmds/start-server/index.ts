@@ -211,11 +211,15 @@ stack: ${code.stack || 'No stack was provided'}`)
 
     state.server.listen(port, () => {
       const altairUrl = `http://localhost:${port}/altair/`
+      const cmsUrl = `[your-development-url]/admin`
       if (verbose)
         logger.info(`Started Filesystem GraphQL server on port: ${port}`)
       logger.info(
-        `Visit the playground at ${chalk.underline.blueBright(altairUrl)}\n`
+        `Visit the GraphQL playground at ${chalk.underline.blueBright(
+          altairUrl
+        )}\nor`
       )
+      logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
     })
     state.server.on('error', function (e) {
       if (e.code === 'EADDRINUSE') {
