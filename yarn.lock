@@ -4606,6 +4606,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kwsites/file-exists@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@kwsites/file-exists@npm:1.1.1"
+  dependencies:
+    debug: ^4.1.1
+  checksum: 8e13130fb3bf4cb4889f9a594531260ea8e5892caa4b7989b22b1250ab10e6ccccabef88f69b59a6059a22e3a742763ee4f3af7037dad7d98b48095baf14a58f
+  languageName: node
+  linkType: hard
+
+"@kwsites/promise-deferred@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@kwsites/promise-deferred@npm:1.1.1"
+  checksum: 1f0c17684c88b5e17868058c781e6170d929e6c27a22bb7c84e384e92582afeb67ebe1f42db5a58177cc0aa567c7052bbed884c67e243587b0560f9e9e8d31a1
+  languageName: node
+  linkType: hard
+
 "@manypkg/find-root@npm:^1.1.0":
   version: 1.1.0
   resolution: "@manypkg/find-root@npm:1.1.0"
@@ -6807,7 +6823,7 @@ __metadata:
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
     react-is: ^17.0.2
-    simple-git: 1.126.0
+    simple-git: 3.5.0
     slate: ^0.66.0
     slate-history: ^0.66.0
     slate-hyperscript: ^0.66.0
@@ -29892,12 +29908,14 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"simple-git@npm:1.126.0":
-  version: 1.126.0
-  resolution: "simple-git@npm:1.126.0"
+"simple-git@npm:3.5.0":
+  version: 3.5.0
+  resolution: "simple-git@npm:3.5.0"
   dependencies:
-    debug: ^4.0.1
-  checksum: f668bbf1af855b890cb600f9287df1a6d88eb1d267ca7dcad389934194d20c83e965696444867ff78122262d10e4311de08eef8139cedc713b1f31bb45adbfb5
+    "@kwsites/file-exists": ^1.1.1
+    "@kwsites/promise-deferred": ^1.1.1
+    debug: ^4.3.3
+  checksum: 7e8a29fd4c92b53dde2d03012d3c4b6239d29927e2e85c575aa25b6980644105f5178fe1c30f7b1962b4f91ead090d5e69f28e9d990920626380a410ad517009
   languageName: node
   linkType: hard
 
