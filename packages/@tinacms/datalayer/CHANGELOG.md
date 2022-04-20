@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.1.1
+
+### Patch Changes
+
+- a2906d6fe: Fix datetime filtering to handle both indexed and non-indexed queries
+- 3e2d9e43a: Adds new GraphQL `deleteDocument` mutation and logic
+
 ## 0.1.0
 
 ### Minor Changes

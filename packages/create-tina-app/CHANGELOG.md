@@ -1,5 +1,12 @@
 # create-tina-app
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [ef450a53a]
+  - @tinacms/metrics@0.0.3
+
 ## 0.1.5
 
 ### Patch Changes
