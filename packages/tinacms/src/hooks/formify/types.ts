@@ -62,11 +62,12 @@ export type FormifiedDocumentNode = {
   id: string
   _internalSys: {
     path: string
+    relativePath: string
     collection: {
       name
     }
   }
-  form: {
+  _form: {
     mutationInfo: {
       string: string
       includeCollection?: boolean
@@ -75,7 +76,7 @@ export type FormifiedDocumentNode = {
     label: string
     fields: Field[]
   }
-  values: object
+  _values: object
 }
 
 export type ChangeMutation = { type: 'change' }
