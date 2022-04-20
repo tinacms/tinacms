@@ -14,7 +14,7 @@ export default function BlogPostPage(
   });
   if (data && data.posts) {
     return (
-      <Layout rawData={data} data={data.global.data}>
+      <Layout rawData={data} data={data.global}>
         <Post {...data.posts} />;
       </Layout>
     );
@@ -48,9 +48,10 @@ export const getStaticProps = async ({ params }) => {
 export const getStaticPaths = async () => {
   const client = ExperimentalGetTinaClient();
   const postsListData = await client.postsConnection();
+  console.log(postsListData);
   return {
     paths: postsListData.data.postsConnection.edges.map((post) => ({
-      params: { filename: post.node.sys.filename },
+      params: { filename: post.node._sys.filename },
     })),
     fallback: "blocking",
   };
