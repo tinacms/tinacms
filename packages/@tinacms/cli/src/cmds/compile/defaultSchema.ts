@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const defaultSchema = `
+export const defaultSchema = (sep: string) => `
 import { defineSchema, defineConfig } from "tinacms";
 
 export default defineSchema({
@@ -19,7 +19,7 @@ export default defineSchema({
     {
       label: "Blog Posts",
       name: "posts",
-      path: "content/posts",
+      path: "content${sep}posts",
       fields: [
         {
           type: "string",
