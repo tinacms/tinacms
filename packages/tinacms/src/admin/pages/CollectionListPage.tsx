@@ -251,7 +251,7 @@ const CollectionListPage = () => {
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
                                               navigate(
-                                                `${document.node.sys.filename}`,
+                                                `${document.node._sys.filename}`,
                                                 { replace: true }
                                               )
                                             },
@@ -269,8 +269,8 @@ const CollectionListPage = () => {
                                               setVars({
                                                 collection: collectionName,
                                                 relativePath:
-                                                  document.node.sys.filename +
-                                                  document.node.sys.extension,
+                                                  document.node._sys.filename +
+                                                  document.node._sys.extension,
                                               })
                                               setOpen(true)
                                             },
