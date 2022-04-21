@@ -12,19 +12,18 @@ limitations under the License.
 */
 
 import * as _ from 'lodash'
-
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
-import { dangerText, logText } from '../../utils/theme'
-
+import { TinaSchemaValidationError } from '@tinacms/schema-tools'
+import fs from 'fs-extra'
+import path from 'path'
+import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
-import { TinaSchemaValidationError } from '@tinacms/schema-tools'
-import { build } from 'esbuild'
+import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import fs from 'fs-extra'
 import { getSchemaPath } from '../../lib'
 import { logger } from '../../logger'
-import path from 'path'
 
 const tinaPath = path.join(process.cwd(), '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
@@ -97,7 +96,7 @@ export const compile = async (
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
     // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema)
+    await fs.writeFile(file, defaultSchema(path.sep))
   }
 
   // Turns the schema into JS files so they can be run

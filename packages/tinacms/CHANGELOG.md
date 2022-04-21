@@ -1,5 +1,29 @@
 # tinacms
 
+## 0.67.3
+
+### Patch Changes
+
+- Updated dependencies [d37562999]
+  - @tinacms/toolkit@0.56.21
+
+## 0.67.2
+
+### Patch Changes
+
+- 40afac061: updated @headlessui/react
+- Updated dependencies [40afac061]
+  - @tinacms/toolkit@0.56.20
+
+## 0.67.1
+
+### Patch Changes
+
+- 921709a7e: Adds validation to the schema instead of only using typescript types
+- 3e2d9e43a: Adds new GraphQL `deleteDocument` mutation and logic
+- Updated dependencies [921709a7e]
+  - @tinacms/schema-tools@0.0.3
+
 ## 0.67.0
 
 ### Minor Changes

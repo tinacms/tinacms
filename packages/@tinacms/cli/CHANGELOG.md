@@ -1,5 +1,25 @@
 # tinacms-cli
 
+## 0.60.12
+
+### Patch Changes
+
+- ef450a53a: - Update tinacms CLI to support schemaFileType option (default 'ts') to allow user to specify the schema file type
+  - Update telemetry module to optionally check NO_TELEMETRY environment variable for disabling telemetry
+- 81b729c24: Update formatting of cli init outputs
+- 558cc4368: Make schema init platform-aware and refactor database put requests
+- Updated dependencies [4da32454b]
+- Updated dependencies [921709a7e]
+- Updated dependencies [ef450a53a]
+- Updated dependencies [a2906d6fe]
+- Updated dependencies [558cc4368]
+- Updated dependencies [06666d39f]
+- Updated dependencies [3e2d9e43a]
+  - @tinacms/graphql@0.59.11
+  - @tinacms/schema-tools@0.0.3
+  - @tinacms/metrics@0.0.3
+  - @tinacms/datalayer@0.1.1
+
 ## 0.60.11
 
 ### Patch Changes

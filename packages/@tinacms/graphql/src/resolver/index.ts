@@ -369,7 +369,7 @@ export class Resolver {
     )
 
     // @ts-ignore
-    await this.database.put(realPath, params)
+    await this.database.put(realPath, params, collection.name)
     return this.getDocument(realPath)
   }
 
@@ -401,7 +401,7 @@ export class Resolver {
               params,
               templateInfo.template
             )
-            await this.database.put(realPath, values)
+            await this.database.put(realPath, values, collection.name)
           }
           break
         case 'union':
@@ -419,7 +419,7 @@ export class Resolver {
                 ...this.buildFieldMutations(templateParams, template),
                 _template: lastItem(template.namespace),
               }
-              await this.database.put(realPath, values)
+              await this.database.put(realPath, values, collection.name)
             }
           })
       }
@@ -432,7 +432,7 @@ export class Resolver {
       collection
     )
     //@ts-ignore
-    await this.database.put(realPath, params)
+    await this.database.put(realPath, params, collection.name)
     return this.getDocument(realPath)
   }
 
