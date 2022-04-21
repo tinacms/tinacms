@@ -206,6 +206,7 @@ type PageConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateAuthor(relativePath: String!, params: AuthorMutation!): Author!
   createAuthor(relativePath: String!, params: AuthorMutation!): Author!

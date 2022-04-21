@@ -36,35 +36,6 @@
           }
         }
       ]
-    },
-    "sortedByHeight": {
-      "edges": [
-        {
-          "node": {
-            "data": {
-              "name": "George Lucas"
-            }
-          }
-        },
-        {
-          "node": {
-            "data": {
-              "name": "Francis Ford Coppolla"
-            }
-          }
-        }
-      ]
-    },
-    "sofiaParent": {
-      "edges": [
-        {
-          "node": {
-            "data": {
-              "name": "Francis Ford Coppolla"
-            }
-          }
-        }
-      ]
     }
   }
 }
