@@ -8,10 +8,7 @@
 
 ## `schema` must be supplied to the `<TinaCMS>` component
 
-Previously the `.tina/schema.ts` was only used by the Tina CLI to generate the GraphQL API.
-However it's now required as a prop to `<TinaCMS>`.
-This allows you to provide runtime logic in the `ui` property of field definitions.
-See the documentation on "Extending Tina" for examples.
+Previously the `.tina/schema.ts` was only used by the Tina CLI to generate the GraphQL API. However it's now required as a prop to `<TinaCMS>`. This allows you to provide runtime logic in the `ui` property of field definitions. See the documentation on "Extending Tina" for examples.
 
 ## The GraphQL API has been simplified
 
