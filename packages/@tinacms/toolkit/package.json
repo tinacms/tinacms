@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/toolkit",
-  "version": "0.56.19",
+  "version": "0.56.20",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
@@ -55,7 +55,7 @@
   "dependencies": {
     "@floating-ui/dom": "^0.1.7",
     "@floating-ui/react-dom": "^0.3.3",
-    "@headlessui/react": "^1.4.2",
+    "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.5",
     "@react-aria/i18n": "^3.3.4",
     "@react-aria/listbox": "3.3.0",
@@ -110,7 +110,7 @@
     "react-dropzone": "10.1.8",
     "react-final-form": "^6.3.0",
     "react-icons": "^4.3.1",
-    "simple-git": "1.126.0",
+    "simple-git": "3.5.0",
     "slate": "^0.66.0",
     "slate-history": "^0.66.0",
     "slate-hyperscript": "^0.66.0",

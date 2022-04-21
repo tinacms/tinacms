@@ -15,9 +15,7 @@ import path from 'path'
 import fs from 'fs-extra'
 import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
-import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
-import { TinaSchemaValidationError } from '@tinacms/schema-tools'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
@@ -91,7 +89,7 @@ export const compile = async (
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
     // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema)
+    await fs.writeFile(file, defaultSchema(path.sep))
   }
 
   // Turns the schema into JS files so they can be run
