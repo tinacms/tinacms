@@ -305,7 +305,7 @@ const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader close={close}>Reset</ModalHeader>
+        <ModalHeader close={close}>Delete {filename}</ModalHeader>
         <ModalBody padded={true}>
           <p>{`Are you sure you want to delete ${filename}?`}</p>
         </ModalBody>
