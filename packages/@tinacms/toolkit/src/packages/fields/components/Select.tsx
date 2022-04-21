@@ -60,7 +60,7 @@ export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
           <option>{input.value}</option>
         )}
       </select>
-      <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out" />
+      <MdKeyboardArrowDown className="absolute top-1/2 right-3 w-6 h-auto -translate-y-1/2 text-gray-300 group-hover:text-blue-500 transition duration-150 ease-out pointer-events-none" />
     </div>
   )
 }
