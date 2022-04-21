@@ -67,15 +67,6 @@ export type FormifiedDocumentNode = {
       name
     }
   }
-  _form: {
-    mutationInfo: {
-      string: string
-      includeCollection?: boolean
-      includeTemplate?: boolean
-    }
-    label: string
-    fields: Field[]
-  }
   _values: object
 }
 

@@ -878,10 +878,10 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace)
+    return `update${generateNamespacedFieldName(namespace)}`
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace)
+    return `create${generateNamespacedFieldName(namespace)}`
   },
   documentQueryName: () => {
     return 'document'
