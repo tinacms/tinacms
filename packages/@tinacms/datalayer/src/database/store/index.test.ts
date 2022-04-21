@@ -1030,19 +1030,5 @@ describe('datalayer store helper functions', () => {
       expect(coerced.length).toEqual(1)
       expect(coerced[0]).toEqual(expected)
     })
-
-    it('coerces ternary string filter', () => {
-      const expected: TernaryFilter = {
-        pathExpression: 'title',
-        leftOperand: 'foo',
-        rightOperand: 'bar',
-        leftOperator: OP.GT,
-        rightOperator: OP.LT,
-        type: 'string',
-      }
-      const coerced = coerceFilterChainOperands([expected], escapeStr)
-      expect(coerced.length).toEqual(1)
-      expect(coerced[0]).toEqual(expected)
-    })
   })
 })
