@@ -38,7 +38,7 @@ The use of the term `connection` is due to our adherence the the [relay cursor s
 
 # new
 {
-  postConnection(relativePath: $relativePath) { ... }
+  postConnection { ... }
 }
 ```
 
