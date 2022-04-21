@@ -120,6 +120,7 @@ type PostConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePage(relativePath: String!, params: PageMutation!): Page!
   createPage(relativePath: String!, params: PageMutation!): Page!
@@ -147,3 +148,4 @@ schema {
   query: Query
   mutation: Mutation
 }
+  
