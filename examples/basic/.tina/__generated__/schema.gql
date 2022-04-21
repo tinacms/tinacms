@@ -97,10 +97,10 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
-union PostPostsPost = Post
+union PostRelatedPostsPost = Page | Post
 
-type PostPosts {
-  post: PostPostsPost
+type PostRelatedPosts {
+  post: PostRelatedPostsPost
   label: String
 }
 
@@ -172,3 +172,4 @@ schema {
   query: Query
   mutation: Mutation
 }
+  

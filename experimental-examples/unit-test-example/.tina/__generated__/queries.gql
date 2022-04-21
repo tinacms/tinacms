@@ -1,6 +1,6 @@
-query getPostDocument($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
-    sys {
+query post($relativePath: String!) {
+  post(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,19 +9,17 @@ query getPostDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PostParts
-    }
+    ...PostParts
   }
 }
 
-query getPostList {
-  getPostList {
+query postConnection {
+  postConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,17 +27,15 @@ query getPostList {
           relativePath
           extension
         }
-        data {
-          ...PostParts
-        }
+        ...PostParts
       }
     }
   }
 }
 
-query getAuthorDocument($relativePath: String!) {
-  getAuthorDocument(relativePath: $relativePath) {
-    sys {
+query author($relativePath: String!) {
+  author(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,19 +44,17 @@ query getAuthorDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...AuthorParts
-    }
+    ...AuthorParts
   }
 }
 
-query getAuthorList {
-  getAuthorList {
+query authorConnection {
+  authorConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,17 +62,15 @@ query getAuthorList {
           relativePath
           extension
         }
-        data {
-          ...AuthorParts
-        }
+        ...AuthorParts
       }
     }
   }
 }
 
-query getBlockPageDocument($relativePath: String!) {
-  getBlockPageDocument(relativePath: $relativePath) {
-    sys {
+query blockPage($relativePath: String!) {
+  blockPage(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -87,19 +79,17 @@ query getBlockPageDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...BlockPageParts
-    }
+    ...BlockPageParts
   }
 }
 
-query getBlockPageList {
-  getBlockPageList {
+query blockPageConnection {
+  blockPageConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -107,9 +97,7 @@ query getBlockPageList {
           relativePath
           extension
         }
-        data {
-          ...BlockPageParts
-        }
+        ...BlockPageParts
       }
     }
   }
