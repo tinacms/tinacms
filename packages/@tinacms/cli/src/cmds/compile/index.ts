@@ -21,7 +21,6 @@ import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
-import fs from 'fs-extra'
 import { getSchemaPath } from '../../lib'
 import { logger } from '../../logger'
 
