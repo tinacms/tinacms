@@ -97,16 +97,7 @@ export type QueryDocumentArgs = {
 };
 
 
-export type QueryGetDocumentListArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
-};
-
-
-export type QueryGetPostsDocumentArgs = {
+export type QueryPostsArgs = {
   relativePath?: Maybe<Scalars['String']>;
 };
 
