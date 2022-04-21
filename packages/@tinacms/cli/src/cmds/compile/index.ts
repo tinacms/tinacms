@@ -11,16 +11,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import path from 'path'
+import * as _ from 'lodash'
+import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
+import { TinaSchemaValidationError } from '@tinacms/schema-tools'
 import fs from 'fs-extra'
+import path from 'path'
 import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
-import { logger } from '../../logger'
 import { getSchemaPath } from '../../lib'
-import { ExecuteSchemaError, BuildSchemaError } from '../start-server/errors'
+import { logger } from '../../logger'
 
 const tinaPath = path.join(process.cwd(), '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
@@ -48,9 +50,13 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
 export const compile = async (
   _ctx,
   _next,
-  options = { schemaFileType: 'ts' }
+  options: { schemaFileType?: string; verbose?: boolean }
 ) => {
-  logger.info(logText('Compiling...'))
+  if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
+
+  if (options.verbose) {
+    logger.info(logText('Compiling...'))
+  }
 
   const { schemaFileType: requestedSchemaFileType = 'ts' } = options
   const schemaFileType =
@@ -94,7 +100,7 @@ export const compile = async (
 
   // Turns the schema into JS files so they can be run
   try {
-    await transpile(tinaPath, tinaTempPath)
+    await transpile(tinaPath, tinaTempPath, options.verbose)
   } catch (e) {
     await cleanup({ tinaTempPath })
     throw new BuildSchemaError(e)
@@ -130,8 +136,8 @@ export const compile = async (
   }
 }
 
-const transpile = async (projectDir, tempDir) => {
-  logger.info(logText('Building javascript...'))
+const transpile = async (projectDir, tempDir, verbose) => {
+  if (verbose) logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(
     fs.readFileSync(packageJSONFilePath).toString() || '{}'
@@ -153,7 +159,7 @@ const transpile = async (projectDir, tempDir) => {
     loader: loaders,
     outfile: outputPath,
   })
-  logger.info(logText(`Javascript built`))
+  if (verbose) logger.info(logText(`Javascript built`))
 }
 
 export const defineSchema = (config: TinaCloudSchema) => {

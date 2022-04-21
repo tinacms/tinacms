@@ -11,22 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import childProcess from 'child_process'
-import path from 'path'
-import { buildSchema, createDatabase } from '@tinacms/graphql'
 import {
-  FilesystemStore,
   FilesystemBridge,
+  FilesystemStore,
   LevelStore,
 } from '@tinacms/datalayer'
-import { genTypes } from '../query-gen'
+import { buildSchema, createDatabase } from '@tinacms/graphql'
 import { compile, resetGeneratedFolder } from '../compile'
+
+import { AsyncLock } from './lock'
+import { Telemetry } from '@tinacms/metrics'
+import chalk from 'chalk'
+import childProcess from 'child_process'
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
-import { logger } from '../../logger'
-import { Telemetry } from '@tinacms/metrics'
+import { genTypes } from '../query-gen'
 import { handleServerErrors } from './errors'
-import { AsyncLock } from './lock'
+import { logger } from '../../logger'
+import path from 'path'
+
 const lock = new AsyncLock()
 interface Options {
   port?: number
@@ -36,6 +39,7 @@ interface Options {
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
+  verbose?: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -51,6 +55,7 @@ export async function startServer(
     noSDK,
     noTelemetry,
     watchFolders,
+    verbose,
   }: Options
 ) {
   lock.disable()
@@ -127,9 +132,9 @@ stack: ${code.stack || 'No stack was provided'}`)
         await resetGeneratedFolder()
       }
       const database = await createDatabase({ store, bridge })
-      await compile(null, null)
+      await compile(null, null, { verbose })
       const schema = await buildSchema(rootPath, database)
-      await genTypes({ schema }, () => {}, { noSDK })
+      await genTypes({ schema }, () => {}, { noSDK, verbose })
     } catch (error) {
       throw error
     } finally {
@@ -155,7 +160,7 @@ stack: ${code.stack || 'No stack was provided'}`)
         }
       )
       .on('ready', async () => {
-        console.log('Generating Tina config')
+        if (verbose) console.log('Generating Tina config')
         try {
           if (shouldBuild) {
             await build(noSDK)
@@ -205,8 +210,16 @@ stack: ${code.stack || 'No stack was provided'}`)
     state.server = await s.default(database)
 
     state.server.listen(port, () => {
-      logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-      logger.info(`Visit the playground at http://localhost:${port}/altair/`)
+      const altairUrl = `http://localhost:${port}/altair/`
+      const cmsUrl = `[your-development-url]/admin`
+      if (verbose)
+        logger.info(`Started Filesystem GraphQL server on port: ${port}`)
+      logger.info(
+        `Visit the GraphQL playground at ${chalk.underline.blueBright(
+          altairUrl
+        )}\nor`
+      )
+      logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
     })
     state.server.on('error', function (e) {
       if (e.code === 'EADDRINUSE') {
