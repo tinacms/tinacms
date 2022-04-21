@@ -4217,23 +4217,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@headlessui/react@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "@headlessui/react@npm:1.4.1"
+"@headlessui/react@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "@headlessui/react@npm:1.5.0"
   peerDependencies:
     react: ^16 || ^17 || ^18
     react-dom: ^16 || ^17 || ^18
-  checksum: f883749ff2dc40d00b3823301c330f18a0864aa5b8847d07c65d1a8fddd3b993ba90dbb81bd8b0743fe6b050ba0be4e56f7d1d9ab43a324de56766139826ebe2
-  languageName: node
-  linkType: hard
-
-"@headlessui/react@npm:^1.4.2":
-  version: 1.4.2
-  resolution: "@headlessui/react@npm:1.4.2"
-  peerDependencies:
-    react: ^16 || ^17 || ^18
-    react-dom: ^16 || ^17 || ^18
-  checksum: b9987c9331aa1dccd2c72bc042cbbc1b74481523f49fa1fbd333d562dbfebc54c3cb49d6b3a93050f817caf1d77c8e30ac79eef215a34f94fcfec832e07d3ea8
+  checksum: a177711f60ed0053844e0f0ce8dbcf0a47b1ac62eee6ea29760ecf81599c20e5b0be6d0c4749979c65e24a120c7d54f5612a5a57db8999b9db19cd1abebc5c2b
   languageName: node
   linkType: hard
 
@@ -4613,6 +4603,22 @@ __metadata:
     "@jridgewell/resolve-uri": ^3.0.3
     "@jridgewell/sourcemap-codec": ^1.4.10
   checksum: 8bf22e4fa618c83dc6f875e5678749d15e4afaa790584ac65dae3ed3e06b5411e3b086e74aa7dd4f540c9b3c7788a79292245181a82214da21e6399266c8712e
+  languageName: node
+  linkType: hard
+
+"@kwsites/file-exists@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@kwsites/file-exists@npm:1.1.1"
+  dependencies:
+    debug: ^4.1.1
+  checksum: 8e13130fb3bf4cb4889f9a594531260ea8e5892caa4b7989b22b1250ab10e6ccccabef88f69b59a6059a22e3a742763ee4f3af7037dad7d98b48095baf14a58f
+  languageName: node
+  linkType: hard
+
+"@kwsites/promise-deferred@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@kwsites/promise-deferred@npm:1.1.1"
+  checksum: 1f0c17684c88b5e17868058c781e6170d929e6c27a22bb7c84e384e92582afeb67ebe1f42db5a58177cc0aa567c7052bbed884c67e243587b0560f9e9e8d31a1
   languageName: node
   linkType: hard
 
@@ -6707,7 +6713,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/starter@workspace:experimental-examples/tina-cloud-starter"
   dependencies:
-    "@headlessui/react": ^1.4.1
+    "@headlessui/react": ^1.5.0
     "@svgr/webpack": ^6.2.1
     "@tailwindcss/typography": ^0.4.1
     "@tinacms/auth": "workspace:*"
@@ -6742,7 +6748,7 @@ __metadata:
   dependencies:
     "@floating-ui/dom": ^0.1.7
     "@floating-ui/react-dom": ^0.3.3
-    "@headlessui/react": ^1.4.2
+    "@headlessui/react": ^1.5.0
     "@heroicons/react": ^1.0.5
     "@react-aria/i18n": ^3.3.4
     "@react-aria/listbox": 3.3.0
@@ -6817,7 +6823,7 @@ __metadata:
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
     react-is: ^17.0.2
-    simple-git: 1.126.0
+    simple-git: 3.5.0
     slate: ^0.66.0
     slate-history: ^0.66.0
     slate-hyperscript: ^0.66.0
@@ -29902,12 +29908,14 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"simple-git@npm:1.126.0":
-  version: 1.126.0
-  resolution: "simple-git@npm:1.126.0"
+"simple-git@npm:3.5.0":
+  version: 3.5.0
+  resolution: "simple-git@npm:3.5.0"
   dependencies:
-    debug: ^4.0.1
-  checksum: f668bbf1af855b890cb600f9287df1a6d88eb1d267ca7dcad389934194d20c83e965696444867ff78122262d10e4311de08eef8139cedc713b1f31bb45adbfb5
+    "@kwsites/file-exists": ^1.1.1
+    "@kwsites/promise-deferred": ^1.1.1
+    debug: ^4.3.3
+  checksum: 7e8a29fd4c92b53dde2d03012d3c4b6239d29927e2e85c575aa25b6980644105f5178fe1c30f7b1962b4f91ead090d5e69f28e9d990920626380a410ad517009
   languageName: node
   linkType: hard
 
@@ -31747,7 +31755,7 @@ resolve@^2.0.0-next.3:
   dependencies:
     "@graphql-tools/relay-operation-optimizer": ^6.4.1
     "@graphql-tools/utils": ^8.6.1
-    "@headlessui/react": ^1.4.1
+    "@headlessui/react": ^1.5.0
     "@heroicons/react": ^1.0.4
     "@testing-library/jest-dom": ^5.11.9
     "@testing-library/react": ^12.0.0

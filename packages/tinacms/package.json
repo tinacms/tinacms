@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.67.0",
+  "version": "0.67.2",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
-    "@headlessui/react": "^1.4.1",
+    "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.4",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
