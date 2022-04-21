@@ -183,9 +183,25 @@ export const formify = async ({
 
     const hasDataJSONField = false
     let hasValuesField = false
-    const shouldFormify = true
+    let shouldFormify = false
     selection.selectionSet.selections.forEach((selection) => {
+      /**
+       * This check makes sure we don't formify on inline fragments,
+       * so shouldFormify only returns true for sub selection, which will be
+       * a document
+       * ```
+       * {
+       *   document(relativePath: $relativePath) {
+       *      # don't want _sys and _values here
+       *      ...on Author {
+       *        # we want them here
+       *        name
+       *      }
+       *   }
+       * }
+       */
       if (selection.kind === 'Field') {
+        shouldFormify = true
         if (selection.name.value === '_values') {
           hasValuesField = true
         }
