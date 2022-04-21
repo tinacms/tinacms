@@ -418,34 +418,6 @@ export class Builder {
    * ```graphql
    * # ex.
    * {
-   *   getDocumentList(first: 10) {
-   *     edges {
-   *       node {
-   *         id
-   *       }
-   *     }
-   *   }
-   * }
-   * ```
-   *
-   * @param collections
-   */
-  public multiCollectionDocumentList = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
-    return this._buildMultiCollectionDocumentListDefinition({
-      fieldName: NAMER.documentConnectionQueryName(),
-      namespace: ['document'],
-      nodeType: astBuilder.TYPES.MultiCollectionDocument,
-      collections: collections,
-      connectionNamespace: ['document'],
-    })
-  }
-
-  /**
-   * ```graphql
-   * # ex.
-   * {
    *   getPostDocument(relativePath: $relativePath) {
    *     id
    *     data {...}
