@@ -239,6 +239,7 @@ const apiURL =
 
 export const tinaConfig = defineConfig({
   apiURL,
+  schema,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
     return cms
