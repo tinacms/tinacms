@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.21
+
+### Patch Changes
+
+- d37562999: Export OverflowMenu
+
 ## 0.56.20
 
 ### Patch Changes
