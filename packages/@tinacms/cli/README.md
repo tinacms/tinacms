@@ -24,6 +24,7 @@ Usage: @tinacms/cli command [options]
 Options:
   -V, --version             output the version number
   -h, --help                display help for command
+  -v, --verbose             increase verbosity of console output   
 
 Commands:
   server:start [options]    Start Filesystem Graphql Server

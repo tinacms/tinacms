@@ -11,10 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { logText } from '../../utils/theme'
-import { generateTypes } from '../../codegen'
-import { printSchema, GraphQLSchema, DocumentNode } from 'graphql'
+import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
+
 import fs from 'fs-extra'
+import { generateTypes } from '../../codegen'
+import { logText } from '../../utils/theme'
 import { logger } from '../../logger'
 
 export async function genTypes(
@@ -40,7 +41,7 @@ export async function genTypes(
 ${typescriptTypes}
 `
   )
-  logger.info(`Typescript types => ${logText(typesPath)}`)
+  logger.info(`\tTypescript types => ${logText(typesPath)}`)
 
   const schemaString = await printSchema(schema)
   const schemaPath = process.cwd() + '/.tina/__generated__/schema.gql'
@@ -55,6 +56,6 @@ schema {
 }
   `
   )
-  logger.info(`GraphQL types ====> ${logText(schemaPath)}`)
+  logger.info(`\tGraphQL types ====> ${logText(schemaPath)}\n`)
   next()
 }
