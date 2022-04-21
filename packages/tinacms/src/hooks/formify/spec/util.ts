@@ -20,6 +20,7 @@ import { LocalClient } from '../../../client'
 
 // @ts-ignore FIXME: violates ts rootDir config
 import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
+
 // @ts-ignore FIXME: violates ts rootDir config
 import schema from '../../../../../../experimental-examples/unit-test-example/.tina/schema'
 
