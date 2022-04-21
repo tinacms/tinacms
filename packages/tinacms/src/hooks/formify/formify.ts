@@ -181,23 +181,14 @@ export const formify = async ({
   }): T {
     let extraFields = []
 
-    let hasDataJSONField = false
+    const hasDataJSONField = false
     let hasValuesField = false
-    let shouldFormify = false
+    const shouldFormify = true
     selection.selectionSet.selections.forEach((selection) => {
       if (selection.kind === 'Field') {
-        // Deprecated
-        // if (selection.name.value === 'dataJSON') {
-        //   shouldFormify = true
-        //   hasDataJSONField = true
-        // }
         if (selection.name.value === '_values') {
-          shouldFormify = true
           hasValuesField = true
         }
-        // if (selection.name.value === 'data') {
-        shouldFormify = true
-        // }
       }
     })
 

@@ -172,6 +172,14 @@ export const buildForm = (
   if (skipped) return
 
   const id = doc._internalSys.path
+  const enrichedSchema: TinaSchema = cms.api.tina.schema
+  const collection = enrichedSchema.getCollection(
+    doc._internalSys.collection.name
+  )
+  const template = enrichedSchema.getTemplateForData({
+    collection,
+    data: doc._values,
+  })
   const formCommon = {
     id,
     label: id,
@@ -180,8 +188,9 @@ export const buildForm = (
       try {
         // TODO: this all probably needs to come from TinaSchema
         const params = transformDocumentIntoMutationRequestPayload(payload, {
+          // False because we're prefixing the params with the collection name before passing them in
           includeCollection: false,
-          includeTemplate: false,
+          includeTemplate: !!collection.templates,
         })
         const variables = { params }
         const mutationString = `#graphql
@@ -226,14 +235,6 @@ export const buildForm = (
   }
   let formConfig = {} as FormOptions<any, AnyField>
 
-  const enrichedSchema: TinaSchema = cms.api.tina.schema
-  const collection = enrichedSchema.getCollection(
-    doc._internalSys.collection.name
-  )
-  const template = enrichedSchema.getTemplateForData({
-    collection,
-    data: doc._values,
-  })
   const formInfo = resolveForm({
     collection,
     basename: collection.name,
