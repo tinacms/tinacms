@@ -58,92 +58,6 @@ type Query {
   relativeConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: RelativeFilter): RelativeConnection!
 }
 
-input StringFilter {
-  startsWith: String
-  eq: String
-  exists: Boolean
-  in: [String]
-}
-
-input DatetimeFilter {
-  after: String
-  before: String
-  eq: String
-  exists: Boolean
-  in: [String]
-}
-
-input NumberFilter {
-  lt: Float
-  lte: Float
-  gte: Float
-  gt: Float
-  eq: Float
-  exists: Boolean
-  in: [Float]
-}
-
-input BooleanFilter {
-  eq: Boolean
-  exists: Boolean
-}
-
-input RelativeFilter {
-  name: StringFilter
-}
-
-input DirectorRelativesSpouseFilter {
-  relative: RelativeFilter
-}
-
-input DirectorRelativesChildFilter {
-  relative: RelativeFilter
-}
-
-input DirectorRelativesFilter {
-  spouse: DirectorRelativesSpouseFilter
-  child: DirectorRelativesChildFilter
-}
-
-input DirectorFilter {
-  name: StringFilter
-  birthday: DatetimeFilter
-  height: NumberFilter
-  relatives: DirectorRelativesFilter
-}
-
-input MovieDirectorFilter {
-  director: DirectorFilter
-}
-
-input MovieFilter {
-  title: StringFilter
-  releaseDate: DatetimeFilter
-  rating: NumberFilter
-  archived: BooleanFilter
-  genre: StringFilter
-  director: MovieDirectorFilter
-  body: StringFilter
-}
-
-input CrewCostumeDesignerFilter {
-  favoriteColor: StringFilter
-}
-
-input CrewStuntPersonFilter {
-  bestMove: StringFilter
-}
-
-input CrewFilter {
-  costumeDesigner: CrewCostumeDesignerFilter
-  stuntPerson: CrewStuntPersonFilter
-}
-
-input ActorFilter {
-  name: StringFilter
-  body: StringFilter
-}
-
 input DocumentFilter {
   movie: MovieFilter
   director: DirectorFilter
@@ -192,6 +106,50 @@ type Movie implements Node & Document {
   _values: JSON!
 }
 
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input DatetimeFilter {
+  after: String
+  before: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input NumberFilter {
+  lt: Float
+  lte: Float
+  gte: Float
+  gt: Float
+  eq: Float
+  exists: Boolean
+  in: [Float]
+}
+
+input BooleanFilter {
+  eq: Boolean
+  exists: Boolean
+}
+
+input MovieDirectorFilter {
+  director: DirectorFilter
+}
+
+input MovieFilter {
+  title: StringFilter
+  releaseDate: DatetimeFilter
+  rating: NumberFilter
+  archived: BooleanFilter
+  genre: StringFilter
+  director: MovieDirectorFilter
+  body: StringFilter
+}
+
 type MovieConnectionEdges {
   cursor: String!
   node: Movie
@@ -222,6 +180,26 @@ type Director implements Node & Document {
   _values: JSON!
 }
 
+input DirectorRelativesSpouseFilter {
+  relative: RelativeFilter
+}
+
+input DirectorRelativesChildFilter {
+  relative: RelativeFilter
+}
+
+input DirectorRelativesFilter {
+  spouse: DirectorRelativesSpouseFilter
+  child: DirectorRelativesChildFilter
+}
+
+input DirectorFilter {
+  name: StringFilter
+  birthday: DatetimeFilter
+  height: NumberFilter
+  relatives: DirectorRelativesFilter
+}
+
 type DirectorConnectionEdges {
   cursor: String!
   node: Director
@@ -249,6 +227,19 @@ type CrewStuntPerson implements Node & Document {
 
 union Crew = CrewCostumeDesigner | CrewStuntPerson
 
+input CrewCostumeDesignerFilter {
+  favoriteColor: StringFilter
+}
+
+input CrewStuntPersonFilter {
+  bestMove: StringFilter
+}
+
+input CrewFilter {
+  costumeDesigner: CrewCostumeDesignerFilter
+  stuntPerson: CrewStuntPersonFilter
+}
+
 type CrewConnectionEdges {
   cursor: String!
   node: Crew
@@ -266,6 +257,11 @@ type Actor implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input ActorFilter {
+  name: StringFilter
+  body: StringFilter
 }
 
 type ActorConnectionEdges {
@@ -286,6 +282,10 @@ type Relative implements Node & Document {
   _values: JSON!
 }
 
+input RelativeFilter {
+  name: StringFilter
+}
+
 type RelativeConnectionEdges {
   cursor: String!
   node: Relative
@@ -300,6 +300,7 @@ type RelativeConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateMovie(relativePath: String!, params: MovieMutation!): Movie!
   createMovie(relativePath: String!, params: MovieMutation!): Movie!

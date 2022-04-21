@@ -145,6 +145,7 @@ type ActorConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateMovie(relativePath: String!, params: MovieMutation!): Movie!
   createMovie(relativePath: String!, params: MovieMutation!): Movie!
