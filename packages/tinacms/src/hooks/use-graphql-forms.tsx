@@ -11,22 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  AnyField,
-  Form,
-  FormMetaPlugin,
-  GlobalFormPlugin,
-  useBranchData,
-  useCMS,
-} from '@tinacms/toolkit'
+import { Form, GlobalFormPlugin, useCMS } from '@tinacms/toolkit'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
-import { assertShape, safeAssertShape } from '../utils'
-import { getIn, setIn } from 'final-form'
-
-import { BiLinkExternal } from 'react-icons/bi'
-import React from 'react'
-import gql from 'graphql-tag'
+import { assertShape } from '../utils'
 import { useFormify } from './formify'
 
 export function useGraphqlForms<T extends object>({
