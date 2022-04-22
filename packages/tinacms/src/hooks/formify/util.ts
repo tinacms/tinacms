@@ -27,7 +27,7 @@ import type {
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 import {
-  generateFormCreatorsUnstable,
+  generateFormCreators,
   formifyCallback,
   transformDocumentIntoMutationRequestPayload,
   onSubmitArgs,
@@ -159,7 +159,7 @@ export const buildForm = (
   showInSidebar: boolean = false,
   onSubmit?: (args: onSubmitArgs) => void
 ): Form => {
-  const { createForm, createGlobalForm } = generateFormCreatorsUnstable(
+  const { createForm, createGlobalForm } = generateFormCreators(
     cms,
     showInSidebar
   )
