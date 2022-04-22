@@ -117,49 +117,7 @@ const transformParams = (data: unknown) => {
   }
 }
 
-// newUpdate.lookup is a field name (ie. blocks.0.hero)
-const getFieldUpdate = (newUpdate, activeForm, formValues) => {
-  const items = newUpdate.lookup.split('.')
-  let currentFields = activeForm.fields
-  items.map((item, index) => {
-    const lookupName = items.slice(0, index + 1).join('.')
-    const value = getIn(
-      formValues,
-      [newUpdate.queryName, 'values', lookupName].join('.')
-    )
-    if (isNaN(Number(item))) {
-      if (Array.isArray(currentFields)) {
-        currentFields = currentFields.find((field) => field.name === item)
-      }
-    } else {
-      // Get templatable for polymorphic or homogenous
-      const template = currentFields.templates
-        ? currentFields.templates[value._template]
-        : currentFields
-      currentFields = template.fields
-    }
-  })
-  return currentFields
-}
-
-const generateFormCreators = (cms: TinaCMS) => {
-  const createForm = (formConfig) => {
-    const form = new Form(formConfig)
-    cms.forms.add(form)
-    return form
-  }
-  const createGlobalForm: GlobalFormCreator = (formConfig, options) => {
-    const form = new Form(formConfig)
-    cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
-    return form
-  }
-  return { createForm, createGlobalForm }
-}
-
-export const generateFormCreatorsUnstable = (
-  cms: TinaCMS,
-  showInSidebar?: boolean
-) => {
+export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
   const createForm = (formConfig) => {
     const form = new Form(formConfig)
     if (showInSidebar) {
@@ -206,18 +164,4 @@ export type onSubmitArgs = {
   queryString: string
   mutationString: string
   variables: object
-}
-
-type FormValues = {
-  [queryName: string]: object
-}
-type Data = {
-  [queryName: string]: object
-}
-type NewUpdate = {
-  queryName: string
-  get: string
-  set: string
-  setReference?: string
-  lookup?: string
 }
