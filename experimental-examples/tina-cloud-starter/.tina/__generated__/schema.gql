@@ -163,9 +163,12 @@ type GlobalConnection implements Connection {
   edges: [GlobalConnectionEdges]
 }
 
+union AuthorsFavoritePost = Posts
+
 type Authors implements Node & Document {
   name: String
   avatar: String
+  favoritePost: AuthorsFavoritePost
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
@@ -327,6 +330,7 @@ input GlobalMutation {
 input AuthorsMutation {
   name: String
   avatar: String
+  favoritePost: String
 }
 
 input PagesBlocksHeroActionsMutation {

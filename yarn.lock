@@ -6501,11 +6501,13 @@ __metadata:
     lodash.get: ^4.4.2
     log4js: ^6.4.0
     normalize-path: ^3.0.0
+    prettier: ^2.6.2
     progress: ^2.0.3
     prompts: ^2.4.1
     typescript: ^4.3.5
     yarn: ^1.22.17
     yup: ^0.32.9
+    zod: ^3.14.4
   bin:
     tinacms: bin/tinacms
   languageName: unknown
@@ -26755,6 +26757,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"prettier@npm:^2.6.2":
+  version: 2.6.2
+  resolution: "prettier@npm:2.6.2"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 10af3147eeb6e7038d6bb4cab48bace7095c4f35e9da45215a8fd3aa8785b4ca6e6cc2cc2fee073a19e230ec0271bae0660031b9252c5263eae7c08113aa8f50
+  languageName: node
+  linkType: hard
+
 "pretty-bytes@npm:^5.1.0, pretty-bytes@npm:^5.6.0":
   version: 5.6.0
   resolution: "pretty-bytes@npm:5.6.0"
@@ -34147,6 +34158,13 @@ resolve@^2.0.0-next.3:
   version: 3.14.3
   resolution: "zod@npm:3.14.3"
   checksum: f9272d20b6b4eb9ac98c53817d2f2d1864729f8e9e7d145c206e43dffd20c838d2f3c9c3f7dfb46868a533110ab831af716e5620122abbc626611a4e45ceccee
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.14.4":
+  version: 3.14.4
+  resolution: "zod@npm:3.14.4"
+  checksum: a343b7511d05ed3fa858b8da646b8c546a728d05d741284f2cddca17bfe4872cdb01286c8b800b970af89db7a7ffea7cc009383e86389743c3de7f46f4b41fe3
   languageName: node
   linkType: hard
 

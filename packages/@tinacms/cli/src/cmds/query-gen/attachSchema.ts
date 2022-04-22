@@ -24,6 +24,7 @@ export async function attachSchema(ctx: any, next: () => void, options) {
   const database = await createDatabase({ store, bridge })
   const schema = await buildSchema(rootPath, database)
 
+  ctx.tinaSchema = await database.getSchema()
   ctx.schema = schema
   next()
 }

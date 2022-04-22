@@ -16,6 +16,7 @@ import { chain } from '../middleware'
 import { genTypes, attachSchema } from './query-gen'
 import { startServer } from './start-server'
 import { compile } from './compile'
+import { migrate } from './migrate'
 import {
   initTina,
   installDeps,
@@ -154,6 +155,29 @@ export const baseCmds: Command[] = [
             next()
           },
           audit,
+          printFinalMessage,
+        ],
+        options
+      ),
+  },
+  {
+    options: [cleanOption, useDefaultValuesOption, noTelemetryOption],
+    command: 'sdk',
+    description: 'sdk',
+    action: (options) =>
+      chain(
+        [
+          // Disable the output of the compile step
+          async (_ctx, next) => {
+            logger.level = 'error'
+            next()
+          },
+          async (_ctx, next) => {
+            await compile(_ctx, next, options)
+            next()
+          },
+          attachSchema,
+          migrate,
           printFinalMessage,
         ],
         options

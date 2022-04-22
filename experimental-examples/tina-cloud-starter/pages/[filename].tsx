@@ -2,15 +2,52 @@ import { Blocks } from "../components/blocks";
 import { ExperimentalGetTinaClient } from "../.tina/__generated__/types";
 import { useTina } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
+import { query, AsyncReturnType } from "../.tina/sdk";
+import React from "react";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  const { data } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
+  const { data } = useTina(props);
+
+  React.useEffect(() => {
+    const run = async () => {
+      const res = await query(({ posts, authorsConnection, global }) => ({
+        p: posts({
+          relativePath: "anotherPost.mdx",
+          fields: {
+            date: true,
+          },
+        }),
+        a: authorsConnection({
+          first: "",
+          include: {
+            favoritePost: {
+              posts: {
+                fields: {
+                  date: true,
+                },
+              },
+            },
+          },
+        }),
+        g: global({
+          relativePath: "index.json",
+          // FIXME: this doesn't work, footer is an object and the addFields function doesn't
+          // know what to do with that
+          // fields: {
+          //   footer: true,
+          // },
+        }),
+        // a: c.authors({ relativePath: "pedro.md" }),
+      }));
+      console.log(res.query);
+      console.log(res.data.a);
+    };
+    run();
   });
+  // data.post.author;
+
   return (
     <Layout rawData={data} data={data.global}>
       <Blocks {...data.pages} />
@@ -19,16 +56,12 @@ export default function HomePage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const client = ExperimentalGetTinaClient();
-  const tinaProps = await client.ContentQuery({
-    relativePath: `${params.filename}.md`,
-  });
   return {
-    props: {
-      data: tinaProps.data,
-      query: tinaProps.query,
-      variables: tinaProps.variables,
-    },
+    props: await query((c) => ({
+      global: c.global({ relativePath: "index.json" }),
+      pages: c.pages({ relativePath: `${params.filename}.md` }),
+      post: c.posts({ relativePath: "anotherPost.mdx" }),
+    })),
   };
 };
 
@@ -42,6 +75,3 @@ export const getStaticPaths = async () => {
     fallback: false,
   };
 };
-
-export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
-  T extends (...args: any) => Promise<infer R> ? R : any;

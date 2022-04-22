@@ -45,7 +45,7 @@ export function useTina<T extends object>({
   data,
 }: {
   query: string
-  variables: object
+  variables?: object
   data: T
 }): { data: T; isLoading: boolean } {
   const {
@@ -62,7 +62,7 @@ export function useTina<T extends object>({
   const isLoading = contextLoading || waitForContextRerender
 
   React.useEffect(() => {
-    setRequest({ query, variables })
+    setRequest({ query, variables: variables || {} })
   }, [JSON.stringify(variables), query])
 
   // A bit of a hack here

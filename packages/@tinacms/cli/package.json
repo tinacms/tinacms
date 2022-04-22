@@ -83,10 +83,12 @@
     "lodash.get": "^4.4.2",
     "log4js": "^6.4.0",
     "normalize-path": "^3.0.0",
+    "prettier": "^2.6.2",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
     "yarn": "^1.22.17",
-    "yup": "^0.32.9"
+    "yup": "^0.32.9",
+    "zod": "^3.14.4"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

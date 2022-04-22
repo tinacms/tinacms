@@ -321,6 +321,12 @@ const schema = defineSchema({
           label: "Avatar",
           name: "avatar",
         },
+        {
+          type: "reference",
+          label: "Favorite Post",
+          name: "favoritePost",
+          collections: ["posts"],
+        },
       ],
     },
     {

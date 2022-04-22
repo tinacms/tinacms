@@ -50,6 +50,11 @@ fragment GlobalParts on Global {
 fragment AuthorsParts on Authors {
   name
   avatar
+  favoritePost {
+    ... on Document {
+      id
+    }
+  }
 }
 
 fragment PagesParts on Pages {
