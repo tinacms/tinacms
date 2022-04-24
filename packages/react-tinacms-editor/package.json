@@ -81,7 +81,8 @@
   "peerDependencies": {
     "react": ">=16.14.0",
     "react-dom": ">=16.14.0",
-    "styled-components": ">=4.1"
+    "styled-components": ">=4.1",
+    "@tinacms/toolkit": ">=0.56.21"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
