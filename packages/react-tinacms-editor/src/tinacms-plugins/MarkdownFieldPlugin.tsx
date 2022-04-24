@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { wrapFieldsWithMeta } from 'tinacms'
+import { wrapFieldsWithMeta } from '@tinacms/toolkit'
 import { EditorProps } from '../types'
 
 export const MarkdownField = wrapFieldsWithMeta<EditorProps, any>((props) => (

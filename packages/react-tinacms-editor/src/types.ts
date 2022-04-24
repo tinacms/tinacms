@@ -23,7 +23,7 @@ import { Node } from 'prosemirror-model'
 import { Schema } from 'prosemirror-model'
 
 import { Format } from './translator'
-import { Form, Media } from 'tinacms'
+import { Form, Media } from '@tinacms/toolkit'
 
 export interface PassedImageProps {
   parse(media: Media): string
