@@ -83,6 +83,7 @@ const buildField = (field: TinaField) => {
               throw new Error('Global templates not supported')
             }
             return `${buildFields(
+              // @ts-ignore
               { required: true },
               template.fields,
               `_template: "${template.name}"`
@@ -142,6 +143,7 @@ const buildFields = (
 
 export const buildCollectionResponses = (name, fields) => {
   const stringFields = buildFields(
+    // @ts-ignore
     { name, required: true, _collections: true },
     fields
   )
