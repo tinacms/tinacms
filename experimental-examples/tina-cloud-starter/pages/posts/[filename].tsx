@@ -48,7 +48,6 @@ export const getStaticProps = async ({ params }) => {
 export const getStaticPaths = async () => {
   const client = ExperimentalGetTinaClient();
   const postsListData = await client.postsConnection();
-  console.log(postsListData);
   return {
     paths: postsListData.data.postsConnection.edges.map((post) => ({
       params: { filename: post.node._sys.filename },
