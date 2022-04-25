@@ -204,6 +204,7 @@ const buildTypes = (tinaSchema: TinaSchema) => {
         .filter((f) => f.type === 'reference')
         .map(
           (f) =>
+            // @ts-ignore
             `${f.name}?: boolean | {${f.collections
               .map(
                 (col) =>
