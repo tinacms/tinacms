@@ -94,10 +94,6 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
   if (schema) {
     // the schema is being passed in from the frontend so we can use that
     const schemaCollection = schema.getCollection(collection.name)
-    const template = schema.getTemplateForData({
-      collection: schemaCollection,
-      data: {},
-    })
     const formInfo = resolveForm({
       collection: schemaCollection,
       basename: schemaCollection.name,
