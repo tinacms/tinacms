@@ -30,6 +30,7 @@ import styles from './styles.css'
 import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { useTina } from './edit-state'
+import { parseURL } from './utils/parseUrl'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -185,31 +186,6 @@ class ErrorBoundary extends React.Component {
     }
 
     return this.props.children
-  }
-}
-
-const parseURL = (url: string): { branch; isLocalClient; clientId } => {
-  if (url.includes('localhost')) {
-    return { branch: null, isLocalClient: true, clientId: null }
-  }
-
-  const tinaHost = 'content.tinajs.io'
-
-  const params = new URL(url)
-  const pattern = new UrlPattern('/content/:clientId/github/:branch')
-  const result = pattern.match(params.pathname)
-
-  // TODO if !result || !result.clientId || !result.branch, throw an error
-
-  if (params.host !== tinaHost) {
-    throw new Error(
-      `The only supported hosts are ${tinaHost} or localhost, but received ${params.host}.`
-    )
-  }
-
-  return {
-    ...result,
-    isLocalClient: false,
   }
 }
 
