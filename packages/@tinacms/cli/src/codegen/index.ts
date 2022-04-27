@@ -11,27 +11,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { parse, printSchema, GraphQLSchema } from 'graphql'
-import { codegen } from '@graphql-codegen/core'
-import { plugin as typescriptPlugin } from '@graphql-codegen/typescript'
-import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations'
-import { AddGeneratedClient } from './plugin'
+import { GraphQLSchema, parse, printSchema } from 'graphql'
 
-// Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
-import { plugin as typescriptSdkPlugin } from './sdkPlugin'
+import { AddGeneratedClient } from './plugin'
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
+import { codegen } from '@graphql-codegen/core'
 // See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
 import { loadDocuments } from '@graphql-tools/load'
-import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
-
 import { logger } from '../logger'
+import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations'
+import { plugin as typescriptPlugin } from '@graphql-codegen/typescript'
+// Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
+import { plugin as typescriptSdkPlugin } from './sdkPlugin'
 
 export const generateTypes = async (
   schema: GraphQLSchema,
   queryPathGlob = process.cwd(),
   fragDocPath = process.cwd(),
-  options: { noSDK: boolean } = { noSDK: false }
+  options: { noSDK: boolean; verbose?: boolean } = {
+    noSDK: false,
+    verbose: false,
+  }
 ) => {
-  logger.info('Generating types...')
+  if (options.verbose) logger.info('Generating types...')
   try {
     let docs = []
     let fragDocs = []
