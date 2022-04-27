@@ -12,13 +12,12 @@ limitations under the License.
 */
 
 import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import GetCMS from '../components/GetCMS'
+import GetCollection from '../components/GetCollection'
+import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
-
-import GetCMS from '../components/GetCMS'
-import GetDocument from '../components/GetDocument'
-import GetDocumentFields from '../components/GetDocumentFields'
+import { Link, useParams } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
@@ -56,9 +55,17 @@ const CollectionUpdatePage = () => {
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
-        <GetDocumentFields cms={cms} collectionName={collectionName}>
-          {({ collection, mutationInfo }) => {
+        <GetCollection
+          cms={cms}
+          collectionName={collectionName}
+          includeDocuments={false}
+        >
+          {(collection) => {
             const relativePath = `${filename}.${collection.format}`
+            const mutationInfo = {
+              includeCollection: true,
+              includeTemplate: !!collection.templates,
+            }
 
             return (
               <GetDocument
@@ -79,7 +86,7 @@ const CollectionUpdatePage = () => {
               </GetDocument>
             )
           }}
-        </GetDocumentFields>
+        </GetCollection>
       )}
     </GetCMS>
   )
@@ -95,30 +102,27 @@ const RenderForm = ({
 }) => {
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
-  let schemaFields = document.form.fields
 
-  if (schema) {
-    // the schema is being passed in from the frontend so we can use that
-    const schemaCollection = schema.getCollection(collection.name)
-    const template = schema.getTemplateForData({
-      collection: schemaCollection,
-      data: document.values,
-    })
-    const formInfo = resolveForm({
-      collection: schemaCollection,
-      basename: schemaCollection.name,
-      schema: schema,
-      template,
-    })
-    schemaFields = formInfo.fields
-  }
+  // the schema is being passed in from the frontend so we can use that
+  const schemaCollection = schema.getCollection(collection.name)
+
+  const template = schema.getTemplateForData({
+    collection: schemaCollection,
+    data: document._values,
+  })
+  const formInfo = resolveForm({
+    collection: schemaCollection,
+    basename: schemaCollection.name,
+    schema: schema,
+    template,
+  })
 
   const form = useMemo(() => {
     return new Form({
       id: 'update-form',
       label: 'form',
-      fields: schemaFields,
-      initialValues: document.values,
+      fields: formInfo.fields as any,
+      initialValues: document._values,
       onSubmit: async (values) => {
         try {
           await updateDocument(

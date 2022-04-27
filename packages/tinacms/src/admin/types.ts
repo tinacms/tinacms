@@ -19,7 +19,7 @@ export interface Template {
 
 export interface DocumentNode {
   node: {
-    sys: {
+    _sys: {
       template: string
       breadcrumbs: string[]
       path: string
@@ -32,22 +32,11 @@ export interface DocumentNode {
 }
 
 export interface DocumentForm {
-  form: {
-    label: string
-    name: string
-    fields: Object[]
-    mutationInfo: {
-      path: string[]
-      string: string
-      includeCollection: boolean
-      includeTemplate: boolean
-    }
-  }
-  values: Object
+  _values: Object
 }
 
 export interface DocumentSys {
-  sys: {
+  _sys: {
     template: string
     breadcrumbs: string[]
     path: string
@@ -61,18 +50,11 @@ export interface DocumentSys {
 export interface Collection {
   label: string
   name: string
+  slug: string
   format?: string
   templates?: Template[]
   documents?: {
     totalCount?: number
     edges?: DocumentNode[]
-  }
-}
-
-export interface GetDocumentFields {
-  [collectionName: string]: {
-    collection: Object
-    templates?: Object[]
-    fields?: Object[]
   }
 }

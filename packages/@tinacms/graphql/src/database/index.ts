@@ -626,6 +626,7 @@ export type CollectionDocumentListLookup = {
 type UnionDataLookup = {
   type: string
   resolveType: 'unionData'
+  collection?: string
   typeMap: { [templateName: string]: string }
 }
 

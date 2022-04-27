@@ -1,5 +1,5 @@
 import React from 'react'
-import { useGraphqlFormsUnstable, getStaticPropsForTina } from 'tinacms'
+import { useGraphqlForms, getStaticPropsForTina } from 'tinacms'
 
 export default function Page(props) {
   const eventList = React.useRef([])
@@ -35,7 +35,7 @@ test('formifies the query and responds correctly to events', async () => {
     console.log('events copied to clipboard')
   }, [])
 
-  const [data] = useGraphqlFormsUnstable({
+  const [data] = useGraphqlForms({
     query,
     variables,
     data: props.data,
@@ -61,22 +61,10 @@ export const getStaticProps = async () => {
 const variables = {}
 
 const query = `#graphql
-query {
-  getBlockPageDocument(relativePath: "blockPage1.mdx") {
-    data {
-      blocks {
-        __typename
-        ...on BlockPageBlocksFeatureList {
-          items {
-            title
-          }
-        }
-        ...on BlockPageBlocksSlideshow {
-          items {
-            title
-          }
-        }
-      }
+query GetBlockPageDocument {
+  document(collection: "author", relativePath: "author1.mdx") {
+    ...on Author {
+      name
     }
   }
 }

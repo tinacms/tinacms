@@ -1,6 +1,6 @@
-query getPostsDocument($relativePath: String!) {
-  getPostsDocument(relativePath: $relativePath) {
-    sys {
+query posts($relativePath: String!) {
+  posts(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,19 +9,17 @@ query getPostsDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PostsParts
-    }
+    ...PostsParts
   }
 }
 
-query getPostsList {
-  getPostsList {
+query postsConnection {
+  postsConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,17 +27,15 @@ query getPostsList {
           relativePath
           extension
         }
-        data {
-          ...PostsParts
-        }
+        ...PostsParts
       }
     }
   }
 }
 
-query getGlobalDocument($relativePath: String!) {
-  getGlobalDocument(relativePath: $relativePath) {
-    sys {
+query global($relativePath: String!) {
+  global(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,19 +44,17 @@ query getGlobalDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...GlobalParts
-    }
+    ...GlobalParts
   }
 }
 
-query getGlobalList {
-  getGlobalList {
+query globalConnection {
+  globalConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,17 +62,15 @@ query getGlobalList {
           relativePath
           extension
         }
-        data {
-          ...GlobalParts
-        }
+        ...GlobalParts
       }
     }
   }
 }
 
-query getAuthorsDocument($relativePath: String!) {
-  getAuthorsDocument(relativePath: $relativePath) {
-    sys {
+query authors($relativePath: String!) {
+  authors(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -87,19 +79,17 @@ query getAuthorsDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...AuthorsParts
-    }
+    ...AuthorsParts
   }
 }
 
-query getAuthorsList {
-  getAuthorsList {
+query authorsConnection {
+  authorsConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -107,17 +97,15 @@ query getAuthorsList {
           relativePath
           extension
         }
-        data {
-          ...AuthorsParts
-        }
+        ...AuthorsParts
       }
     }
   }
 }
 
-query getPagesDocument($relativePath: String!) {
-  getPagesDocument(relativePath: $relativePath) {
-    sys {
+query pages($relativePath: String!) {
+  pages(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -126,19 +114,17 @@ query getPagesDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PagesParts
-    }
+    ...PagesParts
   }
 }
 
-query getPagesList {
-  getPagesList {
+query pagesConnection {
+  pagesConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -146,9 +132,7 @@ query getPagesList {
           relativePath
           extension
         }
-        data {
-          ...PagesParts
-        }
+        ...PagesParts
       }
     }
   }

@@ -1,17 +1,21 @@
 {
-  getCrewList(filter: { costumeDesigner: { favoriteColor: { eq: "blue" } } }) {
+  crewConnection (filter: { costumeDesigner: { favoriteColor: { eq: "blue" } } }) {
     edges {
       node {
-        id
+        ...on Document {
+          id
+        }
       }
     }
   }
-  shouldBeEmpty: getCrewList(
+  shouldBeEmpty: crewConnection(
     filter: { costumeDesigner: { favoriteColor: { eq: "red" } } }
   ) {
     edges {
       node {
-        id
+        ...on Document {
+          id
+        }
       }
     }
   }

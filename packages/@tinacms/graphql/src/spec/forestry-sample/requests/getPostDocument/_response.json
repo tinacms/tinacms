@@ -1,13 +1,9 @@
 {
   "data": {
-    "getPostDocument": {
-      "data": {
-        "title": "Hello, World!",
-        "author": {
-          "data": {
-            "name": "Homer J Simpson"
-          }
-        }
+    "post": {
+      "title": "Hello, World!",
+      "author": {
+        "name": "Homer J Simpson"
       }
     }
   }

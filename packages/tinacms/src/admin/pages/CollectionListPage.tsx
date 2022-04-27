@@ -108,7 +108,7 @@ const handleNavigate = (
     window.location.href = routeOverride
     return null
   } else {
-    navigate(document.sys.breadcrumbs.join('/'))
+    navigate(document._sys.breadcrumbs.join('/'))
   }
 }
 
@@ -185,13 +185,14 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
-                                const subfolders = document.node.sys.breadcrumbs
-                                  .slice(0, -1)
-                                  .join('/')
+                                const subfolders =
+                                  document.node._sys.breadcrumbs
+                                    .slice(0, -1)
+                                    .join('/')
 
                                 return (
                                   <tr
-                                    key={`document-${document.node.sys.relativePath}`}
+                                    key={`document-${document.node._sys.relativePath}`}
                                     className=""
                                   >
                                     <td className="px-6 py-2 whitespace-nowrap">
@@ -218,7 +219,7 @@ const CollectionListPage = () => {
                                               </span>
                                             )}
                                             <span>
-                                              {document.node.sys.filename}
+                                              {document.node._sys.filename}
                                             </span>
                                           </span>
                                         </span>
@@ -229,7 +230,7 @@ const CollectionListPage = () => {
                                         Extension
                                       </span>
                                       <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                        {document.node.sys.extension}
+                                        {document.node._sys.extension}
                                       </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -237,7 +238,7 @@ const CollectionListPage = () => {
                                         Template
                                       </span>
                                       <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                        {document.node.sys.template}
+                                        {document.node._sys.template}
                                       </span>
                                     </td>
                                     <td className="w-0">
@@ -250,7 +251,7 @@ const CollectionListPage = () => {
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
                                               navigate(
-                                                `${document.node.sys.filename}`,
+                                                `${document.node._sys.filename}`,
                                                 { replace: true }
                                               )
                                             },
@@ -268,8 +269,8 @@ const CollectionListPage = () => {
                                               setVars({
                                                 collection: collectionName,
                                                 relativePath:
-                                                  document.node.sys.filename +
-                                                  document.node.sys.extension,
+                                                  document.node._sys.filename +
+                                                  document.node._sys.extension,
                                               })
                                               setOpen(true)
                                             },

@@ -47,32 +47,30 @@ export type Node = {
 };
 
 export type Document = {
-  sys?: Maybe<SystemInfo>;
   id: Scalars['ID'];
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
+  _sys?: Maybe<SystemInfo>;
+  _values: Scalars['JSON'];
 };
 
 /** A relay-compliant pagination connection */
 export type Connection = {
   totalCount: Scalars['Float'];
+  pageInfo: PageInfo;
 };
 
 export type Query = {
   __typename?: 'Query';
   getOptimizedQuery?: Maybe<Scalars['String']>;
-  getCollection: Collection;
-  getCollections: Array<Collection>;
+  collection: Collection;
+  collections: Array<Collection>;
   node: Node;
-  getDocument: DocumentNode;
-  getDocumentList: DocumentConnection;
-  getDocumentFields: Scalars['JSON'];
-  getPostDocument: PostDocument;
-  getPostList: PostConnection;
-  getAuthorDocument: AuthorDocument;
-  getAuthorList: AuthorConnection;
-  getBlockPageDocument: BlockPageDocument;
-  getBlockPageList: BlockPageConnection;
+  document: DocumentNode;
+  post: Post;
+  postConnection: PostConnection;
+  author: Author;
+  authorConnection: AuthorConnection;
+  blockPage: BlockPage;
+  blockPageConnection: BlockPageConnection;
 };
 
 
@@ -81,7 +79,7 @@ export type QueryGetOptimizedQueryArgs = {
 };
 
 
-export type QueryGetCollectionArgs = {
+export type QueryCollectionArgs = {
   collection?: Maybe<Scalars['String']>;
 };
 
@@ -91,67 +89,62 @@ export type QueryNodeArgs = {
 };
 
 
-export type QueryGetDocumentArgs = {
+export type QueryDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetDocumentListArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-};
-
-
-export type QueryGetPostDocumentArgs = {
+export type QueryPostArgs = {
   relativePath?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetPostListArgs = {
+export type QueryPostConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetAuthorDocumentArgs = {
+export type QueryAuthorArgs = {
   relativePath?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetAuthorListArgs = {
+export type QueryAuthorConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetBlockPageDocumentArgs = {
+export type QueryBlockPageArgs = {
   relativePath?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetBlockPageListArgs = {
+export type QueryBlockPageConnectionArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
 export type DocumentConnectionEdges = {
   __typename?: 'DocumentConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
+  cursor: Scalars['String'];
   node?: Maybe<DocumentNode>;
 };
 
 export type DocumentConnection = Connection & {
   __typename?: 'DocumentConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<DocumentConnectionEdges>>>;
 };
@@ -175,42 +168,36 @@ export type CollectionDocumentsArgs = {
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Float']>;
   last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
 };
 
-export type DocumentNode = PostDocument | AuthorDocument | BlockPageDocument;
+export type DocumentNode = Post | Author | BlockPage;
 
-export type PostAuthorDocument = AuthorDocument;
+export type PostAuthor = Author;
 
-export type Post = {
+export type Post = Node & Document & {
   __typename?: 'Post';
   title?: Maybe<Scalars['String']>;
-  author?: Maybe<PostAuthorDocument>;
+  author?: Maybe<PostAuthor>;
   tags?: Maybe<Array<Maybe<Scalars['String']>>>;
   categories?: Maybe<Array<Maybe<Scalars['String']>>>;
   published?: Maybe<Scalars['String']>;
   featured?: Maybe<Scalars['Boolean']>;
   body?: Maybe<Scalars['JSON']>;
-};
-
-export type PostDocument = Node & Document & {
-  __typename?: 'PostDocument';
   id: Scalars['ID'];
-  sys: SystemInfo;
-  data: Post;
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
-  dataJSON: Scalars['JSON'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
 };
 
 export type PostConnectionEdges = {
   __typename?: 'PostConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<PostDocument>;
+  cursor: Scalars['String'];
+  node?: Maybe<Post>;
 };
 
 export type PostConnection = Connection & {
   __typename?: 'PostConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<PostConnectionEdges>>>;
 };
@@ -221,32 +208,25 @@ export type AuthorSocial = {
   handle?: Maybe<Scalars['String']>;
 };
 
-export type Author = {
+export type Author = Node & Document & {
   __typename?: 'Author';
   name?: Maybe<Scalars['String']>;
   social?: Maybe<Array<Maybe<AuthorSocial>>>;
   bio?: Maybe<Scalars['JSON']>;
-};
-
-export type AuthorDocument = Node & Document & {
-  __typename?: 'AuthorDocument';
   id: Scalars['ID'];
-  sys: SystemInfo;
-  data: Author;
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
-  dataJSON: Scalars['JSON'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
 };
 
 export type AuthorConnectionEdges = {
   __typename?: 'AuthorConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<AuthorDocument>;
+  cursor: Scalars['String'];
+  node?: Maybe<Author>;
 };
 
 export type AuthorConnection = Connection & {
   __typename?: 'AuthorConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<AuthorConnectionEdges>>>;
 };
@@ -257,19 +237,19 @@ export type BlockPageBlocksHero = {
   description?: Maybe<Scalars['String']>;
 };
 
-export type BlockPageBlocksBlockQuoteAuthorDocument = AuthorDocument;
+export type BlockPageBlocksBlockQuoteAuthor = Author;
 
 export type BlockPageBlocksBlockQuote = {
   __typename?: 'BlockPageBlocksBlockQuote';
   message?: Maybe<Scalars['JSON']>;
-  author?: Maybe<BlockPageBlocksBlockQuoteAuthorDocument>;
+  author?: Maybe<BlockPageBlocksBlockQuoteAuthor>;
 };
 
-export type BlockPageBlocksFeaturedPostsBlogsItemDocument = PostDocument;
+export type BlockPageBlocksFeaturedPostsBlogsItem = Post;
 
 export type BlockPageBlocksFeaturedPostsBlogs = {
   __typename?: 'BlockPageBlocksFeaturedPostsBlogs';
-  item?: Maybe<BlockPageBlocksFeaturedPostsBlogsItemDocument>;
+  item?: Maybe<BlockPageBlocksFeaturedPostsBlogsItem>;
 };
 
 export type BlockPageBlocksFeaturedPosts = {
@@ -304,31 +284,24 @@ export type BlockPageBlocksSlideshow = {
 
 export type BlockPageBlocks = BlockPageBlocksHero | BlockPageBlocksBlockQuote | BlockPageBlocksFeaturedPosts | BlockPageBlocksFeatureList | BlockPageBlocksSlideshow;
 
-export type BlockPage = {
+export type BlockPage = Node & Document & {
   __typename?: 'BlockPage';
   title?: Maybe<Scalars['String']>;
   blocks?: Maybe<Array<Maybe<BlockPageBlocks>>>;
-};
-
-export type BlockPageDocument = Node & Document & {
-  __typename?: 'BlockPageDocument';
   id: Scalars['ID'];
-  sys: SystemInfo;
-  data: BlockPage;
-  form: Scalars['JSON'];
-  values: Scalars['JSON'];
-  dataJSON: Scalars['JSON'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
 };
 
 export type BlockPageConnectionEdges = {
   __typename?: 'BlockPageConnectionEdges';
-  cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<BlockPageDocument>;
+  cursor: Scalars['String'];
+  node?: Maybe<BlockPage>;
 };
 
 export type BlockPageConnection = Connection & {
   __typename?: 'BlockPageConnection';
-  pageInfo?: Maybe<PageInfo>;
+  pageInfo: PageInfo;
   totalCount: Scalars['Float'];
   edges?: Maybe<Array<Maybe<BlockPageConnectionEdges>>>;
 };
@@ -337,13 +310,14 @@ export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
+  deleteDocument: DocumentNode;
   createDocument: DocumentNode;
-  updatePostDocument: PostDocument;
-  createPostDocument: PostDocument;
-  updateAuthorDocument: AuthorDocument;
-  createAuthorDocument: AuthorDocument;
-  updateBlockPageDocument: BlockPageDocument;
-  createBlockPageDocument: BlockPageDocument;
+  updatePost: Post;
+  createPost: Post;
+  updateAuthor: Author;
+  createAuthor: Author;
+  updateBlockPage: BlockPage;
+  createBlockPage: BlockPage;
 };
 
 
@@ -361,6 +335,12 @@ export type MutationUpdateDocumentArgs = {
 };
 
 
+export type MutationDeleteDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
+  relativePath: Scalars['String'];
+};
+
+
 export type MutationCreateDocumentArgs = {
   collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
@@ -368,37 +348,37 @@ export type MutationCreateDocumentArgs = {
 };
 
 
-export type MutationUpdatePostDocumentArgs = {
+export type MutationUpdatePostArgs = {
   relativePath: Scalars['String'];
   params: PostMutation;
 };
 
 
-export type MutationCreatePostDocumentArgs = {
+export type MutationCreatePostArgs = {
   relativePath: Scalars['String'];
   params: PostMutation;
 };
 
 
-export type MutationUpdateAuthorDocumentArgs = {
+export type MutationUpdateAuthorArgs = {
   relativePath: Scalars['String'];
   params: AuthorMutation;
 };
 
 
-export type MutationCreateAuthorDocumentArgs = {
+export type MutationCreateAuthorArgs = {
   relativePath: Scalars['String'];
   params: AuthorMutation;
 };
 
 
-export type MutationUpdateBlockPageDocumentArgs = {
+export type MutationUpdateBlockPageArgs = {
   relativePath: Scalars['String'];
   params: BlockPageMutation;
 };
 
 
-export type MutationCreateBlockPageDocumentArgs = {
+export type MutationCreateBlockPageArgs = {
   relativePath: Scalars['String'];
   params: BlockPageMutation;
 };
@@ -482,47 +462,47 @@ export type BlockPageMutation = {
   blocks?: Maybe<Array<Maybe<BlockPageBlocksMutation>>>;
 };
 
-export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> };
+export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, author?: Maybe<{ __typename?: 'Author', id: string }> };
 
 export type AuthorPartsFragment = { __typename?: 'Author', name?: Maybe<string>, bio?: Maybe<any>, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> };
 
-export type BlockPagePartsFragment = { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> };
+export type BlockPagePartsFragment = { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'Author', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'Post', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> };
 
-export type GetPostDocumentQueryVariables = Exact<{
+export type PostQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type GetPostDocumentQuery = { __typename?: 'Query', getPostDocument: { __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } } };
+export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, author?: Maybe<{ __typename?: 'Author', id: string }> } };
 
-export type GetPostListQueryVariables = Exact<{ [key: string]: never; }>;
+export type PostConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPostListQuery = { __typename?: 'Query', getPostList: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'PostDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Post', title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } }> }>>> } };
+export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'Post', id: string, title?: Maybe<string>, tags?: Maybe<Array<Maybe<string>>>, categories?: Maybe<Array<Maybe<string>>>, published?: Maybe<string>, featured?: Maybe<boolean>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, author?: Maybe<{ __typename?: 'Author', id: string }> }> }>>> } };
 
-export type GetAuthorDocumentQueryVariables = Exact<{
+export type AuthorQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type GetAuthorDocumentQuery = { __typename?: 'Query', getAuthorDocument: { __typename?: 'AuthorDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Author', name?: Maybe<string>, bio?: Maybe<any>, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> } } };
+export type AuthorQuery = { __typename?: 'Query', author: { __typename?: 'Author', id: string, name?: Maybe<string>, bio?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> } };
 
-export type GetAuthorListQueryVariables = Exact<{ [key: string]: never; }>;
+export type AuthorConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAuthorListQuery = { __typename?: 'Query', getAuthorList: { __typename?: 'AuthorConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'AuthorConnectionEdges', node?: Maybe<{ __typename?: 'AuthorDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'Author', name?: Maybe<string>, bio?: Maybe<any>, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> } }> }>>> } };
+export type AuthorConnectionQuery = { __typename?: 'Query', authorConnection: { __typename?: 'AuthorConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'AuthorConnectionEdges', node?: Maybe<{ __typename?: 'Author', id: string, name?: Maybe<string>, bio?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, social?: Maybe<Array<Maybe<{ __typename: 'AuthorSocial', platform?: Maybe<string>, handle?: Maybe<string> }>>> }> }>>> } };
 
-export type GetBlockPageDocumentQueryVariables = Exact<{
+export type BlockPageQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type GetBlockPageDocumentQuery = { __typename?: 'Query', getBlockPageDocument: { __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> } } };
+export type BlockPageQuery = { __typename?: 'Query', blockPage: { __typename?: 'BlockPage', id: string, title?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'Author', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'Post', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> } };
 
-export type GetBlockPageListQueryVariables = Exact<{ [key: string]: never; }>;
+export type BlockPageConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBlockPageListQuery = { __typename?: 'Query', getBlockPageList: { __typename?: 'BlockPageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'BlockPageConnectionEdges', node?: Maybe<{ __typename?: 'BlockPageDocument', id: string, sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, data: { __typename?: 'BlockPage', title?: Maybe<string>, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'AuthorDocument', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'PostDocument', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> } }> }>>> } };
+export type BlockPageConnectionQuery = { __typename?: 'Query', blockPageConnection: { __typename?: 'BlockPageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'BlockPageConnectionEdges', node?: Maybe<{ __typename?: 'BlockPage', id: string, title?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, blocks?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksHero', title?: Maybe<string>, description?: Maybe<string> } | { __typename: 'BlockPageBlocksBlockQuote', message?: Maybe<any>, author?: Maybe<{ __typename?: 'Author', id: string }> } | { __typename: 'BlockPageBlocksFeaturedPosts', header?: Maybe<string>, blogs?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeaturedPostsBlogs', item?: Maybe<{ __typename?: 'Post', id: string }> }>>> } | { __typename: 'BlockPageBlocksFeatureList', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksFeatureListItems', title?: Maybe<string>, description?: Maybe<string> }>>> } | { __typename: 'BlockPageBlocksSlideshow', title?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'BlockPageBlocksSlideshowItems', title?: Maybe<string>, url?: Maybe<string> }>>> }>>> }> }>>> } };
 
 export const PostPartsFragmentDoc = gql`
     fragment PostParts on Post {
@@ -597,10 +577,10 @@ export const BlockPagePartsFragmentDoc = gql`
   }
 }
     `;
-export const GetPostDocumentDocument = gql`
-    query getPostDocument($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
-    sys {
+export const PostDocument = gql`
+    query post($relativePath: String!) {
+  post(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -609,20 +589,18 @@ export const GetPostDocumentDocument = gql`
       extension
     }
     id
-    data {
-      ...PostParts
-    }
+    ...PostParts
   }
 }
     ${PostPartsFragmentDoc}`;
-export const GetPostListDocument = gql`
-    query getPostList {
-  getPostList {
+export const PostConnectionDocument = gql`
+    query postConnection {
+  postConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -630,18 +608,16 @@ export const GetPostListDocument = gql`
           relativePath
           extension
         }
-        data {
-          ...PostParts
-        }
+        ...PostParts
       }
     }
   }
 }
     ${PostPartsFragmentDoc}`;
-export const GetAuthorDocumentDocument = gql`
-    query getAuthorDocument($relativePath: String!) {
-  getAuthorDocument(relativePath: $relativePath) {
-    sys {
+export const AuthorDocument = gql`
+    query author($relativePath: String!) {
+  author(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -650,20 +626,18 @@ export const GetAuthorDocumentDocument = gql`
       extension
     }
     id
-    data {
-      ...AuthorParts
-    }
+    ...AuthorParts
   }
 }
     ${AuthorPartsFragmentDoc}`;
-export const GetAuthorListDocument = gql`
-    query getAuthorList {
-  getAuthorList {
+export const AuthorConnectionDocument = gql`
+    query authorConnection {
+  authorConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -671,18 +645,16 @@ export const GetAuthorListDocument = gql`
           relativePath
           extension
         }
-        data {
-          ...AuthorParts
-        }
+        ...AuthorParts
       }
     }
   }
 }
     ${AuthorPartsFragmentDoc}`;
-export const GetBlockPageDocumentDocument = gql`
-    query getBlockPageDocument($relativePath: String!) {
-  getBlockPageDocument(relativePath: $relativePath) {
-    sys {
+export const BlockPageDocument = gql`
+    query blockPage($relativePath: String!) {
+  blockPage(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -691,20 +663,18 @@ export const GetBlockPageDocumentDocument = gql`
       extension
     }
     id
-    data {
-      ...BlockPageParts
-    }
+    ...BlockPageParts
   }
 }
     ${BlockPagePartsFragmentDoc}`;
-export const GetBlockPageListDocument = gql`
-    query getBlockPageList {
-  getBlockPageList {
+export const BlockPageConnectionDocument = gql`
+    query blockPageConnection {
+  blockPageConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -712,9 +682,7 @@ export const GetBlockPageListDocument = gql`
           relativePath
           extension
         }
-        data {
-          ...BlockPageParts
-        }
+        ...BlockPageParts
       }
     }
   }
@@ -723,23 +691,23 @@ export const GetBlockPageListDocument = gql`
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
   export function getSdk<C>(requester: Requester<C>) {
     return {
-      getPostDocument(variables: GetPostDocumentQueryVariables, options?: C): Promise<{data: GetPostDocumentQuery, variables: GetPostDocumentQueryVariables, query: string}> {
-        return requester<{data: GetPostDocumentQuery, variables: GetPostDocumentQueryVariables, query: string}, GetPostDocumentQueryVariables>(GetPostDocumentDocument, variables, options);
+      post(variables: PostQueryVariables, options?: C): Promise<{data: PostQuery, variables: PostQueryVariables, query: string}> {
+        return requester<{data: PostQuery, variables: PostQueryVariables, query: string}, PostQueryVariables>(PostDocument, variables, options);
       },
-    getPostList(variables?: GetPostListQueryVariables, options?: C): Promise<{data: GetPostListQuery, variables: GetPostListQueryVariables, query: string}> {
-        return requester<{data: GetPostListQuery, variables: GetPostListQueryVariables, query: string}, GetPostListQueryVariables>(GetPostListDocument, variables, options);
+    postConnection(variables?: PostConnectionQueryVariables, options?: C): Promise<{data: PostConnectionQuery, variables: PostConnectionQueryVariables, query: string}> {
+        return requester<{data: PostConnectionQuery, variables: PostConnectionQueryVariables, query: string}, PostConnectionQueryVariables>(PostConnectionDocument, variables, options);
       },
-    getAuthorDocument(variables: GetAuthorDocumentQueryVariables, options?: C): Promise<{data: GetAuthorDocumentQuery, variables: GetAuthorDocumentQueryVariables, query: string}> {
-        return requester<{data: GetAuthorDocumentQuery, variables: GetAuthorDocumentQueryVariables, query: string}, GetAuthorDocumentQueryVariables>(GetAuthorDocumentDocument, variables, options);
+    author(variables: AuthorQueryVariables, options?: C): Promise<{data: AuthorQuery, variables: AuthorQueryVariables, query: string}> {
+        return requester<{data: AuthorQuery, variables: AuthorQueryVariables, query: string}, AuthorQueryVariables>(AuthorDocument, variables, options);
       },
-    getAuthorList(variables?: GetAuthorListQueryVariables, options?: C): Promise<{data: GetAuthorListQuery, variables: GetAuthorListQueryVariables, query: string}> {
-        return requester<{data: GetAuthorListQuery, variables: GetAuthorListQueryVariables, query: string}, GetAuthorListQueryVariables>(GetAuthorListDocument, variables, options);
+    authorConnection(variables?: AuthorConnectionQueryVariables, options?: C): Promise<{data: AuthorConnectionQuery, variables: AuthorConnectionQueryVariables, query: string}> {
+        return requester<{data: AuthorConnectionQuery, variables: AuthorConnectionQueryVariables, query: string}, AuthorConnectionQueryVariables>(AuthorConnectionDocument, variables, options);
       },
-    getBlockPageDocument(variables: GetBlockPageDocumentQueryVariables, options?: C): Promise<{data: GetBlockPageDocumentQuery, variables: GetBlockPageDocumentQueryVariables, query: string}> {
-        return requester<{data: GetBlockPageDocumentQuery, variables: GetBlockPageDocumentQueryVariables, query: string}, GetBlockPageDocumentQueryVariables>(GetBlockPageDocumentDocument, variables, options);
+    blockPage(variables: BlockPageQueryVariables, options?: C): Promise<{data: BlockPageQuery, variables: BlockPageQueryVariables, query: string}> {
+        return requester<{data: BlockPageQuery, variables: BlockPageQueryVariables, query: string}, BlockPageQueryVariables>(BlockPageDocument, variables, options);
       },
-    getBlockPageList(variables?: GetBlockPageListQueryVariables, options?: C): Promise<{data: GetBlockPageListQuery, variables: GetBlockPageListQueryVariables, query: string}> {
-        return requester<{data: GetBlockPageListQuery, variables: GetBlockPageListQueryVariables, query: string}, GetBlockPageListQueryVariables>(GetBlockPageListDocument, variables, options);
+    blockPageConnection(variables?: BlockPageConnectionQueryVariables, options?: C): Promise<{data: BlockPageConnectionQuery, variables: BlockPageConnectionQueryVariables, query: string}> {
+        return requester<{data: BlockPageConnectionQuery, variables: BlockPageConnectionQueryVariables, query: string}, BlockPageConnectionQueryVariables>(BlockPageConnectionDocument, variables, options);
       }
     };
   }

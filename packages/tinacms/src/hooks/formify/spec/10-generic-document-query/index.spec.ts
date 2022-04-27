@@ -13,11 +13,9 @@ limitations under the License.
 
 const query = `#graphql
 query GetBlockPageDocument {
-  getDocument(collection: "author", relativePath: "author1.mdx") {
-    ...on AuthorDocument {
-      data {
-        name
-      }
+  document(collection: "author", relativePath: "author1.mdx") {
+    ...on Author {
+      name
     }
   }
 }

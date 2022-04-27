@@ -1,5 +1,5 @@
 # Blueprint
-# getPostDocument
+# post
 #
 # Documents for blueprint
 # ================
@@ -11,17 +11,15 @@
 
 
 query GetBlockPageDocument {
-  getPostDocument(relativePath: "post1.mdx") {
-    data {
-      published
-    }
-    _internalSys: sys {
+  post(relativePath: "post1.mdx") {
+    published
+    _internalSys: _sys {
       path
+      relativePath
       collection {
         name
       }
     }
-    form
-    values
+    _values
   }
 }

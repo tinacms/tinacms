@@ -15,10 +15,7 @@ export * from './client'
 export * from './auth'
 export * from './utils'
 export * from './tina-cms'
-export {
-  useGraphqlForms,
-  useGraphqlFormsUnstable,
-} from './hooks/use-graphql-forms'
+export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'

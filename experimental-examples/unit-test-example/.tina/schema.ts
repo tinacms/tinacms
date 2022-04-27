@@ -174,11 +174,6 @@ const schema = defineSchema({
                   label: 'Features',
                   name: 'items',
                   type: 'object',
-                  ui: {
-                    component: (props) => {
-                      return <div>Hi</div>
-                    },
-                  },
                   list: true,
                   fields: [
                     {
@@ -244,6 +239,7 @@ const apiURL =
 
 export const tinaConfig = defineConfig({
   apiURL,
+  schema,
   cmsCallback: (cms) => {
     cms.flags.set('tina-admin', true)
     return cms

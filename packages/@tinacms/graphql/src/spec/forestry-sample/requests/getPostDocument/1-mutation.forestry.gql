@@ -1,5 +1,5 @@
 mutation {
-  updatePostDocument(
+  updatePost(
     relativePath: "hello-world.md"
     params: {
       post: {
@@ -9,6 +9,8 @@ mutation {
       }
     }
   ) {
-    id
+    ...on Document {
+      id
+    }
   }
 }
