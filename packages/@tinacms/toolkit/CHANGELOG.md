@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.22
+
+### Patch Changes
+
+- bf5fe0074: Improvement of select dropdown. Make arrow icon clickable
+
 ## 0.56.21
 
 ### Patch Changes
