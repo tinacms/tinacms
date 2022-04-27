@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.60.13
+
+### Patch Changes
+
+- 9d28ea29e: hide some existing start:server logging behind --verbose flag. format some messages to make them easier to read
+
 ## 0.60.12
 
 ### Patch Changes
