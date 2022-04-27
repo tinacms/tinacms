@@ -307,7 +307,9 @@ export const TinaCMSProvider2 = ({
 
   // schema is now required as the Global Nav and CMS utilize it
   if (!schema) {
-    throw new Error('`schema` is a required field')
+    throw new Error(
+      '`schema` is required to be passed as a property to `TinaProvider`.  You can learn more about this change here: https://github.com/tinacms/tinacms/pull/2823'
+    )
   }
 
   return (
