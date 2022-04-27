@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.67.4
+
+### Patch Changes
+
+- 168f6cc6e: Update delete modal header
+- 2a6060138: Fix url parsing issue when a branch name contained a `/`
+- 3af3d6787: Fix issues with finding the template for multitemplate collections
+- Updated dependencies [bf5fe0074]
+  - @tinacms/toolkit@0.56.22
+
 ## 0.67.3
 
 ### Patch Changes
