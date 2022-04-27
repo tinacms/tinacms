@@ -32,12 +32,13 @@ import {
   OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
+import { lastItem } from '../util'
 
 const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
-    value: 'sys',
+    value: '_sys',
   },
   arguments: [],
   directives: [],
@@ -608,26 +609,12 @@ export const astBuilder = {
                   directives: [],
                 },
                 {
-                  kind: 'Field',
+                  kind: 'FragmentSpread',
                   name: {
                     kind: 'Name',
-                    value: 'data',
+                    value: fragName,
                   },
-                  arguments: [],
                   directives: [],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      {
-                        kind: 'FragmentSpread',
-                        name: {
-                          kind: 'Name',
-                          value: fragName,
-                        },
-                        directives: [],
-                      },
-                    ],
-                  },
                 },
               ],
             },
@@ -709,26 +696,12 @@ export const astBuilder = {
                             },
                             SysFieldDefinition,
                             {
-                              kind: 'Field',
+                              kind: 'FragmentSpread',
                               name: {
                                 kind: 'Name',
-                                value: 'data',
+                                value: fragName,
                               },
-                              arguments: [],
                               directives: [],
-                              selectionSet: {
-                                kind: 'SelectionSet',
-                                selections: [
-                                  {
-                                    kind: 'FragmentSpread',
-                                    name: {
-                                      kind: 'Name',
-                                      value: fragName,
-                                    },
-                                    directives: [],
-                                  },
-                                ],
-                              },
                             },
                           ],
                         },
@@ -905,16 +878,28 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace, 'Document')
+    return `update${generateNamespacedFieldName(namespace)}`
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace, 'Document')
+    return `create${generateNamespacedFieldName(namespace)}`
+  },
+  documentQueryName: () => {
+    return 'document'
+  },
+  documentConnectionQueryName: () => {
+    return 'documentConnection'
+  },
+  collectionQueryName: () => {
+    return 'collection'
+  },
+  collectionListQueryName: () => {
+    return 'collections'
   },
   queryName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'Document')
+    return String(lastItem(namespace))
   },
   generateQueryListName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'List')
+    return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '') + 'Parts'
@@ -923,7 +908,7 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Collection')
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Document')
+    return generateNamespacedFieldName(namespace)
   },
   dataTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '')

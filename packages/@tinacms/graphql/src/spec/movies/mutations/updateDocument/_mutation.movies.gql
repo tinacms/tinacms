@@ -1,7 +1,5 @@
 mutation UpdateMovie($params: MovieMutation!) {
-  updateMovieDocument(relativePath: "star-wars.md", params: $params) {
-    data {
-      title
-    }
+  updateMovie(relativePath: "star-wars.md", params: $params) {
+    title
   }
 }

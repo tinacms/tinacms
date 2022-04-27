@@ -3,21 +3,17 @@ import { Layout } from '../../components/Layout'
 import { useTina } from 'tinacms/dist/edit-state'
 
 const query = `query getPost($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
-    data {
-      title
-      body
-      posts {
-        __typename
-        ... on PostPosts {
-          post {
-            __typename
-            ... on PostDocument {
-              data {
-                title
-                body
-              }
-            }
+  post(relativePath: $relativePath) {
+    title
+    body
+    posts {
+      __typename
+      ... on PostPosts {
+        post {
+          __typename
+          ... on Post {
+            title
+            body
           }
         }
       }
@@ -41,7 +37,7 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(data.getPostDocument.data, null, 2)}
+          {JSON.stringify(data.post, null, 2)}
         </pre>
       </code>
     </Layout>
@@ -51,10 +47,10 @@ export default function Home(props) {
 export const getStaticPaths = async () => {
   const tinaProps = await staticRequest({
     query: `{
-        getPostList{
+        postConnection {
           edges {
             node {
-              sys {
+              _sys {
                 filename
               }
             }
@@ -63,8 +59,8 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.getPostList.edges.map((x) => {
-    return { params: { slug: x.node.sys.filename } }
+  const paths = tinaProps.postConnection.edges.map((x) => {
+    return { params: { slug: x.node._sys.filename } }
   })
 
   return {

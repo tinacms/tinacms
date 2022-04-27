@@ -13,7 +13,7 @@ limitations under the License.
 
 const query = `#graphql
 query GetBlockPageDocument {
-  getBlockPageDocument(relativePath: "blockPage1.mdx") {
+  blockPage (relativePath: "blockPage1.mdx") {
     ... on Document {
       id
     }

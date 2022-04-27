@@ -103,7 +103,7 @@ const components: Components<{
   },
 };
 
-export const Post = ({ data }) => {
+export const Post = (data) => {
   const theme = React.useContext(ThemeContext);
   const titleColorClasses = {
     blue: "from-blue-400 to-blue-600 dark:from-blue-300 dark:to-blue-500",
@@ -149,12 +149,12 @@ export const Post = ({ data }) => {
               <div className="flex-shrink-0 mr-4">
                 <img
                   className="h-14 w-14 object-cover rounded-full shadow-sm"
-                  src={data.author.data.avatar}
-                  alt={data.author.data.name}
+                  src={data.author.avatar}
+                  alt={data.author.name}
                 />
               </div>
               <p className="text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
-                {data.author.data.name}
+                {data.author.name}
               </p>
               <span className="font-bold text-gray-200 dark:text-gray-500 mx-2">
                 —

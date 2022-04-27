@@ -1,27 +1,25 @@
 {
   "data": {
-    "getPageDocument": {
+    "page": {
       "id": "content/pages/home.md",
-      "data": {
-        "title": "Welcome",
-        "seo": {
-          "seoTitle": "Welcome to our website",
-          "ogImage": "http://placehold.it/300x200",
-          "ogDescription": "You're gonna love this site!"
+      "title": "Welcome",
+      "seo": {
+        "seoTitle": "Welcome to our website",
+        "ogImage": "http://placehold.it/300x200",
+        "ogDescription": "You're gonna love this site!"
+      },
+      "blocks": [
+        {
+          "__typename": "PageBlocksHero",
+          "backgroundImage": "http://placehold.it/300x200",
+          "description": "Welcome!"
         },
-        "blocks": [
-          {
-            "__typename": "PageBlocksHero",
-            "backgroundImage": "http://placehold.it/300x200",
-            "description": "Welcome!"
-          },
-          {
-            "__typename": "PageBlocksCta",
-            "ctaText": "Join Us",
-            "ctaStyle": "minimal"
-          }
-        ]
-      }
+        {
+          "__typename": "PageBlocksCta",
+          "ctaText": "Join Us",
+          "ctaStyle": "minimal"
+        }
+      ]
     }
   }
 }

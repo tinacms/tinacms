@@ -2,7 +2,7 @@ import { getStaticPropsForTina } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
 export default function Home(props) {
-  const { body, subtitle, heading } = props.data.getPageDocument.data
+  const { body, subtitle, heading } = props.data.page
   return (
     <Layout>
       <h1 data-test="heading">{heading}</h1>
@@ -24,14 +24,12 @@ export default function Home(props) {
 export const getStaticProps = async () => {
   const tinaProps = await getStaticPropsForTina({
     query: `{
-    getPageDocument(relativePath: "home.mdx"){
-      data{
+      page(relativePath: "home.mdx"){
         body
         heading
         subtitle
       }
-    }
-  }`,
+    }`,
     variables: {},
   })
 

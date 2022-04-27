@@ -1,6 +1,6 @@
-query getPageDocument($relativePath: String!) {
-  getPageDocument(relativePath: $relativePath) {
-    sys {
+query page($relativePath: String!) {
+  page(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -9,19 +9,17 @@ query getPageDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PageParts
-    }
+    ...PageParts
   }
 }
 
-query getPageList {
-  getPageList {
+query pageConnection {
+  pageConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -29,17 +27,15 @@ query getPageList {
           relativePath
           extension
         }
-        data {
-          ...PageParts
-        }
+        ...PageParts
       }
     }
   }
 }
 
-query getPostDocument($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
-    sys {
+query post($relativePath: String!) {
+  post(relativePath: $relativePath) {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -48,19 +44,17 @@ query getPostDocument($relativePath: String!) {
       extension
     }
     id
-    data {
-      ...PostParts
-    }
+    ...PostParts
   }
 }
 
-query getPostList {
-  getPostList {
+query postConnection {
+  postConnection {
     totalCount
     edges {
       node {
         id
-        sys {
+        _sys {
           filename
           basename
           breadcrumbs
@@ -68,9 +62,7 @@ query getPostList {
           relativePath
           extension
         }
-        data {
-          ...PostParts
-        }
+        ...PostParts
       }
     }
   }

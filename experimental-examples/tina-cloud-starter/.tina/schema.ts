@@ -5,7 +5,7 @@ import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       label: "Blog Posts",
@@ -348,6 +348,8 @@ export default defineSchema({
   ],
 });
 
+export default schema;
+
 const branch = "main";
 const apiURL =
   process.env.NODE_ENV == "development"
@@ -356,6 +358,7 @@ const apiURL =
 
 export const tinaConfig = defineConfig({
   apiURL,
+  schema,
   mediaStore: async () => {
     const pack = await import("next-tinacms-cloudinary");
     return pack.TinaCloudCloudinaryMediaStore;
@@ -375,15 +378,15 @@ export const tinaConfig = defineConfig({
           return undefined;
         }
         if (["pages"].includes(collection.name)) {
-          if (document.sys.filename === "home") {
+          if (document._sys.filename === "home") {
             return `/`;
           }
-          if (document.sys.filename === "about") {
+          if (document._sys.filename === "about") {
             return `/about`;
           }
           return undefined;
         }
-        return `/${collection.name}/${document.sys.filename}`;
+        return `/${collection.name}/${document._sys.filename}`;
       });
       cms.plugins.add(RouteMapping);
     });
@@ -391,7 +394,7 @@ export const tinaConfig = defineConfig({
     return cms;
   },
   formifyCallback: ({ formConfig, createForm, createGlobalForm }) => {
-    if (formConfig.id === "getGlobalDocument") {
+    if (formConfig.id === "content/global/index.json") {
       return createGlobalForm(formConfig);
     }
 

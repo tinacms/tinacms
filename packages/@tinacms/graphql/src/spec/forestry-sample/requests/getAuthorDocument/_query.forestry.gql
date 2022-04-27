@@ -1,15 +1,11 @@
 query {
-  getAuthorDocument(relativePath: "homer.md") {
+  author(relativePath: "homer.md") {
     __typename
-    ... on AuthorDocument {
-      data {
-        ... on AuthorAuthor {
-          name
-          socialMedia {
-            platform
-            handle
-          }
-        }
+    ... on AuthorAuthor {
+      name
+      socialMedia {
+        platform
+        handle
       }
     }
   }

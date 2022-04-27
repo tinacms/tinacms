@@ -20,7 +20,7 @@ title: Vote For Pedro
 ---
 # Welcome to the blog.
 
-> To edit this site head over to the [\`/admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙. 
+> To edit this site head over to the [\`/admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙.
 
 # Dixi gaude Arethusa
 
@@ -47,7 +47,7 @@ mille rigidi sub taurum.
 export const nextPostPage =
   () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
   // This is a demo file once you have tina setup feel free to delete this file
-  
+
   import { staticRequest, gql } from "tinacms";
   import Head from "next/head";
   import { createGlobalStyle } from "styled-components";
@@ -56,11 +56,9 @@ export const nextPostPage =
 
   const query = gql\`
     query BlogPostQuery($relativePath: String!) {
-      getPostsDocument(relativePath: $relativePath) {
-        data {
+      posts(relativePath: $relativePath) {
         title
-          body
-        }
+        body
       }
     }
   \`
@@ -98,7 +96,7 @@ export const nextPostPage =
     text-decoration: underline;
   }
   \`;
-  
+
   const BlogPage = (props) => {
     const { data } = useTina({
       query,
@@ -125,10 +123,10 @@ export const nextPostPage =
             }}
           >
             <h1 className="text-3xl m-8 text-center leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              {data.getPostsDocument.data.title}
+              {data.posts.title}
             </h1>
             <ContentSection
-              content={data.getPostsDocument.data.body}
+              content={data.posts.body}
             ></ContentSection>
           </div>
           <div className="bg-green-100 text-center">
@@ -146,7 +144,7 @@ export const nextPostPage =
       </>
     );
   };
-  
+
   export const getStaticProps = async ({ params }) => {
     const variables = { relativePath: \`\${params.filename}.md\` }
     let data = {}
@@ -167,16 +165,18 @@ export const nextPostPage =
       },
     }
   };
-  
+
   export const getStaticPaths = async () => {
     const postsListData = (await staticRequest({
       query: gql\`
         query GetPostsList {
-          getPostsList {
+          postsConnection {
             edges {
               node {
-                sys {
-                  filename
+                ...on Document {
+                  _sys {
+                    filename
+                  }
                 }
               }
             }
@@ -184,15 +184,15 @@ export const nextPostPage =
         }
       \`,
     }));
-  
+
     return {
-      paths: postsListData.getPostsList.edges.map((post) => ({
-        params: { filename: post.node.sys.filename },
+      paths: postsListData.postsConnection.edges.map((post) => ({
+        params: { filename: post.node._sys.filename },
       })),
       fallback: false,
     };
   };
-  
+
   export default BlogPage;
 
   const PageSection = props => {
@@ -207,7 +207,7 @@ export const nextPostPage =
   const components = {
     PageSection: PageSection,
   }
-  
+
   const ContentSection = ({ content }) => {
     return (
       <div className="relative py-16 bg-white overflow-hidden">
@@ -323,7 +323,7 @@ export const nextPostPage =
       </div>
     );
   };
-  
+
 `
 
 export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {

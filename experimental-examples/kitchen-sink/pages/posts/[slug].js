@@ -12,10 +12,10 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(props.data.getPostDocument.data, null, 2)}
+          {JSON.stringify(props.data.post, null, 2)}
         </pre>
       </code>
-      <TinaMarkdown content={props.data.getPostDocument.data.body} />
+      <TinaMarkdown content={props.data.post.body} />
     </Layout>
   )
 }
@@ -23,10 +23,10 @@ export default function Home(props) {
 export const getStaticPaths = async () => {
   const tinaProps = await staticRequest({
     query: `{
-        getPostList{
+        postConnection {
           edges {
             node {
-              sys {
+              _sys {
                 filename
               }
             }
@@ -35,8 +35,8 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.getPostList.edges.map((x) => {
-    return { params: { slug: x.node.sys.filename } }
+  const paths = tinaProps.postConnection.edges.map((x) => {
+    return { params: { slug: x.node._sys.filename } }
   })
 
   return {
@@ -50,7 +50,7 @@ export const getStaticProps = async (ctx) => {
   }
   const client = ExperimentalGetTinaClient()
 
-  const res = await client.getPostDocument(variables)
+  const res = await client.post(variables)
 
   return {
     props: {
