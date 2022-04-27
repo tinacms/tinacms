@@ -102,7 +102,7 @@ const RenderForm = ({
     const schemaCollection = schema.getCollection(collection.name)
     const template = schema.getTemplateForData({
       collection: schemaCollection,
-      data: document.value,
+      data: document.values,
     })
     const formInfo = resolveForm({
       collection: schemaCollection,
