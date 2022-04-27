@@ -1,0 +1,36 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: '70...100'
+  status:
+    project: # settings affecting project coverage
+      default:
+        target: auto # auto % coverage target
+        threshold: 7% # allow for 7% reduction of coverage without failing
+
+    # do not run coverage on patch nor changes
+    patch: off
+    changes: no
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+comment:
+  layout: 'reach,diff,flags,files,footer'
+  behavior: default
+  require_changes: no
+
+ignore:
+  - '.changeset'
+  - '.github'
+  - '.sst'
+  - '.vscode'
+  - '.yarn'
