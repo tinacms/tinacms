@@ -1,7 +1,7 @@
 ---
 "@tinacms/toolkit": patch
-"tinacms": patch
-"@tinacms/graphql": patch
+"tinacms": minor
+"@tinacms/graphql": minor
 ---
 
 # Simplify GraphQL API
