@@ -17449,6 +17449,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-ponyfill@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "fetch-ponyfill@npm:7.1.0"
+  dependencies:
+    node-fetch: ~2.6.1
+  checksum: 8c421d113c58b0591ce7e90fb3f13c346255a4266444d9454c9b8831c6de6726200228e86f95b5283c1ab7feb11fd3eec3002b2bc9cec94de4812160905457af
+  languageName: node
+  linkType: hard
+
 "figgy-pudding@npm:^3.5.1":
   version: 3.5.2
   resolution: "figgy-pudding@npm:3.5.2"
@@ -24719,7 +24728,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:2.6.7":
+"node-fetch@npm:2.6.7, node-fetch@npm:~2.6.1":
   version: 2.6.7
   resolution: "node-fetch@npm:2.6.7"
   dependencies:
@@ -31771,6 +31780,7 @@ resolve@^2.0.0-next.3:
     "@types/react": ^16.9.38
     "@types/yup": ^0.29.10
     crypto-js: ^4.0.0
+    fetch-ponyfill: ^7.1.0
     final-form: 4.20.1
     graphql: ^15.1.0
     graphql-tag: ^2.11.0

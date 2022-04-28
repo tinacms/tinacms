@@ -16,7 +16,7 @@ import { toMatchFile } from 'jest-file-snapshot'
 import path from 'path'
 import 'isomorphic-fetch'
 import * as G from 'graphql'
-import { LocalClient } from '../../../client'
+import { LocalClient } from '../../../internalClient'
 
 // @ts-ignore FIXME: violates ts rootDir config
 import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
