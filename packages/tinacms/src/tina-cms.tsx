@@ -15,11 +15,11 @@ import React, { useState } from 'react'
 import { TinaCloudMediaStoreClass, TinaCloudProvider } from './auth'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 
-import { LocalClient } from './client/index'
+import { LocalClient } from './internalClient/index'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { TinaDataContext } from '@tinacms/sharedctx'
-import type { TinaIOConfig } from './client/index'
+import type { TinaIOConfig } from './internalClient/index'
 import UrlPattern from 'url-pattern'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized

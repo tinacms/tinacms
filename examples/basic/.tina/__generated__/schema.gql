@@ -97,10 +97,10 @@ type PageConnection implements Connection {
   edges: [PageConnectionEdges]
 }
 
-union PostRelatedPostsPost = Page | Post
+union PostPostsPost = Page | Post
 
-type PostRelatedPosts {
-  post: PostRelatedPostsPost
+type PostPosts {
+  post: PostPostsPost
   label: String
 }
 
@@ -110,7 +110,7 @@ type PostFoo {
 
 type Post implements Node & Document {
   title: String
-  relatedPosts: [PostRelatedPosts]
+  posts: [PostPosts]
   foo: PostFoo
   topic: [String]
   body: JSON
@@ -151,7 +151,7 @@ input PageMutation {
   body: JSON
 }
 
-input PostRelatedPostsMutation {
+input PostPostsMutation {
   post: String
   label: String
 }
@@ -162,7 +162,7 @@ input PostFooMutation {
 
 input PostMutation {
   title: String
-  relatedPosts: [PostRelatedPostsMutation]
+  posts: [PostPostsMutation]
   foo: PostFooMutation
   topic: [String]
   body: JSON

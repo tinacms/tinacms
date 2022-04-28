@@ -65,7 +65,7 @@ const schema = defineSchema({
         {
           type: 'object',
           label: 'Related Posts',
-          name: 'relatedPosts',
+          name: 'posts',
           list: true,
           ui: {
             itemProps: (item) => {

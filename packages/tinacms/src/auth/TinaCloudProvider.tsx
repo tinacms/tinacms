@@ -23,7 +23,7 @@ import {
   useLocalStorage,
 } from '@tinacms/toolkit'
 
-import { Client, TinaIOConfig } from '../client'
+import { Client, TinaIOConfig } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
