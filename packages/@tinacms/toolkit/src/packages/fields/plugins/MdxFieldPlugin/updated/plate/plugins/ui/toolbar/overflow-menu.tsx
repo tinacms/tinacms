@@ -60,34 +60,37 @@ export const OverflowMenu = ({ toolbarItems, itemsShown, showEmbed }) => {
         leaveTo="transform opacity-0 scale-95"
       >
         <Popover.Panel>
-          <div className="origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
-            {toolbarItems.map((toolbarItem, index) => {
-              if (index < itemsShown - 1) {
-                return null
-              }
-              return (
-                <span
-                  data-test={`${toolbarItem.name}OverflowButton`}
-                  key={toolbarItem.name}
-                  onMouseDown={(event) => {
-                    event.preventDefault()
-                    toolbarItem.onMouseDown(event)
-                  }}
-                  className={classNames(
-                    toolbarItem.active
-                      ? 'bg-gray-50 text-blue-500'
-                      : 'bg-white text-gray-600',
-                    'hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
-                  )}
-                >
-                  <div className="mr-2 opacity-80">
-                    <ToolbarIcon name={toolbarItem.name} />
-                  </div>{' '}
-                  {toolbarItem.label}
-                </span>
-              )
-            })}
-          </div>
+          {({ close }) => (
+            <div className="origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
+              {toolbarItems.map((toolbarItem, index) => {
+                if (index < itemsShown - 1) {
+                  return null
+                }
+                return (
+                  <span
+                    data-test={`${toolbarItem.name}OverflowButton`}
+                    key={toolbarItem.name}
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      close()
+                      toolbarItem.onMouseDown(event)
+                    }}
+                    className={classNames(
+                      toolbarItem.active
+                        ? 'bg-gray-50 text-blue-500'
+                        : 'bg-white text-gray-600',
+                      'hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center'
+                    )}
+                  >
+                    <div className="mr-2 opacity-80">
+                      <ToolbarIcon name={toolbarItem.name} />
+                    </div>{' '}
+                    {toolbarItem.label}
+                  </span>
+                )
+              })}
+            </div>
+          )}
         </Popover.Panel>
       </Transition>
     </Popover>
