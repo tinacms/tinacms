@@ -166,7 +166,7 @@ export const TinaMarkdown = ({
                 // I don't think it's possible to have more than one
                 // child item here
                 // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                return item.children[0]?.text || ''
+                return item.children ? item.children[0]?.text || '' : ''
               })
               .join('\n')
             if (components[child.type]) {
