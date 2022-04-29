@@ -45,6 +45,10 @@ export function useGraphqlForms<T extends object>({
     onSubmit,
   })
 
+  if (!query) {
+    return [state.data as T, false]
+  }
+
   return [state.data as T, state.status !== 'done']
 }
 
