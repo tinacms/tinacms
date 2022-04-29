@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.24
+
+### Patch Changes
+
+- 41d666f9a: Styles list page overflow menu, removes unused prop
+
 ## 0.56.23
 
 ### Patch Changes
