@@ -201,29 +201,31 @@ const DotMenu = ({ onOpen, onRemove }) => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <div className="z-30 origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-          <div className="py-1">
-            <span
-              onClick={onOpen}
-              className={classNames(
-                'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-              )}
-            >
-              Edit
-            </span>
-            <button
-              onMouseDown={(e) => {
-                e.preventDefault()
-                onRemove()
-              }}
-              className={classNames(
-                'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
-              )}
-            >
-              Remove
-            </button>
+        <Popover.Panel>
+          <div className="z-30 origin-top-right absolute right-0 mt-2 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="py-1">
+              <span
+                onClick={onOpen}
+                className={classNames(
+                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+                )}
+              >
+                Edit
+              </span>
+              <button
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  onRemove()
+                }}
+                className={classNames(
+                  'cursor-pointer text-left w-full block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-900'
+                )}
+              >
+                Remove
+              </button>
+            </div>
           </div>
-        </div>
+        </Popover.Panel>
       </Transition>
     </Popover>
   )
