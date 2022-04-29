@@ -327,6 +327,28 @@ export const nextPostPage =
 `
 
 export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {
+  const importLine = `import Tina from '${
+    usingSrc ? '../' : ''
+  }../.tina/components/TinaDynamicProvider.js'`
+
+  return `${importLine}
+${extraImports || ''}
+
+const App = ({ Component, pageProps }) => {
+  return (
+    <Tina>
+      <Component {...pageProps} />
+    </Tina>
+  )
+}
+
+export default App
+`
+}
+export const AppJsContentPrintout = (
+  usingSrc: boolean,
+  extraImports?: string
+) => {
   const importLine = chalk.green(
     `+ import Tina from '${
       usingSrc ? '../' : ''
@@ -343,7 +365,7 @@ export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {
     ${chalk.green('+ </Tina>')}
   )
 }
-  
+
 export default App
 `
 }

@@ -243,7 +243,6 @@ const CollectionListPage = () => {
                                     </td>
                                     <td className="w-0">
                                       <OverflowMenu
-                                        showEmbed={true}
                                         toolbarItems={[
                                           {
                                             name: 'edit',
