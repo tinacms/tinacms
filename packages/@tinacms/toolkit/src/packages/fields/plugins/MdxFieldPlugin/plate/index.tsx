@@ -89,7 +89,7 @@ export const RichEditor = wrapFieldsWithMeta<
             ) : (
               <FloatingToolbar templates={props.field.templates} />
             )}
-            <Reset form={props.form} initialValue={initialValue} />
+            <Reset id={id} form={props.form} initialValue={initialValue} />
             <FloatingLink />
           </Plate>
         </div>
@@ -104,13 +104,14 @@ export const RichEditor = wrapFieldsWithMeta<
  * resets are properly handled. So we sneak in a callback to the form's reset
  * logic that updates slate's internal values imperatively.
  */
-const Reset = ({ form, initialValue }: { form; initialValue }) => {
-  const editor = usePlateEditorState()
+const Reset = ({ id, form, initialValue }: { id; form; initialValue }) => {
+  const editor = usePlateEditorState(id)
 
   React.useMemo(() => {
     const { reset } = form
     form.reset = (initialValues) => {
       editor.children = initialValue
+      editor.onChange()
       return reset(initialValues)
     }
   }, [])
