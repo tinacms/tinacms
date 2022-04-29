@@ -1,5 +1,14 @@
 # tinacms
 
+## 0.68.1
+
+### Patch Changes
+
+- 41d666f9a: Styles list page overflow menu, removes unused prop
+- e5a1152f2: Fix issue where pages that didnt use `useTina` would get a loading spinner that hangs
+- Updated dependencies [41d666f9a]
+  - @tinacms/toolkit@0.56.24
+
 ## 0.68.0
 
 ### Minor Changes
