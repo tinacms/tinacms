@@ -1,4 +1,10 @@
-import { AppJsContent, adminPage, blogPost, nextPostPage } from './setup-files'
+import {
+  AppJsContent,
+  AppJsContentPrintout,
+  adminPage,
+  blogPost,
+  nextPostPage,
+} from './setup-files'
 import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
 import {
   cmdText,
@@ -277,7 +283,7 @@ export async function successMessage(ctx: any, next: () => void, options) {
     logger.info(
       `⚠️ Before using Tina, you will NEED to add the Tina wrapper to your _app.jsx \n`
     )
-    logger.info(`${AppJsContent(usingSrc)}`)
+    logger.info(`${AppJsContentPrintout(usingSrc)}`)
   }
 
   logger.info(`${chalk.bold('Run your site with Tina')}`)
