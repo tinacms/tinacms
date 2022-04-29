@@ -1,5 +1,7 @@
 # next-tinacms-cloudinary
 
+## 3.5.19
+
 ## 3.5.18
 
 ## 3.5.17
