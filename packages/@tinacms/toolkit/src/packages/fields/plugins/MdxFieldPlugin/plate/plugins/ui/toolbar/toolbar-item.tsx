@@ -245,7 +245,7 @@ export const EmbedButton = ({
                       }}
                       className={`hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
                     >
-                      {template.name}
+                      {template.label || template.name}
                     </span>
                   ))}
                 </div>
