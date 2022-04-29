@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.60.15
+
+### Patch Changes
+
+- ceb826916: Fix issue where \_app override from tina init was improperly formatted
+
 ## 0.60.14
 
 ### Patch Changes
