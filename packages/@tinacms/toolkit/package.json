@@ -68,7 +68,6 @@
     "@types/express": "^4.17.13",
     "@types/multer": "^1.4.7",
     "@types/prop-types": "^15.7.4",
-    "@udecode/plate": "^7.0.3",
     "@udecode/plate-autoformat": "^9.2.1",
     "@udecode/plate-basic-elements": "^9.2.1",
     "@udecode/plate-basic-marks": "^9.2.1",
