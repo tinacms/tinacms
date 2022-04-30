@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.25
+
+### Patch Changes
+
+- e90647da3: Fix issue where popover item onMouseDown wasn't triggering
+
 ## 0.56.24
 
 ### Patch Changes
