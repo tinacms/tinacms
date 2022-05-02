@@ -34,34 +34,40 @@ export class TinaClient {
     args: TinaClientRequestArgs
   ): Promise<{ data: DataType; query: string }> {
     let data: DataType = {} as DataType
-    try {
-      const headers = new Headers()
-      if (this.readonlyToken) {
-        headers.append('X-API-KEY', this.readonlyToken)
-      }
-      headers.append('Content-Type', 'application/json')
-
-      const bodyString = JSON.stringify({
-        query: args.query,
-        variables: args?.variables || {},
-      })
-      const url = args?.url || this.apiUrl
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: bodyString,
-        redirect: 'follow',
-      })
-      data = await res.json()
-    } catch (error) {
-      console.error('ERROR: unable to fetch data in client')
-      console.error(error)
+    const headers = new Headers()
+    if (this.readonlyToken) {
+      headers.append('X-API-KEY', this.readonlyToken)
     }
+    headers.append('Content-Type', 'application/json')
 
+    const bodyString = JSON.stringify({
+      query: args.query,
+      variables: args?.variables || {},
+    })
+    const url = args?.url || this.apiUrl
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: bodyString,
+      redirect: 'follow',
+    })
+    const json = await res.json()
+    if (json.errors) {
+      throw new Error(
+        `Unable to fetch, errors: \n\t${json.errors
+          .map((error) => error.message)
+          .join('\n')}`
+      )
+    }
     return {
-      data,
+      data: json?.data as DataType,
       query: args.query,
     }
   }
+}
+
+export const createClient = (args: TinaClientArs) => {
+  const client = new TinaClient(args)
+  return client
 }
