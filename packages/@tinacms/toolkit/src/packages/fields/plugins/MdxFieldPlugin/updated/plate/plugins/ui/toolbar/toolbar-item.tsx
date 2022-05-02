@@ -87,9 +87,16 @@ export const ToolbarItem = ({
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <div className="origin-top-left absolute left-0 mt-2 -mr-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-2 prose">{options}</div>
-          </div>
+          <Popover.Panel>
+            {({ close }) => (
+              <div className="origin-top-left absolute left-0 mt-2 -mr-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="py-2 prose">
+                  {/* FIXME: this close() should be handled from within the options callback that are passed in */}
+                  <span onMouseDown={() => close()}>{options}</span>
+                </div>
+              </div>
+            )}
+          </Popover.Panel>
         </Transition>
       </Popover>
     )
@@ -225,20 +232,25 @@ export const EmbedButton = ({
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 max-h-[10rem] overflow-y-auto">
-              {templates.map((template) => (
-                <span
-                  key={template.name}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    insertMDX(editor, template)
-                  }}
-                  className={`hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
-                >
-                  {template.name}
-                </span>
-              ))}
-            </div>
+            <Popover.Panel>
+              {({ close }) => (
+                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1 max-h-[10rem] overflow-y-auto">
+                  {templates.map((template) => (
+                    <span
+                      key={template.name}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        close()
+                        insertMDX(editor, template)
+                      }}
+                      className={`hover:bg-gray-50 hover:text-blue-500 cursor-pointer pointer-events-auto px-4 py-2 text-sm w-full flex items-center`}
+                    >
+                      {template.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </Popover.Panel>
           </Transition>
         </>
       )}
