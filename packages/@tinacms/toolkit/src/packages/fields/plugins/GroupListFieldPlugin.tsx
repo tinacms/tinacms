@@ -206,7 +206,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   )
 }
 
-const ItemClickTarget = styled.div`
+export const ItemClickTarget = styled.div`
   flex: 1 1 0;
   min-width: 0;
   position: relative;
@@ -214,12 +214,16 @@ const ItemClickTarget = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 8px;
+
+  *:last-child {
+    margin-bottom: 0 !important;
+  }
 `
 
 export const ItemDeleteButton = ({ onClick }) => {
   return (
     <button
-      className="w-8 h-10 flex items-center justify-center hover:text-red-500"
+      className="w-8 py-2.5 flex items-center justify-center hover:bg-gray-50 hover:text-red-500"
       onClick={onClick}
     >
       <TrashIcon className="" />
@@ -302,6 +306,10 @@ export const ItemHeader = styled.div<{ isDragging: boolean }>`
   font-size: var(--tina-font-size-2);
   font-weight: var(--tina-font-weight-regular);
 
+  label {
+    display: none;
+  }
+
   ${GroupLabel} {
     color: var(--tina-color-grey-8);
     align-self: center;
@@ -359,7 +367,7 @@ export const ItemHeader = styled.div<{ isDragging: boolean }>`
     `};
 `
 
-const DragHandle = styled(function DragHandle({ ...styleProps }) {
+export const DragHandle = styled(function DragHandle({ ...styleProps }) {
   return (
     <div {...styleProps}>
       <DragIcon className="w-7 h-auto" />
