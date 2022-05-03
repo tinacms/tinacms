@@ -1,8 +1,6 @@
-import { useEffect } from 'react'
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import { useTina } from 'tinacms/dist/edit-state'
-import { TinaClient } from 'tinacms/dist/client'
 
 const query = `query getPost($relativePath: String!) {
   post(relativePath: $relativePath) {
@@ -25,12 +23,6 @@ const query = `query getPost($relativePath: String!) {
 `
 
 export default function Home(props) {
-  const client = new TinaClient({ url: 'http://localhost:4001/graphql' })
-  useEffect(() => {
-    client.request({ query, variables: props.variables }).then((data) => {
-      console.log({ tinaClientData: data })
-    })
-  })
   const { data } = useTina({
     query,
     variables: props.variables,
