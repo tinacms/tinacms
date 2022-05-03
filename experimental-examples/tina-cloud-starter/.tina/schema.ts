@@ -1,4 +1,5 @@
 import { defineSchema, defineConfig } from "tinacms";
+import { client } from "./client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
@@ -350,14 +351,8 @@ const schema = defineSchema({
 
 export default schema;
 
-const branch = "main";
-const apiURL =
-  process.env.NODE_ENV == "development"
-    ? "http://localhost:4001/graphql"
-    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`;
-
 export const tinaConfig = defineConfig({
-  apiURL,
+  client,
   schema,
   mediaStore: async () => {
     const pack = await import("next-tinacms-cloudinary");
