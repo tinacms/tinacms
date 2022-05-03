@@ -1,5 +1,18 @@
 # tinacms
 
+## 0.68.3
+
+### Patch Changes
+
+- 8b7ee346a: - Display label instead of name for mdx dropdown af306fa
+  - Fix issue where reset triggered chagnes to the wrong rich-text field 03f6191
+  - Fix issue where null children in a code block threw an error e454bce
+- Updated dependencies [f6f56bcc0]
+- Updated dependencies [59d33a74a]
+- Updated dependencies [8b7ee346a]
+- Updated dependencies [acb38bf9f]
+  - @tinacms/toolkit@0.56.26
+
 ## 0.68.2
 
 ### Patch Changes
