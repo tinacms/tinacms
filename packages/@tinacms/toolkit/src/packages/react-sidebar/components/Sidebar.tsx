@@ -40,18 +40,22 @@ export const SidebarContext = React.createContext<any>(null)
 export const minPreviewWidth = 440
 export const minSidebarWidth = 360
 export const navBreakpoint = 1000
+
 const defaultSidebarWidth = 440
 const defaultSidebarPosition = 'displace'
+const defaultSidebarState = 'open'
 
 export interface SidebarProviderProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
   position?: SidebarStateOptions['position']
+  defaultState?: SidebarStateOptions['defaultState']
 }
 
 export function SidebarProvider({
   position = defaultSidebarPosition,
   defaultWidth = defaultSidebarWidth,
+  defaultState = defaultSidebarState,
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
@@ -62,7 +66,10 @@ export function SidebarProvider({
     <Sidebar
       // @ts-ignore
       position={cms?.sidebar?.position || position}
-      defaultWidth={defaultWidth}
+      // @ts-ignore
+      defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
+      // @ts-ignore
+      defaultState={cms?.sidebar?.defaultState || defaultState}
       sidebar={sidebar}
     />
   )
@@ -71,6 +78,7 @@ export function SidebarProvider({
 interface SidebarProps {
   sidebar: SidebarState
   defaultWidth?: SidebarStateOptions['defaultWidth']
+  defaultState?: SidebarStateOptions['defaultState']
   position?: SidebarStateOptions['position']
 }
 
@@ -106,7 +114,12 @@ const useFetchCollections = (cms) => {
   return { collections, loading }
 }
 
-const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
+const Sidebar = ({
+  sidebar,
+  defaultWidth,
+  defaultState,
+  position,
+}: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
 
@@ -117,10 +130,15 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const [displayState, setDisplayState] = React.useState<displayStates>('open')
+  const [displayState, setDisplayState] =
+    React.useState<displayStates>(defaultState)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
+
+  React.useEffect(() => {
+    setDisplayState(defaultState)
+  }, [defaultState])
 
   const isTinaAdminEnabled =
     cms.flags.get('tina-admin') === false ? false : true
@@ -157,9 +175,12 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
       if (displayState === 'fullscreen') {
         return
       }
-      if (position === 'displace') {
-        updateBodyDisplacement({ displayState, sidebarWidth, resizingSidebar })
-      }
+      updateBodyDisplacement({
+        position,
+        displayState,
+        sidebarWidth,
+        resizingSidebar,
+      })
     }
 
     updateLayout()
@@ -301,6 +322,7 @@ const Sidebar = ({ sidebar, defaultWidth, position }: SidebarProps) => {
 }
 
 export const updateBodyDisplacement = ({
+  position,
   displayState,
   sidebarWidth,
   resizingSidebar,
@@ -308,20 +330,25 @@ export const updateBodyDisplacement = ({
   const body = document.getElementsByTagName('body')[0]
   const windowWidth = window.innerWidth
 
-  // Transition displacement when not dragging sidebar (opening/closing sidebar)
-  if (!resizingSidebar) {
-    body.style.transition = 'all 200ms ease-out'
+  if (position === 'displace') {
+    // Transition displacement when not dragging sidebar (opening/closing sidebar)
+    if (!resizingSidebar) {
+      body.style.transition = 'all 200ms ease-out'
+    } else {
+      body.style.transition = ''
+    }
+
+    if (displayState === 'open') {
+      const bodyDisplacement = Math.min(
+        sidebarWidth,
+        windowWidth - minPreviewWidth
+      )
+      body.style.paddingLeft = bodyDisplacement - 6 + 'px'
+    } else {
+      body.style.paddingLeft = '0'
+    }
   } else {
     body.style.transition = ''
-  }
-
-  if (displayState === 'open') {
-    const bodyDisplacement = Math.min(
-      sidebarWidth,
-      windowWidth - minPreviewWidth
-    )
-    body.style.paddingLeft = bodyDisplacement - 6 + 'px'
-  } else {
     body.style.paddingLeft = '0'
   }
 }

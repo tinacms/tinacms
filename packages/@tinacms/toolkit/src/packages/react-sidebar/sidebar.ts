@@ -25,6 +25,7 @@ export interface SidebarStateOptions {
   buttons?: SidebarButtons
   placeholder?: React.FC
   defaultWidth?: number
+  defaultState?: DefaultSidebarState
 }
 
 /**
@@ -38,6 +39,7 @@ export interface SidebarButtons {
 }
 
 export declare type SidebarPosition = 'displace' | 'overlay'
+export declare type DefaultSidebarState = 'open' | 'closed'
 
 export class SidebarState {
   private _isOpen: boolean = false
