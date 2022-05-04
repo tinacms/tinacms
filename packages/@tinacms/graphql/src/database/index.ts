@@ -42,7 +42,17 @@ import {
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
 
-type CreateDatabase = { bridge: Bridge; store: Store }
+type IndexStatusEvent = {
+  status: 'inprogress' | 'complete' | 'failed'
+  error?: Error
+}
+type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
+
+type CreateDatabase = {
+  bridge: Bridge
+  store: Store
+  indexStatusCallback?: IndexStatusCallback
+}
 
 export const createDatabase = async (config: CreateDatabase) => {
   return new Database({
@@ -72,9 +82,12 @@ export type QueryOptions = {
   before?: string
 }
 
+const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
+
 export class Database {
   public bridge: Bridge
   public store: Store
+  public indexStatusCallback: IndexStatusCallback | undefined
   private tinaSchema: TinaSchema | undefined
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
@@ -85,6 +98,8 @@ export class Database {
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge
     this.store = config.store
+    this.indexStatusCallback =
+      config.indexStatusCallback || defaultStatusCallback
   }
 
   private collectionForPath = async (
@@ -477,6 +492,17 @@ export class Database {
     }
   }
 
+  private async indexStatusCallbackWrapper(fn: () => Promise<void>) {
+    await this.indexStatusCallback({ status: 'inprogress' })
+    try {
+      await fn()
+      await this.indexStatusCallback({ status: 'complete' })
+    } catch (error) {
+      await this.indexStatusCallback({ status: 'failed', error })
+      throw error
+    }
+  }
+
   public indexContent = async ({
     graphQLSchema,
     tinaSchema,
@@ -484,55 +510,64 @@ export class Database {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
-    const lookup = JSON.parse(
-      await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
-    )
-    if (this.store.supportsSeeding()) {
-      await this.store.clear()
-      await this.store.seed(
-        path.join(GENERATED_FOLDER, '_graphql.json'),
-        graphQLSchema
+    await this.indexStatusCallbackWrapper(async () => {
+      const lookup = JSON.parse(
+        await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
       )
-      await this.store.seed(
-        path.join(GENERATED_FOLDER, '_schema.json'),
-        tinaSchema.schema
-      )
-      await this.store.seed(path.join(GENERATED_FOLDER, '_lookup.json'), lookup)
-      await this._indexAllContent()
-    } else {
-      if (this.store.supportsIndexing()) {
-        throw new Error(`Schema must be indexed with provided Store`)
+      if (this.store.supportsSeeding()) {
+        await this.store.clear()
+        await this.store.seed(
+          path.join(GENERATED_FOLDER, '_graphql.json'),
+          graphQLSchema
+        )
+        await this.store.seed(
+          path.join(GENERATED_FOLDER, '_schema.json'),
+          tinaSchema.schema
+        )
+        await this.store.seed(
+          path.join(GENERATED_FOLDER, '_lookup.json'),
+          lookup
+        )
+        await this._indexAllContent()
+      } else {
+        if (this.store.supportsIndexing()) {
+          throw new Error(`Schema must be indexed with provided Store`)
+        }
       }
-    }
+    })
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
-    const { pathsByCollection, nonCollectionPaths, collections } =
-      await this.partitionPathsByCollection(documentPaths)
+    await this.indexStatusCallbackWrapper(async () => {
+      const { pathsByCollection, nonCollectionPaths, collections } =
+        await this.partitionPathsByCollection(documentPaths)
 
-    for (const collection of Object.keys(pathsByCollection)) {
-      await _deleteIndexContent(
-        this,
-        pathsByCollection[collection],
-        collections[collection]
-      )
-    }
+      for (const collection of Object.keys(pathsByCollection)) {
+        await _deleteIndexContent(
+          this,
+          pathsByCollection[collection],
+          collections[collection]
+        )
+      }
 
-    await _deleteIndexContent(this, nonCollectionPaths, null)
+      await _deleteIndexContent(this, nonCollectionPaths, null)
+    })
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
-    const { pathsByCollection, nonCollectionPaths, collections } =
-      await this.partitionPathsByCollection(documentPaths)
+    await this.indexStatusCallbackWrapper(async () => {
+      const { pathsByCollection, nonCollectionPaths, collections } =
+        await this.partitionPathsByCollection(documentPaths)
 
-    for (const collection of Object.keys(pathsByCollection)) {
-      await _indexContent(
-        this,
-        pathsByCollection[collection],
-        collections[collection]
-      )
-    }
-    await _indexContent(this, nonCollectionPaths)
+      for (const collection of Object.keys(pathsByCollection)) {
+        await _indexContent(
+          this,
+          pathsByCollection[collection],
+          collections[collection]
+        )
+      }
+      await _indexContent(this, nonCollectionPaths)
+    })
   }
 
   public delete = async (filepath: string) => {
