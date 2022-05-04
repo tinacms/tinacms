@@ -322,7 +322,7 @@ const Sidebar = ({
 }
 
 export const updateBodyDisplacement = ({
-  position,
+  position = 'overlay',
   displayState,
   sidebarWidth,
   resizingSidebar,
