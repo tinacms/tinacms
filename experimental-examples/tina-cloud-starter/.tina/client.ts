@@ -6,4 +6,5 @@ const apiURL =
     ? "http://localhost:4001/graphql"
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`;
 
-export const client = createClient({ url: apiURL });
+// Token generated on app.tina.io
+export const client = createClient({ url: apiURL, token: "***" });
