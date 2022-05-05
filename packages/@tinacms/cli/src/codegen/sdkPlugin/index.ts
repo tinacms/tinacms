@@ -64,7 +64,8 @@ export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
   const visitorResult = visit(allAst, { leave: visitor as any })
 
   return {
-    prepend: visitor.getImports(),
+    // We will take care of imports
+    // prepend: visitor.getImports(),
     content: [
       visitor.fragments,
       ...visitorResult.definitions.filter((t) => typeof t === 'string'),

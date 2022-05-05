@@ -32076,6 +32076,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["fetch-ponyfill", [
+        ["npm:7.1.0", {
+          "packageLocation": "./.yarn/cache/fetch-ponyfill-npm-7.1.0-083109d699-8c421d113c.zip/node_modules/fetch-ponyfill/",
+          "packageDependencies": [
+            ["fetch-ponyfill", "npm:7.1.0"],
+            ["node-fetch", "virtual:083109d6993d54b0bf1d200d3315b933016c3ae76e4345a5e6d672315ab31efc0525244812e910920e8db870cd77465466aba15b1d0884eb872c8f7df8bb230a#npm:2.6.7"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["figgy-pudding", [
         ["npm:3.5.2", {
           "packageLocation": "./.yarn/cache/figgy-pudding-npm-3.5.2-2f4e3e1305-737645f602.zip/node_modules/figgy-pudding/",
@@ -40034,7 +40044,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["image-size", "npm:1.0.0"],
             ["jest-worker", "npm:27.0.0-next.5"],
             ["native-url", "npm:0.3.4"],
-            ["node-fetch", "virtual:fcb21975b22536617c53a72fb292bd82b8fbc036705fa41f2c07db3424e2b3c1aa8ff5b2d1559c3e25c91dd3566c6d4e55ea8eb322b97ae0888e3f49e0408c98#npm:2.6.7"],
+            ["node-fetch", "virtual:083109d6993d54b0bf1d200d3315b933016c3ae76e4345a5e6d672315ab31efc0525244812e910920e8db870cd77465466aba15b1d0884eb872c8f7df8bb230a#npm:2.6.7"],
             ["node-html-parser", "npm:1.4.9"],
             ["node-libs-browser", "npm:2.2.1"],
             ["node-sass", null],
@@ -40486,17 +40496,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:fcb21975b22536617c53a72fb292bd82b8fbc036705fa41f2c07db3424e2b3c1aa8ff5b2d1559c3e25c91dd3566c6d4e55ea8eb322b97ae0888e3f49e0408c98#npm:2.6.7", {
-          "packageLocation": "./.yarn/$$virtual/node-fetch-virtual-cfc8b9d180/0/cache/node-fetch-npm-2.6.7-777aa2a6df-9eef3f9934.zip/node_modules/node-fetch/",
+        ["virtual:083109d6993d54b0bf1d200d3315b933016c3ae76e4345a5e6d672315ab31efc0525244812e910920e8db870cd77465466aba15b1d0884eb872c8f7df8bb230a#npm:2.6.7", {
+          "packageLocation": "./.yarn/$$virtual/node-fetch-virtual-8369bf9ea7/0/cache/node-fetch-npm-2.6.7-777aa2a6df-9eef3f9934.zip/node_modules/node-fetch/",
           "packageDependencies": [
-            ["node-fetch", "virtual:fcb21975b22536617c53a72fb292bd82b8fbc036705fa41f2c07db3424e2b3c1aa8ff5b2d1559c3e25c91dd3566c6d4e55ea8eb322b97ae0888e3f49e0408c98#npm:2.6.7"],
+            ["node-fetch", "virtual:083109d6993d54b0bf1d200d3315b933016c3ae76e4345a5e6d672315ab31efc0525244812e910920e8db870cd77465466aba15b1d0884eb872c8f7df8bb230a#npm:2.6.7"],
             ["@types/encoding", null],
             ["encoding", "npm:0.1.13"],
             ["whatwg-url", "npm:5.0.0"]
           ],
           "packagePeers": [
-            "@types/encoding",
-            "encoding"
+            "@types/encoding"
           ],
           "linkType": "HARD",
         }]
@@ -49970,6 +49979,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/styled-components", "npm:5.1.24"],
             ["@types/yup", "npm:0.29.13"],
             ["crypto-js", "npm:4.1.1"],
+            ["fetch-ponyfill", "npm:7.1.0"],
             ["final-form", "npm:4.20.1"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:78e11a97c794ac40c35ccdbd21da2e4c8eb8db409771771287a3449a8d22ea6a66eb5079c4f8df07f24cdc5899fae0c8b6d290e1b7d84078c10ad27a4a432c5f#npm:2.12.5"],
@@ -50026,6 +50036,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/styled-components", "npm:4.1.8"],
             ["@types/yup", "npm:0.29.13"],
             ["crypto-js", "npm:4.1.1"],
+            ["fetch-ponyfill", "npm:7.1.0"],
             ["final-form", "npm:4.20.1"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:78e11a97c794ac40c35ccdbd21da2e4c8eb8db409771771287a3449a8d22ea6a66eb5079c4f8df07f24cdc5899fae0c8b6d290e1b7d84078c10ad27a4a432c5f#npm:2.12.5"],
@@ -50082,6 +50093,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/styled-components", null],
             ["@types/yup", "npm:0.29.13"],
             ["crypto-js", "npm:4.1.1"],
+            ["fetch-ponyfill", "npm:7.1.0"],
             ["final-form", "npm:4.20.1"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:78e11a97c794ac40c35ccdbd21da2e4c8eb8db409771771287a3449a8d22ea6a66eb5079c4f8df07f24cdc5899fae0c8b6d290e1b7d84078c10ad27a4a432c5f#npm:2.12.5"],
@@ -50137,6 +50149,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/styled-components", "npm:5.1.11"],
             ["@types/yup", "npm:0.29.13"],
             ["crypto-js", "npm:4.1.1"],
+            ["fetch-ponyfill", "npm:7.1.0"],
             ["final-form", "npm:4.20.1"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:78e11a97c794ac40c35ccdbd21da2e4c8eb8db409771771287a3449a8d22ea6a66eb5079c4f8df07f24cdc5899fae0c8b6d290e1b7d84078c10ad27a4a432c5f#npm:2.12.5"],
@@ -50189,6 +50202,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react", "npm:16.14.11"],
             ["@types/yup", "npm:0.29.13"],
             ["crypto-js", "npm:4.1.1"],
+            ["fetch-ponyfill", "npm:7.1.0"],
             ["final-form", "npm:4.20.1"],
             ["graphql", "npm:15.5.1"],
             ["graphql-tag", "virtual:78e11a97c794ac40c35ccdbd21da2e4c8eb8db409771771287a3449a8d22ea6a66eb5079c4f8df07f24cdc5899fae0c8b6d290e1b7d84078c10ad27a4a432c5f#npm:2.12.5"],
