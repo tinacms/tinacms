@@ -369,6 +369,9 @@ export const tinaConfig = defineConfig({
      */
     cms.flags.set("branch-switcher", true);
 
+    // cms.sidebar.position = "overlay";
+    // cms.sidebar.defaultState = "closed";
+
     /**
      * When `tina-admin` is enabled, this plugin configures contextual editing for collections
      */
