@@ -12,14 +12,15 @@ limitations under the License.
 */
 
 import React, { useState } from 'react'
+import type { TinaClient } from './client'
 import { TinaCloudMediaStoreClass, TinaCloudProvider } from './auth'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 
-import { LocalClient } from './client/index'
+import { LocalClient } from './internalClient/index'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { TinaDataContext } from '@tinacms/sharedctx'
-import type { TinaIOConfig } from './client/index'
+import type { TinaIOConfig } from './internalClient/index'
 import UrlPattern from 'url-pattern'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
@@ -189,10 +190,46 @@ class ErrorBoundary extends React.Component {
 type APIProviderProps =
   | {
       /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client?: never
+      /**
        * Content API URL
        *
        */
       apiURL: string
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: never
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: never
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: never
+    }
+  | {
+      /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client: TinaClient
+      /**
+       * Content API URL
+       *
+       */
+      apiURL?: never
       /**
        * Point to the local version of GraphQL instead of tina.io
        * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
@@ -238,6 +275,11 @@ type APIProviderProps =
        * @deprecated use apiURL instead
        */
       clientId?: string
+      /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client: never
     }
 
 interface BaseProviderProps {
@@ -292,13 +334,17 @@ export const TinaCMSProvider2 = ({
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
 
+  const apiURL = props?.client?.apiUrl || props?.apiURL
+
   // branch & clientId are still supported, so don't throw if they're provided
-  if (!props.apiURL && !validOldSetup) {
-    throw new Error(`apiURL is a required field`)
+  if (!apiURL && !validOldSetup) {
+    throw new Error(
+      `Must provide apiUrl or a client to the TinaWrapper component`
+    )
   }
 
-  const { branch, clientId, isLocalClient } = props.apiURL
-    ? parseURL(props.apiURL)
+  const { branch, clientId, isLocalClient } = apiURL
+    ? parseURL(apiURL)
     : {
         branch: props.branch,
         clientId: props.clientId,
