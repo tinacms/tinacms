@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.60.1
+
+### Patch Changes
+
+- 3b11ff6ad: Add optional indexing status callback to Database
+
 ## 0.60.0
 
 ### Minor Changes
