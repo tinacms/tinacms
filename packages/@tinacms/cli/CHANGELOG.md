@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.60.16
+
+### Patch Changes
+
+- 7372f90ca: Adds a new client that can be used on the backend and frontend.
+- Updated dependencies [3b11ff6ad]
+  - @tinacms/graphql@0.60.1
+
 ## 0.60.15
 
 ### Patch Changes
