@@ -1,5 +1,14 @@
 # tinacms
 
+## 0.68.4
+
+### Patch Changes
+
+- 7372f90ca: Adds a new client that can be used on the backend and frontend.
+- Updated dependencies [d4f98d0fc]
+- Updated dependencies [7e2272442]
+  - @tinacms/toolkit@0.56.27
+
 ## 0.68.3
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.56.27
+
+### Patch Changes
+
+- d4f98d0fc: Add ability to set default sidebar open state, fix overlay position
+- 7e2272442: Improve list field UI by using group list components
+
 ## 0.56.26
 
 ### Patch Changes
