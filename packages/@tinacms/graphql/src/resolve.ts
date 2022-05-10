@@ -99,13 +99,14 @@ export const resolve = async ({
             )
             return tinaSchema.getCollections().map((collection) => {
               return resolver.resolveCollection(
+                args,
                 collection.name,
                 Boolean(hasDocuments)
               )
             })
           }
 
-          // The field is `getCollection`
+          // The field is `collection`
           const collectionNode = info.fieldNodes.find(
             (x) => x.name.value === 'collection'
           )
@@ -116,6 +117,7 @@ export const resolve = async ({
             }
           )
           return resolver.resolveCollection(
+            args,
             args.collection,
             Boolean(hasDocuments)
           )
@@ -250,6 +252,18 @@ export const resolve = async ({
                   return { node: document }
                 }),
               }
+              // TODO when jeffs back: Look at this to make sure its OK to do this. (I am pretty sure it is -- Logan)
+              // Fixes https://github.com/tinacms/tinacms/issues/2886
+            } else if (
+              info.fieldName === 'documents' &&
+              value?.collection &&
+              value?.hasDocuments
+            ) {
+              return resolver.resolveCollectionConnection({
+                args,
+                // @ts-ignore
+                collection: value.collection,
+              })
             } else {
               throw new Error(
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
