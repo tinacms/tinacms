@@ -227,15 +227,19 @@ const CollectionListPage = () => {
                                                 : document.node._sys.filename}
                                             </span>
                                           </span>
-                                          {hasTitle && (
-                                            <span className="block text-xs text-gray-400 my-1">
-                                              Filename:{' '}
-                                              {document.node._sys.filename}
-                                            </span>
-                                          )}
                                         </span>
                                       </a>
                                     </td>
+                                    {hasTitle && (
+                                      <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                          Filename
+                                        </span>
+                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                          {document.node._sys.filename}
+                                        </span>
+                                      </td>
+                                    )}
                                     <td className="px-6 py-4 whitespace-nowrap">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Extension
