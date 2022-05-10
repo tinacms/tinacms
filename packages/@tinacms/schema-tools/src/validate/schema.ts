@@ -47,7 +47,10 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
     })
     .refine(
       // It is valid if it is 0 or 1
-      (val) => val?.filter((x) => x.type === 'string' && x.isTitle).length < 2,
+      (val) => {
+        const arr = val?.filter((x) => x.type === 'string' && x.isTitle) || []
+        return arr.length < 2
+      },
       {
         message: 'Fields can only have one use of `isTitle`',
       }
