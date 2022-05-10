@@ -26,6 +26,7 @@ export interface SidebarStateOptions {
   placeholder?: React.FC
   defaultWidth?: number
   defaultState?: DefaultSidebarState
+  renderNav?: boolean
 }
 
 /**
@@ -46,6 +47,7 @@ export class SidebarState {
   placeholder: React.FC
 
   position: SidebarPosition = 'displace'
+  renderNav: boolean = true
   buttons: SidebarButtons = {
     save: 'Save',
     reset: 'Reset',
@@ -54,6 +56,7 @@ export class SidebarState {
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     // @ts-ignore FIXME twind
     this.position = options.position || 'displace'
+    this.renderNav = options.renderNav || true
     this.placeholder = options.placeholder || NoFormsPlaceholder
 
     if (options.buttons?.save) {

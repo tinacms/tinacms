@@ -366,6 +366,7 @@ export const tinaConfig = defineConfig({
 
     // cms.sidebar.position = "overlay";
     // cms.sidebar.defaultState = "closed";
+    // cms.sidebar.renderNav = false;
 
     /**
      * When `tina-admin` is enabled, this plugin configures contextual editing for collections
