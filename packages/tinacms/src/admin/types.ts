@@ -27,6 +27,7 @@ export interface DocumentNode {
       relativePath: string
       filename: string
       extension: string
+      title?: string
     }
   }
 }

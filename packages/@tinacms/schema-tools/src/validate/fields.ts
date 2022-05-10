@@ -67,6 +67,7 @@ const StringField = TinaScalerBase.extend({
     invalid_type_error: typeTypeError,
     required_error: typeRequiredError,
   }),
+  isTitle: z.boolean().optional(),
 })
 const BooleanField = TinaScalerBase.extend({
   type: z.literal('boolean' as const, {

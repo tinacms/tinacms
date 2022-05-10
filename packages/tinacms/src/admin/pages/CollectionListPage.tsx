@@ -185,6 +185,9 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
+                                const hasTitle = Boolean(
+                                  document.node._sys.title
+                                )
                                 const subfolders =
                                   document.node._sys.breadcrumbs
                                     .slice(0, -1)
@@ -210,7 +213,7 @@ const CollectionListPage = () => {
                                         <BiEdit className="inline-block h-6 w-auto opacity-70" />
                                         <span>
                                           <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            Filename
+                                            {hasTitle ? 'Title' : 'Filename'}
                                           </span>
                                           <span className="h-5 leading-5 block whitespace-nowrap">
                                             {subfolders && (
@@ -219,9 +222,17 @@ const CollectionListPage = () => {
                                               </span>
                                             )}
                                             <span>
-                                              {document.node._sys.filename}
+                                              {hasTitle
+                                                ? document.node._sys?.title
+                                                : document.node._sys.filename}
                                             </span>
                                           </span>
+                                          {hasTitle && (
+                                            <span className="block text-xs text-gray-400 my-1">
+                                              Filename:{' '}
+                                              {document.node._sys.filename}
+                                            </span>
+                                          )}
                                         </span>
                                       </a>
                                     </td>

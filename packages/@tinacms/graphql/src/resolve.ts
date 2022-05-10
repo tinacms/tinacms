@@ -19,6 +19,7 @@ import {
   GraphQLError,
   parse,
 } from 'graphql'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import { createSchema } from './schema'
 import { createResolver } from './resolver'
 import { assertShape } from './util'
@@ -44,7 +45,9 @@ export const resolve = async ({
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
 
     const config = await database.getTinaSchema()
-    const tinaSchema = await createSchema({ schema: config })
+    const tinaSchema = (await createSchema({
+      schema: config,
+    })) as unknown as TinaSchema
     const resolver = await createResolver({ database, tinaSchema })
 
     const res = await graphql({

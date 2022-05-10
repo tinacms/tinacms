@@ -97,6 +97,7 @@
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",
@@ -119,5 +120,8 @@
     "jest-matcher-utils": "27.0.6",
     "nodemon": "^2.0.4",
     "typescript": "^4.3.5"
+  },
+  "peerDependencies": {
+    "@tinacms/schema-tools": "*"
   }
 }
