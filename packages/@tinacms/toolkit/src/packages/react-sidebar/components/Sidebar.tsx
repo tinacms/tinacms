@@ -72,7 +72,7 @@ export function SidebarProvider({
       defaultState={cms?.sidebar?.defaultState || defaultState}
       renderNav={
         // @ts-ignore
-        typeof cms?.sidebar?.renderNav !== undefined
+        typeof cms?.sidebar?.renderNav !== 'undefined'
           ? // @ts-ignore
             cms.sidebar.renderNav
           : true
