@@ -54,6 +54,7 @@ export class Resolver {
     this.tinaSchema = init.tinaSchema
   }
   public resolveCollection = async (
+    args,
     collectionName: string,
     hasDocuments?: boolean
   ) => {
@@ -66,12 +67,15 @@ export class Resolver {
     // if (res.type === "union") {
     //   extraFields["templates"] = res.templates;
     // }
-    let documents = {}
-    if (hasDocuments) {
-      documents = await this.getDocumentsForCollection(collectionName)
-    }
+    // let documents = {}
+    // if (hasDocuments) {
+    //   documents = await this.resolveCollectionConnection({
+    //     args,
+    //     collection,
+    //   })
+    // }
     return {
-      documents,
+      documents: { collection: collection, hasDocuments },
       ...collection,
       ...extraFields,
     }

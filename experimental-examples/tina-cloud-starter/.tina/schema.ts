@@ -318,6 +318,7 @@ const schema = defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          isTitle: true,
         },
         {
           type: "string",
