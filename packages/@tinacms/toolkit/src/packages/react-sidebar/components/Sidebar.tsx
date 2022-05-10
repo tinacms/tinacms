@@ -41,6 +41,9 @@ export const minPreviewWidth = 440
 export const minSidebarWidth = 360
 export const navBreakpoint = 1000
 
+const LOCALSTATEKEY = 'tina.sidebarState'
+const LOCALWIDTHKEY = 'tina.sidebarWidth'
+
 const defaultSidebarWidth = 440
 const defaultSidebarPosition = 'displace'
 const defaultSidebarState = 'open'
@@ -136,9 +139,46 @@ const Sidebar = ({
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
 
+  /* Set sidebar open state and width to local values if available */
   React.useEffect(() => {
-    setDisplayState(defaultState)
+    if (typeof window !== 'undefined') {
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
+      const localSidebarWidth = window.localStorage.getItem(LOCALWIDTHKEY)
+
+      if (localSidebarState !== null) {
+        setDisplayState(JSON.parse(localSidebarState))
+      }
+
+      if (localSidebarWidth !== null) {
+        setSidebarWidth(JSON.parse(localSidebarWidth))
+      }
+    }
+  }, [])
+
+  /* If the default sidebar state changes, update current state if no local value is found */
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const localSidebarState = window.localStorage.getItem(LOCALSTATEKEY)
+
+      if (localSidebarState === null) {
+        setDisplayState(defaultState)
+      }
+    }
   }, [defaultState])
+
+  /* Update the local value of the sidebar state any time it updates, if the CMS is loaded */
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && cms.enabled) {
+      window.localStorage.setItem(LOCALSTATEKEY, JSON.stringify(displayState))
+    }
+  }, [displayState, cms])
+
+  /* Update the local value of the sidebar width any time the user drags to resize it */
+  React.useEffect(() => {
+    if (resizingSidebar) {
+      window.localStorage.setItem(LOCALWIDTHKEY, JSON.stringify(sidebarWidth))
+    }
+  }, [sidebarWidth, resizingSidebar])
 
   const isTinaAdminEnabled =
     cms.flags.get('tina-admin') === false ? false : true
