@@ -70,6 +70,12 @@ export function SidebarProvider({
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
       // @ts-ignore
       defaultState={cms?.sidebar?.defaultState || defaultState}
+      // @ts-ignore
+      renderNav={
+        typeof cms?.sidebar?.renderNav !== undefined
+          ? cms.sidebar.renderNav
+          : true
+      }
       sidebar={sidebar}
     />
   )
@@ -80,6 +86,7 @@ interface SidebarProps {
   defaultWidth?: SidebarStateOptions['defaultWidth']
   defaultState?: SidebarStateOptions['defaultState']
   position?: SidebarStateOptions['position']
+  renderNav?: boolean
 }
 
 type displayStates = 'closed' | 'open' | 'fullscreen'
@@ -119,6 +126,7 @@ const Sidebar = ({
   defaultWidth,
   defaultState,
   position,
+  renderNav,
 }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
@@ -215,29 +223,33 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
-          {(sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
-            <Nav
-              showCollections={isTinaAdminEnabled}
-              collectionsInfo={collectionsInfo}
-              screens={allScreens}
-              contentCreators={contentCreators}
-              sidebarWidth={sidebarWidth}
-              RenderNavSite={({ view }) => (
-                <SidebarSiteLink
-                  view={view}
-                  onClick={() => {
-                    setActiveView(view)
-                    setMenuIsOpen(false)
-                  }}
-                />
-              )}
-              RenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink collection={collection} />
-              )}
-            />
-          )}
+          {renderNav &&
+            (sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
+              <Nav
+                showCollections={isTinaAdminEnabled}
+                collectionsInfo={collectionsInfo}
+                screens={allScreens}
+                contentCreators={contentCreators}
+                sidebarWidth={sidebarWidth}
+                RenderNavSite={({ view }) => (
+                  <SidebarSiteLink
+                    view={view}
+                    onClick={() => {
+                      setActiveView(view)
+                      setMenuIsOpen(false)
+                    }}
+                  />
+                )}
+                RenderNavCollection={({ collection }) => (
+                  <SidebarCollectionLink collection={collection} />
+                )}
+              />
+            )}
           <SidebarBody>
-            <SidebarHeader isLocalMode={cms.api?.tina?.isLocalMode} />
+            <SidebarHeader
+              renderNav={renderNav}
+              isLocalMode={cms.api?.tina?.isLocalMode}
+            />
             <FormsView>
               <sidebar.placeholder />
             </FormsView>
@@ -250,7 +262,7 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        {sidebarWidth < navBreakpoint + 1 && (
+        {renderNav && sidebarWidth < navBreakpoint + 1 && (
           <Transition show={menuIsOpen}>
             <Transition.Child
               as={React.Fragment}
@@ -353,7 +365,7 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ isLocalMode }) => {
+const SidebarHeader = ({ renderNav, isLocalMode }) => {
   const {
     toggleFullscreen,
     displayState,
@@ -366,18 +378,20 @@ const SidebarHeader = ({ isLocalMode }) => {
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
-        {sidebarWidth < navBreakpoint + 1 && displayState !== 'fullscreen' && (
-          <Button
-            rounded="right"
-            variant="secondary"
-            onClick={() => {
-              setMenuIsOpen(true)
-            }}
-            className="pointer-events-auto -ml-px"
-          >
-            <BiMenu className="h-7 w-auto" />
-          </Button>
-        )}
+        {renderNav &&
+          sidebarWidth < navBreakpoint + 1 &&
+          displayState !== 'fullscreen' && (
+            <Button
+              rounded="right"
+              variant="secondary"
+              onClick={() => {
+                setMenuIsOpen(true)
+              }}
+              className="pointer-events-auto -ml-px"
+            >
+              <BiMenu className="h-7 w-auto" />
+            </Button>
+          )}
         <div className="flex-1"></div>
         <div
           className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
