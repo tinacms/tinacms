@@ -32,6 +32,8 @@ export class TinaAdminApi {
 
   async fetchCollections() {
     try {
+      // TODO: fix this type
+      // @ts-ignore
       const collections: Collection[] = this.schema.getCollections()
       return collections
     } catch (e) {
@@ -96,6 +98,8 @@ export class TinaAdminApi {
       return response.collection
     } else {
       try {
+        // TODO: fix this type
+        // @ts-ignore
         const collection: Collection = this.schema.getCollection(collectionName)
         return collection
       } catch (e) {

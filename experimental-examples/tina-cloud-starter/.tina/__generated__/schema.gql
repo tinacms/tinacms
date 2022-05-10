@@ -93,7 +93,7 @@ union DocumentNode = Posts | Global | Authors | Pages
 union PostsAuthor = Authors
 
 type Posts implements Node & Document {
-  title: String
+  title: String!
   heroImg: String
   excerpt: JSON
   author: PostsAuthor
@@ -277,7 +277,7 @@ type GlobalConnection implements Connection {
 }
 
 type Authors implements Node & Document {
-  name: String
+  name: String!
   avatar: String
   id: ID!
   _sys: SystemInfo!

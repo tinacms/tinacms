@@ -18,7 +18,7 @@ const schema = defineSchema({
           type: "string",
           label: "Title",
           name: "title",
-          // list: false,
+          required: true,
           isTitle: true,
         },
         {
@@ -318,6 +318,7 @@ const schema = defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          required: true,
           isTitle: true,
         },
         {
