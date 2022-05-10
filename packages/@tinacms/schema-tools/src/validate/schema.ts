@@ -44,7 +44,14 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
     .optional()
     .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
       message: 'Fields must have a unique name',
-    }),
+    })
+    .refine(
+      // It is valid if it is 0 or 1
+      (val) => val?.filter((x) => x.type === 'string' && x.isTitle).length < 2,
+      {
+        message: 'Fields can only have one use of `isTitle`',
+      }
+    ),
   templates: z
     .array(Template)
     .min(1)

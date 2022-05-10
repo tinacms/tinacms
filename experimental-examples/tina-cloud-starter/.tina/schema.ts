@@ -18,6 +18,8 @@ const schema = defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          // list: false,
+          isTitle: true,
         },
         {
           type: "image",

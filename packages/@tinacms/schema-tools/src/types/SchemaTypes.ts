@@ -165,12 +165,14 @@ type StringField =
       type: 'string'
       isBody?: boolean
       list?: false
+      isTitle?: boolean
       ui?: UIField<any, string>
     }
   | {
       type: 'string'
       isBody?: boolean
       list: true
+      isTitle?: never
       ui?: UIField<any, string[]>
     }
 

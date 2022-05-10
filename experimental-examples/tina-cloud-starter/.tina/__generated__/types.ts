@@ -26,6 +26,7 @@ export type Scalars = {
 export type SystemInfo = {
   __typename?: 'SystemInfo';
   filename: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
   basename: Scalars['String'];
   breadcrumbs: Array<Scalars['String']>;
   path: Scalars['String'];
