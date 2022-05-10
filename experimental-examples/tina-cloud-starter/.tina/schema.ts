@@ -367,6 +367,7 @@ export const tinaConfig = defineConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
+    cms.flags.set("experimentalData", true);
 
     // cms.sidebar.position = "overlay";
     // cms.sidebar.defaultState = "closed";

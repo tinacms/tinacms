@@ -23,7 +23,7 @@ export class TinaAdminApi {
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
-    this.useDataLayer = cms.flags.get('data-layer')
+    this.useDataLayer = cms.flags.get('experimentalData')
   }
 
   async isAuthenticated() {
@@ -60,10 +60,10 @@ export class TinaAdminApi {
   }
   async fetchCollection(collectionName: string, includeDocuments: boolean) {
     if (includeDocuments === true) {
-      // TODO: only include sort if we need to
-      const sort = this.schema.getIsTitleFieldName(collectionName)
-      const response: { collection: Collection } = await this.api.request(
-        `#graphql
+      if (this.useDataLayer) {
+        const sort = this.schema.getIsTitleFieldName(collectionName)
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
       query($collection: String!, $includeDocuments: Boolean!, $sort: String){
         collection(collection: $collection){
           name
@@ -76,7 +76,6 @@ export class TinaAdminApi {
               node {
                 ... on Document {
                   _sys {
-                    # TODO: only include title if we need to
                     title
                     template
                     breadcrumbs
@@ -92,10 +91,45 @@ export class TinaAdminApi {
           }
         }
       }`,
-        { variables: { collection: collectionName, includeDocuments, sort } }
-      )
+          { variables: { collection: collectionName, includeDocuments, sort } }
+        )
 
-      return response.collection
+        return response.collection
+      } else {
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
+    query($collection: String!, $includeDocuments: Boolean!){
+      collection(collection: $collection){
+        name
+        label
+        format
+        templates
+        documents @include(if: $includeDocuments) {
+          totalCount
+          edges {
+            node {
+              ... on Document {
+                _sys {
+                  # TODO: only include title if we need to
+                  template
+                  breadcrumbs
+                  path
+                  basename
+                  relativePath
+                  filename
+                  extension
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+          { variables: { collection: collectionName, includeDocuments } }
+        )
+
+        return response.collection
+      }
     } else {
       try {
         // TODO: fix this type
