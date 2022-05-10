@@ -56,7 +56,7 @@ export class SidebarState {
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     // @ts-ignore FIXME twind
     this.position = options.position || 'displace'
-    this.renderNav = options.nav || true
+    this.renderNav = options.renderNav || true
     this.placeholder = options.placeholder || NoFormsPlaceholder
 
     if (options.buttons?.save) {

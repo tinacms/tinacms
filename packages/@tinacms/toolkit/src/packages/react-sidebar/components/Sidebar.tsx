@@ -70,10 +70,11 @@ export function SidebarProvider({
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
       // @ts-ignore
       defaultState={cms?.sidebar?.defaultState || defaultState}
-      // @ts-ignore
       renderNav={
+        // @ts-ignore
         typeof cms?.sidebar?.renderNav !== undefined
-          ? cms.sidebar.renderNav
+          ? // @ts-ignore
+            cms.sidebar.renderNav
           : true
       }
       sidebar={sidebar}
