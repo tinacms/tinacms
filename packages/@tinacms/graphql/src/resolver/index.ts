@@ -13,7 +13,6 @@ limitations under the License.
 
 import path from 'path'
 import { Database } from '../database'
-import { TinaSchema } from '../schema'
 import { assertShape, lastItem, sequential } from '../util'
 import { NAMER } from '../ast-builder'
 import isValid from 'date-fns/isValid'
@@ -25,8 +24,11 @@ import type {
   Templateable,
   TinaCloudCollection,
   TinaFieldEnriched,
-} from '../types'
-import { Template, TinaFieldInner } from '../types'
+  Template,
+  TinaFieldInner,
+  TinaSchema,
+} from '@tinacms/schema-tools'
+
 import { TinaError } from './error'
 import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
@@ -52,6 +54,7 @@ export class Resolver {
     this.tinaSchema = init.tinaSchema
   }
   public resolveCollection = async (
+    args,
     collectionName: string,
     hasDocuments?: boolean
   ) => {
@@ -64,12 +67,10 @@ export class Resolver {
     // if (res.type === "union") {
     //   extraFields["templates"] = res.templates;
     // }
-    let documents = {}
-    if (hasDocuments) {
-      documents = await this.getDocumentsForCollection(collectionName)
-    }
+
     return {
-      documents,
+      // return the collection and hasDocuments to resolve documents at a lower level
+      documents: { collection: collection, hasDocuments },
       ...collection,
       ...extraFields,
     }
@@ -110,6 +111,13 @@ export class Resolver {
       await sequential(template.fields, async (field) =>
         this.resolveFieldData(field, rawData, data)
       )
+      const titleField = template.fields.find((x) => {
+        if (x.type === 'string' && x?.isTitle) {
+          return true
+        }
+      })
+      const titleFieldName = titleField?.name
+      const title = data[titleFieldName || ' '] || null
 
       return {
         __typename: collection.fields
@@ -118,6 +126,7 @@ export class Resolver {
         id: fullPath,
         ...data,
         _sys: {
+          title,
           basename,
           filename,
           extension,

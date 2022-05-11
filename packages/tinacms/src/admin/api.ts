@@ -12,17 +12,18 @@ limitations under the License.
 */
 
 import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Client } from '../internalClient'
 import type { Collection, DocumentForm } from './types'
 
 export class TinaAdminApi {
-  api: {
-    request: (query: string, { variables }: { variables: object }) => any
-    isAuthenticated: () => boolean
-  }
-  schema: any
+  api: Client
+  useDataLayer: boolean
+  schema: TinaSchema
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
+    this.useDataLayer = cms.flags.get('experimentalData')
   }
 
   async isAuthenticated() {
@@ -31,6 +32,8 @@ export class TinaAdminApi {
 
   async fetchCollections() {
     try {
+      // TODO: fix this type
+      // @ts-ignore
       const collections: Collection[] = this.schema.getCollections()
       return collections
     } catch (e) {
@@ -57,20 +60,23 @@ export class TinaAdminApi {
   }
   async fetchCollection(collectionName: string, includeDocuments: boolean) {
     if (includeDocuments === true) {
-      const response: { collection: Collection } = await this.api.request(
-        `#graphql
-      query($collection: String!, $includeDocuments: Boolean!){
+      if (this.useDataLayer) {
+        const sort = this.schema.getIsTitleFieldName(collectionName)
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents @include(if: $includeDocuments) {
+          documents(sort: $sort) @include(if: $includeDocuments) {
             totalCount
             edges {
               node {
                 ... on Document {
                   _sys {
+                    title
                     template
                     breadcrumbs
                     path
@@ -85,12 +91,49 @@ export class TinaAdminApi {
           }
         }
       }`,
-        { variables: { collection: collectionName, includeDocuments } }
-      )
+          { variables: { collection: collectionName, includeDocuments, sort } }
+        )
 
-      return response.collection
+        return response.collection
+      } else {
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
+    query($collection: String!, $includeDocuments: Boolean!){
+      collection(collection: $collection){
+        name
+        label
+        format
+        templates
+        documents @include(if: $includeDocuments) {
+          totalCount
+          edges {
+            node {
+              ... on Document {
+                _sys {
+                  # TODO: only include title if we need to
+                  template
+                  breadcrumbs
+                  path
+                  basename
+                  relativePath
+                  filename
+                  extension
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+          { variables: { collection: collectionName, includeDocuments } }
+        )
+
+        return response.collection
+      }
     } else {
       try {
+        // TODO: fix this type
+        // @ts-ignore
         const collection: Collection = this.schema.getCollection(collectionName)
         return collection
       } catch (e) {

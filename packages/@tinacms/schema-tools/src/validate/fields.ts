@@ -67,6 +67,7 @@ const StringField = TinaScalerBase.extend({
     invalid_type_error: typeTypeError,
     required_error: typeRequiredError,
   }),
+  isTitle: z.boolean().optional(),
 })
 const BooleanField = TinaScalerBase.extend({
   type: z.literal('boolean' as const, {
@@ -186,6 +187,24 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
     )
     .superRefine(
       (val, ctx) => {
+        if (val.type === 'string') {
+          // refine isTitle to make sure the proper args are passed
+          if (val.isTitle) {
+            if (val.list) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'You can not have `list: true` when using `isTitle`',
+              })
+            }
+            if (!val.required) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'You must have { required: true } when using `isTitle`',
+              })
+            }
+          }
+        }
         // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
         if (val.type === 'object') {
           // TODO: Maybe clean up this code its sorta messy

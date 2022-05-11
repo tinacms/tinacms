@@ -19,6 +19,7 @@ import {
   GraphQLError,
   parse,
 } from 'graphql'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import { createSchema } from './schema'
 import { createResolver } from './resolver'
 import { assertShape } from './util'
@@ -44,7 +45,9 @@ export const resolve = async ({
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
 
     const config = await database.getTinaSchema()
-    const tinaSchema = await createSchema({ schema: config })
+    const tinaSchema = (await createSchema({
+      schema: config,
+    })) as unknown as TinaSchema
     const resolver = await createResolver({ database, tinaSchema })
 
     const res = await graphql({
@@ -96,13 +99,14 @@ export const resolve = async ({
             )
             return tinaSchema.getCollections().map((collection) => {
               return resolver.resolveCollection(
+                args,
                 collection.name,
                 Boolean(hasDocuments)
               )
             })
           }
 
-          // The field is `getCollection`
+          // The field is `collection`
           const collectionNode = info.fieldNodes.find(
             (x) => x.name.value === 'collection'
           )
@@ -113,6 +117,7 @@ export const resolve = async ({
             }
           )
           return resolver.resolveCollection(
+            args,
             args.collection,
             Boolean(hasDocuments)
           )
@@ -247,6 +252,19 @@ export const resolve = async ({
                   return { node: document }
                 }),
               }
+              // TODO when jeffs back: Look at this to make sure its OK to do this. (I am pretty sure it is -- Logan)
+              // Fixes https://github.com/tinacms/tinacms/issues/2886
+            } else if (
+              info.fieldName === 'documents' &&
+              value?.collection &&
+              value?.hasDocuments
+            ) {
+              // use the collecion and hasDocuments to resolve the documents
+              return resolver.resolveCollectionConnection({
+                args,
+                // @ts-ignore
+                collection: value.collection,
+              })
             } else {
               throw new Error(
                 `Expected an array for result of ${info.fieldName} at ${info.path}`
