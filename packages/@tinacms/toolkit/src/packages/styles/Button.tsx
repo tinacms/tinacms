@@ -21,6 +21,8 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger'
   as?: React.ElementType
+  href?: string
+  target?: string
   size?: 'small' | 'medium' | 'custom'
   busy?: boolean
   rounded?: 'full' | 'left' | 'right'
