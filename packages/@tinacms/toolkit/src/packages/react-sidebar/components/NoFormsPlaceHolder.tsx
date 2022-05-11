@@ -18,6 +18,7 @@ limitations under the License.
 
 import styled, { keyframes } from 'styled-components'
 import * as React from 'react'
+import { Button } from '../../styles'
 
 export const NoFormsPlaceholder = () => (
   <EmptyState>
@@ -28,9 +29,13 @@ export const NoFormsPlaceholder = () => (
       generate forms for.
     </p>
     <p>
-      <LinkButton href="https://tina.io/docs/tinacms-context/" target="_blank">
+      <Button
+        href="https://tina.io/docs/tinacms-context/"
+        target="_blank"
+        as="a"
+      >
         <Emoji>📖</Emoji> Contextual Editing
-      </LinkButton>
+      </Button>
     </p>
   </EmptyState>
 )
@@ -71,8 +76,14 @@ const EmptyState = styled.div`
   > *:first-child {
     margin: 0 0 var(--tina-padding-big) 0;
   }
-  > ${Emoji} {
+  ${Emoji} {
     display: block;
+    font-size: 24px;
+  }
+  a {
+    ${Emoji} {
+      margin-right: 0.25em;
+    }
   }
   h3 {
     font-size: var(--tina-font-size-5);
@@ -86,39 +97,5 @@ const EmptyState = styled.div`
   p {
     display: block;
     margin: 0 0 var(--tina-padding-big) 0;
-  }
-`
-
-const LinkButton = styled.a`
-  text-align: center;
-  border: 0;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid var(--tina-color-grey-2);
-  box-shadow: var(--tina-shadow-small);
-  font-weight: var(--tina-font-weight-regular);
-  cursor: pointer;
-  font-size: var(--tina-font-size-0);
-  transition: all var(--tina-timing-short) ease-out;
-  background-color: white;
-  color: var(--tina-color-grey-8);
-  padding: var(--tina-padding-small) var(--tina-padding-big)
-    var(--tina-padding-small) 56px;
-  position: relative;
-  text-decoration: none;
-  display: inline-block;
-  ${Emoji} {
-    font-size: 24px;
-    position: absolute;
-    left: var(--tina-padding-big);
-    top: 50%;
-    transform-origin: 50% 50%;
-    transform: translate3d(0, -50%, 0);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-  &:hover {
-    color: var(--tina-color-primary);
-    ${Emoji} {
-      transform: translate3d(0, -50%, 0);
-    }
   }
 `
