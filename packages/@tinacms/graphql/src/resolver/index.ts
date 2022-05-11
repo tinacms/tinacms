@@ -36,7 +36,7 @@ import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 
 interface ResolverConfig {
-  config: GraphQLConfig
+  config?: GraphQLConfig
   database: Database
   tinaSchema: TinaSchema
 }
@@ -721,7 +721,7 @@ export class Resolver {
           } else {
             accumulator[
               field.name
-            ] = `https://assets.tinajs.io/${this.config.clientId}/${value}`
+            ] = `https://assets.tina.io/${this.config.clientId}/${value}`
           }
         } else {
           accumulator[field.name] = value
