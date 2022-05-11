@@ -28,13 +28,16 @@ import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
 import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
+import type { GraphQLConfig } from './types'
 
 export const resolve = async ({
+  config,
   query,
   variables,
   database,
   silenceErrors,
 }: {
+  config: GraphQLConfig
   query: string
   variables: object
   database: Database
@@ -44,11 +47,11 @@ export const resolve = async ({
     const graphQLSchemaAst = await database.getGraphQLSchema()
     const graphQLSchema = buildASTSchema(graphQLSchemaAst)
 
-    const config = await database.getTinaSchema()
+    const tinaConfig = await database.getTinaSchema()
     const tinaSchema = (await createSchema({
-      schema: config,
+      schema: tinaConfig,
     })) as unknown as TinaSchema
-    const resolver = await createResolver({ database, tinaSchema })
+    const resolver = await createResolver({ config, database, tinaSchema })
 
     const res = await graphql({
       schema: graphQLSchema,
