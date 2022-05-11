@@ -67,14 +67,9 @@ export class Resolver {
     // if (res.type === "union") {
     //   extraFields["templates"] = res.templates;
     // }
-    // let documents = {}
-    // if (hasDocuments) {
-    //   documents = await this.resolveCollectionConnection({
-    //     args,
-    //     collection,
-    //   })
-    // }
+
     return {
+      // return the collection and hasDocuments to resolve documents at a lower level
       documents: { collection: collection, hasDocuments },
       ...collection,
       ...extraFields,
