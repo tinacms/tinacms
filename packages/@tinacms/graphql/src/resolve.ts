@@ -37,7 +37,7 @@ export const resolve = async ({
   database,
   silenceErrors,
 }: {
-  config: GraphQLConfig
+  config?: GraphQLConfig
   query: string
   variables: object
   database: Database
