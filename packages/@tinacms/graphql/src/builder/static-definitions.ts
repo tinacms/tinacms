@@ -107,6 +107,11 @@ const scalarDefinitions = [
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({
+        name: 'title',
+        required: false,
+        type: astBuilder.TYPES.String,
+      }),
+      astBuilder.FieldDefinition({
         name: 'basename',
         required: true,
         type: astBuilder.TYPES.String,

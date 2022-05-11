@@ -18,6 +18,8 @@ const schema = defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          required: true,
+          isTitle: true,
         },
         {
           type: "image",
@@ -316,6 +318,8 @@ const schema = defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          required: true,
+          isTitle: true,
         },
         {
           type: "string",
@@ -363,6 +367,7 @@ export const tinaConfig = defineConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
+    cms.flags.set("experimentalData", true);
 
     // cms.sidebar.position = "overlay";
     // cms.sidebar.defaultState = "closed";
