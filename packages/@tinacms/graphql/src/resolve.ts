@@ -259,6 +259,7 @@ export const resolve = async ({
               value?.collection &&
               value?.hasDocuments
             ) {
+              // use the collecion and hasDocuments to resolve the documents
               return resolver.resolveCollectionConnection({
                 args,
                 // @ts-ignore
