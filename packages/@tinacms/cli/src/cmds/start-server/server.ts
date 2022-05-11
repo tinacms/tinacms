@@ -51,7 +51,11 @@ const gqlServer = async (database) => {
 
   app.post('/graphql', async (req, res) => {
     const { query, variables } = req.body
+    const config = {
+      useRelativeMedia: true,
+    }
     const result = await gqlPackage.resolve({
+      config,
       database,
       query,
       variables,
