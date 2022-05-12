@@ -110,9 +110,7 @@ export class Database {
     | undefined
   > => {
     const tinaSchema = await this.getSchema()
-    const collection = tinaSchema.schema.collections.find((collection) =>
-      filepath.startsWith(collection.path)
-    )
+    const collection = await tinaSchema.getCollectionByFullPath(filepath)
     return collection
   }
 
@@ -572,9 +570,7 @@ export class Database {
 
   public delete = async (filepath: string) => {
     const tinaSchema = await this.getSchema()
-    const collection = tinaSchema.schema.collections.find((collection) =>
-      filepath.startsWith(collection.path)
-    )
+    const collection = await tinaSchema.getCollectionByFullPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
       const indexDefinitions = await this.getIndexDefinitions()
