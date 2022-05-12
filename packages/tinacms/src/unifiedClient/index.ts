@@ -22,7 +22,7 @@ export interface TinaClientArgs<SDK = Record<string, unknown>> {
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
-} & Partial<TinaClientArgs>
+} & Partial<Omit<TinaClientArgs, 'sdk'>>
 export class TinaClient<SDK> {
   public apiUrl: string
   public readonlyToken?: string
