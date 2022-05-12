@@ -224,7 +224,7 @@ type APIProviderProps =
        * The API url From this client will be used to make requests.
        *
        */
-      client: TinaClient
+      client: TinaClient<unknown>
       /**
        * Content API URL
        *
