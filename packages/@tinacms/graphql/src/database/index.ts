@@ -569,8 +569,7 @@ export class Database {
   }
 
   public delete = async (filepath: string) => {
-    const tinaSchema = await this.getSchema()
-    const collection = await tinaSchema.getCollectionByFullPath(filepath)
+    const collection = await this.collectionForPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
       const indexDefinitions = await this.getIndexDefinitions()
