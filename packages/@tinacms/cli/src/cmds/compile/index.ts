@@ -39,6 +39,13 @@ export const resetGeneratedFolder = async () => {
     console.log(e)
   }
   await fs.mkdir(tinaGeneratedPath)
+  // temp types file to allows the client to build
+  await fs.writeFile(
+    path.join(tinaGeneratedPath, 'types.ts'),
+    `
+export const sdk = (client)=>({})
+`
+  )
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
 }
 
