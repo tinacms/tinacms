@@ -29,11 +29,14 @@ import type {
   TinaSchema,
 } from '@tinacms/schema-tools'
 
+import type { GraphQLConfig } from '../types'
+
 import { TinaError } from './error'
 import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 
 interface ResolverConfig {
+  config?: GraphQLConfig
   database: Database
   tinaSchema: TinaSchema
 }
@@ -47,9 +50,11 @@ export const createResolver = (args: ResolverConfig) => {
  * values and retrieves them from the database
  */
 export class Resolver {
+  public config: GraphQLConfig
   public database: Database
   public tinaSchema: TinaSchema
   constructor(public init: ResolverConfig) {
+    this.config = init.config
     this.database = init.database
     this.tinaSchema = init.tinaSchema
   }
@@ -112,6 +117,7 @@ export class Resolver {
         this.resolveFieldData(field, rawData, data)
       )
       const titleField = template.fields.find((x) => {
+        // @ts-ignore
         if (x.type === 'string' && x?.isTitle) {
           return true
         }
@@ -706,8 +712,20 @@ export class Resolver {
       case 'boolean':
       case 'number':
       case 'reference':
-      case 'image':
         accumulator[field.name] = value
+        break
+      case 'image':
+        if (this.config) {
+          if (this.config.useRelativeMedia === true) {
+            accumulator[field.name] = value
+          } else {
+            accumulator[
+              field.name
+            ] = `https://assets.tina.io/${this.config.clientId}/${value}`
+          }
+        } else {
+          accumulator[field.name] = value
+        }
         break
       case 'rich-text':
         // @ts-ignore value is unknown
