@@ -76,6 +76,6 @@ export class TinaClient<GenQueries> {
 }
 
 export function createClient<GenQueries>(args: TinaClientArgs<GenQueries>) {
-  const client = new TinaClient<ReturnType<typeof args.sdk>>(args)
+  const client = new TinaClient<ReturnType<typeof args.queries>>(args)
   return client
 }
