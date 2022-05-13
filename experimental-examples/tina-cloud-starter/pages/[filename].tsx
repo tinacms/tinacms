@@ -19,7 +19,7 @@ export default function HomePage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const tinaProps = await client.sdk.ContentQuery({
+  const tinaProps = await client.queries.ContentQuery({
     relativePath: `${params.filename}.md`,
   });
   return {
@@ -32,7 +32,7 @@ export const getStaticProps = async ({ params }) => {
 };
 
 export const getStaticPaths = async () => {
-  const pagesListData = await client.sdk.pagesConnection();
+  const pagesListData = await client.queries.pagesConnection();
   return {
     paths: pagesListData.data.pagesConnection.edges.map((page) => ({
       params: { filename: page.node._sys.filename },

@@ -1,5 +1,5 @@
 import { createClient } from "tinacms/dist/client";
-import { sdk } from "./__generated__/types";
+import { queries } from "./__generated__/types";
 
 const branch = "main";
 const apiURL =
@@ -8,4 +8,4 @@ const apiURL =
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`;
 
 // Token generated on app.tina.io
-export const client = createClient({ url: apiURL, token: "***", sdk });
+export const client = createClient({ url: apiURL, token: "***", queries });
