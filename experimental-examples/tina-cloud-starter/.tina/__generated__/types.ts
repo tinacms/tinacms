@@ -1216,31 +1216,43 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
   export type Sdk = ReturnType<typeof getSdk>;
 
 // TinaSDK generated code
-import { createClient } from 'tinacms/dist/client'
-const client = createClient({url: 'http://localhost:4001/graphql'})
+import { createClient, TinaClient } from "tinacms/dist/client";
 
-const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
-  doc,
-  vars,
-  _options
-) => {
-  let data = {}
-  try {
-    data = await client.request({
-      query: doc,
-      variables: vars,
-    })
-  } catch (e) {
-    // swallow errors related to document creation
-    console.warn('Warning: There was an error when fetching data')
-    console.warn(e)
-  }
+const generateRequester = (client: TinaClient) => {
+  const requester: (
+    doc: any,
+    vars?: any,
+    options?: any,
+    client
+  ) => Promise<any> = async (doc, vars, _options) => {
+    let data = {};
+    try {
+      data = await client.request({
+        query: doc,
+        variables: vars,
+      });
+    } catch (e) {
+      // swallow errors related to document creation
+      console.warn("Warning: There was an error when fetching data");
+      console.warn(e);
+    }
 
-  return { data: data?.data, query: doc, variables: vars || {} }
-}
+    return { data: data?.data, query: doc, variables: vars || {} };
+  };
+
+  return requester;
+};
 
 /**
  * @experimental this class can be used but may change in the future
  **/
-export const ExperimentalGetTinaClient = ()=>getSdk(requester)
+export const ExperimentalGetTinaClient = () =>
+  getSdk(
+    generateRequester(createClient({ url: "http://localhost:4001/graphql" }))
+  );
+
+export const sdk = (client: TinaClient) => {
+  const requester = generateRequester(client);
+  return getSdk(requester);
+};
 

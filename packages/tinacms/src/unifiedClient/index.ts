@@ -14,20 +14,25 @@ limitations under the License.
 import fetchPonyfill from 'fetch-ponyfill'
 const { fetch, Headers } = fetchPonyfill()
 
-export interface TinaClientArs {
+export interface TinaClientArgs<SDK = Record<string, unknown>> {
   url: string
   token?: string
+  sdk?: (client: TinaClient<SDK>) => SDK
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
-} & Partial<TinaClientArs>
-export class TinaClient {
+} & Partial<Omit<TinaClientArgs, 'sdk'>>
+export class TinaClient<SDK> {
   public apiUrl: string
   public readonlyToken?: string
-  constructor({ token, url }: TinaClientArs) {
+  public sdk?: SDK
+  constructor({ token, url, sdk }: TinaClientArgs<SDK>) {
     this.apiUrl = url
     this.readonlyToken = token
+    if (sdk) {
+      this.sdk = sdk(this)
+    }
   }
 
   public async request<DataType extends Record<string, any> = any>(
@@ -67,7 +72,7 @@ export class TinaClient {
   }
 }
 
-export const createClient = (args: TinaClientArs) => {
-  const client = new TinaClient(args)
+export function createClient<SDK>(args: TinaClientArgs<SDK>) {
+  const client = new TinaClient<ReturnType<typeof args.sdk>>(args)
   return client
 }
