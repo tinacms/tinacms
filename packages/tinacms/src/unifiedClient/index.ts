@@ -14,24 +14,27 @@ limitations under the License.
 import fetchPonyfill from 'fetch-ponyfill'
 const { fetch, Headers } = fetchPonyfill()
 
-export interface TinaClientArgs<SDK = Record<string, unknown>> {
+export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
   token?: string
-  sdk?: (client: TinaClient<SDK>) => SDK
+  queries?: (client: TinaClient<GenQueries>) => GenQueries
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
-} & Partial<Omit<TinaClientArgs, 'sdk'>>
-export class TinaClient<SDK> {
+} & Partial<Omit<TinaClientArgs, 'queries'>>
+export class TinaClient<GenQueries> {
   public apiUrl: string
   public readonlyToken?: string
-  public sdk?: SDK
-  constructor({ token, url, sdk }: TinaClientArgs<SDK>) {
+  /**
+   *
+   */
+  public queries?: GenQueries
+  constructor({ token, url, queries }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token
-    if (sdk) {
-      this.sdk = sdk(this)
+    if (queries) {
+      this.queries = queries(this)
     }
   }
 
@@ -72,7 +75,7 @@ export class TinaClient<SDK> {
   }
 }
 
-export function createClient<SDK>(args: TinaClientArgs<SDK>) {
-  const client = new TinaClient<ReturnType<typeof args.sdk>>(args)
+export function createClient<GenQueries>(args: TinaClientArgs<GenQueries>) {
+  const client = new TinaClient<ReturnType<typeof args.queries>>(args)
   return client
 }
