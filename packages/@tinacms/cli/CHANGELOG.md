@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 0.60.17
+
+### Patch Changes
+
+- 08cdb672a: Adds `useRelativeMedia` support to local graphql client
+- 646cad8da: Adds support for using the generated client on the frontend
+- f857616f6: Rename sdk to queries
+- Updated dependencies [08cdb672a]
+- Updated dependencies [fdbfe9a16]
+- Updated dependencies [6e2ed31a2]
+  - @tinacms/graphql@0.60.2
+  - @tinacms/schema-tools@0.0.4
+
 ## 0.60.16
 
 ### Patch Changes
