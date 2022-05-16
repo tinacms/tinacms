@@ -43,7 +43,7 @@ export const resetGeneratedFolder = async () => {
   await fs.writeFile(
     path.join(tinaGeneratedPath, 'types.ts'),
     `
-export const sdk = (client)=>({})
+export const queries = (client)=>({})
 `
   )
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
