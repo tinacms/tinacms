@@ -36,9 +36,11 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
 
   return (
     <BreadcrumbWrapper showArrow={directory !== ''}>
-      <span onClick={() => setDirectory(prevDir)}>
-        <LeftArrowIcon className="w-8 h-auto" />
-      </span>
+      {directory !== '' && (
+        <span onClick={() => setDirectory(prevDir)}>
+          <LeftArrowIcon className="w-8 h-auto" />
+        </span>
+      )}
       <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
         directory.split('/').map((part, index, parts) => {
