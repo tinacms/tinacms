@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.56.28
+
+### Patch Changes
+
+- a196198bd: Add ability to disable sidebar nav
+- 57a4a3789: Persist sidebar state across browser reload
+- ba1499029: Displays a helpful message in branch switcher when running locally
+
 ## 0.56.27
 
 ### Patch Changes
