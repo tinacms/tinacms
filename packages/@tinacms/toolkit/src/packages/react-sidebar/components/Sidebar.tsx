@@ -247,6 +247,9 @@ const Sidebar = ({
     renderNav &&
     ((sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
       (displayState === 'fullscreen' && windowWidth > navBreakpoint))
+  const renderMobileNav =
+    renderNav &&
+    (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint + 1)
 
   return (
     <SidebarContext.Provider
@@ -310,73 +313,72 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        {renderNav &&
-          (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint) && (
-            <Transition show={menuIsOpen}>
-              <Transition.Child
-                as={React.Fragment}
-                enter="transform transition-all ease-out duration-300"
-                enterFrom="opacity-0 -translate-x-full"
-                enterTo="opacity-100 translate-x-0"
-                leave="transform transition-all ease-in duration-200"
-                leaveFrom="opacity-100 translate-x-0"
-                leaveTo="opacity-0 -translate-x-full"
-              >
-                <div className="fixed left-0 top-0 z-overlay h-full transform">
-                  <Nav
-                    className="rounded-r-md"
-                    showCollections={isTinaAdminEnabled}
-                    collectionsInfo={collectionsInfo}
-                    screens={allScreens}
-                    contentCreators={contentCreators}
-                    sidebarWidth={sidebarWidth}
-                    RenderNavSite={({ view }) => (
-                      <SidebarSiteLink
-                        view={view}
-                        onClick={() => {
-                          setActiveView(view)
-                          setMenuIsOpen(false)
-                        }}
-                      />
-                    )}
-                    RenderNavCollection={({ collection }) => (
-                      <SidebarCollectionLink collection={collection} />
-                    )}
-                  >
-                    <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
-                      <Button
-                        rounded="right"
-                        variant="secondary"
-                        onClick={() => {
-                          setMenuIsOpen(false)
-                        }}
-                        className={`transition-opacity duration-150 ease-out`}
-                      >
-                        <IoMdClose className="h-6 w-auto" />
-                      </Button>
-                    </div>
-                  </Nav>
-                </div>
-              </Transition.Child>
-              <Transition.Child
-                as={React.Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-80"
-                entered="opacity-80"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-80"
-                leaveTo="opacity-0"
-              >
-                <div
-                  onClick={() => {
-                    setMenuIsOpen(false)
-                  }}
-                  className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
-                ></div>
-              </Transition.Child>
-            </Transition>
-          )}
+        {renderMobileNav && (
+          <Transition show={menuIsOpen}>
+            <Transition.Child
+              as={React.Fragment}
+              enter="transform transition-all ease-out duration-300"
+              enterFrom="opacity-0 -translate-x-full"
+              enterTo="opacity-100 translate-x-0"
+              leave="transform transition-all ease-in duration-200"
+              leaveFrom="opacity-100 translate-x-0"
+              leaveTo="opacity-0 -translate-x-full"
+            >
+              <div className="fixed left-0 top-0 z-overlay h-full transform">
+                <Nav
+                  className="rounded-r-md"
+                  showCollections={isTinaAdminEnabled}
+                  collectionsInfo={collectionsInfo}
+                  screens={allScreens}
+                  contentCreators={contentCreators}
+                  sidebarWidth={sidebarWidth}
+                  RenderNavSite={({ view }) => (
+                    <SidebarSiteLink
+                      view={view}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuIsOpen(false)
+                      }}
+                    />
+                  )}
+                  RenderNavCollection={({ collection }) => (
+                    <SidebarCollectionLink collection={collection} />
+                  )}
+                >
+                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                    <Button
+                      rounded="right"
+                      variant="secondary"
+                      onClick={() => {
+                        setMenuIsOpen(false)
+                      }}
+                      className={`transition-opacity duration-150 ease-out`}
+                    >
+                      <IoMdClose className="h-6 w-auto" />
+                    </Button>
+                  </div>
+                </Nav>
+              </div>
+            </Transition.Child>
+            <Transition.Child
+              as={React.Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-80"
+              entered="opacity-80"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-80"
+              leaveTo="opacity-0"
+            >
+              <div
+                onClick={() => {
+                  setMenuIsOpen(false)
+                }}
+                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+              ></div>
+            </Transition.Child>
+          </Transition>
+        )}
       </>
     </SidebarContext.Provider>
   )
