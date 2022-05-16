@@ -5412,6 +5412,59 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-hook/debounce@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@react-hook/debounce@npm:3.0.0"
+  dependencies:
+    "@react-hook/latest": ^1.0.2
+  peerDependencies:
+    react: ">=16.8"
+  checksum: fb2144a8fa5ab73fe49ca6fa491ea8119f5eb3a99e4c42f4117128ddd46772d1a5c0de6400fc53b1aa7dab5a4156e2bd6062027a270db7bd8423f47de1925f3c
+  languageName: node
+  linkType: hard
+
+"@react-hook/event@npm:^1.2.1":
+  version: 1.2.6
+  resolution: "@react-hook/event@npm:1.2.6"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 899a1b534ad45a24b0db34df9b9f8596883cfc2b2bc0ed1b46e0075c49131e71f79df4c9eca13beaaa22e388a1f47b5cce80484773c52c1c4f36c03217a387ce
+  languageName: node
+  linkType: hard
+
+"@react-hook/latest@npm:^1.0.2":
+  version: 1.0.3
+  resolution: "@react-hook/latest@npm:1.0.3"
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 5f9629d1384b16397999cd7c2cc4a3ebf741df22ffbd03c49e1272ed635fe8c2e3581c45cfd832b67fcfbb0ee8eedfca69e92fc0ed7dc39b95c63dd180c3b3fb
+  languageName: node
+  linkType: hard
+
+"@react-hook/throttle@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@react-hook/throttle@npm:2.2.0"
+  dependencies:
+    "@react-hook/latest": ^1.0.2
+  peerDependencies:
+    react: ">=16.8"
+  checksum: ed8733f5e27367edac6f24a43a0a07bced23fed0f0decfe53f75dbff11fa0ee2272341a4b798d3c719b7140accfb6ae56239e035d8a5db3e221b6cc952e38ecf
+  languageName: node
+  linkType: hard
+
+"@react-hook/window-size@npm:^3.0.7":
+  version: 3.0.7
+  resolution: "@react-hook/window-size@npm:3.0.7"
+  dependencies:
+    "@react-hook/debounce": ^3.0.0
+    "@react-hook/event": ^1.2.1
+    "@react-hook/throttle": ^2.2.0
+  peerDependencies:
+    react: ">=16.8"
+  checksum: eb89d45e46059d7410106e877dace115c25ac9e703e1f1896347bdfff44fd7515d9e2ca876469f8b35f8f30c3610ead321e845352d679779dc55634becd48a56
+  languageName: node
+  linkType: hard
+
 "@react-stately/collections@npm:^3.3.2, @react-stately/collections@npm:^3.3.3":
   version: 3.3.4
   resolution: "@react-stately/collections@npm:3.3.4"
@@ -6725,6 +6778,7 @@ __metadata:
     "@heroicons/react": ^1.0.5
     "@react-aria/i18n": ^3.3.4
     "@react-aria/listbox": 3.3.0
+    "@react-hook/window-size": ^3.0.7
     "@react-types/combobox": ^3.2.0
     "@react-types/shared": ^3.10.0
     "@sambego/storybook-styles": ^1.0.0

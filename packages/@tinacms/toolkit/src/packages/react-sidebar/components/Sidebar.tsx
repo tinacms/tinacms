@@ -34,6 +34,7 @@ import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
+import { useWindowWidth } from '@react-hook/window-size'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -241,6 +242,12 @@ const Sidebar = ({
     }
   }, [displayState, position, sidebarWidth, resizingSidebar])
 
+  const windowWidth = useWindowWidth()
+  const displayNav =
+    renderNav &&
+    ((sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
+      (displayState === 'fullscreen' && windowWidth > navBreakpoint))
+
   return (
     <SidebarContext.Provider
       value={{
@@ -264,30 +271,30 @@ const Sidebar = ({
       <>
         <SidebarWrapper>
           <EditButton />
-          {renderNav &&
-            (sidebarWidth > navBreakpoint || displayState === 'fullscreen') && (
-              <Nav
-                showCollections={isTinaAdminEnabled}
-                collectionsInfo={collectionsInfo}
-                screens={allScreens}
-                contentCreators={contentCreators}
-                sidebarWidth={sidebarWidth}
-                RenderNavSite={({ view }) => (
-                  <SidebarSiteLink
-                    view={view}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuIsOpen(false)
-                    }}
-                  />
-                )}
-                RenderNavCollection={({ collection }) => (
-                  <SidebarCollectionLink collection={collection} />
-                )}
-              />
-            )}
+          {displayNav && (
+            <Nav
+              showCollections={isTinaAdminEnabled}
+              collectionsInfo={collectionsInfo}
+              screens={allScreens}
+              contentCreators={contentCreators}
+              sidebarWidth={sidebarWidth}
+              RenderNavSite={({ view }) => (
+                <SidebarSiteLink
+                  view={view}
+                  onClick={() => {
+                    setActiveView(view)
+                    setMenuIsOpen(false)
+                  }}
+                />
+              )}
+              RenderNavCollection={({ collection }) => (
+                <SidebarCollectionLink collection={collection} />
+              )}
+            />
+          )}
           <SidebarBody>
             <SidebarHeader
+              displayNav={displayNav}
               renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
             />
@@ -303,72 +310,73 @@ const Sidebar = ({
           </SidebarBody>
           <ResizeHandle />
         </SidebarWrapper>
-        {renderNav && sidebarWidth < navBreakpoint + 1 && (
-          <Transition show={menuIsOpen}>
-            <Transition.Child
-              as={React.Fragment}
-              enter="transform transition-all ease-out duration-300"
-              enterFrom="opacity-0 -translate-x-full"
-              enterTo="opacity-100 translate-x-0"
-              leave="transform transition-all ease-in duration-200"
-              leaveFrom="opacity-100 translate-x-0"
-              leaveTo="opacity-0 -translate-x-full"
-            >
-              <div className="fixed left-0 top-0 z-overlay h-full transform">
-                <Nav
-                  className="rounded-r-md"
-                  showCollections={isTinaAdminEnabled}
-                  collectionsInfo={collectionsInfo}
-                  screens={allScreens}
-                  contentCreators={contentCreators}
-                  sidebarWidth={sidebarWidth}
-                  RenderNavSite={({ view }) => (
-                    <SidebarSiteLink
-                      view={view}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuIsOpen(false)
-                      }}
-                    />
-                  )}
-                  RenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink collection={collection} />
-                  )}
-                >
-                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
-                    <Button
-                      rounded="right"
-                      variant="secondary"
-                      onClick={() => {
-                        setMenuIsOpen(false)
-                      }}
-                      className={`transition-opacity duration-150 ease-out`}
-                    >
-                      <IoMdClose className="h-6 w-auto" />
-                    </Button>
-                  </div>
-                </Nav>
-              </div>
-            </Transition.Child>
-            <Transition.Child
-              as={React.Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-80"
-              entered="opacity-80"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-80"
-              leaveTo="opacity-0"
-            >
-              <div
-                onClick={() => {
-                  setMenuIsOpen(false)
-                }}
-                className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
-              ></div>
-            </Transition.Child>
-          </Transition>
-        )}
+        {renderNav &&
+          (sidebarWidth < navBreakpoint + 1 || windowWidth < navBreakpoint) && (
+            <Transition show={menuIsOpen}>
+              <Transition.Child
+                as={React.Fragment}
+                enter="transform transition-all ease-out duration-300"
+                enterFrom="opacity-0 -translate-x-full"
+                enterTo="opacity-100 translate-x-0"
+                leave="transform transition-all ease-in duration-200"
+                leaveFrom="opacity-100 translate-x-0"
+                leaveTo="opacity-0 -translate-x-full"
+              >
+                <div className="fixed left-0 top-0 z-overlay h-full transform">
+                  <Nav
+                    className="rounded-r-md"
+                    showCollections={isTinaAdminEnabled}
+                    collectionsInfo={collectionsInfo}
+                    screens={allScreens}
+                    contentCreators={contentCreators}
+                    sidebarWidth={sidebarWidth}
+                    RenderNavSite={({ view }) => (
+                      <SidebarSiteLink
+                        view={view}
+                        onClick={() => {
+                          setActiveView(view)
+                          setMenuIsOpen(false)
+                        }}
+                      />
+                    )}
+                    RenderNavCollection={({ collection }) => (
+                      <SidebarCollectionLink collection={collection} />
+                    )}
+                  >
+                    <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                      <Button
+                        rounded="right"
+                        variant="secondary"
+                        onClick={() => {
+                          setMenuIsOpen(false)
+                        }}
+                        className={`transition-opacity duration-150 ease-out`}
+                      >
+                        <IoMdClose className="h-6 w-auto" />
+                      </Button>
+                    </div>
+                  </Nav>
+                </div>
+              </Transition.Child>
+              <Transition.Child
+                as={React.Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-80"
+                entered="opacity-80"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-80"
+                leaveTo="opacity-0"
+              >
+                <div
+                  onClick={() => {
+                    setMenuIsOpen(false)
+                  }}
+                  className="fixed z-menu inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"
+                ></div>
+              </Transition.Child>
+            </Transition>
+          )}
       </>
     </SidebarContext.Provider>
   )
@@ -406,33 +414,28 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ renderNav, isLocalMode }) => {
-  const {
-    toggleFullscreen,
-    displayState,
-    setMenuIsOpen,
-    toggleSidebarOpen,
-    sidebarWidth,
-  } = React.useContext(SidebarContext)
+const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
+  const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
+    React.useContext(SidebarContext)
+
+  const displayMenuButton = renderNav && !displayNav
 
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
-        {renderNav &&
-          sidebarWidth < navBreakpoint + 1 &&
-          displayState !== 'fullscreen' && (
-            <Button
-              rounded="right"
-              variant="secondary"
-              onClick={() => {
-                setMenuIsOpen(true)
-              }}
-              className="pointer-events-auto -ml-px"
-            >
-              <BiMenu className="h-7 w-auto" />
-            </Button>
-          )}
+        {displayMenuButton && (
+          <Button
+            rounded="right"
+            variant="secondary"
+            onClick={() => {
+              setMenuIsOpen(true)
+            }}
+            className="pointer-events-auto -ml-px"
+          >
+            <BiMenu className="h-7 w-auto" />
+          </Button>
+        )}
         <div className="flex-1"></div>
         <div
           className={`flex items-center gap-2 pointer-events-auto transition-opacity duration-150 ease-in-out -mr-px`}
@@ -541,7 +544,8 @@ const SidebarWrapper = ({ children }) => {
         }`}
         style={{
           width: displayState === 'fullscreen' ? '100vw' : sidebarWidth + 'px',
-          maxWidth: '100vw',
+          maxWidth:
+            displayState === 'fullscreen' ? '100vw' : 'calc(100vw - 8px)',
           minWidth: '360px',
         }}
       >
