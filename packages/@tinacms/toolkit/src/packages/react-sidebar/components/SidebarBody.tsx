@@ -40,7 +40,8 @@ export const FormsView = ({
   const renderNav =
     // @ts-ignore
     typeof cms?.sidebar?.renderNav !== 'undefined'
-      ? cms.sidebar.renderNav
+      ? // @ts-ignore
+        cms.sidebar.renderNav
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
