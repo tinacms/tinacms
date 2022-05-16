@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.0.4
+
+### Patch Changes
+
+- 6e2ed31a2: Added `isTitle` property to the schema that allows the title to be displayed in the CMS
+
 ## 0.0.3
 
 ### Patch Changes

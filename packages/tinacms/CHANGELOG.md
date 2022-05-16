@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.68.5
+
+### Patch Changes
+
+- 646cad8da: Adds support for using the generated client on the frontend
+- f857616f6: Rename sdk to queries
+- 6e2ed31a2: Added `isTitle` property to the schema that allows the title to be displayed in the CMS
+- Updated dependencies [a196198bd]
+- Updated dependencies [57a4a3789]
+- Updated dependencies [6e2ed31a2]
+- Updated dependencies [ba1499029]
+  - @tinacms/toolkit@0.56.28
+  - @tinacms/schema-tools@0.0.4
+
 ## 0.68.4
 
 ### Patch Changes

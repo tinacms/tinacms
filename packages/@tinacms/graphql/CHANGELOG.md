@@ -1,5 +1,13 @@
 # tina-graphql
 
+## 0.60.2
+
+### Patch Changes
+
+- 08cdb672a: Adds `useRelativeMedia` support to local graphql client
+- fdbfe9a16: Fixes issue where on windows documents could not be deleted localy
+- 6e2ed31a2: Added `isTitle` property to the schema that allows the title to be displayed in the CMS
+
 ## 0.60.1
 
 ### Patch Changes
