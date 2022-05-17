@@ -16,4 +16,6 @@ mediaRouter.get('/list/*', async (req, res) => {
 
 mediaRouter.post('/delete/*', async (req, res) => {
   const file = req.params[0]
+  const didDelete = await mediaModel.deleteMedia({ searchPath: file })
+  res.json(didDelete)
 })

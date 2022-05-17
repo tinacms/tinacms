@@ -60,4 +60,18 @@ export class MediaModel {
       }
     }
   }
+  async deleteMedia(
+    args: MediaArgs
+  ): Promise<{ ok: true } | { ok: false; message: string }> {
+    try {
+      const file = join(this.basePath, args.searchPath)
+      // ensure the file exists because fs.remove does not throw an error if the file does not exist
+      await fs.stat(file)
+      await fs.remove(file)
+      return { ok: true }
+    } catch (error) {
+      console.error(error)
+      return { ok: false, message: error?.toString() }
+    }
+  }
 }
