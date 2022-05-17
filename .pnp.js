@@ -14569,6 +14569,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash", "npm:4.14.171"],
             ["@types/lodash.get", "npm:4.4.6"],
             ["@types/log4js", "npm:2.3.5"],
+            ["@types/multer", "npm:1.4.7"],
             ["@types/progress", "npm:2.0.4"],
             ["@types/prompts", "npm:2.4.0"],
             ["@types/yup", "npm:0.29.13"],
@@ -14594,6 +14595,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["lodash", "npm:4.17.21"],
             ["lodash.get", "npm:4.4.2"],
             ["log4js", "npm:6.4.1"],
+            ["multer", "npm:1.4.4"],
             ["normalize-path", "npm:3.0.0"],
             ["progress", "npm:2.0.3"],
             ["prompts", "npm:2.4.1"],
@@ -39404,6 +39406,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "HARD",
         }],
+        ["npm:0.5.6", {
+          "packageLocation": "./.yarn/cache/mkdirp-npm-0.5.6-dcd5a6b97b-d564a43d5d.zip/node_modules/mkdirp/",
+          "packageDependencies": [
+            ["mkdirp", "npm:0.5.6"],
+            ["minimist", "npm:1.2.6"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:1.0.4", {
           "packageLocation": "./.yarn/cache/mkdirp-npm-1.0.4-37f6ef56b9-1aa3a6a2d7.zip/node_modules/mkdirp/",
           "packageDependencies": [
@@ -39502,6 +39512,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["busboy", "npm:0.2.14"],
             ["concat-stream", "npm:1.6.2"],
             ["mkdirp", "npm:0.5.5"],
+            ["object-assign", "npm:4.1.1"],
+            ["on-finished", "npm:2.3.0"],
+            ["type-is", "npm:1.6.18"],
+            ["xtend", "npm:4.0.2"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:1.4.4", {
+          "packageLocation": "./.yarn/cache/multer-npm-1.4.4-741799ce7d-e2288ef507.zip/node_modules/multer/",
+          "packageDependencies": [
+            ["multer", "npm:1.4.4"],
+            ["append-field", "npm:1.0.0"],
+            ["busboy", "npm:0.2.14"],
+            ["concat-stream", "npm:1.6.2"],
+            ["mkdirp", "npm:0.5.6"],
             ["object-assign", "npm:4.1.1"],
             ["on-finished", "npm:2.3.0"],
             ["type-is", "npm:1.6.18"],
