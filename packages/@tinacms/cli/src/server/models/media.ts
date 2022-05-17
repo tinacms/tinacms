@@ -61,23 +61,6 @@ export class MediaModel {
       }
     }
   }
-  async uploadMediaObj(
-    args: MediaArgs & { data: any }
-  ): Promise<SuccessRecord> {
-    try {
-      const file = join(this.basePath, args.searchPath)
-      if (await pathExists(file)) {
-        throw new Error(`File ${file} already exists. Can not upload`)
-      }
-      await fs.writeFile(file, args.data)
-
-      return { ok: true }
-    } catch (error) {
-      console.error(error)
-      return { ok: false, message: error?.toString() }
-    }
-  }
-
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const file = join(this.basePath, args.searchPath)
