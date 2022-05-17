@@ -2,7 +2,6 @@ import fs from 'fs-extra'
 import { join } from 'path'
 
 interface MediaArgs {
-  basePath: string
   searchPath: string
 }
 
@@ -22,35 +21,43 @@ interface ListMediaRes {
   directories: string[]
   files: File[]
   curser?: string
+  error?: string
 }
-export const listMedia = async (args: MediaArgs): Promise<ListMediaRes> => {
-  try {
-    const folderPath = join(args.basePath, args.searchPath)
-    const filesStr = await fs.readdir(folderPath)
-    const filesProm: Promise<FileRes>[] = filesStr.map(async (x) => {
-      const filePath = join(folderPath, x)
-      const stat = await fs.stat(filePath)
+export class MediaModel {
+  readonly basePath: string
+  constructor({ basePath }: { basePath: string }) {
+    this.basePath = basePath
+  }
+  async listMedia(args: MediaArgs): Promise<ListMediaRes> {
+    try {
+      const folderPath = join(this.basePath, args.searchPath)
+      const filesStr = await fs.readdir(folderPath)
+      const filesProm: Promise<FileRes>[] = filesStr.map(async (x) => {
+        const filePath = join(folderPath, x)
+        const stat = await fs.stat(filePath)
 
-      const src = join(args.searchPath, x)
+        const src = join(args.searchPath, x)
+        return {
+          size: stat.size,
+          fileName: x,
+          src: '/' + src,
+          isFile: stat.isFile(),
+        }
+      })
+
+      const files = await Promise.all(filesProm)
+
       return {
-        size: stat.size,
-        fileName: x,
-        src: src,
-        isFile: stat.isFile(),
+        files: files.filter((x) => x.isFile),
+        directories: files.filter((x) => !x.isFile).map((x) => x.src),
       }
-    })
-
-    const files = await Promise.all(filesProm)
-
-    return {
-      files: files.filter((x) => x.isFile),
-      directories: files.filter((x) => !x.isFile).map((x) => x.fileName),
-    }
-  } catch (error) {
-    console.error(error)
-    return {
-      files: [],
-      directories: [],
+    } catch (error) {
+      console.error(error)
+      return {
+        files: [],
+        directories: [],
+        error: error?.toString(),
+      }
     }
   }
 }
