@@ -1,4 +1,4 @@
-import fs from 'fs-extra'
+import fs, { pathExists } from 'fs-extra'
 import { join } from 'path'
 
 interface MediaArgs {
@@ -23,6 +23,7 @@ interface ListMediaRes {
   curser?: string
   error?: string
 }
+type SuccessRecord = { ok: true } | { ok: false; message: string }
 export class MediaModel {
   readonly basePath: string
   constructor({ basePath }: { basePath: string }) {
@@ -60,9 +61,24 @@ export class MediaModel {
       }
     }
   }
-  async deleteMedia(
-    args: MediaArgs
-  ): Promise<{ ok: true } | { ok: false; message: string }> {
+  async uploadMediaObj(
+    args: MediaArgs & { data: any }
+  ): Promise<SuccessRecord> {
+    try {
+      const file = join(this.basePath, args.searchPath)
+      if (await pathExists(file)) {
+        throw new Error(`File ${file} already exists. Can not upload`)
+      }
+      await fs.writeFile(file, args.data)
+
+      return { ok: true }
+    } catch (error) {
+      console.error(error)
+      return { ok: false, message: error?.toString() }
+    }
+  }
+
+  async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
       const file = join(this.basePath, args.searchPath)
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
