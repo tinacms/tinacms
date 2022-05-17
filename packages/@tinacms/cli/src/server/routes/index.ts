@@ -33,12 +33,8 @@ mediaRouter.delete('/delete/*', async (req, res) => {
   res.json(didDelete)
 })
 
-mediaRouter.post(
-  '/upload/*',
-  upload.array('photos', 12),
-  function (req, res, next) {
-    // req.files is array of `photos` files
-    // req.body will contain the text fields, if there were any
-    res.json({ ok: true })
-  }
-)
+mediaRouter.post('/upload/*', upload.single('file'), function (req, res, next) {
+  // req.files is array of `photos` files
+  // req.body will contain the text fields, if there were any
+  res.json({ ok: true })
+})
