@@ -172,7 +172,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
         >
           <DragHandle />
           <ItemClickTarget>
-            <FieldsBuilder form={tinaForm} fields={fields} />
+            <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
           <ItemDeleteButton onClick={removeItem} />
         </ItemHeader>
