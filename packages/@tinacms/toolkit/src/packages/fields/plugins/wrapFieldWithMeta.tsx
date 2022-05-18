@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
-import styled, { css } from 'styled-components'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
@@ -103,38 +102,35 @@ export const FieldWrapper = ({
   )
 }
 
-export const FieldLabel = styled.label`
-  all: unset;
-  font-family: 'Inter', sans-serif;
-  display: block;
-  font-size: var(--tina-font-size-1);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
-  color: var(--tina-color-grey-8);
-  margin-bottom: 8px;
-  text-overflow: ellipsis;
-  width: 100%;
-  overflow: hidden;
-`
+export const FieldLabel = ({ children, ...props }) => {
+  return (
+    <label
+      className="block font-sans text-xs font-semibold text-gray-700 whitespace-normal mb-2"
+      {...props}
+    >
+      {children}
+    </label>
+  )
+}
 
-export const FieldDescription = styled.span`
-  all: unset;
-  display: block;
-  font-family: 'Inter', sans-serif;
-  font-size: var(--tina-font-size-0);
-  font-style: italic;
-  font-weight: lighter;
-  color: var(--tina-color-grey-6);
-  padding-top: 4px;
-  white-space: normal;
-  margin: 0;
-`
+export const FieldDescription = ({ children, ...props }) => {
+  return (
+    <span
+      className="block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0"
+      {...props}
+    >
+      {children}
+    </span>
+  )
+}
 
-const FieldError = styled.span`
-  display: block;
-  color: red;
-  font-size: var(--tina-font-size-1);
-  margin-top: 8px;
-  font-weight: var(--tina-font-weight-regular);
-`
+export const FieldError = ({ children, ...props }) => {
+  return (
+    <span
+      className="block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0"
+      {...props}
+    >
+      {children}
+    </span>
+  )
+}
