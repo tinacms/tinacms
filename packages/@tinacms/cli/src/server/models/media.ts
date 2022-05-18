@@ -33,7 +33,7 @@ interface FileRes {
 interface ListMediaRes {
   directories: string[]
   files: File[]
-  curser?: string
+  cursor?: string
   error?: string
 }
 type SuccessRecord = { ok: true } | { ok: false; message: string }
