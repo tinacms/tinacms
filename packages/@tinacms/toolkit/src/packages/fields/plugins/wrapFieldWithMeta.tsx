@@ -102,10 +102,10 @@ export const FieldWrapper = ({
   )
 }
 
-export const FieldLabel = ({ children, ...props }) => {
+export const FieldLabel = ({ children, className, ...props }) => {
   return (
     <label
-      className="block font-sans text-xs font-semibold text-gray-700 whitespace-normal mb-2"
+      className={`block font-sans text-xs font-semibold text-gray-700 whitespace-normal mb-2 ${className}`}
       {...props}
     >
       {children}
@@ -113,10 +113,10 @@ export const FieldLabel = ({ children, ...props }) => {
   )
 }
 
-export const FieldDescription = ({ children, ...props }) => {
+export const FieldDescription = ({ children, className, ...props }) => {
   return (
     <span
-      className="block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0"
+      className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
       {...props}
     >
       {children}
@@ -124,10 +124,10 @@ export const FieldDescription = ({ children, ...props }) => {
   )
 }
 
-export const FieldError = ({ children, ...props }) => {
+export const FieldError = ({ children, className, ...props }) => {
   return (
     <span
-      className="block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0"
+      className={`block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0 ${className}`}
       {...props}
     >
       {children}
