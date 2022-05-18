@@ -82,6 +82,11 @@ const verboseOption = {
   name: '-v, --verbose',
   description: 'increase verbosity of logged output',
 }
+const tinaCloudMediaStore = {
+  name: '--tinaCloudMediaStore',
+  description:
+    'Automatically pushes updates from GitHub to the Tina Cloud Media Store',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -91,6 +96,7 @@ export const baseCmds: Command[] = [
       startServerPortOption,
       subCommand,
       experimentalDatalayer,
+      tinaCloudMediaStore,
       noWatchOption,
       noSDKCodegenOption,
       noTelemetryOption,
@@ -102,19 +108,29 @@ export const baseCmds: Command[] = [
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer, noTelemetryOption],
+    options: [experimentalDatalayer, tinaCloudMediaStore, noTelemetryOption],
     action: (options) => chain([compile], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [experimentalDatalayer, noSDKCodegenOption, noTelemetryOption],
+    options: [
+      experimentalDatalayer,
+      tinaCloudMediaStore,
+      noSDKCodegenOption,
+      noTelemetryOption,
+    ],
     action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
-    options: [experimentalDatalayer, noTelemetryOption, schemaFileType],
+    options: [
+      experimentalDatalayer,
+      tinaCloudMediaStore,
+      noTelemetryOption,
+      schemaFileType,
+    ],
     description: 'Add Tina Cloud to an existing project',
     action: (options) =>
       chain(
