@@ -94,6 +94,9 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                     label={view.name}
                     to={`screens/${slugify(view.name)}`}
                     Icon={view.Icon ? view.Icon : ImFilesEmpty}
+                    onClick={() => {
+                      setMenuIsOpen(false)
+                    }}
                   />
                 )}
                 RenderNavCollection={({ collection }) => (
@@ -103,6 +106,9 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                     }
                     to={`collections/${collection.name}`}
                     Icon={ImFilesEmpty}
+                    onClick={() => {
+                      setMenuIsOpen(false)
+                    }}
                   />
                 )}
               >
@@ -162,6 +168,7 @@ const SidebarLink = (props: {
   to: string
   label: string
   Icon: IconType
+  onClick?: any
 }): JSX.Element => {
   const { to, label, Icon } = props
   return (
@@ -171,6 +178,7 @@ const SidebarLink = (props: {
           isActive ? 'text-blue-600' : 'text-gray-500'
         } hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`
       }}
+      onClick={props.onClick ? props.onClick : () => {}}
       to={to}
     >
       <Icon className="mr-2 h-6 opacity-80 w-auto" /> {label}
