@@ -9,6 +9,15 @@ fragment PostsParts on Posts {
   }
   date
   _body
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
 
 fragment GlobalParts on Global {
@@ -45,11 +54,29 @@ fragment GlobalParts on Global {
     icon
     darkMode
   }
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
 
 fragment AuthorsParts on Authors {
   name
   avatar
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
 
 fragment PagesParts on Pages {
@@ -97,4 +124,13 @@ fragment PagesParts on Pages {
       color
     }
   }
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }

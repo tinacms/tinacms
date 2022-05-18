@@ -1,14 +1,5 @@
 query posts($relativePath: String!) {
   posts(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PostsParts
   }
 }
@@ -18,15 +9,6 @@ query postsConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PostsParts
       }
     }
@@ -35,15 +17,6 @@ query postsConnection {
 
 query global($relativePath: String!) {
   global(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...GlobalParts
   }
 }
@@ -53,15 +26,6 @@ query globalConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...GlobalParts
       }
     }
@@ -70,15 +34,6 @@ query globalConnection {
 
 query authors($relativePath: String!) {
   authors(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...AuthorsParts
   }
 }
@@ -88,15 +43,6 @@ query authorsConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...AuthorsParts
       }
     }
@@ -105,15 +51,6 @@ query authorsConnection {
 
 query pages($relativePath: String!) {
   pages(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PagesParts
   }
 }
@@ -123,15 +60,6 @@ query pagesConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PagesParts
       }
     }

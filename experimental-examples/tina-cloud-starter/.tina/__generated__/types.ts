@@ -792,82 +792,82 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
-export type LayoutQueryFragmentFragment = { __typename?: 'Query', global: { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } };
+export type LayoutQueryFragmentFragment = { __typename?: 'Query', global: { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PageQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PageQueryQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'Posts', id: string, _values: any, author?: Maybe<{ __typename?: 'Authors', name: string, avatar?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string } }> }>>> }, global: { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } };
+export type PageQueryQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'Posts', id: string, _values: any, author?: Maybe<{ __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }>, _sys: { __typename?: 'SystemInfo', filename: string } }> }>>> }, global: { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type ContentQueryQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type ContentQueryQuery = { __typename?: 'Query', pages: { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> }, global: { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } };
+export type ContentQueryQuery = { __typename?: 'Query', pages: { __typename?: 'Pages', id: string, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }, global: { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type BlogPostQueryQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type BlogPostQueryQuery = { __typename?: 'Query', posts: { __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, author?: Maybe<{ __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string }> }, global: { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } };
+export type BlogPostQueryQuery = { __typename?: 'Query', posts: { __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, id: string, author?: Maybe<{ __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }, global: { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
-export type PostsPartsFragment = { __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, author?: Maybe<{ __typename?: 'Authors', id: string }> };
+export type PostsPartsFragment = { __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, id: string, author?: Maybe<{ __typename?: 'Authors', id: string }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } };
 
-export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
+export type GlobalPartsFragment = { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } };
 
-export type AuthorsPartsFragment = { __typename?: 'Authors', name: string, avatar?: Maybe<string> };
+export type AuthorsPartsFragment = { __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } };
 
-export type PagesPartsFragment = { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> };
+export type PagesPartsFragment = { __typename?: 'Pages', id: string, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } };
 
 export type PostsQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'Posts', id: string, title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, author?: Maybe<{ __typename?: 'Authors', id: string }> } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, id: string, author?: Maybe<{ __typename?: 'Authors', id: string }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PostsConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostsConnectionQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'Posts', id: string, title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, author?: Maybe<{ __typename?: 'Authors', id: string }> }> }>>> } };
+export type PostsConnectionQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'Posts', title: string, heroImg?: Maybe<string>, excerpt?: Maybe<any>, date?: Maybe<string>, _body?: Maybe<any>, id: string, author?: Maybe<{ __typename?: 'Authors', id: string }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export type GlobalQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type GlobalQuery = { __typename?: 'Query', global: { __typename?: 'Global', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } };
+export type GlobalQuery = { __typename?: 'Query', global: { __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type GlobalConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GlobalConnectionQuery = { __typename?: 'Query', globalConnection: { __typename?: 'GlobalConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'GlobalConnectionEdges', node?: Maybe<{ __typename?: 'Global', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> }> }>>> } };
+export type GlobalConnectionQuery = { __typename?: 'Query', globalConnection: { __typename?: 'GlobalConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'GlobalConnectionEdges', node?: Maybe<{ __typename?: 'Global', id: string, header?: Maybe<{ __typename: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export type AuthorsQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type AuthorsQuery = { __typename?: 'Query', authors: { __typename?: 'Authors', id: string, name: string, avatar?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type AuthorsQuery = { __typename?: 'Query', authors: { __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type AuthorsConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AuthorsConnectionQuery = { __typename?: 'Query', authorsConnection: { __typename?: 'AuthorsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'AuthorsConnectionEdges', node?: Maybe<{ __typename?: 'Authors', id: string, name: string, avatar?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
+export type AuthorsConnectionQuery = { __typename?: 'Query', authorsConnection: { __typename?: 'AuthorsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'AuthorsConnectionEdges', node?: Maybe<{ __typename?: 'Authors', name: string, avatar?: Maybe<string>, id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export type PagesQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type PagesQuery = { __typename?: 'Query', pages: { __typename?: 'Pages', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> } };
+export type PagesQuery = { __typename?: 'Query', pages: { __typename?: 'Pages', id: string, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PagesConnectionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PagesConnectionQuery = { __typename?: 'Query', pagesConnection: { __typename?: 'PagesConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PagesConnectionEdges', node?: Maybe<{ __typename?: 'Pages', id: string, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> }> }>>> } };
+export type PagesConnectionQuery = { __typename?: 'Query', pagesConnection: { __typename?: 'PagesConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PagesConnectionEdges', node?: Maybe<{ __typename?: 'Pages', id: string, blocks?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<any>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename: 'PagesBlocksContent', body?: Maybe<any>, color?: Maybe<string> } | { __typename: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
 
 export const GlobalPartsFragmentDoc = gql`
     fragment GlobalParts on Global {
@@ -904,6 +904,15 @@ export const GlobalPartsFragmentDoc = gql`
     icon
     darkMode
   }
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
     `;
 export const LayoutQueryFragmentFragmentDoc = gql`
@@ -925,12 +934,30 @@ export const PostsPartsFragmentDoc = gql`
   }
   date
   _body
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
     `;
 export const AuthorsPartsFragmentDoc = gql`
     fragment AuthorsParts on Authors {
   name
   avatar
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
     `;
 export const PagesPartsFragmentDoc = gql`
@@ -979,6 +1006,15 @@ export const PagesPartsFragmentDoc = gql`
       color
     }
   }
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
     `;
 export const PageQueryDocument = gql`
@@ -1030,15 +1066,6 @@ ${PostsPartsFragmentDoc}`;
 export const PostsDocument = gql`
     query posts($relativePath: String!) {
   posts(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PostsParts
   }
 }
@@ -1049,15 +1076,6 @@ export const PostsConnectionDocument = gql`
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PostsParts
       }
     }
@@ -1067,15 +1085,6 @@ export const PostsConnectionDocument = gql`
 export const GlobalDocument = gql`
     query global($relativePath: String!) {
   global(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...GlobalParts
   }
 }
@@ -1086,15 +1095,6 @@ export const GlobalConnectionDocument = gql`
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...GlobalParts
       }
     }
@@ -1104,15 +1104,6 @@ export const GlobalConnectionDocument = gql`
 export const AuthorsDocument = gql`
     query authors($relativePath: String!) {
   authors(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...AuthorsParts
   }
 }
@@ -1123,15 +1114,6 @@ export const AuthorsConnectionDocument = gql`
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...AuthorsParts
       }
     }
@@ -1141,15 +1123,6 @@ export const AuthorsConnectionDocument = gql`
 export const PagesDocument = gql`
     query pages($relativePath: String!) {
   pages(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PagesParts
   }
 }
@@ -1160,15 +1133,6 @@ export const PagesConnectionDocument = gql`
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PagesParts
       }
     }

@@ -1,6 +1,42 @@
+fragment TestParts on Test {
+  ... on TestTest1 {
+    foo
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+  }
+  ... on TestTest2 {
+    bar
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+  }
+}
+
 fragment PageParts on Page {
-  Title
+  title
   body
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }
 
 fragment PostParts on Post {
@@ -20,4 +56,13 @@ fragment PostParts on Post {
   }
   topic
   body
+  _sys {
+    filename
+    basename
+    breadcrumbs
+    path
+    relativePath
+    extension
+  }
+  id
 }

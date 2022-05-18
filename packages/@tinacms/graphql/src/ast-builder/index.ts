@@ -34,7 +34,7 @@ import {
 import _ from 'lodash'
 import { lastItem } from '../util'
 
-const SysFieldDefinition = {
+export const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
@@ -607,16 +607,16 @@ export const astBuilder = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                SysFieldDefinition,
-                {
-                  kind: 'Field',
-                  name: {
-                    kind: 'Name',
-                    value: 'id',
-                  },
-                  arguments: [],
-                  directives: [],
-                },
+                // SysFieldDefinition,
+                // {
+                //   kind: 'Field',
+                //   name: {
+                //     kind: 'Name',
+                //     value: 'id',
+                //   },
+                //   arguments: [],
+                //   directives: [],
+                // },
                 {
                   kind: 'FragmentSpread',
                   name: {
@@ -694,16 +694,6 @@ export const astBuilder = {
                         selectionSet: {
                           kind: 'SelectionSet',
                           selections: [
-                            {
-                              kind: 'Field',
-                              name: {
-                                kind: 'Name',
-                                value: 'id',
-                              },
-                              arguments: [],
-                              directives: [],
-                            },
-                            SysFieldDefinition,
                             {
                               kind: 'FragmentSpread',
                               name: {

@@ -1,14 +1,22 @@
+query test($relativePath: String!) {
+  test(relativePath: $relativePath) {
+    ...TestParts
+  }
+}
+
+query testConnection {
+  testConnection {
+    totalCount
+    edges {
+      node {
+        ...TestParts
+      }
+    }
+  }
+}
+
 query page($relativePath: String!) {
   page(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PageParts
   }
 }
@@ -18,15 +26,6 @@ query pageConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PageParts
       }
     }
@@ -35,15 +34,6 @@ query pageConnection {
 
 query post($relativePath: String!) {
   post(relativePath: $relativePath) {
-    _sys {
-      filename
-      basename
-      breadcrumbs
-      path
-      relativePath
-      extension
-    }
-    id
     ...PostParts
   }
 }
@@ -53,15 +43,6 @@ query postConnection {
     totalCount
     edges {
       node {
-        id
-        _sys {
-          filename
-          basename
-          breadcrumbs
-          path
-          relativePath
-          extension
-        }
         ...PostParts
       }
     }

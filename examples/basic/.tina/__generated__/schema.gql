@@ -7,6 +7,7 @@ scalar JSON
 
 type SystemInfo {
   filename: String!
+  title: String
   basename: String!
   breadcrumbs(excludeExtension: Boolean): [String!]!
   path: String!
@@ -47,10 +48,18 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
+  test(relativePath: String): Test!
+  testConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: TestFilter): TestConnection!
   page(relativePath: String): Page!
-  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
   post(relativePath: String): Post!
-  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PostFilter): PostConnection!
+}
+
+input DocumentFilter {
+  test: TestFilter
+  page: PageFilter
+  post: PostFilter
 }
 
 type DocumentConnectionEdges {
@@ -73,17 +82,75 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = Page | Post
+union DocumentNode = TestTest1 | TestTest2 | Page | Post
+
+type TestTest1 implements Node & Document {
+  foo: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type TestTest2 implements Node & Document {
+  bar: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+union Test = TestTest1 | TestTest2
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input TestTest1Filter {
+  foo: StringFilter
+}
+
+input TestTest2Filter {
+  bar: StringFilter
+}
+
+input TestFilter {
+  test1: TestTest1Filter
+  test2: TestTest2Filter
+}
+
+type TestConnectionEdges {
+  cursor: String!
+  node: Test
+}
+
+type TestConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [TestConnectionEdges]
+}
 
 type Page implements Node & Document {
-  Title: String
+  title: String
   body: JSON
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input PageFilter {
+  title: StringFilter
+  body: RichTextFilter
 }
 
 type PageConnectionEdges {
@@ -119,6 +186,51 @@ type Post implements Node & Document {
   _values: JSON!
 }
 
+input PostPostsPostFilter {
+  page: PageFilter
+  post: PostFilter
+}
+
+input PostPostsFilter {
+  post: PostPostsPostFilter
+  label: StringFilter
+}
+
+input PostFooFilter {
+  bar: StringFilter
+}
+
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PostBodyGalleryImagesFilter {
+  src: ImageFilter
+  width: StringFilter
+  height: StringFilter
+}
+
+input PostBodyGalleryFilter {
+  images: PostBodyGalleryImagesFilter
+  alignment: StringFilter
+  gap: StringFilter
+}
+
+input PostBodyFilter {
+  Gallery: PostBodyGalleryFilter
+}
+
+input PostFilter {
+  title: StringFilter
+  posts: PostPostsFilter
+  foo: PostFooFilter
+  topic: StringFilter
+  body: PostBodyFilter
+}
+
 type PostConnectionEdges {
   cursor: String!
   node: Post
@@ -135,6 +247,8 @@ type Mutation {
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateTest(relativePath: String!, params: TestMutation!): Test!
+  createTest(relativePath: String!, params: TestMutation!): Test!
   updatePage(relativePath: String!, params: PageMutation!): Page!
   createPage(relativePath: String!, params: PageMutation!): Page!
   updatePost(relativePath: String!, params: PostMutation!): Post!
@@ -142,12 +256,26 @@ type Mutation {
 }
 
 input DocumentMutation {
+  test: TestMutation
   page: PageMutation
   post: PostMutation
 }
 
+input TestTest1Mutation {
+  foo: String
+}
+
+input TestTest2Mutation {
+  bar: String
+}
+
+input TestMutation {
+  test1: TestTest1Mutation
+  test2: TestTest2Mutation
+}
+
 input PageMutation {
-  Title: String
+  title: String
   body: JSON
 }
 

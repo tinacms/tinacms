@@ -16,6 +16,24 @@ import { defineSchema, defineConfig } from 'tinacms'
 const schema = defineSchema({
   collections: [
     {
+      name: 'test',
+      path: 'content/test',
+      label: 'Test',
+      format: 'json',
+      templates: [
+        {
+          name: 'test1',
+          label: 'Test 1',
+          fields: [{ type: 'string', name: 'foo' }],
+        },
+        {
+          name: 'test2',
+          label: 'Test 2',
+          fields: [{ type: 'string', name: 'bar' }],
+        },
+      ],
+    },
+    {
       name: 'page',
       path: 'content/page',
       label: 'Page',
@@ -23,7 +41,7 @@ const schema = defineSchema({
       fields: [
         {
           label: 'Title',
-          name: 'Title',
+          name: 'title',
           type: 'string',
           ui: {
             // defaultValue: 'Title',

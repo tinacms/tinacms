@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { Database } from '../database'
-import { astBuilder, NAMER } from '../ast-builder'
+import { astBuilder, NAMER, SysFieldDefinition } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
@@ -37,6 +37,19 @@ import type {
   Template,
 } from '../types'
 import { TinaSchema } from '../schema'
+
+const extraSections = [
+  SysFieldDefinition,
+  {
+    kind: 'Field',
+    name: {
+      kind: 'Name',
+      value: 'id',
+    },
+    arguments: [],
+    directives: [],
+  },
+]
 
 export const createBuilder = async ({
   database,
@@ -478,14 +491,14 @@ export class Builder {
       return astBuilder.FragmentDefinition({
         name,
         fragmentName,
-        selections: filterSelections(selections),
+        selections: [...filterSelections(selections), ...extraSections],
       })
     } else {
       const selections = []
       await sequential(collection.templates, async (tem) => {
         if (typeof tem === 'object') {
           // TODO: Handle when template is a string
-          selections.push(await this.buildTemplateFragments(tem))
+          selections.push(await this.buildTemplateFragments(tem), true)
         }
       })
       return astBuilder.FragmentDefinition({
@@ -527,7 +540,7 @@ export class Builder {
           await sequential(field.templates, async (tem) => {
             if (typeof tem === 'object') {
               // TODO: Handle when template is a string
-              selections.push(await this.buildTemplateFragments(tem))
+              selections.push(await this.buildTemplateFragments(tem), false)
             }
           })
           return astBuilder.FieldWithSelectionSetDefinition({
@@ -573,7 +586,8 @@ export class Builder {
   }
 
   public async buildTemplateFragments(
-    template: Template<true>
+    template: Template<true>,
+    addExtraSections?: boolean
   ): Promise<InlineFragmentNode> {
     const selections = []
 
@@ -581,6 +595,9 @@ export class Builder {
       const field = await this._buildFieldNodeForFragments(item)
       selections.push(field)
     })
+    if (addExtraSections) {
+      selections.push(...extraSections)
+    }
     return astBuilder.InlineFragmentDefinition({
       selections: filterSelections(selections),
       name: NAMER.dataTypeName(template.namespace),
