@@ -45,15 +45,6 @@ export const SysFieldDefinition = {
   selectionSet: {
     kind: 'SelectionSet' as const,
     selections: [
-      // {
-      //   kind: 'Field' as const,
-      //   name: {
-      //     kind: 'Name' as const,
-      //     value: 'title',
-      //   },
-      //   arguments: [],
-      //   directives: [],
-      // },
       {
         kind: 'Field' as const,
         name: {
