@@ -19,11 +19,11 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder, FieldsGroup } from '../../form-builder'
+import { FieldsBuilder } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, ReorderIcon, TrashIcon } from '../../icons'
-import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
+import { AddIcon } from '../../icons'
+import { FieldDescription } from './wrapFieldWithMeta'
 import {
   DragHandle,
   ItemClickTarget,
@@ -160,15 +160,8 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       index={index}
     >
       {(provider, snapshot) => (
-        <ItemHeader
-          ref={provider.innerRef}
-          // @ts-ignore FIXME twind
-          isDragging={snapshot.isDragging}
-          {...provider.draggableProps}
-          {...provider.dragHandleProps}
-          {...p}
-        >
-          <DragHandle />
+        <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
+          <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
             <FieldsBuilder form={tinaForm} fields={fields} />
           </ItemClickTarget>
