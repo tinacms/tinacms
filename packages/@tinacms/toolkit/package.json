@@ -59,6 +59,7 @@
     "@heroicons/react": "^1.0.5",
     "@react-aria/i18n": "^3.3.4",
     "@react-aria/listbox": "3.3.0",
+    "@react-hook/window-size": "^3.0.7",
     "@react-types/combobox": "^3.2.0",
     "@react-types/shared": "^3.10.0",
     "@sambego/storybook-styles": "^1.0.0",

@@ -36,6 +36,7 @@ interface Options {
   command?: string
   watchFolders?: string[]
   experimentalData?: boolean
+  tinaCloudMediaStore?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -52,6 +53,7 @@ export async function startServer(
     command,
     noWatch,
     experimentalData,
+    tinaCloudMediaStore,
     noSDK,
     noTelemetry,
     watchFolders,
@@ -131,9 +133,13 @@ stack: ${code.stack || 'No stack was provided'}`)
       if (!process.env.CI && !noWatch) {
         await resetGeneratedFolder()
       }
+      const cliFlags = []
+      if (tinaCloudMediaStore) {
+        cliFlags.push('tinaCloudMediaStore')
+      }
       const database = await createDatabase({ store, bridge })
       await compile(null, null, { verbose })
-      const schema = await buildSchema(rootPath, database)
+      const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
     } catch (error) {
       throw error
