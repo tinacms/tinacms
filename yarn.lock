@@ -6498,6 +6498,7 @@ __metadata:
     "@types/lodash": ^4.14.157
     "@types/lodash.get": ^4.4.6
     "@types/log4js": ^2.3.5
+    "@types/multer": ^1.4.7
     "@types/progress": ^2.0.3
     "@types/prompts": ^2.0.13
     "@types/yup": ^0.29.11
@@ -6523,6 +6524,7 @@ __metadata:
     lodash: ^4.17.19
     lodash.get: ^4.4.2
     log4js: ^6.4.0
+    multer: ^1.4.4
     normalize-path: ^3.0.0
     progress: ^2.0.3
     prompts: ^2.4.1
@@ -22860,6 +22862,17 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"mkdirp@npm:^0.5.4":
+  version: 0.5.6
+  resolution: "mkdirp@npm:0.5.6"
+  dependencies:
+    minimist: ^1.2.6
+  bin:
+    mkdirp: bin/cmd.js
+  checksum: d564a43d5d22eed134293453c601c6811d8a51abcae6b6df2762e912fe63b225c5e2465738c9b14cda1f219551479e03a0791f221d11d3442412ef5eca8a550f
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:^1.0.3, mkdirp@npm:^1.0.4":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
@@ -22945,6 +22958,22 @@ fsevents@~2.1.2:
     type-is: ^1.6.4
     xtend: ^4.0.0
   checksum: 7f1fbd8a46fd93728c3491672de45952b7a880cc9921a8438787211831938b910eec4086c54973c7e5e35354bc104987dc052836fbe73761bd572fa427b6ae4c
+  languageName: node
+  linkType: hard
+
+"multer@npm:^1.4.4":
+  version: 1.4.4
+  resolution: "multer@npm:1.4.4"
+  dependencies:
+    append-field: ^1.0.0
+    busboy: ^0.2.11
+    concat-stream: ^1.5.2
+    mkdirp: ^0.5.4
+    object-assign: ^4.1.1
+    on-finished: ^2.3.0
+    type-is: ^1.6.4
+    xtend: ^4.0.0
+  checksum: e2288ef5074e34100ae8c10e3e6959060e014a4a3adbca4f038fd0f9c6268c97f50319add2da51f029a466a1c740b240d8d124d62aab56209763f5d8bf2bb469
   languageName: node
   linkType: hard
 
