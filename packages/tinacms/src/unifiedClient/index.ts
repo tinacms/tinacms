@@ -12,8 +12,11 @@ limitations under the License.
 */
 
 import fetchPonyfill from 'fetch-ponyfill'
+import UrlPattern from 'url-pattern'
+
 const { fetch, Headers } = fetchPonyfill()
 
+export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
   token?: string
@@ -23,6 +26,13 @@ export type TinaClientRequestArgs = {
   variables?: Record<string, any>
   query: string
 } & Partial<Omit<TinaClientArgs, 'queries'>>
+
+export type TinaClientURLParts = {
+  host: string
+  clientId: string
+  branch: string
+  isLocalClient: boolean
+}
 export class TinaClient<GenQueries> {
   public apiUrl: string
   public readonlyToken?: string
@@ -71,6 +81,47 @@ export class TinaClient<GenQueries> {
     return {
       data: json?.data as DataType,
       query: args.query,
+    }
+  }
+
+  public parseURL = (overrideUrl: string): TinaClientURLParts => {
+    const url = overrideUrl || this.apiUrl
+    if (url.includes('localhost')) {
+      return {
+        host: 'localhost',
+        branch: null,
+        isLocalClient: true,
+        clientId: null,
+      }
+    }
+
+    const params = new URL(url)
+    const pattern = new UrlPattern('/content/:clientId/github/*', {
+      escapeChar: ' ',
+    })
+    const result = pattern.match(params.pathname)
+    const branch = result?._
+    const clientId = result?.clientId
+
+    if (!branch || !clientId) {
+      throw new Error(
+        `Invalid URL format provided. Expected: https://${TINA_HOST}/content/<ClientID>/github/<Branch> but but received ${url}`
+      )
+    }
+
+    // TODO if !result || !result.clientId || !result.branch, throw an error
+
+    if (params.host !== TINA_HOST) {
+      throw new Error(
+        `The only supported hosts are ${TINA_HOST} or localhost, but received ${params.host}.`
+      )
+    }
+
+    return {
+      host: params.host,
+      clientId,
+      branch,
+      isLocalClient: false,
     }
   }
 }

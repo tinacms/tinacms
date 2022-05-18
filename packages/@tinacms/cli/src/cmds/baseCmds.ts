@@ -24,13 +24,16 @@ import {
 import { Command } from '../command'
 import { chain } from '../middleware'
 import chalk from 'chalk'
-import { compile } from './compile'
+import { compileSchema, compileClient } from './compile'
 import { logger } from '../logger'
 import { startServer } from './start-server'
+import { waitForDB } from './waitForDB'
+import { startSubprocess } from './startSubprocess'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
 export const CMD_COMPILE_MODELS = 'schema:compile'
+export const CMD_WAIT_FOR_DB = 'server:waitForDB'
 export const INIT = 'init'
 export const AUDIT = 'audit'
 
@@ -103,13 +106,26 @@ export const baseCmds: Command[] = [
       watchFileOption,
       verboseOption,
     ],
-    action: (options) => chain([startServer], options),
+    action: (options) =>
+      chain([compileClient, waitForDB, startServer, startSubprocess], options),
+  },
+  {
+    command: CMD_WAIT_FOR_DB,
+    description: 'Wait for DB to finish indexing, start subprocess',
+    options: [
+      subCommand,
+      experimentalDatalayer,
+      noTelemetryOption,
+      verboseOption,
+    ],
+    action: (options) =>
+      chain([compileClient, waitForDB, startSubprocess], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
     options: [experimentalDatalayer, tinaCloudMediaStore, noTelemetryOption],
-    action: (options) => chain([compile], options),
+    action: (options) => chain([compileSchema], options),
   },
   {
     command: CMD_GEN_TYPES,
@@ -139,7 +155,7 @@ export const baseCmds: Command[] = [
           initTina,
           installDeps,
           async (_ctx, next, options) => {
-            await compile(_ctx, next, options)
+            await compileSchema(_ctx, next, options)
             next()
           },
           attachSchema,
@@ -163,7 +179,7 @@ export const baseCmds: Command[] = [
             next()
           },
           async (_ctx, next) => {
-            await compile(_ctx, next, options)
+            await compileSchema(_ctx, next, options)
             next()
           },
           attachSchema,

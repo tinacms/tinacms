@@ -17,12 +17,12 @@ import {
   LevelStore,
 } from '@tinacms/datalayer'
 import { buildSchema, createDatabase } from '@tinacms/graphql'
-import { compile, resetGeneratedFolder } from '../compile'
+import { compileSchema, resetGeneratedFolder } from '../compile'
 
 import { AsyncLock } from './lock'
 import { Telemetry } from '@tinacms/metrics'
 import chalk from 'chalk'
-import childProcess from 'child_process'
+
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { genTypes } from '../query-gen'
@@ -47,10 +47,9 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 export async function startServer(
   _ctx,
-  _next,
+  next,
   {
     port = 4001,
-    command,
     noWatch,
     experimentalData,
     tinaCloudMediaStore,
@@ -96,32 +95,6 @@ export async function startServer(
   const shouldBuild = bridge.supportsBuilding()
   const database = await createDatabase({ store, bridge })
 
-  const startSubprocess = () => {
-    if (typeof command === 'string') {
-      const commands = command.split(' ')
-      const firstCommand = commands[0]
-      const args = commands.slice(1) || []
-      const ps = childProcess.spawn(firstCommand, args, {
-        stdio: 'inherit',
-        shell: true,
-      })
-      ps.on('error', (code) => {
-        logger.error(
-          dangerText(
-            `An error has occurred in the Next.js child process. Error message below`
-          )
-        )
-        logger.error(`name: ${code.name}
-message: ${code.message}
-
-stack: ${code.stack || 'No stack was provided'}`)
-      })
-      ps.on('close', (code) => {
-        logger.info(`child process exited with code ${code}`)
-        process.exit(code)
-      })
-    }
-  }
   let ready = false
 
   const build = async (noSDK?: boolean) => {
@@ -138,7 +111,7 @@ stack: ${code.stack || 'No stack was provided'}`)
         cliFlags.push('tinaCloudMediaStore')
       }
       const database = await createDatabase({ store, bridge })
-      await compile(null, null, { verbose })
+      await compileSchema(null, null, { verbose })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
     } catch (error) {
@@ -172,7 +145,7 @@ stack: ${code.stack || 'No stack was provided'}`)
             await build(noSDK)
           }
           ready = true
-          startSubprocess()
+          next()
         } catch (e) {
           handleServerErrors(e)
           // FIXME: make this a debug flag
@@ -272,6 +245,6 @@ stack: ${code.stack || 'No stack was provided'}`)
       logger.info('Detected CI environment, omitting watch commands...')
     }
     start()
-    startSubprocess()
+    next()
   }
 }
