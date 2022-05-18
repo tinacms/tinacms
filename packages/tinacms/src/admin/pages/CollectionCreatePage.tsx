@@ -24,6 +24,7 @@ import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+import { useWindowWidth } from '@react-hook/window-size'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -160,11 +161,18 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     })
   }, [cms, collection, mutationInfo])
 
+  const navBreakpoint = 1000
+  const windowWidth = useWindowWidth()
+  const renderNavToggle = windowWidth < navBreakpoint + 1
+  const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
+
   return (
     <PageWrapper>
       <>
         {cms?.api?.tina?.isLocalMode && <LocalWarning />}
-        <div className="py-4 px-20 border-b border-gray-200 bg-white">
+        <div
+          className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+        >
           <div className="max-w-form mx-auto">
             <div className="mb-2">
               <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
