@@ -203,12 +203,7 @@ const BlockListItem = ({
     >
       {(provider, snapshot) => (
         <>
-          <ItemHeader
-            ref={provider.innerRef}
-            isDragging={snapshot.isDragging}
-            {...provider.draggableProps}
-            {...provider.dragHandleProps}
-          >
+          <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
             <DragHandle />
             <ItemClickTarget
               onClick={() => {
