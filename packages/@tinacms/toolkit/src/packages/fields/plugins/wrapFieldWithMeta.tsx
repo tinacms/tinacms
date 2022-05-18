@@ -71,7 +71,7 @@ export const FieldMeta = ({
       onClick={() => setFocusedField({ fieldName: name })}
       {...props}
     >
-      <FieldLabel htmlFor={name}>
+      <FieldLabel name={name}>
         {label || name}
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldLabel>
@@ -86,7 +86,6 @@ export const FieldMeta = ({
   )
 }
 
-// Styling
 export const FieldWrapper = ({
   margin,
   children,
@@ -102,9 +101,21 @@ export const FieldWrapper = ({
   )
 }
 
-export const FieldLabel = ({ children, className, ...props }) => {
+export interface FieldLabel extends React.HTMLAttributes<HTMLLabelElement> {
+  children?: any | any[]
+  className?: string
+  name?: string
+}
+
+export const FieldLabel = ({
+  children,
+  className,
+  name,
+  ...props
+}: FieldLabel) => {
   return (
     <label
+      htmlFor={name}
       className={`block font-sans text-xs font-semibold text-gray-700 whitespace-normal mb-2 ${className}`}
       {...props}
     >
@@ -113,7 +124,14 @@ export const FieldLabel = ({ children, className, ...props }) => {
   )
 }
 
-export const FieldDescription = ({ children, className, ...props }) => {
+export const FieldDescription = ({
+  children,
+  className,
+  ...props
+}: {
+  children?: any | any[]
+  className?: string
+}) => {
   return (
     <span
       className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
@@ -124,7 +142,14 @@ export const FieldDescription = ({ children, className, ...props }) => {
   )
 }
 
-export const FieldError = ({ children, className, ...props }) => {
+export const FieldError = ({
+  children,
+  className,
+  ...props
+}: {
+  children?: any | any[]
+  className?: string
+}) => {
   return (
     <span
       className={`block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0 ${className}`}
