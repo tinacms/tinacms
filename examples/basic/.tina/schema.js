@@ -18,7 +18,7 @@ const schema = defineSchema({
     {
       name: 'test',
       path: 'content/test',
-      label: 'Tes',
+      label: 'Test',
       templates: [
         {
           name: 'tem1',
