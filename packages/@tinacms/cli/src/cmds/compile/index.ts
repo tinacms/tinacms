@@ -89,13 +89,13 @@ export const compileClient = async (
   if (!clientExists) {
     // The client.ts file does not exist
     if (options.verbose) {
-      logger.log(
+      logger.info(
         logText(
           `.tina/client.${requestedClientFileType} not found, skipping compile client...`
         )
       )
     }
-    next()
+    return next()
   }
 
   try {
@@ -135,7 +135,7 @@ export const compileClient = async (
     throw new ExecuteSchemaError(e)
   }
 
-  next()
+  return next()
 }
 
 export const compileSchema = async (

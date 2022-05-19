@@ -35,7 +35,7 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
     if (options.verbose) {
       logger.info(logText('client is unavailable, skipping...'))
     }
-    next()
+    return next()
   }
 
   const client = ctx.client
@@ -46,7 +46,7 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
     if (options.verbose) {
       logger.info(logText('client is local, skipping...'))
     }
-    next()
+    return next()
   }
 
   const pollForStatus = async () => {
@@ -76,7 +76,7 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         if (options.verbose) {
           logger.info(logText(`${statusMessage}`))
         }
-        next()
+        return next()
 
         // Index Inprogress
       } else if (status === STATUS_INPROGRESS) {
@@ -96,7 +96,7 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         if (options.verbose) {
           logger.info(logText(`${statusMessage}`))
         }
-        next()
+        return next()
       }
     } catch (e) {
       throw new Error(
