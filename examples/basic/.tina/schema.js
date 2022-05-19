@@ -16,6 +16,23 @@ import { defineSchema, defineConfig } from 'tinacms'
 const schema = defineSchema({
   collections: [
     {
+      name: 'test',
+      path: 'content/test',
+      label: 'Tes',
+      templates: [
+        {
+          name: 'tem1',
+          label: 'Template 1',
+          fields: [{ type: 'string', name: 'foo' }],
+        },
+        {
+          name: 'tem2',
+          label: 'Template 2',
+          fields: [{ type: 'string', name: 'bar' }],
+        },
+      ],
+    },
+    {
       name: 'page',
       path: 'content/page',
       label: 'Page',
