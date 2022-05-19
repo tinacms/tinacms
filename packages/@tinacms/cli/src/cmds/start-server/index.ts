@@ -41,6 +41,7 @@ interface Options {
   noSDK: boolean
   noTelemetry: boolean
   verbose?: boolean
+  dev?: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -57,6 +58,7 @@ export async function startServer(
     noTelemetry,
     watchFolders,
     verbose,
+    dev,
   }: Options
 ) {
   lock.disable()
@@ -88,6 +90,11 @@ export async function startServer(
   if (!process.env.CI && !noWatch) {
     await resetGeneratedFolder()
   }
+
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = dev ? 'development' : 'production'
+  }
+
   const bridge = new FilesystemBridge(rootPath)
   const store = experimentalData
     ? new LevelStore(rootPath)
