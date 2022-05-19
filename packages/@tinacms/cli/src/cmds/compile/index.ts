@@ -55,8 +55,12 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
 export const compileClient = async (
   ctx,
   next,
-  options: { clientFileType?: string; verbose?: boolean }
+  options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = options.dev ? 'development' : 'production'
+  }
+
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
 
   if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }

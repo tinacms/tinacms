@@ -21,6 +21,7 @@ import {
   tinaSetup,
 } from './init'
 
+import 'dotenv/config'
 import { Command } from '../command'
 import { chain } from '../middleware'
 import chalk from 'chalk'
@@ -90,6 +91,10 @@ const tinaCloudMediaStore = {
   description:
     'Automatically pushes updates from GitHub to the Tina Cloud Media Store',
 }
+const developmentOption = {
+  name: '--dev',
+  description: 'Uses NODE_ENV=development when compiling client and schema',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -105,6 +110,7 @@ export const baseCmds: Command[] = [
       noTelemetryOption,
       watchFileOption,
       verboseOption,
+      developmentOption,
     ],
     action: (options) =>
       chain([compileClient, waitForDB, startServer, startSubprocess], options),
@@ -117,6 +123,7 @@ export const baseCmds: Command[] = [
       experimentalDatalayer,
       noTelemetryOption,
       verboseOption,
+      developmentOption,
     ],
     action: (options) =>
       chain([compileClient, waitForDB, startSubprocess], options),
