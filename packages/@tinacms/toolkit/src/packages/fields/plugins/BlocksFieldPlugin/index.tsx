@@ -18,10 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../../forms'
-import styled from 'styled-components'
 import { FieldsBuilder, useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { DragIcon, ReorderIcon } from '../../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from '../GroupFieldPlugin'
 import { FieldDescription } from '../wrapFieldWithMeta'
 import {
@@ -31,12 +29,16 @@ import {
   ItemDeleteButton,
   ItemHeader,
   ListPanel,
+  DragHandle,
+  ItemClickTarget,
+  EmptyState,
 } from '../GroupListFieldPlugin'
 import { useCMS } from '../../../react-core/use-cms'
 import { useEvent } from '../../../react-core'
 import { FieldHoverEvent, FieldFocusEvent } from '../../field-events'
 import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
+import { BiPencil } from 'react-icons/bi'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -164,8 +166,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   )
 }
 
-const EmptyState = () => <EmptyList>There are no items</EmptyList>
-
 interface BlockListItemProps {
   tinaForm: Form
   field: BlocksFieldDefinititon
@@ -203,13 +203,8 @@ const BlockListItem = ({
     >
       {(provider, snapshot) => (
         <>
-          <ItemHeader
-            ref={provider.innerRef}
-            isDragging={snapshot.isDragging}
-            {...provider.draggableProps}
-            {...provider.dragHandleProps}
-          >
-            <DragHandle />
+          <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
+            <DragHandle isDragging={snapshot.isDragging} />
             <ItemClickTarget
               onClick={() => {
                 const state = tinaForm.finalForm.getState()
@@ -228,6 +223,7 @@ const BlockListItem = ({
               onMouseOut={() => setHoveredField({ fieldName: null })}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
+              <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
             </ItemClickTarget>
             <ItemDeleteButton onClick={removeItem} />
           </ItemHeader>
@@ -273,13 +269,8 @@ const InvalidBlockListItem = ({
       index={index}
     >
       {(provider, snapshot) => (
-        <ItemHeader
-          ref={provider.innerRef}
-          isDragging={snapshot.isDragging}
-          {...provider.draggableProps}
-          {...provider.dragHandleProps}
-        >
-          <DragHandle />
+        <ItemHeader provider={provider} isDragging={snapshot.isDragging}>
+          <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
             <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>
@@ -289,68 +280,6 @@ const InvalidBlockListItem = ({
     </Draggable>
   )
 }
-
-const EmptyList = styled.div`
-  text-align: center;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-  color: var(--tina-color-grey-4);
-  line-height: 1.35;
-  padding: 12px 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-`
-
-const ItemClickTarget = styled.div`
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-`
-
-const DragHandle = styled(function DragHandle({ ...styleProps }) {
-  return (
-    <div {...styleProps}>
-      <DragIcon className="w-7 h-auto" />
-      <ReorderIcon className="w-7 h-auto" />
-    </div>
-  )
-})`
-  margin: 0;
-  flex: 0 0 auto;
-  width: 32px;
-  position: relative;
-  fill: inherit;
-  padding: 12px 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-    cursor: grab;
-  }
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    transform: translate3d(-50%, -50%, 0);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-  svg:last-child {
-    opacity: 0;
-  }
-  *:hover > & {
-    svg:first-child {
-      opacity: 0;
-    }
-    svg:last-child {
-      opacity: 1;
-    }
-  }
-`
 
 interface PanelProps {
   setExpanded(next: boolean): void
