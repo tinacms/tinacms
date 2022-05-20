@@ -123,7 +123,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
   )
 }
 
-const EmptyState = () => <EmptyList>There are no items</EmptyList>
+export const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
