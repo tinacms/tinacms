@@ -162,15 +162,8 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       index={index}
     >
       {(provider, snapshot) => (
-        <ItemHeader
-          ref={provider.innerRef}
-          // @ts-ignore FIXME twind
-          isDragging={snapshot.isDragging}
-          {...provider.draggableProps}
-          {...provider.dragHandleProps}
-          {...p}
-        >
-          <DragHandle />
+        <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
+          <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
