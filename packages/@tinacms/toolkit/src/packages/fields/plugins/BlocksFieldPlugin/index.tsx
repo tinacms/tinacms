@@ -18,10 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../../forms'
-import styled from 'styled-components'
 import { FieldsBuilder, useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { DragIcon, ReorderIcon } from '../../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from '../GroupFieldPlugin'
 import { FieldDescription } from '../wrapFieldWithMeta'
 import {
