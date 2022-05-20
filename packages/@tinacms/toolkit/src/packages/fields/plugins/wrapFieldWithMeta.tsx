@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
-import styled, { css } from 'styled-components'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
@@ -72,7 +71,7 @@ export const FieldMeta = ({
       onClick={() => setFocusedField({ fieldName: name })}
       {...props}
     >
-      <FieldLabel htmlFor={name}>
+      <FieldLabel name={name}>
         {label || name}
         {description && <FieldDescription>{description}</FieldDescription>}
       </FieldLabel>
@@ -87,7 +86,6 @@ export const FieldMeta = ({
   )
 }
 
-// Styling
 export const FieldWrapper = ({
   margin,
   children,
@@ -97,44 +95,67 @@ export const FieldWrapper = ({
   children: React.ReactNode
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
   return (
-    <div className={`relative ${margin ? `mb-5` : ``}`} {...props}>
+    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
       {children}
     </div>
   )
 }
 
-export const FieldLabel = styled.label`
-  all: unset;
-  font-family: 'Inter', sans-serif;
-  display: block;
-  font-size: var(--tina-font-size-1);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
-  color: var(--tina-color-grey-8);
-  margin-bottom: 8px;
-  text-overflow: ellipsis;
-  width: 100%;
-  overflow: hidden;
-`
+export interface FieldLabel extends React.HTMLAttributes<HTMLLabelElement> {
+  children?: any | any[]
+  className?: string
+  name?: string
+}
 
-export const FieldDescription = styled.span`
-  all: unset;
-  display: block;
-  font-family: 'Inter', sans-serif;
-  font-size: var(--tina-font-size-0);
-  font-style: italic;
-  font-weight: lighter;
-  color: var(--tina-color-grey-6);
-  padding-top: 4px;
-  white-space: normal;
-  margin: 0;
-`
+export const FieldLabel = ({
+  children,
+  className,
+  name,
+  ...props
+}: FieldLabel) => {
+  return (
+    <label
+      htmlFor={name}
+      className={`block font-sans text-xs font-semibold text-gray-700 whitespace-normal mb-2 ${className}`}
+      {...props}
+    >
+      {children}
+    </label>
+  )
+}
 
-const FieldError = styled.span`
-  display: block;
-  color: red;
-  font-size: var(--tina-font-size-1);
-  margin-top: 8px;
-  font-weight: var(--tina-font-weight-regular);
-`
+export const FieldDescription = ({
+  children,
+  className,
+  ...props
+}: {
+  children?: any | any[]
+  className?: string
+}) => {
+  return (
+    <span
+      className={`block font-sans text-xs italic font-light text-gray-400 pt-0.5 whitespace-normal m-0 ${className}`}
+      {...props}
+    >
+      {children}
+    </span>
+  )
+}
+
+export const FieldError = ({
+  children,
+  className,
+  ...props
+}: {
+  children?: any | any[]
+  className?: string
+}) => {
+  return (
+    <span
+      className={`block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0 ${className}`}
+      {...props}
+    >
+      {children}
+    </span>
+  )
+}

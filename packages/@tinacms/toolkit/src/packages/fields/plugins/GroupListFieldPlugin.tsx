@@ -22,13 +22,7 @@ import styled, { css } from 'styled-components'
 import { FieldsBuilder, useFormPortal } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import {
-  AddIcon,
-  DragIcon,
-  ReorderIcon,
-  TrashIcon,
-  LeftArrowIcon,
-} from '../../icons'
+import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
 import { useEvent } from '../../react-core/use-cms-event'
@@ -95,7 +89,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </GroupListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
@@ -259,11 +255,6 @@ export const GroupListHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  ${FieldDescription} {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 
 export const GroupListMeta = styled.div`
