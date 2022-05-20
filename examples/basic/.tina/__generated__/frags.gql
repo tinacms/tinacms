@@ -1,3 +1,12 @@
+fragment TestParts on Test {
+  ... on TestTem1 {
+    foo
+  }
+  ... on TestTem2 {
+    bar
+  }
+}
+
 fragment PageParts on Page {
   Title
   body

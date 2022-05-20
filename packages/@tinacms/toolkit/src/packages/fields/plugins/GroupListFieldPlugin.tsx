@@ -89,7 +89,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </GroupListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
