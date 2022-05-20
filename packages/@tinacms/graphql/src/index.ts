@@ -27,13 +27,17 @@ export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
 
-export const buildSchema = async (rootPath: string, database: Database) => {
+export const buildSchema = async (
+  rootPath: string,
+  database: Database,
+  flags?: string[]
+) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
   await fs.rmdir(tempConfig, { recursive: true })
-  await indexDB({ database, config: JSON.parse(config) })
+  await indexDB({ database, config: JSON.parse(config), flags })
   const gqlAst = await database.getGraphQLSchemaFromBridge()
   return buildASTSchema(gqlAst)
 }

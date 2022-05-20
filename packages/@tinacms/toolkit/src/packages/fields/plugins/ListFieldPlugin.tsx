@@ -91,7 +91,9 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
         <ListMeta>
           <Label>{field.label || field.name}</Label>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </ListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
@@ -163,7 +165,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
         <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
           <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
-            <FieldsBuilder form={tinaForm} fields={fields} />
+            <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
           <ItemDeleteButton onClick={removeItem} />
         </ItemHeader>
@@ -203,11 +205,6 @@ const ListHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  ${FieldDescription} {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 
 const ListMeta = styled.div`
