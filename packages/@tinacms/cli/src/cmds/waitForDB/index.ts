@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { logger } from '../../logger'
-import { dangerText, logText } from '../../utils/theme'
+import { logText } from '../../utils/theme'
 
 const POLLING_INTERVAL = 5000
 
@@ -24,6 +24,13 @@ interface IndexStatusResponse {
   status: 'inprogress' | 'complete' | 'failed' | 'unknown'
   timestamp: number
   error?: string
+}
+
+class IndexFailedError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'IndexFailedError'
+  }
 }
 
 export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
@@ -87,8 +94,8 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
 
         // Index Failed
       } else if (status === STATUS_FAILED) {
-        logger.error(
-          dangerText(`${statusMessage}, encountered error: ${error}`)
+        throw new IndexFailedError(
+          `Attempting to index DB responded with status 'failed', ${error}`
         )
 
         // Index Unknown
@@ -99,9 +106,13 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         return next()
       }
     } catch (e) {
-      throw new Error(
-        `Unable to query DB for indexing status, encountered error: ${e.message}`
-      )
+      if (e instanceof IndexFailedError) {
+        throw e
+      } else {
+        throw new Error(
+          `Unable to query DB for indexing status, encountered error: ${e.message}`
+        )
+      }
     }
   }
 
