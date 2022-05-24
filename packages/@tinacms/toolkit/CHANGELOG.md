@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.56.29
+
+### Patch Changes
+
+- 58a7a00f7: Replace field meta components, fix text wrapping
+- 2cc206b1a: Improve mobile nav behaviour
+- aaadefd2d: Improve group list ui, add edit icon
+
 ## 0.56.28
 
 ### Patch Changes

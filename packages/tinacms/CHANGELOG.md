@@ -1,5 +1,16 @@
 # tinacms
 
+## 0.68.6
+
+### Patch Changes
+
+- 2cc206b1a: Improve mobile nav behaviour
+- 8998df207: fix: update tina client with the current branch from local storage
+- Updated dependencies [58a7a00f7]
+- Updated dependencies [2cc206b1a]
+- Updated dependencies [aaadefd2d]
+  - @tinacms/toolkit@0.56.29
+
 ## 0.68.5
 
 ### Patch Changes
