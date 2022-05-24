@@ -110,7 +110,6 @@ export class TinaAdminApi {
             node {
               ... on Document {
                 _sys {
-                  # TODO: only include title if we need to
                   template
                   breadcrumbs
                   path
