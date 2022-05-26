@@ -15,7 +15,7 @@ import path from 'path'
 import { GraphQLError } from 'graphql'
 import { createSchema } from '../schema'
 import { lastItem } from '../util'
-import { parseFile, stringifyFile } from './util'
+import { normalizePath, parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
 import type {
   BinaryFilter,
@@ -143,7 +143,7 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
-      const contentObject = await this.store.get(filepath)
+      const contentObject = await this.store.get(normalizePath(filepath))
       if (!contentObject) {
         throw new GraphQLError(`Unable to find record ${filepath}`)
       }
@@ -197,9 +197,9 @@ export class Database {
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
     if (this.store.supportsSeeding()) {
-      await this.bridge.put(filepath, stringifiedFile)
+      await this.bridge.put(normalizePath(filepath), stringifiedFile)
     }
-    await this.store.put(filepath, payload, {
+    await this.store.put(normalizePath(filepath), payload, {
       keepTemplateKey,
       collection: collection?.name,
       indexDefinitions: collectionIndexDefinitions,
@@ -223,9 +223,9 @@ export class Database {
       const { stringifiedFile, payload, keepTemplateKey } =
         await this.stringifyFile(filepath, data)
       if (this.store.supportsSeeding()) {
-        await this.bridge.put(filepath, stringifiedFile)
+        await this.bridge.put(normalizePath(filepath), stringifiedFile)
       }
-      await this.store.put(filepath, payload, {
+      await this.store.put(normalizePath(filepath), payload, {
         keepTemplateKey,
         collection: collection,
         indexDefinitions: collectionIndexDefinitions,
@@ -307,7 +307,7 @@ export class Database {
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
     const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     if (!this._lookup) {
-      const _lookup = await this.store.get(lookupPath)
+      const _lookup = await this.store.get(normalizePath(lookupPath))
       // @ts-ignore
       this._lookup = _lookup
     }
@@ -315,16 +315,16 @@ export class Database {
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
-    return this.store.get(graphqlPath)
+    return this.store.get(normalizePath(graphqlPath))
   }
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
-    const _graphql = await this.bridge.get(graphqlPath)
+    const _graphql = await this.bridge.get(normalizePath(graphqlPath))
     return JSON.parse(_graphql)
   }
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
-    return this.store.get(schemaPath)
+    return this.store.get(normalizePath(schemaPath))
   }
 
   public getSchema = async () => {
@@ -480,11 +480,11 @@ export class Database {
   }) => {
     if (this.bridge.supportsBuilding()) {
       await this.bridge.putConfig(
-        path.join(GENERATED_FOLDER, `_graphql.json`),
+        normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
       await this.bridge.putConfig(
-        path.join(GENERATED_FOLDER, `_schema.json`),
+        normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
     }
@@ -510,20 +510,22 @@ export class Database {
   }) => {
     await this.indexStatusCallbackWrapper(async () => {
       const lookup = JSON.parse(
-        await this.bridge.get(path.join(GENERATED_FOLDER, '_lookup.json'))
+        await this.bridge.get(
+          normalizePath(path.join(GENERATED_FOLDER, '_lookup.json'))
+        )
       )
       if (this.store.supportsSeeding()) {
         await this.store.clear()
         await this.store.seed(
-          path.join(GENERATED_FOLDER, '_graphql.json'),
+          normalizePath(path.join(GENERATED_FOLDER, '_graphql.json')),
           graphQLSchema
         )
         await this.store.seed(
-          path.join(GENERATED_FOLDER, '_schema.json'),
+          normalizePath(path.join(GENERATED_FOLDER, '_schema.json')),
           tinaSchema.schema
         )
         await this.store.seed(
-          path.join(GENERATED_FOLDER, '_lookup.json'),
+          normalizePath(path.join(GENERATED_FOLDER, '_lookup.json')),
           lookup
         )
         await this._indexAllContent()
@@ -575,18 +577,20 @@ export class Database {
       const indexDefinitions = await this.getIndexDefinitions()
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
-    await this.store.delete(filepath, {
+    await this.store.delete(normalizePath(filepath), {
       collection: collection.name,
       indexDefinitions: collectionIndexDefinitions,
     })
 
-    await this.bridge.delete(filepath)
+    await this.bridge.delete(normalizePath(filepath))
   }
 
   public _indexAllContent = async () => {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
-      const documentPaths = await this.bridge.glob(collection.path)
+      const documentPaths = await this.bridge.glob(
+        normalizePath(collection.path)
+      )
       await _indexContent(this, documentPaths, collection)
     })
   }
@@ -595,7 +599,7 @@ export class Database {
     const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     let lookupMap
     try {
-      lookupMap = JSON.parse(await this.bridge.get(lookupPath))
+      lookupMap = JSON.parse(await this.bridge.get(normalizePath(lookupPath)))
     } catch (e) {
       lookupMap = {}
     }
@@ -603,7 +607,10 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-    await this.bridge.putConfig(lookupPath, JSON.stringify(updatedLookup))
+    await this.bridge.putConfig(
+      normalizePath(lookupPath),
+      JSON.stringify(updatedLookup)
+    )
   }
 }
 
@@ -689,12 +696,12 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
-    const dataString = await database.bridge.get(filepath)
+    const dataString = await database.bridge.get(normalizePath(filepath))
     const data = parseFile(dataString, path.extname(filepath), (yup) =>
       yup.object({})
     )
     if (database.store.supportsSeeding()) {
-      await database.store.seed(filepath, data, seedOptions)
+      await database.store.seed(normalizePath(filepath), data, seedOptions)
     }
   })
 }

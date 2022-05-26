@@ -607,15 +607,31 @@ export const astBuilder = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                SysFieldDefinition,
                 {
-                  kind: 'Field',
-                  name: {
-                    kind: 'Name',
-                    value: 'id',
+                  kind: 'InlineFragment' as const,
+                  typeCondition: {
+                    kind: 'NamedType' as const,
+                    name: {
+                      kind: 'Name' as const,
+                      value: 'Document',
+                    },
                   },
-                  arguments: [],
                   directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet' as const,
+                    selections: [
+                      SysFieldDefinition,
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'id',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                    ],
+                  },
                 },
                 {
                   kind: 'FragmentSpread',
@@ -695,15 +711,31 @@ export const astBuilder = {
                           kind: 'SelectionSet',
                           selections: [
                             {
-                              kind: 'Field',
-                              name: {
-                                kind: 'Name',
-                                value: 'id',
+                              kind: 'InlineFragment' as const,
+                              typeCondition: {
+                                kind: 'NamedType' as const,
+                                name: {
+                                  kind: 'Name' as const,
+                                  value: 'Document',
+                                },
                               },
-                              arguments: [],
                               directives: [],
+                              selectionSet: {
+                                kind: 'SelectionSet' as const,
+                                selections: [
+                                  SysFieldDefinition,
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'id',
+                                    },
+                                    arguments: [],
+                                    directives: [],
+                                  },
+                                ],
+                              },
                             },
-                            SysFieldDefinition,
                             {
                               kind: 'FragmentSpread',
                               name: {

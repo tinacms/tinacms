@@ -84,3 +84,5 @@ export const parseFile = <T extends object>(
 }
 
 export type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
+
+export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/')

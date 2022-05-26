@@ -157,7 +157,9 @@ export const TinaCloudProvider = (
     [props.cms]
   )
   if (!cms.api.tina) {
-    cms.registerApi('tina', createClient(props))
+    cms.registerApi('tina', createClient({ ...props, branch: currentBranch }))
+  } else {
+    cms.api.tina.setBranch(currentBranch)
   }
 
   if (!cms.api.admin) {

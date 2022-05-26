@@ -7,6 +7,7 @@ scalar JSON
 
 type SystemInfo {
   filename: String!
+  title: String
   basename: String!
   breadcrumbs(excludeExtension: Boolean): [String!]!
   path: String!
@@ -47,6 +48,8 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
+  test(relativePath: String): Test!
+  testConnection(before: String, after: String, first: Float, last: Float, sort: String): TestConnection!
   page(relativePath: String): Page!
   pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
   post(relativePath: String): Post!
@@ -76,7 +79,34 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = Page | Post
+union DocumentNode = TestTem1 | TestTem2 | Page | Post
+
+type TestTem1 implements Node & Document {
+  foo: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type TestTem2 implements Node & Document {
+  bar: String
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+union Test = TestTem1 | TestTem2
+
+type TestConnectionEdges {
+  cursor: String!
+  node: Test
+}
+
+type TestConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [TestConnectionEdges]
+}
 
 type Page implements Node & Document {
   Title: String
@@ -135,6 +165,8 @@ type Mutation {
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateTest(relativePath: String!, params: TestMutation!): Test!
+  createTest(relativePath: String!, params: TestMutation!): Test!
   updatePage(relativePath: String!, params: PageMutation!): Page!
   createPage(relativePath: String!, params: PageMutation!): Page!
   updatePost(relativePath: String!, params: PostMutation!): Post!
@@ -142,8 +174,22 @@ type Mutation {
 }
 
 input DocumentMutation {
+  test: TestMutation
   page: PageMutation
   post: PostMutation
+}
+
+input TestTem1Mutation {
+  foo: String
+}
+
+input TestTem2Mutation {
+  bar: String
+}
+
+input TestMutation {
+  tem1: TestTem1Mutation
+  tem2: TestTem2Mutation
 }
 
 input PageMutation {

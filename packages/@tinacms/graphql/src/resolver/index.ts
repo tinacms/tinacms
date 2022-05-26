@@ -721,7 +721,7 @@ export class Resolver {
           } else {
             accumulator[
               field.name
-            ] = `https://assets.tina.io/${this.config.clientId}/${value}`
+            ] = `https://${this.config.assetsHost}/${this.config.clientId}/${value}`
           }
         } else {
           accumulator[field.name] = value

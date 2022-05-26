@@ -111,7 +111,9 @@ export async function startServer(
     lock.enable()
     try {
       if (!process.env.CI && !noWatch) {
+        await store.close()
         await resetGeneratedFolder()
+        await store.open()
       }
       const cliFlags = []
       if (tinaCloudMediaStore) {

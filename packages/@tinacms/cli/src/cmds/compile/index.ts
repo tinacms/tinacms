@@ -192,7 +192,7 @@ export const compileSchema = async (
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
     // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema(path.sep))
+    await fs.writeFile(file, defaultSchema)
   }
 
   // Turns the schema into JS files so they can be run
