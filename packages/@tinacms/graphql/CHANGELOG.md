@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 0.60.3
+
+### Patch Changes
+
+- 79d112d79: Update cli to accept tinaCloudMediaStore flag and add to metadata during schema compilation
+- 3f46c6706: Fixed issue where generated SDK would not work with templates
+- db9168578: Adds support for an `assetsHost` when resolving `image` fields with `useRelativeMedia`
+- 91d6e6758: Fix issues with experimentalData on windows related to path separator inconsistency and interference with the .tina/**generated** folder
+
 ## 0.60.2
 
 ### Patch Changes

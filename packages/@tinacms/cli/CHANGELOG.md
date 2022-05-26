@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 0.60.18
+
+### Patch Changes
+
+- 79d112d79: Update cli to accept tinaCloudMediaStore flag and add to metadata during schema compilation
+- 91d6e6758: revert platform aware paths in schema introduced in https://github.com/tinacms/tinacms/commit/558cc4368cd2a4b6e87dfb82bbfbb6f569f8a6f8
+- b1240328d: Adds local server routes for handling media
+- 91d6e6758: Fix issues with experimentalData on windows related to path separator inconsistency and interference with the .tina/**generated** folder
+- Updated dependencies [79d112d79]
+- Updated dependencies [3f46c6706]
+- Updated dependencies [db9168578]
+- Updated dependencies [91d6e6758]
+  - @tinacms/graphql@0.60.3
+
 ## 0.60.17
 
 ### Patch Changes

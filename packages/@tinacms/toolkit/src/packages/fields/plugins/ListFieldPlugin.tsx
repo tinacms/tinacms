@@ -19,11 +19,11 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder, FieldsGroup } from '../../form-builder'
+import { FieldsBuilder } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, ReorderIcon, TrashIcon } from '../../icons'
-import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
+import { AddIcon } from '../../icons'
+import { FieldDescription } from './wrapFieldWithMeta'
 import {
   DragHandle,
   ItemClickTarget,
@@ -91,7 +91,9 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
         <ListMeta>
           <Label>{field.label || field.name}</Label>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </ListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
@@ -160,17 +162,10 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       index={index}
     >
       {(provider, snapshot) => (
-        <ItemHeader
-          ref={provider.innerRef}
-          // @ts-ignore FIXME twind
-          isDragging={snapshot.isDragging}
-          {...provider.draggableProps}
-          {...provider.dragHandleProps}
-          {...p}
-        >
-          <DragHandle />
+        <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
+          <DragHandle isDragging={snapshot.isDragging} />
           <ItemClickTarget>
-            <FieldsBuilder form={tinaForm} fields={fields} />
+            <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
           <ItemDeleteButton onClick={removeItem} />
         </ItemHeader>
@@ -210,11 +205,6 @@ const ListHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  ${FieldDescription} {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 
 const ListMeta = styled.div`
