@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry",
+    "dev": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --dev",
     "build": "tinacms server:start -c \"next build\"",
     "start": "tinacms server:start -c \"next start\"",
     "export": "npm run build && next export"
