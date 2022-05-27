@@ -58,20 +58,30 @@ export class TinaAdminApi {
       { variables: { collection, relativePath } }
     )
   }
-  async fetchCollection(collectionName: string, includeDocuments: boolean) {
+  async fetchCollection(
+    collectionName: string,
+    includeDocuments: boolean,
+    after?: string
+  ) {
     if (includeDocuments === true) {
       if (this.useDataLayer) {
         const sort = this.schema.getIsTitleFieldName(collectionName)
         const response: { collection: Collection } = await this.api.request(
           `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float $after: String){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort) @include(if: $includeDocuments) {
+          documents(sort: $sort, after: $after, first: $limit) @include(if: $includeDocuments) {
             totalCount
+            pageInfo {
+              hasPreviousPage
+              hasNextPage
+              startCursor
+              endCursor
+            }
             edges {
               node {
                 ... on Document {
@@ -91,7 +101,15 @@ export class TinaAdminApi {
           }
         }
       }`,
-          { variables: { collection: collectionName, includeDocuments, sort } }
+          {
+            variables: {
+              collection: collectionName,
+              includeDocuments,
+              sort,
+              limit: 10,
+              after,
+            },
+          }
         )
 
         return response.collection
