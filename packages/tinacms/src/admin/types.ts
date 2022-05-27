@@ -56,6 +56,12 @@ export interface Collection {
   templates?: Template[]
   documents?: {
     totalCount?: number
+    pageInfo: {
+      hasPreviousPage: boolean
+      hasNextPage: boolean
+      startCursor?: string
+      endCursor?: string
+    }
     edges?: DocumentNode[]
   }
 }

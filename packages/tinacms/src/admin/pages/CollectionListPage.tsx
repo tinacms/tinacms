@@ -18,6 +18,7 @@ import {
   Link,
   useNavigate,
   NavigateFunction,
+  useLocation,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
@@ -36,6 +37,7 @@ import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
+import { useState } from 'react'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -115,11 +117,16 @@ const handleNavigate = (
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
+  const { search } = useLocation()
   const [open, setOpen] = React.useState(false)
   const [vars, setVars] = React.useState({
     collection: collectionName,
     relativePath: '',
   })
+  const params = new URLSearchParams(search)
+  // const currentPage = params.get('currentPage')
+  const [endCursor, setEndCurser] = useState('')
+  const [prevCursers, setPrevCursers] = useState([])
 
   return (
     <GetCMS>
@@ -129,11 +136,13 @@ const CollectionListPage = () => {
             cms={cms}
             collectionName={collectionName}
             includeDocuments
+            startCurser={endCursor}
           >
             {(collection: Collection, _loading, reFetchCollection) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
+              const pageInfo = collection.documents.pageInfo
 
               return (
                 <PageWrapper>
@@ -298,6 +307,46 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
+                        <button
+                          // disabled={pageInfo.hasPreviousPage}
+                          onClick={() => {
+                            // const params = new URLSearchParams(search)
+                            // const prev = params.get('prevPage')
+                            const prev = prevCursers[prevCursers.length - 1]
+                            // params.append('prevPage', pageInfo.startCursor)
+
+                            // params.append('prevPage', pageInfo.startCursor)
+                            // navigate('?' + params.toString())
+                            if (typeof prev === 'string') {
+                              const foo = prevCursers.slice(0, -1)
+                              console.log({ foo })
+                              setPrevCursers(foo)
+                              // params.append('currentPage', prev)
+                              setEndCurser(prev)
+                            }
+                          }}
+                        >
+                          Prev
+                        </button>
+                        <button
+                          // disabled={pageInfo.hasNextPage}
+                          onClick={() => {
+                            const hasPrev = prevCursers.length
+                            const bar = [
+                              ...prevCursers,
+                              // The first curser must be the empty string
+                              hasPrev ? pageInfo.startCursor : '',
+                            ]
+                            setPrevCursers(bar)
+                            // const params = new URLSearchParams()
+                            // params.append('prevPage', pageInfo.startCursor)
+                            // params.append('currentPage', pageInfo.endCursor)
+                            // navigate('?' + params.toString())
+                            setEndCurser(pageInfo.endCursor)
+                          }}
+                        >
+                          Next
+                        </button>
                       </div>
                     </PageBody>
                   </>
