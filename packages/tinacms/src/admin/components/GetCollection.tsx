@@ -74,26 +74,15 @@ const GetCollection = ({
   cms: TinaCMS
   collectionName: string
   includeDocuments?: boolean
-  startCurser: string
+  startCurser?: string
   children: any
 }) => {
   const { collection, loading, error, reFetchCollection } = useGetCollection(
     cms,
     collectionName,
     includeDocuments,
-    startCurser
+    startCurser || ''
   )
-  // keep prevPage and currentPage up to date
-  // useEffect(() => {
-  //   const startCurser = collection?.documents?.pageInfo?.startCursor || ''
-  //   const endCursor = collection?.documents?.pageInfo?.endCursor || ''
-  //   const params = new URLSearchParams()
-  //   // params.append('prevPage', )
-  //   // navigate('?' + params.toString())
-  // }, [
-  //   collection?.documents?.pageInfo?.startCursor || '',
-  //   collection?.documents?.pageInfo?.endCursor || '',
-  // ])
 
   if (error) {
     return null
