@@ -34,6 +34,7 @@ import {
 } from '@tinacms/schema-tools'
 
 export type TinaIOConfig = {
+  assetsApiUrlOverride?: string // https://assets.tinajs.io
   frontendUrlOverride?: string // https://app.tina.io
   identityApiUrlOverride?: string // https://identity.tinajs.io
   contentApiUrlOverride?: string // https://content.tinajs.io
@@ -58,6 +59,7 @@ export class Client {
   frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
+  assetsApiUrl: string
   gqlSchema: GraphQLSchema
   schema?: TinaSchema
   clientId: string
@@ -140,6 +142,9 @@ export class Client {
 
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
+    this.assetsApiUrl =
+      this.options.tinaioConfig?.assetsApiUrlOverride ||
+      'https://assets.tinajs.io'
     this.frontendUrl =
       this.options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io'
     this.identityApiUrl =

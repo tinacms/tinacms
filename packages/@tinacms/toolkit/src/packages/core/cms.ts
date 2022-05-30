@@ -26,7 +26,7 @@ limitations under the License.
 import { Plugin, PluginTypeManager } from './plugins'
 import { EventBus } from './event'
 import { MediaManager, MediaStore } from './media'
-import { DummyMediaStore } from './media-store.default'
+import { DummyMediaStore, TinaMediaStore } from './media-store.default'
 import { Flags } from './flags'
 
 /**
@@ -140,7 +140,10 @@ export class CMS {
 
     if (config.media) {
       this.media.store = config.media
+    } else {
+      this.media.store = new TinaMediaStore(this)
     }
+
     if (config.mediaOptions && config.mediaOptions.pageSize) {
       this.media.pageSize = config.mediaOptions.pageSize
     }
