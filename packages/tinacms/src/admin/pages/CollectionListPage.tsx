@@ -308,7 +308,7 @@ const CollectionListPage = () => {
                         <div className="py-3">
                           <CursorPaginator
                             variant="white"
-                            hasNext={true}
+                            hasNext={pageInfo.hasNextPage}
                             navigateNext={() => {
                               const hasPrev = prevCursers.length
                               const newState = [
