@@ -40,14 +40,14 @@ mediaRouter.get('/list/*', async (req, res) => {
   res.json(media)
 })
 
-mediaRouter.delete('/delete/*', async (req, res) => {
+mediaRouter.delete('/*', async (req, res) => {
   const file = req.params[0]
   const didDelete = await mediaModel.deleteMedia({ searchPath: file })
   res.json(didDelete)
 })
 
-mediaRouter.post('/upload/*', upload.single('file'), function (req, res, next) {
+mediaRouter.post('/upload/*', upload.single('file'), function (req, res) {
   // req.files is array of `photos` files
   // req.body will contain the text fields, if there were any
-  res.json({ ok: true })
+  res.json({ success: true })
 })
