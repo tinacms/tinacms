@@ -305,7 +305,7 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        <div className="py-3">
+                        <div className="pt-3">
                           <CursorPaginator
                             variant="white"
                             hasNext={pageInfo.hasNextPage}
