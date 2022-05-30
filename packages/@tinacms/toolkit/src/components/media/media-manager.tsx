@@ -257,13 +257,14 @@ export function MediaPicker({
           />
         ))}
       </ul>
-      <CursorPaginator
-        currentOffset={offset}
-        hasNext={hasNext}
-        navigateNext={navigateNext}
-        hasPrev={hasPrev}
-        navigatePrev={navigatePrev}
-      />
+      <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+        <CursorPaginator
+          hasNext={hasNext}
+          navigateNext={navigateNext}
+          hasPrev={hasPrev}
+          navigatePrev={navigatePrev}
+        />
+      </div>
     </MediaPickerWrap>
   )
 }
