@@ -38,6 +38,7 @@ import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import { useState } from 'react'
+import { CursorPaginator } from '@tinacms/toolkit/src/components/media/pagination'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -304,35 +305,32 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        <button
-                          // disabled={pageInfo.hasPreviousPage}
-                          onClick={() => {
-                            const prev = prevCursers[prevCursers.length - 1]
-                            if (typeof prev === 'string') {
-                              const foo = prevCursers.slice(0, -1)
-                              console.log({ foo })
-                              setPrevCursers(foo)
-                              setEndCurser(prev)
-                            }
-                          }}
-                        >
-                          Prev
-                        </button>
-                        <button
-                          // disabled={pageInfo.hasNextPage}
-                          onClick={() => {
-                            const hasPrev = prevCursers.length
-                            const newState = [
-                              ...prevCursers,
-                              // The first curser must be the empty string
-                              hasPrev ? pageInfo.startCursor : '',
-                            ]
-                            setPrevCursers(newState)
-                            setEndCurser(pageInfo.endCursor)
-                          }}
-                        >
-                          Next
-                        </button>
+                        <div className="py-3">
+                          <CursorPaginator
+                            variant="white"
+                            hasNext={true}
+                            navigateNext={() => {
+                              const hasPrev = prevCursers.length
+                              const newState = [
+                                ...prevCursers,
+                                // The first curser must be the empty string
+                                hasPrev ? pageInfo.startCursor : '',
+                              ]
+                              setPrevCursers(newState)
+                              setEndCurser(pageInfo.endCursor)
+                            }}
+                            hasPrev={prevCursers.length > 0}
+                            navigatePrev={() => {
+                              const prev = prevCursers[prevCursers.length - 1]
+                              if (typeof prev === 'string') {
+                                const foo = prevCursers.slice(0, -1)
+                                console.log({ foo })
+                                setPrevCursers(foo)
+                                setEndCurser(prev)
+                              }
+                            }}
+                          />
+                        </div>
                       </div>
                     </PageBody>
                   </>
