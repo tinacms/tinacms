@@ -95,6 +95,7 @@ export class IsomorphicBridge implements Bridge {
   ) {
     const type = entry.type
     const entryPath = path ? `${path}/${entry.path}` : entry.path
+    console.log('listEntries', path, entry.path)
     if (type === 'blob') {
       results.push(entryPath)
       return results
@@ -251,13 +252,14 @@ export class IsomorphicBridge implements Bridge {
       })
       treeEntry = treeResult.tree.find((entry) => entry.path === entryPath)
       parentPath = pathParts.slice(1, pathParts.length).join('/')
+    } else {
       // TODO can parentEntry ever be undefined?
-      // } else {
-      //   treeEntry = {
-      //     type: 'tree',
-      //     oid: await leaf.oid(),
-      //   }
-      //   parentPath = ''
+      // @ts-ignore
+      treeEntry = {
+        type: 'tree',
+        oid: await leaf.oid(),
+      }
+      parentPath = ''
     }
 
     const result = []
