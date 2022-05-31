@@ -68,20 +68,20 @@ const GetCollection = ({
   cms,
   collectionName,
   includeDocuments = true,
-  startCurser,
+  startCursor,
   children,
 }: {
   cms: TinaCMS
   collectionName: string
   includeDocuments?: boolean
-  startCurser?: string
+  startCursor?: string
   children: any
 }) => {
   const { collection, loading, error, reFetchCollection } = useGetCollection(
     cms,
     collectionName,
     includeDocuments,
-    startCurser || ''
+    startCursor || ''
   )
 
   if (error) {

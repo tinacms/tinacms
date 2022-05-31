@@ -122,8 +122,8 @@ const CollectionListPage = () => {
     collection: collectionName,
     relativePath: '',
   })
-  const [endCursor, setEndCurser] = useState('')
-  const [prevCursers, setPrevCursers] = useState([])
+  const [endCursor, setEndCursor] = useState('')
+  const [prevCursors, setPrevCursors] = useState([])
 
   return (
     <GetCMS>
@@ -133,7 +133,7 @@ const CollectionListPage = () => {
             cms={cms}
             collectionName={collectionName}
             includeDocuments
-            startCurser={endCursor}
+            startCursor={endCursor}
           >
             {(collection: Collection, _loading, reFetchCollection) => {
               const totalCount = collection.documents.totalCount
@@ -309,17 +309,17 @@ const CollectionListPage = () => {
                             variant="white"
                             hasNext={pageInfo.hasNextPage}
                             navigateNext={() => {
-                              const newState = [...prevCursers, endCursor]
-                              setPrevCursers(newState)
-                              setEndCurser(pageInfo.endCursor)
+                              const newState = [...prevCursors, endCursor]
+                              setPrevCursors(newState)
+                              setEndCursor(pageInfo.endCursor)
                             }}
-                            hasPrev={prevCursers.length > 0}
+                            hasPrev={prevCursors.length > 0}
                             navigatePrev={() => {
-                              const prev = prevCursers[prevCursers.length - 1]
+                              const prev = prevCursors[prevCursors.length - 1]
                               if (typeof prev === 'string') {
-                                const newState = prevCursers.slice(0, -1)
-                                setPrevCursers(newState)
-                                setEndCurser(prev)
+                                const newState = prevCursors.slice(0, -1)
+                                setPrevCursors(newState)
+                                setEndCursor(prev)
                               }
                             }}
                           />
