@@ -14,6 +14,7 @@ limitations under the License.
 import {
   FilesystemBridge,
   FilesystemStore,
+  IsomorphicBridge,
   LevelStore,
 } from '@tinacms/datalayer'
 import { buildSchema, createDatabase } from '@tinacms/graphql'
@@ -93,7 +94,7 @@ export async function startServer(
     await resetGeneratedFolder()
   }
   const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(rootPath)
+    ? new IsomorphicBridge('Tina User', 'tina-user@forestry.io') // TODO source the author info appropriately
     : new FilesystemBridge(rootPath)
 
   const store = experimentalData
