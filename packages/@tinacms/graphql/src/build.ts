@@ -43,6 +43,9 @@ export const indexDB = async ({
     if (flags.indexOf('experimentalData') === -1) {
       flags.push('experimentalData')
     }
+    if (flags.indexOf('isomorphicGitBridge') === -1) {
+      flags.push('isomorphicGitBridge')
+    }
   }
   const tinaSchema = await createSchema({ schema: config, flags })
   const builder = await createBuilder({

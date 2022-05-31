@@ -36,6 +36,7 @@ interface Options {
   command?: string
   watchFolders?: string[]
   experimentalData?: boolean
+  isomorphicGitBridge?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -52,6 +53,7 @@ export async function startServer(
     port = 4001,
     noWatch,
     experimentalData,
+    isomorphicGitBridge,
     noSDK,
     noTelemetry,
     watchFolders,
@@ -88,8 +90,10 @@ export async function startServer(
   if (!process.env.CI && !noWatch) {
     await resetGeneratedFolder()
   }
+  const bridge = isomorphicGitBridge
+    ? new IsomorphicBridge(rootPath)
+    : new FilesystemBridge(rootPath)
 
-  const bridge = new FilesystemBridge(rootPath)
   const store = experimentalData
     ? new LevelStore(rootPath)
     : new FilesystemStore({ rootPath })
