@@ -93,8 +93,6 @@ export class Database {
     | Record<string, Record<string, IndexDefinition>>
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
-  private _graphql: DocumentNode | undefined
-  private _tinaSchema: TinaCloudSchemaBase | undefined
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge
     this.store = config.store
@@ -298,6 +296,14 @@ export class Database {
     }
   }
 
+  /**
+   * Clears the internal cache of the tinaSchema and the lookup file. This allows the state to be reset
+   */
+  public clearCache() {
+    this.tinaSchema = null
+    this._lookup = null
+  }
+
   public flush = async (filepath: string) => {
     const data = await this.get<{ [key: string]: unknown }>(filepath)
     const { stringifiedFile } = await this.stringifyFile(filepath, data)
@@ -328,6 +334,7 @@ export class Database {
   }
 
   public getSchema = async () => {
+    // this is what is causing the issue
     if (this.tinaSchema) {
       return this.tinaSchema
     }
