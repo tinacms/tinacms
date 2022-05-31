@@ -270,11 +270,6 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
       className={`py-4 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
-        {activeForm.label && (
-          <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
-            {activeForm.label}
-          </span>
-        )}
         <FormStatus pristine={formIsPristine} />
       </div>
     </div>
