@@ -598,6 +598,7 @@ export class Database {
       const documentPaths = await this.bridge.glob(
         normalizePath(collection.path)
       )
+      console.log({ documentPaths })
       await _indexContent(this, documentPaths, collection)
     })
   }
@@ -704,6 +705,9 @@ const _indexContent = async (
 
   await sequential(documentPaths, async (filepath) => {
     const dataString = await database.bridge.get(normalizePath(filepath))
+    if (!dataString) {
+      console.log('bridge returned undefined for ', filepath)
+    }
     const data = parseFile(dataString, path.extname(filepath), (yup) =>
       yup.object({})
     )
