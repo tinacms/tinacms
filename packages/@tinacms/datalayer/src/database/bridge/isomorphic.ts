@@ -66,7 +66,7 @@ export class IsomorphicBridge implements Bridge {
     commitMessage?: string
   ) {
     this.rootPath = rootPath || ''
-    this.fsModule = fsModule || fs.promises
+    this.fsModule = fsModule || fs
     this.ref = `refs/heads/${ref || 'main'}`
     this.authorName = authorName
     this.authorEmail = authorEmail
@@ -75,7 +75,7 @@ export class IsomorphicBridge implements Bridge {
       fs: this.fsModule,
     }
     this.commitMessage = commitMessage || 'Update from GraphQL client'
-    console.log('IsomorphicBridge initialized')
+    console.log('IsomorphicBridge initialized', this.rootPath)
   }
 
   private author() {
@@ -351,17 +351,21 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
-    console.log('get', filepath)
+    console.log('get', filepath, 'ref', this.ref)
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
       ref: this.ref,
     })
+    console.log('oid', oid)
     const { blob } = await git.readBlob({
       ...this.isomorphicConfig,
       oid,
       filepath,
     })
-    return Buffer.from(blob).toString('utf8')
+    console.log('blob', blob)
+    const result = Buffer.from(blob).toString('utf8')
+    console.log('result', result)
+    return result
   }
 
   public async putConfig(filepath: string, data: string) {
