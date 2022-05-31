@@ -596,7 +596,7 @@ export class Database {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(
-        `${normalizePath(collection.path)}/*`
+        normalizePath(collection.path)
       )
       console.log({ documentPaths })
       await _indexContent(this, documentPaths, collection)
