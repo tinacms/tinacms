@@ -58,14 +58,14 @@ export class IsomorphicBridge implements Bridge {
   public authorEmail: string
 
   constructor(
+    rootPath: string,
     authorName: string,
     authorEmail: string,
-    gitPath?: string,
     fsModule?: CallbackFsClient | PromiseFsClient,
     ref?: string,
     commitMessage?: string
   ) {
-    this.rootPath = gitPath || ''
+    this.rootPath = rootPath || ''
     this.fsModule = fsModule || fs.promises
     this.ref = `refs/heads/${ref || 'main'}`
     this.authorName = authorName
@@ -75,6 +75,7 @@ export class IsomorphicBridge implements Bridge {
       fs: this.fsModule,
     }
     this.commitMessage = commitMessage || 'Update from GraphQL client'
+    console.log('IsomorphicBridge initialized')
   }
 
   private author() {
@@ -225,6 +226,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async glob(pattern: string) {
+    console.log('glob', pattern)
     const parent = globParent(pattern)
     const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
 
@@ -268,6 +270,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
+    console.log('delete', filepath)
     const { pathParts, pathNodes } = await this.resolvePathEntries(filepath)
     if (pathNodes.length > 0) {
       let ptr = pathNodes.length - 1
@@ -348,6 +351,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
+    console.log('get', filepath)
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
       ref: this.ref,
@@ -365,6 +369,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
+    console.log('put', filepath)
     const { pathParts, pathNodes } = await this.resolvePathEntries(filepath)
     if (pathNodes.length > 0) {
       const blobUpdate = toUint8Array(Buffer.from(data))
