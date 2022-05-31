@@ -90,7 +90,7 @@ export class TinaMediaStore implements MediaStore {
     return await this.api.isAuthenticated()
   }
 
-  accept = 'text/*,  application/*, image/*'
+  accept = 'image/*'
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
