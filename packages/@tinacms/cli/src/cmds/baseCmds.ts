@@ -46,6 +46,10 @@ const experimentalDatalayer = {
   name: '--experimentalData',
   description: 'Build the server with additional data querying capabilities',
 }
+const isomorphicGitBridge = {
+  name: '--isomorphicGitBridge',
+  description: 'Enable Isomorphic Git Bridge Implementation',
+}
 const schemaFileType = {
   name: '--schemaFileType [fileType]',
   description: 'The file type to use for the Tina schema',
@@ -104,6 +108,7 @@ export const baseCmds: Command[] = [
       startServerPortOption,
       subCommand,
       experimentalDatalayer,
+      isomorphicGitBridge,
       tinaCloudMediaStore,
       noWatchOption,
       noSDKCodegenOption,
@@ -130,7 +135,12 @@ export const baseCmds: Command[] = [
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer, tinaCloudMediaStore, noTelemetryOption],
+    options: [
+      experimentalDatalayer,
+      isomorphicGitBridge,
+      tinaCloudMediaStore,
+      noTelemetryOption,
+    ],
     action: (options) => chain([compileSchema], options),
   },
   {
@@ -139,6 +149,7 @@ export const baseCmds: Command[] = [
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
     options: [
       experimentalDatalayer,
+      isomorphicGitBridge,
       tinaCloudMediaStore,
       noSDKCodegenOption,
       noTelemetryOption,
@@ -149,6 +160,7 @@ export const baseCmds: Command[] = [
     command: INIT,
     options: [
       experimentalDatalayer,
+      isomorphicGitBridge,
       tinaCloudMediaStore,
       noTelemetryOption,
       schemaFileType,
