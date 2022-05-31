@@ -61,6 +61,7 @@ export class LevelStore implements Store {
   public async query(
     queryOptions: StoreQueryOptions
   ): Promise<StoreQueryResponse> {
+    console.log('level.query', queryOptions)
     const {
       filterChain: rawFilterChain,
       sort = DEFAULT_COLLECTION_SORT_KEY,
@@ -174,6 +175,7 @@ export class LevelStore implements Store {
     return true
   }
   public async delete(filepath: string, options: DeleteOptions) {
+    console.log('level.delete', filepath)
     const data = await this.db.get(
       `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
     )
@@ -228,6 +230,7 @@ export class LevelStore implements Store {
   }
 
   public async glob(pattern: string, callback) {
+    console.log('level.glob', pattern)
     const strings: string[] = []
     const p = new Promise((resolve, reject) => {
       this.db
@@ -258,6 +261,7 @@ export class LevelStore implements Store {
     }
   }
   public async get(filepath: string) {
+    console.log('level.get', filepath)
     try {
       return await this.db.get(
         `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
@@ -272,6 +276,7 @@ export class LevelStore implements Store {
   }
 
   public async put(filepath: string, data: object, options?: PutOptions) {
+    console.log('level.put', filepath)
     let existingData
     try {
       existingData =

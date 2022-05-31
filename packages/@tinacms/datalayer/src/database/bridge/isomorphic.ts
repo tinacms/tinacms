@@ -356,16 +356,14 @@ export class IsomorphicBridge implements Bridge {
       ...this.isomorphicConfig,
       ref: this.ref,
     })
-    console.log('oid', oid)
+
     const { blob } = await git.readBlob({
       ...this.isomorphicConfig,
       oid,
       filepath,
     })
-    console.log('blob', blob)
-    const result = Buffer.from(blob).toString('utf8')
-    console.log('result', result)
-    return result
+
+    return Buffer.from(blob).toString('utf8')
   }
 
   public async putConfig(filepath: string, data: string) {
