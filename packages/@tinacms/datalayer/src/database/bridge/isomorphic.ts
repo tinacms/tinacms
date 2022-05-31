@@ -227,8 +227,8 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async glob(pattern: string) {
-    console.log('glob', pattern)
-    const parent = globParent(pattern)
+    const p = `${pattern}/*` // TODO should not need to do this
+    const parent = globParent(p)
     const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
 
     const leaf = pathNodes[pathNodes.length - 1]
@@ -263,7 +263,7 @@ export class IsomorphicBridge implements Bridge {
     }
 
     const result = []
-    await this.listEntries(pattern, treeEntry, parentPath, result)
+    await this.listEntries(p, treeEntry, parentPath, result)
     return result
   }
 
