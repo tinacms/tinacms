@@ -18,7 +18,6 @@ import {
   Link,
   useNavigate,
   NavigateFunction,
-  useLocation,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
@@ -310,12 +309,7 @@ const CollectionListPage = () => {
                             variant="white"
                             hasNext={pageInfo.hasNextPage}
                             navigateNext={() => {
-                              const hasPrev = prevCursers.length
-                              const newState = [
-                                ...prevCursers,
-                                // The first curser must be the empty string
-                                hasPrev ? pageInfo.startCursor : '',
-                              ]
+                              const newState = [...prevCursers, endCursor]
                               setPrevCursers(newState)
                               setEndCurser(pageInfo.endCursor)
                             }}
@@ -323,9 +317,8 @@ const CollectionListPage = () => {
                             navigatePrev={() => {
                               const prev = prevCursers[prevCursers.length - 1]
                               if (typeof prev === 'string') {
-                                const foo = prevCursers.slice(0, -1)
-                                console.log({ foo })
-                                setPrevCursers(foo)
+                                const newState = prevCursers.slice(0, -1)
+                                setPrevCursers(newState)
                                 setEndCurser(prev)
                               }
                             }}
