@@ -68,7 +68,7 @@ export class TinaAdminApi {
         const sort = this.schema.getIsTitleFieldName(collectionName)
         const response: { collection: Collection } = await this.api.request(
           `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float $after: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
         collection(collection: $collection){
           name
           label
