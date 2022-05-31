@@ -18,6 +18,7 @@ import {
   Link,
   useNavigate,
   NavigateFunction,
+  useLocation,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
@@ -38,6 +39,7 @@ import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import { useState } from 'react'
 import { CursorPaginator } from '@tinacms/toolkit/src/components/media/pagination'
+import { useEffect } from 'react'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -124,6 +126,12 @@ const CollectionListPage = () => {
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
+  const loc = useLocation()
+  useEffect(() => {
+    // reset state when the route is changed
+    setEndCursor('')
+    setPrevCursors([])
+  }, [loc])
 
   return (
     <GetCMS>
@@ -140,6 +148,7 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
               const pageInfo = collection.documents.pageInfo
+              const useDataFlag = cms.flags.get('experimentalData')
 
               return (
                 <PageWrapper>
@@ -304,26 +313,28 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        <div className="pt-3">
-                          <CursorPaginator
-                            variant="white"
-                            hasNext={pageInfo.hasNextPage}
-                            navigateNext={() => {
-                              const newState = [...prevCursors, endCursor]
-                              setPrevCursors(newState)
-                              setEndCursor(pageInfo.endCursor)
-                            }}
-                            hasPrev={prevCursors.length > 0}
-                            navigatePrev={() => {
-                              const prev = prevCursors[prevCursors.length - 1]
-                              if (typeof prev === 'string') {
-                                const newState = prevCursors.slice(0, -1)
+                        {useDataFlag && (
+                          <div className="pt-3">
+                            <CursorPaginator
+                              variant="white"
+                              hasNext={pageInfo?.hasNextPage}
+                              navigateNext={() => {
+                                const newState = [...prevCursors, endCursor]
                                 setPrevCursors(newState)
-                                setEndCursor(prev)
-                              }
-                            }}
-                          />
-                        </div>
+                                setEndCursor(pageInfo?.endCursor)
+                              }}
+                              hasPrev={prevCursors.length > 0}
+                              navigatePrev={() => {
+                                const prev = prevCursors[prevCursors.length - 1]
+                                if (typeof prev === 'string') {
+                                  const newState = prevCursors.slice(0, -1)
+                                  setPrevCursors(newState)
+                                  setEndCursor(prev)
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </PageBody>
                   </>
