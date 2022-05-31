@@ -448,26 +448,36 @@ export class Database {
       )
     }
 
-    const {
-      edges,
-      pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
-    }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
-      await this.store.query(storeQueryOptions)
+    try {
+      const {
+        edges,
+        pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
+      }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
+        await this.store.query(storeQueryOptions)
 
-    return {
-      edges: await sequential(edges, async (edge) => {
-        const node = await hydrator(edge.path)
-        return {
-          node,
-          cursor: btoa(edge.cursor),
-        }
-      }),
-      pageInfo: {
-        hasPreviousPage,
-        hasNextPage,
-        startCursor: btoa(startCursor),
-        endCursor: btoa(endCursor),
-      },
+      return {
+        edges: await sequential(edges, async (edge) => {
+          try {
+            const node = await hydrator(edge.path)
+            return {
+              node,
+              cursor: btoa(edge.cursor),
+            }
+          } catch (error) {
+            console.error(`error in fetching ${edge.path}`)
+            throw error
+          }
+        }),
+        pageInfo: {
+          hasPreviousPage,
+          hasNextPage,
+          startCursor: btoa(startCursor),
+          endCursor: btoa(endCursor),
+        },
+      }
+    } catch (error) {
+      console.error(`error in querying ${collection}`)
+      throw error
     }
   }
 
