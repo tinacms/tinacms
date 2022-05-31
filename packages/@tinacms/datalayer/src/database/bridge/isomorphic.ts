@@ -11,12 +11,34 @@
  limitations under the License.
  */
 
-import git, { ReadTreeResult, TreeEntry, WalkerEntry } from 'isomorphic-git'
+import git, {
+  CallbackFsClient,
+  PromiseFsClient,
+  ReadTreeResult,
+  TreeEntry,
+  WalkerEntry,
+} from 'isomorphic-git'
 import fs from 'fs-extra'
 // import fg from 'fast-glob'
 // import path from 'path'
 // import normalize from 'normalize-path'
 import type { Bridge } from './index'
+import globParent from 'glob-parent'
+import micromatch from 'micromatch'
+
+const flat =
+  typeof Array.prototype.flat === 'undefined'
+    ? (entries) => entries.reduce((acc, x) => acc.concat(x), [])
+    : (entries) => entries.flat()
+
+const toUint8Array = (buf: Buffer) => {
+  const ab = new ArrayBuffer(buf.length)
+  const view = new Uint8Array(ab)
+  for (let i = 0; i < buf.length; ++i) {
+    view[i] = buf[i]
+  }
+  return view
+}
 
 // TODO do we need the normalize-path in glob
 
@@ -25,12 +47,11 @@ import type { Bridge } from './index'
  */
 export class IsomorphicBridge implements Bridge {
   public rootPath: string
-  public fsModule: any
+  public fsModule: CallbackFsClient | PromiseFsClient
   public ref: string // TODO determine where ref comes from locally
   public isomorphicConfig: {
-    fs: string
+    fs: CallbackFsClient | PromiseFsClient
     dir: string
-    ref: string
   }
   public commitMessage: string
   public authorName: string
@@ -40,12 +61,12 @@ export class IsomorphicBridge implements Bridge {
     authorName: string,
     authorEmail: string,
     gitPath?: string,
-    fsModule?: any,
+    fsModule?: CallbackFsClient | PromiseFsClient,
     ref?: string,
     commitMessage?: string
   ) {
     this.rootPath = gitPath || ''
-    this.fsModule = fsModule || fs
+    this.fsModule = fsModule || fs.promises
     this.ref = `refs/heads/${ref || 'main'}`
     this.authorName = authorName
     this.authorEmail = authorEmail
@@ -79,8 +100,7 @@ export class IsomorphicBridge implements Bridge {
     }
 
     const treeResult: ReadTreeResult = await git.readTree({
-      fs: dynamofs,
-      dir: this.workDir,
+      ...this.isomorphicConfig,
       oid: entry.oid,
     })
 
@@ -138,6 +158,72 @@ export class IsomorphicBridge implements Bridge {
     return { pathParts, pathNodes }
   }
 
+  private async updateTree(
+    existingOid: string,
+    updatedOid: string,
+    path: string,
+    type: string,
+    pathNodes: WalkerEntry[],
+    pathParts: string[]
+  ) {
+    const lastIdx = pathNodes.length - 1
+    const parentEntry = pathNodes[lastIdx]
+    const parentPath = pathParts[lastIdx]
+    let parentOid
+    let tree
+    const mode = type === 'blob' ? '100644' : '040000'
+    if (parentEntry) {
+      parentOid = await parentEntry.oid()
+      const treeResult = await git.readTree({
+        ...this.isomorphicConfig,
+        oid: parentOid,
+      })
+      tree = existingOid
+        ? treeResult.tree.map((entry) => {
+            if (entry.path === path) {
+              entry.oid = updatedOid
+            }
+            return entry
+          })
+        : [
+            ...treeResult.tree,
+            {
+              oid: updatedOid,
+              type,
+              path,
+              mode,
+            },
+          ]
+    } else {
+      tree = [
+        {
+          oid: updatedOid,
+          type,
+          path,
+          mode,
+        },
+      ]
+    }
+
+    const updatedParentOid = await git.writeTree({
+      ...this.isomorphicConfig,
+      tree,
+    })
+
+    if (lastIdx === 0) {
+      return updatedParentOid
+    } else {
+      return await this.updateTree(
+        parentOid,
+        updatedParentOid,
+        parentPath,
+        'tree',
+        pathNodes.slice(0, lastIdx),
+        pathParts.slice(0, lastIdx)
+      )
+    }
+  }
+
   public async glob(pattern: string) {
     const parent = globParent(pattern)
     const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
@@ -149,7 +235,7 @@ export class IsomorphicBridge implements Bridge {
 
     const entryType = await leaf.type()
     if (entryType === 'blob') {
-      return [leaf._fullpath]
+      return [(leaf as any)._fullpath]
     }
 
     const entryPath = pathParts[pathParts.length - 1]
@@ -163,12 +249,13 @@ export class IsomorphicBridge implements Bridge {
       })
       treeEntry = treeResult.tree.find((entry) => entry.path === entryPath)
       parentPath = pathParts.slice(1, pathParts.length).join('/')
-    } else {
-      treeEntry = {
-        type: 'tree',
-        oid: await leaf.oid(),
-      }
-      parentPath = ''
+      // TODO can parentEntry ever be undefined?
+      // } else {
+      //   treeEntry = {
+      //     type: 'tree',
+      //     oid: await leaf.oid(),
+      //   }
+      //   parentPath = ''
     }
 
     const result = []
@@ -189,7 +276,10 @@ export class IsomorphicBridge implements Bridge {
         const leaf = pathNodes[ptr]
         const nodePath = pathParts[ptr]
         if (leaf) {
-          if (`./${leaf._fullpath}` !== pathParts.slice(0, ptr + 1).join('/')) {
+          if (
+            `./${(leaf as any)._fullpath}` !==
+            pathParts.slice(0, ptr + 1).join('/')
+          ) {
             throw new Error(`'${filepath}' not found`)
           }
 
@@ -236,7 +326,9 @@ export class IsomorphicBridge implements Bridge {
                 }),
               ],
               message: this.commitMessage,
+              // TODO these should be configurable
               author: this.author(),
+              committer: this.author(),
             },
           })
 
@@ -251,7 +343,7 @@ export class IsomorphicBridge implements Bridge {
         }
       }
     } else {
-      throw new Error('Unable to resolve path', filepath)
+      throw new Error(`Unable to resolve path: ${filepath}`)
     }
   }
 
@@ -275,14 +367,14 @@ export class IsomorphicBridge implements Bridge {
   public async put(filepath: string, data: string) {
     const { pathParts, pathNodes } = await this.resolvePathEntries(filepath)
     if (pathNodes.length > 0) {
-      const blobUpdate = toArrayBuffer(Buffer.from(file))
+      const blobUpdate = toUint8Array(Buffer.from(data))
 
       let existingOid
       const leaf = pathNodes[pathNodes.length - 1]
       const nodePath = pathParts[pathParts.length - 1]
       if (leaf) {
         existingOid = await leaf.oid()
-        if (leaf._fullpath !== filepath) {
+        if ((leaf as any)._fullpath !== filepath) {
           // TODO should create the path
           throw new Error(`${filepath} not found`)
         }
@@ -314,6 +406,7 @@ export class IsomorphicBridge implements Bridge {
           ],
           message: this.commitMessage,
           author: this.author(),
+          committer: this.author(),
         },
       })
 
