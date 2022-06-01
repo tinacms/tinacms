@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.60.4
+
+### Patch Changes
+
+- d103b27ad: Fix issue where new collections would not be added when CLI restarts
+
 ## 0.60.3
 
 ### Patch Changes
