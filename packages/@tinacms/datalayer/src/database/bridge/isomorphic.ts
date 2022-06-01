@@ -226,8 +226,11 @@ export class IsomorphicBridge implements Bridge {
     }
   }
 
+  // TODO need to think about how to keep the checked out files current
+
   public async glob(pattern: string) {
-    const p = `${pattern}/*` // TODO should not need to do this
+    // TODO should not need to do this
+    const p = `${pattern}/*`
     const parent = globParent(p)
     const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
 
