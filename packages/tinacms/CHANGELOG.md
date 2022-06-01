@@ -1,5 +1,14 @@
 # tinacms
 
+## 0.68.7
+
+### Patch Changes
+
+- aaaa5bb09: Added pagination to the CMS
+- e06dbb3ca: Adds `waitForDB` cmd to cli
+- Updated dependencies [aaaa5bb09]
+  - @tinacms/toolkit@0.56.30
+
 ## 0.68.6
 
 ### Patch Changes

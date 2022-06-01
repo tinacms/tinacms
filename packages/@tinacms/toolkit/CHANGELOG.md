@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.30
+
+### Patch Changes
+
+- aaaa5bb09: Added pagination to the CMS
+
 ## 0.56.29
 
 ### Patch Changes
