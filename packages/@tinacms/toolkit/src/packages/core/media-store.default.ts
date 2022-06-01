@@ -238,7 +238,9 @@ export class TinaMediaStore implements MediaStore {
         id: file.filename,
         filename: file.filename,
         src: file.src,
-        previewSrc: file.src,
+        previewSrc: !this.isLocal
+          ? `${file.src}?fit=crop&max-w=56&max-h=56`
+          : file.src,
       })
     }
 
