@@ -211,27 +211,32 @@ export class Database {
     data: { [key: string]: unknown },
     collection?: string
   ) => {
-    if (SYSTEM_FILES.includes(filepath)) {
-      throw new Error(`Unexpected put for config file ${filepath}`)
-    } else {
-      let collectionIndexDefinitions
-      if (collection) {
-        const indexDefinitions = await this.getIndexDefinitions()
-        collectionIndexDefinitions = indexDefinitions?.[collection]
-      }
+    try {
+      if (SYSTEM_FILES.includes(filepath)) {
+        throw new Error(`Unexpected put for config file ${filepath}`)
+      } else {
+        let collectionIndexDefinitions
+        if (collection) {
+          const indexDefinitions = await this.getIndexDefinitions()
+          collectionIndexDefinitions = indexDefinitions?.[collection]
+        }
 
-      const { stringifiedFile, payload, keepTemplateKey } =
-        await this.stringifyFile(filepath, data)
-      if (this.store.supportsSeeding()) {
-        await this.bridge.put(normalizePath(filepath), stringifiedFile)
+        const { stringifiedFile, payload, keepTemplateKey } =
+          await this.stringifyFile(filepath, data)
+        if (this.store.supportsSeeding()) {
+          await this.bridge.put(normalizePath(filepath), stringifiedFile)
+        }
+        await this.store.put(normalizePath(filepath), payload, {
+          keepTemplateKey,
+          collection: collection,
+          indexDefinitions: collectionIndexDefinitions,
+        })
       }
-      await this.store.put(normalizePath(filepath), payload, {
-        keepTemplateKey,
-        collection: collection,
-        indexDefinitions: collectionIndexDefinitions,
-      })
+      return true
+    } catch (error) {
+      console.error(`Error in PUT for ${filepath}`)
+      throw error
     }
-    return true
   }
 
   public stringifyFile = async (
@@ -706,12 +711,17 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
-    const dataString = await database.bridge.get(normalizePath(filepath))
-    const data = parseFile(dataString, path.extname(filepath), (yup) =>
-      yup.object({})
-    )
-    if (database.store.supportsSeeding()) {
-      await database.store.seed(normalizePath(filepath), data, seedOptions)
+    try {
+      const dataString = await database.bridge.get(normalizePath(filepath))
+      const data = parseFile(dataString, path.extname(filepath), (yup) =>
+        yup.object({})
+      )
+      if (database.store.supportsSeeding()) {
+        await database.store.seed(normalizePath(filepath), data, seedOptions)
+      }
+    } catch (error) {
+      console.error(`Unable to seed ${filepath}`)
+      throw error
     }
   })
 }

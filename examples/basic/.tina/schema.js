@@ -177,18 +177,14 @@ const schema = defineSchema({
 const branch = 'main'
 // When working locally, hit our local filesystem.
 // On a Vercel deployment, hit the Tina Cloud API
-const apiURL =
-  process.env.NODE_ENV == 'development'
-    ? 'http://localhost:4001/graphql'
-    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
+const apiURL = 'http://localhost:4001/graphql'
+// process.env.NODE_ENV == 'development'
+// ? 'http://localhost:4001/graphql'
+// : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
 export const tinaConfig = defineConfig({
   schema,
   apiURL,
-  cmsCallback: (cms) => {
-    cms.flags.set('tina-admin', true)
-    return cms
-  },
 })
 
 export default schema

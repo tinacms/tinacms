@@ -26,8 +26,13 @@ import type { RichTypeInner } from '../types'
 import { isNull } from 'lodash'
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
-  const tree = unified().use(markdown).use(mdx).parse(value)
-  return parseMDXInner(tree, field)
+  try {
+    const tree = unified().use(markdown).use(mdx).parse(value)
+    return parseMDXInner(tree, field)
+  } catch (error) {
+    console.error('ERROR: Invalid MDX, unable to parse')
+    throw error
+  }
 }
 /**
  * ### Convert the MDXAST into an API-friendly format

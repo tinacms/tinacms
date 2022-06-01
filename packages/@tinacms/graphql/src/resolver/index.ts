@@ -145,6 +145,7 @@ export class Resolver {
         _values: data,
       }
     } catch (e) {
+      console.error(`Unable to parse ${fullPath}`)
       if (e instanceof TinaError) {
         // Attach additional information
         throw new TinaError(e.message, {
