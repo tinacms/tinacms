@@ -80,6 +80,10 @@ export class TinaMediaStore implements MediaStore {
         if (this.api.options?.tinaioConfig?.assetsApiUrlOverride) {
           const url = new URL(this.api.assetsApiUrl)
           this.url = `${url.origin}/v1/${this.api.clientId}`
+        } else {
+          this.url = `${contentApiUrl.origin.replace('content', 'assets')}/v1/${
+            this.api.clientId
+          }`
         }
       }
     }
