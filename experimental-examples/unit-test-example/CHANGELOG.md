@@ -4,6 +4,67 @@
 
 ### Patch Changes
 
+- Updated dependencies [2cc206b1a]
+- Updated dependencies [8998df207]
+  - tinacms@0.68.6
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [646cad8da]
+- Updated dependencies [f857616f6]
+- Updated dependencies [6e2ed31a2]
+  - tinacms@0.68.5
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [7372f90ca]
+  - tinacms@0.68.4
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [8b7ee346a]
+  - tinacms@0.68.3
+
+## null
+
+### Patch Changes
+
+- tinacms@0.68.2
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [41d666f9a]
+- Updated dependencies [e5a1152f2]
+  - tinacms@0.68.1
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [6a6f137ae]
+  - tinacms@0.68.0
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [168f6cc6e]
+- Updated dependencies [2a6060138]
+- Updated dependencies [3af3d6787]
+  - tinacms@0.67.4
+
+## null
+
+### Patch Changes
+
 - tinacms@0.67.3
 
 ## null

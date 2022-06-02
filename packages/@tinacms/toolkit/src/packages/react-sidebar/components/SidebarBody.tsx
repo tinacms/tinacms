@@ -28,6 +28,7 @@ import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
+import { useWindowWidth } from '@react-hook/window-size'
 
 export const FormsView = ({
   children,
@@ -36,6 +37,12 @@ export const FormsView = ({
 }) => {
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
+  const renderNav =
+    // @ts-ignore
+    typeof cms?.sidebar?.renderNav !== 'undefined'
+      ? // @ts-ignore
+        cms.sidebar.renderNav
+      : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
 
@@ -98,11 +105,14 @@ export const FormsView = ({
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
           {isMultiform && (
             <MultiformFormHeader
+              renderNav={renderNav}
               activeForm={activeForm}
               setActiveFormId={setActiveFormId}
             />
           )}
-          {!isMultiform && <FormHeader activeForm={activeForm} />}
+          {!isMultiform && (
+            <FormHeader renderNav={renderNav} activeForm={activeForm} />
+          )}
           {formMetas &&
             formMetas.map((meta) => (
               <React.Fragment key={meta.name}>
@@ -186,11 +196,13 @@ const FormWrapper = styled.div<FormWrapperProps>`
 export interface MultiformFormHeaderProps {
   activeForm: Form
   setActiveFormId(id: string): void
+  renderNav?: boolean
 }
 
 export const MultiformFormHeader = ({
   activeForm,
   setActiveFormId,
+  renderNav,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
   const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
@@ -198,7 +210,11 @@ export const MultiformFormHeader = ({
   return (
     <div
       className={`py-4 border-b border-gray-200 bg-white ${
-        sidebarWidth > navBreakpoint ? `px-6` : `px-20`
+        sidebarWidth > navBreakpoint && renderNav
+          ? `px-6`
+          : renderNav
+          ? `pl-20 pr-28`
+          : `pl-6 pr-28`
       }`}
     >
       <div className="max-w-form mx-auto flex flex-col items-start justify-center min-h-[2.5rem]">
@@ -228,16 +244,30 @@ export const MultiformFormHeader = ({
 
 export interface FormHeaderProps {
   activeForm: Form
+  renderNav?: boolean
 }
 
-export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
+  const { sidebarWidth, formIsPristine, displayState } =
+    React.useContext(SidebarContext)
+
+  const headerPadding = {
+    navOpen: 'px-6',
+    navClosed: 'pl-20 pr-28',
+    noNav: 'pl-6 pr-28',
+  }
+
+  const windowWidth = useWindowWidth()
+  const navState = !renderNav
+    ? 'noNav'
+    : (sidebarWidth > navBreakpoint && windowWidth > navBreakpoint) ||
+      (displayState === 'fullscreen' && windowWidth > navBreakpoint)
+    ? 'navOpen'
+    : 'navClosed'
 
   return (
     <div
-      className={`py-4 border-b border-gray-200 bg-white ${
-        sidebarWidth > navBreakpoint ? `px-6` : `px-20`
-      }`}
+      className={`py-4 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
         {activeForm.label && (

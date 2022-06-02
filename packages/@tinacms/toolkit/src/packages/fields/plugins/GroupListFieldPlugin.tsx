@@ -18,22 +18,16 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../forms'
-import styled, { css } from 'styled-components'
 import { FieldsBuilder, useFormPortal } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import {
-  AddIcon,
-  DragIcon,
-  ReorderIcon,
-  TrashIcon,
-  LeftArrowIcon,
-} from '../../icons'
+import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '../../react-core/use-cms'
+import { BiPencil } from 'react-icons/bi'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -95,7 +89,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
         <GroupListMeta>
           <GroupLabel>{field.label || field.name}</GroupLabel>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </GroupListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
@@ -103,7 +99,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
         </IconButton>
       </GroupListHeader>
       <ListPanel>
-        <ItemList>
+        <div>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
               <div ref={provider.innerRef}>
@@ -123,13 +119,13 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
               </div>
             )}
           </Droppable>
-        </ItemList>
+        </div>
       </ListPanel>
     </>
   )
 }
 
-const EmptyState = () => <EmptyList>There are no items</EmptyList>
+export const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
@@ -159,13 +155,11 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       {(provider, snapshot) => (
         <>
           <ItemHeader
-            ref={provider.innerRef}
+            provider={provider}
             isDragging={snapshot.isDragging}
-            {...provider.draggableProps}
-            {...provider.dragHandleProps}
             {...p}
           >
-            <DragHandle />
+            <DragHandle isDragging={snapshot.isDragging} />
             <ItemClickTarget
               onMouseOver={() =>
                 setHoveredField({ fieldName: `${field.name}.${index}` })
@@ -184,6 +178,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
               }}
             >
               <GroupLabel>{title}</GroupLabel>
+              <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
             </ItemClickTarget>
             <ItemDeleteButton onClick={removeItem} />
           </ItemHeader>
@@ -206,65 +201,50 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   )
 }
 
-const ItemClickTarget = styled.div`
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-`
-
-export const ItemDeleteButton = ({ onClick }) => {
+export const ItemClickTarget = ({ children, ...props }) => {
   return (
-    <button
-      className="w-8 h-10 flex items-center justify-center hover:text-red-500"
-      onClick={onClick}
+    <div
+      className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2"
+      {...props}
     >
-      <TrashIcon className="" />
-    </button>
+      {children}
+    </div>
   )
 }
 
-export const GroupLabel = styled.span<{ error?: boolean }>`
-  margin: 0;
-  font-size: var(--tina-font-size-1);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--tina-color-grey-8);
-  transition: all 85ms ease-out;
-  text-align: left;
+export const GroupLabel = ({
+  error,
+  children,
+}: {
+  children?: any
+  error?: boolean
+}) => {
+  return (
+    <span
+      className={`m-0 text-xs font-semibold flex-1 text-ellipsis overflow-hidden transition-all ease-out duration-100 text-left ${
+        error ? `text-red-500` : `text-gray-600 group-hover:text-inherit`
+      }`}
+    >
+      {children}
+    </span>
+  )
+}
 
-  ${(props) =>
-    props.error &&
-    css`
-      color: var(--tina-color-error) !important;
-    `};
-`
+export const GroupListHeader = ({ children }: { children?: any }) => {
+  return (
+    <span className="relative flex w-full justify-between items-center mb-2">
+      {children}
+    </span>
+  )
+}
 
-export const GroupListHeader = styled.div`
-  position: relative;
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  ${FieldDescription} {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`
-
-export const GroupListMeta = styled.div`
-  line-height: 1;
-`
+export const GroupListMeta = ({ children }: { children?: any }) => {
+  return (
+    <div className="leading-none w-full flex-1 flex justify-between items-center gap-2">
+      {children}
+    </div>
+  )
+}
 
 export const ListPanel = ({ children }) => {
   return (
@@ -274,131 +254,70 @@ export const ListPanel = ({ children }) => {
   )
 }
 
-const EmptyList = styled.div`
-  text-align: center;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-  color: var(--tina-color-grey-4);
-  line-height: 1.35;
-  padding: 12px 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-`
-
-const ItemList = styled.div``
-
-export const ItemHeader = styled.div<{ isDragging: boolean }>`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  background-color: white;
-  border: 1px solid var(--tina-color-grey-2) !important;
-  margin: 0 0 -1px 0;
-  overflow: visible;
-  line-height: 1.35;
-  padding: 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-
-  ${GroupLabel} {
-    color: var(--tina-color-grey-8);
-    align-self: center;
-    max-width: 100%;
-  }
-
-  svg {
-    fill: var(--tina-color-grey-3);
-    width: 20px;
-    height: auto;
-    transition: fill 85ms ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    ${GroupLabel} {
-      color: var(--tina-color-primary);
-    }
-  }
-
-  &:first-child {
-    border-radius: 4px 4px 0 0;
-  }
-
-  &:last-child {
-    border-radius: 0 0 4px 4px;
-    &:first-child {
-      border-radius: var(--tina-radius-small);
-    }
-  }
-
-  ${(p) =>
-    p.isDragging &&
-    css<any>`
-      border-radius: var(--tina-radius-small);
-      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-
-      svg {
-        fill: var(--tina-color-grey-8);
-      }
-      ${GroupLabel} {
-        color: var(--tina-color-primary);
-      }
-
-      ${DragHandle} {
-        svg:first-child {
-          opacity: 0;
-        }
-        svg:last-child {
-          opacity: 1;
-        }
-      }
-    `};
-`
-
-const DragHandle = styled(function DragHandle({ ...styleProps }) {
+export const EmptyList = ({ children }) => {
   return (
-    <div {...styleProps}>
-      <DragIcon className="w-7 h-auto" />
-      <ReorderIcon className="w-7 h-auto" />
+    <div className="text-center rounded bg-gray-100 text-gray-400 p-3 text-sm italic font-regular">
+      {children}
     </div>
   )
-})`
-  margin: 0;
-  flex: 0 0 auto;
-  width: 32px;
-  position: relative;
-  fill: inherit;
-  padding: 12px 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-    cursor: grab;
-  }
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    transform: translate3d(-50%, -50%, 0);
-    transition: all 85ms ease-out;
-  }
-  svg:last-child {
-    opacity: 0;
-  }
-  *:hover > & {
-    svg:first-child {
-      opacity: 0;
-    }
-    svg:last-child {
-      opacity: 1;
-    }
-  }
-`
+}
+
+export const ItemHeader = ({
+  isDragging,
+  children,
+  provider,
+  ...props
+}: {
+  isDragging: boolean
+  children: any | any[]
+  provider: any
+}) => {
+  return (
+    <div
+      className={`relative group cursor-pointer flex justify-between items-stretch bg-white border border-gray-100 -mb-px overflow-visible p-0 text-sm font-normal ${
+        isDragging
+          ? `rounded shadow text-blue-600`
+          : `text-gray-600 first:rounded-t last:rounded-b`
+      }`}
+      ref={provider.innerRef}
+      {...provider.draggableProps}
+      {...provider.dragHandleProps}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+export const ItemDeleteButton = ({ onClick }) => {
+  return (
+    <button
+      className="w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500"
+      onClick={onClick}
+    >
+      <TrashIcon className="fill-current transition-colors ease-out duration-100" />
+    </button>
+  )
+}
+
+export const DragHandle = ({ isDragging }: { isDragging: boolean }) => {
+  return (
+    <div
+      className={`relative w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 group cursor-[grab] ${
+        isDragging ? `text-blue-500` : `text-gray-200 hover:text-gray-600`
+      }`}
+    >
+      {isDragging ? (
+        <ReorderIcon className="fill-current w-7 h-auto" />
+      ) : (
+        <>
+          <DragIcon className="fill-current w-7 h-auto group-hover:opacity-0 transition-opacity duration-150 ease-out" />
+          <ReorderIcon className="fill-current w-7 h-auto absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out" />
+        </>
+      )}
+    </div>
+  )
+}
 
 interface PanelProps {
   setExpanded(next: boolean): void

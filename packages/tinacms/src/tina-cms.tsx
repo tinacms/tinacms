@@ -12,17 +12,15 @@ limitations under the License.
 */
 
 import React, { useState } from 'react'
+import type { TinaClient } from './client'
 import { TinaCloudMediaStoreClass, TinaCloudProvider } from './auth'
-import {
-  useGraphqlForms,
-  useGraphqlFormsUnstable,
-} from './hooks/use-graphql-forms'
+import { useGraphqlForms } from './hooks/use-graphql-forms'
 
-import { LocalClient } from './client/index'
+import { LocalClient } from './internalClient/index'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { TinaDataContext } from '@tinacms/sharedctx'
-import type { TinaIOConfig } from './client/index'
+import type { TinaIOConfig } from './internalClient/index'
 import UrlPattern from 'url-pattern'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
@@ -30,6 +28,7 @@ import styles from './styles.css'
 import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { useTina } from './edit-state'
+import { parseURL } from './utils/parseUrl'
 
 const errorButtonStyles = {
   background: '#eb6337',
@@ -188,38 +187,49 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const parseURL = (url: string): { branch; isLocalClient; clientId } => {
-  if (url.includes('localhost')) {
-    return { branch: null, isLocalClient: true, clientId: null }
-  }
-
-  const tinaHost = 'content.tinajs.io'
-
-  const params = new URL(url)
-  const pattern = new UrlPattern('/content/:clientId/github/:branch')
-  const result = pattern.match(params.pathname)
-
-  // TODO if !result || !result.clientId || !result.branch, throw an error
-
-  if (params.host !== tinaHost) {
-    throw new Error(
-      `The only supported hosts are ${tinaHost} or localhost, but received ${params.host}.`
-    )
-  }
-
-  return {
-    ...result,
-    isLocalClient: false,
-  }
-}
-
 type APIProviderProps =
   | {
+      /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client?: never
       /**
        * Content API URL
        *
        */
       apiURL: string
+      /**
+       * Point to the local version of GraphQL instead of tina.io
+       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
+       *
+       * @deprecated use apiURL instead
+       */
+      isLocalClient?: never
+      /**
+       * The base branch to pull content from. Note that this is ignored for local development
+       *
+       * @deprecated use apiURL instead
+       */
+      branch?: never
+      /**
+       * Your clientID from tina.aio
+       *
+       * @deprecated use apiURL instead
+       */
+      clientId?: never
+    }
+  | {
+      /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client: TinaClient<unknown>
+      /**
+       * Content API URL
+       *
+       */
+      apiURL?: never
       /**
        * Point to the local version of GraphQL instead of tina.io
        * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
@@ -265,6 +275,11 @@ type APIProviderProps =
        * @deprecated use apiURL instead
        */
       clientId?: string
+      /**
+       * The API url From this client will be used to make requests.
+       *
+       */
+      client: never
     }
 
 interface BaseProviderProps {
@@ -319,18 +334,29 @@ export const TinaCMSProvider2 = ({
     new Boolean(props?.isLocalClient) ||
     (new Boolean(props?.clientId) && new Boolean(props?.branch))
 
+  const apiURL = props?.client?.apiUrl || props?.apiURL
+
   // branch & clientId are still supported, so don't throw if they're provided
-  if (!props.apiURL && !validOldSetup) {
-    throw new Error(`apiURL is a required field`)
+  if (!apiURL && !validOldSetup) {
+    throw new Error(
+      `Must provide apiUrl or a client to the TinaWrapper component`
+    )
   }
 
-  const { branch, clientId, isLocalClient } = props.apiURL
-    ? parseURL(props.apiURL)
+  const { branch, clientId, isLocalClient } = apiURL
+    ? parseURL(apiURL)
     : {
         branch: props.branch,
         clientId: props.clientId,
         isLocalClient: props.isLocalClient,
       }
+
+  // schema is now required as the Global Nav and CMS utilize it
+  if (!schema) {
+    throw new Error(
+      '`schema` is required to be passed as a property to `TinaProvider`.  You can learn more about this change here: https://github.com/tinacms/tinacms/pull/2823'
+    )
+  }
 
   return (
     <>
@@ -425,13 +451,6 @@ export const TinaDataProvider = ({
     payload: undefined,
     isLoading: true,
   })
-  const cms = useCMS()
-  const useUnstableFormify = React.useMemo(() => {
-    if (cms?.flags.get('use-unstable-formify') === false) {
-      return false
-    }
-    return true
-  }, [cms?.flags])
 
   return (
     <TinaDataContext.Provider
@@ -441,21 +460,12 @@ export const TinaDataProvider = ({
         state: { payload: state.payload },
       }}
     >
-      {useUnstableFormify ? (
-        <FormRegistrarUnstable
-          key={request?.query} // unload on page/query change
-          request={request}
-          formifyCallback={formifyCallback}
-          onPayloadStateChange={setState}
-        />
-      ) : (
-        <FormRegistrar
-          key={request?.query} // unload on page/query change
-          request={request}
-          formifyCallback={formifyCallback}
-          onPayloadStateChange={setState}
-        />
-      )}
+      <FormRegistrar
+        key={request?.query} // unload on page/query change
+        request={request}
+        formifyCallback={formifyCallback}
+        onPayloadStateChange={setState}
+      />
       {children}
     </TinaDataContext.Provider>
   )
@@ -473,49 +483,6 @@ const FormRegistrar = ({
   const cms = useCMS()
 
   const [payload, isLoading] = useGraphqlForms({
-    query: request?.query,
-    variables: request?.variables,
-    formify: (args) => {
-      if (formifyCallback) {
-        return formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
-  })
-
-  React.useEffect(() => {
-    onPayloadStateChange({ payload, isLoading })
-  }, [JSON.stringify(payload), isLoading])
-
-  return isLoading ? (
-    <Loader>
-      <></>
-    </Loader>
-  ) : null
-}
-
-type FormRegistrarProps = {
-  request: { query: string; variables: object }
-  formifyCallback: formifyCallback
-  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
-}
-
-const FormRegistrarUnstable = (props: FormRegistrarProps) => {
-  if (!props.request?.query) {
-    return null
-  }
-
-  return <FormRegistrarUnstableInner {...props} />
-}
-const FormRegistrarUnstableInner = ({
-  request,
-  formifyCallback,
-  onPayloadStateChange,
-}: FormRegistrarProps) => {
-  const cms = useCMS()
-
-  const [payload, isLoading] = useGraphqlFormsUnstable({
     query: request?.query,
     variables: request?.variables,
     formify: (args) => {

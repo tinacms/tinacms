@@ -22,10 +22,9 @@ const UNEXPECTED =
   'Formify encountered an unexpected error, please contact support'
 const EDGES_NODE_NAME = 'edges'
 const NODE_NAME = 'node'
-const COLLECTION_FIELD_NAME = 'getCollection'
-const COLLECTIONS_FIELD_NAME = 'getCollections'
+const COLLECTION_FIELD_NAME = 'collection'
+const COLLECTIONS_FIELD_NAME = 'collections'
 const COLLECTIONS_DOCUMENTS_NAME = 'documents'
-export const DATA_NODE_NAME = 'data'
 
 export const formify = async ({
   schema,
@@ -182,21 +181,29 @@ export const formify = async ({
   }): T {
     let extraFields = []
 
-    let hasDataJSONField = false
+    const hasDataJSONField = false
     let hasValuesField = false
     let shouldFormify = false
     selection.selectionSet.selections.forEach((selection) => {
+      /**
+       * This check makes sure we don't formify on inline fragments,
+       * so shouldFormify only returns true for sub selection, which will be
+       * a document
+       * ```
+       * {
+       *   document(relativePath: $relativePath) {
+       *      # don't want _sys and _values here
+       *      ...on Author {
+       *        # we want them here
+       *        name
+       *      }
+       *   }
+       * }
+       */
       if (selection.kind === 'Field') {
-        if (selection.name.value === 'dataJSON') {
-          shouldFormify = true
-          hasDataJSONField = true
-        }
-        if (selection.name.value === 'values') {
-          shouldFormify = true
+        shouldFormify = true
+        if (selection.name.value === '_values') {
           hasValuesField = true
-        }
-        if (selection.name.value === 'data') {
-          shouldFormify = true
         }
       }
     })
@@ -256,39 +263,11 @@ export const formify = async ({
                 })
               }
               case 'Field': {
-                if (selectionNode.name.value === DATA_NODE_NAME) {
-                  const field = util.getObjectField(type, selectionNode)
-                  return {
-                    ...selectionNode,
-                    selectionSet: {
-                      kind: 'SelectionSet',
-                      selections: [
-                        ...selectionNode.selectionSet.selections.map(
-                          (subSelectionNode) => {
-                            switch (subSelectionNode.kind) {
-                              case 'Field':
-                                return formifyFieldNode({
-                                  fieldNode: subSelectionNode,
-                                  parentType: field.type,
-                                  path: util.buildPath({
-                                    fieldNode: selectionNode,
-                                    type: field.type,
-                                    path,
-                                  }),
-                                })
-                              default:
-                                throw new FormifyError(
-                                  'UNEXPECTED',
-                                  `selection ${subSelectionNode.kind}`
-                                )
-                            }
-                          }
-                        ),
-                      ],
-                    },
-                  }
-                }
-                return selectionNode
+                return formifyFieldNode({
+                  fieldNode: selectionNode,
+                  parentType: type,
+                  path,
+                })
               }
               default:
                 throw new FormifyError('UNEXPECTED')
@@ -318,8 +297,14 @@ export const formify = async ({
       return fieldNode
     }
 
+    const fieldPath = util.buildPath({
+      fieldNode,
+      type: field.type,
+      parentTypename: G.getNamedType(parentType).name,
+      path,
+    })
     const blueprint = blueprints.find(
-      (blueprint) => blueprint.id === util.getRelativeBlueprint(path)
+      (blueprint) => blueprint.id === util.getRelativeBlueprint(fieldPath)
     )
     /**
      * This would be a field like sys.filename
@@ -329,12 +314,9 @@ export const formify = async ({
       return fieldNode
     }
 
-    const fieldPath = util.buildPath({
-      fieldNode,
-      type: field.type,
-      parentTypename: G.getNamedType(parentType).name,
-      path,
-    })
+    if (util.isSysField(fieldNode)) {
+      return fieldNode
+    }
 
     blueprint.fields.push({
       id: util.getBlueprintId(fieldPath),

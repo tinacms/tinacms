@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.59.11",
+  "version": "0.60.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -42,7 +42,8 @@
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
-    "test": "jest"
+    "test": "jest",
+    "test-watch": "jest --watch"
   },
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
@@ -97,6 +98,7 @@
   },
   "devDependencies": {
     "@tinacms/datalayer": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",
@@ -119,5 +121,8 @@
     "jest-matcher-utils": "27.0.6",
     "nodemon": "^2.0.4",
     "typescript": "^4.3.5"
+  },
+  "peerDependencies": {
+    "@tinacms/schema-tools": "*"
   }
 }

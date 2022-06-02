@@ -1,19 +1,15 @@
 {
   "data": {
-    "getDirectorList": {
+    "directorConnection": {
       "edges": [
         {
           "node": {
-            "data": {
-              "name": "Francis Ford Coppolla"
-            }
+            "name": "Francis Ford Coppolla"
           }
         },
         {
           "node": {
-            "data": {
-              "name": "George Lucas"
-            }
+            "name": "George Lucas"
           }
         }
       ]
@@ -22,16 +18,12 @@
       "edges": [
         {
           "node": {
-            "data": {
-              "name": "George Lucas"
-            }
+            "name": "George Lucas"
           }
         },
         {
           "node": {
-            "data": {
-              "name": "Francis Ford Coppolla"
-            }
+            "name": "Francis Ford Coppolla"
           }
         }
       ]
@@ -40,9 +32,7 @@
       "edges": [
         {
           "node": {
-            "data": {
-              "name": "Francis Ford Coppolla"
-            }
+            "name": "Francis Ford Coppolla"
           }
         }
       ]

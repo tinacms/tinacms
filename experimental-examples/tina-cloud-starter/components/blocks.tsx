@@ -5,7 +5,7 @@ import { Features } from "./blocks/features";
 import { Hero } from "./blocks/hero";
 import { Testimonial } from "./blocks/testimonial";
 
-export const Blocks = (props: Pages) => {
+export const Blocks = (props: Omit<Pages, "id" | "_sys" | "_values">) => {
   return (
     <>
       {props.blocks

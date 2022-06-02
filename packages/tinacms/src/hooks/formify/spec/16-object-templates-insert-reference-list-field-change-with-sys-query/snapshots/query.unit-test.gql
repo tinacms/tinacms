@@ -1,5 +1,5 @@
 # Blueprint
-# getBlockPageDocument
+# blockPage
 #
 # Documents for blueprint
 # ================
@@ -12,7 +12,7 @@
 # blocks.[].blogs.[].item
 
 # Blueprint
-# getBlockPageDocument.data.blocks.[].blogs.[].item
+# blockPage.blocks.[].blogs.[].item
 #
 # Documents for blueprint
 # ================
@@ -23,43 +23,41 @@
 
 
 query QueryOperation {
-  getBlockPageDocument(relativePath: "blockPage1.mdx") {
-    data {
-      blocks {
-        ... on BlockPageBlocksFeaturedPosts {
-          blogs {
-            item {
-              ... on PostDocument {
-                sys {
-                  filename
-                  collection {
-                    name
-                  }
+  blockPage(relativePath: "blockPage1.mdx") {
+    id
+    blocks {
+      ... on BlockPageBlocksFeaturedPosts {
+        blogs {
+          item {
+            ... on Post {
+              id
+              _sys {
+                filename
+                collection {
+                  name
                 }
-                data {
-                  title
-                }
-                _internalSys: sys {
-                  path
-                  collection {
-                    name
-                  }
-                }
-                form
-                values
               }
+              title
+              _internalSys: _sys {
+                path
+                relativePath
+                collection {
+                  name
+                }
+              }
+              _values
             }
           }
         }
       }
     }
-    _internalSys: sys {
+    _internalSys: _sys {
       path
+      relativePath
       collection {
         name
       }
     }
-    form
-    values
+    _values
   }
 }

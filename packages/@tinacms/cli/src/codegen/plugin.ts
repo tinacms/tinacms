@@ -21,31 +21,45 @@ export const AddGeneratedClientFunc: PluginFunction = (
 ) => {
   return `
 // TinaSDK generated code
-import { staticRequest } from 'tinacms'
-const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
-  doc,
-  vars,
-  _options
-) => {
-  let data = {}
-  try {
-    data = await staticRequest({
-      query: doc,
-      variables: vars,
-    })
-  } catch (e) {
-    // swallow errors related to document creation
-    console.warn('Warning: There was an error when fetching data')
-    console.warn(e)
-  }
+import { createClient, TinaClient } from "tinacms/dist/client";
 
-  return { data, query: doc, variables: vars || {} }
-}
+const generateRequester = (client: TinaClient) => {
+  const requester: (
+    doc: any,
+    vars?: any,
+    options?: any,
+    client
+  ) => Promise<any> = async (doc, vars, _options) => {
+    let data = {};
+    try {
+      data = await client.request({
+        query: doc,
+        variables: vars,
+      });
+    } catch (e) {
+      // swallow errors related to document creation
+      console.warn("Warning: There was an error when fetching data");
+      console.warn(e);
+    }
+
+    return { data: data?.data, query: doc, variables: vars || {} };
+  };
+
+  return requester;
+};
 
 /**
  * @experimental this class can be used but may change in the future
  **/
-export const ExperimentalGetTinaClient = ()=>getSdk(requester)
+export const ExperimentalGetTinaClient = () =>
+  getSdk(
+    generateRequester(createClient({ url: "http://localhost:4001/graphql" }))
+  );
+
+export const queries = (client: TinaClient) => {
+  const requester = generateRequester(client);
+  return getSdk(requester);
+};
 `
 }
 

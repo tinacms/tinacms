@@ -18,16 +18,10 @@ limitations under the License.
 
 import React from 'react'
 import { RichEditor } from './plate'
-import { RichEditor as RichEditorUpdated } from './updated'
-import { useCMS } from '../../../react-core'
 
 export const MdxFieldPlugin = {
   name: 'rich-text',
   Component: (props) => {
-    const cms = useCMS()
-    if (cms.flags.get('rich-text-alt') === false) {
-      return <RichEditor {...props} />
-    }
-    return <RichEditorUpdated {...props} />
+    return <RichEditor {...props} />
   },
 }

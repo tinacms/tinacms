@@ -1,5 +1,5 @@
 import { Post } from "../../components/post";
-import { ExperimentalGetTinaClient } from "../../.tina/__generated__/types";
+import { client } from "../../.tina/client";
 import { useTina } from "tinacms/dist/edit-state";
 import { Layout } from "../../components/layout";
 
@@ -12,10 +12,10 @@ export default function BlogPostPage(
     variables: props.variables,
     data: props.data,
   });
-  if (data && data.getPostsDocument) {
+  if (data && data.posts) {
     return (
-      <Layout rawData={data} data={data.getGlobalDocument.data}>
-        <Post {...data.getPostsDocument} />;
+      <Layout rawData={data} data={data.global}>
+        <Post {...data.posts} />;
       </Layout>
     );
   }
@@ -27,8 +27,7 @@ export default function BlogPostPage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const client = ExperimentalGetTinaClient();
-  const tinaProps = await client.BlogPostQuery({
+  const tinaProps = await client.queries.BlogPostQuery({
     relativePath: `${params.filename}.mdx`,
   });
   return {
@@ -46,11 +45,10 @@ export const getStaticProps = async ({ params }) => {
  * be viewable at http://localhost:3000/posts/hello
  */
 export const getStaticPaths = async () => {
-  const client = ExperimentalGetTinaClient();
-  const postsListData = await client.getPostsList();
+  const postsListData = await client.queries.postsConnection();
   return {
-    paths: postsListData.data.getPostsList.edges.map((post) => ({
-      params: { filename: post.node.sys.filename },
+    paths: postsListData.data.postsConnection.edges.map((post) => ({
+      params: { filename: post.node._sys.filename },
     })),
     fallback: "blocking",
   };

@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.67.3",
+  "version": "0.68.6",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -9,7 +9,8 @@
     "entryPoints": [
       "src/index.ts",
       "src/edit-state.tsx",
-      "src/rich-text.tsx"
+      "src/rich-text.tsx",
+      "src/client.ts"
     ]
   },
   "typings": "dist/index.d.ts",
@@ -24,10 +25,12 @@
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.4",
+    "@react-hook/window-size": "^3.0.7",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
     "crypto-js": "^4.0.0",
+    "fetch-ponyfill": "^7.1.0",
     "final-form": "4.20.1",
     "graphql": "^15.1.0",
     "graphql-tag": "^2.11.0",

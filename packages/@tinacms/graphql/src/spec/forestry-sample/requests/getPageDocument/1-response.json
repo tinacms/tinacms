@@ -1,27 +1,25 @@
 {
   "data": {
-    "getPageDocument": {
+    "page": {
       "id": "content/pages/home.md",
-      "data": {
-        "title": "Welcome back",
-        "seo": {
-          "seoTitle": "Welcome back to our website",
-          "ogImage": "http://placehold.it/300x200",
-          "ogDescription": "You're still gonna love this site!"
+      "title": "Welcome back",
+      "seo": {
+        "seoTitle": "Welcome back to our website",
+        "ogImage": "http://placehold.it/300x200",
+        "ogDescription": "You're still gonna love this site!"
+      },
+      "blocks": [
+        {
+          "__typename": "PageBlocksCta",
+          "ctaText": "Join us again",
+          "ctaStyle": "minimal"
         },
-        "blocks": [
-          {
-            "__typename": "PageBlocksCta",
-            "ctaText": "Join us again",
-            "ctaStyle": "minimal"
-          },
-          {
-            "__typename": "PageBlocksHero",
-            "backgroundImage": "http://placehold.it/300x200",
-            "description": "Welcome back!"
-          }
-        ]
-      }
+        {
+          "__typename": "PageBlocksHero",
+          "backgroundImage": "http://placehold.it/300x200",
+          "description": "Welcome back!"
+        }
+      ]
     }
   }
 }

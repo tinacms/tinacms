@@ -1,8 +1,8 @@
 {
   "data": {
-    "getMovieDocument": {
+    "movie": {
       "id": "content/movies/star-wars.md",
-      "sys": {
+      "_sys": {
         "filename": "star-wars",
         "basename": "star-wars.md",
         "breadcrumbs": [
@@ -16,137 +16,133 @@
           "name": "movie"
         }
       },
-      "data": {
-        "title": "Star Wars",
-        "genre": "scifi",
-        "body": {
-          "type": "root",
-          "children": [
-            {
-              "type": "p",
-              "children": [
-                {
-                  "type": "text",
-                  "text": "A long, long time ago, in galaxy far far away..."
-                }
-              ]
-            },
-            {
-              "type": "p",
-              "children": [
-                {
-                  "type": "text",
-                  "text": "this is an** "
-                },
-                {
-                  "bold": true,
-                  "type": "text",
-                  "text": "inline",
-                  "value": "inline"
-                },
-                {
-                  "type": "text",
-                  "text": "  **code block"
-                }
-              ]
-            },
-            {
-              "type": "mdxJsxFlowElement",
-              "name": "Cta",
-              "props": {
-                "title": "ok"
+      "title": "Star Wars",
+      "genre": "scifi",
+      "body": {
+        "type": "root",
+        "children": [
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "A long, long time ago, in galaxy far far away..."
               }
-            },
-            {
-              "type": "mdxJsxFlowElement",
-              "name": "BlockQuote",
-              "props": {
-                "author": "Darth Vader",
-                "categories": [
-                  "spoiler"
-                ],
-                "children": {
-                  "type": "root",
-                  "children": [
-                    {
-                      "type": "p",
-                      "children": [
-                        {
-                          "type": "text",
-                          "text": "I am your father"
-                        }
-                      ]
-                    }
-                  ]
-                }
+            ]
+          },
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "this is an** "
+              },
+              {
+                "bold": true,
+                "type": "text",
+                "text": "inline",
+                "value": "inline"
+              },
+              {
+                "type": "text",
+                "text": "  **code block"
               }
-            },
-            {
-              "type": "mdxJsxFlowElement",
-              "name": "Hero",
-              "props": {
-                "subTitle": {
-                  "type": "root",
-                  "children": [
-                    {
-                      "type": "h2",
-                      "children": [
-                        {
-                          "type": "text",
-                          "text": "Some slogan"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "mdxJsxFlowElement",
-                      "name": "Cta",
-                      "props": {
-                        "title": "Get Started"
+            ]
+          },
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "Cta",
+            "props": {
+              "title": "ok"
+            }
+          },
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "BlockQuote",
+            "props": {
+              "author": "Darth Vader",
+              "categories": [
+                "spoiler"
+              ],
+              "children": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "I am your father"
                       }
-                    }
-                  ]
-                },
-                "config": {
-                  "variant": "primary"
-                },
-                "children": {
-                  "type": "root",
-                  "children": [
-                    {
-                      "type": "h1",
-                      "children": [
-                        {
-                          "type": "text",
-                          "text": "Welcome to my website"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "mdxJsxFlowElement",
-                      "name": "Cta",
-                      "props": {
-                        "title": "Get Started",
-                        "actions": [
-                          {
-                            "_template": "popup",
-                            "title": "Click Here!",
-                            "body": "please?"
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
+                    ]
+                  }
+                ]
               }
             }
-          ]
-        },
-        "rating": 10,
-        "director": {
-          "data": {
-            "name": "George Lucas"
+          },
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "Hero",
+            "props": {
+              "subTitle": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "h2",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Some slogan"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "mdxJsxFlowElement",
+                    "name": "Cta",
+                    "props": {
+                      "title": "Get Started"
+                    }
+                  }
+                ]
+              },
+              "config": {
+                "variant": "primary"
+              },
+              "children": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "h1",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Welcome to my website"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "mdxJsxFlowElement",
+                    "name": "Cta",
+                    "props": {
+                      "title": "Get Started",
+                      "actions": [
+                        {
+                          "_template": "popup",
+                          "title": "Click Here!",
+                          "body": "please?"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
           }
-        }
+        ]
+      },
+      "rating": 10,
+      "director": {
+        "name": "George Lucas"
       }
     }
   }

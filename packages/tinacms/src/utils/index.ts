@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Client, LocalClient } from '../client'
-import type { TinaIOConfig } from '../client'
+import { Client, LocalClient } from '../internalClient'
+import type { TinaIOConfig } from '../internalClient'
 import * as yup from 'yup'
 import { TinaCloudSchema } from '@tinacms/schema-tools'
 

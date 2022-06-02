@@ -1,5 +1,247 @@
 # tinacms
 
+## 0.68.6
+
+### Patch Changes
+
+- 2cc206b1a: Improve mobile nav behaviour
+- 8998df207: fix: update tina client with the current branch from local storage
+- Updated dependencies [58a7a00f7]
+- Updated dependencies [2cc206b1a]
+- Updated dependencies [aaadefd2d]
+  - @tinacms/toolkit@0.56.29
+
+## 0.68.5
+
+### Patch Changes
+
+- 646cad8da: Adds support for using the generated client on the frontend
+- f857616f6: Rename sdk to queries
+- 6e2ed31a2: Added `isTitle` property to the schema that allows the title to be displayed in the CMS
+- Updated dependencies [a196198bd]
+- Updated dependencies [57a4a3789]
+- Updated dependencies [6e2ed31a2]
+- Updated dependencies [ba1499029]
+  - @tinacms/toolkit@0.56.28
+  - @tinacms/schema-tools@0.0.4
+
+## 0.68.4
+
+### Patch Changes
+
+- 7372f90ca: Adds a new client that can be used on the backend and frontend.
+- Updated dependencies [d4f98d0fc]
+- Updated dependencies [7e2272442]
+  - @tinacms/toolkit@0.56.27
+
+## 0.68.3
+
+### Patch Changes
+
+- 8b7ee346a: - Display label instead of name for mdx dropdown af306fa
+  - Fix issue where reset triggered chagnes to the wrong rich-text field 03f6191
+  - Fix issue where null children in a code block threw an error e454bce
+- Updated dependencies [f6f56bcc0]
+- Updated dependencies [59d33a74a]
+- Updated dependencies [8b7ee346a]
+- Updated dependencies [acb38bf9f]
+  - @tinacms/toolkit@0.56.26
+
+## 0.68.2
+
+### Patch Changes
+
+- Updated dependencies [e90647da3]
+  - @tinacms/toolkit@0.56.25
+
+## 0.68.1
+
+### Patch Changes
+
+- 41d666f9a: Styles list page overflow menu, removes unused prop
+- e5a1152f2: Fix issue where pages that didnt use `useTina` would get a loading spinner that hangs
+- Updated dependencies [41d666f9a]
+  - @tinacms/toolkit@0.56.24
+
+## 0.68.0
+
+### Minor Changes
+
+- 6a6f137ae: # Simplify GraphQL API
+
+  ## `schema` must be supplied to the `<TinaCMS>` component
+
+  Previously the `.tina/schema.ts` was only used by the Tina CLI to generate the GraphQL API. However it's now required as a prop to `<TinaCMS>`. This allows you to provide runtime logic in the `ui` property of field definitions. See the documentation on "Extending Tina" for examples.
+
+  ## The GraphQL API has been simplified
+
+  ### `get<collection name>` is now just the collection name
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) { ... }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) { ... }
+  }
+  ```
+
+  ### `get<collection name>List` is now `<collection name>Connection`
+
+  The use of the term `connection` is due to our adherence the the [relay cursor spec](https://relay.dev/graphql/connections.htm). We may offer a simplified list field in a future release
+
+  ```graphql
+  # old
+  {
+    getPostList { ... }
+  }
+
+  # new
+  {
+    postConnection { ... }
+  }
+  ```
+
+  ### `getCollection` and `getCollections` are now `collection` and `collections`
+
+  ```graphql
+  # old
+  {
+    getCollection(collection: "post") {...}
+  }
+  {
+    getCollections {...}
+  }
+
+  # new
+  {
+    collection(collection: "post") {...}
+  }
+  {
+    collections {...}
+  }
+  ```
+
+  ### No more `data` property
+
+  The `data` property was previously where all field definitions could be found. This has been moved on level up:
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      data {
+        title
+      }
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      title
+    }
+  }
+  ```
+
+  #### The type for documents no longer includes "Document" at the end
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      data {
+        author {
+          ... on AuthorDocument {
+            data {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      author {
+        ... on Author {
+          name
+        }
+      }
+    }
+  }
+  ```
+
+  ### Meta fields are now underscored
+
+  Aside from `id`, other metadata is now underscored:
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      sys {
+        relativePath
+      }
+      values
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      _sys {
+        relativePath
+      }
+      _values
+    }
+  }
+  ```
+
+  ### `dataJSON` is gone
+
+  This is identical to `_values`
+
+  ### `form` is gone
+
+  `form` was used internally to generate forms for the given document, however that's now handled by providing your `schema` to `<TinaCMS>`.
+
+  ### `getDocumentList` is gone
+
+  It's no longer possible to query all documents at once, you can query for collection documents via the `collection` query:
+
+  ```graphql
+  {
+    collection {
+      documents {
+        edges {
+          node {...}
+        }
+      }
+    }
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies [6a6f137ae]
+  - @tinacms/toolkit@0.56.23
+
+## 0.67.4
+
+### Patch Changes
+
+- 168f6cc6e: Update delete modal header
+- 2a6060138: Fix url parsing issue when a branch name contained a `/`
+- 3af3d6787: Fix issues with finding the template for multitemplate collections
+- Updated dependencies [bf5fe0074]
+  - @tinacms/toolkit@0.56.22
+
 ## 0.67.3
 
 ### Patch Changes

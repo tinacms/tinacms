@@ -32,18 +32,28 @@ import {
   OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
+import { lastItem } from '../util'
 
 const SysFieldDefinition = {
   kind: 'Field' as const,
   name: {
     kind: 'Name' as const,
-    value: 'sys',
+    value: '_sys',
   },
   arguments: [],
   directives: [],
   selectionSet: {
     kind: 'SelectionSet' as const,
     selections: [
+      // {
+      //   kind: 'Field' as const,
+      //   name: {
+      //     kind: 'Name' as const,
+      //     value: 'title',
+      //   },
+      //   arguments: [],
+      //   directives: [],
+      // },
       {
         kind: 'Field' as const,
         name: {
@@ -597,37 +607,39 @@ export const astBuilder = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                SysFieldDefinition,
                 {
-                  kind: 'Field',
-                  name: {
-                    kind: 'Name',
-                    value: 'id',
+                  kind: 'InlineFragment' as const,
+                  typeCondition: {
+                    kind: 'NamedType' as const,
+                    name: {
+                      kind: 'Name' as const,
+                      value: 'Document',
+                    },
                   },
-                  arguments: [],
-                  directives: [],
-                },
-                {
-                  kind: 'Field',
-                  name: {
-                    kind: 'Name',
-                    value: 'data',
-                  },
-                  arguments: [],
                   directives: [],
                   selectionSet: {
-                    kind: 'SelectionSet',
+                    kind: 'SelectionSet' as const,
                     selections: [
+                      SysFieldDefinition,
                       {
-                        kind: 'FragmentSpread',
+                        kind: 'Field',
                         name: {
                           kind: 'Name',
-                          value: fragName,
+                          value: 'id',
                         },
+                        arguments: [],
                         directives: [],
                       },
                     ],
                   },
+                },
+                {
+                  kind: 'FragmentSpread',
+                  name: {
+                    kind: 'Name',
+                    value: fragName,
+                  },
+                  directives: [],
                 },
               ],
             },
@@ -699,36 +711,38 @@ export const astBuilder = {
                           kind: 'SelectionSet',
                           selections: [
                             {
-                              kind: 'Field',
-                              name: {
-                                kind: 'Name',
-                                value: 'id',
+                              kind: 'InlineFragment' as const,
+                              typeCondition: {
+                                kind: 'NamedType' as const,
+                                name: {
+                                  kind: 'Name' as const,
+                                  value: 'Document',
+                                },
                               },
-                              arguments: [],
-                              directives: [],
-                            },
-                            SysFieldDefinition,
-                            {
-                              kind: 'Field',
-                              name: {
-                                kind: 'Name',
-                                value: 'data',
-                              },
-                              arguments: [],
                               directives: [],
                               selectionSet: {
-                                kind: 'SelectionSet',
+                                kind: 'SelectionSet' as const,
                                 selections: [
+                                  SysFieldDefinition,
                                   {
-                                    kind: 'FragmentSpread',
+                                    kind: 'Field',
                                     name: {
                                       kind: 'Name',
-                                      value: fragName,
+                                      value: 'id',
                                     },
+                                    arguments: [],
                                     directives: [],
                                   },
                                 ],
                               },
+                            },
+                            {
+                              kind: 'FragmentSpread',
+                              name: {
+                                kind: 'Name',
+                                value: fragName,
+                              },
+                              directives: [],
                             },
                           ],
                         },
@@ -905,16 +919,28 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
   updateName: (namespace: string[]) => {
-    return 'update' + generateNamespacedFieldName(namespace, 'Document')
+    return `update${generateNamespacedFieldName(namespace)}`
   },
   createName: (namespace: string[]) => {
-    return 'create' + generateNamespacedFieldName(namespace, 'Document')
+    return `create${generateNamespacedFieldName(namespace)}`
+  },
+  documentQueryName: () => {
+    return 'document'
+  },
+  documentConnectionQueryName: () => {
+    return 'documentConnection'
+  },
+  collectionQueryName: () => {
+    return 'collection'
+  },
+  collectionListQueryName: () => {
+    return 'collections'
   },
   queryName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'Document')
+    return String(lastItem(namespace))
   },
   generateQueryListName: (namespace: string[]) => {
-    return 'get' + generateNamespacedFieldName(namespace, 'List')
+    return `${lastItem(namespace)}Connection`
   },
   fragmentName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '') + 'Parts'
@@ -923,7 +949,7 @@ export const NAMER = {
     return generateNamespacedFieldName(namespace, 'Collection')
   },
   documentTypeName: (namespace: string[]) => {
-    return generateNamespacedFieldName(namespace, 'Document')
+    return generateNamespacedFieldName(namespace)
   },
   dataTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, '')

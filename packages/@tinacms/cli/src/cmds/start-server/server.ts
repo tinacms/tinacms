@@ -11,55 +11,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import cors from 'cors'
-import http from 'http'
-import express from 'express'
-import { altairExpress } from 'altair-express-middleware'
-// @ts-ignore
-import bodyParser from 'body-parser'
-
-const gqlServer = async (database) => {
-  // This is lazily required so we can update the module
-  // without having to restart the server
-  const gqlPackage = require('@tinacms/graphql')
-
-  const app = express()
-  const server = http.createServer(app)
-  app.use(cors())
-  app.use(bodyParser.json())
-
-  app.use(
-    '/altair',
-    altairExpress({
-      endpointURL: '/graphql',
-      initialQuery: `# Welcome to Tina!
-      # We've got a simple query set up for you to get started
-      # but there's plenty more for you to explore on your own!
-      query MyQuery {
-        getCollections {
-          documents {
-            id
-            sys {
-              filename
-              extension
-            }
-          }
-        }
-      }`,
-    })
-  )
-
-  app.post('/graphql', async (req, res) => {
-    const { query, variables } = req.body
-    const result = await gqlPackage.resolve({
-      database,
-      query,
-      variables,
-    })
-    return res.json(result)
-  })
-
-  return server
-}
-
+import { gqlServer } from '../../server'
 export default gqlServer

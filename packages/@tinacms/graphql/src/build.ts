@@ -31,15 +31,18 @@ import { Database } from './database'
 export const indexDB = async ({
   database,
   config,
+  flags = [],
   buildSDK = true,
 }: {
   database: Database
   config: TinaSchema['config']
+  flags?: string[]
   buildSDK?: boolean
 }) => {
-  const flags = []
   if (database.store.supportsIndexing()) {
-    flags.push('experimentalData')
+    if (flags.indexOf('experimentalData') === -1) {
+      flags.push('experimentalData')
+    }
   }
   const tinaSchema = await createSchema({ schema: config, flags })
   const builder = await createBuilder({
@@ -195,10 +198,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   mutationTypeDefinitionFields.push(
     await builder.buildCreateCollectionDocumentMutation(collections)
   )
-  queryTypeDefinitionFields.push(
-    await builder.multiCollectionDocumentList(collections)
-  )
-  queryTypeDefinitionFields.push(await builder.multiCollectionDocumentFields())
 
   /**
    * Collection queries/mutations/fragments

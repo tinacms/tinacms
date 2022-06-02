@@ -1,5 +1,59 @@
 # tinacms-cli
 
+## 0.60.18
+
+### Patch Changes
+
+- 79d112d79: Update cli to accept tinaCloudMediaStore flag and add to metadata during schema compilation
+- 91d6e6758: revert platform aware paths in schema introduced in https://github.com/tinacms/tinacms/commit/558cc4368cd2a4b6e87dfb82bbfbb6f569f8a6f8
+- b1240328d: Adds local server routes for handling media
+- 91d6e6758: Fix issues with experimentalData on windows related to path separator inconsistency and interference with the .tina/**generated** folder
+- Updated dependencies [79d112d79]
+- Updated dependencies [3f46c6706]
+- Updated dependencies [db9168578]
+- Updated dependencies [91d6e6758]
+  - @tinacms/graphql@0.60.3
+
+## 0.60.17
+
+### Patch Changes
+
+- 08cdb672a: Adds `useRelativeMedia` support to local graphql client
+- 646cad8da: Adds support for using the generated client on the frontend
+- f857616f6: Rename sdk to queries
+- Updated dependencies [08cdb672a]
+- Updated dependencies [fdbfe9a16]
+- Updated dependencies [6e2ed31a2]
+  - @tinacms/graphql@0.60.2
+  - @tinacms/schema-tools@0.0.4
+
+## 0.60.16
+
+### Patch Changes
+
+- 7372f90ca: Adds a new client that can be used on the backend and frontend.
+- Updated dependencies [3b11ff6ad]
+  - @tinacms/graphql@0.60.1
+
+## 0.60.15
+
+### Patch Changes
+
+- ceb826916: Fix issue where \_app override from tina init was improperly formatted
+
+## 0.60.14
+
+### Patch Changes
+
+- Updated dependencies [6a6f137ae]
+  - @tinacms/graphql@0.60.0
+
+## 0.60.13
+
+### Patch Changes
+
+- 9d28ea29e: hide some existing start:server logging behind --verbose flag. format some messages to make them easier to read
+
 ## 0.60.12
 
 ### Patch Changes

@@ -13,13 +13,11 @@ limitations under the License.
 
 const query = `#graphql
 query {
-  getPostDocument(relativePath: "post1.mdx") {
-    data {
-      author {
-        ...on Document {
-          sys {
-            filename
-          }
+  post(relativePath: "post1.mdx") {
+    author {
+      ...on Document {
+        _sys {
+          filename
         }
       }
     }

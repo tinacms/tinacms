@@ -1,7 +1,7 @@
 query {
-  getMovieDocument(relativePath: "star-wars.md") {
+  movie(relativePath: "star-wars.md") {
     id
-    sys {
+    _sys {
       filename
       basename
       breadcrumbs
@@ -13,17 +13,13 @@ query {
         name
       }
     }
-    data {
-      title
-      genre
-      body
-      rating
-      director {
-        ... on DirectorDocument {
-          data {
-            name
-          }
-        }
+    title
+    genre
+    body
+    rating
+    director {
+      ... on Director {
+        name
       }
     }
   }
