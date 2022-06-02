@@ -2,4 +2,4 @@
 '@tinacms/graphql': patch
 ---
 
-Always use the glob function when the dataLayer in enabled
+Always use the query function when the dataLayer in enabled
