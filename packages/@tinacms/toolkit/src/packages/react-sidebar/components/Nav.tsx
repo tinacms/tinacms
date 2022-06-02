@@ -133,7 +133,7 @@ export const Nav = ({
       <div className="px-6 flex-1 overflow-auto">
         {showCollections && (
           <>
-            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+            <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
               Collections
             </h4>
             <CollectionsList
@@ -144,7 +144,7 @@ export const Nav = ({
         )}
         {(screens.length > 0 || contentCreators.length) > 0 && (
           <>
-            <h4 className="uppercase font-bold text-sm mb-3 mt-8 text-gray-700">
+            <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
               Site
             </h4>
             <ul className="flex flex-col gap-4">
