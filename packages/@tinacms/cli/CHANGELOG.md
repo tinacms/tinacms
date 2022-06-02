@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.60.19
+
+### Patch Changes
+
+- d103b27ad: Fix issue where new collections would not be added when CLI restarts
+- e06dbb3ca: Adds `waitForDB` cmd to cli
+- Updated dependencies [d103b27ad]
+  - @tinacms/graphql@0.60.4
+
 ## 0.60.18
 
 ### Patch Changes
