@@ -484,11 +484,6 @@ export class Resolver {
     }
   }
 
-  public getDocumentsForCollection = async (collectionName: string) => {
-    const collection = this.tinaSchema.getCollection(collectionName)
-    return this.database.store.glob(collection.path, this.getDocument)
-  }
-
   private referenceResolver = async (
     filter: Record<string, object>,
     fieldDefinition: ReferenceTypeWithNamespace
@@ -577,7 +572,14 @@ export class Resolver {
     let edges
     let pageInfo
 
-    if (args.filter || args.sort) {
+    // See if we are using the data layer
+    const useDataLayer = Boolean(
+      this.tinaSchema?.config?.meta?.flags?.find(
+        (x) => x === 'experimentalData'
+      )
+    )
+
+    if (useDataLayer) {
       let conditions: FilterCondition[]
       if (args.filter) {
         if (collection.fields) {
