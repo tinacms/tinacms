@@ -24,7 +24,9 @@ const DashboardPage = () => {
         <PageWrapper>
           <>
             <PageHeader isLocalMode={cms.api?.tina?.isLocalMode}>
-              <h3 className="text-2xl text-gray-700">Welcome to Tina!</h3>
+              <h3 className="text-2xl font-sans text-gray-700">
+                Welcome to Tina!
+              </h3>
             </PageHeader>
             <PageBodyNarrow>
               This is your dashboard for editing or creating content. Select a
