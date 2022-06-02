@@ -37,7 +37,7 @@ interface OptionSet {
 }
 
 interface Response {
-  getCollection: {
+  collection: {
     documents: {
       edges: {
         node: {
@@ -60,7 +60,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
             const response: Response = await cms.api.tina.request(
               `#graphql
             query ($collection: String!){
-              getCollection(collection: $collection) {
+              collection(collection: $collection) {
                 documents {
                   edges {
                     node {
@@ -78,7 +78,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
 
             return {
               collection,
-              edges: response.getCollection.documents.edges,
+              edges: response.collection.documents.edges,
             }
           } catch (e) {
             return {

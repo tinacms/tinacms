@@ -82,10 +82,7 @@ export const generateTypes = async (
         { typescript: {} },
         { typescriptOperations: {} },
         {
-          typescriptSdk: {
-            gqlImport: 'tinacms#gql',
-            documentNodeImport: 'tinacms#DocumentNode',
-          },
+          typescriptSdk: {},
         },
         { AddGeneratedClient: {} },
       ],

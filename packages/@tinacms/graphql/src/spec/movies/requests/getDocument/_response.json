@@ -1,27 +1,12 @@
 {
   "data": {
-    "getDocument": {
+    "document": {
       "id": "content/movies/star-wars.md",
-      "data": {
-        "title": "Star Wars",
-        "genre": "scifi",
-        "director": {
-          "data": {
-            "name": "George Lucas"
-          }
-        }
+      "title": "Star Wars",
+      "genre": "scifi",
+      "director": {
+        "name": "George Lucas"
       }
-    },
-    "paths": [
-      {
-        "path": [
-          "data"
-        ],
-        "dataPath": [
-          "getDocument"
-        ],
-        "queryString": "query GetNode($id: String!) {\n  node(id: $id) {\n    ... on MovieDocument {\n      id\n      data {\n        title\n        genre\n        director {\n          ... on DirectorDocument {\n            data {\n              name\n            }\n          }\n        }\n      }\n    }\n  }\n}"
-      }
-    ]
+    }
   }
 }

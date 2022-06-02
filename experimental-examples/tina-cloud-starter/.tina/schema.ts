@@ -1,11 +1,12 @@
 import { defineSchema, defineConfig } from "tinacms";
+import { client } from "./client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       label: "Blog Posts",
@@ -17,6 +18,8 @@ export default defineSchema({
           type: "string",
           label: "Title",
           name: "title",
+          required: true,
+          isTitle: true,
         },
         {
           type: "image",
@@ -315,6 +318,8 @@ export default defineSchema({
           type: "string",
           label: "Name",
           name: "name",
+          required: true,
+          isTitle: true,
         },
         {
           type: "string",
@@ -348,14 +353,11 @@ export default defineSchema({
   ],
 });
 
-const branch = "main";
-const apiURL =
-  process.env.NODE_ENV == "development"
-    ? "http://localhost:4001/graphql"
-    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`;
+export default schema;
 
 export const tinaConfig = defineConfig({
-  apiURL,
+  client,
+  schema,
   mediaStore: async () => {
     const pack = await import("next-tinacms-cloudinary");
     return pack.TinaCloudCloudinaryMediaStore;
@@ -365,6 +367,11 @@ export const tinaConfig = defineConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
+    cms.flags.set("experimentalData", true);
+
+    // cms.sidebar.position = "overlay";
+    // cms.sidebar.defaultState = "closed";
+    // cms.sidebar.renderNav = false;
 
     /**
      * When `tina-admin` is enabled, this plugin configures contextual editing for collections
@@ -375,15 +382,15 @@ export const tinaConfig = defineConfig({
           return undefined;
         }
         if (["pages"].includes(collection.name)) {
-          if (document.sys.filename === "home") {
+          if (document._sys.filename === "home") {
             return `/`;
           }
-          if (document.sys.filename === "about") {
+          if (document._sys.filename === "about") {
             return `/about`;
           }
           return undefined;
         }
-        return `/${collection.name}/${document.sys.filename}`;
+        return `/${collection.name}/${document._sys.filename}`;
       });
       cms.plugins.add(RouteMapping);
     });
@@ -391,7 +398,7 @@ export const tinaConfig = defineConfig({
     return cms;
   },
   formifyCallback: ({ formConfig, createForm, createGlobalForm }) => {
-    if (formConfig.id === "getGlobalDocument") {
+    if (formConfig.id === "content/global/index.json") {
       return createGlobalForm(formConfig);
     }
 

@@ -333,3 +333,9 @@ export type Templateable = {
   fields: TinaFieldEnriched[]
   ui?: object
 }
+
+export type GraphQLConfig =
+  | {
+      useRelativeMedia: true
+    }
+  | { useRelativeMedia: false; clientId: string; assetsHost: string }

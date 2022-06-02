@@ -20,6 +20,9 @@ import * as React from 'react'
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'white' | 'ghost' | 'danger'
+  as?: React.ElementType
+  href?: string
+  target?: string
   size?: 'small' | 'medium' | 'custom'
   busy?: boolean
   rounded?: 'full' | 'left' | 'right'
@@ -30,6 +33,7 @@ export interface ButtonProps
 
 export const Button = ({
   variant = 'secondary',
+  as: Tag = 'button',
   size = 'medium',
   busy,
   disabled,
@@ -65,12 +69,12 @@ export const Button = ({
   }
 
   return (
-    <button
+    <Tag
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${stateClasses[state]} ${roundedClasses[rounded]} ${className}`}
       {...props}
     >
       {children}
-    </button>
+    </Tag>
   )
 }
 

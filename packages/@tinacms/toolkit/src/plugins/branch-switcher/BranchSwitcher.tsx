@@ -17,7 +17,9 @@ import { BaseTextField } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
-import { MdOutlineClear } from 'react-icons/md'
+import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
+import { useCMS } from '../../packages/react-core'
+import { AiFillWarning } from 'react-icons/ai'
 
 type ListState = 'loading' | 'ready' | 'error'
 
@@ -25,6 +27,8 @@ export const BranchSwitcher = ({
   listBranches,
   createBranch,
 }: BranchSwitcherProps) => {
+  const cms = useCMS()
+  const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
   const { currentBranch, setCurrentBranch } = useBranchData()
@@ -58,7 +62,33 @@ export const BranchSwitcher = ({
   return (
     <div className="w-full flex justify-center p-5">
       <div className="w-full max-w-form">
-        {listState === 'loading' ? (
+        {isLocalMode ? (
+          <div className="px-6 py-8 w-full h-full flex flex-col items-center justify-center">
+            <p className="text-base mb-4 text-center">
+              <AiFillWarning className="w-7 h-auto inline-block mr-0.5 opacity-70 text-yellow-600" />
+            </p>
+            <p className="text-base mb-6 text-center">
+              Tina's branch switcher isn't available in local mode.{' '}
+              <a
+                target="_blank"
+                className="transition-all duration-150 ease-out text-blue-600 hover:text-blue-400 hover:underline no-underline"
+                href="https://tina.io/docs/tina-cloud/"
+              >
+                Learn more about moving to production with Tina Cloud.
+              </a>
+            </p>
+            <p>
+              <Button
+                href="https://tina.io/docs/tina-cloud/"
+                target="_blank"
+                as="a"
+              >
+                Read Our Docs{' '}
+                <MdArrowForward className="w-5 h-auto ml-1.5 opacity-80" />
+              </Button>
+            </p>
+          </div>
+        ) : listState === 'loading' ? (
           <div style={{ margin: '32px auto', textAlign: 'center' }}>
             <LoadingDots color={'var(--tina-color-primary)'} />
           </div>

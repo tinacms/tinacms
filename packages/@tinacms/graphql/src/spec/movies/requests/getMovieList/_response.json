@@ -1,11 +1,11 @@
 {
   "errors": [
     {
-      "message": "Unknown argument \"filter\" on field \"Query.getMovieList\". Did you mean \"after\"?",
+      "message": "Cannot query field \"movieConnectionZ\" on type \"Query\". Did you mean \"movieConnection\" or \"actorConnection\"?",
       "locations": [
         {
           "line": 3,
-          "column": 16
+          "column": 3
         }
       ]
     }

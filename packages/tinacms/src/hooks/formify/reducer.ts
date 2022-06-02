@@ -311,18 +311,12 @@ export function reducer(state: State, action: Action): State {
           const blueprint = util.getFormNodeBlueprint(formNode, state)
           if (blueprint.hasValuesField) {
             changeSets.push({
-              path: [util.formNodePath(formNode), 'values'].join('.'),
-              ...buildChangeSet(event, formNode),
-            })
-          }
-          if (blueprint.hasDataJSONField) {
-            changeSets.push({
-              path: [util.formNodePath(formNode), 'dataJSON'].join('.'),
+              path: [util.formNodePath(formNode), '_values'].join('.'),
               ...buildChangeSet(event, formNode),
             })
           }
           changeSets.push({
-            path: [util.formNodePath(formNode), 'data'].join('.'),
+            path: [util.formNodePath(formNode)].join('.'),
             ...buildChangeSet(event, formNode),
           })
         })

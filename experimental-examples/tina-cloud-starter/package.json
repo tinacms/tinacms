@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\" --noTelemetry",
-    "dev-data": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry",
+    "dev": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --dev",
     "build": "tinacms server:start -c \"next build\"",
     "start": "tinacms server:start -c \"next start\"",
     "export": "npm run build && next export"
@@ -40,6 +39,7 @@
     "typescript": "4.3.5"
   },
   "resolutions": {
-    "final-form": "4.20.1"
+    "final-form": "4.20.1",
+    "@headlessui/react": "1.4.4"
   }
 }

@@ -12,15 +12,18 @@ limitations under the License.
 */
 
 import type { TinaCMS } from '@tinacms/toolkit'
-import type { Collection, DocumentForm, GetDocumentFields } from './types'
+import type { TinaSchema } from '@tinacms/schema-tools'
+import type { Client } from '../internalClient'
+import type { Collection, DocumentForm } from './types'
 
 export class TinaAdminApi {
-  api: {
-    request: (query: string, { variables }: { variables: object }) => any
-    isAuthenticated: () => boolean
-  }
+  api: Client
+  useDataLayer: boolean
+  schema: TinaSchema
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
+    this.schema = cms.api.tina.schema
+    this.useDataLayer = cms.flags.get('experimentalData')
   }
 
   async isAuthenticated() {
@@ -28,18 +31,15 @@ export class TinaAdminApi {
   }
 
   async fetchCollections() {
-    const response: { getCollections: Collection[] } = await this.api.request(
-      `#graphql
-      query{ 
-        getCollections { 
-          label, 
-          name 
-        } 
-      }`,
-      { variables: {} }
-    )
-
-    return response
+    try {
+      // TODO: fix this type
+      // @ts-ignore
+      const collections: Collection[] = this.schema.getCollections()
+      return collections
+    } catch (e) {
+      console.error(`[TinaAdminAPI] Unable to fetchCollections(): ${e.message}`)
+      return []
+    }
   }
   async deleteDocument({
     collection,
@@ -58,21 +58,35 @@ export class TinaAdminApi {
       { variables: { collection, relativePath } }
     )
   }
-  async fetchCollection(collectionName: string, includeDocuments: boolean) {
-    const response: { getCollection: Collection } = await this.api.request(
-      `#graphql
-      query($collection: String!, $includeDocuments: Boolean!){
-        getCollection(collection: $collection){
+  async fetchCollection(
+    collectionName: string,
+    includeDocuments: boolean,
+    after?: string
+  ) {
+    if (includeDocuments === true) {
+      if (this.useDataLayer) {
+        const sort = this.schema.getIsTitleFieldName(collectionName)
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+        collection(collection: $collection){
           name
           label
           format
           templates
-          documents @include(if: $includeDocuments) {
+          documents(sort: $sort, after: $after, first: $limit) @include(if: $includeDocuments) {
             totalCount
+            pageInfo {
+              hasPreviousPage
+              hasNextPage
+              startCursor
+              endCursor
+            }
             edges {
               node {
                 ... on Document {
-                  sys {
+                  _sys {
+                    title
                     template
                     breadcrumbs
                     path
@@ -87,36 +101,78 @@ export class TinaAdminApi {
           }
         }
       }`,
-      { variables: { collection: collectionName, includeDocuments } }
-    )
+          {
+            variables: {
+              collection: collectionName,
+              includeDocuments,
+              sort,
+              limit: 10,
+              after,
+            },
+          }
+        )
 
-    return response
+        return response.collection
+      } else {
+        const response: { collection: Collection } = await this.api.request(
+          `#graphql
+    query($collection: String!, $includeDocuments: Boolean!){
+      collection(collection: $collection){
+        name
+        label
+        format
+        templates
+        documents @include(if: $includeDocuments) {
+          totalCount
+          edges {
+            node {
+              ... on Document {
+                _sys {
+                  template
+                  breadcrumbs
+                  path
+                  basename
+                  relativePath
+                  filename
+                  extension
+                }
+              }
+            }
+          }
+        }
+      }
+    }`,
+          { variables: { collection: collectionName, includeDocuments } }
+        )
+
+        return response.collection
+      }
+    } else {
+      try {
+        // TODO: fix this type
+        // @ts-ignore
+        const collection: Collection = this.schema.getCollection(collectionName)
+        return collection
+      } catch (e) {
+        console.error(
+          `[TinaAdminAPI] Unable to fetchCollection(): ${e.message}`
+        )
+        return undefined
+      }
+    }
   }
 
   async fetchDocument(collectionName: string, relativePath: string) {
-    const response: { getDocument: DocumentForm } = await this.api.request(
+    const response: { document: DocumentForm } = await this.api.request(
       `#graphql
       query($collection: String!, $relativePath: String!) {
-        getDocument(collection:$collection, relativePath:$relativePath) {
+        document(collection:$collection, relativePath:$relativePath) {
           ... on Document {
-            form
-            values
+            _values
           }
         }
       }`,
       { variables: { collection: collectionName, relativePath } }
-    )
-
-    return response
-  }
-
-  async fetchDocumentFields() {
-    const response: GetDocumentFields = await this.api.request(
-      `#graphql
-      query { 
-        getDocumentFields 
-      }`,
-      { variables: {} }
     )
 
     return response
@@ -156,7 +212,7 @@ export class TinaAdminApi {
     const response = await this.api.request(
       `#graphql
       mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-        updateDocument( 
+        updateDocument(
           collection: $collection,
           relativePath: $relativePath,
           params: $params

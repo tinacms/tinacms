@@ -52,6 +52,11 @@ export class TinaSchema {
     // @ts-ignore
     this.schema = config
   }
+  public getIsTitleFieldName = (collection: string) => {
+    const col = this.getCollection(collection)
+    const field = col?.fields.find((x) => x.type === 'string' && x.isTitle)
+    return field?.name
+  }
 
   public getCollectionsByName = (collectionNames: string[]) => {
     return this.schema.collections.filter((collection) =>

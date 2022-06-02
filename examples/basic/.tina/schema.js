@@ -16,6 +16,23 @@ import { defineSchema, defineConfig } from 'tinacms'
 const schema = defineSchema({
   collections: [
     {
+      name: 'test',
+      path: 'content/test',
+      label: 'Test',
+      templates: [
+        {
+          name: 'tem1',
+          label: 'Template 1',
+          fields: [{ type: 'string', name: 'foo' }],
+        },
+        {
+          name: 'tem2',
+          label: 'Template 2',
+          fields: [{ type: 'string', name: 'bar' }],
+        },
+      ],
+    },
+    {
       name: 'page',
       path: 'content/page',
       label: 'Page',
@@ -65,7 +82,7 @@ const schema = defineSchema({
         {
           type: 'object',
           label: 'Related Posts',
-          name: 'relatedPosts',
+          name: 'posts',
           list: true,
           ui: {
             itemProps: (item) => {
@@ -168,10 +185,6 @@ const apiURL =
 export const tinaConfig = defineConfig({
   schema,
   apiURL,
-  cmsCallback: (cms) => {
-    cms.flags.set('tina-admin', true)
-    return cms
-  },
 })
 
 export default schema

@@ -32,21 +32,16 @@ const interfaceDefinitions = [
     name: 'Document',
     fields: [
       astBuilder.FieldDefinition({
-        name: 'sys',
-        type: astBuilder.TYPES.SystemInfo,
-      }),
-      astBuilder.FieldDefinition({
         name: 'id',
         type: astBuilder.TYPES.ID,
         required: true,
       }),
       astBuilder.FieldDefinition({
-        name: 'form',
-        type: astBuilder.TYPES.JSON,
-        required: true,
+        name: '_sys',
+        type: astBuilder.TYPES.SystemInfo,
       }),
       astBuilder.FieldDefinition({
-        name: 'values',
+        name: '_values',
         type: astBuilder.TYPES.JSON,
         required: true,
       }),
@@ -60,6 +55,35 @@ const interfaceDefinitions = [
         name: 'totalCount',
         required: true,
         type: astBuilder.TYPES.Number,
+      }),
+      astBuilder.FieldDefinition({
+        name: 'pageInfo',
+        required: true,
+        type: astBuilder.ObjectTypeDefinition({
+          name: 'PageInfo',
+          fields: [
+            astBuilder.FieldDefinition({
+              name: 'hasPreviousPage',
+              required: true,
+              type: astBuilder.TYPES.Boolean,
+            }),
+            astBuilder.FieldDefinition({
+              name: 'hasNextPage',
+              required: true,
+              type: astBuilder.TYPES.Boolean,
+            }),
+            astBuilder.FieldDefinition({
+              name: 'startCursor',
+              required: true,
+              type: astBuilder.TYPES.String,
+            }),
+            astBuilder.FieldDefinition({
+              name: 'endCursor',
+              required: true,
+              type: astBuilder.TYPES.String,
+            }),
+          ],
+        }),
       }),
     ],
   }),
@@ -80,6 +104,11 @@ const scalarDefinitions = [
       astBuilder.FieldDefinition({
         name: 'filename',
         required: true,
+        type: astBuilder.TYPES.String,
+      }),
+      astBuilder.FieldDefinition({
+        name: 'title',
+        required: false,
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({

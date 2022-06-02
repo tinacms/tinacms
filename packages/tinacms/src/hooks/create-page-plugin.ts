@@ -107,7 +107,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
         } else {
           cms.alerts.info('Document created!')
           if (typeof this.onNewDocument === 'function') {
-            this.onNewDocument(res.addPendingDocument.sys)
+            this.onNewDocument(res.addPendingDocument._sys)
           }
         }
       } catch (e) {

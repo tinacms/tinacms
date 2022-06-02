@@ -20,7 +20,7 @@ const rootPath = path.join(__dirname, '/')
 const fixtures: Fixture[] = [
   {
     name: 'getMovieList',
-    description: "Filtering on movies collection",
+    description: 'Filtering on movies collection',
     assert: 'output',
   },
   {

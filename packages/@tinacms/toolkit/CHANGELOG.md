@@ -1,5 +1,221 @@
 # Change Log
 
+## 0.56.29
+
+### Patch Changes
+
+- 58a7a00f7: Replace field meta components, fix text wrapping
+- 2cc206b1a: Improve mobile nav behaviour
+- aaadefd2d: Improve group list ui, add edit icon
+
+## 0.56.28
+
+### Patch Changes
+
+- a196198bd: Add ability to disable sidebar nav
+- 57a4a3789: Persist sidebar state across browser reload
+- ba1499029: Displays a helpful message in branch switcher when running locally
+
+## 0.56.27
+
+### Patch Changes
+
+- d4f98d0fc: Add ability to set default sidebar open state, fix overlay position
+- 7e2272442: Improve list field UI by using group list components
+
+## 0.56.26
+
+### Patch Changes
+
+- f6f56bcc0: Remove old MDX editor component
+- 59d33a74a: Fix issue where items of type "string" with list: true weren't sending the right event payload
+- 8b7ee346a: - Display label instead of name for mdx dropdown af306fa
+  - Fix issue where reset triggered chagnes to the wrong rich-text field 03f6191
+  - Fix issue where null children in a code block threw an error e454bce
+- acb38bf9f: fix overflow menu click bug with popover panel
+
+## 0.56.25
+
+### Patch Changes
+
+- e90647da3: Fix issue where popover item onMouseDown wasn't triggering
+
+## 0.56.24
+
+### Patch Changes
+
+- 41d666f9a: Styles list page overflow menu, removes unused prop
+
+## 0.56.23
+
+### Patch Changes
+
+- 6a6f137ae: # Simplify GraphQL API
+
+  ## `schema` must be supplied to the `<TinaCMS>` component
+
+  Previously the `.tina/schema.ts` was only used by the Tina CLI to generate the GraphQL API. However it's now required as a prop to `<TinaCMS>`. This allows you to provide runtime logic in the `ui` property of field definitions. See the documentation on "Extending Tina" for examples.
+
+  ## The GraphQL API has been simplified
+
+  ### `get<collection name>` is now just the collection name
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) { ... }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) { ... }
+  }
+  ```
+
+  ### `get<collection name>List` is now `<collection name>Connection`
+
+  The use of the term `connection` is due to our adherence the the [relay cursor spec](https://relay.dev/graphql/connections.htm). We may offer a simplified list field in a future release
+
+  ```graphql
+  # old
+  {
+    getPostList { ... }
+  }
+
+  # new
+  {
+    postConnection { ... }
+  }
+  ```
+
+  ### `getCollection` and `getCollections` are now `collection` and `collections`
+
+  ```graphql
+  # old
+  {
+    getCollection(collection: "post") {...}
+  }
+  {
+    getCollections {...}
+  }
+
+  # new
+  {
+    collection(collection: "post") {...}
+  }
+  {
+    collections {...}
+  }
+  ```
+
+  ### No more `data` property
+
+  The `data` property was previously where all field definitions could be found. This has been moved on level up:
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      data {
+        title
+      }
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      title
+    }
+  }
+  ```
+
+  #### The type for documents no longer includes "Document" at the end
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      data {
+        author {
+          ... on AuthorDocument {
+            data {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      author {
+        ... on Author {
+          name
+        }
+      }
+    }
+  }
+  ```
+
+  ### Meta fields are now underscored
+
+  Aside from `id`, other metadata is now underscored:
+
+  ```graphql
+  # old
+  {
+    getPostDocument(relativePath: $relativePath) {
+      sys {
+        relativePath
+      }
+      values
+    }
+  }
+
+  # new
+  {
+    post(relativePath: $relativePath) {
+      _sys {
+        relativePath
+      }
+      _values
+    }
+  }
+  ```
+
+  ### `dataJSON` is gone
+
+  This is identical to `_values`
+
+  ### `form` is gone
+
+  `form` was used internally to generate forms for the given document, however that's now handled by providing your `schema` to `<TinaCMS>`.
+
+  ### `getDocumentList` is gone
+
+  It's no longer possible to query all documents at once, you can query for collection documents via the `collection` query:
+
+  ```graphql
+  {
+    collection {
+      documents {
+        edges {
+          node {...}
+        }
+      }
+    }
+  }
+  ```
+
+## 0.56.22
+
+### Patch Changes
+
+- bf5fe0074: Improvement of select dropdown. Make arrow icon clickable
+
 ## 0.56.21
 
 ### Patch Changes

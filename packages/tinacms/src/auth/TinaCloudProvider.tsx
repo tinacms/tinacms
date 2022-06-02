@@ -23,7 +23,7 @@ import {
   useLocalStorage,
 } from '@tinacms/toolkit'
 
-import { Client, TinaIOConfig } from '../client'
+import { Client, TinaIOConfig } from '../internalClient'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '@tinacms/sharedctx'
@@ -157,7 +157,9 @@ export const TinaCloudProvider = (
     [props.cms]
   )
   if (!cms.api.tina) {
-    cms.registerApi('tina', createClient(props))
+    cms.registerApi('tina', createClient({ ...props, branch: currentBranch }))
+  } else {
+    cms.api.tina.setBranch(currentBranch)
   }
 
   if (!cms.api.admin) {

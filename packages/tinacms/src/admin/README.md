@@ -70,7 +70,7 @@ Right now, the first phase adds a more "complete" Document Creator utilizing you
    **/
   import { TinaAdmin } from "tinacms";
   export default TinaAdmin;
-  ``` 
+  ```
 
 3. Set the `tina-admin` flag to `true` inside the `cmsCallback` in `pages/_app.tsx`:
   ```tsx
@@ -112,7 +112,7 @@ Introduced with `TinaAdmin`, a `RouteMappingPlugin` tells `TinaAdmin` what an in
 RouteMappingPlugin(mapper: (collection: Collection, document: Document) => string | undefined)
 ```
 
-A new `RouteMappingPlugin` accepts a single argument - the `mapper` function - that is run against each `document` and `collection` that `TinaAdmin` displays.  
+A new `RouteMappingPlugin` accepts a single argument - the `mapper` function - that is run against each `document` and `collection` that `TinaAdmin` displays.
 
 * If `mapper` returns a `string`, it displays a "View" link beside the document.
 * If `mapper` returns `undefined` (or `null` or `''`), no "View" link is displayed.
@@ -142,16 +142,16 @@ const App = ({ Component, pageProps }) => {
                     if (["authors", "global"].includes(collection.name)) {
                       return undefined;
                     }
-  
+
                     /**
                      * While the `pages` collection does have dedicated pages,
                      * their URLs are different than their document names.
                      **/
                     if (["pages"].includes(collection.name)) {
-                      if (document.sys.filename === "home") {
+                      if (document._sys.filename === "home") {
                         return `/`;
                       }
-                      if (document.sys.filename === "about") {
+                      if (document._sys.filename === "about") {
                         return `/about`;
                       }
                       return undefined;
@@ -160,10 +160,10 @@ const App = ({ Component, pageProps }) => {
                      * Finally, any other collections (`posts`, for example)
                      * have URLs based on values in the `collection` and `document`.
                      **/
-                    return `/${collection.name}/${document.sys.filename}`;
+                    return `/${collection.name}/${document._sys.filename}`;
                   }
                 );
-  
+
                 /**
                  * 2. Add the `RouteMappingPlugin` to the `cms`.
                  **/

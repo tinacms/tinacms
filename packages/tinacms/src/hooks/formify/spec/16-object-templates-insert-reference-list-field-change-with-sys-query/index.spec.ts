@@ -13,27 +13,25 @@ limitations under the License.
 
 const query = `#graphql
 query QueryOperation {
-  getBlockPageDocument(relativePath: "blockPage1.mdx") {
-    data {
+  blockPage (relativePath: "blockPage1.mdx") {
+    id
       blocks {
         ... on BlockPageBlocksFeaturedPosts {
           blogs {
             item {
-              ... on PostDocument {
-                sys {
+              ... on Post {
+                id
+                _sys {
                   filename
                   collection {
                     name
                   }
                 }
-                data {
-                  title
-                }
+                title
               }
             }
           }
         }
-      }
     }
   }
 }

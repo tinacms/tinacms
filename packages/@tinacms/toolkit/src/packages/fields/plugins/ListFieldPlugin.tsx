@@ -19,11 +19,17 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder, FieldsGroup } from '../../form-builder'
+import { FieldsBuilder } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, ReorderIcon, TrashIcon } from '../../icons'
-import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
+import { AddIcon } from '../../icons'
+import { FieldDescription } from './wrapFieldWithMeta'
+import {
+  DragHandle,
+  ItemClickTarget,
+  ItemDeleteButton,
+  ItemHeader,
+} from './GroupListFieldPlugin'
 
 type DefaultItem = string | number | (() => string | number)
 
@@ -85,7 +91,9 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
         <ListMeta>
           <Label>{field.label || field.name}</Label>
           {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
+            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
+              {field.description}
+            </FieldDescription>
           )}
         </ListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
@@ -139,6 +147,8 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       type: field.type,
       // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
       list: field.list,
+      // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
+      parentTypename: field.parentTypename,
       ...field.field,
       label: 'Value',
       name: field.name + '.' + index,
@@ -152,47 +162,17 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       index={index}
     >
       {(provider, snapshot) => (
-        <>
-          <ListItem
-            ref={provider.innerRef}
-            // @ts-ignore FIXME twind
-            isDragging={snapshot.isDragging}
-            {...provider.draggableProps}
-            {...provider.dragHandleProps}
-            {...p}
-          >
-            <ItemField>
-              <FieldsBuilder form={tinaForm} fields={fields} />
-            </ItemField>
-            <ItemActions>
-              <DragHandle />
-              <DeleteButton onClick={removeItem}>
-                <TrashIcon className="w-7 h-auto" />
-              </DeleteButton>
-            </ItemActions>
-          </ListItem>
-        </>
+        <ItemHeader provider={provider} isDragging={snapshot.isDragging} {...p}>
+          <DragHandle isDragging={snapshot.isDragging} />
+          <ItemClickTarget>
+            <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
+          </ItemClickTarget>
+          <ItemDeleteButton onClick={removeItem} />
+        </ItemHeader>
       )}
     </Draggable>
   )
 }
-
-const ItemField = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-
-  label {
-    display: none;
-  }
-`
-
-const ItemActions = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  max-height: 84px;
-`
 
 const Label = styled.span<{ error?: boolean }>`
   overflow: hidden;
@@ -225,11 +205,6 @@ const ListHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  ${FieldDescription} {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `
 
 const ListMeta = styled.div`
@@ -258,139 +233,6 @@ const EmptyList = styled.div`
 
 const ItemList = styled.div``
 
-const ListItem = styled.div<{ isDragging: boolean }>`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  background-color: white;
-  border: 1px solid var(--tina-color-grey-2);
-  margin: 0 0 -1px 0;
-  overflow: visible;
-  line-height: 1.35;
-  padding: 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-
-  ${Label} {
-    color: var(--tina-color-grey-8);
-    align-self: center;
-    max-width: 100%;
-  }
-
-  ${FieldsGroup} {
-    padding: var(--tina-padding-small) calc(var(--tina-padding-small) / 2)
-      var(--tina-padding-small) var(--tina-padding-small);
-    display: flex;
-    align-items: center;
-  }
-
-  /* @ts-ignore FIXME twind */
-  /* FieldWrapper {
-    margin: 0;
-    flex: 1;
-  } */
-
-  svg {
-    fill: var(--tina-color-grey-4);
-    transition: fill 85ms ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    ${Label} {
-      color: var(--tina-color-primary);
-    }
-  }
-
-  &:first-child {
-    border-radius: 4px 4px 0 0;
-  }
-
-  &:nth-last-child(2) {
-    border-radius: 0 0 4px 4px;
-    &:first-child {
-      border-radius: var(--tina-radius-small);
-    }
-  }
-
-  ${(p) =>
-    // @ts-ignore FIXME twind
-    p.isDragging &&
-    css<any>`
-      border-radius: var(--tina-radius-small);
-      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-
-      svg {
-        fill: var(--tina-color-grey-8);
-      }
-      ${Label} {
-        color: var(--tina-color-primary);
-      }
-
-      ${DragHandle} {
-        svg:first-child {
-          opacity: 0;
-        }
-        svg:last-child {
-          opacity: 1;
-        }
-      }
-    `};
-`
-
-const DeleteButton = styled.button`
-  text-align: center;
-  flex: 1 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  width: 38px;
-  height: 36px;
-  padding: 0 4px 5px 0;
-  margin: 0;
-  transition: all 85ms ease-out;
-  svg {
-    width: 24px;
-    height: 24px;
-    transition: all 85ms ease-out;
-  }
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-  }
-`
-
-const DragHandle = styled(function DragHandle({ ...styleProps }) {
-  return (
-    <div {...styleProps}>
-      <ReorderIcon className="w-7 h-auto" />
-    </div>
-  )
-})`
-  margin: 0;
-  flex: 1 0 auto;
-  width: 38px;
-  height: 36px;
-  padding: 5px 4px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  fill: inherit;
-  transition: all 85ms ease-out;
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-    cursor: grab;
-  }
-  svg {
-    width: 24px;
-    height: 24px;
-    transition: all 85ms ease-out;
-  }
-`
 export const ListField = List
 
 export const ListFieldPlugin = {

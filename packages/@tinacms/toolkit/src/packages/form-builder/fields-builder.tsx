@@ -26,9 +26,14 @@ import styled, { css } from 'styled-components'
 export interface FieldsBuilderProps {
   form: Form
   fields: Field[]
+  padding?: boolean
 }
 
-export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
+export function FieldsBuilder({
+  form,
+  fields,
+  padding = false,
+}: FieldsBuilderProps) {
   const cms = useCMS()
 
   // re-build fields when new field plugins are registered
@@ -42,7 +47,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 
   return (
     // @ts-ignore FIXME twind
-    <FieldsGroup>
+    <FieldsGroup padding={padding}>
       {fields.map((field: Field) => (
         <InnerField
           key={field.name}
@@ -142,14 +147,23 @@ const InnerField = ({ field, form, fieldPlugins }) => {
   )
 }
 
-export const FieldsGroup = styled.div<{ padding: boolean }>`
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  white-space: nowrap;
-  overflow-x: visible !important;
-`
+export const FieldsGroup = ({
+  padding,
+  children,
+}: {
+  padding?: boolean
+  children?: any | any[]
+}) => {
+  return (
+    <div
+      className={`relative block w-full h-full whitespace-nowrap overflow-x-visible ${
+        padding ? `pb-5` : ``
+      }`}
+    >
+      {children}
+    </div>
+  )
+}
 
 /**
  *

@@ -21,16 +21,20 @@ import {
   tinaSetup,
 } from './init'
 
+import 'dotenv/config'
 import { Command } from '../command'
 import { chain } from '../middleware'
 import chalk from 'chalk'
-import { compile } from './compile'
+import { compileSchema, compileClient } from './compile'
 import { logger } from '../logger'
 import { startServer } from './start-server'
+import { waitForDB } from './waitForDB'
+import { startSubprocess } from './startSubprocess'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
 export const CMD_COMPILE_MODELS = 'schema:compile'
+export const CMD_WAIT_FOR_DB = 'server:waitForDB'
 export const INIT = 'init'
 export const AUDIT = 'audit'
 
@@ -82,6 +86,15 @@ const verboseOption = {
   name: '-v, --verbose',
   description: 'increase verbosity of logged output',
 }
+const tinaCloudMediaStore = {
+  name: '--tinaCloudMediaStore',
+  description:
+    'Automatically pushes updates from GitHub to the Tina Cloud Media Store',
+}
+const developmentOption = {
+  name: '--dev',
+  description: 'Uses NODE_ENV=development when compiling client and schema',
+}
 
 export const baseCmds: Command[] = [
   {
@@ -91,30 +104,56 @@ export const baseCmds: Command[] = [
       startServerPortOption,
       subCommand,
       experimentalDatalayer,
+      tinaCloudMediaStore,
       noWatchOption,
       noSDKCodegenOption,
       noTelemetryOption,
       watchFileOption,
       verboseOption,
+      developmentOption,
     ],
-    action: (options) => chain([startServer], options),
+    action: (options) =>
+      chain([compileClient, waitForDB, startServer, startSubprocess], options),
+  },
+  {
+    command: CMD_WAIT_FOR_DB,
+    description: 'Wait for DB to finish indexing, start subprocess',
+    options: [
+      subCommand,
+      experimentalDatalayer,
+      noTelemetryOption,
+      verboseOption,
+      developmentOption,
+    ],
+    action: (options) =>
+      chain([compileClient, waitForDB, startSubprocess], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer, noTelemetryOption],
-    action: (options) => chain([compile], options),
+    options: [experimentalDatalayer, tinaCloudMediaStore, noTelemetryOption],
+    action: (options) => chain([compileSchema], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [experimentalDatalayer, noSDKCodegenOption, noTelemetryOption],
+    options: [
+      experimentalDatalayer,
+      tinaCloudMediaStore,
+      noSDKCodegenOption,
+      noTelemetryOption,
+    ],
     action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
-    options: [experimentalDatalayer, noTelemetryOption, schemaFileType],
+    options: [
+      experimentalDatalayer,
+      tinaCloudMediaStore,
+      noTelemetryOption,
+      schemaFileType,
+    ],
     description: 'Add Tina Cloud to an existing project',
     action: (options) =>
       chain(
@@ -123,7 +162,7 @@ export const baseCmds: Command[] = [
           initTina,
           installDeps,
           async (_ctx, next, options) => {
-            await compile(_ctx, next, options)
+            await compileSchema(_ctx, next, options)
             next()
           },
           attachSchema,
@@ -147,7 +186,7 @@ export const baseCmds: Command[] = [
             next()
           },
           async (_ctx, next) => {
-            await compile(_ctx, next, options)
+            await compileSchema(_ctx, next, options)
             next()
           },
           attachSchema,

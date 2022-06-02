@@ -1,16 +1,14 @@
 {
   "data": {
-    "getAuthorDocument": {
-      "__typename": "AuthorDocument",
-      "data": {
-        "name": "Homer J",
-        "socialMedia": [
-          {
-            "platform": "instagram",
-            "handle": "homerJay"
-          }
-        ]
-      }
+    "author": {
+      "__typename": "AuthorAuthor",
+      "name": "Homer J",
+      "socialMedia": [
+        {
+          "platform": "instagram",
+          "handle": "homerJay"
+        }
+      ]
     }
   }
 }

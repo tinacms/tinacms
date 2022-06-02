@@ -11,15 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const defaultSchema = (sep: string) => `
+export const defaultSchema = `
 import { defineSchema, defineConfig } from "tinacms";
 
-export default defineSchema({
+const schema = defineSchema({
   collections: [
     {
       label: "Blog Posts",
       name: "posts",
-      path: "content${sep}posts",
+      path: "content/posts",
       fields: [
         {
           type: "string",
@@ -58,8 +58,7 @@ export default defineSchema({
   ],
 });
 
-
-
+export default schema
 
 // Your tina config
 // ==============
@@ -73,6 +72,7 @@ const apiURL =
 
 export const tinaConfig = defineConfig({
   apiURL,
+  schema,
   cmsCallback: (cms) => {
     //  add your CMS callback code here (if you want)
 

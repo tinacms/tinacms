@@ -1,3 +1,12 @@
+fragment TestParts on Test {
+  ... on TestTem1 {
+    foo
+  }
+  ... on TestTem2 {
+    bar
+  }
+}
+
 fragment PageParts on Page {
   Title
   body
@@ -5,7 +14,7 @@ fragment PageParts on Page {
 
 fragment PostParts on Post {
   title
-  relatedPosts {
+  posts {
     __typename
     post {
       ... on Document {

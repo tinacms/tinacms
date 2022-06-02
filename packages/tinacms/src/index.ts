@@ -11,14 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export * from './client'
+export * from './internalClient'
 export * from './auth'
 export * from './utils'
 export * from './tina-cms'
-export {
-  useGraphqlForms,
-  useGraphqlFormsUnstable,
-} from './hooks/use-graphql-forms'
+export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'

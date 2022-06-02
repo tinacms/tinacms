@@ -16,10 +16,13 @@ import { toMatchFile } from 'jest-file-snapshot'
 import path from 'path'
 import 'isomorphic-fetch'
 import * as G from 'graphql'
-import { LocalClient } from '../../../client'
+import { LocalClient } from '../../../internalClient'
 
 // @ts-ignore FIXME: violates ts rootDir config
 import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
+
+// @ts-ignore FIXME: violates ts rootDir config
+import schema from '../../../../../../experimental-examples/unit-test-example/.tina/schema'
 
 expect.extend({ toMatchFile })
 
@@ -50,7 +53,7 @@ class TestClient extends LocalClient {
 const cms = new TinaCMS({
   apis: {
     // tina: tina,
-    tina: new TestClient(),
+    tina: new TestClient({ schema }),
     tina2: {
       getSchema: async () => {
         // @ts-ignore

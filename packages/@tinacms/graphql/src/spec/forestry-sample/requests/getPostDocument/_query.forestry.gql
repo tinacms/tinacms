@@ -1,23 +1,14 @@
 query {
-  getPostDocument(relativePath: "hello-world.md") {
-    ... on PostDocument {
-      data {
-        ... on PostPost {
-          title
-          author {
-            ...AuthorFragment
-          }
-        }
+  post(relativePath: "hello-world.md") {
+    ... on PostPost{
+      title
+      author {
+        ...AuthorFragment
       }
     }
   }
 }
 
-fragment AuthorDataFragment on AuthorAuthor {
+fragment AuthorFragment on AuthorAuthor {
   name
-}
-fragment AuthorFragment on AuthorDocument {
-  data {
-    ...AuthorDataFragment
-  }
 }

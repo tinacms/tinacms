@@ -17,13 +17,14 @@ import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
-import GetDocumentFields from '../components/GetDocumentFields'
+import GetCollection from '../components/GetCollection'
 import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+import { useWindowWidth } from '@react-hook/window-size'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -65,47 +66,50 @@ const CollectionCreatePage = () => {
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
-        <GetDocumentFields
+        <GetCollection
           cms={cms}
           collectionName={collectionName}
-          templateName={templateName}
+          includeDocuments={false}
         >
-          {({ collection, template, fields, mutationInfo }) => (
-            <RenderForm
-              cms={cms}
-              collection={collection}
-              template={template}
-              fields={fields}
-              mutationInfo={mutationInfo}
-            />
-          )}
-        </GetDocumentFields>
+          {(collection) => {
+            const mutationInfo = {
+              includeCollection: true,
+              includeTemplate: !!collection.templates,
+            }
+
+            return (
+              <RenderForm
+                cms={cms}
+                collection={collection}
+                templateName={templateName}
+                mutationInfo={mutationInfo}
+              />
+            )
+          }}
+        </GetCollection>
       )}
     </GetCMS>
   )
 }
 
-const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
+const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
-  let schemaFields = fields
 
-  if (schema) {
-    // the schema is being passed in from the frontend so we can use that
-    const schemaCollection = schema.getCollection(collection.name)
-    const template = schema.getTemplateForData({
-      collection: schemaCollection,
-      data: {},
-    })
-    const formInfo = resolveForm({
-      collection: schemaCollection,
-      basename: schemaCollection.name,
-      schema: schema,
-      template,
-    })
-    schemaFields = formInfo.fields
-  }
+  // the schema is being passed in from the frontend so we can use that
+  const schemaCollection = schema.getCollection(collection.name)
+  const template = schema.getTemplateForData({
+    collection: schemaCollection,
+    data: { _template: templateName },
+  })
+
+  const formInfo = resolveForm({
+    collection: schemaCollection,
+    basename: schemaCollection.name,
+    schema: schema,
+    template,
+  })
 
   const form = useMemo(() => {
     return new Form({
@@ -139,7 +143,7 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
             }
           },
         },
-        ...schemaFields,
+        ...(formInfo.fields as any),
       ],
       onSubmit: async (values) => {
         try {
@@ -155,13 +159,20 @@ const RenderForm = ({ cms, collection, template, fields, mutationInfo }) => {
         }
       },
     })
-  }, [cms, collection, template, fields, mutationInfo])
+  }, [cms, collection, mutationInfo])
+
+  const navBreakpoint = 1000
+  const windowWidth = useWindowWidth()
+  const renderNavToggle = windowWidth < navBreakpoint + 1
+  const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
 
   return (
     <PageWrapper>
       <>
         {cms?.api?.tina?.isLocalMode && <LocalWarning />}
-        <div className="py-4 px-20 border-b border-gray-200 bg-white">
+        <div
+          className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+        >
           <div className="max-w-form mx-auto">
             <div className="mb-2">
               <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">

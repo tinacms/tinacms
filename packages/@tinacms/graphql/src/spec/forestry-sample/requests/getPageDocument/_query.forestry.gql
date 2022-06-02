@@ -1,23 +1,21 @@
 query {
-  getPageDocument(relativePath: "home.md") {
+  page(relativePath: "home.md") {
     id
-    data {
-      title
-      seo {
-        seoTitle
-        ogImage
-        ogDescription
+    title
+    seo {
+      seoTitle
+      ogImage
+      ogDescription
+    }
+    blocks {
+      __typename
+      ... on PageBlocksHero {
+        backgroundImage
+        description
       }
-      blocks {
-        __typename
-        ... on PageBlocksHero {
-          backgroundImage
-          description
-        }
-        ... on PageBlocksCta {
-          ctaText
-          ctaStyle
-        }
+      ... on PageBlocksCta {
+        ctaText
+        ctaStyle
       }
     }
   }

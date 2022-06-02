@@ -1,5 +1,69 @@
 # Change Log
 
+## 0.53.20
+
+### Patch Changes
+
+- Updated dependencies [58a7a00f7]
+- Updated dependencies [2cc206b1a]
+- Updated dependencies [aaadefd2d]
+  - @tinacms/toolkit@0.56.29
+
+## 0.53.19
+
+### Patch Changes
+
+- Updated dependencies [a196198bd]
+- Updated dependencies [57a4a3789]
+- Updated dependencies [ba1499029]
+  - @tinacms/toolkit@0.56.28
+
+## 0.53.18
+
+### Patch Changes
+
+- Updated dependencies [d4f98d0fc]
+- Updated dependencies [7e2272442]
+  - @tinacms/toolkit@0.56.27
+
+## 0.53.17
+
+### Patch Changes
+
+- Updated dependencies [f6f56bcc0]
+- Updated dependencies [59d33a74a]
+- Updated dependencies [8b7ee346a]
+- Updated dependencies [acb38bf9f]
+  - @tinacms/toolkit@0.56.26
+
+## 0.53.16
+
+### Patch Changes
+
+- Updated dependencies [e90647da3]
+  - @tinacms/toolkit@0.56.25
+
+## 0.53.15
+
+### Patch Changes
+
+- Updated dependencies [41d666f9a]
+  - @tinacms/toolkit@0.56.24
+
+## 0.53.14
+
+### Patch Changes
+
+- Updated dependencies [6a6f137ae]
+  - @tinacms/toolkit@0.56.23
+
+## 0.53.13
+
+### Patch Changes
+
+- Updated dependencies [bf5fe0074]
+  - @tinacms/toolkit@0.56.22
+
 ## 0.53.12
 
 ### Patch Changes

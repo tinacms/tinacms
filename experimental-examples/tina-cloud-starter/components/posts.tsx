@@ -23,8 +23,8 @@ export const Posts = ({ data }) => {
         const post = postData.node;
         return (
           <Link
-            key={post.sys.filename}
-            href={`/posts/` + post.sys.filename}
+            key={post._sys.filename}
+            href={`/posts/` + post._sys.filename}
             passHref
           >
             <a
@@ -36,30 +36,30 @@ export const Posts = ({ data }) => {
                   titleColorClasses[theme.color]
                 }`}
               >
-                {post.values.title}{" "}
+                {post._values.title}{" "}
                 <span className="inline-block opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
                   <BsArrowRight className="inline-block h-8 -mt-1 ml-1 w-auto opacity-70" />
                 </span>
               </h3>
               <div className="prose dark:prose-dark prose-lg w-full max-w-none mb-5">
-                <TinaMarkdown content={post.values.excerpt} />
+                <TinaMarkdown content={post._values.excerpt} />
               </div>
               <div className="flex items-center -mb-2">
                 <div className="flex-shrink-0 mr-2">
                   <img
                     className="h-10 w-10 object-cover rounded-full shadow-sm"
-                    src={post?.data.author?.data.avatar}
-                    alt={post?.data.author?.data.name}
+                    src={post?.author?.avatar}
+                    alt={post?.author?.name}
                   />
                 </div>
                 <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
-                  {post?.data.author?.data.name}
+                  {post?.author?.name}
                 </p>
                 <span className="font-bold text-gray-200 dark:text-gray-500 mx-2">
                   —
                 </span>
                 <p className="text-sm text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150">
-                  {post.values.date}
+                  {post._values.date}
                 </p>
               </div>
             </a>

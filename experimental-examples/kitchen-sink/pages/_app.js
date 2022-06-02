@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic'
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
+import schema from '../.tina/schema.ts'
 
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
@@ -16,6 +17,7 @@ const App = ({ Component, pageProps }) => {
         editMode={
           <TinaCMS
             branch="main"
+            schema={schema}
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
             {...pageProps}

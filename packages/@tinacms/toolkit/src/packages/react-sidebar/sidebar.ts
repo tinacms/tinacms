@@ -25,6 +25,8 @@ export interface SidebarStateOptions {
   buttons?: SidebarButtons
   placeholder?: React.FC
   defaultWidth?: number
+  defaultState?: DefaultSidebarState
+  renderNav?: boolean
 }
 
 /**
@@ -38,12 +40,14 @@ export interface SidebarButtons {
 }
 
 export declare type SidebarPosition = 'displace' | 'overlay'
+export declare type DefaultSidebarState = 'open' | 'closed'
 
 export class SidebarState {
   private _isOpen: boolean = false
   placeholder: React.FC
 
   position: SidebarPosition = 'displace'
+  renderNav: boolean = true
   buttons: SidebarButtons = {
     save: 'Save',
     reset: 'Reset',
@@ -52,6 +56,7 @@ export class SidebarState {
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     // @ts-ignore FIXME twind
     this.position = options.position || 'displace'
+    this.renderNav = options.renderNav || true
     this.placeholder = options.placeholder || NoFormsPlaceholder
 
     if (options.buttons?.save) {

@@ -13,7 +13,6 @@ limitations under the License.
 
 import * as _ from 'lodash'
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
-import { TinaSchemaValidationError } from '@tinacms/schema-tools'
 import fs from 'fs-extra'
 import path from 'path'
 import { build } from 'esbuild'
@@ -21,13 +20,12 @@ import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
-import { getSchemaPath } from '../../lib'
+import { getSchemaPath, getClientPath } from '../../lib'
 import { logger } from '../../logger'
 
 const tinaPath = path.join(process.cwd(), '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
 const tinaGeneratedPath = path.join(tinaPath, '__generated__')
-const tinaTempPath = path.join(tinaGeneratedPath, 'temp')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
 export const resetGeneratedFolder = async () => {
@@ -39,6 +37,13 @@ export const resetGeneratedFolder = async () => {
     console.log(e)
   }
   await fs.mkdir(tinaGeneratedPath)
+  // temp types file to allows the client to build
+  await fs.writeFile(
+    path.join(tinaGeneratedPath, 'types.ts'),
+    `
+export const queries = (client)=>({})
+`
+  )
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
 }
 
@@ -47,18 +52,110 @@ const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
   await fs.remove(tinaTempPath)
 }
 
-export const compile = async (
+export const compileClient = async (
+  ctx,
+  next,
+  options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
+) => {
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = options.dev ? 'development' : 'production'
+  }
+
+  const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
+
+  if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }
+
+  if (options.verbose) {
+    logger.info(logText('Compiling Client...'))
+  }
+
+  const { clientFileType: requestedClientFileType = 'ts' } = options
+  const allowedFileTypes = ['ts', 'js']
+
+  if (allowedFileTypes.includes(requestedClientFileType) === false) {
+    throw new Error(
+      `Requested schema file type '${requestedClientFileType}' is not valid. Supported schema file types: 'ts, js'`
+    )
+  }
+
+  if (ctx) {
+    ctx.clientFileType = requestedClientFileType
+  }
+
+  let clientExists = true
+  try {
+    getClientPath({ projectDir: tinaPath })
+  } catch {
+    clientExists = false
+  }
+
+  // TODO: Do we want to introduce a `defaultClient()` like we do with `defaultSchema()`?
+  if (!clientExists) {
+    // The client.ts file does not exist
+    if (options.verbose) {
+      logger.info(
+        logText(
+          `.tina/client.${requestedClientFileType} not found, skipping compile client...`
+        )
+      )
+    }
+    return next()
+  }
+
+  try {
+    const inputFile = getClientPath({ projectDir: tinaPath })
+    await transpile(inputFile, 'client.js', tinaTempPath, options.verbose)
+  } catch (e) {
+    await cleanup({ tinaTempPath })
+    throw new BuildSchemaError(e)
+  }
+
+  // Delete the node require cache for .tina temp folder
+  Object.keys(require.cache).map((key) => {
+    if (key.startsWith(tinaTempPath)) {
+      delete require.cache[require.resolve(key)]
+    }
+  })
+
+  try {
+    const clientFunc = require(path.join(tinaTempPath, 'client.js'))
+    const client = clientFunc.default
+
+    ctx.client = client
+
+    await cleanup({ tinaTempPath })
+  } catch (e) {
+    // Always remove the temp code
+    await cleanup({ tinaTempPath })
+
+    // Keep TinaSchemaValidationErrors around
+    if (e instanceof Error) {
+      if (e.name === 'TinaSchemaValidationError') {
+        throw e
+      }
+    }
+
+    // Throw an execution error
+    throw new ExecuteSchemaError(e)
+  }
+
+  return next()
+}
+
+export const compileSchema = async (
   _ctx,
   _next,
   options: { schemaFileType?: string; verbose?: boolean }
 ) => {
+  const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
   if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
 
   if (options.verbose) {
-    logger.info(logText('Compiling...'))
+    logger.info(logText('Compiling Schema...'))
   }
 
   const { schemaFileType: requestedSchemaFileType = 'ts' } = options
+
   const schemaFileType =
     ((requestedSchemaFileType === 'ts' || requestedSchemaFileType === 'tsx') &&
       'ts') ||
@@ -95,12 +192,13 @@ export const compile = async (
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
     // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema(path.sep))
+    await fs.writeFile(file, defaultSchema)
   }
 
   // Turns the schema into JS files so they can be run
   try {
-    await transpile(tinaPath, tinaTempPath, options.verbose)
+    const inputFile = getSchemaPath({ projectDir: tinaPath })
+    await transpile(inputFile, 'schema.js', tinaTempPath, options.verbose)
   } catch (e) {
     await cleanup({ tinaTempPath })
     throw new BuildSchemaError(e)
@@ -112,6 +210,7 @@ export const compile = async (
       delete require.cache[require.resolve(key)]
     }
   })
+
   try {
     const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
     const schemaObject: TinaCloudSchema = schemaFunc.default
@@ -136,7 +235,7 @@ export const compile = async (
   }
 }
 
-const transpile = async (projectDir, tempDir, verbose) => {
+const transpile = async (inputFile, outputFile, tempDir, verbose) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(
@@ -146,9 +245,8 @@ const transpile = async (projectDir, tempDir, verbose) => {
   const peerDeps = packageJSON?.peerDependencies || []
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
-  const inputFile = getSchemaPath({ projectDir })
 
-  const outputPath = path.join(tempDir, 'schema.js')
+  const outputPath = path.join(tempDir, outputFile)
   await build({
     bundle: true,
     platform: 'neutral',

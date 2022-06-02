@@ -399,6 +399,35 @@ const schemaWithBadType = {
     },
   ],
 }
+
+const schemaWithIsTitleValid = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'string', name: 'foo', isTitle: true, required: true }],
+    },
+  ],
+}
+
+const schemaWithIsTitleNotValid1 = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'string', name: 'foo', isTitle: true }],
+    },
+  ],
+}
+const schemaWithIsTitleNotValid2 = {
+  collections: [
+    {
+      name: 'foo',
+      path: 'foo/bar',
+      fields: [{ type: 'string', name: 'foo', isTitle: true, list: true }],
+    },
+  ],
+}
 describe('validateSchema', () => {
   it('Passes on a valid schema', () => {
     validateSchema({ config: validSchema })
@@ -456,5 +485,17 @@ describe('validateSchema', () => {
     expect(() => {
       validateSchema({ config: schemaWithBadType })
     }).toThrow()
+  })
+  it('fails when a invalid configuration for `isTitle` is given', () => {
+    expect(() => {
+      validateSchema({ config: schemaWithIsTitleNotValid1 })
+    }).toThrow()
+    expect(() => {
+      validateSchema({ config: schemaWithIsTitleNotValid2 })
+    }).toThrow()
+  })
+  it('passes when a valid configuration for `isTitle` is given', () => {
+    validateSchema({ config: schemaWithIsTitleValid })
+    expect(consoleErrMock).not.toHaveBeenCalled()
   })
 })
