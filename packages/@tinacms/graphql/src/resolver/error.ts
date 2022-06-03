@@ -100,25 +100,6 @@ export const handleFetchErrorError = (e: unknown, verbose) => {
         console.log(e.stack)
       }
     }
-    // if (e instanceof TinaGraphQLError) {
-    //   if (verbose) {
-    //     console.log(e.stack)
-    //     console.log(e)
-    //   }
-    // }
-    // if (e instanceof TinaParseDocumentError) {
-    //   if (verbose) {
-    //     console.log(e)
-
-    //     console.log(e)
-    //   }
-    // }
-    // if (e instanceof TinaQueryError) {
-    //   if (verbose) {
-    //     console.log(e.stack)
-    //     console.log(e)
-    //   }
-    // }
   } else {
     console.error(e)
   }
