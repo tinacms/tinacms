@@ -24,15 +24,11 @@ import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
 import { isNull } from 'lodash'
+import { TinaParseDocumentError } from '../resolver/error'
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
-  try {
-    const tree = unified().use(markdown).use(mdx).parse(value)
-    return parseMDXInner(tree, field)
-  } catch (error) {
-    console.error('ERROR: Invalid MDX, unable to parse')
-    throw error
-  }
+  const tree = unified().use(markdown).use(mdx).parse(value)
+  return parseMDXInner(tree, field)
 }
 /**
  * ### Convert the MDXAST into an API-friendly format
@@ -334,12 +330,12 @@ const parseField = (attribute, field: TinaField, props) => {
            *  </>}
            * />
            */
-          try {
-            const mdx = parseMDX(attribute.value.value, field)
-            props[field.name] = mdx.children[0].props
-          } catch (e) {
-            console.log(e)
-          }
+          // try {
+          const mdx = parseMDX(attribute.value.value, field)
+          props[field.name] = mdx.children[0].props
+          // } catch (e) {
+          // console.log(e)
+          // }
         }
       } else {
         console.log('nothing', field.name, mdx)
