@@ -18,6 +18,7 @@ import { indexDB } from './build'
 
 export { indexDB } from './build'
 export { resolve } from './resolve'
+export * from './resolver/error'
 export { createDatabase } from './database'
 export type { QueryOptions } from './database'
 import type { Database } from './database'

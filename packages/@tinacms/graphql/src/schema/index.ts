@@ -25,7 +25,7 @@ import type {
   Templateable,
   TinaCloudCollection,
 } from '../types'
-import { TinaError } from '../resolver/error'
+import { TinaGraphQLError } from '../resolver/error'
 
 export const createSchema = async ({
   schema,
@@ -208,7 +208,7 @@ export class TinaSchema {
             template.namespace[template.namespace.length - 1] === data._template
         )
         if (!template) {
-          throw new TinaError(
+          throw new TinaGraphQLError(
             `Expected to find template named '${
               data._template
             }' for collection '${lastItem(collection.namespace)}'`,

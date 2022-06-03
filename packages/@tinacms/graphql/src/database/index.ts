@@ -41,6 +41,7 @@ import {
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
+import { TinaGraphQLError, TinaQueryError } from '../resolver/error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -452,37 +453,41 @@ export class Database {
         `No indexDefinitions for collection ${queryOptions.collection}`
       )
     }
+    const {
+      edges,
+      pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
+    }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
+      await this.store.query(storeQueryOptions)
 
-    try {
-      const {
-        edges,
-        pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
-      }: { edges: { path: string; cursor: string }[]; pageInfo: PageInfo } =
-        await this.store.query(storeQueryOptions)
-
-      return {
-        edges: await sequential(edges, async (edge) => {
-          try {
-            const node = await hydrator(edge.path)
-            return {
-              node,
-              cursor: btoa(edge.cursor),
-            }
-          } catch (error) {
-            console.error(`error in fetching ${edge.path}`)
+    return {
+      edges: await sequential(edges, async (edge) => {
+        try {
+          const node = await hydrator(edge.path)
+          return {
+            node,
+            cursor: btoa(edge.cursor),
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            throw new TinaQueryError({
+              originalError: error,
+              file: edge.path,
+              collection,
+              stack: error.stack,
+            })
+          } else {
+            // I dont think this should ever happen
+            console.error(`Error in fetching ${edge.path}`)
             throw error
           }
-        }),
-        pageInfo: {
-          hasPreviousPage,
-          hasNextPage,
-          startCursor: btoa(startCursor),
-          endCursor: btoa(endCursor),
-        },
-      }
-    } catch (error) {
-      console.error(`error in querying ${collection}`)
-      throw error
+        }
+      }),
+      pageInfo: {
+        hasPreviousPage,
+        hasNextPage,
+        startCursor: btoa(startCursor),
+        endCursor: btoa(endCursor),
+      },
     }
   }
 
