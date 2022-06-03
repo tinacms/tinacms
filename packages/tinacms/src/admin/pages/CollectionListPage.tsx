@@ -280,7 +280,9 @@ const CollectionListPage = () => {
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
                                               navigate(
-                                                `${document.node._sys.filename}`,
+                                                `${document.node._sys.breadcrumbs.join(
+                                                  '/'
+                                                )}`,
                                                 { replace: true }
                                               )
                                             },
@@ -298,7 +300,9 @@ const CollectionListPage = () => {
                                               setVars({
                                                 collection: collectionName,
                                                 relativePath:
-                                                  document.node._sys.filename +
+                                                  document.node._sys.breadcrumbs.join(
+                                                    '/'
+                                                  ) +
                                                   document.node._sys.extension,
                                               })
                                               setOpen(true)
@@ -356,27 +360,25 @@ interface ResetModalProps {
 const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
   return (
     <Modal>
-      <ModalPopup>
-        <ModalHeader close={close}>Delete {filename}</ModalHeader>
-        <ModalBody padded={true}>
-          <p>{`Are you sure you want to delete ${filename}?`}</p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="danger"
-            onClick={async () => {
-              await deleteFunc()
-              close()
-            }}
-          >
-            Delete
-          </Button>
-        </ModalActions>
-      </ModalPopup>
+      <ModalHeader close={close}>Delete {filename}</ModalHeader>
+      <ModalBody padded={true}>
+        <p>{`Are you sure you want to delete ${filename}?`}</p>
+      </ModalBody>
+      <ModalActions>
+        <Button style={{ flexGrow: 2 }} onClick={close}>
+          Cancel
+        </Button>
+        <Button
+          style={{ flexGrow: 3 }}
+          variant="danger"
+          onClick={async () => {
+            await deleteFunc()
+            close()
+          }}
+        >
+          Delete
+        </Button>
+      </ModalActions>
     </Modal>
   )
 }
