@@ -330,12 +330,8 @@ const parseField = (attribute, field: TinaField, props) => {
            *  </>}
            * />
            */
-          // try {
           const mdx = parseMDX(attribute.value.value, field)
           props[field.name] = mdx.children[0].props
-          // } catch (e) {
-          // console.log(e)
-          // }
         }
       } else {
         console.log('nothing', field.name, mdx)
