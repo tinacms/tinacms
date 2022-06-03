@@ -49,7 +49,6 @@ export const handleServerErrors = (e: Error) => {
   Error Message Below
   ${e}`)
   } else if (e instanceof TinaFetchError) {
-    console.log('========')
     handleFetchErrorError(e, true)
   } else {
     logger.info(
