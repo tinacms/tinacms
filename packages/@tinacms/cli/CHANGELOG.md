@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.60.20
+
+### Patch Changes
+
+- f71f55ac3: Fixd issue where --dev caused a breaking change
+- Updated dependencies [57f09bdd7]
+  - @tinacms/graphql@0.60.5
+
 ## 0.60.19
 
 ### Patch Changes
