@@ -106,12 +106,14 @@ export class IsomorphicBridge implements Bridge {
       oid: entry.oid,
     })
 
+    console.log('FILTERING!')
     const children: TreeEntry[] = []
     for (const childEntry of treeResult.tree) {
       const childPath = path ? `${path}/${childEntry.path}` : childEntry.path
       if (childEntry.type === 'tree') {
         children.push(childEntry)
       } else {
+        console.log({ childPath, pattern })
         if (micromatch.isMatch(childPath, pattern)) {
           results.push(childPath)
         }
