@@ -50,7 +50,7 @@ export class MediaModel {
         const filePath = join(folderPath, x)
         const stat = await fs.stat(filePath)
 
-        const src = join(args.searchPath, x)
+        const src = `/${join(args.searchPath, x)}`
         return {
           filename: x,
           isFile: stat.isFile(),
