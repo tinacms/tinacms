@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.60.5
+
+### Patch Changes
+
+- 57f09bdd7: Always use the query function when the dataLayer in enabled
+
 ## 0.60.4
 
 ### Patch Changes

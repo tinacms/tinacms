@@ -1,5 +1,14 @@
 # tinacms
 
+## 0.68.8
+
+### Patch Changes
+
+- 999f0895a: Set font family on heading elements
+- 41be5e7fc: Fixes subitem links to use breadcrumbs
+- Updated dependencies [999f0895a]
+  - @tinacms/toolkit@0.56.31
+
 ## 0.68.7
 
 ### Patch Changes
