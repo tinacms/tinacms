@@ -112,8 +112,7 @@ export const baseCmds: Command[] = [
       verboseOption,
       developmentOption,
     ],
-    action: (options) =>
-      chain([compileClient, waitForDB, startServer, startSubprocess], options),
+    action: (options) => chain([startServer, startSubprocess], options),
   },
   {
     command: CMD_WAIT_FOR_DB,
