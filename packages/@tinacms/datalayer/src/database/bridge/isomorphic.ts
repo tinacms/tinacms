@@ -24,7 +24,6 @@ import fs from 'fs-extra'
 // import normalize from 'normalize-path'
 import type { Bridge } from './index'
 import globParent from 'glob-parent'
-import micromatch from 'micromatch'
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -106,15 +105,13 @@ export class IsomorphicBridge implements Bridge {
       oid: entry.oid,
     })
 
-    console.log('FILTERING!')
     const children: TreeEntry[] = []
     for (const childEntry of treeResult.tree) {
       const childPath = path ? `${path}/${childEntry.path}` : childEntry.path
       if (childEntry.type === 'tree') {
         children.push(childEntry)
       } else {
-        console.log({ childPath, pattern })
-        if (micromatch.isMatch(childPath, pattern)) {
+        if (childPath.startsWith(pattern)) {
           results.push(childPath)
         }
       }
@@ -232,8 +229,7 @@ export class IsomorphicBridge implements Bridge {
 
   public async glob(pattern: string) {
     // TODO should not need to do this
-    const p = `${pattern}/*`
-    const parent = globParent(p)
+    const parent = globParent(pattern)
     const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
 
     const leaf = pathNodes[pathNodes.length - 1]
@@ -268,7 +264,7 @@ export class IsomorphicBridge implements Bridge {
     }
 
     const result = []
-    await this.listEntries(p, treeEntry, parentPath, result)
+    await this.listEntries(pattern, treeEntry, parentPath, result)
     return result
   }
 

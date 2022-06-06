@@ -14970,7 +14970,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["levelup", "npm:5.1.1"],
             ["lodash", "npm:4.17.21"],
             ["memdown", "npm:6.1.1"],
-            ["micromatch", "npm:4.0.5"],
             ["normalize-path", "npm:3.0.0"],
             ["prettier", "npm:2.3.2"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
@@ -39351,15 +39350,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["picomatch", "npm:2.3.0"]
           ],
           "linkType": "HARD",
-        }],
-        ["npm:4.0.5", {
-          "packageLocation": "./.yarn/cache/micromatch-npm-4.0.5-cfab5d7669-af3dc46b9d.zip/node_modules/micromatch/",
-          "packageDependencies": [
-            ["micromatch", "npm:4.0.5"],
-            ["braces", "npm:3.0.2"],
-            ["picomatch", "npm:2.3.1"]
-          ],
-          "linkType": "HARD",
         }]
       ]],
       ["miller-rabin", [
@@ -42230,13 +42220,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/picomatch-npm-2.3.0-5e60e6c82d-80113a0fb7.zip/node_modules/picomatch/",
           "packageDependencies": [
             ["picomatch", "npm:2.3.0"]
-          ],
-          "linkType": "HARD",
-        }],
-        ["npm:2.3.1", {
-          "packageLocation": "./.yarn/cache/picomatch-npm-2.3.1-c782cfd986-5e3bbbf6a7.zip/node_modules/picomatch/",
-          "packageDependencies": [
-            ["picomatch", "npm:2.3.1"]
           ],
           "linkType": "HARD",
         }]

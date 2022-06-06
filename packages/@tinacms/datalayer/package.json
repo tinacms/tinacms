@@ -40,7 +40,6 @@
     "levelup": "^5.1.1",
     "lodash": "^4.17.20",
     "memdown": "^6.1.1",
-    "micromatch": "^4.0.5",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "yup": "^0.32.9"
