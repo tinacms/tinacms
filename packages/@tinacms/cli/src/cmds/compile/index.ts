@@ -206,12 +206,11 @@ export const compileSchema = async (
   // Turns the schema into JS files so they can be run
   try {
     const define = {}
-    // We can add this in later if we want to use the --dev option in the schema
-    // if (!process.env.NODE_ENV) {
-    //   define['process.env.NODE_ENV'] = options.dev
-    //     ? '"development"'
-    //     : '"production"'
-    // }
+    if (!process.env.NODE_ENV) {
+      define['process.env.NODE_ENV'] = options.dev
+        ? '"development"'
+        : '"production"'
+    }
     const inputFile = getSchemaPath({ projectDir: tinaPath })
     await transpile(
       inputFile,
