@@ -57,10 +57,6 @@ export const compileClient = async (
   next,
   options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
-  if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = options.dev ? 'development' : 'production'
-  }
-
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
 
   if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }
@@ -103,8 +99,20 @@ export const compileClient = async (
   }
 
   try {
+    const define = {}
+    if (!process.env.NODE_ENV) {
+      define['process.env.NODE_ENV'] = options.dev
+        ? '"development"'
+        : '"production"'
+    }
     const inputFile = getClientPath({ projectDir: tinaPath })
-    await transpile(inputFile, 'client.js', tinaTempPath, options.verbose)
+    await transpile(
+      inputFile,
+      'client.js',
+      tinaTempPath,
+      options.verbose,
+      define
+    )
   } catch (e) {
     await cleanup({ tinaTempPath })
     throw new BuildSchemaError(e)
@@ -145,7 +153,7 @@ export const compileClient = async (
 export const compileSchema = async (
   _ctx,
   _next,
-  options: { schemaFileType?: string; verbose?: boolean }
+  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
   if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
@@ -197,8 +205,21 @@ export const compileSchema = async (
 
   // Turns the schema into JS files so they can be run
   try {
+    const define = {}
+    // We can add this in later if we want to use the --dev option in the schema
+    // if (!process.env.NODE_ENV) {
+    //   define['process.env.NODE_ENV'] = options.dev
+    //     ? '"development"'
+    //     : '"production"'
+    // }
     const inputFile = getSchemaPath({ projectDir: tinaPath })
-    await transpile(inputFile, 'schema.js', tinaTempPath, options.verbose)
+    await transpile(
+      inputFile,
+      'schema.js',
+      tinaTempPath,
+      options.verbose,
+      define
+    )
   } catch (e) {
     await cleanup({ tinaTempPath })
     throw new BuildSchemaError(e)
@@ -235,7 +256,7 @@ export const compileSchema = async (
   }
 }
 
-const transpile = async (inputFile, outputFile, tempDir, verbose) => {
+const transpile = async (inputFile, outputFile, tempDir, verbose, define) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(
@@ -256,6 +277,7 @@ const transpile = async (inputFile, outputFile, tempDir, verbose) => {
     external: [...external, './node_modules/*'],
     loader: loaders,
     outfile: outputPath,
+    define: define,
   })
   if (verbose) logger.info(logText(`Javascript built`))
 }
