@@ -6520,6 +6520,7 @@ __metadata:
     fast-glob: ^3.2.4
     fs-extra: ^9.0.1
     graphql: ^15.1.0
+    ini: ^3.0.0
     jest: ^27.0.6
     js-yaml: ^4.0.0
     lodash: ^4.17.19
@@ -18588,6 +18589,13 @@ fsevents@~2.1.2:
   version: 1.3.8
   resolution: "ini@npm:1.3.8"
   checksum: 62189ce7ea44c5778e757e4232c581212e838f3c39e79d931bb9152fd4b9275f09fb20b96afdd60ba9f5d7996b92486cad6cc617fcb84ff4beedd1b33b86221e
+  languageName: node
+  linkType: hard
+
+"ini@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "ini@npm:3.0.0"
+  checksum: 239e98a3439a6eb2bc3039e2de7fb18027861fa076bf7c0ca267c1c334d6b432cc15a67fe8861c5028f8ef6ede129097c96f07086974d483bd90fd44042e5d9c
   languageName: node
   linkType: hard
 

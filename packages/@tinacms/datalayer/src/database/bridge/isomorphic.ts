@@ -38,6 +38,14 @@ const toUint8Array = (buf: Buffer) => {
   return view
 }
 
+export type IsomorphicGitBridgeOptions = {
+  gitRoot: string
+  fsModule?: CallbackFsClient | PromiseFsClient
+  commitMessage?: string
+  authorName: string
+  authorEmail: string
+}
+
 /**
  * Bridge backed by isomorphic-git
  */
@@ -55,15 +63,17 @@ export class IsomorphicBridge implements Bridge {
 
   constructor(
     rootPath: string,
-    gitRoot: string,
-    authorName: string,
-    authorEmail: string,
-    fsModule?: CallbackFsClient | PromiseFsClient,
-    commitMessage?: string
+    {
+      gitRoot,
+      authorName,
+      authorEmail,
+      fsModule = fs,
+      commitMessage = 'Update from GraphQL client',
+    }: IsomorphicGitBridgeOptions
   ) {
-    this.gitRoot = gitRoot || ''
-    this.rootPath = rootPath || ''
-    this.fsModule = fsModule || fs
+    this.gitRoot = gitRoot
+    this.rootPath = rootPath
+    this.fsModule = fsModule
     this.authorName = authorName
     this.authorEmail = authorEmail
     this.isomorphicConfig = {
@@ -71,7 +81,7 @@ export class IsomorphicBridge implements Bridge {
       fs: this.fsModule,
     }
 
-    this.commitMessage = commitMessage || 'Update from GraphQL client'
+    this.commitMessage = commitMessage
   }
 
   private author() {

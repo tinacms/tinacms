@@ -14917,6 +14917,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["fast-glob", "npm:3.2.7"],
             ["fs-extra", "npm:9.1.0"],
             ["graphql", "npm:15.5.1"],
+            ["ini", "npm:3.0.0"],
             ["jest", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
             ["lodash", "npm:4.17.21"],
@@ -34967,6 +34968,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/ini-npm-2.0.0-28f7426761-4ad3460740.zip/node_modules/ini/",
           "packageDependencies": [
             ["ini", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/ini-npm-3.0.0-c2af955701-239e98a343.zip/node_modules/ini/",
+          "packageDependencies": [
+            ["ini", "npm:3.0.0"]
           ],
           "linkType": "HARD",
         }]
