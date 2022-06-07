@@ -21,23 +21,20 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import type { RichTypeInner } from '../types'
 import { SlateNodeType, plateElements } from './parse'
-import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
+import type { Content, PhrasingContent } from 'mdast'
 
 export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
-    const tree = stringifyChildren(slateTree, field)
-    const out = toMarkdown(
-      {
-        type: 'root',
-        // @ts-ignore
-        children: tree,
-      },
-      {
-        extensions: [mdxToMarkdown],
-      }
-    )
+    const tree = {
+      type: 'root',
+      children: stringifyChildren(slateTree, field),
+    }
+    // console.log(JSON.stringify(tree, null, 2))
+    const out = toMarkdown(tree, {
+      extensions: [mdxToMarkdown],
+    })
     return out.replace(/&#x22;/g, `"`)
   } catch (e) {
     console.log(e)
@@ -51,44 +48,157 @@ const allChildrenEmpty = (children: any[]) => {
   return false
 }
 
+const matches = (a: string[], b: string[]) => {
+  return a.some((v) => b.includes(v))
+}
+
+const cleanNode = (node, marks) => {
+  const cleanedNode = {}
+  Object.entries(node).map(([key, value]) => {
+    if (!marks.includes(key)) {
+      cleanedNode[key] = value
+    }
+  })
+  return cleanedNode
+}
+
+const eat = (children) => {
+  const node = children[0]
+  if (!node) {
+    return []
+  }
+  const siblings = children.slice(1) || []
+  const marks = getMarks(node)
+  if (!marks) {
+    return children
+  }
+  let done = false
+  const matchingSiblings = []
+  const leftoverSiblings = []
+  siblings.filter((sibling) => {
+    if (done) {
+      leftoverSiblings.push(sibling)
+      return
+    }
+    if (matches(marks, getMarks(sibling))) {
+      matchingSiblings.push(sibling)
+    } else {
+      if (sibling.type === 'a') {
+        if (sibling.children.length === 1) {
+          if (matches(marks, getMarks(sibling.children[0]))) {
+            matchingSiblings.push({
+              ...sibling,
+              children: [cleanNode(sibling.children[0], marks)],
+            })
+            return
+          }
+        }
+      }
+      done = true
+      leftoverSiblings.push(sibling)
+    }
+  })
+  const cleanMatchingSiblings = matchingSiblings.map((node) =>
+    cleanNode(node, marks)
+  )
+  const cleanMatchingSiblings2 = eat(cleanMatchingSiblings)
+  const cleanedNode = cleanNode(node, marks)
+  const newNode = stringifyMark2(marks, [
+    cleanedNode,
+    ...cleanMatchingSiblings2,
+  ])
+  const nodes = Array.isArray(newNode) ? newNode : [newNode]
+
+  return [...nodes, ...eat(leftoverSiblings)]
+}
+
+const getMarks = (node) => {
+  const marks = []
+  if (node.code) {
+    marks.push('code')
+  }
+  if (node.bold) {
+    marks.push('bold')
+  }
+  if (node.italic) {
+    marks.push('italic')
+  }
+  return marks
+}
+
+const stringifyMarks = (children) => {
+  return eat(children)
+}
+
+const stringifyMark2 = (marks, children) => {
+  let returnNode = children.map((child) => {
+    if (child.type === 'a') {
+      return {
+        type: 'link',
+        url: child.url,
+        title: child.title,
+        children: stringifyMark2(marks, eat(child.children)),
+      }
+    }
+    if (!child.type || child.type === 'text') {
+      return {
+        type: 'text',
+        // In nested children, this node may already be processed,
+        // so `value` is already present
+        value: child.text || child.value,
+      }
+    } else {
+      return child
+    }
+  })
+  if (marks.includes('code')) {
+    returnNode = {
+      type: 'inlineCode',
+      value: returnNode[0].value,
+    }
+  }
+  if (marks.includes('bold')) {
+    returnNode = {
+      type: 'strong',
+      children: Array.isArray(returnNode) ? returnNode : [returnNode],
+    }
+  }
+  if (marks.includes('italic')) {
+    returnNode = {
+      type: 'emphasis',
+      children: Array.isArray(returnNode) ? returnNode : [returnNode],
+    }
+  }
+  return returnNode
+}
+
 const stringifyChildren = (children: any[], field) => {
   if (!children) {
     return []
   }
-  return (
-    children
-      .map((child) => stringify(child, field))
-      // This allows us to return `false` when we want a node to be removed entirely
-      .filter(Boolean) as PhrasingContent[]
-  )
+  const result = children
+    .map((child) => stringify(child, field))
+    // This allows us to return `false` when we want a node to be removed entirely
+    .filter(Boolean) as PhrasingContent[]
+
+  return stringifyMarks(result)
+}
+
+const stringifyMark = (node) => {
+  return {
+    type: 'text',
+    ...node,
+    value: node.text,
+  }
 }
 
 export const stringify = (
   node: { type: typeof plateElements },
   field: RichTypeInner
 ): Content => {
-  if (!node.type) {
-    // Inline code cannot have other marks like bold and emphasis
-    if (node?.code) {
-      return {
-        type: 'inlineCode',
-        value: node.text,
-      }
-    }
-    let returnNode: Content = { type: 'text', value: node.text || '' }
-    if (node?.bold) {
-      returnNode = { type: 'strong', children: [returnNode] }
-    }
-    if (node?.italic) {
-      returnNode = {
-        type: 'emphasis',
-        children: [returnNode],
-      }
-    }
-    return returnNode
-  }
-
   switch (node.type) {
+    case plateElements.ELEMENT_LINK:
+      return node
     case plateElements.ELEMENT_H1:
       return {
         type: 'heading',
@@ -196,13 +306,6 @@ export const stringify = (
     case plateElements.ELEMENT_HR:
       return {
         type: 'thematicBreak',
-      }
-    case plateElements.ELEMENT_LINK:
-      return {
-        type: 'link',
-        url: node.url,
-        title: node.title,
-        children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_BLOCKQUOTE:
       return {
@@ -446,27 +549,11 @@ ${out}
         type: 'break',
       }
     case 'text':
-      // Inline code cannot have other marks like bold and emphasis
-      if (node?.code) {
-        return {
-          type: 'inlineCode',
-          value: node.text,
-        }
-      }
-      let returnNode: Content = { type: 'text', value: node.text || '' }
-
-      if (node?.bold) {
-        returnNode = { type: 'strong', children: [returnNode] }
-      }
-      if (node?.italic) {
-        returnNode = {
-          type: 'emphasis',
-          children: [returnNode],
-        }
-      }
-      return returnNode
-
+      return stringifyMark(node)
     default:
+      if (!node.type) {
+        return stringifyMark(node)
+      }
       console.log(`Unrecognized field type: ${node.type}`)
       break
   }

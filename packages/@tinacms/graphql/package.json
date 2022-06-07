@@ -85,6 +85,7 @@
     "unified": "^10.1.0",
     "unist-util-remove-position": "^3.0.0",
     "unist-util-visit": "^4.0.0",
+    "unist-util-visit-parents": "^5.1.0",
     "vfile": "^4.2.0",
     "ws": "^7.3.1",
     "yup": "^0.32.9"

@@ -19,14 +19,23 @@ limitations under the License.
 import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
-import { TinaField } from '..'
+import { TinaField } from '../..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
-import type { RichTypeInner } from '../types'
-import { isNull } from 'lodash'
+import type { RichTypeInner } from '../../types'
+import { flatten, isNull } from 'lodash'
+
+export const markdownToAst = (value: string) => {
+  const tree = unified().use(markdown).use(mdx).parse(value)
+  // Delete useless position info
+  visit(tree, (node) => {
+    delete node.position
+  })
+  return tree
+}
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
-  const tree = unified().use(markdown).use(mdx).parse(value)
+  const tree = markdownToAst(value)
   return parseMDXInner(tree, field)
 }
 /**
@@ -79,10 +88,6 @@ export const parseMDX = (value: string, field: RichTypeInner) => {
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
 export const parseMDXInner = (tree: any, field: RichTypeInner) => {
-  // Delete useless position info
-  visit(tree, (node) => {
-    delete node.position
-  })
   visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
     let props = {}
     if (!node.name) {
@@ -566,7 +571,11 @@ export const defaultNodeTypes: NodeTypes = {
   image: plateElements.ELEMENT_IMAGE,
 }
 
-export default function remarkToSlate(node: MdxAstNode) {
+const childrenRemarkToSlate = (children: MdastNode['children']) => {
+  return flatten(children.map(remarkToSlate))
+}
+
+export function remarkToSlate(node: MdxAstNode) {
   const types = {
     ...defaultNodeTypes,
     heading: {
@@ -578,12 +587,12 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'heading':
       return {
         type: types.heading[node.depth],
-        children: node.children.map(remarkToSlate),
+        children: childrenRemarkToSlate(node.children),
       }
     case 'list':
       return {
         type: node.ordered ? types.ol_list : types.ul_list,
-        children: node.children.map(remarkToSlate),
+        children: childrenRemarkToSlate(node.children),
       }
     case 'listItem':
       const realChildren = []
@@ -591,13 +600,13 @@ export default function remarkToSlate(node: MdxAstNode) {
         if (child.type === 'list') {
           realChildren.push({
             type: child.ordered ? types.ol_list : types.ul_list,
-            children: child.children.map(remarkToSlate),
+            children: childrenRemarkToSlate(child.children),
           })
         } else {
           realChildren.push({
             type: plateElements.ELEMENT_LIC,
             // @ts-ignore FIXME: MDAST types don't match with some of these
-            children: child.children.map(remarkToSlate),
+            children: childrenRemarkToSlate(child.children),
           })
         }
       })
@@ -608,13 +617,7 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'paragraph':
       return {
         type: types.paragraph,
-        children: node.children.map(remarkToSlate),
-      }
-    case 'link':
-      return {
-        type: types.link,
-        url: node.url,
-        children: node.children.map(remarkToSlate),
+        children: childrenRemarkToSlate(node.children),
       }
     case 'image':
       return {
@@ -626,7 +629,7 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'blockquote':
       return {
         type: types.block_quote,
-        children: node.children.map(remarkToSlate),
+        children: childrenRemarkToSlate(node.children),
       }
     case 'code':
       return {
@@ -637,39 +640,16 @@ export default function remarkToSlate(node: MdxAstNode) {
           children: [{ type: 'text', text: item }],
         })),
       }
-
-    // case 'html':
-    //   if (node.value?.includes('<br>')) {
-    //     return {
-    //       break: true,
-    //       type: types.paragraph,
-    //       children: [{ text: node.value?.replace(/<br>/g, '') || '' }],
-    //     }
-    //   }
-    //   return { type: 'paragraph', children: [{ text: node.value || '' }] }
-
     case 'emphasis':
-      return {
-        [types.emphasis_mark]: true,
-        ...forceLeafNode(node.children),
-        ...persistLeafFormats(node.children),
-      }
     case 'strong':
-      return {
-        [types.strong_mark]: true,
-        ...forceLeafNode(node.children),
-        ...persistLeafFormats(node.children),
-      }
+    case 'link':
+    case 'inlineCode':
+      return handleInlineElement(node)
     case 'delete':
       return {
         [types.delete_mark]: true,
         ...forceLeafNode(node.children),
         ...persistLeafFormats(node.children),
-      }
-    case 'inlineCode':
-      return {
-        [types.inline_code_mark]: true,
-        text: node.value,
       }
     case 'thematicBreak':
       return {
@@ -692,6 +672,82 @@ export default function remarkToSlate(node: MdxAstNode) {
   }
 }
 
+const handleInlineElement = (
+  node: Extract<
+    MdxAstNode,
+    | { type: 'strong' }
+    | { type: 'emphasis' }
+    | { type: 'link' }
+    | { type: 'image' }
+    | { type: 'inlineCode' }
+    | { type: 'text' }
+  >,
+  marks: ('bold' | 'italic' | 'code')[] = []
+) => {
+  const accum = []
+  switch (node.type) {
+    case 'emphasis': {
+      const children = flatten(
+        node.children.map((child) =>
+          handleInlineElement(child, [...marks, 'italic'])
+        )
+      )
+      children.forEach((child) => {
+        accum.push(child)
+      })
+      break
+    }
+    case 'inlineCode': {
+      const markProps = {}
+      marks.forEach((mark) => (markProps[mark] = true))
+      console.log(markProps)
+      accum.push({
+        type: 'text',
+        text: node.value,
+        code: true,
+        ...markProps,
+      })
+      break
+    }
+    case 'strong': {
+      const children = flatten(
+        node.children.map((child) =>
+          handleInlineElement(child, [...marks, 'bold'])
+        )
+      )
+      children.forEach((child) => {
+        accum.push(child)
+      })
+      break
+    }
+    case 'image': {
+      accum.push({
+        type: 'img',
+        url: node.url,
+        caption: node.title,
+        alt: node.alt,
+      })
+      break
+    }
+    case 'link': {
+      const children = flatten(
+        node.children.map((child) => handleInlineElement(child, marks))
+      )
+      accum.push({ type: 'a', url: node.url, title: node.title, children })
+      break
+    }
+    case 'text':
+      const markProps = {}
+      marks.forEach((mark) => (markProps[mark] = true))
+      accum.push({ type: 'text', text: node.value, ...markProps })
+      break
+    default:
+      // @ts-expect-error
+      throw new Error(`Unexpected inline element of type ${node.type}`)
+  }
+  return accum
+}
+
 const forceLeafNode = (children: Array<MdxAstNode>) => {
   const extraProps = {}
   const text = []
@@ -709,7 +765,15 @@ const forceLeafNode = (children: Array<MdxAstNode>) => {
           //@ts-ignore FIXME: Property 'children' does not exist on type 'Code | Emphasis | Strong'
           text.push(item.value)
         })
+      case 'link':
+        extraProps['url'] = k.url
+        extraProps['title'] = k.title
+        return k.children.forEach((item) => {
+          //@ts-ignore FIXME: Property 'children' does not exist on type 'Code | Emphasis | Strong'
+          text.push(item.value)
+        })
       default:
+        console.log(k)
         throw new Error(`Not sure, this should be flattened to the same node`)
     }
   })

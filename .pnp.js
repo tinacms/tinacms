@@ -15043,6 +15043,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["unified", "npm:10.1.0"],
             ["unist-util-remove-position", "npm:3.0.0"],
             ["unist-util-visit", "npm:4.1.0"],
+            ["unist-util-visit-parents", "npm:5.1.0"],
             ["vfile", "npm:4.2.1"],
             ["ws", "virtual:3358d9cb9aa6fa9bfed606524cdd1ee1fe60a39f73105cf9a1c695ae3e013b68ce244c57e371c480917f71da7eee5cacb8156c3cb77e1b1b9f53af4f53a885e7#npm:7.5.3"],
             ["yup", "npm:0.32.9"]
@@ -15119,6 +15120,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["unified", "npm:10.1.0"],
             ["unist-util-remove-position", "npm:3.0.0"],
             ["unist-util-visit", "npm:4.1.0"],
+            ["unist-util-visit-parents", "npm:5.1.0"],
             ["vfile", "npm:4.2.1"],
             ["ws", "virtual:3358d9cb9aa6fa9bfed606524cdd1ee1fe60a39f73105cf9a1c695ae3e013b68ce244c57e371c480917f71da7eee5cacb8156c3cb77e1b1b9f53af4f53a885e7#npm:7.5.3"],
             ["yup", "npm:0.32.9"]
