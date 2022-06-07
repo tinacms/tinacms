@@ -22,6 +22,7 @@ import fs from 'fs-extra'
 import type { Bridge } from './index'
 import globParent from 'glob-parent'
 import normalize from 'normalize-path'
+import { GraphQLError } from 'graphql'
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -37,13 +38,12 @@ const toUint8Array = (buf: Buffer) => {
   return view
 }
 
-// TODO do we need the normalize-path in glob
-
 /**
- * TODO
+ * Bridge backed by isomorphic-git
  */
 export class IsomorphicBridge implements Bridge {
   public rootPath: string
+  public gitRoot: string
   public fsModule: CallbackFsClient | PromiseFsClient
   public isomorphicConfig: {
     fs: CallbackFsClient | PromiseFsClient
@@ -55,22 +55,23 @@ export class IsomorphicBridge implements Bridge {
 
   constructor(
     rootPath: string,
+    gitRoot: string,
     authorName: string,
     authorEmail: string,
     fsModule?: CallbackFsClient | PromiseFsClient,
-    ref?: string,
     commitMessage?: string
   ) {
+    this.gitRoot = gitRoot || ''
     this.rootPath = rootPath || ''
     this.fsModule = fsModule || fs
     this.authorName = authorName
     this.authorEmail = authorEmail
     this.isomorphicConfig = {
-      dir: normalize(this.rootPath),
+      dir: normalize(this.gitRoot),
       fs: this.fsModule,
     }
+
     this.commitMessage = commitMessage || 'Update from GraphQL client'
-    console.log('IsomorphicBridge initialized', this.rootPath)
   }
 
   private author() {
@@ -82,20 +83,26 @@ export class IsomorphicBridge implements Bridge {
     }
   }
 
-  private async listEntries(
-    pattern: string,
-    entry: TreeEntry,
-    path: string,
+  /**
+   * Recursively populate paths matching `pattern` for the given `entry`
+   *
+   * @param pattern - pattern to filter paths by
+   * @param entry - TreeEntry to start building list from
+   * @param path - base path
+   * @param results
+   * @private
+   */
+  private async listEntries({
+    pattern,
+    entry,
+    path,
+    results,
+  }: {
+    pattern: string
+    entry: TreeEntry
+    path?: string
     results: string[]
-  ) {
-    const type = entry.type
-    const entryPath = path ? `${path}/${entry.path}` : entry.path
-    console.log('listEntries', path, entry.path)
-    if (type === 'blob') {
-      results.push(entryPath)
-      return results
-    }
-
+  }) {
     const treeResult: ReadTreeResult = await git.readTree({
       ...this.isomorphicConfig,
       oid: entry.oid,
@@ -115,57 +122,74 @@ export class IsomorphicBridge implements Bridge {
 
     for (const childEntry of children) {
       const childPath = path ? `${path}/${childEntry.path}` : childEntry.path
-      await this.listEntries(pattern, childEntry, childPath, results)
+      await this.listEntries({
+        pattern,
+        entry: childEntry,
+        path: childPath,
+        results,
+      })
     }
   }
 
+  /**
+   * For the specified path, returns an object with an array containing the parts of the path (pathParts)
+   * and an array containing the WalkerEntry objects for the path parts (pathEntries). Any null elements in the
+   * pathEntries are placeholders for non-existent entries.
+   *
+   * @param path - path being resolved
+   * @param ref - ref to resolve path entries for
+   * @private
+   */
   private async resolvePathEntries(
     path: string,
     ref: string
-  ): Promise<{ pathParts: string[]; pathNodes: WalkerEntry[] }> {
+  ): Promise<{ pathParts: string[]; pathEntries: WalkerEntry[] }> {
     let pathParts = path.split('/')
     const result = await git.walk({
       ...this.isomorphicConfig,
       reduce: async (parent: any, children: any[]) => {
-        const flatten = flat(children).filter((child) => {
-          if (path.startsWith(child[0]._fullpath)) {
-            const entryParts = child[0]._fullpath.split('/')
-            for (let i = 0; i < entryParts.length; i++) {
-              if (pathParts[i] !== entryParts[i]) {
-                return false
-              }
-            }
-            return true
-          }
-        })
+        const flatten = flat(children).filter(([child]) =>
+          path.startsWith(child._fullpath)
+        )
         if (parent !== undefined) flatten.unshift(parent)
         return flatten
       },
       trees: [git.TREE({ ref })],
     })
 
-    const pathNodes = flat(result)
+    const pathEntries = flat(result)
     if (pathParts.indexOf('.') === -1) {
       pathParts = ['.', ...pathParts]
     }
 
-    while (pathParts.length > pathNodes.length) {
+    while (pathParts.length > pathEntries.length) {
       // push placeholders for the non-existent entries
-      pathNodes.push(null)
+      pathEntries.push(null)
     }
-    return { pathParts, pathNodes }
+    return { pathParts, pathEntries }
   }
 
-  private async updateTree(
+  /**
+   * Updates tree entry and associated parent tree entries
+   *
+   * @param existingOid - the existing OID
+   * @param updatedOid - the updated OID
+   * @param path - the path of the entry being updated
+   * @param type - the type of the entry being updated (blob or tree)
+   * @param pathEntries - parent path entries
+   * @param pathParts - parent path parts
+   * @private
+   */
+  private async updateTreeHierarchy(
     existingOid: string,
     updatedOid: string,
     path: string,
     type: string,
-    pathNodes: WalkerEntry[],
+    pathEntries: WalkerEntry[],
     pathParts: string[]
   ) {
-    const lastIdx = pathNodes.length - 1
-    const parentEntry = pathNodes[lastIdx]
+    const lastIdx = pathEntries.length - 1
+    const parentEntry = pathEntries[lastIdx]
     const parentPath = pathParts[lastIdx]
     let parentOid
     let tree
@@ -211,18 +235,49 @@ export class IsomorphicBridge implements Bridge {
     if (lastIdx === 0) {
       return updatedParentOid
     } else {
-      return await this.updateTree(
+      return await this.updateTreeHierarchy(
         parentOid,
         updatedParentOid,
         parentPath,
         'tree',
-        pathNodes.slice(0, lastIdx),
+        pathEntries.slice(0, lastIdx),
         pathParts.slice(0, lastIdx)
       )
     }
   }
 
-  // TODO need to think about how to keep the checked out files current
+  /**
+   * Creates a commit for the specified tree and updates the specified ref to point to the commit
+   *
+   * @param treeSha - sha of the new tree
+   * @param ref - the ref that should be updated
+   * @private
+   */
+  private async commitTree(treeSha: string, ref: string) {
+    const commitSha = await git.writeCommit({
+      ...this.isomorphicConfig,
+      commit: {
+        tree: treeSha,
+        parent: [
+          await git.resolveRef({
+            ...this.isomorphicConfig,
+            ref,
+          }),
+        ],
+        message: this.commitMessage,
+        // TODO these should be configurable
+        author: this.author(),
+        committer: this.author(),
+      },
+    })
+
+    await git.writeRef({
+      ...this.isomorphicConfig,
+      ref,
+      value: commitSha,
+      force: true,
+    })
+  }
 
   private async currentBranch(): Promise<string> {
     const ref = await git.currentBranch({
@@ -230,28 +285,30 @@ export class IsomorphicBridge implements Bridge {
       fullname: true,
     })
     if (!ref) {
-      throw new Error('Unable to determine current branch from HEAD')
+      throw new GraphQLError(
+        `Unable to determine current branch from HEAD`,
+        null,
+        null,
+        null,
+        null,
+        null,
+        {}
+      )
     }
     return ref
   }
 
   public async glob(pattern: string) {
     const ref = await this.currentBranch()
-    const parent = globParent(pattern)
-    const { pathParts, pathNodes } = await this.resolvePathEntries(parent, ref)
+    const parent = globParent(this.qualifyPath(pattern))
+    const { pathParts, pathEntries } = await this.resolvePathEntries(
+      parent,
+      ref
+    )
 
-    const leaf = pathNodes[pathNodes.length - 1]
-    if (!leaf) {
-      return []
-    }
-
-    const entryType = await leaf.type()
-    if (entryType === 'blob') {
-      return [(leaf as any)._fullpath]
-    }
-
+    const leafEntry = pathEntries[pathEntries.length - 1]
     const entryPath = pathParts[pathParts.length - 1]
-    const parentEntry = pathNodes[pathNodes.length - 2]
+    const parentEntry = pathEntries[pathEntries.length - 2]
     let treeEntry: TreeEntry
     let parentPath
     if (parentEntry) {
@@ -262,18 +319,22 @@ export class IsomorphicBridge implements Bridge {
       treeEntry = treeResult.tree.find((entry) => entry.path === entryPath)
       parentPath = pathParts.slice(1, pathParts.length).join('/')
     } else {
-      // TODO can parentEntry ever be undefined?
       // @ts-ignore
       treeEntry = {
         type: 'tree',
-        oid: await leaf.oid(),
+        oid: await leafEntry.oid(),
       }
       parentPath = ''
     }
 
-    const result = []
-    await this.listEntries(pattern, treeEntry, parentPath, result)
-    return result
+    const results = []
+    await this.listEntries({
+      pattern: this.qualifyPath(pattern),
+      entry: treeEntry,
+      path: parentPath,
+      results,
+    })
+    return results.map((path) => this.unqualifyPath(path))
   }
 
   public supportsBuilding() {
@@ -281,88 +342,72 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
-    console.log('delete', filepath)
     const ref = await this.currentBranch()
-    const { pathParts, pathNodes } = await this.resolvePathEntries(
-      filepath,
+    const { pathParts, pathEntries } = await this.resolvePathEntries(
+      this.qualifyPath(filepath),
       ref
     )
-    if (pathNodes.length > 0) {
-      let ptr = pathNodes.length - 1
-      while (ptr >= 1) {
-        // let existingOid
-        const leaf = pathNodes[ptr]
-        const nodePath = pathParts[ptr]
-        if (leaf) {
-          if (
-            `./${(leaf as any)._fullpath}` !==
-            pathParts.slice(0, ptr + 1).join('/')
-          ) {
-            throw new Error(`'${filepath}' not found`)
-          }
 
-          const parentEntry = pathNodes[ptr - 1]
-          const existingOid = await parentEntry.oid()
-          const treeResult: ReadTreeResult = await git.readTree({
-            ...this.isomorphicConfig,
-            oid: existingOid,
-          })
+    let ptr = pathEntries.length - 1
+    while (ptr >= 1) {
+      // let existingOid
+      const leafEntry = pathEntries[ptr]
+      const nodePath = pathParts[ptr]
+      if (leafEntry) {
+        const parentEntry = pathEntries[ptr - 1]
+        const existingOid = await parentEntry.oid()
+        const treeResult: ReadTreeResult = await git.readTree({
+          ...this.isomorphicConfig,
+          oid: existingOid,
+        })
 
-          const updatedTree = treeResult.tree.filter(
-            (value) => value.path !== nodePath
-          )
+        const updatedTree = treeResult.tree.filter(
+          (value) => value.path !== nodePath
+        )
 
-          // The folder is empty after removing the file, so we remove the entire folder
-          if (updatedTree.length === 0) {
-            ptr -= 1
-            continue
-          }
-
-          const updatedOid = await git.writeTree({
-            ...this.isomorphicConfig,
-            tree: updatedTree,
-          })
-
-          const updatedRootSha = await this.updateTree(
-            existingOid,
-            updatedOid,
-            pathParts[ptr - 1],
-            'tree',
-            pathNodes.slice(0, ptr - 1),
-            pathParts.slice(0, ptr - 1)
-          )
-
-          // TODO consolidate duplicate code for committing tree updates
-          const commitSha = await git.writeCommit({
-            ...this.isomorphicConfig,
-            commit: {
-              tree: updatedRootSha,
-              parent: [
-                await git.resolveRef({
-                  ...this.isomorphicConfig,
-                  ref,
-                }),
-              ],
-              message: this.commitMessage,
-              // TODO these should be configurable
-              author: this.author(),
-              committer: this.author(),
-            },
-          })
-
-          await git.writeRef({
-            ...this.isomorphicConfig,
-            ref,
-            value: commitSha,
-            force: true, // TODO I don't believe this should be necessary
-          })
-
-          break
+        // The folder is empty after removing the file, so we remove the entire folder
+        if (updatedTree.length === 0) {
+          ptr -= 1
+          continue
         }
+
+        const updatedTreeOid = await git.writeTree({
+          ...this.isomorphicConfig,
+          tree: updatedTree,
+        })
+
+        const updatedRootTreeOid = await this.updateTreeHierarchy(
+          existingOid,
+          updatedTreeOid,
+          pathParts[ptr - 1],
+          'tree',
+          pathEntries.slice(0, ptr - 1),
+          pathParts.slice(0, ptr - 1)
+        )
+
+        await this.commitTree(updatedRootTreeOid, ref)
+
+        break
+      } else {
+        throw new GraphQLError(
+          `Unable to resolve path: ${filepath}`,
+          null,
+          null,
+          null,
+          null,
+          null,
+          { status: 404 }
+        )
       }
-    } else {
-      throw new Error(`Unable to resolve path: ${filepath}`)
     }
+  }
+
+  private qualifyPath(filepath: string): string {
+    return this.rootPath ? `${this.rootPath}/${filepath}` : filepath
+  }
+
+  private unqualifyPath(filepath: string): string {
+    return this.rootPath ? filepath.slice(this.rootPath.length + 1) : filepath
   }
 
   public async get(filepath: string) {
@@ -375,7 +420,7 @@ export class IsomorphicBridge implements Bridge {
     const { blob } = await git.readBlob({
       ...this.isomorphicConfig,
       oid,
-      filepath,
+      filepath: this.qualifyPath(filepath),
     })
 
     return Buffer.from(blob).toString('utf8')
@@ -387,62 +432,38 @@ export class IsomorphicBridge implements Bridge {
 
   public async put(filepath: string, data: string) {
     const ref = await this.currentBranch()
-    const { pathParts, pathNodes } = await this.resolvePathEntries(
-      filepath,
+    const { pathParts, pathEntries } = await this.resolvePathEntries(
+      this.qualifyPath(filepath),
       ref
     )
-    if (pathNodes.length > 0) {
-      const blobUpdate = toUint8Array(Buffer.from(data))
 
-      let existingOid
-      const leaf = pathNodes[pathNodes.length - 1]
-      const nodePath = pathParts[pathParts.length - 1]
-      if (leaf) {
-        existingOid = await leaf.oid()
-        if ((leaf as any)._fullpath !== filepath) {
-          // TODO should create the path
-          throw new Error(`${filepath} not found`)
-        }
-        const hash = await git.hashBlob({ object: blobUpdate })
-        if (hash.oid === existingOid) {
-          return // no changes - exit early
-        }
+    const blobUpdate = toUint8Array(Buffer.from(data))
+
+    let existingOid
+    const leafEntry = pathEntries[pathEntries.length - 1]
+    const nodePath = pathParts[pathParts.length - 1]
+    if (leafEntry) {
+      existingOid = await leafEntry.oid()
+      const hash = await git.hashBlob({ object: blobUpdate })
+      if (hash.oid === existingOid) {
+        return // no changes - exit early
       }
-
-      const updatedOid = await git.writeBlob({
-        ...this.isomorphicConfig,
-        blob: blobUpdate,
-      })
-
-      const updatedRootSha = await this.updateTree(
-        existingOid,
-        updatedOid,
-        nodePath,
-        'blob',
-        pathNodes.slice(0, pathNodes.length - 1),
-        pathParts.slice(0, pathParts.length - 1)
-      )
-      const commitSha = await git.writeCommit({
-        ...this.isomorphicConfig,
-        commit: {
-          tree: updatedRootSha,
-          parent: [await git.resolveRef({ ...this.isomorphicConfig, ref })],
-          message: this.commitMessage,
-          author: this.author(),
-          committer: this.author(),
-        },
-      })
-
-      await git.writeRef({
-        ...this.isomorphicConfig,
-        ref,
-        value: commitSha,
-        force: true, // TODO I don't believe this should be necessary
-      })
-    } else {
-      // TODO at this point we could create the filepath but we'd need to grab the parent
-      // Ideally we should be able to grab the entire tree
-      throw new Error(`Path not found ${filepath}`)
     }
+
+    const updatedOid = await git.writeBlob({
+      ...this.isomorphicConfig,
+      blob: blobUpdate,
+    })
+
+    const updatedRootSha = await this.updateTreeHierarchy(
+      existingOid,
+      updatedOid,
+      nodePath,
+      'blob',
+      pathEntries.slice(0, pathEntries.length - 1),
+      pathParts.slice(0, pathParts.length - 1)
+    )
+
+    await this.commitTree(updatedRootSha, ref)
   }
 }

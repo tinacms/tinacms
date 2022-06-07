@@ -92,7 +92,12 @@ export async function startServer(
     await resetGeneratedFolder()
   }
   const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(process.cwd(), 'Tina User', 'tina-user@forestry.io') // TODO source the author info appropriately
+    ? new IsomorphicBridge(
+        rootPath,
+        process.cwd() /* TODO this should find the .git folder */,
+        'Tina User',
+        'tina-user@forestry.io'
+      ) // TODO source the author info appropriately
     : new FilesystemBridge(rootPath)
 
   const store = experimentalData
