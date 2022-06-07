@@ -34,6 +34,10 @@ import type { GraphQLConfig } from '../types'
 import { TinaError } from './error'
 import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
+import {
+  resolveMediaRelativeToCloud,
+  resolveMediaCloudToRelative,
+} from './media-utils'
 
 interface ResolverConfig {
   config?: GraphQLConfig
@@ -670,15 +674,19 @@ export class Resolver {
         case 'string':
         case 'boolean':
         case 'number':
-        case 'image':
           accum[fieldName] = fieldValue
+          break
+        case 'image':
+          accum[fieldName] = resolveMediaCloudToRelative(
+            fieldValue as string,
+            this.config
+          )
           break
         case 'object':
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
         case 'rich-text':
-          field
-          accum[fieldName] = stringifyMDX(fieldValue, field)
+          accum[fieldName] = stringifyMDX(fieldValue, field, this.config)
           break
         case 'reference':
           accum[fieldName] = fieldValue
@@ -717,21 +725,14 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'image':
-        if (this.config) {
-          if (this.config.useRelativeMedia === true) {
-            accumulator[field.name] = value
-          } else {
-            accumulator[
-              field.name
-            ] = `https://${this.config.assetsHost}/${this.config.clientId}/${value}`
-          }
-        } else {
-          accumulator[field.name] = value
-        }
+        accumulator[field.name] = resolveMediaRelativeToCloud(
+          value as string,
+          this.config
+        )
         break
       case 'rich-text':
         // @ts-ignore value is unknown
-        const tree = parseMDX(value, field)
+        const tree = parseMDX(value, field, this.config)
         accumulator[field.name] = tree
         break
       case 'object':
