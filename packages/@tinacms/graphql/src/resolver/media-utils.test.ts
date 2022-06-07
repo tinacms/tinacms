@@ -19,7 +19,7 @@ import {
 
 describe('resolveMedia', () => {
   const relativeAssetURL = `/MySweetImage.png`
-  const tinaCloudAssetURL = `https://assets-host.com/0000-1111-2222-3333/MySweetImage.png`
+  const cloudAssetURL = `https://assets-host.com/0000-1111-2222-3333/MySweetImage.png`
 
   /**
    * When using `useRelativeMedia: true`, the URL should not be changed.
@@ -38,11 +38,11 @@ describe('resolveMedia', () => {
   it('resolves relative media to cloud media when useRelativeMedia: false', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
-      clientId: '0000-1111-2222-3333',
       assetsHost: 'assets-host.com',
+      clientId: '0000-1111-2222-3333',
     }
     const resolvedURL = resolveMediaRelativeToCloud(relativeAssetURL, config)
-    expect(resolvedURL).toEqual(tinaCloudAssetURL)
+    expect(resolvedURL).toEqual(cloudAssetURL)
   })
 
   /**
@@ -51,10 +51,10 @@ describe('resolveMedia', () => {
   it('resolves cloud media to relative media when useRelativeMedia: false', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
-      clientId: '0000-1111-2222-3333',
       assetsHost: 'assets-host.com',
+      clientId: '0000-1111-2222-3333',
     }
-    const resolvedURL = resolveMediaCloudToRelative(tinaCloudAssetURL, config)
-    expect(tinaCloudAssetURL).toEqual(resolvedURL)
+    const resolvedURL = resolveMediaCloudToRelative(cloudAssetURL, config)
+    expect(resolvedURL).toEqual(relativeAssetURL)
   })
 })
