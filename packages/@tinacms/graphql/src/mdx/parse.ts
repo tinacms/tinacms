@@ -22,12 +22,17 @@ import mdx from 'remark-mdx'
 import { TinaField } from '..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
-import type { RichTypeInner } from '../types'
+import type { GraphQLConfig, RichTypeInner } from '../types'
 import { isNull } from 'lodash'
+import { resolveMediaRelativeToCloud } from '../resolver/media-utils'
 
-export const parseMDX = (value: string, field: RichTypeInner) => {
+export const parseMDX = (
+  value: string,
+  field: RichTypeInner,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
-  return parseMDXInner(tree, field)
+  return parseMDXInner(tree, field, graphQLconfig)
 }
 /**
  * ### Convert the MDXAST into an API-friendly format
@@ -78,7 +83,11 @@ export const parseMDX = (value: string, field: RichTypeInner) => {
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
-export const parseMDXInner = (tree: any, field: RichTypeInner) => {
+export const parseMDXInner = (
+  tree: any,
+  field: RichTypeInner,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+) => {
   // Delete useless position info
   visit(tree, (node) => {
     delete node.position
@@ -86,7 +95,11 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
   visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
     let props = {}
     if (!node.name) {
-      props = parseMDXInner({ type: 'root', children: node.children }, field)
+      props = parseMDXInner(
+        { type: 'root', children: node.children },
+        field,
+        graphQLconfig
+      )
     }
     const template = field.templates?.find((template) => {
       const templateName =
@@ -128,7 +141,7 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
             )
           }
 
-          parseField(attribute, field, props)
+          parseField(attribute, field, props, graphQLconfig)
         }
       } else {
         console.log(`Not sure what this is, type: ${attribute.type}`)
@@ -142,11 +155,20 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
   return { type: 'root', children: slateTree }
 }
 
-const parseField = (attribute, field: TinaField, props) => {
+const parseField = (
+  attribute,
+  field: TinaField,
+  props,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+) => {
   switch (field.type) {
     case 'boolean':
     case 'datetime':
     case 'image':
+      props[field.name] = resolveMediaRelativeToCloud(
+        attribute.value,
+        graphQLconfig
+      )
     case 'number':
     case 'string':
       if (field.list) {
@@ -236,7 +258,7 @@ const parseField = (attribute, field: TinaField, props) => {
                       )
                     }
                     field.fields.forEach((field) => {
-                      parseField(property, field, objectProps)
+                      parseField(property, field, objectProps, graphQLconfig)
                     })
                   }
                 })
@@ -265,7 +287,12 @@ const parseField = (attribute, field: TinaField, props) => {
                           )
                         }
                         field.fields.forEach((field) => {
-                          parseField(property, field, objectProps)
+                          parseField(
+                            property,
+                            field,
+                            objectProps,
+                            graphQLconfig
+                          )
                         })
                       }
                       if (field.templates) {
@@ -276,7 +303,12 @@ const parseField = (attribute, field: TinaField, props) => {
                             )
                           }
                           fieldTemplate.fields.forEach((field) => {
-                            parseField(property, field, objectProps)
+                            parseField(
+                              property,
+                              field,
+                              objectProps,
+                              graphQLconfig
+                            )
                           })
                         })
                       }
@@ -311,7 +343,8 @@ const parseField = (attribute, field: TinaField, props) => {
             // console.log(field.name)
             props[field.name] = parseMDXInner(
               { type: 'root', children: attribute.value },
-              field
+              field,
+              graphQLconfig
             )
           } else {
             throw Error(
@@ -330,7 +363,7 @@ const parseField = (attribute, field: TinaField, props) => {
            * />
            */
           try {
-            const mdx = parseMDX(attribute.value.value, field)
+            const mdx = parseMDX(attribute.value.value, field, graphQLconfig)
             props[field.name] = mdx.children[0].props
           } catch (e) {
             console.log(e)

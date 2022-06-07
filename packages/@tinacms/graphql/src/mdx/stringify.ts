@@ -19,15 +19,20 @@ limitations under the License.
 
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
-import type { RichTypeInner } from '../types'
+import type { GraphQLConfig, RichTypeInner } from '../types'
 import { SlateNodeType, plateElements } from './parse'
-import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
+import type { Content, PhrasingContent } from 'mdast'
+import { resolveMediaRelativeToCloud } from '../resolver/media-utils'
 
-export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
+export const stringifyMDX = (
+  value: unknown,
+  field: RichTypeInner,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
-    const tree = stringifyChildren(slateTree, field)
+    const tree = stringifyChildren(slateTree, field, graphQLconfig)
     const out = toMarkdown(
       {
         type: 'root',
@@ -51,13 +56,17 @@ const allChildrenEmpty = (children: any[]) => {
   return false
 }
 
-const stringifyChildren = (children: any[], field) => {
+const stringifyChildren = (
+  children: any[],
+  field,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+) => {
   if (!children) {
     return []
   }
   return (
     children
-      .map((child) => stringify(child, field))
+      .map((child) => stringify(child, field, graphQLconfig))
       // This allows us to return `false` when we want a node to be removed entirely
       .filter(Boolean) as PhrasingContent[]
   )
@@ -65,7 +74,8 @@ const stringifyChildren = (children: any[], field) => {
 
 export const stringify = (
   node: { type: typeof plateElements },
-  field: RichTypeInner
+  field: RichTypeInner,
+  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
 ): Content => {
   if (!node.type) {
     // Inline code cannot have other marks like bold and emphasis
@@ -187,11 +197,12 @@ export const stringify = (
         children: stringifyChildren(node.children, field),
       }
     case plateElements.ELEMENT_IMAGE:
+      const url = resolveMediaRelativeToCloud(node.url, graphQLconfig)
       return {
         type: 'image',
         title: node.caption,
         alt: node.alt,
-        url: node.url,
+        url: url,
       }
     case plateElements.ELEMENT_HR:
       return {
