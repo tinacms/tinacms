@@ -15,8 +15,15 @@ query posts($relativePath: String!) {
   }
 }
 
-query postsConnection {
-  postsConnection {
+query postsConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: PostsFilter) {
+  postsConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
     totalCount
     edges {
       node {
@@ -54,8 +61,15 @@ query global($relativePath: String!) {
   }
 }
 
-query globalConnection {
-  globalConnection {
+query globalConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: GlobalFilter) {
+  globalConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
     totalCount
     edges {
       node {
@@ -93,8 +107,15 @@ query authors($relativePath: String!) {
   }
 }
 
-query authorsConnection {
-  authorsConnection {
+query authorsConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: AuthorsFilter) {
+  authorsConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
     totalCount
     edges {
       node {
@@ -132,8 +153,15 @@ query pages($relativePath: String!) {
   }
 }
 
-query pagesConnection {
-  pagesConnection {
+query pagesConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: PagesFilter) {
+  pagesConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+    filter: $filter
+  ) {
     totalCount
     edges {
       node {

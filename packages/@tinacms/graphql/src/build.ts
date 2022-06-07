@@ -113,6 +113,9 @@ const _buildQueries = async (
     const queryName = NAMER.queryName(collection.namespace)
     const queryListName = NAMER.generateQueryListName(collection.namespace)
 
+    // queryFilterTypeName is only defined if data layer is enabled
+    const queryFilterTypeName = NAMER.dataFilterTypeName(collection.namespace)
+
     const fragName = NAMER.fragmentName(collection.namespace)
 
     operationsDefinitions.push(
@@ -123,6 +126,10 @@ const _buildQueries = async (
       astBuilder.ListQueryOperationDefinition({
         fragName,
         queryName: queryListName,
+        filterType: queryFilterTypeName,
+        dataLayer: Boolean(
+          tinaSchema.config?.meta?.flags?.find((x) => x === 'experimentalData')
+        ),
       })
     )
   })

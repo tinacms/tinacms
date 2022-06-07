@@ -9,4 +9,5 @@ const apiURL =
 
 // Token generated on app.tina.io
 export const client = createClient({ url: apiURL, token: "***", queries });
+
 export default client;
