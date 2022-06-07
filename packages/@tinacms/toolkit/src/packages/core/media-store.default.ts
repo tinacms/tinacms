@@ -194,6 +194,11 @@ export class TinaMediaStore implements MediaStore {
   async previewSrc(filename: string) {
     return filename
   }
+
+  parse(img) {
+    return img.src
+  }
+
   async list(options?: MediaListOptions): Promise<MediaList> {
     this.setup()
 
@@ -261,10 +266,6 @@ export class TinaMediaStore implements MediaStore {
       items,
       nextOffset: cursor || 0,
     }
-  }
-
-  parse = (img) => {
-    return img.src
   }
 
   async delete(media: Media) {
