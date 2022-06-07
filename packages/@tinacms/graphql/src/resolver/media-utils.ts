@@ -57,7 +57,7 @@ export const resolveMediaRelativeToCloud = (
     if (config.useRelativeMedia === true) {
       return value
     } else {
-      return `https://${config.assetsHost}/${config.clientId}/${value}`
+      return `https://${config.assetsHost}/${config.clientId}${value}`
     }
   } else {
     return value
