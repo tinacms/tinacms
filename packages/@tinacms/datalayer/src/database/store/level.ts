@@ -228,7 +228,6 @@ export class LevelStore implements Store {
   }
 
   public async glob(pattern: string, callback) {
-    console.log('level.glob', pattern)
     const strings: string[] = []
     const p = new Promise((resolve, reject) => {
       this.db

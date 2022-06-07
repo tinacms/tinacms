@@ -624,7 +624,6 @@ export class Database {
       const documentPaths = await this.bridge.glob(
         normalizePath(collection.path)
       )
-      console.log({ documentPaths })
       await _indexContent(this, documentPaths, collection)
     })
   }
