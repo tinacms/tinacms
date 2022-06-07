@@ -1,15 +1,15 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ Copyright 2021 Forestry.io Holdings, Inc.
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 import {
   FilesystemBridge,
@@ -29,6 +29,10 @@ import { dangerText } from '../../utils/theme'
 import { genTypes } from '../query-gen'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
+
+import fs from 'fs-extra'
+import ini from 'ini'
+import os from 'os'
 import path from 'path'
 
 const lock = new AsyncLock()
@@ -47,6 +51,24 @@ interface Options {
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
+
+const resolveGitRoot = async () => {
+  const pathParts = path.dirname(process.cwd()).split(path.sep)
+
+  while (true) {
+    const pathToGit = `${pathParts.join(path.sep)}${path.sep}.git`
+    if (await fs.pathExists(pathToGit)) {
+      return pathParts.join(path.sep)
+    }
+
+    if (!pathParts.length) {
+      throw new Error(
+        'Unable to locate your .git folder (required for isomorphicGitBridge)'
+      )
+    }
+    pathParts.pop()
+  }
+}
 
 export async function startServer(
   _ctx,
@@ -74,6 +96,57 @@ export async function startServer(
     },
   })
 
+  let isomorphicOptions = undefined
+  if (isomorphicGitBridge) {
+    const gitRoot = await resolveGitRoot()
+    isomorphicOptions = {
+      gitRoot,
+    }
+
+    let gitConfig = `${os.homedir()}${path.sep}.gitconfig`
+    if (await fs.pathExists(gitConfig)) {
+      const config = ini.parse(await fs.readFile(gitConfig, 'utf-8'))
+      if (config['user']?.['name']) {
+        isomorphicOptions['authorName'] = config['user']['name']
+      }
+      if (config['user']?.['email']) {
+        isomorphicOptions['authorEmail'] = config['user']['email']
+      }
+    }
+
+    let localConfig = undefined
+    if (!isomorphicOptions['authorName']) {
+      localConfig = ini.parse(
+        await fs.readFile(`${gitRoot}/.git/config`, 'utf-8')
+      )
+      if (localConfig['user']?.['name']) {
+        isomorphicOptions['authorName'] = localConfig['user']['name']
+      }
+
+      if (!isomorphicOptions['authorName']) {
+        throw new Error(
+          'Unable to determine user.name from git config. Hint: `git config --global user.name "John Doe"`'
+        )
+      }
+    }
+
+    if (!isomorphicOptions['authorEmail']) {
+      localConfig =
+        localConfig ||
+        ini.parse(await fs.readFile(`${gitRoot}/.git/config`, 'utf-8'))
+
+      if (localConfig['user']?.['email']) {
+        isomorphicOptions['authorEmail'] = localConfig['user']['email']
+      }
+
+      if (!isomorphicOptions['authorEmail']) {
+        throw new Error(
+          'Unable to determine user.email from git config. Hint: `git config --global user.email johndoe@example.com`'
+        )
+      }
+    }
+  }
+
   /**
    * To work with Github directly, replace the Bridge and Store
    * and ensure you've provided your access token.
@@ -95,11 +168,9 @@ export async function startServer(
   }
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(
-        rootPath,
-        process.cwd() /* TODO this should find the .git folder */,
-        'Tina User',
-        'tina-user@forestry.io'
-      ) // TODO source the author info appropriately
+        rootPath.slice(isomorphicOptions['gitRoot'].length + 1),
+        isomorphicOptions
+      )
     : new FilesystemBridge(rootPath)
 
   const store = experimentalData

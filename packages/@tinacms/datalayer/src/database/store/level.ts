@@ -1,15 +1,15 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+ Copyright 2021 Forestry.io Holdings, Inc.
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 import type {
   StoreQueryOptions,
@@ -61,7 +61,6 @@ export class LevelStore implements Store {
   public async query(
     queryOptions: StoreQueryOptions
   ): Promise<StoreQueryResponse> {
-    console.log('level.query', queryOptions)
     const {
       filterChain: rawFilterChain,
       sort = DEFAULT_COLLECTION_SORT_KEY,
@@ -175,7 +174,6 @@ export class LevelStore implements Store {
     return true
   }
   public async delete(filepath: string, options: DeleteOptions) {
-    console.log('level.delete', filepath)
     const data = await this.db.get(
       `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
     )
@@ -261,7 +259,6 @@ export class LevelStore implements Store {
     }
   }
   public async get(filepath: string) {
-    console.log('level.get', filepath)
     try {
       return await this.db.get(
         `${defaultPrefix}${INDEX_KEY_FIELD_SEPARATOR}${filepath}`
@@ -276,7 +273,6 @@ export class LevelStore implements Store {
   }
 
   public async put(filepath: string, data: object, options?: PutOptions) {
-    console.log('level.put', filepath)
     let existingData
     try {
       existingData =
