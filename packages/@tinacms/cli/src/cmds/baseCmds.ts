@@ -30,11 +30,15 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
+import { buildStandAlone } from './standAlone'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
 export const CMD_COMPILE_MODELS = 'schema:compile'
 export const CMD_WAIT_FOR_DB = 'server:waitForDB'
+export const CMD_STANDALONE_BUILD = 'standAlone:build'
+export const CMD_STANDALONE_DEV = 'standAlone:dev'
+
 export const INIT = 'init'
 export const AUDIT = 'audit'
 
@@ -202,5 +206,19 @@ export const baseCmds: Command[] = [
         ],
         options
       ),
+  },
+  {
+    options: [],
+    command: CMD_STANDALONE_BUILD,
+    action: (options) =>
+      chain(
+        [
+          async (_ctx, _next, _options) => {
+            await buildStandAlone()
+          },
+        ],
+        options
+      ),
+    description: 'Build a stand alone version of Tina',
   },
 ]
