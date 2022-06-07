@@ -1,4 +1,4 @@
-name: e2e Tests
+name: e2e Tests | DEV
 on: [push]
 jobs:
   cypress-run:
