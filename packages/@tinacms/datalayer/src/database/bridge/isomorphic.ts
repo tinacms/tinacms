@@ -19,11 +19,9 @@ import git, {
   WalkerEntry,
 } from 'isomorphic-git'
 import fs from 'fs-extra'
-// import fg from 'fast-glob'
-// import path from 'path'
-// import normalize from 'normalize-path'
 import type { Bridge } from './index'
 import globParent from 'glob-parent'
+import normalize from 'normalize-path'
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -47,7 +45,6 @@ const toUint8Array = (buf: Buffer) => {
 export class IsomorphicBridge implements Bridge {
   public rootPath: string
   public fsModule: CallbackFsClient | PromiseFsClient
-  public ref: string // TODO determine where ref comes from locally
   public isomorphicConfig: {
     fs: CallbackFsClient | PromiseFsClient
     dir: string
@@ -66,11 +63,10 @@ export class IsomorphicBridge implements Bridge {
   ) {
     this.rootPath = rootPath || ''
     this.fsModule = fsModule || fs
-    this.ref = `refs/heads/${ref || 'main'}`
     this.authorName = authorName
     this.authorEmail = authorEmail
     this.isomorphicConfig = {
-      dir: this.rootPath,
+      dir: normalize(this.rootPath),
       fs: this.fsModule,
     }
     this.commitMessage = commitMessage || 'Update from GraphQL client'
@@ -124,7 +120,8 @@ export class IsomorphicBridge implements Bridge {
   }
 
   private async resolvePathEntries(
-    path: string
+    path: string,
+    ref: string
   ): Promise<{ pathParts: string[]; pathNodes: WalkerEntry[] }> {
     let pathParts = path.split('/')
     const result = await git.walk({
@@ -144,7 +141,7 @@ export class IsomorphicBridge implements Bridge {
         if (parent !== undefined) flatten.unshift(parent)
         return flatten
       },
-      trees: [git.TREE({ ref: this.ref })],
+      trees: [git.TREE({ ref })],
     })
 
     const pathNodes = flat(result)
@@ -227,10 +224,21 @@ export class IsomorphicBridge implements Bridge {
 
   // TODO need to think about how to keep the checked out files current
 
+  private async currentBranch(): Promise<string> {
+    const ref = await git.currentBranch({
+      ...this.isomorphicConfig,
+      fullname: true,
+    })
+    if (!ref) {
+      throw new Error('Unable to determine current branch from HEAD')
+    }
+    return ref
+  }
+
   public async glob(pattern: string) {
-    // TODO should not need to do this
+    const ref = await this.currentBranch()
     const parent = globParent(pattern)
-    const { pathParts, pathNodes } = await this.resolvePathEntries(parent)
+    const { pathParts, pathNodes } = await this.resolvePathEntries(parent, ref)
 
     const leaf = pathNodes[pathNodes.length - 1]
     if (!leaf) {
@@ -274,7 +282,11 @@ export class IsomorphicBridge implements Bridge {
 
   public async delete(filepath: string) {
     console.log('delete', filepath)
-    const { pathParts, pathNodes } = await this.resolvePathEntries(filepath)
+    const ref = await this.currentBranch()
+    const { pathParts, pathNodes } = await this.resolvePathEntries(
+      filepath,
+      ref
+    )
     if (pathNodes.length > 0) {
       let ptr = pathNodes.length - 1
       while (ptr >= 1) {
@@ -328,7 +340,7 @@ export class IsomorphicBridge implements Bridge {
               parent: [
                 await git.resolveRef({
                   ...this.isomorphicConfig,
-                  ref: this.ref,
+                  ref,
                 }),
               ],
               message: this.commitMessage,
@@ -340,7 +352,7 @@ export class IsomorphicBridge implements Bridge {
 
           await git.writeRef({
             ...this.isomorphicConfig,
-            ref: this.ref,
+            ref,
             value: commitSha,
             force: true, // TODO I don't believe this should be necessary
           })
@@ -354,10 +366,10 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
-    console.log('get', filepath, 'ref', this.ref)
+    const ref = await this.currentBranch()
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
-      ref: this.ref,
+      ref,
     })
 
     const { blob } = await git.readBlob({
@@ -374,8 +386,11 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
-    console.log('put', filepath)
-    const { pathParts, pathNodes } = await this.resolvePathEntries(filepath)
+    const ref = await this.currentBranch()
+    const { pathParts, pathNodes } = await this.resolvePathEntries(
+      filepath,
+      ref
+    )
     if (pathNodes.length > 0) {
       const blobUpdate = toUint8Array(Buffer.from(data))
 
@@ -411,9 +426,7 @@ export class IsomorphicBridge implements Bridge {
         ...this.isomorphicConfig,
         commit: {
           tree: updatedRootSha,
-          parent: [
-            await git.resolveRef({ ...this.isomorphicConfig, ref: this.ref }),
-          ],
+          parent: [await git.resolveRef({ ...this.isomorphicConfig, ref })],
           message: this.commitMessage,
           author: this.author(),
           committer: this.author(),
@@ -422,7 +435,7 @@ export class IsomorphicBridge implements Bridge {
 
       await git.writeRef({
         ...this.isomorphicConfig,
-        ref: this.ref,
+        ref,
         value: commitSha,
         force: true, // TODO I don't believe this should be necessary
       })
