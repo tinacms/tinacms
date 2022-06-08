@@ -44,6 +44,8 @@ export type IsomorphicGitBridgeOptions = {
   commitMessage?: string
   authorName: string
   authorEmail: string
+  committerName?: string
+  committerEmail?: string
 }
 
 /**
@@ -60,6 +62,8 @@ export class IsomorphicBridge implements Bridge {
   public commitMessage: string
   public authorName: string
   public authorEmail: string
+  public committerName: string
+  public committerEmail: string
 
   constructor(
     rootPath: string,
@@ -67,6 +71,8 @@ export class IsomorphicBridge implements Bridge {
       gitRoot,
       authorName,
       authorEmail,
+      committerName,
+      committerEmail,
       fsModule = fs,
       commitMessage = 'Update from GraphQL client',
     }: IsomorphicGitBridgeOptions
@@ -76,6 +82,8 @@ export class IsomorphicBridge implements Bridge {
     this.fsModule = fsModule
     this.authorName = authorName
     this.authorEmail = authorEmail
+    this.committerName = committerName || authorName
+    this.committerEmail = committerEmail || authorEmail
     this.isomorphicConfig = {
       dir: normalize(this.gitRoot),
       fs: this.fsModule,
@@ -88,6 +96,15 @@ export class IsomorphicBridge implements Bridge {
     return {
       name: this.authorName,
       email: this.authorEmail,
+      timestamp: Math.round(new Date().getTime() / 1000),
+      timezoneOffset: 0,
+    }
+  }
+
+  private committer() {
+    return {
+      name: this.committerName,
+      email: this.committerEmail,
       timestamp: Math.round(new Date().getTime() / 1000),
       timezoneOffset: 0,
     }
@@ -277,7 +294,7 @@ export class IsomorphicBridge implements Bridge {
         message: this.commitMessage,
         // TODO these should be configurable
         author: this.author(),
-        committer: this.author(),
+        committer: this.committer(),
       },
     })
 
