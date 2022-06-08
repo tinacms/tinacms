@@ -53,11 +53,10 @@ interface Options {
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 const resolveGitRoot = async () => {
-  const pathParts = path.dirname(process.cwd()).split(path.sep)
+  const pathParts = process.cwd().split(path.sep)
 
   while (true) {
     const pathToGit = `${pathParts.join(path.sep)}${path.sep}.git`
-    console.log('checking', pathToGit)
     if (await fs.pathExists(pathToGit)) {
       return pathParts.join(path.sep)
     }
