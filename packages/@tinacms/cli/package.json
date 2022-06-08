@@ -63,7 +63,7 @@
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
-    "@tinacms/schema-tools": "workspace:packages/@tinacms/schema-tools",
+    "@tinacms/schema-tools": "workspace:*",
     "@vitejs/plugin-react": "^1.3.2",
     "@yarnpkg/esbuild-plugin-pnp": "^2.0.1-rc.3",
     "add": "^2.0.6",

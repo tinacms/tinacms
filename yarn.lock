@@ -6719,7 +6719,7 @@ __metadata:
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
     "@tinacms/metrics": "workspace:*"
-    "@tinacms/schema-tools": "workspace:packages/@tinacms/schema-tools"
+    "@tinacms/schema-tools": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
