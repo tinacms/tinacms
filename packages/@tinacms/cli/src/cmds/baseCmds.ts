@@ -30,7 +30,7 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
-import { buildStandAlone } from './standAlone'
+import { buildStandAlone, createViteServer } from './standAlone'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -215,6 +215,20 @@ export const baseCmds: Command[] = [
         [
           async (_ctx, _next, _options) => {
             await buildStandAlone()
+          },
+        ],
+        options
+      ),
+    description: 'Build a stand alone version of Tina',
+  },
+  {
+    options: [],
+    command: CMD_STANDALONE_DEV,
+    action: (options) =>
+      chain(
+        [
+          async (_ctx, _next, _options) => {
+            await createViteServer()
           },
         ],
         options

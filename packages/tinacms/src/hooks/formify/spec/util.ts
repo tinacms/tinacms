@@ -13,7 +13,7 @@ limitations under the License.
 import { TinaCMS } from '@tinacms/toolkit'
 import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
 import { toMatchFile } from 'jest-file-snapshot'
-import path from 'path'
+// import path from 'path'
 import 'isomorphic-fetch'
 import * as G from 'graphql'
 import { LocalClient } from '../../../internalClient'
@@ -145,9 +145,9 @@ export const sequential = async <A, B>(
 }
 
 export const buildFileOutput = (dirname) => {
-  return path.join(dirname, 'snapshots', `query.unit-test.gql`)
+  return 'foo'
 }
 
 export const buildMarkdownOutput = (dirname, counter) => {
-  return path.join(dirname, 'snapshots', 'events', `${counter}.md`)
+  return 'bar'
 }

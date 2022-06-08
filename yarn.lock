@@ -3978,6 +3978,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild-plugins/node-globals-polyfill@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@esbuild-plugins/node-globals-polyfill@npm:0.1.1"
+  peerDependencies:
+    esbuild: "*"
+  checksum: 9e007da2f48a339218e11fb1daa5374d9b691b2a6b67300416d98593ef34900cea0bdfb600bcc7f7b7dda2f7d8330df0e33f530b84b79f8c8446830ae322e759
+  languageName: node
+  linkType: hard
+
+"@esbuild-plugins/node-modules-polyfill@npm:^0.1.4":
+  version: 0.1.4
+  resolution: "@esbuild-plugins/node-modules-polyfill@npm:0.1.4"
+  dependencies:
+    escape-string-regexp: ^4.0.0
+    rollup-plugin-node-polyfills: ^0.2.1
+  peerDependencies:
+    esbuild: "*"
+  checksum: 7c85b7e390b9ddd4f9789184cadef2ac4e983e31b4b4b773a5054a99ffdb958685e934a273abc420401aa50853c01b9de9da7954c92fe106b3b39b549af52381
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^0.4.3":
   version: 0.4.3
   resolution: "@eslint/eslintrc@npm:0.4.3"
@@ -4822,22 +4843,6 @@ __metadata:
     "@jridgewell/resolve-uri": ^3.0.3
     "@jridgewell/sourcemap-codec": ^1.4.10
   checksum: 7f8105125e27a9007d473145e9e420fa2dc721f01773ea94fe3eee95c825f5a8f9cad9fe39591aee782e7dabb9e5734aa93225d1dbe0131b1bf6226d4fbb9b56
-  languageName: node
-  linkType: hard
-
-"@kwsites/file-exists@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@kwsites/file-exists@npm:1.1.1"
-  dependencies:
-    debug: ^4.1.1
-  checksum: 8e13130fb3bf4cb4889f9a594531260ea8e5892caa4b7989b22b1250ab10e6ccccabef88f69b59a6059a22e3a742763ee4f3af7037dad7d98b48095baf14a58f
-  languageName: node
-  linkType: hard
-
-"@kwsites/promise-deferred@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@kwsites/promise-deferred@npm:1.1.1"
-  checksum: 1f0c17684c88b5e17868058c781e6170d929e6c27a22bb7c84e384e92582afeb67ebe1f42db5a58177cc0aa567c7052bbed884c67e243587b0560f9e9e8d31a1
   languageName: node
   linkType: hard
 
@@ -6701,6 +6706,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/cli@workspace:packages/@tinacms/cli"
   dependencies:
+    "@esbuild-plugins/node-globals-polyfill": ^0.1.1
+    "@esbuild-plugins/node-modules-polyfill": ^0.1.4
     "@graphql-codegen/core": ^2.1.0
     "@graphql-codegen/plugin-helpers": latest
     "@graphql-codegen/typescript": ^2.2.2
@@ -6712,7 +6719,7 @@ __metadata:
     "@tinacms/datalayer": "workspace:*"
     "@tinacms/graphql": "workspace:*"
     "@tinacms/metrics": "workspace:*"
-    "@tinacms/schema-tools": "workspace:*"
+    "@tinacms/schema-tools": "workspace:packages/@tinacms/schema-tools"
     "@tinacms/scripts": "workspace:*"
     "@types/clear": 0.1.0
     "@types/cors": 2.8.5
@@ -6759,6 +6766,12 @@ __metadata:
     normalize-path: ^3.0.0
     progress: ^2.0.3
     prompts: ^2.4.1
+    react: 17.0.2
+    react-dom: 17.0.2
+    react-is: 17.0.2
+    rollup-plugin-node-polyfills: ^0.2.1
+    rollup-plugin-pnp-resolve: ^2.0.0
+    tinacms: "workspace:*"
     typescript: ^4.3.5
     vite: ^2.9.10
     yarn: ^1.22.17
@@ -6906,7 +6919,7 @@ __metadata:
     "@tinacms/scripts": "workspace:*"
     "@types/yup": ^0.29.10
     jest: ^27.0.6
-    react: 16.14.0
+    react: 17.0.2
     typescript: ^4.3.5
     yup: ^0.32.0
     zod: ^3.14.3
@@ -7063,7 +7076,6 @@ __metadata:
     atob: 2.1.2
     color-string: ^1.5.3
     cors: ^2.8.5
-    express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
     final-form-set-field-data: ^1.0.2
@@ -7071,8 +7083,6 @@ __metadata:
     jest: ^27.0.6
     lodash.get: ^4.4.2
     moment: ">=2 <=3"
-    multer: 1.4.2
-    path: ^0.12.7
     prop-types: 15.7.2
     react: 17.0.2
     react-beautiful-dnd: ^13.1.0
@@ -7083,7 +7093,6 @@ __metadata:
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
     react-is: ^17.0.2
-    simple-git: 3.5.0
     slate: ^0.66.0
     slate-history: ^0.66.0
     slate-hyperscript: ^0.66.0
@@ -16299,6 +16308,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"estree-walker@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "estree-walker@npm:0.6.1"
+  checksum: a63b94b841fcda2d79ff8e313b4ea8439b3364094ba66547289814bd7da4399a54cd33849b23504d239266430f219a142627071201a9fb6eb488bd025575f8fc
+  languageName: node
+  linkType: hard
+
 "estree-walker@npm:^2.0.1":
   version: 2.0.2
   resolution: "estree-walker@npm:2.0.2"
@@ -21979,6 +21995,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"magic-string@npm:^0.25.3":
+  version: 0.25.9
+  resolution: "magic-string@npm:0.25.9"
+  dependencies:
+    sourcemap-codec: ^1.4.8
+  checksum: a7f637a9b837a02f43d9f9b68737e4fd90fb6642d493555af9856cfbde480ef6b43b595af3be516b175e3d6282ec1230c4b52482dffba2747b57318d2ba91a9f
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^2.0.0":
   version: 2.1.0
   resolution: "make-dir@npm:2.1.0"
@@ -23372,9 +23397,9 @@ fsevents@~2.1.2:
   linkType: hard
 
 "moment@npm:>=2 <=3":
-  version: 2.29.1
-  resolution: "moment@npm:2.29.1"
-  checksum: 86729013febf7160de5b93da69273dd304d674b0224f9544b3abd09a87671ddd2cdd57598261ce57588910d63747ffd5590965e83c790d8bf327083c0e0a06e0
+  version: 2.29.3
+  resolution: "moment@npm:2.29.3"
+  checksum: ab0d432d93ef0f6e40ee8a66feb8cfa15d6b9665c74141890b6488825c6f0cb5edfcc1781b3b84c0c82c4a5ba21a9f1d176e1fd4de705bb8300444e6b7f9209e
   languageName: node
   linkType: hard
 
@@ -23427,7 +23452,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"multer@npm:1.4.2, multer@npm:^1.4.2":
+"multer@npm:^1.4.2":
   version: 1.4.2
   resolution: "multer@npm:1.4.2"
   dependencies:
@@ -23664,8 +23689,8 @@ fsevents@~2.1.2:
     cloudinary: ^1.25.2
     multer: ^1.4.2
     next: 10.0.5
-    react: 16.14.0
-    react-dom: 16.14.0
+    react: 17.0.2
+    react-dom: 17.0.2
     styled-components: ^5.2.0
     tinacms: "workspace:*"
     typescript: ^4.3.5
@@ -25213,16 +25238,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"path@npm:^0.12.7":
-  version: 0.12.7
-  resolution: "path@npm:0.12.7"
-  dependencies:
-    process: ^0.11.1
-    util: ^0.10.3
-  checksum: 0e2d3342ca6f91aba8e514919cae8a08ad12071297a3a99da6e3ea493f5296d9bb323ca9bece4d035fc280e91b701a740ce1e48ff65802004deaaae2f2cd623e
-  languageName: node
-  linkType: hard
-
 "pbkdf2@npm:^3.0.3":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
@@ -26256,7 +26271,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"process@npm:0.11.10, process@npm:^0.11.1, process@npm:^0.11.10":
+"process@npm:0.11.10, process@npm:^0.11.10":
   version: 0.11.10
   resolution: "process@npm:0.11.10"
   checksum: ed93a85e9185b40fb01788c588a87c1a9da0eb925ef7cebebbe1b8bbf0eba1802130366603a29e3b689c116969d4fe018de6aed3474bbeb5aefb3716b85d6449
@@ -27035,20 +27050,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-dom@npm:16.14.0, react-dom@npm:^16.8.3":
-  version: 16.14.0
-  resolution: "react-dom@npm:16.14.0"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    prop-types: ^15.6.2
-    scheduler: ^0.19.1
-  peerDependencies:
-    react: ^16.14.0
-  checksum: a13558f0e7c6d1a98684214460bcd4b9005500015b5048fb1b0d2856786b8764dbc713e6b078a5b1a56e17866400e1d862183c7a0a513ae8351de11f6f6749d2
-  languageName: node
-  linkType: hard
-
 "react-dom@npm:17.0.2, react-dom@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-dom@npm:17.0.2"
@@ -27059,6 +27060,20 @@ fsevents@~2.1.2:
   peerDependencies:
     react: 17.0.2
   checksum: 960a74ff6670766846a73097a599115963df1574833c59ca0c2fd909758ebe7a6214cd14f5e6aa63ce846d8f39fde7f3b80474ccfcfadc45dd7f3246364718c6
+  languageName: node
+  linkType: hard
+
+"react-dom@npm:^16.8.3":
+  version: 16.14.0
+  resolution: "react-dom@npm:16.14.0"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+    prop-types: ^15.6.2
+    scheduler: ^0.19.1
+  peerDependencies:
+    react: ^16.14.0
+  checksum: a13558f0e7c6d1a98684214460bcd4b9005500015b5048fb1b0d2856786b8764dbc713e6b078a5b1a56e17866400e1d862183c7a0a513ae8351de11f6f6749d2
   languageName: node
   linkType: hard
 
@@ -27431,10 +27446,10 @@ fsevents@~2.1.2:
     prosemirror-transform: ^1.0.0
     prosemirror-utils: ^0.9.6
     prosemirror-view: ^1.11.3
-    react: 16.14.0
+    react: 17.0.2
     react-docgen-typescript-loader: ^3.1.0
     react-docgen-typescript-webpack-plugin: ^1.1.0
-    react-dom: 16.14.0
+    react-dom: 17.0.2
     react-is: ^17.0.2
     styled-components: ">=4.1"
     tinacms: "workspace:*"
@@ -27448,17 +27463,6 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react@npm:16.14.0, react@npm:^16.13.0, react@npm:^16.8.3":
-  version: 16.14.0
-  resolution: "react@npm:16.14.0"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    prop-types: ^15.6.2
-  checksum: 2769580b22952a52de3b5b2ea0f09cb904030b762d759739f49ab4da0b1f550e5c087ce3728c4be90f423d09481e0c075483c0c30b1ea9c549445c8b12020fd3
-  languageName: node
-  linkType: hard
-
 "react@npm:17.0.2, react@npm:^17.0.2":
   version: 17.0.2
   resolution: "react@npm:17.0.2"
@@ -27466,6 +27470,17 @@ fsevents@~2.1.2:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
   checksum: 7d0dfebafe1d297503157abb2e9acdb49852185deb8700c16f4a6faad87642f84903ab18cfc16f40b9a0dfe97540f99834982ee953e6d48b39c41608dc3e4b29
+  languageName: node
+  linkType: hard
+
+"react@npm:^16.13.0, react@npm:^16.8.3":
+  version: 16.14.0
+  resolution: "react@npm:16.14.0"
+  dependencies:
+    loose-envify: ^1.1.0
+    object-assign: ^4.1.1
+    prop-types: ^15.6.2
+  checksum: 2769580b22952a52de3b5b2ea0f09cb904030b762d759739f49ab4da0b1f550e5c087ce3728c4be90f423d09481e0c075483c0c30b1ea9c549445c8b12020fd3
   languageName: node
   linkType: hard
 
@@ -28471,6 +28486,42 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"rollup-plugin-inject@npm:^3.0.0":
+  version: 3.0.2
+  resolution: "rollup-plugin-inject@npm:3.0.2"
+  dependencies:
+    estree-walker: ^0.6.1
+    magic-string: ^0.25.3
+    rollup-pluginutils: ^2.8.1
+  checksum: c043f4eba75145d39e6732aac0420cad12045e3eaa3cb78905083382d0315c026a0af289a803287ba466f3a6470ac3dc8dd8731b1cc93969752682fae5b96152
+  languageName: node
+  linkType: hard
+
+"rollup-plugin-node-polyfills@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "rollup-plugin-node-polyfills@npm:0.2.1"
+  dependencies:
+    rollup-plugin-inject: ^3.0.0
+  checksum: ece17e6ff9d6a5e08f444719dc5aeba62ea64998a32abd70a6fc7a3ea1649042f1223b6621faa0d9777b18fec2888f42133188551b32d1f1821f79694827c4ed
+  languageName: node
+  linkType: hard
+
+"rollup-plugin-pnp-resolve@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "rollup-plugin-pnp-resolve@npm:2.0.0"
+  checksum: 6fd37cfa9f5191920defd57c778c7b3eab784eb2743669c89e0903b169e08edcb3f6485115c5e7a4be42d22172f97c86bc950129e2f6d8b155efb7a9d132bf0b
+  languageName: node
+  linkType: hard
+
+"rollup-pluginutils@npm:^2.8.1":
+  version: 2.8.2
+  resolution: "rollup-pluginutils@npm:2.8.2"
+  dependencies:
+    estree-walker: ^0.6.1
+  checksum: 6922c1a26df033cc3da4650106244fb2211b5ddf72a93be5010cbe51a0817c9abcab08f61cbc3f5fc906b2701df123d8c9b0dae0a34e69dd07218e34e5d357b8
+  languageName: node
+  linkType: hard
+
 "rollup@npm:^2.38.5":
   version: 2.56.2
   resolution: "rollup@npm:2.56.2"
@@ -29170,17 +29221,6 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.5.0":
-  version: 3.5.0
-  resolution: "simple-git@npm:3.5.0"
-  dependencies:
-    "@kwsites/file-exists": ^1.1.1
-    "@kwsites/promise-deferred": ^1.1.1
-    debug: ^4.3.3
-  checksum: 7e8a29fd4c92b53dde2d03012d3c4b6239d29927e2e85c575aa25b6980644105f5178fe1c30f7b1962b4f91ead090d5e69f28e9d990920626380a410ad517009
-  languageName: node
-  linkType: hard
-
 "simple-swizzle@npm:^0.2.2":
   version: 0.2.2
   resolution: "simple-swizzle@npm:0.2.2"
@@ -29527,6 +29567,13 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"sourcemap-codec@npm:^1.4.8":
+  version: 1.4.8
+  resolution: "sourcemap-codec@npm:1.4.8"
+  checksum: 4d56d1232a45af813606d1755f11e7ae6b3542c615a7e3f904382f0134a9412ba8d090e83749254d78449eafdfcc62d5158b8f35e6241480b51b74b5c46b99f9
+  languageName: node
+  linkType: hard
+
 "space-separated-tokens@npm:^1.0.0":
   version: 1.1.5
   resolution: "space-separated-tokens@npm:1.1.5"
@@ -29705,13 +29752,14 @@ resolve@^2.0.0-next.3:
   version: 0.0.0-use.local
   resolution: "starter-empty@workspace:examples/empty"
   dependencies:
+    "@tinacms/cli": "workspace:*"
     "@types/node": ^17.0.21
     eslint: 7
     eslint-config-next: 12.0.3
     next: 12.0.3
     react: 17.0.2
     react-dom: 17.0.2
-    react-is: ^17.0.2
+    react-is: 17.0.2
   languageName: unknown
   linkType: soft
 
@@ -30979,8 +31027,8 @@ resolve@^2.0.0-next.3:
     jest-file-snapshot: ^0.5.0
     lodash.set: ^4.3.2
     next: 9.4.2
-    react: 16.14.0
-    react-dom: 16.14.0
+    react: 17.0.2
+    react-dom: 17.0.2
     react-icons: ^4.3.1
     react-is: ^17.0.2
     react-router-dom: 6
@@ -32273,15 +32321,6 @@ resolve@^2.0.0-next.3:
     safe-buffer: ^5.1.2
     which-typed-array: ^1.1.2
   checksum: 6e3cbc15468436de8aa7bbc50ea1354b738ece2330ef4da417d08893d1105985ac1cc0dd1ea86ef855494e01dd000d7f866c802537afe8751f0c319d16ceccd0
-  languageName: node
-  linkType: hard
-
-"util@npm:^0.10.3":
-  version: 0.10.4
-  resolution: "util@npm:0.10.4"
-  dependencies:
-    inherits: 2.0.3
-  checksum: 6682ea8239076243495c45e81f19c2c002e02805de4de08554dc815500805923f27f504ec1a9c7599d420b62bf7452efbab6fa078219d529188b0ca830f142a5
   languageName: node
   linkType: hard
 

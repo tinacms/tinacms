@@ -435,6 +435,10 @@ const buildIt = async (entryPoint, packageJSON) => {
         outdir: path.join(process.cwd(), 'dist'),
         external,
         target: 'node12',
+        define: {
+          // replace process.env.TINA_INTERNAL_MONOREPO with "true" when building.
+          'process.env.TINA_INTERNAL_MONOREPO': '"true"',
+        },
       })
     }
 
