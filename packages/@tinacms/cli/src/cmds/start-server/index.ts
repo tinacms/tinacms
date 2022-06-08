@@ -68,6 +68,59 @@ const resolveGitRoot = async () => {
   }
 }
 
+async function makeIsomorphicOptions() {
+  const gitRoot = await resolveGitRoot()
+  const options = {
+    gitRoot,
+    authorName: '',
+    authorEmail: '',
+  }
+
+  const userGitConfig = `${os.homedir()}${path.sep}.gitconfig`
+  if (await fs.pathExists(userGitConfig)) {
+    const config = ini.parse(await fs.readFile(userGitConfig, 'utf-8'))
+    if (config['user']?.['name']) {
+      options.authorName = config['user']['name']
+    }
+    if (config['user']?.['email']) {
+      options.authorEmail = config['user']['email']
+    }
+  }
+
+  let repoGitConfig = undefined
+  if (!options.authorName) {
+    repoGitConfig = ini.parse(
+      await fs.readFile(`${gitRoot}/.git/config`, 'utf-8')
+    )
+    if (repoGitConfig['user']?.['name']) {
+      options.authorName = repoGitConfig['user']['name']
+    }
+
+    if (!options.authorName) {
+      throw new Error(
+        'Unable to determine user.name from git config. Hint: `git config --global user.name "John Doe"`'
+      )
+    }
+  }
+
+  if (!options.authorEmail) {
+    repoGitConfig =
+      repoGitConfig ||
+      ini.parse(await fs.readFile(`${gitRoot}/.git/config`, 'utf-8'))
+
+    if (repoGitConfig['user']?.['email']) {
+      options.authorEmail = repoGitConfig['user']['email']
+    }
+
+    if (!options.authorEmail) {
+      throw new Error(
+        'Unable to determine user.email from git config. Hint: `git config --global user.email johndoe@example.com`'
+      )
+    }
+  }
+  return options
+}
+
 export async function startServer(
   _ctx,
   next,
@@ -93,56 +146,8 @@ export async function startServer(
     },
   })
 
-  let isomorphicOptions = undefined
-  if (isomorphicGitBridge) {
-    const gitRoot = await resolveGitRoot()
-    isomorphicOptions = {
-      gitRoot,
-    }
-
-    let gitConfig = `${os.homedir()}${path.sep}.gitconfig`
-    if (await fs.pathExists(gitConfig)) {
-      const config = ini.parse(await fs.readFile(gitConfig, 'utf-8'))
-      if (config['user']?.['name']) {
-        isomorphicOptions['authorName'] = config['user']['name']
-      }
-      if (config['user']?.['email']) {
-        isomorphicOptions['authorEmail'] = config['user']['email']
-      }
-    }
-
-    let localConfig = undefined
-    if (!isomorphicOptions['authorName']) {
-      localConfig = ini.parse(
-        await fs.readFile(`${gitRoot}/.git/config`, 'utf-8')
-      )
-      if (localConfig['user']?.['name']) {
-        isomorphicOptions['authorName'] = localConfig['user']['name']
-      }
-
-      if (!isomorphicOptions['authorName']) {
-        throw new Error(
-          'Unable to determine user.name from git config. Hint: `git config --global user.name "John Doe"`'
-        )
-      }
-    }
-
-    if (!isomorphicOptions['authorEmail']) {
-      localConfig =
-        localConfig ||
-        ini.parse(await fs.readFile(`${gitRoot}/.git/config`, 'utf-8'))
-
-      if (localConfig['user']?.['email']) {
-        isomorphicOptions['authorEmail'] = localConfig['user']['email']
-      }
-
-      if (!isomorphicOptions['authorEmail']) {
-        throw new Error(
-          'Unable to determine user.email from git config. Hint: `git config --global user.email johndoe@example.com`'
-        )
-      }
-    }
-  }
+  const isomorphicOptions =
+    isomorphicGitBridge && (await makeIsomorphicOptions())
 
   /**
    * To work with Github directly, replace the Bridge and Store
