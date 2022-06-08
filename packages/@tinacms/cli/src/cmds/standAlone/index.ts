@@ -15,7 +15,8 @@ import { createServer, build as viteBuild, InlineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-const root = path.resolve(__dirname, '../src/cmds/standAlone/app/')
+const root = path.join(__dirname, '..', 'appFiles')
+console.log({ root })
 let config: InlineConfig = {
   root,
   resolve: {

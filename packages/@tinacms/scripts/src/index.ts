@@ -576,6 +576,9 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
     }
   })
   if (args.watch) {
+    // when using watch always set this to true
+    process.env.TINA_INTERNAL_MONOREPO = 'true'
+
     console.log(`${chalk.blue(`Watching workspaces...`)}`)
     chokidar
       .watch(workspacePkgs, {
