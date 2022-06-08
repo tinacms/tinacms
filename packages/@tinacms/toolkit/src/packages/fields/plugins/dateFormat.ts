@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// import moment from 'moment'
+import moment from 'moment'
 import { DatetimepickerProps } from 'react-datetime'
 
 export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'

@@ -15,7 +15,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 import { useFormify } from '..'
 import * as util from './util'
 import fs from 'fs'
-// import path from 'path'
+import path from 'path'
 import { OnChangeEvent } from '../types'
 
 const requestList = []
@@ -55,8 +55,8 @@ export const testRunner = async (
     try {
       let mocks = []
       mocks = JSON.parse(
-        // await fs.readFileSync(path.join(dirname, 'mocks.json')).toString()
-        '/bar'
+        // this might need to be removed
+        await fs.readFileSync(path.join(dirname, 'mocks.json')).toString()
       )
 
       // @ts-ignore
