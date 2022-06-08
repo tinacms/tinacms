@@ -56,7 +56,7 @@ const resolveGitRoot = async () => {
   const pathParts = process.cwd().split(path.sep)
   console.log('resolveGitRoot', pathParts)
   while (true) {
-    const pathToGit = `${path.sep}${path.join(...pathParts)}`
+    const pathToGit = pathParts.join(path.sep)
     console.log(pathToGit, path.join(pathToGit, '.git'))
     if (await fs.pathExists(path.join(pathToGit, '.git'))) {
       return pathToGit
