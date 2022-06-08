@@ -348,7 +348,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public supportsBuilding() {
-    return false
+    return true
   }
 
   public async delete(filepath: string) {
