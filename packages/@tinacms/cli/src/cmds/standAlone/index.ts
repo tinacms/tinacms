@@ -14,16 +14,12 @@ limitations under the License.
 import { createServer, build as viteBuild, InlineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-
 const root = path.join(__dirname, '..', 'appFiles')
 const isMonoRepo = process.env.TINA_INTERNAL_MONOREPO === 'true'
 let config: InlineConfig = {
   root,
   server: {
     force: true,
-  },
-  optimizeDeps: {
-    disabled: !isMonoRepo,
   },
   resolve: {
     alias: {
@@ -32,6 +28,7 @@ let config: InlineConfig = {
     },
   },
   build: {
+    emptyOutDir: true,
     outDir: path.resolve(process.cwd(), 'out'),
   },
   plugins: [react],
@@ -82,7 +79,9 @@ export const createViteServer = async () => {
 
   server.printUrls()
 }
-
+type Awaited<T> = T extends PromiseLike<infer U> ? U : T
+type TempUnion = Awaited<ReturnType<typeof viteBuild>>
+type TempType = Extract<TempUnion, { output: Array<any> }>
 export const buildStandAlone = async () => {
-  const out = await viteBuild(config)
+  const out = (await viteBuild(config)) as TempType
 }

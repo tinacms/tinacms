@@ -14,6 +14,7 @@ limitations under the License.
 import cors from 'cors'
 import http from 'http'
 import express from 'express'
+import path from 'path'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
@@ -65,6 +66,9 @@ export const gqlServer = async (database) => {
   })
 
   app.use('/media', mediaRouter)
+
+  // this is bad and is only for the POC
+  app.use(express.static(path.join(process.cwd(), 'out')))
 
   return server
 }

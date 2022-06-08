@@ -29,6 +29,8 @@ import { genTypes } from '../query-gen'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import path from 'path'
+import { CMD_STANDALONE_DEV } from '../baseCmds'
+import { buildStandAlone } from '../standAlone'
 
 const lock = new AsyncLock()
 interface Options {
@@ -47,7 +49,7 @@ interface Options {
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 export async function startServer(
-  _ctx,
+  ctx,
   next,
   {
     port = 4001,
@@ -163,6 +165,11 @@ export async function startServer(
       .on('all', async () => {
         if (ready) {
           logger.info('Tina change detected, regenerating config')
+
+          // rebuild if you are in dev
+          if (ctx.cmd === CMD_STANDALONE_DEV) {
+            await buildStandAlone()
+          }
           try {
             if (shouldBuild) {
               await build(noSDK)

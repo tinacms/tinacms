@@ -30,7 +30,7 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
-import { buildStandAlone, createViteServer } from './standAlone'
+import { buildStandAlone } from './standAlone'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -227,9 +227,14 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
-          async (_ctx, _next, _options) => {
-            await createViteServer()
+          // build the app in the .out folder
+          async (ctx, next, _options) => {
+            ctx.cmd = CMD_STANDALONE_DEV
+            await buildStandAlone()
+            next()
           },
+          startServer,
+          startSubprocess,
         ],
         options
       ),
