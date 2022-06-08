@@ -182,6 +182,7 @@ export async function startServer(
   const database = await createDatabase({ store, bridge })
 
   if (isomorphicGitBridge) {
+    await compileSchema(null, null, { verbose, dev })
     const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
     const config = fs
       .readFileSync(path.join(tempConfig, 'schema.json'))
