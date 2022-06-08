@@ -151,7 +151,9 @@ export const parseMDXInner = (
     node.props = props
   })
 
-  const slateTree = tree.children.map(remarkToSlate)
+  const slateTree = tree.children.map((node) =>
+    remarkToSlate(node, graphQLconfig)
+  )
   return { type: 'root', children: slateTree }
 }
 
@@ -602,7 +604,10 @@ export const defaultNodeTypes: NodeTypes = {
   image: plateElements.ELEMENT_IMAGE,
 }
 
-export default function remarkToSlate(node: MdxAstNode) {
+export default function remarkToSlate(
+  node: MdxAstNode,
+  graphQLconfig: GraphQLConfig
+) {
   const types = {
     ...defaultNodeTypes,
     heading: {
@@ -614,12 +619,16 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'heading':
       return {
         type: types.heading[node.depth],
-        children: node.children.map(remarkToSlate),
+        children: node.children.map((node) =>
+          remarkToSlate(node, graphQLconfig)
+        ),
       }
     case 'list':
       return {
         type: node.ordered ? types.ol_list : types.ul_list,
-        children: node.children.map(remarkToSlate),
+        children: node.children.map((node) =>
+          remarkToSlate(node, graphQLconfig)
+        ),
       }
     case 'listItem':
       const realChildren = []
@@ -627,13 +636,17 @@ export default function remarkToSlate(node: MdxAstNode) {
         if (child.type === 'list') {
           realChildren.push({
             type: child.ordered ? types.ol_list : types.ul_list,
-            children: child.children.map(remarkToSlate),
+            children: child.children.map((node) =>
+              remarkToSlate(node, graphQLconfig)
+            ),
           })
         } else {
           realChildren.push({
             type: plateElements.ELEMENT_LIC,
             // @ts-ignore FIXME: MDAST types don't match with some of these
-            children: child.children.map(remarkToSlate),
+            children: child.children.map((node) =>
+              remarkToSlate(node, graphQLconfig)
+            ),
           })
         }
       })
@@ -644,25 +657,32 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'paragraph':
       return {
         type: types.paragraph,
-        children: node.children.map(remarkToSlate),
+        children: node.children.map((node) =>
+          remarkToSlate(node, graphQLconfig)
+        ),
       }
     case 'link':
       return {
         type: types.link,
         url: node.url,
-        children: node.children.map(remarkToSlate),
+        children: node.children.map((node) =>
+          remarkToSlate(node, graphQLconfig)
+        ),
       }
     case 'image':
+      const url = resolveMediaRelativeToCloud(node.url, graphQLconfig)
       return {
         type: types.image,
-        url: node.url,
+        url: url,
         alt: node.alt,
         caption: node.title,
       }
     case 'blockquote':
       return {
         type: types.block_quote,
-        children: node.children.map(remarkToSlate),
+        children: node.children.map((node) =>
+          remarkToSlate(node, graphQLconfig)
+        ),
       }
     case 'code':
       return {
