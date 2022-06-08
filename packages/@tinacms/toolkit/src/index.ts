@@ -20,6 +20,7 @@ limitations under the License.
  * Export @tinacms internal packages
  */
 export * from './packages/react-modals'
+export { CursorPaginator } from './components/media/pagination'
 export type {
   Media,
   MediaUploadOptions,
