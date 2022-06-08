@@ -16,9 +16,15 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 const root = path.join(__dirname, '..', 'appFiles')
-console.log({ root })
+const isMonoRepo = process.env.TINA_INTERNAL_MONOREPO === 'true'
 let config: InlineConfig = {
   root,
+  server: {
+    force: true,
+  },
+  optimizeDeps: {
+    disabled: !isMonoRepo,
+  },
   resolve: {
     alias: {
       // external
@@ -31,7 +37,7 @@ let config: InlineConfig = {
   plugins: [react],
 }
 
-if (process.env.TINA_INTERNAL_MONOREPO === 'true') {
+if (isMonoRepo) {
   // if we are building in the mono repo resolve locally because PNP does not seem to work with vite
   config = {
     ...config,
