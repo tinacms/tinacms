@@ -120,6 +120,7 @@ export const baseCmds: Command[] = [
     options: [
       subCommand,
       experimentalDatalayer,
+      isomorphicGitBridge,
       noTelemetryOption,
       verboseOption,
       developmentOption,
