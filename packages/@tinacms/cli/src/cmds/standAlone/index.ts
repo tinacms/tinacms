@@ -5,6 +5,12 @@ import path from 'path'
 const root = path.resolve(__dirname, '../src/cmds/standAlone/app/')
 let config: InlineConfig = {
   root,
+  resolve: {
+    alias: {
+      // external
+      TINA_IMPORT: path.join(process.cwd(), '.tina', 'schema'),
+    },
+  },
   build: {
     outDir: path.resolve(process.cwd(), 'out'),
   },
@@ -16,7 +22,9 @@ if (process.env.TINA_INTERNAL_MONOREPO === 'true') {
   config = {
     ...config,
     resolve: {
+      ...config?.resolve,
       alias: {
+        ...config.resolve?.alias,
         /// internal
         'tinacms/dist/edit-state': path.resolve(
           __dirname,
