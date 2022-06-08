@@ -56,9 +56,9 @@ const resolveGitRoot = async () => {
   const pathParts = process.cwd().split(path.sep)
 
   while (true) {
-    const pathToGit = `${pathParts.join(path.sep)}${path.sep}.git`
-    if (await fs.pathExists(pathToGit)) {
-      return pathParts.join(path.sep)
+    const pathToGit = path.join(...pathParts)
+    if (await fs.pathExists(path.join(pathToGit, '.git'))) {
+      return pathToGit
     }
 
     if (!pathParts.length) {
@@ -163,9 +163,21 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
+  if (isomorphicGitBridge) {
+    console.log({
+      rootPath,
+      gitRoot: isomorphicOptions['gitRoot'],
+      slicedRootPath: rootPath
+        .slice(isomorphicOptions['gitRoot'].length + 1)
+        .replace(/\\/g, '/'),
+    })
+  }
+
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(
-        rootPath.slice(isomorphicOptions['gitRoot'].length + 1),
+        rootPath
+          .slice(isomorphicOptions['gitRoot'].length + 1)
+          .replace(/\\/g, '/'),
         isomorphicOptions
       )
     : new FilesystemBridge(rootPath)
