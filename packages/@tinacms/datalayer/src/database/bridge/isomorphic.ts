@@ -437,6 +437,7 @@ export class IsomorphicBridge implements Bridge {
       ...this.isomorphicConfig,
       ref,
     })
+    console.log('get', filepath, this.qualifyPath(filepath), ref)
 
     const { blob } = await git.readBlob({
       ...this.isomorphicConfig,
