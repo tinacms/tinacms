@@ -113,6 +113,7 @@ export class IsomorphicBridge implements Bridge {
     path?: string
     results: string[]
   }) {
+    console.log('listEntries', pattern, path)
     const treeResult: ReadTreeResult = await git.readTree({
       ...this.isomorphicConfig,
       oid: entry.oid,
@@ -121,6 +122,7 @@ export class IsomorphicBridge implements Bridge {
     const children: TreeEntry[] = []
     for (const childEntry of treeResult.tree) {
       const childPath = path ? `${path}/${childEntry.path}` : childEntry.path
+      console.log({ childPath })
       if (childEntry.type === 'tree') {
         children.push(childEntry)
       } else {
@@ -309,12 +311,15 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async glob(pattern: string) {
+    console.log('glob', pattern)
     const ref = await this.currentBranch()
     const parent = globParent(this.qualifyPath(pattern))
+    console.log('glob parent', parent)
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       parent,
       ref
     )
+    console.log({ pathParts, pathEntries })
 
     const leafEntry = pathEntries[pathEntries.length - 1]
     const entryPath = pathParts[pathParts.length - 1]
@@ -326,7 +331,9 @@ export class IsomorphicBridge implements Bridge {
         ...this.isomorphicConfig,
         oid: await parentEntry.oid(),
       })
+      console.log({ entryPath })
       treeEntry = treeResult.tree.find((entry) => entry.path === entryPath)
+      console.log({ treeEntry })
       parentPath = pathParts.slice(1, pathParts.length).join('/')
     } else {
       // @ts-ignore
@@ -343,6 +350,10 @@ export class IsomorphicBridge implements Bridge {
       entry: treeEntry,
       path: parentPath,
       results,
+    })
+    console.log({
+      results,
+      unqualifiedResults: results.map((path) => this.unqualifyPath(path)),
     })
     return results.map((path) => this.unqualifyPath(path))
   }
