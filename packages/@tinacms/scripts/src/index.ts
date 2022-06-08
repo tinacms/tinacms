@@ -437,7 +437,10 @@ const buildIt = async (entryPoint, packageJSON) => {
         target: 'node12',
         define: {
           // replace process.env.TINA_INTERNAL_MONOREPO with "true" when building.
-          'process.env.TINA_INTERNAL_MONOREPO': '"true"',
+          'process.env.TINA_INTERNAL_MONOREPO': process.env
+            .TINA_INTERNAL_MONOREPO
+            ? '"true"'
+            : "'false'",
         },
       })
     }
