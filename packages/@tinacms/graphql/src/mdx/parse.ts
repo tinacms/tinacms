@@ -29,7 +29,7 @@ import { resolveMediaRelativeToCloud } from '../resolver/media-utils'
 export const parseMDX = (
   value: string,
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+  graphQLconfig: GraphQLConfig
 ) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
   return parseMDXInner(tree, field, graphQLconfig)
@@ -86,7 +86,7 @@ export const parseMDX = (
 export const parseMDXInner = (
   tree: any,
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+  graphQLconfig: GraphQLConfig
 ) => {
   // Delete useless position info
   visit(tree, (node) => {
@@ -159,16 +159,19 @@ const parseField = (
   attribute,
   field: TinaField,
   props,
-  graphQLconfig: GraphQLConfig = { useRelativeMedia: true }
+  graphQLconfig: GraphQLConfig
 ) => {
   switch (field.type) {
     case 'boolean':
     case 'datetime':
+      props[field.name] = attribute.value
+      break
     case 'image':
       props[field.name] = resolveMediaRelativeToCloud(
         attribute.value,
         graphQLconfig
       )
+      break
     case 'number':
     case 'string':
       if (field.list) {

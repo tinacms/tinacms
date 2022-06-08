@@ -672,6 +672,8 @@ export class Resolver {
         case 'string':
         case 'boolean':
         case 'number':
+          accum[fieldName] = fieldValue
+          break
         case 'image':
           accum[fieldName] = resolveMediaCloudToRelative(
             fieldValue as string,
