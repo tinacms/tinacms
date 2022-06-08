@@ -17,7 +17,7 @@ import {
   IsomorphicBridge,
   LevelStore,
 } from '@tinacms/datalayer'
-import { buildSchema, createDatabase } from '@tinacms/graphql'
+import { buildSchema, createDatabase, indexDB } from '@tinacms/graphql'
 import { compileSchema, resetGeneratedFolder } from '../compile'
 
 import { AsyncLock } from './lock'
@@ -178,6 +178,18 @@ export async function startServer(
   }
 
   const database = await createDatabase({ store, bridge })
+
+  if (isomorphicGitBridge) {
+    const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
+    const config = fs
+      .readFileSync(path.join(tempConfig, 'schema.json'))
+      .toString()
+    await indexDB({
+      database,
+      config: JSON.parse(config),
+      flags: ['experimentalData', 'isomorphicGit'],
+    })
+  }
 
   let ready = false
 
