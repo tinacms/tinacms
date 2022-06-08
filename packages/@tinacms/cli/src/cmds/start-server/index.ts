@@ -185,6 +185,7 @@ export async function startServer(
     const config = fs
       .readFileSync(path.join(tempConfig, 'schema.json'))
       .toString()
+    await fs.rmdir(tempConfig, { recursive: true })
     await indexDB({
       database,
       config: JSON.parse(config),
