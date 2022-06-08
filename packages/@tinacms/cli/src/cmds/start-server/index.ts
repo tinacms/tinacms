@@ -54,10 +54,8 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 const resolveGitRoot = async () => {
   const pathParts = process.cwd().split(path.sep)
-  console.log('resolveGitRoot', pathParts)
   while (true) {
     const pathToGit = pathParts.join(path.sep)
-    console.log(pathToGit, path.join(pathToGit, '.git'))
     if (await fs.pathExists(path.join(pathToGit, '.git'))) {
       return pathToGit
     }
@@ -163,16 +161,6 @@ export async function startServer(
   // }
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
-
-  if (isomorphicGitBridge) {
-    console.log({
-      rootPath,
-      gitRoot: isomorphicOptions['gitRoot'],
-      slicedRootPath: rootPath
-        .slice(isomorphicOptions['gitRoot'].length + 1)
-        .replace(/\\/g, '/'),
-    })
-  }
 
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(
