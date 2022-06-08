@@ -445,7 +445,9 @@ export class IsomorphicBridge implements Bridge {
       filepath: this.qualifyPath(filepath),
     })
 
-    return Buffer.from(blob).toString('utf8')
+    const result = Buffer.from(blob).toString('utf8')
+    console.log('get len', result.length)
+    return result
   }
 
   public async putConfig(filepath: string, data: string) {
