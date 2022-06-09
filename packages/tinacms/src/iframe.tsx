@@ -28,7 +28,7 @@ export const Iframe = ({ url: u = '/' }) => {
     }
   }, [JSON.stringify(state.data)])
 
-  const [width, setWidth] = React.useState(1200)
+  const [width, setWidth] = React.useState(2000)
   const [hideSidebar, setHideSibar] = React.useState(false)
 
   React.useEffect(() => {
@@ -106,7 +106,7 @@ export const Iframe = ({ url: u = '/' }) => {
                   />
                 </svg>
               </button>
-              <button onClick={() => setWidth(1200)}>
+              <button onClick={() => setWidth(2000)}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
