@@ -15,6 +15,7 @@ import React, { useState } from 'react'
 import { TinaCloudMediaStoreClass, TinaCloudProvider } from './auth'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 
+import { TinaAdmin } from './admin'
 import { LocalClient } from './client/index'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
@@ -327,18 +328,7 @@ export const TinaCMSProvider2 = ({
         <ErrorBoundary>
           <DocumentCreator documentCreatorCallback={documentCreatorCallback} />
           <TinaDataProvider formifyCallback={formifyCallback}>
-            {typeof props.children == 'function' ? (
-              <TinaQuery
-                {...props}
-                variables={props.variables}
-                data={props.data}
-                query={query}
-                formifyCallback={formifyCallback}
-                children={props.children as any}
-              />
-            ) : (
-              props.children
-            )}
+            <TinaAdmin />
           </TinaDataProvider>
         </ErrorBoundary>
       </TinaCloudProvider>
