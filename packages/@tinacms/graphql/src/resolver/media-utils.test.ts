@@ -11,15 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { GraphQLConfig } from '../types'
+import type { GraphQLConfig } from '../types'
 import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
 
 describe('resolveMedia', () => {
-  const relativeAssetURL = `/MySweetImage.png`
-  const cloudAssetURL = `https://assets-host.com/0000-1111-2222-3333/MySweetImage.png`
+  const assetsHost = `assets.tinajs.dev`
+  const clientId = `a03ff3e2-1c3a-41af-8afd-ba0d58853191`
+  const relativeAssetURL = `/llama.png`
+  const cloudAssetURL = `https://assets.tinajs.dev/a03ff3e2-1c3a-41af-8afd-ba0d58853191/llama.png`
 
   /**
    * When using `useRelativeMedia: true`, the URL should not be changed.
@@ -38,8 +40,8 @@ describe('resolveMedia', () => {
   it('resolves relative media to cloud media when useRelativeMedia: false', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
-      assetsHost: 'assets-host.com',
-      clientId: '0000-1111-2222-3333',
+      assetsHost,
+      clientId,
     }
     const resolvedURL = resolveMediaRelativeToCloud(relativeAssetURL, config)
     expect(resolvedURL).toEqual(cloudAssetURL)
@@ -51,10 +53,26 @@ describe('resolveMedia', () => {
   it('resolves cloud media to relative media when useRelativeMedia: false', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
-      assetsHost: 'assets-host.com',
-      clientId: '0000-1111-2222-3333',
+      assetsHost,
+      clientId,
     }
     const resolvedURL = resolveMediaCloudToRelative(cloudAssetURL, config)
     expect(resolvedURL).toEqual(relativeAssetURL)
+  })
+
+  /**
+   * A empty value should return empty, regardless of `useRelativeMedia`
+   */
+  it('resolved to empty when provided an empty value', () => {
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+    }
+    const aURL = resolveMediaCloudToRelative('', config)
+    expect(aURL).toEqual('')
+
+    const bURL = resolveMediaRelativeToCloud('', config)
+    expect(bURL).toEqual('')
   })
 })
