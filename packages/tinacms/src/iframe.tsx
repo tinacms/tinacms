@@ -42,11 +42,11 @@ export const Iframe = ({ url: u = '/' }) => {
   return (
     <div className="tina-tailwind">
       {state.query && <Data onUpdate={setState} {...state} />}
-      <div className="grid grid-cols-2">
-        <div className="">
+      <div className="grid grid-cols-10">
+        <div className={hideSidebar ? 'col-span-3' : 'col-span-5'}>
           <FormsView />
         </div>
-        <div className="w-full">
+        <div className={hideSidebar ? 'col-span-7' : 'col-span-5'}>
           <div
             style={{ height: '81.5px' }}
             className="w-full bg-white border-b border-gray-200 p-4 flex items-center gap-3"
