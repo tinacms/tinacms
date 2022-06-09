@@ -406,7 +406,13 @@ export type TestQueryVariables = Exact<{
 
 export type TestQuery = { __typename?: 'Query', test: { __typename?: 'TestTem1', id: string, foo?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'TestTem2', id: string, bar?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
-export type TestConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+export type TestConnectionQueryVariables = Exact<{
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
+}>;
 
 
 export type TestConnectionQuery = { __typename?: 'Query', testConnection: { __typename?: 'TestConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'TestConnectionEdges', node?: Maybe<{ __typename?: 'TestTem1', id: string, foo?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | { __typename?: 'TestTem2', id: string, bar?: Maybe<string>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
@@ -418,7 +424,13 @@ export type PageQueryVariables = Exact<{
 
 export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, Title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
-export type PageConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+export type PageConnectionQueryVariables = Exact<{
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
+}>;
 
 
 export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'Page', id: string, Title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
@@ -430,7 +442,13 @@ export type PostQueryVariables = Exact<{
 
 export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, posts?: Maybe<Array<Maybe<{ __typename: 'PostPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'Page', id: string } | { __typename?: 'Post', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> } };
 
-export type PostConnectionQueryVariables = Exact<{ [key: string]: never; }>;
+export type PostConnectionQueryVariables = Exact<{
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Float']>;
+  last?: Maybe<Scalars['Float']>;
+  sort?: Maybe<Scalars['String']>;
+}>;
 
 
 export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'Post', id: string, title?: Maybe<string>, topic?: Maybe<Array<Maybe<string>>>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string }, posts?: Maybe<Array<Maybe<{ __typename: 'PostPosts', label?: Maybe<string>, post?: Maybe<{ __typename?: 'Page', id: string } | { __typename?: 'Post', id: string }> }>>>, foo?: Maybe<{ __typename: 'PostFoo', bar?: Maybe<string> }> }> }>>> } };
@@ -490,8 +508,14 @@ export const TestDocument = gql`
 }
     ${TestPartsFragmentDoc}`;
 export const TestConnectionDocument = gql`
-    query testConnection {
-  testConnection {
+    query testConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+  testConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+  ) {
     totalCount
     edges {
       node {
@@ -531,8 +555,14 @@ export const PageDocument = gql`
 }
     ${PagePartsFragmentDoc}`;
 export const PageConnectionDocument = gql`
-    query pageConnection {
-  pageConnection {
+    query pageConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+  pageConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+  ) {
     totalCount
     edges {
       node {
@@ -572,8 +602,14 @@ export const PostDocument = gql`
 }
     ${PostPartsFragmentDoc}`;
 export const PostConnectionDocument = gql`
-    query postConnection {
-  postConnection {
+    query postConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+  postConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+  ) {
     totalCount
     edges {
       node {
