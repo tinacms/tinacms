@@ -25,7 +25,7 @@ export const resolveMediaCloudToRelative = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true }
 ) => {
-  if (config) {
+  if (config && value) {
     if (config.useRelativeMedia === true) {
       return value
     } else {
@@ -53,7 +53,7 @@ export const resolveMediaRelativeToCloud = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true }
 ) => {
-  if (config) {
+  if (config && value) {
     if (config.useRelativeMedia === true) {
       return value
     } else {
