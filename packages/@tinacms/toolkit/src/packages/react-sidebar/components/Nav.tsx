@@ -23,7 +23,7 @@ import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
 import { updateBodyDisplacement } from './Sidebar'
 import { FormModal } from '../../react-forms'
-import { useEditState } from '@tinacms/sharedctx'
+// import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '../../react-screens'
 import { LoadingDots } from '../../form-builder'
 
@@ -57,10 +57,11 @@ export const Nav = ({
   RenderNavCollection,
   ...props
 }: NavProps) => {
-  const { setEdit } = useEditState()
+  // const { setEdit } = useEditState()
 
   return (
     <div
+      id="admin-nav"
       className={`relative z-30 flex flex-col bg-white border-r border-gray-200 w-96 h-full ${className}`}
       style={{ maxWidth: sidebarWidth + 'px' }}
       {...props}
@@ -114,7 +115,7 @@ export const Nav = ({
                               sidebarWidth: null,
                               resizingSidebar: false,
                             })
-                            setEdit(false)
+                            // setEdit(false)
                           }}
                         >
                           <BiExit className="w-6 h-auto mr-2 text-blue-400" />{' '}

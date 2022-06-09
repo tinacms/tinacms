@@ -27,7 +27,7 @@ import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
-import { useEditState } from '@tinacms/sharedctx'
+// import { useEditState } from '@tinacms/sharedctx'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -41,19 +41,19 @@ const Redirect = () => {
 
 export const TinaAdmin = () => {
   const isSSR = typeof window === 'undefined'
-  const { edit } = useEditState()
+  // const { edit } = useEditState()
 
-  if (isSSR) {
-    return null
-  }
+  // if (isSSR) {
+  //   return null
+  // }
 
-  if (!edit) {
-    return (
-      <Layout>
-        <LoginPage />
-      </Layout>
-    )
-  }
+  // if (!edit) {
+  //   return (
+  //     <Layout>
+  //       <LoginPage />
+  //     </Layout>
+  //   )
+  // }
 
   return (
     <GetCMS>

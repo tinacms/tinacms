@@ -364,11 +364,11 @@ export const tinaConfig = defineConfig({
     return pack.TinaCloudCloudinaryMediaStore;
   },
   cmsCallback: (cms) => {
+    cms.sidebar.position = "displace";
     /**
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
-
     /**
      * When `tina-admin` is enabled, this plugin configures contextual editing for collections
      */

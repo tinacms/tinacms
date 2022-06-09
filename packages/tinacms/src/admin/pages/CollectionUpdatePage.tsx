@@ -24,6 +24,8 @@ import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+import { RouteMappingPlugin } from '../plugins/route-mapping'
+import { Iframe } from '../../iframe'
 
 const updateDocument = async (
   cms: TinaCMS,
@@ -103,6 +105,19 @@ const RenderForm = ({
   const [formIsPristine, setFormIsPristine] = useState(true)
   const schema: TinaSchema | undefined = cms.api.tina.schema
 
+  /**
+   * Retrieve the RouteMapping Plugin
+   */
+  const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
+  const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
+
+  // /**
+  //  * Determine if the document has a route mapped
+  //  */
+  const routeOverride = routeMapping
+    ? routeMapping.mapper(collection, document)
+    : undefined
+
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
 
@@ -147,26 +162,32 @@ const RenderForm = ({
     <PageWrapper>
       <>
         {cms?.api?.tina?.isLocalMode && <LocalWarning />}
-        <div className="py-4 px-20 border-b border-gray-200 bg-white">
-          <div className="max-w-form mx-auto">
-            <div className="mb-2">
-              <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
-                <Link
-                  to={`/collections/${collection.name}`}
-                  className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
-                >
-                  {collection.label ? collection.label : collection.name}
-                </Link>
-                <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
-              </span>
-              <span className="text-xl text-gray-700 font-medium leading-tight">
-                Edit {`${filename}.${collection.format}`}
-              </span>
+        {!routeOverride && (
+          <div className="py-4 px-20 border-b border-gray-200 bg-white">
+            <div className="max-w-form mx-auto">
+              <div className="mb-2">
+                <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
+                  <Link
+                    to={`/collections/${collection.name}`}
+                    className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
+                  >
+                    {collection.label ? collection.label : collection.name}
+                  </Link>
+                  <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
+                </span>
+                <span className="text-xl text-gray-700 font-medium leading-tight">
+                  Edit {`${filename}.${collection.format}`}
+                </span>
+              </div>
+              <FormStatus pristine={formIsPristine} />
             </div>
-            <FormStatus pristine={formIsPristine} />
           </div>
-        </div>
-        <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+        )}
+        {routeOverride ? (
+          <Iframe url={routeOverride} />
+        ) : (
+          <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+        )}
       </>
     </PageWrapper>
   )

@@ -26,7 +26,7 @@ import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
 import { FormMetaPlugin } from '../../../plugins/form-meta'
-import { SidebarContext, navBreakpoint } from './Sidebar'
+import { navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 
 export const FormsView = ({
@@ -37,7 +37,7 @@ export const FormsView = ({
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const formPlugins = cms.plugins.getType<Form>('form')
-  const { setFormIsPristine } = React.useContext(SidebarContext)
+  // const { setFormIsPristine } = React.useContext(SidebarContext)
 
   /**
    * If there's only one form, make it the active form.
@@ -111,7 +111,7 @@ export const FormsView = ({
             ))}
           <FormBuilder
             form={activeForm as any}
-            onPristineChange={setFormIsPristine}
+            // onPristineChange={setFormIsPristine}
           />
         </FormWrapper>
       )}
@@ -193,7 +193,8 @@ export const MultiformFormHeader = ({
   setActiveFormId,
 }: MultiformFormHeaderProps) => {
   const cms = useCMS()
-  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+  // const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+  const sidebarWidth = 300
 
   return (
     <div
@@ -220,7 +221,7 @@ export const MultiformFormHeader = ({
         <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
           {activeForm.label || activeForm.name}
         </span>
-        <FormStatus pristine={formIsPristine} />
+        <FormStatus pristine={() => {}} />
       </div>
     </div>
   )
@@ -231,7 +232,8 @@ export interface FormHeaderProps {
 }
 
 export const FormHeader = ({ activeForm }: FormHeaderProps) => {
-  const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+  // const { sidebarWidth, formIsPristine } = React.useContext(SidebarContext)
+  const sidebarWidth = 300
 
   return (
     <div
@@ -245,7 +247,7 @@ export const FormHeader = ({ activeForm }: FormHeaderProps) => {
             {activeForm.label}
           </span>
         )}
-        <FormStatus pristine={formIsPristine} />
+        <FormStatus pristine={() => {}} />
       </div>
     </div>
   )

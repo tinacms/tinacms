@@ -104,12 +104,13 @@ const handleNavigate = (
   /**
    * Redirect the browser if 'yes', else navigate react-router.
    */
-  if (routeOverride) {
-    window.location.href = routeOverride
-    return null
-  } else {
-    navigate(document._sys.breadcrumbs.join('/'))
-  }
+  // if (routeOverride) {
+  //   window.location.href = routeOverride
+  //   return null
+  // } else {
+  //   navigate(document._sys.breadcrumbs.join('/'))
+  // }
+  navigate(document._sys.breadcrumbs.join('/'))
 }
 
 const CollectionListPage = () => {

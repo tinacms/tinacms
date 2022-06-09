@@ -108,6 +108,10 @@ export class TinaAdminApi {
       query($collection: String!, $relativePath: String!) {
         document(collection:$collection, relativePath:$relativePath) {
           ... on Document {
+            _sys {
+              breadcrumbs
+              filename
+            }
             _values
           }
         }

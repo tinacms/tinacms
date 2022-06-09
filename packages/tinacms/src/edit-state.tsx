@@ -39,7 +39,24 @@ export const TinaEditProvider = ({
   )
 }
 
-export function useTina<T extends object>({
+export const useTina = ({ query, variables, data }) => {
+  const [data2, setData] = React.useState(data)
+  React.useEffect(() => {
+    window.onmessage = function (e) {
+      if (e.data.type === 'tina-update') {
+        setData(e.data.data)
+      }
+    }
+    setTimeout(() => {
+      if (parent) {
+        parent.postMessage({ type: 'tina', query, variables, data }, '*')
+      }
+    }, 100)
+  }, [])
+  return { data: data2 }
+}
+
+export function useTina2<T extends object>({
   query,
   variables,
   data,

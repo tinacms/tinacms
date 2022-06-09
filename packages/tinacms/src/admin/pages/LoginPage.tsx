@@ -14,13 +14,13 @@ limitations under the License.
 import React from 'react'
 import { BiLogIn } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
-import { useEditState } from '@tinacms/sharedctx'
+// import { useEditState } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
 import { Button } from '@tinacms/toolkit'
 
 const LoginPage = () => {
-  const { setEdit } = useEditState()
-  const login = () => setEdit(true)
+  // const { setEdit } = useEditState()
+  const login = () => {}
   return (
     <AuthTemplate>
       <div className="flex w-full flex-1 gap-4 items-center justify-end">

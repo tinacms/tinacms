@@ -1,2 +1,11 @@
 import { TinaAdmin } from "tinacms";
-export default TinaAdmin;
+import TinaCMS from "tinacms";
+import { tinaConfig } from "../.tina/schema.ts";
+
+export default function Page() {
+  return (
+    <TinaCMS {...tinaConfig}>
+      <TinaAdmin />
+    </TinaCMS>
+  );
+}
