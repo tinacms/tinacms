@@ -100,6 +100,7 @@ export class IsomorphicBridge implements Bridge {
 
     this.commitMessage = commitMessage
 
+    console.log({ onPut, onDelete })
     this.onPut = onPut || (() => {})
     this.onDelete = onDelete || (() => {})
   }
