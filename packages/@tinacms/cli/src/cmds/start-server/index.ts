@@ -69,12 +69,18 @@ const resolveGitRoot = async () => {
   }
 }
 
-async function makeIsomorphicOptions() {
+async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
   const gitRoot = await resolveGitRoot()
   const options = {
     gitRoot,
     authorName: '',
     authorEmail: '',
+    onPut: async (filepath: string, data: string) => {
+      await fsBridge.put(filepath, data)
+    },
+    onDelete: async (filepath: string) => {
+      await fsBridge.delete(filepath)
+    },
   }
 
   const userGitConfig = `${os.homedir()}${path.sep}.gitconfig`
@@ -148,8 +154,9 @@ export async function startServer(
     },
   })
 
+  const fsBridge = new FilesystemBridge(rootPath)
   const isomorphicOptions =
-    isomorphicGitBridge && (await makeIsomorphicOptions())
+    isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
 
   /**
    * To work with Github directly, replace the Bridge and Store
@@ -178,7 +185,7 @@ export async function startServer(
           .replace(/\\/g, '/'),
         isomorphicOptions
       )
-    : new FilesystemBridge(rootPath)
+    : fsBridge
 
   const store = experimentalData
     ? new LevelStore(rootPath)
