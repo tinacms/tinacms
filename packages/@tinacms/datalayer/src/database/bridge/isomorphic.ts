@@ -508,6 +508,11 @@ export class IsomorphicBridge implements Bridge {
     )
 
     await this.commitTree(updatedRootSha, ref)
+    await git.resetIndex({
+      ...this.isomorphicConfig,
+      ref,
+      filepath,
+    })
 
     await this.onPut(filepath, data)
   }
