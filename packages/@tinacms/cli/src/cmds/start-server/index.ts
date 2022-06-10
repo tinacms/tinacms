@@ -194,24 +194,9 @@ export async function startServer(
 
   const database = await createDatabase({ store, bridge })
 
-  // if (isomorphicGitBridge) {
-  //   await compileSchema(null, null, { verbose, dev })
-  //   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
-  //   const config = fs
-  //     .readFileSync(path.join(tempConfig, 'schema.json'))
-  //     .toString()
-  //   await fs.rmdir(tempConfig, { recursive: true })
-  //   await indexDB({
-  //     database,
-  //     config: JSON.parse(config),
-  //     flags: ['experimentalData', 'isomorphicGit'],
-  //   })
-  // }
-
   let ready = false
 
   const build = async (noSDK?: boolean) => {
-    console.log('build start')
     // Clear the cache of the DB passed to the GQL server
     database.clearCache()
     // Wait for the lock to be disabled
@@ -232,7 +217,6 @@ export async function startServer(
       await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
-      console.log('build complete')
     } catch (error) {
       throw error
     } finally {

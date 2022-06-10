@@ -44,7 +44,6 @@ export class FilesystemBridge implements Bridge {
     return true
   }
   public async delete(filepath: string) {
-    console.log('fsbridge.delete', filepath)
     await fs.remove(path.join(this.rootPath, filepath))
   }
   public async get(filepath: string) {
@@ -54,7 +53,6 @@ export class FilesystemBridge implements Bridge {
     await this.put(filepath, data)
   }
   public async put(filepath: string, data: string) {
-    console.log('fsbridge.put', filepath)
     await fs.outputFileSync(path.join(this.rootPath, filepath), data)
   }
 }
