@@ -614,7 +614,6 @@ export class Database {
       ...lookupMap,
       [lookup.type]: lookup,
     }
-
     await this.bridge.putConfig(
       normalizePath(lookupPath),
       JSON.stringify(updatedLookup)
