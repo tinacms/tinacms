@@ -167,6 +167,10 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
+  if (!process.env.CI && !noWatch) {
+    await resetGeneratedFolder()
+  }
+
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(
         rootPath
@@ -180,10 +184,6 @@ export async function startServer(
     ? new LevelStore(rootPath)
     : new FilesystemStore({ rootPath })
   const shouldBuild = bridge.supportsBuilding()
-
-  if (!process.env.CI && !noWatch && shouldBuild) {
-    await resetGeneratedFolder()
-  }
 
   const database = await createDatabase({ store, bridge })
 
