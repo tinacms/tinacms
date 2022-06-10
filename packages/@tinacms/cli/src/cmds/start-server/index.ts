@@ -211,6 +211,7 @@ export async function startServer(
   let ready = false
 
   const build = async (noSDK?: boolean) => {
+    console.log('build start')
     // Clear the cache of the DB passed to the GQL server
     database.clearCache()
     // Wait for the lock to be disabled
@@ -231,6 +232,7 @@ export async function startServer(
       await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
+      console.log('build complete')
     } catch (error) {
       throw error
     } finally {

@@ -29,6 +29,7 @@ const tinaGeneratedPath = path.join(tinaPath, '__generated__')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
 export const resetGeneratedFolder = async () => {
+  console.log('resetting generated folder')
   try {
     await fs.rmdir(tinaGeneratedPath, {
       recursive: true,
@@ -45,6 +46,7 @@ export const queries = (client)=>({})
 `
   )
   await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
+  console.log('reset complete')
 }
 
 // Cleanup function that is guaranteed to run
