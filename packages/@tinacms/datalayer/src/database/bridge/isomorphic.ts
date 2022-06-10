@@ -491,6 +491,7 @@ export class IsomorphicBridge implements Bridge {
       const hash = await git.hashBlob({ object: blobUpdate })
       if (hash.oid === existingOid) {
         console.log('oid matches - no update')
+        await this.onPut(filepath, data)
         return // no changes - exit early
       } else {
         console.log('oid mismatch - will update')
