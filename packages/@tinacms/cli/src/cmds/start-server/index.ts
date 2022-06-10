@@ -68,12 +68,18 @@ const resolveGitRoot = async () => {
   }
 }
 
-async function makeIsomorphicOptions() {
+async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
   const gitRoot = await resolveGitRoot()
   const options = {
     gitRoot,
     authorName: '',
     authorEmail: '',
+    onPut: async (filepath: string, data: string) => {
+      await fsBridge.put(filepath, data)
+    },
+    onDelete: async (filepath: string) => {
+      await fsBridge.delete(filepath)
+    },
   }
 
   const userGitConfig = `${os.homedir()}${path.sep}.gitconfig`
@@ -146,8 +152,9 @@ export async function startServer(
     },
   })
 
+  const fsBridge = new FilesystemBridge(rootPath)
   const isomorphicOptions =
-    isomorphicGitBridge && (await makeIsomorphicOptions())
+    isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
 
   /**
    * To work with Github directly, replace the Bridge and Store
@@ -165,6 +172,10 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
+  if (!process.env.CI && !noWatch) {
+    await resetGeneratedFolder()
+  }
+
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(
         rootPath
@@ -172,32 +183,14 @@ export async function startServer(
           .replace(/\\/g, '/'),
         isomorphicOptions
       )
-    : new FilesystemBridge(rootPath)
+    : fsBridge
 
   const store = experimentalData
     ? new LevelStore(rootPath)
     : new FilesystemStore({ rootPath })
   const shouldBuild = bridge.supportsBuilding()
 
-  if (!process.env.CI && !noWatch && shouldBuild) {
-    await resetGeneratedFolder()
-  }
-
   const database = await createDatabase({ store, bridge })
-
-  if (isomorphicGitBridge) {
-    await compileSchema(null, null, { verbose, dev })
-    const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
-    const config = fs
-      .readFileSync(path.join(tempConfig, 'schema.json'))
-      .toString()
-    await fs.rmdir(tempConfig, { recursive: true })
-    await indexDB({
-      database,
-      config: JSON.parse(config),
-      flags: ['experimentalData', 'isomorphicGit'],
-    })
-  }
 
   let ready = false
 

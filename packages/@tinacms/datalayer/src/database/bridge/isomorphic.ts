@@ -46,6 +46,8 @@ export type IsomorphicGitBridgeOptions = {
   authorEmail: string
   committerName?: string
   committerEmail?: string
+  onPut?: (filepath: string, data: string) => Promise<void>
+  onDelete?: (filepath: string) => Promise<void>
 }
 
 /**
@@ -65,6 +67,11 @@ export class IsomorphicBridge implements Bridge {
   public committerName: string
   public committerEmail: string
 
+  private onPut:
+    | ((filepath: string, data: string) => Promise<void>)
+    | (() => void)
+  private onDelete: ((filepath: string) => Promise<void>) | (() => void)
+
   constructor(
     rootPath: string,
     {
@@ -75,6 +82,8 @@ export class IsomorphicBridge implements Bridge {
       committerEmail,
       fsModule = fs,
       commitMessage = 'Update from GraphQL client',
+      onPut,
+      onDelete,
     }: IsomorphicGitBridgeOptions
   ) {
     this.gitRoot = gitRoot
@@ -90,6 +99,9 @@ export class IsomorphicBridge implements Bridge {
     }
 
     this.commitMessage = commitMessage
+
+    this.onPut = onPut || (() => {})
+    this.onDelete = onDelete || (() => {})
   }
 
   private author() {
@@ -366,7 +378,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public supportsBuilding() {
-    return false
+    return true
   }
 
   public async delete(filepath: string) {
@@ -428,6 +440,8 @@ export class IsomorphicBridge implements Bridge {
         )
       }
     }
+
+    await this.onDelete(filepath)
   }
 
   private qualifyPath(filepath: string): string {
@@ -474,6 +488,7 @@ export class IsomorphicBridge implements Bridge {
       existingOid = await leafEntry.oid()
       const hash = await git.hashBlob({ object: blobUpdate })
       if (hash.oid === existingOid) {
+        await this.onPut(filepath, data)
         return // no changes - exit early
       }
     }
@@ -493,5 +508,7 @@ export class IsomorphicBridge implements Bridge {
     )
 
     await this.commitTree(updatedRootSha, ref)
+
+    await this.onPut(filepath, data)
   }
 }
