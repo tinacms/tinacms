@@ -366,7 +366,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public supportsBuilding() {
-    return false
+    return true
   }
 
   public async delete(filepath: string) {
@@ -459,6 +459,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
+    console.log('put', filepath)
     const ref = await this.currentBranch()
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
@@ -474,7 +475,10 @@ export class IsomorphicBridge implements Bridge {
       existingOid = await leafEntry.oid()
       const hash = await git.hashBlob({ object: blobUpdate })
       if (hash.oid === existingOid) {
+        console.log('oid matches - no update')
         return // no changes - exit early
+      } else {
+        console.log('oid mismatch - will update')
       }
     }
 

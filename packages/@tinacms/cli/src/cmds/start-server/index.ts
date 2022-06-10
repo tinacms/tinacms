@@ -187,19 +187,19 @@ export async function startServer(
 
   const database = await createDatabase({ store, bridge })
 
-  if (isomorphicGitBridge) {
-    await compileSchema(null, null, { verbose, dev })
-    const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
-    const config = fs
-      .readFileSync(path.join(tempConfig, 'schema.json'))
-      .toString()
-    await fs.rmdir(tempConfig, { recursive: true })
-    await indexDB({
-      database,
-      config: JSON.parse(config),
-      flags: ['experimentalData', 'isomorphicGit'],
-    })
-  }
+  // if (isomorphicGitBridge) {
+  //   await compileSchema(null, null, { verbose, dev })
+  //   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
+  //   const config = fs
+  //     .readFileSync(path.join(tempConfig, 'schema.json'))
+  //     .toString()
+  //   await fs.rmdir(tempConfig, { recursive: true })
+  //   await indexDB({
+  //     database,
+  //     config: JSON.parse(config),
+  //     flags: ['experimentalData', 'isomorphicGit'],
+  //   })
+  // }
 
   let ready = false
 
