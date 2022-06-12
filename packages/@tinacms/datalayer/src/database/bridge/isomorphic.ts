@@ -104,7 +104,7 @@ export class IsomorphicBridge implements Bridge {
     this.onDelete = onDelete || (() => {})
   }
 
-  private author() {
+  private getAuthor() {
     return {
       name: this.authorName,
       email: this.authorEmail,
@@ -113,7 +113,7 @@ export class IsomorphicBridge implements Bridge {
     }
   }
 
-  private committer() {
+  private getCommitter() {
     return {
       name: this.committerName,
       email: this.committerEmail,
@@ -305,8 +305,8 @@ export class IsomorphicBridge implements Bridge {
         ],
         message: this.commitMessage,
         // TODO these should be configurable
-        author: this.author(),
-        committer: this.committer(),
+        author: this.getAuthor(),
+        committer: this.getCommitter(),
       },
     })
 
