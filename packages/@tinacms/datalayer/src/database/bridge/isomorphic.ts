@@ -46,6 +46,7 @@ export type IsomorphicGitBridgeOptions = {
   authorEmail: string
   committerName?: string
   committerEmail?: string
+  ref?: string
   onPut?: (filepath: string, data: string) => Promise<void>
   onDelete?: (filepath: string) => Promise<void>
 }
@@ -66,6 +67,7 @@ export class IsomorphicBridge implements Bridge {
   public authorEmail: string
   public committerName: string
   public committerEmail: string
+  public ref: string | undefined
 
   private onPut:
     | ((filepath: string, data: string) => Promise<void>)
@@ -82,6 +84,7 @@ export class IsomorphicBridge implements Bridge {
       committerEmail,
       fsModule = fs,
       commitMessage = 'Update from GraphQL client',
+      ref,
       onPut,
       onDelete,
     }: IsomorphicGitBridgeOptions
@@ -98,6 +101,7 @@ export class IsomorphicBridge implements Bridge {
       fs: this.fsModule,
     }
 
+    this.ref = ref
     this.commitMessage = commitMessage
 
     this.onPut = onPut || (() => {})
@@ -318,7 +322,10 @@ export class IsomorphicBridge implements Bridge {
     })
   }
 
-  private async currentBranch(): Promise<string> {
+  private async getRef(): Promise<string> {
+    if (this.ref) {
+      return this.ref
+    }
     const ref = await git.currentBranch({
       ...this.isomorphicConfig,
       fullname: true,
@@ -334,11 +341,12 @@ export class IsomorphicBridge implements Bridge {
         {}
       )
     }
+    this.ref = ref
     return ref
   }
 
   public async glob(pattern: string) {
-    const ref = await this.currentBranch()
+    const ref = await this.getRef()
     const parent = globParent(this.qualifyPath(pattern))
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       parent,
@@ -382,7 +390,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async delete(filepath: string) {
-    const ref = await this.currentBranch()
+    const ref = await this.getRef()
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
       ref
@@ -453,7 +461,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async get(filepath: string) {
-    const ref = await this.currentBranch()
+    const ref = await this.getRef()
     const oid = await git.resolveRef({
       ...this.isomorphicConfig,
       ref,
@@ -473,7 +481,7 @@ export class IsomorphicBridge implements Bridge {
   }
 
   public async put(filepath: string, data: string) {
-    const ref = await this.currentBranch()
+    const ref = await this.getRef()
     const { pathParts, pathEntries } = await this.resolvePathEntries(
       this.qualifyPath(filepath),
       ref
