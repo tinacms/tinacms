@@ -36,7 +36,6 @@ interface Options {
   command?: string
   watchFolders?: string[]
   experimentalData?: boolean
-  tinaCloudMediaStore?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -53,7 +52,6 @@ export async function startServer(
     port = 4001,
     noWatch,
     experimentalData,
-    tinaCloudMediaStore,
     noSDK,
     noTelemetry,
     watchFolders,
@@ -114,9 +112,6 @@ export async function startServer(
         await store.open()
       }
       const cliFlags = []
-      if (tinaCloudMediaStore) {
-        cliFlags.push('tinaCloudMediaStore')
-      }
       const database = await createDatabase({ store, bridge })
       await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
