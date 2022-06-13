@@ -20,6 +20,7 @@ limitations under the License.
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import type { GraphQLConfig, RichTypeInner } from '../types'
+import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
 import { SlateNodeType, plateElements } from './parse'
 import type { Content, PhrasingContent } from 'mdast'
 import { resolveMediaCloudToRelative } from '../resolver/media-utils'
@@ -27,12 +28,13 @@ import { resolveMediaCloudToRelative } from '../resolver/media-utils'
 export const stringifyMDX = (
   value: unknown,
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
-    const tree = stringifyChildren(slateTree, field, graphQLconfig)
+    const tree = stringifyChildren(slateTree, field, graphQLconfig, schema)
     const out = toMarkdown(
       {
         type: 'root',
@@ -59,14 +61,15 @@ const allChildrenEmpty = (children: any[]) => {
 const stringifyChildren = (
   children: any[],
   field,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) => {
   if (!children) {
     return []
   }
   return (
     children
-      .map((child) => stringify(child, field, graphQLconfig))
+      .map((child) => stringify(child, field, graphQLconfig, schema))
       // This allows us to return `false` when we want a node to be removed entirely
       .filter(Boolean) as PhrasingContent[]
   )
@@ -75,7 +78,8 @@ const stringifyChildren = (
 export const stringify = (
   node: { type: typeof plateElements },
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ): Content => {
   if (!node.type) {
     // Inline code cannot have other marks like bold and emphasis
@@ -103,40 +107,75 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 1,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_H2:
       return {
         type: 'heading',
         depth: 2,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_H3:
       return {
         type: 'heading',
         depth: 3,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_H4:
       return {
         type: 'heading',
         depth: 4,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_H5:
       return {
         type: 'heading',
         depth: 5,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_H6:
       return {
         type: 'heading',
         depth: 6,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_PARAGRAPH:
-      const children = stringifyChildren(node.children, field, graphQLconfig)
+      const children = stringifyChildren(
+        node.children,
+        field,
+        graphQLconfig,
+        schema
+      )
       if (allChildrenEmpty(children)) {
         return false
       }
@@ -156,7 +195,12 @@ export const stringify = (
         ordered: false,
         spread: false,
         check: null,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_OL:
       return {
@@ -164,7 +208,12 @@ export const stringify = (
         ordered: true,
         spread: false,
         check: null,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_LI:
       const realChildren = []
@@ -187,17 +236,22 @@ export const stringify = (
         spread: false,
         check: null,
         children: [
-          ...stringifyChildren([p], field, graphQLconfig),
-          ...stringifyChildren(extraChildren, field, graphQLconfig),
+          ...stringifyChildren([p], field, graphQLconfig, schema),
+          ...stringifyChildren(extraChildren, field, graphQLconfig, schema),
         ],
       }
     case plateElements.ELEMENT_LIC:
       return {
         type: 'paragraph',
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_IMAGE:
-      const url = resolveMediaCloudToRelative(node.url, graphQLconfig)
+      const url = resolveMediaCloudToRelative(node.url, graphQLconfig, schema)
       return {
         type: 'image',
         title: node.caption,
@@ -213,12 +267,22 @@ export const stringify = (
         type: 'link',
         url: node.url,
         title: node.title,
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case plateElements.ELEMENT_BLOCKQUOTE:
       return {
         type: 'blockquote',
-        children: stringifyChildren(node.children, field, graphQLconfig),
+        children: stringifyChildren(
+          node.children,
+          field,
+          graphQLconfig,
+          schema
+        ),
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
@@ -406,7 +470,8 @@ export const stringify = (
                 const tree = stringifyChildren(
                   value.children,
                   field,
-                  graphQLconfig
+                  graphQLconfig,
+                  schema
                 )
                 if (field.name === 'children') {
                   children = tree

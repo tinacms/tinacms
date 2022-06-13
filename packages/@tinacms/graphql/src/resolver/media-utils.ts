@@ -11,7 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { GraphQLConfig } from '../types'
+import type { GraphQLConfig } from '../types'
+import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
 
 /**
  * Strips away the Tina Cloud Asset URL from an `image` value
@@ -23,19 +24,28 @@ import { GraphQLConfig } from '../types'
 
 export const resolveMediaCloudToRelative = (
   value: string,
-  config: GraphQLConfig = { useRelativeMedia: true }
+  config: GraphQLConfig = { useRelativeMedia: true },
+  schema: TinaCloudSchemaEnriched
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
       return value
-    } else {
+    }
+
+    if (isValidTinaSchema(schema) === true) {
       const assetsURL = `https://${config.assetsHost}/${config.clientId}`
       if (typeof value === 'string' && value.includes(assetsURL)) {
-        return value.replace(assetsURL, '')
-      } else {
-        return value
+        const cleanSyncFolder = cleanUpSlashes(
+          schema.config.media.tina.syncFolder
+        )
+        const strippedURL = value.replace(assetsURL, '')
+        return `${cleanSyncFolder}${strippedURL}`
       }
+
+      return value
     }
+
+    return value
   } else {
     return value
   }
@@ -51,15 +61,42 @@ export const resolveMediaCloudToRelative = (
 
 export const resolveMediaRelativeToCloud = (
   value: string,
-  config: GraphQLConfig = { useRelativeMedia: true }
+  config: GraphQLConfig = { useRelativeMedia: true },
+  schema: TinaCloudSchemaEnriched
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
       return value
-    } else {
-      return `https://${config.assetsHost}/${config.clientId}${value}`
     }
+
+    if (isValidTinaSchema(schema) === true) {
+      const cleanSyncFolder = cleanUpSlashes(
+        schema.config.media.tina.syncFolder
+      )
+      const strippedValue = value.replace(cleanSyncFolder, '')
+      return `https://${config.assetsHost}/${config.clientId}${strippedValue}`
+    }
+
+    return value
   } else {
     return value
   }
+}
+
+const cleanUpSlashes = (path: string): string => {
+  if (path) {
+    return `/${path.replace(/^\/+|\/+$/gm, '')}`
+  }
+  return ''
+}
+
+const isValidTinaSchema = (schema: TinaCloudSchemaEnriched): boolean => {
+  if (
+    schema.config?.media?.tina?.publicFolder &&
+    schema.config?.media?.tina?.syncFolder
+  ) {
+    return true
+  }
+
+  return false
 }
