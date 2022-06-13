@@ -357,9 +357,6 @@ export const resolve = async ({
 
     if (res.errors) {
       if (!silenceErrors) {
-        // console.error('ERROR: ' + res.errors.toString())
-
-        // if (verboseValue) {
         res.errors.map((e) => {
           console.error(e.toString())
 
@@ -369,15 +366,6 @@ export const resolve = async ({
             console.error(e)
           }
         })
-        // }
-
-        // if (!verbose) {
-        //   console.error('ERROR: ' + res.errors)
-        // } else {
-        //   res.errors.map((e) => {
-        //     console.error(e.message)
-        //   })
-        // }
       }
     }
     return res
