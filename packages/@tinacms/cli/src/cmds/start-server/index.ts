@@ -203,6 +203,9 @@ export async function startServer(
         await store.open()
       }
       const cliFlags = []
+      if (isomorphicGitBridge) {
+        cliFlags.push('isomorphicGitBridge')
+      }
       const database = await createDatabase({ store, bridge })
       await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)

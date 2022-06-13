@@ -8,6 +8,9 @@ blocks:
       content/pages/home.md, components from components/blocks, and puts them
       all together in pages/\[filename].tsx, all based on a schema defined in
       .tina/schema.ts.
+
+
+      mod7
     actions:
       - label: Get Started
         type: button
