@@ -705,6 +705,7 @@ export class Builder {
     extraInterfaces: NamedTypeNode[] = []
   ) => {
     const documentTypeName = NAMER.documentTypeName(collection.namespace)
+
     const templateInfo = this.tinaSchema.getTemplatesForCollectable(collection)
     if (templateInfo.type === 'union') {
       return this._buildObjectOrUnionData(

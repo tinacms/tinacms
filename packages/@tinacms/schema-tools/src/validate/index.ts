@@ -16,6 +16,8 @@ import { TinaCloudSchema } from '../types'
 import { parseZodError } from '../util/parseZodErrors'
 import { TinaCloudSchemaZod } from './schema'
 
+export { validateTinaCloudSchemaConfig } from './tinaCloudSchemaConfig'
+
 export class TinaSchemaValidationError extends Error {
   constructor(message) {
     super(message)
