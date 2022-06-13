@@ -17,7 +17,7 @@ import {
   IsomorphicBridge,
   LevelStore,
 } from '@tinacms/datalayer'
-import { buildSchema, createDatabase, indexDB } from '@tinacms/graphql'
+import { buildSchema, createDatabase } from '@tinacms/graphql'
 import { compileSchema, resetGeneratedFolder } from '../compile'
 
 import { AsyncLock } from './lock'
@@ -177,12 +177,7 @@ export async function startServer(
   }
 
   const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(
-        rootPath
-          .slice(isomorphicOptions['gitRoot'].length + 1)
-          .replace(/\\/g, '/'),
-        isomorphicOptions
-      )
+    ? new IsomorphicBridge(rootPath, isomorphicOptions)
     : fsBridge
 
   const store = experimentalData

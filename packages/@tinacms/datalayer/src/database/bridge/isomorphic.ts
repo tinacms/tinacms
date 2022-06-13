@@ -38,8 +38,6 @@ const toUint8Array = (buf: Buffer) => {
   return view
 }
 
-const cache = {}
-
 export type IsomorphicGitBridgeOptions = {
   gitRoot: string
   fsModule?: CallbackFsClient | PromiseFsClient
@@ -58,6 +56,7 @@ export type IsomorphicGitBridgeOptions = {
  */
 export class IsomorphicBridge implements Bridge {
   public rootPath: string
+  public relativePath: string
   public gitRoot: string
   public fsModule: CallbackFsClient | PromiseFsClient
   public isomorphicConfig: {
@@ -71,10 +70,13 @@ export class IsomorphicBridge implements Bridge {
   public committerEmail: string
   public ref: string | undefined
 
-  private onPut:
+  private readonly onPut:
     | ((filepath: string, data: string) => Promise<void>)
     | (() => void)
-  private onDelete: ((filepath: string) => Promise<void>) | (() => void)
+  private readonly onDelete:
+    | ((filepath: string) => Promise<void>)
+    | (() => void)
+  private cache = {}
 
   constructor(
     rootPath: string,
@@ -91,8 +93,11 @@ export class IsomorphicBridge implements Bridge {
       onDelete,
     }: IsomorphicGitBridgeOptions
   ) {
-    this.gitRoot = gitRoot
     this.rootPath = rootPath
+    this.gitRoot = gitRoot
+    this.relativePath = rootPath
+      .slice(this.gitRoot.length + 1)
+      .replace(/\\/g, '/')
     this.fsModule = fsModule
     this.authorName = authorName
     this.authorEmail = authorEmail
@@ -151,6 +156,7 @@ export class IsomorphicBridge implements Bridge {
     const treeResult: ReadTreeResult = await git.readTree({
       ...this.isomorphicConfig,
       oid: entry.oid,
+      cache: this.cache,
     })
 
     const children: TreeEntry[] = []
@@ -197,7 +203,7 @@ export class IsomorphicBridge implements Bridge {
           return head
         }
       },
-      cache,
+      cache: this.cache,
       trees: [git.TREE({ ref })],
     })
 
@@ -243,6 +249,7 @@ export class IsomorphicBridge implements Bridge {
       const treeResult = await git.readTree({
         ...this.isomorphicConfig,
         oid: parentOid,
+        cache: this.cache,
       })
       tree = existingOid
         ? treeResult.tree.map((entry) => {
@@ -363,6 +370,7 @@ export class IsomorphicBridge implements Bridge {
       const treeResult: ReadTreeResult = await git.readTree({
         ...this.isomorphicConfig,
         oid: await parentEntry.oid(),
+        cache: this.cache,
       })
 
       treeEntry = treeResult.tree.find((entry) => entry.path === entryPath)
@@ -408,6 +416,7 @@ export class IsomorphicBridge implements Bridge {
         const treeResult: ReadTreeResult = await git.readTree({
           ...this.isomorphicConfig,
           oid: existingOid,
+          cache: this.cache,
         })
 
         const updatedTree = treeResult.tree.filter(
@@ -454,11 +463,13 @@ export class IsomorphicBridge implements Bridge {
   }
 
   private qualifyPath(filepath: string): string {
-    return this.rootPath ? `${this.rootPath}/${filepath}` : filepath
+    return this.relativePath ? `${this.relativePath}/${filepath}` : filepath
   }
 
   private unqualifyPath(filepath: string): string {
-    return this.rootPath ? filepath.slice(this.rootPath.length + 1) : filepath
+    return this.relativePath
+      ? filepath.slice(this.relativePath.length + 1)
+      : filepath
   }
 
   public async get(filepath: string) {
@@ -472,6 +483,7 @@ export class IsomorphicBridge implements Bridge {
       ...this.isomorphicConfig,
       oid,
       filepath: this.qualifyPath(filepath),
+      cache: this.cache,
     })
 
     return Buffer.from(blob).toString('utf8')
@@ -521,6 +533,7 @@ export class IsomorphicBridge implements Bridge {
       ...this.isomorphicConfig,
       ref,
       filepath,
+      cache: this.cache,
     })
 
     await this.onPut(filepath, data)
