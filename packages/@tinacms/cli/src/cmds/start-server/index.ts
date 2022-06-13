@@ -91,10 +91,6 @@ export async function startServer(
     await resetGeneratedFolder()
   }
 
-  if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = dev ? 'development' : 'production'
-  }
-
   const bridge = new FilesystemBridge(rootPath)
   const store = experimentalData
     ? new LevelStore(rootPath)
@@ -105,6 +101,8 @@ export async function startServer(
   let ready = false
 
   const build = async (noSDK?: boolean) => {
+    // Clear the cache of the DB passed to the GQL server
+    database.clearCache()
     // Wait for the lock to be disabled
     await lock.promise
     // Enable the lock so that no two builds can happen at once
@@ -120,7 +118,7 @@ export async function startServer(
         cliFlags.push('tinaCloudMediaStore')
       }
       const database = await createDatabase({ store, bridge })
-      await compileSchema(null, null, { verbose })
+      await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
     } catch (error) {

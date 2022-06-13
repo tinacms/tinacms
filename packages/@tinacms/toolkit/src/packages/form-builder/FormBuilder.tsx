@@ -38,7 +38,9 @@ export interface FormBuilderProps {
 const NoFieldsPlaceholder = () => (
   <EmptyState>
     <Emoji>🤔</Emoji>
-    <h3>Hey, you don't have any fields added to this form.</h3>
+    <h3 className="font-sans font-normal text-lg">
+      Hey, you don't have any fields added to this form.
+    </h3>
     <p>
       <LinkButton href="https://tinacms.org/docs/fields" target="_blank">
         <Emoji>📖</Emoji> Field Setup Guide
@@ -227,7 +229,9 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
               <div className="w-full h-screen flex flex-col items-center">
                 <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
                   {label && (
-                    <h4 className="font-bold text-lg opacity-80">{label}</h4>
+                    <h4 className="font-bold font-sans text-lg opacity-80">
+                      {label}
+                    </h4>
                   )}
                   <div className="flex flex-1 gap-4 items-center justify-end">
                     <FormStatus pristine={pristine} />

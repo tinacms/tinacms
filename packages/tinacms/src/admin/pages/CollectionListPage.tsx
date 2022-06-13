@@ -18,6 +18,7 @@ import {
   Link,
   useNavigate,
   NavigateFunction,
+  useLocation,
 } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 import {
@@ -36,6 +37,9 @@ import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
+import { useState } from 'react'
+import { CursorPaginator } from '@tinacms/toolkit/src/components/media/pagination'
+import { useEffect } from 'react'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -120,6 +124,14 @@ const CollectionListPage = () => {
     collection: collectionName,
     relativePath: '',
   })
+  const [endCursor, setEndCursor] = useState('')
+  const [prevCursors, setPrevCursors] = useState([])
+  const loc = useLocation()
+  useEffect(() => {
+    // reset state when the route is changed
+    setEndCursor('')
+    setPrevCursors([])
+  }, [loc])
 
   return (
     <GetCMS>
@@ -129,11 +141,14 @@ const CollectionListPage = () => {
             cms={cms}
             collectionName={collectionName}
             includeDocuments
+            startCursor={endCursor}
           >
             {(collection: Collection, _loading, reFetchCollection) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
+              const pageInfo = collection.documents.pageInfo
+              const useDataFlag = cms.flags.get('experimentalData')
 
               return (
                 <PageWrapper>
@@ -160,7 +175,7 @@ const CollectionListPage = () => {
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
-                        <h3 className="text-2xl text-gray-700">
+                        <h3 className="font-sans text-2xl text-gray-700">
                           {collection.label
                             ? collection.label
                             : collection.name}
@@ -265,7 +280,9 @@ const CollectionListPage = () => {
                                             Icon: <BiEdit size="1.3rem" />,
                                             onMouseDown: () => {
                                               navigate(
-                                                `${document.node._sys.filename}`,
+                                                `${document.node._sys.breadcrumbs.join(
+                                                  '/'
+                                                )}`,
                                                 { replace: true }
                                               )
                                             },
@@ -283,7 +300,9 @@ const CollectionListPage = () => {
                                               setVars({
                                                 collection: collectionName,
                                                 relativePath:
-                                                  document.node._sys.filename +
+                                                  document.node._sys.breadcrumbs.join(
+                                                    '/'
+                                                  ) +
                                                   document.node._sys.extension,
                                               })
                                               setOpen(true)
@@ -297,6 +316,28 @@ const CollectionListPage = () => {
                               })}
                             </tbody>
                           </table>
+                        )}
+                        {useDataFlag && (
+                          <div className="pt-3">
+                            <CursorPaginator
+                              variant="white"
+                              hasNext={pageInfo?.hasNextPage}
+                              navigateNext={() => {
+                                const newState = [...prevCursors, endCursor]
+                                setPrevCursors(newState)
+                                setEndCursor(pageInfo?.endCursor)
+                              }}
+                              hasPrev={prevCursors.length > 0}
+                              navigatePrev={() => {
+                                const prev = prevCursors[prevCursors.length - 1]
+                                if (typeof prev === 'string') {
+                                  const newState = prevCursors.slice(0, -1)
+                                  setPrevCursors(newState)
+                                  setEndCursor(prev)
+                                }
+                              }}
+                            />
+                          </div>
                         )}
                       </div>
                     </PageBody>
@@ -319,27 +360,25 @@ interface ResetModalProps {
 const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
   return (
     <Modal>
-      <ModalPopup>
-        <ModalHeader close={close}>Delete {filename}</ModalHeader>
-        <ModalBody padded={true}>
-          <p>{`Are you sure you want to delete ${filename}?`}</p>
-        </ModalBody>
-        <ModalActions>
-          <Button style={{ flexGrow: 2 }} onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            style={{ flexGrow: 3 }}
-            variant="danger"
-            onClick={async () => {
-              await deleteFunc()
-              close()
-            }}
-          >
-            Delete
-          </Button>
-        </ModalActions>
-      </ModalPopup>
+      <ModalHeader close={close}>Delete {filename}</ModalHeader>
+      <ModalBody padded={true}>
+        <p>{`Are you sure you want to delete ${filename}?`}</p>
+      </ModalBody>
+      <ModalActions>
+        <Button style={{ flexGrow: 2 }} onClick={close}>
+          Cancel
+        </Button>
+        <Button
+          style={{ flexGrow: 3 }}
+          variant="danger"
+          onClick={async () => {
+            await deleteFunc()
+            close()
+          }}
+        >
+          Delete
+        </Button>
+      </ModalActions>
     </Modal>
   )
 }
