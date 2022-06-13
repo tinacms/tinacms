@@ -43,7 +43,7 @@ export const indexDB = async ({
     if (flags.indexOf('experimentalData') === -1) {
       flags.push('experimentalData')
     }
-    if (flags.indexOf('isomorphicGitBridge') === -1) {
+    if (flags.indexOf('isomorphicGitBridge') !== -1) {
       flags.push('isomorphicGitBridge')
     }
   }
