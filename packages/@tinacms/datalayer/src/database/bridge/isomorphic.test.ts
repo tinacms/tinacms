@@ -104,12 +104,12 @@ describe('isomorphic bridge', () => {
     })
 
     bridgeMap = {
-      repo: new IsomorphicBridge('', {
+      repo: new IsomorphicBridge(repoDir, {
         gitRoot: repoDir,
         authorName,
         authorEmail,
       }),
-      monorepo: new IsomorphicBridge(pathToTina, {
+      monorepo: new IsomorphicBridge(`${monorepoDir}/${pathToTina}`, {
         gitRoot: monorepoDir,
         authorName,
         authorEmail,
