@@ -24,7 +24,8 @@ import type {
   TinaCloudSchemaBase,
   Templateable,
   TinaCloudCollection,
-} from '../types'
+} from '@tinacms/schema-tools'
+
 import { TinaError } from '../resolver/error'
 
 export const createSchema = async ({

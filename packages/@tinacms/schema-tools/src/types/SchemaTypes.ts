@@ -33,9 +33,19 @@ export type UIField<F extends UIField = any, Shape = any> = {
   // fields?: F[]
 }
 
+export interface TinaCloudSchemaConfig {
+  media?: {
+    tina?: {
+      publicFolder: string
+      syncFolder: string
+    }
+  }
+}
+
 export interface TinaCloudSchema<WithNamespace extends boolean> {
   templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
+  config?: TinaCloudSchemaConfig
 }
 export type TinaCloudSchemaBase = TinaCloudSchema<false>
 export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
@@ -48,6 +58,7 @@ export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
 export interface TinaCloudSchemaWithNamespace {
   templates?: GlobalTemplate<true>[]
   collections: TinaCloudCollection<true>[]
+  config?: TinaCloudSchemaConfig
   namespace: string[]
 }
 

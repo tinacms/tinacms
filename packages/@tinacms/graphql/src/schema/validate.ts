@@ -23,7 +23,8 @@ import type {
   TinaCloudCollectionEnriched,
   TinaCloudTemplateEnriched,
   TinaCloudCollection,
-} from '../types'
+} from '@tinacms/schema-tools'
+import { validateTinaCloudSchemaConfig } from '@tinacms/schema-tools'
 import { TinaField } from '..'
 
 const FIELD_TYPES: TinaField['type'][] = [
@@ -49,6 +50,13 @@ export const validateSchema = async (
     async (collection) => validateCollection(collection)
   )
   validationCollectionsPathAndMatch(collections)
+  if (schema2.config) {
+    const config = validateTinaCloudSchemaConfig(schema2.config)
+    return {
+      collections,
+      config,
+    }
+  }
   return {
     collections,
   }
@@ -134,6 +142,7 @@ const validationCollectionsPathAndMatch = (
   })
 }
 
+// TODO: use ZOD instead of Yup
 const validateCollection = async (
   collection: TinaCloudCollectionEnriched
 ): Promise<TinaCloudCollectionEnriched> => {
