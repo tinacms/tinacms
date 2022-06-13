@@ -30,6 +30,8 @@ import {
   FieldNode,
   InlineFragmentNode,
   OperationDefinitionNode,
+  VariableDefinitionNode,
+  ArgumentNode,
 } from 'graphql'
 import _ from 'lodash'
 import { lastItem } from '../util'
@@ -652,10 +654,215 @@ export const astBuilder = {
   ListQueryOperationDefinition: ({
     queryName,
     fragName,
+    filterType,
+    dataLayer,
   }: {
     queryName: string
     fragName: string
+    filterType: string
+    dataLayer: boolean
   }): OperationDefinitionNode => {
+    const variableDefinitions: VariableDefinitionNode[] = [
+      {
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'before',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: 'String',
+          },
+        },
+        directives: [],
+      },
+      {
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'after',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: 'String',
+          },
+        },
+        directives: [],
+      },
+      {
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'first',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: 'Float',
+          },
+        },
+        directives: [],
+      },
+      {
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'last',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: 'Float',
+          },
+        },
+        directives: [],
+      },
+      {
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'sort',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: 'String',
+          },
+        },
+        directives: [],
+      },
+    ]
+    const queryArguments: ArgumentNode[] = [
+      {
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'before',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'before',
+          },
+        },
+      },
+      {
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'after',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'after',
+          },
+        },
+      },
+      {
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'first',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'first',
+          },
+        },
+      },
+      {
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'last',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'last',
+          },
+        },
+      },
+      {
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'sort',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'sort',
+          },
+        },
+      },
+    ]
+
+    if (dataLayer) {
+      queryArguments.push({
+        kind: 'Argument',
+        name: {
+          kind: 'Name',
+          value: 'filter',
+        },
+        value: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'filter',
+          },
+        },
+      })
+
+      variableDefinitions.push({
+        kind: 'VariableDefinition',
+        variable: {
+          kind: 'Variable',
+          name: {
+            kind: 'Name',
+            value: 'filter',
+          },
+        },
+        type: {
+          kind: 'NamedType',
+          name: {
+            kind: 'Name',
+            value: filterType,
+          },
+        },
+        directives: [],
+      })
+    }
+
     return {
       kind: 'OperationDefinition',
       operation: 'query',
@@ -663,7 +870,7 @@ export const astBuilder = {
         kind: 'Name',
         value: queryName,
       },
-      variableDefinitions: [],
+      variableDefinitions,
       directives: [],
       selectionSet: {
         kind: 'SelectionSet',
@@ -674,7 +881,7 @@ export const astBuilder = {
               kind: 'Name',
               value: queryName,
             },
-            arguments: [],
+            arguments: queryArguments,
             directives: [],
             selectionSet: {
               kind: 'SelectionSet',

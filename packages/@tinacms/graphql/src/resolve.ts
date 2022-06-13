@@ -54,6 +54,8 @@ export const resolve = async ({
     const tinaConfig = await database.getTinaSchema()
     const tinaSchema = (await createSchema({
       schema: tinaConfig,
+      // @ts-ignore
+      flags: tinaConfig?.meta?.flags,
     })) as unknown as TinaSchema
     const resolver = await createResolver({ config, database, tinaSchema })
 

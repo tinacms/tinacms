@@ -20,7 +20,8 @@ import type { Collection } from '../types'
 export const useGetCollection = (
   cms: TinaCMS,
   collectionName: string,
-  includeDocuments: boolean = true
+  includeDocuments: boolean = true,
+  after: string = ''
 ) => {
   const api = new TinaAdminApi(cms)
   const [collection, setCollection] = useState<Collection | undefined>(
@@ -36,7 +37,8 @@ export const useGetCollection = (
         try {
           const collection = await api.fetchCollection(
             collectionName,
-            includeDocuments
+            includeDocuments,
+            after
           )
           setCollection(collection)
         } catch (error) {
@@ -55,7 +57,7 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
-  }, [cms, collectionName, resetState])
+  }, [cms, collectionName, resetState, after])
 
   const reFetchCollection = () => setResetSate((x) => x + 1)
 
@@ -66,17 +68,20 @@ const GetCollection = ({
   cms,
   collectionName,
   includeDocuments = true,
+  startCursor,
   children,
 }: {
   cms: TinaCMS
   collectionName: string
   includeDocuments?: boolean
+  startCursor?: string
   children: any
 }) => {
   const { collection, loading, error, reFetchCollection } = useGetCollection(
     cms,
     collectionName,
-    includeDocuments
+    includeDocuments,
+    startCursor || ''
   )
 
   if (error) {
