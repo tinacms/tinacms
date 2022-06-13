@@ -41,7 +41,11 @@ import {
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
-import { TinaGraphQLError, TinaQueryError } from '../resolver/error'
+import {
+  TinaFetchError,
+  TinaGraphQLError,
+  TinaQueryError,
+} from '../resolver/error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -235,8 +239,12 @@ export class Database {
       }
       return true
     } catch (error) {
-      console.error(`Error in PUT for ${filepath}`)
-      throw error
+      throw new TinaFetchError(`Error in PUT for ${filepath}`, {
+        originalError: error,
+        file: filepath,
+        collection: collection,
+        stack: error.stack,
+      })
     }
   }
 
@@ -477,7 +485,6 @@ export class Database {
             })
           } else {
             // I dont think this should ever happen
-            console.error(`Error in fetching ${edge.path}`)
             throw error
           }
         }
@@ -725,8 +732,12 @@ const _indexContent = async (
         await database.store.seed(normalizePath(filepath), data, seedOptions)
       }
     } catch (error) {
-      console.error(`Unable to seed ${filepath}`)
-      throw error
+      throw new TinaFetchError(`Unable to seed ${filepath}`, {
+        originalError: error,
+        file: filepath,
+        collection: collection.name,
+        stack: error.stack,
+      })
     }
   })
 }
