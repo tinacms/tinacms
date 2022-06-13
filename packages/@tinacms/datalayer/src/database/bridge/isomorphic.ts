@@ -38,6 +38,8 @@ const toUint8Array = (buf: Buffer) => {
   return view
 }
 
+const cache = {}
+
 export type IsomorphicGitBridgeOptions = {
   gitRoot: string
   fsModule?: CallbackFsClient | PromiseFsClient
@@ -190,13 +192,12 @@ export class IsomorphicBridge implements Bridge {
     let pathParts = path.split('/')
     const result = await git.walk({
       ...this.isomorphicConfig,
-      reduce: async (parent: any, children: any[]) => {
-        const flatten = flat(children).filter(([child]) =>
-          path.startsWith(child._fullpath)
-        )
-        if (parent !== undefined) flatten.unshift(parent)
-        return flatten
+      map: async (filepath, [head]) => {
+        if ((head as any)._fullpath === '.' || path.startsWith(filepath)) {
+          return head
+        }
       },
+      cache,
       trees: [git.TREE({ ref })],
     })
 
