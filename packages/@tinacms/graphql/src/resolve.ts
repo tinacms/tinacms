@@ -365,7 +365,7 @@ export const resolve = async ({
           console.error(e.toString())
 
           if (verboseValue) {
-            console.error('More error connext below')
+            console.error('More error context below')
             console.error(e.message)
             console.error(e)
           }
