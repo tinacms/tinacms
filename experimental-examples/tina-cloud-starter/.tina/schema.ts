@@ -366,6 +366,7 @@ export default schema;
 export const tinaConfig = defineConfig({
   client,
   schema,
+  // Can add this back in if we want to use the cloudinary media store
   // mediaStore: async () => {
   //   const pack = await import("next-tinacms-cloudinary");
   //   return pack.TinaCloudCloudinaryMediaStore;
