@@ -14910,6 +14910,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["chokidar", "npm:3.5.2"],
             ["commander", "npm:9.0.0"],
             ["cors", "npm:2.8.5"],
+            ["dotenv", "npm:16.0.1"],
             ["esbuild", "npm:0.14.20"],
             ["esm", "npm:3.2.25"],
             ["express", "npm:4.17.1"],
@@ -30372,6 +30373,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["dotenv", [
+        ["npm:16.0.1", {
+          "packageLocation": "./.yarn/cache/dotenv-npm-16.0.1-d99e72bb95-e97e94476c.zip/node_modules/dotenv/",
+          "packageDependencies": [
+            ["dotenv", "npm:16.0.1"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:6.2.0", {
           "packageLocation": "./.yarn/cache/dotenv-npm-6.2.0-72b7dafc27-2589b4c8e3.zip/node_modules/dotenv/",
           "packageDependencies": [

@@ -30,22 +30,12 @@ export const parseZodError = ({ zodError }: { zodError: ZodError }) => {
     return {
       errors: errorMessages as string[],
     }
-
-    // return {
-    //   message: issue.message,
-    //   code: issue.code || 'no code provided',
-    //   path: issue.path.join('.'),
-    //   moreInfo,
-    // }
   })
-  // console.log({ errors })
   const formErrors = errors.formErrors.flatMap((x) => x.errors)
 
   const parsedErrors = [
-    ...(errors.fieldErrors?.collections.flatMap((x) => x.errors) || []),
+    ...(errors.fieldErrors?.collections?.flatMap((x) => x.errors) || []),
     ...formErrors,
   ]
   return parsedErrors
-
-  // return errors
 }

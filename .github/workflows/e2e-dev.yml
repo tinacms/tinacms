@@ -1,0 +1,37 @@
+name: e2e Tests | DEV
+on: [push]
+jobs:
+  cypress-run:
+    runs-on: ubuntu-20.04
+    # There is currently a bug on chrome 100 that adds an extra space in the editor.=
+    # container: cypress/browsers:node14.17.6-chrome100-ff98
+    container: cypress/browsers:node14.17.0-chrome88-ff89
+    name: E2E on Tests (DEV)
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          install-command: yarn install
+          browser: ${{ matrix.browser }}
+          env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
+          build: yarn build:e2e
+          command: yarn test:e2e
+          start: yarn start:e2e:dev
+          wait-on: 'http://localhost:3000'
+          # wait for 3 minutes for the server to respond
+          wait-on-timeout: 180
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+      # Test run video was always captured, so this action uses "always()" condition
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos

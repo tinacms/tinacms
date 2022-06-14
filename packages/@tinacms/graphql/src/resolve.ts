@@ -49,7 +49,11 @@ export const resolve = async ({
 
     const tinaConfig = await database.getTinaSchema()
     const tinaSchema = (await createSchema({
+      // TODO: please update all the types to import from @tinacms/schema-tools
+      // @ts-ignore
       schema: tinaConfig,
+      // @ts-ignore
+      flags: tinaConfig?.meta?.flags,
     })) as unknown as TinaSchema
     const resolver = await createResolver({ config, database, tinaSchema })
 

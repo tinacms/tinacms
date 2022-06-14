@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "0.60.18",
+  "version": "0.60.21",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -73,6 +73,7 @@
     "chokidar": "^3.5.1",
     "commander": "^9.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "esbuild": "^0.14.20",
     "esm": "3.2.25",
     "express": "^4.17.1",

@@ -6513,6 +6513,7 @@ __metadata:
     chokidar: ^3.5.1
     commander: ^9.0.0
     cors: ^2.8.5
+    dotenv: ^16.0.1
     esbuild: ^0.14.20
     esm: 3.2.25
     express: ^4.17.1
@@ -14623,6 +14624,13 @@ __metadata:
   peerDependencies:
     webpack: ^1 || ^2 || ^3 || ^4
   checksum: a4ef436b38ed99f0dca297e8e0aafca47cebf8fc4b30027f1d14607f782db296640600cbec3bbd3fb382d54542534b98628ec24d6dd7bbb8bafe06282d11133f
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.0.1":
+  version: 16.0.1
+  resolution: "dotenv@npm:16.0.1"
+  checksum: e97e94476c1af74c81966438b7a1b606ef32764d4cffec79d9dae7f1bf25e8f718d630b2ad32ca3193cb6036c4e535c3d87103d94bb87c1b1ec2e9682db482b0
   languageName: node
   linkType: hard
 
