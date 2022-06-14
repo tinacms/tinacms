@@ -23,16 +23,18 @@ import { TinaField } from '..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { GraphQLConfig, RichTypeInner } from '../types'
+import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
 import { isNull } from 'lodash'
 import { resolveMediaRelativeToCloud } from '../resolver/media-utils'
 
 export const parseMDX = (
   value: string,
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
-  return parseMDXInner(tree, field, graphQLconfig)
+  return parseMDXInner(tree, field, graphQLconfig, schema)
 }
 /**
  * ### Convert the MDXAST into an API-friendly format
@@ -86,7 +88,8 @@ export const parseMDX = (
 export const parseMDXInner = (
   tree: any,
   field: RichTypeInner,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) => {
   // Delete useless position info
   visit(tree, (node) => {
@@ -98,7 +101,8 @@ export const parseMDXInner = (
       props = parseMDXInner(
         { type: 'root', children: node.children },
         field,
-        graphQLconfig
+        graphQLconfig,
+        schema
       )
     }
     const template = field.templates?.find((template) => {
@@ -141,7 +145,7 @@ export const parseMDXInner = (
             )
           }
 
-          parseField(attribute, field, props, graphQLconfig)
+          parseField(attribute, field, props, graphQLconfig, schema)
         }
       } else {
         console.log(`Not sure what this is, type: ${attribute.type}`)
@@ -152,7 +156,7 @@ export const parseMDXInner = (
   })
 
   const slateTree = tree.children.map((node) =>
-    remarkToSlate(node, graphQLconfig)
+    remarkToSlate(node, graphQLconfig, schema)
   )
   return { type: 'root', children: slateTree }
 }
@@ -161,7 +165,8 @@ const parseField = (
   attribute,
   field: TinaField,
   props,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -171,7 +176,8 @@ const parseField = (
     case 'image':
       props[field.name] = resolveMediaRelativeToCloud(
         attribute.value,
-        graphQLconfig
+        graphQLconfig,
+        schema
       )
       break
     case 'number':
@@ -263,7 +269,13 @@ const parseField = (
                       )
                     }
                     field.fields.forEach((field) => {
-                      parseField(property, field, objectProps, graphQLconfig)
+                      parseField(
+                        property,
+                        field,
+                        objectProps,
+                        graphQLconfig,
+                        schema
+                      )
                     })
                   }
                 })
@@ -296,7 +308,8 @@ const parseField = (
                             property,
                             field,
                             objectProps,
-                            graphQLconfig
+                            graphQLconfig,
+                            schema
                           )
                         })
                       }
@@ -312,7 +325,8 @@ const parseField = (
                               property,
                               field,
                               objectProps,
-                              graphQLconfig
+                              graphQLconfig,
+                              schema
                             )
                           })
                         })
@@ -349,7 +363,8 @@ const parseField = (
             props[field.name] = parseMDXInner(
               { type: 'root', children: attribute.value },
               field,
-              graphQLconfig
+              graphQLconfig,
+              schema
             )
           } else {
             throw Error(
@@ -368,7 +383,12 @@ const parseField = (
            * />
            */
           try {
-            const mdx = parseMDX(attribute.value.value, field, graphQLconfig)
+            const mdx = parseMDX(
+              attribute.value.value,
+              field,
+              graphQLconfig,
+              schema
+            )
             props[field.name] = mdx.children[0].props
           } catch (e) {
             console.log(e)
@@ -606,7 +626,8 @@ export const defaultNodeTypes: NodeTypes = {
 
 export default function remarkToSlate(
   node: MdxAstNode,
-  graphQLconfig: GraphQLConfig
+  graphQLconfig: GraphQLConfig,
+  schema: TinaCloudSchemaEnriched
 ) {
   const types = {
     ...defaultNodeTypes,
@@ -620,14 +641,14 @@ export default function remarkToSlate(
       return {
         type: types.heading[node.depth],
         children: node.children.map((node) =>
-          remarkToSlate(node, graphQLconfig)
+          remarkToSlate(node, graphQLconfig, schema)
         ),
       }
     case 'list':
       return {
         type: node.ordered ? types.ol_list : types.ul_list,
         children: node.children.map((node) =>
-          remarkToSlate(node, graphQLconfig)
+          remarkToSlate(node, graphQLconfig, schema)
         ),
       }
     case 'listItem':
@@ -637,7 +658,7 @@ export default function remarkToSlate(
           realChildren.push({
             type: child.ordered ? types.ol_list : types.ul_list,
             children: child.children.map((node) =>
-              remarkToSlate(node, graphQLconfig)
+              remarkToSlate(node, graphQLconfig, schema)
             ),
           })
         } else {
@@ -645,7 +666,7 @@ export default function remarkToSlate(
             type: plateElements.ELEMENT_LIC,
             // @ts-ignore FIXME: MDAST types don't match with some of these
             children: child.children.map((node) =>
-              remarkToSlate(node, graphQLconfig)
+              remarkToSlate(node, graphQLconfig, schema)
             ),
           })
         }
@@ -658,7 +679,7 @@ export default function remarkToSlate(
       return {
         type: types.paragraph,
         children: node.children.map((node) =>
-          remarkToSlate(node, graphQLconfig)
+          remarkToSlate(node, graphQLconfig, schema)
         ),
       }
     case 'link':
@@ -666,11 +687,11 @@ export default function remarkToSlate(
         type: types.link,
         url: node.url,
         children: node.children.map((node) =>
-          remarkToSlate(node, graphQLconfig)
+          remarkToSlate(node, graphQLconfig, schema)
         ),
       }
     case 'image':
-      const url = resolveMediaRelativeToCloud(node.url, graphQLconfig)
+      const url = resolveMediaRelativeToCloud(node.url, graphQLconfig, schema)
       return {
         type: types.image,
         url: url,
@@ -681,7 +702,7 @@ export default function remarkToSlate(
       return {
         type: types.block_quote,
         children: node.children.map((node) =>
-          remarkToSlate(node, graphQLconfig)
+          remarkToSlate(node, graphQLconfig, schema)
         ),
       }
     case 'code':
