@@ -13,6 +13,7 @@ limitations under the License.
 
 import fs from 'fs-extra'
 import { join } from 'path'
+import { parseMediaFolder } from '../../utils/'
 
 interface MediaArgs {
   searchPath: string
@@ -36,26 +37,45 @@ interface ListMediaRes {
   cursor?: string
   error?: string
 }
+export interface PathConfig {
+  publicFolder: string
+  syncFolder: string
+}
+
 type SuccessRecord = { ok: true } | { ok: false; message: string }
 export class MediaModel {
-  readonly basePath: string
-  constructor({ basePath }: { basePath: string }) {
-    this.basePath = basePath
+  public readonly publicFolder: string
+  public readonly syncFolder: string
+  constructor({ publicFolder, syncFolder }: PathConfig) {
+    this.syncFolder = syncFolder
+    this.publicFolder = publicFolder
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
-      const folderPath = join(this.basePath, args.searchPath)
+      const folderPath = join(
+        this.publicFolder,
+        this.syncFolder,
+        args.searchPath
+      )
+      const searchPath = parseMediaFolder(args.searchPath)
       const filesStr = await fs.readdir(folderPath)
-      const filesProm: Promise<FileRes>[] = filesStr.map(async (x) => {
-        const filePath = join(folderPath, x)
+      const filesProm: Promise<FileRes>[] = filesStr.map(async (file) => {
+        const filePath = join(folderPath, file)
         const stat = await fs.stat(filePath)
 
-        const src = `/${join(args.searchPath, x)}`
+        let src = `/${file}`
+        if (searchPath) {
+          src = `/${searchPath}${src}`
+        }
+        if (this.syncFolder) {
+          src = `/${this.syncFolder}${src}`
+        }
+
         return {
-          filename: x,
-          isFile: stat.isFile(),
           size: stat.size,
+          fileName: file,
           src,
+          isFile: stat.isFile(),
         }
       })
 
@@ -76,7 +96,7 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(this.basePath, args.searchPath)
+      const file = join(this.publicFolder, this.syncFolder, args.searchPath)
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file)
       await fs.remove(file)

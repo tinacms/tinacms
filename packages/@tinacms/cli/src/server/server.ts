@@ -11,13 +11,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import path from 'path'
 import cors from 'cors'
 import http from 'http'
 import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
-import { mediaRouter } from './routes'
+import type { Database } from '@tinacms/graphql'
+import { createMediaRouter } from './routes'
+import { parseMediaFolder } from '../utils'
 
 export const gqlServer = async (database, verbose: boolean) => {
   // This is lazily required so we can update the module
@@ -65,7 +68,18 @@ export const gqlServer = async (database, verbose: boolean) => {
     return res.json(result)
   })
 
-  app.use('/media', mediaRouter)
+  const db: Database = database
+  const schema = await db.getSchema()
+  // TODO: fix types
+  // @ts-ignore
+  const mediaPaths = schema?.schema?.config?.media?.tina || {}
 
+  app.use(
+    '/media',
+    createMediaRouter({
+      publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
+      syncFolder: parseMediaFolder(mediaPaths?.syncFolder || ''),
+    })
+  )
   return server
 }
