@@ -7,6 +7,14 @@ import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
 
 const schema = defineSchema({
+  config: {
+    media: {
+      tina: {
+        publicFolder: "public",
+        syncFolder: "uploads",
+      },
+    },
+  },
   collections: [
     {
       label: "Blog Posts",
@@ -358,10 +366,11 @@ export default schema;
 export const tinaConfig = defineConfig({
   client,
   schema,
-  mediaStore: async () => {
-    const pack = await import("next-tinacms-cloudinary");
-    return pack.TinaCloudCloudinaryMediaStore;
-  },
+  // Can add this back in if we want to use the cloudinary media store
+  // mediaStore: async () => {
+  //   const pack = await import("next-tinacms-cloudinary");
+  //   return pack.TinaCloudCloudinaryMediaStore;
+  // },
   cmsCallback: (cms) => {
     /**
      * Enables experimental branch switcher
