@@ -24,6 +24,8 @@ import type {
   TinaCloudTemplateEnriched,
   TinaCloudCollection,
 } from '../types'
+
+import { validateTinaCloudSchemaConfig } from '@tinacms/schema-tools'
 import { TinaField } from '..'
 
 const FIELD_TYPES: TinaField['type'][] = [
@@ -37,6 +39,7 @@ const FIELD_TYPES: TinaField['type'][] = [
   'rich-text',
 ]
 
+// TODO: fix types to use @tinacms/schema-tools
 export const validateSchema = async (
   schema: TinaCloudSchemaBase
 ): Promise<TinaCloudSchemaBase> => {
@@ -49,6 +52,16 @@ export const validateSchema = async (
     async (collection) => validateCollection(collection)
   )
   validationCollectionsPathAndMatch(collections)
+  // @ts-ignore
+  if (schema2.config) {
+    // @ts-ignore
+    const config = validateTinaCloudSchemaConfig(schema2.config)
+    return {
+      collections,
+      // @ts-ignore
+      config,
+    }
+  }
   return {
     collections,
   }
@@ -134,6 +147,7 @@ const validationCollectionsPathAndMatch = (
   })
 }
 
+// TODO: use ZOD instead of Yup
 const validateCollection = async (
   collection: TinaCloudCollectionEnriched
 ): Promise<TinaCloudCollectionEnriched> => {
