@@ -1,4 +1,3 @@
-import { DummyMediaStore } from './media-store.default'
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.
@@ -18,6 +17,7 @@ limitations under the License.
 */
 
 import { EventBus } from './event'
+import { DummyMediaStore } from './media-store.default'
 
 /**
  * Represents an individual file in the MediaStore
