@@ -20,6 +20,7 @@ import { altairExpress } from 'altair-express-middleware'
 import bodyParser from 'body-parser'
 import type { Database } from '@tinacms/graphql'
 import { createMediaRouter } from './routes'
+import { parseMediaFolder } from '../utils/removeStartingAndTrailingSlash'
 
 export const gqlServer = async (database) => {
   // This is lazily required so we can update the module
@@ -71,12 +72,13 @@ export const gqlServer = async (database) => {
   // TODO: fix types
   // @ts-ignore
   const mediaPaths = schema?.schema?.config?.media?.tina || {}
-  const basePath = path.join(
-    mediaPaths.publicFolder || '.',
-    mediaPaths.syncFolder || '.'
+
+  app.use(
+    '/media',
+    createMediaRouter({
+      publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
+      syncFolder: parseMediaFolder(mediaPaths?.syncFolder || ''),
+    })
   )
-
-  app.use('/media', createMediaRouter({ basePath }))
-
   return server
 }

@@ -14,10 +14,14 @@ limitations under the License.
 import { Router } from 'express'
 import { join } from 'path'
 import multer from 'multer'
-import { MediaModel } from '../models/media'
+import { MediaModel, PathConfig } from '../models/media'
 
-export const createMediaRouter = ({ basePath }: { basePath: string }) => {
-  const mediaFolder = join(process.cwd(), basePath)
+export const createMediaRouter = (config: PathConfig) => {
+  const mediaFolder = join(
+    process.cwd(),
+    config.publicFolder,
+    config.syncFolder
+  )
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, mediaFolder)
@@ -30,7 +34,7 @@ export const createMediaRouter = ({ basePath }: { basePath: string }) => {
 
   const upload = multer({ storage })
 
-  const mediaModel = new MediaModel({ basePath: mediaFolder })
+  const mediaModel = new MediaModel(config)
 
   const mediaRouter = Router()
 
