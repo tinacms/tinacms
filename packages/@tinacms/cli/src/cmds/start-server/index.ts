@@ -192,6 +192,8 @@ export async function startServer(
   let isReady = false
 
   const start = async () => {
+    // we do not want to start the server while the schema is building
+    await lock.promise
     const s = require('./server')
     state.server = await s.default(database)
 
