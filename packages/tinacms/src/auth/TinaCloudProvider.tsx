@@ -21,6 +21,8 @@ import {
   Branch,
   BranchDataProvider,
   useLocalStorage,
+  DummyMediaStore,
+  TinaMediaStore,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../internalClient'
@@ -178,6 +180,13 @@ export const TinaCloudProvider = (
         // @ts-ignore
         const MediaClass = await props.mediaStore()
         cms.media.store = new MediaClass(cms.api.tina)
+      }
+    } else {
+      /** Determine default MediaStore */
+      if (props.schema.config?.media?.tina) {
+        cms.media.store = new TinaMediaStore(cms)
+      } else {
+        cms.media.store = new DummyMediaStore()
       }
     }
   }
