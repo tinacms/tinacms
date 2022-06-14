@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaSchemaValidationError } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 import { dangerText } from '../../../utils/theme'
+import { handleFetchErrorError, TinaFetchError } from '@tinacms/graphql'
 
 export class BuildSchemaError extends Error {
   constructor(message) {
@@ -48,6 +48,8 @@ export const handleServerErrors = (e: Error) => {
     )}
   Error Message Below
   ${e}`)
+  } else if (e instanceof TinaFetchError) {
+    handleFetchErrorError(e, true)
   } else {
     logger.info(
       dangerText(

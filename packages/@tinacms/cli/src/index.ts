@@ -66,7 +66,7 @@ const registerCommands = (commands: Command[], noHelp: boolean = false) => {
       logger.info('')
     })
     ;(command.options || []).forEach((option) => {
-      newCmd.option(option.name, option.description)
+      newCmd.option(option.name, option.description, option?.defaultValue)
     })
 
     if (command.subCommands) {
