@@ -160,6 +160,7 @@ export const auditDocuments = async (args: AuditArgs) => {
         relativePath: node._sys.relativePath,
       },
       silenceErrors: true,
+      verbose: true,
     })
     if (mutationRes.errors) {
       mutationRes.errors.forEach((err) => {

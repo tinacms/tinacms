@@ -11,15 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  ASTNode,
-  GraphQLError,
-  GraphQLFormattedError,
-  Source,
-  SourceLocation,
-} from 'graphql'
+import { ASTNode, GraphQLError, Source, SourceLocation } from 'graphql'
 
-export class TinaError extends Error implements GraphQLError {
+export class TinaGraphQLError extends Error implements GraphQLError {
   public extensions: Record<string, any>
   // FIXME: not sure what this does
   // override readonly name!: string;
@@ -38,9 +32,76 @@ export class TinaError extends Error implements GraphQLError {
 
     // if no name provided, use the default. defineProperty ensures that it stays non-enumerable
     if (!this.name) {
-      Object.defineProperty(this, 'name', { value: 'TinaError' })
+      Object.defineProperty(this, 'name', { value: 'TinaGraphQLError' })
     }
 
     this.extensions = { ...extensions }
   }
+}
+
+export type TypeFetchErrorArgs = {
+  stack?: string
+  file?: string
+  originalError: Error
+  collection?: string
+}
+
+export class TinaFetchError extends Error {
+  public stack?: string
+  public collection?: string
+  public file?: string
+  originalError: Error
+  constructor(message: string, args: TypeFetchErrorArgs) {
+    super(message)
+    this.name = 'TinaFetchError'
+    this.collection = args.collection
+    this.stack = args.stack
+    this.file = args.file
+    this.originalError = args.originalError
+  }
+}
+export class TinaQueryError extends TinaFetchError {
+  public stack?: string
+  public collection?: string
+  public file?: string
+  originalError: Error
+  constructor(args: TypeFetchErrorArgs) {
+    super(
+      `Error querying file ${args.file} collection ${args.collection}. Please run "tinacms audit" or add the --verbose option for more info`,
+      args
+    )
+  }
+}
+
+export class TinaParseDocumentError extends TinaFetchError {
+  public stack?: string
+  public collection?: string
+  public file?: string
+  originalError: Error
+  constructor(args: TypeFetchErrorArgs) {
+    super(
+      `Error Parsing file ${args.file} collection ${args.collection}. Please run "tinacms audit" or add the --verbose option  for more info`,
+      args
+    )
+  }
+  toString() {
+    return (
+      super.toString() + '\n OriginalError: \n' + this.originalError.toString()
+    )
+  }
+}
+
+export const handleFetchErrorError = (e: unknown, verbose) => {
+  if (e instanceof Error) {
+    if (e instanceof TinaFetchError) {
+      if (verbose) {
+        console.log(e.toString())
+        console.log(e)
+        console.log(e.stack)
+      }
+    }
+  } else {
+    console.error(e)
+  }
+  throw e
 }
