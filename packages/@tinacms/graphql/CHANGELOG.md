@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 0.60.7
+
+### Patch Changes
+
+- f6cb634c2: Added an optional config key to the schema that will be used for tina cloud media store
+- b1a4290e6: Use media config from the schema in the local media server
+- 1955b8842: Uses new `schema.config` when resolving media/asset urls
+- 8b81c3cf3: Added more context to error messages to help to user debug issues
+  - @tinacms/datalayer@0.1.1
+
 ## 0.60.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.0.5
+
+### Patch Changes
+
+- f6cb634c2: Added an optional config key to the schema that will be used for tina cloud media store
+
 ## 0.0.4
 
 ### Patch Changes
