@@ -20,7 +20,7 @@ import { altairExpress } from 'altair-express-middleware'
 import bodyParser from 'body-parser'
 import type { Database } from '@tinacms/graphql'
 import { createMediaRouter } from './routes'
-import { parseMediaFolder } from '../utils/removeStartingAndTrailingSlash'
+import { parseMediaFolder } from '../utils'
 
 export const gqlServer = async (database) => {
   // This is lazily required so we can update the module
