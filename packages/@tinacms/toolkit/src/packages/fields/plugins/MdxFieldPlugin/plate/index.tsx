@@ -72,7 +72,7 @@ export const RichEditor = wrapFieldsWithMeta<
         <div
           className={classNames(
             withToolbar ? 'min-h-[100px]' : 'min-h-auto',
-            'max-w-full prose relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5'
+            'max-w-full tina-prose relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5'
           )}
         >
           <Plate
