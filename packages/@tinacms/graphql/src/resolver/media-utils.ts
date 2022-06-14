@@ -32,7 +32,7 @@ export const resolveMediaCloudToRelative = (
       return value
     }
 
-    if (isValidTinaSchema(schema) === true) {
+    if (hasTinaMediaSchema(schema) === true) {
       const assetsURL = `https://${config.assetsHost}/${config.clientId}`
       if (typeof value === 'string' && value.includes(assetsURL)) {
         const cleanSyncFolder = cleanUpSlashes(
@@ -69,7 +69,7 @@ export const resolveMediaRelativeToCloud = (
       return value
     }
 
-    if (isValidTinaSchema(schema) === true) {
+    if (hasTinaMediaSchema(schema) === true) {
       const cleanSyncFolder = cleanUpSlashes(
         schema.config.media.tina.syncFolder
       )
@@ -90,7 +90,7 @@ const cleanUpSlashes = (path: string): string => {
   return ''
 }
 
-const isValidTinaSchema = (schema: TinaCloudSchemaEnriched): boolean => {
+const hasTinaMediaSchema = (schema: TinaCloudSchemaEnriched): boolean => {
   if (
     schema.config?.media?.tina?.publicFolder &&
     schema.config?.media?.tina?.syncFolder
