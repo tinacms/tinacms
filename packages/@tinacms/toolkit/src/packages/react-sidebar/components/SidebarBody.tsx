@@ -265,14 +265,18 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
     ? 'navOpen'
     : 'navClosed'
 
+  const shortFormLabel = activeForm.label
+    ? activeForm.label.replace(/^.*[\\\/]/, '')
+    : false
+
   return (
     <div
       className={`py-4 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
-        {activeForm.label && (
-          <span className="block w-full text-xl mb-[6px] text-gray-700 font-medium leading-tight">
-            {activeForm.label}
+        {shortFormLabel && (
+          <span className="block w-full text-lg mb-[6px] text-gray-700 font-medium leading-tight text-ellipsis overflow-hidden whitespace-nowrap">
+            {shortFormLabel}
           </span>
         )}
         <FormStatus pristine={formIsPristine} />
