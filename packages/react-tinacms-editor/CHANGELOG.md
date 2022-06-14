@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.53.23
+
+### Patch Changes
+
+- 1f7d3ca3d: Use custom wrapper class for tailwind type plugin
+- Updated dependencies [1f7d3ca3d]
+- Updated dependencies [6c17f0160]
+- Updated dependencies [cceef726e]
+  - @tinacms/toolkit@0.56.32
+
 ## 0.53.22
 
 ### Patch Changes
