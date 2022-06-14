@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { parseMediaFolder } from './removeStartingAndTrailingSlash'
+import { parseMediaFolder } from '.'
 
 describe('parseMediaFolder', () => {
   it('removes the starting slash when it is there', () => {

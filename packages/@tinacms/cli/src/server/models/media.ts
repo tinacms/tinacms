@@ -13,7 +13,7 @@ limitations under the License.
 
 import fs from 'fs-extra'
 import { join } from 'path'
-import { parseMediaFolder } from '../../utils/removeStartingAndTrailingSlash'
+import { parseMediaFolder } from '../../utils/'
 
 interface MediaArgs {
   searchPath: string
