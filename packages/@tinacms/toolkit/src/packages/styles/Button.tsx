@@ -43,7 +43,7 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out '
+    'icon-parent border-0 inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center inline-flex justify-center transition-all duration-150 ease-out '
   const variantClasses = {
     primary: `shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500`,
     secondary: `shadow text-gray-500 hover:text-blue-500 bg-gray-50 hover:bg-white border border-gray-200`,
