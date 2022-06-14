@@ -16,25 +16,25 @@
 }
 
 /* if the last block has margin-bottom it makes the text box larger but some of it isn't clickable */
-.prose [data-slate-editor='true'] {
+.tina-prose [data-slate-editor='true'] {
   padding-bottom: 0.5em;
 }
 /* prose adds backticks, which look like they should be editable */
-.prose [data-slate-editor='true'] .slate-code::before {
+.tina-prose [data-slate-editor='true'] .slate-code::before {
   content: '';
 }
-.prose [data-slate-editor='true'] .slate-code::after {
+.tina-prose [data-slate-editor='true'] .slate-code::after {
   content: '';
 }
-.prose [data-slate-editor='true'] .slate-code_block {
+.tina-prose [data-slate-editor='true'] .slate-code_block {
   margin: 0;
 }
 /* code lines as part of a block don't need the same background formatting */
-.prose [data-slate-editor='true'] .slate-code_block .slate-code {
+.tina-prose [data-slate-editor='true'] .slate-code_block .slate-code {
   background: none;
 }
 /* prose makes the first p in a block slightly larger */
-.prose [data-slate-editor='true'] p:first-of-type {
+.tina-prose [data-slate-editor='true'] p:first-of-type {
   font-size: 1em;
 }
 
