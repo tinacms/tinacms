@@ -129,61 +129,6 @@ export async function startServer(
     }
   }
 
-  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
-  if (!noWatch && !process.env.CI) {
-    chokidar
-      .watch(
-        [
-          ...foldersToWatch,
-          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
-        ],
-        {
-          ignored: [
-            '**/node_modules/**/*',
-            '**/.next/**/*',
-            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
-          ],
-        }
-      )
-      .on('ready', async () => {
-        if (verbose) console.log('Generating Tina config')
-        try {
-          if (shouldBuild) {
-            await build(noSDK)
-          }
-          ready = true
-          next()
-        } catch (e) {
-          handleServerErrors(e)
-          // FIXME: make this a debug flag
-          console.log(e)
-          process.exit(0)
-        }
-      })
-      .on('all', async () => {
-        if (ready) {
-          logger.info('Tina change detected, regenerating config')
-          try {
-            if (shouldBuild) {
-              await build(noSDK)
-            }
-          } catch (e) {
-            handleServerErrors(e)
-            t.submitRecord({
-              event: {
-                name: 'tinacms:cli:server:error',
-                errorMessage: e.message,
-              },
-            })
-          }
-        }
-      })
-  } else {
-    if (shouldBuild) {
-      await build(noSDK)
-    }
-  }
-
   const state = {
     server: null,
     sockets: [],
@@ -222,7 +167,7 @@ export async function startServer(
   }
 
   const restart = async () => {
-    logger.info('Detected change to gql package, restarting...')
+    logger.info('restarting local server...')
     delete require.cache[gqlPackageFile]
 
     state.sockets.forEach((socket) => {
@@ -235,6 +180,66 @@ export async function startServer(
       logger.info('Server closed')
       start()
     })
+  }
+  // ===
+
+  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
+  if (!noWatch && !process.env.CI) {
+    chokidar
+      .watch(
+        [
+          ...foldersToWatch,
+          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
+        ],
+        {
+          ignored: [
+            '**/node_modules/**/*',
+            '**/.next/**/*',
+            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+          ],
+        }
+      )
+      .on('ready', async () => {
+        if (verbose) console.log('Generating Tina config')
+        try {
+          if (shouldBuild) {
+            await build(noSDK)
+          }
+          ready = true
+          next()
+        } catch (e) {
+          handleServerErrors(e)
+          // FIXME: make this a debug flag
+          console.log(e)
+          process.exit(0)
+        }
+      })
+      .on('all', async () => {
+        if (ready) {
+          logger.info('Tina change detected, regenerating config')
+          try {
+            if (shouldBuild) {
+              await build(noSDK)
+              if (isReady) {
+                // restart the server so that we get the new asset routes
+                restart()
+              }
+            }
+          } catch (e) {
+            handleServerErrors(e)
+            t.submitRecord({
+              event: {
+                name: 'tinacms:cli:server:error',
+                errorMessage: e.message,
+              },
+            })
+          }
+        }
+      })
+  } else {
+    if (shouldBuild) {
+      await build(noSDK)
+    }
   }
 
   if (!noWatch && !process.env.CI) {
