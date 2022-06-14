@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from '../types'
 import {
   resolveMediaRelativeToCloud,
@@ -18,20 +19,32 @@ import {
 } from './media-utils'
 
 describe('resolveMedia', () => {
+  const schema: TinaCloudSchemaEnriched = {
+    config: {
+      media: {
+        tina: {
+          publicFolder: 'public',
+          syncFolder: 'uploads',
+        },
+      },
+    },
+    collections: [],
+  }
   const assetsHost = `assets.tinajs.dev`
   const clientId = `a03ff3e2-1c3a-41af-8afd-ba0d58853191`
-  const relativeAssetURL = `/llama.png`
-  const cloudAssetURL = `https://assets.tinajs.dev/a03ff3e2-1c3a-41af-8afd-ba0d58853191/llama.png`
+  const relativeURL = '/uploads/llama.png'
+  const cloudURL = `https://${assetsHost}/${clientId}/llama.png`
 
   /**
    * When using `useRelativeMedia: true`, the URL should not be changed.
    */
-  it('resolves relative media when useRelativeMedia: true', () => {
+  it('resolves to relative media when useRelativeMedia: true', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: true,
     }
-    const resolvedURL = resolveMediaRelativeToCloud(relativeAssetURL, config)
-    expect(resolvedURL).toEqual(resolvedURL)
+
+    const resolvedURL = resolveMediaRelativeToCloud(relativeURL, config, schema)
+    expect(resolvedURL).toEqual(relativeURL)
   })
 
   /**
@@ -43,8 +56,9 @@ describe('resolveMedia', () => {
       assetsHost,
       clientId,
     }
-    const resolvedURL = resolveMediaRelativeToCloud(relativeAssetURL, config)
-    expect(resolvedURL).toEqual(cloudAssetURL)
+
+    const resolvedURL = resolveMediaRelativeToCloud(relativeURL, config, schema)
+    expect(resolvedURL).toEqual(cloudURL)
   })
 
   /**
@@ -56,23 +70,52 @@ describe('resolveMedia', () => {
       assetsHost,
       clientId,
     }
-    const resolvedURL = resolveMediaCloudToRelative(cloudAssetURL, config)
-    expect(resolvedURL).toEqual(relativeAssetURL)
+
+    const resolvedURL = resolveMediaCloudToRelative(cloudURL, config, schema)
+    expect(resolvedURL).toEqual(relativeURL)
   })
 
   /**
    * A empty value should return empty, regardless of `useRelativeMedia`
    */
-  it('resolved to empty when provided an empty value', () => {
+  it('resolves to empty when provided an empty value', () => {
     const config: GraphQLConfig = {
       useRelativeMedia: false,
       assetsHost,
       clientId,
     }
-    const aURL = resolveMediaCloudToRelative('', config)
+
+    const aURL = resolveMediaCloudToRelative('', config, schema)
     expect(aURL).toEqual('')
 
-    const bURL = resolveMediaRelativeToCloud('', config)
+    const bURL = resolveMediaRelativeToCloud('', config, schema)
     expect(bURL).toEqual('')
+  })
+
+  /**
+   * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
+   */
+  it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {
+    const otherSchema: TinaCloudSchemaEnriched = {
+      config: {
+        media: {},
+      },
+      collections: [],
+    }
+    const config: GraphQLConfig = {
+      useRelativeMedia: false,
+      assetsHost,
+      clientId,
+    }
+
+    const resolvedURL = resolveMediaCloudToRelative(
+      `https://assets.other-cloud-media-service.com/112233/llama.png`,
+      config,
+      otherSchema
+    )
+
+    expect(resolvedURL).toEqual(
+      `https://assets.other-cloud-media-service.com/112233/llama.png`
+    )
   })
 })
