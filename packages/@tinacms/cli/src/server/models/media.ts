@@ -72,10 +72,10 @@ export class MediaModel {
         }
 
         return {
-          size: stat.size,
-          fileName: file,
-          src,
           isFile: stat.isFile(),
+          size: stat.size,
+          src: src,
+          filename: file,
         }
       })
 
