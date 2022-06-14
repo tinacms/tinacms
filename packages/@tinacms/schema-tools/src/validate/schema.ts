@@ -15,6 +15,7 @@ import { z } from 'zod'
 import { name } from './properties'
 import { hasDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
+import { tinaConfigZod } from './tinaCloudSchemaConfig'
 const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
 
 const Template = z
@@ -78,6 +79,7 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
 export const TinaCloudSchemaZod = z
   .object({
     collections: z.array(TinaCloudCollection),
+    config: tinaConfigZod.optional(),
   })
   .refine((val) => !hasDuplicates(val.collections.map((x) => x.name)), {
     message: 'can not have two collections with the same name',
