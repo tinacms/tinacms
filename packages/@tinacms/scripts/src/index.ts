@@ -389,7 +389,9 @@ const config = (cwd = '') => {
     },
     content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
     plugins: [
-      require('@tailwindcss/typography'),
+      require('@tailwindcss/typography')({
+        className: 'tina-prose',
+      }),
       require('@tailwindcss/line-clamp'),
       require('@tailwindcss/aspect-ratio'),
     ],

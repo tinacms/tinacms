@@ -19,7 +19,7 @@ import { altairExpress } from 'altair-express-middleware'
 import bodyParser from 'body-parser'
 import { mediaRouter } from './routes'
 
-export const gqlServer = async (database) => {
+export const gqlServer = async (database, verbose: boolean) => {
   // This is lazily required so we can update the module
   // without having to restart the server
   const gqlPackage = require('@tinacms/graphql')
@@ -60,6 +60,7 @@ export const gqlServer = async (database) => {
       database,
       query,
       variables,
+      verbose,
     })
     return res.json(result)
   })

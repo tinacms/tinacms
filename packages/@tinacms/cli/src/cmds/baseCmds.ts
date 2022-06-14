@@ -85,6 +85,7 @@ const watchFileOption = {
 const verboseOption = {
   name: '-v, --verbose',
   description: 'increase verbosity of logged output',
+  defaultValue: false,
 }
 const tinaCloudMediaStore = {
   name: '--tinaCloudMediaStore',

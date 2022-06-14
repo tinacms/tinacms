@@ -25,4 +25,5 @@ export interface Command {
 interface Option {
   name: string
   description: string
+  defaultValue?: any
 }

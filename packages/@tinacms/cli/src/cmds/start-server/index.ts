@@ -193,7 +193,7 @@ export async function startServer(
 
   const start = async () => {
     const s = require('./server')
-    state.server = await s.default(database)
+    state.server = await s.default(database, verbose)
 
     state.server.listen(port, () => {
       const altairUrl = `http://localhost:${port}/altair/`

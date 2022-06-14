@@ -95,7 +95,7 @@ export const ProsemirrorEditor = styled(
 const RichTextInput = ({ children }) => {
   return (
     <div
-      className="prose shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md p-5 mb-5"
+      className="tina-prose shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md p-5 mb-5"
       style={{ minHeight: '100px', maxWidth: `100%` }}
     >
       {children}
