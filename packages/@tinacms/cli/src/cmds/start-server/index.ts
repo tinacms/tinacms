@@ -36,7 +36,6 @@ interface Options {
   command?: string
   watchFolders?: string[]
   experimentalData?: boolean
-  tinaCloudMediaStore?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -53,7 +52,6 @@ export async function startServer(
     port = 4001,
     noWatch,
     experimentalData,
-    tinaCloudMediaStore,
     noSDK,
     noTelemetry,
     watchFolders,
@@ -114,9 +112,6 @@ export async function startServer(
         await store.open()
       }
       const cliFlags = []
-      if (tinaCloudMediaStore) {
-        cliFlags.push('tinaCloudMediaStore')
-      }
       const database = await createDatabase({ store, bridge })
       await compileSchema(null, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
@@ -128,6 +123,60 @@ export async function startServer(
       lock.disable()
     }
   }
+
+  const state = {
+    server: null,
+    sockets: [],
+  }
+
+  let isReady = false
+
+  const start = async () => {
+    // we do not want to start the server while the schema is building
+    await lock.promise
+    const s = require('./server')
+    state.server = await s.default(database)
+
+    state.server.listen(port, () => {
+      const altairUrl = `http://localhost:${port}/altair/`
+      const cmsUrl = `[your-development-url]/admin`
+      if (verbose)
+        logger.info(`Started Filesystem GraphQL server on port: ${port}`)
+      logger.info(
+        `Visit the GraphQL playground at ${chalk.underline.blueBright(
+          altairUrl
+        )}\nor`
+      )
+      logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
+    })
+    state.server.on('error', function (e) {
+      if (e.code === 'EADDRINUSE') {
+        logger.error(dangerText(`Port 4001 already in use`))
+        process.exit()
+      }
+      throw e
+    })
+    state.server.on('connection', (socket) => {
+      state.sockets.push(socket)
+    })
+  }
+
+  const restart = async () => {
+    logger.info('restarting local server...')
+    delete require.cache[gqlPackageFile]
+
+    state.sockets.forEach((socket) => {
+      if (socket.destroyed === false) {
+        socket.destroy()
+      }
+    })
+    state.sockets = []
+    state.server.close(() => {
+      logger.info('Server closed')
+      start()
+    })
+  }
+  // ===
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   if (!noWatch && !process.env.CI) {
@@ -166,6 +215,10 @@ export async function startServer(
           try {
             if (shouldBuild) {
               await build(noSDK)
+              if (isReady) {
+                // restart the server so that we get the new asset routes
+                restart()
+              }
             }
           } catch (e) {
             handleServerErrors(e)
@@ -182,57 +235,6 @@ export async function startServer(
     if (shouldBuild) {
       await build(noSDK)
     }
-  }
-
-  const state = {
-    server: null,
-    sockets: [],
-  }
-
-  let isReady = false
-
-  const start = async () => {
-    const s = require('./server')
-    state.server = await s.default(database, verbose)
-
-    state.server.listen(port, () => {
-      const altairUrl = `http://localhost:${port}/altair/`
-      const cmsUrl = `[your-development-url]/admin`
-      if (verbose)
-        logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-      logger.info(
-        `Visit the GraphQL playground at ${chalk.underline.blueBright(
-          altairUrl
-        )}\nor`
-      )
-      logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
-    })
-    state.server.on('error', function (e) {
-      if (e.code === 'EADDRINUSE') {
-        logger.error(dangerText(`Port 4001 already in use`))
-        process.exit()
-      }
-      throw e
-    })
-    state.server.on('connection', (socket) => {
-      state.sockets.push(socket)
-    })
-  }
-
-  const restart = async () => {
-    logger.info('Detected change to gql package, restarting...')
-    delete require.cache[gqlPackageFile]
-
-    state.sockets.forEach((socket) => {
-      if (socket.destroyed === false) {
-        socket.destroy()
-      }
-    })
-    state.sockets = []
-    state.server.close(() => {
-      logger.info('Server closed')
-      start()
-    })
   }
 
   if (!noWatch && !process.env.CI) {

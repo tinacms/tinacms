@@ -348,7 +348,6 @@ export class Database {
   }
 
   public getSchema = async () => {
-    // this is what is causing the issue
     if (this.tinaSchema) {
       return this.tinaSchema
     }
