@@ -41,6 +41,11 @@ import {
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
+import {
+  TinaFetchError,
+  TinaGraphQLError,
+  TinaQueryError,
+} from '../resolver/error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -209,27 +214,36 @@ export class Database {
     data: { [key: string]: unknown },
     collection?: string
   ) => {
-    if (SYSTEM_FILES.includes(filepath)) {
-      throw new Error(`Unexpected put for config file ${filepath}`)
-    } else {
-      let collectionIndexDefinitions
-      if (collection) {
-        const indexDefinitions = await this.getIndexDefinitions()
-        collectionIndexDefinitions = indexDefinitions?.[collection]
-      }
+    try {
+      if (SYSTEM_FILES.includes(filepath)) {
+        throw new Error(`Unexpected put for config file ${filepath}`)
+      } else {
+        let collectionIndexDefinitions
+        if (collection) {
+          const indexDefinitions = await this.getIndexDefinitions()
+          collectionIndexDefinitions = indexDefinitions?.[collection]
+        }
 
-      const { stringifiedFile, payload, keepTemplateKey } =
-        await this.stringifyFile(filepath, data)
-      if (this.store.supportsSeeding()) {
-        await this.bridge.put(normalizePath(filepath), stringifiedFile)
+        const { stringifiedFile, payload, keepTemplateKey } =
+          await this.stringifyFile(filepath, data)
+        if (this.store.supportsSeeding()) {
+          await this.bridge.put(normalizePath(filepath), stringifiedFile)
+        }
+        await this.store.put(normalizePath(filepath), payload, {
+          keepTemplateKey,
+          collection: collection,
+          indexDefinitions: collectionIndexDefinitions,
+        })
       }
-      await this.store.put(normalizePath(filepath), payload, {
-        keepTemplateKey,
+      return true
+    } catch (error) {
+      throw new TinaFetchError(`Error in PUT for ${filepath}`, {
+        originalError: error,
+        file: filepath,
         collection: collection,
-        indexDefinitions: collectionIndexDefinitions,
+        stack: error.stack,
       })
     }
-    return true
   }
 
   public stringifyFile = async (
@@ -453,7 +467,6 @@ export class Database {
         `No indexDefinitions for collection ${queryOptions.collection}`
       )
     }
-
     const {
       edges,
       pageInfo: { hasPreviousPage, hasNextPage, startCursor, endCursor },
@@ -462,10 +475,24 @@ export class Database {
 
     return {
       edges: await sequential(edges, async (edge) => {
-        const node = await hydrator(edge.path)
-        return {
-          node,
-          cursor: btoa(edge.cursor),
+        try {
+          const node = await hydrator(edge.path)
+          return {
+            node,
+            cursor: btoa(edge.cursor),
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            throw new TinaQueryError({
+              originalError: error,
+              file: edge.path,
+              collection,
+              stack: error.stack,
+            })
+          } else {
+            // I dont think this should ever happen
+            throw error
+          }
         }
       }),
       pageInfo: {
@@ -702,12 +729,21 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
-    const dataString = await database.bridge.get(normalizePath(filepath))
-    const data = parseFile(dataString, path.extname(filepath), (yup) =>
-      yup.object({})
-    )
-    if (database.store.supportsSeeding()) {
-      await database.store.seed(normalizePath(filepath), data, seedOptions)
+    try {
+      const dataString = await database.bridge.get(normalizePath(filepath))
+      const data = parseFile(dataString, path.extname(filepath), (yup) =>
+        yup.object({})
+      )
+      if (database.store.supportsSeeding()) {
+        await database.store.seed(normalizePath(filepath), data, seedOptions)
+      }
+    } catch (error) {
+      throw new TinaFetchError(`Unable to seed ${filepath}`, {
+        originalError: error,
+        file: filepath,
+        collection: collection.name,
+        stack: error.stack,
+      })
     }
   })
 }

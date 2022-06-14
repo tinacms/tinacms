@@ -90,7 +90,7 @@ export const ToolbarItem = ({
           <Popover.Panel>
             {({ close }) => (
               <div className="origin-top-left absolute left-0 mt-2 -mr-1 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <div className="py-2 prose">
+                <div className="py-2 tina-prose">
                   {/* FIXME: this close() should be handled from within the options callback that are passed in */}
                   <span onMouseDown={() => close()}>{options}</span>
                 </div>

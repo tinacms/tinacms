@@ -31,7 +31,7 @@ import type {
 
 import type { GraphQLConfig } from '../types'
 
-import { TinaError } from './error'
+import { TinaGraphQLError, TinaParseDocumentError } from './error'
 import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 import {
@@ -117,9 +117,19 @@ export class Resolver {
         _collection: rawData._collection,
         _template: rawData._template,
       }
-      await sequential(template.fields, async (field) =>
-        this.resolveFieldData(field, rawData, data)
-      )
+      try {
+        await sequential(template.fields, async (field) => {
+          return this.resolveFieldData(field, rawData, data)
+        })
+      } catch (e) {
+        throw new TinaParseDocumentError({
+          originalError: e,
+          collection: collection.name,
+          file: relativePath,
+          stack: e.stack,
+        })
+      }
+
       const titleField = template.fields.find((x) => {
         // @ts-ignore
         if (x.type === 'string' && x?.isTitle) {
@@ -149,9 +159,9 @@ export class Resolver {
         _values: data,
       }
     } catch (e) {
-      if (e instanceof TinaError) {
+      if (e instanceof TinaGraphQLError) {
         // Attach additional information
-        throw new TinaError(e.message, {
+        throw new TinaGraphQLError(e.message, {
           requestedDocument: fullPath,
           ...e.extensions,
         })
