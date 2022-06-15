@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.56.32
+
+### Patch Changes
+
+- 1f7d3ca3d: Use custom wrapper class for tailwind type plugin
+- 6c17f0160: fix scale isssue, truncate form label to filename
+- cceef726e: Fix login ui issue
+  - @tinacms/sharedctx@0.1.1
+
 ## 0.56.31
 
 ### Patch Changes
