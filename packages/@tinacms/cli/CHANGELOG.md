@@ -1,5 +1,20 @@
 # tinacms-cli
 
+## 0.60.22
+
+### Patch Changes
+
+- b1a4290e6: Use media config from the schema in the local media server
+- 1955b8842: Uses new `schema.config` when resolving media/asset urls
+- Updated dependencies [f6cb634c2]
+- Updated dependencies [b1a4290e6]
+- Updated dependencies [1955b8842]
+- Updated dependencies [8b81c3cf3]
+  - @tinacms/graphql@0.60.7
+  - @tinacms/schema-tools@0.0.5
+  - @tinacms/datalayer@0.1.1
+  - @tinacms/metrics@0.0.3
+
 ## 0.60.21
 
 ### Patch Changes
