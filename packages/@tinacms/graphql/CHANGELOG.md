@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.60.8
+
+### Patch Changes
+
+- 3325cd226: Make @tinacms/schema-tools a regular dependency of @tinacms/graphql
+
 ## 0.60.7
 
 ### Patch Changes
