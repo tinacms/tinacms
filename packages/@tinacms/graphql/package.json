@@ -48,6 +48,7 @@
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@tinacms/datalayer": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -121,8 +122,5 @@
     "jest-matcher-utils": "27.0.6",
     "nodemon": "^2.0.4",
     "typescript": "^4.3.5"
-  },
-  "peerDependencies": {
-    "@tinacms/schema-tools": "*"
   }
 }
