@@ -6647,8 +6647,6 @@ __metadata:
     vfile: ^4.2.0
     ws: ^7.3.1
     yup: ^0.32.9
-  peerDependencies:
-    "@tinacms/schema-tools": "*"
   languageName: unknown
   linkType: soft
 
