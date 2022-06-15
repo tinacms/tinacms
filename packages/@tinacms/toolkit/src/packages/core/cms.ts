@@ -140,7 +140,10 @@ export class CMS {
 
     if (config.media) {
       this.media.store = config.media
+    } else {
+      this.media.store = new DummyMediaStore()
     }
+
     if (config.mediaOptions && config.mediaOptions.pageSize) {
       this.media.pageSize = config.mediaOptions.pageSize
     }
