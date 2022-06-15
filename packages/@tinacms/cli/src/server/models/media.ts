@@ -21,13 +21,13 @@ interface MediaArgs {
 
 interface File {
   src: string
-  fileName: string
+  filename: string
   size: number
 }
 
 interface FileRes {
   src: string
-  fileName: string
+  filename: string
   size: number
   isFile: boolean
 }
@@ -72,10 +72,10 @@ export class MediaModel {
         }
 
         return {
-          size: stat.size,
-          fileName: file,
-          src,
           isFile: stat.isFile(),
+          size: stat.size,
+          src: src,
+          filename: file,
         }
       })
 

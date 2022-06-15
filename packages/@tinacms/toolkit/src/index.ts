@@ -27,7 +27,13 @@ export type {
   MediaListOptions,
   MediaList,
 } from './packages/core'
-export { MediaManager, MediaListError, EventBus } from './packages/core'
+export {
+  MediaManager,
+  MediaListError,
+  EventBus,
+  DummyMediaStore,
+  TinaMediaStore,
+} from './packages/core'
 export * from './packages/alerts'
 export * from './packages/styles'
 export { useScreenPlugin } from './packages/react-screens'

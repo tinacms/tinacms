@@ -1,4 +1,3 @@
-import { DummyMediaStore } from './media-store.default'
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.
@@ -18,6 +17,7 @@ limitations under the License.
 */
 
 import { EventBus } from './event'
+import { DummyMediaStore } from './media-store.default'
 
 /**
  * Represents an individual file in the MediaStore
@@ -272,3 +272,22 @@ export class MediaListError extends Error {
     this.docsLink = config.docsLink
   }
 }
+
+export const E_UNAUTHORIZED = new MediaListError({
+  title: 'Unauthorized',
+  message: "You don't have access to this resource.",
+  docsLink: 'https://tina.io/packages/next-tinacms-cloudinary',
+})
+
+export const E_BAD_ROUTE = new MediaListError({
+  title: 'Bad Route',
+  message: 'The Cloudinary API route is missing or misconfigured.',
+  docsLink:
+    'https://tina.io/packages/next-tinacms-cloudinary/#set-up-api-routes',
+})
+
+export const E_DEFAULT = new MediaListError({
+  title: 'An Error Occurred',
+  message: 'Something went wrong accessing your media from Tina Cloud.',
+  docsLink: '', // TODO
+})
