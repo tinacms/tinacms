@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.50.8
+
+### Patch Changes
+
+- 1f7d3ca3d: Use custom wrapper class for tailwind type plugin
+- 6c17f0160: fix scale isssue, truncate form label to filename
+
 ## 0.50.7
 
 ### Patch Changes

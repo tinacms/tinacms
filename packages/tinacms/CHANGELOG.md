@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.68.9
+
+### Patch Changes
+
+- 1f7d3ca3d: Use custom wrapper class for tailwind type plugin
+- cceef726e: Fix login ui issue
+- Updated dependencies [1f7d3ca3d]
+- Updated dependencies [f6cb634c2]
+- Updated dependencies [6c17f0160]
+- Updated dependencies [cceef726e]
+  - @tinacms/toolkit@0.56.32
+  - @tinacms/schema-tools@0.0.5
+  - @tinacms/sharedctx@0.1.1
+
 ## 0.68.8
 
 ### Patch Changes
