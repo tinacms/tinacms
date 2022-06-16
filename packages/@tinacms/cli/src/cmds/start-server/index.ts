@@ -176,9 +176,12 @@ export async function startServer(
       start()
     })
   }
-  // ===
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
+
+  // in the future we should only do this in the monorepo
+  foldersToWatch.push(gqlPackageFile)
+
   if (!noWatch && !process.env.CI) {
     chokidar
       .watch(
@@ -201,6 +204,7 @@ export async function startServer(
             await build(noSDK)
           }
           ready = true
+          await start()
           next()
         } catch (e) {
           handleServerErrors(e)
@@ -217,7 +221,7 @@ export async function startServer(
               await build(noSDK)
               if (isReady) {
                 // restart the server so that we get the new asset routes
-                restart()
+                await restart()
               }
             }
           } catch (e) {
@@ -235,25 +239,10 @@ export async function startServer(
     if (shouldBuild) {
       await build(noSDK)
     }
-  }
-
-  if (!noWatch && !process.env.CI) {
-    chokidar
-      .watch([gqlPackageFile])
-      .on('ready', async () => {
-        isReady = true
-        start()
-      })
-      .on('all', async () => {
-        if (isReady) {
-          restart()
-        }
-      })
-  } else {
     if (process.env.CI) {
       logger.info('Detected CI environment, omitting watch commands...')
     }
-    start()
+    await start()
     next()
   }
 }
