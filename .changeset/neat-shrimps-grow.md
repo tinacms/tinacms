@@ -2,4 +2,4 @@
 '@tinacms/cli': patch
 ---
 
-Only use one watch process in the CLI
+Fixed issue where child process would start before parent
