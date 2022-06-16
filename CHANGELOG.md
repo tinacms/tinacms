@@ -1,6 +1,9 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
+
+Note: For tinacms package changes, please refer to the [CHANGELOG.md](https://github.com/tinacms/tinacms/packages/tinacms/CHANGELOG.md) located in `/packages/tinacms/`.
+
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 ## [0.43.1](https://github.com/tinacms/tinacms/compare/v0.43.0...v0.43.1) (2021-07-13)

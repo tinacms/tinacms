@@ -1,5 +1,9 @@
 # tinacms
 
+All notable changes to `tinacms/packages/tinacms` will be documented in this file.
+
+Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://github.com/tinacms/tinacms/CHANGELOG.md) specific to root `tinacms`.
+
 ## 0.68.9
 
 ### Patch Changes
