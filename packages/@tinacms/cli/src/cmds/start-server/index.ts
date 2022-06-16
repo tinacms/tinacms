@@ -129,8 +129,6 @@ export async function startServer(
     sockets: [],
   }
 
-  let isReady = false
-
   const start = async () => {
     // we do not want to start the server while the schema is building
     await lock.promise
@@ -219,10 +217,7 @@ export async function startServer(
           try {
             if (shouldBuild) {
               await build(noSDK)
-              if (isReady) {
-                // restart the server so that we get the new asset routes
-                await restart()
-              }
+              await restart()
             }
           } catch (e) {
             handleServerErrors(e)
