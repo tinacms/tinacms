@@ -27,7 +27,7 @@ import {
   ModalActions,
   ModalBody,
   ModalHeader,
-  ModalPopup,
+  PopupModal,
   TinaCMS,
   OverflowMenu,
 } from '@tinacms/toolkit'
@@ -360,25 +360,27 @@ interface ResetModalProps {
 const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
   return (
     <Modal>
-      <ModalHeader close={close}>Delete {filename}</ModalHeader>
-      <ModalBody padded={true}>
-        <p>{`Are you sure you want to delete ${filename}?`}</p>
-      </ModalBody>
-      <ModalActions>
-        <Button style={{ flexGrow: 2 }} onClick={close}>
-          Cancel
-        </Button>
-        <Button
-          style={{ flexGrow: 3 }}
-          variant="danger"
-          onClick={async () => {
-            await deleteFunc()
-            close()
-          }}
-        >
-          Delete
-        </Button>
-      </ModalActions>
+      <PopupModal>
+        <ModalHeader close={close}>Delete {filename}</ModalHeader>
+        <ModalBody padded={true}>
+          <p>{`Are you sure you want to delete ${filename}?`}</p>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="danger"
+            onClick={async () => {
+              await deleteFunc()
+              close()
+            }}
+          >
+            Delete
+          </Button>
+        </ModalActions>
+      </PopupModal>
     </Modal>
   )
 }
