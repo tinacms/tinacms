@@ -405,12 +405,14 @@ export class IsomorphicBridge implements Bridge {
       ref
     )
 
+    let oidToRemove: string | undefined
     let ptr = pathEntries.length - 1
     while (ptr >= 1) {
       // let existingOid
       const leafEntry = pathEntries[ptr]
       const nodePath = pathParts[ptr]
       if (leafEntry) {
+        oidToRemove = oidToRemove || (await leafEntry.oid())
         const parentEntry = pathEntries[ptr - 1]
         const existingOid = await parentEntry.oid()
         const treeResult: ReadTreeResult = await git.readTree({
@@ -457,6 +459,17 @@ export class IsomorphicBridge implements Bridge {
           { status: 404 }
         )
       }
+    }
+
+    if (oidToRemove) {
+      await git.updateIndex({
+        ...this.isomorphicConfig,
+        filepath: this.qualifyPath(filepath),
+        force: true,
+        remove: true,
+        oid: oidToRemove,
+        cache: this.cache,
+      })
     }
 
     await this.onDelete(filepath)
@@ -529,10 +542,11 @@ export class IsomorphicBridge implements Bridge {
     )
 
     await this.commitTree(updatedRootSha, ref)
-    await git.resetIndex({
+    await git.updateIndex({
       ...this.isomorphicConfig,
-      ref,
-      filepath,
+      filepath: this.qualifyPath(filepath),
+      add: true,
+      oid: updatedOid,
       cache: this.cache,
     })
 
