@@ -64,6 +64,19 @@ export class MediaModel {
         const stat = await fs.stat(filePath)
 
         let src = `/${file}`
+
+        const isFile = stat.isFile()
+
+        // It seems like our media manager wants relative paths for dirs.
+        if (!isFile) {
+          return {
+            isFile,
+            size: stat.size,
+            src,
+            filename: file,
+          }
+        }
+
         if (searchPath) {
           src = `/${searchPath}${src}`
         }
@@ -72,7 +85,7 @@ export class MediaModel {
         }
 
         return {
-          isFile: stat.isFile(),
+          isFile,
           size: stat.size,
           src: src,
           filename: file,
