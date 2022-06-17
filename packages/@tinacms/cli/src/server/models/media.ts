@@ -67,7 +67,7 @@ export class MediaModel {
 
         const isFile = stat.isFile()
 
-        // It seems like our media manager wants relative paths for dirs (Seems strange but it works)
+        // It seems like our media manager wants relative paths for dirs.
         if (!isFile) {
           return {
             isFile,
