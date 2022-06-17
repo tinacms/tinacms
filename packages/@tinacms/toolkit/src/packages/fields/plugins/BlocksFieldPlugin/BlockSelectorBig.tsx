@@ -167,6 +167,7 @@ export const BlockSelectorBig = ({
                         <CardColumns className="pt-3">
                           {uncategorized.map(([name, template]) => (
                             <BlockCard
+                              key={`${template}-${name}`}
                               close={close}
                               name={name}
                               template={template}
