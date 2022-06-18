@@ -57,7 +57,7 @@ Proceed through the prompts until you have a new `.md` file in the `.changeset` 
 
 Feel free to edit this file if you want to alter your messages or which versions will be bumped.
 
-### Commit your changes and push to Github and creat a PR
+### Commit your changes and push to GitHub and create a PR
 
 The PR will be checked for a changeset file. You're done!
 
