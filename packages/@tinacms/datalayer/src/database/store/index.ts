@@ -108,7 +108,8 @@ export type DeleteOptions = SeedOptions & { seed?: boolean }
 export interface Store {
   glob(
     pattern: string,
-    hydrator?: (fullPath: string) => Promise<object>
+    hydrator?: (fullPath: string) => Promise<object>,
+    extension?: string
   ): Promise<string[]>
   get<T extends object>(filepath: string): Promise<T>
   delete(filepath: string, options?: DeleteOptions): Promise<void>
