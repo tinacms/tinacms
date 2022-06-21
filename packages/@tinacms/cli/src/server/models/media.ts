@@ -97,16 +97,25 @@ export class MediaModel {
       const offset = Number(args.cursor) || 0
       const limit = Number(args.limit) || 20
 
-      const allItems = await Promise.all(filesProm)
-      const files = allItems.filter((x) => x.isFile)
-      const directories = allItems.filter((x) => !x.isFile).map((x) => x.src)
+      const rawItems = await Promise.all(filesProm)
+      const sortedItems = rawItems.sort((a, b) => {
+        if (a.isFile && !b.isFile) {
+          return 1
+        }
+        if (!a.isFile && b.isFile) {
+          return -1
+        }
+        return 0
+      })
+      const limitItems = sortedItems.slice(offset, offset + limit)
+      const files = limitItems.filter((x) => x.isFile)
+      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src)
 
-      const limitFiles = files.slice(offset, offset + limit)
       const cursor =
-        files.length > offset + limit ? String(offset + limit + 1) : null
+        rawItems.length > offset + limit ? String(offset + limit) : null
 
       return {
-        files: limitFiles,
+        files,
         directories,
         cursor,
       }
