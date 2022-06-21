@@ -38,10 +38,10 @@
                 "text": "this is an** "
               },
               {
-                "bold": true,
                 "type": "text",
                 "text": "inline",
-                "value": "inline"
+                "code": true,
+                "bold": true
               },
               {
                 "type": "text",

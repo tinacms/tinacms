@@ -412,7 +412,11 @@ const buildIt = async (entryPoint, packageJSON) => {
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
-    if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
+    if (
+      ['@tinacms/graphql', '@tinacms/datalayer', '@tinacms/mdx'].includes(
+        packageJSON.name
+      )
+    ) {
       await esbuild({
         plugins: [pnpPlugin()],
         entryPoints: [path.join(process.cwd(), entry)],

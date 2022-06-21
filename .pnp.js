@@ -59,6 +59,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/@tinacms/graphql"
       },
       {
+        "name": "@tinacms/mdx",
+        "reference": "workspace:packages/@tinacms/mdx"
+      },
+      {
         "name": "@tinacms/metrics",
         "reference": "workspace:packages/@tinacms/metrics"
       },
@@ -106,6 +110,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@tinacms/cli", ["workspace:packages/@tinacms/cli"]],
       ["@tinacms/datalayer", ["workspace:packages/@tinacms/datalayer"]],
       ["@tinacms/graphql", ["workspace:packages/@tinacms/graphql"]],
+      ["@tinacms/mdx", ["virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/mdx", "workspace:packages/@tinacms/mdx"]],
       ["@tinacms/metrics", ["virtual:64686824937af610331751949d793f321bb3281425f097b381576fdae92f1e48b6eb7246389e62fabc3a2d64976cb7b2cfac00701af6c68772661a80a64942a5#workspace:packages/@tinacms/metrics", "virtual:b7d50e7e5a3a341a3fdfcc5240d39f5e26d985d9f0a513387e030a328cc013c06cfd7ec9a6baf48afb2322b165ef2513126a40ab021e7f61f40c2b11eb2ec9e0#workspace:packages/@tinacms/metrics", "workspace:packages/@tinacms/metrics"]],
       ["@tinacms/schema-tools", ["virtual:0ef6e645d306f7c6ada2d623f62fb365090b9f97cee5cec814ed9b5aaade820c7076dbc7ca74ce7f58b328e021c9b9131372d46d96bc42d904728809891a56da#workspace:packages/@tinacms/schema-tools", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/schema-tools", "virtual:5d0198e03efaedcdaab02db193ec110dc7aeba35a420ffbe0961f35a9eab41f5bafb11caf59172345be77ef328cf6e821d2c68f6d0d5bc632b5c329c22c91110#workspace:packages/@tinacms/schema-tools", "virtual:e889d1f5fd31539481dea7aac568c49533f162b70a2620cda85aeaf1e8c313afa3ef9ad883e8e1e76504391f1a6a7566b0e17ecd57d890b9f19e564588fbff74#workspace:packages/@tinacms/schema-tools", "workspace:packages/@tinacms/schema-tools"]],
       ["@tinacms/scripts", ["workspace:packages/@tinacms/scripts"]],
@@ -14983,6 +14988,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@tinacms/graphql", "workspace:packages/@tinacms/graphql"],
             ["@graphql-tools/relay-operation-optimizer", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:6.4.1"],
             ["@tinacms/datalayer", "workspace:packages/@tinacms/datalayer"],
+            ["@tinacms/mdx", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/mdx"],
             ["@tinacms/schema-tools", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/schema-tools"],
             ["@tinacms/scripts", "workspace:packages/@tinacms/scripts"],
             ["@types/cors", "npm:2.8.12"],
@@ -15043,6 +15049,145 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["unified", "npm:10.1.0"],
             ["unist-util-remove-position", "npm:3.0.0"],
             ["unist-util-visit", "npm:4.1.0"],
+            ["vfile", "npm:4.2.1"],
+            ["ws", "virtual:3358d9cb9aa6fa9bfed606524cdd1ee1fe60a39f73105cf9a1c695ae3e013b68ce244c57e371c480917f71da7eee5cacb8156c3cb77e1b1b9f53af4f53a885e7#npm:7.5.3"],
+            ["yup", "npm:0.32.9"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@tinacms/mdx", [
+        ["virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/mdx", {
+          "packageLocation": "./.yarn/$$virtual/@tinacms-mdx-virtual-d31d915a28/1/packages/@tinacms/mdx/",
+          "packageDependencies": [
+            ["@tinacms/mdx", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/mdx"],
+            ["@graphql-tools/relay-operation-optimizer", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:6.4.1"],
+            ["@tinacms/datalayer", "workspace:packages/@tinacms/datalayer"],
+            ["@tinacms/schema-tools", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/schema-tools"],
+            ["@tinacms/scripts", "workspace:packages/@tinacms/scripts"],
+            ["@types/cors", "npm:2.8.12"],
+            ["@types/estree", "npm:0.0.50"],
+            ["@types/express", "npm:4.17.13"],
+            ["@types/fs-extra", "npm:9.0.12"],
+            ["@types/jest", "npm:26.0.24"],
+            ["@types/js-yaml", "npm:3.12.7"],
+            ["@types/lodash", "npm:4.14.171"],
+            ["@types/lodash.camelcase", "npm:4.3.6"],
+            ["@types/lodash.upperfirst", "npm:4.3.6"],
+            ["@types/lru-cache", "npm:5.1.1"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["@types/node", "npm:14.17.34"],
+            ["@types/normalize-path", "npm:3.0.0"],
+            ["@types/prettier", "npm:2.6.3"],
+            ["@types/tinacms__schema-tools", null],
+            ["@types/ws", "npm:7.4.7"],
+            ["@types/yup", "npm:0.29.13"],
+            ["acorn", "npm:8.7.1"],
+            ["body-parser", "npm:1.19.0"],
+            ["cors", "npm:2.8.5"],
+            ["dataloader", "npm:2.0.0"],
+            ["date-fns", "npm:2.22.1"],
+            ["encoding-down", "npm:7.1.0"],
+            ["esbuild", "npm:0.12.29"],
+            ["esbuild-jest", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:0.5.0"],
+            ["estree-walker", "npm:3.0.1"],
+            ["fast-glob", "npm:3.2.7"],
+            ["flat", "npm:5.0.2"],
+            ["fs-extra", "npm:9.1.0"],
+            ["graphql", "npm:15.5.1"],
+            ["graphql-type-json", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:0.3.2"],
+            ["gray-matter", "npm:4.0.3"],
+            ["jest", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:27.0.6"],
+            ["jest-diff", "npm:27.0.6"],
+            ["jest-file-snapshot", "npm:0.5.0"],
+            ["jest-matcher-utils", "npm:27.0.6"],
+            ["js-yaml", "npm:3.14.1"],
+            ["leveldown", "npm:6.1.0"],
+            ["lodash", "npm:4.17.21"],
+            ["mdast", "npm:3.0.0"],
+            ["mdast-util-mdx", "npm:2.0.0"],
+            ["mdast-util-mdx-jsx", "npm:2.0.1"],
+            ["mdast-util-to-markdown", "npm:1.3.0"],
+            ["nodemon", "npm:2.0.12"],
+            ["normalize-path", "npm:3.0.0"],
+            ["prettier", "npm:2.7.1"],
+            ["remark", "npm:14.0.2"],
+            ["remark-mdx", "npm:2.1.2"],
+            ["remark-parse", "npm:10.0.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
+            ["unified", "npm:10.1.2"],
+            ["unist-util-visit", "npm:4.1.0"],
+            ["unist-util-visit-parents", "npm:5.1.0"],
+            ["vfile", "npm:4.2.1"],
+            ["ws", "virtual:3358d9cb9aa6fa9bfed606524cdd1ee1fe60a39f73105cf9a1c695ae3e013b68ce244c57e371c480917f71da7eee5cacb8156c3cb77e1b1b9f53af4f53a885e7#npm:7.5.3"],
+            ["yup", "npm:0.32.9"]
+          ],
+          "packagePeers": [
+            "@tinacms/schema-tools",
+            "@types/tinacms__schema-tools"
+          ],
+          "linkType": "SOFT",
+        }],
+        ["workspace:packages/@tinacms/mdx", {
+          "packageLocation": "./packages/@tinacms/mdx/",
+          "packageDependencies": [
+            ["@tinacms/mdx", "workspace:packages/@tinacms/mdx"],
+            ["@graphql-tools/relay-operation-optimizer", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:6.4.1"],
+            ["@tinacms/datalayer", "workspace:packages/@tinacms/datalayer"],
+            ["@tinacms/schema-tools", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#workspace:packages/@tinacms/schema-tools"],
+            ["@tinacms/scripts", "workspace:packages/@tinacms/scripts"],
+            ["@types/cors", "npm:2.8.12"],
+            ["@types/estree", "npm:0.0.50"],
+            ["@types/express", "npm:4.17.13"],
+            ["@types/fs-extra", "npm:9.0.12"],
+            ["@types/jest", "npm:26.0.24"],
+            ["@types/js-yaml", "npm:3.12.7"],
+            ["@types/lodash", "npm:4.14.171"],
+            ["@types/lodash.camelcase", "npm:4.3.6"],
+            ["@types/lodash.upperfirst", "npm:4.3.6"],
+            ["@types/lru-cache", "npm:5.1.1"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["@types/node", "npm:14.17.34"],
+            ["@types/normalize-path", "npm:3.0.0"],
+            ["@types/prettier", "npm:2.6.3"],
+            ["@types/ws", "npm:7.4.7"],
+            ["@types/yup", "npm:0.29.13"],
+            ["acorn", "npm:8.7.1"],
+            ["body-parser", "npm:1.19.0"],
+            ["cors", "npm:2.8.5"],
+            ["dataloader", "npm:2.0.0"],
+            ["date-fns", "npm:2.22.1"],
+            ["encoding-down", "npm:7.1.0"],
+            ["esbuild", "npm:0.12.29"],
+            ["esbuild-jest", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:0.5.0"],
+            ["estree-walker", "npm:3.0.1"],
+            ["fast-glob", "npm:3.2.7"],
+            ["flat", "npm:5.0.2"],
+            ["fs-extra", "npm:9.1.0"],
+            ["graphql", "npm:15.5.1"],
+            ["graphql-type-json", "virtual:565ea2c8342fa3d96ddee82681762cdabfd4e8975b21793cb10035ac5a446bba93bc8fe1112879d2ce13062cb3a728904acd86ebd19a38db36227e1f7863c0e0#npm:0.3.2"],
+            ["gray-matter", "npm:4.0.3"],
+            ["jest", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:27.0.6"],
+            ["jest-diff", "npm:27.0.6"],
+            ["jest-file-snapshot", "npm:0.5.0"],
+            ["jest-matcher-utils", "npm:27.0.6"],
+            ["js-yaml", "npm:3.14.1"],
+            ["leveldown", "npm:6.1.0"],
+            ["lodash", "npm:4.17.21"],
+            ["mdast", "npm:3.0.0"],
+            ["mdast-util-mdx", "npm:2.0.0"],
+            ["mdast-util-mdx-jsx", "npm:2.0.1"],
+            ["mdast-util-to-markdown", "npm:1.3.0"],
+            ["nodemon", "npm:2.0.12"],
+            ["normalize-path", "npm:3.0.0"],
+            ["prettier", "npm:2.7.1"],
+            ["remark", "npm:14.0.2"],
+            ["remark-mdx", "npm:2.1.2"],
+            ["remark-parse", "npm:10.0.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
+            ["unified", "npm:10.1.2"],
+            ["unist-util-visit", "npm:4.1.0"],
+            ["unist-util-visit-parents", "npm:5.1.0"],
             ["vfile", "npm:4.2.1"],
             ["ws", "virtual:3358d9cb9aa6fa9bfed606524cdd1ee1fe60a39f73105cf9a1c695ae3e013b68ce244c57e371c480917f71da7eee5cacb8156c3cb77e1b1b9f53af4f53a885e7#npm:7.5.3"],
             ["yup", "npm:0.32.9"]
@@ -16487,6 +16632,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/hast", [
+        ["npm:2.3.4", {
+          "packageLocation": "./.yarn/cache/@types-hast-npm-2.3.4-7249cc0ece-5cba736682.zip/node_modules/@types/hast/",
+          "packageDependencies": [
+            ["@types/hast", "npm:2.3.4"],
+            ["@types/unist", "npm:2.0.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/hoist-non-react-statics", [
         ["npm:3.3.1", {
           "packageLocation": "./.yarn/cache/@types-hoist-non-react-statics-npm-3.3.1-c0081332b2-16ab4c45d4.zip/node_modules/@types/hoist-non-react-statics/",
@@ -17026,6 +17181,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-prettier-npm-2.3.2-377cc404e1-7b425386aa.zip/node_modules/@types/prettier/",
           "packageDependencies": [
             ["@types/prettier", "npm:2.3.2"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:2.6.3", {
+          "packageLocation": "./.yarn/cache/@types-prettier-npm-2.6.3-8d27063d48-878d0d3ba6.zip/node_modules/@types/prettier/",
+          "packageDependencies": [
+            ["@types/prettier", "npm:2.6.3"]
           ],
           "linkType": "HARD",
         }]
@@ -23892,6 +24054,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["acorn", "npm:8.5.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:8.7.1", {
+          "packageLocation": "./.yarn/cache/acorn-npm-8.7.1-7c7a019990-f02336f3bf.zip/node_modules/acorn/",
+          "packageDependencies": [
+            ["acorn", "npm:8.7.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["acorn-globals", [
@@ -27297,6 +27466,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ccount", "npm:1.1.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/cache/ccount-npm-2.0.1-f4b7827860-5d3001d9fe.zip/node_modules/ccount/",
+          "packageDependencies": [
+            ["ccount", "npm:2.0.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["chalk", [
@@ -27452,6 +27628,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/character-entities-legacy-npm-2.0.0-25b164631e-b16b9f716f.zip/node_modules/character-entities-legacy/",
           "packageDependencies": [
             ["character-entities-legacy", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/character-entities-legacy-npm-3.0.0-ba39d6d541-f1efa2e60a.zip/node_modules/character-entities-legacy/",
+          "packageDependencies": [
+            ["character-entities-legacy", "npm:3.0.0"]
           ],
           "linkType": "HARD",
         }]
@@ -29624,6 +29807,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/decimal.js-npm-10.3.1-797c736b6c-e042c676c7.zip/node_modules/decimal.js/",
           "packageDependencies": [
             ["decimal.js", "npm:10.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["decode-named-character-reference", [
+        ["npm:1.0.2", {
+          "packageLocation": "./.yarn/cache/decode-named-character-reference-npm-1.0.2-db17a755fd-b994e7857f.zip/node_modules/decode-named-character-reference/",
+          "packageDependencies": [
+            ["decode-named-character-reference", "npm:1.0.2"],
+            ["character-entities", "npm:2.0.0"]
           ],
           "linkType": "HARD",
         }]
@@ -31853,6 +32046,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/estree-walker-npm-3.0.0-eb28c1befc-c035ffd417.zip/node_modules/estree-walker/",
           "packageDependencies": [
             ["estree-walker", "npm:3.0.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:3.0.1", {
+          "packageLocation": "./.yarn/cache/estree-walker-npm-3.0.1-f100136724-156b9ca9dc.zip/node_modules/estree-walker/",
+          "packageDependencies": [
+            ["estree-walker", "npm:3.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -38483,6 +38683,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["mdast-util-mdxjs-esm", "npm:1.1.1"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:2.0.0", {
+          "packageLocation": "./.yarn/cache/mdast-util-mdx-npm-2.0.0-344d686584-24197317a8.zip/node_modules/mdast-util-mdx/",
+          "packageDependencies": [
+            ["mdast-util-mdx", "npm:2.0.0"],
+            ["mdast-util-mdx-expression", "npm:1.1.1"],
+            ["mdast-util-mdx-jsx", "npm:2.0.1"],
+            ["mdast-util-mdxjs-esm", "npm:1.1.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["mdast-util-mdx-expression", [
@@ -38525,6 +38735,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/mdast", "npm:3.0.7"],
             ["mdast-util-to-markdown", "npm:1.2.3"],
             ["parse-entities", "npm:3.0.0"],
+            ["stringify-entities", "npm:4.0.1"],
+            ["unist-util-remove-position", "npm:4.0.1"],
+            ["unist-util-stringify-position", "npm:3.0.0"],
+            ["vfile-message", "npm:3.0.2"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/cache/mdast-util-mdx-jsx-npm-2.0.1-b081def6f0-d8eaaa622a.zip/node_modules/mdast-util-mdx-jsx/",
+          "packageDependencies": [
+            ["mdast-util-mdx-jsx", "npm:2.0.1"],
+            ["@types/estree-jsx", "npm:0.0.1"],
+            ["@types/hast", "npm:2.3.4"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["ccount", "npm:2.0.1"],
+            ["mdast-util-to-markdown", "npm:1.3.0"],
+            ["parse-entities", "npm:4.0.0"],
             ["stringify-entities", "npm:4.0.1"],
             ["unist-util-remove-position", "npm:4.0.1"],
             ["unist-util-stringify-position", "npm:3.0.0"],
@@ -38588,6 +38815,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/mdast-util-to-markdown-npm-1.2.3-e27fe7fcf9-d50b5c4a9f.zip/node_modules/mdast-util-to-markdown/",
           "packageDependencies": [
             ["mdast-util-to-markdown", "npm:1.2.3"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["@types/unist", "npm:2.0.6"],
+            ["longest-streak", "npm:3.0.0"],
+            ["mdast-util-to-string", "npm:3.1.0"],
+            ["micromark-util-decode-string", "npm:1.0.1"],
+            ["unist-util-visit", "npm:4.1.0"],
+            ["zwitch", "npm:2.0.2"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:1.3.0", {
+          "packageLocation": "./.yarn/cache/mdast-util-to-markdown-npm-1.3.0-c713a54ac1-dbc39b2b12.zip/node_modules/mdast-util-to-markdown/",
+          "packageDependencies": [
+            ["mdast-util-to-markdown", "npm:1.3.0"],
             ["@types/mdast", "npm:3.0.7"],
             ["@types/unist", "npm:2.0.6"],
             ["longest-streak", "npm:3.0.0"],
@@ -41850,6 +42091,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-hexadecimal", "npm:2.0.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:4.0.0", {
+          "packageLocation": "./.yarn/cache/parse-entities-npm-4.0.0-fd521e2809-1bc6204939.zip/node_modules/parse-entities/",
+          "packageDependencies": [
+            ["parse-entities", "npm:4.0.0"],
+            ["@types/unist", "npm:2.0.6"],
+            ["character-entities", "npm:2.0.0"],
+            ["character-entities-legacy", "npm:3.0.0"],
+            ["character-reference-invalid", "npm:2.0.0"],
+            ["decode-named-character-reference", "npm:1.0.2"],
+            ["is-alphanumerical", "npm:2.0.0"],
+            ["is-decimal", "npm:2.0.0"],
+            ["is-hexadecimal", "npm:2.0.0"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["parse-filepath", [
@@ -43102,6 +43358,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/prettier-npm-2.6.0-fb29989f51-51151f1b26.zip/node_modules/prettier/",
           "packageDependencies": [
             ["prettier", "npm:2.6.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:2.7.1", {
+          "packageLocation": "./.yarn/cache/prettier-npm-2.7.1-d1f40f5e1a-74e646bf94.zip/node_modules/prettier/",
+          "packageDependencies": [
+            ["prettier", "npm:2.7.1"]
           ],
           "linkType": "HARD",
         }]
@@ -46562,6 +46825,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["unified", "npm:9.2.2"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:14.0.2", {
+          "packageLocation": "./.yarn/cache/remark-npm-14.0.2-9e7a75b6a9-5a111806b6.zip/node_modules/remark/",
+          "packageDependencies": [
+            ["remark", "npm:14.0.2"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["remark-parse", "npm:10.0.0"],
+            ["remark-stringify", "npm:10.0.2"],
+            ["unified", "npm:10.1.0"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["remark-frontmatter", [
@@ -46585,6 +46859,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["micromark-extension-mdxjs", "npm:0.3.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:2.1.2", {
+          "packageLocation": "./.yarn/cache/remark-mdx-npm-2.1.2-e177732033-e661024735.zip/node_modules/remark-mdx/",
+          "packageDependencies": [
+            ["remark-mdx", "npm:2.1.2"],
+            ["mdast-util-mdx", "npm:2.0.0"],
+            ["micromark-extension-mdxjs", "npm:1.0.0"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["remark-parse", [
@@ -46592,6 +46875,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/remark-parse-npm-10.0.0-a311463b1a-161a56a41d.zip/node_modules/remark-parse/",
           "packageDependencies": [
             ["remark-parse", "npm:10.0.0"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["mdast-util-from-markdown", "npm:1.0.4"],
+            ["unified", "npm:10.1.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:10.0.1", {
+          "packageLocation": "./.yarn/cache/remark-parse-npm-10.0.1-e654d7df78-f733119e11.zip/node_modules/remark-parse/",
+          "packageDependencies": [
+            ["remark-parse", "npm:10.0.1"],
             ["@types/mdast", "npm:3.0.7"],
             ["mdast-util-from-markdown", "npm:1.0.4"],
             ["unified", "npm:10.1.0"]
@@ -46629,6 +46922,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["remark-stringify", [
+        ["npm:10.0.2", {
+          "packageLocation": "./.yarn/cache/remark-stringify-npm-10.0.2-c887aca72d-7e8cf4880b.zip/node_modules/remark-stringify/",
+          "packageDependencies": [
+            ["remark-stringify", "npm:10.0.2"],
+            ["@types/mdast", "npm:3.0.7"],
+            ["mdast-util-to-markdown", "npm:1.2.3"],
+            ["unified", "npm:10.1.0"]
+          ],
+          "linkType": "HARD",
+        }],
         ["npm:8.1.1", {
           "packageLocation": "./.yarn/cache/remark-stringify-npm-8.1.1-19c0515ee9-39de4617fe.zip/node_modules/remark-stringify/",
           "packageDependencies": [
@@ -51441,6 +51744,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/unified-npm-10.1.0-d9f1f63894-dc12b62fd1.zip/node_modules/unified/",
           "packageDependencies": [
             ["unified", "npm:10.1.0"],
+            ["@types/unist", "npm:2.0.6"],
+            ["bail", "npm:2.0.1"],
+            ["extend", "npm:3.0.2"],
+            ["is-buffer", "npm:2.0.5"],
+            ["is-plain-obj", "npm:4.0.0"],
+            ["trough", "npm:2.0.2"],
+            ["vfile", "npm:5.1.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:10.1.2", {
+          "packageLocation": "./.yarn/cache/unified-npm-10.1.2-731093c9be-e78760a7d7.zip/node_modules/unified/",
+          "packageDependencies": [
+            ["unified", "npm:10.1.2"],
             ["@types/unist", "npm:2.0.6"],
             ["bail", "npm:2.0.1"],
             ["extend", "npm:3.0.2"],
