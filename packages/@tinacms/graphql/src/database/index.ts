@@ -71,6 +71,9 @@ const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
+  /* the extension of the file to filter on */
+  // TODO: make this required
+  fileExtension?: string
   /* collection name */
   collection: string
   /* filters to apply to the query */
@@ -708,6 +711,7 @@ const _indexContent = async (
     | CollectionTemplatesWithNamespace<true>
 ) => {
   let seedOptions: object | undefined = undefined
+
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions()
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]
@@ -729,6 +733,12 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
+    // do not index files that don't end with the correct format
+    // this fixes https://github.com/tinacms/tinacms/issues/2703 for the data layer
+    const ext = collection?.format || 'md'
+    if (!filepath.endsWith(ext)) {
+      return
+    }
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
       const data = parseFile(dataString, path.extname(filepath), (yup) =>
