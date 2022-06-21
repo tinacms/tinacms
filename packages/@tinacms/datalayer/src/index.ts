@@ -15,6 +15,7 @@ export {
   FilesystemBridge,
   AuditFileSystemBridge,
 } from './database/bridge/filesystem'
+export { IsomorphicBridge } from './database/bridge/isomorphic'
 export {
   FilesystemStore,
   AuditFilesystemStore,

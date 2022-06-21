@@ -93,7 +93,7 @@ const _buildFragments = async (
   // TODO: These should possibly be outputted somewhere else?
   const fragPath = path.join(rootPath, '.tina', '__generated__')
 
-  await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
+  await fs.outputFile(path.join(fragPath, 'frags.gql'), print(fragDoc))
   //   await fs.outputFileSync(
   //     path.join(fragPath, 'frags.json'),
   //     JSON.stringify(fragDoc, null, 2)
@@ -145,7 +145,7 @@ const _buildQueries = async (
 
   const fragPath = path.join(rootPath, '.tina', '__generated__')
 
-  await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
+  await fs.outputFile(path.join(fragPath, 'queries.gql'), print(queryDoc))
   // We dont this them for now
   // await fs.outputFileSync(
   //   path.join(fragPath, 'queries.json'),
