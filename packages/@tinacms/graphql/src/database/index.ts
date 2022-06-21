@@ -625,7 +625,8 @@ export class Database {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(
-        normalizePath(collection.path)
+        normalizePath(collection.path),
+        collection.format || 'md'
       )
       await _indexContent(this, documentPaths, collection)
     })
@@ -733,12 +734,6 @@ const _indexContent = async (
   }
 
   await sequential(documentPaths, async (filepath) => {
-    // do not index files that don't end with the correct format
-    // this fixes https://github.com/tinacms/tinacms/issues/2703 for the data layer
-    const ext = collection?.format || 'md'
-    if (!filepath.endsWith(ext)) {
-      return
-    }
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
       const data = parseFile(dataString, path.extname(filepath), (yup) =>
