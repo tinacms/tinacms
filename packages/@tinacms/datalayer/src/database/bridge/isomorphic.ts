@@ -42,10 +42,14 @@ export type IsomorphicGitBridgeOptions = {
   gitRoot: string
   fsModule?: CallbackFsClient | PromiseFsClient
   commitMessage?: string
-  authorName: string
-  authorEmail: string
-  committerName?: string
-  committerEmail?: string
+  author: {
+    name: string
+    email: string
+  }
+  committer?: {
+    name: string
+    email: string
+  }
   ref?: string
   onPut?: (filepath: string, data: string) => Promise<void>
   onDelete?: (filepath: string) => Promise<void>
@@ -64,10 +68,8 @@ export class IsomorphicBridge implements Bridge {
     dir: string
   }
   public commitMessage: string
-  public authorName: string
-  public authorEmail: string
-  public committerName: string
-  public committerEmail: string
+  public author: { name: string; email: string }
+  public committer: { name: string; email: string }
   public ref: string | undefined
 
   private readonly onPut:
@@ -82,10 +84,8 @@ export class IsomorphicBridge implements Bridge {
     rootPath: string,
     {
       gitRoot,
-      authorName,
-      authorEmail,
-      committerName,
-      committerEmail,
+      author,
+      committer,
       fsModule = fs,
       commitMessage = 'Update from GraphQL client',
       ref,
@@ -99,10 +99,8 @@ export class IsomorphicBridge implements Bridge {
       .slice(this.gitRoot.length + 1)
       .replace(/\\/g, '/')
     this.fsModule = fsModule
-    this.authorName = authorName
-    this.authorEmail = authorEmail
-    this.committerName = committerName || authorName
-    this.committerEmail = committerEmail || authorEmail
+    this.author = author
+    this.committer = committer || author
     this.isomorphicConfig = {
       dir: normalize(this.gitRoot),
       fs: this.fsModule,
@@ -117,8 +115,7 @@ export class IsomorphicBridge implements Bridge {
 
   private getAuthor() {
     return {
-      name: this.authorName,
-      email: this.authorEmail,
+      ...this.author,
       timestamp: Math.round(new Date().getTime() / 1000),
       timezoneOffset: 0,
     }
@@ -126,8 +123,7 @@ export class IsomorphicBridge implements Bridge {
 
   private getCommitter() {
     return {
-      name: this.committerName,
-      email: this.committerEmail,
+      ...this.committer,
       timestamp: Math.round(new Date().getTime() / 1000),
       timezoneOffset: 0,
     }

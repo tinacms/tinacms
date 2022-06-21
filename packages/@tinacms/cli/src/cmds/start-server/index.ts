@@ -72,8 +72,10 @@ async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
   const gitRoot = await resolveGitRoot()
   const options = {
     gitRoot,
-    authorName: '',
-    authorEmail: '',
+    author: {
+      name: '',
+      email: '',
+    },
     onPut: async (filepath: string, data: string) => {
       await fsBridge.put(filepath, data)
     },
@@ -86,39 +88,39 @@ async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
   if (await fs.pathExists(userGitConfig)) {
     const config = ini.parse(await fs.readFile(userGitConfig, 'utf-8'))
     if (config['user']?.['name']) {
-      options.authorName = config['user']['name']
+      options.author.name = config['user']['name']
     }
     if (config['user']?.['email']) {
-      options.authorEmail = config['user']['email']
+      options.author.email = config['user']['email']
     }
   }
 
   let repoGitConfig = undefined
-  if (!options.authorName) {
+  if (!options.author.name) {
     repoGitConfig = ini.parse(
       await fs.readFile(`${gitRoot}/.git/config`, 'utf-8')
     )
     if (repoGitConfig['user']?.['name']) {
-      options.authorName = repoGitConfig['user']['name']
+      options.author.name = repoGitConfig['user']['name']
     }
 
-    if (!options.authorName) {
+    if (!options.author.name) {
       throw new Error(
         'Unable to determine user.name from git config. Hint: `git config --global user.name "John Doe"`'
       )
     }
   }
 
-  if (!options.authorEmail) {
+  if (!options.author.email) {
     repoGitConfig =
       repoGitConfig ||
       ini.parse(await fs.readFile(`${gitRoot}/.git/config`, 'utf-8'))
 
     if (repoGitConfig['user']?.['email']) {
-      options.authorEmail = repoGitConfig['user']['email']
+      options.author.email = repoGitConfig['user']['email']
     }
 
-    if (!options.authorEmail) {
+    if (!options.author.email) {
       throw new Error(
         'Unable to determine user.email from git config. Hint: `git config --global user.email johndoe@example.com`'
       )
