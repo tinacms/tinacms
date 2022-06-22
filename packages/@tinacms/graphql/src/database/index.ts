@@ -71,8 +71,6 @@ const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
-  /* the extension of the file to filter on */
-  // TODO: make this required
   fileExtension?: string
   /* collection name */
   collection: string
