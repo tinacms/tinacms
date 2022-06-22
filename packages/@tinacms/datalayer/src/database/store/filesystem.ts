@@ -27,7 +27,7 @@ export class FilesystemStore implements Store {
     this.rootPath = rootPath || ''
   }
   public async query(
-    queryOptions: StoreQueryOptions
+    _queryOptions: StoreQueryOptions
   ): Promise<StoreQueryResponse> {
     throw new Error(`Unable to perform query for Filesystem store`)
   }
@@ -49,10 +49,10 @@ export class FilesystemStore implements Store {
   public supportsIndexing() {
     return false
   }
-  public async glob(pattern: string, callback) {
+  public async glob(pattern: string, callback, extension) {
     const basePath = path.join(this.rootPath, ...pattern.split('/'))
     const itemsRaw = await fg(
-      path.join(basePath, '**', '/*').replace(/\\/g, '/'),
+      path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
       }
