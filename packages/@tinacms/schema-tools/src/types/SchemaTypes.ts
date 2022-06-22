@@ -37,7 +37,7 @@ export interface TinaCloudSchemaConfig {
   media?: {
     tina?: {
       publicFolder: string
-      syncFolder: string
+      mediaRoot: string
     }
   }
 }
