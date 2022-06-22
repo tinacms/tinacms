@@ -95,9 +95,10 @@ export class IsomorphicBridge implements Bridge {
   ) {
     this.rootPath = rootPath
     this.gitRoot = gitRoot
-    this.relativePath = rootPath
-      .slice(this.gitRoot.length + 1)
-      .replace(/\\/g, '/')
+    this.relativePath = rootPath.slice(this.gitRoot.length).replace(/\\/g, '/')
+    if (this.relativePath.startsWith('/')) {
+      this.relativePath = this.relativePath.slice(1)
+    }
     this.fsModule = fsModule
     this.author = author
     this.committer = committer || author
@@ -360,6 +361,7 @@ export class IsomorphicBridge implements Bridge {
     const leafEntry = pathEntries[pathEntries.length - 1]
     const entryPath = pathParts[pathParts.length - 1]
     const parentEntry = pathEntries[pathEntries.length - 2]
+
     let treeEntry: TreeEntry
     let parentPath
     if (parentEntry) {
