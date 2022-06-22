@@ -349,7 +349,7 @@ export class IsomorphicBridge implements Bridge {
     return ref
   }
 
-  public async glob(pattern: string) {
+  public async glob(pattern: string, extension: string) {
     const ref = await this.getRef()
     const parent = globParent(this.qualifyPath(pattern))
     const { pathParts, pathEntries } = await this.resolvePathEntries(
@@ -387,7 +387,9 @@ export class IsomorphicBridge implements Bridge {
       path: parentPath,
       results,
     })
-    return results.map((path) => this.unqualifyPath(path))
+    return results
+      .map((path) => this.unqualifyPath(path))
+      .filter((path) => path.endsWith(extension))
   }
 
   public supportsBuilding() {
