@@ -17,7 +17,7 @@ import z from 'zod'
 const tinaConfigKey = z
   .object({
     publicFolder: z.string(),
-    syncFolder: z.string(),
+    mediaRoot: z.string(),
   })
   .strict()
   .optional()

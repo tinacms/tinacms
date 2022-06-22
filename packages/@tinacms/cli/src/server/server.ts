@@ -78,7 +78,7 @@ export const gqlServer = async (database, verbose: boolean) => {
     '/media',
     createMediaRouter({
       publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
-      syncFolder: parseMediaFolder(mediaPaths?.syncFolder || ''),
+      mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
     })
   )
   return server
