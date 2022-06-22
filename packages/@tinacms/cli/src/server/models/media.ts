@@ -17,6 +17,8 @@ import { parseMediaFolder } from '../../utils/'
 
 interface MediaArgs {
   searchPath: string
+  cursor?: string
+  limit?: string
 }
 
 interface File {
@@ -92,11 +94,30 @@ export class MediaModel {
         }
       })
 
-      const files = await Promise.all(filesProm)
+      const offset = Number(args.cursor) || 0
+      const limit = Number(args.limit) || 20
+
+      const rawItems = await Promise.all(filesProm)
+      const sortedItems = rawItems.sort((a, b) => {
+        if (a.isFile && !b.isFile) {
+          return 1
+        }
+        if (!a.isFile && b.isFile) {
+          return -1
+        }
+        return 0
+      })
+      const limitItems = sortedItems.slice(offset, offset + limit)
+      const files = limitItems.filter((x) => x.isFile)
+      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src)
+
+      const cursor =
+        rawItems.length > offset + limit ? String(offset + limit) : null
 
       return {
-        files: files.filter((x) => x.isFile),
-        directories: files.filter((x) => !x.isFile).map((x) => x.src),
+        files,
+        directories,
+        cursor,
       }
     } catch (error) {
       console.error(error)

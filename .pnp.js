@@ -14917,6 +14917,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["fast-glob", "npm:3.2.7"],
             ["fs-extra", "npm:9.1.0"],
             ["graphql", "npm:15.5.1"],
+            ["ini", "npm:3.0.0"],
             ["jest", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:27.0.6"],
             ["js-yaml", "npm:4.1.0"],
             ["lodash", "npm:4.17.21"],
@@ -14955,8 +14956,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["encoding-down", "npm:7.1.0"],
             ["fast-glob", "npm:3.2.7"],
             ["fs-extra", "npm:9.1.0"],
+            ["glob-parent", "npm:6.0.2"],
             ["graphql", "npm:15.5.1"],
             ["gray-matter", "npm:4.0.3"],
+            ["isomorphic-git", "npm:1.17.2"],
             ["jest", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:27.0.6"],
             ["jest-diff", "npm:27.0.6"],
             ["jest-file-snapshot", "npm:0.5.0"],
@@ -24960,6 +24963,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["async-lock", [
+        ["npm:1.3.1", {
+          "packageLocation": "./.yarn/cache/async-lock-npm-1.3.1-87e23d2552-97e2e6fb0f.zip/node_modules/async-lock/",
+          "packageDependencies": [
+            ["async-lock", "npm:1.3.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["async-retry", [
         ["npm:1.2.3", {
           "packageLocation": "./.yarn/cache/async-retry-npm-1.2.3-eaddd454e1-a770aad562.zip/node_modules/async-retry/",
@@ -27671,6 +27683,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["clean-git-ref", [
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/cache/clean-git-ref-npm-2.0.1-5994838863-12ab3c05f9.zip/node_modules/clean-git-ref/",
+          "packageDependencies": [
+            ["clean-git-ref", "npm:2.0.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["clean-stack", [
         ["npm:2.2.0", {
           "packageLocation": "./.yarn/cache/clean-stack-npm-2.2.0-a8ce435a5c-e291ce2b8c.zip/node_modules/clean-stack/",
@@ -28490,6 +28511,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["parse-json", "npm:5.2.0"],
             ["path-type", "npm:4.0.0"],
             ["yaml", "npm:1.10.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["crc-32", [
+        ["npm:1.2.2", {
+          "packageLocation": "./.yarn/cache/crc-32-npm-1.2.2-28bdc12bcc-5b370438c3.zip/node_modules/crc-32/",
+          "packageDependencies": [
+            ["crc-32", "npm:1.2.2"]
           ],
           "linkType": "HARD",
         }]
@@ -30035,6 +30065,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/diff-sequences-npm-27.5.1-29338362fa-3d2d8f7ead.zip/node_modules/diff-sequences/",
           "packageDependencies": [
             ["diff-sequences", "npm:27.5.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["diff3", [
+        ["npm:0.0.3", {
+          "packageLocation": "./.yarn/cache/diff3-npm-0.0.3-63099a9be4-9a86c0e3ca.zip/node_modules/diff3/",
+          "packageDependencies": [
+            ["diff3", "npm:0.0.3"]
           ],
           "linkType": "HARD",
         }]
@@ -34931,6 +34970,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ini", "npm:2.0.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:3.0.0", {
+          "packageLocation": "./.yarn/cache/ini-npm-3.0.0-c2af955701-239e98a343.zip/node_modules/ini/",
+          "packageDependencies": [
+            ["ini", "npm:3.0.0"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["inquirer", [
@@ -35997,6 +36043,26 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["isomorphic-fetch", "npm:3.0.0"],
             ["node-fetch", "npm:2.6.1"],
             ["whatwg-fetch", "npm:3.6.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["isomorphic-git", [
+        ["npm:1.17.2", {
+          "packageLocation": "./.yarn/cache/isomorphic-git-npm-1.17.2-e81d72152b-663e3a6237.zip/node_modules/isomorphic-git/",
+          "packageDependencies": [
+            ["isomorphic-git", "npm:1.17.2"],
+            ["async-lock", "npm:1.3.1"],
+            ["clean-git-ref", "npm:2.0.1"],
+            ["crc-32", "npm:1.2.2"],
+            ["diff3", "npm:0.0.3"],
+            ["ignore", "npm:5.1.8"],
+            ["minimisted", "npm:2.0.1"],
+            ["pako", "npm:1.0.11"],
+            ["pify", "npm:4.0.1"],
+            ["readable-stream", "npm:3.6.0"],
+            ["sha.js", "npm:2.4.11"],
+            ["simple-get", "npm:4.0.1"]
           ],
           "linkType": "HARD",
         }]
@@ -39515,6 +39581,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["arrify", "npm:1.0.1"],
             ["is-plain-obj", "npm:1.1.0"],
             ["kind-of", "npm:6.0.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["minimisted", [
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/cache/minimisted-npm-2.0.1-f825408156-95c95b9e85.zip/node_modules/minimisted/",
+          "packageDependencies": [
+            ["minimisted", "npm:2.0.1"],
+            ["minimist", "npm:1.2.5"]
           ],
           "linkType": "HARD",
         }]
@@ -47756,6 +47832,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/simple-get-npm-4.0.0-14ed0bd6c2-91c007260d.zip/node_modules/simple-get/",
           "packageDependencies": [
             ["simple-get", "npm:4.0.0"],
+            ["decompress-response", "npm:6.0.0"],
+            ["once", "npm:1.4.0"],
+            ["simple-concat", "npm:1.0.1"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:4.0.1", {
+          "packageLocation": "./.yarn/cache/simple-get-npm-4.0.1-fa2a97645d-8e7d8dd396.zip/node_modules/simple-get/",
+          "packageDependencies": [
+            ["simple-get", "npm:4.0.1"],
             ["decompress-response", "npm:6.0.0"],
             ["once", "npm:1.4.0"],
             ["simple-concat", "npm:1.0.1"]
