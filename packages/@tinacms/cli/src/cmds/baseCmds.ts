@@ -131,11 +131,7 @@ export const baseCmds: Command[] = [
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [
-      experimentalDatalayer,
-      isomorphicGitBridge,
-      noTelemetryOption,
-    ],
+    options: [experimentalDatalayer, isomorphicGitBridge, noTelemetryOption],
     action: (options) => chain([compileSchema], options),
   },
   {

@@ -132,9 +132,8 @@ describe('isomorphic bridge', () => {
     })
 
     test('empty pattern', async () => {
-      const result = await bridge.glob('')
+      const result = await bridge.glob('', '.mdx')
       expect(result).toEqual([
-        'README.md',
         'content/authors/napoleon.mdx',
         'content/authors/pedro.mdx',
         'content/posts/anotherPost.mdx',
@@ -143,12 +142,12 @@ describe('isomorphic bridge', () => {
     })
 
     test('file pattern', async () => {
-      const result = await bridge.glob('README.md')
+      const result = await bridge.glob('README.md', '.md')
       expect(result).toEqual(['README.md'])
     })
 
     test('posts folder', async () => {
-      const result = await bridge.glob('content/posts')
+      const result = await bridge.glob('content/posts', '.mdx')
       expect(result).toEqual([
         'content/posts/anotherPost.mdx',
         'content/posts/voteForPedro.mdx',
@@ -156,7 +155,7 @@ describe('isomorphic bridge', () => {
     })
 
     test('non-existent folder', async () => {
-      const result = await bridge.glob('content/foobar')
+      const result = await bridge.glob('content/foobar', '.md')
       expect(result).toEqual([])
     })
   })
@@ -184,7 +183,7 @@ describe('isomorphic bridge', () => {
       const filepath = 'content/posts/myNewPost.mdx'
       const content = '# My New Post'
       await bridge.put(filepath, content)
-      const result = await bridge.glob('content/posts')
+      const result = await bridge.glob('content/posts', '.mdx')
       expect(result).toEqual([
         'content/posts/anotherPost.mdx',
         filepath,
@@ -197,7 +196,7 @@ describe('isomorphic bridge', () => {
       const filepath = 'content/posts/anotherPost.mdx'
       const content = contentMap[filepath]
       await bridge.put(filepath, content)
-      const result = await bridge.glob('content/posts')
+      const result = await bridge.glob('content/posts', '.mdx')
       expect(result).toEqual([
         'content/posts/anotherPost.mdx',
         'content/posts/voteForPedro.mdx',
@@ -209,7 +208,7 @@ describe('isomorphic bridge', () => {
       const filepath = 'content/posts/anotherPost.mdx'
       const content = '# My Updated Post'
       await bridge.put(filepath, content)
-      const result = await bridge.glob('content/posts')
+      const result = await bridge.glob('content/posts', '.mdx')
       expect(result).toEqual([
         'content/posts/anotherPost.mdx',
         'content/posts/voteForPedro.mdx',
@@ -221,7 +220,7 @@ describe('isomorphic bridge', () => {
       const filepath = 'content/bios/bio1.mdx'
       const content = '# My First Bio'
       await bridge.put(filepath, content)
-      const result = await bridge.glob('content/bios')
+      const result = await bridge.glob('content/bios', '.mdx')
       expect(result).toEqual([filepath])
       expect(content).toEqual(await bridge.get(filepath))
     })
@@ -230,7 +229,7 @@ describe('isomorphic bridge', () => {
       const filepath = '.tina/__generated__/_schema.json'
       const content = '{}'
       await bridge.putConfig(filepath, content)
-      const result = await bridge.glob('.tina')
+      const result = await bridge.glob('.tina', '.json')
       expect(result).toEqual([filepath])
       expect(content).toEqual(await bridge.get(filepath))
     })
@@ -245,7 +244,7 @@ describe('isomorphic bridge', () => {
     test('single post', async () => {
       const filepath = 'content/posts/anotherPost.mdx'
       await bridge.delete(filepath)
-      const result = await bridge.glob('content/posts')
+      const result = await bridge.glob('content/posts', '.mdx')
       expect(result).toEqual(['content/posts/voteForPedro.mdx'])
     })
 
@@ -259,7 +258,7 @@ describe('isomorphic bridge', () => {
     test('all posts', async () => {
       await bridge.delete('content/posts/anotherPost.mdx')
       await bridge.delete('content/posts/voteForPedro.mdx')
-      const result = await bridge.glob('content')
+      const result = await bridge.glob('content', '.mdx')
       expect(result).toEqual([
         'content/authors/napoleon.mdx',
         'content/authors/pedro.mdx',

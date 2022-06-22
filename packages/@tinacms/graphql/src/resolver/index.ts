@@ -642,8 +642,9 @@ export class Resolver {
       edges = result.edges
       pageInfo = result.pageInfo
     } else {
+      const ext = collection?.format || '.md'
       edges = (
-        await this.database.store.glob(collection.path, this.getDocument)
+        await this.database.store.glob(collection.path, this.getDocument, ext)
       ).map((document) => ({
         node: document,
       }))
