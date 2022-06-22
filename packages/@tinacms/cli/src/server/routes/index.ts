@@ -40,8 +40,12 @@ export const createMediaRouter = (config: PathConfig) => {
 
   mediaRouter.get('/list/*', async (req, res) => {
     const folder = req.params[0]
+    const cursor = req.query.cursor as string
+    const limit = req.query.limit as string
     const media = await mediaModel.listMedia({
       searchPath: folder,
+      cursor,
+      limit,
     })
     res.json(media)
   })
