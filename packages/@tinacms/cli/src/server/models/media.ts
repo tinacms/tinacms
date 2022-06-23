@@ -41,22 +41,22 @@ interface ListMediaRes {
 }
 export interface PathConfig {
   publicFolder: string
-  syncFolder: string
+  mediaRoot: string
 }
 
 type SuccessRecord = { ok: true } | { ok: false; message: string }
 export class MediaModel {
   public readonly publicFolder: string
-  public readonly syncFolder: string
-  constructor({ publicFolder, syncFolder }: PathConfig) {
-    this.syncFolder = syncFolder
+  public readonly mediaRoot: string
+  constructor({ publicFolder, mediaRoot }: PathConfig) {
+    this.mediaRoot = mediaRoot
     this.publicFolder = publicFolder
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
       const folderPath = join(
         this.publicFolder,
-        this.syncFolder,
+        this.mediaRoot,
         args.searchPath
       )
       const searchPath = parseMediaFolder(args.searchPath)
@@ -82,8 +82,8 @@ export class MediaModel {
         if (searchPath) {
           src = `/${searchPath}${src}`
         }
-        if (this.syncFolder) {
-          src = `/${this.syncFolder}${src}`
+        if (this.mediaRoot) {
+          src = `/${this.mediaRoot}${src}`
         }
 
         return {
@@ -130,7 +130,7 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(this.publicFolder, this.syncFolder, args.searchPath)
+      const file = join(this.publicFolder, this.mediaRoot, args.searchPath)
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file)
       await fs.remove(file)
