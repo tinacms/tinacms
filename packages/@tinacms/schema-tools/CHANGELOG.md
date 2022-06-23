@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.0.6
+
+### Patch Changes
+
+- fb73fb355: Renames syncFolder to a mediaRoot when configuring Repo-Based Media
+
 ## 0.0.5
 
 ### Patch Changes
