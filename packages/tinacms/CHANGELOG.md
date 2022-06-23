@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.68.10
+
+### Patch Changes
+
+- d95b73974: Fix collection list page delete modal
+- 7b77fe1b5: Add a default TinaMediaStore for repo-based media
+- Updated dependencies [2ef5a1f33]
+- Updated dependencies [fb73fb355]
+- Updated dependencies [7b77fe1b5]
+- Updated dependencies [99a13024d]
+  - @tinacms/toolkit@0.56.33
+  - @tinacms/schema-tools@0.0.6
+  - @tinacms/sharedctx@0.1.1
+
 All notable changes to `tinacms/packages/tinacms` will be documented in this file.
 
 Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://github.com/tinacms/tinacms/CHANGELOG.md) specific to root `tinacms`.
