@@ -24,7 +24,7 @@ describe('resolveMedia', () => {
       media: {
         tina: {
           publicFolder: 'public',
-          syncFolder: 'uploads',
+          mediaRoot: 'uploads',
         },
       },
     },
