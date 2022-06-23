@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.50.9
+
+### Patch Changes
+
+- 2ef5a1f33: fix scale isssue, truncate form label to filename
+
 ## 0.50.8
 
 ### Patch Changes

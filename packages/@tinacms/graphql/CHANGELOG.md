@@ -1,5 +1,49 @@
 # tina-graphql
 
+## 0.61.0
+
+### Minor Changes
+
+- 4daf15b36: Updated matching logic to only return the correct extension.
+
+  This means if you are using any other files besides `.md` the format must be provided in the schema.
+
+  ```ts
+  // .tina/schema.ts
+
+  import { defineSchema } from 'tinacms'
+
+  const schema = defineSchema({
+    collections: [
+      {
+        name: 'page',
+        path: 'content/page',
+        label: 'Page',
+        // Need to provide the format if the file being used (default is `.md`)
+        format: 'mdx',
+        fields: [
+          //...
+        ],
+      },
+    ],
+  })
+  //...
+
+  export default schema
+  ```
+
+### Patch Changes
+
+- 2ef5a1f33: Use media config from the schema in the local media server
+- 2ef5a1f33: Uses new `schema.config` when resolving media/asset urls
+- b348f8b6b: Experimental isomorphic git bridge implementation
+- fb73fb355: Renames syncFolder to a mediaRoot when configuring Repo-Based Media
+- Updated dependencies [b348f8b6b]
+- Updated dependencies [fb73fb355]
+- Updated dependencies [4daf15b36]
+  - @tinacms/datalayer@0.2.0
+  - @tinacms/schema-tools@0.0.6
+
 ## 0.60.8
 
 ### Patch Changes

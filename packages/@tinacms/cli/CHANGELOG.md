@@ -1,5 +1,27 @@
 # tinacms-cli
 
+## 0.60.24
+
+### Patch Changes
+
+- 2ef5a1f33: Use media config from the schema in the local media server
+- 2ef5a1f33: Uses new `schema.config` when resolving media/asset urls
+- b348f8b6b: Experimental isomorphic git bridge implementation
+- b46e9a481: Fixed issue where child process would start before parent
+- fb73fb355: Renames syncFolder to a mediaRoot when configuring Repo-Based Media
+- 7b77fe1b5: Add a default TinaMediaStore for repo-based media
+- 3e4b3ea7e: media manage uses relieve dir paths
+- 99a13024d: Enables paging for local media manager
+- Updated dependencies [2ef5a1f33]
+- Updated dependencies [2ef5a1f33]
+- Updated dependencies [b348f8b6b]
+- Updated dependencies [fb73fb355]
+- Updated dependencies [4daf15b36]
+  - @tinacms/graphql@0.61.0
+  - @tinacms/datalayer@0.2.0
+  - @tinacms/schema-tools@0.0.6
+  - @tinacms/metrics@0.0.3
+
 ## 0.60.23
 
 ### Patch Changes
