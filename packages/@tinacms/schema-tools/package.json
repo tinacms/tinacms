@@ -10,8 +10,7 @@
   "buildConfig": {
     "entryPoints": [
       {
-        "name": "src/index.ts",
-        "target": "node"
+        "name": "src/index.ts"
       }
     ]
   },
@@ -19,7 +18,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/yup": "^0.29.10",
     "jest": "^27.0.6",
-    "react": "16.14.0",
+    "react": "17.0.2",
     "typescript": "^4.3.5",
     "yup": "^0.32.0"
   },
