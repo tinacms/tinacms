@@ -1426,7 +1426,7 @@ describe('MDX Elements', () => {
 ![](/uploads/image.jpg)
 
 <CustomImage url="/uploads/my-pic.jpg" />`
-    test.only('With an image MDX element', () => {
+    test('With an image MDX element', () => {
       const string = mdxTestImage.trim()
 
       const parseImageCallback = jest.fn((src) => {
