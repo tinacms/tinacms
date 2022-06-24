@@ -255,6 +255,14 @@ export type DatetimeFilter = {
   in?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type Posts_BodyRelatedPostPostFilter = {
+  posts?: Maybe<PostsFilter>;
+};
+
+export type Posts_BodyRelatedPostFilter = {
+  post?: Maybe<Posts_BodyRelatedPostPostFilter>;
+};
+
 export type Posts_BodyDateTimeFilter = {
   format?: Maybe<StringFilter>;
 };
@@ -272,6 +280,7 @@ export type Posts_BodyNewsletterSignupFilter = {
 };
 
 export type Posts_BodyFilter = {
+  RelatedPost?: Maybe<Posts_BodyRelatedPostFilter>;
   DateTime?: Maybe<Posts_BodyDateTimeFilter>;
   BlockQuote?: Maybe<Posts_BodyBlockQuoteFilter>;
   NewsletterSignup?: Maybe<Posts_BodyNewsletterSignupFilter>;

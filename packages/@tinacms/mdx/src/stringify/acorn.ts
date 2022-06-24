@@ -7,14 +7,16 @@ import { blockElement, rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
-  return stringifyProps(element, field, true)
+  return stringifyProps(element, field, true, imageCallback)
 }
 export const stringifyProps = (
   element: Plate.MdxBlockElement,
   parentField: RichTypeInner,
-  flatten?: boolean
+  flatten: boolean,
+  imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] } => {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.BlockContent[] = []
@@ -55,7 +57,6 @@ export const stringifyProps = (
         }
         break
       case 'datetime':
-      case 'image':
       case 'string':
         if (field.list) {
           attributes.push({
@@ -71,6 +72,26 @@ export const stringifyProps = (
             type: 'mdxJsxAttribute',
             name,
             value: value,
+          })
+        }
+        break
+      case 'image':
+        if (field.list) {
+          attributes.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              value: `[${value
+                .map((item) => `"${imageCallback(item)}"`)
+                .join(', ')}]`,
+            },
+          })
+        } else {
+          attributes.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: imageCallback(value),
           })
         }
         break

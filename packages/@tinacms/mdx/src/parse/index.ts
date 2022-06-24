@@ -80,7 +80,11 @@ export const markdownToAst = (value: string) => {
   return tree
 }
 
-export const parseMDX = (value: string, field: RichTypeInner) => {
+export const parseMDX = (
+  value: string,
+  field: RichTypeInner,
+  imageCallback: (s: string) => string
+) => {
   const tree = markdownToAst(value)
-  return remarkToSlate(tree, field)
+  return remarkToSlate(tree, field, imageCallback)
 }

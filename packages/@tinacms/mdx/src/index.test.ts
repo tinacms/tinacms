@@ -1,6 +1,7 @@
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import { parseMDX } from './parse/index'
 import { stringifyMDX } from './stringify'
+import fs from 'fs'
 
 const field: RichTypeInner = { name: 'body', type: 'rich-text' }
 
@@ -12,14 +13,20 @@ expect.addSnapshotSerializer({
   },
 })
 
-const parseThenStringify = (string, field) => {
-  const astResult = parseMDX(string, field)
+const parseThenStringify = (
+  string,
+  field,
+  parseImageCallback?: any,
+  stringifyImageCallback?: any
+) => {
+  const parseCallback = parseImageCallback || ((url) => url)
+  const stringifyCallback = stringifyImageCallback || ((url) => url)
+  const astResult = parseMDX(string, field, parseCallback)
   // Trim newlines for readability
-  const stringResult = stringifyMDX(astResult, field).trim()
+  const stringResult = stringifyMDX(astResult, field, stringifyCallback).trim()
   return { astResult, stringResult }
 }
 
-import fs from 'fs'
 describe('Kitchen sink', () => {
   test.skip('tests', async () => {
     const string = await fs
@@ -359,7 +366,7 @@ describe('Lists', () => {
   test('Unsupported list items like code blocks throw an error', () => {
     const string = list5
 
-    expect(() => parseMDX(string, field)).toThrowError()
+    expect(() => parseMDX(string, field, (s) => s)).toThrowError()
   })
   const list6 = `
   - <Date />
@@ -1071,7 +1078,7 @@ describe('MDX Elements', () => {
     test('unregistered elements throw an error', () => {
       const string = mdxTest1
 
-      expect(() => parseMDX(string, field)).toThrowError()
+      expect(() => parseMDX(string, field, (s) => s)).toThrowError()
     })
     test(mdxTest1, () => {
       const string = mdxTest1
@@ -1413,6 +1420,77 @@ describe('MDX Elements', () => {
 ]
 `)
       expect(stringResult).toEqual(string)
+    })
+
+    const mdxTestImage = `
+![](/uploads/image.jpg)
+
+<CustomImage url="/uploads/my-pic.jpg" />`
+    test.only('With an image MDX element', () => {
+      const string = mdxTestImage.trim()
+
+      const parseImageCallback = jest.fn((src) => {
+        return `some-prefix${src}`
+      })
+      const stringifyImageCallback = jest.fn((src) => {
+        return src.replace('some-prefix', '')
+      })
+
+      const { astResult, stringResult } = parseThenStringify(
+        string,
+        {
+          ...field,
+          templates: [
+            {
+              name: 'CustomImage',
+              label: 'Image',
+              fields: [{ name: 'url', label: 'URL', type: 'image' }],
+            },
+          ],
+        },
+        parseImageCallback,
+        stringifyImageCallback
+      )
+      expect(astResult).toMatchInlineSnapshot(`
+[
+  {
+    "type": "p",
+    "children": [
+      {
+        "type": "img",
+        "url": "some-prefix/uploads/image.jpg",
+        "alt": "",
+        "caption": null,
+        "children": [
+          {
+            "type": "text",
+            "text": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "mdxJsxFlowElement",
+    "name": "CustomImage",
+    "children": [
+      {
+        "type": "text",
+        "text": ""
+      }
+    ],
+    "props": {
+      "url": "some-prefix/uploads/my-pic.jpg"
+    }
+  }
+]
+`)
+      expect(stringResult).toEqual(
+        `
+![](/uploads/image.jpg)
+
+<CustomImage url="/uploads/my-pic.jpg" />`.trim()
+      )
     })
 
     const mdxTest5 = `

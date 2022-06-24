@@ -26,9 +26,10 @@ import { stringifyProps } from './acorn'
 
 export const stringifyMDX = (
   value: Plate.RootElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ) => {
-  return toMarkdown(rootElement(value, field), {
+  return toMarkdown(rootElement(value, field, imageCallback), {
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
   })
@@ -36,11 +37,12 @@ export const stringifyMDX = (
 
 export const rootElement = (
   content: Plate.RootElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = []
   content.children.forEach((child) => {
-    const value = blockElement(child, field)
+    const value = blockElement(child, field, imageCallback)
     if (value) {
       children.push(value)
     }
@@ -53,7 +55,8 @@ export const rootElement = (
 
 export const blockElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
     case 'h1':
@@ -66,7 +69,7 @@ export const blockElement = (
         type: 'heading',
         // @ts-ignore Type 'number' is not assignable to type '1 | 2 | 3 | 4 | 5 | 6'
         depth: { h1: 1, h2: 2, h3: 3, h4: 4, h5: 5, h6: 6 }[content.type],
-        children: eat(content.children, field),
+        children: eat(content.children, field, imageCallback),
       }
     case 'p':
       // Ignore empty blocks
@@ -78,7 +81,7 @@ export const blockElement = (
       }
       return {
         type: 'paragraph',
-        children: eat(content.children, field),
+        children: eat(content.children, field, imageCallback),
       }
     case 'code_block':
       const valueArray: string[] = []
@@ -93,7 +96,12 @@ export const blockElement = (
         value: valueArray.join('\n'),
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes } = stringifyProps(content, field)
+      const { children, attributes } = stringifyProps(
+        content,
+        field,
+        false,
+        imageCallback
+      )
       return {
         type: 'mdxJsxFlowElement',
         name: content.name,
@@ -106,7 +114,7 @@ export const blockElement = (
         children: [
           {
             type: 'paragraph',
-            children: eat(content.children, field),
+            children: eat(content.children, field, imageCallback),
           },
         ],
       }
@@ -121,7 +129,7 @@ export const blockElement = (
         ordered: content.type === 'ol',
         spread: false,
         children: content.children.map((child) =>
-          listItemElement(child, field)
+          listItemElement(child, field, imageCallback)
         ),
       }
     default:
@@ -130,7 +138,8 @@ export const blockElement = (
 }
 const listItemElement = (
   content: Plate.ListItemElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
     type: 'listItem',
@@ -141,29 +150,31 @@ const listItemElement = (
       if (child.type === 'lic') {
         return {
           type: 'paragraph',
-          children: eat(child.children, field),
+          children: eat(child.children, field, imageCallback),
         }
       }
-      return blockContentElement(child, field)
+      return blockContentElement(child, field, imageCallback)
     }),
   }
 }
 const blockContentElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {
     case 'blockquote':
       return {
         type: 'blockquote',
         children: content.children.map((child) =>
-          blockContentElement(child, field)
+          // FIXME: text nodes are probably passed in here by the rich text editor
+          blockContentElement(child, field, imageCallback)
         ),
       }
     case 'p':
       return {
         type: 'paragraph',
-        children: eat(content.children, field),
+        children: eat(content.children, field, imageCallback),
       }
     case 'ol':
     case 'ul':
@@ -172,7 +183,7 @@ const blockContentElement = (
         ordered: content.type === 'ol',
         spread: false,
         children: content.children.map((child) =>
-          listItemElement(child, field)
+          listItemElement(child, field, imageCallback)
         ),
       }
     default:

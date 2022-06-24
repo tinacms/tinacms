@@ -8,7 +8,8 @@ import { parseMDX } from '.'
 
 export const extractAttributes = (
   attributes: MdxJsxAttribute[],
-  fields: TinaFieldBase[]
+  fields: TinaFieldBase[],
+  imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
   attributes.forEach((attribute) => {
@@ -19,25 +20,39 @@ export const extractAttributes = (
         `Unable to find field definition for property "${attribute.name}"`
       )
     }
-    properties[attribute.name] = extractAttribute(attribute, field)
+    properties[attribute.name] = extractAttribute(
+      attribute,
+      field,
+      imageCallback
+    )
   })
   return properties
 }
 export const extractAttribute = (
   attribute: MdxJsxAttribute,
-  field: TinaFieldBase
+  field: TinaFieldBase,
+  imageCallback: (image: string) => string
 ) => {
   switch (field.type) {
     case 'boolean':
     case 'number':
       return extractScalar(extractExpression(attribute), field)
     case 'datetime':
-    case 'image':
     case 'string':
       if (field.list) {
         return extractScalar(extractExpression(attribute), field)
       } else {
         return extractString(attribute, field)
+      }
+    case 'image':
+      if (field.list) {
+        const values = extractScalar(extractExpression(attribute), field)
+        if (typeof values === 'string') {
+          return values.split(',').map((value) => imageCallback(value))
+        }
+      } else {
+        const value = extractString(attribute, field)
+        return imageCallback(value)
       }
     case 'reference':
       if (field.list) {

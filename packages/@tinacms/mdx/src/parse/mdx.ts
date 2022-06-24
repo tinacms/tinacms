@@ -9,17 +9,20 @@ export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxTextElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Plate.MdxInlineElement
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxFlowElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Plate.MdxBlockElement
 export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Plate.MdxInlineElement | Plate.MdxBlockElement {
   const template = field.templates?.find((template) => {
     const templateName = typeof template === 'string' ? template : template.name
@@ -34,9 +37,13 @@ export function mdxJsxElement(
     )
   }
   // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
-  const props = extractAttributes(node.attributes, template.fields)
+  const props = extractAttributes(
+    node.attributes,
+    template.fields,
+    imageCallback
+  )
   const childField = template.fields.find((field) => field.name === 'children')
-  const childProps = remarkToSlate(node, childField)
+  const childProps = remarkToSlate(node, childField, imageCallback)
   if (childField) {
     props.children = childProps
   }

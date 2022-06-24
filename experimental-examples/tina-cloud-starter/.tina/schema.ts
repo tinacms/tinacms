@@ -60,6 +60,19 @@ const schema = defineSchema({
           name: "_body",
           templates: [
             {
+              name: "RelatedPost",
+              label: "Related Post",
+              inline: true,
+              fields: [
+                {
+                  name: "post",
+                  label: "Post",
+                  type: "reference",
+                  collections: ["posts"],
+                },
+              ],
+            },
+            {
               name: "DateTime",
               label: "Date & Time",
               inline: true,

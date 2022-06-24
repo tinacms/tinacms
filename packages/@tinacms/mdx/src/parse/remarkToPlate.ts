@@ -41,7 +41,8 @@ declare module 'mdast' {
 
 export const remarkToSlate = (
   root: Md.Root,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Plate.RootElement => {
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
@@ -64,7 +65,7 @@ export const remarkToSlate = (
       case 'paragraph':
         return paragraph(content)
       case 'mdxJsxFlowElement':
-        return mdxJsxElement(content, field)
+        return mdxJsxElement(content, field, imageCallback)
       case 'thematicBreak':
         return {
           type: 'hr',
@@ -138,7 +139,8 @@ export const remarkToSlate = (
                 // @ts-ignore casting a flow element to a paragraph
                 mdxJsxElement(
                   { ...child, type: 'mdxJsxTextElement' as const },
-                  field
+                  field,
+                  imageCallback
                 ),
               ],
             }
@@ -207,7 +209,7 @@ export const remarkToSlate = (
   ): Plate.InlineElement | Plate.InlineElement[] => {
     switch (content.type) {
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field)
+        return mdxJsxElement(content, field, imageCallback)
       case 'text':
         return text(content)
       case 'inlineCode':
@@ -232,7 +234,7 @@ export const remarkToSlate = (
       case 'image':
         return image(content)
       case 'mdxJsxTextElement':
-        return mdxJsxElement(content, field)
+        return mdxJsxElement(content, field, imageCallback)
       case 'emphasis':
         return phrashingMark(content)
       case 'strong':
@@ -319,7 +321,7 @@ export const remarkToSlate = (
   const image = (content: Md.Image): Plate.ImageElement => {
     return {
       type: 'img',
-      url: content.url,
+      url: imageCallback(content.url),
       alt: content.alt,
       caption: content.title,
       children: [{ type: 'text', text: '' }],

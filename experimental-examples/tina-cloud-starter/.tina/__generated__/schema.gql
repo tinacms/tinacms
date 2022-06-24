@@ -136,6 +136,14 @@ input DatetimeFilter {
   in: [String]
 }
 
+input Posts_bodyRelatedPostPostFilter {
+  posts: PostsFilter
+}
+
+input Posts_bodyRelatedPostFilter {
+  post: Posts_bodyRelatedPostPostFilter
+}
+
 input Posts_bodyDateTimeFilter {
   format: StringFilter
 }
@@ -153,6 +161,7 @@ input Posts_bodyNewsletterSignupFilter {
 }
 
 input Posts_bodyFilter {
+  RelatedPost: Posts_bodyRelatedPostFilter
   DateTime: Posts_bodyDateTimeFilter
   BlockQuote: Posts_bodyBlockQuoteFilter
   NewsletterSignup: Posts_bodyNewsletterSignupFilter

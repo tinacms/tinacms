@@ -104,7 +104,8 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
  */
 const inlineElementExceptLink = (
   content: InlineElementWithCallback,
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.PhrasingContent => {
   switch (content.type) {
     case 'a':
@@ -114,7 +115,7 @@ const inlineElementExceptLink = (
     case 'img':
       return {
         type: 'image',
-        url: content.url,
+        url: imageCallback(content.url),
         alt: content.alt,
         title: content.caption,
       }
@@ -123,7 +124,11 @@ const inlineElementExceptLink = (
         type: 'break',
       }
     case 'mdxJsxTextElement': {
-      const { attributes, children } = stringifyPropsInline(content, field)
+      const { attributes, children } = stringifyPropsInline(
+        content,
+        field,
+        imageCallback
+      )
       return {
         type: 'mdxJsxTextElement',
         name: content.name,
@@ -144,7 +149,8 @@ const inlineElementExceptLink = (
 
 export const eat = (
   c: InlineElementWithCallback[],
-  field: RichTypeInner
+  field: RichTypeInner,
+  imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c)
   const first = content[0]
@@ -154,8 +160,8 @@ export const eat = (
   if (first && first?.type !== 'text') {
     // non-text nodes can't be merged. Eg. img, break. So process them and move on to the rest
     return [
-      inlineElementExceptLink(first, field),
-      ...eat(content.slice(1), field),
+      inlineElementExceptLink(first, field, imageCallback),
+      ...eat(content.slice(1), field, imageCallback),
     ]
   }
   const marks = getMarks(first)
@@ -164,12 +170,12 @@ export const eat = (
     if (first.linkifyTextNode) {
       return [
         first.linkifyTextNode({ type: 'text', value: first.text }),
-        ...eat(content.slice(1), field),
+        ...eat(content.slice(1), field, imageCallback),
       ]
     } else {
       return [
         { type: 'text', value: first.text },
-        ...eat(content.slice(1), field),
+        ...eat(content.slice(1), field, imageCallback),
       ]
     }
   }
@@ -215,7 +221,7 @@ export const eat = (
         type: 'text',
         value: first.text,
       },
-      ...eat(content.slice(1), field),
+      ...eat(content.slice(1), field, imageCallback),
     ]
   }
   if (markToProcess === 'inlineCode') {
@@ -227,7 +233,7 @@ export const eat = (
         type: markToProcess,
         value: first.text,
       },
-      ...eat(content.slice(nonMatchingSiblingIndex + 1), field),
+      ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ]
   }
   return [
@@ -239,10 +245,11 @@ export const eat = (
             cleanNode(sibling, markToProcess)
           ),
         ],
-        field
+        field,
+        imageCallback
       ),
     },
-    ...eat(content.slice(nonMatchingSiblingIndex + 1), field),
+    ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
   ]
 }
 const cleanNode = (

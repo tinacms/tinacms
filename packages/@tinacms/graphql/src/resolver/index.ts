@@ -701,8 +701,14 @@ export class Resolver {
           accum[fieldName] = stringifyMDX(
             fieldValue,
             field,
-            this.config,
-            this.tinaSchema.schema
+            (fieldValue) =>
+              resolveMediaCloudToRelative(
+                fieldValue as string,
+                this.config,
+                this.tinaSchema.schema
+              )
+            // this.config,
+            // this.tinaSchema.schema
           )
           break
         case 'reference':
@@ -750,7 +756,13 @@ export class Resolver {
         break
       case 'rich-text':
         // @ts-ignore value is unknown
-        const tree = parseMDX(value, field, this.config, this.tinaSchema.schema)
+        const tree = parseMDX(value, field, (value) =>
+          resolveMediaRelativeToCloud(
+            value,
+            this.config,
+            this.tinaSchema.schema
+          )
+        )
         accumulator[field.name] = tree
         break
       case 'object':
