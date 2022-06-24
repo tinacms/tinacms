@@ -89,7 +89,7 @@
     "@udecode/plate-reset-node": "^9.2.1",
     "@udecode/plate-select": "^9.2.1",
     "@udecode/plate-table": "^9.2.1",
-    "@udecode/plate-trailing-block": "^9.2.1",
+    "@udecode/plate-trailing-block": "^9.3.1",
     "@udecode/plate-ui-combobox": "^9.2.1",
     "atob": "2.1.2",
     "color-string": "^1.5.3",

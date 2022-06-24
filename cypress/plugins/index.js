@@ -28,6 +28,10 @@ limitations under the License.
 const fs = require('fs')
 const path = require('path')
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 /**
  * @type {Cypress.PluginConfig}
  */
@@ -44,11 +48,15 @@ module.exports = (on, config) => {
     )
 
   on('task', {
-    readrawmdx(relativePath = 'home.mdx') {
+    readrawmdx: async function (relativePath = 'home.mdx') {
+      // // give the file a little time to be written
+      await sleep(500)
+      return fs.readFileSync(getAbsPath(relativePath), 'utf8')
+      // return res
       return fs.readFileSync(getAbsPath(relativePath), 'utf8')
     },
-    writemdx(markdown, relativePath = 'home.mdx') {
-      fs.writeFileSync(getAbsPath(relativePath), markdown, 'utf8')
+    writemdx: async function (markdown, relativePath = 'home.mdx') {
+      await fs.writeFileSync(getAbsPath(relativePath), markdown, 'utf8')
       return true
     },
   })

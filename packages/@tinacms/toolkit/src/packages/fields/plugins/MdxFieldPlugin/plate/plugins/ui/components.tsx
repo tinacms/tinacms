@@ -152,7 +152,7 @@ export const components = () => {
     }) => (
       <blockquote
         className={classNames(
-          'not-italic mb-4 last:mb-0',
+          'not-italic mb-4 last:mb-0 border-l-3 border-gray-200 pl-3',
           blockClasses,
           className
         )}
@@ -166,15 +166,8 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          'mb-4 pl-2 list-disc list-inside last:mb-0'
+          'mb-4 pl-4 list-disc list-inside last:mb-0'
         )}
-        {...attributes}
-        {...props}
-      />
-    ),
-    [ELEMENT_LI]: ({ attributes, editor, className, element, ...props }) => (
-      <li
-        className={classNames('p-0 mt-0 mb-2 last:mb-0', className)}
         {...attributes}
         {...props}
       />
@@ -192,14 +185,19 @@ export const components = () => {
     ),
     [ELEMENT_LI]: ({ attributes, className, editor, element, ...props }) => (
       <li
-        className={classNames('p-0 mt-0 mb-2 last:mb-0', className)}
+        className={classNames('p-0 mt-0 mb-0 list-outside', className)}
         {...attributes}
         {...props}
       />
     ),
     /** "list item content" */
     [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
-      <span className={classNames(className)} {...attributes} {...props} />
+      <span
+        // without a min-width the cursor is hidden when the list is empty
+        className={classNames(className, 'inline-block align-top mb-2')}
+        {...attributes}
+        {...props}
+      />
     ),
     [ELEMENT_LINK]: ({
       attributes,

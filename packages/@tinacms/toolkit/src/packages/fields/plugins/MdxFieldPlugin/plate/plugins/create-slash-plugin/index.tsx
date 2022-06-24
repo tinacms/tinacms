@@ -50,7 +50,7 @@ export const findMaybeMDX = (editor: PlateEditor) =>
  * This can probably be customized to whatever command
  * the developer wants (eg. `<`)
  */
-export const withMaybeMDX = (editor) => {
+export const withMaybeMDX = (editor: PlateEditor) => {
   const { type } = getPlugin(editor, ELEMENT_MAYBE_MDX)
   const { insertText } = editor
   editor.insertText = (text) => {

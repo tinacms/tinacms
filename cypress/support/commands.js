@@ -76,7 +76,10 @@ Cypress.Commands.add('save', () => {
 Cypress.Commands.add(
   'assertRTE',
   (markdown = '', typed = '', wantedHTML = '', wantedMD = '') => {
-    if (markdown !== null) cy.task('writemdx', markdown)
+    if (markdown !== null) {
+      const trimmedMarkdown = markdown.trim()
+      cy.task('writemdx', trimmedMarkdown)
+    }
 
     cy.visit('/')
 
@@ -86,7 +89,11 @@ Cypress.Commands.add(
 
     if (typed) cy.getRTE().type(typed)
 
-    cy.getPageRTEBody().should('contain.html', wantedHTML)
+    const trimmedWantedHTML = wantedHTML
+      .split('\n')
+      .map((line) => line.trim())
+      .join('')
+    cy.getPageRTEBody().should('contain.html', trimmedWantedHTML)
 
     if (!wantedMD) return
 
@@ -94,7 +101,8 @@ Cypress.Commands.add(
 
     cy.task('readrawmdx').then((content) => {
       console.info('readrawmdx', content)
-      expect(content).to.contain(wantedMD)
+      const trimmedWantedMD = wantedMD.trim()
+      expect(content).to.contain(trimmedWantedMD)
     })
   }
 )

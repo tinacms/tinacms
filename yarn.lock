@@ -6894,7 +6894,7 @@ __metadata:
     "@udecode/plate-reset-node": ^9.2.1
     "@udecode/plate-select": ^9.2.1
     "@udecode/plate-table": ^9.2.1
-    "@udecode/plate-trailing-block": ^9.2.1
+    "@udecode/plate-trailing-block": ^9.3.1
     "@udecode/plate-ui-combobox": ^9.2.1
     atob: 2.1.2
     color-string: ^1.5.3
@@ -8671,6 +8671,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@udecode/plate-core@npm:9.3.1":
+  version: 9.3.1
+  resolution: "@udecode/plate-core@npm:9.3.1"
+  dependencies:
+    "@udecode/zustood": 0.4.4
+    clsx: 1.1.1
+    lodash: 4.17.21
+    use-deep-compare: 1.1.0
+    zustand: 3.6.7
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+    slate: ">=0.66.1"
+    slate-history: ">=0.66.0"
+    slate-react: ">=0.66.1"
+  checksum: eee42793adddd723fea2e42697933d30d76c19f2af57f4281169c81fe48196d514d87d79754a4587f55e08691d4a832424b0fbb24e9b0ac45a3f4afd12580fda
+  languageName: node
+  linkType: hard
+
 "@udecode/plate-heading@npm:9.2.1, @udecode/plate-heading@npm:^9.2.1":
   version: 9.2.1
   resolution: "@udecode/plate-heading@npm:9.2.1"
@@ -8871,18 +8890,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-trailing-block@npm:^9.2.1":
-  version: 9.2.1
-  resolution: "@udecode/plate-trailing-block@npm:9.2.1"
+"@udecode/plate-trailing-block@npm:^9.3.1":
+  version: 9.3.1
+  resolution: "@udecode/plate-trailing-block@npm:9.3.1"
   dependencies:
-    "@udecode/plate-core": 9.2.1
+    "@udecode/plate-core": 9.3.1
   peerDependencies:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
     slate: ">=0.66.1"
     slate-history: ">=0.66.0"
     slate-react: ">=0.66.1"
-  checksum: 6da1c17028b8de3be8dcf33b21598a5abcc0f74ad191dcd38d4041634711de81fc13ee03d30a3d4499841cfbe5d96c71e428da4dcb42108d4bcdc8ca0c0ee681
+  checksum: a415488843a272653f05f0ae9f435dbf200ec14f16b3b3607f095e75e6b3a8344abadb559592b9c4e5f73463541345b288dd70597aee07e277f0b64719aab4e0
   languageName: node
   linkType: hard
 
@@ -8941,6 +8960,17 @@ __metadata:
   peerDependencies:
     zustand: ">=3.5.10"
   checksum: cb74dae956b85786184468defac49780fb616b8de167b77b8d31f973b7556c6fa2a5b35b43483e3ce7f2b57d8b922d57bafa43d6276db6908c5f187bdb71e34a
+  languageName: node
+  linkType: hard
+
+"@udecode/zustood@npm:0.4.4":
+  version: 0.4.4
+  resolution: "@udecode/zustood@npm:0.4.4"
+  dependencies:
+    immer: 9.0.6
+  peerDependencies:
+    zustand: ">=3.5.10"
+  checksum: 1ec83cc246456fca509b3b110e76fcf790a741d32b8c183758ce69bc19441ecaaa2a1b046a576893c6f438159f49ec1c93adc87b48b9d72403e4a217ed2b96a9
   languageName: node
   linkType: hard
 

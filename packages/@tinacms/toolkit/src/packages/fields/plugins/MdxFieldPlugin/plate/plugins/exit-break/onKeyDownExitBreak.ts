@@ -10,28 +10,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import {
-  getBlockAbove,
-  KeyboardHandler,
-  queryNode,
-  insertNodes,
-} from '@udecode/plate-core'
-import isHotkey from 'is-hotkey'
-import { SoftBreakPlugin } from './types'
-import { KEY_SOFT_BREAK } from './createSoftBreakPlugin'
 
-export const onKeyDownSoftBreak: KeyboardHandler<{}, SoftBreakPlugin> =
+import { getBlockAbove, KeyboardHandler, queryNode } from '@udecode/plate-core'
+import isHotkey from 'is-hotkey'
+import { exitBreak } from './transforms/exitBreak'
+import { ExitBreakPlugin } from './types'
+
+export const onKeyDownExitBreak: KeyboardHandler<{}, ExitBreakPlugin> =
   (editor, { options: { rules = [] } }) =>
   (event) => {
     const entry = getBlockAbove(editor)
     if (!entry) return
 
-    rules.forEach(({ hotkey, query }) => {
-      if (isHotkey(hotkey, event as any) && queryNode(entry, query)) {
-        event.preventDefault()
-        event.stopPropagation()
-
-        insertNodes(editor, { type: KEY_SOFT_BREAK, children: [{ text: '' }] })
+    rules.forEach(({ hotkey, ...rule }) => {
+      if (isHotkey(hotkey, event as any) && queryNode(entry, rule.query)) {
+        if (exitBreak(editor, rule)) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
       }
     })
   }

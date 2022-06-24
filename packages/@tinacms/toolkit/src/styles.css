@@ -33,6 +33,17 @@
 .tina-prose [data-slate-editor='true'] .slate-code_block .slate-code {
   background: none;
 }
+/* blockquotes add "" to beginning and end of quote, this looks awkward when there's not text yet */
+.tina-prose
+  :where(blockquote p:first-of-type):not(:where([class~='not-tina-prose']
+      *))::before {
+  content: '';
+}
+.tina-prose
+  :where(blockquote p:first-of-type):not(:where([class~='not-tina-prose']
+      *))::after {
+  content: '';
+}
 /* prose makes the first p in a block slightly larger */
 .tina-prose [data-slate-editor='true'] p:first-of-type {
   font-size: 1em;

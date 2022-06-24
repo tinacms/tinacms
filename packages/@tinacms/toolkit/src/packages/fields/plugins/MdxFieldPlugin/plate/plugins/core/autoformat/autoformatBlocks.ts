@@ -19,6 +19,7 @@ limitations under the License.
 import {
   insertEmptyCodeBlock,
   ELEMENT_CODE_BLOCK,
+  ELEMENT_CODE_LINE,
 } from '@udecode/plate-code-block'
 import { ELEMENT_HR } from '@udecode/plate-horizontal-rule'
 import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
@@ -84,20 +85,20 @@ export const autoformatBlocks: AutoformatRule[] = [
     type: ELEMENT_BLOCKQUOTE,
     match: '> ',
     preFormat,
-    format: (editor) => {
-      /**
-       * Blockquotes need to wrap `p` elements to adhere to the remark spec
-       */
-      insertNodes(editor, {
-        type: ELEMENT_BLOCKQUOTE,
-        children: [
-          {
-            type: ELEMENT_PARAGRAPH,
-            children: [{ text: '' }],
-          },
-        ],
-      })
-    },
+    // format: (editor) => {
+    //   /**
+    //    * Blockquotes need to wrap `p` elements to adhere to the remark spec
+    //    */
+    //   insertNodes(editor, {
+    //     type: ELEMENT_BLOCKQUOTE,
+    //     children: [
+    //       {
+    //         type: ELEMENT_PARAGRAPH,
+    //         children: [{ text: '' }],
+    //       },
+    //     ],
+    //   })
+    // },
   },
   {
     mode: 'block',
@@ -107,7 +108,7 @@ export const autoformatBlocks: AutoformatRule[] = [
     preFormat,
     format: (editor) => {
       insertEmptyCodeBlock(editor as PlateEditor, {
-        defaultType: getPluginType(editor as PlateEditor, ELEMENT_DEFAULT),
+        defaultType: getPluginType(editor as PlateEditor, ELEMENT_CODE_LINE),
         insertNodesOptions: { select: true },
       })
     },

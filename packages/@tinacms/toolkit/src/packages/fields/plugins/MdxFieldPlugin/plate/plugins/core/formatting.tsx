@@ -18,7 +18,7 @@ import {
 } from '@udecode/plate-core'
 import { autoformatRules } from './autoformat/autoformatRules'
 import { createAutoformatPlugin } from '@udecode/plate-autoformat'
-import { createExitBreakPlugin } from '@udecode/plate-break'
+import { createExitBreakPlugin } from '../exit-break'
 import { createSoftBreakPlugin } from '../soft-break'
 import { createResetNodePlugin } from '@udecode/plate-reset-node'
 import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
@@ -33,7 +33,7 @@ import {
   ELEMENT_H6,
   KEYS_HEADING,
 } from '@udecode/plate-heading'
-import { createTrailingBlockPlugin } from './trailing-block'
+import { createTrailingBlockPlugin } from '@udecode/plate-trailing-block'
 import { withCorrectVoidBehavior } from './with-correct-void-behavior'
 
 export const HANDLES_MDX = [
@@ -107,11 +107,11 @@ export const plugins = [
           hotkey: 'Enter',
           predicate: isBlockAboveEmpty,
         },
-        // {
-        //   ...resetBlockTypesCommonRule,
-        //   hotkey: 'Backspace',
-        //   predicate: isSelectionAtBlockStart,
-        // },
+        {
+          ...resetBlockTypesCommonRule,
+          hotkey: 'Backspace',
+          predicate: isSelectionAtBlockStart,
+        },
       ],
     },
   }),

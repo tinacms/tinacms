@@ -10,34 +10,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import React from 'react'
-import { createPluginFactory } from '@udecode/plate-core'
-import { onKeyDownSoftBreak } from './onKeyDownSoftBreak'
-import { SoftBreakPlugin } from './types'
 
-export const KEY_SOFT_BREAK = 'break'
+import { createPluginFactory } from '@udecode/plate-core'
+import { onKeyDownExitBreak } from './onKeyDownExitBreak'
+import { ExitBreakPlugin } from './types'
+
+export const KEY_EXIT_BREAK = 'exitBreak'
 
 /**
  * Insert soft break following configurable rules.
  * Each rule specifies a hotkey and query options.
  */
-export const createSoftBreakPlugin = createPluginFactory<SoftBreakPlugin>({
-  key: KEY_SOFT_BREAK,
-  isElement: true,
-  isInline: true,
-  isVoid: true,
-  component: (props) => {
-    return (
-      <>
-        <br className={props.className} {...props.attributes} />
-        {props.children}
-      </>
-    )
-  },
+export const createExitBreakPlugin = createPluginFactory<ExitBreakPlugin>({
+  key: KEY_EXIT_BREAK,
   handlers: {
-    onKeyDown: onKeyDownSoftBreak,
+    onKeyDown: onKeyDownExitBreak,
   },
   options: {
-    rules: [{ hotkey: 'shift+enter' }],
+    rules: [
+      { hotkey: 'mod+enter' },
+      { hotkey: 'mod+shift+enter', before: true },
+    ],
   },
 })
