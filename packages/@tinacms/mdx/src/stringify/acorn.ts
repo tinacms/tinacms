@@ -43,14 +43,14 @@ export const stringifyProps = (
             name,
             value: {
               type: 'mdxJsxAttributeValueExpression',
-              value: `[${value.map((item) => `"${item.id}"`).join(', ')}]`,
+              value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
             },
           })
         } else {
           attributes.push({
             type: 'mdxJsxAttribute',
             name,
-            value: value.id,
+            value: value,
           })
         }
         break
@@ -110,7 +110,7 @@ export const stringifyProps = (
           const joiner = flatten ? ' ' : '\n'
           let val = ''
           if (field.name === 'children') {
-            const root = rootElement({ type: 'root', children: value }, field)
+            const root = rootElement(value, field)
             children.push(root.children[0])
             return
           } else {

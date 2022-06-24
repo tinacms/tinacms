@@ -41,9 +41,11 @@ export const extractAttribute = (
       }
     case 'reference':
       if (field.list) {
-        return { id: extractScalar(extractExpression(attribute), field) }
+        // return { id: extractScalar(extractExpression(attribute), field) }
+        return extractScalar(extractExpression(attribute), field)
       } else {
-        return { id: extractString(attribute, field) }
+        // return { id: extractString(attribute, field) }
+        return extractString(attribute, field)
       }
     case 'object':
       return extractObject(extractExpression(attribute), field)

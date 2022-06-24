@@ -211,10 +211,10 @@ export const remarkToSlate = (
       case 'text':
         return text(content)
       case 'inlineCode':
-        return phrashingMark(content)
       case 'emphasis':
       case 'image':
       case 'strong':
+        return phrashingMark(content)
       default:
         throw new Error(
           `StaticPhrasingContent: ${content.type} is not yet supported`

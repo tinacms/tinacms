@@ -36,7 +36,7 @@ export function mdxJsxElement(
   // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
   const props = extractAttributes(node.attributes, template.fields)
   const childField = template.fields.find((field) => field.name === 'children')
-  const childProps = remarkToSlate(node, childField).children
+  const childProps = remarkToSlate(node, childField)
   if (childField) {
     props.children = childProps
   }

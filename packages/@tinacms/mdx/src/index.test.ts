@@ -1331,20 +1331,21 @@ describe('MDX Elements', () => {
       }
     ],
     "props": {
-      "author": {
-        "id": "content/authors/pedro.md"
-      },
-      "children": [
-        {
-          "type": "h1",
-          "children": [
-            {
-              "type": "text",
-              "text": "Lorem ipsum dolor."
-            }
-          ]
-        }
-      ]
+      "author": "content/authors/pedro.md",
+      "children": {
+        "type": "root",
+        "children": [
+          {
+            "type": "h1",
+            "children": [
+              {
+                "type": "text",
+                "text": "Lorem ipsum dolor."
+              }
+            ]
+          }
+        ]
+      }
     }
   }
 ]
@@ -1392,9 +1393,7 @@ describe('MDX Elements', () => {
       }
     ],
     "props": {
-      "author": {
-        "id": "content/authors/pedro.md"
-      },
+      "author": "content/authors/pedro.md",
       "quote": {
         "type": "root",
         "children": [
