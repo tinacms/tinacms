@@ -17,6 +17,8 @@ import { parseMediaFolder } from '../../utils/'
 
 interface MediaArgs {
   searchPath: string
+  cursor?: string
+  limit?: string
 }
 
 interface File {
@@ -39,22 +41,22 @@ interface ListMediaRes {
 }
 export interface PathConfig {
   publicFolder: string
-  syncFolder: string
+  mediaRoot: string
 }
 
 type SuccessRecord = { ok: true } | { ok: false; message: string }
 export class MediaModel {
   public readonly publicFolder: string
-  public readonly syncFolder: string
-  constructor({ publicFolder, syncFolder }: PathConfig) {
-    this.syncFolder = syncFolder
+  public readonly mediaRoot: string
+  constructor({ publicFolder, mediaRoot }: PathConfig) {
+    this.mediaRoot = mediaRoot
     this.publicFolder = publicFolder
   }
   async listMedia(args: MediaArgs): Promise<ListMediaRes> {
     try {
       const folderPath = join(
         this.publicFolder,
-        this.syncFolder,
+        this.mediaRoot,
         args.searchPath
       )
       const searchPath = parseMediaFolder(args.searchPath)
@@ -80,8 +82,8 @@ export class MediaModel {
         if (searchPath) {
           src = `/${searchPath}${src}`
         }
-        if (this.syncFolder) {
-          src = `/${this.syncFolder}${src}`
+        if (this.mediaRoot) {
+          src = `/${this.mediaRoot}${src}`
         }
 
         return {
@@ -92,11 +94,30 @@ export class MediaModel {
         }
       })
 
-      const files = await Promise.all(filesProm)
+      const offset = Number(args.cursor) || 0
+      const limit = Number(args.limit) || 20
+
+      const rawItems = await Promise.all(filesProm)
+      const sortedItems = rawItems.sort((a, b) => {
+        if (a.isFile && !b.isFile) {
+          return 1
+        }
+        if (!a.isFile && b.isFile) {
+          return -1
+        }
+        return 0
+      })
+      const limitItems = sortedItems.slice(offset, offset + limit)
+      const files = limitItems.filter((x) => x.isFile)
+      const directories = limitItems.filter((x) => !x.isFile).map((x) => x.src)
+
+      const cursor =
+        rawItems.length > offset + limit ? String(offset + limit) : null
 
       return {
-        files: files.filter((x) => x.isFile),
-        directories: files.filter((x) => !x.isFile).map((x) => x.src),
+        files,
+        directories,
+        cursor,
       }
     } catch (error) {
       console.error(error)
@@ -109,7 +130,7 @@ export class MediaModel {
   }
   async deleteMedia(args: MediaArgs): Promise<SuccessRecord> {
     try {
-      const file = join(this.publicFolder, this.syncFolder, args.searchPath)
+      const file = join(this.publicFolder, this.mediaRoot, args.searchPath)
       // ensure the file exists because fs.remove does not throw an error if the file does not exist
       await fs.stat(file)
       await fs.remove(file)

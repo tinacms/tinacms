@@ -27,10 +27,10 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
   }
-  public async glob(pattern: string) {
+  public async glob(pattern: string, extension: string) {
     const basePath = path.join(this.rootPath, ...pattern.split('/'))
     const items = await fg(
-      path.join(basePath, '**', '/*').replace(/\\/g, '/'),
+      path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
       }

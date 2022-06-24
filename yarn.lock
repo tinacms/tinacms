@@ -6520,6 +6520,7 @@ __metadata:
     fast-glob: ^3.2.4
     fs-extra: ^9.0.1
     graphql: ^15.1.0
+    ini: ^3.0.0
     jest: ^27.0.6
     js-yaml: ^4.0.0
     lodash: ^4.17.19
@@ -6558,8 +6559,10 @@ __metadata:
     encoding-down: ^7.1.0
     fast-glob: ^3.2.5
     fs-extra: ^9.0.1
+    glob-parent: ^6.0.2
     graphql: ^15.3.0
     gray-matter: ^4.0.2
+    isomorphic-git: ^1.10.3
     jest: 27.0.6
     jest-diff: 27.0.6
     jest-file-snapshot: ^0.5.0
@@ -10339,6 +10342,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"async-lock@npm:^1.1.0":
+  version: 1.3.1
+  resolution: "async-lock@npm:1.3.1"
+  checksum: 97e2e6fb0f67791b1de12edabade20e5685cc12b7d2d814697837b697cc57cf477cc9c82bbe04bdc72ace78e0cc82810c6385781bb31c7e2a7fd1e90ea44c3c4
+  languageName: node
+  linkType: hard
+
 "async-retry@npm:1.2.3":
   version: 1.2.3
   resolution: "async-retry@npm:1.2.3"
@@ -12469,6 +12479,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clean-git-ref@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "clean-git-ref@npm:2.0.1"
+  checksum: 12ab3c05f9194e3656d31dca8884b9383b360dbf1de8aae15476665c8165a475a1072c1e783bd0acb46c71d94ada068d83945da322816562b8d23c645aa74474
+  languageName: node
+  linkType: hard
+
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
@@ -13204,6 +13221,15 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 796261c250559339589455c1522bfa284b5bf8203ced7e3c5b0060bd5b27cad86418214d8d86d59c8c9af81e526f27965a6bd725cb12021f1835d9b347727272
+  languageName: node
+  linkType: hard
+
+"crc-32@npm:^1.2.0":
+  version: 1.2.2
+  resolution: "crc-32@npm:1.2.2"
+  bin:
+    crc32: bin/crc32.njs
+  checksum: 5b370438c30fd98716cfb9bc5395ce0c739db6537f019c7e84a349be97e023aaf9fc8eeeff89f6b8f0d1f810644cb0e0972a9d462a9ee1da9b2f1eec57c70bed
   languageName: node
   linkType: hard
 
@@ -14483,6 +14509,13 @@ __metadata:
   version: 27.5.1
   resolution: "diff-sequences@npm:27.5.1"
   checksum: 3d2d8f7eadbef33e9e0af2f6d5f4b95f729075b559b65b8c243671360a5de41f9e4766d2bfb7ea33d2e47e7f3bfa732dc5634c1eb246b13e1d0f1ffe6897efc3
+  languageName: node
+  linkType: hard
+
+"diff3@npm:0.0.3":
+  version: 0.0.3
+  resolution: "diff3@npm:0.0.3"
+  checksum: 9a86c0e3ca3cd92e939e3aa6a92b1efa0e1e2b5992fe360e0b8405f717d9fd9e69f43a507b5094ebcce17949ecb90c32586d0cd8b15e6ca6801fe913a1764cf5
   languageName: node
   linkType: hard
 
@@ -18713,6 +18746,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"ini@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "ini@npm:3.0.0"
+  checksum: 239e98a3439a6eb2bc3039e2de7fb18027861fa076bf7c0ca267c1c334d6b432cc15a67fe8861c5028f8ef6ede129097c96f07086974d483bd90fd44042e5d9c
+  languageName: node
+  linkType: hard
+
 "inquirer@npm:6.5.0":
   version: 6.5.0
   resolution: "inquirer@npm:6.5.0"
@@ -19680,6 +19720,27 @@ fsevents@~2.1.2:
     node-fetch: ^2.6.1
     whatwg-fetch: ^3.4.1
   checksum: 999c2845d440a6d53755d7954af40e55b38a25140a81f782aced55d56698f05aae8a0528ba6fd5630cc1040ecbf330c9858340a63b25645c0f81fa2f057fd0bb
+  languageName: node
+  linkType: hard
+
+"isomorphic-git@npm:^1.10.3":
+  version: 1.17.2
+  resolution: "isomorphic-git@npm:1.17.2"
+  dependencies:
+    async-lock: ^1.1.0
+    clean-git-ref: ^2.0.1
+    crc-32: ^1.2.0
+    diff3: 0.0.3
+    ignore: ^5.1.4
+    minimisted: ^2.0.0
+    pako: ^1.0.10
+    pify: ^4.0.1
+    readable-stream: ^3.4.0
+    sha.js: ^2.4.9
+    simple-get: ^4.0.1
+  bin:
+    isogit: cli.cjs
+  checksum: 663e3a6237e90fc2dd3419bf5768009eb5965491dcdcf3f9d7fd1a39e4ec4952646cf4ba1dbcd97863897dc784b70be37afa221b1ce0c0b21d54ad2fdbf6116c
   languageName: node
   linkType: hard
 
@@ -22904,6 +22965,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"minimisted@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "minimisted@npm:2.0.1"
+  dependencies:
+    minimist: ^1.2.5
+  checksum: 95c95b9e8590997d5ecca6fcdf6cee76ccb55029d60a95aa2450b22e20bef9ed381ae1e60aa67ced72d1f0e69a7f3caff45b9bb91422dc1bd32385c55e1445aa
+  languageName: node
+  linkType: hard
+
 "minipass-collect@npm:^1.0.2":
   version: 1.0.2
   resolution: "minipass-collect@npm:1.0.2"
@@ -24616,7 +24686,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"pako@npm:~1.0.5":
+"pako@npm:^1.0.10, pako@npm:~1.0.5":
   version: 1.0.11
   resolution: "pako@npm:1.0.11"
   checksum: 71c60150b68220ec52a404f3c39a4ed38f750e42452b88fe0eb2e6b5c98e91f73f706444359b097aca1e6db83ef8fef50b5a9ec100e30a606cda6da8d45e5439
@@ -28736,7 +28806,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"sha.js@npm:^2.4.0, sha.js@npm:^2.4.8":
+"sha.js@npm:^2.4.0, sha.js@npm:^2.4.8, sha.js@npm:^2.4.9":
   version: 2.4.11
   resolution: "sha.js@npm:2.4.11"
   dependencies:
@@ -28912,6 +28982,17 @@ resolve@^2.0.0-next.3:
     once: ^1.3.1
     simple-concat: ^1.0.0
   checksum: 91c007260dd92480b8dcd78b4310561967532e1ef9b4ec332a1aac6990c9a71d7477a8d05c84bb0165e4eb0e205fa620e37f42652dceea46c713084ae935e873
+  languageName: node
+  linkType: hard
+
+"simple-get@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "simple-get@npm:4.0.1"
+  dependencies:
+    decompress-response: ^6.0.0
+    once: ^1.3.1
+    simple-concat: ^1.0.0
+  checksum: 8e7d8dd396915df8461d27ca3ecb8c0c3ddb6c48e14cc44cd6999374295ea125ad332f15b1cb5bd4b579df99685e749a27f4c72e9bd8fa81a46830172032e44b
   languageName: node
   linkType: hard
 

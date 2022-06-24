@@ -66,13 +66,14 @@ export const RichEditor = wrapFieldsWithMeta<
   const withToolbar = true
   const tempId = [props.tinaForm.id, props.input.name].join('.')
   const id = React.useMemo(() => uuid(), [tempId])
+
   return (
     <EditorContext.Provider value={{ templates: props.field.templates }}>
       <div className={withToolbar ? 'with-toolbar' : ''}>
         <div
           className={classNames(
             withToolbar ? 'min-h-[100px]' : 'min-h-auto',
-            'max-w-full tina-prose relative shadow-inner focus:shadow-outline focus:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus:text-gray-900 rounded-md px-3 py-2 mb-5'
+            'max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2 mb-5'
           )}
         >
           <Plate
@@ -84,6 +85,7 @@ export const RichEditor = wrapFieldsWithMeta<
               props.input.onChange({ type: 'root', children: value })
             }}
           >
+            {}
             {withToolbar ? (
               <Toolbar templates={props.field.templates} inlineOnly={false} />
             ) : (

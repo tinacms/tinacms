@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.56.33
+
+### Patch Changes
+
+- 2ef5a1f33: fix scale isssue, truncate form label to filename
+- 7b77fe1b5: Add a default TinaMediaStore for repo-based media
+- 99a13024d: Enables paging for local media manager
+  - @tinacms/sharedctx@0.1.1
+
 ## 0.56.32
 
 ### Patch Changes

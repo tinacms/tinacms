@@ -13,7 +13,8 @@ limitations under the License.
 
 export interface Bridge {
   rootPath: string
-  glob(pattern: string): Promise<string[]>
+  glob(pattern: string, extension: string): Promise<string[]>
+  delete(filepath: string): Promise<void>
   get(filepath: string): Promise<string>
   put(filepath: string, data: string): Promise<void>
   /**

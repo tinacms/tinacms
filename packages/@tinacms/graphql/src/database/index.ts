@@ -71,6 +71,7 @@ const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
+  fileExtension?: string
   /* collection name */
   collection: string
   /* filters to apply to the query */
@@ -622,7 +623,8 @@ export class Database {
     const tinaSchema = await this.getSchema()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(
-        normalizePath(collection.path)
+        normalizePath(collection.path),
+        collection.format || 'md'
       )
       await _indexContent(this, documentPaths, collection)
     })
@@ -708,6 +710,7 @@ const _indexContent = async (
     | CollectionTemplatesWithNamespace<true>
 ) => {
   let seedOptions: object | undefined = undefined
+
   if (collection) {
     const indexDefinitions = await database.getIndexDefinitions()
     const collectionIndexDefinitions = indexDefinitions?.[collection.name]

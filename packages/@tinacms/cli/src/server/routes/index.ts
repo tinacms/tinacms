@@ -17,11 +17,7 @@ import multer from 'multer'
 import { MediaModel, PathConfig } from '../models/media'
 
 export const createMediaRouter = (config: PathConfig) => {
-  const mediaFolder = join(
-    process.cwd(),
-    config.publicFolder,
-    config.syncFolder
-  )
+  const mediaFolder = join(process.cwd(), config.publicFolder, config.mediaRoot)
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       cb(null, mediaFolder)
@@ -40,8 +36,12 @@ export const createMediaRouter = (config: PathConfig) => {
 
   mediaRouter.get('/list/*', async (req, res) => {
     const folder = req.params[0]
+    const cursor = req.query.cursor as string
+    const limit = req.query.limit as string
     const media = await mediaModel.listMedia({
       searchPath: folder,
+      cursor,
+      limit,
     })
     res.json(media)
   })
