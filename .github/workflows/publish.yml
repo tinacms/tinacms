@@ -13,41 +13,40 @@ jobs:
           - dev
 
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
-      - uses: actions/setup-node@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: 16
+          cache: 'pnpm'
+
       - name: Install dependencies
-        # Before merging to main, re-run the install for security purposes
-        # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications
-        run: yarn install --check-cache
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Build Types
+        run: pnpm types
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: Build
-        run: yarn build
-      - name: Test
-        run: yarn test
-      - name: Build Types
-        run: yarn types
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
-          yarn version:snapshot
-          yarn publish:beta
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          pnpm version:snapshot
+          pnpm publish:beta
       - name: Publish
         if: matrix.channel == 'latest'
         run: |
-          yarn publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          pnpm publish
       - name: Push tags
         if: matrix.channel == 'latest'
         run: |
@@ -61,6 +60,6 @@ jobs:
         uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
-          version: yarn version
+          version: pnpm version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

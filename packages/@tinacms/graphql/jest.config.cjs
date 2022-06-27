@@ -18,5 +18,6 @@ module.exports = {
     ...mod.default.config.transform,
     // unified.js only publishes ESM, which jest doesn't like
     unified: '@tinacms/scripts/dist/jest-runner.js',
+    vfile: '@tinacms/scripts/dist/jest-runner.js',
   },
 }
