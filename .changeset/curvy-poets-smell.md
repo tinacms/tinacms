@@ -2,4 +2,4 @@
 '@tinacms/cli': patch
 ---
 
-Fixed issue where to many saves at one would cause server to crash
+Fixed issue where too many saves at one time would cause server to crash
