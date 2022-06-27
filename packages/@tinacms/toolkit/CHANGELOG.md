@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.34
+
+### Patch Changes
+
+- ea9c190e8: Fix rich text field focus styles
+
 ## 0.56.33
 
 ### Patch Changes

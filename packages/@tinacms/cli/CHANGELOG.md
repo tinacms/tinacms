@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.60.25
+
+### Patch Changes
+
+- 0bc18072e: Fixed issue where too many saves at one time would cause server to crash
+
 ## 0.60.24
 
 ### Patch Changes

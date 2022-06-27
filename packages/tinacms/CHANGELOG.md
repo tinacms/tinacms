@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.68.11
+
+### Patch Changes
+
+- 42af73648: Adds more useful error messages from internalClient
+- Updated dependencies [ea9c190e8]
+  - @tinacms/toolkit@0.56.34
+
 ## 0.68.10
 
 ### Patch Changes
