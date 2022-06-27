@@ -32,8 +32,9 @@ export function FontLoader() {
 
   React.useEffect(() => {
     if (!fontLoaded) {
-      const WebFont = require('webfontloader')
-      return WebFont.load(WebFontConfig)
+      import('webfontloader').then((WebFont) => {
+        return WebFont.load(WebFontConfig)
+      })
     }
   }, [])
 
