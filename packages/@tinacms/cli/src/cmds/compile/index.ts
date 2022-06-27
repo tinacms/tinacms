@@ -30,7 +30,7 @@ const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
 export const resetGeneratedFolder = async () => {
   try {
-    await fs.rmdir(tinaGeneratedPath, {
+    await fs.rm(tinaGeneratedPath, {
       recursive: true,
     })
   } catch (e) {

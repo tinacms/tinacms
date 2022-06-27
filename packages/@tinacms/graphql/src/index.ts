@@ -37,7 +37,7 @@ export const buildSchema = async (
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
-  await fs.rmdir(tempConfig, { recursive: true })
+  await fs.rm(tempConfig, { recursive: true })
   await indexDB({ database, config: JSON.parse(config), flags })
   const gqlAst = await database.getGraphQLSchemaFromBridge()
   return buildASTSchema(gqlAst)
