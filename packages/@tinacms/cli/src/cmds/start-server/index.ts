@@ -288,31 +288,41 @@ export async function startServer(
   const start = async () => {
     // we do not want to start the server while the schema is building
     await lock.promise
-    const s = require('./server')
-    state.server = await s.default(database)
 
-    state.server.listen(port, () => {
-      const altairUrl = `http://localhost:${port}/altair/`
-      const cmsUrl = `[your-development-url]/admin`
-      if (verbose)
-        logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-      logger.info(
-        `Visit the GraphQL playground at ${chalk.underline.blueBright(
-          altairUrl
-        )}\nor`
-      )
-      logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
-    })
-    state.server.on('error', function (e) {
-      if (e.code === 'EADDRINUSE') {
-        logger.error(dangerText(`Port 4001 already in use`))
-        process.exit()
-      }
-      throw e
-    })
-    state.server.on('connection', (socket) => {
-      state.sockets.push(socket)
-    })
+    // hold the lock
+    lock.enable()
+    try {
+      const s = require('./server')
+      state.server = await s.default(database)
+
+      state.server.listen(port, () => {
+        const altairUrl = `http://localhost:${port}/altair/`
+        const cmsUrl = `[your-development-url]/admin`
+        if (verbose)
+          logger.info(`Started Filesystem GraphQL server on port: ${port}`)
+        logger.info(
+          `Visit the GraphQL playground at ${chalk.underline.blueBright(
+            altairUrl
+          )}\nor`
+        )
+        logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
+      })
+      state.server.on('error', function (e) {
+        if (e.code === 'EADDRINUSE') {
+          logger.error(dangerText(`Port 4001 already in use`))
+          process.exit()
+        }
+        throw e
+      })
+      state.server.on('connection', (socket) => {
+        state.sockets.push(socket)
+      })
+    } catch (error) {
+      throw error
+    } finally {
+      // let go of the lock
+      lock.disable()
+    }
   }
 
   const restart = async () => {
@@ -325,9 +335,9 @@ export async function startServer(
       }
     })
     state.sockets = []
-    state.server.close(() => {
+    await state.server.close(async () => {
       logger.info('Server closed')
-      start()
+      await start()
     })
   }
 
