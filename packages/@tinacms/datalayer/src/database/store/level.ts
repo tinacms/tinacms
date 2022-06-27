@@ -50,6 +50,7 @@ export class LevelStore implements Store {
     this.rootPath = rootPath || ''
     this.useMemory = useMemory
     if (useMemory) {
+      // @ts-ignore FIXME: something from the upgrade is now causing `errors` to be missing
       this.db = levelup(encode(memdown(), { valueEncoding: 'json' }))
     } else {
       this.db = level(path.join(rootPath, '.tina/__generated__/db'), {

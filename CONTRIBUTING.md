@@ -8,25 +8,23 @@ Before a Pull Request can be accepted, all contributors must sign the [Contribut
 
 ## Getting started
 
-Currently this is a monorepo built with Yarn V2 and Plug-n-Play.
+Currently this is a monorepo built with Turborepo and PNPM
 
 You _should_ :fingers_crossed: be able to just run these commands. (Please make a note of any hang-ups you ran into during this process)
 
 ```sh
 # check the node version, this repo only supports node 14.x.x at the moment
 node -v
-# check yarn version, this repo ships with yarn so it should be 2.4.1
-yarn -v
-# it should show 2.4.1, you'll definitely need +2.0
-yarn install
+# install pnpm (see docs for other options https://pnpm.io/installation)
+curl -fsSL https://get.pnpm.io/install.sh | sh -
 # build all the packages
-yarn run build
+pnpm run build
 # watch all packages
-yarn run watch
+pnpm run watch
 # in a separate tab, navigate to starter project
 cd experimental-examples/tina-cloud-starter
 # start the dev server
-yarn dev
+pnpm run dev
 ```
 
 That should allow you to see 2 things: The Altair graphql playground at `http://localhost:4001/altair` and the demo app at `http://localhost:3000`. Tina form changes should result in `experimental-examples//tina-cloud-starter/content/marketing-pages/index.md` being changed.
@@ -37,7 +35,7 @@ All pull requests should include a changeset. To create a changeset, ensure you 
 
 ```sh
 # from the root of the repo
-yarn changeset
+pnpm changeset
 ```
 
 Choose the package or packages that were affected by your work. _(Tip: you may have to wait a couple of seconds after selecting your packages, sometimes it doesn't get registered and it'll ask you to pick again)_
@@ -61,11 +59,11 @@ Feel free to edit this file if you want to alter your messages or which versions
 
 The PR will be checked for a changeset file. You're done!
 
-Once the PR is merged and has completed it's actions, you can install the changes by installing the @dev version of the package. So if there were changes to `@tinacms/graphql` merged into `main`, you can test them out by running `yarn add tina-grahql@beta`.
+Once the PR is merged and has completed it's actions, you can install the changes by installing the @dev version of the package. So if there were changes to `@tinacms/graphql` merged into `main`, you can test them out by running `pnpm add tina-grahql@beta`.
 
 However, your changes won't yet be published to NPM under the `@latest` tag yet. So without specifying the `@beta` tag, users won't get your latest changes. Instead, when the PR is merged to `main`, another action will kick in. It will create a _separate_ PR which is essentially all of the active changesets in flight. So several merged PRs may result in several pending changesets.
 
-This PR calls `yarn changeset version`, which _deletes_ changeset files and updates `CHANGELOG.md` files in each package. This PR will stay up to date as new changesets enter the `main` branch. [Here's an example](https://github.com/tinacms/tina-graphql-gateway/pull/316) of what that looks like. Only once this PR is merged will the latest changes be generally available.
+This PR calls `pnpm changeset version`, which _deletes_ changeset files and updates `CHANGELOG.md` files in each package. This PR will stay up to date as new changesets enter the `main` branch. [Here's an example](https://github.com/tinacms/tina-graphql-gateway/pull/316) of what that looks like. Only once this PR is merged will the latest changes be generally available.
 
 ### For maintainers: Merge the "Version Packages" PR _back_ to `main`
 
@@ -75,11 +73,11 @@ Previous PRs to main would _not_ have triggered NPM packages to be published bec
 
 Ensure you have created a changeset and have a clean `git` working directory.
 
-Build your changes with `yarn build`
+Build your changes with `pnpm build`
 
-Run `yarn version:snapshot`
+Run `pnpm version:snapshot`
 
-Run `yarn publish:dev`
+Run `pnpm publish:dev`
 
 If you have 2FA, this will prompt you to enter you one-time code for each package you publish.
 
@@ -137,19 +135,6 @@ IDENTITY_API_OVERRIDE=<URL TO IDENTITY>
 CONTENT_API_OVERRIDE=<URL TO CONTENTAPI>
 ```
 
-### Import errors
-
-Are you getting lots of import errors in VSCode and yet it builds fine? In VSCode try pressing cmd+shift+p, search for `select typescript version` and choose `use workspace version`.
-
-### Troubleshooting
-
-If you are running into errors while trying to build or run examples here are some common fixes to try
-
-- Make sure the repo is up to date by running `git checkout main` and `git pull origin main`
-- Try cleaning the repo by running `yarn nuke` at the root of the repo. This script removes all build outputs
-- After running `yarn nuke`, `yarn install` and `yarn watch` (or `yarn build`) must be run before doing anything else.
-- If you are still having issues feel free to reach out on our [Community Discord](https://discord.com/invite/zumN63Ybpf)
-
 ## E2E tests
 
 In order to run the Cypress E2E tests:
@@ -157,7 +142,7 @@ In order to run the Cypress E2E tests:
 1. Build and start the E2E test project
    ```sh
    NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-   yarn build:e2e
-   yarn start:e2e
+   pnpm build:e2e
+   pnpm start:e2e
    ```
-2. Run the tests in a separate terminal `yarn test:dev` or `yarn test:e2e`
+2. Run the tests in a separate terminal `pnpm test:dev` or `pnpm test:e2e`

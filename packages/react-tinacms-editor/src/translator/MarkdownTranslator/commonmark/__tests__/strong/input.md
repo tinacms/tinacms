@@ -1,3 +1,0 @@
-__strong__
-
-**strong**

@@ -33,6 +33,7 @@ export const getStaticProps = async ({ params }) => {
 
 export const getStaticPaths = async () => {
   const pagesListData = await client.queries.pagesConnection();
+  console.log("gsp", pagesListData.data);
   return {
     paths: pagesListData.data.pagesConnection.edges.map((page) => ({
       params: { filename: page.node._sys.filename },

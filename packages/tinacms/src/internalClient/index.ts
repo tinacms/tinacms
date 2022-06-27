@@ -142,6 +142,7 @@ export class Client {
 
   setBranch(branchName: string) {
     const encodedBranch = encodeURIComponent(branchName)
+    this.branch = encodedBranch
     this.assetsApiUrl =
       this.options.tinaioConfig?.assetsApiUrlOverride ||
       'https://assets.tinajs.io'
@@ -298,6 +299,34 @@ mutation addPendingDocumentMutation(
       return json
     }
     return json.data as ReturnType
+  }
+
+  async syncTinaMedia(): Promise<{ assetsSyncing: string[] }> {
+    const res = await this.fetchWithToken(
+      `${this.contentApiBase}/assets/${this.clientId}/sync/${this.branch}`,
+      { method: 'POST' }
+    )
+    const jsonRes = await res.json()
+    return jsonRes
+  }
+
+  async checkSyncStatus({
+    assetsSyncing,
+  }: {
+    assetsSyncing: string[]
+  }): Promise<{ assetsSyncing: string[] }> {
+    const res = await this.fetchWithToken(
+      `${this.assetsApiUrl}/v1/${this.clientId}/syncStatus`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ assetsSyncing: assetsSyncing }),
+      }
+    )
+    const jsonRes = await res.json()
+    return jsonRes
   }
 
   parseJwt(token) {
