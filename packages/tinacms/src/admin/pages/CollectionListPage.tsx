@@ -38,7 +38,7 @@ import { RouteMappingPlugin } from '../plugins/route-mapping'
 import { PageWrapper, PageHeader, PageBody } from '../components/Page'
 import { TinaAdminApi } from '../api'
 import { useState } from 'react'
-import { CursorPaginator } from '@tinacms/toolkit/src/components/media/pagination'
+import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {

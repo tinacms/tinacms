@@ -30,7 +30,7 @@
     "next": "^11.0.4",
     "next-svgr": "^0.0.2",
     "next-tinacms-cloudinary": "workspace:*",
-    "react": "^17.0.2",
+    "react": "17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
     "react-is": "^17.0.2",
