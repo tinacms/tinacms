@@ -32,13 +32,71 @@ import {
   MediaListOffset,
   MediaListError,
 } from '../../packages/core'
-import path from 'path'
 import { Button } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
+
+// taken from https://davidwalsh.name/javascript-polling
+async function poll(
+  fn: () => Promise<{
+    complete: boolean
+    status: {
+      [key: string]: boolean
+    }
+  }>,
+  timeout,
+  interval
+) {
+  const endTime = Number(new Date()) + (timeout || 2000)
+  interval = interval || 100
+
+  const checkCondition = async function (resolve, reject) {
+    // If the condition is met, we're done!
+    const result = await fn()
+    if (result.complete) {
+      resolve(result)
+    }
+    // If the condition isn't met but the timeout hasn't elapsed, go again
+    else if (Number(new Date()) < endTime) {
+      setTimeout(checkCondition, interval, resolve, reject)
+    }
+    // Didn't match and too much time, reject!
+    else {
+      reject(new Error('Time out error'))
+    }
+  }
+
+  return new Promise(checkCondition)
+}
+
+// Can not use path.join on the frontend
+const join = function (...parts) {
+  // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join
+  /* This function takes zero or more strings, which are concatenated
+  together to form a path or URL, which is returned as a string. This
+  function intelligently adds and removes slashes as required, and is
+  aware that `file` URLs will contain three adjacent slashes. */
+
+  const [first, last, slash] = [0, parts.length - 1, '/']
+
+  const matchLeadingSlash = new RegExp('^' + slash)
+  const matchTrailingSlash = new RegExp(slash + '$')
+
+  parts = parts.map(function (part, index) {
+    if (index === first && part === 'file://') return part
+
+    if (index > first) part = part.replace(matchLeadingSlash, '')
+
+    if (index < last) part = part.replace(matchTrailingSlash, '')
+
+    return part
+  })
+
+  return parts.join(slash)
+}
 
 export interface MediaRequest {
   directory?: string
@@ -109,6 +167,7 @@ export function MediaPicker({
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const [loadingText, setLoadingText] = useState('')
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -122,26 +181,34 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
 
+  const isLocal = cms.api.tina.isLocalMode
+  const hasTinaMedia =
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'mediaRoot'
+    ) &&
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'publicFolder'
+    )
+  function loadMedia() {
+    setListState('loading')
+    cms.media
+      .list({ offset, limit: cms.media.pageSize, directory })
+      .then((list) => {
+        setList(list)
+        setListState('loaded')
+      })
+      .catch((e) => {
+        console.error(e)
+        if (e.ERR_TYPE === 'MediaListError') {
+          setListError(e)
+        } else {
+          setListError(defaultListError)
+        }
+        setListState('error')
+      })
+  }
   useEffect(() => {
     if (!cms.media.isConfigured) return
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({ offset, limit: cms.media.pageSize, directory })
-        .then((list) => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch((e) => {
-          console.error(e)
-          if (e.ERR_TYPE === 'MediaListError') {
-            setListError(e)
-          } else {
-            setListError(defaultListError)
-          }
-          setListState('error')
-        })
-    }
     loadMedia()
 
     return cms.events.subscribe(
@@ -152,7 +219,7 @@ export function MediaPicker({
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
-      setDirectory(path.join(item.directory, item.filename))
+      setDirectory(join(item.directory, item.filename))
       resetOffset()
     }
   }
@@ -197,6 +264,53 @@ export function MediaPicker({
     },
   })
 
+  const syncMedia = async () => {
+    if (hasTinaMedia) {
+      const res = await cms.api.tina.syncTinaMedia()
+      if (res?.assetsSyncing) {
+        // it was successful
+        try {
+          setListState('loading')
+          // poll every 3 seconds until it is done
+          await poll(
+            async () => {
+              const status = await cms.api.tina.checkSyncStatus({
+                assetsSyncing: res.assetsSyncing,
+              })
+              const totalDone = Object.values(status.status).filter(
+                Boolean
+              )?.length
+              const total = Object.keys(status.status)?.length
+              setLoadingText(`${totalDone}/${total} Media items loaded`)
+              return status
+            },
+            3000,
+            // Will time out after 10 seconds
+            10000
+          )
+          setLoadingText('')
+          // refresh the media
+          loadMedia()
+        } catch (e) {
+          cms.alerts.error(
+            'Error in syncing media, check console for more details'
+          )
+          console.error("'Error in syncing media, check below for more details")
+          console.error(e)
+        }
+      } else {
+        // it was not
+        cms.alerts.warn(
+          'Whoops, Looks media is not set up correctly in Tina Cloud. Check console for more details'
+        )
+        console.warn(
+          'Whoops, Looks media is not set up correctly. Check below for more details'
+        )
+        console.warn(res)
+      }
+    }
+  }
+
   const { onClick, ...rootProps } = getRootProps()
 
   function disableScrollBody() {
@@ -211,7 +325,7 @@ export function MediaPicker({
   useEffect(disableScrollBody, [])
 
   if (listState === 'loading' || uploading) {
-    return <LoadingMediaList />
+    return <LoadingMediaList extraText={loadingText} />
   }
 
   if (listState === 'not-configured') {
@@ -234,6 +348,9 @@ export function MediaPicker({
       <div className="flex items-center bg-white border-b border-gray-100 py-3 px-5 shadow-sm flex-shrink-0">
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <UploadButton onClick={onClick} uploading={uploading} />
+        {!isLocal && hasTinaMedia && (
+          <button onClick={syncMedia}>Refresh</button>
+        )}
       </div>
       <ul
         {...rootProps}
@@ -295,6 +412,7 @@ const LoadingMediaList = (props) => {
       className="w-full h-full flex flex-col items-center justify-center"
       {...props}
     >
+      {props.extraText && <p>{props.extraText}</p>}
       <LoadingDots color={'var(--tina-color-primary)'} />
     </div>
   )
