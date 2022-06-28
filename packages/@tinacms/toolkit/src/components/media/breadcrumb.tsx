@@ -19,7 +19,11 @@ limitations under the License.
 import React from 'react'
 import styled, { css } from 'styled-components'
 import { LeftArrowIcon } from '../../packages/icons'
-import path from 'path'
+
+// Fixed issue where dirname was being used in the frontend
+function dirname(path) {
+  return path.match(/.*\//)
+}
 
 interface BreadcrumbProps {
   directory?: string
@@ -29,7 +33,7 @@ interface BreadcrumbProps {
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   directory = directory.replace(/^\/|\/$/g, '')
 
-  let prevDir = path.dirname(directory)
+  let prevDir = dirname(directory)
   if (prevDir === '.') {
     prevDir = ''
   }
