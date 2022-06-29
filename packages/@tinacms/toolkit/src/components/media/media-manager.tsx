@@ -291,8 +291,8 @@ export function MediaPicker({
               return status
             },
             3000,
-            // Will time out after 10 seconds
-            10000
+            // Will time out after 60 seconds
+            60000
           )
           setLoadingText('')
           // refresh the media
