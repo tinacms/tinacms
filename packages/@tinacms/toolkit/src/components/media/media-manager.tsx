@@ -298,9 +298,9 @@ export function MediaPicker({
               setLoadingText(`${totalDone}/${total} Media items loaded`)
               return status
             },
-            3000,
             // Will time out after 60 seconds
-            60000
+            60000,
+            3000
           )
           setLoadingText('')
           // refresh the media
@@ -493,7 +493,7 @@ const SyncModal = ({ close, syncFunc, folder, branch }) => {
         <ModalHeader close={close}>Sync Media</ModalHeader>
         <ModalBody padded={true}>
           <p>
-            {`This will copy all media from your remote git repository in folder ${folder} on branch ${branch} to Tina cloud. Are
+            {`This will copy all media from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud. Are
             you sure you would like to perform this action?`}
           </p>
         </ModalBody>

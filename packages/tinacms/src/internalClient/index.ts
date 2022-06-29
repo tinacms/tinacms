@@ -302,7 +302,6 @@ mutation addPendingDocumentMutation(
   }
 
   async syncTinaMedia(): Promise<{ assetsSyncing: string[] }> {
-    console.log({ apiBase: this.contentApiBase }, { branch: this.branch })
     const res = await this.fetchWithToken(
       `${this.contentApiBase}/assets/${this.clientId}/sync/${this.branch}`,
       { method: 'POST' }
