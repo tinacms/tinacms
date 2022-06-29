@@ -169,16 +169,18 @@ export const TinaCloudProvider = (
   }
 
   const setupMedia = async () => {
-    if (props.mediaStore) {
+    if (props.schema.config?.media?.loadCustomStore || props.mediaStore) {
       // Check to see if the media was store was passed in?
-      if (props.mediaStore.prototype?.persist) {
+      const mediaStoreFromProps =
+        props.schema.config?.media?.loadCustomStore || props.mediaStore
+      if (mediaStoreFromProps.prototype?.persist) {
         // @ts-ignore
-        cms.media.store = new props.mediaStore(cms.api.tina)
+        cms.media.store = new mediaStoreFromProps(cms.api.tina)
       } else {
         // This means that an async function was passed in so we will use that to get the class
 
         // @ts-ignore
-        const MediaClass = await props.mediaStore()
+        const MediaClass = await mediaStoreFromProps()
         cms.media.store = new MediaClass(cms.api.tina)
       }
     } else {
