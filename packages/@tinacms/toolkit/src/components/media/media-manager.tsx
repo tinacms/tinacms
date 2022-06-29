@@ -195,6 +195,14 @@ export function MediaPicker({
     Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
       'publicFolder'
     )
+  const folder = hasTinaMedia
+    ? join(
+        cms.api.tina.schema.schema?.config?.media?.tina.publicFolder,
+        cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
+      )
+    : ''
+  const branch = cms.api.tina?.branch
+
   function loadMedia() {
     setListState('loading')
     cms.media
@@ -356,7 +364,8 @@ export function MediaPicker({
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           {!isLocal && hasTinaMedia && (
             <Button
-              busy={listState === 'loading'}
+              // this button is only displayed when the data is not loading
+              busy={false}
               variant="white"
               onClick={() => {
                 setShowSync(true)
@@ -400,6 +409,8 @@ export function MediaPicker({
       </MediaPickerWrap>
       {showSync && (
         <SyncModal
+          folder={folder}
+          branch={branch}
           syncFunc={syncMedia}
           close={() => {
             setShowSync(false)
@@ -475,15 +486,15 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
   )
 }
 
-const SyncModal = ({ close, syncFunc }) => {
+const SyncModal = ({ close, syncFunc, folder, branch }) => {
   return (
     <Modal>
       <PopupModal>
         <ModalHeader close={close}>Sync Media</ModalHeader>
         <ModalBody padded={true}>
           <p>
-            This will sync media between your git repository and Tina cloud. Are
-            you sure you would like to perform this action?
+            {`This will copy all media from your remote git repository in folder ${folder} on branch ${branch} to Tina cloud. Are
+            you sure you would like to perform this action?`}
           </p>
         </ModalBody>
         <ModalActions>
