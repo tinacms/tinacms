@@ -25,6 +25,8 @@ import {
   ModalHeader,
   ModalBody,
   FullscreenModal,
+  PopupModal,
+  ModalActions,
 } from '../../packages/react-modals'
 import {
   MediaList,
@@ -32,13 +34,72 @@ import {
   MediaListOffset,
   MediaListError,
 } from '../../packages/core'
-import path from 'path'
 import { Button } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
+import { IoMdSync } from 'react-icons/io'
+
+// taken from https://davidwalsh.name/javascript-polling
+async function poll(
+  fn: () => Promise<{
+    complete: boolean
+    status: {
+      [key: string]: boolean
+    }
+  }>,
+  timeout,
+  interval
+) {
+  const endTime = Number(new Date()) + (timeout || 2000)
+  interval = interval || 100
+
+  const checkCondition = async function (resolve, reject) {
+    // If the condition is met, we're done!
+    const result = await fn()
+    if (result.complete) {
+      resolve(result)
+    }
+    // If the condition isn't met but the timeout hasn't elapsed, go again
+    else if (Number(new Date()) < endTime) {
+      setTimeout(checkCondition, interval, resolve, reject)
+    }
+    // Didn't match and too much time, reject!
+    else {
+      reject(new Error('Time out error'))
+    }
+  }
+
+  return new Promise(checkCondition)
+}
+
+// Can not use path.join on the frontend
+const join = function (...parts) {
+  // From: https://stackoverflow.com/questions/29855098/is-there-a-built-in-javascript-function-similar-to-os-path-join
+  /* This function takes zero or more strings, which are concatenated
+  together to form a path or URL, which is returned as a string. This
+  function intelligently adds and removes slashes as required, and is
+  aware that `file` URLs will contain three adjacent slashes. */
+
+  const [first, last, slash] = [0, parts.length - 1, '/']
+
+  const matchLeadingSlash = new RegExp('^' + slash)
+  const matchTrailingSlash = new RegExp(slash + '$')
+
+  parts = parts.map(function (part, index) {
+    if (index === first && part === 'file://') return part
+
+    if (index > first) part = part.replace(matchLeadingSlash, '')
+
+    if (index < last) part = part.replace(matchTrailingSlash, '')
+
+    return part
+  })
+
+  return parts.join(slash)
+}
 
 export interface MediaRequest {
   directory?: string
@@ -104,11 +165,14 @@ export function MediaPicker({
     nextOffset: undefined,
   })
 
+  const [showSync, setShowSync] = useState(false)
+
   /**
    * current offset is last element in offsetHistory[]
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const [loadingText, setLoadingText] = useState('')
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -122,26 +186,43 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
 
+  const isLocal = cms.api.tina.isLocalMode
+
+  const hasTinaMedia =
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'mediaRoot'
+    ) &&
+    Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
+      'publicFolder'
+    )
+  const folder = hasTinaMedia
+    ? join(
+        cms.api.tina.schema.schema?.config?.media?.tina.publicFolder,
+        cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
+      )
+    : ''
+  const branch = cms.api.tina?.branch
+
+  function loadMedia() {
+    setListState('loading')
+    cms.media
+      .list({ offset, limit: cms.media.pageSize, directory })
+      .then((list) => {
+        setList(list)
+        setListState('loaded')
+      })
+      .catch((e) => {
+        console.error(e)
+        if (e.ERR_TYPE === 'MediaListError') {
+          setListError(e)
+        } else {
+          setListError(defaultListError)
+        }
+        setListState('error')
+      })
+  }
   useEffect(() => {
     if (!cms.media.isConfigured) return
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({ offset, limit: cms.media.pageSize, directory })
-        .then((list) => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch((e) => {
-          console.error(e)
-          if (e.ERR_TYPE === 'MediaListError') {
-            setListError(e)
-          } else {
-            setListError(defaultListError)
-          }
-          setListState('error')
-        })
-    }
     loadMedia()
 
     return cms.events.subscribe(
@@ -152,7 +233,7 @@ export function MediaPicker({
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
-      setDirectory(path.join(item.directory, item.filename))
+      setDirectory(join(item.directory, item.filename))
       resetOffset()
     }
   }
@@ -197,6 +278,53 @@ export function MediaPicker({
     },
   })
 
+  const syncMedia = async () => {
+    if (hasTinaMedia) {
+      const res = await cms.api.tina.syncTinaMedia()
+      if (res?.assetsSyncing) {
+        // it was successful
+        try {
+          setListState('loading')
+          // poll every 3 seconds until it is done
+          await poll(
+            async () => {
+              const status = await cms.api.tina.checkSyncStatus({
+                assetsSyncing: res.assetsSyncing,
+              })
+              const totalDone = Object.values(status.status).filter(
+                Boolean
+              )?.length
+              const total = Object.keys(status.status)?.length
+              setLoadingText(`${totalDone}/${total} Media items loaded`)
+              return status
+            },
+            // Will time out after 60 seconds
+            60000,
+            3000
+          )
+          setLoadingText('')
+          // refresh the media
+          loadMedia()
+        } catch (e) {
+          cms.alerts.error(
+            'Error in syncing media, check console for more details'
+          )
+          console.error("'Error in syncing media, check below for more details")
+          console.error(e)
+        }
+      } else {
+        // it was not
+        cms.alerts.warn(
+          'Whoops, Looks media is not set up correctly in Tina Cloud. Check console for more details'
+        )
+        console.warn(
+          'Whoops, Looks media is not set up correctly. Check below for more details'
+        )
+        console.warn(res)
+      }
+    }
+  }
+
   const { onClick, ...rootProps } = getRootProps()
 
   function disableScrollBody() {
@@ -211,7 +339,7 @@ export function MediaPicker({
   useEffect(disableScrollBody, [])
 
   if (listState === 'loading' || uploading) {
-    return <LoadingMediaList />
+    return <LoadingMediaList extraText={loadingText} />
   }
 
   if (listState === 'not-configured') {
@@ -230,42 +358,66 @@ export function MediaPicker({
   }
 
   return (
-    <MediaPickerWrap>
-      <div className="flex items-center bg-white border-b border-gray-100 py-3 px-5 shadow-sm flex-shrink-0">
-        <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <UploadButton onClick={onClick} uploading={uploading} />
-      </div>
-      <ul
-        {...rootProps}
-        className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
-          isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
-        }`}
-      >
-        <input {...getInputProps()} />
+    <>
+      <MediaPickerWrap>
+        <div className="flex items-center bg-white border-b border-gray-100 gap-x-3 py-3 px-5 shadow-sm flex-shrink-0">
+          <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          {!isLocal && hasTinaMedia && (
+            <Button
+              // this button is only displayed when the data is not loading
+              busy={false}
+              variant="white"
+              onClick={() => {
+                setShowSync(true)
+              }}
+            >
+              Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
+            </Button>
+          )}
+          <UploadButton onClick={onClick} uploading={uploading} />
+        </div>
+        <ul
+          {...rootProps}
+          className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
+            isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
+          }`}
+        >
+          <input {...getInputProps()} />
 
-        {listState === 'loaded' && list.items.length === 0 && (
-          <EmptyMediaList />
-        )}
+          {listState === 'loaded' && list.items.length === 0 && (
+            <EmptyMediaList />
+          )}
 
-        {list.items.map((item: Media) => (
-          <MediaItem
-            key={item.id}
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
+          {list.items.map((item: Media) => (
+            <MediaItem
+              key={item.id}
+              item={item}
+              onClick={onClickMediaItem}
+              onSelect={selectMediaItem}
+              onDelete={deleteMediaItem}
+            />
+          ))}
+        </ul>
+        <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+          <CursorPaginator
+            hasNext={hasNext}
+            navigateNext={navigateNext}
+            hasPrev={hasPrev}
+            navigatePrev={navigatePrev}
           />
-        ))}
-      </ul>
-      <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
-        <CursorPaginator
-          hasNext={hasNext}
-          navigateNext={navigateNext}
-          hasPrev={hasPrev}
-          navigatePrev={navigatePrev}
+        </div>
+      </MediaPickerWrap>
+      {showSync && (
+        <SyncModal
+          folder={folder}
+          branch={branch}
+          syncFunc={syncMedia}
+          close={() => {
+            setShowSync(false)
+          }}
         />
-      </div>
-    </MediaPickerWrap>
+      )}
+    </>
   )
 }
 
@@ -295,6 +447,7 @@ const LoadingMediaList = (props) => {
       className="w-full h-full flex flex-col items-center justify-center"
       {...props}
     >
+      {props.extraText && <p>{props.extraText}</p>}
       <LoadingDots color={'var(--tina-color-primary)'} />
     </div>
   )
@@ -330,5 +483,36 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
         Learn More
       </a>
     </div>
+  )
+}
+
+const SyncModal = ({ close, syncFunc, folder, branch }) => {
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>Sync Media</ModalHeader>
+        <ModalBody padded={true}>
+          <p>
+            {`This will copy all media from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud. Are
+            you sure you would like to perform this action?`}
+          </p>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={async () => {
+              await syncFunc()
+              close()
+            }}
+          >
+            Sync Media
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
   )
 }
