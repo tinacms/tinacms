@@ -25,6 +25,8 @@ import {
   ModalHeader,
   ModalBody,
   FullscreenModal,
+  PopupModal,
+  ModalActions,
 } from '../../packages/react-modals'
 import {
   MediaList,
@@ -38,6 +40,7 @@ import { CursorPaginator } from './pagination'
 import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
+import { IoMdSync } from 'react-icons/io'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -162,6 +165,8 @@ export function MediaPicker({
     nextOffset: undefined,
   })
 
+  const [showSync, setShowSync] = useState(false)
+
   /**
    * current offset is last element in offsetHistory[]
    * control offset by pushing/popping to offsetHistory
@@ -182,6 +187,7 @@ export function MediaPicker({
   const hasNext = !!list.nextOffset
 
   const isLocal = cms.api.tina.isLocalMode
+
   const hasTinaMedia =
     Object.keys(cms.api.tina.schema.schema?.config?.media?.tina || {}).includes(
       'mediaRoot'
@@ -344,45 +350,63 @@ export function MediaPicker({
   }
 
   return (
-    <MediaPickerWrap>
-      <div className="flex items-center bg-white border-b border-gray-100 py-3 px-5 shadow-sm flex-shrink-0">
-        <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <UploadButton onClick={onClick} uploading={uploading} />
-        {!isLocal && hasTinaMedia && (
-          <button onClick={syncMedia}>Refresh</button>
-        )}
-      </div>
-      <ul
-        {...rootProps}
-        className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
-          isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
-        }`}
-      >
-        <input {...getInputProps()} />
+    <>
+      <MediaPickerWrap>
+        <div className="flex items-center bg-white border-b border-gray-100 gap-x-3 py-3 px-5 shadow-sm flex-shrink-0">
+          <Breadcrumb directory={directory} setDirectory={setDirectory} />
+          {!isLocal && hasTinaMedia && (
+            <Button
+              busy={listState === 'loading'}
+              variant="white"
+              onClick={() => {
+                setShowSync(true)
+              }}
+            >
+              Sync <IoMdSync className="w-6 h-full ml-2 opacity-70" />
+            </Button>
+          )}
+          <UploadButton onClick={onClick} uploading={uploading} />
+        </div>
+        <ul
+          {...rootProps}
+          className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
+            isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
+          }`}
+        >
+          <input {...getInputProps()} />
 
-        {listState === 'loaded' && list.items.length === 0 && (
-          <EmptyMediaList />
-        )}
+          {listState === 'loaded' && list.items.length === 0 && (
+            <EmptyMediaList />
+          )}
 
-        {list.items.map((item: Media) => (
-          <MediaItem
-            key={item.id}
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
+          {list.items.map((item: Media) => (
+            <MediaItem
+              key={item.id}
+              item={item}
+              onClick={onClickMediaItem}
+              onSelect={selectMediaItem}
+              onDelete={deleteMediaItem}
+            />
+          ))}
+        </ul>
+        <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+          <CursorPaginator
+            hasNext={hasNext}
+            navigateNext={navigateNext}
+            hasPrev={hasPrev}
+            navigatePrev={navigatePrev}
           />
-        ))}
-      </ul>
-      <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
-        <CursorPaginator
-          hasNext={hasNext}
-          navigateNext={navigateNext}
-          hasPrev={hasPrev}
-          navigatePrev={navigatePrev}
+        </div>
+      </MediaPickerWrap>
+      {showSync && (
+        <SyncModal
+          syncFunc={syncMedia}
+          close={() => {
+            setShowSync(false)
+          }}
         />
-      </div>
-    </MediaPickerWrap>
+      )}
+    </>
   )
 }
 
@@ -448,5 +472,36 @@ const DocsLink = ({ title, message, docsLink, ...props }) => {
         Learn More
       </a>
     </div>
+  )
+}
+
+const SyncModal = ({ close, syncFunc }) => {
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>Sync Media</ModalHeader>
+        <ModalBody padded={true}>
+          <p>
+            This will sync media between your git repository and Tina cloud. Are
+            you sure you would like to perform this action?
+          </p>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={async () => {
+              await syncFunc()
+              close()
+            }}
+          >
+            Sync Media
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
   )
 }
