@@ -364,9 +364,7 @@ const schema = defineSchema({
 export default schema;
 
 export const tinaConfig = defineConfig({
-  // client,
-  apiURL:
-    "https://content.tinajs.io/content/30b12ec6-57ff-4df2-9485-1bfa4d589d79/github/main",
+  client,
   schema,
   // Can add this back in if we want to use the cloudinary media store
   // mediaStore: async () => {
