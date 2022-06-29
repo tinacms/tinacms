@@ -65,7 +65,6 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const upload = promisify(
     multer({
       storage: multer.diskStorage({
-        // @ts-ignore FIXME: multer was being interpretted as `any`
         directory: (req, file, cb) => {
           cb(null, '/tmp')
         },
@@ -76,7 +75,6 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
     }).single('file')
   )
 
-  // @ts-ignore multer was being interpreted as `any`
   await upload(req, res)
 
   const { directory } = req.body
