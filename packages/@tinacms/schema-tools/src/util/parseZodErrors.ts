@@ -32,7 +32,6 @@ export const parseZodError = ({ zodError }: { zodError: ZodError }) => {
     }
   })
   const formErrors = errors.formErrors.flatMap((x) => x.errors)
-  console.log({ errors })
 
   const parsedErrors = [
     ...(errors.fieldErrors?.collections?.flatMap((x) => x.errors) || []),
