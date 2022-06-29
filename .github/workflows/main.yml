@@ -47,8 +47,6 @@ jobs:
       - name: Build Types
         run: pnpm types
 
-      - name: Check types
-        run: cat packages/tinacms/dist/index.d.ts
       - name: Test
         run: pnpm test
 

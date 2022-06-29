@@ -13,10 +13,12 @@ Currently this is a monorepo built with Turborepo and PNPM
 You _should_ :fingers_crossed: be able to just run these commands. (Please make a note of any hang-ups you ran into during this process)
 
 ```sh
-# check the node version, this repo only supports node 14.x.x at the moment
+# check the node version, 14 or greater is required
 node -v
 # install pnpm (see docs for other options https://pnpm.io/installation)
 curl -fsSL https://get.pnpm.io/install.sh | sh -
+# ensure you have the latest (at the time of this writing this is 7.4.0)
+pnpm -v
 # build all the packages
 pnpm run build
 # watch all packages
