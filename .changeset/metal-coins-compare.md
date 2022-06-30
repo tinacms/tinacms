@@ -2,4 +2,4 @@
 '@tinacms/cli': patch
 ---
 
-Fix issues with windows rebuild
+Fix issue where server would start before the generated file was made
