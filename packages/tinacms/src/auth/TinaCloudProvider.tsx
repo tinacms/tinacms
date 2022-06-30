@@ -169,7 +169,20 @@ export const TinaCloudProvider = (
   }
 
   const setupMedia = async () => {
-    if (props.schema.config?.media?.loadCustomStore || props.mediaStore) {
+    const hasTinaMedia = Boolean(props.schema.config?.media?.tina)
+
+    /* 
+     Has tina media (set up in the schema)
+    */
+    if (hasTinaMedia) {
+      cms.media.store = new TinaMediaStore(cms)
+    } else if (
+      /* 
+     Has tina custom media (set up in the schema or define schema)
+      */
+      props.schema.config?.media?.loadCustomStore ||
+      props.mediaStore
+    ) {
       // Check to see if the media was store was passed in?
       const mediaStoreFromProps =
         props.schema.config?.media?.loadCustomStore || props.mediaStore
@@ -184,12 +197,8 @@ export const TinaCloudProvider = (
         cms.media.store = new MediaClass(cms.api.tina)
       }
     } else {
-      /** Determine default MediaStore */
-      if (props.schema.config?.media?.tina) {
-        cms.media.store = new TinaMediaStore(cms)
-      } else {
-        cms.media.store = new DummyMediaStore()
-      }
+      /** Default MediaStore */
+      cms.media.store = new DummyMediaStore()
     }
   }
 
