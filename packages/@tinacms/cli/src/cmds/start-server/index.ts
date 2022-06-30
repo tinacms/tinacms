@@ -197,7 +197,7 @@ export async function startServer(
     // Clear the cache of the DB passed to the GQL server
     database.clearCache()
     // Wait for the lock to be disabled
-    // await lock.promise
+    await buildLock.promise
     // Enable the lock so that no two builds can happen at once
     buildLock.enable()
     try {
