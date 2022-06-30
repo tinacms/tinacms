@@ -220,72 +220,6 @@ export async function startServer(
     }
   }
 
-  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
-  if (!noWatch && !process.env.CI) {
-    chokidar
-      .watch(
-        [
-          ...foldersToWatch,
-          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
-          gqlPackageFile,
-        ],
-        {
-          ignored: [
-            '**/node_modules/**/*',
-            '**/.next/**/*',
-            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
-          ],
-        }
-      )
-      .on('ready', async () => {
-        if (verbose) console.log('Generating Tina config')
-        try {
-          if (shouldBuild) {
-            await build(noSDK)
-          }
-          ready = true
-          isReady = true
-          await start()
-          next()
-        } catch (e) {
-          handleServerErrors(e)
-          // FIXME: make this a debug flag
-          console.log(e)
-          process.exit(0)
-        }
-      })
-      .on('all', async () => {
-        if (ready) {
-          await reBuildLock.promise
-          // hold the rebuild lock
-          reBuildLock.enable()
-          logger.info('Tina change detected, regenerating config')
-          try {
-            if (shouldBuild) {
-              await build(noSDK)
-            }
-            if (isReady) {
-              await restart()
-            }
-          } catch (e) {
-            handleServerErrors(e)
-            t.submitRecord({
-              event: {
-                name: 'tinacms:cli:server:error',
-                errorMessage: e.message,
-              },
-            })
-          } finally {
-            reBuildLock.disable()
-          }
-        }
-      })
-  } else {
-    if (shouldBuild) {
-      await build(noSDK)
-    }
-  }
-
   const state = {
     server: null,
     sockets: [],
@@ -353,29 +287,72 @@ export async function startServer(
     })
   }
 
+  const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   if (!noWatch && !process.env.CI) {
-    // chokidar
-    //   .watch([gqlPackageFile])
-    //   .on('ready', async () => {
-    //     isReady = true
-    //     start()
-    //   })
-    //   .on('all', async () => {
-    //     await reBuildLock.promise
-    //     reBuildLock.enable()
-    //     try {
-    //       if (isReady) {
-    //         await restart()
-    //       }
-    //     } catch (error) {
-    //       throw error
-    //     } finally {
-    //       reBuildLock.disable()
-    //     }
-    //   })
+    chokidar
+      .watch(
+        [
+          ...foldersToWatch,
+          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
+          gqlPackageFile,
+        ],
+        {
+          ignored: [
+            '**/node_modules/**/*',
+            '**/.next/**/*',
+            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+          ],
+        }
+      )
+      .on('ready', async () => {
+        if (verbose) console.log('Generating Tina config')
+        try {
+          if (shouldBuild) {
+            await build(noSDK)
+          }
+          ready = true
+          isReady = true
+          await start()
+          next()
+        } catch (e) {
+          handleServerErrors(e)
+          // FIXME: make this a debug flag
+          console.log(e)
+          process.exit(0)
+        }
+      })
+      .on('all', async () => {
+        if (ready) {
+          await reBuildLock.promise
+          // hold the rebuild lock
+          reBuildLock.enable()
+          logger.info('Tina change detected, regenerating config')
+          try {
+            if (shouldBuild) {
+              await build(noSDK)
+            }
+            if (isReady) {
+              await restart()
+            }
+          } catch (e) {
+            handleServerErrors(e)
+            t.submitRecord({
+              event: {
+                name: 'tinacms:cli:server:error',
+                errorMessage: e.message,
+              },
+            })
+          } finally {
+            reBuildLock.disable()
+          }
+        }
+      })
   } else {
     if (process.env.CI) {
       logger.info('Detected CI environment, omitting watch commands...')
+    }
+    if (shouldBuild) {
+      await build(noSDK)
     }
     await start()
     next()
