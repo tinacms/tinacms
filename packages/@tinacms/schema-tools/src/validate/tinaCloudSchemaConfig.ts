@@ -25,6 +25,7 @@ export const tinaConfigZod = z.object({
   media: z
     .object({
       tina: tinaConfigKey,
+      loadCustomStore: z.function().optional(),
     })
     .optional(),
 })

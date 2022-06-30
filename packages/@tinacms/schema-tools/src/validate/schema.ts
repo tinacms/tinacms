@@ -81,6 +81,22 @@ export const TinaCloudSchemaZod = z
     collections: z.array(TinaCloudCollection),
     config: tinaConfigZod.optional(),
   })
-  .refine((val) => !hasDuplicates(val.collections.map((x) => x.name)), {
-    message: 'can not have two collections with the same name',
+  .superRefine((val, ctx) => {
+    if (hasDuplicates(val.collections.map((x) => x.name))) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'can not have two collections with the same name',
+        fatal: true,
+      })
+    }
+    const media = val?.config?.media
+    if (media && media.tina && media.loadCustomStore) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'can not have both loadCustomStore and tina. Must use one or the other',
+        fatal: true,
+        path: ['config', 'media'],
+      })
+    }
   })
