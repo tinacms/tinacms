@@ -176,10 +176,6 @@ export async function startServer(
   // const bridge = new GithubBridge(ghConfig)
   // const store = new GithubStore(ghConfig)
 
-  if (!process.env.CI && !noWatch) {
-    await resetGeneratedFolder()
-  }
-
   const bridge = isomorphicGitBridge
     ? new IsomorphicBridge(rootPath, isomorphicOptions)
     : fsBridge
@@ -187,6 +183,8 @@ export async function startServer(
   const store = experimentalData
     ? new LevelStore(rootPath)
     : new FilesystemStore({ rootPath })
+
+  // is this ever false?
   const shouldBuild = bridge.supportsBuilding()
 
   const database = await createDatabase({ store, bridge })
@@ -229,6 +227,7 @@ export async function startServer(
         [
           ...foldersToWatch,
           `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
+          gqlPackageFile,
         ],
         {
           ignored: [
@@ -245,6 +244,8 @@ export async function startServer(
             await build(noSDK)
           }
           ready = true
+          isReady = true
+          await start()
           next()
         } catch (e) {
           handleServerErrors(e)
@@ -353,30 +354,30 @@ export async function startServer(
   }
 
   if (!noWatch && !process.env.CI) {
-    chokidar
-      .watch([gqlPackageFile])
-      .on('ready', async () => {
-        isReady = true
-        start()
-      })
-      .on('all', async () => {
-        await reBuildLock.promise
-        reBuildLock.enable()
-        try {
-          if (isReady) {
-            await restart()
-          }
-        } catch (error) {
-          throw error
-        } finally {
-          reBuildLock.disable()
-        }
-      })
+    // chokidar
+    //   .watch([gqlPackageFile])
+    //   .on('ready', async () => {
+    //     isReady = true
+    //     start()
+    //   })
+    //   .on('all', async () => {
+    //     await reBuildLock.promise
+    //     reBuildLock.enable()
+    //     try {
+    //       if (isReady) {
+    //         await restart()
+    //       }
+    //     } catch (error) {
+    //       throw error
+    //     } finally {
+    //       reBuildLock.disable()
+    //     }
+    //   })
   } else {
     if (process.env.CI) {
       logger.info('Detected CI environment, omitting watch commands...')
     }
-    start()
+    await start()
     next()
   }
 }
