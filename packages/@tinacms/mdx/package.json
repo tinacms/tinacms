@@ -29,7 +29,7 @@
   },
   "scripts": {
     "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "tinacms-scripts build",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest",
