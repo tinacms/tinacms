@@ -10,13 +10,12 @@
   ],
   "license": "Apache-2.0",
   "bin": {
-    "tinacms-scripts": "./bin/tina-build.js"
+    "tinacms-scripts": "./bin/tina-build"
   },
   "scripts": {
     "build:all": "bin/tina-build build:all",
-    "watch:all": "bin/tina-build build:all --watch",
-    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs --external pnpapi",
-    "watch": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --watch --format cjs --external pnpapi"
+    "watch": "bin/tina-build watch",
+    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs"
   },
   "dependencies": {
     "@babel/core": "^7.15.0",
@@ -26,7 +25,6 @@
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.0",
     "@types/inquirer": "^6.5.0",
-    "@yarnpkg/esbuild-plugin-pnp": "^1.0.0-rc.12",
     "chalk": "^4.1.1",
     "chokidar": "^3.5.2",
     "commander": "^7.2.0",

@@ -5,31 +5,44 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
-      - uses: actions/setup-node@v2
+
+      - uses: pnpm/action-setup@v2.0.1
         with:
-          node-version: '14'
+          version: 7.4.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Print cwd
+        run: ls
       - name: Install dependencies
-        # Before merging to main, re-run the install for security purposes
-        # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications
-        run: yarn install
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Build Types
+        run: pnpm types
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: Build
-        run: yarn build
-      - name: Test
-        run: yarn test
-      - name: Build Types
-        run: yarn types
+      - name: View NPMRC
+        run: cat .npmrc
       - name: Publish under PR tag
         run: |
           echo running on branch ${GITHUB_REF##*/}
-          yarn version:snapshot
-          yarn workspaces foreach --parallel --no-private --verbose npm publish --tolerate-republish --tag ${GITHUB_REF##*/} --access public
+          pnpm version:snapshot
+          pnpm publish -r --tag ${GITHUB_REF##*/} --no-git-checks --access public
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

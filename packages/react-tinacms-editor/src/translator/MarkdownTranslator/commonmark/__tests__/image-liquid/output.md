@@ -1,1 +1,0 @@
-![]({{ site.baseurl }}/uploads/image.png)

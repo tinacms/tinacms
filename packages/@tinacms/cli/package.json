@@ -40,12 +40,12 @@
     "@types/prompts": "^2.0.13",
     "@types/yup": "^0.29.11",
     "jest": "^27.0.6",
-    "typescript": "^4.3.5"
+    "typescript": "4.3.5"
   },
   "scripts": {
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests",
-    "types": "yarn tsc",
+    "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
@@ -62,7 +62,6 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
-    "@yarnpkg/esbuild-plugin-pnp": "^2.0.1-rc.3",
     "add": "^2.0.6",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",

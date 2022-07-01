@@ -2,9 +2,9 @@
   "name": "kitchen-sink-starter",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\"",
-    "build": "yarn tinacms server:start -c \"next build\"",
-    "start": "yarn tinacms server:start -c \"next start\"",
+    "dev": "tinacms server:start -c \"next dev\"",
+    "build": "tinacms server:start -c \"next build\"",
+    "start": "tinacms server:start -c \"next start\"",
     "lint": "next lint"
   },
   "dependencies": {
