@@ -8,6 +8,7 @@ export function gql(strings: TemplateStringsArray, ...args: string[]): string {
   return str
 }
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -38,7 +39,7 @@ export type SystemInfo = {
 
 
 export type SystemInfoBreadcrumbsArgs = {
-  excludeExtension?: Maybe<Scalars['Boolean']>;
+  excludeExtension?: InputMaybe<Scalars['Boolean']>;
 };
 
 export type PageInfo = {
@@ -85,46 +86,46 @@ export type QueryGetOptimizedQueryArgs = {
 
 
 export type QueryCollectionArgs = {
-  collection?: Maybe<Scalars['String']>;
+  collection?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryNodeArgs = {
-  id?: Maybe<Scalars['String']>;
+  id?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryDocumentArgs = {
-  collection?: Maybe<Scalars['String']>;
-  relativePath?: Maybe<Scalars['String']>;
+  collection?: InputMaybe<Scalars['String']>;
+  relativePath?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryPageArgs = {
-  relativePath?: Maybe<Scalars['String']>;
+  relativePath?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryPageConnectionArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryPostArgs = {
-  relativePath?: Maybe<Scalars['String']>;
+  relativePath?: InputMaybe<Scalars['String']>;
 };
 
 
 export type QueryPostConnectionArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 };
 
 export type DocumentConnectionEdges = {
@@ -155,11 +156,11 @@ export type Collection = {
 
 
 export type CollectionDocumentsArgs = {
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 };
 
 export type DocumentNode = Page | Post;
@@ -225,25 +226,25 @@ export type Mutation = {
 export type MutationAddPendingDocumentArgs = {
   collection: Scalars['String'];
   relativePath: Scalars['String'];
-  template?: Maybe<Scalars['String']>;
+  template?: InputMaybe<Scalars['String']>;
 };
 
 
 export type MutationUpdateDocumentArgs = {
-  collection?: Maybe<Scalars['String']>;
+  collection?: InputMaybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };
 
 
 export type MutationDeleteDocumentArgs = {
-  collection?: Maybe<Scalars['String']>;
+  collection?: InputMaybe<Scalars['String']>;
   relativePath: Scalars['String'];
 };
 
 
 export type MutationCreateDocumentArgs = {
-  collection?: Maybe<Scalars['String']>;
+  collection?: InputMaybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };
@@ -273,60 +274,60 @@ export type MutationCreatePostArgs = {
 };
 
 export type DocumentMutation = {
-  page?: Maybe<PageMutation>;
-  post?: Maybe<PostMutation>;
+  page?: InputMaybe<PageMutation>;
+  post?: InputMaybe<PostMutation>;
 };
 
 export type PageMutation = {
-  heading?: Maybe<Scalars['String']>;
-  subtitle?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['JSON']>;
+  heading?: InputMaybe<Scalars['String']>;
+  subtitle?: InputMaybe<Scalars['String']>;
+  body?: InputMaybe<Scalars['JSON']>;
 };
 
 export type PostMutation = {
-  title?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['JSON']>;
+  title?: InputMaybe<Scalars['String']>;
+  body?: InputMaybe<Scalars['JSON']>;
 };
 
-export type PagePartsFragment = { __typename?: 'Page', heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any> };
+export type PagePartsFragment = { __typename?: 'Page', heading?: string | null, subtitle?: string | null, body?: any | null };
 
-export type PostPartsFragment = { __typename?: 'Post', title?: Maybe<string>, body?: Maybe<any> };
+export type PostPartsFragment = { __typename?: 'Post', title?: string | null, body?: any | null };
 
 export type PageQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type PageQuery = { __typename?: 'Query', page: { __typename?: 'Page', id: string, heading?: string | null, subtitle?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PageConnectionQueryVariables = Exact<{
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PageConnectionEdges', node?: Maybe<{ __typename?: 'Page', id: string, heading?: Maybe<string>, subtitle?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
+export type PageConnectionQuery = { __typename?: 'Query', pageConnection: { __typename?: 'PageConnection', totalCount: number, edges?: Array<{ __typename?: 'PageConnectionEdges', node?: { __typename?: 'Page', id: string, heading?: string | null, subtitle?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export type PostQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
-export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, title?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
 
 export type PostConnectionQueryVariables = Exact<{
-  before?: Maybe<Scalars['String']>;
-  after?: Maybe<Scalars['String']>;
-  first?: Maybe<Scalars['Float']>;
-  last?: Maybe<Scalars['Float']>;
-  sort?: Maybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostConnectionEdges', node?: Maybe<{ __typename?: 'Post', id: string, title?: Maybe<string>, body?: Maybe<any>, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } }> }>>> } };
+export type PostConnectionQuery = { __typename?: 'Query', postConnection: { __typename?: 'PostConnection', totalCount: number, edges?: Array<{ __typename?: 'PostConnectionEdges', node?: { __typename?: 'Post', id: string, title?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export const PagePartsFragmentDoc = gql`
     fragment PageParts on Page {

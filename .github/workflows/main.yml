@@ -17,30 +17,39 @@ jobs:
         #  - windows-latest
         node-version: [12.x, 14.x]
     runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+    timeout-minutes: 15
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
-      - if: matrix.os == 'windows-latest'
-        run: |
-          yarn add windows-build-tools@4.0.0
-          yarn add node-gyp
-      - name: Install
-        run: yarn install
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.4.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Build
-        run: yarn build
+        run: pnpm build
+
+      - name: Build Types
+        run: pnpm types
 
       - name: Test
-        run: yarn test
+        run: pnpm test
 
       - name: Lint
         if: matrix.os == 'ubuntu-latest'
-        run: yarn lint
-
-      - name: Build Types
-        run: yarn types
+        run: pnpm lint

@@ -1,6 +1,3 @@
-declare const schema: import('tinacms').TinaCloudSchema
-export declare const tinaConfig: Omit<
-  import('tinacms').TinaCMSProviderDefaultProps,
-  'children'
->
+declare const schema: any
+export declare const tinaConfig: any
 export default schema

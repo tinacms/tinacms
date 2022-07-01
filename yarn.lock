@@ -4606,22 +4606,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@kwsites/file-exists@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@kwsites/file-exists@npm:1.1.1"
-  dependencies:
-    debug: ^4.1.1
-  checksum: 8e13130fb3bf4cb4889f9a594531260ea8e5892caa4b7989b22b1250ab10e6ccccabef88f69b59a6059a22e3a742763ee4f3af7037dad7d98b48095baf14a58f
-  languageName: node
-  linkType: hard
-
-"@kwsites/promise-deferred@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@kwsites/promise-deferred@npm:1.1.1"
-  checksum: 1f0c17684c88b5e17868058c781e6170d929e6c27a22bb7c84e384e92582afeb67ebe1f42db5a58177cc0aa567c7052bbed884c67e243587b0560f9e9e8d31a1
-  languageName: node
-  linkType: hard
-
 "@manypkg/find-root@npm:^1.1.0":
   version: 1.1.0
   resolution: "@manypkg/find-root@npm:1.1.0"
@@ -6745,7 +6729,7 @@ __metadata:
     "@tinacms/scripts": "workspace:*"
     "@types/yup": ^0.29.10
     jest: ^27.0.6
-    react: 16.14.0
+    react: 17.0.2
     typescript: ^4.3.5
     yup: ^0.32.0
     zod: ^3.14.3
@@ -6829,7 +6813,7 @@ __metadata:
     postcss: ^8.3.11
     postcss-import: ^14.0.2
     postcss-nesting: ^10.1.0
-    react: ^17.0.2
+    react: 17.0.2
     react-dom: ^17.0.2
     react-icons: ^4.2.0
     react-is: ^17.0.2
@@ -6863,12 +6847,9 @@ __metadata:
     "@types/atob": ^2.1.2
     "@types/codemirror": ^0.0.71
     "@types/color-string": ^1.5.0
-    "@types/cors": ^2.8.12
-    "@types/express": ^4.17.13
     "@types/jest": ^27.0.1
     "@types/lodash.debounce": ^4.0.6
     "@types/lodash.get": ^4.4.5
-    "@types/multer": ^1.4.7
     "@types/prop-types": ^15.7.4
     "@types/react": ^17.0.14
     "@types/react-beautiful-dnd": ^11.0.3
@@ -6901,8 +6882,6 @@ __metadata:
     "@udecode/plate-ui-combobox": ^9.2.1
     atob: 2.1.2
     color-string: ^1.5.3
-    cors: ^2.8.5
-    express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
     final-form-set-field-data: ^1.0.2
@@ -6911,8 +6890,6 @@ __metadata:
     lodash.get: ^4.4.2
     mime-types: ^2.1.24
     moment: ">=2 <=3"
-    multer: 1.4.2
-    path: ^0.12.7
     prop-types: 15.7.2
     react: 17.0.2
     react-beautiful-dnd: ^13.1.0
@@ -6923,7 +6900,6 @@ __metadata:
     react-final-form: ^6.3.0
     react-icons: ^4.3.1
     react-is: ^17.0.2
-    simple-git: 3.5.0
     slate: ^0.66.0
     slate-history: ^0.66.0
     slate-hyperscript: ^0.66.0
@@ -7106,7 +7082,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cors@npm:^2.8.12, @types/cors@npm:^2.8.7":
+"@types/cors@npm:^2.8.7":
   version: 2.8.12
   resolution: "@types/cors@npm:2.8.12"
   checksum: f3b62196df42c286282b9dbda26e24d2264211d932e7d9c2240f361e27ef693a5cb03790daeb3610fd958a0690f4d31d45ef7848b0df7a0dd2afc698a4f9df76
@@ -7189,7 +7165,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:^4.17.13, @types/express@npm:^4.17.7, @types/express@npm:^4.17.8":
+"@types/express@npm:*, @types/express@npm:^4.17.7, @types/express@npm:^4.17.8":
   version: 4.17.13
   resolution: "@types/express@npm:4.17.13"
   dependencies:
@@ -23220,7 +23196,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"multer@npm:1.4.2, multer@npm:^1.4.2":
+"multer@npm:^1.4.2":
   version: 1.4.2
   resolution: "multer@npm:1.4.2"
   dependencies:
@@ -23448,8 +23424,8 @@ fsevents@~2.1.2:
     cloudinary: ^1.25.2
     multer: ^1.4.2
     next: 10.0.5
-    react: 16.14.0
-    react-dom: 16.14.0
+    react: 17.0.2
+    react-dom: 17.0.2
     styled-components: ^5.2.0
     tinacms: "workspace:*"
     typescript: ^4.3.5
@@ -25013,16 +24989,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"path@npm:^0.12.7":
-  version: 0.12.7
-  resolution: "path@npm:0.12.7"
-  dependencies:
-    process: ^0.11.1
-    util: ^0.10.3
-  checksum: 0e2d3342ca6f91aba8e514919cae8a08ad12071297a3a99da6e3ea493f5296d9bb323ca9bece4d035fc280e91b701a740ce1e48ff65802004deaaae2f2cd623e
-  languageName: node
-  linkType: hard
-
 "pbkdf2@npm:^3.0.3":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
@@ -26047,7 +26013,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"process@npm:0.11.10, process@npm:^0.11.1, process@npm:^0.11.10":
+"process@npm:0.11.10, process@npm:^0.11.10":
   version: 0.11.10
   resolution: "process@npm:0.11.10"
   checksum: ed93a85e9185b40fb01788c588a87c1a9da0eb925ef7cebebbe1b8bbf0eba1802130366603a29e3b689c116969d4fe018de6aed3474bbeb5aefb3716b85d6449
@@ -27243,7 +27209,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react@npm:17.0.2, react@npm:^17.0.2":
+"react@npm:17.0.2":
   version: 17.0.2
   resolution: "react@npm:17.0.2"
   dependencies:
@@ -28993,17 +28959,6 @@ resolve@^2.0.0-next.3:
     once: ^1.3.1
     simple-concat: ^1.0.0
   checksum: 8e7d8dd396915df8461d27ca3ecb8c0c3ddb6c48e14cc44cd6999374295ea125ad332f15b1cb5bd4b579df99685e749a27f4c72e9bd8fa81a46830172032e44b
-  languageName: node
-  linkType: hard
-
-"simple-git@npm:3.5.0":
-  version: 3.5.0
-  resolution: "simple-git@npm:3.5.0"
-  dependencies:
-    "@kwsites/file-exists": ^1.1.1
-    "@kwsites/promise-deferred": ^1.1.1
-    debug: ^4.3.3
-  checksum: 7e8a29fd4c92b53dde2d03012d3c4b6239d29927e2e85c575aa25b6980644105f5178fe1c30f7b1962b4f91ead090d5e69f28e9d990920626380a410ad517009
   languageName: node
   linkType: hard
 
@@ -30805,8 +30760,8 @@ resolve@^2.0.0-next.3:
     jest-file-snapshot: ^0.5.0
     lodash.set: ^4.3.2
     next: 9.4.2
-    react: 16.14.0
-    react-dom: 16.14.0
+    react: 17.0.2
+    react-dom: 17.0.2
     react-icons: ^4.3.1
     react-is: ^17.0.2
     react-router-dom: 6
@@ -32114,15 +32069,6 @@ resolve@^2.0.0-next.3:
     safe-buffer: ^5.1.2
     which-typed-array: ^1.1.2
   checksum: 6e3cbc15468436de8aa7bbc50ea1354b738ece2330ef4da417d08893d1105985ac1cc0dd1ea86ef855494e01dd000d7f866c802537afe8751f0c319d16ceccd0
-  languageName: node
-  linkType: hard
-
-"util@npm:^0.10.3":
-  version: 0.10.4
-  resolution: "util@npm:0.10.4"
-  dependencies:
-    inherits: 2.0.3
-  checksum: 6682ea8239076243495c45e81f19c2c002e02805de4de08554dc815500805923f27f504ec1a9c7599d420b62bf7452efbab6fa078219d529188b0ca830f142a5
   languageName: node
   linkType: hard
 

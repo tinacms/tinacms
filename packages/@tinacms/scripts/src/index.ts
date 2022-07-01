@@ -13,9 +13,10 @@ limitations under the License.
 
 import { build } from 'vite'
 import { build as esbuild } from 'esbuild'
-import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
 import fs from 'fs'
 import path from 'path'
+import chokidar from 'chokidar'
+import { exec } from 'child_process'
 import chalk from 'chalk'
 import tailwind from 'tailwindcss'
 import postcssNested from 'postcss-nested'
@@ -123,6 +124,35 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
   }
 }
 
+const watch = () => {
+  exec('pnpm list -r --json', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`)
+      return
+    }
+    const json = JSON.parse(stdout) as { name: string; path: string }[]
+    const watchPaths: string[] = []
+    json.forEach((pkg) => {
+      if (pkg.path.includes('/packages/')) {
+        watchPaths.push(pkg.path)
+      }
+    })
+
+    chokidar
+      .watch(
+        watchPaths.map((p) => path.join(p, 'src', '**/*')),
+        {
+          ignored: ['**/spec/**/*', 'node_modules'],
+        }
+      )
+      .on('change', async (path) => {
+        const changedPackagePath = watchPaths.find((p) => path.startsWith(p))
+        await run({ dir: changedPackagePath })
+        // console.log('change', changedPackagePath)
+      })
+  })
+}
+
 export async function init(args: any) {
   registerCommands([
     {
@@ -137,19 +167,9 @@ export async function init(args: any) {
       action: (options) => run(options),
     },
     {
-      command: 'build:all',
-      description: 'Build all packages',
-      options: [
-        {
-          name: '--watch',
-          description: 'Watch for file changes and rebuild',
-        },
-        {
-          name: '--lines',
-          description: 'add the lines',
-        },
-      ],
-      action: (options) => all(options),
+      command: 'watch',
+      description: 'Watch',
+      action: () => watch(),
     },
   ])
 
@@ -401,7 +421,7 @@ const config = (cwd = '') => {
   }
 }
 
-const buildIt = async (entryPoint, packageJSON) => {
+export const buildIt = async (entryPoint, packageJSON) => {
   const entry = typeof entryPoint === 'string' ? entryPoint : entryPoint.name
   const target = typeof entryPoint === 'string' ? 'browser' : entryPoint.target
   const deps = packageJSON.dependencies
@@ -418,7 +438,6 @@ const buildIt = async (entryPoint, packageJSON) => {
       )
     ) {
       await esbuild({
-        plugins: [pnpPlugin()],
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'node',
@@ -434,7 +453,6 @@ const buildIt = async (entryPoint, packageJSON) => {
       })
     } else {
       await esbuild({
-        plugins: [pnpPlugin()],
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'node',
@@ -460,7 +478,6 @@ const buildIt = async (entryPoint, packageJSON) => {
   }
 
   const defaultBuildConfig: Parameters<typeof build>[0] = {
-    // plugins: [pnpPlugin(), dts()],
     plugins: [
       {
         name: 'vite-plugin-tina',
@@ -546,60 +563,6 @@ const buildIt = async (entryPoint, packageJSON) => {
     `export * from "../${entry.replace(extension, '')}"`
   )
   return true
-}
-
-import pnp from 'pnpapi'
-import chokidar from 'chokidar'
-
-const all = async (args: { watch?: boolean; dir?: string }) => {
-  const workspacePackageNames = []
-  await sequential(pnp.getDependencyTreeRoots(), async (locator) => {
-    const pkg = pnp.getPackageInformation(locator)
-    const packageJSON = JSON.parse(
-      await fs
-        .readFileSync(path.join(pkg.packageLocation, 'package.json'))
-        .toString()
-    )
-    workspacePackageNames.push(packageJSON.name)
-  })
-  const workspacePkgs = []
-  await sequential(pnp.getDependencyTreeRoots(), async (locator) => {
-    const pkg = pnp.getPackageInformation(locator)
-    const packageJSON = JSON.parse(
-      await fs
-        .readFileSync(path.join(pkg.packageLocation, 'package.json'))
-        .toString()
-    )
-    if (!packageJSON.private) {
-      workspacePkgs.push(path.join(pkg.packageLocation, 'src'))
-    }
-  })
-  if (args.watch) {
-    console.log(`${chalk.blue(`Watching workspaces...`)}`)
-    chokidar
-      .watch(workspacePkgs, {
-        ignored: '**/spec/**/*', // ignore dotfiles
-      })
-      .on('change', async (path) => {
-        const packageLocator = pnp.findPackageLocator(path)
-        const packageInformation = pnp.getPackageInformation(packageLocator)
-        await run({ dir: packageInformation.packageLocation })
-      })
-  } else {
-    console.log(`${chalk.blue(`Building workspaces...`)}`)
-    const packagePathsToBuild = await fs
-      .readFileSync(path.resolve('../../../topologicalDeps.txt'))
-      .toString()
-      .split('\n')
-      .filter((stdout) => {
-        return stdout.includes('packages')
-      })
-      .map((line) => line.split(' ').pop())
-
-    await sequential(packagePathsToBuild, async (packagePath) => {
-      await run({ dir: packagePath })
-    })
-  }
 }
 
 export const sequential = async <A, B>(

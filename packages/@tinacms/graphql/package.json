@@ -38,8 +38,8 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc",
-    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest",
@@ -122,6 +122,6 @@
     "jest-file-snapshot": "^0.5.0",
     "jest-matcher-utils": "27.0.6",
     "nodemon": "^2.0.4",
-    "typescript": "^4.3.5"
+    "typescript": "4.3.5"
   }
 }

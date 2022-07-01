@@ -3,11 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --dev",
-    "server": "yarn tinacms server:start --experimentalData --noTelemetry --dev",
+    "dev": "tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --dev",
     "dev-isomorphic": "yarn tinacms server:start -c \"next dev\" --experimentalData --isomorphicGitBridge --noTelemetry --dev",
-    "build": "tinacms server:start -c \"next build\"",
-    "start": "tinacms server:start -c \"next start\"",
+    "build": "tinacms server:start -c \"next build\" --experimentalData --noTelemetry --dev",
+    "start": "tinacms server:start -c \"next start\" --experimentalData --noTelemetry --dev",
     "export": "npm run build && next export"
   },
   "devDependencies": {
@@ -31,7 +30,7 @@
     "next": "^11.0.4",
     "next-svgr": "^0.0.2",
     "next-tinacms-cloudinary": "workspace:*",
-    "react": "^17.0.2",
+    "react": "17.0.2",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
     "react-is": "^17.0.2",

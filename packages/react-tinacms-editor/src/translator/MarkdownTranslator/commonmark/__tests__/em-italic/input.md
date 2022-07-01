@@ -1,3 +1,0 @@
-_italic_
-
-*italic*

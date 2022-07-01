@@ -33,8 +33,9 @@ export type UIField<F extends UIField = any, Shape = any> = {
   // fields?: F[]
 }
 
-export interface TinaCloudSchemaConfig {
+export interface TinaCloudSchemaConfig<Store = any> {
   media?: {
+    loadCustomStore?: () => Promise<Store>
     tina?: {
       publicFolder: string
       mediaRoot: string
@@ -42,10 +43,10 @@ export interface TinaCloudSchemaConfig {
   }
 }
 
-export interface TinaCloudSchema<WithNamespace extends boolean> {
+export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
   templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
-  config?: TinaCloudSchemaConfig
+  config?: TinaCloudSchemaConfig<Store>
 }
 export type TinaCloudSchemaBase = TinaCloudSchema<false>
 export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
