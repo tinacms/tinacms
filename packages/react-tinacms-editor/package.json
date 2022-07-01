@@ -3,11 +3,18 @@
   "version": "0.53.25",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "module": "dist/react-tinacms-editor.esm.js",
+  "module": "dist/index.es.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
     "watch": "tinacms-scripts watch",
