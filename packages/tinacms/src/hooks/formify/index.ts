@@ -456,7 +456,7 @@ export const useFormify = ({
         }
       }
     })
-  }, [state.changeSets.length])
+  }, [JSON.stringify(state.changeSets.length)])
 
   /**
    * NOTE: we're mimicking `componentWillUnmount` by keeping track of
