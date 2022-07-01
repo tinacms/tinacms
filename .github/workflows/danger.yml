@@ -6,6 +6,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.4.0
       - uses: actions/checkout@v1
       - name: Install
         run: pnpm install
