@@ -18,11 +18,11 @@ import 'isomorphic-fetch'
 import * as G from 'graphql'
 import { LocalClient } from '../../../internalClient'
 
-// @ts-ignore FIXME: violates ts rootDir config
-import graphqlJSON from '../../../../../../experimental-examples/unit-test-example/.tina/__generated__/_graphql.json'
-
-// @ts-ignore FIXME: violates ts rootDir config
-import schema from '../../../../../../experimental-examples/unit-test-example/.tina/schema'
+/**
+ * Import these manually from 'unit-test-example'
+ */
+import graphqlJSON from './graphql.json'
+import schema from './schema'
 
 expect.extend({ toMatchFile })
 

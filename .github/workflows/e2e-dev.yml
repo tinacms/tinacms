@@ -12,15 +12,19 @@ jobs:
         browser: ['chrome', 'firefox']
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.4.0
+          run_install: true
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          install-command: yarn install
+          install: false
           browser: ${{ matrix.browser }}
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: yarn build:e2e
-          command: yarn test:e2e
-          start: yarn start:e2e:dev
+          build: pnpm build:e2e
+          command: pnpm test:e2e
+          start: pnpm start:e2e:dev
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
           wait-on-timeout: 180
