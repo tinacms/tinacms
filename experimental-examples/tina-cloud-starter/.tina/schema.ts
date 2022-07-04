@@ -8,6 +8,9 @@ import { iconSchema } from "../components/icon";
 
 const schema = defineSchema({
   config: {
+    client: {
+      referenceDepth: 5,
+    },
     media: {
       tina: {
         publicFolder: "public",
