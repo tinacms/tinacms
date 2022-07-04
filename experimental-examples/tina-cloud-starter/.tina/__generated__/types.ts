@@ -257,11 +257,11 @@ export type DatetimeFilter = {
 };
 
 export type Posts_BodyRelatedPostPostFilter = {
-  posts?: Maybe<PostsFilter>;
+  posts?: InputMaybe<PostsFilter>;
 };
 
 export type Posts_BodyRelatedPostFilter = {
-  post?: Maybe<Posts_BodyRelatedPostPostFilter>;
+  post?: InputMaybe<Posts_BodyRelatedPostPostFilter>;
 };
 
 export type Posts_BodyDateTimeFilter = {
@@ -281,6 +281,7 @@ export type Posts_BodyNewsletterSignupFilter = {
 };
 
 export type Posts_BodyFilter = {
+  RelatedPost?: InputMaybe<Posts_BodyRelatedPostFilter>;
   DateTime?: InputMaybe<Posts_BodyDateTimeFilter>;
   BlockQuote?: InputMaybe<Posts_BodyBlockQuoteFilter>;
   NewsletterSignup?: InputMaybe<Posts_BodyNewsletterSignupFilter>;

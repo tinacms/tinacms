@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import sucraseRunner from '@sucrase/jest-plugin'
+import esbuildRunner from 'esbuild-jest'
 
 const config = {
   verbose: true,
@@ -34,7 +35,12 @@ const config = {
   },
 }
 
+const t = esbuildRunner.createTransformer()
+
 module.exports = {
-  process: sucraseRunner.process,
+  // process: sucraseRunner.process,
+  process: (one, two, three) => {
+    return t.process(one, two, three)
+  },
   config,
 }
