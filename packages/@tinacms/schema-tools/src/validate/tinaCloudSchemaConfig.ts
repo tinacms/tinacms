@@ -22,6 +22,7 @@ const tinaConfigKey = z
   .strict()
   .optional()
 export const tinaConfigZod = z.object({
+  client: z.object({ referenceDepth: z.number().optional() }).optional(),
   media: z
     .object({
       tina: tinaConfigKey,

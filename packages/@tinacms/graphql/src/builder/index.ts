@@ -27,6 +27,9 @@ import type {
   FieldDefinitionNode,
   NamedTypeNode,
 } from 'graphql'
+
+// TODO: update types. Import from @tinacms/schema-tools
+
 import type {
   TinaCloudCollectionEnriched,
   TinaFieldEnriched,
@@ -54,7 +57,7 @@ export const createBuilder = async ({
  * storing a reference to how we can resolve that type when we come across it.
  */
 export class Builder {
-  private _MAXDEPTH = 5
+  private _MAXDEPTH: number
   // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
@@ -64,6 +67,10 @@ export class Builder {
       tinaSchema: TinaSchema
     }
   ) {
+    // @ts-ignore
+    this._MAXDEPTH =
+      config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 5
+    console.log('max depth is', this._MAXDEPTH)
     this.tinaSchema = config.tinaSchema
     this.database = config.database
   }
