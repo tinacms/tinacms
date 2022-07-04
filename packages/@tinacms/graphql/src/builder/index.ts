@@ -54,6 +54,7 @@ export const createBuilder = async ({
  * storing a reference to how we can resolve that type when we come across it.
  */
 export class Builder {
+  private _MAXDEPTH = 5
   // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
@@ -467,38 +468,57 @@ export class Builder {
   ) => {
     const name = NAMER.dataTypeName(collection.namespace)
     const fragmentName = NAMER.fragmentName(collection.namespace)
+    const selections = await this._getCollectionFragmentSelections(
+      collection,
+      0
+    )
 
+    return astBuilder.FragmentDefinition({
+      name,
+      fragmentName,
+      selections: filterSelections(selections),
+    })
+  }
+
+  /**
+   * Given a collection this function returns its selections set. For example for Post this would return
+   *
+   * "
+   * body
+   * title
+   * ... on Author {
+   *   name
+   *   heroImg
+   * }
+   *
+   * But in the AST format
+   *
+   * */
+  private _getCollectionFragmentSelections = async (
+    collection: TinaCloudCollectionEnriched,
+    depth: number
+  ) => {
+    const selections = []
     if (typeof collection.fields === 'object') {
-      const selections = []
       await sequential(collection.fields, async (x) => {
-        const field = await this._buildFieldNodeForFragments(x)
+        const field = await this._buildFieldNodeForFragments(x, depth)
         selections.push(field)
       })
-
-      return astBuilder.FragmentDefinition({
-        name,
-        fragmentName,
-        selections: filterSelections(selections),
-      })
     } else {
-      const selections = []
       await sequential(collection.templates, async (tem) => {
         if (typeof tem === 'object') {
           // TODO: Handle when template is a string
-          selections.push(await this.buildTemplateFragments(tem))
+          selections.push(await this.buildTemplateFragments(tem, depth))
         }
       })
-      return astBuilder.FragmentDefinition({
-        name,
-        fragmentName,
-        selections: filterSelections(selections),
-      })
     }
+    return selections
   }
 
   private _buildFieldNodeForFragments: (
-    field: TinaFieldInner<true>
-  ) => Promise<SelectionSetNode | FieldNode> = async (field) => {
+    field: TinaFieldInner<true>,
+    depth: number
+  ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
       case 'string':
       case 'image':
@@ -511,7 +531,7 @@ export class Builder {
         if (typeof field.fields === 'object') {
           const selections = []
           await sequential(field.fields, async (item) => {
-            const field = await this._buildFieldNodeForFragments(item)
+            const field = await this._buildFieldNodeForFragments(item, depth)
             selections.push(field)
           })
 
@@ -527,7 +547,7 @@ export class Builder {
           await sequential(field.templates, async (tem) => {
             if (typeof tem === 'object') {
               // TODO: Handle when template is a string
-              selections.push(await this.buildTemplateFragments(tem))
+              selections.push(await this.buildTemplateFragments(tem, depth))
             }
           })
           return astBuilder.FieldWithSelectionSetDefinition({
@@ -539,9 +559,44 @@ export class Builder {
           })
         }
       case 'reference':
+        if (depth >= this._MAXDEPTH) return false
+
+        if (!('collections' in field)) {
+          // todo add an error
+          return false
+        }
+        const selections = []
+
+        await sequential(field.collections, async (col) => {
+          const collection = this.tinaSchema.getCollection(col)
+
+          selections.push({
+            kind: 'InlineFragment',
+            typeCondition: {
+              kind: 'NamedType',
+              name: {
+                kind: 'Name',
+                value: NAMER.documentTypeName(collection.namespace),
+              },
+            },
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: filterSelections(
+                await this._getCollectionFragmentSelections(
+                  collection,
+                  depth + 1
+                )
+              ),
+            },
+          })
+        })
+
         return astBuilder.FieldWithSelectionSetDefinition({
           name: field.name,
           selections: [
+            ...selections,
+            // This is ... on Document { id }
             {
               kind: 'InlineFragment',
               typeCondition: {
@@ -573,12 +628,13 @@ export class Builder {
   }
 
   public async buildTemplateFragments(
-    template: Template<true>
+    template: Template<true>,
+    depth: number
   ): Promise<InlineFragmentNode> {
     const selections = []
 
     await sequential(template.fields || [], async (item) => {
-      const field = await this._buildFieldNodeForFragments(item)
+      const field = await this._buildFieldNodeForFragments(item, depth)
       selections.push(field)
     })
     return astBuilder.InlineFragmentDefinition({

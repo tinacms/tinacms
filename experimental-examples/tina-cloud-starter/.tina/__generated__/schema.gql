@@ -90,9 +90,12 @@ type Collection {
 
 union DocumentNode = Posts | Global | Authors | Pages
 
+union PostsMorePosts = Posts | Pages
+
 union PostsAuthor = Authors
 
 type Posts implements Node & Document {
+  morePosts: PostsMorePosts
   title: String!
   heroImg: String
   excerpt: JSON
@@ -102,6 +105,11 @@ type Posts implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input PostsMorePostsFilter {
+  posts: PostsFilter
+  pages: PagesFilter
 }
 
 input StringFilter {
@@ -159,6 +167,7 @@ input Posts_bodyFilter {
 }
 
 input PostsFilter {
+  morePosts: PostsMorePostsFilter
   title: StringFilter
   heroImg: ImageFilter
   excerpt: RichTextFilter
@@ -457,6 +466,7 @@ input DocumentMutation {
 }
 
 input PostsMutation {
+  morePosts: String
   title: String
   heroImg: String
   excerpt: JSON
