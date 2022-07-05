@@ -124,16 +124,9 @@ export const Post = (data) => {
   if (!isNaN(date.getTime())) {
     formattedDate = format(date, "MMM dd, yyyy");
   }
-  console.log({ data });
-
   return (
     <Section className="flex-1">
       <Container className={`flex-1 max-w-4xl pb-2`} size="large">
-        <div>
-          <pre>{data?.foo1 && data?.foo1[0]?.yo}</pre>
-          <pre>{data?.foo2 && data?.foo2[0]?.yo}</pre>
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
         <h2
           data-tinafield="title"
           className={`w-full relative	mb-8 text-6xl font-extrabold tracking-normal text-center title-font`}

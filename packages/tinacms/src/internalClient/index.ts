@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
-import deepclone from 'lodash.clonedeep'
 //@ts-ignore can't locate BranchChangeEvent
 import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit'
 import {
