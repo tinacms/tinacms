@@ -70,12 +70,25 @@ export class TinaClient<GenQueries> {
       body: bodyString,
       redirect: 'follow',
     })
+    if (!res.ok) {
+      let additionalInfo = ''
+      if (res.status === 401) {
+        additionalInfo =
+          'Please check that your client ID, URL and read only token are configured properly.'
+      }
+
+      throw new Error(
+        `Server responded with status code ${res.status}, ${res.statusText}. ${
+          additionalInfo ? additionalInfo : ''
+        } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
+      )
+    }
     const json = await res.json()
     if (json.errors) {
       throw new Error(
-        `Unable to fetch, errors: \n\t${json.errors
-          .map((error) => error.message)
-          .join('\n')}`
+        `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
+  
+        Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
       )
     }
     return {
