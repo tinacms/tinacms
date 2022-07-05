@@ -3,7 +3,15 @@
   "version": "0.60.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "module": "./dist/index.mjs",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "files": [
     "package.json",
     "dist"

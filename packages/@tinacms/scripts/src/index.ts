@@ -432,11 +432,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
-    if (
-      ['@tinacms/graphql', '@tinacms/datalayer', '@tinacms/mdx'].includes(
-        packageJSON.name
-      )
-    ) {
+    if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
@@ -446,6 +442,37 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
         outdir: path.join(process.cwd(), 'dist'),
+        external: external.filter(
+          (item) =>
+            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
+        ),
+      })
+    } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        // FIXME: no idea why but even though I'm on node14 it doesn't like
+        // the syntax for optional chaining, should be supported on 14
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+        target: 'node12',
+        format: 'cjs',
+        outfile: path.join(process.cwd(), 'dist', 'index.js'),
+        external: external.filter(
+          (item) =>
+            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
+        ),
+      })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        // FIXME: no idea why but even though I'm on node14 it doesn't like
+        // the syntax for optional chaining, should be supported on 14
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+        target: 'node12',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
         external: external.filter(
           (item) =>
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
