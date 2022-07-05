@@ -592,13 +592,11 @@ importers:
       '@tinacms/scripts': workspace:*
       '@types/yup': ^0.29.10
       jest: ^27.0.6
-      lodash.clonedeep: ^4.5.0
       react: 17.0.2
       typescript: 4.3.5
       yup: ^0.32.0
       zod: ^3.14.3
     dependencies:
-      lodash.clonedeep: 4.5.0
       zod: 3.17.3
     devDependencies:
       '@tinacms/scripts': link:../scripts
@@ -947,7 +945,6 @@ importers:
       isomorphic-fetch: ^3.0.0
       jest: ^27.0.6
       jest-file-snapshot: ^0.5.0
-      lodash.clonedeep: ^4.5.0
       lodash.set: ^4.3.2
       next: 9.4.2
       react: 17.0.2
@@ -972,7 +969,6 @@ importers:
       final-form: 4.20.1
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
-      lodash.clonedeep: 4.5.0
       lodash.set: 4.3.2
       react-icons: 4.4.0_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
@@ -18992,13 +18988,6 @@ packages:
     resolution:
       {
         integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==,
-      }
-    dev: false
-
-  /lodash.clonedeep/4.5.0:
-    resolution:
-      {
-        integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==,
       }
     dev: false
 

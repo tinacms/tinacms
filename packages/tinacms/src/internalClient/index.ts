@@ -75,14 +75,11 @@ export class Client {
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     if (options.schema) {
-      const allSchema = addNamespaceToSchema(deepclone(options.schema), [])
-      console.log({ allSchema })
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
         meta: { flags: [] },
-        ...allSchema,
+        ...addNamespaceToSchema({ ...options.schema }, []),
       })
-      console.log(enrichedSchema)
       this.schema = enrichedSchema
     }
     this.options = options
