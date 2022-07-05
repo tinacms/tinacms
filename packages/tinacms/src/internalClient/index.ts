@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
+import deepclone from 'lodash.clonedeep'
 //@ts-ignore can't locate BranchChangeEvent
 import { BranchChangeEvent, BranchData, EventBus } from '@tinacms/toolkit'
 import {
@@ -74,11 +75,14 @@ export class Client {
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     if (options.schema) {
+      const allSchema = addNamespaceToSchema(deepclone(options.schema), [])
+      console.log({ allSchema })
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
         meta: { flags: [] },
-        ...addNamespaceToSchema(options.schema, []),
+        ...allSchema,
       })
+      console.log(enrichedSchema)
       this.schema = enrichedSchema
     }
     this.options = options
