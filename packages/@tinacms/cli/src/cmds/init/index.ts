@@ -6,17 +6,8 @@ import {
   nextPostPage,
 } from './setup-files'
 import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
-import {
-  cmdText,
-  dangerText,
-  logText,
-  successText,
-  warnText,
-} from '../../utils/theme'
-import {
-  extendNextScripts,
-  generateGqlScript,
-} from '../../utils/script-helpers'
+import { logText, successText } from '../../utils/theme'
+import { extendNextScripts } from '../../utils/script-helpers'
 /**
 Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -163,7 +154,6 @@ export async function installDeps(ctx: any, next: () => void, options) {
 }
 
 const baseDir = process.cwd()
-// TODO: should handle src folder here
 const packageJSONPath = p.join(baseDir, 'package.json')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
