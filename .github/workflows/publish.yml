@@ -33,8 +33,6 @@ jobs:
           node-version: 16
           cache: 'pnpm'
 
-      - name: DEBUG ONE
-        run: git status
       - name: Install dependencies
         run: pnpm install
       - name: Build
@@ -45,8 +43,6 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: DEBUG TWO
-        run: git status
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |
