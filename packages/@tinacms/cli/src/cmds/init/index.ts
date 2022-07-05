@@ -173,7 +173,7 @@ const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
 const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
 
 export async function tinaSetup(_ctx: any, next: () => void, _options) {
-  const usingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
+  const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
 
   // 1. Create a content/blog Folder and add one or two blog posts
   if (!fs.pathExistsSync(blogPostPath)) {
