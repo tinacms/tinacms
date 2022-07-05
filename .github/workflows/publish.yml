@@ -51,7 +51,7 @@ jobs:
         if: matrix.channel == 'dev'
         run: |
           pnpm version:snapshot
-          pnpm publish:beta
+          pnpm run publish:beta
       - name: Publish
         if: matrix.channel == 'latest'
         run: |
