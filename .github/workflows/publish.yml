@@ -55,7 +55,7 @@ jobs:
       - name: Publish
         if: matrix.channel == 'latest'
         run: |
-          pnpm publish
+          pnpm run publish
       - name: Push tags
         if: matrix.channel == 'latest'
         run: |
