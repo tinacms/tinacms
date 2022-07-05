@@ -25,7 +25,8 @@ export function addNamespaceToSchema<T extends object | string>(
   // @ts-ignore
   const newNode: {
     [key in keyof T]: (T & { namespace?: string[] }) | string
-  } = deepclone(maybeNode)
+    // @ts-ignore
+  } = { ...maybeNode }
 
   // Traverse node's properties first
   const keys = Object.keys(maybeNode)
