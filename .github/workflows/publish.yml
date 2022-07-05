@@ -65,6 +65,6 @@ jobs:
         uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
-          version: pnpm version
+          version: pnpm run version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
