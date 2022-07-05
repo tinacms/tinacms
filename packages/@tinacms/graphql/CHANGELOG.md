@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 0.61.1
+
+### Patch Changes
+
+- b5b0dfd66: chore: migrate from fs.rmdir -> fs.rm
+- Updated dependencies [7d87eb6b7]
+- Updated dependencies [67e291e56]
+- Updated dependencies [ae23e9ad6]
+  - @tinacms/schema-tools@0.0.7
+
 ## 0.61.0
 
 ### Minor Changes

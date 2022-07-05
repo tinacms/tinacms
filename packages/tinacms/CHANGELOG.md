@@ -1,5 +1,22 @@
 # tinacms
 
+## 0.68.12
+
+### Patch Changes
+
+- 7d87eb6b7: Add `loadCustomStore` to top schema config
+- 67e291e56: Add support for ES modules
+- f3c6b0f36: Fix an issue where changes to a field weren't reflected on the page when typing quickly
+- 7a45e4e12: Added a media sync button that adds new media to tina-cloud. This button only appears when you are not in local mode and have the new media store enable
+- Updated dependencies [7d87eb6b7]
+- Updated dependencies [67e291e56]
+- Updated dependencies [7a45e4e12]
+- Updated dependencies [ae23e9ad6]
+- Updated dependencies [489be9cb1]
+  - @tinacms/schema-tools@0.0.7
+  - @tinacms/sharedctx@0.1.2
+  - @tinacms/toolkit@0.56.35
+
 ## 0.68.11
 
 ### Patch Changes

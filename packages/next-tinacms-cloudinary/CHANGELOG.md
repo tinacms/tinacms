@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.29
+
+### Patch Changes
+
+- ae23e9ad6: Remove unused deps from monorepo
+
 ## 3.5.28
 
 ## 3.5.27
