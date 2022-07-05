@@ -1,5 +1,11 @@
 # @tinacms/sharedctx
 
+## 0.1.2
+
+### Patch Changes
+
+- 67e291e56: Add support for ES modules
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.56.35
+
+### Patch Changes
+
+- 67e291e56: Add support for ES modules
+- 7a45e4e12: Added a media sync button that adds new media to tina-cloud. This button only appears when you are not in local mode and have the new media store enable
+- ae23e9ad6: Remove unused deps from monorepo
+- 489be9cb1: docs: Update media help link in sidebar
+- Updated dependencies [67e291e56]
+  - @tinacms/sharedctx@0.1.2
+
 ## 0.56.34
 
 ### Patch Changes

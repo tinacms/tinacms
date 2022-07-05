@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 0.60.26
+
+### Patch Changes
+
+- b5b0dfd66: chore: migrate from fs.rmdir -> fs.rm
+- 7d87eb6b7: Add `loadCustomStore` to top schema config
+- 7038745f6: Fixed issue where server would start before the generated file was made.
+- Updated dependencies [b5b0dfd66]
+- Updated dependencies [7d87eb6b7]
+- Updated dependencies [67e291e56]
+- Updated dependencies [ae23e9ad6]
+  - @tinacms/graphql@0.61.1
+  - @tinacms/schema-tools@0.0.7
+
 ## 0.60.25
 
 ### Patch Changes
