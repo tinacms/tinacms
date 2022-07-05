@@ -17,6 +17,8 @@ packages/cli/forestry/.env
 **/.cache/
 **/package-lock.json
 
+.npmrc
+
 .yarn/*
 !.yarn/cache
 !.yarn/patches
