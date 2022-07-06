@@ -83,6 +83,8 @@ export const remarkToSlate = (
         }
       case 'list':
         return list(content)
+      case 'html':
+        return content
       default:
         throw new Error(`Content: ${content.type} is not yet supported`)
     }
@@ -181,9 +183,11 @@ export const remarkToSlate = (
     return {
       type: 'code_block',
       lang: content.lang,
-      children: content.value.split('\n').map((child) => {
-        return { type: 'code_line', children: [{ type: 'text', text: child }] }
-      }),
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
+      // children: content.value.split('\n').map((child) => {
+      //   return { type: 'code_line', children: [{ type: 'text', text: child }] }
+      // }),
     }
   }
   const link = (content: Md.Link): Plate.LinkElement => {
@@ -243,6 +247,8 @@ export const remarkToSlate = (
         return breakContent()
       case 'inlineCode':
         return phrashingMark(content)
+      case 'html':
+        return { ...content, children: [{ type: 'text', text: '' }] }
       default:
         throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
     }

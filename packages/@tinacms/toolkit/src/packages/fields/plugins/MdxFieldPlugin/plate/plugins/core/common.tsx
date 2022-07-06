@@ -23,7 +23,11 @@ import {
 } from '@udecode/plate-core'
 import { ReactEditor } from 'slate-react'
 import { createParagraphPlugin } from '@udecode/plate-paragraph'
-import { createCodeBlockPlugin } from '@udecode/plate-code-block'
+// import { createCodeBlockPlugin } from '@udecode/plate-code-block'
+import {
+  createCodeBlockPlugin,
+  createHTMLBlockPlugin,
+} from '../create-code-block'
 import { createHorizontalRulePlugin } from '@udecode/plate-horizontal-rule'
 import { createNodeIdPlugin } from '@udecode/plate-node-id'
 import { createListPlugin, getListItemEntry } from '@udecode/plate-list'
@@ -44,6 +48,7 @@ export const plugins = [
   createHeadingPlugin(),
   createParagraphPlugin(),
   createCodeBlockPlugin(),
+  createHTMLBlockPlugin(),
   createBlockquotePlugin(),
   createBoldPlugin(),
   createItalicPlugin(),
@@ -62,7 +67,8 @@ const isNodeActive = (editor, type) => {
   )
 }
 const isMarkActive = (editor, type) => {
-  return !!editor?.selection && isMarkActiveBase(editor, type)
+  return false
+  // return !!editor?.selection && isMarkActiveBase(editor, type)
 }
 const isListActive = (editor, type) => {
   const res = !!editor?.selection && getListItemEntry(editor)

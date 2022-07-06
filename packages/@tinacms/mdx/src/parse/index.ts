@@ -71,8 +71,13 @@ import { remarkToSlate } from './remarkToPlate'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
-export const markdownToAst = (value: string) => {
-  const tree = unified().use(markdown).use(mdx).parse(value)
+export const markdownToAst = (value: string, skipMDX?: boolean) => {
+  let tree
+  if (skipMDX) {
+    tree = unified().use(markdown).parse(value)
+  } else {
+    tree = unified().use(markdown).use(mdx).parse(value)
+  }
   // Delete useless position info
   visit(tree, (node) => {
     delete node.position
@@ -83,8 +88,9 @@ export const markdownToAst = (value: string) => {
 export const parseMDX = (
   value: string,
   field: RichTypeInner,
-  imageCallback: (s: string) => string
+  imageCallback: (s: string) => string,
+  skipMDX?: boolean
 ) => {
-  const tree = markdownToAst(value)
+  const tree = markdownToAst(value, skipMDX)
   return remarkToSlate(tree, field, imageCallback)
 }

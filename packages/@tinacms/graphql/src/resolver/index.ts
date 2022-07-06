@@ -756,12 +756,16 @@ export class Resolver {
         break
       case 'rich-text':
         // @ts-ignore value is unknown
-        const tree = parseMDX(value, field, (value) =>
-          resolveMediaRelativeToCloud(
-            value,
-            this.config,
-            this.tinaSchema.schema
-          )
+        const tree = parseMDX(
+          value,
+          field,
+          (value) =>
+            resolveMediaRelativeToCloud(
+              value,
+              this.config,
+              this.tinaSchema.schema
+            ),
+          true
         )
         accumulator[field.name] = tree
         break
