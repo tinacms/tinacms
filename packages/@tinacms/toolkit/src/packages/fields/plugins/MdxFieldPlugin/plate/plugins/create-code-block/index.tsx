@@ -1,15 +1,23 @@
 import React from 'react'
-import { createPluginFactory } from '@udecode/plate-core'
+import { createPluginFactory, isStart } from '@udecode/plate-core'
 
 export const createCodeBlockPlugin = createPluginFactory({
   key: 'code_block',
   isElement: true,
   isVoid: true,
   isInline: false,
-  component: (props) => {
-    console.log('code_block', props)
-    return <div>Here is some code</div>
+  handlers: {
+    // onKeyDownCapture: (editor) => (e) => {
+    //   console.log('keypress', editor, e)
+    //   if (isStart(editor, editor.selection)) {
+    //     console.log('is at the start')
+    //   }
+    // },
   },
+  // onKeyDown: (editor) => (e) => {
+  //   console.log('keywown', e)
+  // },
+  // },
   // handlers: {
   //   onKeyDown: onKeyDownToggleElement,
   // },

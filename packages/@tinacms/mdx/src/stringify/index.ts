@@ -84,13 +84,6 @@ export const blockElement = (
         children: eat(content.children, field, imageCallback),
       }
     case 'code_block':
-      // const valueArray: string[] = []
-      // content.children.forEach((code_line) => {
-      //   code_line.children.forEach((child) => {
-      //     valueArray.push(child.text)
-      //   })
-      // })
-      console.log('code_block', content.value)
       return {
         type: 'code',
         lang: content.lang,

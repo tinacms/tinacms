@@ -21,6 +21,9 @@ import { setNodes } from '@udecode/plate-core'
 import { Dropdown } from './dropdown'
 import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
+import { insertBlockElement } from '../core/common'
+import { Element, Transforms } from 'slate'
+import { ReactEditor, useSelected } from 'slate-react'
 
 const languages = {
   typescript: 'TypeScript',
@@ -715,6 +718,9 @@ const nightOwl = {
 
 export const CodeBlock = ({ attributes, editor, element, ...props }) => {
   const monaco = useMonaco()
+  const value = element.value || ''
+  const height = value.split('\n').length * 28
+  const id = React.useMemo(() => uuid(), [])
 
   React.useEffect(() => {
     if (monaco) {
@@ -744,18 +750,92 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
   const language = element.lang
 
   const editorRef = React.useRef(null)
+  const [shouldUnwrap, setShouldUnwrap] = React.useState(false)
+  const [shouldBreak, setShouldBreak] = React.useState(false)
+
+  React.useEffect(() => {
+    if (shouldBreak) {
+      const editorEl = ReactEditor.toDOMNode(editor, element)
+      editorEl.focus()
+      setTimeout(() => {
+        Transforms.insertNodes(
+          editor,
+          [
+            {
+              type: 'p',
+              children: [{ text: '' }],
+              lang: undefined,
+              value: undefined,
+            },
+          ],
+          { select: true }
+        )
+        setShouldBreak(false)
+      }, 1)
+    }
+  }, [shouldBreak])
+  React.useEffect(() => {
+    if (shouldUnwrap) {
+      const editorEl = ReactEditor.toDOMNode(editor, element)
+      editorEl.focus()
+      setTimeout(() => {
+        Transforms.setNodes(
+          editor,
+          {
+            type: 'p',
+            children: [{ text: '' }],
+            lang: undefined,
+            value: undefined,
+          },
+          {
+            match: (n) => {
+              // @ts-ignore bad type from slate
+              if (Element.isElement(n) && n.type === 'code_block') {
+                return true
+              }
+            },
+          }
+        )
+        insertBlockElement(editor, { type: 'p', children: [{ text: '' }] })
+      }, 1)
+      setShouldUnwrap(false)
+    }
+  }, [shouldUnwrap])
 
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor
+    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () =>
+      setShouldBreak(true)
+    )
     if (editorRef.current) {
-      // editorRef.current.focus()
-      // console.log(editorRef)
+      editor.onKeyDown((l, h, f) => {
+        if (l.code === 'Backspace') {
+          const selection = editor.getSelection()
+          if (
+            selection.endColumn === 1 &&
+            selection.endLineNumber === 1 &&
+            selection.positionColumn === 1 &&
+            selection.positionLineNumber === 1 &&
+            selection.selectionStartColumn === 1 &&
+            selection.selectionStartLineNumber === 1 &&
+            selection.startColumn === 1 &&
+            selection.startLineNumber === 1
+          ) {
+            setShouldUnwrap(true)
+          }
+        }
+      })
     }
   }
-
-  const value = element.value || ''
-  const height = value.split('\n').length * 28
-  const id = React.useMemo(() => uuid(), [])
+  const selected = useSelected()
+  // FIXME: monaco mounts too slowly to focus immediately
+  React.useEffect(() => {
+    if (selected) {
+      if (editorRef.current) {
+        editorRef.current.focus()
+      }
+    }
+  }, [selected])
 
   return (
     <div
@@ -764,50 +844,54 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
       // FIXME: z-index should be some sane number, but does seem
       // to need to override most other elements
       style={{ backgroundColor: '#1e1e1e', zIndex: 1000 }}
-      contentEditable={false}
     >
-      <div className="flex justify-between pb-2">
-        <div />
-        <Dropdown label={languages[element.lang] || 'Language'} items={items} />
+      {props.children}
+      <div contentEditable={false}>
+        <div className="flex justify-between pb-2">
+          <div />
+          <Dropdown
+            label={languages[element.lang] || 'Language'}
+            items={items}
+          />
+        </div>
+        <Editor
+          height={`${height}px`}
+          path={id}
+          onMount={handleEditorDidMount}
+          theme="vs-dark"
+          options={{
+            scrollBeyondLastLine: false,
+            tabSize: 2,
+            disableLayerHinting: true,
+            accessibilitySupport: 'off',
+            codeLens: false,
+            wordWrap: 'on',
+            minimap: {
+              enabled: false,
+            },
+            fontSize: 14,
+            lineHeight: 2,
+            formatOnPaste: true,
+            lineNumbers: 'off',
+            formatOnType: true,
+            fixedOverflowWidgets: true,
+            // Takes too much horizontal space for iframe
+            folding: false,
+            renderLineHighlight: 'none',
+            scrollbar: {
+              verticalScrollbarSize: 1,
+              horizontalScrollbarSize: 1,
+              // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
+              alwaysConsumeMouseWheel: false,
+            },
+          }}
+          language={language}
+          value={element.value}
+          onChange={(value, ev) => {
+            setNodes(editor, { value, lang: language })
+          }}
+        />
       </div>
-      <Editor
-        height={`${height}px`}
-        path={id}
-        onMount={handleEditorDidMount}
-        theme="vs-dark"
-        options={{
-          scrollBeyondLastLine: false,
-          tabSize: 2,
-          disableLayerHinting: true,
-          accessibilitySupport: 'off',
-          codeLens: false,
-          wordWrap: 'on',
-          minimap: {
-            enabled: false,
-          },
-          fontSize: 14,
-          lineHeight: 2,
-          formatOnPaste: true,
-          lineNumbers: 'off',
-          formatOnType: true,
-          fixedOverflowWidgets: true,
-          // Takes too much horizontal space for iframe
-          folding: false,
-          renderLineHighlight: 'none',
-          scrollbar: {
-            verticalScrollbarSize: 1,
-            horizontalScrollbarSize: 1,
-            // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
-            alwaysConsumeMouseWheel: false,
-          },
-        }}
-        language={language}
-        value={element.value}
-        onChange={(value) => {
-          setNodes(editor, { value, lang: language })
-        }}
-      />
-      <span {...props} />
     </div>
   )
 }

@@ -104,14 +104,19 @@ export const autoformatBlocks: AutoformatRule[] = [
     mode: 'block',
     type: ELEMENT_CODE_BLOCK,
     match: '```',
-    triggerAtBlockStart: false,
+    // triggerAtBlockStart: false,
     preFormat,
-    format: (editor) => {
-      insertEmptyCodeBlock(editor as PlateEditor, {
-        defaultType: getPluginType(editor as PlateEditor, ELEMENT_CODE_LINE),
-        insertNodesOptions: { select: true },
-      })
-    },
+    // format: (editor) => {
+    //   insertNodes(editor, {
+    //     type: 'code_block',
+    //     value: '',
+    //     children: [{ text: '' }],
+    //   })
+    //   // insertEmptyCodeBlock(editor as PlateEditor, {
+    //   //   defaultType: getPluginType(editor as PlateEditor, ELEMENT_CODE_LINE),
+    //   //   insertNodesOptions: { select: true },
+    //   // })
+    // },
   },
   {
     mode: 'block',

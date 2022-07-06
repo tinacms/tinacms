@@ -65,7 +65,7 @@ export const RichEditor = wrapFieldsWithMeta<
   // This should be a plugin customization
   const withToolbar = true
   const tempId = [props.tinaForm.id, props.input.name].join('.')
-  const id = React.useMemo(() => uuid(), [tempId])
+  const id = React.useMemo(() => uuid() + tempId, [tempId])
 
   return (
     <EditorContext.Provider value={{ templates: props.field.templates }}>

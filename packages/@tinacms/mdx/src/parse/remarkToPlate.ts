@@ -149,7 +149,6 @@ export const remarkToSlate = (
           case 'code':
           case 'thematicBreak':
           case 'table':
-          case 'mdxjsEsm':
           case 'html':
             throw new Error(`${content.type} inside list item is not supported`)
           default:
@@ -185,9 +184,6 @@ export const remarkToSlate = (
       lang: content.lang,
       value: content.value,
       children: [{ type: 'text', text: '' }],
-      // children: content.value.split('\n').map((child) => {
-      //   return { type: 'code_line', children: [{ type: 'text', text: child }] }
-      // }),
     }
   }
   const link = (content: Md.Link): Plate.LinkElement => {

@@ -21,14 +21,11 @@ export type HrElement = {
   type: 'hr'
   children: [EmptyTextElement]
 }
-export type CodeLineElement = {
-  type: 'code_line'
-  children: TextElement[]
-}
 export type CodeBlockElement = {
   type: 'code_block'
   lang?: string
-  children: CodeLineElement[]
+  value: string
+  children: [EmptyTextElement]
 }
 export type BlockquoteElement = {
   type: 'blockquote'

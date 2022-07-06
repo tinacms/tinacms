@@ -704,7 +704,6 @@ const nightOwl = {
 
 export const Monaco = (props) => {
   const monaco = useMonaco()
-  console.log('meh', props)
 
   React.useEffect(() => {
     if (monaco) {

@@ -56,74 +56,74 @@ This is *italic*, and this is **bold**
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "h1",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello, world"
-      }
-    ]
-  },
-  {
-    "type": "hr",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ]
-  },
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "This is a paragraph, and "
-      },
-      {
-        "type": "a",
-        "url": "http://example.com",
-        "title": null,
-        "children": [
-          {
-            "type": "text",
-            "text": "here"
-          }
-        ]
-      },
-      {
-        "type": "text",
-        "text": " is a link"
-      }
-    ]
-  },
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "This is "
-      },
-      {
-        "type": "text",
-        "text": "italic",
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": ", and this is "
-      },
-      {
-        "type": "text",
-        "text": "bold",
-        "bold": true
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "h1",
+          "children": [
+            {
+              "type": "text",
+              "text": "Hello, world"
+            }
+          ]
+        },
+        {
+          "type": "hr",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "This is a paragraph, and "
+            },
+            {
+              "type": "a",
+              "url": "http://example.com",
+              "title": null,
+              "children": [
+                {
+                  "type": "text",
+                  "text": "here"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " is a link"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "This is "
+            },
+            {
+              "type": "text",
+              "text": "italic",
+              "italic": true
+            },
+            {
+              "type": "text",
+              "text": ", and this is "
+            },
+            {
+              "type": "text",
+              "text": "bold",
+              "bold": true
+            }
+          ]
+        }
+      ]
+    `)
   })
 
   const text2 = `
@@ -141,45 +141,45 @@ P 4
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "P 1"
-      }
-    ]
-  },
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "P 2"
-      }
-    ]
-  },
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "P 3"
-      }
-    ]
-  },
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "P 4"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "P 1"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "P 2"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "P 3"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "P 4"
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 describe('Lists', () => {
@@ -190,28 +190,28 @@ describe('Lists', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "ul",
-    "children": [
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "text",
-                "text": "this is a list"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "ul",
+          "children": [
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "this is a list"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
 
   const list2 = `* > some blockquote`
@@ -221,28 +221,28 @@ describe('Lists', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(`* some blockquote`)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "ul",
-    "children": [
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "text",
-                "text": "some blockquote"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "ul",
+          "children": [
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "some blockquote"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
   const list3 = `
 * list item 1
@@ -255,61 +255,61 @@ describe('Lists', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "ul",
-    "children": [
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "text",
-                "text": "list item 1"
-              }
-            ]
-          },
-          {
-            "type": "ol",
-            "children": [
-              {
-                "type": "li",
-                "children": [
-                  {
-                    "type": "lic",
-                    "children": [
-                      {
-                        "type": "text",
-                        "text": "sub list item 1A"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "text",
-                "text": "list item 2"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "ul",
+          "children": [
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "list item 1"
+                    }
+                  ]
+                },
+                {
+                  "type": "ol",
+                  "children": [
+                    {
+                      "type": "li",
+                      "children": [
+                        {
+                          "type": "lic",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "sub list item 1A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "list item 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
 
   const list4 = `
@@ -321,44 +321,44 @@ describe('Lists', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "ul",
-    "children": [
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "text",
-                "text": "list "
-              },
-              {
-                "type": "text",
-                "text": "with ",
-                "bold": true
-              },
-              {
-                "type": "text",
-                "text": "some",
-                "bold": true,
-                "italic": true
-              },
-              {
-                "type": "text",
-                "text": " formatting",
-                "bold": true
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "ul",
+          "children": [
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "list "
+                    },
+                    {
+                      "type": "text",
+                      "text": "with ",
+                      "bold": true
+                    },
+                    {
+                      "type": "text",
+                      "text": "some",
+                      "bold": true,
+                      "italic": true
+                    },
+                    {
+                      "type": "text",
+                      "text": " formatting",
+                      "bold": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
   const list5 = `
 - \`\`\`
@@ -380,35 +380,35 @@ describe('Lists', () => {
     })
     // expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "ul",
-    "children": [
-      {
-        "type": "li",
-        "children": [
-          {
-            "type": "lic",
-            "children": [
-              {
-                "type": "mdxJsxTextElement",
-                "name": "Date",
-                "children": [
-                  {
-                    "type": "text",
-                    "text": ""
-                  }
-                ],
-                "props": {}
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "ul",
+          "children": [
+            {
+              "type": "li",
+              "children": [
+                {
+                  "type": "lic",
+                  "children": [
+                    {
+                      "type": "mdxJsxTextElement",
+                      "name": "Date",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": ""
+                        }
+                      ],
+                      "props": {}
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -420,18 +420,18 @@ describe('Headers', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "h1",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "h1",
+          "children": [
+            {
+              "type": "text",
+              "text": "Hello"
+            }
+          ]
+        }
+      ]
+    `)
   })
 
   const header2 = '# Hello **world**'
@@ -441,23 +441,23 @@ describe('Headers', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "h1",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello "
-      },
-      {
-        "type": "text",
-        "text": "world",
-        "bold": true
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "h1",
+          "children": [
+            {
+              "type": "text",
+              "text": "Hello "
+            },
+            {
+              "type": "text",
+              "text": "world",
+              "bold": true
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -468,33 +468,33 @@ describe('Links', () => {
 
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Click "
-      },
-      {
-        "type": "a",
-        "url": "https://example.com",
-        "title": "Tester",
-        "children": [
-          {
-            "type": "text",
-            "text": "here"
-          }
-        ]
-      },
-      {
-        "type": "text",
-        "text": " to join now"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Click "
+            },
+            {
+              "type": "a",
+              "url": "https://example.com",
+              "title": "Tester",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "here"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " to join now"
+            }
+          ]
+        }
+      ]
+    `)
     expect(stringResult).toEqual(string)
   })
 })
@@ -506,18 +506,18 @@ test(blockquote, () => {
   const { astResult, stringResult } = parseThenStringify(string, field)
   expect(stringResult).toEqual(string)
   expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "blockquote",
-    "children": [
+    [
       {
-        "type": "text",
-        "text": "Hello, World!"
+        "type": "blockquote",
+        "children": [
+          {
+            "type": "text",
+            "text": "Hello, World!"
+          }
+        ]
       }
     ]
-  }
-]
-`)
+  `)
 })
 describe('Marks', () => {
   const mark1 = 'Some *bold* text'
@@ -527,27 +527,27 @@ describe('Marks', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Some "
-      },
-      {
-        "type": "text",
-        "text": "bold",
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": " text"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Some "
+            },
+            {
+              "type": "text",
+              "text": "bold",
+              "italic": true
+            },
+            {
+              "type": "text",
+              "text": " text"
+            }
+          ]
+        }
+      ]
+    `)
   })
   const mark2 = 'Some **emphasized** text'
   test(mark2, () => {
@@ -556,27 +556,27 @@ describe('Marks', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Some "
-      },
-      {
-        "type": "text",
-        "text": "emphasized",
-        "bold": true
-      },
-      {
-        "type": "text",
-        "text": " text"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Some "
+            },
+            {
+              "type": "text",
+              "text": "emphasized",
+              "bold": true
+            },
+            {
+              "type": "text",
+              "text": " text"
+            }
+          ]
+        }
+      ]
+    `)
   })
   const mark3 = 'Some ***bold and emphasized*** text'
   test(mark3, () => {
@@ -585,28 +585,28 @@ describe('Marks', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Some "
-      },
-      {
-        "type": "text",
-        "text": "bold and emphasized",
-        "italic": true,
-        "bold": true
-      },
-      {
-        "type": "text",
-        "text": " text"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Some "
+            },
+            {
+              "type": "text",
+              "text": "bold and emphasized",
+              "italic": true,
+              "bold": true
+            },
+            {
+              "type": "text",
+              "text": " text"
+            }
+          ]
+        }
+      ]
+    `)
   })
   const mark4 = 'Some `inline code` text'
   test(mark4, () => {
@@ -615,27 +615,27 @@ describe('Marks', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Some "
-      },
-      {
-        "type": "text",
-        "text": "inline code",
-        "code": true
-      },
-      {
-        "type": "text",
-        "text": " text"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Some "
+            },
+            {
+              "type": "text",
+              "text": "inline code",
+              "code": true
+            },
+            {
+              "type": "text",
+              "text": " text"
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -646,39 +646,39 @@ describe('Nested marks', () => {
 
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "bold": true
-      },
-      {
-        "type": "text",
-        "text": "world",
-        "bold": true,
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": ", again",
-        "bold": true
-      },
-      {
-        "type": "text",
-        "text": " "
-      },
-      {
-        "type": "text",
-        "text": "here",
-        "italic": true
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Hello ",
+              "bold": true
+            },
+            {
+              "type": "text",
+              "text": "world",
+              "bold": true,
+              "italic": true
+            },
+            {
+              "type": "text",
+              "text": ", again",
+              "bold": true
+            },
+            {
+              "type": "text",
+              "text": " "
+            },
+            {
+              "type": "text",
+              "text": "here",
+              "italic": true
+            }
+          ]
+        }
+      ]
+    `)
     expect(stringResult).toEqual(string)
   })
 
@@ -688,30 +688,30 @@ describe('Nested marks', () => {
 
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": "world",
-        "italic": true,
-        "bold": true
-      },
-      {
-        "type": "text",
-        "text": ", again",
-        "italic": true
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Hello ",
+              "italic": true
+            },
+            {
+              "type": "text",
+              "text": "world",
+              "italic": true,
+              "bold": true
+            },
+            {
+              "type": "text",
+              "text": ", again",
+              "italic": true
+            }
+          ]
+        }
+      ]
+    `)
     expect(stringResult).toEqual(string)
   })
 
@@ -723,31 +723,31 @@ describe('Nested marks', () => {
 
       const { astResult, stringResult } = parseThenStringify(string, field)
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "bold": true
-      },
-      {
-        "type": "a",
-        "url": "https://example.com",
-        "title": "Example Site",
-        "children": [
+        [
           {
-            "type": "text",
-            "text": "world",
-            "bold": true
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "Hello ",
+                "bold": true
+              },
+              {
+                "type": "a",
+                "url": "https://example.com",
+                "title": "Example Site",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "world",
+                    "bold": true
+                  }
+                ]
+              }
+            ]
           }
         ]
-      }
-    ]
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(string)
     })
     const linkInNestedMark3 =
@@ -757,46 +757,46 @@ describe('Nested marks', () => {
 
       const { astResult, stringResult } = parseThenStringify(string, field)
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "bold": true
-      },
-      {
-        "type": "a",
-        "url": "https://example.com",
-        "title": "Example Site",
-        "children": [
+        [
           {
-            "type": "text",
-            "text": "world",
-            "bold": true
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "Hello ",
+                "bold": true
+              },
+              {
+                "type": "a",
+                "url": "https://example.com",
+                "title": "Example Site",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "world",
+                    "bold": true
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " And some other text, which has a "
+              },
+              {
+                "type": "a",
+                "url": "https://something.com",
+                "title": null,
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "link to something"
+                  }
+                ]
+              }
+            ]
           }
         ]
-      },
-      {
-        "type": "text",
-        "text": " And some other text, which has a "
-      },
-      {
-        "type": "a",
-        "url": "https://something.com",
-        "title": null,
-        "children": [
-          {
-            "type": "text",
-            "text": "link to something"
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(string)
     })
 
@@ -809,37 +809,37 @@ describe('Nested marks', () => {
 
       const { astResult, stringResult } = parseThenStringify(string, field)
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "bold": true
-      },
-      {
-        "type": "a",
-        "url": "https://example.com",
-        "title": "Example Site",
-        "children": [
+        [
           {
-            "type": "text",
-            "text": "world",
-            "bold": true,
-            "italic": true
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "Hello ",
+                "bold": true
+              },
+              {
+                "type": "a",
+                "url": "https://example.com",
+                "title": "Example Site",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "world",
+                    "bold": true,
+                    "italic": true
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " ok",
+                "bold": true
+              }
+            ]
           }
         ]
-      },
-      {
-        "type": "text",
-        "text": " ok",
-        "bold": true
-      }
-    ]
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(linkInNestedMark2Cleaned)
     })
   })
@@ -852,30 +852,30 @@ describe('Nested marks', () => {
       const { astResult, stringResult } = parseThenStringify(string, field)
       expect(stringResult).toEqual(string)
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Hello ",
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": "some code",
-        "code": true,
-        "italic": true
-      },
-      {
-        "type": "text",
-        "text": ", again",
-        "italic": true
-      }
-    ]
-  }
-]
-`)
+        [
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "text",
+                "text": "Hello ",
+                "italic": true
+              },
+              {
+                "type": "text",
+                "text": "some code",
+                "code": true,
+                "italic": true
+              },
+              {
+                "type": "text",
+                "text": ", again",
+                "italic": true
+              }
+            ]
+          }
+        ]
+      `)
     })
   })
 })
@@ -886,26 +886,26 @@ describe('Images', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "img",
-        "url": "https://some-image.jpg",
-        "alt": "alt description",
-        "caption": "Some Title",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "img",
+              "url": "https://some-image.jpg",
+              "alt": "alt description",
+              "caption": "Some Title",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
   const image2 = `![](https://some-image.jpg "Some title")`
   test(image2, () => {
@@ -913,26 +913,26 @@ describe('Images', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "img",
-        "url": "https://some-image.jpg",
-        "alt": "",
-        "caption": "Some title",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "img",
+              "url": "https://some-image.jpg",
+              "alt": "",
+              "caption": "Some title",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
   const image3 = `![](https://some-image.jpg)`
   test(image3, () => {
@@ -940,26 +940,26 @@ describe('Images', () => {
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "img",
-        "url": "https://some-image.jpg",
-        "alt": "",
-        "caption": null,
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "img",
+              "url": "https://some-image.jpg",
+              "alt": "",
+              "caption": null,
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -972,24 +972,20 @@ const test = 123
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "code_block",
-    "lang": null,
-    "children": [
-      {
-        "type": "code_line",
-        "children": [
-          {
-            "type": "text",
-            "text": "const test = 123"
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "code_block",
+          "lang": null,
+          "value": "const test = 123",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    `)
   })
   test('block of code with language prop', () => {
     const string = `\`\`\`javascript
@@ -999,24 +995,20 @@ const test = 123
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "code_block",
-    "lang": "javascript",
-    "children": [
-      {
-        "type": "code_line",
-        "children": [
-          {
-            "type": "text",
-            "text": "const test = 123"
-          }
-        ]
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "code_block",
+          "lang": "javascript",
+          "value": "const test = 123",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -1030,31 +1022,31 @@ Charlottetown, PEI
     const { astResult, stringResult } = parseThenStringify(string, field)
     expect(stringResult).toEqual(string)
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "123 Abc Street"
-      },
-      {
-        "type": "break",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ]
-      },
-      {
-        "type": "text",
-        "text": "Charlottetown, PEI"
-      }
-    ]
-  }
-]
-`)
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "123 Abc Street"
+            },
+            {
+              "type": "break",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "Charlottetown, PEI"
+            }
+          ]
+        }
+      ]
+    `)
   })
 })
 
@@ -1094,22 +1086,22 @@ describe('MDX Elements', () => {
         ],
       })
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "mdxJsxFlowElement",
-    "name": "Cta",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ],
-    "props": {
-      "title": "Hello World!"
-    }
-  }
-]
-`)
+        [
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "Cta",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "props": {
+              "title": "Hello World!"
+            }
+          }
+        ]
+      `)
       expect(stringResult).toEqual(string)
     })
   })
@@ -1129,25 +1121,25 @@ describe('MDX Elements', () => {
         ],
       })
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "mdxJsxFlowElement",
-    "name": "Tags",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ],
-    "props": {
-      "items": [
-        "cooking",
-        "music"
-      ]
-    }
-  }
-]
-`)
+        [
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "Tags",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "props": {
+              "items": [
+                "cooking",
+                "music"
+              ]
+            }
+          }
+        ]
+      `)
       expect(stringResult).toEqual(string)
     })
   })
@@ -1220,35 +1212,35 @@ describe('MDX Elements', () => {
       ],
     })
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Today's date is "
-      },
-      {
-        "type": "mdxJsxTextElement",
-        "name": "Date",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ],
-        "props": {
-          "format": "iso"
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Today's date is "
+            },
+            {
+              "type": "mdxJsxTextElement",
+              "name": "Date",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "format": "iso"
+              }
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
         }
-      },
-      {
-        "type": "text",
-        "text": "."
-      }
-    ]
-  }
-]
-`)
+      ]
+    `)
     expect(stringResult).toEqual(string)
   })
   const mdxTest5 = `Today's date is <Date format="iso" />.`
@@ -1267,35 +1259,35 @@ describe('MDX Elements', () => {
       ],
     })
     expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "text",
-        "text": "Today's date is "
-      },
-      {
-        "type": "mdxJsxTextElement",
-        "name": "Date",
-        "children": [
-          {
-            "type": "text",
-            "text": ""
-          }
-        ],
-        "props": {
-          "format": "iso"
+      [
+        {
+          "type": "p",
+          "children": [
+            {
+              "type": "text",
+              "text": "Today's date is "
+            },
+            {
+              "type": "mdxJsxTextElement",
+              "name": "Date",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "format": "iso"
+              }
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ]
         }
-      },
-      {
-        "type": "text",
-        "text": "."
-      }
-    ]
-  }
-]
-`)
+      ]
+    `)
     expect(stringResult).toEqual(string)
   })
 
@@ -1327,36 +1319,36 @@ describe('MDX Elements', () => {
         ],
       })
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "mdxJsxFlowElement",
-    "name": "Blockquote",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ],
-    "props": {
-      "author": "content/authors/pedro.md",
-      "children": {
-        "type": "root",
-        "children": [
+        [
           {
-            "type": "h1",
+            "type": "mdxJsxFlowElement",
+            "name": "Blockquote",
             "children": [
               {
                 "type": "text",
-                "text": "Lorem ipsum dolor."
+                "text": ""
               }
-            ]
+            ],
+            "props": {
+              "author": "content/authors/pedro.md",
+              "children": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "h1",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Lorem ipsum dolor."
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
           }
         ]
-      }
-    }
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(string)
     })
 
@@ -1389,36 +1381,36 @@ describe('MDX Elements', () => {
         ],
       })
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "mdxJsxFlowElement",
-    "name": "Blockquote",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ],
-    "props": {
-      "author": "content/authors/pedro.md",
-      "quote": {
-        "type": "root",
-        "children": [
+        [
           {
-            "type": "h1",
+            "type": "mdxJsxFlowElement",
+            "name": "Blockquote",
             "children": [
               {
                 "type": "text",
-                "text": "Lorem ipsum dolor."
+                "text": ""
               }
-            ]
+            ],
+            "props": {
+              "author": "content/authors/pedro.md",
+              "quote": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "h1",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Lorem ipsum dolor."
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
           }
         ]
-      }
-    }
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(string)
     })
 
@@ -1452,39 +1444,39 @@ describe('MDX Elements', () => {
         stringifyImageCallback
       )
       expect(astResult).toMatchInlineSnapshot(`
-[
-  {
-    "type": "p",
-    "children": [
-      {
-        "type": "img",
-        "url": "some-prefix/uploads/image.jpg",
-        "alt": "",
-        "caption": null,
-        "children": [
+        [
           {
-            "type": "text",
-            "text": ""
+            "type": "p",
+            "children": [
+              {
+                "type": "img",
+                "url": "some-prefix/uploads/image.jpg",
+                "alt": "",
+                "caption": null,
+                "children": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "CustomImage",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "props": {
+              "url": "some-prefix/uploads/my-pic.jpg"
+            }
           }
         ]
-      }
-    ]
-  },
-  {
-    "type": "mdxJsxFlowElement",
-    "name": "CustomImage",
-    "children": [
-      {
-        "type": "text",
-        "text": ""
-      }
-    ],
-    "props": {
-      "url": "some-prefix/uploads/my-pic.jpg"
-    }
-  }
-]
-`)
+      `)
       expect(stringResult).toEqual(
         `
 ![](/uploads/image.jpg)
