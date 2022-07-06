@@ -239,39 +239,6 @@ export type StringFilter = {
   in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
 };
 
-export type PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter = {
-  title?: InputMaybe<StringFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter = {
-  nestedBlockc?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock1Filter = {
-  items?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter = {
-  title?: InputMaybe<StringFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter = {
-  nestedBlockc?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2Filter = {
-  items?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter>;
-};
-
-export type PostsPageBlocks3NestedBlocksFilter = {
-  nestedBlock1?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1Filter>;
-  nestedBlock2?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2Filter>;
-};
-
-export type PostsPageBlocks3Filter = {
-  nestedBlocks?: InputMaybe<PostsPageBlocks3NestedBlocksFilter>;
-};
-
 export type ImageFilter = {
   startsWith?: InputMaybe<Scalars['String']>;
   eq?: InputMaybe<Scalars['String']>;
@@ -717,39 +684,6 @@ export type DocumentMutation = {
   global?: InputMaybe<GlobalMutation>;
   authors?: InputMaybe<AuthorsMutation>;
   pages?: InputMaybe<PagesMutation>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation = {
-  title?: InputMaybe<Scalars['String']>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation = {
-  nestedBlockc?: InputMaybe<Array<InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation>>>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock1Mutation = {
-  items?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation = {
-  title?: InputMaybe<Scalars['String']>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation = {
-  nestedBlockc?: InputMaybe<Array<InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation>>>;
-};
-
-export type PostsPageBlocks3NestedBlocksNestedBlock2Mutation = {
-  items?: InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation>;
-};
-
-export type PostsPageBlocks3NestedBlocksMutation = {
-  nestedBlock1?: InputMaybe<Array<InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock1Mutation>>>;
-  nestedBlock2?: InputMaybe<Array<InputMaybe<PostsPageBlocks3NestedBlocksNestedBlock2Mutation>>>;
-};
-
-export type PostsPageBlocks3Mutation = {
-  nestedBlocks?: InputMaybe<PostsPageBlocks3NestedBlocksMutation>;
 };
 
 export type PostsMutation = {

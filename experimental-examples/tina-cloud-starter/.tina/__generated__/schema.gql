@@ -119,39 +119,6 @@ input StringFilter {
   in: [String]
 }
 
-input PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter {
-  title: StringFilter
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter {
-  nestedBlockc: PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock1Filter {
-  items: PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter {
-  title: StringFilter
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter {
-  nestedBlockc: PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2Filter {
-  items: PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter
-}
-
-input PostsPageBlocks3NestedBlocksFilter {
-  nestedBlock1: PostsPageBlocks3NestedBlocksNestedBlock1Filter
-  nestedBlock2: PostsPageBlocks3NestedBlocksNestedBlock2Filter
-}
-
-input PostsPageBlocks3Filter {
-  nestedBlocks: PostsPageBlocks3NestedBlocksFilter
-}
-
 input ImageFilter {
   startsWith: String
   eq: String
@@ -496,39 +463,6 @@ input DocumentMutation {
   global: GlobalMutation
   authors: AuthorsMutation
   pages: PagesMutation
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation {
-  title: String
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation {
-  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation]
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock1Mutation {
-  items: PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation {
-  title: String
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation {
-  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation]
-}
-
-input PostsPageBlocks3NestedBlocksNestedBlock2Mutation {
-  items: PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation
-}
-
-input PostsPageBlocks3NestedBlocksMutation {
-  nestedBlock1: [PostsPageBlocks3NestedBlocksNestedBlock1Mutation]
-  nestedBlock2: [PostsPageBlocks3NestedBlocksNestedBlock2Mutation]
-}
-
-input PostsPageBlocks3Mutation {
-  nestedBlocks: PostsPageBlocks3NestedBlocksMutation
 }
 
 input PostsMutation {

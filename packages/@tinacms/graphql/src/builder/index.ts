@@ -70,7 +70,6 @@ export class Builder {
     this._MAXDEPTH =
       // @ts-ignore
       config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 5
-    console.log('max depth is', this._MAXDEPTH)
     this.tinaSchema = config.tinaSchema
     this.database = config.database
   }
