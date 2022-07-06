@@ -739,6 +739,7 @@ importers:
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@tailwindcss/line-clamp': ^0.3.1
       '@tailwindcss/typography': ^0.5.0
+      '@types/fs-extra': ^9.0.13
       '@types/inquirer': ^6.5.0
       chalk: ^4.1.1
       chokidar: ^3.5.2
@@ -768,6 +769,7 @@ importers:
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.4
       '@tailwindcss/line-clamp': 0.3.1_tailwindcss@3.1.4
       '@tailwindcss/typography': 0.5.2_tailwindcss@3.1.4
+      '@types/fs-extra': 9.0.13
       '@types/inquirer': 6.5.0
       chalk: 4.1.2
       chokidar: 3.5.3
@@ -1051,6 +1053,7 @@ importers:
       '@graphql-tools/utils': ^8.6.1
       '@headlessui/react': ^1.5.0
       '@heroicons/react': ^1.0.4
+      '@monaco-editor/react': ^4.4.5
       '@react-hook/window-size': ^3.0.7
       '@testing-library/jest-dom': ^5.11.9
       '@testing-library/react': ^12.0.0
@@ -1090,6 +1093,7 @@ importers:
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
+      '@monaco-editor/react': 4.4.5_sfoxds7t5ydpegc3knd667wn6m
       '@react-hook/window-size': 3.0.7_react@17.0.2
       '@tinacms/schema-tools': link:../@tinacms/schema-tools
       '@tinacms/sharedctx': link:../@tinacms/sharedctx
@@ -7041,7 +7045,6 @@ packages:
       }
     dependencies:
       '@types/node': 18.0.0
-    dev: true
 
   /@types/graceful-fs/4.1.5:
     resolution:

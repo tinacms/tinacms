@@ -15,7 +15,8 @@
   "scripts": {
     "build:all": "bin/tina-build build:all",
     "watch": "bin/tina-build watch",
-    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs"
+    "build": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs",
+    "watch:self": "yarn tsup src/jest-runner.ts src/css-transform.ts src/index.ts --format cjs --watch"
   },
   "dependencies": {
     "@babel/core": "^7.15.0",
@@ -24,6 +25,7 @@
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.0",
+    "@types/fs-extra": "^9.0.13",
     "@types/inquirer": "^6.5.0",
     "chalk": "^4.1.1",
     "chokidar": "^3.5.2",

@@ -17,19 +17,8 @@ limitations under the License.
 */
 
 import React from 'react'
-import { setNodes } from '@udecode/plate-core'
-import { Dropdown } from './dropdown'
-import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
 
-const languages = {
-  typescript: 'TypeScript',
-  javascript: 'JavaScript',
-  css: 'CSS',
-  json: 'JSON',
-  html: 'HTML',
-  markdown: 'Markdown',
-}
 const nightOwl = {
   base: 'vs-dark',
   inherit: true,
@@ -713,8 +702,9 @@ const nightOwl = {
   },
 }
 
-export const CodeBlock = ({ attributes, editor, element, ...props }) => {
+export const Monaco = (props) => {
   const monaco = useMonaco()
+  console.log('meh', props)
 
   React.useEffect(() => {
     if (monaco) {
@@ -726,57 +716,33 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
       monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         // disable errors
-        // noSemanticValidation: true,
-        // noSyntaxValidation: true,
+        noSemanticValidation: true,
+        noSyntaxValidation: true,
       })
     }
   }, [monaco])
 
-  const items = Object.entries(languages).map(([key, item]) => {
-    return {
-      key,
-      onClick: () => {
-        setNodes(editor, { lang: key })
-      },
-      render: item,
-    }
-  })
-  const language = element.lang
-
-  const editorRef = React.useRef(null)
-
-  function handleEditorDidMount(editor, monaco) {
-    editorRef.current = editor
-    if (editorRef.current) {
-      // editorRef.current.focus()
-      // console.log(editorRef)
-    }
-  }
-
-  const value = element.value || ''
+  const value = props.children || ''
+  const language = props.lang
   const height = value.split('\n').length * 28
-  const id = React.useMemo(() => uuid(), [])
+  // FIXME
+  const id = React.useMemo(() => String(Date.now()), [])
 
   return (
     <div
-      {...attributes}
-      className="relative mb-2 mt-0.5 rounded-lg shadow-lg p-2"
+      className="relative mb-2 mt-2 rounded-lg shadow-lg py-8 px-3 text-white overflow-hidden"
       // FIXME: z-index should be some sane number, but does seem
       // to need to override most other elements
       style={{ backgroundColor: '#1e1e1e', zIndex: 1000 }}
       contentEditable={false}
     >
-      <div className="flex justify-between pb-2">
-        <div />
-        <Dropdown label={languages[element.lang] || 'Language'} items={items} />
-      </div>
       <Editor
         height={`${height}px`}
         path={id}
-        onMount={handleEditorDidMount}
         theme="vs-dark"
         options={{
           scrollBeyondLastLine: false,
+          readOnly: true,
           tabSize: 2,
           disableLayerHinting: true,
           accessibilitySupport: 'off',
@@ -802,12 +768,8 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
           },
         }}
         language={language}
-        value={element.value}
-        onChange={(value) => {
-          setNodes(editor, { value, lang: language })
-        }}
+        value={value}
       />
-      <span {...props} />
     </div>
   )
 }

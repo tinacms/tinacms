@@ -17,6 +17,8 @@ import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
+import { Prism } from "tinacms/dist/rich-text/prism";
+import { Monaco } from "tinacms/dist/rich-text/monaco";
 import type { TinaMarkdownContent, Components } from "tinacms/dist/rich-text";
 
 const components: Components<{
@@ -50,6 +52,8 @@ const components: Components<{
       </div>
     );
   },
+  code_block: (props) => <Monaco {...props} />,
+  // code_block: (props) => <Prism {...props} />,
   RelatedPost: (props) => {
     return <div>{props.post}</div>;
   },

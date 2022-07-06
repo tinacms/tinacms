@@ -20,9 +20,19 @@
       "require": "./dist/edit-state.js"
     },
     "./dist/rich-text": {
-      "types": "./dist/rich-text.d.ts",
-      "import": "./dist/rich-text.es.js",
-      "require": "./dist/rich-text.js"
+      "types": "./dist/rich-text/index.d.ts",
+      "import": "./dist/rich-text/index.es.js",
+      "require": "./dist/rich-text/index.js"
+    },
+    "./dist/rich-text/prism": {
+      "types": "./dist/rich-text/prism.d.ts",
+      "import": "./dist/rich-text/prism.es.js",
+      "require": "./dist/rich-text/prism.js"
+    },
+    "./dist/rich-text/monaco": {
+      "types": "./dist/rich-text/monaco.d.ts",
+      "import": "./dist/rich-text/monaco.es.js",
+      "require": "./dist/rich-text/monaco.js"
     }
   },
   "files": [
@@ -32,7 +42,9 @@
     "entryPoints": [
       "src/index.ts",
       "src/edit-state.tsx",
-      "src/rich-text.tsx",
+      "src/rich-text/index.tsx",
+      "src/rich-text/prism.tsx",
+      "src/rich-text/monaco.tsx",
       "src/client.ts"
     ]
   },
@@ -48,6 +60,7 @@
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@headlessui/react": "^1.5.0",
     "@heroicons/react": "^1.0.4",
+    "@monaco-editor/react": "^4.4.5",
     "@react-hook/window-size": "^3.0.7",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/sharedctx": "workspace:*",

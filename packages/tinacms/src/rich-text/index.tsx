@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import React from 'react'
-import Highlight, { defaultProps } from 'prism-react-renderer'
 
 type BaseComponents = {
   h1?: { children: JSX.Element }
@@ -173,32 +172,6 @@ export const TinaMarkdown = ({
                 </Component>
               )
             }
-            return (
-              <Highlight
-                key={key}
-                {...defaultProps}
-                code={value}
-                language={child.lang}
-              >
-                {({
-                  className,
-                  style,
-                  tokens,
-                  getLineProps,
-                  getTokenProps,
-                }) => (
-                  <pre className={className} style={style}>
-                    {tokens.map((line, i) => (
-                      <div {...getLineProps({ line, key: i })}>
-                        {line.map((token, key) => (
-                          <span {...getTokenProps({ token, key })} />
-                        ))}
-                      </div>
-                    ))}
-                  </pre>
-                )}
-              </Highlight>
-            )
             return (
               <pre key={key}>
                 <code>{value}</code>
