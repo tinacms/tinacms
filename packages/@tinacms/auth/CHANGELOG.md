@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 0.50.3
+
+### Patch Changes
+
+- 67e291e56: Add support for ES modules
+
 ## 0.50.2
 
 ### Patch Changes

@@ -22,6 +22,11 @@ jobs:
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.4.0
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
@@ -42,17 +47,17 @@ jobs:
         if: matrix.channel == 'dev'
         run: |
           pnpm version:snapshot
-          pnpm publish:beta
+          pnpm run publish:beta
       - name: Publish
         if: matrix.channel == 'latest'
         run: |
-          pnpm publish
+          pnpm run publish
       - name: Push tags
         if: matrix.channel == 'latest'
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-          yarn push-tags
+          pnpm push-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
@@ -60,6 +65,6 @@ jobs:
         uses: changesets/action@v1
         if: matrix.channel == 'latest'
         with:
-          version: pnpm version
+          version: pnpm run version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
