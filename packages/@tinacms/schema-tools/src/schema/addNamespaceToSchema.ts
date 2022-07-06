@@ -10,7 +10,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 export function addNamespaceToSchema<T extends object | string>(
   maybeNode: T,
   namespace: string[] = []
@@ -25,7 +24,9 @@ export function addNamespaceToSchema<T extends object | string>(
   // @ts-ignore
   const newNode: {
     [key in keyof T]: (T & { namespace?: string[] }) | string
-  } = maybeNode
+    // @ts-ignore
+  } = { ...maybeNode }
+
   // Traverse node's properties first
   const keys = Object.keys(maybeNode)
   Object.values(maybeNode).map((m, index) => {

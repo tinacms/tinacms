@@ -1,5 +1,13 @@
 # @tinacms/schema-tools
 
+## 0.0.7
+
+### Patch Changes
+
+- 7d87eb6b7: Add `loadCustomStore` to top schema config
+- 67e291e56: Add support for ES modules
+- ae23e9ad6: Remove unused deps from monorepo
+
 ## 0.0.6
 
 ### Patch Changes

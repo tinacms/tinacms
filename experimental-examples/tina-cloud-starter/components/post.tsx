@@ -124,7 +124,6 @@ export const Post = (data) => {
   if (!isNaN(date.getTime())) {
     formattedDate = format(date, "MMM dd, yyyy");
   }
-
   return (
     <Section className="flex-1">
       <Container className={`flex-1 max-w-4xl pb-2`} size="large">

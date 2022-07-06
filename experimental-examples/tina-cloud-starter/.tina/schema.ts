@@ -1,10 +1,68 @@
 import { defineSchema, defineConfig } from "tinacms";
+import type { TinaTemplate } from "tinacms";
 import { client } from "./client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
+
+const tem = {
+  name: "test",
+  label: "test",
+  fields: [{ type: "string", name: "yo" }],
+};
+// const CreateInnerTemplate = () => {
+const InnerTemplate: TinaTemplate = {
+  label: "List Items",
+  name: "items",
+  ui: {
+    defaultItem: {
+      title: "Here's Another Feature",
+    },
+  },
+  fields: [
+    {
+      label: "Page Blocks",
+      name: "nestedBlockc",
+      type: "object",
+      list: true,
+      ui: {
+        visualSelector: true,
+      },
+      fields: [
+        {
+          label: "title",
+          name: "title",
+          type: "string",
+        },
+      ],
+    },
+  ],
+};
+// return InnerTemplate;
+// };
+
+const BlocksTemplate: TinaTemplate = {
+  label: "Page Blocks",
+  name: "nestedBlocks",
+  fields: [
+    {
+      label: "Page Blocks",
+      name: "nestedBlock1",
+      type: "object",
+      list: true,
+      templates: [InnerTemplate],
+    },
+    {
+      label: "Page Blocks2",
+      name: "nestedBlock2",
+      type: "object",
+      list: true,
+      templates: [InnerTemplate],
+    },
+  ],
+};
 
 const schema = defineSchema({
   config: {
