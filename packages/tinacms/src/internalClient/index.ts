@@ -77,7 +77,7 @@ export class Client {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
         meta: { flags: [] },
-        ...addNamespaceToSchema(options.schema, []),
+        ...addNamespaceToSchema({ ...options.schema }, []),
       })
       this.schema = enrichedSchema
     }

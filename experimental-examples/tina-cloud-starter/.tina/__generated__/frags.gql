@@ -1,4 +1,27 @@
 fragment PostsParts on Posts {
+  pageBlocks3 {
+    __typename
+    ... on PostsPageBlocks3NestedBlocks {
+      nestedBlock1 {
+        __typename
+        ... on PostsPageBlocks3NestedBlocksNestedBlock1Items {
+          nestedBlockc {
+            __typename
+            title
+          }
+        }
+      }
+      nestedBlock2 {
+        __typename
+        ... on PostsPageBlocks3NestedBlocksNestedBlock2Items {
+          nestedBlockc {
+            __typename
+            title
+          }
+        }
+      }
+    }
+  }
   title
   heroImg
   excerpt
