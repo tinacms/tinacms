@@ -17,10 +17,9 @@ limitations under the License.
 */
 
 import React from 'react'
-import { CODE_BLOCK_LANGUAGES } from '@udecode/plate-code-block'
-import { insertNodes, setNodes } from '@udecode/plate-core'
-import { ReactEditor } from 'slate-react'
+import { setNodes } from '@udecode/plate-core'
 import { Dropdown } from './dropdown'
+import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
 
 const languages = {
@@ -33,9 +32,25 @@ const languages = {
 }
 
 export const CodeBlock = ({ attributes, editor, element, ...props }) => {
+  const monaco = useMonaco()
+
+  React.useEffect(() => {
+    if (monaco) {
+      // monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      //   jsx: monaco.languages.typescript.JsxEmit.React,
+      // });
+      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
+      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+        // disable errors
+        // noSemanticValidation: true,
+        // noSyntaxValidation: true,
+      })
+    }
+  }, [monaco])
+
   const items = Object.entries(languages).map(([key, item]) => {
     return {
-      item,
+      key,
       onClick: () => {
         console.log('setnodes', item)
         setNodes(editor, { lang: key })
@@ -57,7 +72,7 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
 
   const value = element.value || ''
   const height = value.split('\n').length * 28
-  console.log(height)
+  const id = React.useMemo(() => uuid(), [])
 
   return (
     <div
@@ -68,23 +83,18 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
       style={{ backgroundColor: '#1e1e1e', zIndex: 1000 }}
       contentEditable={false}
     >
-      {/* Testing scroll behavior */}
-      {/* <div className="absolute inset-0 z-30" style={{userSelect: 'none'}} /> */}
       <div className="flex justify-between pb-2">
-        <div
-        // style={{ userSelect: 'none'}}
-        />
+        <div />
         <Dropdown label={languages[element.lang] || 'Language'} items={items} />
       </div>
       <Editor
         height={`${height}px`}
-        path={`${element.id}.tsx`}
+        path={id}
         onMount={handleEditorDidMount}
         theme="vs-dark"
         options={{
-          // readOnly: true,
-          // automaticLayout: true,
           scrollBeyondLastLine: false,
+          tabSize: 2,
           disableLayerHinting: true,
           accessibilitySupport: 'off',
           codeLens: false,
@@ -108,7 +118,6 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
             alwaysConsumeMouseWheel: false,
           },
         }}
-        //  defaultLanguage={"javascript"}
         language={language}
         value={element.value}
         onChange={(value) => {
@@ -116,27 +125,6 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
         }}
       />
       <span {...props} />
-    </div>
-  )
-
-  return (
-    <div className="relative mb-2 mt-0.5">
-      <div
-        style={{ userSelect: 'none' }}
-        contentEditable={false}
-        className="absolute top-1 right-1"
-      >
-        <div className="flex w-full">
-          <div />
-          <Dropdown
-            label={CODE_BLOCK_LANGUAGES[element.lang] || 'Language'}
-            items={items}
-          />
-        </div>
-      </div>
-      <pre {...attributes} className="pt-10 m-0">
-        <code {...props} />
-      </pre>
     </div>
   )
 }

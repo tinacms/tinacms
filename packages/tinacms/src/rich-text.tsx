@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
+import Highlight, { defaultProps } from 'prism-react-renderer'
 
 type BaseComponents = {
   h1?: { children: JSX.Element }
@@ -161,14 +162,7 @@ export const TinaMarkdown = ({
               </a>
             )
           case 'code_block':
-            const value = child.children
-              .map((item) => {
-                // I don't think it's possible to have more than one
-                // child item here
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                return item.children ? item.children[0]?.text || '' : ''
-              })
-              .join('\n')
+            const value = child.value
             if (components[child.type]) {
               const Component = components[child.type]
               return (
@@ -179,6 +173,32 @@ export const TinaMarkdown = ({
                 </Component>
               )
             }
+            return (
+              <Highlight
+                key={key}
+                {...defaultProps}
+                code={value}
+                language={child.lang}
+              >
+                {({
+                  className,
+                  style,
+                  tokens,
+                  getLineProps,
+                  getTokenProps,
+                }) => (
+                  <pre className={className} style={style}>
+                    {tokens.map((line, i) => (
+                      <div {...getLineProps({ line, key: i })}>
+                        {line.map((token, key) => (
+                          <span {...getTokenProps({ token, key })} />
+                        ))}
+                      </div>
+                    ))}
+                  </pre>
+                )}
+              </Highlight>
+            )
             return (
               <pre key={key}>
                 <code>{value}</code>
