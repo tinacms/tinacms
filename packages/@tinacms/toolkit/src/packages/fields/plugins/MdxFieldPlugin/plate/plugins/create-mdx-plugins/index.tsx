@@ -12,7 +12,12 @@ limitations under the License.
 */
 
 import React from 'react'
-import { createPluginFactory, setNodes, PlateEditor } from '@udecode/plate-core'
+import {
+  createPluginFactory,
+  setNodes,
+  normalizeEditor,
+  PlateEditor,
+} from '@udecode/plate-headless'
 import { ReactEditor } from 'slate-react'
 import { BlockEmbed, InlineEmbed } from './component'
 import { Editor } from 'slate'
@@ -68,8 +73,7 @@ export const insertMDX = (editor: PlateEditor, value: MdxTemplate) => {
       props: value.defaultItem ? value.defaultItem : {},
     })
 
-    // FIXME: not sure why this was needed
-    Editor.normalize(editor, { force: true })
+    normalizeEditor(editor, { force: true })
   } else {
     insertInlineElement(editor, {
       type: ELEMENT_MDX_INLINE,

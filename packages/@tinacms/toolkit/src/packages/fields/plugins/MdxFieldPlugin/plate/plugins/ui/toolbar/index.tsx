@@ -22,24 +22,24 @@ import {
   getPreventDefaultHandler,
   toggleMark,
   toggleNodeType,
-} from '@udecode/plate-core'
-import { ELEMENT_LINK } from '@udecode/plate-link'
-import {
+  toggleList,
+  insertEmptyCodeBlock,
+  ELEMENT_LINK,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-} from '@udecode/plate-heading'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
-import { MARK_BOLD, MARK_ITALIC, MARK_CODE } from '@udecode/plate-basic-marks'
-import { toggleList, ELEMENT_UL, ELEMENT_OL } from '@udecode/plate-list'
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
-import {
-  insertEmptyCodeBlock,
+  ELEMENT_PARAGRAPH,
+  ELEMENT_UL,
+  ELEMENT_OL,
+  ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
-} from '@udecode/plate-code-block'
+  MARK_BOLD,
+  MARK_ITALIC,
+  MARK_CODE,
+} from '@udecode/plate-headless'
 import { ToolbarItem, ToolbarItemType, EmbedButton } from './toolbar-item'
 import { OverflowMenu } from './overflow-menu'
 import { helpers } from '../../core/common'

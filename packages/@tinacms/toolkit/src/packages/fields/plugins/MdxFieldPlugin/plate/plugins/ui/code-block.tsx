@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { setNodes } from '@udecode/plate-core'
+import { setNodes } from '@udecode/plate-headless'
 import { Dropdown } from './dropdown'
 import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'

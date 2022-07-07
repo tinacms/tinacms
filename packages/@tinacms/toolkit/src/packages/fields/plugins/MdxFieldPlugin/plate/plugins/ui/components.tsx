@@ -17,26 +17,26 @@ limitations under the License.
 */
 
 import React from 'react'
-import { ELEMENT_HR } from '@udecode/plate-horizontal-rule'
-import { ELEMENT_LINK } from '@udecode/plate-link'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
 import {
+  ELEMENT_HR,
+  ELEMENT_LINK,
+  ELEMENT_PARAGRAPH,
+  ELEMENT_CODE_BLOCK,
+  ELEMENT_BLOCKQUOTE,
   ELEMENT_LI,
   ELEMENT_OL,
   ELEMENT_UL,
   ELEMENT_LIC,
-} from '@udecode/plate-list'
-import {
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-} from '@udecode/plate-heading'
-import { MARK_CODE, MARK_BOLD, MARK_ITALIC } from '@udecode/plate-basic-marks'
+  MARK_CODE,
+  MARK_BOLD,
+  MARK_ITALIC,
+} from '@udecode/plate-headless'
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'

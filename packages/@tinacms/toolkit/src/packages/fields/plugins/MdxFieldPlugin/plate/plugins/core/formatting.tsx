@@ -15,16 +15,14 @@ import {
   createPluginFactory,
   isSelectionAtBlockStart,
   isBlockAboveEmpty,
-} from '@udecode/plate-core'
-import { autoformatRules } from './autoformat/autoformatRules'
-import { createAutoformatPlugin } from '@udecode/plate-autoformat'
-import { createExitBreakPlugin } from '../exit-break'
-import { createSoftBreakPlugin } from '../soft-break'
-import { createResetNodePlugin } from '@udecode/plate-reset-node'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
-import { ELEMENT_CODE_BLOCK } from '@udecode/plate-code-block'
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
-import {
+  createAutoformatPlugin,
+  createResetNodePlugin,
+  createTrailingBlockPlugin,
+  createSoftBreakPlugin,
+  createExitBreakPlugin,
+  ELEMENT_PARAGRAPH,
+  ELEMENT_CODE_BLOCK,
+  ELEMENT_BLOCKQUOTE,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -32,8 +30,8 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
   KEYS_HEADING,
-} from '@udecode/plate-heading'
-import { createTrailingBlockPlugin } from '@udecode/plate-trailing-block'
+} from '@udecode/plate-headless'
+import { autoformatRules } from './autoformat/autoformatRules'
 import { withCorrectVoidBehavior } from './with-correct-void-behavior'
 
 export const HANDLES_MDX = [

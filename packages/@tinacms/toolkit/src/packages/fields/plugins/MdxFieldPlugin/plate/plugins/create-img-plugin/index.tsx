@@ -13,7 +13,12 @@ limitations under the License.
 
 import React from 'react'
 import { ImgEmbed } from './component'
-import { createPluginFactory, setNodes } from '@udecode/plate-core'
+import {
+  createPluginFactory,
+  normalizeEditor,
+  PlateEditor,
+  setNodes,
+} from '@udecode/plate-headless'
 import { Editor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { insertBlockElement } from '../core/common'
@@ -34,7 +39,7 @@ export const createImgPlugin = createPluginFactory({
   },
 })
 
-export const insertImg = (editor: ReactEditor) => {
+export const insertImg = (editor: PlateEditor) => {
   insertBlockElement(editor, {
     type: ELEMENT_IMG,
     children: [{ text: '' }],
@@ -44,5 +49,5 @@ export const insertImg = (editor: ReactEditor) => {
   })
 
   // FIXME: not sure why this was needed
-  Editor.normalize(editor, { force: true })
+  normalizeEditor(editor, { force: true })
 }

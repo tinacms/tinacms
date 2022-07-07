@@ -12,7 +12,11 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plate, createPlugins, usePlateEditorState } from '@udecode/plate-core'
+import {
+  Plate,
+  createPlugins,
+  usePlateEditorState,
+} from '@udecode/plate-headless'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
@@ -84,16 +88,21 @@ export const RichEditor = wrapFieldsWithMeta<
               // console.log(JSON.stringify(value, null, 2))
               props.input.onChange({ type: 'root', children: value })
             }}
-          >
-            {}
-            {withToolbar ? (
-              <Toolbar templates={props.field.templates} inlineOnly={false} />
-            ) : (
-              <FloatingToolbar templates={props.field.templates} />
-            )}
-            <Reset id={id} form={props.form} initialValue={initialValue} />
-            <FloatingLink />
-          </Plate>
+            firstChildren={
+              <>
+                {withToolbar ? (
+                  <Toolbar
+                    templates={props.field.templates}
+                    inlineOnly={false}
+                  />
+                ) : (
+                  <FloatingToolbar templates={props.field.templates} />
+                )}
+                <Reset id={id} form={props.form} initialValue={initialValue} />
+                <FloatingLink />
+              </>
+            }
+          ></Plate>
         </div>
       </div>
     </EditorContext.Provider>

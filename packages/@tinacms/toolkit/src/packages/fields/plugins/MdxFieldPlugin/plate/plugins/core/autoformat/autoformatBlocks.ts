@@ -17,31 +17,22 @@ limitations under the License.
 */
 
 import {
-  insertEmptyCodeBlock,
   ELEMENT_CODE_BLOCK,
-  ELEMENT_CODE_LINE,
-} from '@udecode/plate-code-block'
-import { ELEMENT_HR } from '@udecode/plate-horizontal-rule'
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote'
-import {
+  ELEMENT_HR,
+  ELEMENT_BLOCKQUOTE,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-} from '@udecode/plate-heading'
-import { AutoformatRule } from '@udecode/plate-autoformat'
-
-import {
   ELEMENT_DEFAULT,
   insertNodes,
-  PlateEditor,
   setNodes,
-  getPluginType,
-} from '@udecode/plate-core'
+} from '@udecode/plate-headless'
+import type { AutoformatRule } from '@udecode/plate-headless'
+
 import { preFormat } from './autoformatUtils'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -85,38 +76,12 @@ export const autoformatBlocks: AutoformatRule[] = [
     type: ELEMENT_BLOCKQUOTE,
     match: '> ',
     preFormat,
-    // format: (editor) => {
-    //   /**
-    //    * Blockquotes need to wrap `p` elements to adhere to the remark spec
-    //    */
-    //   insertNodes(editor, {
-    //     type: ELEMENT_BLOCKQUOTE,
-    //     children: [
-    //       {
-    //         type: ELEMENT_PARAGRAPH,
-    //         children: [{ text: '' }],
-    //       },
-    //     ],
-    //   })
-    // },
   },
   {
     mode: 'block',
     type: ELEMENT_CODE_BLOCK,
     match: '```',
-    // triggerAtBlockStart: false,
     preFormat,
-    // format: (editor) => {
-    //   insertNodes(editor, {
-    //     type: 'code_block',
-    //     value: '',
-    //     children: [{ text: '' }],
-    //   })
-    //   // insertEmptyCodeBlock(editor as PlateEditor, {
-    //   //   defaultType: getPluginType(editor as PlateEditor, ELEMENT_CODE_LINE),
-    //   //   insertNodesOptions: { select: true },
-    //   // })
-    // },
   },
   {
     mode: 'block',
