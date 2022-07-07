@@ -37,7 +37,7 @@ export type ToolbarItemType = {
   inlineOnly?: boolean
   hidden?: boolean
   active?: boolean
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onMouseDown?: () => void
   icon?: string
   options?: {}[]
   isLastItem?: boolean
@@ -160,7 +160,7 @@ export const ToolbarItem = ({
         {isExpanded && (
           <LinkForm
             selection={selection}
-            onClose={(e) => {
+            onClose={() => {
               setIsExpanded(false)
             }}
             onChange={(v) => console.log(v)}

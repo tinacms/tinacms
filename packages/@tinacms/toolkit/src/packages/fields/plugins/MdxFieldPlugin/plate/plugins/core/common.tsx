@@ -14,6 +14,7 @@ limitations under the License.
 import {
   someNode,
   getPluginType,
+  isMarkActive as isMarkActiveBase,
   insertNodes,
   setNodes,
   findNode,
@@ -64,8 +65,7 @@ const isNodeActive = (editor, type) => {
   )
 }
 const isMarkActive = (editor, type) => {
-  return false
-  // return !!editor?.selection && isMarkActiveBase(editor, type)
+  return !!editor?.selection && isMarkActiveBase(editor, type)
 }
 const isListActive = (editor, type) => {
   const res = !!editor?.selection && getListItemEntry(editor)

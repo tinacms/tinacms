@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { setNodes } from '@udecode/plate-headless'
+import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-headless'
 import { Dropdown } from './dropdown'
 import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
@@ -34,7 +34,7 @@ const languages = {
   markdown: 'Markdown',
 }
 const nightOwl = {
-  base: 'vs-dark',
+  base: 'vs-dark' as const,
   inherit: true,
   rules: [
     {
@@ -758,11 +758,11 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
       const editorEl = ReactEditor.toDOMNode(editor, element)
       editorEl.focus()
       setTimeout(() => {
-        Transforms.insertNodes(
+        insertNodes(
           editor,
           [
             {
-              type: 'p',
+              type: ELEMENT_DEFAULT,
               children: [{ text: '' }],
               lang: undefined,
               value: undefined,

@@ -20,7 +20,6 @@ import {
 } from '@udecode/plate-headless'
 import { ReactEditor } from 'slate-react'
 import { BlockEmbed, InlineEmbed } from './component'
-import { Editor } from 'slate'
 import {
   insertBlockElement,
   insertInlineElement,

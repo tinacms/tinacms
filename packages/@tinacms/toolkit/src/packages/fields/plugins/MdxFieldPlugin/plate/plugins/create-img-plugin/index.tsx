@@ -19,7 +19,6 @@ import {
   PlateEditor,
   setNodes,
 } from '@udecode/plate-headless'
-import { Editor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { insertBlockElement } from '../core/common'
 
