@@ -17,7 +17,17 @@ limitations under the License.
 */
 
 import React from 'react'
-import { ELEMENT_DEFAULT, insertNodes, setNodes } from '@udecode/plate-headless'
+import {
+  ELEMENT_DEFAULT,
+  insertNodes,
+  PlateEditor,
+  setNodes,
+  setSelection,
+  useEditorRef,
+  getBlockAbove,
+  getNextSiblingNodes,
+  getPath,
+} from '@udecode/plate-headless'
 import { Dropdown } from './dropdown'
 import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
@@ -716,7 +726,14 @@ const nightOwl = {
   },
 }
 
-export const CodeBlock = ({ attributes, editor, element, ...props }) => {
+export const CodeBlock = ({
+  attributes,
+  editor,
+  element,
+  ...props
+}: {
+  editor: PlateEditor
+}) => {
   const monaco = useMonaco()
   const value = element.value || ''
   const height = value.split('\n').length * 28
@@ -753,25 +770,34 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
   const [shouldUnwrap, setShouldUnwrap] = React.useState(false)
   const [shouldBreak, setShouldBreak] = React.useState(false)
 
+  const previousSelection = React.useMemo(() => {
+    return editor.selection
+  }, [])
+
   React.useEffect(() => {
     if (shouldBreak) {
-      const editorEl = ReactEditor.toDOMNode(editor, element)
-      editorEl.focus()
-      setTimeout(() => {
-        insertNodes(
-          editor,
-          [
-            {
-              type: ELEMENT_DEFAULT,
-              children: [{ text: '' }],
-              lang: undefined,
-              value: undefined,
-            },
-          ],
-          { select: true }
-        )
-        setShouldBreak(false)
-      }, 1)
+      const path = getPath(editor, element)
+      if (path) {
+        console.log('editor', editor)
+        console.log('editorRef', editorRef)
+        console.log('element', element)
+        console.log('path', path)
+      }
+      // setSelection(editor, previousSelection)
+      // console.log('set it up', above)
+      insertNodes(
+        editor,
+        [
+          {
+            type: ELEMENT_DEFAULT,
+            children: [{ text: '' }],
+            lang: undefined,
+            value: undefined,
+          },
+        ],
+        { select: true }
+      )
+      setShouldBreak(false)
     }
   }, [shouldBreak])
   React.useEffect(() => {
@@ -804,8 +830,11 @@ export const CodeBlock = ({ attributes, editor, element, ...props }) => {
 
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor
-    editor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () =>
-      setShouldBreak(true)
+    editorRef.current.addCommand(
+      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
+      () => {
+        setShouldBreak(true)
+      }
     )
     if (editorRef.current) {
       editor.onKeyDown((l, h, f) => {
