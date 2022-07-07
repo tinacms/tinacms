@@ -22,20 +22,21 @@ import {
   insertNodes,
   PlateEditor,
   setNodes,
-  setSelection,
-  useEditorRef,
-  getBlockAbove,
-  getNextSiblingNodes,
-  getPath,
+  toDOMNode,
+  TElement,
+  isElement,
 } from '@udecode/plate-headless'
 import { Dropdown } from './dropdown'
 import { uuid } from './helpers'
 import Editor, { useMonaco } from '@monaco-editor/react'
+import * as monaco from 'monaco-editor'
 import { insertBlockElement } from '../core/common'
-import { Element, Transforms } from 'slate'
-import { ReactEditor, useSelected } from 'slate-react'
+import { Element } from 'slate'
+import { useSelected } from 'slate-react'
 
-const languages = {
+type Monaco = typeof monaco
+
+const languages: Record<string, string> = {
   typescript: 'TypeScript',
   javascript: 'JavaScript',
   css: 'CSS',
@@ -732,10 +733,22 @@ export const CodeBlock = ({
   element,
   ...props
 }: {
+  attributes: Record<string, unknown>
+  element: TElement
   editor: PlateEditor
+  children: React.ReactNode
 }) => {
-  const monaco = useMonaco()
+  const [shouldUnwrap, setShouldUnwrap] = React.useState(false)
+  const [shouldBreak, setShouldBreak] = React.useState(false)
+  const monaco = useMonaco() as Monaco
+  const editorRef = React.useRef(null)
+
   const value = element.value || ''
+  if (typeof value !== 'string') {
+    throw new Error(`Element must be of type string for code block`)
+  }
+
+  const language = element.lang
   const height = value.split('\n').length * 28
   const id = React.useMemo(() => uuid(), [])
 
@@ -764,27 +777,9 @@ export const CodeBlock = ({
       render: item,
     }
   })
-  const language = element.lang
-
-  const editorRef = React.useRef(null)
-  const [shouldUnwrap, setShouldUnwrap] = React.useState(false)
-  const [shouldBreak, setShouldBreak] = React.useState(false)
-
-  const previousSelection = React.useMemo(() => {
-    return editor.selection
-  }, [])
 
   React.useEffect(() => {
     if (shouldBreak) {
-      const path = getPath(editor, element)
-      if (path) {
-        console.log('editor', editor)
-        console.log('editorRef', editorRef)
-        console.log('element', element)
-        console.log('path', path)
-      }
-      // setSelection(editor, previousSelection)
-      // console.log('set it up', above)
       insertNodes(
         editor,
         [
@@ -799,13 +794,14 @@ export const CodeBlock = ({
       )
       setShouldBreak(false)
     }
-  }, [shouldBreak])
+  }, [editor, element, shouldBreak])
+
   React.useEffect(() => {
     if (shouldUnwrap) {
-      const editorEl = ReactEditor.toDOMNode(editor, element)
+      const editorEl = toDOMNode(editor, element)
       editorEl.focus()
       setTimeout(() => {
-        Transforms.setNodes(
+        setNodes(
           editor,
           {
             type: 'p',
@@ -815,8 +811,7 @@ export const CodeBlock = ({
           },
           {
             match: (n) => {
-              // @ts-ignore bad type from slate
-              if (Element.isElement(n) && n.type === 'code_block') {
+              if (isElement(n) && n.type === 'code_block') {
                 return true
               }
             },
@@ -828,18 +823,18 @@ export const CodeBlock = ({
     }
   }, [shouldUnwrap])
 
-  function handleEditorDidMount(editor, monaco) {
-    editorRef.current = editor
-    editorRef.current.addCommand(
-      monaco.KeyMod.Shift | monaco.KeyCode.Enter,
-      () => {
-        setShouldBreak(true)
-      }
-    )
+  function handleEditorDidMount(
+    monacoEditor: monaco.editor.IStandaloneCodeEditor,
+    monaco: Monaco
+  ) {
+    monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
+      setShouldBreak(true)
+    })
     if (editorRef.current) {
-      editor.onKeyDown((l, h, f) => {
-        if (l.code === 'Backspace') {
-          const selection = editor.getSelection()
+      monacoEditor.onKeyDown((l) => {
+        console.log(editorRef.current)
+        if (l.code === 'backspace') {
+          const selection = monacoEditor.getSelection()
           if (
             selection.endColumn === 1 &&
             selection.endLineNumber === 1 &&
@@ -856,15 +851,9 @@ export const CodeBlock = ({
       })
     }
   }
-  const selected = useSelected()
-  // FIXME: monaco mounts too slowly to focus immediately
-  React.useEffect(() => {
-    if (selected) {
-      if (editorRef.current) {
-        editorRef.current.focus()
-      }
-    }
-  }, [selected])
+
+  const activeLanguageLabel =
+    typeof language === 'string' ? languages[language] : 'Plaintext'
 
   return (
     <div
@@ -878,10 +867,7 @@ export const CodeBlock = ({
       <div contentEditable={false}>
         <div className="flex justify-between pb-2">
           <div />
-          <Dropdown
-            label={languages[element.lang] || 'Language'}
-            items={items}
-          />
+          <Dropdown label={activeLanguageLabel} items={items} />
         </div>
         <Editor
           height={`${height}px`}
@@ -916,7 +902,7 @@ export const CodeBlock = ({
           }}
           language={language}
           value={element.value}
-          onChange={(value, ev) => {
+          onChange={(value) => {
             setNodes(editor, { value, lang: language })
           }}
         />
