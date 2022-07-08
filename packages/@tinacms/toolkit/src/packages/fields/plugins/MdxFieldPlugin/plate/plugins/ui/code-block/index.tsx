@@ -28,13 +28,13 @@ import {
   getPointAfter,
   focusEditor,
   getPointBefore,
+  isCollapsed,
 } from '@udecode/plate-headless'
 import { Dropdown } from '../dropdown'
 import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
 import { useSelected } from 'slate-react'
-import { nightOwl } from './nightOwl'
 
 type Monaco = typeof monaco
 
@@ -50,6 +50,16 @@ const languages: Record<string, string> = {
   json: 'JSON',
   html: 'HTML',
   markdown: 'Markdown',
+}
+
+const retryFocus = (ref) => {
+  if (ref.current) {
+    ref.current.focus()
+  } else {
+    setTimeout(() => {
+      retryFocus(ref)
+    }, 100)
+  }
 }
 
 export const CodeBlock = ({
@@ -72,8 +82,8 @@ export const CodeBlock = ({
   const selected = useSelected()
 
   React.useEffect(() => {
-    if (selected) {
-      monacoEditorRef.current.focus()
+    if (selected && isCollapsed(editor.selection)) {
+      retryFocus(monacoEditorRef)
     }
   }, [selected, monacoEditorRef.current])
 
@@ -88,8 +98,6 @@ export const CodeBlock = ({
 
   React.useEffect(() => {
     if (monaco) {
-      monaco.editor.defineTheme('nightOwl', nightOwl)
-
       monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         // disable errors
@@ -113,38 +121,42 @@ export const CodeBlock = ({
     if (navigateAway) {
       switch (navigateAway) {
         case 'remove':
-          focusEditor(editor)
-          setNodes(
-            editor,
-            {
-              type: 'p',
-              children: [{ text: '' }],
-              lang: undefined,
-              value: undefined,
-            },
-            {
-              match: (n) => {
-                if (isElement(n) && n.type === 'code_block') {
-                  return true
-                }
-              },
-            }
-          )
-          break
-        case 'insertNext':
-          focusEditor(editor)
-          insertNodes(
-            editor,
-            [
+          {
+            focusEditor(editor)
+            setNodes(
+              editor,
               {
-                type: ELEMENT_DEFAULT,
+                type: 'p',
                 children: [{ text: '' }],
                 lang: undefined,
                 value: undefined,
               },
-            ],
-            { select: true }
-          )
+              {
+                match: (n) => {
+                  if (isElement(n) && n.type === 'code_block') {
+                    return true
+                  }
+                },
+              }
+            )
+          }
+          break
+        case 'insertNext':
+          {
+            insertNodes(
+              editor,
+              [
+                {
+                  type: ELEMENT_DEFAULT,
+                  children: [{ text: '' }],
+                  lang: undefined,
+                  value: undefined,
+                },
+              ],
+              { select: true }
+            )
+            focusEditor(editor)
+          }
           break
         case 'up':
           {
@@ -175,7 +187,7 @@ export const CodeBlock = ({
             focusEditor(editor, previousNodePath)
           }
           break
-        case 'down':
+        case 'down': {
           const path = findNodePath(editor, element)
           if (!path) {
             return // Not sure if/when this would happen
@@ -184,7 +196,6 @@ export const CodeBlock = ({
           const nextNodePath = getPointAfter(editor, path)
           if (!nextNodePath) {
             // No next children, insert an empty block
-            focusEditor(editor)
             insertNodes(
               editor,
               [
@@ -197,11 +208,12 @@ export const CodeBlock = ({
               ],
               { select: true }
             )
-            return
+            focusEditor(editor)
+          } else {
+            focusEditor(editor, nextNodePath)
           }
-
-          focusEditor(editor, nextNodePath)
           break
+        }
       }
       setNavigateAway(null)
     }
@@ -259,11 +271,11 @@ export const CodeBlock = ({
     <div
       {...attributes}
       className="relative mb-2 mt-0.5 rounded-lg shadow-lg p-2"
-      style={{ backgroundColor: '#021627' }}
+      style={{ backgroundColor: '#1e1e1e' }}
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
-        {`.monaco-editor .editor-widget {
+        {`.tina-tailwind .monaco-editor .editor-widget {
           display: none !important;
           visibility: hidden !important;
         }`}
@@ -278,7 +290,9 @@ export const CodeBlock = ({
           height={`${height}px`}
           path={id}
           onMount={handleEditorDidMount}
-          theme="nightOwl"
+          // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
+          // So we end up with the default (light) theme in some scenarios. Seems like a race condition.
+          theme="vs-dark"
           options={{
             scrollBeyondLastLine: false,
             tabSize: 2,
