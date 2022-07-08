@@ -16,10 +16,16 @@ import { Container } from "./container";
 import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
+// import MonacoEditor, { useMonaco, loader } from "@monaco-editor/react";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 import { Prism } from "tinacms/dist/rich-text/prism";
-import { Monaco } from "tinacms/dist/rich-text/monaco";
+// import { Monaco } from "tinacms/dist/rich-text/monaco";
 import type { TinaMarkdownContent, Components } from "tinacms/dist/rich-text";
+
+// loader.config({
+//   paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.31.0/min/vs" },
+//   // paths: { vs: 'https://example.com' },
+// });
 
 const components: Components<{
   BlockQuote: {
@@ -52,8 +58,8 @@ const components: Components<{
       </div>
     );
   },
-  code_block: (props) => <Monaco {...props} />,
-  // code_block: (props) => <Prism {...props} />,
+  // code_block: (props) => <MonacoEditor {...props} />,
+  code_block: (props) => <Prism {...props} />,
   RelatedPost: (props) => {
     return <div>{props.post}</div>;
   },

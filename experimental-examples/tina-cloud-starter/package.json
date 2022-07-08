@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.5.0",
+    "@monaco-editor/react": "^4.4.5",
     "@tailwindcss/typography": "^0.4.1",
     "@tinacms/auth": "workspace:*",
     "date-fns": "^2.23.0",
