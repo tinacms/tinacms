@@ -22,17 +22,9 @@ import {
   insertNodes,
   PlateEditor,
   setNodes,
-  toDOMNode,
   TElement,
   isElement,
   findNodePath,
-  setSelection,
-  getNextSiblingNodes,
-  getParentNode,
-  selectEndOfBlockAboveSelection,
-  getBlockAbove,
-  getLeafNode,
-  select,
   getPointAfter,
   focusEditor,
   getPointBefore,
@@ -41,9 +33,7 @@ import { Dropdown } from '../dropdown'
 import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
 import * as monaco from 'monaco-editor'
-import { insertBlockElement } from '../../core/common'
-import { Element, Transforms } from 'slate'
-import { ReactEditor, useSelected } from 'slate-react'
+import { useSelected } from 'slate-react'
 import { nightOwl } from './nightOwl'
 
 type Monaco = typeof monaco
@@ -83,7 +73,6 @@ export const CodeBlock = ({
 
   React.useEffect(() => {
     if (selected) {
-      console.log('selection', JSON.stringify(editor.selection))
       monacoEditorRef.current.focus()
     }
   }, [selected, monacoEditorRef.current])
@@ -141,7 +130,6 @@ export const CodeBlock = ({
               },
             }
           )
-          // insertNodes(editor, [{ type: 'p', children: [{ text: '' }] }])
           break
         case 'insertNext':
           focusEditor(editor)
@@ -271,10 +259,7 @@ export const CodeBlock = ({
     <div
       {...attributes}
       className="relative mb-2 mt-0.5 rounded-lg shadow-lg p-2"
-      // FIXME: z-index should be some sane number, but does seem
-      // to need to override most other elements
-      // style={{ backgroundColor: '#1e1e1e', zIndex: 1000 }}
-      style={{ backgroundColor: '#1e1e1e' }}
+      style={{ backgroundColor: '#021627' }}
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
@@ -293,7 +278,7 @@ export const CodeBlock = ({
           height={`${height}px`}
           path={id}
           onMount={handleEditorDidMount}
-          theme="vs-dark"
+          theme="nightOwl"
           options={{
             scrollBeyondLastLine: false,
             tabSize: 2,
