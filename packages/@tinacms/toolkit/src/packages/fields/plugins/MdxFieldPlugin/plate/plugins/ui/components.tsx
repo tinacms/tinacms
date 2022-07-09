@@ -36,6 +36,9 @@ import {
   MARK_CODE,
   MARK_BOLD,
   MARK_ITALIC,
+  Plate,
+  setFragmentData,
+  setNodes,
 } from '@udecode/plate-headless'
 import { CodeBlock } from './code-block'
 import { classNames } from './helpers'
@@ -161,6 +164,36 @@ export const components = () => {
       />
     ),
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
+    html: (props) => {
+      return <CodeBlock language="html" {...props} />
+    },
+    html_inline: ({ element, editor, leaf, text, className, ...props }) => {
+      return <span className={`bg-green-100 ${className}`} {...props} />
+    },
+    html_inline2: ({ attributes, editor, className, element, children }) => {
+      return (
+        <span
+          contentEditable={false}
+          style={{ userSelect: 'none' }}
+          className="bg-green-100"
+          {...attributes}
+        >
+          <input
+            type="text"
+            className="inline-block bg-green-100"
+            onChange={(e) => {
+              console.log('change', e.target.value)
+              setNodes(editor, { value: e.target.value })
+            }}
+            value={element.value}
+          />
+          {/* <span style={{ userSelect: 'auto' }} contentEditable={true}>
+            {element.value}
+          </span> */}
+          {children}
+        </span>
+      )
+    },
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
       <ul
         className={classNames(

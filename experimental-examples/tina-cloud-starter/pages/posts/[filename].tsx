@@ -28,7 +28,7 @@ export default function BlogPostPage(
 
 export const getStaticProps = async ({ params }) => {
   const tinaProps = await client.queries.BlogPostQuery({
-    relativePath: `${params.filename}.mdx`,
+    relativePath: `${params.filename}.md`,
   });
   return {
     props: {

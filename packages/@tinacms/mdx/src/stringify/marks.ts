@@ -136,6 +136,12 @@ const inlineElementExceptLink = (
         children,
       }
     }
+    case 'html': {
+      return {
+        type: 'html',
+        value: content.value,
+      }
+    }
     default:
       if (!content.type && typeof content.text === 'string') {
         return {

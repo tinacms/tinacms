@@ -21,6 +21,11 @@ export type HrElement = {
   type: 'hr'
   children: [EmptyTextElement]
 }
+export type HTMLElement = {
+  type: 'html'
+  value: string
+  children: [EmptyTextElement]
+}
 export type CodeBlockElement = {
   type: 'code_block'
   lang?: string
@@ -59,6 +64,7 @@ export type BlockElement =
   | CodeBlockElement
   | BlockquoteElement
   | MdxBlockElement
+  | HTMLElement
   | UnorderedListElement
   | OrderedListElement
   | ListItemElement

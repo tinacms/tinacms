@@ -1,4 +1,3 @@
-import React from 'react'
 import { createPluginFactory } from '@udecode/plate-headless'
 
 export const createCodeBlockPlugin = createPluginFactory({
@@ -13,7 +12,9 @@ export const createHTMLBlockPlugin = createPluginFactory({
   isElement: true,
   isVoid: true,
   isInline: false,
-  component: () => {
-    return <div>Here is some code</div>
-  },
+})
+
+export const createHTMLInlinePlugin = createPluginFactory({
+  key: 'html_inline',
+  isLeaf: true,
 })

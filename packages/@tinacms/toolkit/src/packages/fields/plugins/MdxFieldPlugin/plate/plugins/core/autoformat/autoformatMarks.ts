@@ -42,6 +42,11 @@ export const autoformatMarks: AutoformatRule[] = [
   },
   {
     mode: 'mark',
+    type: 'html_inline',
+    match: { start: '<', end: '>' },
+  },
+  {
+    mode: 'mark',
     type: MARK_CODE,
     match: '`',
   },

@@ -26,7 +26,7 @@ const schema = defineSchema({
       label: "Blog Posts",
       name: "posts",
       path: "content/posts",
-      format: "mdx",
+      format: "md",
       fields: [
         {
           type: "string",

@@ -84,9 +84,25 @@ export const remarkToSlate = (
       case 'list':
         return list(content)
       case 'html':
-        return content
+        return html(content, true)
       default:
         throw new Error(`Content: ${content.type} is not yet supported`)
+    }
+  }
+
+  const html = (content: Md.HTML, block?: boolean): Plate.HTMLElement => {
+    if (block) {
+      return {
+        type: block ? 'html' : 'html_inline',
+        value: content.value,
+        children: [{ type: 'text', text: '' }],
+      }
+    } else {
+      return {
+        type: 'text',
+        text: content.value,
+        html_inline: true,
+      }
     }
   }
 
@@ -244,7 +260,7 @@ export const remarkToSlate = (
       case 'inlineCode':
         return phrashingMark(content)
       case 'html':
-        return { ...content, children: [{ type: 'text', text: '' }] }
+        return html(content)
       default:
         throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
     }

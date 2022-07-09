@@ -36,6 +36,7 @@ import { ReactEditor } from 'slate-react'
 import {
   createCodeBlockPlugin,
   createHTMLBlockPlugin,
+  createHTMLInlinePlugin,
 } from '../create-code-block'
 import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
@@ -47,6 +48,7 @@ export const plugins = [
   createParagraphPlugin(),
   createCodeBlockPlugin(),
   createHTMLBlockPlugin(),
+  createHTMLInlinePlugin(),
   createBlockquotePlugin(),
   createBoldPlugin(),
   createItalicPlugin(),

@@ -66,11 +66,13 @@ export const CodeBlock = ({
   attributes,
   editor,
   element,
+  language: restrictLanguage,
   ...props
 }: {
   attributes: Record<string, unknown>
   element: TElement
   editor: PlateEditor
+  language?: string
   children: React.ReactNode
 }) => {
   const [navigateAway, setNavigateAway] = React.useState<
@@ -80,6 +82,7 @@ export const CodeBlock = ({
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const selected = useSelected()
+  const [height, setHeight] = React.useState(28)
 
   React.useEffect(() => {
     if (selected && isCollapsed(editor.selection)) {
@@ -92,8 +95,10 @@ export const CodeBlock = ({
     throw new Error(`Element must be of type string for code block`)
   }
 
-  const language = element.lang
-  const height = value.split('\n').length * 28
+  const language = restrictLanguage || element.lang
+  // const height = value.split('\n').length * 28
+  // const height = 300
+  // console.log('height', height)
   const id = React.useMemo(() => uuid(), [])
 
   React.useEffect(() => {
@@ -133,7 +138,7 @@ export const CodeBlock = ({
               },
               {
                 match: (n) => {
-                  if (isElement(n) && n.type === 'code_block') {
+                  if (isElement(n) && n.type === element.type) {
                     return true
                   }
                 },
@@ -219,11 +224,44 @@ export const CodeBlock = ({
     }
   }, [navigateAway])
 
+  // React.useEffect(() => {
+  //   console.log('height', monacoEditorRef.current?.getContentHeight())
+  //   if (monacoEditorRef.current) {
+  //     console.log('yeah?')
+  //     setHeight(monacoEditorRef.current.getContentHeight())
+  //   }
+  // }, [monacoEditorRef.current?.getContentHeight()])
+
   function handleEditorDidMount(
     monacoEditor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
     monacoEditorRef.current = monacoEditor
+    // let ignoreEvent = false
+    // const updateHeight = () => {
+    //   const contentHeight = Math.min(1000, monacoEditor.getContentHeight())
+    //   // monacoEditor.getContentWidth()
+    //   // container.style.width = `${width}px`;
+    //   // container.style.height = `${contentHeight}px`;
+    //   try {
+    //     ignoreEvent = true
+    //     monacoEditor.layout({
+    //       // width: monacoEditor.getContentWidth(),
+    //       width: 300,
+    //       height: contentHeight,
+    //     })
+    //     // monacoEditor.hei
+    //   } finally {
+    //     ignoreEvent = false
+    //   }
+    // }
+    // monacoEditor.onDidContentSizeChange(updateHeight)
+    // updateHeight()
+    monacoEditor.onDidContentSizeChange(() => {
+      setHeight(monacoEditor.getContentHeight())
+      monacoEditor.layout()
+    })
+
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
         setNavigateAway('insertNext')
@@ -270,8 +308,7 @@ export const CodeBlock = ({
   return (
     <div
       {...attributes}
-      className="relative mb-2 mt-0.5 rounded-lg shadow-lg p-2"
-      style={{ backgroundColor: '#1e1e1e' }}
+      className="relative mb-2 mt-0.5 rounded-lg shadow-md p-2 border-gray-200 border"
     >
       <style>
         {/* Disable hints (not ideal but it conflicts with the toolbar and other floating elements) */}
@@ -282,49 +319,55 @@ export const CodeBlock = ({
       </style>
       {props.children}
       <div contentEditable={false}>
-        <div className="flex justify-between pb-2">
-          <div />
-          <Dropdown label={activeLanguageLabel} items={items} />
+        {!restrictLanguage && (
+          <div className="flex justify-between pb-2">
+            <div />
+            <Dropdown label={activeLanguageLabel} items={items} />
+          </div>
+        )}
+        <div style={{ height: `${height}px` }}>
+          <MonacoEditor
+            // height={`${height}px`}
+            // width='100%'
+            path={id}
+            onMount={handleEditorDidMount}
+            // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
+            // So we end up with the default (light) theme in some scenarios. Seems like a race condition.
+            // theme="vs-dark"
+            options={{
+              scrollBeyondLastLine: false,
+              // automaticLayout: true,
+              tabSize: 2,
+              disableLayerHinting: true,
+              accessibilitySupport: 'off',
+              codeLens: false,
+              wordWrap: 'on',
+              minimap: {
+                enabled: false,
+              },
+              fontSize: 14,
+              lineHeight: 2,
+              formatOnPaste: true,
+              lineNumbers: 'off',
+              formatOnType: true,
+              fixedOverflowWidgets: true,
+              // Takes too much horizontal space for iframe
+              folding: false,
+              renderLineHighlight: 'none',
+              scrollbar: {
+                verticalScrollbarSize: 1,
+                horizontalScrollbarSize: 1,
+                // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
+                alwaysConsumeMouseWheel: false,
+              },
+            }}
+            language={language}
+            value={element.value}
+            onChange={(value) => {
+              setNodes(editor, { value, lang: language })
+            }}
+          />
         </div>
-        <MonacoEditor
-          height={`${height}px`}
-          path={id}
-          onMount={handleEditorDidMount}
-          // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
-          // So we end up with the default (light) theme in some scenarios. Seems like a race condition.
-          theme="vs-dark"
-          options={{
-            scrollBeyondLastLine: false,
-            tabSize: 2,
-            disableLayerHinting: true,
-            accessibilitySupport: 'off',
-            codeLens: false,
-            wordWrap: 'on',
-            minimap: {
-              enabled: false,
-            },
-            fontSize: 14,
-            lineHeight: 2,
-            formatOnPaste: true,
-            lineNumbers: 'off',
-            formatOnType: true,
-            fixedOverflowWidgets: true,
-            // Takes too much horizontal space for iframe
-            folding: false,
-            renderLineHighlight: 'none',
-            scrollbar: {
-              verticalScrollbarSize: 1,
-              horizontalScrollbarSize: 1,
-              // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
-              alwaysConsumeMouseWheel: false,
-            },
-          }}
-          language={language}
-          value={element.value}
-          onChange={(value) => {
-            setNodes(editor, { value, lang: language })
-          }}
-        />
       </div>
     </div>
   )

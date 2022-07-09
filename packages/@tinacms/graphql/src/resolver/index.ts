@@ -119,7 +119,7 @@ export class Resolver {
       }
       try {
         await sequential(template.fields, async (field) => {
-          return this.resolveFieldData(field, rawData, data)
+          return this.resolveFieldData(field, rawData, data, collection)
         })
       } catch (e) {
         throw new TinaParseDocumentError({
@@ -725,7 +725,8 @@ export class Resolver {
   private resolveFieldData = async (
     { namespace, ...field }: TinaFieldEnriched,
     rawData: unknown,
-    accumulator: { [key: string]: unknown }
+    accumulator: { [key: string]: unknown },
+    collection: TinaCloudCollection<false>
   ) => {
     if (!rawData) {
       return undefined
@@ -765,7 +766,7 @@ export class Resolver {
               this.config,
               this.tinaSchema.schema
             ),
-          true
+          collection.format !== 'mdx'
         )
         accumulator[field.name] = tree
         break
@@ -788,7 +789,7 @@ export class Resolver {
             })
             const payload = {}
             await sequential(template.fields, async (field) => {
-              await this.resolveFieldData(field, item, payload)
+              await this.resolveFieldData(field, item, payload, collection)
             })
             const isUnion = !!field.templates
             return isUnion
@@ -812,7 +813,7 @@ export class Resolver {
           })
           const payload = {}
           await sequential(template.fields, async (field) => {
-            await this.resolveFieldData(field, value, payload)
+            await this.resolveFieldData(field, value, payload, collection)
           })
           const isUnion = !!field.templates
           accumulator[field.name] = isUnion

@@ -217,6 +217,8 @@ export const TinaMarkdown = ({
              * be transformed before form submission
              */
             return null
+          case 'html':
+            return child.value
           default:
             // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             if (typeof child.text === 'string') {
@@ -224,7 +226,7 @@ export const TinaMarkdown = ({
               return <Leaf key={key} components={components} {...child} />
             }
 
-            console.log(`No tina renderer for ${child.type}`, child)
+          // console.log(`No tina renderer for ${child.type}`, child)
         }
       })}
     </>

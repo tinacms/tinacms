@@ -126,6 +126,14 @@ export const blockElement = (
           listItemElement(child, field, imageCallback)
         ),
       }
+    case 'html':
+      {
+        return {
+          type: 'html',
+          value: content.value,
+        }
+      }
+      break
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }
