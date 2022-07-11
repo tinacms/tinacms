@@ -34,6 +34,7 @@ import fs from 'fs-extra'
 import ini from 'ini'
 import os from 'os'
 import path from 'path'
+import { spin } from '../../utils/spinner'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -210,7 +211,9 @@ export async function startServer(
       }
       const database = await createDatabase({ store, bridge })
       await compileSchema(null, null, { verbose, dev })
-      const schema = await buildSchema(rootPath, database, cliFlags)
+      const schema = await spin({
+        waitFor: () => buildSchema(rootPath, database, cliFlags),
+      })
       await genTypes({ schema }, () => {}, { noSDK, verbose })
     } catch (error) {
       throw error

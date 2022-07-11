@@ -247,6 +247,7 @@ importers:
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/clear': 0.1.0
+      '@types/cli-spinner': ^0.2.1
       '@types/cors': 2.8.5
       '@types/express': ^4.17.7
       '@types/express-graphql': ^0.9.0
@@ -271,6 +272,7 @@ importers:
       body-parser: ^1.19.0
       chalk: ^2.4.2
       chokidar: ^3.5.1
+      cli-spinner: ^0.2.10
       commander: ^9.0.0
       cors: ^2.8.5
       dotenv: ^16.0.1
@@ -295,7 +297,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -314,6 +316,7 @@ importers:
       body-parser: 1.20.0
       chalk: 2.4.2
       chokidar: 3.5.3
+      cli-spinner: 0.2.10
       commander: 9.3.0
       cors: 2.8.5
       dotenv: 16.0.1
@@ -337,6 +340,7 @@ importers:
     devDependencies:
       '@tinacms/scripts': link:../scripts
       '@types/clear': 0.1.0
+      '@types/cli-spinner': 0.2.1
       '@types/cors': 2.8.5
       '@types/express': 4.17.13
       '@types/express-graphql': 0.9.0_graphql@15.8.0
@@ -4325,17 +4329,17 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-tools/schema': 8.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
     dev: false
 
-  /@graphql-codegen/plugin-helpers/2.4.2_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/2.5.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-LJNvwAPv/sKtI3RnRDm+nPD+JeOfOuSOS4FFIpQCMUCyMnFcchV/CPTTv7tT12fLUpEg6XjuFfDBvOwndti30Q==,
+        integrity: sha512-0jM5/14EdM4yow5v8OGOnUmRqfA1gaWkh+J5berqQUpcFYfSQXD6+Idnkiju/jjIypEN7UvbPkC7BgryWVxexA==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -4346,7 +4350,7 @@ packages:
       graphql: 15.8.0
       import-from: 4.0.0
       lodash: 4.17.21
-      tslib: 2.3.1
+      tslib: 2.4.0
     dev: false
 
   /@graphql-codegen/schema-ast/2.4.1_graphql@15.8.0:
@@ -4357,7 +4361,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
@@ -4372,7 +4376,7 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-tag: ^2.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
       graphql: 15.8.0
@@ -4390,7 +4394,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4409,7 +4413,7 @@ packages:
     peerDependencies:
       graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-codegen/schema-ast': 2.4.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4428,7 +4432,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.4.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
       '@graphql-tools/optimize': 1.3.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
@@ -6723,6 +6727,15 @@ packages:
       {
         integrity: sha512-b2VgNzu3BxxM2nGhZSMzkiaTaCClevKkBCtgpV2Al0eGaEeQgTk5qHedzNxi/SgsvmDbqxWKDAIrxZNVKyDCXw==,
       }
+    dev: true
+
+  /@types/cli-spinner/0.2.1:
+    resolution:
+      {
+        integrity: sha512-bsdlZy3LThi9QbsK0GXm5s/e3F6HAJi1tMsIanm9trtoStSlV3gzir9JpfOK40gERMNIVevDTpG5NzSGnYs3QA==,
+      }
+    dependencies:
+      '@types/node': 18.0.0
     dev: true
 
   /@types/codemirror/0.0.71:
@@ -11061,6 +11074,14 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       restore-cursor: 3.1.0
+
+  /cli-spinner/0.2.10:
+    resolution:
+      {
+        integrity: sha512-U0sSQ+JJvSLi1pAYuJykwiA8Dsr15uHEy85iCJ6A+0DjVxivr3d+N2Wjvodeg89uP5K6TswFkKBfAD7B3YSn/Q==,
+      }
+    engines: { node: '>=0.10' }
+    dev: false
 
   /cli-table3/0.6.2:
     resolution:
