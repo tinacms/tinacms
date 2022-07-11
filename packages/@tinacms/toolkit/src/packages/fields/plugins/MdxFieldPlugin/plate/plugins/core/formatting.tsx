@@ -31,7 +31,6 @@ import {
   ELEMENT_H6,
   KEYS_HEADING,
 } from '@udecode/plate-headless'
-import { createAutoHTMLPlugin } from '../create-auto-html-plugin'
 import { autoformatRules } from './autoformat/autoformatRules'
 import { withCorrectVoidBehavior } from './with-correct-void-behavior'
 
@@ -73,7 +72,6 @@ export const plugins = [
       rules: autoformatRules,
     },
   }),
-  createAutoHTMLPlugin(),
   createExitBreakPlugin({
     options: {
       rules: [

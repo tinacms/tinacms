@@ -478,6 +478,17 @@ export const buildIt = async (entryPoint, packageJSON) => {
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
         ),
       })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'browser',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'browser.js'),
+        external: external.filter(
+          (item) =>
+            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
+        ),
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

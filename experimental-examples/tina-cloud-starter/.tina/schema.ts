@@ -1,10 +1,13 @@
-import { defineSchema, defineConfig } from "tinacms";
+// import { defineSchema, defineConfig } from "tinacms";
 import { client } from "./client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
+
+const defineSchema = (obj) => obj;
+const defineConfig = (obj) => obj;
 
 const schema = defineSchema({
   config: {
@@ -26,7 +29,7 @@ const schema = defineSchema({
       label: "Blog Posts",
       name: "posts",
       path: "content/posts",
-      format: "md",
+      format: "mdx",
       fields: [
         {
           type: "string",
@@ -40,11 +43,11 @@ const schema = defineSchema({
           name: "heroImg",
           label: "Hero Image",
         },
-        {
-          type: "rich-text",
-          label: "Excerpt",
-          name: "excerpt",
-        },
+        // {
+        //   type: "rich-text",
+        //   label: "Excerpt",
+        //   name: "excerpt",
+        // },
         {
           type: "reference",
           label: "Author",

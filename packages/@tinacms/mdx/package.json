@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./dist/browser.js": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/browser.js"
     }
   },
   "files": [

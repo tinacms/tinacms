@@ -95,7 +95,6 @@ union PostsAuthor = Authors
 type Posts implements Node & Document {
   title: String!
   heroImg: String
-  excerpt: JSON
   author: PostsAuthor
   date: String
   _body: JSON
@@ -116,12 +115,6 @@ input ImageFilter {
   eq: String
   exists: Boolean
   in: [String]
-}
-
-input RichTextFilter {
-  startsWith: String
-  eq: String
-  exists: Boolean
 }
 
 input PostsAuthorFilter {
@@ -148,6 +141,12 @@ input Posts_bodyDateTimeFilter {
   format: StringFilter
 }
 
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
 input Posts_bodyBlockQuoteFilter {
   children: RichTextFilter
   authorName: StringFilter
@@ -170,7 +169,6 @@ input Posts_bodyFilter {
 input PostsFilter {
   title: StringFilter
   heroImg: ImageFilter
-  excerpt: RichTextFilter
   author: PostsAuthorFilter
   date: DatetimeFilter
   _body: Posts_bodyFilter
@@ -468,7 +466,6 @@ input DocumentMutation {
 input PostsMutation {
   title: String
   heroImg: String
-  excerpt: JSON
   author: String
   date: String
   _body: JSON

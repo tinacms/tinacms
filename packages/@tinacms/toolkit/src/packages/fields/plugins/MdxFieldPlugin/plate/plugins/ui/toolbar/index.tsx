@@ -50,6 +50,7 @@ import { unwrapLink } from '../../create-link-plugin'
 import { ELEMENT_IMG } from '../../create-img-plugin'
 
 import type { MdxTemplate } from '../../../types'
+import { useEditorContext } from '../../../editor-context'
 
 const headers = [
   {
@@ -89,6 +90,7 @@ export function Toolbar({
   inlineOnly: boolean
   templates: MdxTemplate[]
 }) {
+  const { setRawMode } = useEditorContext()
   const showEmbed = templates.length > 0
   const toolbarRef = React.useRef(null)
   const editor = useEditorState()!
@@ -195,6 +197,12 @@ export function Toolbar({
       onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
         key: MARK_ITALIC,
       }),
+    },
+    {
+      name: 'raw',
+      label: 'Raw',
+      active: false,
+      onMouseDown: () => setRawMode(true),
     },
   ]
   const [itemsShown, setItemsShown] = React.useState(toolbarItems.length)

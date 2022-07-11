@@ -1,7 +1,6 @@
 fragment PostsParts on Posts {
   title
   heroImg
-  excerpt
   author {
     ... on Document {
       id

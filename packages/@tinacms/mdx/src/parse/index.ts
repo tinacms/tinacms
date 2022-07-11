@@ -76,7 +76,14 @@ export const markdownToAst = (value: string, skipMDX?: boolean) => {
   if (skipMDX) {
     tree = unified().use(markdown).parse(value)
   } else {
-    tree = unified().use(markdown).use(mdx).parse(value)
+    try {
+      tree = unified().use(markdown).use(mdx).parse(value)
+    } catch (e) {
+      // FIXME: this error is completely empty, not sure how to get the message
+    }
+  }
+  if (!tree) {
+    throw new Error('Error parsing markdown')
   }
   // Delete useless position info
   visit(tree, (node) => {
