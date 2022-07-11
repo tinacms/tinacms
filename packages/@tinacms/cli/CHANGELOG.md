@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 0.60.27
+
+### Patch Changes
+
+- 8e893a027: Fixed issue where having a src and pages dir would cause an issue
+- Updated dependencies [cf0f531a1]
+- Updated dependencies [b0dfc6205]
+  - @tinacms/datalayer@0.2.1
+  - @tinacms/schema-tools@0.0.8
+  - @tinacms/graphql@0.61.2
+
 ## 0.60.26
 
 ### Patch Changes
