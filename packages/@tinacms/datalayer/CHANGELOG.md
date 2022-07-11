@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.2.1
+
+### Patch Changes
+
+- cf0f531a1: limit db key values to 100 characters
+
 ## 0.2.0
 
 ### Minor Changes

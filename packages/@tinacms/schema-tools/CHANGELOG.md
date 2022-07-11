@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.0.8
+
+### Patch Changes
+
+- b0dfc6205: Fixed bug where objects where not being copied
+
 ## 0.0.7
 
 ### Patch Changes
