@@ -612,7 +612,8 @@ export const makeFilterSuffixes = (
 export const makeKeyForField = (
   definition: IndexDefinition,
   data: object,
-  stringEscaper: StringEscaper
+  stringEscaper: StringEscaper,
+  maxStringLength: number = 100
 ): string | null => {
   const valueParts = []
   for (const field of definition.fields) {
@@ -624,7 +625,7 @@ export const makeKeyForField = (
           : field.type === 'string'
           ? stringEscaper(data[field.name] as string | string[])
           : data[field.name]
-      )
+      ).substring(0, maxStringLength)
       valueParts.push(applyPadding(resolvedValue, field.pad))
     } else {
       return null // tell caller that one of the fields is missing and we can't index
