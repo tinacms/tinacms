@@ -1,15 +1,12 @@
 ---
 title: Just Another Blog Post
-excerpt: |
-  ```typescript
-  type Meh = {
-    ok: string
-  }
+excerpt: |+
+  sdfa \<a href>
 
-  const meh: Meh = {
-    ok: '23'
-  }
+  ```html
+  <div>code example>
   ```
+
 author: content/authors/napolean.md
 date: '2021-07-12T07:00:00.000Z'
 ---

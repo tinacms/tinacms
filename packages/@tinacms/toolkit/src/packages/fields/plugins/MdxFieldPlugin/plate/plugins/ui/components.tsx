@@ -168,30 +168,11 @@ export const components = () => {
       return <CodeBlock language="html" {...props} />
     },
     html_inline: ({ element, editor, leaf, text, className, ...props }) => {
-      return <span className={`bg-green-100 ${className}`} {...props} />
-    },
-    html_inline2: ({ attributes, editor, className, element, children }) => {
       return (
         <span
-          contentEditable={false}
-          style={{ userSelect: 'none' }}
-          className="bg-green-100"
-          {...attributes}
-        >
-          <input
-            type="text"
-            className="inline-block bg-green-100"
-            onChange={(e) => {
-              console.log('change', e.target.value)
-              setNodes(editor, { value: e.target.value })
-            }}
-            value={element.value}
-          />
-          {/* <span style={{ userSelect: 'auto' }} contentEditable={true}>
-            {element.value}
-          </span> */}
-          {children}
-        </span>
+          className={`underline decoration-dotted underline-offset-2 ${className}`}
+          {...props}
+        />
       )
     },
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (

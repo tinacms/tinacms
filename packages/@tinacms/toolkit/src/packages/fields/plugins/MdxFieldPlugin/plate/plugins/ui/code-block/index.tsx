@@ -52,13 +52,23 @@ const languages: Record<string, string> = {
   markdown: 'Markdown',
 }
 
+/**
+ * Since monaco lazy-loads we may have a delay from when the block is inserted
+ * to when monaco has intantiated, keep trying to focus on it.
+ *
+ * Will try for 3 seconds before moving on
+ */
+let retryCount = 0
 const retryFocus = (ref) => {
   if (ref.current) {
     ref.current.focus()
   } else {
-    setTimeout(() => {
-      retryFocus(ref)
-    }, 100)
+    if (retryCount < 30) {
+      setTimeout(() => {
+        retryCount = retryCount + 1
+        retryFocus(ref)
+      }, 100)
+    }
   }
 }
 
@@ -96,9 +106,6 @@ export const CodeBlock = ({
   }
 
   const language = restrictLanguage || element.lang
-  // const height = value.split('\n').length * 28
-  // const height = 300
-  // console.log('height', height)
   const id = React.useMemo(() => uuid(), [])
 
   React.useEffect(() => {
@@ -124,6 +131,7 @@ export const CodeBlock = ({
 
   React.useEffect(() => {
     if (navigateAway) {
+      setNavigateAway(null)
       switch (navigateAway) {
         case 'remove':
           {
@@ -220,47 +228,35 @@ export const CodeBlock = ({
           break
         }
       }
-      setNavigateAway(null)
     }
   }, [navigateAway])
-
-  // React.useEffect(() => {
-  //   console.log('height', monacoEditorRef.current?.getContentHeight())
-  //   if (monacoEditorRef.current) {
-  //     console.log('yeah?')
-  //     setHeight(monacoEditorRef.current.getContentHeight())
-  //   }
-  // }, [monacoEditorRef.current?.getContentHeight()])
 
   function handleEditorDidMount(
     monacoEditor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco
   ) {
     monacoEditorRef.current = monacoEditor
-    // let ignoreEvent = false
-    // const updateHeight = () => {
-    //   const contentHeight = Math.min(1000, monacoEditor.getContentHeight())
-    //   // monacoEditor.getContentWidth()
-    //   // container.style.width = `${width}px`;
-    //   // container.style.height = `${contentHeight}px`;
-    //   try {
-    //     ignoreEvent = true
-    //     monacoEditor.layout({
-    //       // width: monacoEditor.getContentWidth(),
-    //       width: 300,
-    //       height: contentHeight,
-    //     })
-    //     // monacoEditor.hei
-    //   } finally {
-    //     ignoreEvent = false
-    //   }
-    // }
-    // monacoEditor.onDidContentSizeChange(updateHeight)
-    // updateHeight()
     monacoEditor.onDidContentSizeChange(() => {
       setHeight(monacoEditor.getContentHeight())
       monacoEditor.layout()
     })
+    // If the value is empty when we mount, we know the html
+    // block was triggered by typing `<`, so insert that value
+    // and set the cursor to the next position
+    if (restrictLanguage) {
+      const value = monacoEditor.getModel().getValue()
+      if (!value) {
+        monacoEditor.getModel().setValue('<')
+        monacoEditor.setSelections([
+          {
+            positionColumn: 2,
+            positionLineNumber: 1,
+            selectionStartColumn: 2,
+            selectionStartLineNumber: 1,
+          },
+        ])
+      }
+    }
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
@@ -327,8 +323,6 @@ export const CodeBlock = ({
         )}
         <div style={{ height: `${height}px` }}>
           <MonacoEditor
-            // height={`${height}px`}
-            // width='100%'
             path={id}
             onMount={handleEditorDidMount}
             // Setting a custom theme is kind of buggy because it doesn't get defined until monaco has mounted.
