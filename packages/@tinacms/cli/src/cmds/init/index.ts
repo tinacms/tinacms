@@ -4,6 +4,7 @@ import {
   adminPage,
   blogPost,
   nextPostPage,
+  ClientFile,
 } from './setup-files'
 import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
 import {
@@ -151,10 +152,10 @@ export async function installDeps(ctx: any, next: () => void, options) {
     prog: '',
   })
   const installCMD = `yarn add ${deps.join(' ')}`
-  await execShellCommand(installCMD)
+  // await execShellCommand(installCMD)
 
   // Fake installed used for dev
-  // await delay(2000)
+  await delay(2000)
   bar.tick({
     prog: '✅',
   })
@@ -267,6 +268,10 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   }
 
   outputFileSync(adminPath, adminPage)
+
+  // Create a .tina/client.ts
+  const clientPath = p.join(TinaFolder, 'client.js')
+  await fs.writeFile(clientPath, ClientFile)
 
   next()
 }
