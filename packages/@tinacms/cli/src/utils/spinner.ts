@@ -9,6 +9,7 @@ export async function spin<T>({ waitFor }: { waitFor: () => Promise<T> }) {
       this.stream.write(msg)
     },
   })
+  // List of spinners of we want a different one: https://github.com/helloIAmPau/node-spinner/blob/master/spinners.json
   spinner.setSpinnerString('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏')
 
   // spinner start
