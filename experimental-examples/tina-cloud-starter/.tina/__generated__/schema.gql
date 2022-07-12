@@ -90,12 +90,37 @@ type Collection {
 
 union DocumentNode = Posts | Global | Authors | Pages
 
-union PostsMorePosts = Posts | Pages
+type PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockc {
+  title: String
+}
+
+type PostsPageBlocks3NestedBlocksNestedBlock1Items {
+  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockc]
+}
+
+union PostsPageBlocks3NestedBlocksNestedBlock1 = PostsPageBlocks3NestedBlocksNestedBlock1Items
+
+type PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockc {
+  title: String
+}
+
+type PostsPageBlocks3NestedBlocksNestedBlock2Items {
+  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockc]
+}
+
+union PostsPageBlocks3NestedBlocksNestedBlock2 = PostsPageBlocks3NestedBlocksNestedBlock2Items
+
+type PostsPageBlocks3NestedBlocks {
+  nestedBlock1: [PostsPageBlocks3NestedBlocksNestedBlock1]
+  nestedBlock2: [PostsPageBlocks3NestedBlocksNestedBlock2]
+}
+
+union PostsPageBlocks3 = PostsPageBlocks3NestedBlocks
 
 union PostsAuthor = Authors
 
 type Posts implements Node & Document {
-  morePosts: PostsMorePosts
+  pageBlocks3: [PostsPageBlocks3]
   title: String!
   heroImg: String
   excerpt: JSON
@@ -107,16 +132,44 @@ type Posts implements Node & Document {
   _values: JSON!
 }
 
-input PostsMorePostsFilter {
-  posts: PostsFilter
-  pages: PagesFilter
-}
-
 input StringFilter {
   startsWith: String
   eq: String
   exists: Boolean
   in: [String]
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter {
+  title: StringFilter
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter {
+  nestedBlockc: PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcFilter
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock1Filter {
+  items: PostsPageBlocks3NestedBlocksNestedBlock1ItemsFilter
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter {
+  title: StringFilter
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter {
+  nestedBlockc: PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcFilter
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2Filter {
+  items: PostsPageBlocks3NestedBlocksNestedBlock2ItemsFilter
+}
+
+input PostsPageBlocks3NestedBlocksFilter {
+  nestedBlock1: PostsPageBlocks3NestedBlocksNestedBlock1Filter
+  nestedBlock2: PostsPageBlocks3NestedBlocksNestedBlock2Filter
+}
+
+input PostsPageBlocks3Filter {
+  nestedBlocks: PostsPageBlocks3NestedBlocksFilter
 }
 
 input ImageFilter {
@@ -167,7 +220,7 @@ input Posts_bodyFilter {
 }
 
 input PostsFilter {
-  morePosts: PostsMorePostsFilter
+  pageBlocks3: PostsPageBlocks3Filter
   title: StringFilter
   heroImg: ImageFilter
   excerpt: RichTextFilter
@@ -465,8 +518,41 @@ input DocumentMutation {
   pages: PagesMutation
 }
 
+input PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation {
+  title: String
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation {
+  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockcMutation]
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock1Mutation {
+  items: PostsPageBlocks3NestedBlocksNestedBlock1ItemsMutation
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation {
+  title: String
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation {
+  nestedBlockc: [PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockcMutation]
+}
+
+input PostsPageBlocks3NestedBlocksNestedBlock2Mutation {
+  items: PostsPageBlocks3NestedBlocksNestedBlock2ItemsMutation
+}
+
+input PostsPageBlocks3NestedBlocksMutation {
+  nestedBlock1: [PostsPageBlocks3NestedBlocksNestedBlock1Mutation]
+  nestedBlock2: [PostsPageBlocks3NestedBlocksNestedBlock2Mutation]
+}
+
+input PostsPageBlocks3Mutation {
+  nestedBlocks: PostsPageBlocks3NestedBlocksMutation
+}
+
 input PostsMutation {
-  morePosts: String
+  pageBlocks3: [PostsPageBlocks3Mutation]
   title: String
   heroImg: String
   excerpt: JSON
