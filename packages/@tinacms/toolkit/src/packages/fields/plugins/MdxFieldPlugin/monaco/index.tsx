@@ -19,9 +19,10 @@ limitations under the License.
 import React from 'react'
 import { uuid } from '../plate/plugins/ui/helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import * as monaco from 'monaco-editor'
+import type * as monaco from 'monaco-editor'
 import { parseMDX, stringifyMDX } from '@tinacms/mdx/dist/browser.js'
 import { useEditorContext } from '../plate/editor-context'
+import { useDebounce } from './use-debounce'
 
 type Monaco = typeof monaco
 
@@ -50,11 +51,11 @@ const retryFocus = (ref) => {
   }
 }
 
-export const RawEditor = (props: { input: any }) => {
+const RawEditor = (props: { input: any }) => {
   const monaco = useMonaco() as Monaco
   const { setRawMode } = useEditorContext()
   const monacoEditorRef =
-    React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
+    React.useRef<Monaco.editor.IStandaloneCodeEditor>(null)
   const [height, setHeight] = React.useState(100)
   const field = props.field
   const inputValue = React.useMemo(() => {
@@ -66,15 +67,18 @@ export const RawEditor = (props: { input: any }) => {
   const [refresh, setRefresh] = React.useState(false)
   const [error, setError] = React.useState(null)
 
+  const debouncedValue = useDebounce(value, 500)
+
   React.useEffect(() => {
     if (refresh) {
-      console.log(field)
       try {
         const parsedValue = parseMDX(value, field, (value) => {
           console.log('imagecallback', value)
           return value
         })
+        console.log(parsedValue)
         props.input.onChange(parsedValue)
+        setError(null)
       } catch (e) {
         if (e.message) {
           setError(e.message)
@@ -84,7 +88,7 @@ export const RawEditor = (props: { input: any }) => {
       }
       setRefresh(false)
     }
-  }, [refresh, JSON.stringify(value)])
+  }, [refresh, JSON.stringify(debouncedValue)])
 
   const id = React.useMemo(() => uuid(), [])
 
@@ -105,7 +109,9 @@ export const RawEditor = (props: { input: any }) => {
   ) {
     monacoEditorRef.current = monacoEditor
     monacoEditor.onDidContentSizeChange(() => {
-      setHeight(Math.max(100, monacoEditor.getContentHeight()))
+      // FIXME: if the window is too tall the performance degrades, come up with a nice
+      // balance between the two
+      setHeight(Math.min(Math.max(100, monacoEditor.getContentHeight()), 1000))
       monacoEditor.layout()
     })
   }
@@ -126,6 +132,24 @@ export const RawEditor = (props: { input: any }) => {
         <Button onClick={() => setRefresh(true)}>Refresh</Button>
       </div>
       <div style={{ height: `${height}px` }}>
+        {error && (
+          <div className="text-red-500 absolute top-1 right-0" title={error}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        )}
         <MonacoEditor
           path={id}
           onMount={handleEditorDidMount}
@@ -191,3 +215,5 @@ const Button = (props) => {
     </button>
   )
 }
+
+export default RawEditor

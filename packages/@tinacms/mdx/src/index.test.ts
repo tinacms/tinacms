@@ -1065,9 +1065,10 @@ describe('Broken tests', () => {
 })
 
 describe('MDX Elements', () => {
-  const mdxTest1 = '<Cta title="Hello World!" />'
+  // const mdxTest1 = '<div>Hi</div>'
+  const mdxTest1 = `<blockquote>“Apps that browse the web must use the appropriate WebKit framework and WebKit JavaScript.”</blockquote>`
   describe(mdxTest1, () => {
-    test('unregistered elements throw an error', () => {
+    test.only('unregistered elements throw an error', () => {
       const string = mdxTest1
 
       expect(() => parseMDX(string, field, (s) => s)).toThrowError()

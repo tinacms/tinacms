@@ -18,9 +18,14 @@ limitations under the License.
 
 import React from 'react'
 import { wrapFieldsWithMeta } from '../wrapFieldWithMeta'
-import { RawEditor } from './monaco'
+import RawEditor from './monaco'
 import { RichEditor } from './plate'
 import { EditorContext } from './plate/editor-context'
+
+// FIXME RawEditor is large since it comes with the mdx stuff.
+// Either lazy load from a CDN like this package https://github.com/suren-atoyan/monaco-loader#readme
+// Or lazy load via suspense and force all users of Tina to support ESM
+// const RawEditor = React.lazy(() => import('./monaco'))
 
 export const MdxFieldPlugin = {
   name: 'rich-text',
@@ -35,13 +40,7 @@ export const MdxFieldPlugin = {
             'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2 mb-5'
           }
         >
-          {rawMode ? (
-            <div>
-              <RawEditor {...props} />
-            </div>
-          ) : (
-            <RichEditor {...props} />
-          )}
+          {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />}
         </div>
       </EditorContext.Provider>
     )

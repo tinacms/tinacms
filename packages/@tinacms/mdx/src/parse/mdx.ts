@@ -4,6 +4,9 @@ import type * as Plate from './plate'
 import { extractAttributes } from './acorn'
 import { parseMDX } from '.'
 import { remarkToSlate } from './remarkToPlate'
+import { stringifyMDX } from '../stringify'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -32,8 +35,22 @@ export function mdxJsxElement(
     throw new Error('Global templates not yet supported')
   }
   if (!template) {
+    console.log(node)
+    const string = toMarkdown(
+      { type: 'root', children: [node] },
+      {
+        extensions: [mdxJsxToMarkdown()],
+        listItemIndent: 'one',
+      }
+    )
+    console.log(string)
+    return {
+      type: 'html',
+      value: string,
+      children: [{ type: 'text', text: '' }],
+    }
     throw new Error(
-      `Found unregistered JSX or HTML: <${node.name}>. Please ensure all structured elements have been registered with your schema. https://tina.io/docs/editing/mdx/`
+      `Found unregistered JSX or HTML: <${node.name}>! Please ensure all structured elements have been registered with your schema. https://tina.io/docs/editing/mdx/`
     )
   }
   // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)

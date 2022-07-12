@@ -41,6 +41,8 @@ import {
   setNodes,
 } from '@udecode/plate-headless'
 import { CodeBlock } from './code-block'
+import { Monaco } from './code-block/monaco'
+import { Prism } from './code-block/prism'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
 
@@ -164,17 +166,7 @@ export const components = () => {
       />
     ),
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
-    html: (props) => {
-      return <CodeBlock language="html" {...props} />
-    },
-    html_inline: ({ element, editor, leaf, text, className, ...props }) => {
-      return (
-        <span
-          className={`underline decoration-dotted underline-offset-2 ${className}`}
-          {...props}
-        />
-      )
-    },
+    html: (props) => <Monaco language="html" {...props} />,
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
       <ul
         className={classNames(
