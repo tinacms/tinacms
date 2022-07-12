@@ -233,7 +233,12 @@ export function MediaPicker({
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
-      setDirectory(join(item.directory, item.filename))
+      // Only join when there is a directory to join to
+      setDirectory(
+        item.directory === '.' || item.directory === ''
+          ? item.filename
+          : join(item.directory, item.filename)
+      )
       resetOffset()
     }
   }
