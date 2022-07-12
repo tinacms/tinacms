@@ -15,7 +15,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
 import { indexDB } from './build'
-
 export { indexDB } from './build'
 export { resolve } from './resolve'
 export * from './resolver/error'
