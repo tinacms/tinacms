@@ -91,18 +91,10 @@ export const remarkToSlate = (
   }
 
   const html = (content: Md.HTML, block?: boolean): Plate.HTMLElement => {
-    if (block) {
-      return {
-        type: block ? 'html' : 'html_inline',
-        value: content.value,
-        children: [{ type: 'text', text: '' }],
-      }
-    } else {
-      return {
-        type: 'text',
-        text: content.value,
-        html_inline: true,
-      }
+    return {
+      type: block ? 'html' : 'html_inline',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
     }
   }
 
@@ -365,9 +357,21 @@ export const remarkToSlate = (
     }
   }
   const paragraph = (content: Md.Paragraph): Plate.ParagraphElement => {
+    const children = flatten(content.children.map(phrasingContent))
+    // MDX treats <div>Hello</div> is inline even if it's isolated on one line
+    // If that's the case, swap it out with html
+    // TODO: probably need to do the same with JSX
+    if (children.length === 1) {
+      if (children[0].type === 'html_inline') {
+        return {
+          ...children[0],
+          type: 'html',
+        }
+      }
+    }
     return {
       type: 'p',
-      children: flatten(content.children.map(phrasingContent)),
+      children,
     }
   }
   const blockContent = (content: Md.BlockContent): Plate.BlockElement => {

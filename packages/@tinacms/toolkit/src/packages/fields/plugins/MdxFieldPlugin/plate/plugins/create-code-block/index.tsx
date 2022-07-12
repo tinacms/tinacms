@@ -16,5 +16,7 @@ export const createHTMLBlockPlugin = createPluginFactory({
 
 export const createHTMLInlinePlugin = createPluginFactory({
   key: 'html_inline',
-  isLeaf: true,
+  isElement: true,
+  isVoid: true,
+  isInline: true,
 })

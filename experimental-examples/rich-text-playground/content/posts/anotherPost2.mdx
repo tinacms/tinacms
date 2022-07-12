@@ -23,8 +23,6 @@ The aforementioned [theory](https://infrequently.org/2020/06/platform-adjacency-
 
 I relate with the author’s passion for keeping the open web relevant, and with the concern that going too slow with enhancing the web with new features will make it irrelevant. This is augmented by my dislike of app stores and other [walled gardens](https://en.wikipedia.org/wiki/Closed_platform). But as a user I can relate to the opposite perspective &mdash; I get dizzy sometimes when I don’t know what websites I’m browsing are capable or not capable of doing, and I find platform restrictions and auditing to be comforting.
 
-{{% feature-panel %}}
-
 ### Meta-Platforms
 
 To understand the term “meta-platform”, I looked at what the theory uses that name for &mdash; Java and Flash, both products of the turn of the millennium.
@@ -42,8 +40,6 @@ The other ways to develop client-side applications are mainly platform-specific,
 ### Capabilities vs. Time
 
 The main graph in the theory, shows the relevance of meta-platforms on a 2D axis of capabilities vs. time:
-
-{{< rimg src="https://res.cloudinary.com/indysigner/image/upload/v1609336455/the-relevance-gap_kzwi6q.png" href="https://infrequently.org/2020/06/platform-adjacency-theory/" sizes="100vw" caption="Image credit: <a href='https://infrequently.org/2020/06/platform-adjacency-theory/'>Alex Russell</a>" alt="The Relevance Gap" >}}
 
 I can see how the above graph makes sense when talking about cross-platform development frameworks mentioned above like Qt, Xamarin, Flutter and Rust, and also to server platforms like node.js and Java/Scala.
 
@@ -81,11 +77,7 @@ One of the criticisms about native apps in the theory is about [lack of browser 
 
 The criticism is specifically about [Item 2.5.6](https://developer.apple.com/app-store/review/guidelines/#software-requirements) of Apple’s app store review guidelines:
 
-<blockquote>“Apps that browse the web must use the appropriate WebKit framework and WebKit JavaScript.”</blockquote>
-
 This might seem anti-competitive, and I do have my own reservation about how restrictive iOS is. But item 2.5.6 cannot be read without the context of the rest of the app-store review guidelines, for example [Item 2.3.12](https://developer.apple.com/app-store/review/guidelines/#accurate-metadata):
-
-<blockquote>“Apps must clearly describe new features and product changes in their ‘What’s New’ text.”</blockquote>
 
 If an app could receive device access permissions, and then included its own framework that could execute code from any web site out there, those items in the app store review guidelines would become meaningless. Unlike apps, web sites don’t have to describe their features and product changes with every revision.
 
@@ -133,8 +125,6 @@ I wish that for device-access capabilities we could come up with prompts that en
 
 I do agree with the argument that Mozilla & Apple should at least try to innovate in that space rather than “decline to implement”. But maybe they are? I think [isLoggedIn](https://github.com/privacycg/is-logged-in) from Apple, for example, is an interesting and relevant proposal in the 3rd dimension that future device APIs could build upon &mdash; for example, device APIs that are fingerprinting-prone can be made available when the current website already knows the identity of the user.
 
-{{% ad-panel-leaderboard %}}
-
 ## WebUSB
 
 In the next section I will dive into WebUSB, check what it allows, and how it’s handled in the 3rd dimension &mdash; what is the trust and distribution model? Is it sufficient? What are the alternatives?
@@ -161,13 +151,9 @@ So I’ve researched further.
 
 I started by reading what [David Baron](https://dbaron.org/) had to say about why Mozilla ended up rejecting WebUSB, in Mozilla’s [official standards position](https://github.com/mozilla/standards-positions/issues/100):
 
-<blockquote>“Because many USB devices are not designed to handle potentially-malicious interactions over the USB protocols and because those devices can have significant effects on the computer they’re connected to, we believe that the security risks of exposing USB devices to the Web are too broad to risk exposing users to them or to explain properly to end users to obtain meaningful informed consent.”</blockquote>
-
 ### The Current Permission Prompt
 
 This is what Chrome’s WebUSB permission prompt looks like at the time of publishing this post:
-
-{{< rimg href="https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png" src="https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png" sizes="100vw" caption="Permission Prompt. (<a href='https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png'>Large preview</a>)" alt="Permission Prompt" >}}
 
 Particular domain Foo wants to connect to particular device Bar. To do what? and how can I know for sure?
 
@@ -210,117 +196,3 @@ For example, a web page can’t decide on its own to click a link on or wake up 
 So even with the current WebUSB specification, devices can choose to implement several interfaces, e.g. debug for [adb](https://developer.android.com/studio/command-line/adb) and [HID](https://www.usb.org/hid) for pointer input, and using malicious code that takes advantage of ADB, become a keylogger and browse websites on behalf of the user, given the right exploitable firmware flashing mechanism.
 
 Adding that device to a blocklist would be too late for devices with firmware that was compromised using ADB or other allowed forms of flashing, and would make device manufacturers even more reliant than before on browser versions for security fixes associated with their devices.
-
-### Informed Consent & Content
-
-The problem with informed consent and USB, as mentioned before, is that USB (specifically in the extra-generic WebUSB use-cases) is not content-specific. Users know what a printer is, what a camera is, but “USB” for most users is merely a cable (or a socket) &mdash; a means to an end &mdash; very few users know that USB is a protocol and what enabling it between websites and devices means.
-
-One suggestion was to have a “scary” prompt, something along the lines of “Allow this web page to take over the device” (which is an improvement over the seemingly harmless “wants to connect”).
-
-But as scary as prompts get, they cannot explain the breadth of possible things that can be done with raw access to a USB peripheral that the browser doesn’t know intimately, and if they did, no user in their right mind would click “Yes”, unless it’s a device that they fully trust to be bug-free and a website they truly trust to be up-to-date and not malicious.
-
-A possible prompt like that would read “Allow this web page to potentially take over your computer”. I don’t think that a scary prompt like this one would be beneficial for the WebUSB community, and constant changes to these dialogs will leave the community confused.
-
-### Prototyping vs. Product
-
-I can see a possible exception to this. If the premise of WebUSB and the other project Fugu APIs was to support prototyping rather than product-grade devices, all-encompassing generic prompts could make sense.
-
-In order to make that viable, though, I think the following must happen:
-
-1. Use language in the specs that set expectations about this being for prototyping;
-2. Have these APIs available only after some opt-in gesture, like having the user enable them manually in the browser settings;
-3. Have “scary” permission prompts, like the ones for invalid SSL certificates.
-
-Not having the above makes me think that these APIs are for real products rather than for prototypes, and as such, the feedback holds.
-
-{{% ad-panel-leaderboard %}}
-
-## An Alternative Proposal
-
-One of the parts in the original blog post that I agree with is that it’s not enough to say “no” &mdash; major players in the web world who decline certain APIs for being harmful should also play offense and propose ways in which these capabilities that matter to users and developers can be safely exposed. I don’t represent any major player, but I’m going to give it a humble go.
-
-I believe that the answer to this lies in the 3rd dimension of trust and relationship, and that it’s outside the box of permission prompts and block-lists.
-
-### Straightforward And Verified Prompt
-
-The main case I’m going to make is that the prompt should be about the content or action, and not about the peripheral, and that informed consent can be granted for a specific straightforward action with a specific set of verified parameters, not for a general action like “taking over” or “connecting to” a device.
-
-### The 3D Printer Example
-
-In the [WebUSB spec](https://wicg.github.io/webusb/#app-drivers), 3D printers are brought as an example, so I’m going to use it here.
-
-When developing a WebUSB application for a 3D printer, I want the browser/OS prompt to ask me something along the lines of **Allow AutoDesk 3ds-mask to print a model to your CreatBot 3D printer?**, be shown a browser/OS dialog with some print parameters, like refinement, thickness and output dimensions, and with a preview of what’s going to be printed. All of these parameters should be verified by a trusted user agent, not by a drive-by web page.
-
-Currently, the browser doesn’t know the printer, and it can verify only some of the claims in the prompt:
-
-- The requesting domain has a certificate registered to AutoDesk, so there is some certainty that this is AutoDesk Inc;
-- The requested peripheral calls itself “CreatBot 3d printer”;
-- This device, device class and domain are not found in the browser’s block-lists;
-- The user responded “Yes” or “No” to a general question they were asked.
-
-But in order to show a truthful prompt and dialog with the above details, the browser would also have to verify the following:
-
-- When permission is granted, the action performed will be printing a 3D model, and nothing but that;
-- The selected parameters (refinement/thickness/dimensions etc.) are going to be respected;
-- A verified preview of what is going to be printed was shown to the user;
-- In certain sensitive cases, an additional verification that this is in fact AutoDesk, maybe with something like a revokable short-lived token.
-
-Without verifying the above, a website that was granted permission to “connect to” or “take over” a 3D printer can start printing huge 3D models due to a bug (or malicious code in one of its dependencies).
-
-Also, an imagined full-blown web 3D printing capability would do a lot more than what WebUSB can provide &mdash; for example, spooling and queuing different print requests. How would that be handled if the browser window is closed? I haven’t researched all the possible WebUSB peripheral use-cases, but I’m guessing that when looking at them from a content/action perspective, most will need more than USB access.
-
-Because of the above, using WebUSB for 3D printing will probably be hacky and short-lived, and developers relying on it will have to provide a “real” driver for their printer at some point. For example, if OS vendors decide to add built-in support for 3D printers, all sites using that printer with WebUSB would stop working.
-
-### Proposal: Driver Auditing Authority
-
-So, overarching permissions like “take over the peripheral” are problematic, we don’t have enough information in order to show a full-fledged parameter dialog and verify that its results are going to be respected, and we don’t want to send the user on an unsafe trip to download a random executable from the web.
-
-But what if there was an *audited* piece of code, a driver, that used the WebUSB API internally and did the following:
-
-- Implemented the “print” command;
-- Displayed an out-of-page print dialog;
-- Connected to a particular set of USB devices;
-- Performed some of its actions when the page is in the background (e.g. in a service worker), or even when the browser is closed.
-
-An auditing of a driver like this can make sure that what it does amounts to “printing”, that it respects the parameters, and that it shows the print preview.
-
-I see this as being similar to [certificate authorities](https://en.wikipedia.org/wiki/Certificate_authority), an important piece in the web ecosystem that is somewhat disconnected from the browser vendors.
-
-### Driver Syndication
-
-The drivers don’t have to be audited by Google/Apple, though the browser/OS vendor can choose to audit drivers on its own. It can work like SSL certificate authorities &mdash; the issuer is a highly trusted organization; for example, the manufacturer of the particular peripheral or an organization that certifies many drivers, or a platform like Arduino. (I imagine organizations popping up similar to [Let’s Encrypt](https://letsencrypt.org/).)
-
-It might be enough to say to users: “Arduino trusts that this code is going to flash your Uno with *this* firmware” (with a preview of the firmware).
-
-### Caveats
-
-This is of course not free of potential problems:
-
-- The driver itself can be buggy or malicious. But at least it’s audited;
-- It’s less “webby” and generates an additional development burden;
-- It doesn’t exist today, and cannot be solved by internal innovation in browser engines.
-
-### Other Alternatives
-
-Other alternatives could be to somehow standardize and improve the cross-browser [Web Extensions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions) API, and make the existing browser add-on stores like [Chrome Web Store](https://chrome.google.com/webstore/category/extensions) into somewhat of a driver auditing authority, mediating between user requests and peripheral access.
-
-## Summary Of Opinion
-
-The author, Google and partners’ bold efforts to keep the open web relevant by enhancing its capabilities are inspirational.
-
-When I get down to the details, I see Apple and Mozilla’s more conservative view of the web, and their defensive approach to new device capabilities, as carrying technical merit. Core issues with informed consent around open-ended hardware capabilities are far from being solved.
-
-Apple could be more forthcoming in the discussion to find new ways to enable device capabilities, but I believe this comes from a different perspective about computing, a standpoint that was part of Apple’s identity for decades, not from an anti-competitive standpoint.
-
-In order to support things like the somewhat open-ended hardware capabilities in project Fugu, and specifically WebUSB, the *trust model* of the web needs to evolve beyond permission prompts and domain/device block-lists, drawing inspiration from trust ecosystems like certificate authorities and package distributions.
-
-### <span class="rh">Further Reading</span> on SmashingMag:
-
-<ul>
-  <li><a title="Read 'How Improving Website Performance Can Help Save The Planet'" href="https://www.smashingmagazine.com/2019/01/save-planet-improving-website-performance/" rel="bookmark">How Improving Website Performance Can Help Save The Planet</a></li>
-  <li><a title="Read 'Towards An Ad-Free Web: Diversifying The Online Economy'" href="https://www.smashingmagazine.com/2021/01/towards-ad-free-web-diversifying-online-economy/" rel="bookmark">Towards An Ad-Free Web: Diversifying The Online Economy</a></li>
-  <li><a title="Read 'Is There A Future Beyond Writing Great Code?'" href="https://www.smashingmagazine.com/2019/11/future-beyond-writing-great-code/" rel="bookmark">Is There A Future Beyond Writing Great Code?</a></li>
-  <li><a title="Read 'Using Ethics In Web Design'" href="https://www.smashingmagazine.com/2018/03/using-ethics-in-web-design/" rel="bookmark">Using Ethics In Web Design</a></li>
-</ul>
-
-{{< signature "ra, yk, il" >}}

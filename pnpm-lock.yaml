@@ -650,16 +650,21 @@ importers:
       leveldown: ^6.1.0
       lodash: ^4.17.20
       mdast: ^3.0.0
+      mdast-util-from-markdown: ^1.0.0
       mdast-util-mdx: ^2.0.0
       mdast-util-mdx-jsx: ^2.0.1
       mdast-util-to-markdown: ^1.3.0
+      micromark: ^3.0.10
+      micromark-extension-mdx: ^1.0.0
+      micromark-extension-mdx-jsx: ^1.0.3
+      micromark-extension-mdx-md: ^1.0.0
       nodemon: ^2.0.4
       normalize-path: ^3.0.0
       prettier: ^2.7.1
       rehype-raw: ^6.1.1
       remark: ^14.0.2
       remark-html: ^15.0.1
-      remark-mdx: ^2.1.1
+      remark-mdx: ^2.1.2
       remark-parse: ^10.0.1
       remark-rehype: ^8.0.0
       ts-node: ^10.8.2
@@ -694,9 +699,14 @@ importers:
       leveldown: 6.1.1
       lodash: 4.17.21
       mdast: 3.0.0
+      mdast-util-from-markdown: 1.2.0
       mdast-util-mdx: 2.0.0
       mdast-util-mdx-jsx: 2.0.1
       mdast-util-to-markdown: 1.3.0
+      micromark: 3.0.10
+      micromark-extension-mdx: 1.0.0
+      micromark-extension-mdx-jsx: 1.0.3
+      micromark-extension-mdx-md: 1.0.0
       normalize-path: 3.0.0
       prettier: 2.7.1
       rehype-raw: 6.1.1
@@ -7455,7 +7465,7 @@ packages:
         integrity: sha512-veQTnWP+1D/xbxVrPC3zHnCZRjSrKfhbMUlEA43iMZLu7EsnTtkJklIuwrCPbOi8YkvDQAiW05VQQFvvz9oieQ==,
       }
     dependencies:
-      '@types/estree': 0.0.50
+      '@types/estree': 0.0.52
     dev: false
 
   /@types/aria-query/4.2.2:
@@ -7633,6 +7643,7 @@ packages:
       {
         integrity: sha512-C6N5s2ZFtuZRj54k2/zyRhNDjJwwcViAM3Nbm8zjBpbqAdZ00mr0CFxvSKeO8Y/e03WVFLpQMdHYVfUd6SB+Hw==,
       }
+    dev: true
 
   /@types/estree/0.0.51:
     resolution:
@@ -22192,6 +22203,19 @@ packages:
         integrity: sha512-xaRAMoSkKdqZXDAoSgp20Azm0aRQKGOl0RrS81yGu8Hr/JhMsBmfs4wR7m9kgVUIO36cMUQjNyiyDKPrsv8gOw==,
       }
     dependencies:
+      micromark-util-types: 1.0.2
+    dev: false
+
+  /micromark-extension-mdx/1.0.0:
+    resolution:
+      {
+        integrity: sha512-kXD6iMuht9/zs9Q0DHcosuqqEivRc85fk0jJyx+HIGfhjw4xBsyBjz2ImvL6gLKka8GhLYw/Abo91+2LlPhX7A==,
+      }
+    dependencies:
+      micromark-extension-mdx-expression: 1.0.3
+      micromark-extension-mdx-jsx: 1.0.3
+      micromark-extension-mdx-md: 1.0.0
+      micromark-util-combine-extensions: 1.0.0
       micromark-util-types: 1.0.2
     dev: false
 

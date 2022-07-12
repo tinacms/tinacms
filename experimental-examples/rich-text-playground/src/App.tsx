@@ -1,6 +1,7 @@
 import Tina from '../.tina/components/TinaProvider'
 import { useTina } from 'tinacms/dist/edit-state'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { Prism } from 'tinacms/dist/rich-text/prism'
 
 function Page() {
   const { isLoading, data } = useTina({
@@ -19,7 +20,11 @@ function Page() {
 
   return (
     <div className="prose m-12">
-      <TinaMarkdown content={data.posts.body} />
+      {/* <pre>{JSON.stringify(data.posts.body, null, 2)}</pre> */}
+      <TinaMarkdown
+        content={data.posts.body}
+        components={{ code_block: (props) => <Prism {...props} /> }}
+      />
     </div>
   )
 }

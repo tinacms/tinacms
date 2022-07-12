@@ -71,17 +71,16 @@ import { remarkToSlate } from './remarkToPlate'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import * as acorn from 'acorn'
+import { mdxJsxFromMarkdown } from 'mdast-util-mdx-jsx'
+import { mdxJsx } from 'micromark-extension-mdx-jsx'
+import { mdxMd } from 'micromark-extension-mdx-md'
 export const markdownToAst = (value: string, skipMDX?: boolean) => {
-  let tree
-  if (skipMDX) {
-    tree = unified().use(markdown).parse(value)
-  } else {
-    try {
-      tree = unified().use(markdown).use(mdx).parse(value)
-    } catch (e) {
-      // FIXME: this error is completely empty, not sure how to get the message
-    }
-  }
+  const tree = fromMarkdown(value, 'utf-8', {
+    extensions: [mdxMd, mdxJsx({ acorn: acorn, addResult: true })],
+    mdastExtensions: [mdxJsxFromMarkdown()],
+  })
   if (!tree) {
     throw new Error('Error parsing markdown')
   }

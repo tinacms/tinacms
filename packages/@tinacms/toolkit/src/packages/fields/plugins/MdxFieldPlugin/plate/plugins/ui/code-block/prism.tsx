@@ -18,7 +18,17 @@ import theme from 'prism-react-renderer/themes/nightOwl'
 export const Prism = (props) => {
   console.log(props)
   return (
-    <div contentEditable="false">
+    <span contentEditable="false">
+      <style>
+        {`
+        pre[class*="language-" ],
+        code[class*="language-"] {
+            white-space: normal;
+            overflow: auto;
+            word-break: break-word;
+        }
+        `}
+      </style>
       <Highlight
         {...defaultProps}
         {...props.attributes}
@@ -39,6 +49,6 @@ export const Prism = (props) => {
           </pre>
         )}
       </Highlight>
-    </div>
+    </span>
   )
 }

@@ -166,7 +166,34 @@ export const components = () => {
       />
     ),
     [ELEMENT_CODE_BLOCK]: (props) => <CodeBlock {...props} />,
-    html: (props) => <Monaco language="html" {...props} />,
+    html: ({ attributes, editor, element, children, className }) => {
+      return (
+        <div
+          {...attributes}
+          className={classNames(
+            'font-mono text-sm bg-green-100 cursor-not-allowed mb-4',
+            className
+          )}
+        >
+          {children}
+          {element.value}
+        </div>
+      )
+    },
+    html_inline: ({ attributes, editor, element, children, className }) => {
+      return (
+        <span
+          {...attributes}
+          className={classNames(
+            'font-mono bg-green-100 cursor-not-allowed',
+            className
+          )}
+        >
+          {children}
+          {element.value}
+        </span>
+      )
+    },
     [ELEMENT_UL]: ({ attributes, editor, className, element, ...props }) => (
       <ul
         className={classNames(

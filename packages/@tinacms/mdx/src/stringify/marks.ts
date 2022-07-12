@@ -136,7 +136,7 @@ const inlineElementExceptLink = (
         children,
       }
     }
-    case 'html': {
+    case 'html_inline': {
       return {
         type: 'html',
         value: content.value,

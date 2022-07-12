@@ -35,7 +35,6 @@ export function mdxJsxElement(
     throw new Error('Global templates not yet supported')
   }
   if (!template) {
-    console.log(node)
     const string = toMarkdown(
       { type: 'root', children: [node] },
       {
@@ -43,15 +42,11 @@ export function mdxJsxElement(
         listItemIndent: 'one',
       }
     )
-    console.log(string)
     return {
-      type: 'html',
-      value: string,
+      type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
+      value: string.trim(),
       children: [{ type: 'text', text: '' }],
     }
-    throw new Error(
-      `Found unregistered JSX or HTML: <${node.name}>! Please ensure all structured elements have been registered with your schema. https://tina.io/docs/editing/mdx/`
-    )
   }
   // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
   const props = extractAttributes(
