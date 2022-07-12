@@ -11,6 +11,7 @@
     },
     "types": {
       "dependsOn": ["build", "^types"],
+      "cache": false,
       "outputs": [
         "dist/**"
       ]
