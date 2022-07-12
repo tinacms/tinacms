@@ -15,7 +15,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
 import { indexDB } from './build'
-
 export { indexDB } from './build'
 export { resolve } from './resolve'
 export * from './resolver/error'
@@ -27,6 +26,8 @@ export type { Store } from '@tinacms/datalayer'
 export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
+
+export type DummyType = unknown
 
 export const buildSchema = async (
   rootPath: string,

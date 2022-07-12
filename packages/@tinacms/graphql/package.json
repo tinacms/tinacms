@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.61.1",
+  "version": "0.61.7",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
