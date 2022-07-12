@@ -77,12 +77,16 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
+      styled-components: ^5.1.3
+      tinacms: workspace:*
     dependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
       next: 12.0.3_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+      tinacms: link:../../packages/tinacms
     devDependencies:
       '@types/node': 17.0.45
       eslint: 7.32.0
