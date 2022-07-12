@@ -27,6 +27,8 @@ export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
 
+export type DummyType = unknown
+
 export const buildSchema = async (
   rootPath: string,
   database: Database,
