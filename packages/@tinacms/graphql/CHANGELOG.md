@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.61.3
+
+### Patch Changes
+
+- 0b5a8e6e7: Whitespace change to bump package
+
 ## 0.61.2
 
 ### Patch Changes
