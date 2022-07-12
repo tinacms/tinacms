@@ -17,7 +17,7 @@ const schema = defineSchema({
 })
 ```
 
-To get the old behaver set referenceDepth to `1`.
+To get the old behavior set referenceDepth to `1`.
 
 ```ts
 const schema = defineSchema({
