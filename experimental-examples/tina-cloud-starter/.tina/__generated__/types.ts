@@ -899,7 +899,7 @@ export type LayoutQueryFragmentFragment = { __typename?: 'Query', global: { __ty
 export type PageQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PageQueryQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', edges?: Array<{ __typename?: 'PostsConnectionEdges', node?: { __typename?: 'Posts', id: string, _values: any, author?: { __typename?: 'Authors', name: string, avatar?: string | null } | null, _sys: { __typename?: 'SystemInfo', filename: string } } | null } | null> | null }, global: { __typename?: 'Global', header?: { __typename: 'GlobalHeader', color?: string | null, icon?: { __typename: 'GlobalHeaderIcon', color?: string | null, style?: string | null, name?: string | null } | null, nav?: Array<{ __typename: 'GlobalHeaderNav', href?: string | null, label?: string | null } | null> | null } | null, footer?: { __typename: 'GlobalFooter', color?: string | null, social?: { __typename: 'GlobalFooterSocial', facebook?: string | null, twitter?: string | null, instagram?: string | null, github?: string | null } | null } | null, theme?: { __typename: 'GlobalTheme', color?: string | null, font?: string | null, icon?: string | null, darkMode?: string | null } | null } };
+export type PageQueryQuery = { __typename?: 'Query', postsConnection: { __typename?: 'PostsConnection', edges?: Array<{ __typename?: 'PostsConnectionEdges', node?: { __typename?: 'Posts', id: string, title: string, heroImg?: string | null, excerpt?: any | null, date?: string | null, _body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string }, pageBlocks3?: Array<{ __typename: 'PostsPageBlocks3NestedBlocks', nestedBlock1?: Array<{ __typename: 'PostsPageBlocks3NestedBlocksNestedBlock1Items', nestedBlockc?: Array<{ __typename: 'PostsPageBlocks3NestedBlocksNestedBlock1ItemsNestedBlockc', title?: string | null } | null> | null } | null> | null, nestedBlock2?: Array<{ __typename: 'PostsPageBlocks3NestedBlocksNestedBlock2Items', nestedBlockc?: Array<{ __typename: 'PostsPageBlocks3NestedBlocksNestedBlock2ItemsNestedBlockc', title?: string | null } | null> | null } | null> | null } | null> | null, author?: { __typename?: 'Authors', name: string, avatar?: string | null, id: string } | null } | null } | null> | null }, global: { __typename?: 'Global', header?: { __typename: 'GlobalHeader', color?: string | null, icon?: { __typename: 'GlobalHeaderIcon', color?: string | null, style?: string | null, name?: string | null } | null, nav?: Array<{ __typename: 'GlobalHeaderNav', href?: string | null, label?: string | null } | null> | null } | null, footer?: { __typename: 'GlobalFooter', color?: string | null, social?: { __typename: 'GlobalFooterSocial', facebook?: string | null, twitter?: string | null, instagram?: string | null, github?: string | null } | null } | null, theme?: { __typename: 'GlobalTheme', color?: string | null, font?: string | null, icon?: string | null, darkMode?: string | null } | null } };
 
 export type ContentQueryQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -1145,12 +1145,7 @@ export const PageQueryDocument = gql`
     edges {
       node {
         id
-        _values
-        author {
-          ... on Authors {
-            ...AuthorsParts
-          }
-        }
+        ...PostsParts
         _sys {
           filename
         }
@@ -1159,7 +1154,7 @@ export const PageQueryDocument = gql`
   }
 }
     ${LayoutQueryFragmentFragmentDoc}
-${AuthorsPartsFragmentDoc}`;
+${PostsPartsFragmentDoc}`;
 export const ContentQueryDocument = gql`
     query ContentQuery($relativePath: String!) {
   ...LayoutQueryFragment
