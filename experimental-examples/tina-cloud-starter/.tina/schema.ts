@@ -69,6 +69,12 @@ const schema = defineSchema({
     client: {
       referenceDepth: 5,
     },
+    // If you wanted cloudinary do this
+    // loadCustomStore: async () => {
+    //   const pack = await import("next-tinacms-cloudinary");
+    //   return pack.TinaCloudCloudinaryMediaStore;
+    // },
+    // this is the config for the tina cloud media store
     media: {
       tina: {
         publicFolder: "public",
