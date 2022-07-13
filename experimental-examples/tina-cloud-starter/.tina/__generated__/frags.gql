@@ -26,6 +26,10 @@ fragment PostsParts on Posts {
   heroImg
   excerpt
   author {
+    ... on Authors {
+      name
+      avatar
+    }
     ... on Document {
       id
     }

@@ -34,6 +34,9 @@ export type UIField<F extends UIField = any, Shape = any> = {
 }
 
 export interface TinaCloudSchemaConfig<Store = any> {
+  client?: {
+    referenceDepth?: number
+  }
   media?: {
     loadCustomStore?: () => Promise<Store>
     tina?: {
