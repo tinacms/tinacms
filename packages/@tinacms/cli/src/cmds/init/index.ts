@@ -73,6 +73,12 @@ export const MIN_REACT_VERSION = '>=16.14.0'
 export async function checkDeps(ctx: any, next: () => void, options) {
   const bar = new Progress('Checking dependencies. :prog', 1)
 
+  if (!fs.existsSync(packageJSONPath)) {
+    logger.warn(
+      warnText('Warning: can not find package.json, skipping decency checks')
+    )
+    return next()
+  }
   const packageJSON = JSON.parse(
     (await fs.readFileSync(packageJSONPath)).toString()
   )
@@ -104,6 +110,9 @@ export const checkPackage = (packageJSON, packageName) => {
       }
     }
   )
+  if (!strippedVersion) {
+    throw new Error(`Please add ${packageName} to your project`)
+  }
   return checkVersion(strippedVersion)
 }
 
@@ -163,7 +172,6 @@ export async function installDeps(ctx: any, next: () => void, options) {
 }
 
 const baseDir = process.cwd()
-// TODO: should handle src folder here
 const packageJSONPath = p.join(baseDir, 'package.json')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.md')
@@ -245,18 +253,36 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   }
   logger.info('Adding a content folder... ✅')
   // 4. update the users package.json
-  const packagePath = p.join(baseDir, 'package.json')
-  const pack = JSON.parse(readFileSync(packagePath).toString())
-  const oldScripts = pack.scripts || {}
-  const newPack = JSON.stringify(
-    {
-      ...pack,
-      scripts: extendNextScripts(oldScripts),
-    },
-    null,
-    2
-  )
-  writeFileSync(packagePath, newPack)
+  if (!fs.existsSync(packageJSONPath)) {
+    logger.warn(
+      warnText(
+        `Warning: can not find package.json, skipping adding build and dev scripts\n Please add ${JSON.stringify(
+          {
+            scripts: extendNextScripts({
+              build: 'your build script',
+              dev: 'your dev script',
+              start: 'your start script',
+            }),
+          },
+          null,
+          2
+        )} to your package.json`
+      )
+    )
+    return next()
+  } else {
+    const pack = JSON.parse(readFileSync(packageJSONPath).toString())
+    const oldScripts = pack.scripts || {}
+    const newPack = JSON.stringify(
+      {
+        ...pack,
+        scripts: extendNextScripts(oldScripts),
+      },
+      null,
+      2
+    )
+    writeFileSync(packageJSONPath, newPack)
+  }
 
   // pages/admin.tsx
   const adminPath = p.join(pagesPath, 'admin.js')
