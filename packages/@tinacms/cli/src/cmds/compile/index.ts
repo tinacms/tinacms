@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import * as _ from 'lodash'
+import packPath from 'package-json-path'
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
 import fs from 'fs-extra'
 import path from 'path'
@@ -23,8 +24,10 @@ import { defaultSchema } from './defaultSchema'
 import { getSchemaPath, getClientPath } from '../../lib'
 import { logger } from '../../logger'
 
-const tinaPath = path.join(process.cwd(), '.tina')
-const packageJSONFilePath = path.join(process.cwd(), 'package.json')
+const root = process.cwd()
+const tinaPath = path.join(root, '.tina')
+// const packageJSONFilePath = path.join(process.cwd(), 'package.json')
+const packageJSONFilePath = packPath(root)
 const tinaGeneratedPath = path.join(tinaPath, '__generated__')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
