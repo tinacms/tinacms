@@ -288,7 +288,6 @@ importers:
       log4js: ^6.4.0
       multer: ^1.4.4
       normalize-path: ^3.0.0
-      package-json-path: ^1.0.9
       progress: ^2.0.3
       prompts: ^2.4.1
       typescript: 4.3.5
@@ -331,7 +330,6 @@ importers:
       log4js: 6.5.2
       multer: 1.4.4
       normalize-path: 3.0.0
-      package-json-path: 1.0.9
       progress: 2.0.3
       prompts: 2.4.2
       yarn: 1.22.19
@@ -8797,15 +8795,6 @@ packages:
     dependencies:
       event-target-shim: 5.0.1
 
-  /abs/1.3.14:
-    resolution:
-      {
-        integrity: sha512-PrS26IzwKLWwuURpiKl8wRmJ2KdR/azaVrLEBWG/TALwT20Y7qjtYp1qcMLHA4206hBHY5phv3w4pjf9NPv4Vw==,
-      }
-    dependencies:
-      ul: 5.2.15
-    dev: false
-
   /abstract-leveldown/7.2.0:
     resolution:
       {
@@ -12667,15 +12656,6 @@ packages:
       inherits: 2.0.4
     dev: false
 
-  /deffy/2.2.4:
-    resolution:
-      {
-        integrity: sha512-pLc9lsbsWjr6RxmJ2OLyvm+9l4j1yK69h+TML/gUit/t3vTijpkNGh8LioaJYTGO7F25m6HZndADcUOo2PsiUg==,
-      }
-    dependencies:
-      typpy: 2.3.13
-    dev: false
-
   /define-properties/1.1.4:
     resolution:
       {
@@ -15383,15 +15363,6 @@ packages:
       {
         integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==,
       }
-
-  /function.name/1.0.13:
-    resolution:
-      {
-        integrity: sha512-mVrqdoy5npWZyoXl4DxCeuVF6delDcQjVS9aPdvLYlBxtMTZDR2B5GVEQEoM1jJyspCqg3C0v4ABkLE7tp9xFA==,
-      }
-    dependencies:
-      noop6: 1.0.9
-    dev: false
 
   /function.prototype.name/1.1.5:
     resolution:
@@ -21281,13 +21252,6 @@ packages:
       update-notifier: 5.1.0
     dev: true
 
-  /noop6/1.0.9:
-    resolution:
-      {
-        integrity: sha512-DB3Hwyd89dPr5HqEPg3YHjzvwh/mCqizC1zZ8vyofqc+TQRyPDnT4wgXXbLGF4z9YAzwwTLi8pNLhGqcbSjgkA==,
-      }
-    dev: false
-
   /nopt/1.0.10:
     resolution:
       {
@@ -21907,15 +21871,6 @@ packages:
       netmask: 2.0.2
     dev: false
     optional: true
-
-  /package-json-path/1.0.9:
-    resolution:
-      {
-        integrity: sha512-uNu7f6Ef7tQHZRnkyVnCtzdSYVN9uBtge/sG7wzcUaawFWkPYUq67iXxRGrQSg/q0tzxIB8jSyIYUKjG2Jn//A==,
-      }
-    dependencies:
-      abs: 1.3.14
-    dev: false
 
   /package-json/6.5.0:
     resolution:
@@ -27513,30 +27468,11 @@ packages:
     hasBin: true
     dev: false
 
-  /typpy/2.3.13:
-    resolution:
-      {
-        integrity: sha512-vOxIcQz9sxHi+rT09SJ5aDgVgrPppQjwnnayTrMye1ODaU8gIZTDM19t9TxmEElbMihx2Nq/0/b/MtyKfayRqA==,
-      }
-    dependencies:
-      function.name: 1.0.13
-    dev: false
-
   /ua-parser-js/0.7.31:
     resolution:
       {
         integrity: sha512-qLK/Xe9E2uzmYI3qLeOmI0tEOt+TBBQyUIAh4aAgU05FVYzeZrKUdkAZfBNVGRaHVgV0TDkdEngJSw/SyQchkQ==,
       }
-    dev: false
-
-  /ul/5.2.15:
-    resolution:
-      {
-        integrity: sha512-svLEUy8xSCip5IWnsRa0UOg+2zP0Wsj4qlbjTmX6GJSmvKMHADBuHOm1dpNkWqWPIGuVSqzUkV3Cris5JrlTRQ==,
-      }
-    dependencies:
-      deffy: 2.2.4
-      typpy: 2.3.13
     dev: false
 
   /unbox-primitive/1.0.2:
