@@ -35,6 +35,8 @@ type BaseComponents = {
   hr?: {}
   break?: {}
   maybe_mdx?: { children: JSX.Element }
+  html?: { value: string }
+  html_inline?: { value: string }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -325,10 +327,11 @@ const Node = ({ components, child }) => {
        */
       return null
     case 'html':
-      // return <div dangerouslySetInnerHTML={createMarkup(child.value)} />
-      return child.value
     case 'html_inline':
-      // return <div dangerouslySetInnerHTML={createMarkup(child.value)} />
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return <Component {...props} />
+      }
       return child.value
     default:
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types

@@ -17,13 +17,24 @@ function Page() {
   if (isLoading) {
     return <div>Loading...</div>
   }
+  function createMarkup(value) {
+    return { __html: value }
+  }
 
   return (
     <div className="prose m-12">
       {/* <pre>{JSON.stringify(data.posts.body, null, 2)}</pre> */}
       <TinaMarkdown
         content={data.posts.body}
-        components={{ code_block: (props) => <Prism {...props} /> }}
+        components={{
+          code_block: (props) => <Prism {...props} />,
+          // html_inline: (props) => (
+          //   <span dangerouslySetInnerHTML={createMarkup(props?.value)} />
+          // ),
+          // html : (props) => (
+          //   <div dangerouslySetInnerHTML={createMarkup(props?.value)} />
+          // ),
+        }}
       />
     </div>
   )
