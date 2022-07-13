@@ -315,8 +315,7 @@ const Node = ({ components, child }) => {
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
           return <ComponentMissing name={child.name} />
         } else {
-          // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-          throw new Error(`No component provided for ${child.name}`)
+          return <span>{`No component provided for ${child.name}`}</span>
         }
       }
     case 'maybe_mdx':

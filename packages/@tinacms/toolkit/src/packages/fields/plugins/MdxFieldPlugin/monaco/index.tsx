@@ -59,9 +59,8 @@ const RawEditor = (props: { input: any }) => {
   const [height, setHeight] = React.useState(100)
   const field = props.field
   const inputValue = React.useMemo(() => {
-    return typeof props.input.value === 'string'
-      ? props.input.value
-      : stringifyMDX(props.input.value, field)
+    const res = stringifyMDX(props.input.value, field)
+    return typeof props.input.value === 'string' ? props.input.value : res
   }, [])
   const [value, setValue] = React.useState(inputValue)
   const [refresh, setRefresh] = React.useState(false)

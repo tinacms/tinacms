@@ -32,6 +32,44 @@ const schema = defineSchema({
           name: 'body',
           templates: [
             {
+              name: 'MyShortcode',
+              label: 'My Shortcode',
+              // inline: true,
+              match: {
+                start: '{{<',
+                end: '>}}',
+              },
+              fields: [
+                {
+                  name: 'text',
+                  label: 'Text',
+                  type: 'string',
+                  ui: {
+                    component: 'textarea',
+                  },
+                },
+              ],
+            },
+            {
+              name: 'MyShortcode2',
+              label: 'My Shortcode 2',
+              // inline: true,
+              match: {
+                start: '{{%',
+                end: '%}}',
+              },
+              fields: [
+                {
+                  name: 'text',
+                  label: 'Text',
+                  type: 'string',
+                  ui: {
+                    component: 'textarea',
+                  },
+                },
+              ],
+            },
+            {
               name: 'RelatedPost',
               label: 'Related Post',
               inline: true,

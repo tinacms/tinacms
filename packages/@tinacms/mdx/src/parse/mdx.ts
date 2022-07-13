@@ -2,9 +2,7 @@ import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Plate from './plate'
 import { extractAttributes } from './acorn'
-import { parseMDX } from '.'
 import { remarkToSlate } from './remarkToPlate'
-import { stringifyMDX } from '../stringify'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 
@@ -48,6 +46,28 @@ export function mdxJsxElement(
       children: [{ type: 'text', text: '' }],
     }
   }
+
+  if (template.match) {
+    const value = node.children[0].value
+    if (node.type === 'mdxJsxFlowElement') {
+      // NOTE: Since we cast the children to `inline code`
+      // I don't think this code will ever run.
+      // And I'm not sure care either way
+      return {
+        type: node.type,
+        name: node.name,
+        children: [{ type: 'text', text: '' }],
+        props: { text: value },
+      }
+    } else {
+      return {
+        type: node.type,
+        name: node.name,
+        children: [{ type: 'text', text: '' }],
+        props: { text: value },
+      }
+    }
+  }
   // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
   const props = extractAttributes(
     node.attributes,
@@ -55,8 +75,8 @@ export function mdxJsxElement(
     imageCallback
   )
   const childField = template.fields.find((field) => field.name === 'children')
-  const childProps = remarkToSlate(node, childField, imageCallback)
   if (childField) {
+    const childProps = remarkToSlate(node, childField, imageCallback)
     props.children = childProps
   }
   return {

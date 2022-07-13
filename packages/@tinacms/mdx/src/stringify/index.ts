@@ -29,10 +29,25 @@ export const stringifyMDX = (
   field: RichTypeInner,
   imageCallback: (url: string) => string
 ) => {
-  return toMarkdown(rootElement(value, field, imageCallback), {
+  const res = toMarkdown(rootElement(value, field, imageCallback), {
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
   })
+  const templatesWithMatchers = field.templates.filter(
+    (template) => template.match
+  )
+  let preprocessedString = res
+  templatesWithMatchers.forEach((template) => {
+    preprocessedString = preprocessedString.replaceAll(
+      `<${template.name}>\``,
+      `${template.match.start} `
+    )
+    preprocessedString = preprocessedString.replaceAll(
+      `\`</${template.name}>`,
+      ` ${template.match.end}`
+    )
+  })
+  return preprocessedString
 }
 
 export const rootElement = (
@@ -90,6 +105,7 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
+      console.log('itme?', content)
       const { children, attributes } = stringifyProps(
         content,
         field,

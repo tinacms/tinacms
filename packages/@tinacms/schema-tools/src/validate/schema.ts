@@ -56,6 +56,12 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
         message: 'Fields can only have one use of `isTitle`',
       }
     ),
+  match: z
+    .object({
+      start: z.string(),
+      end: z.string(),
+    })
+    .optional(),
   templates: z
     .array(Template)
     .min(1)

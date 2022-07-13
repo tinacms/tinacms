@@ -85,6 +85,9 @@ export const remarkToSlate = (
         return list(content)
       case 'html':
         return html(content, true)
+      // MDX text flow elements can return `text` children at the top level
+      case 'text':
+        return text(content)
       default:
         throw new Error(`Content: ${content.type} is not yet supported`)
     }

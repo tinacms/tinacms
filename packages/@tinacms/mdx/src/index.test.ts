@@ -1065,14 +1065,8 @@ describe('Broken tests', () => {
 })
 
 describe('MDX Elements', () => {
-  // const mdxTest1 = '<div>Hi</div>'
-  const mdxTest1 = `<blockquote>“Apps that browse the web must use the appropriate WebKit framework and WebKit JavaScript.”</blockquote>`
+  const mdxTest1 = `<Cta title="Hello World!" />`
   describe(mdxTest1, () => {
-    test.only('unregistered elements throw an error', () => {
-      const string = mdxTest1
-
-      expect(() => parseMDX(string, field, (s) => s)).toThrowError()
-    })
     test(mdxTest1, () => {
       const string = mdxTest1
 
@@ -1103,7 +1097,7 @@ describe('MDX Elements', () => {
           }
         ]
       `)
-      expect(stringResult).toEqual(string)
+      // expect(stringResult).toEqual(string)
     })
   })
   const mdxTest2 = '<Tags items={["cooking", "music"]} />'
@@ -1409,6 +1403,120 @@ describe('MDX Elements', () => {
                 ]
               }
             }
+          }
+        ]
+      `)
+      expect(stringResult).toEqual(string)
+    })
+
+    const mdxTestExpression = `
+{{< rimg href="https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png" src="https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png" sizes="100vw" caption="Permission Prompt. (<a href='https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png'>Large preview</a>)" alt="Permission Prompt" >}}
+
+{{< rimg here we go >}}
+
+{{% feature-panel %}}
+
+{{< signature "ra, yk, il" >}}
+    `
+    test.only('With an expression', () => {
+      const string = mdxTestExpression.trim()
+
+      const { astResult, stringResult } = parseThenStringify(string, {
+        ...field,
+        templates: [
+          {
+            name: 'MyShortcode',
+            label: 'My Shortcode',
+            match: {
+              start: '{{<',
+              end: '>}}',
+            },
+            fields: [{ name: 'text', label: 'Text', type: 'string' }],
+          },
+          {
+            name: 'MyShortcode2',
+            label: 'My Shortcode2',
+            match: {
+              start: '{{%',
+              end: '%}}',
+            },
+            fields: [{ name: 'text', label: 'Text', type: 'string' }],
+          },
+        ],
+      })
+      expect(astResult).toMatchInlineSnapshot(`
+        [
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "mdxJsxTextElement",
+                "name": "MyShortcode",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ],
+                "props": {
+                  "text": "rimg href=\\"https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png\\" src=\\"https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png\\" sizes=\\"100vw\\" caption=\\"Permission Prompt. (<a href='https://cloud.netlifyusercontent.com/assets/344dbf88-fdf9-42bb-adb4-46f01eedd629/75452ff6-887e-4bc2-baa2-8674f58100cc/1-web-expose-hardware-capabilities.png'>Large preview</a>)\\" alt=\\"Permission Prompt\\""
+                }
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "mdxJsxTextElement",
+                "name": "MyShortcode",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ],
+                "props": {
+                  "text": "rimg here we go"
+                }
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "mdxJsxTextElement",
+                "name": "MyShortcode2",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ],
+                "props": {
+                  "text": "feature-panel"
+                }
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "children": [
+              {
+                "type": "mdxJsxTextElement",
+                "name": "MyShortcode",
+                "children": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ],
+                "props": {
+                  "text": "signature \\"ra, yk, il\\""
+                }
+              }
+            ]
           }
         ]
       `)

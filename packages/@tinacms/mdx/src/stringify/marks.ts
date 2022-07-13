@@ -129,6 +129,17 @@ const inlineElementExceptLink = (
         field,
         imageCallback
       )
+      const template = field.templates.find(
+        (template) => template.name === content.name
+      )
+      if (template.match) {
+        return {
+          type: 'mdxJsxTextElement',
+          name: content.name,
+          attributes: [],
+          children: [{ type: 'inlineCode', value: attributes[0].value }],
+        }
+      }
       return {
         type: 'mdxJsxTextElement',
         name: content.name,

@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 
+import { remark } from 'remark'
+import remarkMdx from 'remark-mdx'
 import { unified } from 'unified'
-import markdown from 'remark-parse'
-import mdx from 'remark-mdx'
-import { RichTypeInner } from '@tinacms/schema-tools'
 import { visit } from 'unist-util-visit'
 import { remarkToSlate } from './remarkToPlate'
+import type { RichTypeInner } from '@tinacms/schema-tools'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -71,24 +71,38 @@ import { remarkToSlate } from './remarkToPlate'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import * as acorn from 'acorn'
-import { mdxJsxFromMarkdown } from 'mdast-util-mdx-jsx'
-import { mdxJsx } from 'micromark-extension-mdx-jsx'
-import { mdxMd } from 'micromark-extension-mdx-md'
-export const markdownToAst = (value: string, skipMDX?: boolean) => {
-  const tree = fromMarkdown(value, 'utf-8', {
-    extensions: [mdxMd, mdxJsx({ acorn: acorn, addResult: true })],
-    mdastExtensions: [mdxJsxFromMarkdown()],
-  })
-  if (!tree) {
-    throw new Error('Error parsing markdown')
+export const markdownToAst = (
+  value: string,
+  skipMDX: boolean,
+  field: RichTypeInner
+) => {
+  try {
+    const templatesWithMatchers = field.templates.filter(
+      (template) => template.match
+    )
+    let preprocessedString = value
+    templatesWithMatchers.forEach((template) => {
+      preprocessedString = preprocessedString.replaceAll(
+        template.match.start,
+        `<${template.name}>\``
+      )
+      preprocessedString = preprocessedString.replaceAll(
+        template.match.end,
+        `\`</${template.name}>`
+      )
+    })
+    const tree = remark().use(remarkMdx).parse(preprocessedString)
+    if (!tree) {
+      throw new Error('Error parsing markdown')
+    }
+    // Delete useless position info
+    visit(tree, (node) => {
+      delete node.position
+    })
+    return tree
+  } catch (e) {
+    console.log(e)
   }
-  // Delete useless position info
-  visit(tree, (node) => {
-    delete node.position
-  })
-  return tree
 }
 
 export const parseMDX = (
@@ -97,6 +111,6 @@ export const parseMDX = (
   imageCallback: (s: string) => string,
   skipMDX?: boolean
 ) => {
-  const tree = markdownToAst(value, skipMDX)
+  const tree = markdownToAst(value, skipMDX, field)
   return remarkToSlate(tree, field, imageCallback)
 }
