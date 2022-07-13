@@ -74,10 +74,9 @@ export async function checkDeps(ctx: any, next: () => void, options) {
   const bar = new Progress('Checking dependencies. :prog', 1)
 
   if (!fs.existsSync(packageJSONPath)) {
-    logger.warn(
-      warnText('Warning: can not find package.json, skipping decency checks')
+    throw new Error(
+      'No package.json Found. Please run tinacms init at the root of your app'
     )
-    return next()
   }
   const packageJSON = JSON.parse(
     (await fs.readFileSync(packageJSONPath)).toString()
@@ -254,22 +253,9 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   logger.info('Adding a content folder... ✅')
   // 4. update the users package.json
   if (!fs.existsSync(packageJSONPath)) {
-    logger.warn(
-      warnText(
-        `Warning: can not find package.json, skipping adding build and dev scripts\n Please add ${JSON.stringify(
-          {
-            scripts: extendNextScripts({
-              build: 'your build script',
-              dev: 'your dev script',
-              start: 'your start script',
-            }),
-          },
-          null,
-          2
-        )} to your package.json`
-      )
+    throw new Error(
+      'No package.json Found. Please run tinacms init at the root of your app'
     )
-    return next()
   } else {
     const pack = JSON.parse(readFileSync(packageJSONPath).toString())
     const oldScripts = pack.scripts || {}
