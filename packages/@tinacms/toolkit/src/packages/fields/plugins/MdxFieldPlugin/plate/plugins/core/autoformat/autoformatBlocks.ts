@@ -33,6 +33,7 @@ import {
 import type { AutoformatRule } from '@udecode/plate-headless'
 
 import { preFormat } from './autoformatUtils'
+import { insertEmptyCodeBlock } from '../../../transforms/insertEmptyBlock'
 
 export const autoformatBlocks: AutoformatRule[] = [
   {
@@ -81,7 +82,11 @@ export const autoformatBlocks: AutoformatRule[] = [
     mode: 'block',
     type: ELEMENT_CODE_BLOCK,
     match: '```',
+    triggerAtBlockStart: false,
     preFormat,
+    format: (editor) => {
+      insertEmptyCodeBlock(editor)
+    },
   },
   {
     mode: 'block',

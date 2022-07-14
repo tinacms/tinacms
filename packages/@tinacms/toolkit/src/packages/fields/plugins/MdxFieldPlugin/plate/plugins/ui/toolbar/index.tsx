@@ -23,7 +23,6 @@ import {
   toggleMark,
   toggleNodeType,
   toggleList,
-  insertEmptyCodeBlock,
   ELEMENT_LINK,
   ELEMENT_H1,
   ELEMENT_H2,
@@ -51,6 +50,7 @@ import { ELEMENT_IMG } from '../../create-img-plugin'
 
 import type { MdxTemplate } from '../../../types'
 import { useEditorContext } from '../../../editor-context'
+import { insertEmptyCodeBlock } from '../../../transforms/insertEmptyBlock'
 
 const headers = [
   {
@@ -170,17 +170,7 @@ export function Toolbar({
       name: 'codeBlock',
       label: 'Code Block',
       active: codeBlockActive,
-      onMouseDown: getPreventDefaultHandler(insertEmptyCodeBlock, editor, {
-        insertNodesOptions: { select: true },
-      }),
-    },
-    {
-      name: 'htmlInline',
-      label: 'HTML Inline',
-      active: htmlInlineActive,
-      onMouseDown: getPreventDefaultHandler(toggleMark, editor, {
-        key: 'html_inline',
-      }),
+      onMouseDown: getPreventDefaultHandler(insertEmptyCodeBlock, editor),
     },
     {
       name: 'bold',

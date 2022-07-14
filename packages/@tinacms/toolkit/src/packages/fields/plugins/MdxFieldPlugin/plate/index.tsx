@@ -79,32 +79,10 @@ export const RichEditor = (props) => {
             ) : (
               <FloatingToolbar templates={props.field.templates} />
             )}
-            <Reset id={id} form={props.form} initialValue={initialValue} />
             <FloatingLink />
           </>
         }
       ></Plate>
     </div>
   )
-}
-
-/**
- * Since slate keeps track of it's own state, and that state is an object rather
- * than something easily memoizable like a string it can be tricky to ensure
- * resets are properly handled. So we sneak in a callback to the form's reset
- * logic that updates slate's internal values imperatively.
- */
-const Reset = ({ id, form, initialValue }: { id; form; initialValue }) => {
-  const editor = usePlateEditorState(id)
-
-  React.useMemo(() => {
-    const { reset } = form
-    form.reset = (initialValues) => {
-      editor.children = initialValue
-      editor.onChange()
-      return reset(initialValues)
-    }
-  }, [])
-
-  return null
 }
