@@ -105,6 +105,25 @@ const schema = defineSchema({
                   name: 'children',
                   label: 'Quote',
                   type: 'rich-text',
+                  templates: [
+                    {
+                      name: 'BlockQuote',
+                      label: 'Block Quote',
+                      fields: [
+                        {
+                          name: 'children',
+                          label: 'Quote',
+                          type: 'rich-text',
+                        },
+                        {
+                          name: 'authorName',
+                          isTitle: true,
+                          label: 'Author',
+                          type: 'string',
+                        },
+                      ],
+                    },
+                  ],
                 },
                 {
                   name: 'authorName',

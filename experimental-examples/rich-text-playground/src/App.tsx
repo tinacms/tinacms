@@ -28,6 +28,23 @@ function Page() {
         content={data.posts.body}
         components={{
           code_block: (props) => <Prism {...props} />,
+          BlockQuote: (props) => {
+            return (
+              <blockquote>
+                <TinaMarkdown
+                  content={props.children}
+                  components={{
+                    BlockQuote: (props) => (
+                      <blockquote>
+                        <TinaMarkdown content={props.children} />
+                        <div>{props.authorName}</div>
+                      </blockquote>
+                    ),
+                  }}
+                />
+              </blockquote>
+            )
+          },
           // html_inline: (props) => (
           //   <span dangerouslySetInnerHTML={createMarkup(props?.value)} />
           // ),
