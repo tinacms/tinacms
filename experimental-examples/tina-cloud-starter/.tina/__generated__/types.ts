@@ -1421,17 +1421,10 @@ const generateRequester = (client: TinaClient) => {
     options?: any,
     client
   ) => Promise<any> = async (doc, vars, _options) => {
-    let data = {};
-    try {
-      data = await client.request({
-        query: doc,
-        variables: vars,
-      });
-    } catch (e) {
-      // swallow errors related to document creation
-      console.warn("Warning: There was an error when fetching data");
-      console.warn(e);
-    }
+    const data = await client.request({
+      query: doc,
+      variables: vars,
+    });
 
     return { data: data?.data, query: doc, variables: vars || {} };
   };
