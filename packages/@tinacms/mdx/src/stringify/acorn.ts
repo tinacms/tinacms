@@ -131,8 +131,10 @@ export const stringifyProps = (
           const joiner = flatten ? ' ' : '\n'
           let val = ''
           if (field.name === 'children') {
-            const root = rootElement(value, field)
-            children.push(root.children[0])
+            const root = rootElement(value, field, imageCallback)
+            root.children.forEach((child) => {
+              children.push(child)
+            })
             return
           } else {
             const stringValue = stringifyMDX(value, field)

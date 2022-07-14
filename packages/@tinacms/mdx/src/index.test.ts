@@ -1593,18 +1593,65 @@ describe('MDX Elements', () => {
 <CustomImage url="/uploads/my-pic.jpg" />`.trim()
       )
     })
-    const mdxnested = `
-    <Blockquote
-      author="content/authors/pedro.md"
-    >
-    # Lorem ipsum dolor.
-    </Blockquote>`
-    test.skip('With rich-text multiline', () => {
+    const mdxnested = `<Blockquote>
+  # Lorem ipsum dolor.
+
+  Some child text
+</Blockquote>`
+    test.only('With rich-text multiline', () => {
       const string = mdxnested.trim()
 
       const { astResult, stringResult } = parseThenStringify(string, {
         ...field,
+        templates: [
+          {
+            name: 'Blockquote',
+            label: 'Blockquote',
+            fields: [{ name: 'children', label: 'Body', type: 'rich-text' }],
+          },
+        ],
       })
+
+      expect(astResult).toMatchInlineSnapshot(`
+        [
+          {
+            "type": "mdxJsxFlowElement",
+            "name": "Blockquote",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "props": {
+              "children": {
+                "type": "root",
+                "children": [
+                  {
+                    "type": "h1",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Lorem ipsum dolor."
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Some child text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      `)
+      expect(stringResult).toEqual(string)
     })
 
     const mdxTest5 = `
