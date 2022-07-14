@@ -1418,7 +1418,7 @@ describe('MDX Elements', () => {
 
 {{< signature "ra, yk, il" >}}
     `
-    test.only('With an expression', () => {
+    test('With an expression', () => {
       const string = mdxTestExpression.trim()
 
       const { astResult, stringResult } = parseThenStringify(string, {
@@ -1592,6 +1592,19 @@ describe('MDX Elements', () => {
 
 <CustomImage url="/uploads/my-pic.jpg" />`.trim()
       )
+    })
+    const mdxnested = `
+    <Blockquote
+      author="content/authors/pedro.md"
+    >
+    # Lorem ipsum dolor.
+    </Blockquote>`
+    test.skip('With rich-text multiline', () => {
+      const string = mdxnested.trim()
+
+      const { astResult, stringResult } = parseThenStringify(string, {
+        ...field,
+      })
     })
 
     const mdxTest5 = `

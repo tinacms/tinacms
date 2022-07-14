@@ -77,11 +77,11 @@ export const markdownToAst = (
   field: RichTypeInner
 ) => {
   try {
-    const templatesWithMatchers = field.templates.filter(
+    const templatesWithMatchers = field.templates?.filter(
       (template) => template.match
     )
     let preprocessedString = value
-    templatesWithMatchers.forEach((template) => {
+    templatesWithMatchers?.forEach((template) => {
       preprocessedString = preprocessedString.replaceAll(
         template.match.start,
         `<${template.name}>\``

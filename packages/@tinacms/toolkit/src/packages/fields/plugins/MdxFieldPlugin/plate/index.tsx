@@ -70,7 +70,6 @@ export const RichEditor = (props) => {
         initialValue={initialValue}
         plugins={plugins}
         onChange={(value) => {
-          // console.log(JSON.stringify(value, null, 2))
           props.input.onChange({ type: 'root', children: value })
         }}
         firstChildren={

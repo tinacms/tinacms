@@ -33,11 +33,11 @@ export const stringifyMDX = (
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
   })
-  const templatesWithMatchers = field.templates.filter(
+  const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
   let preprocessedString = res
-  templatesWithMatchers.forEach((template) => {
+  templatesWithMatchers?.forEach((template) => {
     preprocessedString = preprocessedString.replaceAll(
       `<${template.name}>\``,
       `${template.match.start} `
@@ -105,7 +105,6 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
-      console.log('itme?', content)
       const { children, attributes } = stringifyProps(
         content,
         field,
