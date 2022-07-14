@@ -26,7 +26,7 @@ import chalk from 'chalk'
 
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
-import { genTypes } from '../query-gen'
+import { genClient, genTypes } from '../query-gen'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 
@@ -131,7 +131,7 @@ async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
 }
 
 export async function startServer(
-  _ctx,
+  ctx,
   next,
   {
     port = 4001,
@@ -209,9 +209,10 @@ export async function startServer(
         cliFlags.push('isomorphicGitBridge')
       }
       const database = await createDatabase({ store, bridge })
-      await compileSchema(null, null, { verbose, dev })
+      await compileSchema(ctx, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
+      await genClient({ tinaSchema: ctx.schema }, () => {}, { local: false })
     } catch (error) {
       throw error
     } finally {

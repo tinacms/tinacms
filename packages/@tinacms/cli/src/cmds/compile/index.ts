@@ -44,7 +44,14 @@ export const resetGeneratedFolder = async () => {
 export const queries = (client)=>({})
 `
   )
-  await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
+  await fs.outputFile(
+    path.join(tinaGeneratedPath, '.gitignore'),
+    `db
+client.ts
+types.ts
+frags.gql
+queries.gql`
+  )
 }
 
 // Cleanup function that is guaranteed to run
@@ -151,7 +158,7 @@ export const compileClient = async (
 }
 
 export const compileSchema = async (
-  _ctx,
+  ctx,
   _next,
   options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
@@ -176,8 +183,8 @@ export const compileSchema = async (
     )
   }
 
-  if (_ctx) {
-    _ctx.schemaFileType = schemaFileType
+  if (ctx) {
+    ctx.schemaFileType = schemaFileType
   }
 
   let schemaExists = true
@@ -234,11 +241,13 @@ export const compileSchema = async (
   try {
     const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
     const schemaObject: TinaCloudSchema = schemaFunc.default
+    ctx.schema = schemaObject
     await fs.outputFile(
       path.join(tinaConfigPath, 'schema.json'),
       JSON.stringify(schemaObject, null, 2)
     )
     await cleanup({ tinaTempPath })
+    return schemaObject
   } catch (e) {
     // Always remove the temp code
     await cleanup({ tinaTempPath })
