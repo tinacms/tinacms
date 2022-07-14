@@ -1,7 +1,7 @@
 import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
-import { client } from "../.tina/client";
+import { client } from "../.tina/__generated__/client";
 import { Layout } from "../components/layout";
 
 export default function HomePage(

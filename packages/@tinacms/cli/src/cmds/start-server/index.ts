@@ -48,6 +48,7 @@ interface Options {
   noTelemetry: boolean
   verbose?: boolean
   dev?: boolean
+  local: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -143,6 +144,7 @@ export async function startServer(
     watchFolders,
     verbose,
     dev,
+    local,
   }: Options
 ) {
   buildLock.disable()
@@ -212,7 +214,7 @@ export async function startServer(
       await compileSchema(ctx, null, { verbose, dev })
       const schema = await buildSchema(rootPath, database, cliFlags)
       await genTypes({ schema }, () => {}, { noSDK, verbose })
-      await genClient({ tinaSchema: ctx.schema }, () => {}, { local: false })
+      await genClient({ tinaSchema: ctx.schema }, () => {}, { local })
     } catch (error) {
       throw error
     } finally {

@@ -50,7 +50,9 @@ export const queries = (client)=>({})
 client.ts
 types.ts
 frags.gql
-queries.gql`
+queries.gql
+schema.gql
+`
   )
 }
 

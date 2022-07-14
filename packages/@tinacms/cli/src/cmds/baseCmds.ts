@@ -95,6 +95,11 @@ const developmentOption = {
   name: '--dev',
   description: 'Uses NODE_ENV=development when compiling client and schema',
 }
+const localOption = {
+  name: '--local',
+  description: 'Uses the local file system graphql server',
+  defaultValue: false,
+}
 
 export const baseCmds: Command[] = [
   {
@@ -111,6 +116,7 @@ export const baseCmds: Command[] = [
       watchFileOption,
       verboseOption,
       developmentOption,
+      localOption,
     ],
     action: (options) => chain([startServer, startSubprocess], options),
   },
