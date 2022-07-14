@@ -66,11 +66,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
    * old `FinalForm` componentt and create a new one.
    *
    * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
+   *
+   * UPDATE: I don't believe we are mutating the `form` property after the initial mount
+   * anymore so there's no need to double-render. Commenting this out because it has a
+   * jarring UX when `FormBuilder` is mounted in a nested context (ie. rich-text)
+   *
    */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
+  // const [i, setI] = React.useState(0)
+  // React.useEffect(() => {
+  //   setI((i) => i + 1)
+  // }, [tinaForm])
 
   const finalForm = tinaForm.finalForm
 
@@ -121,7 +126,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   return (
     <FinalForm
       form={finalForm}
-      key={`${i}: ${tinaForm.id}`}
+      // key={`${i}: ${tinaForm.id}`}
       onSubmit={tinaForm.onSubmit}
     >
       {({ handleSubmit, pristine, invalid, submitting }) => {
