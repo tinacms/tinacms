@@ -23,7 +23,8 @@ import { defaultSchema } from './defaultSchema'
 import { getSchemaPath, getClientPath } from '../../lib'
 import { logger } from '../../logger'
 
-const tinaPath = path.join(process.cwd(), '.tina')
+const root = process.cwd()
+const tinaPath = path.join(root, '.tina')
 const packageJSONFilePath = path.join(process.cwd(), 'package.json')
 const tinaGeneratedPath = path.join(tinaPath, '__generated__')
 const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
