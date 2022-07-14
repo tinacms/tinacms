@@ -12,11 +12,37 @@ limitations under the License.
 */
 
 import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
+import { TinaCloudSchema } from '@tinacms/schema-tools'
 
 import fs from 'fs-extra'
+import p from 'path'
 import { generateTypes } from '../../codegen'
 import { logText } from '../../utils/theme'
 import { logger } from '../../logger'
+export const TINA_HOST = 'content.tinajs.io'
+const root = process.cwd()
+const generatedPath = p.join(root, '.tina', '__generated__')
+
+export async function genClient(
+  { tinaSchema }: { tinaSchema: TinaCloudSchema<false> },
+  next: () => void,
+  options
+) {
+  const { branch, clientID, token } = tinaSchema.config
+  const apiURL = options.local
+    ? 'http://localhost:4001/graphql'
+    : `https://${TINA_HOST}/content/${clientID}/${branch}`
+
+  const clientPath = p.join(generatedPath, 'client.ts')
+  fs.writeFileSync(
+    clientPath,
+    `import { createClient } from "tinacms/dist/client";
+import { queries } from "./types";
+export const client = createClient({ url: '${apiURL}', token: '${token}', queries });
+export default client;
+  `
+  )
+}
 
 export async function genTypes(
   { schema }: { schema: GraphQLSchema },

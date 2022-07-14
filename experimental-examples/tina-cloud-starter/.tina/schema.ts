@@ -66,6 +66,9 @@ const BlocksTemplate: TinaTemplate = {
 
 const schema = defineSchema({
   config: {
+    branch: "main",
+    clientID: "foobar",
+    token: "foo",
     media: {
       // If you wanted cloudinary do this
       // loadCustomStore: async () => {
