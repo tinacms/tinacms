@@ -78,6 +78,7 @@ export const InlineEmbed = ({
     return null
   }
 
+  const label = getLabel(activeTemplate, formProps)
   return (
     <span {...attributes}>
       {children}
@@ -91,12 +92,12 @@ export const InlineEmbed = ({
             <span className="absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md z-10 pointer-events-none" />
           )}
           <span
+            style={{ fontWeight: 'inherit', maxWidth: '275px' }}
             // Tailwind reset puts styles on buttons
-            style={{ fontWeight: 'inherit' }}
-            className="cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-md border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="truncate cursor-pointer relative inline-flex items-center justify-start px-2 py-0.5 rounded-l-md border border-gray-200 bg-white  hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             onMouseDown={handleSelect}
           >
-            {activeTemplate.label || activeTemplate.name}
+            {label}
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
@@ -139,6 +140,7 @@ export const BlockEmbed = ({
     return null
   }
 
+  const label = getLabel(activeTemplate, formProps)
   return (
     <div {...attributes} className="w-full my-2">
       {children}
@@ -149,9 +151,9 @@ export const BlockEmbed = ({
           )}
           <span
             onMouseDown={handleSelect}
-            className="cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            className="truncate cursor-pointer w-full relative inline-flex items-center justify-start px-4 py-2 rounded-l-md border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
           >
-            {activeTemplate.label || activeTemplate.name}
+            {label}
           </span>
           <DotMenu onOpen={handleSelect} onRemove={handleRemove} />
         </span>
@@ -159,6 +161,19 @@ export const BlockEmbed = ({
       </Wrapper>
     </div>
   )
+}
+
+const getLabel = (activeTemplate, formProps) => {
+  const titleField = activeTemplate.fields.find((field) => field.isTitle)
+  let label = activeTemplate.label || activeTemplate.name
+  if (titleField) {
+    const titleValue = formProps.element.props[titleField.name]
+    if (titleValue) {
+      label = `${label}: ${titleValue}`
+    }
+  }
+
+  return label
 }
 
 const EmbedNestedForm = ({

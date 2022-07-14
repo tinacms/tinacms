@@ -34,7 +34,7 @@ const schema = defineSchema({
             {
               name: 'MyShortcode',
               label: 'My Shortcode',
-              // inline: true,
+              inline: true,
               match: {
                 start: '{{<',
                 end: '>}}',
@@ -44,6 +44,7 @@ const schema = defineSchema({
                   name: 'text',
                   label: 'Text',
                   type: 'string',
+                  isTitle: true,
                   ui: {
                     component: 'textarea',
                   },
@@ -53,7 +54,7 @@ const schema = defineSchema({
             {
               name: 'MyShortcode2',
               label: 'My Shortcode 2',
-              // inline: true,
+              inline: true,
               match: {
                 start: '{{%',
                 end: '%}}',
@@ -61,6 +62,7 @@ const schema = defineSchema({
               fields: [
                 {
                   name: 'text',
+                  isTitle: true,
                   label: 'Text',
                   type: 'string',
                   ui: {
@@ -106,6 +108,7 @@ const schema = defineSchema({
                 },
                 {
                   name: 'authorName',
+                  isTitle: true,
                   label: 'Author',
                   type: 'string',
                 },
