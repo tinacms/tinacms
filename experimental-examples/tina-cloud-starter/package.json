@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --dev",
+    "dev": "tinacms server:start -c \"next dev\" --experimentalData --noTelemetry --local",
     "dev-isomorphic": "yarn tinacms server:start -c \"next dev\" --experimentalData --isomorphicGitBridge --noTelemetry --dev",
     "build": "tinacms server:start -c \"next build\" --experimentalData --noTelemetry --dev",
     "start": "tinacms server:start -c \"next start\" --experimentalData --noTelemetry --dev",

@@ -31,7 +31,7 @@ export async function genClient(
   const { branch, clientID, token } = tinaSchema.config
   const apiURL = options.local
     ? 'http://localhost:4001/graphql'
-    : `https://${TINA_HOST}/content/${clientID}/${branch}`
+    : `https://${TINA_HOST}/content/${clientID}/github/${branch}`
 
   const clientPath = p.join(generatedPath, 'client.ts')
   fs.writeFileSync(

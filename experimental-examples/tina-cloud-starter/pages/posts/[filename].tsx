@@ -1,5 +1,5 @@
 import { Post } from "../../components/post";
-import { client } from "../../.tina/client";
+import { client } from "../../.tina/__generated__/client";
 import { useTina } from "tinacms/dist/edit-state";
 import { Layout } from "../../components/layout";
 
