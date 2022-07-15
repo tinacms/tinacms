@@ -44,6 +44,12 @@ export const resetGeneratedFolder = async () => {
 export const queries = (client)=>({})
 `
   )
+  await fs.writeFile(
+    path.join(tinaGeneratedPath, 'client.ts'),
+    `
+export const client = {}
+`
+  )
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
     `db
@@ -249,7 +255,6 @@ export const compileSchema = async (
       JSON.stringify(schemaObject, null, 2)
     )
     await cleanup({ tinaTempPath })
-    return schemaObject
   } catch (e) {
     // Always remove the temp code
     await cleanup({ tinaTempPath })
