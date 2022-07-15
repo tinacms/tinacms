@@ -37,6 +37,7 @@ export const CMD_COMPILE_MODELS = 'schema:compile'
 export const CMD_WAIT_FOR_DB = 'server:waitForDB'
 export const INIT = 'init'
 export const AUDIT = 'audit'
+export const CMD_SETUP = 'setup'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -105,6 +106,24 @@ export const baseCmds: Command[] = [
   {
     command: CMD_START_SERVER,
     description: 'Start Filesystem Graphql Server',
+    options: [
+      startServerPortOption,
+      subCommand,
+      experimentalDatalayer,
+      isomorphicGitBridge,
+      noWatchOption,
+      noSDKCodegenOption,
+      noTelemetryOption,
+      watchFileOption,
+      verboseOption,
+      developmentOption,
+      localOption,
+    ],
+    action: (options) => chain([startServer, startSubprocess], options),
+  },
+  {
+    command: CMD_SETUP,
+    description: 'Setup Tina.',
     options: [
       startServerPortOption,
       subCommand,
