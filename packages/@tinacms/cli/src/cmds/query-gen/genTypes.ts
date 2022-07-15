@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
+import { GraphQLSchema, printSchema } from 'graphql'
 import { TinaCloudSchema } from '@tinacms/schema-tools'
 
 import fs from 'fs-extra'

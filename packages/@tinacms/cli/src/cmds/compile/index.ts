@@ -95,8 +95,9 @@ export const compileClient = async (
   }
 
   let clientExists = true
+  const projectDir = path.join(tinaPath, '__generated__')
   try {
-    getClientPath({ projectDir: tinaPath })
+    getClientPath({ projectDir })
   } catch {
     clientExists = false
   }
@@ -121,7 +122,9 @@ export const compileClient = async (
         ? '"development"'
         : '"production"'
     }
-    const inputFile = getClientPath({ projectDir: tinaPath })
+    const inputFile = getClientPath({
+      projectDir,
+    })
     await transpile(
       inputFile,
       'client.js',
