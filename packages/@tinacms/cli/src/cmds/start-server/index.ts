@@ -11,29 +11,17 @@
  limitations under the License.
  */
 
-import {
-  FilesystemBridge,
-  FilesystemStore,
-  IsomorphicBridge,
-  LevelStore,
-} from '@tinacms/datalayer'
-import { buildSchema, createDatabase } from '@tinacms/graphql'
-import { compileSchema, resetGeneratedFolder } from '../compile'
-
-import { AsyncLock } from './lock'
-import { Telemetry } from '@tinacms/metrics'
+import path from 'path'
 import chalk from 'chalk'
-
 import chokidar from 'chokidar'
+
+import { Telemetry } from '@tinacms/metrics'
+
+import { build, buildSetup } from '../../buildTina'
+import { AsyncLock } from './lock'
 import { dangerText } from '../../utils/theme'
-import { genClient, genTypes } from '../query-gen'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
-
-import fs from 'fs-extra'
-import ini from 'ini'
-import os from 'os'
-import path from 'path'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -52,84 +40,6 @@ interface Options {
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
-
-const resolveGitRoot = async () => {
-  const pathParts = process.cwd().split(path.sep)
-  while (true) {
-    const pathToGit = pathParts.join(path.sep)
-    if (await fs.pathExists(path.join(pathToGit, '.git'))) {
-      return pathToGit
-    }
-
-    if (!pathParts.length) {
-      throw new Error(
-        'Unable to locate your .git folder (required for isomorphicGitBridge)'
-      )
-    }
-    pathParts.pop()
-  }
-}
-
-async function makeIsomorphicOptions(fsBridge: FilesystemBridge) {
-  const gitRoot = await resolveGitRoot()
-  const options = {
-    gitRoot,
-    author: {
-      name: '',
-      email: '',
-    },
-    onPut: async (filepath: string, data: string) => {
-      await fsBridge.put(filepath, data)
-    },
-    onDelete: async (filepath: string) => {
-      await fsBridge.delete(filepath)
-    },
-  }
-
-  const userGitConfig = `${os.homedir()}${path.sep}.gitconfig`
-  if (await fs.pathExists(userGitConfig)) {
-    const config = ini.parse(await fs.readFile(userGitConfig, 'utf-8'))
-    if (config['user']?.['name']) {
-      options.author.name = config['user']['name']
-    }
-    if (config['user']?.['email']) {
-      options.author.email = config['user']['email']
-    }
-  }
-
-  let repoGitConfig = undefined
-  if (!options.author.name) {
-    repoGitConfig = ini.parse(
-      await fs.readFile(`${gitRoot}/.git/config`, 'utf-8')
-    )
-    if (repoGitConfig['user']?.['name']) {
-      options.author.name = repoGitConfig['user']['name']
-    }
-
-    if (!options.author.name) {
-      throw new Error(
-        'Unable to determine user.name from git config. Hint: `git config --global user.name "John Doe"`'
-      )
-    }
-  }
-
-  if (!options.author.email) {
-    repoGitConfig =
-      repoGitConfig ||
-      ini.parse(await fs.readFile(`${gitRoot}/.git/config`, 'utf-8'))
-
-    if (repoGitConfig['user']?.['email']) {
-      options.author.email = repoGitConfig['user']['email']
-    }
-
-    if (!options.author.email) {
-      throw new Error(
-        'Unable to determine user.email from git config. Hint: `git config --global user.email johndoe@example.com`'
-      )
-    }
-  }
-  return options
-}
 
 export async function startServer(
   ctx,
@@ -158,70 +68,16 @@ export async function startServer(
     },
   })
 
-  const fsBridge = new FilesystemBridge(rootPath)
-  const isomorphicOptions =
-    isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
+  const { bridge, database, store } = await buildSetup({
+    rootPath,
+    isomorphicGitBridge,
+    experimentalData,
+  })
 
-  /**
-   * To work with Github directly, replace the Bridge and Store
-   * and ensure you've provided your access token.
-   * NOTE: when talking the the tinacms repo, you must
-   * give your personal access token access to the TinaCMS org
-   */
-  // const ghConfig = {
-  //   rootPath: 'examples/tina-cloud-starter',
-  //   accessToken: '<my-token>',
-  //   owner: 'tinacms',
-  //   repo: 'tinacms',
-  //   ref: 'add-data-store',
-  // }
-  // const bridge = new GithubBridge(ghConfig)
-  // const store = new GithubStore(ghConfig)
-
-  const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(rootPath, isomorphicOptions)
-    : fsBridge
-
-  const store = experimentalData
-    ? new LevelStore(rootPath)
-    : new FilesystemStore({ rootPath })
-
-  // is this ever false?
+  // This is only false for tina-cloud media stores
   const shouldBuild = bridge.supportsBuilding()
 
-  const database = await createDatabase({ store, bridge })
-
   let ready = false
-
-  const build = async (noSDK?: boolean) => {
-    // Clear the cache of the DB passed to the GQL server
-    database.clearCache()
-    // Wait for the lock to be disabled
-    await buildLock.promise
-    // Enable the lock so that no two builds can happen at once
-    buildLock.enable()
-    try {
-      if (!process.env.CI && !noWatch) {
-        await store.close()
-        await resetGeneratedFolder()
-        await store.open()
-      }
-      const cliFlags = []
-      if (isomorphicGitBridge) {
-        cliFlags.push('isomorphicGitBridge')
-      }
-      const database = await createDatabase({ store, bridge })
-      await compileSchema(ctx, null, { verbose, dev })
-      const schema = await buildSchema(rootPath, database, cliFlags)
-      await genTypes({ schema }, () => {}, { noSDK, verbose })
-      await genClient({ tinaSchema: ctx.schema }, () => {}, { local })
-    } catch (error) {
-      throw error
-    } finally {
-      // Disable the lock so a new build can run
-      buildLock.disable()
-    }
-  }
 
   const state = {
     server: null,
@@ -229,6 +85,17 @@ export async function startServer(
   }
 
   let isReady = false
+
+  const beforeBuild = async () => {
+    // Wait for the lock to be disabled
+    await buildLock.promise
+    // Enable the lock so that no two builds can happen at once
+    buildLock.enable()
+  }
+  const afterBuild = async () => {
+    // Disable the lock so a new build can run
+    buildLock.disable()
+  }
 
   const start = async () => {
     // we do not want to start the server while the schema is building
@@ -311,7 +178,21 @@ export async function startServer(
         if (verbose) console.log('Generating Tina config')
         try {
           if (shouldBuild) {
-            await build(noSDK)
+            await build({
+              bridge,
+              ctx,
+              database,
+              rootPath,
+              store,
+              dev,
+              isomorphicGitBridge,
+              local,
+              noSDK,
+              noWatch,
+              verbose,
+              beforeBuild,
+              afterBuild,
+            })
           }
           ready = true
           isReady = true
@@ -332,7 +213,21 @@ export async function startServer(
           logger.info('Tina change detected, regenerating config')
           try {
             if (shouldBuild) {
-              await build(noSDK)
+              await build({
+                bridge,
+                ctx,
+                database,
+                rootPath,
+                store,
+                dev,
+                isomorphicGitBridge,
+                local,
+                noSDK,
+                noWatch,
+                verbose,
+                beforeBuild,
+                afterBuild,
+              })
             }
             if (isReady) {
               await restart()
@@ -355,7 +250,21 @@ export async function startServer(
       logger.info('Detected CI environment, omitting watch commands...')
     }
     if (shouldBuild) {
-      await build(noSDK)
+      await build({
+        bridge,
+        ctx,
+        database,
+        rootPath,
+        store,
+        dev,
+        isomorphicGitBridge,
+        local,
+        noSDK,
+        noWatch,
+        verbose,
+        beforeBuild,
+        afterBuild,
+      })
     }
     await start()
     next()
