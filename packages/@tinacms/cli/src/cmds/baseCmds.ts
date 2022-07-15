@@ -156,51 +156,11 @@ export const baseCmds: Command[] = [
       developmentOption,
       localOption,
     ],
-    action: (options) => chain([attachPath, buildSetup, buildCmd], options),
-  },
-  {
-    command: CMD_WAIT_FOR_DB,
-    description: 'Wait for DB to finish indexing, start subprocess',
-    options: [
-      subCommand,
-      experimentalDatalayer,
-      isomorphicGitBridge,
-      noTelemetryOption,
-      verboseOption,
-      developmentOption,
-      noSDKCodegenOption,
-      localOption,
-    ],
     action: (options) =>
       chain(
-        [
-          attachPath,
-          buildSetup,
-          buildCmd,
-          compileClient,
-          waitForDB,
-          startSubprocess,
-        ],
+        [attachPath, buildSetup, buildCmd, compileClient, waitForDB],
         options
       ),
-  },
-  {
-    command: CMD_COMPILE_MODELS,
-    description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer, isomorphicGitBridge, noTelemetryOption],
-    action: (options) => chain([compileSchema], options),
-  },
-  {
-    command: CMD_GEN_TYPES,
-    description:
-      "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [
-      experimentalDatalayer,
-      isomorphicGitBridge,
-      noSDKCodegenOption,
-      noTelemetryOption,
-    ],
-    action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
@@ -214,15 +174,12 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
+          attachPath,
           checkDeps,
           initTina,
           installDeps,
-          async (_ctx, next, options) => {
-            await compileSchema(_ctx, next, options)
-            next()
-          },
-          attachSchema,
-          genTypes,
+          buildSetup,
+          buildCmd,
           tinaSetup,
           successMessage,
         ],

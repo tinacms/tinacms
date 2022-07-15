@@ -23,13 +23,11 @@ import { defaultSchema } from './defaultSchema'
 import { getSchemaPath, getClientPath } from '../../lib'
 import { logger } from '../../logger'
 
-const root = process.cwd()
-const tinaPath = path.join(root, '.tina')
-const packageJSONFilePath = path.join(process.cwd(), 'package.json')
-const tinaGeneratedPath = path.join(tinaPath, '__generated__')
-const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
-
-export const resetGeneratedFolder = async () => {
+export const resetGeneratedFolder = async ({
+  tinaGeneratedPath,
+}: {
+  tinaGeneratedPath: string
+}) => {
   try {
     await fs.rm(tinaGeneratedPath, {
       recursive: true,
@@ -73,6 +71,15 @@ export const compileClient = async (
   next,
   options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
+  const root = ctx.rootPath
+  if (!root) {
+    throw new Error('ctx.rootPath has not been attached')
+  }
+  const tinaPath = path.join(root, '.tina')
+
+  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
+  const packageJSONFilePath = path.join(root, 'package.json')
+
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
 
   if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }
@@ -130,7 +137,8 @@ export const compileClient = async (
       'client.js',
       tinaTempPath,
       options.verbose,
-      define
+      define,
+      packageJSONFilePath
     )
   } catch (e) {
     await cleanup({ tinaTempPath })
@@ -174,7 +182,16 @@ export const compileSchema = async (
   _next,
   options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
+  const root = ctx.rootPath
+  if (!root) {
+    throw new Error('ctx.rootPath has not been attached')
+  }
+  const tinaPath = path.join(root, '.tina')
+  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
+  const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
+  const packageJSONFilePath = path.join(root, 'package.json')
+
   if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
 
   if (options.verbose) {
@@ -236,7 +253,8 @@ export const compileSchema = async (
       'schema.js',
       tinaTempPath,
       options.verbose,
-      define
+      define,
+      packageJSONFilePath
     )
   } catch (e) {
     await cleanup({ tinaTempPath })
@@ -275,7 +293,14 @@ export const compileSchema = async (
   }
 }
 
-const transpile = async (inputFile, outputFile, tempDir, verbose, define) => {
+const transpile = async (
+  inputFile,
+  outputFile,
+  tempDir,
+  verbose,
+  define,
+  packageJSONFilePath: string
+) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(
