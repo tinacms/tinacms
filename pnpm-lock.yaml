@@ -944,6 +944,7 @@ importers:
       '@react-types/combobox': 3.5.1_react@17.0.2
       '@react-types/shared': 3.13.1_react@17.0.2
       '@sambego/storybook-styles': 1.0.0
+      '@tinacms/mdx': link:../mdx
       '@tinacms/sharedctx': link:../sharedctx
       '@udecode/plate-headless': 14.0.2_c6lk7cwfs2ec6pqi2jt3gvduaa
       atob: 2.1.2
@@ -976,7 +977,6 @@ importers:
       '@testing-library/jest-dom': 5.16.4
       '@testing-library/react': 12.1.5_sfoxds7t5ydpegc3knd667wn6m
       '@testing-library/user-event': 12.8.3_7izb363m7fjrh7ob6q4a2yqaqe
-      '@tinacms/mdx': link:../mdx
       '@tinacms/scripts': link:../scripts
       '@types/atob': 2.1.2
       '@types/codemirror': 0.0.71

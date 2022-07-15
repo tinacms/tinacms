@@ -3,7 +3,7 @@ import { parseMDX } from './parse/index'
 import { stringifyMDX } from './stringify'
 import fs from 'fs'
 
-const field: RichTypeInner = { name: 'body', type: 'rich-text' }
+const field: RichTypeInner = { name: 'body', type: 'rich-text', templates: [] }
 
 expect.addSnapshotSerializer({
   test: () => true,

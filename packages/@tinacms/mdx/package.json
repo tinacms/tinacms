@@ -3,17 +3,13 @@
   "version": "0.60.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.es.js",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
+      "import": "./dist/index.es.js",
       "require": "./dist/index.js"
-    },
-    "./dist/browser.js": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/browser.js"
     }
   },
   "files": [
@@ -21,7 +17,7 @@
     "dist"
   ],
   "license": "Apache-2.0",
-  "buildConfig": {
+  "buildConfig2": {
     "entryPoints": [
       {
         "name": "src/index.ts",
@@ -37,6 +33,13 @@
           "unist-util-visit",
           "vfile"
         ]
+      }
+    ]
+  },
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts"
       }
     ]
   },

@@ -19,7 +19,7 @@ limitations under the License.
 import React from 'react'
 import { uuid } from '../plate/plugins/ui/helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import { parseMDX, stringifyMDX } from '@tinacms/mdx/dist/browser.js'
+import { parseMDX, stringifyMDX } from '@tinacms/mdx'
 import { useEditorContext } from '../plate/editor-context'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
