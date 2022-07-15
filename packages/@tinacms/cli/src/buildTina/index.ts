@@ -19,6 +19,7 @@ import {
   LevelStore,
   Store,
 } from '@tinacms/datalayer'
+import path from 'path'
 
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
@@ -118,6 +119,9 @@ export const build = async ({
   noSDK,
 }: BuildOptions) => {
   const rootPath = ctx.rootPath as string
+  if (!rootPath) {
+    throw new Error('Root path has not been attached')
+  }
   // Clear the cache of the DB passed to the GQL server
   database.clearCache()
 
@@ -128,7 +132,9 @@ export const build = async ({
   try {
     if (!process.env.CI && !noWatch) {
       await store.close()
-      await resetGeneratedFolder()
+      await resetGeneratedFolder({
+        tinaGeneratedPath: path.join(rootPath, '.tina', '__generated__'),
+      })
       await store.open()
     }
     const cliFlags = []
