@@ -95,6 +95,8 @@ export const markdownToAst = (
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
+    // NOTE: if we want to provide error highlighing in the raw editor
+    // we could keep this info around in edit mode
     // Delete useless position info
     visit(tree, (node) => {
       delete node.position

@@ -19,10 +19,10 @@ limitations under the License.
 import React from 'react'
 import { uuid } from '../plate/plugins/ui/helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import type * as monaco from 'monaco-editor'
 import { parseMDX, stringifyMDX } from '@tinacms/mdx/dist/browser.js'
 import { useEditorContext } from '../plate/editor-context'
 import { useDebounce } from './use-debounce'
+import type * as monaco from 'monaco-editor'
 
 type Monaco = typeof monaco
 
@@ -63,31 +63,27 @@ const RawEditor = (props: { input: any }) => {
     return typeof props.input.value === 'string' ? props.input.value : res
   }, [])
   const [value, setValue] = React.useState(inputValue)
-  const [refresh, setRefresh] = React.useState(false)
   const [error, setError] = React.useState(null)
 
   const debouncedValue = useDebounce(value, 500)
 
   React.useEffect(() => {
-    if (refresh) {
-      try {
-        const parsedValue = parseMDX(value, field, (value) => {
-          console.log('imagecallback', value)
-          return value
-        })
-        console.log(parsedValue)
-        props.input.onChange(parsedValue)
-        setError(null)
-      } catch (e) {
-        if (e.message) {
-          setError(e.message)
-        } else {
-          setError('Unable to parse string into markdown')
-        }
+    try {
+      const parsedValue = parseMDX(value, field, (value) => {
+        console.log('imagecallback', value)
+        return value
+      })
+      console.log(parsedValue)
+      props.input.onChange(parsedValue)
+      setError(null)
+    } catch (e) {
+      if (e.message) {
+        setError(e.message)
+      } else {
+        setError('Unable to parse string into markdown')
       }
-      setRefresh(false)
     }
-  }, [refresh, JSON.stringify(debouncedValue)])
+  }, [JSON.stringify(debouncedValue)])
 
   const id = React.useMemo(() => uuid(), [])
 
@@ -125,10 +121,9 @@ const RawEditor = (props: { input: any }) => {
         }`} */}
       </style>
       <div className="sticky -top-4 inline-flex shadow rounded-md mb-2 z-50 max-w-full">
-        <Button onClick={() => setRawMode(false)} align="left">
-          Toggle
+        <Button onClick={() => setRawMode(false)}>
+          View in rich-text editor
         </Button>
-        <Button onClick={() => setRefresh(true)}>Refresh</Button>
       </div>
       <div style={{ height: `${height}px` }}>
         {error && (
