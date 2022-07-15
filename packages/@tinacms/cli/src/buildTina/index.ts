@@ -25,7 +25,6 @@ import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
 
 interface BuildOptions {
-  rootPath: string
   ctx: any
   database: Database
   store: Store
@@ -41,16 +40,16 @@ interface BuildOptions {
 }
 
 interface BuildSetupOptions {
-  rootPath: string
   isomorphicGitBridge?: boolean
   experimentalData?: boolean
 }
 
-export const buildSetup = async ({
-  rootPath,
-  isomorphicGitBridge,
-  experimentalData,
-}: BuildSetupOptions) => {
+export const buildSetup = async (
+  ctx: any,
+  next: () => void,
+  { isomorphicGitBridge, experimentalData }: BuildSetupOptions
+) => {
+  const rootPath = ctx.rootPath as string
   const fsBridge = new FilesystemBridge(rootPath)
   const isomorphicOptions =
     isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
@@ -81,12 +80,31 @@ export const buildSetup = async ({
 
   const database = await createDatabase({ store, bridge })
 
-  return { bridge, database, store }
+  // attach to context
+  ctx.bridge = bridge
+  ctx.database = database
+  ctx.store = store
+
+  next()
+}
+
+export const buildCmd = async (
+  ctx: any,
+  next: () => void,
+  options: Omit<
+    BuildOptions & BuildSetupOptions,
+    'bridge' | 'database' | 'store'
+  >
+) => {
+  const bridge: Bridge = ctx.bridge
+  const database: Database = ctx.database
+  const store: Store = ctx.store
+  await build({ ...options, bridge, database, store, ctx: ctx })
+  next()
 }
 
 export const build = async ({
   noWatch,
-  rootPath,
   ctx,
   bridge,
   database,
@@ -99,6 +117,7 @@ export const build = async ({
   verbose,
   noSDK,
 }: BuildOptions) => {
+  const rootPath = ctx.rootPath as string
   // Clear the cache of the DB passed to the GQL server
   database.clearCache()
 
@@ -128,11 +147,4 @@ export const build = async ({
       await afterBuild()
     }
   }
-}
-
-export async function setupAndBuild(
-  args: Omit<BuildOptions & BuildSetupOptions, 'bridge' | 'database' | 'store'>
-) {
-  const { bridge, database, store } = await buildSetup({ ...args })
-  await build({ ...args, bridge, database, store })
 }

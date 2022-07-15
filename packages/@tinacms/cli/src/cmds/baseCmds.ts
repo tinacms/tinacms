@@ -30,6 +30,8 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
+import { buildCmd, buildSetup } from '../buildTina'
+import { attachPath } from '../buildTina/attachPath'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -38,6 +40,7 @@ export const CMD_WAIT_FOR_DB = 'server:waitForDB'
 export const INIT = 'init'
 export const AUDIT = 'audit'
 export const CMD_SETUP = 'setup'
+export const CMD_BUILD = 'build'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -119,7 +122,8 @@ export const baseCmds: Command[] = [
       developmentOption,
       localOption,
     ],
-    action: (options) => chain([startServer, startSubprocess], options),
+    action: (options) =>
+      chain([attachPath, buildSetup, startServer, startSubprocess], options),
   },
   {
     command: CMD_SETUP,
@@ -137,7 +141,22 @@ export const baseCmds: Command[] = [
       developmentOption,
       localOption,
     ],
-    action: (options) => chain([startServer, startSubprocess], options),
+    action: (options) =>
+      chain([attachPath, buildSetup, startServer, startSubprocess], options),
+  },
+  {
+    command: CMD_BUILD,
+    description: 'Build Tina.',
+    options: [
+      experimentalDatalayer,
+      isomorphicGitBridge,
+      noSDKCodegenOption,
+      noTelemetryOption,
+      verboseOption,
+      developmentOption,
+      localOption,
+    ],
+    action: (options) => chain([attachPath, buildSetup, buildCmd], options),
   },
   {
     command: CMD_WAIT_FOR_DB,
@@ -149,9 +168,21 @@ export const baseCmds: Command[] = [
       noTelemetryOption,
       verboseOption,
       developmentOption,
+      noSDKCodegenOption,
+      localOption,
     ],
     action: (options) =>
-      chain([compileClient, waitForDB, startSubprocess], options),
+      chain(
+        [
+          attachPath,
+          buildSetup,
+          buildCmd,
+          compileClient,
+          waitForDB,
+          startSubprocess,
+        ],
+        options
+      ),
   },
   {
     command: CMD_COMPILE_MODELS,

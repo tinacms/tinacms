@@ -7,6 +7,8 @@
     "dev-isomorphic": "yarn tinacms server:start -c \"next dev\" --experimentalData --isomorphicGitBridge --noTelemetry --dev",
     "build": "tinacms server:start -c \"next build\" --experimentalData --noTelemetry --dev",
     "start": "tinacms server:start -c \"next start\" --experimentalData --noTelemetry --dev",
+    "build:tina": "tinacms build --experimentalData --noTelemetry --dev",
+    "build:wait": "tinacms server:waitForDB  --experimentalData --noTelemetry --verbose",
     "export": "npm run build && next export"
   },
   "devDependencies": {

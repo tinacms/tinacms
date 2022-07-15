@@ -17,11 +17,12 @@ import chokidar from 'chokidar'
 
 import { Telemetry } from '@tinacms/metrics'
 
-import { build, buildSetup } from '../../buildTina'
+import { build } from '../../buildTina'
 import { AsyncLock } from './lock'
 import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
+import type { Bridge, Database, Store } from '@tinacms/graphql'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -47,7 +48,6 @@ export async function startServer(
   {
     port = 4001,
     noWatch,
-    experimentalData,
     isomorphicGitBridge,
     noSDK,
     noTelemetry,
@@ -60,19 +60,16 @@ export async function startServer(
   buildLock.disable()
   reBuildLock.disable()
 
-  const rootPath = process.cwd()
+  const rootPath = ctx.rootPath as string
   const t = new Telemetry({ disabled: Boolean(noTelemetry) })
   t.submitRecord({
     event: {
       name: 'tinacms:cli:server:start:invoke',
     },
   })
-
-  const { bridge, database, store } = await buildSetup({
-    rootPath,
-    isomorphicGitBridge,
-    experimentalData,
-  })
+  const bridge: Bridge = ctx.bridge
+  const database: Database = ctx.database
+  const store: Store = ctx.store
 
   // This is only false for tina-cloud media stores
   const shouldBuild = bridge.supportsBuilding()
@@ -182,7 +179,6 @@ export async function startServer(
               bridge,
               ctx,
               database,
-              rootPath,
               store,
               dev,
               isomorphicGitBridge,
@@ -217,7 +213,6 @@ export async function startServer(
                 bridge,
                 ctx,
                 database,
-                rootPath,
                 store,
                 dev,
                 isomorphicGitBridge,
@@ -254,7 +249,6 @@ export async function startServer(
         bridge,
         ctx,
         database,
-        rootPath,
         store,
         dev,
         isomorphicGitBridge,
