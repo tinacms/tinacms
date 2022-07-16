@@ -3,6 +3,7 @@
   "version": "0.56.34",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "keywords": [
     "tinacms",
     "cms",
