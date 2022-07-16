@@ -89,7 +89,6 @@ export const remarkToSlate = (
       case 'text':
         return text(content)
       default:
-        console.log('okokook', content)
         throw new Error(`Content: ${content.type} is not yet supported`)
     }
   }

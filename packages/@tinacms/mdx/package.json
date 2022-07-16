@@ -48,7 +48,8 @@
     "build": "tinacms-scripts build",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
-    "test": "jest",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
     "test-watch": "jest --watch"
   },
   "dependencies": {
@@ -97,6 +98,7 @@
     "unist-util-visit": "^4.1.0",
     "unist-util-visit-parents": "^5.1.0",
     "vfile": "^4.2.0",
+    "vitest": "^0.18.0",
     "ws": "^7.3.1",
     "yup": "^0.32.9"
   },
@@ -127,6 +129,7 @@
     "@types/normalize-path": "^3.0.0",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
+    "c8": "^7.11.3",
     "jest": "^28.1.2",
     "jest-diff": "^28.1.1",
     "jest-file-snapshot": "^0.5.0",
