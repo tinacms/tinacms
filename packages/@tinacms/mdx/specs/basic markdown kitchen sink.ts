@@ -1,4 +1,4 @@
-import type { BlockElement } from './runner.test'
+import type { BlockElement } from './_runner.test'
 
 const output: BlockElement[] = [
   { type: 'h1', children: [{ type: 'text', text: 'Hello, world' }] },

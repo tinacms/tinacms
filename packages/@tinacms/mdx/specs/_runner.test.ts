@@ -11,7 +11,7 @@ export { BlockElement }
 
 export const print = (ast) =>
   prettier.format(
-    `import type { BlockElement } from "./runner.test"
+    `import type { BlockElement } from "./_runner.test"
 
 const output: BlockElement[] = ${JSON.stringify(ast)}
 export { output }
