@@ -5,6 +5,7 @@ import type { BlockElement } from '../src/parse/plate'
 import { parseMDX } from '../src/parse/index'
 import { stringifyMDX } from '../src/stringify'
 import fs from 'fs'
+import path from 'path'
 
 export { BlockElement }
 
@@ -27,7 +28,14 @@ export const output = (value: BlockElement[]) => value
 export const field: RichTypeInner = {
   name: 'body',
   type: 'rich-text',
-  templates: [],
+  templates: [
+    {
+      name: 'Greeting',
+      label: 'Greeting',
+      inline: true,
+      fields: [{ type: 'string', name: 'message' }],
+    },
+  ],
 }
 
 export const parseThenStringify = (
@@ -49,7 +57,7 @@ const content = import.meta.glob('./*.md', { as: 'raw' })
 const outputString = import.meta.glob('./*.ts', { as: 'raw' })
 
 Object.entries(content).map(([filename, value]) => {
-  const string = outputString[filename.replace('md', 'ts')]
+  const string = outputString[filename.replace('.md', '.ts')]
   it(filename, () => {
     const { astResult, stringResult } = parseThenStringify(value, field)
     expect(stringResult).toEqual(value.trim())
@@ -57,7 +65,7 @@ Object.entries(content).map(([filename, value]) => {
       expect(string).toEqual(astResult)
     } else {
       fs.writeFile(
-        `./fixtures2/${filename.replace('md', 'ts')}`,
+        path.join('.', 'specs', filename.replace('.md', '.ts')),
         astResult,
         (error) => {
           console.log(error)
