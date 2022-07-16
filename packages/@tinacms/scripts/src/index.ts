@@ -576,7 +576,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         name: packageJSON.name,
         fileName: (format) => {
           return format === 'umd'
-            ? `${outInfo.outfile}.js`
+            ? `${outInfo.outfile}.cjs`
             : `${outInfo.outfile}.es.js`
         },
       },
