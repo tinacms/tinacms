@@ -4,14 +4,17 @@ import prettier from 'prettier'
 import type { BlockElement } from '../src/parse/plate'
 import { parseMDX } from '../src/parse/index'
 import { stringifyMDX } from '../src/stringify'
+import fs from 'fs'
 
-export { expect, it }
+export { BlockElement }
 
 export const print = (ast) =>
   prettier.format(
-    `import { output } from "../runner"
+    `import type { BlockElement } from "./runner.test"
 
-export default output(${JSON.stringify(ast)})`,
+const output: BlockElement[] = ${JSON.stringify(ast)}
+export { output }
+`,
     {
       parser: 'babel-ts',
       singleQuote: true,
@@ -25,14 +28,6 @@ export const field: RichTypeInner = {
   name: 'body',
   type: 'rich-text',
   templates: [],
-}
-
-import fs from 'fs'
-
-export const writeSnapshot = (astResult) => {
-  fs.writeFile('./specs/basic/out.ts', astResult, (error) => {
-    console.log(error)
-  })
 }
 
 export const parseThenStringify = (
@@ -49,3 +44,25 @@ export const parseThenStringify = (
   // Only care about the children
   return { astResult: print(astResult.children), stringResult }
 }
+
+const content = import.meta.glob('./*.md', { as: 'raw' })
+const outputString = import.meta.glob('./*.ts', { as: 'raw' })
+
+Object.entries(content).map(([filename, value]) => {
+  const string = outputString[filename.replace('md', 'ts')]
+  it(filename, () => {
+    const { astResult, stringResult } = parseThenStringify(value, field)
+    expect(stringResult).toEqual(value.trim())
+    if (string) {
+      expect(string).toEqual(astResult)
+    } else {
+      fs.writeFile(
+        `./fixtures2/${filename.replace('md', 'ts')}`,
+        astResult,
+        (error) => {
+          console.log(error)
+        }
+      )
+    }
+  })
+})
