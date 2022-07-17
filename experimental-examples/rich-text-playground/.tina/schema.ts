@@ -1,8 +1,5 @@
-// import { defineSchema, defineConfig } from "tinacms";
+import { defineSchema, defineConfig } from 'tinacms'
 import { client } from './client'
-
-const defineSchema = (obj) => obj
-const defineConfig = (obj) => obj
 
 const schema = defineSchema({
   config: {
@@ -44,6 +41,7 @@ const schema = defineSchema({
                   name: 'text',
                   label: 'Text',
                   type: 'string',
+                  required: true,
                   isTitle: true,
                   ui: {
                     component: 'textarea',
@@ -62,6 +60,7 @@ const schema = defineSchema({
               fields: [
                 {
                   name: 'text',
+                  required: true,
                   isTitle: true,
                   label: 'Text',
                   type: 'string',
@@ -118,6 +117,7 @@ const schema = defineSchema({
                         {
                           name: 'authorName',
                           isTitle: true,
+                          required: true,
                           label: 'Author',
                           type: 'string',
                         },
@@ -128,6 +128,7 @@ const schema = defineSchema({
                 {
                   name: 'authorName',
                   isTitle: true,
+                  required: true,
                   label: 'Author',
                   type: 'string',
                 },

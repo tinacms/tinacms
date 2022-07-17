@@ -18,7 +18,6 @@ limitations under the License.
 
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
-import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 import { remarkToSlate } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'

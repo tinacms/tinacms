@@ -73,7 +73,6 @@ const RawEditor = (props: { input: any }) => {
         console.log('imagecallback', value)
         return value
       })
-      console.log(parsedValue)
       props.input.onChange(parsedValue)
       setError(null)
     } catch (e) {

@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { expect, it, describe } from 'vitest'
+import { vi, expect, it, describe } from 'vitest'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import { parseMDX } from './parse/index'
 import { stringifyMDX } from './stringify'
@@ -1550,10 +1550,10 @@ describe('MDX Elements', () => {
     test('With an image MDX element', () => {
       const string = mdxTestImage.trim()
 
-      const parseImageCallback = jest.fn((src) => {
+      const parseImageCallback = vi.fn((src) => {
         return `some-prefix${src}`
       })
-      const stringifyImageCallback = jest.fn((src) => {
+      const stringifyImageCallback = vi.fn((src) => {
         return src.replace('some-prefix', '')
       })
 
@@ -1618,7 +1618,7 @@ describe('MDX Elements', () => {
 
   Some child text
 </Blockquote>`
-    test.only('With rich-text multiline', () => {
+    test('With rich-text multiline', () => {
       const string = mdxnested.trim()
 
       const { astResult, stringResult } = parseThenStringify(string, {

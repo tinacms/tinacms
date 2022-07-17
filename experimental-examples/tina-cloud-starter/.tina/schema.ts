@@ -1,13 +1,10 @@
-// import { defineSchema, defineConfig } from "tinacms";
+import { defineSchema, defineConfig } from "tinacms";
 import { client } from "./client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
 import { testimonialBlockSchema } from "../components/blocks/testimonial";
 import { iconSchema } from "../components/icon";
-
-const defineSchema = (obj) => obj;
-const defineConfig = (obj) => obj;
 
 const schema = defineSchema({
   config: {

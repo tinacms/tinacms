@@ -120,7 +120,7 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
     }
   } catch (e) {
     console.log(`Error building ${packageJSON.name}`)
-    throw new Error(e)
+    throw e
   }
 }
 
@@ -425,9 +425,25 @@ export const buildIt = async (entryPoint, packageJSON) => {
   const entry = typeof entryPoint === 'string' ? entryPoint : entryPoint.name
   const target = typeof entryPoint === 'string' ? 'browser' : entryPoint.target
   const deps = packageJSON.dependencies
-  // @ts-ignore
   const peerDeps = packageJSON.peerDependencies
-  const external = Object.keys({ ...deps, ...peerDeps })
+  const devDeps = packageJSON.devDependencies
+  const external = peerDeps ? Object.keys(peerDeps) : []
+  if (devDeps) {
+    Object.keys(devDeps).forEach((dep) => external.push(dep))
+  }
+  if (packageJSON.buildConfig) {
+    if (packageJSON.buildConfig?.entryPoints[0].bundleDeps) {
+      // Don't mark deps as external
+    } else {
+      if (deps) {
+        Object.keys(deps).forEach((dep) => external.push(dep))
+      }
+    }
+  } else {
+    if (deps) {
+      Object.keys(deps).forEach((dep) => external.push(dep))
+    }
+  }
   const globals = {}
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
@@ -442,10 +458,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
         outdir: path.join(process.cwd(), 'dist'),
-        external: external.filter(
-          (item) =>
-            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
-        ),
+        external,
       })
     } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
       await esbuild({
@@ -457,37 +470,16 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
         format: 'cjs',
-        outfile: path.join(process.cwd(), 'dist', 'index.js'),
-        external: external.filter(
-          (item) =>
-            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
-        ),
-      })
-      await esbuild({
-        entryPoints: [path.join(process.cwd(), entry)],
-        bundle: true,
-        platform: 'node',
-        // FIXME: no idea why but even though I'm on node14 it doesn't like
-        // the syntax for optional chaining, should be supported on 14
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-        target: 'node12',
-        format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.mjs'),
-        external: external.filter(
-          (item) =>
-            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
-        ),
+        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
+        external,
       })
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'browser',
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'browser.js'),
-        external: external.filter(
-          (item) =>
-            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
-        ),
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        external,
       })
     } else {
       await esbuild({
@@ -529,19 +521,6 @@ export const buildIt = async (entryPoint, packageJSON) => {
     )
     console.log('out', outdir, outfile, relativeOutfile)
     return { outdir, outfile, relativeOutfile }
-  }
-  const outfile = (entry: string, format: string, js?: boolean) => {
-    const base = path.basename(entry)
-    const ext = path.extname(entry)
-    const name = base.replace(ext, '')
-    const dir = path.dirname(entry)
-    let fmt = format === 'umd' ? '' : `.${format}`
-    fmt = js ? `${fmt}.js` : fmt
-    const prefix = dir.replace('src', '')
-    const fileName = prefix
-      ? [prefix, `${name}${fmt}`].join('-').replace('/', '')
-      : `${name}${fmt}`
-    return fileName
   }
 
   const outInfo = out(entry)

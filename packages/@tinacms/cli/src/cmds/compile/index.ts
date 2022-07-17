@@ -269,10 +269,10 @@ const transpile = async (inputFile, outputFile, tempDir, verbose, define) => {
   const outputPath = path.join(tempDir, outputFile)
   await build({
     bundle: true,
-    platform: 'neutral',
+    platform: 'node',
     target: ['node10.4'],
     entryPoints: [inputFile],
-    treeShaking: true,
+    // treeShaking: true,
     external: [...external, './node_modules/*'],
     loader: loaders,
     outfile: outputPath,
