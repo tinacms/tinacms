@@ -213,10 +213,20 @@ input Posts_bodyNewsletterSignupFilter {
   disclaimer: RichTextFilter
 }
 
+input Posts_bodyShortcode1Filter {
+  text: StringFilter
+}
+
+input Posts_bodyShortcode2Filter {
+  text: StringFilter
+}
+
 input Posts_bodyFilter {
   DateTime: Posts_bodyDateTimeFilter
   BlockQuote: Posts_bodyBlockQuoteFilter
   NewsletterSignup: Posts_bodyNewsletterSignupFilter
+  Shortcode1: Posts_bodyShortcode1Filter
+  Shortcode2: Posts_bodyShortcode2Filter
 }
 
 input PostsFilter {

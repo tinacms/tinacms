@@ -414,6 +414,10 @@ export type Template<WithNamespace extends boolean> = WithNamespace extends true
       label: string
       name: string
       fields: TinaFieldInner<WithNamespace>[]
+      match?: {
+        start: string
+        end: string
+      }
       ui?: object | (UIField<any, any> & { previewSrc: string })
       namespace: WithNamespace extends true ? string[] : undefined
     }
@@ -422,6 +426,10 @@ export type Template<WithNamespace extends boolean> = WithNamespace extends true
       name: string
       ui?: object | (UIField<any, any> & { previewSrc: string })
       fields: TinaFieldInner<WithNamespace>[]
+      match?: {
+        start: string
+        end: string
+      }
     }
 
 // Builder types

@@ -116,6 +116,12 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
       label: z.string(),
       name: nameProp,
       fields: z.array(TinaFieldZod),
+      match: z
+        .object({
+          start: z.string(),
+          end: z.string(),
+        })
+        .optional(),
     })
     .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
       message: 'Fields must have a unique name',
