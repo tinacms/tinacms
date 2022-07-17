@@ -447,6 +447,29 @@ export const buildIt = async (entryPoint, packageJSON) => {
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
         ),
       })
+    } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
+      const peerDeps = packageJSON.peerDependencies
+      const external = Object.keys({ ...peerDeps })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        // FIXME: no idea why but even though I'm on node14 it doesn't like
+        // the syntax for optional chaining, should be supported on 14
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+        target: 'node12',
+        format: 'cjs',
+        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
+        external,
+      })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'browser',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        external,
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

@@ -59,7 +59,7 @@ const RawEditor = (props: { input: any }) => {
   const [height, setHeight] = React.useState(100)
   const field = props.field
   const inputValue = React.useMemo(() => {
-    const res = stringifyMDX(props.input.value, field)
+    const res = stringifyMDX(props.input.value, field, (value) => value)
     return typeof props.input.value === 'string' ? props.input.value : res
   }, [])
   const [value, setValue] = React.useState(inputValue)
@@ -69,10 +69,7 @@ const RawEditor = (props: { input: any }) => {
 
   React.useEffect(() => {
     try {
-      const parsedValue = parseMDX(value, field, (value) => {
-        console.log('imagecallback', value)
-        return value
-      })
+      const parsedValue = parseMDX(value, field, (value) => value)
       props.input.onChange(parsedValue)
       setError(null)
     } catch (e) {
