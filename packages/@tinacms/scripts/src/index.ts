@@ -13,7 +13,7 @@ limitations under the License.
 
 import { build } from 'vite'
 import { build as esbuild } from 'esbuild'
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
 import { exec } from 'child_process'
@@ -496,6 +496,23 @@ export const buildIt = async (entryPoint, packageJSON) => {
     return true
   }
 
+  const out = (entry: string) => {
+    const { dir, name } = path.parse(entry)
+    const outdir = dir.replace('src', 'dist')
+    const outfile = name
+    const relativeOutfile = path.join(
+      outdir
+        .split('/')
+        .map(() => '..')
+        .join('/'),
+      dir,
+      name
+    )
+    return { outdir, outfile, relativeOutfile }
+  }
+
+  const outInfo = out(entry)
+
   const defaultBuildConfig: Parameters<typeof build>[0] = {
     plugins: [
       {
@@ -525,15 +542,12 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entry: path.resolve(process.cwd(), entry),
         name: packageJSON.name,
         fileName: (format) => {
-          const base = path.basename(entry)
-          const ext = path.extname(entry)
-          const name = base.replace(ext, '')
-          if (format === 'umd') {
-            return `${name}.js`
-          }
-          return `${name}.${format}.js`
+          return format === 'umd'
+            ? `${outInfo.outfile}.js`
+            : `${outInfo.outfile}.es.js`
         },
       },
+      outDir: outInfo.outdir,
       emptyOutDir: false, // we build multiple files in to the dir
       sourcemap: false, // true | 'inline' (note: inline will go straight into your bundle size)
       rollupOptions: {
@@ -572,14 +586,9 @@ export const buildIt = async (entryPoint, packageJSON) => {
   await build({
     ...buildConfig,
   })
-  const extension = path.extname(entry)
-  await fs.writeFileSync(
-    path.join(
-      process.cwd(),
-      'dist',
-      entry.replace('src/', '').replace(extension, '.d.ts')
-    ),
-    `export * from "../${entry.replace(extension, '')}"`
+  await fs.outputFileSync(
+    path.join(outInfo.outdir, `${outInfo.outfile}.d.ts`),
+    `export * from "${outInfo.relativeOutfile}"`
   )
   return true
 }
