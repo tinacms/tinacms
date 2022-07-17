@@ -35,6 +35,8 @@ type BaseComponents = {
   hr?: {}
   break?: {}
   maybe_mdx?: { children: JSX.Element }
+  html?: { value: string }
+  html_inline?: { value: string }
   // Provide a fallback when a JSX component wasn't provided
   component_missing?: { name: string }
 }
@@ -97,142 +99,7 @@ export const TinaMarkdown = ({
   return (
     <>
       {nodes.map((child, index) => {
-        // FIXME: Should add positional meta data to each node
-        // for use as a key. Though using `index` doesn't seem to present problems
-        const key = index
-        const { children, ...props } = child
-        switch (child.type) {
-          case 'h1':
-          case 'h2':
-          case 'h3':
-          case 'h4':
-          case 'h5':
-          case 'h6':
-          case 'p':
-          case 'blockquote':
-          case 'ol':
-          case 'ul':
-          case 'li':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              return (
-                <Component key={key} {...props}>
-                  <TinaMarkdown components={components} content={children} />
-                </Component>
-              )
-            }
-            return React.createElement(child.type, {
-              key,
-              children: (
-                <TinaMarkdown components={components} content={children} />
-              ),
-            })
-          case 'lic': // List Item Content
-            return (
-              <div key={key}>
-                <TinaMarkdown
-                  components={components}
-                  content={child.children}
-                />
-              </div>
-            )
-          case 'img':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-              return <Component key={key} {...props} />
-            }
-            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-            return <img key={key} src={child.url} alt={child.caption} />
-          case 'a':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              return (
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                <Component key={key} {...props}>
-                  <TinaMarkdown components={components} content={children} />
-                </Component>
-              )
-            }
-            return (
-              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-              <a key={key} href={child.url}>
-                <TinaMarkdown components={components} content={children} />
-              </a>
-            )
-          case 'code_block':
-            const value = child.children
-              .map((item) => {
-                // I don't think it's possible to have more than one
-                // child item here
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                return item.children ? item.children[0]?.text || '' : ''
-              })
-              .join('\n')
-            if (components[child.type]) {
-              const Component = components[child.type]
-              return (
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                <Component key={key} {...props}>
-                  {/* @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types */}
-                  {value}
-                </Component>
-              )
-            }
-            return (
-              <pre key={key}>
-                <code>{value}</code>
-              </pre>
-            )
-          case 'hr':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-              return <Component key={key} {...props} />
-            }
-            return <hr key={key} />
-          case 'break':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              return <Component key={key} {...props} />
-            }
-            return <br key={key} />
-          case 'text':
-            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-            return <Leaf key={key} components={components} {...child} />
-          case 'mdxJsxTextElement':
-          case 'mdxJsxFlowElement':
-            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-            const Component = components[child.name]
-            if (Component) {
-              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-              const props = child.props ? child.props : {}
-              return <Component key={key} {...props} />
-            } else {
-              const ComponentMissing = components['component_missing']
-              if (ComponentMissing) {
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                return <ComponentMissing key={key} name={child.name} />
-              } else {
-                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-                throw new Error(`No component provided for ${child.name}`)
-              }
-            }
-          case 'maybe_mdx':
-            /**
-             * We don't want to render this as it's only displayed while editing an mdx node and should
-             * be transformed before form submission
-             */
-            return null
-          default:
-            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-            if (typeof child.text === 'string') {
-              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-              return <Leaf key={key} components={components} {...child} />
-            }
-
-            console.log(`No tina renderer for ${child.type}`, child)
-        }
+        return <MemoNode components={components} key={index} child={child} />
       })}
     </>
   )
@@ -332,4 +199,147 @@ const Leaf = (props: {
     )
   }
   return <>{props.text}</>
+}
+
+// FIXME: this needs more testing. But in theory all props
+// are serializable anyway so the JSON.stringify comparison makes sense.
+// I haven't thought all the way through this though, and maybe it'll break
+// down with custom components in some way.
+// In general this component handles most things without too many issues but for
+// large bodies of text it becomes pretty painful to see as-you-type updates, especially
+// in Safari.
+const MemoNode = (props) => {
+  const MNode = React.useMemo(
+    () => <Node {...props} />,
+    [JSON.stringify(props)]
+  )
+  return MNode
+}
+const Node = ({ components, child }) => {
+  const { children, ...props } = child
+  switch (child.type) {
+    case 'h1':
+    case 'h2':
+    case 'h3':
+    case 'h4':
+    case 'h5':
+    case 'h6':
+    case 'p':
+    case 'blockquote':
+    case 'ol':
+    case 'ul':
+    case 'li':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return (
+          <Component {...props}>
+            <TinaMarkdown components={components} content={children} />
+          </Component>
+        )
+      }
+      return React.createElement(child.type, {
+        children: <TinaMarkdown components={components} content={children} />,
+      })
+    case 'lic': // List Item Content
+      return (
+        <div>
+          <TinaMarkdown components={components} content={child.children} />
+        </div>
+      )
+    case 'img':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+        return <Component {...props} />
+      }
+      // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+      return <img src={child.url} alt={child.caption} />
+    case 'a':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return (
+          // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+          <Component {...props}>
+            <TinaMarkdown components={components} content={children} />
+          </Component>
+        )
+      }
+      return (
+        // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+        <a href={child.url}>
+          <TinaMarkdown components={components} content={children} />
+        </a>
+      )
+    case 'code_block':
+      const value = child.value
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return (
+          // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+          <Component {...props}>
+            {/* @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types */}
+            {value}
+          </Component>
+        )
+      }
+      return (
+        <pre>
+          <code>{value}</code>
+        </pre>
+      )
+    case 'hr':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+        return <Component {...props} />
+      }
+      return <hr />
+    case 'break':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return <Component {...props} />
+      }
+      return <br />
+    case 'text':
+      // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+      return <Leaf components={components} {...child} />
+    case 'mdxJsxTextElement':
+    case 'mdxJsxFlowElement':
+      // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+      const Component = components[child.name]
+      if (Component) {
+        // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+        const props = child.props ? child.props : {}
+        return <Component {...props} />
+      } else {
+        const ComponentMissing = components['component_missing']
+        if (ComponentMissing) {
+          // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+          return <ComponentMissing name={child.name} />
+        } else {
+          return <span>{`No component provided for ${child.name}`}</span>
+        }
+      }
+    case 'maybe_mdx':
+      /**
+       * We don't want to render this as it's only displayed while editing an mdx node and should
+       * be transformed before form submission
+       */
+      return null
+    case 'html':
+    case 'html_inline':
+      if (components[child.type]) {
+        const Component = components[child.type]
+        return <Component {...props} />
+      }
+      return child.value
+    default:
+      // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+      if (typeof child.text === 'string') {
+        // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
+        return <Leaf components={components} {...child} />
+      }
+
+    // console.log(`No tina renderer for ${child.type}`, child)
+  }
 }

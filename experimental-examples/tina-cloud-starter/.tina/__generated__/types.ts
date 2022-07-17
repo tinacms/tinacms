@@ -338,10 +338,20 @@ export type Posts_BodyNewsletterSignupFilter = {
   disclaimer?: InputMaybe<RichTextFilter>;
 };
 
+export type Posts_BodyShortcode1Filter = {
+  text?: InputMaybe<StringFilter>;
+};
+
+export type Posts_BodyShortcode2Filter = {
+  text?: InputMaybe<StringFilter>;
+};
+
 export type Posts_BodyFilter = {
   DateTime?: InputMaybe<Posts_BodyDateTimeFilter>;
   BlockQuote?: InputMaybe<Posts_BodyBlockQuoteFilter>;
   NewsletterSignup?: InputMaybe<Posts_BodyNewsletterSignupFilter>;
+  Shortcode1?: InputMaybe<Posts_BodyShortcode1Filter>;
+  Shortcode2?: InputMaybe<Posts_BodyShortcode2Filter>;
 };
 
 export type PostsFilter = {

@@ -193,6 +193,48 @@ const schema = defineSchema({
                 },
               },
             },
+            {
+              name: "Shortcode1",
+              label: "Shortcode 1",
+              inline: true,
+              match: {
+                start: "{{<",
+                end: ">}}",
+              },
+              fields: [
+                {
+                  name: "text",
+                  label: "Text",
+                  type: "string",
+                  required: true,
+                  isTitle: true,
+                  ui: {
+                    component: "textarea",
+                  },
+                },
+              ],
+            },
+            {
+              name: "Shortcode2",
+              label: "Shortcode 2",
+              inline: true,
+              match: {
+                start: "{{%",
+                end: "%}}",
+              },
+              fields: [
+                {
+                  name: "text",
+                  required: true,
+                  isTitle: true,
+                  label: "Text",
+                  type: "string",
+                  ui: {
+                    component: "textarea",
+                  },
+                },
+              ],
+            },
           ],
           isBody: true,
         },
