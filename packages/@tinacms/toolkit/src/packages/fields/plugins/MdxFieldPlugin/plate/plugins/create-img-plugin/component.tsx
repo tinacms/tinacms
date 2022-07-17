@@ -13,8 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { useSelected } from 'slate-react'
-import { insertNodes } from '@udecode/plate-core'
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph'
+import { insertNodes, ELEMENT_PARAGRAPH } from '@udecode/plate-headless'
 import { NestedForm } from '../../nested-form'
 import { useEmbedHandles, useHotkey } from '../../hooks/embed-hooks'
 import { DeleteImageButton } from '../../../../../components'

@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { MARK_BOLD, MARK_CODE, MARK_ITALIC } from '@udecode/plate-basic-marks'
-import type { AutoformatRule } from '@udecode/plate-autoformat'
+import { MARK_BOLD, MARK_CODE, MARK_ITALIC } from '@udecode/plate-headless'
+import type { AutoformatRule } from '@udecode/plate-headless'
 
 export const autoformatMarks: AutoformatRule[] = [
   {

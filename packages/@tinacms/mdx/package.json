@@ -1,0 +1,89 @@
+{
+  "name": "@tinacms/mdx",
+  "version": "0.60.3",
+  "main": "dist/index.cjs",
+  "typings": "dist/index.d.ts",
+  "module": "./dist/index.es.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "package.json",
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node",
+        "bundleDeps": true
+      }
+    ]
+  },
+  "scripts": {
+    "types": "yarn tsc",
+    "build": "tinacms-scripts build",
+    "docs": "yarn typedoc",
+    "serve": "yarn nodemon dist/server.js",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "test-watch": "jest --watch"
+  },
+  "dependencies": {
+    "acorn": "^8.7.1",
+    "lodash.flatten": "^4.4.0",
+    "mdast-util-mdx-jsx": "^2.0.1",
+    "mdast-util-to-markdown": "^1.3.0",
+    "prettier": "^2.7.1",
+    "remark": "^14.0.2",
+    "remark-mdx": "^2.1.2",
+    "unist-util-visit": "^4.1.0",
+    "vfile": "^4.2.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/tina-graphql"
+  },
+  "devDependencies": {
+    "mdast": "^3.0.0",
+    "vitest": "^0.18.0",
+    "@swc/core": "^1.2.210",
+    "@types/prettier": "^2.6.3",
+    "@swc/jest": "^0.2.21",
+    "@tinacms/datalayer": "workspace:*",
+    "@tinacms/schema-tools": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
+    "@types/cors": "^2.8.7",
+    "@types/estree": "^0.0.50",
+    "@types/express": "^4.17.8",
+    "@types/fs-extra": "^9.0.2",
+    "@types/jest": "^26.0.4",
+    "@types/js-yaml": "^3.12.5",
+    "@types/lodash.flatten": "4.4.7",
+    "@types/mdast": "3.0.7",
+    "@types/node": "^14.17.34",
+    "@types/normalize-path": "^3.0.0",
+    "@types/ws": "^7.2.6",
+    "@types/yup": "^0.29.7",
+    "c8": "^7.11.3",
+    "jest": "^28.1.2",
+    "jest-diff": "^28.1.1",
+    "jest-file-snapshot": "^0.5.0",
+    "jest-matcher-utils": "^28.1.1",
+    "nodemon": "^2.0.4",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.3.5"
+  },
+  "peerDependencies": {
+    "@tinacms/schema-tools": "*"
+  }
+}

@@ -19,24 +19,25 @@ limitations under the License.
 import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
-} from '@udecode/plate-code-block'
-import { unwrapList, toggleList } from '@udecode/plate-list'
-import type { AutoformatBlockRule } from '@udecode/plate-autoformat'
+  unwrapList,
+  toggleList,
+} from '@udecode/plate-headless'
+import type { AutoformatBlockRule } from '@udecode/plate-headless'
 
 import {
-  getParent,
+  getParentNode,
   isElement,
   isType,
   PlateEditor,
   TEditor,
-} from '@udecode/plate-core'
+} from '@udecode/plate-headless'
 
 export const preFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as PlateEditor)
 
 export const format = (editor: TEditor, customFormatting: any) => {
   if (editor.selection) {
-    const parentEntry = getParent(editor, editor.selection)
+    const parentEntry = getParentNode(editor, editor.selection)
     if (!parentEntry) return
     const [node] = parentEntry
     if (

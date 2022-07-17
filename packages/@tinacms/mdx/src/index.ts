@@ -16,5 +16,8 @@ limitations under the License.
 
 */
 
-export * from './createTrailingBlockPlugin'
-export * from './withTrailingBlock'
+import { parseMDX } from './parse'
+import { stringifyMDX } from './stringify'
+
+export { parseMDX }
+export { stringifyMDX }

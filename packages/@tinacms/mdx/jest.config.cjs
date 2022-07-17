@@ -10,17 +10,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { QueryNodeOptions } from '@udecode/plate-core'
 
-export interface SoftBreakRule {
-  hotkey: string
-
-  /**
-   * Filter the block types where the rule applies.
-   */
-  query?: QueryNodeOptions
-}
-
-export interface SoftBreakPlugin {
-  rules?: SoftBreakRule[]
+const mod = require('@tinacms/scripts/dist/jest-runner.js')
+module.exports = {
+  ...mod.default.config,
+  transform: {
+    '.(ts|tsx|js)$': [
+      '@swc/jest',
+      {
+        sourceMaps: true,
+      },
+    ],
+    // '.(js)$': [
+    //   '@swc/jest',
+    //   {
+    //     sourceMaps: true,
+    //   },
+    // ],
+    // 'node_modules/(?!unified).(js)$': '@tinacms/scripts/dist/jest-runner.js',
+  },
 }
