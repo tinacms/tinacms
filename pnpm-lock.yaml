@@ -998,6 +998,8 @@ importers:
       jest-file-snapshot: ^0.5.0
       lodash.set: ^4.3.2
       next: 9.4.2
+      prism: ^4.1.2
+      prism-react-renderer: ^1.3.5
       react: 17.0.2
       react-dom: 17.0.2
       react-icons: ^4.3.1
@@ -1021,6 +1023,8 @@ importers:
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
       lodash.set: 4.3.2
+      prism: 4.1.2_react@17.0.2
+      prism-react-renderer: 1.3.5_react@17.0.2
       react-icons: 4.4.0_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       url-pattern: 1.0.3
@@ -12232,6 +12236,13 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /change-emitter/0.1.6:
+    resolution:
+      {
+        integrity: sha512-YXzt1cQ4a2jqazhcuSWEOc1K2q8g9H6eWNsyZgi640LDzRWVQ2eDe+Y/kVdftH+vYdPF2rgDb3dLdpxE1jvAxw==,
+      }
+    dev: false
+
   /char-regex/1.0.2:
     resolution:
       {
@@ -13021,6 +13032,14 @@ packages:
       }
     requiresBuild: true
     dev: true
+
+  /core-js/1.2.7:
+    resolution:
+      {
+        integrity: sha512-ZiPp9pZlgxpWRu0M+YWbm6+aQ84XEfH1JRXvfOc/fILWI0VKhLC2LX13X1NYq4fULzLMq7Hfh43CSo2/aIaUPA==,
+      }
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
+    dev: false
 
   /core-js/2.6.12:
     resolution:
@@ -16166,6 +16185,21 @@ packages:
       }
     dev: false
 
+  /fbjs/0.8.18:
+    resolution:
+      {
+        integrity: sha512-EQaWFK+fEPSoibjNy8IxUtaFOMXcWsY0JaVrQoZR9zC8N2Ygf9iDITPWjUTVIax95b6I742JFLqASHfsag/vKA==,
+      }
+    dependencies:
+      core-js: 1.2.7
+      isomorphic-fetch: 2.2.1
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      promise: 7.3.1
+      setimmediate: 1.0.5
+      ua-parser-js: 0.7.31
+    dev: false
+
   /fbjs/3.0.4:
     resolution:
       {
@@ -17561,6 +17595,13 @@ packages:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
+  /hoist-non-react-statics/1.2.0:
+    resolution:
+      {
+        integrity: sha512-r8huvKK+m+VraiRipdZYc+U4XW43j6OFG/oIafe7GfDbRpCduRoX9JI/DRxqgtBSCeL+et6N6ibZoedHS2NyOQ==,
+      }
+    dev: false
+
   /hoist-non-react-statics/3.3.2:
     resolution:
       {
@@ -18868,6 +18909,16 @@ packages:
         integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==,
       }
     engines: { node: '>=0.10.0' }
+
+  /isomorphic-fetch/2.2.1:
+    resolution:
+      {
+        integrity: sha512-9c4TNAKYXM5PRyVcwUZrF3W09nQ+sO7+jydgs4ZGW9dhsLG2VOlISJABombdQqQRXCwuYG3sYV/puGf5rp0qmA==,
+      }
+    dependencies:
+      node-fetch: 1.7.3
+      whatwg-fetch: 3.6.2
+    dev: false
 
   /isomorphic-fetch/3.0.0:
     resolution:
@@ -23226,6 +23277,16 @@ packages:
     dependencies:
       lodash: 4.17.21
 
+  /node-fetch/1.7.3:
+    resolution:
+      {
+        integrity: sha512-NhZ4CsKx7cYm2vSrBAr2PvFOe6sWDf0UYLRqA6svUYg7+/TSfVAu49jYC4BvQ4Sms9SZgdqGBgroqfDhJdTyKQ==,
+      }
+    dependencies:
+      encoding: 0.1.13
+      is-stream: 1.1.0
+    dev: false
+
   /node-fetch/2.6.1:
     resolution:
       {
@@ -25203,6 +25264,37 @@ packages:
       react: 17.0.2
     dev: false
 
+  /prism-react/1.0.2_react@17.0.2:
+    resolution:
+      {
+        integrity: sha512-OoBo0kX55Fi+M4oGuYQ+AkU4/xSvB357mLXbYGP3j4oi4RtsdY5Rn3ViJ6gGU8IkZKs5cnmF7IteWWwUFyVd7Q==,
+      }
+    peerDependencies:
+      react: ^15.0.2 || ^0.14.8
+    dependencies:
+      react: 17.0.2
+      recompose: 0.22.0_react@17.0.2
+    dev: false
+
+  /prism-redux/1.0.2:
+    resolution:
+      {
+        integrity: sha512-e1DGRK+V/dxL6n6M25Py1QrAQLHkeueXyNxDTURT1y+KAMwSJdnlNvGU3ZLY2RIaA+ZdFTc9oTvTSR+mS88VyQ==,
+      }
+    dev: false
+
+  /prism/4.1.2_react@17.0.2:
+    resolution:
+      {
+        integrity: sha512-SsqrfKkYKYEYz/7RRET2KVZd9O22Rnj3331Al06ClLMycKWoM+MpfrjQrKuHGoIJ9IOy+k27kPEFnqPoAeFZpA==,
+      }
+    dependencies:
+      prism-react: 1.0.2_react@17.0.2
+      prism-redux: 1.0.2
+    transitivePeerDependencies:
+      - react
+    dev: false
+
   /prismjs/1.28.0:
     resolution:
       {
@@ -26102,6 +26194,21 @@ packages:
         integrity: sha512-gNva8/6UAe8QYepIQH/jQ2qn91Qj0B9sYjMBBs3QOB8F2CXcKgLxQaJRP76sWVRQt+QU+8fAkCbCvjjMFu7Ycw==,
       }
     engines: { node: '>= 0.8.0' }
+    dev: false
+
+  /recompose/0.22.0_react@17.0.2:
+    resolution:
+      {
+        integrity: sha512-QjNK/CgNg6wa7sqaQelgkRdl7ktIYbOV4xp0m2n8TexmHI5h3gjOc5a6nNQhtH3Js63hGZ1HfvJ3DUErrvZ2yg==,
+      }
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0
+    dependencies:
+      change-emitter: 0.1.6
+      fbjs: 0.8.18
+      hoist-non-react-statics: 1.2.0
+      react: 17.0.2
+      symbol-observable: 1.2.0
     dev: false
 
   /redent/3.0.0:
@@ -28619,6 +28726,14 @@ packages:
       }
     dependencies:
       tslib: 2.4.0
+    dev: false
+
+  /symbol-observable/1.2.0:
+    resolution:
+      {
+        integrity: sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==,
+      }
+    engines: { node: '>=0.10.0' }
     dev: false
 
   /symbol-tree/3.2.4:
