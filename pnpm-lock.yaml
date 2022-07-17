@@ -437,6 +437,7 @@ importers:
     specifiers:
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
       '@tinacms/datalayer': workspace:*
+      '@tinacms/mdx': workspace:*
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/cors': ^2.8.7
@@ -503,6 +504,7 @@ importers:
     dependencies:
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@tinacms/datalayer': link:../datalayer
+      '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
       body-parser: 1.20.0
       cors: 2.8.5
