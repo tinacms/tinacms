@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useEditorState } from '@udecode/plate-core'
+import { useEditorState } from '@udecode/plate-headless'
 import { Range, Editor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { computePosition, flip, shift } from '@floating-ui/dom'

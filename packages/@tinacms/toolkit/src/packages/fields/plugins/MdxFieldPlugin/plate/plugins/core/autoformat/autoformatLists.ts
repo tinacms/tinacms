@@ -21,10 +21,13 @@ import {
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
-  TodoListItemNodeData,
-} from '@udecode/plate-list'
-import { setNodes, TElement } from '@udecode/plate-core'
-import { AutoformatRule } from '@udecode/plate-autoformat'
+  setNodes,
+} from '@udecode/plate-headless'
+import type {
+  TTodoListItemElement,
+  TElement,
+  AutoformatRule,
+} from '@udecode/plate-headless'
 import { Editor } from 'slate'
 import { formatList, preFormat } from './autoformatUtils'
 
@@ -53,7 +56,7 @@ export const autoformatLists: AutoformatRule[] = [
     type: ELEMENT_TODO_LI,
     match: '[x] ',
     format: (editor) =>
-      setNodes<TElement<TodoListItemNodeData>>(
+      setNodes<TElement<TTodoListItemElement>>(
         editor,
         { type: ELEMENT_TODO_LI, checked: true },
         {

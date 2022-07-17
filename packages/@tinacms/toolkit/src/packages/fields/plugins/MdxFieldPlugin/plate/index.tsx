@@ -12,8 +12,11 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plate, createPlugins, usePlateEditorState } from '@udecode/plate-core'
-import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
+import {
+  Plate,
+  createPlugins,
+  usePlateEditorState,
+} from '@udecode/plate-headless'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
@@ -25,16 +28,9 @@ import {
 import { createImgPlugin } from './plugins/create-img-plugin'
 import { createSlashPlugin } from './plugins/create-slash-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
-import { EditorContext } from './editor-context'
+import { uuid } from './plugins/ui/helpers'
 
-import type { MdxTemplate } from './types'
-import type { InputProps } from '../../../components'
-import { uuid, classNames } from './plugins/ui/helpers'
-
-export const RichEditor = wrapFieldsWithMeta<
-  InputProps,
-  { templates: MdxTemplate[] }
->((props) => {
+export const RichEditor = (props) => {
   const initialValue = React.useMemo(
     () =>
       props.input.value?.children?.length
@@ -65,58 +61,28 @@ export const RichEditor = wrapFieldsWithMeta<
   // This should be a plugin customization
   const withToolbar = true
   const tempId = [props.tinaForm.id, props.input.name].join('.')
-  const id = React.useMemo(() => uuid(), [tempId])
+  const id = React.useMemo(() => uuid() + tempId, [tempId])
 
   return (
-    <EditorContext.Provider value={{ templates: props.field.templates }}>
-      <div className={withToolbar ? 'with-toolbar' : ''}>
-        <div
-          className={classNames(
-            withToolbar ? 'min-h-[100px]' : 'min-h-auto',
-            'max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2 mb-5'
-          )}
-        >
-          <Plate
-            id={id}
-            initialValue={initialValue}
-            plugins={plugins}
-            onChange={(value) => {
-              // console.log(JSON.stringify(value, null, 2))
-              props.input.onChange({ type: 'root', children: value })
-            }}
-          >
-            {}
+    <div className={withToolbar ? 'with-toolbar' : ''}>
+      <Plate
+        id={id}
+        initialValue={initialValue}
+        plugins={plugins}
+        onChange={(value) => {
+          props.input.onChange({ type: 'root', children: value })
+        }}
+        firstChildren={
+          <>
             {withToolbar ? (
               <Toolbar templates={props.field.templates} inlineOnly={false} />
             ) : (
               <FloatingToolbar templates={props.field.templates} />
             )}
-            <Reset id={id} form={props.form} initialValue={initialValue} />
             <FloatingLink />
-          </Plate>
-        </div>
-      </div>
-    </EditorContext.Provider>
+          </>
+        }
+      ></Plate>
+    </div>
   )
-})
-
-/**
- * Since slate keeps track of it's own state, and that state is an object rather
- * than something easily memoizable like a string it can be tricky to ensure
- * resets are properly handled. So we sneak in a callback to the form's reset
- * logic that updates slate's internal values imperatively.
- */
-const Reset = ({ id, form, initialValue }: { id; form; initialValue }) => {
-  const editor = usePlateEditorState(id)
-
-  React.useMemo(() => {
-    const { reset } = form
-    form.reset = (initialValues) => {
-      editor.children = initialValue
-      editor.onChange()
-      return reset(initialValues)
-    }
-  }, [])
-
-  return null
 }
