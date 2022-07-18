@@ -28,9 +28,9 @@ export async function genClient(
   next: () => void,
   options
 ) {
-  const branch = tinaSchema?.config.branch
-  const clientID = tinaSchema?.config.clientID
-  const token = tinaSchema?.config.token
+  const branch = tinaSchema?.config?.branch
+  const clientID = tinaSchema?.config?.clientID
+  const token = tinaSchema?.config?.token
 
   if (!branch || !clientID || !token) {
     logger.warn(
@@ -53,6 +53,7 @@ export const client = createClient({ url: '${apiURL}', token: '${token}', querie
 export default client;
   `
   )
+  return next()
 }
 
 export async function genTypes(
