@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently --kill-others \"pnpm tina-dev\" \"pnpm dev-server\" ",
-    "tina-dev": "next dev",
+    "tina-dev": "tinacms build --experimentalData --noTelemetry --local && next dev",
     "dev-server": "tinacms server:start --experimentalData --noTelemetry --local",
     "dev-server-isomorphic": "yarn tinacms server:start --experimentalData --isomorphicGitBridge --noTelemetry --local",
     "build": "tinacms build --experimentalData --noTelemetry && next build",

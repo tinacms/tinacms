@@ -30,7 +30,7 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
-import { buildCmd, buildSetup } from '../buildTina'
+import { buildCmd, buildCmdServerStart, buildSetupCmd } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
 
 export const CMD_GEN_TYPES = 'schema:types'
@@ -123,11 +123,14 @@ export const baseCmds: Command[] = [
       localOption,
     ],
     action: (options) =>
-      chain([attachPath, buildSetup, startServer, startSubprocess], options),
+      chain(
+        [attachPath, buildCmdServerStart, startServer, startSubprocess],
+        options
+      ),
   },
   {
     command: CMD_SETUP,
-    description: 'Setup Tina.',
+    description: 'Build',
     options: [
       startServerPortOption,
       subCommand,
@@ -142,7 +145,7 @@ export const baseCmds: Command[] = [
       localOption,
     ],
     action: (options) =>
-      chain([attachPath, buildSetup, startServer, startSubprocess], options),
+      chain([attachPath, buildSetupCmd, startServer, startSubprocess], options),
   },
   {
     command: CMD_BUILD,
@@ -158,7 +161,7 @@ export const baseCmds: Command[] = [
     ],
     action: (options) =>
       chain(
-        [attachPath, buildSetup, buildCmd, compileClient, waitForDB],
+        [attachPath, buildSetupCmd, buildCmd, compileClient, waitForDB],
         options
       ),
   },
@@ -178,7 +181,7 @@ export const baseCmds: Command[] = [
           checkDeps,
           initTina,
           installDeps,
-          buildSetup,
+          buildSetupCmd,
           buildCmd,
           tinaSetup,
           successMessage,
