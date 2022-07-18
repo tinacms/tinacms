@@ -17,7 +17,7 @@ import { TinaCloudSchema } from '@tinacms/schema-tools'
 import fs from 'fs-extra'
 import p from 'path'
 import { generateTypes } from '../../codegen'
-import { logText } from '../../utils/theme'
+import { logText, warnText } from '../../utils/theme'
 import { logger } from '../../logger'
 export const TINA_HOST = 'content.tinajs.io'
 const root = process.cwd()
@@ -28,7 +28,17 @@ export async function genClient(
   next: () => void,
   options
 ) {
-  const { branch, clientID, token } = tinaSchema.config
+  const branch = tinaSchema?.config.branch
+  const clientID = tinaSchema?.config.clientID
+  const token = tinaSchema?.config.token
+
+  if (!branch || clientID || token) {
+    logger.warn(
+      // TODO: add link to docs
+      warnText('Client not configured properly. Skipping client generation.')
+    )
+  }
+
   const apiURL = options.local
     ? 'http://localhost:4001/graphql'
     : `https://${TINA_HOST}/content/${clientID}/github/${branch}`
