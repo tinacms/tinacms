@@ -32,11 +32,12 @@ export async function genClient(
   const clientID = tinaSchema?.config.clientID
   const token = tinaSchema?.config.token
 
-  if (!branch || clientID || token) {
+  if (!branch || !clientID || !token) {
     logger.warn(
       // TODO: add link to docs
       warnText('Client not configured properly. Skipping client generation.')
     )
+    return next()
   }
 
   const apiURL = options.local
