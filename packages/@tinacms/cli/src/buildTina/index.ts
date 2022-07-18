@@ -45,12 +45,50 @@ interface BuildSetupOptions {
   experimentalData?: boolean
 }
 
-export const buildSetup = async (
+export const buildSetupCmd = async (
   ctx: any,
   next: () => void,
-  { isomorphicGitBridge, experimentalData }: BuildSetupOptions
+  opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
+  const { bridge, database, store } = await buildSetup({
+    ...opts,
+    rootPath,
+    useMemoryStore: true,
+  })
+  // attach to context
+  ctx.bridge = bridge
+  ctx.database = database
+  ctx.store = store
+
+  next()
+}
+
+export const buildCmdServerStart = async (
+  ctx: any,
+  next: () => void,
+  opts: BuildSetupOptions
+) => {
+  const rootPath = ctx.rootPath as string
+  const { bridge, database, store } = await buildSetup({
+    ...opts,
+    rootPath,
+    useMemoryStore: false,
+  })
+  // attach to context
+  ctx.bridge = bridge
+  ctx.database = database
+  ctx.store = store
+
+  next()
+}
+
+export const buildSetup = async ({
+  isomorphicGitBridge,
+  experimentalData,
+  rootPath,
+  useMemoryStore,
+}: BuildSetupOptions & { rootPath: string; useMemoryStore: boolean }) => {
   const fsBridge = new FilesystemBridge(rootPath)
   const isomorphicOptions =
     isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
@@ -76,17 +114,12 @@ export const buildSetup = async (
     : fsBridge
 
   const store = experimentalData
-    ? new LevelStore(rootPath)
+    ? new LevelStore(rootPath, useMemoryStore)
     : new FilesystemStore({ rootPath })
 
   const database = await createDatabase({ store, bridge })
 
-  // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.store = store
-
-  next()
+  return { database, bridge, store }
 }
 
 export const buildCmd = async (
