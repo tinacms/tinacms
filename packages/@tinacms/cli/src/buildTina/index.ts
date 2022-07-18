@@ -38,6 +38,7 @@ interface BuildOptions {
   noSDK?: boolean
   beforeBuild?: () => Promise<any>
   afterBuild?: () => Promise<any>
+  skipIndex?: boolean
 }
 
 interface BuildSetupOptions {
@@ -45,7 +46,7 @@ interface BuildSetupOptions {
   experimentalData?: boolean
 }
 
-export const buildSetupCmd = async (
+export const buildSetupCmdBuild = async (
   ctx: any,
   next: () => void,
   opts: BuildSetupOptions
@@ -64,7 +65,7 @@ export const buildSetupCmd = async (
   next()
 }
 
-export const buildCmdServerStart = async (
+export const buildSetupCmdServerStart = async (
   ctx: any,
   next: () => void,
   opts: BuildSetupOptions
@@ -83,7 +84,7 @@ export const buildCmdServerStart = async (
   next()
 }
 
-export const buildSetup = async ({
+const buildSetup = async ({
   isomorphicGitBridge,
   experimentalData,
   rootPath,
@@ -122,7 +123,7 @@ export const buildSetup = async ({
   return { database, bridge, store }
 }
 
-export const buildCmd = async (
+export const buildCmdBuild = async (
   ctx: any,
   next: () => void,
   options: Omit<
@@ -133,7 +134,15 @@ export const buildCmd = async (
   const bridge: Bridge = ctx.bridge
   const database: Database = ctx.database
   const store: Store = ctx.store
-  await build({ ...options, bridge, database, store, ctx: ctx })
+  // always skip indexing in the "build" command
+  await build({
+    ...options,
+    bridge,
+    database,
+    store,
+    ctx: ctx,
+    skipIndex: true,
+  })
   next()
 }
 
@@ -150,6 +159,7 @@ export const build = async ({
   local,
   verbose,
   noSDK,
+  skipIndex,
 }: BuildOptions) => {
   const rootPath = ctx.rootPath as string
   if (!rootPath) {
@@ -176,7 +186,7 @@ export const build = async ({
     }
     const database = await createDatabase({ store, bridge })
     await compileSchema(ctx, null, { verbose, dev })
-    const schema = await buildSchema(rootPath, database, cliFlags)
+    const schema = await buildSchema(rootPath, database, cliFlags, skipIndex)
     await genTypes({ schema }, () => {}, { noSDK, verbose })
     await genClient({ tinaSchema: ctx.schema }, () => {}, { local })
   } catch (error) {
