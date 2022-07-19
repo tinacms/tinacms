@@ -26,6 +26,7 @@ import path from 'path'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
+import type { GraphQLSchema } from 'graphql'
 
 interface BuildOptions {
   ctx: any
@@ -116,9 +117,11 @@ const buildSetup = async ({
     ? new IsomorphicBridge(rootPath, isomorphicOptions)
     : fsBridge
 
-  const store = experimentalData
-    ? new LevelStore(rootPath, useMemoryStore)
-    : new FilesystemStore({ rootPath })
+  // const store = experimentalData
+  //   ? new LevelStore(rootPath, useMemoryStore)
+  //   : new FilesystemStore({ rootPath })
+
+  const store = new LevelStore(rootPath, useMemoryStore)
 
   const database = await createDatabase({ store, bridge })
 
@@ -190,7 +193,7 @@ export const build = async ({
     await compileSchema(ctx, null, { verbose, dev })
 
     // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const schema = await retry(
+    const schema: GraphQLSchema = await retry(
       async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
     )
     await genTypes({ schema }, () => {}, { noSDK, verbose })
