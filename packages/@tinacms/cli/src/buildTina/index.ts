@@ -11,6 +11,8 @@
  limitations under the License.
  */
 
+import retry from 'async-retry'
+
 import { Bridge, buildSchema, createDatabase, Database } from '@tinacms/graphql'
 import {
   FilesystemBridge,
@@ -181,12 +183,16 @@ export const build = async ({
       await store.open()
     }
     const cliFlags = []
-    if (isomorphicGitBridge) {
-      cliFlags.push('isomorphicGitBridge')
-    }
+    // always enable experimentalData and isomorphicGitBridge on the  backend
+    cliFlags.push('experimentalData')
+    cliFlags.push('isomorphicGitBridge')
     const database = await createDatabase({ store, bridge })
     await compileSchema(ctx, null, { verbose, dev })
-    const schema = await buildSchema(rootPath, database, cliFlags, skipIndex)
+
+    // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
+    const schema = await retry(
+      async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
+    )
     await genTypes({ schema }, () => {}, { noSDK, verbose })
     await genClient({ tinaSchema: ctx.schema }, () => {}, { local })
   } catch (error) {
