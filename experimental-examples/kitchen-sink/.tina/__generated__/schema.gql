@@ -49,9 +49,14 @@ type Query {
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
   page(relativePath: String): Page!
-  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
   post(relativePath: String): Post!
-  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PostFilter): PostConnection!
+}
+
+input DocumentFilter {
+  page: PageFilter
+  post: PostFilter
 }
 
 type DocumentConnectionEdges {
@@ -74,7 +79,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = Page | Post
@@ -86,6 +91,34 @@ type Page implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PageBodyComponent1Filter {
+  prop1: StringFilter
+  prop2: StringFilter
+}
+
+input PageBodyComponent2Filter {
+  prop1: StringFilter
+  prop2: StringFilter
+}
+
+input PageBodyFilter {
+  component1: PageBodyComponent1Filter
+  component2: PageBodyComponent2Filter
+}
+
+input PageFilter {
+  heading: StringFilter
+  subtitle: StringFilter
+  body: PageBodyFilter
 }
 
 type PageConnectionEdges {
@@ -105,6 +138,17 @@ type Post implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input PostFilter {
+  title: StringFilter
+  body: RichTextFilter
 }
 
 type PostConnectionEdges {
