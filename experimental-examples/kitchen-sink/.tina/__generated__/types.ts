@@ -112,6 +112,7 @@ export type QueryPageConnectionArgs = {
   first?: InputMaybe<Scalars['Float']>;
   last?: InputMaybe<Scalars['Float']>;
   sort?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<PageFilter>;
 };
 
 
@@ -126,6 +127,12 @@ export type QueryPostConnectionArgs = {
   first?: InputMaybe<Scalars['Float']>;
   last?: InputMaybe<Scalars['Float']>;
   sort?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<PostFilter>;
+};
+
+export type DocumentFilter = {
+  page?: InputMaybe<PageFilter>;
+  post?: InputMaybe<PostFilter>;
 };
 
 export type DocumentConnectionEdges = {
@@ -161,6 +168,7 @@ export type CollectionDocumentsArgs = {
   first?: InputMaybe<Scalars['Float']>;
   last?: InputMaybe<Scalars['Float']>;
   sort?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<DocumentFilter>;
 };
 
 export type DocumentNode = Page | Post;
@@ -173,6 +181,34 @@ export type Page = Node & Document & {
   id: Scalars['ID'];
   _sys: SystemInfo;
   _values: Scalars['JSON'];
+};
+
+export type StringFilter = {
+  startsWith?: InputMaybe<Scalars['String']>;
+  eq?: InputMaybe<Scalars['String']>;
+  exists?: InputMaybe<Scalars['Boolean']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+};
+
+export type PageBodyComponent1Filter = {
+  prop1?: InputMaybe<StringFilter>;
+  prop2?: InputMaybe<StringFilter>;
+};
+
+export type PageBodyComponent2Filter = {
+  prop1?: InputMaybe<StringFilter>;
+  prop2?: InputMaybe<StringFilter>;
+};
+
+export type PageBodyFilter = {
+  component1?: InputMaybe<PageBodyComponent1Filter>;
+  component2?: InputMaybe<PageBodyComponent2Filter>;
+};
+
+export type PageFilter = {
+  heading?: InputMaybe<StringFilter>;
+  subtitle?: InputMaybe<StringFilter>;
+  body?: InputMaybe<PageBodyFilter>;
 };
 
 export type PageConnectionEdges = {
@@ -195,6 +231,17 @@ export type Post = Node & Document & {
   id: Scalars['ID'];
   _sys: SystemInfo;
   _values: Scalars['JSON'];
+};
+
+export type RichTextFilter = {
+  startsWith?: InputMaybe<Scalars['String']>;
+  eq?: InputMaybe<Scalars['String']>;
+  exists?: InputMaybe<Scalars['Boolean']>;
+};
+
+export type PostFilter = {
+  title?: InputMaybe<StringFilter>;
+  body?: InputMaybe<RichTextFilter>;
 };
 
 export type PostConnectionEdges = {
@@ -306,6 +353,7 @@ export type PageConnectionQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']>;
   last?: InputMaybe<Scalars['Float']>;
   sort?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<PageFilter>;
 }>;
 
 
@@ -324,6 +372,7 @@ export type PostConnectionQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Float']>;
   last?: InputMaybe<Scalars['Float']>;
   sort?: InputMaybe<Scalars['String']>;
+  filter?: InputMaybe<PostFilter>;
 }>;
 
 
@@ -361,13 +410,14 @@ export const PageDocument = gql`
 }
     ${PagePartsFragmentDoc}`;
 export const PageConnectionDocument = gql`
-    query pageConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+    query pageConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: PageFilter) {
   pageConnection(
     before: $before
     after: $after
     first: $first
     last: $last
     sort: $sort
+    filter: $filter
   ) {
     totalCount
     edges {
@@ -408,13 +458,14 @@ export const PostDocument = gql`
 }
     ${PostPartsFragmentDoc}`;
 export const PostConnectionDocument = gql`
-    query postConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+    query postConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String, $filter: PostFilter) {
   postConnection(
     before: $before
     after: $after
     first: $first
     last: $last
     sort: $sort
+    filter: $filter
   ) {
     totalCount
     edges {
@@ -465,17 +516,10 @@ const generateRequester = (client: TinaClient) => {
     options?: any,
     client
   ) => Promise<any> = async (doc, vars, _options) => {
-    let data = {};
-    try {
-      data = await client.request({
-        query: doc,
-        variables: vars,
-      });
-    } catch (e) {
-      // swallow errors related to document creation
-      console.warn("Warning: There was an error when fetching data");
-      console.warn(e);
-    }
+    const data = await client.request({
+      query: doc,
+      variables: vars,
+    });
 
     return { data: data?.data, query: doc, variables: vars || {} };
   };
