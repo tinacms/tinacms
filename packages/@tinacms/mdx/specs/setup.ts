@@ -53,24 +53,21 @@ export const parseThenStringify = (
   return { astResult: print(astResult.children), stringResult }
 }
 
-const content = import.meta.glob('./*.md', { as: 'raw' })
-const outputString = import.meta.glob('./*.ts', { as: 'raw' })
-
-Object.entries(content).map(([filename, value]) => {
-  const string = outputString[filename.replace('.md', '.ts')]
-  it(filename, () => {
-    const { astResult, stringResult } = parseThenStringify(value, field)
-    expect(stringResult).toEqual(value.trim())
-    if (string) {
-      expect(string).toEqual(astResult)
-    } else {
-      fs.writeFile(
-        path.join('.', 'specs', filename.replace('.md', '.ts')),
-        astResult,
-        (error) => {
-          console.log(error)
-        }
-      )
+export const writeSnapshot = (filepath, filename, astResult) => {
+  const dir = path.dirname(filepath)
+  fs.writeFile(
+    path.join(dir, filename.replace('.md', '.ts')),
+    astResult,
+    (error) => {
+      console.log(error)
     }
+  )
+}
+
+export const loop = (content, outputString, field, callback) => {
+  Object.entries(content).map(([name, value]) => {
+    const output = outputString[name.replace('.md', '.ts')]
+    const { astResult, stringResult } = parseThenStringify(value, field)
+    callback({ output, name, value, astResult, stringResult })
   })
-})
+}

@@ -20,7 +20,7 @@ import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import type * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
-import { blockElement, rootElement, stringifyMDX } from '.'
+import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
@@ -29,12 +29,27 @@ export const stringifyPropsInline = (
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
-export const stringifyProps = (
+export function stringifyProps(
+  element: Plate.MdxInlineElement,
+  parentField: RichTypeInner,
+  flatten: boolean,
+  imageCallback: (url: string) => string
+): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] }
+export function stringifyProps(
   element: Plate.MdxBlockElement,
   parentField: RichTypeInner,
   flatten: boolean,
   imageCallback: (url: string) => string
-): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] } => {
+): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] }
+export function stringifyProps(
+  element: Plate.MdxBlockElement | Plate.MdxInlineElement,
+  parentField: RichTypeInner,
+  flatten: boolean,
+  imageCallback: (url: string) => string
+): {
+  attributes: MdxJsxAttribute[]
+  children: Md.BlockContent[] | Md.PhrasingContent[]
+} {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.BlockContent[] = []
   const template = parentField.templates?.find((template) => {
@@ -57,33 +72,39 @@ export const stringifyProps = (
     switch (field.type) {
       case 'reference':
         if (field.list) {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: {
-              type: 'mdxJsxAttributeValueExpression',
-              value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
-            },
-          })
+          if (Array.isArray(value)) {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+              },
+            })
+          }
         } else {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: value,
-          })
+          if (typeof value === 'string') {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: value,
+            })
+          }
         }
         break
       case 'datetime':
       case 'string':
         if (field.list) {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: {
-              type: 'mdxJsxAttributeValueExpression',
-              value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
-            },
-          })
+          if (Array.isArray(value)) {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `[${value.map((item) => `"${item}"`).join(', ')}]`,
+              },
+            })
+          }
         } else {
           attributes.push({
             type: 'mdxJsxAttribute',
