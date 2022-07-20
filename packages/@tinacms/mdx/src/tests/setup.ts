@@ -9,12 +9,19 @@ export type { BlockElement, RichTypeInner }
 
 export const output = (object: RootElement) => object
 
-export const print = (ast: object, name: string) =>
+export const print = (ast: object, name: string, autoformatted?: boolean) =>
   prettier.format(
     `
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
 import markdownString from '${name}?raw'
+${
+  autoformatted &&
+  `import markdownStringFormatted from '${name.replace(
+    '.md',
+    '.autoformat.md'
+  )}?raw'`
+}
 
 const out = output(${JSON.stringify(ast)})
 
@@ -23,7 +30,9 @@ describe("${name}", () => {
     expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
   })
   it('stringifies the AST into the expect string', () => {
-    expect(stringifyMDX(out, field, (v) => v)).toEqual(markdownString)
+    expect(stringifyMDX(out, field, (v) => v)).toEqual(${
+      autoformatted ? 'markdownStringFormatted' : 'markdownString'
+    })
   })
 })
 `,
@@ -106,16 +115,30 @@ export const runInner = (
 export const writeTestFile = (
   dirname: string,
   name: string,
-  astResult: object
+  astResult: object,
+  autoformatted?: boolean
 ) => {
   const tsFilename = name.replace('.md', '.test.ts')
   fs.writeFile(
     path.join(dirname, tsFilename),
-    print(astResult, name),
+    print(astResult, name, autoformatted),
     (err) => {
       if (err) {
         throw err
       }
     }
   )
+}
+
+export const writeAutoformatFile = (
+  dirname: string,
+  name: string,
+  stringResult: string
+) => {
+  const filename = name.replace('.md', '.autoformat.md')
+  fs.writeFile(path.join(dirname, filename), stringResult, (err) => {
+    if (err) {
+      throw err
+    }
+  })
 }
