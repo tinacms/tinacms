@@ -134,7 +134,7 @@ export const baseCmds: Command[] = [
   },
   {
     command: CMD_BUILD,
-    description: 'Build Tina.',
+    description: 'Build Tina',
     options: [
       experimentalDatalayer,
       isomorphicGitBridge,
