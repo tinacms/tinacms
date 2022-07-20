@@ -54,10 +54,7 @@
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
-    "mdast": "^3.0.0",
-    "vitest": "^0.18.0",
     "@swc/core": "^1.2.210",
-    "@types/prettier": "^2.6.3",
     "@swc/jest": "^0.2.21",
     "@tinacms/datalayer": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
@@ -72,6 +69,7 @@
     "@types/mdast": "3.0.7",
     "@types/node": "^14.17.34",
     "@types/normalize-path": "^3.0.0",
+    "@types/prettier": "^2.6.3",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
     "c8": "^7.11.3",
@@ -79,9 +77,12 @@
     "jest-diff": "^28.1.1",
     "jest-file-snapshot": "^0.5.0",
     "jest-matcher-utils": "^28.1.1",
+    "mdast": "^3.0.0",
     "nodemon": "^2.0.4",
     "ts-node": "^10.8.2",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "vite": "^3.0.2",
+    "vitest": "^0.18.0"
   },
   "peerDependencies": {
     "@tinacms/schema-tools": "*"

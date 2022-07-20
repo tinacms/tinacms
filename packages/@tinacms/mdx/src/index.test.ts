@@ -984,7 +984,7 @@ describe('Images', () => {
 })
 
 describe('Code blocks', () => {
-  test('simple block of code', () => {
+  test.skip('simple block of code', () => {
     const string = `\`\`\`
 const test = 123
 \`\`\``

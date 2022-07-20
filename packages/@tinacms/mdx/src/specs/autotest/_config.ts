@@ -1,10 +1,6 @@
-import { expect, it } from 'vitest'
-import { loop, writeSnapshot } from '../setup'
 import type { RichTypeInner } from '@tinacms/schema-tools'
-export type { BlockElement } from '../../src/parse/plate'
-
-const content = import.meta.glob('./*.md', { as: 'raw' })
-const outputString = import.meta.glob('./*.ts', { as: 'raw' })
+export { output } from '../setup'
+export { parseMDX, stringifyMDX } from '../..'
 
 export const field: RichTypeInner = {
   name: 'body',
@@ -47,21 +43,10 @@ export const field: RichTypeInner = {
       label: 'Tags',
       fields: [{ type: 'string', name: 'items', list: true }],
     },
+    {
+      name: 'Date',
+      label: 'Date',
+      fields: [{ type: 'datetime', name: 'here' }],
+    },
   ],
 }
-
-loop(
-  content,
-  outputString,
-  field,
-  ({ name, output, value, astResult, stringResult }) => {
-    it(name, () => {
-      expect(stringResult).toEqual(value.trim())
-      if (output) {
-        expect(output).toEqual(astResult)
-      } else {
-        writeSnapshot(__filename, name, astResult)
-      }
-    })
-  }
-)
