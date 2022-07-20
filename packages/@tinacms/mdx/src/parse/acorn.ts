@@ -19,6 +19,7 @@ import type {
   MdxJsxAttribute,
   MdxJsxAttributeValueExpression,
 } from 'mdast-util-mdx-jsx'
+import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { parseMDX } from '.'
@@ -88,11 +89,16 @@ export const extractAttribute = (
       return extractObject(extractExpression(attribute), field)
     case 'rich-text':
       const JSXString = extractJSXFragment(
+        // @ts-ignore FIXME: estree-jsx needs to be merged with estree
         extractExpression(attribute),
         attribute,
         field
       )
-      return parseMDX(JSXString, field, imageCallback)
+      if (JSXString) {
+        return parseMDX(JSXString, field, imageCallback)
+      } else {
+        return {}
+      }
     default:
       // @ts-expect-error
       throw new Error(`Extract attribute: Unhandled field type ${field.type}`)
@@ -170,17 +176,20 @@ const getField = (
 const extractJSXFragment = <
   T extends Extract<TinaFieldBase, { type: 'rich-text' }>
 >(
-  attribute: { expression: { type: string } },
+  attribute: { expression: JSXFragment },
   baseAttribute: MdxJsxAttribute,
   field: T
 ) => {
   if (field.list) {
   } else {
     if (attribute.expression.type === 'JSXFragment') {
-      assertHasType(attribute.expression.children[0])
-      return attribute.expression.children[0].value.trim()
-      if (typeof baseAttribute.value !== 'string') {
-        return baseAttribute.value?.value
+      assertHasType(attribute.expression)
+      if (attribute.expression.children[0]) {
+        const firstChild = attribute.expression.children[0]
+        if (attribute.expression.children[0].type === 'JSXText') {
+          const child = firstChild as JSXText
+          return child.value.trim()
+        }
       }
     }
   }
