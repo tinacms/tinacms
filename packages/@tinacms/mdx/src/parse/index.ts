@@ -73,49 +73,60 @@ import type * as Plate from './plate'
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
 export const markdownToAst = (value: string, field: RichTypeInner) => {
-  try {
-    const templatesWithMatchers = field.templates?.filter(
-      (template) => template.match
-    )
-    let preprocessedString = value
-    templatesWithMatchers?.forEach((template) => {
-      if (typeof template === 'string') {
-        throw new Error('Global templates are not supported')
-      }
-      if (template.match) {
-        preprocessedString = preprocessedString.replaceAll(
-          template.match.start,
-          `<${template.name}>\``
-        )
-        preprocessedString = preprocessedString.replaceAll(
-          template.match.end,
-          `\`</${template.name}>`
-        )
-      }
-    })
-    // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-    if (!tree) {
-      throw new Error('Error parsing markdown')
+  const templatesWithMatchers = field.templates?.filter(
+    (template) => template.match
+  )
+  let preprocessedString = value
+  templatesWithMatchers?.forEach((template) => {
+    if (typeof template === 'string') {
+      throw new Error('Global templates are not supported')
     }
-    // NOTE: if we want to provide error highlighing in the raw editor
-    // we could keep this info around in edit mode
-    // Delete useless position info
-    visit(tree, (node) => {
-      delete node.position
-    })
-    return tree
-  } catch (e) {
-    console.log(e)
+    if (template.match) {
+      preprocessedString = preprocessedString.replaceAll(
+        template.match.start,
+        `<${template.name}>\``
+      )
+      preprocessedString = preprocessedString.replaceAll(
+        template.match.end,
+        `\`</${template.name}>`
+      )
+    }
+  })
+  // Remark Root is not the same as mdast for some reason
+  const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+  if (!tree) {
+    throw new Error('Error parsing markdown')
   }
+  // NOTE: if we want to provide error highlighing in the raw editor
+  // we could keep this info around in edit mode
+  // Delete useless position info
+  visit(tree, (node) => {
+    delete node.position
+  })
+  return tree
 }
+
+export const MDX_PARSE_ERROR_MSG =
+  'TinaCMS supports a stricter version of markdown and a subset of MDX - learn more: https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 
 export const parseMDX = (
   value: string,
   field: RichTypeInner,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
-  const tree = markdownToAst(value, field)
+  let tree
+  try {
+    tree = markdownToAst(value, field)
+  } catch (e) {
+    // @ts-ignore
+    if (e.position) {
+      throw new Error(
+        // @ts-ignore
+        `Unable to parse markdown at line: ${e.position.start.line}, column: ${e.position.start.column}. ${MDX_PARSE_ERROR_MSG}`
+      )
+    }
+    throw new Error(`Unable to parse markdown, ${MDX_PARSE_ERROR_MSG}`)
+  }
   if (tree) {
     return remarkToSlate(tree, field, imageCallback)
   } else {
