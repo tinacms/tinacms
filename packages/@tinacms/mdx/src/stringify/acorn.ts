@@ -185,7 +185,7 @@ export function stringifyProps(
             })
             return
           } else {
-            const stringValue = stringifyMDX(value, field)
+            const stringValue = stringifyMDX(value, field, imageCallback)
             val = stringValue
               .trim()
               .split('\n')
@@ -215,16 +215,26 @@ export function stringifyProps(
         }
         break
       default:
+        // @ts-expect-error error type is never
         throw new Error(`Stringify props: ${field.type} not yet supported`)
     }
   })
+
+  if (template.match) {
+    if (attributes[0] && typeof attributes[0].value === 'string') {
+      return {
+        attributes: [],
+        children: [{ type: 'inlineCode', value: attributes[0].value }],
+      }
+    }
+  }
   return { attributes, children }
 }
 
 /**
  * Use prettier to determine how to format potentially large objects as strings
  */
-function stringifyObj(obj, flatten) {
+function stringifyObj(obj: object, flatten: boolean) {
   const dummyFunc = `const dummyFunc = `
   const res = format(`${dummyFunc}${JSON.stringify(obj)}`, {
     parser: 'acorn',
