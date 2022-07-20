@@ -48,5 +48,67 @@ export const field: RichTypeInner = {
       label: 'Date',
       fields: [{ type: 'datetime', name: 'here' }],
     },
+    {
+      name: 'Playground',
+      label: 'Playground',
+      fields: [
+        { type: 'string', name: 'code' },
+        {
+          name: 'config',
+          type: 'object',
+          list: true,
+          fields: [
+            {
+              type: 'string',
+              name: 'key',
+            },
+            {
+              type: 'string',
+              name: 'value',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Action',
+      label: 'Action',
+      fields: [
+        {
+          type: 'object',
+          name: 'action',
+          templates: [
+            {
+              label: 'Popup',
+              name: 'popup',
+              fields: [
+                {
+                  type: 'string',
+                  name: 'title',
+                },
+                {
+                  type: 'string',
+                  name: 'descrption',
+                },
+              ],
+            },
+            {
+              label: 'Link',
+              name: 'link',
+              fields: [
+                {
+                  type: 'string',
+                  name: 'title',
+                },
+                {
+                  type: 'string',
+                  name: 'url',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
   ],
 }
