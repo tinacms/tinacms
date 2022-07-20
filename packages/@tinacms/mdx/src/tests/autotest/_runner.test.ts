@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { field, parseMDX, stringifyMDX } from './_config'
 import { setupNewTests, writeAutoformatFile, writeTestFile } from '../setup'
 
-const content = import.meta.glob('./*[!.autoformat].md', { as: 'raw' })
+const content = import.meta.glob('./*.md', { as: 'raw' })
 const outputString = import.meta.glob('./*.ts', { as: 'raw' })
 
 setupNewTests(content, outputString, ({ name, markdownContent }) => {

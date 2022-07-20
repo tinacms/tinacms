@@ -19,7 +19,7 @@ ${
   autoformatted &&
   `import markdownStringFormatted from '${name.replace(
     '.md',
-    '.autoformat.md'
+    '.result.md'
   )}?raw'`
 }
 
@@ -84,7 +84,9 @@ export const setupNewTests = (
   Object.entries(markdownContentFiles).forEach(([name, markdownContent]) => {
     const testFilename = name.replace('.md', '.test.ts')
     if (!testFiles[testFilename]) {
-      newTests.push({ name, markdownContent })
+      if (!name.includes('result.md')) {
+        newTests.push({ name, markdownContent })
+      }
     }
   })
   newTests.forEach((testInfo) => callback(testInfo))
@@ -135,7 +137,7 @@ export const writeAutoformatFile = (
   name: string,
   stringResult: string
 ) => {
-  const filename = name.replace('.md', '.autoformat.md')
+  const filename = name.replace('.md', '.result.md')
   fs.writeFile(path.join(dirname, filename), stringResult, (err) => {
     if (err) {
       throw err
