@@ -5,7 +5,7 @@ import { parseMDX } from '../parse/index'
 import fs from 'fs'
 import path from 'path'
 
-export { BlockElement, RichTypeInner }
+export type { BlockElement, RichTypeInner }
 
 export const output = (object: RootElement) => object
 
