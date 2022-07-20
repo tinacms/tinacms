@@ -1,8 +1,10 @@
 {
   "name": "@tinacms/toolkit",
   "version": "0.56.35",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
+  "module": "./dist/index.es.js",
+  "type": "module",
   "keywords": [
     "tinacms",
     "cms",
@@ -12,12 +14,11 @@
     "assets",
     "dist"
   ],
-  "module": "./dist/index.es.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     }
   },
   "bugs": {

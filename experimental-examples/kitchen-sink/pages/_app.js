@@ -3,7 +3,10 @@ import { TinaEditProvider } from 'tinacms/dist/edit-state'
 import schema from '../.tina/schema.ts'
 
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
+const TinaCMS = dynamic(() => import('tinacms'), {
+  ssr: false,
+})
+// import TinaCMS from 'tinacms'
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID
 const NEXT_PUBLIC_USE_LOCAL_CLIENT =

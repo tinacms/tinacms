@@ -441,7 +441,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // the syntax for optional chaining, should be supported on 14
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
-        outdir: path.join(process.cwd(), 'dist'),
+        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
         external: external.filter(
           (item) =>
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
@@ -475,7 +475,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'node',
-        outdir: path.join(process.cwd(), 'dist'),
+        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
         external,
         target: 'node12',
       })
@@ -543,7 +543,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         name: packageJSON.name,
         fileName: (format) => {
           return format === 'umd'
-            ? `${outInfo.outfile}.js`
+            ? `${outInfo.outfile}.cjs`
             : `${outInfo.outfile}.es.js`
         },
       },

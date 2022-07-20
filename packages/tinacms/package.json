@@ -1,13 +1,14 @@
 {
   "name": "tinacms",
   "version": "0.68.13",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "./dist/index.es.js",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./dist/client": {
       "types": "./dist/client.d.ts",
@@ -17,17 +18,17 @@
     "./dist/edit-state": {
       "types": "./dist/edit-state.d.ts",
       "import": "./dist/edit-state.es.js",
-      "require": "./dist/edit-state.js"
+      "require": "./dist/edit-state.cjs"
     },
     "./dist/rich-text": {
       "types": "./dist/rich-text/index.d.ts",
       "import": "./dist/rich-text/index.es.js",
-      "require": "./dist/rich-text/index.js"
+      "require": "./dist/rich-text/index.cjs"
     },
     "./dist/rich-text/prism": {
       "types": "./dist/rich-text/prism.d.ts",
       "import": "./dist/rich-text/prism.es.js",
-      "require": "./dist/rich-text/prism.js"
+      "require": "./dist/rich-text/prism.cjs"
     }
   },
   "files": [
