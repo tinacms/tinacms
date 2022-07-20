@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { parseMDX, stringifyMDX } from '@tinacms/mdx'
+import { parseMDX, stringifyMDX } from '@tinacms/mdx/dist/index.cjs'
 
 export { parseMDX }
 export { stringifyMDX }

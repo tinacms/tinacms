@@ -1,7 +1,7 @@
 {
   "name": "@tinacms/auth",
   "version": "0.50.3",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
