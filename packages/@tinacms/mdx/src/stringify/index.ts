@@ -17,12 +17,32 @@ limitations under the License.
 */
 
 import { toMarkdown } from 'mdast-util-to-markdown'
-import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
+import {
+  mdxJsxToMarkdown,
+  MdxJsxTextElement,
+  MdxJsxFlowElement,
+} from 'mdast-util-mdx-jsx'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
+
+declare module 'mdast' {
+  interface StaticPhrasingContentMap {
+    mdxJsxTextElement: MdxJsxTextElement
+  }
+  interface PhrasingContentMap {
+    mdxJsxTextElement: MdxJsxTextElement
+  }
+
+  interface BlockContentMap {
+    mdxJsxFlowElement: MdxJsxFlowElement
+  }
+  interface ContentMap {
+    mdxJsxFlowElement: MdxJsxFlowElement
+  }
+}
 
 export const stringifyMDX = (
   value: Plate.RootElement,
