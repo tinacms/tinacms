@@ -23,6 +23,12 @@ import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { parseMDX } from '.'
 
+type TinaStringField =
+  | Extract<TinaFieldBase, { type: 'string' }>
+  | Extract<TinaFieldBase, { type: 'datetime' }>
+  | Extract<TinaFieldBase, { type: 'image' }>
+  | Extract<TinaFieldBase, { type: 'reference' }>
+
 export const extractAttributes = (
   attributes: MdxJsxAttribute[],
   fields: TinaFieldBase[],
@@ -63,20 +69,19 @@ export const extractAttribute = (
       }
     case 'image':
       if (field.list) {
-        const values = extractScalar(extractExpression(attribute), field)
-        if (typeof values === 'string') {
-          return values.split(',').map((value) => imageCallback(value))
-        }
+        const values = extractScalar(
+          extractExpression(attribute),
+          field
+        ) as string
+        return values.split(',').map((value) => imageCallback(value))
       } else {
         const value = extractString(attribute, field)
         return imageCallback(value)
       }
     case 'reference':
       if (field.list) {
-        // return { id: extractScalar(extractExpression(attribute), field) }
         return extractScalar(extractExpression(attribute), field)
       } else {
-        // return { id: extractString(attribute, field) }
         return extractString(attribute, field)
       }
     case 'object':
@@ -87,7 +92,7 @@ export const extractAttribute = (
         attribute,
         field
       )
-      return parseMDX(JSXString, field)
+      return parseMDX(JSXString, field, imageCallback)
     default:
       // @ts-expect-error
       throw new Error(`Extract attribute: Unhandled field type ${field.type}`)
@@ -228,16 +233,13 @@ const extractStatement = (
  * JSX props can be either expressions, or in the case of non-list strings, literals
  * eg. `<Cta label="hello" />` or `<Cta label={"hello"} />` are both valid
  */
-const extractString = (
-  attribute: MdxJsxAttribute,
-  field: Extract<TinaFieldBase, { type: 'string' }>
-) => {
+const extractString = (attribute: MdxJsxAttribute, field: TinaStringField) => {
   if (attribute.type === 'mdxJsxAttribute') {
     if (typeof attribute.value === 'string') {
       return attribute.value
     }
   }
-  return extractScalar(extractExpression(attribute), field)
+  return extractScalar(extractExpression(attribute), field) as string
 }
 
 const extractExpression = (attribute: MdxJsxAttribute): ExpressionStatement => {
