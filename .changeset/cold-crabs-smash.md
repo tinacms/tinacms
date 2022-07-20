@@ -56,7 +56,7 @@ The token must be a wildcard token (`*`) and can be generated from the tina dash
 
 ## Updates to scripts in package.json
 
-We are now recommending separating the graphQL server into two separate process (could use two separate terminals in development). The scripts should look like this.
+We now recommend separating the graphQL server into two separate processes (two separate terminals in development). The scripts should look like this:
 
 ```json
 {
@@ -68,7 +68,7 @@ We are now recommending separating the graphQL server into two separate process 
     }
 }
 ```
-And then when developing in one terminal run `yarn dev-server` and then `yarn dev` in another.
+When developing, in the first terminal run `yarn dev-server` and then `yarn dev` in the second.
 
 The old `-c` subcommand can still be used. This will start the dev server and next dev process in the same terminal.
 
@@ -86,9 +86,9 @@ The old `-c` subcommand can still be used. This will start the dev server and ne
 
 ## Updates to generated files
 
-We are now recommending to ignore Most of the generated files. This is because `client.ts` and `types.ts` will be generated in CI with `tinacms build`
+We now recommend ignoring most of the generated files. This is because `client.ts` and `types.ts` will be generated in CI with `tinacms build`
 
-To remove them run `git rm --cached .tina/__generated__/* ` and then `yarn tinacms build` to update the generated files that need to stay. 
+To remove them from your repository, run `git rm --cached .tina/__generated__/* ` and then `yarn tinacms build` to update the generated files that need to stay. 
 
 
 
