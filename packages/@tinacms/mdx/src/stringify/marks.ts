@@ -129,17 +129,6 @@ const inlineElementExceptLink = (
         field,
         imageCallback
       )
-      const template = field.templates.find(
-        (template) => template.name === content.name
-      )
-      if (template.match) {
-        return {
-          type: 'mdxJsxTextElement',
-          name: content.name,
-          attributes: [],
-          children: [{ type: 'inlineCode', value: attributes[0].value }],
-        }
-      }
       return {
         type: 'mdxJsxTextElement',
         name: content.name,
@@ -154,13 +143,15 @@ const inlineElementExceptLink = (
       }
     }
     default:
+      // @ts-expect-error type is 'never'
       if (!content.type && typeof content.text === 'string') {
         return {
           type: 'text',
+          // @ts-expect-error type is 'never'
           value: content.text,
         }
       }
-      throw new Error(`InlineElement: ${content.type} is not yet supported`)
+      throw new Error(`InlineElement: ${content.type} is not supported`)
   }
 }
 
