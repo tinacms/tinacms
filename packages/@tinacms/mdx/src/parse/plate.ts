@@ -43,6 +43,11 @@ export type HTMLElement = {
   value: string
   children: [EmptyTextElement]
 }
+export type HTMLInlineElement = {
+  type: 'html_inline'
+  value: string
+  children: [EmptyTextElement]
+}
 export type CodeBlockElement = {
   type: 'code_block'
   lang?: string
@@ -128,3 +133,4 @@ export type InlineElement =
   | BreakElement
   | LinkElement
   | ImageElement
+  | HTMLInlineElement

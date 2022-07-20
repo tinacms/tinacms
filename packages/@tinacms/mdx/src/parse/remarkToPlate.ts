@@ -77,25 +77,32 @@ export const remarkToSlate = (
           children: [
             {
               type: 'lic',
-              children: content.children.map((child) => blockContent(child)),
+              children: flatten(
+                content.children.map((child) => unwrapBlockContent(child))
+              ),
             },
           ],
         }
       case 'list':
         return list(content)
       case 'html':
-        return html(content, true)
-      // MDX text flow elements can return `text` children at the top level
-      case 'text':
-        return text(content)
+        return html(content)
       default:
         throw new Error(`Content: ${content.type} is not yet supported`)
     }
   }
 
-  const html = (content: Md.HTML, block?: boolean): Plate.HTMLElement => {
+  const html = (content: Md.HTML): Plate.HTMLElement => {
     return {
-      type: block ? 'html' : 'html_inline',
+      type: 'html',
+      value: content.value,
+      children: [{ type: 'text', text: '' }],
+    }
+  }
+
+  const html_inline = (content: Md.HTML): Plate.HTMLInlineElement => {
+    return {
+      type: 'html_inline',
       value: content.value,
       children: [{ type: 'text', text: '' }],
     }
@@ -257,7 +264,7 @@ export const remarkToSlate = (
       case 'inlineCode':
         return phrashingMark(content)
       case 'html':
-        return html(content)
+        return html_inline(content)
       default:
         throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
     }
@@ -361,16 +368,20 @@ export const remarkToSlate = (
       children,
     }
   }
-  const paragraph = (content: Md.Paragraph): Plate.ParagraphElement => {
+  const paragraph = (
+    content: Md.Paragraph
+  ): Plate.ParagraphElement | Plate.HTMLElement => {
     const children = flatten(content.children.map(phrasingContent))
     // MDX treats <div>Hello</div> is inline even if it's isolated on one line
     // If that's the case, swap it out with html
     // TODO: probably need to do the same with JSX
     if (children.length === 1) {
-      if (children[0].type === 'html_inline') {
-        return {
-          ...children[0],
-          type: 'html',
+      if (children[0]) {
+        if (children[0].type === 'html_inline') {
+          return {
+            ...children[0],
+            type: 'html',
+          }
         }
       }
     }
