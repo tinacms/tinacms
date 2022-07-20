@@ -2,15 +2,13 @@
   "name": "@tinacms/mdx",
   "version": "0.60.3",
   "typings": "dist/index.d.ts",
+  "main": "dist/index.cjs",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js"
-    },
-    "./dist/index.cjs": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.cjs"
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
