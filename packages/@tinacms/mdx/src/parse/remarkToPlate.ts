@@ -22,6 +22,7 @@ import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import { MDX_PARSE_ERROR_MSG } from '.'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -87,6 +88,12 @@ export const remarkToSlate = (
         return list(content)
       case 'html':
         return html(content)
+      // @ts-ignore
+      case 'mdxjsEsm':
+        throw new Error(
+          // @ts-ignore
+          `Unexpected expression ${content.value} ${MDX_PARSE_ERROR_MSG}`
+        )
       default:
         throw new Error(`Content: ${content.type} is not yet supported`)
     }

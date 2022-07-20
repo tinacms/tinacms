@@ -22,7 +22,7 @@ import type {
 import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
-import { parseMDX } from '.'
+import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
 
 type TinaStringField =
   | Extract<TinaFieldBase, { type: 'string' }>
@@ -263,7 +263,9 @@ function assertType<T extends { type: string }, U extends T['type']>(
   type: U
 ): asserts val is Extract<T, { type: U }> {
   if (val.type !== type) {
-    throw new Error(`Expected type to be ${type} but received ${val.type}`)
+    throw new Error(
+      `Expected type to be ${type} but received ${val.type}. ${MDX_PARSE_ERROR_MSG}`
+    )
   }
 }
 
