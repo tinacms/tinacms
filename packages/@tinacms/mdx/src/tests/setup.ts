@@ -60,18 +60,18 @@ export const run = (
   })
 }
 
-type GlobReturn = Record<string, GlobFile>
-
-type GlobFile = () => Promise<{
-  [key: string]: any
-}>
+type GlobFile = Record<string, () => Promise<string>>
 
 export const setupNewTests = (
-  markdownContentFiles: GlobReturn,
-  testFiles: GlobReturn,
-  callback: (newTests: { name: string; markdownContent: GlobFile }) => void
+  markdownContentFiles: GlobFile,
+  testFiles: GlobFile,
+  callback: (newTests: {
+    name: string
+    markdownContent: () => Promise<string>
+  }) => void
 ) => {
-  const newTests: { name: string; markdownContent: GlobFile }[] = []
+  const newTests: { name: string; markdownContent: () => Promise<string> }[] =
+    []
   Object.entries(markdownContentFiles).forEach(([name, markdownContent]) => {
     const testFilename = name.replace('.md', '.test.ts')
     if (!testFiles[testFilename]) {
@@ -103,7 +103,11 @@ export const runInner = (
   }
 }
 
-export const writeTestFile = (dirname, name, astResult) => {
+export const writeTestFile = (
+  dirname: string,
+  name: string,
+  astResult: object
+) => {
   const tsFilename = name.replace('.md', '.test.ts')
   fs.writeFile(
     path.join(dirname, tsFilename),

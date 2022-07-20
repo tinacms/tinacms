@@ -22,6 +22,7 @@ import { visit } from 'unist-util-visit'
 import { remarkToSlate } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
+import type * as Plate from './plate'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -113,11 +114,11 @@ export const parseMDX = (
   value: string,
   field: RichTypeInner,
   imageCallback: (s: string) => string
-) => {
+): Plate.RootElement => {
   const tree = markdownToAst(value, field)
   if (tree) {
     return remarkToSlate(tree, field, imageCallback)
   } else {
-    return {}
+    return { type: 'root', children: [] }
   }
 }
