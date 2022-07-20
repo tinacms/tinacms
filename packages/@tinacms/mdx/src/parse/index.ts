@@ -70,11 +70,7 @@ import type { RichTypeInner } from '@tinacms/schema-tools'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
-export const markdownToAst = (
-  value: string,
-  skipMDX: boolean,
-  field: RichTypeInner
-) => {
+export const markdownToAst = (value: string, field: RichTypeInner) => {
   try {
     const templatesWithMatchers = field.templates?.filter(
       (template) => template.match
@@ -109,9 +105,8 @@ export const markdownToAst = (
 export const parseMDX = (
   value: string,
   field: RichTypeInner,
-  imageCallback: (s: string) => string,
-  skipMDX?: boolean
+  imageCallback: (s: string) => string
 ) => {
-  const tree = markdownToAst(value, skipMDX, field)
+  const tree = markdownToAst(value, field)
   return remarkToSlate(tree, field, imageCallback)
 }
