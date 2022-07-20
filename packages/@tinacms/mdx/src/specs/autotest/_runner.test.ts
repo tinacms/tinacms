@@ -11,7 +11,6 @@ setupNewTests(content, outputString, ({ name, markdownContent }) => {
       // import.meta.glob type doesn't take `raw` into consideration, so cast it to a string
       const markdownString = (await markdownContent()) as any as string
       const astResult = parseMDX(markdownString, field, (v) => v)
-      console.log(astResult)
       expect(stringifyMDX(astResult, field, (v) => v)).toEqual(markdownString)
       // If `expect` doesn't throw, save the file
       writeTestFile(__dirname, name, astResult)
