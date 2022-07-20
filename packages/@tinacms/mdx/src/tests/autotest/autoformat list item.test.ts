@@ -1,16 +1,29 @@
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
-import markdownString from './autoformat blockquote.md?raw'
-import markdownStringFormatted from './autoformat blockquote.result.md?raw'
+import markdownString from './autoformat list item.md?raw'
+import markdownStringFormatted from './autoformat list item.result.md?raw'
 
 const out = output({
   type: 'root',
   children: [
-    { type: 'blockquote', children: [{ type: 'text', text: 'Hello, World!' }] },
+    {
+      type: 'ul',
+      children: [
+        {
+          type: 'li',
+          children: [
+            {
+              type: 'lic',
+              children: [{ type: 'text', text: 'this is a list item' }],
+            },
+          ],
+        },
+      ],
+    },
   ],
 })
 
-describe('./autoformat blockquote.md', () => {
+describe('./autoformat list item.md', () => {
   it('parses the string in the expected AST', () => {
     expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
   })
