@@ -8,8 +8,8 @@ const outputString = import.meta.glob('./*.ts', { as: 'raw' })
 setupNewTests(content, outputString, ({ name, markdownContent }) => {
   describe(`setting up ${name}`, () => {
     it(`verifies that stringifying the parsed output will match the original string`, async () => {
-      const markdownString = await markdownContent()
-      // @ts-ignore glob return type is key/value but ?raw is a string
+      // import.meta.glob type doesn't take `raw` into consideration, so cast it to a string
+      const markdownString = (await markdownContent()) as any as string
       const astResult = parseMDX(markdownString, field, (v) => v)
       console.log(astResult)
       expect(stringifyMDX(astResult, field, (v) => v)).toEqual(markdownString)
