@@ -190,9 +190,11 @@ export const remarkToSlate = (
   }
 
   const code = (content: Md.Code): Plate.CodeBlockElement => {
+    const extra: Record<string, string> = {}
+    if (content.lang) extra['lang'] = content.lang
     return {
       type: 'code_block',
-      lang: content.lang,
+      ...extra,
       value: content.value,
       children: [{ type: 'text', text: '' }],
     }

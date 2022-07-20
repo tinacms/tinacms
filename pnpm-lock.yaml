@@ -295,7 +295,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -608,6 +608,7 @@ importers:
       typescript: ^4.3.5
       unist-util-visit: ^4.1.0
       vfile: ^4.2.0
+      vite: ^3.0.2
       vitest: ^0.18.0
     dependencies:
       acorn: 8.7.1
@@ -647,6 +648,7 @@ importers:
       nodemon: 2.0.18
       ts-node: 10.9.1_3ts5pezbn3c3azuqsq74yqdemu
       typescript: 4.7.4
+      vite: 3.0.2
       vitest: 0.18.1_c8@7.11.3
 
   packages/@tinacms/metrics:
@@ -4390,17 +4392,17 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-tools/schema': 8.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
     dev: false
 
-  /@graphql-codegen/plugin-helpers/2.5.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/2.6.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-0jM5/14EdM4yow5v8OGOnUmRqfA1gaWkh+J5berqQUpcFYfSQXD6+Idnkiju/jjIypEN7UvbPkC7BgryWVxexA==,
+        integrity: sha512-z8uw6GdUvtKyt5YSijtj1yRqI0A2lBWdGIgTjgXaAKqSC+InlVBy+89859LlKNMrO7somdt44cbMys8r4Hbqeg==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -4422,7 +4424,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
@@ -4437,7 +4439,7 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-tag: ^2.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
       graphql: 15.8.0
@@ -4455,7 +4457,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4474,7 +4476,7 @@ packages:
     peerDependencies:
       graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-codegen/schema-ast': 2.4.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4493,7 +4495,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.5.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.0_graphql@15.8.0
       '@graphql-tools/optimize': 1.3.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
@@ -30742,6 +30744,37 @@ packages:
       rollup: 2.75.7
     optionalDependencies:
       fsevents: 2.3.2
+    dev: false
+
+  /vite/3.0.2:
+    resolution:
+      {
+        integrity: sha512-TAqydxW/w0U5AoL5AsD9DApTvGb2iNbGs3sN4u2VdT1GFkQVUfgUldt+t08TZgi23uIauh1TUOQJALduo9GXqw==,
+      }
+    engines: { node: ^14.18.0 || >=16.0.0 }
+    hasBin: true
+    peerDependencies:
+      less: '*'
+      sass: '*'
+      stylus: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+      terser:
+        optional: true
+    dependencies:
+      esbuild: 0.14.47
+      postcss: 8.4.14
+      resolve: 1.22.1
+      rollup: 2.75.7
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: true
 
   /vitest/0.18.1_c8@7.11.3:
     resolution:
@@ -30777,12 +30810,13 @@ packages:
       local-pkg: 0.4.2
       tinypool: 0.2.4
       tinyspy: 1.0.0
-      vite: 2.9.13
+      vite: 3.0.2
     transitivePeerDependencies:
       - less
       - sass
       - stylus
       - supports-color
+      - terser
     dev: true
 
   /vm-browserify/1.1.2:
