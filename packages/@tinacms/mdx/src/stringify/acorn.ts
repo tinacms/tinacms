@@ -115,16 +115,18 @@ export function stringifyProps(
         break
       case 'image':
         if (field.list) {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: {
-              type: 'mdxJsxAttributeValueExpression',
-              value: `[${value
-                .map((item) => `"${imageCallback(item)}"`)
-                .join(', ')}]`,
-            },
-          })
+          if (Array.isArray(value)) {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `[${value
+                  .map((item) => `"${imageCallback(item)}"`)
+                  .join(', ')}]`,
+              },
+            })
+          }
         } else {
           attributes.push({
             type: 'mdxJsxAttribute',
@@ -136,6 +138,14 @@ export function stringifyProps(
       case 'number':
       case 'boolean':
         if (field.list) {
+          attributes.push({
+            type: 'mdxJsxAttribute',
+            name,
+            value: {
+              type: 'mdxJsxAttributeValueExpression',
+              value: `[${value.map((item) => `${item}`).join(', ')}]`,
+            },
+          })
         } else {
           attributes.push({
             type: 'mdxJsxAttribute',

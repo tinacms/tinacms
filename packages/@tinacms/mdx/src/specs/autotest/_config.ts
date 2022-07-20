@@ -49,6 +49,11 @@ export const field: RichTypeInner = {
       fields: [{ type: 'datetime', name: 'here' }],
     },
     {
+      name: 'Ratings',
+      label: 'Ratings',
+      fields: [{ type: 'number', name: 'value', list: true }],
+    },
+    {
       name: 'Playground',
       label: 'Playground',
       fields: [
