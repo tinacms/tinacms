@@ -58,14 +58,19 @@ export const stringifyMDX = (
   )
   let preprocessedString = res
   templatesWithMatchers?.forEach((template) => {
-    preprocessedString = preprocessedString.replaceAll(
-      `<${template.name}>\``,
-      `${template.match.start} `
-    )
-    preprocessedString = preprocessedString.replaceAll(
-      `\`</${template.name}>`,
-      ` ${template.match.end}`
-    )
+    if (typeof template === 'string') {
+      throw new Error('Global templates are not supported')
+    }
+    if (template.match) {
+      preprocessedString = preprocessedString.replaceAll(
+        `<${template.name}>\``,
+        `${template.match.start} `
+      )
+      preprocessedString = preprocessedString.replaceAll(
+        `\`</${template.name}>`,
+        ` ${template.match.end}`
+      )
+    }
   })
   return preprocessedString
 }

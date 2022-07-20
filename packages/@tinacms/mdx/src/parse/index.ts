@@ -21,6 +21,7 @@ import remarkMdx from 'remark-mdx'
 import { visit } from 'unist-util-visit'
 import { remarkToSlate } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
+import type * as Md from 'mdast'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -77,16 +78,22 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     )
     let preprocessedString = value
     templatesWithMatchers?.forEach((template) => {
-      preprocessedString = preprocessedString.replaceAll(
-        template.match.start,
-        `<${template.name}>\``
-      )
-      preprocessedString = preprocessedString.replaceAll(
-        template.match.end,
-        `\`</${template.name}>`
-      )
+      if (typeof template === 'string') {
+        throw new Error('Global templates are not supported')
+      }
+      if (template.match) {
+        preprocessedString = preprocessedString.replaceAll(
+          template.match.start,
+          `<${template.name}>\``
+        )
+        preprocessedString = preprocessedString.replaceAll(
+          template.match.end,
+          `\`</${template.name}>`
+        )
+      }
     })
-    const tree = remark().use(remarkMdx).parse(preprocessedString)
+    // Remark Root is not the same as mdast for some reason
+    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
@@ -108,5 +115,9 @@ export const parseMDX = (
   imageCallback: (s: string) => string
 ) => {
   const tree = markdownToAst(value, field)
-  return remarkToSlate(tree, field, imageCallback)
+  if (tree) {
+    return remarkToSlate(tree, field, imageCallback)
+  } else {
+    return {}
+  }
 }
