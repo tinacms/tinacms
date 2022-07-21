@@ -37,6 +37,9 @@ export interface TinaCloudSchemaConfig<Store = any> {
   client?: {
     referenceDepth?: number
   }
+  clientId: string
+  branch: string
+  token: string
   media?: {
     loadCustomStore?: () => Promise<Store>
     tina?: {
