@@ -29,7 +29,6 @@
     "@headlessui/react": "^1.5.0",
     "@tailwindcss/typography": "^0.4.1",
     "@tinacms/auth": "workspace:*",
-    "concurrently": "^7.2.2",
     "date-fns": "^2.23.0",
     "next": "^11.0.4",
     "next-svgr": "^0.0.2",
