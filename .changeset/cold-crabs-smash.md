@@ -12,7 +12,7 @@ This PR adds the new generated client, a new build command and introduces a new 
 
 ## Updates to schema.ts
 
-Instead of passing an ApiURL, now the clientID, branch and read only token (NEW) will all be configured in the schema. The local url will be used if the --local flag is passed.
+Instead of passing an ApiURL, now the clientId, branch and read only token (NEW) will all be configured in the schema. The local url will be used if the --local flag is passed.
 
 This will require a change to the schema and the scripts.
 
@@ -26,7 +26,7 @@ This will require a change to the schema and the scripts.
 const schema = defineSchema({
 +    config: {
 +        branch: "main",
-+        clientID: "***",
++        clientId: "***",
 +        token: "***",
     },
     collections: [
