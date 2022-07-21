@@ -160,7 +160,6 @@ export const build = async ({
   beforeBuild,
   afterBuild,
   dev,
-  isomorphicGitBridge,
   local,
   verbose,
   noSDK,
