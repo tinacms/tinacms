@@ -30,6 +30,13 @@ import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
 import { startSubprocess } from './startSubprocess'
+import {
+  buildCmdBuild,
+  buildSetupCmdServerStart,
+  buildSetupCmdBuild,
+} from '../buildTina'
+import { attachPath } from '../buildTina/attachPath'
+import { warnText } from '../utils/theme'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -37,6 +44,8 @@ export const CMD_COMPILE_MODELS = 'schema:compile'
 export const CMD_WAIT_FOR_DB = 'server:waitForDB'
 export const INIT = 'init'
 export const AUDIT = 'audit'
+export const CMD_SETUP = 'setup'
+export const CMD_BUILD = 'build'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -95,6 +104,22 @@ const developmentOption = {
   name: '--dev',
   description: 'Uses NODE_ENV=development when compiling client and schema',
 }
+const localOption = {
+  name: '--local',
+  description: 'Uses the local file system graphql server',
+  defaultValue: false,
+}
+
+const checkOptions = async (_ctx: any, next: () => void, options: any) => {
+  if (options?.experimentalData) {
+    logger.warn(
+      warnText(
+        'Warning: you are using the `--experimentalData`flag. This flag is not needed and can safely be removed. It will be deprecated in a future version'
+      )
+    )
+  }
+  next()
+}
 
 export const baseCmds: Command[] = [
   {
@@ -111,40 +136,44 @@ export const baseCmds: Command[] = [
       watchFileOption,
       verboseOption,
       developmentOption,
-    ],
-    action: (options) => chain([startServer, startSubprocess], options),
-  },
-  {
-    command: CMD_WAIT_FOR_DB,
-    description: 'Wait for DB to finish indexing, start subprocess',
-    options: [
-      subCommand,
-      experimentalDatalayer,
-      isomorphicGitBridge,
-      noTelemetryOption,
-      verboseOption,
-      developmentOption,
+      localOption,
     ],
     action: (options) =>
-      chain([compileClient, waitForDB, startSubprocess], options),
+      chain(
+        [
+          attachPath,
+          checkOptions,
+          buildSetupCmdServerStart,
+          startServer,
+          startSubprocess,
+        ],
+        options
+      ),
   },
   {
-    command: CMD_COMPILE_MODELS,
-    description: 'Compile schema into static files for the server',
-    options: [experimentalDatalayer, isomorphicGitBridge, noTelemetryOption],
-    action: (options) => chain([compileSchema], options),
-  },
-  {
-    command: CMD_GEN_TYPES,
-    description:
-      "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
+    command: CMD_BUILD,
+    description: 'Build Tina',
     options: [
       experimentalDatalayer,
       isomorphicGitBridge,
       noSDKCodegenOption,
       noTelemetryOption,
+      verboseOption,
+      developmentOption,
+      localOption,
     ],
-    action: (options) => chain([attachSchema, genTypes], options),
+    action: (options) =>
+      chain(
+        [
+          attachPath,
+          checkOptions,
+          buildSetupCmdBuild,
+          buildCmdBuild,
+          compileClient,
+          waitForDB,
+        ],
+        options
+      ),
   },
   {
     command: INIT,
@@ -158,15 +187,13 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
+          attachPath,
+          checkOptions,
           checkDeps,
           initTina,
           installDeps,
-          async (_ctx, next, options) => {
-            await compileSchema(_ctx, next, options)
-            next()
-          },
-          attachSchema,
-          genTypes,
+          buildSetupCmdBuild,
+          buildCmdBuild,
           tinaSetup,
           successMessage,
         ],
