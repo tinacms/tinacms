@@ -54,7 +54,7 @@ export class TinaSchema {
   }
   public getIsTitleFieldName = (collection: string) => {
     const col = this.getCollection(collection)
-    const field = col?.fields.find((x) => x.type === 'string' && x.isTitle)
+    const field = col?.fields?.find((x) => x.type === 'string' && x.isTitle)
     return field?.name
   }
 

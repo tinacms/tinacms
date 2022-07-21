@@ -583,72 +583,63 @@ export class Resolver {
     collection: TinaCloudCollection<true>
     hydrator?: (string) => any
   }) => {
-    let edges
-    let pageInfo
-
-    // See if we are using the data layer
-    const useDataLayer = Boolean(
-      this.tinaSchema?.config?.meta?.flags?.find(
-        (x) => x === 'experimentalData'
-      )
-    )
-
-    if (useDataLayer) {
-      let conditions: FilterCondition[]
-      if (args.filter) {
-        if (collection.fields) {
-          conditions = await this.resolveFilterConditions(
-            args.filter as Record<string, Record<string, object>>,
-            collection.fields as TinaFieldInner<false>[],
-            collection.name
+    let conditions: FilterCondition[]
+    if (args.filter) {
+      if (collection.fields) {
+        conditions = await this.resolveFilterConditions(
+          args.filter as Record<string, Record<string, object>>,
+          collection.fields as TinaFieldInner<false>[],
+          collection.name
+        )
+      } else if (collection.templates) {
+        for (const templateName of Object.keys(args.filter)) {
+          const template = (collection.templates as Template<false>[]).find(
+            (template) => template.name === templateName
           )
-        } else if (collection.templates) {
-          for (const templateName of Object.keys(args.filter)) {
-            const template = (collection.templates as Template<false>[]).find(
-              (template) => template.name === templateName
-            )
 
-            if (template) {
-              conditions = await this.resolveFilterConditions(
-                args.filter[templateName],
-                template.fields as TinaFieldInner<false>[],
-                `${collection.name}.${templateName}`
-              )
-            } else {
-              throw new Error(
-                `Error template not found: ${templateName} in collection ${collection.name}`
-              )
-            }
+          if (template) {
+            conditions = await this.resolveFilterConditions(
+              args.filter[templateName],
+              template.fields as TinaFieldInner<false>[],
+              `${collection.name}.${templateName}`
+            )
+          } else {
+            throw new Error(
+              `Error template not found: ${templateName} in collection ${collection.name}`
+            )
           }
         }
       }
-
-      const queryOptions = {
-        filterChain: makeFilterChain({
-          conditions: conditions || [],
-        }),
-        collection: collection.name,
-        sort: args.sort as string,
-        first: args.first as number,
-        last: args.last as number,
-        before: args.before as string,
-        after: args.after as string,
-      }
-
-      const result = await this.database.query(
-        queryOptions,
-        hydrator ? hydrator : this.getDocument
-      )
-      edges = result.edges
-      pageInfo = result.pageInfo
-    } else {
-      const ext = collection?.format || '.md'
-      edges = (
-        await this.database.store.glob(collection.path, this.getDocument, ext)
-      ).map((document) => ({
-        node: document,
-      }))
     }
+
+    const queryOptions = {
+      filterChain: makeFilterChain({
+        conditions: conditions || [],
+      }),
+      collection: collection.name,
+      sort: args.sort as string,
+      first: args.first as number,
+      last: args.last as number,
+      before: args.before as string,
+      after: args.after as string,
+    }
+
+    const result = await this.database.query(
+      queryOptions,
+      hydrator ? hydrator : this.getDocument
+    )
+    const edges = result.edges
+    const pageInfo = result.pageInfo
+
+    // This was the non datalayer code
+    // } else {
+    //   const ext = collection?.format || '.md'
+    //   edges = (
+    //     await this.database.store.glob(collection.path, this.getDocument, ext)
+    //   ).map((document) => ({
+    //     node: document,
+    //   }))
+    // }
 
     return {
       totalCount: edges.length,

@@ -36,6 +36,7 @@ import {
   buildSetupCmdBuild,
 } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
+import { warnText } from '../utils/theme'
 
 export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
@@ -109,6 +110,17 @@ const localOption = {
   defaultValue: false,
 }
 
+const checkOptions = async (_ctx: any, next: () => void, options: any) => {
+  if (options?.experimentalData) {
+    logger.warn(
+      warnText(
+        'Warning: you are using the `--experimentalData`flag. This flag is not needed and can safely be removed. It will be deprecated in a future version'
+      )
+    )
+  }
+  next()
+}
+
 export const baseCmds: Command[] = [
   {
     command: CMD_START_SERVER,
@@ -128,7 +140,13 @@ export const baseCmds: Command[] = [
     ],
     action: (options) =>
       chain(
-        [attachPath, buildSetupCmdServerStart, startServer, startSubprocess],
+        [
+          attachPath,
+          checkOptions,
+          buildSetupCmdServerStart,
+          startServer,
+          startSubprocess,
+        ],
         options
       ),
   },
@@ -148,6 +166,7 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          checkOptions,
           buildSetupCmdBuild,
           buildCmdBuild,
           compileClient,
@@ -169,6 +188,7 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          checkOptions,
           checkDeps,
           initTina,
           installDeps,
