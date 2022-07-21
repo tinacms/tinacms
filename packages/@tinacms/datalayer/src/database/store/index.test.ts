@@ -103,6 +103,23 @@ describe('datalayer store helper functions', () => {
       )
       expect(result).toEqual(expected)
     })
+
+    it('fails with null field', () => {
+      const expected = null
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'string',
+            },
+          ],
+        },
+        { foo: null },
+        escapeStr
+      )
+      expect(result).toEqual(expected)
+    })
   })
 
   describe('buildFilterSuffixes', () => {
