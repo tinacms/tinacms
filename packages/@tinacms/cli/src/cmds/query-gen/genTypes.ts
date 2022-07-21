@@ -29,10 +29,10 @@ export async function genClient(
   options
 ) {
   const branch = tinaSchema?.config?.branch
-  const clientID = tinaSchema?.config?.clientID
+  const clientId = tinaSchema?.config?.clientId
   const token = tinaSchema?.config?.token
 
-  if (!branch || !clientID || !token) {
+  if (!branch || !clientId || !token) {
     logger.warn(
       // TODO: add link to docs
       warnText('Client not configured properly. Skipping client generation.')
@@ -42,7 +42,7 @@ export async function genClient(
 
   const apiURL = options.local
     ? 'http://localhost:4001/graphql'
-    : `https://${TINA_HOST}/content/${clientID}/github/${branch}`
+    : `https://${TINA_HOST}/content/${clientId}/github/${branch}`
 
   const clientPath = p.join(generatedPath, 'client.ts')
   fs.writeFileSync(
