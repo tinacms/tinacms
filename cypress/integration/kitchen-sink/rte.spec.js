@@ -21,6 +21,19 @@ Cypress.on('uncaught:exception', (err) => {
 })
 
 describe('Rich Text Editor', () => {
+  beforeEach(() => {
+    cy.request({
+      method: 'POST',
+      url: 'http://localhost:4001/graphql',
+      body: {
+        query: `mutation {
+          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
+            __typename
+          }
+        }`,
+      },
+    })
+  })
   describe('italic', () => {
     it('is correctly rendered from markdown', () => {
       cy.assertRTE('*italic*', '', '<em>italic</em>')

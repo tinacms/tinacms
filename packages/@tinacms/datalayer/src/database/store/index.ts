@@ -612,19 +612,25 @@ export const makeFilterSuffixes = (
 export const makeKeyForField = (
   definition: IndexDefinition,
   data: object,
-  stringEscaper: StringEscaper
+  stringEscaper: StringEscaper,
+  maxStringLength: number = 100
 ): string | null => {
   const valueParts = []
   for (const field of definition.fields) {
-    if (field.name in data) {
+    if (
+      field.name in data &&
+      data[field.name] !== undefined &&
+      data[field.name] !== null
+    ) {
       // TODO I think these dates are ISO 8601 so I don't think we need to convert to numbers
+      const rawValue = data[field.name]
       const resolvedValue = String(
         field.type === 'datetime'
-          ? new Date(data[field.name]).getTime()
+          ? new Date(rawValue).getTime()
           : field.type === 'string'
-          ? stringEscaper(data[field.name] as string | string[])
-          : data[field.name]
-      )
+          ? stringEscaper(rawValue as string | string[])
+          : rawValue
+      ).substring(0, maxStringLength)
       valueParts.push(applyPadding(resolvedValue, field.pad))
     } else {
       return null // tell caller that one of the fields is missing and we can't index

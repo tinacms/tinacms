@@ -4,12 +4,7 @@ query PageQuery {
     edges {
       node {
         id
-        _values
-          author {
-          ... on Authors {
-            ...AuthorsParts
-          }
-        }
+        ...PostsParts
         _sys {
           filename
         }

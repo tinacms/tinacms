@@ -37,6 +37,19 @@ const SLATE_SELECTOR = `[role="textbox"][data-slate-editor="true"][contenteditab
 const RICH_TEXT_BODY_SELECTOR = `[data-test="rich-text-body"]`
 
 describe('Tina side bar', () => {
+  afterEach(() => {
+    cy.request({
+      method: 'POST',
+      url: 'http://localhost:4001/graphql',
+      body: {
+        query: `mutation {
+          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
+            __typename
+          }
+        }`,
+      },
+    })
+  })
   beforeEach(() => {
     // reset content from GraphQL API
     cy.request({
@@ -44,7 +57,7 @@ describe('Tina side bar', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updatePage(relativePath: "home.mdx", params: { heading: "" subtitle: "" body: ""  }) {
+          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
             __typename
           }
         }`,

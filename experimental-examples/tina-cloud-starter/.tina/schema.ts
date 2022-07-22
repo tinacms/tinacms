@@ -1,6 +1,6 @@
 import { defineSchema, defineConfig } from "tinacms";
 import type { TinaTemplate } from "tinacms";
-import { client } from "./client";
+import { client } from "./__generated__/client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
@@ -66,6 +66,9 @@ const BlocksTemplate: TinaTemplate = {
 
 const schema = defineSchema({
   config: {
+    branch: "main",
+    clientId: "foobar",
+    token: "foo",
     media: {
       // If you wanted cloudinary do this
       // loadCustomStore: async () => {
@@ -75,7 +78,7 @@ const schema = defineSchema({
       // this is the config for the tina cloud media store
       tina: {
         publicFolder: "public",
-        mediaRoot: "uploads",
+        mediaRoot: "",
       },
     },
   },
@@ -449,7 +452,6 @@ export const tinaConfig = defineConfig({
      * Enables experimental branch switcher
      */
     cms.flags.set("branch-switcher", true);
-    cms.flags.set("experimentalData", true);
 
     // cms.sidebar.position = "overlay";
     // cms.sidebar.defaultState = "closed";

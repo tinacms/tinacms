@@ -34,6 +34,12 @@ export type UIField<F extends UIField = any, Shape = any> = {
 }
 
 export interface TinaCloudSchemaConfig<Store = any> {
+  client?: {
+    referenceDepth?: number
+  }
+  clientId: string
+  branch: string
+  token: string
   media?: {
     loadCustomStore?: () => Promise<Store>
     tina?: {

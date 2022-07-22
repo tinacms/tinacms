@@ -23,12 +23,11 @@ import { defaultSchema } from './defaultSchema'
 import { getSchemaPath, getClientPath } from '../../lib'
 import { logger } from '../../logger'
 
-const tinaPath = path.join(process.cwd(), '.tina')
-const packageJSONFilePath = path.join(process.cwd(), 'package.json')
-const tinaGeneratedPath = path.join(tinaPath, '__generated__')
-const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
-
-export const resetGeneratedFolder = async () => {
+export const resetGeneratedFolder = async ({
+  tinaGeneratedPath,
+}: {
+  tinaGeneratedPath: string
+}) => {
   try {
     await fs.rm(tinaGeneratedPath, {
       recursive: true,
@@ -44,7 +43,22 @@ export const resetGeneratedFolder = async () => {
 export const queries = (client)=>({})
 `
   )
-  await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
+  await fs.writeFile(
+    path.join(tinaGeneratedPath, 'client.ts'),
+    `
+export const client = {}
+`
+  )
+  await fs.outputFile(
+    path.join(tinaGeneratedPath, '.gitignore'),
+    `db
+client.ts
+types.ts
+frags.gql
+queries.gql
+schema.gql
+`
+  )
 }
 
 // Cleanup function that is guaranteed to run
@@ -57,6 +71,15 @@ export const compileClient = async (
   next,
   options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
+  const root = ctx.rootPath
+  if (!root) {
+    throw new Error('ctx.rootPath has not been attached')
+  }
+  const tinaPath = path.join(root, '.tina')
+
+  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
+  const packageJSONFilePath = path.join(root, 'package.json')
+
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
 
   if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }
@@ -79,8 +102,9 @@ export const compileClient = async (
   }
 
   let clientExists = true
+  const projectDir = path.join(tinaPath, '__generated__')
   try {
-    getClientPath({ projectDir: tinaPath })
+    getClientPath({ projectDir })
   } catch {
     clientExists = false
   }
@@ -105,13 +129,16 @@ export const compileClient = async (
         ? '"development"'
         : '"production"'
     }
-    const inputFile = getClientPath({ projectDir: tinaPath })
+    const inputFile = getClientPath({
+      projectDir,
+    })
     await transpile(
       inputFile,
       'client.js',
       tinaTempPath,
       options.verbose,
-      define
+      define,
+      packageJSONFilePath
     )
   } catch (e) {
     await cleanup({ tinaTempPath })
@@ -151,11 +178,20 @@ export const compileClient = async (
 }
 
 export const compileSchema = async (
-  _ctx,
+  ctx,
   _next,
   options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
 ) => {
+  const root = ctx.rootPath
+  if (!root) {
+    throw new Error('ctx.rootPath has not been attached')
+  }
+  const tinaPath = path.join(root, '.tina')
+  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
+  const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
+  const packageJSONFilePath = path.join(root, 'package.json')
+
   if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
 
   if (options.verbose) {
@@ -176,8 +212,8 @@ export const compileSchema = async (
     )
   }
 
-  if (_ctx) {
-    _ctx.schemaFileType = schemaFileType
+  if (ctx) {
+    ctx.schemaFileType = schemaFileType
   }
 
   let schemaExists = true
@@ -217,7 +253,8 @@ export const compileSchema = async (
       'schema.js',
       tinaTempPath,
       options.verbose,
-      define
+      define,
+      packageJSONFilePath
     )
   } catch (e) {
     await cleanup({ tinaTempPath })
@@ -234,6 +271,7 @@ export const compileSchema = async (
   try {
     const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
     const schemaObject: TinaCloudSchema = schemaFunc.default
+    ctx.schema = schemaObject
     await fs.outputFile(
       path.join(tinaConfigPath, 'schema.json'),
       JSON.stringify(schemaObject, null, 2)
@@ -255,7 +293,14 @@ export const compileSchema = async (
   }
 }
 
-const transpile = async (inputFile, outputFile, tempDir, verbose, define) => {
+const transpile = async (
+  inputFile,
+  outputFile,
+  tempDir,
+  verbose,
+  define,
+  packageJSONFilePath: string
+) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
   const packageJSON = JSON.parse(

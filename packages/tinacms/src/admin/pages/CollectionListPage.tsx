@@ -148,7 +148,6 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
               const pageInfo = collection.documents.pageInfo
-              const useDataFlag = cms.flags.get('experimentalData')
 
               return (
                 <PageWrapper>
@@ -317,28 +316,26 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        {useDataFlag && (
-                          <div className="pt-3">
-                            <CursorPaginator
-                              variant="white"
-                              hasNext={pageInfo?.hasNextPage}
-                              navigateNext={() => {
-                                const newState = [...prevCursors, endCursor]
+                        <div className="pt-3">
+                          <CursorPaginator
+                            variant="white"
+                            hasNext={pageInfo?.hasNextPage}
+                            navigateNext={() => {
+                              const newState = [...prevCursors, endCursor]
+                              setPrevCursors(newState)
+                              setEndCursor(pageInfo?.endCursor)
+                            }}
+                            hasPrev={prevCursors.length > 0}
+                            navigatePrev={() => {
+                              const prev = prevCursors[prevCursors.length - 1]
+                              if (typeof prev === 'string') {
+                                const newState = prevCursors.slice(0, -1)
                                 setPrevCursors(newState)
-                                setEndCursor(pageInfo?.endCursor)
-                              }}
-                              hasPrev={prevCursors.length > 0}
-                              navigatePrev={() => {
-                                const prev = prevCursors[prevCursors.length - 1]
-                                if (typeof prev === 'string') {
-                                  const newState = prevCursors.slice(0, -1)
-                                  setPrevCursors(newState)
-                                  setEndCursor(prev)
-                                }
-                              }}
-                            />
-                          </div>
-                        )}
+                                setEndCursor(prev)
+                              }
+                            }}
+                          />
+                        </div>
                       </div>
                     </PageBody>
                   </>

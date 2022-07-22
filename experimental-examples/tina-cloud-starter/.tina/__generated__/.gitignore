@@ -1,1 +1,6 @@
 db
+client.ts
+types.ts
+frags.gql
+queries.gql
+schema.gql

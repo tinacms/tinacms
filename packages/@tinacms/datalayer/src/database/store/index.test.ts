@@ -32,7 +32,7 @@ const escapeStr = makeStringEscaper(
 )
 
 describe('datalayer store helper functions', () => {
-  describe('buildKeyForField', () => {
+  describe('makeKeyForField', () => {
     it('succeeds with non-datetime', () => {
       const expected = 'bar'
       const result = makeKeyForField(
@@ -45,6 +45,25 @@ describe('datalayer store helper functions', () => {
           ],
         },
         { foo: expected },
+        escapeStr
+      )
+      expect(result).toEqual(expected)
+    })
+
+    it('succeeds with long string', () => {
+      const val =
+        'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
+      const expected = val.substring(0, 100)
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'string',
+            },
+          ],
+        },
+        { foo: val },
         escapeStr
       )
       expect(result).toEqual(expected)
@@ -80,6 +99,23 @@ describe('datalayer store helper functions', () => {
           ],
         },
         { bar: 'foo' },
+        escapeStr
+      )
+      expect(result).toEqual(expected)
+    })
+
+    it('fails with null field', () => {
+      const expected = null
+      const result = makeKeyForField(
+        {
+          fields: [
+            {
+              name: 'foo',
+              type: 'string',
+            },
+          ],
+        },
+        { foo: null },
         escapeStr
       )
       expect(result).toEqual(expected)
