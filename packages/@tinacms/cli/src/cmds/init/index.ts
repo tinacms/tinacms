@@ -4,7 +4,6 @@ import {
   adminPage,
   blogPost,
   nextPostPage,
-  ClientFile,
 } from './setup-files'
 import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
 import { logText, successText } from '../../utils/theme'
@@ -271,10 +270,6 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   }
 
   outputFileSync(adminPath, adminPage)
-
-  // Create a .tina/client.ts
-  const clientPath = p.join(TinaFolder, 'client.js')
-  await fs.writeFile(clientPath, ClientFile)
 
   next()
 }
