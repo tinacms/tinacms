@@ -13,8 +13,21 @@ limitations under the License.
 
 export const defaultSchema = `
 import { defineSchema, defineConfig } from 'tinacms'
+import { client } from "/.tina/__generated__/client"
 
+
+const branch =
+  process.env.NEXT_PUBLIC_TINA_BRANCH ||
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF ||
+  process.env.HEAD ||
+  'main'
 const schema = defineSchema({
+  // See https://tina.io/docs/tina-cloud/connecting-site/ for more information about this config
+  config: {
+    token: '<Your Read Only Token>' // generated on app.tina.io,
+    clientId: '<Your Client ID>', // generated on app.tina.io
+    branch,
+  },
   collections: [
     {
       label: 'Blog Posts',
@@ -62,17 +75,9 @@ const schema = defineSchema({
 export default schema
 
 // Your tina config
-// ==============
-const branch = 'main'
-// When working locally, hit our local filesystem.
-// On a Vercel deployment, hit the Tina Cloud API
-const apiURL =
-  process.env.NODE_ENV == 'development'
-    ? 'http://localhost:4001/graphql'
-    : \`https://content.tinajs.io/content/\${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/\${branch}\`
 
 export const tinaConfig = defineConfig({
-  apiURL,
+  client,
   schema,
   cmsCallback: (cms) => {
     //  add your CMS callback code here (if you want)
