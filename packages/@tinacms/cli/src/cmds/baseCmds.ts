@@ -38,13 +38,10 @@ import {
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 
-export const CMD_GEN_TYPES = 'schema:types'
 export const CMD_START_SERVER = 'server:start'
-export const CMD_COMPILE_MODELS = 'schema:compile'
-export const CMD_WAIT_FOR_DB = 'server:waitForDB'
+export const CMD_DEV = 'dev'
 export const INIT = 'init'
 export const AUDIT = 'audit'
-export const CMD_SETUP = 'setup'
 export const CMD_BUILD = 'build'
 
 const startServerPortOption = {
@@ -137,6 +134,31 @@ export const baseCmds: Command[] = [
       verboseOption,
       developmentOption,
       localOption,
+    ],
+    action: (options) =>
+      chain(
+        [
+          attachPath,
+          checkOptions,
+          buildSetupCmdServerStart,
+          startServer,
+          startSubprocess,
+        ],
+        options
+      ),
+  },
+  {
+    command: CMD_DEV,
+    description: 'Builds tina and starts the dev server.',
+    options: [
+      startServerPortOption,
+      subCommand,
+      isomorphicGitBridge,
+      noWatchOption,
+      noSDKCodegenOption,
+      noTelemetryOption,
+      watchFileOption,
+      verboseOption,
     ],
     action: (options) =>
       chain(
