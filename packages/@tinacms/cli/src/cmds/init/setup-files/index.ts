@@ -52,7 +52,7 @@ export const nextPostPage =
   import { createGlobalStyle } from 'styled-components'
   import { useTina } from 'tinacms/dist/edit-state'
   import { TinaMarkdown } from 'tinacms/dist/rich-text'
-  import client from '../../../.tina/client'
+  import client from '../../../.tina/__generated__/client'
   
   // Styles for markdown
   const GlobalStyle = createGlobalStyle\`
