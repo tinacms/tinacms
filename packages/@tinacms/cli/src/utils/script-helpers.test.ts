@@ -38,7 +38,7 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'tinacms server:start -c "tinacms build --local && next dev -p 3000"',
+        dev: 'tinacms dev -c "next dev -p 3000"',
         build: 'tinacms build && next build -p 3000',
         start: 'tinacms build && next start -p 3000',
       })
@@ -53,7 +53,7 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'tinacms server:start -c "tinacms build --local && next dev"',
+        dev: 'tinacms dev -c "next dev"',
         build: 'tinacms build && next build',
         start: 'tinacms build && next start',
       })
