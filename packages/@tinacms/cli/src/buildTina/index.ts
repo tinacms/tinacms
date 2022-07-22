@@ -12,6 +12,7 @@
  */
 
 import retry from 'async-retry'
+import fs from 'fs-extra'
 
 import { Bridge, buildSchema, createDatabase, Database } from '@tinacms/graphql'
 import {
@@ -178,9 +179,11 @@ export const build = async ({
 
   try {
     if (!process.env.CI && !noWatch) {
+      const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+      await fs.mkdirp(tinaGeneratedPath)
       await store.close()
       await resetGeneratedFolder({
-        tinaGeneratedPath: path.join(rootPath, '.tina', '__generated__'),
+        tinaGeneratedPath,
       })
       await store.open()
     }
