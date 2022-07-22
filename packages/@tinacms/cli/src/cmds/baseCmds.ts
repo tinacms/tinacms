@@ -139,6 +139,14 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          async (ctx, next, _) => {
+            logger.warn(
+              warnText(
+                'server:start will be deprecated in the future, please use `tinacms dev` instead'
+              )
+            )
+            next()
+          },
           checkOptions,
           buildSetupCmdServerStart,
           startServer,
