@@ -333,6 +333,8 @@ const Node = ({ components, child }) => {
         return <Component {...props} />
       }
       return child.value
+    case 'invalid_markdown':
+      return <pre>{child.value}</pre>
     default:
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
       if (typeof child.text === 'string') {

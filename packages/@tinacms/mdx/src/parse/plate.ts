@@ -48,6 +48,15 @@ export type HTMLInlineElement = {
   value: string
   children: [EmptyTextElement]
 }
+export type InvalidMarkdownElement = {
+  type: 'invalid_markdown'
+  value: string
+  position: {
+    start: { line: number; column: number; offset: number }
+    end: { line: number; column: number; offset: number }
+  }
+  children: [EmptyTextElement]
+}
 export type CodeBlockElement = {
   type: 'code_block'
   lang?: string
@@ -91,6 +100,7 @@ export type BlockElement =
   | OrderedListElement
   | ListItemElement
   | HrElement
+  | InvalidMarkdownElement
 
 export type MdxInlineElement = {
   type: 'mdxJsxTextElement'
