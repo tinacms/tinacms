@@ -118,14 +118,19 @@ export const parseMDX = (
   try {
     tree = markdownToAst(value, field)
   } catch (e) {
-    // @ts-ignore
-    if (e.position) {
-      throw new Error(
-        // @ts-ignore
-        `Unable to parse markdown at line: ${e.position.start.line}, column: ${e.position.start.column}. ${MDX_PARSE_ERROR_MSG}`
-      )
+    return {
+      type: 'root',
+      children: [
+        {
+          type: 'invalid_markdown',
+          value,
+          // @ts-ignore
+          position: e.position,
+          message: e.message,
+          children: [{ type: 'text', text: '' }],
+        },
+      ],
     }
-    throw new Error(`Unable to parse markdown, ${MDX_PARSE_ERROR_MSG}`)
   }
   if (tree) {
     return remarkToSlate(tree, field, imageCallback)

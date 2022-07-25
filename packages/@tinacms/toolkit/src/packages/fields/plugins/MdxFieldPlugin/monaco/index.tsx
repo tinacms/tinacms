@@ -64,14 +64,33 @@ const RawEditor = (props: { input: any }) => {
   }, [])
   const [value, setValue] = React.useState(inputValue)
   const [error, setError] = React.useState(null)
+  const [errorPosition, setErrorPosition] = React.useState(null)
 
   const debouncedValue = useDebounce(value, 500)
 
   React.useEffect(() => {
     try {
       const parsedValue = parseMDX(value, field, (value) => value)
+      if (parsedValue.children[0]) {
+        if (parsedValue.children[0].type === 'invalid_markdown') {
+          setError('Unable to parse string into markdown')
+          const invalidMarkdown = parsedValue.children[0]
+          const position = invalidMarkdown.position
+          setErrorPosition({
+            startColumn: position.start.column,
+            endColumn: position.end.column,
+            startLineNumber: position.start.line,
+            endLineNumber: position.end.line,
+            message: invalidMarkdown.message || 'INvalid!',
+            // Error severity
+            severity: 8,
+          })
+          return
+        }
+      }
       props.input.onChange(parsedValue)
       setError(null)
+      setErrorPosition(null)
     } catch (e) {
       if (e.message) {
         setError(e.message)
@@ -85,12 +104,30 @@ const RawEditor = (props: { input: any }) => {
 
   React.useEffect(() => {
     if (monaco) {
+      if (error) {
+        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [
+          errorPosition,
+        ])
+      } else {
+        console.log('undo!')
+        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [])
+      }
+    }
+  }, [error])
+  React.useEffect(() => {
+    if (monaco) {
       monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         // disable errors
         noSemanticValidation: true,
         noSyntaxValidation: true,
       })
+
+      if (error) {
+        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [
+          errorPosition,
+        ])
+      }
     }
   }, [monaco])
 

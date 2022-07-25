@@ -49,6 +49,11 @@ export const stringifyMDX = (
   field: RichTypeInner,
   imageCallback: (url: string) => string
 ) => {
+  if (value?.children[0]) {
+    if (value?.children[0].type === 'invalid_markdown') {
+      return value.children[0].value
+    }
+  }
   const res = toMarkdown(rootElement(value, field, imageCallback), {
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
@@ -166,14 +171,12 @@ export const blockElement = (
           listItemElement(child, field, imageCallback)
         ),
       }
-    case 'html':
-      {
-        return {
-          type: 'html',
-          value: content.value,
-        }
+    case 'html': {
+      return {
+        type: 'html',
+        value: content.value,
       }
-      break
+    }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }

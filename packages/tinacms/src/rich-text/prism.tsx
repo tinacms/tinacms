@@ -16,6 +16,9 @@ import Highlight, { defaultProps } from 'prism-react-renderer'
 import theme from 'prism-react-renderer/themes/nightOwl'
 
 export const Prism = (props) => {
+  console.log(props)
+  return <pre>{props.value}</pre>
+
   return (
     <>
       <style>
@@ -31,7 +34,7 @@ export const Prism = (props) => {
       <Highlight
         {...defaultProps}
         theme={theme}
-        code={props.children || ''}
+        code={props.value || ''}
         language={props.lang}
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
