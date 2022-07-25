@@ -44,7 +44,7 @@ export const queries = (client)=>({})
 `
   )
   await fs.writeFile(
-    path.join(tinaGeneratedPath, 'client.ts'),
+    path.join(tinaGeneratedPath, 'client.js'),
     `
 export const client = {}
 `
@@ -52,7 +52,7 @@ export const client = {}
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
     `db
-client.ts
+client.js
 types.ts
 types.js
 frags.gql

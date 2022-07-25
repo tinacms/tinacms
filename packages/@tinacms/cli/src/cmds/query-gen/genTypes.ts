@@ -45,7 +45,7 @@ export async function genClient(
     ? 'http://localhost:4001/graphql'
     : `https://${TINA_HOST}/content/${clientId}/github/${branch}`
 
-  const clientPath = p.join(generatedPath, 'client.ts')
+  const clientPath = p.join(generatedPath, 'client.js')
   fs.writeFileSync(
     clientPath,
     `import { createClient } from "tinacms/dist/client";
