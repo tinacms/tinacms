@@ -54,6 +54,7 @@ export const client = {}
     `db
 client.ts
 types.ts
+types.js
 frags.gql
 queries.gql
 schema.gql
