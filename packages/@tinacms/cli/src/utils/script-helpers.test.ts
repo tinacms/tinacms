@@ -22,7 +22,7 @@ describe('generateGqlScript', () => {
   it('wraps original script correctly', () => {
     const newScript = generateGqlScript('next dev -p 3000')
 
-    expect(newScript).toEqual('tinacms server:start -c "next dev -p 3000"')
+    expect(newScript).toEqual('tinacms dev -c "next dev -p 3000"')
   })
 })
 
