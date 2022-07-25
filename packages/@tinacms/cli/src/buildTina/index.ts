@@ -167,6 +167,7 @@ export const build = async ({
   skipIndex,
 }: BuildOptions) => {
   const rootPath = ctx.rootPath as string
+  const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
   if (!rootPath) {
     throw new Error('Root path has not been attached')
   }
@@ -179,11 +180,11 @@ export const build = async ({
 
   try {
     if (!process.env.CI && !noWatch) {
-      const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
       await fs.mkdirp(tinaGeneratedPath)
       await store.close()
       await resetGeneratedFolder({
         tinaGeneratedPath,
+        usingTs: ctx.usingTs,
       })
       await store.open()
     }
@@ -198,8 +199,17 @@ export const build = async ({
     const schema: GraphQLSchema = await retry(
       async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
     )
-    await genTypes({ schema }, () => {}, { noSDK, verbose })
-    await genClient({ tinaSchema: ctx.schema }, () => {}, { local })
+    await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
+      noSDK,
+      verbose,
+    })
+    await genClient(
+      { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
+      () => {},
+      {
+        local,
+      }
+    )
   } catch (error) {
     throw error
   } finally {
