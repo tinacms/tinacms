@@ -168,6 +168,7 @@ export async function startServer(
             '**/node_modules/**/*',
             '**/.next/**/*',
             `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+            `${path.resolve(rootPath)}/.tina/__generated__/**`,
           ],
         }
       )
@@ -201,7 +202,7 @@ export async function startServer(
           process.exit(0)
         }
       })
-      .on('all', async () => {
+      .on('all', async (_, path) => {
         if (ready) {
           await reBuildLock.promise
           // hold the rebuild lock

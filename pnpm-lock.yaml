@@ -334,6 +334,7 @@ importers:
       normalize-path: 3.0.0
       progress: 2.0.3
       prompts: 2.4.2
+      typescript: 4.3.5
       yarn: 1.22.19
       yup: 0.32.11
     devDependencies:
@@ -356,7 +357,6 @@ importers:
       '@types/prompts': 2.0.14
       '@types/yup': 0.29.14
       jest: 27.5.1
-      typescript: 4.3.5
 
   packages/@tinacms/datalayer:
     specifiers:
