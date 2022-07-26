@@ -100,14 +100,14 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   // NOTE: if we want to provide error highlighing in the raw editor
   // we could keep this info around in edit mode
   // Delete useless position info
-  visit(tree, (node) => {
-    delete node.position
-  })
+  // visit(tree, (node) => {
+  //   delete node.position
+  // })
   return tree
 }
 
 export const MDX_PARSE_ERROR_MSG =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX - learn more: https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. [Learn more](http://example.com)'
 
 export const parseMDX = (
   value: string,
@@ -118,23 +118,32 @@ export const parseMDX = (
   try {
     tree = markdownToAst(value, field)
   } catch (e) {
-    return {
-      type: 'root',
-      children: [
-        {
-          type: 'invalid_markdown',
-          value,
-          // @ts-ignore
-          position: e.position,
-          message: e.message,
-          children: [{ type: 'text', text: '' }],
-        },
-      ],
-    }
+    console.log('dishere', e)
+    return invalidMarkdown(e, value)
   }
   if (tree) {
-    return remarkToSlate(tree, field, imageCallback)
+    try {
+      return remarkToSlate(tree, field, imageCallback)
+    } catch (e) {
+      return invalidMarkdown(e, value)
+    }
   } else {
     return { type: 'root', children: [] }
+  }
+}
+
+const invalidMarkdown = (e, value) => {
+  return {
+    type: 'root',
+    children: [
+      {
+        type: 'invalid_markdown',
+        value,
+        // @ts-ignore
+        position: e.position,
+        message: e.message || `Error parsring markdown ${MDX_PARSE_ERROR_MSG}`,
+        children: [{ type: 'text', text: '' }],
+      },
+    ],
   }
 }

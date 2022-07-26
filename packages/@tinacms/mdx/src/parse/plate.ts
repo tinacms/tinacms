@@ -51,6 +51,7 @@ export type HTMLInlineElement = {
 export type InvalidMarkdownElement = {
   type: 'invalid_markdown'
   value: string
+  message: string
   position: {
     start: { line: number; column: number; offset: number }
     end: { line: number; column: number; offset: number }

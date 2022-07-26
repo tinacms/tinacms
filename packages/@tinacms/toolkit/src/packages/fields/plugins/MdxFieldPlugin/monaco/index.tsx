@@ -51,69 +51,94 @@ const retryFocus = (ref) => {
   }
 }
 
-const RawEditor = (props: { input: any }) => {
+type ErrorType = {
+  message: string
+  position?: {
+    startColumn: number
+    endColumn: number
+    startLineNumber: number
+    endLineNumber: number
+  }
+}
+export const buildError = (element: InvalidMarkdownElement): ErrorType => {
+  return {
+    message: element.message,
+    position: element.position && {
+      endColumn: element.position.end.column,
+      startColumn: element.position.start.column,
+      startLineNumber: element.position.start.line,
+      endLineNumber: element.position.end.line,
+    },
+  }
+}
+export const buildErrorMessage = (element: InvalidMarkdownElement): string => {
+  if (!element) {
+    return ''
+  }
+  const errorMessage = buildError(element)
+  const message = errorMessage
+    ? `${errorMessage.message}${
+        errorMessage.position
+          ? ` at line: ${errorMessage.position.startLineNumber}, column: ${errorMessage.position.startColumn}`
+          : ''
+      }`
+    : null
+  return message
+}
+
+const RawEditor = (props: RichTextType) => {
   const monaco = useMonaco() as Monaco
   const { setRawMode } = useEditorContext()
   const monacoEditorRef =
-    React.useRef<Monaco.editor.IStandaloneCodeEditor>(null)
+    React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [height, setHeight] = React.useState(100)
+  const id = React.useMemo(() => uuid(), [])
   const field = props.field
   const inputValue = React.useMemo(() => {
+    // @ts-ignore no access to the rich-text type from this package
     const res = stringifyMDX(props.input.value, field, (value) => value)
     return typeof props.input.value === 'string' ? props.input.value : res
   }, [])
   const [value, setValue] = React.useState(inputValue)
-  const [error, setError] = React.useState(null)
-  const [errorPosition, setErrorPosition] = React.useState(null)
+  const [error, setError] = React.useState<InvalidMarkdownElement>(null)
 
   const debouncedValue = useDebounce(value, 500)
 
   React.useEffect(() => {
-    try {
-      const parsedValue = parseMDX(value, field, (value) => value)
-      if (parsedValue.children[0]) {
-        if (parsedValue.children[0].type === 'invalid_markdown') {
-          setError('Unable to parse string into markdown')
-          const invalidMarkdown = parsedValue.children[0]
-          const position = invalidMarkdown.position
-          setErrorPosition({
-            startColumn: position.start.column,
-            endColumn: position.end.column,
-            startLineNumber: position.start.line,
-            endLineNumber: position.end.line,
-            message: invalidMarkdown.message || 'INvalid!',
-            // Error severity
-            severity: 8,
-          })
-          return
-        }
-      }
-      props.input.onChange(parsedValue)
-      setError(null)
-      setErrorPosition(null)
-    } catch (e) {
-      if (e.message) {
-        setError(e.message)
-      } else {
-        setError('Unable to parse string into markdown')
+    // @ts-ignore no access to the rich-text type from this package
+    const parsedValue = parseMDX(value, field, (value) => value)
+    if (parsedValue.children[0]) {
+      if (parsedValue.children[0].type === 'invalid_markdown') {
+        const invalidMarkdown = parsedValue.children[0]
+        setError(invalidMarkdown)
+        return
       }
     }
+    props.input.onChange(parsedValue)
+    setError(null)
   }, [JSON.stringify(debouncedValue)])
 
-  const id = React.useMemo(() => uuid(), [])
-
   React.useEffect(() => {
-    if (monaco) {
+    if (monacoEditorRef.current) {
       if (error) {
-        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [
-          errorPosition,
+        const errorMessage = buildError(error)
+        monaco.editor.setModelMarkers(monacoEditorRef.current.getModel(), id, [
+          {
+            ...errorMessage.position,
+            message: errorMessage.message,
+            severity: 8,
+          },
         ])
       } else {
-        console.log('undo!')
-        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [])
+        monaco.editor.setModelMarkers(
+          monacoEditorRef.current.getModel(),
+          id,
+          []
+        )
       }
     }
-  }, [error])
+  }, [JSON.stringify(error), monacoEditorRef.current])
+
   React.useEffect(() => {
     if (monaco) {
       monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true)
@@ -122,12 +147,6 @@ const RawEditor = (props: { input: any }) => {
         noSemanticValidation: true,
         noSyntaxValidation: true,
       })
-
-      if (error) {
-        monaco.editor.setModelMarkers(monaco.editor.getModels()[0], '', [
-          errorPosition,
-        ])
-      }
     }
   }, [monaco])
 
@@ -153,30 +172,13 @@ const RawEditor = (props: { input: any }) => {
           visibility: hidden !important;
         }`} */}
       </style>
-      <div className="sticky -top-4 inline-flex shadow rounded-md mb-2 z-50 max-w-full">
+      <div className="sticky -top-4 w-full flex justify-between mb-2 z-50 max-w-full">
         <Button onClick={() => setRawMode(false)}>
           View in rich-text editor
         </Button>
+        <ErrorMessage error={error} />
       </div>
       <div style={{ height: `${height}px` }}>
-        {error && (
-          <div className="text-red-500 absolute top-1 right-0" title={error}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        )}
         <MonacoEditor
           path={id}
           onMount={handleEditorDidMount}
@@ -232,7 +234,7 @@ const Button = (props) => {
         props.align === 'left'
           ? 'rounded-l-md border-r-0'
           : 'rounded-r-md border-l-0'
-      } bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
+      } shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500`}
       type="button"
       onClick={props.onClick}
     >
@@ -244,3 +246,60 @@ const Button = (props) => {
 }
 
 export default RawEditor
+
+/* This example requires Tailwind CSS v2.0+ */
+import { XCircleIcon } from '@heroicons/react/solid'
+import { Popover, Transition } from '@headlessui/react'
+import { Fragment } from 'react'
+import { RichTextType } from '../../..'
+import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
+
+function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
+  const message = buildErrorMessage(error)
+
+  return (
+    <Popover className="relative">
+      {() => (
+        <>
+          <Popover.Button
+            className={`p-2 shaodw-lg border ${
+              error ? '' : ' opacity-0 hidden '
+            }`}
+          >
+            <span className="sr-only">Errors</span>
+            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+          </Popover.Button>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-200"
+            enterFrom="opacity-0 translate-y-1"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease-in duration-150"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 translate-y-1"
+          >
+            <Popover.Panel className="absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0">
+              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="rounded-md bg-red-50 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <XCircleIcon
+                        className="h-5 w-5 text-red-400"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800 whitespace-pre-wrap">
+                        {message}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Popover.Panel>
+          </Transition>
+        </>
+      )}
+    </Popover>
+  )
+}

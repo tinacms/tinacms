@@ -44,11 +44,17 @@ export const extractAttributes = (
         `Unable to find field definition for property "${attribute.name}"`
       )
     }
-    properties[attribute.name] = extractAttribute(
-      attribute,
-      field,
-      imageCallback
-    )
+    try {
+      properties[attribute.name] = extractAttribute(
+        attribute,
+        field,
+        imageCallback
+      )
+    } catch (e) {
+      throw new Error(
+        `Unable to parse field value for field "${field.name}" (type: ${field.type}). ${e.message}`
+      )
+    }
   })
   return properties
 }
