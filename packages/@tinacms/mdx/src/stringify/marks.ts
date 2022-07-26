@@ -77,12 +77,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
                 type: 'link',
                 url: item.url,
                 title: item.title,
-                children: [
-                  {
-                    type: 'text',
-                    value: a.value,
-                  },
-                ],
+                children: [text({ text: a.value })],
               }
             },
           })
@@ -145,13 +140,16 @@ const inlineElementExceptLink = (
     default:
       // @ts-expect-error type is 'never'
       if (!content.type && typeof content.text === 'string') {
-        return {
-          type: 'text',
-          // @ts-expect-error type is 'never'
-          value: content.text,
-        }
+        return text(content)
       }
       throw new Error(`InlineElement: ${content.type} is not supported`)
+  }
+}
+
+const text = (content: { text: string }) => {
+  return {
+    type: 'text' as const,
+    value: content.text,
   }
 }
 
@@ -177,14 +175,11 @@ export const eat = (
   if (marks.length === 0) {
     if (first.linkifyTextNode) {
       return [
-        first.linkifyTextNode({ type: 'text', value: first.text }),
+        first.linkifyTextNode(text(first)),
         ...eat(content.slice(1), field, imageCallback),
       ]
     } else {
-      return [
-        { type: 'text', value: first.text },
-        ...eat(content.slice(1), field, imageCallback),
-      ]
+      return [text(first), ...eat(content.slice(1), field, imageCallback)]
     }
   }
   let nonMatchingSiblingIndex: number = 0
@@ -224,13 +219,7 @@ export const eat = (
     }
   })
   if (!markToProcess) {
-    return [
-      {
-        type: 'text',
-        value: first.text,
-      },
-      ...eat(content.slice(1), field, imageCallback),
-    ]
+    return [text(first), ...eat(content.slice(1), field, imageCallback)]
   }
   if (markToProcess === 'inlineCode') {
     if (nonMatchingSiblingIndex) {
