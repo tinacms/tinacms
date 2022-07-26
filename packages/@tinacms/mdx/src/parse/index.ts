@@ -18,7 +18,6 @@ limitations under the License.
 
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
-import { visit } from 'unist-util-visit'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -92,18 +91,23 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
       )
     }
   })
-  // Remark Root is not the same as mdast for some reason
-  const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-  if (!tree) {
-    throw new Error('Error parsing markdown')
+  try {
+    // Remark Root is not the same as mdast for some reason
+    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    if (!tree) {
+      throw new Error('Error parsing markdown')
+    }
+    // NOTE: if we want to provide error highlighing in the raw editor
+    // we could keep this info around in edit mode
+    // Delete useless position info
+    // visit(tree, (node) => {
+    //   delete node.position
+    // })
+    return tree
+  } catch (e) {
+    // @ts-ignore VMessage is the error type but it's not accessible
+    throw new RichTextParseError(e, e.position)
   }
-  // NOTE: if we want to provide error highlighing in the raw editor
-  // we could keep this info around in edit mode
-  // Delete useless position info
-  // visit(tree, (node) => {
-  //   delete node.position
-  // })
-  return tree
 }
 
 export const MDX_PARSE_ERROR_MSG =
@@ -119,29 +123,20 @@ export const parseMDX = (
   let tree
   try {
     tree = markdownToAst(value, field)
+    if (tree) {
+      return remarkToSlate(tree, field, imageCallback)
+    } else {
+      return { type: 'root', children: [] }
+    }
   } catch (e) {
     if (e instanceof RichTextParseError) {
       return invalidMarkdown(e, value)
     }
-    return invalidMarkdown(e, value)
     throw e
-  }
-  if (tree) {
-    try {
-      return remarkToSlate(tree, field, imageCallback)
-    } catch (e) {
-      if (e instanceof RichTextParseError) {
-        return invalidMarkdown(e, value)
-      }
-      return invalidMarkdown(e, value)
-      throw e
-    }
-  } else {
-    return { type: 'root', children: [] }
   }
 }
 
-const invalidMarkdown = (
+export const invalidMarkdown = (
   e: RichTextParseError,
   value: string
 ): Plate.RootElement => {

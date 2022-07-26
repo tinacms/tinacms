@@ -40,7 +40,7 @@ declare module 'mdast' {
 }
 
 export const remarkToSlate = (
-  root: Md.Root,
+  root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement,
   field: RichTypeInner,
   imageCallback: (url: string) => string
 ): Plate.RootElement => {
@@ -412,7 +412,10 @@ export const remarkToSlate = (
 
   return {
     type: 'root',
-    children: root.children.map((child) => content(child)),
+    children: root.children.map((child) => {
+      // @ts-ignore child from MDX elements aren't shared with MDAST types
+      return content(child)
+    }),
   }
 }
 
@@ -429,8 +432,8 @@ export type Position = {
 }
 
 export class RichTextParseError extends Error {
-  public position: Position
-  constructor(message: string, position: Position) {
+  public position?: Position
+  constructor(message: string, position?: Position) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(message)
 

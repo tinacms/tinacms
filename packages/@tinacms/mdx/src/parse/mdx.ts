@@ -41,7 +41,11 @@ export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
   field: RichTypeInner,
   imageCallback: (url: string) => string
-): Plate.MdxInlineElement | Plate.MdxBlockElement {
+):
+  | Plate.MdxInlineElement
+  | Plate.MdxBlockElement
+  | Plate.HTMLInlineElement
+  | Plate.HTMLElement {
   try {
     const template = field.templates?.find((template) => {
       const templateName =
@@ -67,24 +71,31 @@ export function mdxJsxElement(
     }
 
     if (template.match) {
-      const value = node.children[0].value
-      if (node.type === 'mdxJsxFlowElement') {
-        // NOTE: Since we cast the children to `inline code`
-        // I don't think this code will ever run.
-        // And I'm not sure care either way
-        return {
-          type: node.type,
-          name: node.name,
-          children: [{ type: 'text', text: '' }],
-          props: { text: value },
+      const firstChild = node?.children[0]
+      if (firstChild?.type === 'inlineCode') {
+        const value = firstChild.value
+        if (node.type === 'mdxJsxFlowElement') {
+          // NOTE: Since we cast the children to `inline code`
+          // I don't think this code will ever run.
+          // And I'm not sure care either way
+          return {
+            type: node.type,
+            name: node.name,
+            children: [{ type: 'text', text: '' }],
+            props: { text: value },
+          }
+        } else {
+          return {
+            type: node.type,
+            name: node.name,
+            children: [{ type: 'text', text: '' }],
+            props: { text: value },
+          }
         }
       } else {
-        return {
-          type: node.type,
-          name: node.name,
-          children: [{ type: 'text', text: '' }],
-          props: { text: value },
-        }
+        throw new Error(
+          `Unable to parse value for template match pattern -  start: ${template.match.start}, end: ${template.match.end}`
+        )
       }
     }
     // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
@@ -97,8 +108,9 @@ export function mdxJsxElement(
       (field) => field.name === 'children'
     )
     if (childField) {
-      const childProps = remarkToSlate(node, childField, imageCallback)
-      props.children = childProps
+      if (childField.type === 'rich-text') {
+        props.children = remarkToSlate(node, childField, imageCallback)
+      }
     }
     return {
       type: node.type,
@@ -107,6 +119,9 @@ export function mdxJsxElement(
       props,
     }
   } catch (e) {
-    throw new RichTextParseError(e, e.position)
+    if (e instanceof Error) {
+      throw new RichTextParseError(e.message, node.position)
+    }
+    throw e
   }
 }
