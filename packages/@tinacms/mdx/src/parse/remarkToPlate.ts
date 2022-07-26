@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import flatten from 'lodash.flatten'
+import { flatten } from 'lodash-es'
 import { mdxJsxElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
