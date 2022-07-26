@@ -18,7 +18,7 @@ limitations under the License.
 import { format } from 'prettier'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import type * as Plate from '../parse/plate'
+import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
 import { rootElement, stringifyMDX } from '.'
 
@@ -51,7 +51,7 @@ export function stringifyProps(
   children: Md.BlockContent[] | Md.PhrasingContent[]
 } {
   const attributes: MdxJsxAttribute[] = []
-  const children: Md.BlockContent[] = []
+  const children: Md.Content[] = []
   const template = parentField.templates?.find((template) => {
     if (typeof template === 'string') {
       throw new Error('Global templates not supported')
@@ -137,28 +137,30 @@ export function stringifyProps(
           attributes.push({
             type: 'mdxJsxAttribute',
             name,
-            value: imageCallback(value),
+            value: imageCallback(String(value)),
           })
         }
         break
       case 'number':
       case 'boolean':
         if (field.list) {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: {
-              type: 'mdxJsxAttributeValueExpression',
-              value: `[${value.map((item) => `${item}`).join(', ')}]`,
-            },
-          })
+          if (Array.isArray(value)) {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: `[${value.map((item) => `${item}`).join(', ')}]`,
+              },
+            })
+          }
         } else {
           attributes.push({
             type: 'mdxJsxAttribute',
             name,
             value: {
               type: 'mdxJsxAttributeValueExpression',
-              value: value,
+              value: String(value),
             },
           })
         }
@@ -184,6 +186,11 @@ export function stringifyProps(
         } else {
           const joiner = flatten ? ' ' : '\n'
           let val = ''
+          assertShape<Plate.RootElement>(
+            value,
+            (value) => value.type === 'root' && Array.isArray(value.children),
+            `Nested rich-text element is not a valid shape for field ${field.name}`
+          )
           if (field.name === 'children') {
             const root = rootElement(value, field, imageCallback)
             root.children.forEach((child) => {
@@ -204,7 +211,6 @@ export function stringifyProps(
               name,
               value: {
                 type: 'mdxJsxAttributeValueExpression',
-                // value: `<>${JSON.stringify(value)}</>`,
                 value: `<>${val.trim()}</>`,
               },
             })
@@ -234,29 +240,37 @@ export function stringifyProps(
       }
     }
   }
-  return { attributes, children }
+  return { attributes, children } as any
 }
 
 /**
  * Use prettier to determine how to format potentially large objects as strings
  */
-function stringifyObj(obj: object, flatten: boolean) {
-  const dummyFunc = `const dummyFunc = `
-  const res = format(`${dummyFunc}${JSON.stringify(obj)}`, {
-    parser: 'acorn',
-    trailingComma: 'none',
-    semi: false,
-  })
-    .trim()
-    .replace(dummyFunc, '')
-  return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
+function stringifyObj(obj: unknown, flatten: boolean) {
+  if (typeof obj === 'object' && obj !== null) {
+    const dummyFunc = `const dummyFunc = `
+    const res = format(`${dummyFunc}${JSON.stringify(obj)}`, {
+      parser: 'acorn',
+      trailingComma: 'none',
+      semi: false,
+    })
+      .trim()
+      .replace(dummyFunc, '')
+    return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
+  } else {
+    console.log(obj)
+    throw new Error(
+      `stringifyObj must be passed an object or an array of objects, received ${typeof obj}`
+    )
+  }
 }
 
-function assertScalar<
-  T extends string | boolean | number,
-  U extends 'string' | 'boolean' | 'number'
->(val: T, type: U): asserts val is T {
-  if (typeof val !== type) {
-    throw new Error(`Expected type to be ${type} but received ${typeof val}`)
+export function assertShape<T extends unknown>(
+  value: unknown,
+  callback: (item: any) => boolean,
+  errorMessage?: string
+): asserts value is T {
+  if (!callback(value)) {
+    throw new Error(errorMessage || `Failed to assert shape`)
   }
 }

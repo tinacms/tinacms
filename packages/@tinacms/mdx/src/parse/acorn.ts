@@ -18,12 +18,12 @@ limitations under the License.
 import type {
   MdxJsxAttribute,
   MdxJsxAttributeValueExpression,
+  MdxJsxExpressionAttribute,
 } from 'mdast-util-mdx-jsx'
 import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
-import { RichTextParseError } from './remarkToPlate'
 
 type TinaStringField =
   | Extract<TinaFieldBase, { type: 'string' }>
@@ -32,7 +32,7 @@ type TinaStringField =
   | Extract<TinaFieldBase, { type: 'reference' }>
 
 export const extractAttributes = (
-  attributes: MdxJsxAttribute[],
+  attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
   fields: TinaFieldBase[],
   imageCallback: (image: string) => string
 ) => {
@@ -62,7 +62,7 @@ export const extractAttributes = (
   })
   return properties
 }
-export const extractAttribute = (
+const extractAttribute = (
   attribute: MdxJsxAttribute,
   field: TinaFieldBase,
   imageCallback: (image: string) => string

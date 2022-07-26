@@ -10,7 +10,7 @@ const out = output({
       type: 'invalid_markdown',
       value: 'This is a </a> broken html tag\n',
       message:
-        'Unexpected closing slash `/` in tag, expected an open tag first',
+        '1:12-1:13: Unexpected closing slash `/` in tag, expected an open tag first',
       children: [{ type: 'text', text: '' }],
       position: {
         start: { line: 1, column: 12, offset: 11, _index: 0, _bufferIndex: 11 },

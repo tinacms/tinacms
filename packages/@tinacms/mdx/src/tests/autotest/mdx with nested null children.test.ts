@@ -1,25 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
-import markdownString from './invalid mdx with an expression {{}}.md?raw'
+import markdownString from './mdx with nested null children.md?raw'
 undefined
 
 const out = output({
   type: 'root',
   children: [
     {
-      type: 'invalid_markdown',
-      value: 'Hello {{ world! }}\n',
-      message: '1:15: Could not parse expression with acorn: Unexpected token',
+      type: 'mdxJsxFlowElement',
+      name: 'Blockquote',
       children: [{ type: 'text', text: '' }],
-      position: {
-        start: { line: 1, column: 15, offset: 14 },
-        end: { line: null, column: null },
-      },
+      props: { author: 'Pedro', children: { type: 'root', children: [] } },
     },
   ],
 })
 
-describe('./invalid mdx with an expression {{}}.md', () => {
+describe('./mdx with nested null children.md', () => {
   it('parses the string in the expected AST', () => {
     expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
   })

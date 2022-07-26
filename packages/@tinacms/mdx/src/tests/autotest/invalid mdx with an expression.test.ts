@@ -10,8 +10,12 @@ const out = output({
       type: 'invalid_markdown',
       value: '<Greeting message={() => "hello"} />\n',
       message:
-        'Error: Unable to parse field value for field "message" (type: string). Expected type to be Literal but received ArrowFunctionExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations',
+        'Unable to parse field value for field "message" (type: string). Expected type to be Literal but received ArrowFunctionExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations',
       children: [{ type: 'text', text: '' }],
+      position: {
+        start: { line: 1, column: 1, offset: 0 },
+        end: { line: 1, column: 37, offset: 36 },
+      },
     },
   ],
 })

@@ -213,6 +213,7 @@ const blockContentElement = (
         type: 'blockquote',
         children: content.children.map((child) =>
           // FIXME: text nodes are probably passed in here by the rich text editor
+          // @ts-ignore
           blockContentElement(child, field, imageCallback)
         ),
       }
