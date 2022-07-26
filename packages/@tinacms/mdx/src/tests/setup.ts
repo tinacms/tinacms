@@ -1,16 +1,16 @@
 import type { RichTypeInner } from '@tinacms/schema-tools'
-import prettier from 'prettier'
+import { format } from 'prettier'
 import type { BlockElement, RootElement } from '../parse/plate'
 import { parseMDX } from '../parse/index'
-import fs from 'fs'
-import path from 'path'
+import { writeFile } from 'fs'
+import { join } from 'path'
 
 export type { BlockElement, RichTypeInner }
 
 export const output = (object: RootElement) => object
 
 export const print = (ast: object, name: string, autoformatted?: boolean) =>
-  prettier.format(
+  format(
     `
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
@@ -56,15 +56,11 @@ export const run = (
     const tsFilename = name.replace('.md', '.test.ts')
     if (!outputString[tsFilename]) {
       const astResult = parseMDX(content, field, (v) => v)
-      fs.writeFile(
-        path.join(dirname, tsFilename),
-        print(astResult, name),
-        (err) => {
-          if (err) {
-            throw err
-          }
+      writeFile(join(dirname, tsFilename), print(astResult, name), (err) => {
+        if (err) {
+          throw err
         }
-      )
+      })
     }
   })
 }
@@ -102,15 +98,11 @@ export const runInner = (
   const tsFilename = name.replace('.md', '.test.ts')
   if (!outputString[tsFilename]) {
     const astResult = parseMDX(content, field, (v) => v)
-    fs.writeFile(
-      path.join(dirname, tsFilename),
-      print(astResult, name),
-      (err) => {
-        if (err) {
-          throw err
-        }
+    writeFile(join(dirname, tsFilename), print(astResult, name), (err) => {
+      if (err) {
+        throw err
       }
-    )
+    })
   }
 }
 
@@ -121,8 +113,8 @@ export const writeTestFile = (
   autoformatted?: boolean
 ) => {
   const tsFilename = name.replace('.md', '.test.ts')
-  fs.writeFile(
-    path.join(dirname, tsFilename),
+  writeFile(
+    join(dirname, tsFilename),
     print(astResult, name, autoformatted),
     (err) => {
       if (err) {
@@ -138,7 +130,7 @@ export const writeAutoformatFile = (
   stringResult: string
 ) => {
   const filename = name.replace('.md', '.result.md')
-  fs.writeFile(path.join(dirname, filename), stringResult, (err) => {
+  writeFile(join(dirname, filename), stringResult, (err) => {
     if (err) {
       throw err
     }
