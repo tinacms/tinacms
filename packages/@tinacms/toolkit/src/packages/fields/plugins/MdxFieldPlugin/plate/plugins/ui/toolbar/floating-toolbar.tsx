@@ -17,9 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useEditorState } from '@udecode/plate-headless'
-import { Range, Editor } from 'slate'
-import { ReactEditor } from 'slate-react'
+import {
+  getEditorString,
+  isEditorFocused,
+  useEditorState,
+} from '@udecode/plate-headless'
+import { Range } from 'slate'
 import { computePosition, flip, shift } from '@floating-ui/dom'
 
 export const FloatingToolbarWrapper = ({
@@ -42,9 +45,9 @@ export const FloatingToolbarWrapper = ({
 
     if (
       !selection ||
-      !ReactEditor.isFocused(editor) ||
+      !isEditorFocused(editor) ||
       Range.isCollapsed(selection) ||
-      Editor.string(editor, selection) === ''
+      getEditorString(editor, selection) === ''
     ) {
       el.classList.add('hidden')
       el.classList.remove('block')

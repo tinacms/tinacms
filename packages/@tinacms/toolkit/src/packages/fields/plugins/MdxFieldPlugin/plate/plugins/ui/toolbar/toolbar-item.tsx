@@ -37,7 +37,7 @@ export type ToolbarItemType = {
   inlineOnly?: boolean
   hidden?: boolean
   active?: boolean
-  onMouseDown?: () => void
+  onMouseDown?: (event: any) => void
   icon?: string
   options?: {}[]
   isLastItem?: boolean
