@@ -38,16 +38,16 @@ export const resetGeneratedFolder = async ({
     console.log(e)
   }
   await fs.mkdir(tinaGeneratedPath)
-  const etx = usingTs ? 'ts' : 'js'
+  const ext = usingTs ? 'ts' : 'js'
   // temp types file to allows the client to build
   await fs.writeFile(
-    path.join(tinaGeneratedPath, `types.${etx}`),
+    path.join(tinaGeneratedPath, `types.${ext}`),
     `
 export const queries = (client)=>({})
 `
   )
   await fs.writeFile(
-    path.join(tinaGeneratedPath, `client.${etx}`),
+    path.join(tinaGeneratedPath, `client.${ext}`),
     `
 export const client = {}
 `
