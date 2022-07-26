@@ -89,13 +89,21 @@ export const remarkToSlate = (
       case 'html':
         return html(content)
       // @ts-ignore
+      case 'mdxFlowExpression':
+      // @ts-ignore
       case 'mdxjsEsm':
-        throw new Error(
+        // @ts-ignore
+        throw new RichTextParseError(
           // @ts-ignore
-          `Unexpected expression ${content.value} ${MDX_PARSE_ERROR_MSG}`
+          content.position,
+          // @ts-ignore
+          `Unexpected expression ${content.value}. ${MDX_PARSE_ERROR_MSG}`
         )
       default:
-        throw new Error(`Content: ${content.type} is not yet supported`)
+        throw new RichTextParseError(
+          content.position,
+          `Content: ${content.type} is not yet supported`
+        )
     }
   }
 
@@ -120,10 +128,6 @@ export const remarkToSlate = (
       type: content.ordered ? 'ol' : 'ul',
       children: content.children.map((child) => listItem(child)),
     }
-  }
-
-  const toArray = <T>(item: T | T[]): T[] => {
-    return Array.isArray(item) ? item : [item]
   }
 
   const listItem = (content: Md.ListItem): Plate.ListItemElement => {
@@ -272,6 +276,14 @@ export const remarkToSlate = (
         return phrashingMark(content)
       case 'html':
         return html_inline(content)
+      // @ts-ignore
+      case 'mdxTextExpression':
+        throw new RichTextParseError(
+          // @ts-ignore
+          content.position,
+          // @ts-ignore
+          `Unexpected expression ${content.value}. ${MDX_PARSE_ERROR_MSG}`
+        )
       default:
         throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
     }
@@ -421,5 +433,21 @@ export const remarkToSlate = (
   return {
     type: 'root',
     children: root.children.map((child) => content(child)),
+  }
+}
+
+export class RichTextParseError extends Error {
+  constructor(position, ...params) {
+    // Pass remaining arguments (including vendor specific ones) to parent constructor
+    super(...params)
+
+    // Maintains proper stack trace for where our error was thrown (only available on V8)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RichTextParseError)
+    }
+
+    this.name = 'RichTextParseError'
+    // Custom debugging information
+    this.position = position
   }
 }

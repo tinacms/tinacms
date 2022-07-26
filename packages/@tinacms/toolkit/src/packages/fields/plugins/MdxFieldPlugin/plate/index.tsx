@@ -12,11 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import {
-  Plate,
-  createPlugins,
-  usePlateEditorState,
-} from '@udecode/plate-headless'
+import { Plate, createPlugins } from '@udecode/plate-headless'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
@@ -30,8 +26,9 @@ import { createInvalidMarkdownPlugin } from './plugins/create-invalid-markdown-p
 import { createSlashPlugin } from './plugins/create-slash-plugin'
 import { createLinkPlugin } from './plugins/create-link-plugin'
 import { uuid } from './plugins/ui/helpers'
+import { RichTextType } from '..'
 
-export const RichEditor = (props) => {
+export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
       props.input.value?.children?.length
