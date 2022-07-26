@@ -13,12 +13,11 @@ limitations under the License.
 
 import React from 'react'
 import Highlight, { defaultProps } from 'prism-react-renderer'
-import theme from 'prism-react-renderer/themes/nightOwl'
+// import theme from 'prism-react-renderer/themes/nightOwl'
 
 export const Prism = (props) => {
-  console.log(props)
+  // FIXME: some issue with type "module"
   return <pre>{props.value}</pre>
-
   return (
     <>
       <style>
@@ -33,17 +32,15 @@ export const Prism = (props) => {
       </style>
       <Highlight
         {...defaultProps}
-        theme={theme}
-        code={props.value || ''}
+        // theme={theme}
+        // code={props.value || ''}
+        code="<div>hi</div>"
         language={props.lang}
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre className={className} style={style}>
             {tokens.map((line, i) => (
-              <div
-                // style={{ maxWidth: '200px' }}
-                {...getLineProps({ line, key: i })}
-              >
+              <div {...getLineProps({ line, key: i })}>
                 {line.map((token, key) => (
                   <span {...getTokenProps({ token, key })} />
                 ))}
