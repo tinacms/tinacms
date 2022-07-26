@@ -13,7 +13,7 @@ limitations under the License.
 
 export const defaultSchema = `
 import { defineSchema, defineConfig } from 'tinacms'
-import { client } from "./__generated__/client"
+import { client } from './__generated__/client'
 
 
 const branch =
@@ -24,7 +24,7 @@ const branch =
 const schema = defineSchema({
   // See https://tina.io/docs/tina-cloud/connecting-site/ for more information about this config
   config: {
-    token: '<Your Read Only Token>' // generated on app.tina.io,
+    token: '<Your Read Only Token>', // generated on app.tina.io,
     clientId: '<Your Client ID>', // generated on app.tina.io
     branch,
   },
