@@ -23,6 +23,7 @@ import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
+import { RichTextParseError } from './remarkToPlate'
 
 type TinaStringField =
   | Extract<TinaFieldBase, { type: 'string' }>
@@ -51,9 +52,12 @@ export const extractAttributes = (
         imageCallback
       )
     } catch (e) {
-      throw new Error(
-        `Unable to parse field value for field "${field.name}" (type: ${field.type}). ${e.message}`
-      )
+      if (e instanceof Error) {
+        throw new Error(
+          `Unable to parse field value for field "${field.name}" (type: ${field.type}). ${e.message}`
+        )
+      }
+      throw e
     }
   })
   return properties

@@ -22,7 +22,6 @@ import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import { MDX_PARSE_ERROR_MSG } from '.'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -95,14 +94,15 @@ export const remarkToSlate = (
         // @ts-ignore
         throw new RichTextParseError(
           // @ts-ignore
-          content.position,
+          `Unexpected expression ${content.value}.`,
           // @ts-ignore
-          `Unexpected expression ${content.value}. ${MDX_PARSE_ERROR_MSG}`
+          content.position
         )
       default:
         throw new RichTextParseError(
-          content.position,
-          `Content: ${content.type} is not yet supported`
+          `Content: ${content.type} is not yet supported`,
+          // @ts-ignore
+          content.position
         )
     }
   }
@@ -280,9 +280,9 @@ export const remarkToSlate = (
       case 'mdxTextExpression':
         throw new RichTextParseError(
           // @ts-ignore
-          content.position,
+          `Unexpected expression ${content.value}.`,
           // @ts-ignore
-          `Unexpected expression ${content.value}. ${MDX_PARSE_ERROR_MSG}`
+          content.position
         )
       default:
         throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
@@ -409,26 +409,6 @@ export const remarkToSlate = (
       children,
     }
   }
-  const blockContent = (content: Md.BlockContent): Plate.BlockElement => {
-    switch (content.type) {
-      case 'blockquote':
-        return blockquote(content)
-      case 'paragraph':
-        return paragraph(content)
-      case 'thematicBreak':
-        return {
-          type: 'hr',
-          children: [{ type: 'text', text: '' }],
-        }
-      case 'code':
-      case 'heading':
-      case 'html':
-      case 'list':
-      case 'table':
-      default:
-        throw new Error(`BlockContent: ${content.type} is not yet supported`)
-    }
-  }
 
   return {
     type: 'root',
@@ -436,10 +416,23 @@ export const remarkToSlate = (
   }
 }
 
+export type PositionItem = {
+  line?: number | null
+  column?: number | null
+  offset?: number | null
+  _index?: number | null
+  _bufferIndex?: number | null
+}
+export type Position = {
+  start: PositionItem
+  end: PositionItem
+}
+
 export class RichTextParseError extends Error {
-  constructor(position, ...params) {
+  public position: Position
+  constructor(message: string, position: Position) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
-    super(...params)
+    super(message)
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
