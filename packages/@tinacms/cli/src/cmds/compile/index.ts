@@ -200,7 +200,7 @@ export const compileSchema = async (
   const packageJSONFilePath = path.join(root, 'package.json')
 
   if (!options.schemaFileType) {
-    const usingTs = fs.pathExists(tsConfigPath)
+    const usingTs = await fs.pathExists(tsConfigPath)
     // default schema file type is based on the existence of a tsconfig.json
     options = { ...options, schemaFileType: usingTs ? 'ts' : 'js' }
   }
