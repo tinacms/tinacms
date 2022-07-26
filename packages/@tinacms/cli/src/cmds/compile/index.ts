@@ -25,8 +25,10 @@ import { logger } from '../../logger'
 
 export const resetGeneratedFolder = async ({
   tinaGeneratedPath,
+  usingTs,
 }: {
   tinaGeneratedPath: string
+  usingTs: boolean
 }) => {
   try {
     await fs.rm(tinaGeneratedPath, {
@@ -36,15 +38,16 @@ export const resetGeneratedFolder = async ({
     console.log(e)
   }
   await fs.mkdir(tinaGeneratedPath)
+  const ext = usingTs ? 'ts' : 'js'
   // temp types file to allows the client to build
   await fs.writeFile(
-    path.join(tinaGeneratedPath, 'types.ts'),
+    path.join(tinaGeneratedPath, `types.${ext}`),
     `
 export const queries = (client)=>({})
 `
   )
   await fs.writeFile(
-    path.join(tinaGeneratedPath, 'client.ts'),
+    path.join(tinaGeneratedPath, `client.${ext}`),
     `
 export const client = {}
 `
@@ -53,7 +56,10 @@ export const client = {}
     path.join(tinaGeneratedPath, '.gitignore'),
     `db
 client.ts
+client.js
 types.ts
+types.js
+types.d.ts
 frags.gql
 queries.gql
 schema.gql

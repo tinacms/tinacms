@@ -11,7 +11,16 @@
  limitations under the License.
  */
 
+import { pathExists } from 'fs-extra'
+import path from 'path'
+
 export const attachPath = async (ctx: any, next: () => void, _options: any) => {
   ctx.rootPath = process.cwd()
+
+  const tinaPath = path.join(ctx.rootPath, '.tina')
+
+  ctx.usingTs =
+    (await pathExists(path.join(tinaPath, 'schema.ts'))) ||
+    (await pathExists(path.join(tinaPath, 'schema.tsx')))
   next()
 }
