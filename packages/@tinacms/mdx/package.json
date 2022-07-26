@@ -26,7 +26,7 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc",
+    "types": "yarn tsc --project ./tsconfig.build.json",
     "build": "tinacms-scripts build",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
@@ -81,11 +81,8 @@
     "mdast": "^3.0.0",
     "nodemon": "^2.0.4",
     "ts-node": "^10.8.2",
-    "typescript": "^4.3.5",
+    "typescript": "^4.7.4",
     "vite": "^3.0.2",
     "vitest": "^0.18.0"
-  },
-  "peerDependencies": {
-    "@tinacms/schema-tools": "*"
   }
 }
