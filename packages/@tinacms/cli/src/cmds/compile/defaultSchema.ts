@@ -13,7 +13,7 @@ limitations under the License.
 
 export const defaultSchema = `
 import { defineSchema, defineConfig } from 'tinacms'
-import { client } from "/.tina/__generated__/client"
+import { client } from "./__generated__/client"
 
 
 const branch =
