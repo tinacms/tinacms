@@ -167,10 +167,13 @@ export const build = async ({
   skipIndex,
 }: BuildOptions) => {
   const rootPath = ctx.rootPath as string
-  const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+
   if (!rootPath) {
     throw new Error('Root path has not been attached')
   }
+
+  const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+
   // Clear the cache of the DB passed to the GQL server
   database.clearCache()
 
