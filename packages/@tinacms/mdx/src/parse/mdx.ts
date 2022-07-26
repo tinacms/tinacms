@@ -107,6 +107,6 @@ export function mdxJsxElement(
       props,
     }
   } catch (e) {
-    throw new RichTextParseError(node.position, e)
+    throw new RichTextParseError(e, e.position)
   }
 }

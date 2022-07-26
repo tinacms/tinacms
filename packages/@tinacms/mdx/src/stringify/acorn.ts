@@ -106,11 +106,17 @@ export function stringifyProps(
             })
           }
         } else {
-          attributes.push({
-            type: 'mdxJsxAttribute',
-            name,
-            value: value,
-          })
+          if (typeof value === 'string') {
+            attributes.push({
+              type: 'mdxJsxAttribute',
+              name,
+              value: value,
+            })
+          } else {
+            throw new Error(
+              `Expected string for attribute on field ${field.name}`
+            )
+          }
         }
         break
       case 'image':
@@ -244,4 +250,13 @@ function stringifyObj(obj: object, flatten: boolean) {
     .trim()
     .replace(dummyFunc, '')
   return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
+}
+
+function assertScalar<
+  T extends string | boolean | number,
+  U extends 'string' | 'boolean' | 'number'
+>(val: T, type: U): asserts val is T {
+  if (typeof val !== type) {
+    throw new Error(`Expected type to be ${type} but received ${typeof val}`)
+  }
 }

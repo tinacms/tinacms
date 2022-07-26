@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { Position } from './remarkToPlate'
+
 export type RootElement = {
   type: 'root'
   children: BlockElement[]
@@ -52,10 +54,7 @@ export type InvalidMarkdownElement = {
   type: 'invalid_markdown'
   value: string
   message: string
-  position: {
-    start: { line: number; column: number; offset: number }
-    end: { line: number; column: number; offset: number }
-  }
+  position?: Position
   children: [EmptyTextElement]
 }
 export type CodeBlockElement = {

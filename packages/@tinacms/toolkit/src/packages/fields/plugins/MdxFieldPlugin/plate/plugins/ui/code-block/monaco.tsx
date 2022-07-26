@@ -72,6 +72,12 @@ const retryFocus = (ref) => {
   }
 }
 
+interface CodeBlockElement extends TElement {
+  value: string
+  lang?: string
+  type: string
+}
+
 export const Monaco = ({
   attributes,
   editor,
@@ -80,7 +86,7 @@ export const Monaco = ({
   ...props
 }: {
   attributes: Record<string, unknown>
-  element: TElement
+  element: CodeBlockElement
   editor: PlateEditor
   language?: string
   children: React.ReactNode

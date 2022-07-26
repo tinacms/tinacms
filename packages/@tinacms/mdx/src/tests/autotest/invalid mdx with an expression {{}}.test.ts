@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
-import markdownString from './html that is invalid.md?raw'
+import markdownString from './invalid mdx with an expression {{}}.md?raw'
 undefined
 
 const out = output({
@@ -8,13 +8,18 @@ const out = output({
   children: [
     {
       type: 'invalid_markdown',
-      value: 'This is a </a> broken html tag\n',
+      value: 'Hello {{ world! }}\n',
+      message: 'Could not parse expression with acorn: Unexpected token',
       children: [{ type: 'text', text: '' }],
+      position: {
+        start: { line: 1, column: 15, offset: 14 },
+        end: { line: null, column: null },
+      },
     },
   ],
 })
 
-describe('./html that is invalid.md', () => {
+describe('./invalid mdx with an expression {{}}.md', () => {
   it('parses the string in the expected AST', () => {
     expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
   })

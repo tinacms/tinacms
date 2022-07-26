@@ -14,8 +14,7 @@ limitations under the License.
 import React from 'react'
 import { createPluginFactory } from '@udecode/plate-headless'
 import { useEditorContext } from '../../editor-context'
-import { XCircleIcon } from '@heroicons/react/solid'
-import { buildErrorMessage } from '../../../monaco'
+import { buildErrorMessage } from '../../../monaco/error-message'
 
 export const ELEMENT_INVALID_MARKDOWN = 'invalid_markdown'
 
@@ -24,7 +23,7 @@ export const createInvalidMarkdownPlugin = createPluginFactory({
   isVoid: true,
   isInline: false,
   isElement: true,
-  component: ({ attributes, editor, element, children, className }) => {
+  component: ({ attributes, element, children }) => {
     return (
       <div {...attributes}>
         <ErrorMessage error={element} />
@@ -34,32 +33,6 @@ export const createInvalidMarkdownPlugin = createPluginFactory({
   },
 })
 
-const Message = ({ error }) => {
-  const message = error
-    ? `${error.message}${
-        error.position &&
-        ` at line: ${error.position.startLineNumber}, column: ${error.position.startColumn}`
-      }`
-    : null
-  return (
-    <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-      <div className="rounded-md bg-red-50 p-4">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <XCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
-          </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800 whitespace-pre-wrap">
-              {message}
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* This example requires Tailwind CSS v2.0+ */
 export function ErrorMessage({ error }) {
   const message = buildErrorMessage(error)
   const { setRawMode } = useEditorContext()

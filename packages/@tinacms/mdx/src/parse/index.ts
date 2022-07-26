@@ -19,7 +19,7 @@ limitations under the License.
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
 import { visit } from 'unist-util-visit'
-import { remarkToSlate } from './remarkToPlate'
+import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
@@ -107,7 +107,9 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
 }
 
 export const MDX_PARSE_ERROR_MSG =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. [Learn more](http://example.com)'
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
+export const MDX_PARSE_ERROR_MSG_HTML =
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. <a href="https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations" target="_blank" rel="noopener noreferrer">Learn More</a>'
 
 export const parseMDX = (
   value: string,
@@ -118,31 +120,44 @@ export const parseMDX = (
   try {
     tree = markdownToAst(value, field)
   } catch (e) {
-    console.log('dishere', e)
+    if (e instanceof RichTextParseError) {
+      return invalidMarkdown(e, value)
+    }
     return invalidMarkdown(e, value)
+    throw e
   }
   if (tree) {
     try {
       return remarkToSlate(tree, field, imageCallback)
     } catch (e) {
+      if (e instanceof RichTextParseError) {
+        return invalidMarkdown(e, value)
+      }
       return invalidMarkdown(e, value)
+      throw e
     }
   } else {
     return { type: 'root', children: [] }
   }
 }
 
-const invalidMarkdown = (e, value) => {
+const invalidMarkdown = (
+  e: RichTextParseError,
+  value: string
+): Plate.RootElement => {
+  const extra: Record<string, unknown> = {}
+  if (e.position && Object.keys(e.position).length) {
+    extra['position'] = e.position
+  }
   return {
     type: 'root',
     children: [
       {
         type: 'invalid_markdown',
         value,
-        // @ts-ignore
-        position: e.position,
-        message: e.message || `Error parsring markdown ${MDX_PARSE_ERROR_MSG}`,
+        message: e.message || `Error parsing markdown ${MDX_PARSE_ERROR_MSG}`,
         children: [{ type: 'text', text: '' }],
+        ...extra,
       },
     ],
   }
