@@ -101,7 +101,6 @@ export function Toolbar({
   const ulActive = helpers.isListActive(editor, ELEMENT_UL)
   const olActive = helpers.isListActive(editor, ELEMENT_OL)
   const codeBlockActive = helpers.isNodeActive(editor, ELEMENT_CODE_BLOCK)
-  const htmlInlineActive = helpers.isNodeActive(editor, 'html_inline')
   const blockQuoteActive = helpers.isNodeActive(editor, ELEMENT_BLOCKQUOTE)
   const isImgActive = helpers.isNodeActive(editor, ELEMENT_IMG)
 

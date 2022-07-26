@@ -698,6 +698,7 @@ export class Resolver {
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
         case 'rich-text':
+          // @ts-ignore
           accum[fieldName] = stringifyMDX(fieldValue, field, (fieldValue) =>
             resolveMediaCloudToRelative(
               fieldValue as string,

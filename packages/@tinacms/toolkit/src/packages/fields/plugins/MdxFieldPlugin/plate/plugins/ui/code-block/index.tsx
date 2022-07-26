@@ -355,8 +355,8 @@ export const CodeBlock = ({
                 alwaysConsumeMouseWheel: false,
               },
             }}
-            language={language}
-            value={element.value}
+            language={String(language)}
+            value={String(element.value)}
             onChange={(value) => {
               // FIXME: if a code_block is focused first, onChange doesn't fire until
               // a non-void node is focused

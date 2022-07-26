@@ -21,6 +21,7 @@ import {
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
+  isBlock,
   setNodes,
 } from '@udecode/plate-headless'
 import type {
@@ -56,11 +57,11 @@ export const autoformatLists: AutoformatRule[] = [
     type: ELEMENT_TODO_LI,
     match: '[x] ',
     format: (editor) =>
-      setNodes<TElement<TTodoListItemElement>>(
+      setNodes(
         editor,
         { type: ELEMENT_TODO_LI, checked: true },
         {
-          match: (n) => Editor.isBlock(editor, n),
+          match: (n) => isBlock(editor, n),
         }
       ),
   },
