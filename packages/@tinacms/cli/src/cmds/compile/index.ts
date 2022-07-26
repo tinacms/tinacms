@@ -193,12 +193,17 @@ export const compileSchema = async (
     throw new Error('ctx.rootPath has not been attached')
   }
   const tinaPath = path.join(root, '.tina')
+  const tsConfigPath = path.join(root, 'tsconfig.json')
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
   const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
   const packageJSONFilePath = path.join(root, 'package.json')
 
-  if (!options.schemaFileType) options = { ...options, schemaFileType: 'ts' }
+  if (!options.schemaFileType) {
+    const usingTs = await fs.pathExists(tsConfigPath)
+    // default schema file type is based on the existence of a tsconfig.json
+    options = { ...options, schemaFileType: usingTs ? 'ts' : 'js' }
+  }
 
   if (options.verbose) {
     logger.info(logText('Compiling Schema...'))

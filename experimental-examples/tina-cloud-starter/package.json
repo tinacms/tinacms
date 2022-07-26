@@ -3,14 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tinacms server:start --noTelemetry -c \"pnpm tina-dev\"",
-    "tina-dev": "tinacms build --noTelemetry --local && next dev",
-    "dev-server-isomorphic": "yarn tinacms server:start --experimentalData --isomorphicGitBridge --noTelemetry --local",
-    "build": "tinacms build --experimentalData --noTelemetry && next build",
-    "start": "tinacms server:start -c \"next start\" --experimentalData --noTelemetry --dev",
-    "build:tina": "tinacms build --experimentalData --noTelemetry --dev",
-    "build:wait": "tinacms server:waitForDB  --experimentalData --noTelemetry --verbose",
-    "export": "npm run build && next export"
+    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
+    "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
+    "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\""
   },
   "devDependencies": {
     "@svgr/webpack": "^6.2.1",

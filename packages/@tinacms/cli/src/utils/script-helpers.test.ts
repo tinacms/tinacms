@@ -22,7 +22,7 @@ describe('generateGqlScript', () => {
   it('wraps original script correctly', () => {
     const newScript = generateGqlScript('next dev -p 3000')
 
-    expect(newScript).toEqual('tinacms server:start -c "next dev -p 3000"')
+    expect(newScript).toEqual('tinacms dev -c "next dev -p 3000"')
   })
 })
 
@@ -38,9 +38,9 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'tinacms server:start -c "next dev -p 3000"',
-        build: 'tinacms server:start -c "next build -p 3000"',
-        start: 'tinacms server:start -c "next start -p 3000"',
+        dev: 'tinacms dev -c "next dev -p 3000"',
+        build: 'tinacms build && next build -p 3000',
+        start: 'tinacms build && next start -p 3000',
       })
     })
   })
@@ -53,9 +53,9 @@ describe('extendNextScripts', () => {
 
       expect(newScripts).toEqual({
         foo: 'bar',
-        dev: 'tinacms server:start -c "next dev"',
-        build: 'tinacms server:start -c "next build"',
-        start: 'tinacms server:start -c "next start"',
+        dev: 'tinacms dev -c "next dev"',
+        build: 'tinacms build && next build',
+        start: 'tinacms build && next start',
       })
     })
   })

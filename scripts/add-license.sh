@@ -8,7 +8,7 @@ declare -a ignoreFiles=(
   ".pnp.js"
   )
 
-for file in `find $PWD \( -name .yarn -prune \) -or \( -name "*.js" -or -name "*.ts" -or -name "*.tsx" \) -not -path "*/examples/*" -not -path "*/experimental-examples/*" -not -path "*/build/*" -not -path "*/.yarn/*" -not -path "*/deprecated-packages/*"   -not -path "*/cypress/*"    -print  -type f`
+for file in `find $PWD \( -name .yarn -prune \) -or \( -name "*.js" -or -name "*.ts" -or -name "*.tsx" \) -not -path "*/examples/*" -not -path "*/experimental-examples/*" -not -path "*/build/*" -not -path "*/.yarn/*" -not -path "*/deprecated-packages/*"   -not -path "*/cypress/*"  -not -path "*/node_modules/*"    -print  -type f`
 
 do
   if [[ $file == *"${ignoreFiles[*]}"* ]]
