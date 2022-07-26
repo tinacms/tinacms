@@ -240,6 +240,7 @@ const extractStatement = (
   if (body) {
     if (body[0]) {
       assertType(body[0], 'ExpressionStatement')
+      // @ts-ignore incomplete types available Directive | ExpressionStatement
       return body[0]
     }
   }

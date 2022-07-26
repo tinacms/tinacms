@@ -1,5 +1,4 @@
 {
-  "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
@@ -8,7 +7,8 @@
     "noImplicitAny": true,
     "noUncheckedIndexedAccess": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vite/client"]
+    "target": "es2021",
+    "moduleResolution": "node",
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src", "vite-env.d.ts"]
