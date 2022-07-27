@@ -213,7 +213,7 @@ type APIProviderProps =
        */
       branch?: never
       /**
-       * Your clientID from tina.aio
+       * Your clientId from tina.io
        *
        * @deprecated use apiURL instead
        */
@@ -244,7 +244,7 @@ type APIProviderProps =
        */
       branch?: never
       /**
-       * Your clientID from tina.aio
+       * Your clientId from tina.io
        *
        * @deprecated use apiURL instead
        */
@@ -270,7 +270,7 @@ type APIProviderProps =
        */
       branch?: string
       /**
-       * Your clientID from tina.aio
+       * Your clientId from tina.io
        *
        * @deprecated use apiURL instead
        */

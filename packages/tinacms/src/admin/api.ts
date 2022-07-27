@@ -23,7 +23,6 @@ export class TinaAdminApi {
   constructor(cms: TinaCMS) {
     this.api = cms.api.tina
     this.schema = cms.api.tina.schema
-    this.useDataLayer = cms.flags.get('experimentalData')
   }
 
   async isAuthenticated() {
@@ -64,10 +63,9 @@ export class TinaAdminApi {
     after?: string
   ) {
     if (includeDocuments === true) {
-      if (this.useDataLayer) {
-        const sort = this.schema.getIsTitleFieldName(collectionName)
-        const response: { collection: Collection } = await this.api.request(
-          `#graphql
+      const sort = this.schema.getIsTitleFieldName(collectionName)
+      const response: { collection: Collection } = await this.api.request(
+        `#graphql
       query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
         collection(collection: $collection){
           name
@@ -101,52 +99,18 @@ export class TinaAdminApi {
           }
         }
       }`,
-          {
-            variables: {
-              collection: collectionName,
-              includeDocuments,
-              sort,
-              limit: 10,
-              after,
-            },
-          }
-        )
-
-        return response.collection
-      } else {
-        const response: { collection: Collection } = await this.api.request(
-          `#graphql
-    query($collection: String!, $includeDocuments: Boolean!){
-      collection(collection: $collection){
-        name
-        label
-        format
-        templates
-        documents @include(if: $includeDocuments) {
-          totalCount
-          edges {
-            node {
-              ... on Document {
-                _sys {
-                  template
-                  breadcrumbs
-                  path
-                  basename
-                  relativePath
-                  filename
-                  extension
-                }
-              }
-            }
-          }
+        {
+          variables: {
+            collection: collectionName,
+            includeDocuments,
+            sort,
+            limit: 10,
+            after,
+          },
         }
-      }
-    }`,
-          { variables: { collection: collectionName, includeDocuments } }
-        )
+      )
 
-        return response.collection
-      }
+      return response.collection
     } else {
       try {
         // TODO: fix this type

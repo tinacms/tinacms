@@ -14,7 +14,7 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
-import { indexDB } from './build'
+import { buildFiles, indexDB } from './build'
 export { indexDB } from './build'
 export { resolve } from './resolve'
 export * from './resolver/error'
@@ -32,14 +32,24 @@ export type DummyType = unknown
 export const buildSchema = async (
   rootPath: string,
   database: Database,
-  flags?: string[]
+  flags?: string[],
+  skipIndexing?: boolean
 ) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
   await fs.rm(tempConfig, { recursive: true })
-  await indexDB({ database, config: JSON.parse(config), flags })
+
+  // skipIndexing defaults to false
+  if (skipIndexing ?? false) {
+    // only build the files, do not index
+    await buildFiles({ database, config: JSON.parse(config), flags })
+  } else {
+    // Build and index
+    await indexDB({ database, config: JSON.parse(config), flags })
+  }
+
   const gqlAst = await database.getGraphQLSchemaFromBridge()
   return buildASTSchema(gqlAst)
 }
