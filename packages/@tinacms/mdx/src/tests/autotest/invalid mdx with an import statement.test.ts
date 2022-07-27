@@ -17,7 +17,7 @@ limitations under the License.
 */
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
-import markdownString from './invalid mdx with an import statment.md?raw'
+import markdownString from './invalid mdx with an import statement.md?raw'
 undefined
 
 const out = output({
@@ -36,7 +36,7 @@ const out = output({
   ],
 })
 
-describe('./invalid mdx with an import statment.md', () => {
+describe('./invalid mdx with an import statement.md', () => {
   it('parses the string in the expected AST', () => {
     expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
   })
