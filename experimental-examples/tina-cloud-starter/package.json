@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
+    "build:prod": "tinacms build && next build",
     "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\""
   },
   "devDependencies": {
