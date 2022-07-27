@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { attachSchema, genTypes } from './query-gen'
 import { audit, printFinalMessage } from './audit'
 import {
   checkDeps,
@@ -25,7 +24,7 @@ import 'dotenv/config'
 import { Command } from '../command'
 import { chain } from '../middleware'
 import chalk from 'chalk'
-import { compileSchema, compileClient } from './compile'
+import { compileClient } from './compile'
 import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './waitForDB'
@@ -34,6 +33,8 @@ import {
   buildCmdBuild,
   buildSetupCmdServerStart,
   buildSetupCmdBuild,
+  auditCmdBuild,
+  buildSetupCmdAudit,
 } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
@@ -237,17 +238,9 @@ export const baseCmds: Command[] = [
     action: (options) =>
       chain(
         [
-          // Disable the output of the compile step
-          async (_ctx, next) => {
-            logger.level = 'error'
-            next()
-          },
-          async (_ctx, next) => {
-            await compileSchema(_ctx, next, options)
-            next()
-          },
-          attachSchema,
-          genTypes,
+          attachPath,
+          buildSetupCmdAudit,
+          auditCmdBuild,
           async (_ctx, next) => {
             logger.level = 'info'
             logger.info(
