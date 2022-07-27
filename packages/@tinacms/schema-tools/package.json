@@ -2,10 +2,12 @@
   "name": "@tinacms/schema-tools",
   "version": "0.0.8",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js"
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
     }
   },
   "typings": "dist/index.d.ts",
