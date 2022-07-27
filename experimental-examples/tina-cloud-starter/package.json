@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
-    "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\""
+    "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\"",
+    "dev:audit": "tinacms audit"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.2.1",
