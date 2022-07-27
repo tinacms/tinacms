@@ -37,11 +37,16 @@ export async function genClient(
   const token = tinaSchema.config?.token
 
   if ((!branch || !clientId || !token) && !options?.local) {
-    logger.warn(
-      // TODO: add link to docs
-      warnText('Client not configured properly. Skipping client generation.')
+    const missing = []
+    if (!branch) missing.push('branch')
+    if (!clientId) missing.push('clientId')
+    if (!token) missing.push('token')
+
+    throw new Error(
+      `Client not configured properly. Missing ${missing.join(
+        ', '
+      )}. Please visit https://tina.io/docs/tina-cloud/connecting-site/ for more information`
     )
-    return next()
   }
 
   const apiURL = options.local
