@@ -23,8 +23,11 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
 import { useEditorContext } from '../plate/editor-context'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
-import { buildError, ErrorMessage } from './error-message'
-import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
+import {
+  buildError,
+  ErrorMessage,
+  InvalidMarkdownElement,
+} from './error-message'
 import { RichTextType } from '..'
 
 const parseMDX = (value: string) => ({ type: 'root', children: [] })

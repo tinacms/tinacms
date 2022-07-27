@@ -458,7 +458,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // the syntax for optional chaining, should be supported on 14
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
-        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
+        outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external: external.filter(
           (item) =>
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
@@ -476,16 +476,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
         target: 'node12',
         format: 'cjs',
-        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
-        external,
-      })
-      await esbuild({
-        entryPoints: [path.join(process.cwd(), entry)],
-        bundle: true,
-        platform: 'browser',
-        format: 'esm',
-        plugins,
-        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external,
       })
     } else {
@@ -493,7 +484,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'node',
-        outfile: path.join(process.cwd(), 'dist', 'index.cjs'),
+        outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external,
         target: 'node12',
       })
@@ -561,7 +552,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         name: packageJSON.name,
         fileName: (format) => {
           return format === 'umd'
-            ? `${outInfo.outfile}.cjs`
+            ? `${outInfo.outfile}.js`
             : `${outInfo.outfile}.es.js`
         },
       },

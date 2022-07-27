@@ -1,7 +1,7 @@
 {
   "name": "@tinacms/metrics",
   "version": "0.0.3",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
