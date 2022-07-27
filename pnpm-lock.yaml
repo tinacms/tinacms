@@ -69,6 +69,7 @@ importers:
 
   examples/empty:
     specifiers:
+      '@tinacms/cli': workspace:*
       '@types/node': ^17.0.21
       eslint: '7'
       eslint-config-next: 12.0.3
@@ -76,11 +77,16 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
+      styled-components: ^5.1.3
+      tinacms: workspace:*
     dependencies:
+      '@tinacms/cli': link:../../packages/@tinacms/cli
       next: 12.0.3_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
+      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+      tinacms: link:../../packages/tinacms
     devDependencies:
       '@types/node': 17.0.45
       eslint: 7.32.0
@@ -247,6 +253,7 @@ importers:
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/clear': 0.1.0
+      '@types/cli-spinner': ^0.2.1
       '@types/cors': 2.8.5
       '@types/express': ^4.17.7
       '@types/express-graphql': ^0.9.0
@@ -266,11 +273,13 @@ importers:
       add: ^2.0.6
       ajv: ^6.12.3
       altair-express-middleware: 4.0.6
+      async-retry: ^1.3.3
       auto-bind: ^4.0.0
       axios: 0.21.2
       body-parser: ^1.19.0
       chalk: ^2.4.2
       chokidar: ^3.5.1
+      cli-spinner: ^0.2.10
       commander: ^9.0.0
       cors: ^2.8.5
       dotenv: ^16.0.1
@@ -309,11 +318,13 @@ importers:
       add: 2.0.6
       ajv: 6.12.6
       altair-express-middleware: 4.0.6
+      async-retry: 1.3.3
       auto-bind: 4.0.0
       axios: 0.21.2
       body-parser: 1.20.0
       chalk: 2.4.2
       chokidar: 3.5.3
+      cli-spinner: 0.2.10
       commander: 9.3.0
       cors: 2.8.5
       dotenv: 16.0.1
@@ -337,6 +348,7 @@ importers:
     devDependencies:
       '@tinacms/scripts': link:../scripts
       '@types/clear': 0.1.0
+      '@types/cli-spinner': 0.2.1
       '@types/cors': 2.8.5
       '@types/express': 4.17.13
       '@types/express-graphql': 0.9.0_graphql@15.8.0
@@ -7364,6 +7376,15 @@ packages:
       }
     dev: true
 
+  /@types/cli-spinner/0.2.1:
+    resolution:
+      {
+        integrity: sha512-bsdlZy3LThi9QbsK0GXm5s/e3F6HAJi1tMsIanm9trtoStSlV3gzir9JpfOK40gERMNIVevDTpG5NzSGnYs3QA==,
+      }
+    dependencies:
+      '@types/node': 18.0.0
+    dev: true
+
   /@types/codemirror/0.0.71:
     resolution:
       {
@@ -10865,6 +10886,15 @@ packages:
       retry: 0.12.0
     dev: false
 
+  /async-retry/1.3.3:
+    resolution:
+      {
+        integrity: sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==,
+      }
+    dependencies:
+      retry: 0.13.1
+    dev: false
+
   /async/3.2.4:
     resolution:
       {
@@ -12503,6 +12533,14 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       restore-cursor: 3.1.0
+
+  /cli-spinner/0.2.10:
+    resolution:
+      {
+        integrity: sha512-U0sSQ+JJvSLi1pAYuJykwiA8Dsr15uHEy85iCJ6A+0DjVxivr3d+N2Wjvodeg89uP5K6TswFkKBfAD7B3YSn/Q==,
+      }
+    engines: { node: '>=0.10' }
+    dev: false
 
   /cli-table3/0.6.2:
     resolution:
@@ -26727,6 +26765,14 @@ packages:
 
   /retry/0.12.0:
     resolution: { integrity: sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs= }
+    engines: { node: '>= 4' }
+    dev: false
+
+  /retry/0.13.1:
+    resolution:
+      {
+        integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==,
+      }
     engines: { node: '>= 4' }
     dev: false
 
