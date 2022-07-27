@@ -61,7 +61,16 @@ export class FilesystemBridge implements Bridge {
  * Same as the `FileSystemBridge` except it does not save files
  */
 export class AuditFileSystemBridge extends FilesystemBridge {
-  public async put(_filepath: string, _data: string) {
+  public async put(filepath: string, data: string) {
+    if (
+      [
+        '.tina/__generated__/_lookup.json',
+        '.tina/__generated__/_schema.json',
+        '.tina/__generated__/_graphql.json',
+      ].includes(filepath)
+    ) {
+      return super.put(filepath, data)
+    }
     return
   }
 }
