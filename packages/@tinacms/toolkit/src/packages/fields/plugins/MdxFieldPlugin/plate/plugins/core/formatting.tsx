@@ -18,7 +18,6 @@ import {
   createAutoformatPlugin,
   createResetNodePlugin,
   createTrailingBlockPlugin,
-  createSoftBreakPlugin,
   createExitBreakPlugin,
   ELEMENT_PARAGRAPH,
   ELEMENT_CODE_BLOCK,
@@ -31,6 +30,7 @@ import {
   ELEMENT_H6,
   KEYS_HEADING,
 } from '@udecode/plate-headless'
+import { createSoftBreakPlugin } from '../soft-break'
 import { autoformatRules } from './autoformat/autoformatRules'
 import { withCorrectVoidBehavior } from './with-correct-void-behavior'
 
