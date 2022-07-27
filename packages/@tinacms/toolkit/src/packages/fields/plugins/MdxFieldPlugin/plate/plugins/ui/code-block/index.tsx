@@ -240,23 +240,6 @@ export const CodeBlock = ({
       setHeight(monacoEditor.getContentHeight())
       monacoEditor.layout()
     })
-    // If the value is empty when we mount, we know the html
-    // block was triggered by typing `<`, so insert that value
-    // and set the cursor to the next position
-    if (restrictLanguage) {
-      const value = monacoEditor.getModel().getValue()
-      if (!value) {
-        monacoEditor.getModel().setValue('<')
-        monacoEditor.setSelections([
-          {
-            positionColumn: 2,
-            positionLineNumber: 1,
-            selectionStartColumn: 2,
-            selectionStartLineNumber: 1,
-          },
-        ])
-      }
-    }
 
     monacoEditor.addCommand(monaco.KeyMod.Shift | monaco.KeyCode.Enter, () => {
       if (monacoEditor.hasTextFocus()) {
@@ -358,8 +341,8 @@ export const CodeBlock = ({
             language={String(language)}
             value={String(element.value)}
             onChange={(value) => {
-              // FIXME: if a code_block is focused first, onChange doesn't fire until
-              // a non-void node is focused
+              // FIXME: if a void is focused first, onChange doesn't fire until
+              // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
               setNodes(editor, { value, lang: language })
             }}
           />

@@ -36,13 +36,8 @@ import {
   MARK_CODE,
   MARK_BOLD,
   MARK_ITALIC,
-  Plate,
-  setFragmentData,
-  setNodes,
 } from '@udecode/plate-headless'
 import { CodeBlock } from './code-block'
-import { Monaco } from './code-block/monaco'
-import { Prism } from './code-block/prism'
 import { classNames } from './helpers'
 import { useSelected } from 'slate-react'
 

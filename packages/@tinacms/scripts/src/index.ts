@@ -430,23 +430,6 @@ export const buildIt = async (entryPoint, packageJSON) => {
   const external = Object.keys({ ...deps, ...peerDeps })
   const globals = {}
 
-  let overrideRemarkDep = {
-    name: 'example',
-    setup(build) {
-      build.onLoad(
-        { filter: /decode-named-character-reference/ },
-        async (args) => {
-          return {
-            contents:
-              'export const decodeNamedCharacterReference = (value) => value',
-            loader: 'js',
-          }
-        }
-      )
-    },
-  }
-  const plugins = [overrideRemarkDep]
-
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
     if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
