@@ -44,7 +44,7 @@ describe('Tina side bar', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updatePage(relativePath: "home.mdx", params: { heading: "" subtitle: "" body: ""  }) {
+          updatePage(relativePath: "home.mdx", params: { heading: "" subtitle: "" }) {
             __typename
           }
         }`,

@@ -49,6 +49,12 @@ export const stringifyMDX = (
   field: RichTypeInner,
   imageCallback: (url: string) => string
 ) => {
+  if (!value) {
+    return
+  }
+  if (typeof value === 'string') {
+    throw new Error('Expected an object to stringify, but received a string')
+  }
   if (value?.children[0]) {
     if (value?.children[0].type === 'invalid_markdown') {
       return value.children[0].value
