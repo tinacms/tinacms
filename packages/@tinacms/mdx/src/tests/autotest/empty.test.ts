@@ -15,25 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { createPluginFactory } from '@udecode/plate-headless'
+import { describe, it, expect } from 'vitest'
+import { field, output, parseMDX, stringifyMDX } from './_config'
+import markdownString from './empty.md?raw'
+undefined
 
-export const createCodeBlockPlugin = createPluginFactory({
-  key: 'code_block',
-  isElement: true,
-  isVoid: true,
-  isInline: false,
-})
+const out = output({ type: 'root', children: [] })
 
-export const createHTMLBlockPlugin = createPluginFactory({
-  key: 'html',
-  isElement: true,
-  isVoid: true,
-  isInline: false,
-})
-
-export const createHTMLInlinePlugin = createPluginFactory({
-  key: 'html_inline',
-  isElement: true,
-  isVoid: true,
-  isInline: true,
+describe('./empty.md', () => {
+  it('parses the string in the expected AST', () => {
+    expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
+  })
+  it('stringifies the AST into the expect string', () => {
+    expect(stringifyMDX(out, field, (v) => v)).toEqual(markdownString)
+  })
 })
