@@ -38,7 +38,6 @@
       "src/index.ts",
       "src/edit-state.tsx",
       "src/rich-text/index.tsx",
-      "src/rich-text/prism.tsx",
       "src/client.ts"
     ]
   },

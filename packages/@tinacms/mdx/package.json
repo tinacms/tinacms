@@ -48,7 +48,6 @@
   "devDependencies": {
     "@swc/core": "^1.2.210",
     "@swc/jest": "^0.2.21",
-    "@tinacms/datalayer": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/estree": "^0.0.50",

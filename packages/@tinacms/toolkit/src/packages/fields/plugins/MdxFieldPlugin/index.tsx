@@ -25,11 +25,6 @@ import { RichEditor } from './plate'
 import { EditorContext } from './plate/editor-context'
 import type { MdxTemplate } from './plate/types'
 
-// TODO: RawEditor is large since it comes with the mdx stuff.
-// Either lazy load from a CDN like this package https://github.com/suren-atoyan/monaco-loader#readme
-// Or lazy load via suspense and force all users of Tina to support ESM
-// const RawEditor = React.lazy(() => import('./monaco'))
-
 // TODO: there's an issue where void node values don't get updated if the editor hasn't been focused from another node first.
 // https://github.com/udecode/plate/issues/1519#issuecomment-1184933602
 
