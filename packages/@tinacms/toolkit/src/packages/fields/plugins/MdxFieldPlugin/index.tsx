@@ -19,7 +19,8 @@ limitations under the License.
 import React from 'react'
 import { InputProps } from 'react-select/lib/components/Input'
 import { InputFieldType, wrapFieldsWithMeta } from '../wrapFieldWithMeta'
-import RawEditor from './monaco'
+// Not importing for now as we don't ship with @tinacms/mdx yet
+// import RawEditor from './monaco'
 import { RichEditor } from './plate'
 import { EditorContext } from './plate/editor-context'
 import type { MdxTemplate } from './plate/types'
@@ -72,7 +73,8 @@ export const MdxFieldPlugin = {
               'min-h-[100px] max-w-full tina-prose relative shadow-inner focus-within:shadow-outline focus-within:border-blue-500 block w-full bg-white border border-gray-200 text-gray-600 focus-within:text-gray-900 rounded-md px-3 py-2 mb-5'
             }
           >
-            {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />}
+            {/* {rawMode ? <RawEditor {...props} /> : <RichEditor {...props} />} */}
+            <RichEditor {...props} />
           </div>
         </EditorContext.Provider>
       )
