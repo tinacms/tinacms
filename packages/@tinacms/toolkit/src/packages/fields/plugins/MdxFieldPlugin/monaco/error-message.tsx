@@ -2,7 +2,26 @@ import React from 'react'
 import { XCircleIcon } from '@heroicons/react/solid'
 import { Popover, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
-import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
+// import { InvalidMarkdownElement } from '@tinacms/mdx/src/parse/plate'
+export type EmptyTextElement = { type: 'text'; text: '' }
+export type PositionItem = {
+  line?: number | null
+  column?: number | null
+  offset?: number | null
+  _index?: number | null
+  _bufferIndex?: number | null
+}
+export type Position = {
+  start: PositionItem
+  end: PositionItem
+}
+export type InvalidMarkdownElement = {
+  type: 'invalid_markdown'
+  value: string
+  message: string
+  position?: Position
+  children: [EmptyTextElement]
+}
 
 type ErrorType = {
   message: string

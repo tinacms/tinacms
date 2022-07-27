@@ -44,9 +44,12 @@ export function ErrorMessage({ error }) {
         </h3>
         <div className="mt-2 max-w-xl text-sm text-red-800 space-y-4">
           <p>{message}</p>
-          <p>To fix these errors, you can edit your content in raw mode</p>
+          <p>
+            To fix these errors, edit your content locally and then restart the
+            Tina server.
+          </p>
         </div>
-        <div className="mt-5">
+        {/* <div className="mt-5">
           <button
             type="button"
             onClick={() => setRawMode(true)}
@@ -54,7 +57,7 @@ export function ErrorMessage({ error }) {
           >
             Fix Errors
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   )
