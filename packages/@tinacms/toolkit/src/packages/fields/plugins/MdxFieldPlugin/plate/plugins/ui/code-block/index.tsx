@@ -33,7 +33,7 @@ import {
 import { Dropdown } from '../dropdown'
 import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import * as monaco from 'monaco-editor'
+import type * as monaco from 'monaco-editor'
 import { useSelected } from 'slate-react'
 
 type Monaco = typeof monaco
