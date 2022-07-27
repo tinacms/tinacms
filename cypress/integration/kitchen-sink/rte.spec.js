@@ -76,7 +76,7 @@ describe('Rich Text Editor', () => {
       )
     })
 
-    it.only('can be typed', () => {
+    it('can be typed', () => {
       cy.assertRTE(
         '',
         'First line{shift+enter}Second line',
