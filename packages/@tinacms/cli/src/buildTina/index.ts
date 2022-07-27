@@ -92,7 +92,6 @@ export const buildSetupCmdAudit = async (
   next: () => void,
   options: { clean: boolean }
 ) => {
-  console.log('setup start')
   const rootPath = ctx.rootPath as string
   const bridge = options.clean
     ? new FilesystemBridge(rootPath)
