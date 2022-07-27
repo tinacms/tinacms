@@ -199,11 +199,13 @@ export function stringifyProps(
             return
           } else {
             const stringValue = stringifyMDX(value, field, imageCallback)
-            val = stringValue
-              .trim()
-              .split('\n')
-              .map((str) => `  ${str.trim()}`)
-              .join(joiner)
+            if (stringValue) {
+              val = stringValue
+                .trim()
+                .split('\n')
+                .map((str) => `  ${str.trim()}`)
+                .join(joiner)
+            }
           }
           if (flatten) {
             attributes.push({

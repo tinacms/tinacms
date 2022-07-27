@@ -36,7 +36,7 @@ setupNewTests(content, outputString, ({ name, markdownContent }) => {
         if (name.startsWith('./autoformat')) {
           console.log('we shoud write another file', stringResult)
           writeTestFile(__dirname, name, astResult, true)
-          writeAutoformatFile(__dirname, name, stringResult)
+          writeAutoformatFile(__dirname, name, String(stringResult))
         } else {
           throw e
         }
