@@ -43,9 +43,7 @@ export class TinaClient<GenQueries> {
   constructor({ token, url, queries }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token
-    if (queries) {
-      this.queries = queries(this)
-    }
+    this.queries = queries(this)
   }
 
   public async request<DataType extends Record<string, any> = any>(
