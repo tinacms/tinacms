@@ -31,10 +31,19 @@ const typeRequiredError = `type is required and must be one of ${TypeName.join(
   ', '
 )}`
 
-const nameProp = z.string({
-  required_error: 'name must be provided',
-  invalid_type_error: 'name must be a sting',
-})
+const nameProp = z
+  .string({
+    required_error: 'name must be provided',
+    invalid_type_error: 'name must be a sting',
+  })
+  .superRefine((val, ctx) => {
+    if (val.includes(' '))
+      ctx.addIssue({
+        message: 'name cannot contain spaces',
+        code: z.ZodIssueCode.custom,
+        fatal: true,
+      })
+  })
 
 const Option = z.union(
   [z.string(), z.object({ label: z.string(), value: z.string() })],
