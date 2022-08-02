@@ -13,6 +13,7 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
+import type { TinaCloudSchemaEnriched, TinaSchema } from '@tinacms/schema-tools'
 import { TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { Collection } from '../types'
@@ -21,9 +22,12 @@ export const useGetCollection = (
   cms: TinaCMS,
   collectionName: string,
   includeDocuments: boolean = true,
-  after: string = ''
+  after: string = '',
+  sortKey?: string
 ) => {
   const api = new TinaAdminApi(cms)
+  const schema = cms.api.tina.schema as TinaSchema
+  const collectionExtra = schema.getCollection(collectionName)
   const [collection, setCollection] = useState<Collection | undefined>(
     undefined
   )
@@ -38,7 +42,8 @@ export const useGetCollection = (
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
-            after
+            after,
+            sortKey
           )
           setCollection(collection)
         } catch (error) {
@@ -57,11 +62,11 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
-  }, [cms, collectionName, resetState, after])
+  }, [cms, collectionName, resetState, after, sortKey])
 
   const reFetchCollection = () => setResetSate((x) => x + 1)
 
-  return { collection, loading, error, reFetchCollection }
+  return { collection, loading, error, reFetchCollection, collectionExtra }
 }
 
 const GetCollection = ({
@@ -69,20 +74,24 @@ const GetCollection = ({
   collectionName,
   includeDocuments = true,
   startCursor,
+  sortKey,
   children,
 }: {
   cms: TinaCMS
   collectionName: string
   includeDocuments?: boolean
   startCursor?: string
+  sortKey?: string
   children: any
 }) => {
-  const { collection, loading, error, reFetchCollection } = useGetCollection(
-    cms,
-    collectionName,
-    includeDocuments,
-    startCursor || ''
-  )
+  const { collection, loading, error, reFetchCollection, collectionExtra } =
+    useGetCollection(
+      cms,
+      collectionName,
+      includeDocuments,
+      startCursor || '',
+      sortKey
+    ) || {}
 
   if (error) {
     return null
@@ -92,7 +101,9 @@ const GetCollection = ({
     return <LoadingPage />
   }
 
-  return <>{children(collection, loading, reFetchCollection)}</>
+  return (
+    <>{children(collection, loading, reFetchCollection, collectionExtra)}</>
+  )
 }
 
 export default GetCollection

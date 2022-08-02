@@ -40,6 +40,7 @@ import { TinaAdminApi } from '../api'
 import { useState } from 'react'
 import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
+import type { TinaCloudCollection } from '@tinacms/schema-tools'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -126,6 +127,7 @@ const CollectionListPage = () => {
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
+  const [sortKey, setSortKey] = useState('')
   const loc = useLocation()
   useEffect(() => {
     // reset state when the route is changed
@@ -142,8 +144,14 @@ const CollectionListPage = () => {
             collectionName={collectionName}
             includeDocuments
             startCursor={endCursor}
+            sortKey={sortKey}
           >
-            {(collection: Collection, _loading, reFetchCollection) => {
+            {(
+              collection: Collection,
+              _loading,
+              reFetchCollection,
+              collectionExtra: TinaCloudCollection<true>
+            ) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
@@ -195,6 +203,26 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
+                        <div>
+                          <label htmlFor="sort">Sort by:</label>
+
+                          <select
+                            name="sort"
+                            id="sort"
+                            value={sortKey}
+                            onChange={(e) => {
+                              setSortKey(e.target.value)
+                            }}
+                          >
+                            {collectionExtra.fields.map((field) => {
+                              return (
+                                <option value={field.name}>
+                                  {field?.label || field.name}
+                                </option>
+                              )
+                            })}
+                          </select>
+                        </div>
                         {totalCount > 0 && (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
