@@ -60,10 +60,11 @@ export class TinaAdminApi {
   async fetchCollection(
     collectionName: string,
     includeDocuments: boolean,
-    after?: string
+    after?: string,
+    sortKey?: string
   ) {
     if (includeDocuments === true) {
-      const sort = this.schema.getIsTitleFieldName(collectionName)
+      const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
       const response: { collection: Collection } = await this.api.request(
         `#graphql
       query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
