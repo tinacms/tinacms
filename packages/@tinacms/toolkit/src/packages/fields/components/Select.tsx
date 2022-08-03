@@ -34,8 +34,8 @@ interface SelectFieldProps {
 
 export interface SelectProps {
   name: string
-  input: any
-  field: SelectFieldProps
+  input: React.SelectHTMLAttributes<HTMLSelectElement>
+  field?: SelectFieldProps
   disabled?: boolean
   options?: (Option | string)[]
 }
