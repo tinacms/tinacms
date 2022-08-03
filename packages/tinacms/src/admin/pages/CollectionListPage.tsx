@@ -128,7 +128,13 @@ const CollectionListPage = () => {
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
-  const [sortKey, setSortKey] = useState('')
+  const [sortKey, setSortKey] = useState(
+    JSON.stringify({
+      order: 'asc',
+      name: '',
+    })
+  )
+  const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
   const loc = useLocation()
   useEffect(() => {
     // reset state when the route is changed
@@ -204,30 +210,43 @@ const CollectionListPage = () => {
                               </label>
                               <Select
                                 name="sort"
-                                options={fields
-                                  .map((x) => [
-                                    {
-                                      label: x.label + ' (Acscending)',
-                                      value: JSON.stringify({
-                                        name: x.name,
-                                        order: 'asc',
-                                      }),
-                                    },
-                                    {
-                                      label: x.label + ' (Descending)',
-                                      value: JSON.stringify({
-                                        name: x.name,
-                                        order: 'desc',
-                                      }),
-                                    },
-                                  ])
-                                  .flat()}
+                                options={[
+                                  {
+                                    label: 'No Selection',
+                                    value: JSON.stringify({
+                                      order: 'asc',
+                                      name: '',
+                                    }),
+                                  },
+                                  ...fields
+                                    .map((x) => [
+                                      {
+                                        label: x.label + ' (Acscending)',
+                                        value: JSON.stringify({
+                                          name: x.name,
+                                          order: 'asc',
+                                        }),
+                                      },
+                                      {
+                                        label: x.label + ' (Descending)',
+                                        value: JSON.stringify({
+                                          name: x.name,
+                                          order: 'desc',
+                                        }),
+                                      },
+                                    ])
+                                    .flat(),
+                                ]}
                                 input={{
                                   id: 'sort',
                                   name: 'sort',
                                   value: sortKey,
                                   onChange: (e) => {
+                                    const val = JSON.parse(e.target.value)
+                                    setEndCursor('')
+                                    setPrevCursors([])
                                     setSortKey(e.target.value)
+                                    setSortOrder(val.order)
                                   },
                                 }}
                               />
@@ -374,11 +393,23 @@ const CollectionListPage = () => {
                         <div className="pt-3">
                           <CursorPaginator
                             variant="white"
-                            hasNext={pageInfo?.hasNextPage}
+                            hasNext={
+                              sortOrder === 'asc'
+                                ? pageInfo?.hasNextPage
+                                : pageInfo.hasPreviousPage
+                            }
                             navigateNext={() => {
+                              const newCurser =
+                                sortOrder === 'desc'
+                                  ? pageInfo?.startCursor
+                                  : pageInfo?.endCursor
+
                               const newState = [...prevCursors, endCursor]
                               setPrevCursors(newState)
-                              setEndCursor(pageInfo?.endCursor)
+                              setEndCursor(newCurser)
+                              // const newState = [...prevCursors, endCursor]
+                              // setPrevCursors(newState)
+                              // setEndCursor(pageInfo?.endCursor)
                             }}
                             hasPrev={prevCursors.length > 0}
                             navigatePrev={() => {

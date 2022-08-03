@@ -61,12 +61,15 @@ export class TinaAdminApi {
     collectionName: string,
     includeDocuments: boolean,
     after?: string,
-    sortKey?: string
+    sortKey?: string,
+    order?: 'asc' | 'desc'
   ) {
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
-      const response: { collection: Collection } = await this.api.request(
-        `#graphql
+      const response: { collection: Collection } =
+        order === 'asc'
+          ? await this.api.request(
+              `#graphql
       query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
         collection(collection: $collection){
           name
@@ -100,16 +103,61 @@ export class TinaAdminApi {
           }
         }
       }`,
-        {
-          variables: {
-            collection: collectionName,
-            includeDocuments,
-            sort,
-            limit: 10,
-            after,
-          },
+              {
+                variables: {
+                  collection: collectionName,
+                  includeDocuments,
+                  sort,
+                  limit: 10,
+                  after,
+                },
+              }
+            )
+          : await this.api.request(
+              `#graphql
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+        collection(collection: $collection){
+          name
+          label
+          format
+          templates
+          documents(sort: $sort, before: $after, last: $limit) @include(if: $includeDocuments) {
+            totalCount
+            pageInfo {
+              hasPreviousPage
+              hasNextPage
+              startCursor
+              endCursor
+            }
+            edges {
+              node {
+                ... on Document {
+                  _sys {
+                    title
+                    template
+                    breadcrumbs
+                    path
+                    basename
+                    relativePath
+                    filename
+                    extension
+                  }
+                }
+              }
+            }
+          }
         }
-      )
+      }`,
+              {
+                variables: {
+                  collection: collectionName,
+                  includeDocuments,
+                  sort,
+                  limit: 10,
+                  after,
+                },
+              }
+            )
 
       return response.collection
     } else {
