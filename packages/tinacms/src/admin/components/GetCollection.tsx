@@ -38,12 +38,17 @@ export const useGetCollection = (
   useEffect(() => {
     const fetchCollection = async () => {
       if (await api.isAuthenticated()) {
+        const validSortKey = collectionExtra.fields
+          .map((x) => x.name)
+          .includes(sortKey)
+          ? sortKey
+          : undefined
         try {
           const collection = await api.fetchCollection(
             collectionName,
             includeDocuments,
             after,
-            sortKey
+            validSortKey
           )
           setCollection(collection)
         } catch (error) {

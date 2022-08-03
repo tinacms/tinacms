@@ -214,13 +214,20 @@ const CollectionListPage = () => {
                               setSortKey(e.target.value)
                             }}
                           >
-                            {collectionExtra.fields.map((field) => {
-                              return (
-                                <option value={field.name}>
-                                  {field?.label || field.name}
-                                </option>
+                            {collectionExtra.fields
+                              .filter((x) =>
+                                // only allow sortable fields
+                                ['string', 'number', 'datetime'].includes(
+                                  x.type
+                                )
                               )
-                            })}
+                              .map((field) => {
+                                return (
+                                  <option value={field.name}>
+                                    {field?.label || field.name}
+                                  </option>
+                                )
+                              })}
                           </select>
                         </div>
                         {totalCount > 0 && (
