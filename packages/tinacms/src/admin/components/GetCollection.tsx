@@ -38,10 +38,11 @@ export const useGetCollection = (
   useEffect(() => {
     const fetchCollection = async () => {
       if (await api.isAuthenticated()) {
+        const { name, order } = JSON.parse(sortKey || '{}')
         const validSortKey = collectionExtra.fields
           .map((x) => x.name)
-          .includes(sortKey)
-          ? sortKey
+          .includes(name)
+          ? name
           : undefined
         try {
           const collection = await api.fetchCollection(
