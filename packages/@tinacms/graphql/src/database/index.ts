@@ -483,7 +483,10 @@ export class Database {
             cursor: btoa(edge.cursor),
           }
         } catch (error) {
-          if (error instanceof Error) {
+          if (
+            error instanceof Error &&
+            !edge.path.includes('.tina/__generated__/_graphql.json')
+          ) {
             throw new TinaQueryError({
               originalError: error,
               file: edge.path,
