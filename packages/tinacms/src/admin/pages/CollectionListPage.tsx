@@ -187,11 +187,39 @@ const CollectionListPage = () => {
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
-                        <h3 className="font-sans text-2xl text-gray-700">
-                          {collection.label
-                            ? collection.label
-                            : collection.name}
-                        </h3>
+                        <div className="flex flex-col gap-4">
+                          <h3 className="font-sans text-2xl text-gray-700">
+                            {collection.label
+                              ? collection.label
+                              : collection.name}
+                          </h3>
+
+                          {fields.length > 0 && (
+                            <div className="flex gap-3 items-center">
+                              <label
+                                htmlFor="sort"
+                                className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                              >
+                                Sort by
+                              </label>
+                              <Select
+                                name="sort"
+                                options={fields.map((x) => ({
+                                  label: x.label,
+                                  value: x.name,
+                                }))}
+                                input={{
+                                  id: 'sort',
+                                  name: 'sort',
+                                  value: sortKey,
+                                  onChange: (e) => {
+                                    setSortKey(e.target.value)
+                                  },
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                         {!collection.templates && (
                           <Link
                             to={`new`}
@@ -208,26 +236,6 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
-                        {fields.length > 0 && (
-                          <div>
-                            <label htmlFor="sort">Sort by:</label>
-                            <Select
-                              name="sort"
-                              options={fields.map((x) => ({
-                                label: x.label,
-                                value: x.name,
-                              }))}
-                              input={{
-                                id: 'sort',
-                                name: 'sort',
-                                value: sortKey,
-                                onChange: (e) => {
-                                  setSortKey(e.target.value)
-                                },
-                              }}
-                            />
-                          </div>
-                        )}
                         {totalCount > 0 && (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
