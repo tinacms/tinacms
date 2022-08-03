@@ -20,7 +20,7 @@ export const TINA_HOST = 'content.tinajs.io'
 export interface TinaClientArgs<GenQueries = Record<string, unknown>> {
   url: string
   token?: string
-  queries?: (client: TinaClient<GenQueries>) => GenQueries
+  queries: (client: TinaClient<GenQueries>) => GenQueries
 }
 export type TinaClientRequestArgs = {
   variables?: Record<string, any>
@@ -39,13 +39,11 @@ export class TinaClient<GenQueries> {
   /**
    *
    */
-  public queries?: GenQueries
+  public queries: GenQueries
   constructor({ token, url, queries }: TinaClientArgs<GenQueries>) {
     this.apiUrl = url
     this.readonlyToken = token
-    if (queries) {
-      this.queries = queries(this)
-    }
+    this.queries = queries(this)
   }
 
   public async request<DataType extends Record<string, any> = any>(
