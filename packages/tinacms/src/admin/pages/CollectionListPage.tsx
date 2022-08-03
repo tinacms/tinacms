@@ -195,7 +195,7 @@ const CollectionListPage = () => {
                           </h3>
 
                           {fields.length > 0 && (
-                            <div className="flex gap-3 items-center">
+                            <div className="flex gap-2 items-center">
                               <label
                                 htmlFor="sort"
                                 className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
