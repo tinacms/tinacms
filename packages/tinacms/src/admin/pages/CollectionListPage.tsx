@@ -30,6 +30,7 @@ import {
   PopupModal,
   TinaCMS,
   OverflowMenu,
+  Select,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -156,6 +157,10 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
               const pageInfo = collection.documents.pageInfo
+              const fields = collectionExtra.fields.filter((x) =>
+                // only allow sortable fields
+                ['string', 'number', 'datetime'].includes(x.type)
+              )
 
               return (
                 <PageWrapper>
@@ -205,30 +210,21 @@ const CollectionListPage = () => {
                       <div className="w-full mx-auto max-w-screen-xl">
                         <div>
                           <label htmlFor="sort">Sort by:</label>
-
-                          <select
+                          <Select
                             name="sort"
-                            id="sort"
-                            value={sortKey}
-                            onChange={(e) => {
-                              setSortKey(e.target.value)
+                            options={fields.map((x) => ({
+                              label: x.label,
+                              value: x.name,
+                            }))}
+                            input={{
+                              id: 'sort',
+                              name: 'sort',
+                              value: sortKey,
+                              onChange: (e) => {
+                                setSortKey(e.target.value)
+                              },
                             }}
-                          >
-                            {collectionExtra.fields
-                              .filter((x) =>
-                                // only allow sortable fields
-                                ['string', 'number', 'datetime'].includes(
-                                  x.type
-                                )
-                              )
-                              .map((field) => {
-                                return (
-                                  <option value={field.name}>
-                                    {field?.label || field.name}
-                                  </option>
-                                )
-                              })}
-                          </select>
+                          />
                         </div>
                         {totalCount > 0 && (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
