@@ -13,7 +13,7 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
-import type { TinaCloudSchemaEnriched, TinaSchema } from '@tinacms/schema-tools'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import { TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { Collection } from '../types'
@@ -49,7 +49,8 @@ export const useGetCollection = (
             collectionName,
             includeDocuments,
             after,
-            validSortKey
+            validSortKey,
+            order
           )
           setCollection(collection)
         } catch (error) {
