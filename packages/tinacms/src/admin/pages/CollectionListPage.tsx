@@ -204,10 +204,24 @@ const CollectionListPage = () => {
                               </label>
                               <Select
                                 name="sort"
-                                options={fields.map((x) => ({
-                                  label: x.label,
-                                  value: x.name,
-                                }))}
+                                options={fields
+                                  .map((x) => [
+                                    {
+                                      label: x.label + ' (Acscending)',
+                                      value: JSON.stringify({
+                                        name: x.name,
+                                        order: 'asc',
+                                      }),
+                                    },
+                                    {
+                                      label: x.label + ' (Descending)',
+                                      value: JSON.stringify({
+                                        name: x.name,
+                                        order: 'desc',
+                                      }),
+                                    },
+                                  ])
+                                  .flat()}
                                 input={{
                                   id: 'sort',
                                   name: 'sort',
