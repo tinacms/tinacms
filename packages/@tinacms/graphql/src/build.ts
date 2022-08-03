@@ -108,6 +108,26 @@ const _buildFragments = async (
   const fragPath = path.join(rootPath, '.tina', '__generated__')
 
   await fs.outputFile(path.join(fragPath, 'frags.gql'), print(fragDoc))
+  // is the file bigger then 100kb?
+  if (
+    (await (await fs.stat(path.join(fragPath, 'frags.gql'))).size) >
+    // convert to 100 kb to bytes
+    100 * 1024
+  ) {
+    console.warn(
+      'Warning: frags.gql is very large (>100kb). Consider setting the reference dept to 1 or 0. See code snippet below.'
+    )
+    console.log(
+      `const schema = defineSchema({
+        config: {
+            client: {
+                referenceDepth: 1,
+            },
+        }
+        // ...
+    })`
+    )
+  }
   //   await fs.outputFileSync(
   //     path.join(fragPath, 'frags.json'),
   //     JSON.stringify(fragDoc, null, 2)
