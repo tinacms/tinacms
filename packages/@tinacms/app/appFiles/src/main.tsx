@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-// This value is substituted by our plugin to use
 // the user's actual schema
 // @ts-ignore
 import { tinaConfig } from 'TINA_IMPORT'
@@ -12,9 +11,11 @@ const App = () => {
   // we should get ride of that check
   return (
     <>
+      {/* @ts-ignore */}
       <TinaEditProvider
         editMode={
           // Stricter tsconfig in this package shows this error
+          //@ts-ignore
           <TinaCMS {...tinaConfig}>
             <TinaAdmin />
           </TinaCMS>

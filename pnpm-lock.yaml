@@ -120,7 +120,6 @@ importers:
       '@headlessui/react': ^1.5.0
       '@svgr/webpack': ^6.2.1
       '@tailwindcss/typography': ^0.4.1
-      '@tinacms/app': workspace:*
       '@tinacms/auth': workspace:*
       '@tinacms/cli': workspace:*
       '@types/js-cookie': ^3.0.0
@@ -162,7 +161,6 @@ importers:
       typescript: 4.3.5
     devDependencies:
       '@svgr/webpack': 6.2.1
-      '@tinacms/app': link:../../packages/@tinacms/app
       '@tinacms/cli': link:../../packages/@tinacms/cli
       '@types/js-cookie': 3.0.2
       '@types/node': 16.11.41
@@ -201,22 +199,26 @@ importers:
 
   packages/@tinacms/app:
     specifiers:
+      '@tinacms/scripts': workspace:*
       '@types/react': ^18.0.15
       '@types/react-dom': ^18.0.6
-      '@vitejs/plugin-react': ^2.0.0
+      '@vitejs/plugin-react': ^1.0.0
+      jest: ^27.0.6
       react: ^18.2.0
       react-dom: ^18.2.0
       tinacms: workspace:*
       typescript: ^4.6.4
-      vite: ^3.0.0
+      vite: ^2.4.3
       vite-node: ^0.18.1
     dependencies:
-      '@vitejs/plugin-react': 2.0.0_vite@3.0.4
+      '@tinacms/scripts': link:../scripts
+      '@vitejs/plugin-react': 1.3.2
+      jest: 27.5.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       tinacms: link:../../tinacms
       typescript: 4.7.4
-      vite: 3.0.4
+      vite: 2.9.13
       vite-node: 0.18.1
     devDependencies:
       '@types/react': 18.0.15
@@ -272,6 +274,7 @@ importers:
       '@graphql-codegen/visitor-plugin-common': ^2.4.0
       '@graphql-tools/graphql-file-loader': ^7.2.0
       '@graphql-tools/load': ^7.3.2
+      '@tinacms/app': workspace:*
       '@tinacms/datalayer': workspace:*
       '@tinacms/graphql': workspace:*
       '@tinacms/metrics': workspace:*
@@ -336,6 +339,7 @@ importers:
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       '@graphql-tools/graphql-file-loader': 7.4.0_graphql@15.8.0
       '@graphql-tools/load': 7.7.0_graphql@15.8.0
+      '@tinacms/app': link:../app
       '@tinacms/datalayer': link:../datalayer
       '@tinacms/graphql': link:../graphql
       '@tinacms/metrics': link:../metrics
@@ -6106,6 +6110,17 @@ packages:
       react: 17.0.2
     dev: false
 
+  /@rollup/pluginutils/4.2.1:
+    resolution:
+      {
+        integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==,
+      }
+    engines: { node: '>= 8.0.0' }
+    dependencies:
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+    dev: false
+
   /@rushstack/eslint-patch/1.1.3:
     resolution:
       {
@@ -8528,23 +8543,21 @@ packages:
       zustand: 3.6.7_react@17.0.2
     dev: false
 
-  /@vitejs/plugin-react/2.0.0_vite@3.0.4:
+  /@vitejs/plugin-react/1.3.2:
     resolution:
       {
-        integrity: sha512-zHkRR+X4zqEPNBbKV2FvWSxK7Q6crjMBVIAYroSU8Nbb4M3E5x4qOiLoqJBHtXgr27kfednXjkwr3lr8jS6Wrw==,
+        integrity: sha512-aurBNmMo0kz1O4qRoY+FM4epSA39y3ShWGuqfLRA/3z0oEJAdtoSfgA3aO98/PCCHAqMaduLxIxErWrVKIFzXA==,
       }
-    engines: { node: '>=14.18.0' }
-    peerDependencies:
-      vite: ^3.0.0
+    engines: { node: '>=12.0.0' }
     dependencies:
       '@babel/core': 7.18.6
       '@babel/plugin-transform-react-jsx': 7.18.6_@babel+core@7.18.6
       '@babel/plugin-transform-react-jsx-development': 7.18.6_@babel+core@7.18.6
       '@babel/plugin-transform-react-jsx-self': 7.18.6_@babel+core@7.18.6
       '@babel/plugin-transform-react-jsx-source': 7.18.6_@babel+core@7.18.6
-      magic-string: 0.26.2
-      react-refresh: 0.14.0
-      vite: 3.0.4
+      '@rollup/pluginutils': 4.2.1
+      react-refresh: 0.13.0
+      resolve: 1.22.1
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -9029,7 +9042,6 @@ packages:
       }
     engines: { node: '>=0.4.0' }
     hasBin: true
-    dev: false
 
   /add/2.0.6:
     resolution:
@@ -14440,6 +14452,13 @@ packages:
       '@types/unist': 2.0.6
     dev: false
 
+  /estree-walker/2.0.2:
+    resolution:
+      {
+        integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==,
+      }
+    dev: false
+
   /estree-walker/3.0.1:
     resolution:
       {
@@ -18427,7 +18446,7 @@ packages:
         optional: true
     dependencies:
       abab: 2.0.6
-      acorn: 8.7.1
+      acorn: 8.8.0
       acorn-globals: 6.0.0
       cssom: 0.4.4
       cssstyle: 2.3.0
@@ -19441,16 +19460,6 @@ packages:
         integrity: sha512-EIgv+QZ9r+814gjJj0Bt5vSLJLzswGmSUbUpbi9AIr/fsN2IWFBl2NucV9PAiek+U1STK468tEkxmVYUtuAN3g==,
       }
     engines: { node: '>=6' }
-    dev: false
-
-  /magic-string/0.26.2:
-    resolution:
-      {
-        integrity: sha512-NzzlXpclt5zAbmo6h6jNc8zl2gNRGHvmsZW4IvZhTC4W7k4OlLP+S5YLussa/r3ixNT66KOQfNORlXHSOy/X4A==,
-      }
-    engines: { node: '>=12' }
-    dependencies:
-      sourcemap-codec: 1.4.8
     dev: false
 
   /make-dir/2.1.0:
@@ -23923,10 +23932,10 @@ packages:
       react-is: 17.0.2
     dev: false
 
-  /react-refresh/0.14.0:
+  /react-refresh/0.13.0:
     resolution:
       {
-        integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==,
+        integrity: sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==,
       }
     engines: { node: '>=0.10.0' }
     dev: false
@@ -25665,13 +25674,6 @@ packages:
     engines: { node: '>= 8' }
     dependencies:
       whatwg-url: 7.1.0
-
-  /sourcemap-codec/1.4.8:
-    resolution:
-      {
-        integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==,
-      }
-    dev: false
 
   /space-separated-tokens/1.1.5:
     resolution:

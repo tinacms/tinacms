@@ -2,10 +2,10 @@
 // Seems like this is no longer necessary
 import react from '@vitejs/plugin-react'
 import { build, defineConfig, createServer } from 'vite'
-import { dirname, join } from 'path'
+import path, { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = path.join(dirname(fileURLToPath(import.meta.url)), 'appFiles')
 const pathToSchema = join(process.cwd(), '.tina', 'schema')
 
 const config = defineConfig({

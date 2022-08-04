@@ -10,7 +10,6 @@
     "build:prod": "tinacms build && next build"
   },
   "devDependencies": {
-    "@tinacms/app": "workspace:*",
     "@svgr/webpack": "^6.2.1",
     "@tinacms/cli": "workspace:*",
     "@types/js-cookie": "^3.0.0",
