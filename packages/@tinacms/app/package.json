@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@vitejs/plugin-react": "^1.0.0",
+    "@vitejs/plugin-react": "1.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tinacms": "workspace:*",
