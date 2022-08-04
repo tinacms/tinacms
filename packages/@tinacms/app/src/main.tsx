@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 // This value is substituted by our plugin to use
 // the user's actual schema
 // @ts-ignore
-import { tinaConfig } from '../.tina/schema'
+import { tinaConfig } from 'TINA_IMPORT'
 import TinaCMS, { TinaAdmin } from 'tinacms'
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
 

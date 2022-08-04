@@ -6,32 +6,23 @@ import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const pathToSchema = join(process.cwd(), '.tina', 'schema.ts')
-
-export function pluginResolvePathToTina() {
-  const moduleName = '../.tina/schema'
-
-  return {
-    name: 'my-plugin', // required, will show up in warnings and errors
-    enforce: 'pre',
-    resolveId(id) {
-      if (id === moduleName) {
-        return pathToSchema
-      }
-    },
-  }
-}
+const pathToSchema = join(process.cwd(), '.tina', 'schema')
 
 const config = defineConfig({
   root: __dirname,
   mode: 'development',
   base: '/tina/',
-  plugins: [react(), pluginResolvePathToTina()],
+  plugins: [react()],
   define: {
     'process.env': {},
   },
   server: {
     strictPort: true,
+  },
+  resolve: {
+    alias: {
+      TINA_IMPORT: pathToSchema,
+    },
   },
   build: {
     sourcemap: true,
