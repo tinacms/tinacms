@@ -1,5 +1,111 @@
 # tinacms-cli
 
+## 0.61.0
+
+### Minor Changes
+
+- 870a32f18: This PR adds the new generated client, a new build command and introduces a new path of working with tina.
+
+  # How to upgrade
+
+  ## Updates to schema.ts
+
+  Instead of passing an ApiURL, now the clientId, branch and read only token (NEW) will all be configured in the schema. The local url will be used if the --local flag is passed.
+
+  This will require a change to the schema and the scripts.
+
+  ```diff
+  // .tina/schema.ts
+
+  + import { client } from "./__generated__/client";
+
+  // ...
+
+  const schema = defineSchema({
+  +    config: {
+  +        branch: "main",
+  +        clientId: "***",
+  +        token: "***",
+      },
+      collections: [
+          // ...
+      ]
+  })
+
+  // ...
+  - const branch = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF
+  - const clientId = 'YOUR-CLIENT-ID-HERE'
+  - const apiURL =
+  -   process.env.NODE_ENV == 'development'
+  -     ? 'http://localhost:4001/graphql'
+  -    : `https://content.tinajs.io/content/${clientId}/github/${branch}`
+  export const tinaConfig = defineConfig({
+  +  client,
+  -  apiURl,
+    schema,
+    // ...
+  })
+
+  export default schema
+  ```
+
+  The token must be a wildcard token (`*`) and can be generated from the tina dashboard. [Read more hear](https://tina.io/docs/graphql/read-only-tokens/)
+
+  ## Updates to scripts in package.json
+
+  We now recommend separating the graphQL server into two separate processes (two separate terminals in development). The scripts should look like this:
+
+  ```json
+  {
+    "scripts": {
+      "dev": "tinacms build --local && next dev",
+      "dev-server": "tinacms server:start",
+      "build": "tinacms build && next build"
+      // ... Other Scripts
+    }
+  }
+  ```
+
+  When developing, in the first terminal run `yarn dev-server` and then `yarn dev` in the second.
+
+  The old `-c` subcommand can still be used. This will start the dev server and next dev process in the same terminal.
+
+  ```json
+  {
+    "scripts": {
+      "dev": "tinacms server:start \"tinacms build --local && next dev\"",
+      "dev-server": "tinacms server:start",
+      "build": "tinacms build && next build"
+      // ... Other Scripts
+    }
+  }
+  ```
+
+  ## Updates to generated files
+
+  We now recommend ignoring most of the generated files. This is because `client.ts` and `types.ts` will be generated in CI with `tinacms build`
+
+  To remove them from your repository, run `git rm --cached .tina/__generated__/*` and then `yarn tinacms build` to update the generated files that need to stay.
+
+### Patch Changes
+
+- 98f82cef7: Updates the init command to use the new client
+- ae06f4a96: Fixed audit cmd to use datalayer
+- 4360ef284: Minor bug fixes with tina init command in the CLI
+- 3ac1fb8e4: Generate types and client based on the file type of the schema
+- cf7df9859: Throw an error message when the client is not setup properly in production
+- f68b045b9: Example page accounts for apps that use the src dir
+- 637793dc0: Always reset the generated folder
+- 8dab8d4ce: fix bug where tina init would error because there is no generated folder
+- Updated dependencies [870a32f18]
+- Updated dependencies [dcbc57c86]
+- Updated dependencies [ae06f4a96]
+- Updated dependencies [660247b6b]
+- Updated dependencies [a7dcb8d44]
+  - @tinacms/graphql@0.62.0
+  - @tinacms/schema-tools@0.0.9
+  - @tinacms/datalayer@0.2.2
+
 ## 0.60.28
 
 ### Patch Changes
