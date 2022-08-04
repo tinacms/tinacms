@@ -43,6 +43,9 @@ import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
 import type { TinaCloudCollection } from '@tinacms/schema-tools'
 
+const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
+const isSSR = typeof window === 'undefined'
+
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
@@ -129,14 +132,26 @@ const CollectionListPage = () => {
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
   const [sortKey, setSortKey] = useState(
-    JSON.stringify({
-      order: 'asc',
-      name: '',
-    })
+    // set sort key to cached value if it exists
+    isSSR
+      ? ''
+      : window.localStorage.getItem(`${LOCAL_STORAGE_KEY}.${collectionName}`) ||
+          JSON.stringify({
+            order: 'asc',
+            name: '',
+          })
   )
   const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
   const loc = useLocation()
   useEffect(() => {
+    // set sort key to cached value on route change
+    setSortKey(
+      window.localStorage.getItem(`${LOCAL_STORAGE_KEY}.${collectionName}`) ||
+        JSON.stringify({
+          order: 'asc',
+          name: '',
+        })
+    )
     // reset state when the route is changed
     setEndCursor('')
     setPrevCursors([])
@@ -245,6 +260,10 @@ const CollectionListPage = () => {
                                     const val = JSON.parse(e.target.value)
                                     setEndCursor('')
                                     setPrevCursors([])
+                                    window?.localStorage.setItem(
+                                      `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                      e.target.value
+                                    )
                                     setSortKey(e.target.value)
                                     setSortOrder(val.order)
                                   },
