@@ -1,34 +1,53 @@
 {
   "name": "@tinacms/app",
   "version": "0.0.3",
-  "type": "module",
-  "bin": {
-    "tinaspa": "./script.mjs"
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    }
   },
-  "scripts": {
-    "build": "echo \"Skipping build for @tinacms/app\""
-  },
+  "typings": "dist/index.d.ts",
   "files": [
+    "dist",
     "script.mjs",
     "package.json",
     "public",
-    "src",
-    "index.html",
+    "appFiles/src",
+    "appFiles/index.html",
     "tsconfig.json",
     "tsconfig.node.json",
     "vite.config.ts"
   ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
+    "test": "jest --passWithNoTests"
+  },
   "devDependencies": {
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^2.0.0",
+    "@tinacms/scripts": "workspace:*",
+    "@vitejs/plugin-react": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tinacms": "workspace:*",
     "typescript": "^4.6.4",
-    "vite": "^3.0.0",
-    "vite-node": "^0.18.1"
+    "vite": "^2.4.3",
+    "vite-node": "^0.18.1",
+    "jest": "^27.0.6"
   }
 }

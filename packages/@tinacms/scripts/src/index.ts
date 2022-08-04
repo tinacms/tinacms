@@ -98,9 +98,7 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
     await fs.readFileSync(path.join(packageDir, 'package.json')).toString()
   )
   if (
-    ['@tinacms/scripts', '@tinacms/webpack-helpers', '@tinacms/app'].includes(
-      packageJSON.name
-    )
+    ['@tinacms/scripts', '@tinacms/webpack-helpers'].includes(packageJSON.name)
   ) {
     console.log(`skipping ${packageJSON.name}`)
     return

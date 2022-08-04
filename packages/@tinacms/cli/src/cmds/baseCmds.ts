@@ -38,6 +38,7 @@ import {
 } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
+import { viteBuildCmd } from './standAlone'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
@@ -253,5 +254,11 @@ export const baseCmds: Command[] = [
         ],
         options
       ),
+  },
+  {
+    options: [noTelemetryOption],
+    command: 's',
+    description: 'S',
+    action: (options) => chain([attachPath, viteBuildCmd], options),
   },
 ]
