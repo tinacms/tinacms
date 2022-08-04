@@ -228,15 +228,13 @@ export const build = async ({
   }
 
   try {
-    if (!process.env.CI && !noWatch) {
-      await fs.mkdirp(tinaGeneratedPath)
-      await store.close()
-      await resetGeneratedFolder({
-        tinaGeneratedPath,
-        usingTs: ctx.usingTs,
-      })
-      await store.open()
-    }
+    await fs.mkdirp(tinaGeneratedPath)
+    await store.close()
+    await resetGeneratedFolder({
+      tinaGeneratedPath,
+      usingTs: ctx.usingTs,
+    })
+    await store.open()
     const cliFlags = []
     // always enable experimentalData and isomorphicGitBridge on the  backend
     cliFlags.push('experimentalData')
