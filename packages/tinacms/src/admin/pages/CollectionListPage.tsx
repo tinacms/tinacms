@@ -399,17 +399,9 @@ const CollectionListPage = () => {
                                 : pageInfo.hasPreviousPage
                             }
                             navigateNext={() => {
-                              const newCurser =
-                                sortOrder === 'desc'
-                                  ? pageInfo?.startCursor
-                                  : pageInfo?.endCursor
-
                               const newState = [...prevCursors, endCursor]
                               setPrevCursors(newState)
-                              setEndCursor(newCurser)
-                              // const newState = [...prevCursors, endCursor]
-                              // setPrevCursors(newState)
-                              // setEndCursor(pageInfo?.endCursor)
+                              setEndCursor(pageInfo?.endCursor)
                             }}
                             hasPrev={prevCursors.length > 0}
                             navigatePrev={() => {
