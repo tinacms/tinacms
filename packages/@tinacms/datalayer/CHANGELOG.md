@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.2.2
+
+### Patch Changes
+
+- dcbc57c86: update key generation to gracefully handle null / undefined field values by skipping indexing
+- ae06f4a96: Fixed audit cmd to use datalayer
+
 ## 0.2.1
 
 ### Patch Changes
