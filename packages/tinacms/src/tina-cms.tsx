@@ -250,37 +250,6 @@ type APIProviderProps =
        */
       clientId?: never
     }
-  | {
-      /**
-       * Content API URL
-       *
-       */
-      apiURL?: never
-      /**
-       * Point to the local version of GraphQL instead of tina.io
-       * https://tina.io/docs/tinacms-context/#adding-tina-to-the-sites-frontend
-       *
-       * @deprecated use apiURL instead
-       */
-      isLocalClient?: boolean
-      /**
-       * The base branch to pull content from. Note that this is ignored for local development
-       *
-       * @deprecated use apiURL instead
-       */
-      branch?: string
-      /**
-       * Your clientId from tina.io
-       *
-       * @deprecated use apiURL instead
-       */
-      clientId?: string
-      /**
-       * The API url From this client will be used to make requests.
-       *
-       */
-      client: never
-    }
 
 interface BaseProviderProps {
   /** Callback if you need access to the TinaCMS instance */
