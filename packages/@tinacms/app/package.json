@@ -1,0 +1,34 @@
+{
+  "name": "@tinacms/app",
+  "version": "0.0.3",
+  "type": "module",
+  "bin": {
+    "tinaspa": "./script.mjs"
+  },
+  "scripts": {
+    "build": "echo \"Skipping build for @tinacms/app\""
+  },
+  "files": [
+    "script.mjs",
+    "package.json",
+    "public",
+    "src",
+    "index.html",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "vite.config.ts"
+  ],
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^2.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tinacms": "workspace:*",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0",
+    "vite-node": "^0.18.1"
+  }
+}
