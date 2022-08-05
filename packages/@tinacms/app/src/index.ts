@@ -1,4 +1,5 @@
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
 import { build, InlineConfig } from 'vite'
 import path from 'path'
 
@@ -13,6 +14,12 @@ export const viteBuild = async ({
 }) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToSchema = path.join(rootPath, '.tina', 'schema')
+  fs.writeFileSync(
+    path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
+    `index.html
+assets/
+vite.svg`
+  )
 
   const base = `/${outputFolder}/`
   const config: InlineConfig = {

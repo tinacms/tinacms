@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev --noTelemetry --static -c \"next dev\"",
+    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
     "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\"",
     "dev:audit": "tinacms audit",
