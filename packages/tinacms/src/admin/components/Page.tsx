@@ -35,7 +35,7 @@ export const PageHeader = ({
 }) => (
   <>
     {isLocalMode && <LocalWarning />}
-    <div className="bg-white pb-4 pt-18 border-b border-gray-200 px-12">
+    <div className="bg-white pb-4 pt-16 border-b border-gray-200 px-12">
       <div className="w-full mx-auto max-w-screen-xl">
         <div className="w-full flex justify-between items-end">{children}</div>
       </div>
