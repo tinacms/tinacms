@@ -45,7 +45,6 @@ interface BuildOptions {
   beforeBuild?: () => Promise<any>
   afterBuild?: () => Promise<any>
   skipIndex?: boolean
-  static?: boolean
 }
 
 interface BuildSetupOptions {
@@ -203,7 +202,6 @@ export const auditCmdBuild = async (
 }
 export const build = async ({
   noWatch,
-  static: isStatic,
   ctx,
   bridge,
   database,
@@ -260,9 +258,13 @@ export const build = async ({
         local,
       }
     )
-    if (isStatic) {
+    if (ctx.schema?.config?.build) {
       logger.info('Building static')
-      await viteBuild({ rootPath })
+      await viteBuild({
+        rootPath,
+        outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+        publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+      })
     }
   } catch (error) {
     throw error

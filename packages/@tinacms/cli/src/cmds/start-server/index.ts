@@ -38,7 +38,6 @@ interface Options {
   verbose?: boolean
   dev?: boolean
   local: boolean
-  static?: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -56,7 +55,6 @@ export async function startServer(
     verbose,
     dev,
     local,
-    static: isStatic,
   }: Options
 ) {
   buildLock.disable()
@@ -178,7 +176,6 @@ export async function startServer(
         try {
           if (shouldBuild) {
             await build({
-              static: isStatic,
               bridge,
               ctx,
               database,
@@ -213,7 +210,6 @@ export async function startServer(
           try {
             if (shouldBuild) {
               await build({
-                static: isStatic,
                 bridge,
                 ctx,
                 database,
@@ -250,7 +246,6 @@ export async function startServer(
     }
     if (shouldBuild) {
       await build({
-        static: isStatic,
         bridge,
         ctx,
         database,

@@ -66,6 +66,10 @@ const BlocksTemplate: TinaTemplate = {
 
 const schema = defineSchema({
   config: {
+    build: {
+      outputFolder: "tina",
+      publicFolder: "public",
+    },
     branch: "main",
     clientId: "foobar",
     token: "foo",
