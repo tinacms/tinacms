@@ -108,12 +108,6 @@ const localOption = {
   defaultValue: false,
 }
 
-const staticOption = {
-  name: '--static',
-  description: 'Build Tinacms statically the public folder of your site ',
-  defaultValue: false,
-}
-
 const checkOptions = async (_ctx: any, next: () => void, options: any) => {
   if (options?.experimentalData) {
     logger.warn(
@@ -174,7 +168,6 @@ export const baseCmds: Command[] = [
       noTelemetryOption,
       watchFileOption,
       verboseOption,
-      staticOption,
     ],
     action: (options) =>
       chain(
@@ -199,7 +192,6 @@ export const baseCmds: Command[] = [
       verboseOption,
       developmentOption,
       localOption,
-      staticOption,
     ],
     action: (options) =>
       chain(
