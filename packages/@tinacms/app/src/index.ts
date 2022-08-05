@@ -2,13 +2,22 @@ import react from '@vitejs/plugin-react'
 import { build, InlineConfig } from 'vite'
 import path from 'path'
 
-export const viteBuild = async ({ rootPath }: { rootPath: string }) => {
+export const viteBuild = async ({
+  rootPath,
+  outputFolder,
+  publicFolder,
+}: {
+  rootPath: string
+  publicFolder: string
+  outputFolder: string
+}) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToSchema = path.join(rootPath, '.tina', 'schema')
 
+  const base = `/${outputFolder}/`
   const config: InlineConfig = {
     root,
-    base: '/tina/',
+    base,
     plugins: [react()],
     define: {
       'process.env': {},
@@ -23,7 +32,7 @@ export const viteBuild = async ({ rootPath }: { rootPath: string }) => {
     },
     build: {
       sourcemap: true,
-      outDir: path.join(rootPath, 'public', 'tina'),
+      outDir: path.join(rootPath, publicFolder, outputFolder),
       emptyOutDir: false,
     },
   }

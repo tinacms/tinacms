@@ -37,6 +37,10 @@ export interface TinaCloudSchemaConfig<Store = any> {
   client?: {
     referenceDepth?: number
   }
+  build?: {
+    publicFolder: string
+    outputFolder: string
+  }
   clientId: string
   branch: string
   token: string
