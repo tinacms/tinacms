@@ -20,6 +20,7 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Select } from '../components'
 import { parse } from './textFormat'
 
+// @ts-ignore
 export const SelectField = wrapFieldsWithMeta(Select)
 
 export const SelectFieldPlugin = {

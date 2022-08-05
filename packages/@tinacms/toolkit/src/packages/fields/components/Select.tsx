@@ -34,14 +34,14 @@ interface SelectFieldProps {
 
 export interface SelectProps {
   name: string
-  input: any
-  field: SelectFieldProps
+  input: React.SelectHTMLAttributes<HTMLSelectElement>
+  field?: SelectFieldProps
   disabled?: boolean
   options?: (Option | string)[]
 }
 
 export const selectFieldClasses =
-  'shadow appearance-none bg-white text-gray-600 block pl-3 pr-7 py-2 truncate w-full text-base cursor-pointer border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
+  'shadow appearance-none bg-white text-gray-600 block pl-3 pr-7 py-2 truncate w-full text-base cursor-pointer border border-gray-100 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
