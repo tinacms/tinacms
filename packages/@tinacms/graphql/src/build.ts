@@ -115,7 +115,7 @@ const _buildFragments = async (
     100 * 1024
   ) {
     console.warn(
-      'Warning: frags.gql is very large (>100kb). Consider setting the reference dept to 1 or 0. See code snippet below.'
+      'Warning: frags.gql is very large (>100kb). Consider setting the reference depth to 1 or 0. See code snippet below.'
     )
     console.log(
       `const schema = defineSchema({
