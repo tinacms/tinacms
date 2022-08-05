@@ -227,7 +227,7 @@ const CollectionListPage = () => {
                                 name="sort"
                                 options={[
                                   {
-                                    label: 'No Selection',
+                                    label: 'Default',
                                     value: JSON.stringify({
                                       order: 'asc',
                                       name: '',
