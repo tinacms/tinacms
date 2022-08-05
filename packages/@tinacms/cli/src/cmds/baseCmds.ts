@@ -38,7 +38,6 @@ import {
 } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
-import { viteBuildCmd } from './standAlone'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
@@ -109,6 +108,12 @@ const localOption = {
   defaultValue: false,
 }
 
+const staticOption = {
+  name: '--static',
+  description: 'Build Tinacms statically the public folder of your site ',
+  defaultValue: false,
+}
+
 const checkOptions = async (_ctx: any, next: () => void, options: any) => {
   if (options?.experimentalData) {
     logger.warn(
@@ -169,6 +174,7 @@ export const baseCmds: Command[] = [
       noTelemetryOption,
       watchFileOption,
       verboseOption,
+      staticOption,
     ],
     action: (options) =>
       chain(
@@ -193,6 +199,7 @@ export const baseCmds: Command[] = [
       verboseOption,
       developmentOption,
       localOption,
+      staticOption,
     ],
     action: (options) =>
       chain(
@@ -254,11 +261,5 @@ export const baseCmds: Command[] = [
         ],
         options
       ),
-  },
-  {
-    options: [noTelemetryOption],
-    command: 's',
-    description: 'S',
-    action: (options) => chain([attachPath, viteBuildCmd], options),
   },
 ]
