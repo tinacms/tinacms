@@ -69,7 +69,7 @@ export class Builder {
   ) {
     this.maxDepth =
       // @ts-ignore
-      config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 5
+      config?.tinaSchema.schema?.config?.client?.referenceDepth ?? 2
     this.tinaSchema = config.tinaSchema
     this.database = config.database
   }
