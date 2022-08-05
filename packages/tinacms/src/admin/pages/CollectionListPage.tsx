@@ -30,6 +30,7 @@ import {
   PopupModal,
   TinaCMS,
   OverflowMenu,
+  Select,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -40,6 +41,10 @@ import { TinaAdminApi } from '../api'
 import { useState } from 'react'
 import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
+import type { TinaCloudCollection } from '@tinacms/schema-tools'
+
+const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
+const isSSR = typeof window === 'undefined'
 
 const TemplateMenu = ({ templates }: { templates: Template[] }) => {
   return (
@@ -126,8 +131,27 @@ const CollectionListPage = () => {
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
+  const [sortKey, setSortKey] = useState(
+    // set sort key to cached value if it exists
+    isSSR
+      ? ''
+      : window.localStorage.getItem(`${LOCAL_STORAGE_KEY}.${collectionName}`) ||
+          JSON.stringify({
+            order: 'asc',
+            name: '',
+          })
+  )
+  const [sortOrder, setSortOrder] = useState('asc' as 'asc' | 'desc')
   const loc = useLocation()
   useEffect(() => {
+    // set sort key to cached value on route change
+    setSortKey(
+      window.localStorage.getItem(`${LOCAL_STORAGE_KEY}.${collectionName}`) ||
+        JSON.stringify({
+          order: 'asc',
+          name: '',
+        })
+    )
     // reset state when the route is changed
     setEndCursor('')
     setPrevCursors([])
@@ -142,12 +166,22 @@ const CollectionListPage = () => {
             collectionName={collectionName}
             includeDocuments
             startCursor={endCursor}
+            sortKey={sortKey}
           >
-            {(collection: Collection, _loading, reFetchCollection) => {
+            {(
+              collection: Collection,
+              _loading,
+              reFetchCollection,
+              collectionExtra: TinaCloudCollection<true>
+            ) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
               const pageInfo = collection.documents.pageInfo
+              const fields = collectionExtra.fields.filter((x) =>
+                // only allow sortable fields
+                ['string', 'number', 'datetime'].includes(x.type)
+              )
 
               return (
                 <PageWrapper>
@@ -174,11 +208,70 @@ const CollectionListPage = () => {
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
                       <>
-                        <h3 className="font-sans text-2xl text-gray-700">
-                          {collection.label
-                            ? collection.label
-                            : collection.name}
-                        </h3>
+                        <div className="flex flex-col gap-4">
+                          <h3 className="font-sans text-2xl text-gray-700">
+                            {collection.label
+                              ? collection.label
+                              : collection.name}
+                          </h3>
+
+                          {fields.length > 0 && (
+                            <div className="flex gap-2 items-center">
+                              <label
+                                htmlFor="sort"
+                                className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                              >
+                                Sort by
+                              </label>
+                              <Select
+                                name="sort"
+                                options={[
+                                  {
+                                    label: 'Default',
+                                    value: JSON.stringify({
+                                      order: 'asc',
+                                      name: '',
+                                    }),
+                                  },
+                                  ...fields
+                                    .map((x) => [
+                                      {
+                                        label: x.label + ' (Ascending)',
+                                        value: JSON.stringify({
+                                          name: x.name,
+                                          order: 'asc',
+                                        }),
+                                      },
+                                      {
+                                        label: x.label + ' (Descending)',
+                                        value: JSON.stringify({
+                                          name: x.name,
+                                          order: 'desc',
+                                        }),
+                                      },
+                                    ])
+                                    .flat(),
+                                ]}
+                                input={{
+                                  id: 'sort',
+                                  name: 'sort',
+                                  value: sortKey,
+                                  onChange: (e) => {
+                                    const val = JSON.parse(e.target.value)
+                                    setEndCursor('')
+                                    setPrevCursors([])
+                                    window?.localStorage.setItem(
+                                      `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                      e.target.value
+                                    )
+                                    setSortKey(e.target.value)
+                                    setSortOrder(val.order)
+                                  },
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                         {!collection.templates && (
                           <Link
                             to={`new`}
@@ -319,7 +412,11 @@ const CollectionListPage = () => {
                         <div className="pt-3">
                           <CursorPaginator
                             variant="white"
-                            hasNext={pageInfo?.hasNextPage}
+                            hasNext={
+                              sortOrder === 'asc'
+                                ? pageInfo?.hasNextPage
+                                : pageInfo.hasPreviousPage
+                            }
                             navigateNext={() => {
                               const newState = [...prevCursors, endCursor]
                               setPrevCursors(newState)
