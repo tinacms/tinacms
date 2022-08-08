@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.62.1
+
+### Patch Changes
+
+- 028e10686: Adding sorting in the CMS
+- e27f5cce7: Update default reference depth to 2 and give warning when a large file is produced.
+
 ## 0.62.0
 
 ### Minor Changes
