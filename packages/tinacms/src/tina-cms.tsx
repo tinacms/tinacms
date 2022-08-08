@@ -205,7 +205,13 @@ export const TinaCMSProvider2 = ({
         // @ts-expect-error this is for backwards compatibility
         isLocalClient: props?.isLocalClient,
       }
-  if (!branch || !clientId || !isLocalClient) {
+  if (
+    // Check if local client is defined
+    typeof isLocalClient === 'undefined' ||
+    // If in not in localMode check if clientId and branch are defined
+    (!isLocalClient && (!branch || !clientId))
+  ) {
+    console.log({ branch, clientId, isLocalClient })
     throw new Error(
       'Invalid setup. See https://tina.io/docs/tina-cloud/connecting-site/ for more information.'
     )
