@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.68.15
+
+### Patch Changes
+
+- 028e10686: Adding sorting in the CMS
+- Updated dependencies [028e10686]
+  - @tinacms/toolkit@0.56.37
+
 ## 0.68.14
 
 ### Patch Changes
