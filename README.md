@@ -41,10 +41,11 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 ### Maintainers
 
 - Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
-- Chris Davis ([@Enigmatical](https://github.com/Enigmatical) – Forestry.io
-- DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
 - Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
+- Kelly Davis ([@kldavis](https://github.com/kldavis4)) - Forestry.io
+- James O'Halloran ([@jamespohalloran](hhttps://github.com/jamespohalloran)) - Forestry.io
+
 
 ### All Contributors ✨
 
