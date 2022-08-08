@@ -14,6 +14,7 @@ export const viteBuild = async ({
   publicFolder: string
   outputFolder: string
 }) => {
+  const oldProcessEnv = { ...process.env }
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToSchema = path.join(rootPath, '.tina', 'schema')
   fs.writeFileSync(
@@ -27,7 +28,7 @@ vite.svg`
   const config: InlineConfig = {
     root,
     base,
-    mode: local ? 'development' : 'production',
+    // mode: local ? 'development' : 'production',
     plugins: [react()],
     define: {
       'process.env': {},
@@ -47,4 +48,7 @@ vite.svg`
     },
   }
   await build(config)
+
+  // Restore process.env
+  // process.env = oldProcessEnv
 }

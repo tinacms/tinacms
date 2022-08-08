@@ -10,9 +10,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import type { FC } from 'react'
 
 import { TinaSchema } from '../schema'
-import type { FC } from 'react'
+import type { TinaCloudSchemaConfig } from './config'
 
 export type UIField<F extends UIField = any, Shape = any> = {
   // name?: string
@@ -30,27 +31,6 @@ export type UIField<F extends UIField = any, Shape = any> = {
     field: UIField<F, Shape>
   ): string | object | undefined | void
   defaultValue?: Shape
-  // fields?: F[]
-}
-
-export interface TinaCloudSchemaConfig<Store = any> {
-  client?: {
-    referenceDepth?: number
-  }
-  build?: {
-    publicFolder: string
-    outputFolder: string
-  }
-  clientId: string
-  branch: string
-  token: string
-  media?: {
-    loadCustomStore?: () => Promise<Store>
-    tina?: {
-      publicFolder: string
-      mediaRoot: string
-    }
-  }
 }
 
 export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
@@ -468,3 +448,5 @@ export type ResolveFormArgs = {
   template: Templateable
   schema: TinaSchema
 }
+
+export * from './config'
