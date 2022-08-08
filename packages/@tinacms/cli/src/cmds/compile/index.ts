@@ -33,6 +33,7 @@ export const resetGeneratedFolder = async ({
   try {
     await fs.rm(tinaGeneratedPath, {
       recursive: true,
+      force: true,
     })
   } catch (e) {
     console.log(e)
