@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.37
+
+### Patch Changes
+
+- 028e10686: Adding sorting in the CMS
+
 ## 0.56.36
 
 ### Patch Changes
