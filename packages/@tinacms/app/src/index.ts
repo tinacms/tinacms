@@ -7,7 +7,9 @@ export const viteBuild = async ({
   rootPath,
   outputFolder,
   publicFolder,
+  local,
 }: {
+  local: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
@@ -25,6 +27,7 @@ vite.svg`
   const config: InlineConfig = {
     root,
     base,
+    mode: local ? 'development' : 'production',
     plugins: [react()],
     define: {
       'process.env': {},
