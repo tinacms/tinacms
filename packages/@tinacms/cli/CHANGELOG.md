@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.61.1
+
+### Patch Changes
+
+- 531347748: Update to use mkdirp to fix issue on windows
+- Updated dependencies [028e10686]
+- Updated dependencies [e27f5cce7]
+  - @tinacms/graphql@0.62.1
+
 ## 0.61.0
 
 ### Minor Changes
