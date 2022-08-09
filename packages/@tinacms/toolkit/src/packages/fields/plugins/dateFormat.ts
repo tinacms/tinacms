@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import moment from 'moment'
-import { DatetimepickerProps } from 'react-datetime'
+import type { DatetimepickerProps } from 'react-datetime'
 
 export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'
 export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A'
