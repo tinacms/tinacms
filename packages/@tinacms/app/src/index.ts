@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import react from '@vitejs/plugin-react'
-import fs from 'fs'
+import fs from 'fs-extra'
 import { build, InlineConfig } from 'vite'
 import path from 'path'
 
@@ -29,7 +29,10 @@ export const viteBuild = async ({
 }) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
-  fs.writeFileSync(
+  const outDir = path.join(rootPath, publicFolder, outputFolder)
+  await fs.emptyDir(outDir)
+  await fs.ensureDir(outDir)
+  await fs.writeFile(
     path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
     `index.html
 assets/
@@ -55,7 +58,7 @@ vite.svg`
     },
     build: {
       sourcemap: true,
-      outDir: path.join(rootPath, publicFolder, outputFolder),
+      outDir,
       emptyOutDir: false,
     },
   }
