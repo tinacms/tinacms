@@ -12,34 +12,12 @@ limitations under the License.
 */
 
 import React from 'react'
-import ReactDOM from 'react-dom/client'
-// the user's actual schema
-// @ts-ignore
-import config from 'TINA_IMPORT'
-import TinaCMS, { TinaAdmin } from 'tinacms'
-import { TinaEditProvider } from 'tinacms/dist/edit-state'
+import ReactDOM from 'react-dom'
+import App from './App'
 
-const App = () => {
-  // TinaAdmin checks edit state, hence why it's still being wrapped by it
-  // we should get ride of that check
-  return (
-    <>
-      {/* @ts-ignore */}
-      <TinaEditProvider
-        editMode={
-          // Stricter tsconfig in this package shows this error
-          //@ts-ignore
-          <TinaCMS {...config}>
-            <TinaAdmin />
-          </TinaCMS>
-        }
-      ></TinaEditProvider>
-    </>
-  )
-}
-
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 )

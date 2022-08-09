@@ -200,12 +200,12 @@ importers:
   packages/@tinacms/app:
     specifiers:
       '@tinacms/scripts': workspace:*
-      '@types/react': ^18.0.15
-      '@types/react-dom': ^18.0.6
+      '@types/react': 17.0.2
+      '@types/react-dom': 17.0.2
       '@vitejs/plugin-react': 1.3.2
       jest: ^27.0.6
-      react: ^18.2.0
-      react-dom: ^18.2.0
+      react: 17.0.2
+      react-dom: 17.0.2
       tinacms: workspace:*
       typescript: ^4.6.4
       vite: ^2.4.3
@@ -214,15 +214,15 @@ importers:
       '@tinacms/scripts': link:../scripts
       '@vitejs/plugin-react': 1.3.2
       jest: 27.5.1
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
       tinacms: link:../../tinacms
       typescript: 4.7.4
       vite: 2.9.13
       vite-node: 0.18.1
     devDependencies:
-      '@types/react': 18.0.15
-      '@types/react-dom': 18.0.6
+      '@types/react': 17.0.2
+      '@types/react-dom': 17.0.2
 
   packages/@tinacms/auth:
     specifiers:
@@ -332,7 +332,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -4394,17 +4394,17 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-tools/schema': 8.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
     dev: false
 
-  /@graphql-codegen/plugin-helpers/2.6.1_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/2.6.2_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-RbkCPu8rZo+d3tWPUzqnZhgGutp15GVcs9UhaOcenKpCDDQxNxqGGTn76LuAAymT9y7BSnXdY20k1CW59z4nTw==,
+        integrity: sha512-bt5PNix0MwzWP53UdaYm6URrVMWU8RlQhrTSLFjxQ8ShS5zoTlQtpZJGZc5ONqFgKa83qbUmzXUtP8oRVVn8zw==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -4426,7 +4426,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
@@ -4441,7 +4441,7 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-tag: ^2.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
       graphql: 15.8.0
@@ -4459,7 +4459,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4478,7 +4478,7 @@ packages:
     peerDependencies:
       graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-codegen/schema-ast': 2.4.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -4497,7 +4497,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.6.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.6.2_graphql@15.8.0
       '@graphql-tools/optimize': 1.3.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
@@ -7454,6 +7454,15 @@ packages:
       '@types/react': 17.0.47
     dev: true
 
+  /@types/react-dom/17.0.2:
+    resolution:
+      {
+        integrity: sha512-Icd9KEgdnFfJs39KyRyr0jQ7EKhq8U6CcHRMGAS45fp5qgUvxL3ujUCfWFttUK2UErqZNj97t9gsVPNAqcwoCg==,
+      }
+    dependencies:
+      '@types/react': 18.0.15
+    dev: true
+
   /@types/react-dom/18.0.5:
     resolution:
       {
@@ -7461,15 +7470,6 @@ packages:
       }
     dependencies:
       '@types/react': 18.0.14
-    dev: true
-
-  /@types/react-dom/18.0.6:
-    resolution:
-      {
-        integrity: sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==,
-      }
-    dependencies:
-      '@types/react': 18.0.15
     dev: true
 
   /@types/react-redux/7.1.24:
@@ -7521,6 +7521,16 @@ packages:
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
+      csstype: 3.1.0
+    dev: true
+
+  /@types/react/17.0.2:
+    resolution:
+      {
+        integrity: sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==,
+      }
+    dependencies:
+      '@types/prop-types': 15.7.5
       csstype: 3.1.0
     dev: true
 
@@ -23796,19 +23806,6 @@ packages:
       react: 17.0.2
       scheduler: 0.20.2
 
-  /react-dom/18.2.0_react@18.2.0:
-    resolution:
-      {
-        integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==,
-      }
-    peerDependencies:
-      react: ^18.2.0
-    dependencies:
-      loose-envify: 1.4.0
-      react: 18.2.0
-      scheduler: 0.23.0
-    dev: false
-
   /react-dropzone/10.1.8_react@17.0.2:
     resolution:
       {
@@ -23993,16 +23990,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-
-  /react/18.2.0:
-    resolution:
-      {
-        integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==,
-      }
-    engines: { node: '>=0.10.0' }
-    dependencies:
-      loose-envify: 1.4.0
-    dev: false
 
   /reactcss/1.2.3_react@17.0.2:
     resolution:
@@ -24992,15 +24979,6 @@ packages:
     dependencies:
       loose-envify: 1.4.0
       object-assign: 4.1.1
-
-  /scheduler/0.23.0:
-    resolution:
-      {
-        integrity: sha512-CtuThmgHNg7zIZWAXi3AsyIzA3n4xx7aNyjwC2VJldO2LMVDhFK+63xGqq6CsJH4rTAt6/M+N4GhZiDYPx9eUw==,
-      }
-    dependencies:
-      loose-envify: 1.4.0
-    dev: false
 
   /schema-utils/1.0.0:
     resolution:
