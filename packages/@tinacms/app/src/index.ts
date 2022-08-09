@@ -28,7 +28,7 @@ export const viteBuild = async ({
   outputFolder: string
 }) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
-  const pathToSchema = path.join(rootPath, '.tina', 'schema')
+  const pathToConfig = path.join(rootPath, '.tina', 'config')
   fs.writeFileSync(
     path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
     `index.html
@@ -50,7 +50,7 @@ vite.svg`
     },
     resolve: {
       alias: {
-        TINA_IMPORT: pathToSchema,
+        TINA_IMPORT: pathToConfig,
       },
     },
     build: {
