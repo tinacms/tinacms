@@ -15,7 +15,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 // the user's actual schema
 // @ts-ignore
-import { tinaConfig } from 'TINA_IMPORT'
+import config from 'TINA_IMPORT'
 import TinaCMS, { TinaAdmin } from 'tinacms'
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
 
@@ -29,7 +29,7 @@ const App = () => {
         editMode={
           // Stricter tsconfig in this package shows this error
           //@ts-ignore
-          <TinaCMS {...tinaConfig}>
+          <TinaCMS {...config}>
             <TinaAdmin />
           </TinaCMS>
         }
