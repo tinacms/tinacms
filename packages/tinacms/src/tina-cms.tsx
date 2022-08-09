@@ -211,7 +211,6 @@ export const TinaCMSProvider2 = ({
     // If in not in localMode check if clientId and branch are defined
     (!isLocalClient && (!branch || !clientId))
   ) {
-    console.log({ branch, clientId, isLocalClient })
     throw new Error(
       'Invalid setup. See https://tina.io/docs/tina-cloud/connecting-site/ for more information.'
     )

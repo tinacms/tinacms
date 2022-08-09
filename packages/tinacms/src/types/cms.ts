@@ -1,5 +1,8 @@
 import type { TinaCMS } from '@tinacms/toolkit'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type {
+  TinaCloudSchema,
+  TinaCloudSchemaConfig,
+} from '@tinacms/schema-tools'
 import type { TinaCloudMediaStoreClass } from '../auth'
 import type { useDocumentCreatorPlugin } from '../hooks/use-content-creator'
 import type { formifyCallback } from '../hooks/use-graphql-forms'
@@ -15,22 +18,8 @@ type APIProviderProps = {
 
   /**
    * The API url From this client will be used to make requests.
-   *
    */
   client: TinaClient<unknown>
-  /**
-   * The base branch to pull content from. Note that this is ignored for local development
-   *
-   */
-  branch: string
-  /**
-   * Your clientId from  app.tina.io
-   */
-  clientId: string
-  /**
-   * Your read only token from app.tina.io
-   */
-  token: string
 }
 
 interface BaseProviderProps {
@@ -48,6 +37,7 @@ interface BaseProviderProps {
   schema?: TinaCloudSchema<false>
 }
 
+// TODO: This type can probably be deprecated and removed
 type QueryProviderProps =
   | {
       /** Your React page component */
@@ -72,4 +62,5 @@ type QueryProviderProps =
 
 export type TinaCMSProviderDefaultProps = QueryProviderProps &
   APIProviderProps &
-  BaseProviderProps
+  BaseProviderProps &
+  TinaCloudSchemaConfig

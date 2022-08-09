@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// TODO: ClintID, Branch, Token should not be optional
 export interface TinaCloudSchemaConfig<Store = any> {
   client?: {
     referenceDepth?: number
@@ -19,9 +20,18 @@ export interface TinaCloudSchemaConfig<Store = any> {
     publicFolder: string
     outputFolder: string
   }
-  clientId: string
-  branch: string
-  token: string
+  /**
+   * The base branch to pull content from. Note that this is ignored for local development
+   */
+  branch?: string
+  /**
+   * Your clientId from  app.tina.io
+   */
+  clientId?: string
+  /**
+   * Your read only token from app.tina.io
+   */
+  token?: string
   media?: {
     loadCustomStore?: () => Promise<Store>
     tina?: {
