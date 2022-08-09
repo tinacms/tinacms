@@ -44,7 +44,7 @@ Please see our [./CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
 - Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
 - Kelly Davis ([@kldavis](https://github.com/kldavis4)) - Forestry.io
-- James O'Halloran ([@jamespohalloran](hhttps://github.com/jamespohalloran)) - Forestry.io
+- James O'Halloran ([@jamespohalloran](https://github.com/jamespohalloran)) - Forestry.io
 
 
 ### All Contributors ✨
