@@ -30,6 +30,7 @@ import { makeIsomorphicOptions } from './git'
 import type { GraphQLSchema } from 'graphql'
 import { viteBuild } from '@tinacms/app'
 import { logger } from '../logger'
+import { spin } from '../utils/spinner'
 
 interface BuildOptions {
   ctx: any
@@ -259,13 +260,18 @@ export const build = async ({
       }
     )
     if (ctx.schema?.config?.build) {
-      logger.info('Building static')
-      await viteBuild({
-        local,
-        rootPath,
-        outputFolder: ctx.schema?.config?.build?.outputFolder as string,
-        publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+      await spin({
+        text: 'Building static site',
+        waitFor: async () => {
+          await viteBuild({
+            local,
+            rootPath,
+            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+          })
+        },
       })
+      console.log('\nDone building static site')
     }
   } catch (error) {
     throw error

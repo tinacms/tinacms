@@ -61,6 +61,7 @@ vite.svg`
       outDir,
       emptyOutDir: false,
     },
+    logLevel: 'silent',
   }
   await build(config)
 }
