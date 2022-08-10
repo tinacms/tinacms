@@ -34,11 +34,11 @@ export default defineConfig({
 
 export default defineConfig({
    build: {
-     outputFolder: "tina",
+     outputFolder: "admin",
      publicFolder: "public",
   },
   //... other config
 })
 ```
 
-3. Go to `http://localhost:300/tina/index.html` and view the admin
+3. Go to `http://localhost:3000/admin/index.html` and view the admin
