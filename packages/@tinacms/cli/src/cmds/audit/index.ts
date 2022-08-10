@@ -60,13 +60,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
     )
   }
 
-  const bridge = options.clean
-    ? new FilesystemBridge(rootPath)
-    : new AuditFileSystemBridge(rootPath)
-  const store = options.clean
-    ? new FilesystemStore({ rootPath })
-    : new AuditFilesystemStore({ rootPath })
-  const database = await createDatabase({ store, bridge })
+  const database = ctx.database
   const schema = await database.getSchema()
   const collections = schema.getCollections()
   let warning = false

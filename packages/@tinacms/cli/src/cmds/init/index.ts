@@ -239,7 +239,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
   if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
     fs.mkdirpSync(tinaBlogPagePath)
-    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage())
+    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
   }
   logger.info('Adding a content folder... ✅')
   // 4. update the users package.json

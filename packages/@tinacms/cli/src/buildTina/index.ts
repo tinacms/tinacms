@@ -16,8 +16,8 @@ import fs from 'fs-extra'
 
 import { Bridge, buildSchema, createDatabase, Database } from '@tinacms/graphql'
 import {
+  AuditFileSystemBridge,
   FilesystemBridge,
-  FilesystemStore,
   IsomorphicBridge,
   LevelStore,
   Store,
@@ -87,13 +87,37 @@ export const buildSetupCmdServerStart = async (
 
   next()
 }
+export const buildSetupCmdAudit = async (
+  ctx: any,
+  next: () => void,
+  options: { clean: boolean }
+) => {
+  const rootPath = ctx.rootPath as string
+  const bridge = options.clean
+    ? new FilesystemBridge(rootPath)
+    : new AuditFileSystemBridge(rootPath)
+
+  const store = new LevelStore(rootPath, false)
+
+  const database = await createDatabase({ store, bridge })
+
+  // attach to context
+  ctx.bridge = bridge
+  ctx.database = database
+  ctx.store = store
+
+  next()
+}
 
 const buildSetup = async ({
   isomorphicGitBridge,
   experimentalData,
   rootPath,
   useMemoryStore,
-}: BuildSetupOptions & { rootPath: string; useMemoryStore: boolean }) => {
+}: BuildSetupOptions & {
+  rootPath: string
+  useMemoryStore: boolean
+}) => {
   const fsBridge = new FilesystemBridge(rootPath)
   const isomorphicOptions =
     isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
@@ -152,6 +176,28 @@ export const buildCmdBuild = async (
   next()
 }
 
+export const auditCmdBuild = async (
+  ctx: any,
+  next: () => void,
+  options: Omit<
+    BuildOptions & BuildSetupOptions,
+    'bridge' | 'database' | 'store'
+  >
+) => {
+  const bridge: Bridge = ctx.bridge
+  const database: Database = ctx.database
+  const store: Store = ctx.store
+  await build({
+    ...options,
+    local: true,
+    verbose: true,
+    bridge,
+    database,
+    store,
+    ctx: ctx,
+  })
+  next()
+}
 export const build = async ({
   noWatch,
   ctx,
