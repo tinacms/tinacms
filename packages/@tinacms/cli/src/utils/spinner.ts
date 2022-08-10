@@ -13,9 +13,15 @@ limitations under the License.
 
 import { Spinner } from 'cli-spinner'
 
-export async function spin<T>({ waitFor }: { waitFor: () => Promise<T> }) {
+export async function spin<T>({
+  waitFor,
+  text,
+}: {
+  waitFor: () => Promise<T>
+  text: string
+}) {
   const spinner = new Spinner({
-    text: 'Indexing... %s',
+    text: `${text} %s`,
     stream: process.stderr,
     onTick: function (msg) {
       this.clearLine(this.stream)
