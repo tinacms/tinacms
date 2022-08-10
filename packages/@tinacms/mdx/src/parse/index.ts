@@ -81,11 +81,13 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = preprocessedString.replaceAll(
+      preprocessedString = replaceAll(
+        preprocessedString,
         template.match.start,
         `<${template.name}>\``
       )
-      preprocessedString = preprocessedString.replaceAll(
+      preprocessedString = replaceAll(
+        preprocessedString,
         template.match.end,
         `\`</${template.name}>`
       )
@@ -156,4 +158,9 @@ export const invalidMarkdown = (
       },
     ],
   }
+}
+
+export const replaceAll = (string: string, target: string, value: string) => {
+  const regex = new RegExp(target, 'g')
+  return string.valueOf().replace(regex, value)
 }

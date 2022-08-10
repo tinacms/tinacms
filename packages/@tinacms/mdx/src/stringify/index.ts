@@ -22,6 +22,7 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
+import { replaceAll } from '../parse'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
@@ -73,11 +74,13 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = preprocessedString.replaceAll(
+      preprocessedString = replaceAll(
+        preprocessedString,
         `<${template.name}>\``,
         `${template.match.start} `
       )
-      preprocessedString = preprocessedString.replaceAll(
+      preprocessedString = replaceAll(
+        preprocessedString,
         `\`</${template.name}>`,
         ` ${template.match.end}`
       )
