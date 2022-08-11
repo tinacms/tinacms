@@ -25,6 +25,7 @@ import { TinaCMSProvider2 } from './tina-cms'
 import { useTina } from './edit-state'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 
+const mockApiURl = 'http://localhost:4001/graphql'
 jest.mock('./auth', () => {
   return {
     TinaCloudProvider: ({ children }: any) => (<>{children}</>) as ReactNode,
@@ -55,6 +56,7 @@ describe('TinaCMSProvider', () => {
     it('passes along all props', () => {
       const { queryByText } = render(
         <TinaCMSProvider2
+          apiURL={mockApiURl}
           query="my-query"
           variables={{ foo: 'my-variable-val' }}
           data={{ foo: 'my-data' }}
@@ -86,6 +88,7 @@ describe('TinaCMSProvider', () => {
       }
       render(
         <TinaCMSProvider2
+          apiURL={mockApiURl}
           {...request}
           schema={{
             collections: [],
@@ -110,6 +113,7 @@ describe('TinaCMSProvider', () => {
       const { queryByText } = render(
         <TinaCMSProvider2
           {...request}
+          apiURL={mockApiURl}
           schema={{
             collections: [],
           }}
@@ -134,6 +138,7 @@ describe('TinaCMSProvider', () => {
       render(
         <TinaCMSProvider2
           {...request}
+          apiURL={mockApiURl}
           schema={{
             collections: [],
           }}
@@ -164,6 +169,7 @@ describe('TinaCMSProvider', () => {
             schema={{
               collections: [],
             }}
+            apiURL={mockApiURl}
           >
             {(liveProps) => <DummyChild {...liveProps} />}
           </TinaCMSProvider2>
@@ -180,7 +186,7 @@ describe('TinaCMSProvider', () => {
     it('render children', () => {
       const { queryByText } = render(
         <TinaCMSProvider2
-          apiURL={'http://localhost:3000'}
+          apiURL={mockApiURl}
           schema={{
             collections: [],
           }}
@@ -197,6 +203,7 @@ describe('TinaCMSProvider', () => {
     it('doesnt register form', () => {
       render(
         <TinaCMSProvider2
+          apiURL={mockApiURl}
           schema={{
             collections: [],
           }}
