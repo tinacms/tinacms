@@ -249,6 +249,7 @@ const apiURL =
     ? 'http://localhost:4001/graphql'
     : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
 
+// @ts-ignore
 export const tinaConfig = defineConfig({
   apiURL,
   schema,
