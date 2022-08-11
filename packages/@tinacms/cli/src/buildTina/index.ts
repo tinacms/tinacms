@@ -28,6 +28,9 @@ import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
 import type { GraphQLSchema } from 'graphql'
+import { viteBuild } from '@tinacms/app'
+import { logger } from '../logger'
+import { spin } from '../utils/spinner'
 
 interface BuildOptions {
   ctx: any
@@ -217,7 +220,6 @@ export const build = async ({
   if (!rootPath) {
     throw new Error('Root path has not been attached')
   }
-
   const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
 
   // Clear the cache of the DB passed to the GQL server
@@ -257,6 +259,20 @@ export const build = async ({
         local,
       }
     )
+    if (ctx.schema?.config?.build) {
+      await spin({
+        text: 'Building static site',
+        waitFor: async () => {
+          await viteBuild({
+            local,
+            rootPath,
+            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+          })
+        },
+      })
+      console.log('\nDone building static site')
+    }
   } catch (error) {
     throw error
   } finally {
