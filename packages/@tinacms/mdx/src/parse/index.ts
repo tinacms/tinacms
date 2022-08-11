@@ -69,7 +69,7 @@ import type * as Plate from './plate'
  * doesn't change
  *
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
- * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
+ * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
 export const markdownToAst = (value: string, field: RichTypeInner) => {
   const templatesWithMatchers = field.templates?.filter(
