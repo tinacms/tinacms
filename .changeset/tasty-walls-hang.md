@@ -1,0 +1,44 @@
+---
+'@tinacms/app': patch
+'@tinacms/cli': patch
+'@tinacms/schema-tools': patch
+'@tinacms/scripts': patch
+'@tinacms/toolkit': patch
+'tinacms': patch
+---
+
+
+ ## Adds a new "Static" build option.
+
+This new option will build tina into a static `index.html` file. This will allow someone to use tina without having react as a dependency.
+
+### How to update
+
+ 
+ 1. Add a `.tina/config.{js,ts,tsx,jsx}` with the default export of define config.
+```ts
+// .tina/config.ts
+import schema from './schema'
+
+export default defineConfig({
+  schema: schema,
+  //.. Everything from define config in `schema.ts`
+  //.. Everything from `schema.config`  
+}) 
+```
+
+2. Add Build config
+
+```
+.tina/config.ts
+
+export default defineConfig({
+   build: {
+     outputFolder: "admin",
+     publicFolder: "public",
+  },
+  //... other config
+})
+```
+
+3. Go to `http://localhost:3000/admin/index.html` and view the admin

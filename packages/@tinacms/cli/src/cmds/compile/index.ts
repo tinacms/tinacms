@@ -20,7 +20,7 @@ import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
-import { getSchemaPath, getClientPath } from '../../lib'
+import { getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
 
 export const resetGeneratedFolder = async ({
@@ -47,7 +47,8 @@ export const queries = (client)=>({})
   await fs.writeFile(
     path.join(tinaGeneratedPath, `client.${ext}`),
     `
-export const client = {}
+export const client = ()=>{}
+export default client
 `
   )
   await fs.outputFile(
@@ -181,10 +182,11 @@ export const compileClient = async (
   return next()
 }
 
-export const compileSchema = async (
+export const compileFile = async (
   ctx,
   _next,
-  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
+  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean },
+  fileName: string
 ) => {
   const root = ctx.rootPath
   if (!root) {
@@ -193,8 +195,7 @@ export const compileSchema = async (
   const tinaPath = path.join(root, '.tina')
   const tsConfigPath = path.join(root, 'tsconfig.json')
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
-  const tinaTempPath = path.join(tinaGeneratedPath, 'temp_schema')
-  const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
+  const tinaTempPath = path.join(tinaGeneratedPath, `temp_${fileName}`)
   const packageJSONFilePath = path.join(root, 'package.json')
 
   if (!options.schemaFileType) {
@@ -204,7 +205,7 @@ export const compileSchema = async (
   }
 
   if (options.verbose) {
-    logger.info(logText('Compiling Schema...'))
+    logger.info(logText(`Compiling ${fileName}...`))
   }
 
   const { schemaFileType: requestedSchemaFileType = 'ts' } = options
@@ -227,12 +228,18 @@ export const compileSchema = async (
 
   let schemaExists = true
   try {
-    getSchemaPath({ projectDir: tinaPath })
+    getPath({
+      projectDir: tinaPath,
+      filename: fileName,
+      allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
+      errorMessage: `Must provide a ${fileName}.{js,jsx,tsx,ts}`,
+    })
   } catch {
     // getSchemaPath will throw an error if it is not found
     schemaExists = false
   }
-  if (!schemaExists) {
+  // TODO: refactor this
+  if (!schemaExists && fileName === 'schema') {
     // The schema.ts file does not exist
     logger.info(
       dangerText(`
@@ -240,7 +247,6 @@ export const compileSchema = async (
       See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
       `)
     )
-    // We will default to TS?
     const file = path.join(tinaPath, `schema.${schemaFileType}`)
     // Ensure there is a .tina/schema.ts file
     await fs.ensureFile(file)
@@ -256,10 +262,15 @@ export const compileSchema = async (
         ? '"development"'
         : '"production"'
     }
-    const inputFile = getSchemaPath({ projectDir: tinaPath })
+    const inputFile = getPath({
+      projectDir: tinaPath,
+      filename: fileName,
+      allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
+      errorMessage: `Must provide a ${fileName}.{js,jsx,tsx,ts}`,
+    })
     await transpile(
       inputFile,
-      'schema.js',
+      `${fileName}.js`,
       tinaTempPath,
       options.verbose,
       define,
@@ -276,15 +287,11 @@ export const compileSchema = async (
       delete require.cache[require.resolve(key)]
     }
   })
+  let returnObject = {}
 
   try {
-    const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-    const schemaObject: TinaCloudSchema = schemaFunc.default
-    ctx.schema = schemaObject
-    await fs.outputFile(
-      path.join(tinaConfigPath, 'schema.json'),
-      JSON.stringify(schemaObject, null, 2)
-    )
+    const schemaFunc = require(path.join(tinaTempPath, `${fileName}.js`))
+    returnObject = schemaFunc.default
     await cleanup({ tinaTempPath })
   } catch (e) {
     // Always remove the temp code
@@ -300,6 +307,38 @@ export const compileSchema = async (
     // Throw an execution error
     throw new ExecuteSchemaError(e)
   }
+  return returnObject
+}
+
+export const compileSchema = async (
+  ctx,
+  _next,
+  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
+) => {
+  const root = ctx.rootPath
+  const tinaPath = path.join(root, '.tina')
+  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
+  const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
+
+  let schema: any = await compileFile(ctx, _next, options, 'schema')
+  try {
+    const config = (await compileFile(ctx, _next, options, 'config')) as any
+    const configCopy = _.cloneDeep(config)
+    delete configCopy.schema
+    if (config?.schema) {
+      // Merge the schema with the config to maintain backwards compatibility
+      // EX: {collections: [], config: {...}}
+      schema = { ...config.schema, config: configCopy }
+    }
+  } catch (e) {
+    // Do nothing, they are not using a config file
+  }
+
+  ctx.schema = schema
+  await fs.outputFile(
+    path.join(tinaConfigPath, `schema.json`),
+    JSON.stringify(schema, null, 2)
+  )
 }
 
 const transpile = async (

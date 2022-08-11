@@ -21,7 +21,7 @@ interface GetPathParams {
   errorMessage: string
 }
 
-const getPath = ({
+export const getPath = ({
   projectDir,
   filename,
   allowedTypes,
