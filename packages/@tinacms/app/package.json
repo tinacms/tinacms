@@ -1,0 +1,55 @@
+{
+  "name": "@tinacms/app",
+  "version": "0.0.3",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "script.mjs",
+    "package.json",
+    "public",
+    "appFiles/src",
+    "appFiles/index.html",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "vite.config.ts"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "types": "pnpm tsc",
+    "build": "tinacms-scripts build",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.2",
+    "@types/fs-extra": "^9.0.1"
+  },
+  "dependencies": {
+    "@tinacms/scripts": "workspace:*",
+    "@vitejs/plugin-react": "1.3.2",
+    "fs-extra": "^9.0.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "tinacms": "workspace:*",
+    "typescript": "^4.6.4",
+    "vite": "^2.4.3",
+    "vite-node": "^0.18.1",
+    "jest": "^27.0.6"
+  }
+}

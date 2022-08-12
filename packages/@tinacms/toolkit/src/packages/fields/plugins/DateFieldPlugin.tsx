@@ -21,8 +21,9 @@ import { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
 import { InputProps, textFieldClasses } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import ReactDatetime from 'react-datetime'
-import { DatetimepickerProps } from 'react-datetime'
+// we might be able to go back to react-datetime when https://github.com/arqex/react-datetime/pull/813 is merged
+import ReactDatetime from '../../react-datetime/DateTime'
+import type { DatetimepickerProps } from 'react-datetime'
 import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './dateFormat'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(

@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.56.37
+
+### Patch Changes
+
+- 028e10686: Adding sorting in the CMS
+
+## 0.56.36
+
+### Patch Changes
+
+- 090a5b995: fixed issue where a dot would show up in the media store directory
+
 ## 0.56.35
 
 ### Patch Changes
