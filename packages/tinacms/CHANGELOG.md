@@ -1,5 +1,29 @@
 # tinacms
 
+## 0.68.15
+
+### Patch Changes
+
+- 028e10686: Adding sorting in the CMS
+- Updated dependencies [028e10686]
+  - @tinacms/toolkit@0.56.37
+
+## 0.68.14
+
+### Patch Changes
+
+- 329b72e7a: fix types in createClient
+- ef94f2b59: BREAKING CHANGE: Deprecate dated defineConfig use:
+  - clientId & branch should instead be passed to defineSchema.
+  - defineConfig now needs to take in the client.
+    See tina.io for upgrade details: https://tina.io/blog/tina-v-0.69.0
+- 7334ec5be: Client now throws an error when a non 200 status code is returned.
+- Updated dependencies [870a32f18]
+- Updated dependencies [090a5b995]
+- Updated dependencies [660247b6b]
+  - @tinacms/schema-tools@0.0.9
+  - @tinacms/toolkit@0.56.36
+
 ## 0.68.13
 
 ### Patch Changes
