@@ -20,9 +20,14 @@
       "require": "./dist/edit-state.js"
     },
     "./dist/rich-text": {
-      "types": "./dist/rich-text.d.ts",
-      "import": "./dist/rich-text.es.js",
-      "require": "./dist/rich-text.js"
+      "types": "./dist/rich-text/index.d.ts",
+      "import": "./dist/rich-text/index.es.js",
+      "require": "./dist/rich-text/index.js"
+    },
+    "./dist/rich-text/prism": {
+      "types": "./dist/rich-text/prism.d.ts",
+      "import": "./dist/rich-text/prism.es.js",
+      "require": "./dist/rich-text/prism.js"
     }
   },
   "files": [
@@ -32,7 +37,7 @@
     "entryPoints": [
       "src/index.ts",
       "src/edit-state.tsx",
-      "src/rich-text.tsx",
+      "src/rich-text/index.tsx",
       "src/client.ts"
     ]
   },
@@ -58,6 +63,8 @@
     "graphql": "^15.1.0",
     "graphql-tag": "^2.11.0",
     "lodash.set": "^4.3.2",
+    "prism-react-renderer": "^1.3.5",
+    "prism": "^4.1.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "6",
     "url-pattern": "^1.0.3",
