@@ -1,0 +1,79 @@
+{
+  "name": "@tinacms/mdx",
+  "version": "0.60.3",
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "files": [
+    "package.json",
+    "dist"
+  ],
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node",
+        "bundleDeps": true
+      }
+    ]
+  },
+  "scripts": {
+    "types": "yarn tsc",
+    "build": "tinacms-scripts build",
+    "docs": "yarn typedoc",
+    "serve": "yarn nodemon dist/server.js",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "test-watch": "jest --watch"
+  },
+  "dependencies": {
+    "@tinacms/schema-tools": "workspace:*",
+    "acorn": "^8.7.1",
+    "lodash-es": "^4.17.21",
+    "mdast-util-mdx-jsx": "^2.0.1",
+    "mdast-util-to-markdown": "^1.3.0",
+    "prettier": "^2.7.1",
+    "remark": "^14.0.2",
+    "remark-mdx": "^2.1.2",
+    "unist-util-visit": "^4.1.0",
+    "vfile": "^4.2.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/tina-graphql"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.2.210",
+    "@swc/jest": "^0.2.21",
+    "@tinacms/scripts": "workspace:*",
+    "@types/cors": "^2.8.7",
+    "@types/estree": "^0.0.50",
+    "@types/estree-jsx": "^1.0.0",
+    "@types/express": "^4.17.8",
+    "@types/fs-extra": "^9.0.2",
+    "@types/jest": "^26.0.4",
+    "@types/js-yaml": "^3.12.5",
+    "@types/lodash-es": "4.17.6",
+    "@types/mdast": "3.0.7",
+    "@types/node": "^14.18.21",
+    "@types/normalize-path": "^3.0.0",
+    "@types/prettier": "^2.6.3",
+    "@types/ws": "^7.2.6",
+    "@types/yup": "^0.29.7",
+    "c8": "^7.11.3",
+    "estree-jsx": "^0.0.1",
+    "jest": "^28.1.2",
+    "jest-diff": "^28.1.1",
+    "jest-file-snapshot": "^0.5.0",
+    "jest-matcher-utils": "^28.1.1",
+    "mdast": "^3.0.0",
+    "nodemon": "^2.0.4",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.2",
+    "vitest": "^0.18.0"
+  }
+}
