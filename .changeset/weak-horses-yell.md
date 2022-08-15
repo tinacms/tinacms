@@ -2,4 +2,4 @@
 "tinacms": patch
 ---
 
-Specify inlineFragment nodes to show in sidebar
+Fixes an issue where `collections` with `templates` weren't generating forms in the sidebar
