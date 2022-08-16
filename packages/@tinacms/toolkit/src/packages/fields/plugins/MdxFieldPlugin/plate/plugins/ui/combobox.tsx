@@ -157,10 +157,6 @@ export function SearchAutocomplete(props: {
     props.onCancel()
   })
 
-  useHotkey('enter', () => {
-    dispatch({ type: 'selectCurrentItem' })
-  })
-
   useHotkey('ArrowDown', () => {
     dispatch({ type: 'move', value: 'down' })
   })

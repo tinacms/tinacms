@@ -1,0 +1,2 @@
+<Blockquote author="Pedro">
+</Blockquote>

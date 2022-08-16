@@ -19,7 +19,7 @@ limitations under the License.
 import React, { Fragment } from 'react'
 import { PlusIcon, HeadingIcon, ToolbarIcon } from '../icons'
 import { Popover, Transition } from '@headlessui/react'
-import { useEditorState, isCollapsed } from '@udecode/plate-core'
+import { useEditorState, isCollapsed } from '@udecode/plate-headless'
 import { insertMDX } from '../../create-mdx-plugins'
 import {
   LinkForm,
@@ -27,7 +27,7 @@ import {
   isLinkActive,
 } from '../../create-link-plugin'
 
-import type { PlateEditor } from '@udecode/plate-core'
+import type { PlateEditor } from '@udecode/plate-headless'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
 
@@ -37,7 +37,7 @@ export type ToolbarItemType = {
   inlineOnly?: boolean
   hidden?: boolean
   active?: boolean
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onMouseDown?: (event: any) => void
   icon?: string
   options?: {}[]
   isLastItem?: boolean
@@ -160,7 +160,7 @@ export const ToolbarItem = ({
         {isExpanded && (
           <LinkForm
             selection={selection}
-            onClose={(e) => {
+            onClose={() => {
               setIsExpanded(false)
             }}
             onChange={(v) => console.log(v)}

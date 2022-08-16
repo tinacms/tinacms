@@ -158,6 +158,7 @@ export const resolveField = (
             key: templateName,
             inline: template.inline,
             name: templateName,
+            match: template.match,
             fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }

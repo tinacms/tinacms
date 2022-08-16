@@ -25,14 +25,15 @@ import {
   findNode,
   getPluginType,
   PlateEditor,
-} from '@udecode/plate-core'
+  removeNodes,
+} from '@udecode/plate-headless'
 import { computePosition, flip, shift } from '@floating-ui/dom'
-import { Element, Transforms } from 'slate'
 import { useFocused, useSelected } from 'slate-react'
 import { SearchAutocomplete } from '../ui/combobox'
 import { insertMDX } from '../create-mdx-plugins'
-import type { MdxTemplate } from '../../types'
 import { helpers } from '../core/common'
+import { Element } from 'slate'
+import type { MdxTemplate } from '../../types'
 
 export const ELEMENT_MAYBE_MDX = 'maybe_mdx'
 
@@ -50,12 +51,12 @@ export const findMaybeMDX = (editor: PlateEditor) =>
  * This can probably be customized to whatever command
  * the developer wants (eg. `<`)
  */
-export const withMaybeMDX = (editor) => {
+export const withMaybeMDX = (editor: PlateEditor) => {
   const { type } = getPlugin(editor, ELEMENT_MAYBE_MDX)
   const { insertText } = editor
   editor.insertText = (text) => {
     if (isSelectionInMaybeMDX(editor)) {
-      return Transforms.insertText(editor, text)
+      return insertText(text)
     }
     if (!editor.selection || text !== '/') {
       return insertText(text)
@@ -101,9 +102,8 @@ const SlashCombobox = (props: {
 
   const onValue = (value: MdxTemplate) => {
     // Effectively replaces the existing node with the MDX element
-    Transforms.removeNodes(props.editor, {
+    removeNodes(props.editor, {
       match: (n) => {
-        // @ts-ignore bad type from slate
         if (Element.isElement(n) && n.type === ELEMENT_MAYBE_MDX) {
           return true
         }
