@@ -19,18 +19,19 @@ limitations under the License.
 import React from 'react'
 import {
   useEditorState,
-  getNodes,
+  getNodeEntries,
   unwrapNodes,
   setNodes,
   wrapNodes,
   PlateEditor,
   isCollapsed,
-  getAbove,
+  getAboveNode,
   getPluginType,
-} from '@udecode/plate-core'
+  createLinkPlugin,
+  ELEMENT_LINK,
+} from '@udecode/plate-headless'
 import { Editor, Element, BaseRange, Transforms } from 'slate'
 import { NestedForm } from '../../nested-form'
-import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
 
 export { createLinkPlugin }
 
@@ -50,7 +51,7 @@ export const wrapOrRewrapLink = (editor) => {
 
   // if our cursor is inside an existing link, but don't have the text selected, select it now
   if (isCollapsed(editor.selection)) {
-    const [, path] = getAbove(editor, {
+    const [, path] = getAboveNode(editor, {
       match: (n) =>
         !Editor.isEditor(n) &&
         Element.isElement(n) &&
@@ -75,7 +76,7 @@ export const LinkForm = (props) => {
   const selection = React.useMemo(() => editor.selection, [])
 
   const handleChange = (values) => {
-    const linksInSelection = getNodes<LinkElement>(editor, {
+    const linksInSelection = getNodeEntries<LinkElement>(editor, {
       match: (n) =>
         !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
       at: selection,
@@ -129,7 +130,7 @@ export const unwrapLink = (editor: PlateEditor, selection?: BaseRange) => {
 }
 
 export const getLinks = (editor) => {
-  return getNodes<LinkElement>(editor, {
+  return getNodeEntries<LinkElement>(editor, {
     match: (n) =>
       !Editor.isEditor(n) && Element.isElement(n) && n.type === ELEMENT_LINK,
   })
