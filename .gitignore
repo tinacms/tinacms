@@ -16,6 +16,7 @@ packages/cli/forestry/.env
 .idea/
 **/.cache/
 **/package-lock.json
+tsconfig.tsbuildinfo
 
 .npmrc
 
