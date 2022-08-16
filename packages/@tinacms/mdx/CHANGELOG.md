@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 0.61.1
+
+### Patch Changes
+
+- 3d36a0e42: Add null check in markdownToAst to fix error during new doc creation
+
 ## 0.61.0
 
 ### Minor Changes
