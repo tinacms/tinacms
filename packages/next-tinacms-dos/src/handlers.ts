@@ -1,0 +1,195 @@
+/**
+Copyright 2021 Forestry.io Holdings, Inc.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+import {
+  S3Client,
+  ListObjectsCommand,
+  S3ClientConfig,
+  ListObjectsCommandInput,
+  _Object,
+} from '@aws-sdk/client-s3'
+import { Media, MediaListOptions } from '@tinacms/toolkit'
+import path from 'path'
+import { NextApiRequest, NextApiResponse } from 'next'
+// import multer from 'multer'
+// import { promisify } from 'util'
+
+export interface DOSConfig {
+  config: S3ClientConfig
+  bucket: string
+  authorized: (_req: NextApiRequest, _res: NextApiResponse) => Promise<boolean>
+}
+
+export interface DOSOptions {
+  cdnUrl?: string
+}
+
+export const mediaHandlerConfig = {
+  api: {
+    bodyParser: false,
+  },
+}
+
+export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
+  const client = new S3Client(config.config)
+  const bucket = config.bucket
+  const cdnUrl =
+    options?.cdnUrl ||
+    config.config.endpoint
+      .toString()
+      .replace(/http(s|):\/\//i, `https://${bucket}.`)
+
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    const isAuthorized = await config.authorized(req, res)
+    // make sure the user is authorized to upload
+    if (!isAuthorized) {
+      res.status(401).json({ message: 'sorry this user is unauthorized' })
+      return
+    }
+    switch (req.method) {
+      case 'GET':
+        return listMedia(req, res, client, bucket, cdnUrl)
+      case 'POST':
+        return uploadMedia(req, res)
+      case 'DELETE':
+        return deleteAsset(req, res)
+      default:
+        res.end(404)
+    }
+  }
+}
+
+async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
+  console.log(req, res)
+  // const upload = promisify(
+  //   multer({
+  //     storage: multer.diskStorage({
+  //       directory: (req, file, cb) => {
+  //         cb(null, '/tmp')
+  //       },
+  //       filename: (req, file, cb) => {
+  //         cb(null, file.originalname)
+  //       },
+  //     }),
+  //   }).single('file')
+  // )
+
+  // await upload(req, res)
+
+  // const { directory } = req.body
+
+  // //@ts-ignore
+  // const result = await dos.uploader.upload(req.file.path, {
+  //   folder: directory.replace(/^\//, ''),
+  //   use_filename: true,
+  //   overwrite: false,
+  // })
+
+  // res.json(result)
+}
+
+async function listMedia(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  client: S3Client,
+  bucket: string,
+  cdnUrl: string
+) {
+  try {
+    const {
+      directory = '',
+      limit = 500,
+      offset,
+    } = req.query as MediaListOptions
+
+    const params: ListObjectsCommandInput = {
+      Bucket: bucket,
+      Delimiter: '/',
+      Prefix: directory,
+      Marker: offset?.toString(),
+      MaxKeys: directory && !offset ? limit + 1 : limit,
+    }
+
+    const command = new ListObjectsCommand(params)
+
+    const response = await client.send(command)
+
+    const items = []
+
+    response.CommonPrefixes?.forEach(({ Prefix }) =>
+      items.push({
+        id: Prefix,
+        type: 'dir',
+        filename: path.basename(Prefix),
+        directory: path.dirname(Prefix),
+      })
+    )
+
+    items.push(
+      ...(response.Contents || [])
+        .slice(directory && !offset ? 1 : 0)
+        .map(getDOSToTinaFunc(cdnUrl))
+    )
+
+    res.json({
+      items,
+      offset: response.NextMarker,
+    })
+  } catch (e) {
+    res.status(500)
+    const message = findErrorMessage(e)
+    res.json({ e: message })
+  }
+}
+
+/**
+ * we're getting inconsistent errors in this try-catch
+ * sometimes we just get a string, sometimes we get the whole response.
+ * I suspect this is coming from Digital Ocean Space SDK so let's just try to
+ * normalize it into a string here.
+ */
+const findErrorMessage = (e: any) => {
+  if (typeof e == 'string') return e
+  if (e.message) return e.message
+  if (e.error && e.error.message) return e.error.message
+  return 'an error occurred'
+}
+
+async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
+  console.log(req, res)
+  // const { media } = req.query
+  // const [, public_id] = media as string[]
+
+  // dos.uploader.destroy(public_id as string, {}, (err) => {
+  //   if (err) res.status(500)
+  //   res.json({
+  //     err,
+  //     public_id,
+  //   })
+  // })
+}
+function getDOSToTinaFunc(cdnUrl) {
+  return function dosToTina(file: _Object): Media {
+    const filename = path.basename(file.Key)
+    const directory = path.dirname(file.Key) + '/'
+
+    return {
+      id: file.Key,
+      filename,
+      directory,
+      src: cdnUrl + '/' + file.Key,
+      previewSrc: cdnUrl + '/' + file.Key,
+      type: 'file',
+    }
+  }
+}
