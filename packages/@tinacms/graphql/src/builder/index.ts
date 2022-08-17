@@ -1081,7 +1081,7 @@ export class Builder {
           type: await this._filterCollectionDocumentType(field),
         })
       case 'rich-text':
-        if (!field.templates) {
+        if (!field.templates || field.templates.length === 0) {
           return astBuilder.InputValueDefinition({
             name: field.name,
             type: astBuilder.InputObjectTypeDefinition({
