@@ -157,12 +157,6 @@ export const remarkToSlate = (
                 child.children.map((child) => phrasingContent(child))
               ),
             }
-          case 'blockquote': {
-            return {
-              ...blockquote(child),
-              type: 'lic',
-            }
-          }
           case 'mdxJsxFlowElement':
             return {
               type: 'lic',
@@ -177,11 +171,20 @@ export const remarkToSlate = (
             }
           case 'code':
           case 'thematicBreak':
+          case 'blockquote':
           case 'table':
           case 'html':
-            throw new Error(`${content.type} inside list item is not supported`)
+            throw new RichTextParseError(
+              `${child.type} inside list item is not supported`,
+              child.position
+            )
           default:
-            throw new Error(`Unknown list item of type ${content.type}`)
+            throw new RichTextParseError(
+              // @ts-expect-error child should be of type "never"
+              `Unknown list item of type ${child.type}`,
+              // @ts-expect-error child should be of type "never"
+              child.position
+            )
         }
       }),
     }
@@ -201,8 +204,9 @@ export const remarkToSlate = (
       case 'paragraph':
         return flattenPhrasingContent(content.children)
       default:
-        throw new Error(
-          `UnwrapBlock: Unknown block content of type ${content.type}`
+        throw new RichTextParseError(
+          `UnwrapBlock: Unknown block content of type ${content.type}`,
+          content.position
         )
     }
   }
@@ -249,8 +253,9 @@ export const remarkToSlate = (
       case 'strong':
         return phrashingMark(content)
       default:
-        throw new Error(
-          `StaticPhrasingContent: ${content.type} is not yet supported`
+        throw new RichTextParseError(
+          `StaticPhrasingContent: ${content.type} is not yet supported`,
+          content.position
         )
     }
   }
@@ -285,7 +290,10 @@ export const remarkToSlate = (
           content.position
         )
       default:
-        throw new Error(`PhrasingContent: ${content.type} is not yet supported`)
+        throw new RichTextParseError(
+          `PhrasingContent: ${content.type} is not yet supported`,
+          content.position
+        )
     }
   }
   const breakContent = (): Plate.BreakElement => {
@@ -354,7 +362,10 @@ export const remarkToSlate = (
         accum.push({ type: 'text', text: node.value, ...markProps })
         break
       default:
-        throw new Error(`Unexpected inline element of type ${node.type}`)
+        throw new RichTextParseError(
+          `Unexpected inline element of type ${node.type}`,
+          node.position
+        )
     }
     return accum
   }

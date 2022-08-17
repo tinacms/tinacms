@@ -11,3 +11,8 @@
 * list item 1
   1. sub list item 1A
 * list item 2
+
+***
+
+* On Monday
+  1. `next` is merged into `latest`; then `latest` is published to npm
