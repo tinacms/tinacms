@@ -260,6 +260,7 @@ export const formify = async ({
                   inlineFragmentNode: selectionNode,
                   parentType: type,
                   path,
+                  showInSidebar: true,
                 })
               }
               case 'Field': {
@@ -347,6 +348,7 @@ export const formify = async ({
                   inlineFragmentNode: selectionNode,
                   parentType: field.type,
                   path: fieldPath,
+                  showInSidebar: false,
                 })
               }
               default:
@@ -365,10 +367,12 @@ export const formify = async ({
     inlineFragmentNode,
     parentType,
     path,
+    showInSidebar,
   }: {
     inlineFragmentNode: G.InlineFragmentNode
     parentType: G.GraphQLOutputType
     path: BlueprintPath[]
+    showInSidebar: boolean
   }) => {
     const type = util.getSelectedUnionType(parentType, inlineFragmentNode)
     if (!type) {
@@ -380,7 +384,7 @@ export const formify = async ({
         inlineFragmentNode: inlineFragmentNode,
         type,
         path,
-        showInSidebar: false,
+        showInSidebar,
       })
     }
 

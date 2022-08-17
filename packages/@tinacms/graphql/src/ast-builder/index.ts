@@ -890,6 +890,56 @@ export const astBuilder = {
                   kind: 'Field',
                   name: {
                     kind: 'Name',
+                    value: 'pageInfo',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'hasPreviousPage',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'hasNextPage',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'startCursor',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'endCursor',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
                     value: 'totalCount',
                   },
                   arguments: [],

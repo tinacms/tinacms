@@ -13,28 +13,31 @@ limitations under the License.
 
 import {
   someNode,
-  isMarkActive as isMarkActiveBase,
   getPluginType,
+  isMarkActive as isMarkActiveBase,
   insertNodes,
   setNodes,
   findNode,
   PlateEditor,
   getBlockAbove,
-} from '@udecode/plate-core'
-import { ReactEditor } from 'slate-react'
-import { createParagraphPlugin } from '@udecode/plate-paragraph'
-import { createCodeBlockPlugin } from '@udecode/plate-code-block'
-import { createHorizontalRulePlugin } from '@udecode/plate-horizontal-rule'
-import { createNodeIdPlugin } from '@udecode/plate-node-id'
-import { createListPlugin, getListItemEntry } from '@udecode/plate-list'
-import { createBlockquotePlugin } from '@udecode/plate-block-quote'
-import { createHeadingPlugin } from '@udecode/plate-heading'
-import {
+  createParagraphPlugin,
+  createHorizontalRulePlugin,
+  createNodeIdPlugin,
+  createListPlugin,
+  getListItemEntry,
+  createBlockquotePlugin,
+  createHeadingPlugin,
   createBoldPlugin,
   createItalicPlugin,
   createUnderlinePlugin,
   createCodePlugin,
-} from '@udecode/plate-basic-marks'
+} from '@udecode/plate-headless'
+import { ReactEditor } from 'slate-react'
+import {
+  createCodeBlockPlugin,
+  createHTMLBlockPlugin,
+  createHTMLInlinePlugin,
+} from '../create-code-block'
 import { Editor, Node, Transforms } from 'slate'
 import { ELEMENT_IMG } from '../create-img-plugin'
 import { ELEMENT_MDX_BLOCK, ELEMENT_MDX_INLINE } from '../create-mdx-plugins'
@@ -44,6 +47,8 @@ export const plugins = [
   createHeadingPlugin(),
   createParagraphPlugin(),
   createCodeBlockPlugin(),
+  createHTMLBlockPlugin(),
+  createHTMLInlinePlugin(),
   createBlockquotePlugin(),
   createBoldPlugin(),
   createItalicPlugin(),
