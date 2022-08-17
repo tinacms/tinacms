@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import React from 'react'
-import { createPluginFactory } from '@udecode/plate-core'
+import { createPluginFactory } from '@udecode/plate-headless'
 import { onKeyDownSoftBreak } from './onKeyDownSoftBreak'
 import { SoftBreakPlugin } from './types'
 

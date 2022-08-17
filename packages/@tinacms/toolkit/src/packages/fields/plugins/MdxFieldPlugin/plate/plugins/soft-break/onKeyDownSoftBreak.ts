@@ -10,17 +10,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import {
-  getBlockAbove,
-  KeyboardHandler,
-  queryNode,
-  insertNodes,
-} from '@udecode/plate-core'
+import { getBlockAbove, queryNode, insertNodes } from '@udecode/plate-headless'
 import isHotkey from 'is-hotkey'
-import { SoftBreakPlugin } from './types'
 import { KEY_SOFT_BREAK } from './createSoftBreakPlugin'
 
-export const onKeyDownSoftBreak: KeyboardHandler<{}, SoftBreakPlugin> =
+export const onKeyDownSoftBreak =
   (editor, { options: { rules = [] } }) =>
   (event) => {
     const entry = getBlockAbove(editor)
@@ -29,8 +23,16 @@ export const onKeyDownSoftBreak: KeyboardHandler<{}, SoftBreakPlugin> =
     rules.forEach(({ hotkey, query }) => {
       if (isHotkey(hotkey, event as any) && queryNode(entry, query)) {
         event.preventDefault()
+        event.stopPropagation()
 
-        insertNodes(editor, { type: KEY_SOFT_BREAK, children: [{ text: '' }] })
+        insertNodes(
+          editor,
+          [
+            { type: KEY_SOFT_BREAK, children: [{ text: '' }] },
+            { type: 'text', text: '' },
+          ],
+          { select: true }
+        )
       }
     })
   }

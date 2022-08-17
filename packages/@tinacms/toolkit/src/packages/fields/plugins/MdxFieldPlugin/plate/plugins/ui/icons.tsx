@@ -12,6 +12,26 @@ limitations under the License.
 */
 
 import React from 'react'
+
+const RawMarkdown = () => {
+  return (
+    <svg
+      stroke="currentColor"
+      fill="currentColor"
+      strokeWidth={0}
+      role="img"
+      className="h-5 w-5"
+      viewBox="0 0 24 24"
+      height="1em"
+      width="1em"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <title />
+      <path d="M22.27 19.385H1.73A1.73 1.73 0 010 17.655V6.345a1.73 1.73 0 011.73-1.73h20.54A1.73 1.73 0 0124 6.345v11.308a1.73 1.73 0 01-1.73 1.731zM5.769 15.923v-4.5l2.308 2.885 2.307-2.885v4.5h2.308V8.078h-2.308l-2.307 2.885-2.308-2.885H3.46v7.847zM21.232 12h-2.309V8.077h-2.307V12h-2.308l3.461 4.039z" />
+    </svg>
+  )
+}
+
 const iconEl = {
   heading: <HeadingIcon />,
   link: <LinkIcon />,
@@ -23,6 +43,7 @@ const iconEl = {
   codeBlock: <CodeBlockIcon />,
   bold: <BoldIcon />,
   italic: <ItalicIcon />,
+  raw: <RawMarkdown />,
 }
 
 export const ToolbarIcon = ({ name }: { name: string }) => {
@@ -206,6 +227,7 @@ export function CodeBlockIcon(props) {
       width="1em"
       xmlns="http://www.w3.org/2000/svg"
     >
+      <title>{title}</title>
       <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
       <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z" />
     </svg>

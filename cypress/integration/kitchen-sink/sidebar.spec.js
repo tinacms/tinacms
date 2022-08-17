@@ -43,7 +43,7 @@ describe('Tina side bar', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
+          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: ""}}){
             __typename
           }
         }`,
@@ -57,7 +57,7 @@ describe('Tina side bar', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
+          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: ""}}){
             __typename
           }
         }`,
