@@ -19,6 +19,11 @@
       "import": "./dist/edit-state.es.js",
       "require": "./dist/edit-state.js"
     },
+    "./dist/react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.es.js",
+      "require": "./dist/react.js"
+    },
     "./dist/rich-text": {
       "types": "./dist/rich-text/index.d.ts",
       "import": "./dist/rich-text/index.es.js",
@@ -38,6 +43,7 @@
       "src/index.ts",
       "src/edit-state.tsx",
       "src/rich-text/index.tsx",
+      "src/react.tsx",
       "src/client.ts"
     ]
   },
