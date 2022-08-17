@@ -93,7 +93,7 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
     <GetReference cms={cms} id={input.value}>
       {(document: Document) => (
         <a
-          href={`/admin#/collections/${
+          href={`/tina/index.html#/collections/${
             document._sys.collection.name
           }/${document._sys.breadcrumbs.join('/')}`}
           className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"

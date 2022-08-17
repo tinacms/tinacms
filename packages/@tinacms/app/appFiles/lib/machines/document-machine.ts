@@ -1,15 +1,16 @@
-import { Form } from 'tinacms'
+import { AnyField, Client, Form, FormOptions, TinaCMS } from 'tinacms'
+import { GlobalFormPlugin } from 'tinacms'
 import { assign, createMachine } from 'xstate'
-import { resolveForm, Templateable } from '@tinacms/schema-tools'
+import { resolveForm, Templateable, TinaSchema } from '@tinacms/schema-tools'
 import { sendParent } from 'xstate/lib/actions'
 import * as util from './util'
 import * as G from 'graphql'
 import type { DocumentBlueprint } from '../formify/types'
 import { SelectionNode } from 'graphql'
-import { cms, client } from './query-machine'
+// import { cms, client } from './query-machine'
 
-// export const client = new LocalClient({ schema: tinaSchema })
-// export const cms = new TinaCMS({ apis: { tina: client } })
+// // export const client = new LocalClient({ schema: tinaSchema })
+// // export const cms = new TinaCMS({ apis: { tina: client } })
 
 export type DataType = Record<string, unknown>
 
@@ -42,6 +43,8 @@ type ContextType = {
   id: string
   data: null | Data
   form: null | Form
+  cms: TinaCMS
+  formifyCallback: (args: any) => Form
   locations: string[]
   subDocuments: string[]
   allBlueprints: DocumentBlueprint[]
@@ -50,6 +53,7 @@ type ContextType = {
 export const documentMachine = createMachine(
   {
     tsTypes: {} as import('./document-machine.typegen').Typegen0,
+    // predictableActionArguments: true,
     schema: {
       context: {} as ContextType,
       services: {} as {
@@ -111,7 +115,7 @@ export const documentMachine = createMachine(
         console.error(event.data)
       },
       storeFormAndData: assign((context, event) => {
-        cms.forms.add(event.data.form)
+        // context.cms.forms.add(event.data.form)
         return { ...context, form: event.data.form, data: event.data.data }
       }),
     },
@@ -128,7 +132,8 @@ export const documentMachine = createMachine(
           // return types
           selections.push(blueprint.selection)
         })
-        const response = await client.request<{
+        const tina = context.cms.api.tina as Client
+        const response = await tina.request<{
           node: Data
         }>(
           `query GetNode($id: String!) {
@@ -163,7 +168,7 @@ export const documentMachine = createMachine(
       }`,
           { variables: { id: context.id } }
         )
-        const schema = client.schema
+        const schema = context.cms.api.tina.schema
         if (!schema) {
           throw new Error(`Schema must be provided`)
         }
@@ -192,42 +197,151 @@ export const documentMachine = createMachine(
           schema,
           template,
         })
-        const form = new Form({
+        const onSubmit = async (payload) => {
+          try {
+            const mutationString = `#graphql
+              mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+                updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {
+                  __typename
+                }
+              }
+            `
+
+            await context.cms.api.tina.request(mutationString, {
+              variables: {
+                collection: response.node._internalSys.collection.name,
+                relativePath: response.node._internalSys.relativePath,
+                params: schema.transformPayload(
+                  response.node._internalSys.collection.name,
+                  payload
+                ),
+              },
+            })
+            context.cms.alerts.success('Document saved!')
+          } catch (e) {
+            context.cms.alerts.error('There was a problem saving your document')
+            console.error(e)
+          }
+        }
+        const formConfig = {
           id: context.id,
           label:
             response.node._internalSys.title ||
-            response.node._internalSys.filename,
+            response.node._internalSys.collection.label,
           initialValues: response.node._internalValues,
           fields: resolvedForm.fields,
-          onSubmit: async (payload) => {
-            try {
-              const mutationString = `#graphql
-                mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-                  updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {
-                    __typename
-                  }
-                }
-              `
-
-              await cms.api.tina.request(mutationString, {
-                variables: {
-                  collection: response.node._internalSys.collection.name,
-                  relativePath: response.node._internalSys.relativePath,
-                  params: schema.transformPayload(
-                    response.node._internalSys.collection.name,
-                    payload
-                  ),
-                },
-              })
-              cms.alerts.success('Document saved!')
-            } catch (e) {
-              cms.alerts.error('There was a problem saving your document')
-              console.error(e)
+          onSubmit,
+        }
+        const formifyCallback = context.formifyCallback
+        const form = buildForm(
+          formConfig,
+          context.cms,
+          (args) => {
+            if (formifyCallback) {
+              return formifyCallback(args, context.cms)
+            } else {
+              return args.createForm(args.formConfig)
             }
           },
-        })
+          true,
+          onSubmit
+        )
         return { form, data: response.node }
       },
     },
   }
 )
+
+type FormCreator = (formConfig: FormOptions<any>) => Form
+interface GlobalFormOptions {
+  icon?: any
+  layout: 'fullscreen' | 'popup'
+}
+type GlobalFormCreator = (
+  formConfig: FormOptions<any>,
+  options?: GlobalFormOptions
+) => Form
+interface GlobalFormOptions {
+  icon?: any
+  layout: 'fullscreen' | 'popup'
+}
+export interface FormifyArgs {
+  formConfig: FormOptions<any>
+  createForm: FormCreator
+  createGlobalForm: FormCreator
+  skip?: () => void
+}
+
+export type formifyCallback = (args: FormifyArgs, cms: TinaCMS) => Form | void
+export type onSubmitArgs = {
+  /**
+   * @deprecated queryString is actually a mutation string, use `mutationString` instead
+   */
+  queryString: string
+  mutationString: string
+  variables: object
+}
+
+export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
+  const createForm = (formConfig) => {
+    const form = new Form(formConfig)
+    // if (showInSidebar) {
+    cms.forms.add(form)
+    // }
+    return form
+  }
+  const createGlobalForm: GlobalFormCreator = (
+    formConfig,
+    options?: { icon?: any; layout: 'fullscreen' | 'popup' }
+  ) => {
+    const form = new Form(formConfig)
+    // if (showInSidebar) {
+    cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
+    // }
+    return form
+  }
+  return { createForm, createGlobalForm }
+}
+
+export const buildForm = (
+  formConfig: any,
+  cms: TinaCMS,
+  formify: formifyCallback,
+  showInSidebar: boolean = false,
+  onSubmit?: (args: any) => void
+): Form | undefined => {
+  const { createForm, createGlobalForm } = generateFormCreators(
+    cms,
+    showInSidebar
+  )
+  const SKIPPED = 'SKIPPED'
+  let form
+  let skipped
+  const skip = () => {
+    skipped = SKIPPED
+  }
+  if (skipped) return
+
+  if (formify) {
+    form = formify(
+      {
+        formConfig,
+        createForm,
+        createGlobalForm,
+        skip,
+      },
+      cms
+    )
+  } else {
+    form = createForm(formConfig)
+  }
+
+  if (!(form instanceof Form)) {
+    if (skipped === SKIPPED) {
+      return
+    }
+    throw new Error('formify must return a form or skip()')
+  }
+
+  return form
+}

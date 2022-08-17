@@ -58,6 +58,8 @@ export interface SidebarProviderProps {
 
 export function SidebarProvider({
   position = defaultSidebarPosition,
+  resizingSidebar,
+  setResizingSidebar,
   defaultWidth = defaultSidebarWidth,
   defaultState = defaultSidebarState,
   sidebar,
@@ -74,6 +76,8 @@ export function SidebarProvider({
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
       // @ts-ignore
       defaultState={cms?.sidebar?.defaultState || defaultState}
+      resizingSidebar={resizingSidebar}
+      setResizingSidebar={setResizingSidebar}
       renderNav={
         // @ts-ignore
         typeof cms?.sidebar?.renderNav !== 'undefined'
@@ -132,6 +136,8 @@ const Sidebar = ({
   defaultState,
   position,
   renderNav,
+  resizingSidebar,
+  setResizingSidebar,
 }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
@@ -146,7 +152,6 @@ const Sidebar = ({
   const [displayState, setDisplayState] =
     React.useState<displayStates>(defaultState)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
 
   /* Set sidebar open state and width to local values if available */
@@ -342,10 +347,15 @@ const Sidebar = ({
                     />
                   )}
                   RenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink collection={collection} />
+                    <SidebarCollectionLink
+                      onClick={() => {
+                        setMenuIsOpen(false)
+                      }}
+                      collection={collection}
+                    />
                   )}
                 >
-                  <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
+                  <div className="absolute top-3 right-0 transform translate-x-full overflow-hidden">
                     <Button
                       rounded="right"
                       variant="secondary"
@@ -424,8 +434,8 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
 
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
-      {isLocalMode && <LocalWarning />}
-      <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
+      {/* {isLocalMode && <LocalWarning />} */}
+      <div className="mt-3 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button
             rounded="right"
@@ -489,14 +499,17 @@ const SidebarSiteLink = ({
 
 const SidebarCollectionLink = ({
   collection,
+  onClick,
 }: {
   collection: {
     label: string
     name: string
   }
+  onClick: () => void
 }) => (
   <a
-    href={`/admin#/collections/${collection.name}`}
+    onClick={onClick}
+    href={`/tina/index.html#/collections/${collection.name}`}
     className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
   >
     <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
@@ -512,7 +525,7 @@ const EditButton = ({}) => {
       rounded="right"
       variant="primary"
       onClick={toggleSidebarOpen}
-      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
+      className={`absolute top-3 right-0 transition-all duration-150 ease-out ${
         displayState !== 'closed'
           ? 'opacity-0'
           : 'translate-x-full pointer-events-auto'
@@ -562,7 +575,7 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden transition-opacity duration-300 ease-out ${
         displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
       } ${displayState === 'fullscreen' ? '' : 'rounded-r-md'}`}
     >

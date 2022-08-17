@@ -1,27 +1,14 @@
 import { assign, ContextFrom, createMachine, spawn } from 'xstate'
 import { DocumentBlueprint, OnChangeEvent } from '../formify/types'
-import { TinaCMS, LocalClient, TinaField } from 'tinacms'
+import { Form, TinaCMS, TinaField } from 'tinacms'
 import { setIn } from 'final-form'
 import * as G from 'graphql'
 import * as util from './util'
-// @ts-expect-error
-import config from 'TINA_IMPORT'
 import { formify } from '../formify'
 import { spliceLocation } from '../formify/util'
 import { documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
 import { NAMER } from '@tinacms/schema-tools'
-
-type TreeItem = any
-
-export const client = new LocalClient({ schema: config.schema })
-export const cms = new TinaCMS({
-  apis: { tina: client },
-  enabled: true,
-  sidebar: {
-    position: 'displace',
-  },
-})
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -34,29 +21,40 @@ type DocumentMap = {
 type ContextType = {
   id: null | string
   data: null | DataType
-  tree: TreeItem[]
+  cms: TinaCMS
   selectedDocument: string | null
   url: string
+  inputURL: null | string
+  displayURL: null | string
   iframe: null | HTMLIFrameElement
+  iframeWidth: string
+  formifyCallback: (args: any) => Form
   documentMap: DocumentMap
   blueprints: DocumentBlueprint[]
   documentsToResolve: { id: string; location: string }[]
 }
-const initialContext: ContextType = {
+export const initialContext: ContextType = {
   id: null,
   data: null,
   selectedDocument: null,
-  tree: [],
   blueprints: [],
+  // @ts-ignore
+  cms: null,
   url: '/',
+  iframeWidth: '200px',
+  inputURL: null,
+  displayURL: null,
   documentMap: {},
+  // @ts-ignore
+  formifyCallback: null,
   iframe: null,
   documentsToResolve: [],
 }
 export const queryMachine = createMachine(
   {
     tsTypes: {} as import('./query-machine.typegen').Typegen0,
-    context: initialContext,
+    // Breaks stuff:
+    // predictableActionArguments: true,
     schema: {
       context: {} as ContextType,
       services: {} as {
@@ -67,7 +65,7 @@ export const queryMachine = createMachine(
           }
         }
         setter: {
-          data: { data: DataType; tree: TreeItem[] }
+          data: { data: DataType }
         }
         subDocumentResolver: {
           data: {
@@ -87,6 +85,17 @@ export const queryMachine = createMachine(
         | {
             type: 'SET_URL'
             value: string
+          }
+        | {
+            type: 'SET_INPUT_URL'
+            value: string
+          }
+        | {
+            type: 'SET_DISPLAY_URL'
+            value: string
+          }
+        | {
+            type: 'UPDATE_URL'
           }
         | {
             type: 'SELECT_DOCUMENT'
@@ -127,6 +136,9 @@ export const queryMachine = createMachine(
           idle: {
             on: {
               SET_URL: { actions: 'setUrl' },
+              SET_INPUT_URL: { actions: 'setInputUrl' },
+              SET_DISPLAY_URL: { actions: 'setDisplayUrl' },
+              UPDATE_URL: { actions: 'updateUrl' },
             },
           },
         },
@@ -215,6 +227,8 @@ export const queryMachine = createMachine(
               documentMachine.withContext({
                 id: event.data.id,
                 locations: [],
+                cms: context.cms,
+                formifyCallback: context.formifyCallback,
                 form: null,
                 data: null,
                 subDocuments: [],
@@ -235,16 +249,53 @@ export const queryMachine = createMachine(
           return context
         }
       }),
-      clear: assign((context) => ({
-        ...initialContext,
-        documentMap: context.documentMap,
-        iframe: context.iframe,
-        url: context.url,
-      })),
+      clear: assign((context) => {
+        Object.values(context.documentMap).forEach((doc) => {
+          const form = doc.ref.getSnapshot()?.context?.form
+          if (form) {
+            context.cms.forms.remove(form.id)
+          }
+        })
+        return {
+          ...initialContext,
+          formifyCallback: context.formifyCallback,
+          cms: context.cms,
+          // documentMap: context.documentMap, // to preserve docs across pages
+          iframe: context.iframe,
+          url: context.url,
+        }
+      }),
       setUrl: assign((context, event) => {
         return {
           ...context,
           url: event.value,
+        }
+      }),
+      setDisplayUrl: assign((context, event) => {
+        localStorage.setItem('tina-url', event.value)
+        return {
+          ...context,
+          displayURL: event.value,
+        }
+      }),
+      setInputUrl: assign((context, event) => {
+        return {
+          ...context,
+          inputURL: event.value.startsWith('/')
+            ? event.value
+            : `/${event.value}`,
+        }
+      }),
+      updateUrl: assign((context) => {
+        if (context.inputURL) {
+          return {
+            ...context,
+            inputURL: null,
+            displayURL: context.inputURL,
+            url: context.inputURL,
+          }
+        } else {
+          return context
         }
       }),
       storeInitialValues: assign((context, event) => {
@@ -274,7 +325,6 @@ export const queryMachine = createMachine(
         }
         return {
           ...context,
-          tree: event.data.tree,
         }
       }),
       scanForInitialDocuments: assign((context, event) => {
@@ -296,6 +346,8 @@ export const queryMachine = createMachine(
                   documentMachine.withContext({
                     id: value.value.id,
                     form: null,
+                    cms: context.cms,
+                    formifyCallback: context.formifyCallback,
                     data: null,
                     locations: [location],
                     subDocuments: [],
@@ -314,12 +366,11 @@ export const queryMachine = createMachine(
       }),
     },
     services: {
-      setter: async (context, event) => {
+      setter: async (context) => {
         let newData = {}
         const initialBlueprints = context.blueprints.filter(
           (blueprint) => blueprint.isTopLevel
         )
-        const tree: TreeItem[] = []
         initialBlueprints.forEach((blueprint) => {
           const values = util.getAllInBlueprint(context.data, blueprint.id)
 
@@ -337,28 +388,27 @@ export const queryMachine = createMachine(
                 value.value._internalSys.path
               )
             }
-            const treeChildren = []
             const nextData: Record<string, unknown> = setData({
               id: docContext.id,
               data: { ...docContext.data, ...form.values },
               // @ts-ignore form.fields is Field
               fields: form.fields,
               namespace: [docContext.data._internalSys.collection.name],
-              treeChildren,
               path: [],
               blueprint,
               context,
             })
-            tree.push({ id: docContext.id, path: '', children: treeChildren })
             newData = setIn(newData, location, nextData)
           })
         })
-        return { data: newData, tree }
+        return { data: newData }
       },
-      initializer: async (_context, event) => {
-        const schema = await client?.getSchema()
+      initializer: async (context, event) => {
+        const schema = await context.cms.api.tina.getSchema()
         const documentNode = G.parse(event.value.query)
-        const optimizedQuery = await client?.getOptimizedQuery(documentNode)
+        const optimizedQuery = await context.cms.api.tina.getOptimizedQuery(
+          documentNode
+        )
         if (!optimizedQuery) {
           throw new Error(`Unable to optimize query`)
         }
@@ -366,14 +416,17 @@ export const queryMachine = createMachine(
           schema,
           optimizedDocumentNode: optimizedQuery,
         })
-        const data = await client.request<DataType>(G.print(formifiedQuery), {
-          variables: event.value.variables,
-        })
+        const data = await context.cms.api.tina.request<DataType>(
+          G.print(formifiedQuery),
+          {
+            variables: event.value.variables,
+          }
+        )
         return { data, blueprints, id: event.value.id }
       },
-      onChangeCallback: () => (callback, _onReceive) => {
-        if (cms) {
-          cms.events.subscribe(
+      onChangeCallback: (context) => (callback, _onReceive) => {
+        if (context.cms) {
+          context.cms.events.subscribe(
             `forms:fields:onChange`,
             (event: OnChangeEvent) => {
               callback({ type: 'FIELD_CHANGE', value: event })
@@ -428,7 +481,6 @@ const setData = ({
   path,
   fields,
   namespace,
-  treeChildren,
   blueprint,
   context,
 }: {
@@ -437,7 +489,6 @@ const setData = ({
   path: (string | number)[]
   fields: TinaField[]
   namespace: string[]
-  treeChildren: TreeItem[]
   blueprint: DocumentBlueprint
   context: ContextFrom<typeof queryMachine>
 }) => {
@@ -489,7 +540,6 @@ const setData = ({
                   id,
                   data: item,
                   path: [...nextPath, index],
-                  treeChildren,
                   // @ts-ignore form.fields is Field
                   fields: template.fields,
                   namespace: template.namespace,
@@ -506,7 +556,6 @@ const setData = ({
                   id,
                   data: item,
                   path: [...nextPath, index],
-                  treeChildren,
                   // @ts-ignore form.fields is Field
                   fields: field.fields,
                   namespace: field.namespace,
@@ -528,7 +577,6 @@ const setData = ({
                 data: item,
                 path: [...nextPath, index],
                 namespace: field.namespace,
-                treeChildren,
                 fields: [],
                 blueprint,
                 context,
@@ -560,22 +608,15 @@ const setData = ({
             if (!form) {
               throw new QueryError(`Unable to resolve form for document`, value)
             }
-            const nextTreeChildren = []
             nextData[key] = setData({
               id: docContext.id,
               data: { ...docContext.data, ...form.values },
               // @ts-ignore form.fields is Field
               fields: form.fields,
-              treeChildren: nextTreeChildren,
               namespace: [],
               path: [],
               blueprint: childBlueprint,
               context,
-            })
-            treeChildren.push({
-              id: docContext.id,
-              path: '',
-              children: nextTreeChildren,
             })
           } else {
             // The reference value is null
@@ -618,7 +659,6 @@ const setData = ({
             path: nextPath,
             namespace: field.namespace,
             fields: field.fields,
-            treeChildren,
             blueprint,
             context,
           })

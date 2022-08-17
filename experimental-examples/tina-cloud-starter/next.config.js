@@ -14,6 +14,14 @@ module.exports = withSvgr({
         source: "/",
         destination: "/home",
       },
+      {
+        source: "/tina",
+        destination: `http://127.0.0.1:5173/tina/tina`,
+      },
+      {
+        source: "/tina/:path*",
+        destination: `http://127.0.0.1:5173/tina/:path*`,
+      },
     ];
   },
 });
