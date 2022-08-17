@@ -14,6 +14,7 @@ limitations under the License.
 import React from 'react'
 import TinaCMS, { TinaAdmin } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
+import { Preview } from './preview'
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
@@ -40,4 +41,4 @@ function App() {
     </TinaEditProvider>
   )
 }
-export default App
+export default Preview
