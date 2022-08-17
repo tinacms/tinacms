@@ -8,164 +8,58 @@ author: content/authors/napolean.md
 date: '2021-07-12T07:00:00.000Z'
 ---
 
-## Overarching Process
+# Vote For Pedro
 
-Tina has three main branches:
+Hello, the current date and time is <DateTime format="iso"/>. Quis semper [vulputate](https://example.com) aliquam venenatdis egestas sagittis quisque orci. Donec commodo sdit viverra aliquam porttitor ultrices gravida eu. Tincidunt leo, elementum mattis elementum ut nisl, justo, amet, mattis. Nunc purus, diam cdommodo tincidunt turpis. Amet, duis sed elit interdum dignissim
 
-- **master:** The bleeding edge of tinacms
-- **next:** A preview of the next release
-- **latest:** The current stable release
+![](http://res.cloudinary.com/deuzrsg3m/image/upload/v1634858384/tina-upload_yxevty.jpg)
 
-The flow of changes therefore looks like:
+***
 
-> `fix-some-bug` => `master` => `next` => `latest`
+```javascript
+const test ="this code"
+```
 
-The process happens over a week:
+> Id orci tellus laoreet id ac. Dolor, aenean leo, ac etiam consequat in. Convallis arcu ipsum urna nibh. Pha
+>
+> retra, euismod vitae interdum mauris enim, consequat vulputate nibh. Maecenas pellentesque id sed tellus mauris, ultrices mauris. Tincidunt enim cursus ridiculus mi. Pellentesque nam sed nullam sed diam turpis ipsum eu a sed convallis diam.
 
-- On Monday
-  1. `next` is merged into `latest`; then `latest` is published to npm
-  2. `master` is merged into `next`; then `next` is published to npm
-- Any hot fixes for bugs will be cherry picked into `next` and `latest`
-  and the published accordingly.
-- Every pull request merged to `master` automatically triggers a
-  `canary` release.
+![This is an image](http://res.cloudinary.com/deuzrsg3m/image/upload/v1631389967/apfx/kevin-bosc-oeqBJZd1GWY-unsplash_rtuyot.jpg "Building, by Thomas Carlisle")
 
-With this process:
+Quis semper [vulputate](https://example.com) aliquam venenatdis egestas sagittis quisque orci. Donec commodo sit viverra aliquam porttitor ultrices gravida eu. Tincidunt leo, elementum mattis elementum ut nisl, justo, amet, mattis. Nunc purus, diam cdommodo tincidunt turpis. Amet, duis sed elit interdum dignissim
 
-- all accepted changes are available as `canary` releases for early testing
-- critical fixes are published as soon as possible
-- new features and minor fixes take ~1.5 weeks to be published
+<NewsletterSignup
+  placeholder="Enter your email"
+  buttonText="Notify Me"
+  disclaimer={
+<>
+We care about the protection of your data. Read our [Privacy Policy](http://example.com).
 
-## Steps to Release
+</>
+}
+>
+  ## Stay in touch!
 
-The general release process looks like this:
+  ![](http://placehold.it/300x200)
 
-1. **Build the source files:**
+  Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.
+</NewsletterSignup>
 
-   The source must be compiled, minified, and uglified in preparation for release.
+### 3 Reasons to vote for Pedro
 
-1. **Generate CHANGELOGs and Git tags:**
+*   Anim aute id magna aliqua ad ad non deserunt sunt
+*   Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.
+*   Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
 
-   We use `lerna` to generate CHANGELOG files automatically from our commit messages.
+### 3 More Reasons to vote for Pedro
 
-1. **Clean the CHANGELOGs**
+1.  Anim aute id magna aliqua ad ad non deserunt sunt
+2.  Qui irure qui Lorem cupidatat commodo.
+    .   Elit sunt amet fugiat veniam occaecat fugiat.
+3.  Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
 
-   Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
-   then `tinacms` will get get a patch update with only the dependency updated. Make sure to install `lerna-clean-changelog-cli`:
+***
 
-   ```
-   npm i -g lerna-clean-changelogs-cli
-   ```
-
-1. **Publish to NPM:**
-
-   You must have an NPM_TOKEN set locally that has access to the `@tinacms` organization
-
-1. **Push CHANGELOGs and Git tags to Github:**
-
-   Let everyone know!
-
-The exact commands vary slightly depending on the type of release being made.
-
-### Prerelease
-
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and Git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-prerelease \
-     --no-push \
-     --allow-branch next \
-     -m "chore(publish): prerelease"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1. **Publish to NPM:**
-   ```
-   lerna publish from-package --dist-tag next
-   ```
-1. **Push CHANGELOGs and Git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
-
-### Graduating Prereleases
-
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and Git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-graduate \
-     --no-push \
-     --allow-branch next \
-     -m "chore(publish): graduation"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1) **Publish to NPM:**
-
-   ```
-   lerna publish from-package
-   ```
-
-1) **Push CHANGELOGs and Git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
-
-### Release
-
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and Git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --no-push \
-     --allow-branch master \
-     -m "chore(publish): release"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1. **Publish to NPM:**
-   ```
-   lerna publish from-package
-   ```
-1. **Push CHANGELOGs and Git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
+<BlockQuote authorName="Uncle Rico">
+  How much you wanna make a bet I can throw a football over [them mountains](https://images.unsplash.com/photo-1454496522488-7a8e488e8606?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8\&ixlib=rb-1.2.1\&auto=format\&fit=crop\&w=2110\&q=80)?
+</BlockQuote>
