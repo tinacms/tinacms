@@ -12,17 +12,20 @@ limitations under the License.
 */
 
 import {
-  S3Client,
-  ListObjectsCommand,
-  S3ClientConfig,
-  ListObjectsCommandInput,
   _Object,
+  S3Client,
+  S3ClientConfig,
+  ListObjectsCommand,
+  ListObjectsCommandInput,
+  PutObjectCommand,
+  PutObjectCommandInput,
 } from '@aws-sdk/client-s3'
 import { Media, MediaListOptions } from '@tinacms/toolkit'
 import path from 'path'
+import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
-// import multer from 'multer'
-// import { promisify } from 'util'
+import multer from 'multer'
+import { promisify } from 'util'
 
 export interface DOSConfig {
   config: S3ClientConfig
@@ -60,7 +63,7 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
       case 'GET':
         return listMedia(req, res, client, bucket, cdnUrl)
       case 'POST':
-        return uploadMedia(req, res)
+        return uploadMedia(req, res, client, bucket)
       case 'DELETE':
         return deleteAsset(req, res)
       default:
@@ -69,33 +72,48 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
   }
 }
 
-async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
-  console.log(req, res)
-  // const upload = promisify(
-  //   multer({
-  //     storage: multer.diskStorage({
-  //       directory: (req, file, cb) => {
-  //         cb(null, '/tmp')
-  //       },
-  //       filename: (req, file, cb) => {
-  //         cb(null, file.originalname)
-  //       },
-  //     }),
-  //   }).single('file')
-  // )
+async function uploadMedia(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  client: S3Client,
+  bucket: string
+) {
+  const upload = promisify(
+    multer({
+      storage: multer.diskStorage({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // @ts-ignore
+        directory: (req, file, cb) => {
+          cb(null, '/tmp')
+        },
+        filename: (req, file, cb) => {
+          cb(null, file.originalname)
+        },
+      }),
+    }).single('file')
+  )
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  await upload(req, res)
 
-  // await upload(req, res)
+  const { directory } = req.body
+  let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
+  if (prefix) prefix = prefix + '/'
 
-  // const { directory } = req.body
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // @ts-ignore
+  const filePath = req.file.path
+  const blob = fs.readFileSync(filePath)
+  const params: PutObjectCommandInput = {
+    Bucket: bucket,
+    Key: prefix + path.basename(filePath),
+    Body: blob,
+    ACL: 'public-read',
+  }
+  const command = new PutObjectCommand(params)
+  const result = await client.send(command)
 
-  // //@ts-ignore
-  // const result = await dos.uploader.upload(req.file.path, {
-  //   folder: directory.replace(/^\//, ''),
-  //   use_filename: true,
-  //   overwrite: false,
-  // })
-
-  // res.json(result)
+  res.json(result)
 }
 
 async function listMedia(
@@ -112,12 +130,15 @@ async function listMedia(
       offset,
     } = req.query as MediaListOptions
 
+    let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
+    if (prefix) prefix = prefix + '/'
+
     const params: ListObjectsCommandInput = {
       Bucket: bucket,
       Delimiter: '/',
-      Prefix: directory,
+      Prefix: prefix,
       Marker: offset?.toString(),
-      MaxKeys: directory && !offset ? limit + 1 : limit,
+      MaxKeys: directory && !offset ? +limit + 1 : +limit,
     }
 
     const command = new ListObjectsCommand(params)
@@ -137,7 +158,7 @@ async function listMedia(
 
     items.push(
       ...(response.Contents || [])
-        .slice(directory && !offset ? 1 : 0)
+        .filter((file) => file.Key !== prefix)
         .map(getDOSToTinaFunc(cdnUrl))
     )
 
