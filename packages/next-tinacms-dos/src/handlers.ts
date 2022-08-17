@@ -19,6 +19,8 @@ import {
   ListObjectsCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3'
 import { Media, MediaListOptions } from '@tinacms/toolkit'
 import path from 'path'
@@ -65,7 +67,7 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
       case 'POST':
         return uploadMedia(req, res, client, bucket)
       case 'DELETE':
-        return deleteAsset(req, res)
+        return deleteAsset(req, res, client, bucket)
       default:
         res.end(404)
     }
@@ -186,19 +188,30 @@ const findErrorMessage = (e: any) => {
   return 'an error occurred'
 }
 
-async function deleteAsset(req: NextApiRequest, res: NextApiResponse) {
-  console.log(req, res)
-  // const { media } = req.query
-  // const [, public_id] = media as string[]
+async function deleteAsset(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  client: S3Client,
+  bucket: string
+) {
+  const { media } = req.query
+  const [, objectKey] = media as string[]
 
-  // dos.uploader.destroy(public_id as string, {}, (err) => {
-  //   if (err) res.status(500)
-  //   res.json({
-  //     err,
-  //     public_id,
-  //   })
-  // })
+  const params: DeleteObjectCommandInput = {
+    Bucket: bucket,
+    Key: objectKey,
+  }
+  const command = new DeleteObjectCommand(params)
+  try {
+    const data = await client.send(command)
+    res.json(data)
+  } catch (err) {
+    res.status(500).json({
+      message: err.message || 'Something went wrong',
+    })
+  }
 }
+
 function getDOSToTinaFunc(cdnUrl) {
   return function dosToTina(file: _Object): Media {
     const filename = path.basename(file.Key)
