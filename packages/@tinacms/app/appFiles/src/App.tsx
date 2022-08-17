@@ -23,7 +23,7 @@ import config from 'TINA_IMPORT'
 export const TinaAdminWrapper = () => {
   return (
     <TinaCMS {...config}>
-      <TinaAdmin />
+      <TinaAdmin preview={<Preview {...config} />} />
     </TinaCMS>
   )
 }
@@ -41,4 +41,4 @@ function App() {
     </TinaEditProvider>
   )
 }
-export default Preview
+export default App

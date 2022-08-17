@@ -13,8 +13,9 @@ limitations under the License.
 
 import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
-import { build, InlineConfig } from 'vite'
+import { build, createServer, InlineConfig } from 'vite'
 import path from 'path'
+import { viteTina } from './tailwind'
 
 export const viteBuild = async ({
   rootPath,
@@ -44,12 +45,13 @@ vite.svg`
     root,
     base,
     mode: local ? 'development' : 'production',
-    plugins: [react()],
+    plugins: [react(), viteTina()],
     define: {
       'process.env': {},
     },
     server: {
       strictPort: true,
+      port: 5173,
     },
     resolve: {
       alias: {
@@ -61,7 +63,10 @@ vite.svg`
       outDir,
       emptyOutDir: false,
     },
-    logLevel: 'silent',
+    // logLevel: 'silent',
   }
-  await build(config)
+  // await build(config)
+  const server = await createServer(config)
+  await server.listen()
+  await server.printUrls()
 }

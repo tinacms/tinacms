@@ -114,7 +114,8 @@ const handleNavigate = (
    * Redirect the browser if 'yes', else navigate react-router.
    */
   if (routeOverride) {
-    window.location.href = routeOverride
+    // window.location.href = routeOverride
+    navigate(`/preview?iframe-url=${encodeURIComponent(routeOverride)}`)
     return null
   } else {
     navigate(document._sys.breadcrumbs.join('/'))
