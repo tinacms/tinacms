@@ -197,6 +197,53 @@ export class TinaSchema {
         return template
     }
   }
+
+  public transformPayload = (collectionName: string, payload: object) => {
+    const collection = this.getCollection(collectionName)
+    if (collection.templates) {
+    } else {
+      const accumulator = {}
+      Object.entries(payload).forEach(([key, value]) => {
+        const field = collection.fields.find((field) => {
+          if (typeof field === 'string') {
+            throw new Error('Global templates not supported')
+          }
+          return field.name === key
+        })
+        if (field) {
+          accumulator[key] = this.transformField(field, value)
+        }
+      })
+      return { [collectionName]: accumulator }
+    }
+  }
+
+  private transformField = (field: TinaFieldEnriched, value: unknown) => {
+    if (field.type === 'object')
+      if (field.templates) {
+        if (field.list) {
+          assertShape<{ _template: string }[]>(value, (yup) =>
+            yup.array(yup.object({ _template: yup.string().required() }))
+          )
+          return value.map((item) => {
+            const { _template, ...rest } = item
+            return { [_template]: rest }
+          })
+        } else {
+          assertShape<{ _template: string }>(value, (yup) =>
+            yup.object({ _template: yup.string().required() })
+          )
+          const { _template, ...rest } = value
+          return { [_template]: rest }
+        }
+      } else {
+        return value
+      }
+    else {
+      return value
+    }
+  }
+
   public isMarkdownCollection = (collectionName: string) => {
     const collection = this.getCollection(collectionName)
     const format = collection.format
