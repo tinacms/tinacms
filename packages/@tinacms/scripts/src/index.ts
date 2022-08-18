@@ -430,6 +430,23 @@ export const buildIt = async (entryPoint, packageJSON) => {
   const external = Object.keys({ ...deps, ...peerDeps })
   const globals = {}
 
+  const out = (entry: string) => {
+    const { dir, name } = path.parse(entry)
+    const outdir = dir.replace('src', 'dist')
+    const outfile = name
+    const relativeOutfile = path.join(
+      outdir
+        .split('/')
+        .map(() => '..')
+        .join('/'),
+      dir,
+      name
+    )
+    return { outdir, outfile, relativeOutfile }
+  }
+
+  const outInfo = out(entry)
+
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
     if (['@tinacms/graphql', '@tinacms/datalayer'].includes(packageJSON.name)) {
@@ -467,7 +484,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         platform: 'node',
-        outfile: path.join(process.cwd(), 'dist', 'index.js'),
+        outfile: path.join(process.cwd(), 'dist', `${outInfo.outfile}.js`),
         external,
         target: 'node12',
       })
@@ -487,23 +504,6 @@ export const buildIt = async (entryPoint, packageJSON) => {
 
     return true
   }
-
-  const out = (entry: string) => {
-    const { dir, name } = path.parse(entry)
-    const outdir = dir.replace('src', 'dist')
-    const outfile = name
-    const relativeOutfile = path.join(
-      outdir
-        .split('/')
-        .map(() => '..')
-        .join('/'),
-      dir,
-      name
-    )
-    return { outdir, outfile, relativeOutfile }
-  }
-
-  const outInfo = out(entry)
 
   const defaultBuildConfig: Parameters<typeof build>[0] = {
     plugins: [
