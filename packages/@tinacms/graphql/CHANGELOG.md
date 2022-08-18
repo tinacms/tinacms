@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 0.63.1
+
+### Patch Changes
+
+- 067c49efd: Updated generated queries to use pageInfo
+- 9ba09bd0c: Fix issue where `rich-text` fields with an empty templates array generated an invalid GraphQL filter
+- Updated dependencies [3d36a0e42]
+  - @tinacms/mdx@0.61.1
+
 ## 0.63.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.69.1
+
+### Patch Changes
+
+- 9ea28113e: Fixes an issue where `collections` with `templates` weren't generating forms in the sidebar
+
 ## 0.69.0
 
 ### Minor Changes
