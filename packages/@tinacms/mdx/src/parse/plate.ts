@@ -96,6 +96,7 @@ export type BlockElement =
   | BlockquoteElement
   | MdxBlockElement
   | HTMLElement
+  | ImageElement
   | UnorderedListElement
   | OrderedListElement
   | ListItemElement
