@@ -85,7 +85,7 @@ const App = ({ Component, pageProps }) => {
 
 ## Set up API routes
 
-Set up a new API route in the `pages` directory of your Next.js app, e.g. `pages/api/media`.
+Set up a new API route in the `pages` directory of your Next.js app, e.g. `pages/api/dos/[...media].ts`.
 Then add a new catch all API route for media.
 
 Call `createMediaHandler` to set up routes and connect your instance of the Media Store to your Digital Ocean Space.
