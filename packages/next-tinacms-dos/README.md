@@ -96,7 +96,7 @@ The `authorized` key will make it so only authorized users within Tina Cloud can
 
 
 ```
-//[...media].tsx
+// pages/api/dos/[...media].ts
 
 import {
   mediaHandlerConfig,
