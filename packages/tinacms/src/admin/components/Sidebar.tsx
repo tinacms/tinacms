@@ -57,7 +57,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           RenderNavSite={({ view }) => (
             <SidebarLink
               label={view.name}
-              to={`screens/${slugify(view.name)}`}
+              to={`/screens/${slugify(view.name)}`}
               Icon={view.Icon ? view.Icon : ImFilesEmpty}
             />
           )}

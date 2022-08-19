@@ -2,25 +2,12 @@ import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from '../../lib/machines/query-machine'
 import { ChevronRightIcon, textFieldClasses, useCMS } from 'tinacms'
-import {
-  ArrowRightIcon,
-  ChevronLeftIcon,
-  DesktopComputerIcon,
-  DeviceMobileIcon,
-  DeviceTabletIcon,
-} from '@heroicons/react/outline'
+import { ArrowRightIcon, ChevronLeftIcon } from '@heroicons/react/outline'
 import { useLocation } from 'react-router-dom'
 
 export const Preview = (props) => {
   const cms = useCMS()
   const location = useLocation()
-  // React.useEffect(() => {
-  //   console.log(location.search)
-  //   const searchParams = new URLSearchParams(location.search).get("iframe-url")
-  //   console.log(searchParams.get('iframe-url'))
-  // }, [location.search])
-  // For some reason I get a warning about the machine changing
-  // between renders
   const machine = React.useMemo(
     () =>
       queryMachine.withContext({
@@ -129,29 +116,6 @@ export const Preview = (props) => {
                     <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </span>
-                {/* <span className="relative z-0 inline-flex shadow-sm rounded-md">
-                  <button
-                    type="button"
-                    className="relative inline-flex items-center px-4 py-2 rounded-l-full border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <DeviceMobileIcon className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="-ml-px relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <DeviceTabletIcon className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="-ml-px relative inline-flex items-center px-4 py-2 rounded-r-full border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    <DesktopComputerIcon
-                      className="h-4 w-4"
-                      aria-hidden="true"
-                    />
-                  </button>
-                </span> */}
               </div>
             </div>
             <div className="relative flex-1 bg-gray-300 col-span-2 overflow-scroll flex items-center justify-center">
