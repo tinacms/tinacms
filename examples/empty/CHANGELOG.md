@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- @tinacms/cli@0.61.5
+
+## null
+
+### Patch Changes
+
 - @tinacms/cli@0.61.4
 - tinacms@0.69.1
 
