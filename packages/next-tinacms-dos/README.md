@@ -41,7 +41,6 @@ This is also where we can update our `mediaOptions` on the cms object.
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { TinaCloudDOSMediaStore } from "next-tinacms-dos";
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 
 const App = ({ Component, pageProps }) => {
