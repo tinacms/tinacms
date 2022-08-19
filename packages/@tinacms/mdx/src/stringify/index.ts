@@ -186,6 +186,13 @@ export const blockElement = (
         value: content.value,
       }
     }
+    case 'img':
+      return {
+        type: 'image',
+        url: imageCallback(content.url),
+        alt: content.alt,
+        title: content.caption,
+      }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
   }
