@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 0.61.2
+
+### Patch Changes
+
+- c6726c65b: Fix regression in handling images in rich-text
+
 ## 0.61.1
 
 ### Patch Changes
