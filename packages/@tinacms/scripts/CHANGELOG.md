@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.51.1
+
+### Patch Changes
+
+- 9fbb4e557: Fix issue building node packages to non-index.js files
+
 ## 0.51.0
 
 ### Minor Changes

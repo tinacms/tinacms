@@ -1,5 +1,21 @@
 # tinacms-cli
 
+## 0.61.5
+
+### Patch Changes
+
+- @tinacms/graphql@0.63.2
+
+## 0.61.4
+
+### Patch Changes
+
+- @tinacms/app@0.0.6
+- @tinacms/datalayer@0.2.2
+- @tinacms/graphql@0.63.1
+- @tinacms/metrics@0.0.3
+- @tinacms/schema-tools@0.1.0
+
 ## 0.61.3
 
 ### Patch Changes
