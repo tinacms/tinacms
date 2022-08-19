@@ -22,6 +22,7 @@ import config from 'TINA_IMPORT'
 
 export const TinaAdminWrapper = () => {
   return (
+    // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config}>
       <TinaAdmin preview={<Preview {...config} />} />
     </TinaCMS>

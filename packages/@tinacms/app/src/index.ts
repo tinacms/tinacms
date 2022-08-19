@@ -63,10 +63,10 @@ vite.svg`
       outDir,
       emptyOutDir: false,
     },
-    // logLevel: 'silent',
+    logLevel: 'silent',
   }
-  // await build(config)
-  const server = await createServer(config)
-  await server.listen()
-  await server.printUrls()
+  await build(config)
+  // const server = await createServer(config)
+  // await server.listen()
+  // await server.printUrls()
 }
