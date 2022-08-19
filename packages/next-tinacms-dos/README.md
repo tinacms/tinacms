@@ -23,8 +23,8 @@ You need some credentials provided by Digital Ocean Space to set this up properl
 Add the following variables to an `.env` file.
 
 ```
-NEXT_PUBLIC_SPACE_ENDPOINT=<Your Digital Ocean Space Endpoint>
-NEXT_PUBLIC_SPACE_NAME=<Your Digital Ocean Space Name>
+NEXT_PUBLIC_SPACE_ENDPOINT=<Your Digital Ocean Space Endpoint: ex. https://fra1.digitaloceanspaces.com>
+NEXT_PUBLIC_SPACE_NAME=<Your Digital Ocean Space Name: ex. my-space>
 NEXT_PUBLIC_SPACE_KEY=<Your Digital Ocean Space access key>
 SPACE_SECRET_KEY=<Your Digital Ocean Space access secret>
 ```
