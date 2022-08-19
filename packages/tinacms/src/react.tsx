@@ -1,6 +1,10 @@
 import React from 'react'
 
-export const useTina = <T extends object>(props: T): T => {
+export function useTina<T extends object>(props: {
+  query: string
+  variables: object
+  data: T
+}): { data: T } {
   const [data, setData] = React.useState(props.data)
   React.useEffect(() => {
     const id = btoa(JSON.stringify({ query: props.query }))
