@@ -178,7 +178,7 @@ const CollectionListPage = () => {
               const documents = collection.documents.edges
               const admin: TinaAdminApi = cms.api.admin
               const pageInfo = collection.documents.pageInfo
-              const fields = collectionExtra.fields.filter((x) =>
+              const fields = collectionExtra.fields?.filter((x) =>
                 // only allow sortable fields
                 ['string', 'number', 'datetime'].includes(x.type)
               )
