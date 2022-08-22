@@ -77,7 +77,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
                 type: 'link',
                 url: item.url,
                 title: item.title,
-                children: [text({ text: a.value })],
+                children: [a],
               }
             },
           })
@@ -225,11 +225,12 @@ export const eat = (
     if (nonMatchingSiblingIndex) {
       throw new Error(`Marks inside inline code are not supported`)
     }
+    const node = {
+      type: markToProcess,
+      value: first.text,
+    }
     return [
-      {
-        type: markToProcess,
-        value: first.text,
-      },
+      first.linkifyTextNode?.(node) ?? node,
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ]
   }
