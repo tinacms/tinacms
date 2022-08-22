@@ -137,9 +137,9 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
               return true
             }
 
-            const isValid = /^[_a-zA-Z][\.\-_\/a-zA-Z0-9]*$/.test(value)
+            const isValid = /^[_a-zA-Z0-9][\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
-              return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
+              return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
             }
           },
         },
