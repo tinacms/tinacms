@@ -20,7 +20,7 @@ export function useTina<T extends object>(props: {
   const [data, setData] = React.useState(props.data)
   React.useEffect(() => {
     const id = btoa(JSON.stringify({ query: props.query }))
-    parent.postMessage({ type: 'open', ...props, id })
+    parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
     window.addEventListener('message', (event) => {
       if (event.data.id === id) {
         console.log('child: event received')
@@ -28,7 +28,8 @@ export function useTina<T extends object>(props: {
       }
     })
 
-    return () => parent.postMessage({ type: 'close', id })
+    return () =>
+      parent.postMessage({ type: 'close', id }, window.location.origin)
   }, [])
   return { data } as any
 }
