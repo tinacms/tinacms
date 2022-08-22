@@ -41,3 +41,7 @@ This is [an example](http://example.com "Example") link.
 This paragraph has some `code` in it.
 
 ![Alt Text](https://get.svg.workers.dev "Image Title")
+
+This is a **paragraph with *nested* emphasis**.
+
+This is a [`link in code`](http://example.com)
