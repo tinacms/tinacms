@@ -121,6 +121,24 @@ export const auditDocuments = async (args: AuditArgs) => {
       query: documentQuery,
       variables: {},
     })
+
+    Object.keys(docResult.data.document._values)
+      .filter((fieldName) => {
+        return docResult.data.document._values[fieldName]?.type == 'root'
+      })
+      .forEach((fieldName) => {
+        const errorMessages = docResult.data.document._values[
+          fieldName
+        ].children
+          .filter((f) => f.type == 'invalid_markdown')
+          .map((f) => f.message)
+
+        errorMessages.forEach((errorMessage) => {
+          error = true
+          logger.error(chalk.red(errorMessage))
+        })
+      })
+
     const topLevelDefaults = {}
 
     // TODO: account for when collection is a string
