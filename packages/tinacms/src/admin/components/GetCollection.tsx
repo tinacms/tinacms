@@ -40,7 +40,7 @@ export const useGetCollection = (
       if (await api.isAuthenticated()) {
         const { name, order } = JSON.parse(sortKey || '{}')
         const validSortKey = collectionExtra.fields
-          .map((x) => x.name)
+          ?.map((x) => x.name)
           .includes(name)
           ? name
           : undefined
