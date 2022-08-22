@@ -167,7 +167,23 @@ const out = output({
         {
           type: 'a',
           url: 'http://example.com',
+          title: null,
           children: [{ type: 'text', text: 'link in code', code: true }],
+        },
+      ],
+    },
+    {
+      type: 'p',
+      children: [
+        { type: 'text', text: 'This is a ' },
+        {
+          type: 'a',
+          url: 'http://example.com',
+          title: null,
+          children: [
+            { type: 'text', text: 'bold mark', italic: true },
+            { type: 'text', text: ' in a link' },
+          ],
         },
       ],
     },
