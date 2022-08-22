@@ -31,7 +31,6 @@
     ]
   },
   "scripts": {
-    "types": "pnpm tsc",
     "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests"
   },
