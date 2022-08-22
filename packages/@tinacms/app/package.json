@@ -31,6 +31,7 @@
     ]
   },
   "scripts": {
+    "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
     "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests"
   },
