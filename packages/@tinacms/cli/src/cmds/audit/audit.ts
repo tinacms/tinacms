@@ -73,13 +73,8 @@ const interateCollectionDocuments = async (
   } while (hasNextPage)
 }
 
-const auditDocument = async (
-  node,
-  args: AuditArgs
-): Promise<{ warnings: string[]; errors: string[] }> => {
-  let errors: string[] = []
+const validateRichText = (node) => {
   let warnings: string[] = []
-
   Object.keys(node._values)
     .map((fieldName) => node._values[fieldName])
     .filter((field) => {
@@ -95,6 +90,10 @@ const auditDocument = async (
       })
     })
 
+  return warnings
+}
+
+const validateMutations = async (node, args: AuditArgs) => {
   const topLevelDefaults = {}
 
   // TODO: account for when collection is a string
@@ -136,8 +135,23 @@ const auditDocument = async (
     silenceErrors: true,
     verbose: true,
   })
-  if (mutationRes.errors) {
-    mutationRes.errors.forEach((err) => {
+
+  return mutationRes.errors
+}
+
+const auditDocument = async (
+  node,
+  args: AuditArgs
+): Promise<{ warnings: string[]; errors: string[] }> => {
+  let errors: string[] = []
+  let warnings: string[] = []
+
+  warnings = [...warnings, ...validateRichText(node)]
+
+  const mutationErrors = await validateMutations(node, args)
+
+  if (mutationErrors) {
+    mutationErrors.forEach((err) => {
       errors.push(err.message)
     })
   }
