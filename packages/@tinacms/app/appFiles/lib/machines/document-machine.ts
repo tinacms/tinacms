@@ -292,20 +292,16 @@ export type onSubmitArgs = {
 
 export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
   const createForm = (formConfig) => {
-    const form = new Form(formConfig)
-    // if (showInSidebar) {
-    cms.forms.add(form)
-    // }
-    return form
+    return new Form(formConfig)
   }
   const createGlobalForm: GlobalFormCreator = (
     formConfig,
     options?: { icon?: any; layout: 'fullscreen' | 'popup' }
   ) => {
-    const form = new Form(formConfig)
-    // if (showInSidebar) {
-    cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
-    // }
+    const form = new Form({
+      ...formConfig,
+      global: { global: true, ...options },
+    })
     return form
   }
   return { createForm, createGlobalForm }

@@ -19,11 +19,13 @@ import { viteTina } from './tailwind'
 
 export const viteBuild = async ({
   rootPath,
+  dev,
   outputFolder,
   publicFolder,
   local,
 }: {
   local: boolean
+  dev: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
@@ -65,8 +67,15 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  await build(config)
-  // const server = await createServer(config)
-  // await server.listen()
-  // await server.printUrls()
+  if (true) {
+    const indexDev = await fs
+      .readFileSync(path.join(root, 'index.dev.html'))
+      .toString()
+    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
+    const server = await createServer(config)
+    await server.listen()
+    await server.printUrls()
+  } else {
+    await build(config)
+  }
 }

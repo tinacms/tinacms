@@ -209,7 +209,7 @@ export const MultiformFormHeader = ({
 
   return (
     <div
-      className={`py-2.5 border-b border-gray-200 bg-white ${
+      className={`py-4 border-b border-gray-200 bg-white ${
         sidebarWidth > navBreakpoint && renderNav
           ? `px-6`
           : renderNav
@@ -271,7 +271,7 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
 
   return (
     <div
-      className={`py-2.5 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
+      className={`py-4 border-b border-gray-200 bg-white ${headerPadding[navState]}`}
     >
       <div className="max-w-form mx-auto  flex flex-col items-start justify-center min-h-[2.5rem]">
         {shortFormLabel && (

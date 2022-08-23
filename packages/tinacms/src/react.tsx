@@ -12,6 +12,10 @@ limitations under the License.
 */
 import React from 'react'
 
+/**
+ * This is an experimental version of the useTina hook,
+ * it is only meant to be used with Tina in "iframe mode".
+ */
 export function useTina<T extends object>(props: {
   query: string
   variables: object

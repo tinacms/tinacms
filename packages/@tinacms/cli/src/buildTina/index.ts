@@ -265,13 +265,20 @@ export const build = async ({
         waitFor: async () => {
           await viteBuild({
             local,
+            dev,
             rootPath,
             outputFolder: ctx.schema?.config?.build?.outputFolder as string,
             publicFolder: ctx.schema?.config?.build?.publicFolder as string,
           })
         },
       })
-      console.log('\nDone building static site')
+      if (dev) {
+        console.log(
+          '\nDone building static site, listening for changes on port 5173'
+        )
+      } else {
+        console.log('\nDone building static site')
+      }
     }
   } catch (error) {
     throw error

@@ -62,6 +62,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({
           )}
           <ActiveFieldIndicator />
         </div>
+        {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
         <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
           {children}
         </div>
