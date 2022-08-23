@@ -1,6 +1,6 @@
 import { AuditError, AuditIssue } from '../issue'
-import { assertShape, resolve } from '@tinacms/graphql'
-import { AuditArgs } from '../audit'
+import { assertShape } from '@tinacms/graphql'
+import { AuditArgs } from '../auditArgs'
 
 export const validateMutations = async (
   node,
@@ -36,8 +36,7 @@ export const validateMutations = async (
         ){__typename}
       }`
 
-  const mutationRes = await resolve({
-    database: args.database,
+  const mutationRes = await args.resolve({
     query: mutation,
     variables: {
       params,

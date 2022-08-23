@@ -16,7 +16,7 @@ import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
-import { Database } from '@tinacms/graphql'
+import { Database, resolve } from '@tinacms/graphql'
 import { AuditIssue } from './issue'
 
 const rootPath = process.cwd()
@@ -68,7 +68,9 @@ export const audit = async (ctx: AuditCtx, next: () => void, options) => {
   for (let i = 0; i < collections.length; i++) {
     const collectionIssues = await auditDocuments({
       collection: collections[i],
-      database,
+      resolve: (args) => {
+        return resolve({ ...args, database })
+      },
       rootPath,
       useDefaultValues: options.useDefaultValues,
     })

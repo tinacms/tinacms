@@ -11,24 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { resolve } from '@tinacms/graphql'
-import type { Database, TinaCloudCollection } from '@tinacms/graphql'
-import p from 'path'
-import { logger } from '../../logger'
 import { AuditIssue } from './issue'
 import { validateRichText } from './validations/validateRichText'
 import { validateMutations } from './validations/validateMutations'
-
-export type AuditArgs = {
-  collection: TinaCloudCollection
-  database: Database
-  rootPath: string
-  useDefaultValues: boolean
-}
+import { AuditArgs, Resolver } from './auditArgs'
 
 const interateCollectionDocuments = async (
   collectionName: string,
-  database: Database,
+  resolve: Resolver,
   action: (doc) => Promise<void>
 ) => {
   let endCursor
@@ -58,11 +48,7 @@ const interateCollectionDocuments = async (
         }
       }
       `
-    const result = await resolve({
-      database,
-      query,
-      variables: {},
-    })
+    const result = await resolve({ query, variables: {} })
     endCursor = result.data[rootNode].pageInfo.endCursor
     hasNextPage = result.data[rootNode].pageInfo.hasNextPage
 
@@ -81,11 +67,11 @@ const auditDocument = async (node, args: AuditArgs): Promise<AuditIssue[]> => {
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database } = args
+  const { collection, resolve } = args
 
   let issues: AuditIssue[] = []
 
-  await interateCollectionDocuments(collection.name, database, async (doc) => {
+  await interateCollectionDocuments(collection.name, resolve, async (doc) => {
     const docIssues = await auditDocument(doc, args)
     issues = [...issues, ...docIssues]
   })
