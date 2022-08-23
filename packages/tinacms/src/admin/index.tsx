@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import type { TinaCMS } from '@tinacms/toolkit'
+import { TinaCMS, useCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -42,6 +42,13 @@ const Redirect = () => {
 export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
   const isSSR = typeof window === 'undefined'
   const { edit } = useEditState()
+  const cms = useCMS()
+
+  React.useEffect(() => {
+    if (preview) {
+      cms.flags.set('tina-iframe', true)
+    }
+  }, [preview])
 
   if (isSSR) {
     return null
@@ -60,7 +67,6 @@ export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
       {(cms: TinaCMS) => {
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true
-
         if (isTinaAdminEnabled) {
           return (
             <Router>
