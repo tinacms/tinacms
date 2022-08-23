@@ -84,7 +84,9 @@ export const auditDocuments = async (args: AuditArgs) => {
           documents {
             edges {
               node {
+                __typename
                 ...on Document {
+                  _values
                   _sys {
                     extension
                     path
@@ -108,28 +110,13 @@ export const auditDocuments = async (args: AuditArgs) => {
     const node = documents[i].node
     const fullPath = p.join(rootPath, node._sys.path)
     logger.info(`Checking document: ${fullPath}`)
-    const documentQuery = `query {
-        document(collection: "${collection.name}", relativePath: "${node._sys.relativePath}") {
-          __typename
-          ...on Document {
-            _values
-          }
-        }
-      }`
-    const docResult = await resolve({
-      database,
-      query: documentQuery,
-      variables: {},
-    })
 
-    Object.keys(docResult.data.document._values)
+    Object.keys(node._values)
       .filter((fieldName) => {
-        return docResult.data.document._values[fieldName]?.type == 'root'
+        return node._values[fieldName]?.type == 'root'
       })
       .forEach((fieldName) => {
-        const errorMessages = docResult.data.document._values[
-          fieldName
-        ].children
+        const errorMessages = node._values[fieldName].children
           .filter((f) => f.type == 'invalid_markdown')
           .map((f) => f.message)
 
@@ -153,7 +140,7 @@ export const auditDocuments = async (args: AuditArgs) => {
         })
     }
     const params = transformDocumentIntoMutationRequestPayload(
-      docResult.data.document._values,
+      node._values,
       {
         includeCollection: true,
         includeTemplate: typeof collection.templates !== 'undefined',
