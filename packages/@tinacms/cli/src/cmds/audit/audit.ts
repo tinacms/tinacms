@@ -18,6 +18,42 @@ import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
+interface AuditIssue {
+  level: 'error' | 'warning'
+  print: () => void
+}
+
+abstract class BaseAuditIssue implements AuditIssue {
+  message: string
+  level: 'error' | 'warning'
+  constructor(message: string, level: 'error' | 'warning') {
+    this.level = level
+    this.message = message
+  }
+
+  print() {
+    throw new Error('Not Implemented')
+  }
+}
+
+class AuditError extends BaseAuditIssue {
+  constructor(message) {
+    super(message, 'error')
+  }
+  public print() {
+    logger.error(chalk.red(this.message))
+  }
+}
+
+class AuditWarning extends BaseAuditIssue {
+  constructor(message) {
+    super(message, 'warning')
+  }
+  public print() {
+    logger.warn(chalk.yellowBright(this.message))
+  }
+}
+
 type AuditArgs = {
   collection: TinaCloudCollection
   database: Database
@@ -74,7 +110,7 @@ const interateCollectionDocuments = async (
 }
 
 const validateRichText = (node) => {
-  let warnings: string[] = []
+  let issues: AuditIssue[] = []
   Object.keys(node._values)
     .map((fieldName) => node._values[fieldName])
     .filter((field) => {
@@ -86,14 +122,17 @@ const validateRichText = (node) => {
         .map((f) => f.message)
 
       errorMessages.forEach((errorMessage) => {
-        warnings.push(errorMessage)
+        issues.push(new AuditWarning(errorMessage))
       })
     })
 
-  return warnings
+  return issues
 }
 
-const validateMutations = async (node, args: AuditArgs) => {
+const validateMutations = async (
+  node,
+  args: AuditArgs
+): Promise<AuditIssue[]> => {
   const topLevelDefaults = {}
 
   // TODO: account for when collection is a string
@@ -136,27 +175,13 @@ const validateMutations = async (node, args: AuditArgs) => {
     verbose: true,
   })
 
-  return mutationRes.errors
+  return (mutationRes.errors || []).map((err) => new AuditError(err.message))
 }
 
-const auditDocument = async (
-  node,
-  args: AuditArgs
-): Promise<{ warnings: string[]; errors: string[] }> => {
-  let errors: string[] = []
-  let warnings: string[] = []
-
-  warnings = [...warnings, ...validateRichText(node)]
-
-  const mutationErrors = await validateMutations(node, args)
-
-  if (mutationErrors) {
-    mutationErrors.forEach((err) => {
-      errors.push(err.message)
-    })
-  }
-
-  return { errors, warnings }
+const auditDocument = async (node, args: AuditArgs): Promise<AuditIssue[]> => {
+  const richTextIssues = validateRichText(node)
+  const mutationIssues = await validateMutations(node, args)
+  return [...richTextIssues, ...mutationIssues]
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
@@ -169,16 +194,16 @@ export const auditDocuments = async (args: AuditArgs) => {
     const fullPath = p.join(args.rootPath, doc._sys.path)
     logger.info(`Checking document: ${fullPath}`)
 
-    const auditResult = await auditDocument(doc, args)
-    auditResult.warnings.forEach((errMessage) => {
-      logger.warn(chalk.yellowBright(errMessage))
-    })
-    auditResult.errors.forEach((errMessage) => {
-      logger.error(chalk.red(errMessage))
+    const auditIssues = await auditDocument(doc, args)
+    auditIssues.forEach((issue) => {
+      issue.print()
     })
 
-    error = error || auditResult.errors.length > 0
-    warning = warning || auditResult.warnings.length > 0
+    error =
+      error || auditIssues.filter((issue) => issue.level == 'error').length > 0
+    warning =
+      warning ||
+      auditIssues.filter((issue) => issue.level == 'warning').length > 0
   })
 
   return { error, warning }
