@@ -17,6 +17,7 @@
     "public",
     "appFiles/src",
     "appFiles/index.html",
+    "appFiles/index.dev.html",
     "tsconfig.json",
     "tsconfig.node.json",
     "vite.config.ts"
