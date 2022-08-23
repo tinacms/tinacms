@@ -80,9 +80,6 @@ const auditDocument = async (
   let errors: string[] = []
   let warnings: string[] = []
 
-  const fullPath = p.join(args.rootPath, node._sys.path)
-  logger.info(`Checking document: ${fullPath}`)
-
   Object.keys(node._values)
     .map((fieldName) => node._values[fieldName])
     .filter((field) => {
@@ -95,7 +92,6 @@ const auditDocument = async (
 
       errorMessages.forEach((errorMessage) => {
         warnings.push(errorMessage)
-        logger.warn(chalk.yellowBright(errorMessage))
       })
     })
 
@@ -143,7 +139,6 @@ const auditDocument = async (
   if (mutationRes.errors) {
     mutationRes.errors.forEach((err) => {
       errors.push(err.message)
-      logger.error(chalk.red(err.message))
     })
   }
 
@@ -157,7 +152,16 @@ export const auditDocuments = async (args: AuditArgs) => {
   let warning = false
 
   await interateCollectionDocuments(collection.name, database, async (doc) => {
+    const fullPath = p.join(args.rootPath, doc._sys.path)
+    logger.info(`Checking document: ${fullPath}`)
+
     const auditResult = await auditDocument(doc, args)
+    auditResult.warnings.forEach((errMessage) => {
+      logger.warn(chalk.yellowBright(errMessage))
+    })
+    auditResult.errors.forEach((errMessage) => {
+      logger.error(chalk.red(errMessage))
+    })
 
     error = error || auditResult.errors.length > 0
     warning = warning || auditResult.warnings.length > 0
