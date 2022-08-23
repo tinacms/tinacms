@@ -11,12 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { auditDocuments, AuditIssue } from './audit'
+import { auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
 import { Database } from '@tinacms/graphql'
+import { AuditIssue } from './issue'
 
 const rootPath = process.cwd()
 
