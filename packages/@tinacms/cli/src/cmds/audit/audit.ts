@@ -25,16 +25,15 @@ type AuditArgs = {
   useDefaultValues: boolean
 }
 
-export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database, rootPath, useDefaultValues } = args
-
+const interateCollectionDocuments = async (
+  collectionName: string,
+  database: Database,
+  action: (doc) => Promise<void>
+) => {
   let endCursor
   let hasNextPage = true
-  let error = false
-  let warning = false
-
   do {
-    const rootNode = `${collection.name}Connection`
+    const rootNode = `${collectionName}Connection`
     const queryParams = endCursor ? `(after: "${endCursor}")` : ''
     const query = `query {
       ${rootNode}${queryParams} {
@@ -63,56 +62,66 @@ export const auditDocuments = async (args: AuditArgs) => {
       query,
       variables: {},
     })
-
     endCursor = result.data[rootNode].pageInfo.endCursor
     hasNextPage = result.data[rootNode].pageInfo.hasNextPage
 
     const documents: any[] = result.data[rootNode].edges
 
     for (let i = 0; i < documents.length; i++) {
-      const node = documents[i].node
-      const fullPath = p.join(rootPath, node._sys.path)
-      logger.info(`Checking document: ${fullPath}`)
+      await action(documents[i].node)
+    }
+  } while (hasNextPage)
+}
 
-      Object.keys(node._values)
-        .map((fieldName) => node._values[fieldName])
-        .filter((field) => {
-          return field?.type == 'root'
+export const auditDocuments = async (args: AuditArgs) => {
+  const { collection, database, rootPath, useDefaultValues } = args
+
+  let error = false
+  let warning = false
+
+  await interateCollectionDocuments(collection.name, database, async (node) => {
+    const fullPath = p.join(rootPath, node._sys.path)
+    logger.info(`Checking document: ${fullPath}`)
+
+    Object.keys(node._values)
+      .map((fieldName) => node._values[fieldName])
+      .filter((field) => {
+        return field?.type == 'root'
+      })
+      .forEach((field) => {
+        const errorMessages = field.children
+          .filter((f) => f.type == 'invalid_markdown')
+          .map((f) => f.message)
+
+        errorMessages.forEach((errorMessage) => {
+          warning = true
+          logger.warn(chalk.yellowBright(errorMessage))
         })
-        .forEach((field) => {
-          const errorMessages = field.children
-            .filter((f) => f.type == 'invalid_markdown')
-            .map((f) => f.message)
+      })
 
-          errorMessages.forEach((errorMessage) => {
-            warning = true
-            logger.warn(chalk.yellowBright(errorMessage))
-          })
+    const topLevelDefaults = {}
+
+    // TODO: account for when collection is a string
+    if (useDefaultValues && typeof collection.fields !== 'string') {
+      collection.fields
+        .filter((x) => !x.list)
+        .forEach((x) => {
+          const value = x.ui as any
+          if (typeof value !== 'undefined') {
+            topLevelDefaults[x.name] = value.defaultValue
+          }
         })
+    }
+    const params = transformDocumentIntoMutationRequestPayload(
+      node._values,
+      {
+        includeCollection: true,
+        includeTemplate: typeof collection.templates !== 'undefined',
+      },
+      topLevelDefaults
+    )
 
-      const topLevelDefaults = {}
-
-      // TODO: account for when collection is a string
-      if (useDefaultValues && typeof collection.fields !== 'string') {
-        collection.fields
-          .filter((x) => !x.list)
-          .forEach((x) => {
-            const value = x.ui as any
-            if (typeof value !== 'undefined') {
-              topLevelDefaults[x.name] = value.defaultValue
-            }
-          })
-      }
-      const params = transformDocumentIntoMutationRequestPayload(
-        node._values,
-        {
-          includeCollection: true,
-          includeTemplate: typeof collection.templates !== 'undefined',
-        },
-        topLevelDefaults
-      )
-
-      const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+    const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
@@ -120,25 +129,24 @@ export const auditDocuments = async (args: AuditArgs) => {
         ){__typename}
       }`
 
-      const mutationRes = await resolve({
-        database,
-        query: mutation,
-        variables: {
-          params,
-          collection: collection.name,
-          relativePath: node._sys.relativePath,
-        },
-        silenceErrors: true,
-        verbose: true,
+    const mutationRes = await resolve({
+      database,
+      query: mutation,
+      variables: {
+        params,
+        collection: collection.name,
+        relativePath: node._sys.relativePath,
+      },
+      silenceErrors: true,
+      verbose: true,
+    })
+    if (mutationRes.errors) {
+      mutationRes.errors.forEach((err) => {
+        error = true
+        logger.error(chalk.red(err.message))
       })
-      if (mutationRes.errors) {
-        mutationRes.errors.forEach((err) => {
-          error = true
-          logger.error(chalk.red(err.message))
-        })
-      }
     }
-  } while (hasNextPage)
+  })
 
   return { error, warning }
 }
