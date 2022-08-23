@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { audit, printFinalMessage } from './audit'
+import { audit, printAudit } from './audit'
 import {
   checkDeps,
   initTina,
@@ -249,7 +249,7 @@ export const baseCmds: Command[] = [
             next()
           },
           audit,
-          printFinalMessage,
+          printAudit,
         ],
         options
       ),

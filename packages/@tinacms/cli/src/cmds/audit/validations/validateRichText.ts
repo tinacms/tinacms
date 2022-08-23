@@ -13,7 +13,7 @@ export const validateRichText = (node) => {
         .map((f) => f.message)
 
       errorMessages.forEach((errorMessage) => {
-        issues.push(new AuditWarning(errorMessage))
+        issues.push(new AuditWarning(errorMessage, node._sys.path))
       })
     })
 

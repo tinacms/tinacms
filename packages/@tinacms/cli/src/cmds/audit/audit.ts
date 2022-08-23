@@ -86,14 +86,8 @@ export const auditDocuments = async (args: AuditArgs) => {
   let issues: AuditIssue[] = []
 
   await interateCollectionDocuments(collection.name, database, async (doc) => {
-    const fullPath = p.join(args.rootPath, doc._sys.path)
-    logger.info(`Checking document: ${fullPath}`)
-
     const docIssues = await auditDocument(doc, args)
     issues = [...issues, ...docIssues]
-    docIssues.forEach((issue) => {
-      issue.print()
-    })
   })
 
   return issues

@@ -48,7 +48,9 @@ export const validateMutations = async (
     verbose: true,
   })
 
-  return (mutationRes.errors || []).map((err) => new AuditError(err.message))
+  return (mutationRes.errors || []).map(
+    (err) => new AuditError(err.message, node._sys.path)
+  )
 }
 
 // TODO: move this to its own package

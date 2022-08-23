@@ -79,11 +79,11 @@ export const audit = async (ctx: AuditCtx, next: () => void, options) => {
   next()
 }
 
-export const printFinalMessage = async (
-  ctx: AuditCtx,
-  next: () => void,
-  _options
-) => {
+export const printAudit = async (ctx: AuditCtx, next: () => void, _options) => {
+  ctx.issues.forEach((issue) => {
+    issue.print()
+  })
+
   const warnings = ctx.issues.filter((issue) => issue.level == 'warning')
   const errors = ctx.issues.filter((issue) => issue.level == 'error')
 
