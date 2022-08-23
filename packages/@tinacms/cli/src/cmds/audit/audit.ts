@@ -16,7 +16,7 @@ import { validateRichText } from './validations/validateRichText'
 import { validateMutations } from './validations/validateMutations'
 import { AuditArgs, Resolver } from './auditArgs'
 
-const interateCollectionDocuments = async (
+const iterateCollectionDocuments = async (
   collectionName: string,
   resolve: Resolver,
   action: (doc) => Promise<void>
@@ -71,7 +71,7 @@ export const auditDocuments = async (args: AuditArgs) => {
 
   let issues: AuditIssue[] = []
 
-  await interateCollectionDocuments(collection.name, resolve, async (doc) => {
+  await iterateCollectionDocuments(collection.name, resolve, async (doc) => {
     const docIssues = await auditDocument(doc, args)
     issues = [...issues, ...docIssues]
   })
