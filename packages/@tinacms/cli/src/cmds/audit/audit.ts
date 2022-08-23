@@ -73,55 +73,55 @@ const interateCollectionDocuments = async (
   } while (hasNextPage)
 }
 
-export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database, rootPath, useDefaultValues } = args
+const auditDocument = async (
+  node,
+  args: AuditArgs
+): Promise<{ warnings: string[]; errors: string[] }> => {
+  let errors: string[] = []
+  let warnings: string[] = []
 
-  let error = false
-  let warning = false
+  const fullPath = p.join(args.rootPath, node._sys.path)
+  logger.info(`Checking document: ${fullPath}`)
 
-  await interateCollectionDocuments(collection.name, database, async (node) => {
-    const fullPath = p.join(rootPath, node._sys.path)
-    logger.info(`Checking document: ${fullPath}`)
+  Object.keys(node._values)
+    .map((fieldName) => node._values[fieldName])
+    .filter((field) => {
+      return field?.type == 'root'
+    })
+    .forEach((field) => {
+      const errorMessages = field.children
+        .filter((f) => f.type == 'invalid_markdown')
+        .map((f) => f.message)
 
-    Object.keys(node._values)
-      .map((fieldName) => node._values[fieldName])
-      .filter((field) => {
-        return field?.type == 'root'
+      errorMessages.forEach((errorMessage) => {
+        warnings.push(errorMessage)
+        logger.warn(chalk.yellowBright(errorMessage))
       })
-      .forEach((field) => {
-        const errorMessages = field.children
-          .filter((f) => f.type == 'invalid_markdown')
-          .map((f) => f.message)
+    })
 
-        errorMessages.forEach((errorMessage) => {
-          warning = true
-          logger.warn(chalk.yellowBright(errorMessage))
-        })
+  const topLevelDefaults = {}
+
+  // TODO: account for when collection is a string
+  if (args.useDefaultValues && typeof args.collection.fields !== 'string') {
+    args.collection.fields
+      .filter((x) => !x.list)
+      .forEach((x) => {
+        const value = x.ui as any
+        if (typeof value !== 'undefined') {
+          topLevelDefaults[x.name] = value.defaultValue
+        }
       })
+  }
+  const params = transformDocumentIntoMutationRequestPayload(
+    node._values,
+    {
+      includeCollection: true,
+      includeTemplate: typeof args.collection.templates !== 'undefined',
+    },
+    topLevelDefaults
+  )
 
-    const topLevelDefaults = {}
-
-    // TODO: account for when collection is a string
-    if (useDefaultValues && typeof collection.fields !== 'string') {
-      collection.fields
-        .filter((x) => !x.list)
-        .forEach((x) => {
-          const value = x.ui as any
-          if (typeof value !== 'undefined') {
-            topLevelDefaults[x.name] = value.defaultValue
-          }
-        })
-    }
-    const params = transformDocumentIntoMutationRequestPayload(
-      node._values,
-      {
-        includeCollection: true,
-        includeTemplate: typeof collection.templates !== 'undefined',
-      },
-      topLevelDefaults
-    )
-
-    const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+  const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
@@ -129,23 +129,38 @@ export const auditDocuments = async (args: AuditArgs) => {
         ){__typename}
       }`
 
-    const mutationRes = await resolve({
-      database,
-      query: mutation,
-      variables: {
-        params,
-        collection: collection.name,
-        relativePath: node._sys.relativePath,
-      },
-      silenceErrors: true,
-      verbose: true,
+  const mutationRes = await resolve({
+    database: args.database,
+    query: mutation,
+    variables: {
+      params,
+      collection: args.collection.name,
+      relativePath: node._sys.relativePath,
+    },
+    silenceErrors: true,
+    verbose: true,
+  })
+  if (mutationRes.errors) {
+    mutationRes.errors.forEach((err) => {
+      errors.push(err.message)
+      logger.error(chalk.red(err.message))
     })
-    if (mutationRes.errors) {
-      mutationRes.errors.forEach((err) => {
-        error = true
-        logger.error(chalk.red(err.message))
-      })
-    }
+  }
+
+  return { errors, warnings }
+}
+
+export const auditDocuments = async (args: AuditArgs) => {
+  const { collection, database, rootPath, useDefaultValues } = args
+
+  let error = false
+  let warning = false
+
+  await interateCollectionDocuments(collection.name, database, async (doc) => {
+    const auditResult = await auditDocument(doc, args)
+
+    error = error || auditResult.errors.length > 0
+    warning = warning || auditResult.warnings.length > 0
   })
 
   return { error, warning }
