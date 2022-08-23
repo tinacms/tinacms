@@ -12,7 +12,7 @@ limitations under the License.
 */
 import { assign, ContextFrom, createMachine, spawn } from 'xstate'
 import { DocumentBlueprint, OnChangeEvent } from '../formify/types'
-import { Form, TinaCMS, TinaField } from 'tinacms'
+import { Form, GlobalFormPlugin, TinaCMS, TinaField } from 'tinacms'
 import { setIn } from 'final-form'
 import * as G from 'graphql'
 import * as util from './util'
@@ -300,8 +300,18 @@ export const queryMachine = createMachine(
       }),
       updateUrl: assign((context) => {
         if (context.inputURL) {
+          Object.values(context.documentMap).forEach((doc) => {
+            const form = doc.ref.getSnapshot()?.context?.form
+            if (form) {
+              context.cms.forms.remove(form.id)
+            }
+          })
           return {
             ...context,
+            selectedDocument: initialContext.selectedDocument,
+            documentMap: initialContext.documentMap,
+            blueprints: initialContext.blueprints,
+            data: initialContext.data,
             inputURL: null,
             displayURL: context.inputURL,
             url: context.inputURL,
@@ -400,6 +410,27 @@ export const queryMachine = createMachine(
                 value.value._internalSys.path
               )
             }
+
+            /**
+             * This section can be removed when we support forms for list
+             * and nested items.
+             */
+            if (blueprint.path.some((item) => item.list)) {
+              // do nothing
+            } else {
+              if (form.global) {
+                context.cms.plugins.add(
+                  new GlobalFormPlugin(
+                    form,
+                    form.global?.icon,
+                    form.global?.layout
+                  )
+                )
+              } else {
+                context.cms.forms.add(form)
+              }
+            }
+
             const nextData: Record<string, unknown> = setData({
               id: docContext.id,
               data: { ...docContext.data, ...form.values },

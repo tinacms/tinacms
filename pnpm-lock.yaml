@@ -793,7 +793,7 @@ importers:
       tailwindcss: ^3.0.13
       tsup: ^4.12.5
       typescript: ^4.2.2
-      vite: ^2.4.3
+      vite: 2.9.14
       vite-plugin-dts: ^0.5.3
       yargs: ^17.0.1
     dependencies:
@@ -822,8 +822,8 @@ importers:
       tailwindcss: 3.1.4_postcss@8.4.14
       tsup: 4.14.0_m3gf5jmpd2aiwepqhoxxcqgnwi
       typescript: 4.7.4
-      vite: 2.9.13
-      vite-plugin-dts: 0.5.3_vite@2.9.13
+      vite: 2.9.14
+      vite-plugin-dts: 0.5.3_vite@2.9.14
       yargs: 17.5.1
 
   packages/@tinacms/sharedctx:
@@ -28324,6 +28324,7 @@ packages:
         integrity: sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==,
       }
     engines: { node: '>=10.0.0' }
+    hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -32204,7 +32205,7 @@ packages:
       - terser
     dev: false
 
-  /vite-plugin-dts/0.5.3_vite@2.9.13:
+  /vite-plugin-dts/0.5.3_vite@2.9.14:
     resolution:
       {
         integrity: sha512-nQA5WHgHqFuqV+zw16r9YjdW3NJhYfwTlr6TWCjGy6fxoFI6R7KhIPcKN4TUkpw6MtWBBooXU3dgVGXMbG/Zxw==,
@@ -32216,13 +32217,40 @@ packages:
       fast-glob: 3.2.11
       fs-extra: 10.1.0
       ts-morph: 11.0.3
-      vite: 2.9.13
+      vite: 2.9.14
     dev: false
 
   /vite/2.9.13:
     resolution:
       {
         integrity: sha512-AsOBAaT0AD7Mhe8DuK+/kE4aWYFMx/i0ZNi98hJclxb4e0OhQcZYUrvLjIaQ8e59Ui7txcvKMiJC1yftqpQoDw==,
+      }
+    engines: { node: '>=12.2.0' }
+    hasBin: true
+    peerDependencies:
+      less: '*'
+      sass: '*'
+      stylus: '*'
+    peerDependenciesMeta:
+      less:
+        optional: true
+      sass:
+        optional: true
+      stylus:
+        optional: true
+    dependencies:
+      esbuild: 0.14.47
+      postcss: 8.4.14
+      resolve: 1.22.1
+      rollup: 2.75.7
+    optionalDependencies:
+      fsevents: 2.3.2
+    dev: false
+
+  /vite/2.9.14:
+    resolution:
+      {
+        integrity: sha512-P/UCjSpSMcE54r4mPak55hWAZPlyfS369svib/gpmz8/01L822lMPOJ/RYW6tLCe1RPvMvOsJ17erf55bKp4Hw==,
       }
     engines: { node: '>=12.2.0' }
     hasBin: true

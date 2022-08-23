@@ -15,17 +15,21 @@ import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from '../../lib/machines/query-machine'
 import { ChevronRightIcon, textFieldClasses, useCMS } from 'tinacms'
 import { ArrowRightIcon, ChevronLeftIcon } from '@heroicons/react/outline'
-import { useLocation } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 
 export const Preview = (props) => {
   const cms = useCMS()
-  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  React.useEffect(() => {
+    // We'll often land here with the preview route in the URL (eg. ?iframe-url=/posts)
+    setSearchParams({})
+  }, [])
   const machine = React.useMemo(
     () =>
       queryMachine.withContext({
         ...initialContext,
         url:
-          new URLSearchParams(location.search).get('iframe-url') ||
+          searchParams.get('iframe-url') ||
           localStorage.getItem('tina-url') ||
           '/',
         cms,
@@ -33,6 +37,7 @@ export const Preview = (props) => {
       }),
     []
   )
+
   const [state, send] = useMachine(machine)
   const ref = React.useRef<HTMLIFrameElement>(null)
 
