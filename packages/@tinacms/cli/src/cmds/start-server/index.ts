@@ -23,6 +23,7 @@ import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database, Store } from '@tinacms/graphql'
+import { viteBuild } from '@tinacms/app'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -98,6 +99,16 @@ export async function startServer(
     // we do not want to start the server while the schema is building
     await buildLock.promise
 
+    if (ctx.schema?.config?.build) {
+      await viteBuild({
+        local: true,
+        watch: true,
+        rootPath,
+        outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+        publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+      })
+    }
+
     // hold the lock
     buildLock.enable()
     try {
@@ -106,7 +117,9 @@ export async function startServer(
 
       state.server.listen(port, () => {
         const altairUrl = `http://localhost:${port}/altair/`
-        const cmsUrl = `[your-development-url]/admin`
+        const cmsUrl = ctx.schema?.config?.build
+          ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
+          : `[your-development-url]/admin`
         if (verbose)
           logger.info(`Started Filesystem GraphQL server on port: ${port}`)
         logger.info(
@@ -181,6 +194,7 @@ export async function startServer(
               database,
               store,
               dev,
+              buildFrontend: false,
               isomorphicGitBridge,
               local: true,
               noSDK,
@@ -215,6 +229,7 @@ export async function startServer(
                 database,
                 store,
                 dev,
+                buildFrontend: false,
                 isomorphicGitBridge,
                 local: true,
                 noSDK,
@@ -253,6 +268,7 @@ export async function startServer(
         dev,
         isomorphicGitBridge,
         local: true,
+        buildFrontend: false,
         noSDK,
         noWatch,
         verbose,
