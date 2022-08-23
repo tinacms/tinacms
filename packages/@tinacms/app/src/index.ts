@@ -56,6 +56,15 @@ vite.svg`
     server: {
       strictPort: true,
       port: 5173,
+      fs: {
+        /**
+         * From the monorepo Vite is importing from a node_modules folder relative to itself, which
+         * works as expected. But when published and used from a yarn setup, the node_modules
+         * are flattened, meaning we need to access the global node_modules folder instead of
+         * our own. I believe this is fine, but something to keep an eye on.
+         */
+        allow: ['..'],
+      },
     },
     resolve: {
       alias: {
