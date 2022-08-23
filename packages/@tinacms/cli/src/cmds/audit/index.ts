@@ -11,15 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { auditDocuments } from './audit'
+import { auditDocuments, AuditIssue } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
+import { Database } from '@tinacms/graphql'
 
 const rootPath = process.cwd()
 
-export const audit = async (ctx: any, next: () => void, options) => {
+interface AuditCtx {
+  issues: AuditIssue[]
+  database: Database
+}
+
+export const audit = async (ctx: AuditCtx, next: () => void, options) => {
   const telemetry = new Telemetry({ disabled: options.noTelemetry })
   await telemetry.submitRecord({
     event: {
@@ -73,7 +79,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
 }
 
 export const printFinalMessage = async (
-  ctx: any,
+  ctx: AuditCtx,
   next: () => void,
   _options
 ) => {

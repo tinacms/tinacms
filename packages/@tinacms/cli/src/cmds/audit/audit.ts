@@ -18,7 +18,7 @@ import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
-interface AuditIssue {
+export interface AuditIssue {
   level: 'error' | 'warning'
   print: () => void
 }
