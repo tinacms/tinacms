@@ -56,21 +56,18 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const schema = await database.getSchema()
   const collections = schema.getCollections()
 
-  let warning = false
-  let error = false
+  ctx.issues = []
 
   for (let i = 0; i < collections.length; i++) {
-    const auditResult = await auditDocuments({
+    const collectionIssues = await auditDocuments({
       collection: collections[i],
       database,
       rootPath,
       useDefaultValues: options.useDefaultValues,
     })
-    warning = warning || auditResult.warning
-    error = error || auditResult.error
+
+    ctx.issues = [...ctx.issues, ...collectionIssues]
   }
-  ctx.warning = warning
-  ctx.error = error
 
   next()
 }
@@ -80,12 +77,19 @@ export const printFinalMessage = async (
   next: () => void,
   _options
 ) => {
-  if (ctx.error) {
+  const warnings = ctx.issues.filter((issue) => issue.level == 'warning')
+  const errors = ctx.issues.filter((issue) => issue.level == 'error')
+
+  if (errors.length > 0) {
     logger.error(
-      chalk.redBright(`‼️ Audit ${chalk.bold('failed')} with errors`)
+      chalk.redBright(
+        `‼️ Audit ${chalk.bold('failed')} with ${errors.length} error(s)`
+      )
     )
-  } else if (ctx.warning) {
-    logger.warn(chalk.yellowBright('⚠️ Audit passed with warnings'))
+  } else if (warnings.length > 0) {
+    logger.warn(
+      chalk.yellowBright(`⚠️ Audit passed with ${warnings.length} warning(s)`)
+    )
   } else {
     logger.info(chalk.greenBright('✅ Audit passed'))
   }

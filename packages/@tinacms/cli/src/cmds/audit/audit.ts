@@ -185,28 +185,22 @@ const auditDocument = async (node, args: AuditArgs): Promise<AuditIssue[]> => {
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database, rootPath, useDefaultValues } = args
+  const { collection, database } = args
 
-  let error = false
-  let warning = false
+  let issues: AuditIssue[] = []
 
   await interateCollectionDocuments(collection.name, database, async (doc) => {
     const fullPath = p.join(args.rootPath, doc._sys.path)
     logger.info(`Checking document: ${fullPath}`)
 
-    const auditIssues = await auditDocument(doc, args)
-    auditIssues.forEach((issue) => {
+    const docIssues = await auditDocument(doc, args)
+    issues = [...issues, ...docIssues]
+    docIssues.forEach((issue) => {
       issue.print()
     })
-
-    error =
-      error || auditIssues.filter((issue) => issue.level == 'error').length > 0
-    warning =
-      warning ||
-      auditIssues.filter((issue) => issue.level == 'warning').length > 0
   })
 
-  return { error, warning }
+  return issues
 }
 
 // TODO: move this to its own package
