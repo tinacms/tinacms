@@ -15,9 +15,7 @@
     "script.mjs",
     "package.json",
     "public",
-    "appFiles/src",
-    "appFiles/index.html",
-    "appFiles/index.dev.html",
+    "appFiles",
     "tsconfig.json",
     "tsconfig.node.json",
     "vite.config.ts"
