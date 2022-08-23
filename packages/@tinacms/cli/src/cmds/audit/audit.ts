@@ -24,56 +24,6 @@ type AuditArgs = {
   rootPath: string
   useDefaultValues: boolean
 }
-export const auditCollection = async (args: AuditArgs) => {
-  let warning = false
-  const { collection, database, rootPath } = args
-  logger.info(`Checking collection ${collection.name}`)
-  const query = `query {
-        collection(collection: "${collection.name}") {
-          format
-          documents {
-            edges {
-              node {
-                ...on Document {
-                  _sys {
-                    extension
-                    path
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      `
-  const result = await resolve({
-    database,
-    query,
-    variables: {},
-  })
-  const format = result.data.collection.format
-  const docs = result.data.collection.documents.edges
-
-  // validate file extension
-  docs.forEach((x) => {
-    const node = x.node
-    if (node._sys.extension.replace('.', '') !== format) {
-      warning = true
-      logger.warn(
-        chalk.yellowBright(
-          `WARNING: there is a file with extension \`${
-            node._sys.extension
-          }\` but in your schema it is defined to be \`.${format}\`\n\n\location: ${p.join(
-            rootPath,
-            node._sys.path
-          )}`
-        )
-      )
-    }
-  })
-
-  return warning
-}
 
 export const auditDocuments = async (args: AuditArgs) => {
   const { collection, database, rootPath, useDefaultValues } = args
@@ -105,7 +55,9 @@ export const auditDocuments = async (args: AuditArgs) => {
     variables: {},
   })
   let error = false
+  let warning = false
   const documents: any[] = result.data.collection.documents.edges
+
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
     const fullPath = p.join(rootPath, node._sys.path)
@@ -174,7 +126,7 @@ export const auditDocuments = async (args: AuditArgs) => {
       })
     }
   }
-  return error
+  return { error, warning }
 }
 
 // TODO: move this to its own package

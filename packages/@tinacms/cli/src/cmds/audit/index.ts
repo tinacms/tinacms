@@ -11,15 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { createDatabase } from '@tinacms/graphql'
-
-import {
-  AuditFileSystemBridge,
-  FilesystemBridge,
-  AuditFilesystemStore,
-  FilesystemStore,
-} from '@tinacms/datalayer'
-import { auditCollection, auditDocuments } from './audit'
+import { auditDocuments } from './audit'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
@@ -63,25 +55,19 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const database = ctx.database
   const schema = await database.getSchema()
   const collections = schema.getCollections()
+
   let warning = false
   let error = false
 
   for (let i = 0; i < collections.length; i++) {
-    const collection = collections[i]
-    const returnWarning = await auditCollection({
-      collection,
+    const auditResult = await auditDocuments({
+      collection: collections[i],
       database,
       rootPath,
       useDefaultValues: options.useDefaultValues,
     })
-    const returnError = await auditDocuments({
-      collection,
-      database,
-      rootPath,
-      useDefaultValues: options.useDefaultValues,
-    })
-    warning = warning || returnWarning
-    error = error || returnError
+    warning = warning || auditResult.warning
+    error = error || auditResult.error
   }
   ctx.warning = warning
   ctx.error = error
