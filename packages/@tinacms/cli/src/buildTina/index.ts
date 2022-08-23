@@ -39,6 +39,7 @@ interface BuildOptions {
   bridge: Bridge
   noWatch?: boolean
   isomorphicGitBridge?: boolean
+  buildFrontend: boolean
   verbose?: boolean
   dev?: boolean
   local?: boolean
@@ -161,7 +162,7 @@ export const buildCmdBuild = async (
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
-    'bridge' | 'database' | 'store'
+    'bridge' | 'database' | 'store' | 'buildFrontend'
   >
 ) => {
   const bridge: Bridge = ctx.bridge
@@ -172,6 +173,7 @@ export const buildCmdBuild = async (
     ...options,
     bridge,
     database,
+    buildFrontend: true,
     store,
     ctx: ctx,
     skipIndex: true,
@@ -184,7 +186,7 @@ export const auditCmdBuild = async (
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
-    'bridge' | 'database' | 'store'
+    'bridge' | 'database' | 'store' | 'buildFrontend'
   >
 ) => {
   const bridge: Bridge = ctx.bridge
@@ -194,6 +196,7 @@ export const auditCmdBuild = async (
     ...options,
     local: true,
     verbose: true,
+    buildFrontend: false,
     bridge,
     database,
     store,
@@ -209,6 +212,7 @@ export const build = async ({
   store,
   beforeBuild,
   afterBuild,
+  buildFrontend,
   dev,
   local,
   verbose,
@@ -259,26 +263,20 @@ export const build = async ({
         local,
       }
     )
-    if (ctx.schema?.config?.build) {
+    if (ctx.schema?.config?.build && buildFrontend) {
       await spin({
         text: 'Building static site',
         waitFor: async () => {
           await viteBuild({
             local,
-            dev,
+            watch: false,
             rootPath,
             outputFolder: ctx.schema?.config?.build?.outputFolder as string,
             publicFolder: ctx.schema?.config?.build?.publicFolder as string,
           })
         },
       })
-      if (dev) {
-        console.log(
-          '\nDone building static site, listening for changes on port 5173'
-        )
-      } else {
-        console.log('\nDone building static site')
-      }
+      console.log('\nDone building static site')
     }
   } catch (error) {
     throw error

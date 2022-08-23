@@ -19,13 +19,13 @@ import { viteTina } from './tailwind'
 
 export const viteBuild = async ({
   rootPath,
-  dev,
+  watch,
   outputFolder,
   publicFolder,
   local,
 }: {
   local: boolean
-  dev: boolean
+  watch: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
@@ -46,7 +46,9 @@ vite.svg`
   const config: InlineConfig = {
     root,
     base,
-    mode: local ? 'development' : 'production',
+    // in watch mode the process is being shared with the server start, so I believe
+    // that causes issues, so always build in production, watch in development
+    mode: watch ? 'development' : 'production',
     plugins: [react(), viteTina()],
     define: {
       'process.env': {},
@@ -67,7 +69,7 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (true) {
+  if (watch) {
     const indexDev = await fs
       .readFileSync(path.join(root, 'index.dev.html'))
       .toString()
