@@ -73,8 +73,8 @@ export const auditDocuments = async (args: AuditArgs) => {
           .map((f) => f.message)
 
         errorMessages.forEach((errorMessage) => {
-          error = true
-          logger.error(chalk.red(errorMessage))
+          warning = true
+          logger.warn(chalk.yellowBright(errorMessage))
         })
       })
 
