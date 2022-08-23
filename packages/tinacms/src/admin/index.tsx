@@ -39,17 +39,24 @@ const Redirect = () => {
   return null
 }
 
-export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
-  const isSSR = typeof window === 'undefined'
-  const { edit } = useEditState()
-  const cms = useCMS()
-
+const SetPreviewFlag = ({
+  preview,
+  cms,
+}: {
+  preview?: JSX.Element
+  cms: TinaCMS
+}) => {
   React.useEffect(() => {
     if (preview) {
       cms.flags.set('tina-iframe', true)
     }
   }, [preview])
+  return null
+}
 
+export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
+  const isSSR = typeof window === 'undefined'
+  const { edit } = useEditState()
   if (isSSR) {
     return null
   }
@@ -70,6 +77,7 @@ export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
         if (isTinaAdminEnabled) {
           return (
             <Router>
+              <SetPreviewFlag preview={preview} cms={cms} />
               <Routes>
                 {preview && <Route path="preview" element={preview} />}
                 <Route
