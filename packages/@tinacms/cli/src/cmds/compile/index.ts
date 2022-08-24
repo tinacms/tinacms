@@ -15,7 +15,7 @@ import * as _ from 'lodash'
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
 import fs from 'fs-extra'
 import path from 'path'
-import { build as esbuild } from 'esbuild'
+import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { dangerText, logText } from '../../utils/theme'
@@ -360,11 +360,10 @@ const transpile = async (
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
 
   const outputPath = path.join(tempDir, outputFile)
-  await esbuild({
+  await build({
     bundle: true,
     platform: 'neutral',
     target: ['node10.4'],
-    format: 'cjs',
     entryPoints: [inputFile],
     treeShaking: true,
     external: [...external, './node_modules/*'],

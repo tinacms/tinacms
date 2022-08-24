@@ -46,9 +46,10 @@ vite.svg`
   const config: InlineConfig = {
     root,
     base,
-    // in watch mode the process is being shared with the server start, so I believe
-    // that causes issues, so always build in production, watch in development
-    mode: watch ? 'development' : 'production',
+    // For some reason this is breaking the React runtime in the end user's application.
+    // Not sure what's going on but `development` works for now.
+    // mode: watch ? 'development' : 'production',
+    mode: 'development',
     plugins: [react(), viteTina()],
     define: {
       'process.env': {},
