@@ -1,6 +1,6 @@
 {
   "name": "create-tina-app",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -45,9 +45,9 @@
     "cross-spawn": "^7.0.3",
     "esm": "3.2.25",
     "fs-extra": "^10.0.0",
-    "got": "^11.8.2",
+    "got": "^11.8.5",
     "prompts": "^2.4.2",
     "rimraf": "^3.0.2",
-    "tar": "4.4.10"
+    "tar": "4.4.18"
   }
 }

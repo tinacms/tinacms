@@ -77,7 +77,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
                 type: 'link',
                 url: item.url,
                 title: item.title,
-                children: [text({ text: a.value })],
+                children: [a],
               }
             },
           })
@@ -164,6 +164,21 @@ export const eat = (
     return []
   }
   if (first && first?.type !== 'text') {
+    if (first.type === 'a') {
+      return [
+        {
+          type: 'link',
+          url: first.url,
+          title: first.title,
+          children: eat(
+            first.children,
+            field,
+            imageCallback
+          ) as Md.StaticPhrasingContent[],
+        },
+        ...eat(content.slice(1), field, imageCallback),
+      ]
+    }
     // non-text nodes can't be merged. Eg. img, break. So process them and move on to the rest
     return [
       inlineElementExceptLink(first, field, imageCallback),
@@ -225,11 +240,12 @@ export const eat = (
     if (nonMatchingSiblingIndex) {
       throw new Error(`Marks inside inline code are not supported`)
     }
+    const node = {
+      type: markToProcess,
+      value: first.text,
+    }
     return [
-      {
-        type: markToProcess,
-        value: first.text,
-      },
+      first.linkifyTextNode?.(node) ?? node,
       ...eat(content.slice(nonMatchingSiblingIndex + 1), field, imageCallback),
     ]
   }
