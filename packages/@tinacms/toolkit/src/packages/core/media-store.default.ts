@@ -26,7 +26,7 @@ import {
   E_BAD_ROUTE,
 } from './media'
 import { CMS } from './cms'
-import mime from 'mime-types'
+import mime from 'mime'
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 
@@ -121,7 +121,7 @@ export class TinaMediaStore implements MediaStore {
           body: item.file,
           headers: {
             'Content-Type':
-              mime.contentType(item.file.name) || 'application/octet-stream',
+              mime.getType(item.file.name) || 'application/octet-stream',
             'Content-Length': String(item.file.size),
           },
         })
