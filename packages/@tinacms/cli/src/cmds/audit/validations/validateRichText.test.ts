@@ -58,6 +58,9 @@ describe('validateRichText', () => {
           group: {
             date: '2021-07-12T07:00:00.000Z',
             foo: null,
+            emptyArray: [],
+            objArray: [{ title: 'foo' }],
+            strArray: ['foo', 'bar'],
             nestedBody: {
               type: 'root',
               children: [
