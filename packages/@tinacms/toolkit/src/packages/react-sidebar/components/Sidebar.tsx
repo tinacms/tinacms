@@ -534,7 +534,7 @@ const EditButton = ({}) => {
       rounded="right"
       variant="primary"
       onClick={toggleSidebarOpen}
-      className={`absolute top-3 right-0 transition-all duration-150 ease-out ${
+      className={` absolute top-8 right-0 transition-all duration-150 ease-out ${
         displayState !== 'closed'
           ? 'opacity-0'
           : 'translate-x-full pointer-events-auto'
