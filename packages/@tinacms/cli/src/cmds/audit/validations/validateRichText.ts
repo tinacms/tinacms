@@ -18,21 +18,18 @@ const validateValues = (values, addWarning: (message: string) => void) => {
     .map((fieldName) => values[fieldName])
     .filter((field) => typeof field === 'object')
 
-  fields
-    .filter((field) => field?.type == 'root')
-    .forEach((field) => {
-      const errorMessages = field.children
-        .filter((f) => f.type == 'invalid_markdown')
-        .map((f) => f.message)
-
-      errorMessages.forEach((errorMessage) => {
-        addWarning(errorMessage)
-      })
-    })
-
-  //check nested values
   fields.forEach((field) => {
     if (field) {
+      if (field?.type == 'root') {
+        const errorMessages = field.children
+          .filter((f) => f.type == 'invalid_markdown')
+          .map((f) => f.message)
+
+        errorMessages.forEach((errorMessage) => {
+          addWarning(errorMessage)
+        })
+      }
+
       validateValues(field, addWarning)
     }
   })
