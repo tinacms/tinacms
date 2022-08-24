@@ -112,7 +112,9 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
 
   p {
     margin: 0;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
+    white-space: wrap;
+    max-width: 680px;
     text-align: left;
   }
 
