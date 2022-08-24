@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 0.1.1
+
+### Patch Changes
+
+- 857f43c28: Tinacms Media store using DigitalOcean space
+
 ## 3.5.29
 
 ### Patch Changes

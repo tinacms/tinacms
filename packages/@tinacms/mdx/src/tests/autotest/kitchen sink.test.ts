@@ -150,6 +150,43 @@ const out = output({
         },
       ],
     },
+    {
+      type: 'p',
+      children: [
+        { type: 'text', text: 'This is a ' },
+        { type: 'text', text: 'paragraph with ', bold: true },
+        { type: 'text', text: 'nested', bold: true, italic: true },
+        { type: 'text', text: ' emphasis', bold: true },
+        { type: 'text', text: '.' },
+      ],
+    },
+    {
+      type: 'p',
+      children: [
+        { type: 'text', text: 'This is a ' },
+        {
+          type: 'a',
+          url: 'http://example.com',
+          title: null,
+          children: [{ type: 'text', text: 'link in code', code: true }],
+        },
+      ],
+    },
+    {
+      type: 'p',
+      children: [
+        { type: 'text', text: 'This is a ' },
+        {
+          type: 'a',
+          url: 'http://example.com',
+          title: null,
+          children: [
+            { type: 'text', text: 'bold mark', italic: true },
+            { type: 'text', text: ' in a link' },
+          ],
+        },
+      ],
+    },
   ],
 })
 

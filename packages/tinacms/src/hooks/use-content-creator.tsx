@@ -159,9 +159,9 @@ export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
                  * https://github.com/tinacms/tina-graphql-gateway/blob/682e2ed54c51520d1a87fac2887950839892f465/packages/tina-graphql-gateway-cli/src/cmds/compile/index.ts#L296
                  * */
 
-                const isValid = /^[_a-zA-Z][-,_a-zA-Z0-9]*$/.test(value)
+                const isValid = /^[_a-zA-Z0-9][\-_a-zA-Z0-9]*$/.test(value)
                 if (value && !isValid) {
-                  return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, - or _'
+                  return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, - or _'
                 }
               },
             },
