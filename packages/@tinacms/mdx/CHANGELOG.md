@@ -1,5 +1,12 @@
 # @tinacms/mdx
 
+## 0.61.3
+
+### Patch Changes
+
+- 7506a46b9: Fix issue where marks within links would throw an error
+- 5fbdd05be: Fix stringification of code element nested in link
+
 ## 0.61.2
 
 ### Patch Changes
