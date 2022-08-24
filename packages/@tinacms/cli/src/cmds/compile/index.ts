@@ -364,6 +364,7 @@ const transpile = async (
     bundle: true,
     platform: 'neutral',
     target: ['node10.4'],
+    format: 'cjs',
     entryPoints: [inputFile],
     treeShaking: true,
     external: [...external, './node_modules/*'],
