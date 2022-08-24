@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.30
+
+### Patch Changes
+
+- b369d7238: Update dependencies to fix vulnerabilities in external packages.
+
 ## 3.5.29
 
 ### Patch Changes

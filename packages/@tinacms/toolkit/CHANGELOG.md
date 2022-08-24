@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.1
+
+### Patch Changes
+
+- b369d7238: Update dependencies to fix vulnerabilities in external packages.
+
 ## 0.57.0
 
 ### Minor Changes
