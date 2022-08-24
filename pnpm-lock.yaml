@@ -879,7 +879,7 @@ importers:
       is-hotkey: ^0.2.0
       jest: ^27.0.6
       lodash.get: ^4.4.2
-      mime: ^2.1.24
+      mime-types: ^2.1.24
       moment: '>=2 <=3'
       monaco-editor: 0.31.0
       prism-react-renderer: ^1.3.5
@@ -924,7 +924,7 @@ importers:
       final-form-set-field-data: 1.0.2_final-form@4.20.7
       is-hotkey: 0.2.0
       lodash.get: 4.4.2
-      mime: 2.6.0
+      mime-types: 2.1.35
       moment: 2.29.3
       monaco-editor: 0.31.0
       prism-react-renderer: 1.3.5_react@17.0.2
@@ -23996,15 +23996,6 @@ packages:
         integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==,
       }
     engines: { node: '>=4' }
-    dev: false
-
-  /mime/2.6.0:
-    resolution:
-      {
-        integrity: sha512-USPkMeET31rOMiarsBNIHZKLGgvKc/LrjofAnBlOttf5ajRvqiRA8QsenbcooctK6d6Ts6aqZXBA+XbkKthiQg==,
-      }
-    engines: { node: '>=4.0.0' }
-    hasBin: true
     dev: false
 
   /mimic-fn/2.1.0:
