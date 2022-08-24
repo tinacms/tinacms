@@ -55,7 +55,7 @@ importers:
       styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
-      next: 12.0.3_sfoxds7t5ydpegc3knd667wn6m
+      next: 12.0.3_apvyc6hsquzbx56wwdowrbgkzm
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
@@ -65,7 +65,7 @@ importers:
       '@tinacms/cli': link:../../packages/@tinacms/cli
       '@types/node': 17.0.45
       eslint: 7.32.0
-      eslint-config-next: 12.0.3_eslint@7.32.0+next@12.0.3
+      eslint-config-next: 12.0.3_ktvaemcdm7a57genqgo743rmeu
 
   examples/empty:
     specifiers:
@@ -81,7 +81,7 @@ importers:
       tinacms: workspace:*
     dependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
-      next: 12.0.3_apvyc6hsquzbx56wwdowrbgkzm
+      next: 12.0.3_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
@@ -90,7 +90,7 @@ importers:
     devDependencies:
       '@types/node': 17.0.45
       eslint: 7.32.0
-      eslint-config-next: 12.0.3_ktvaemcdm7a57genqgo743rmeu
+      eslint-config-next: 12.0.3_eslint@7.32.0+next@12.0.3
 
   experimental-examples/kitchen-sink:
     specifiers:
@@ -13272,7 +13272,7 @@ packages:
       mkdirp: 0.5.3
       move-concurrently: 1.0.1
       p-map: 3.0.0
-      promise-inflight: 1.0.1_bluebird@3.7.2
+      promise-inflight: 1.0.1
       rimraf: 2.7.1
       ssri: 7.1.1
       unique-filename: 1.1.1
@@ -26850,6 +26850,18 @@ packages:
     dependencies:
       promise: 7.3.1
     dev: false
+
+  /promise-inflight/1.0.1:
+    resolution:
+      {
+        integrity: sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==,
+      }
+    peerDependencies:
+      bluebird: '*'
+    peerDependenciesMeta:
+      bluebird:
+        optional: true
+    dev: true
 
   /promise-inflight/1.0.1_bluebird@3.7.2:
     resolution:
