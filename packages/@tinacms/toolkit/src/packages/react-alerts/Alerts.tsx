@@ -22,6 +22,14 @@ import {
   CloseIcon,
 } from '../icons'
 import { useSubscribable } from '../react-core'
+import {
+  Modal,
+  ModalActions,
+  ModalBody,
+  ModalHeader,
+  PopupModal,
+} from '../react-modals'
+import { Button } from '../styles'
 
 export interface AlertsProps {
   alerts: AlertsCollection
@@ -35,27 +43,67 @@ export function Alerts({ alerts }: AlertsProps) {
   }
 
   return (
-    <AlertContainer>
-      {alerts.all.map((alert, i) => {
-        return (
-          <Alert
-            key={alert.id}
-            index={i}
-            level={alert.level}
-            onClick={() => {
-              alerts.dismiss(alert)
-            }}
-          >
-            {alert.level === 'info' && <InfoIcon />}
-            {alert.level === 'success' && <AlertIcon />}
-            {alert.level === 'warn' && <WarningIcon />}
-            {alert.level === 'error' && <ErrorIcon />}
-            <p>{alert.message}</p>
-            <CloseAlert />
-          </Alert>
-        )
-      })}
-    </AlertContainer>
+    <>
+      <AlertContainer>
+        {alerts.all
+          .filter((alert) => {
+            return alert.level !== 'error'
+          })
+          .map((alert, i) => {
+            return (
+              <Alert key={alert.id} index={i} level={alert.level}>
+                {alert.level === 'info' && <InfoIcon />}
+                {alert.level === 'success' && <AlertIcon />}
+                {alert.level === 'warn' && <WarningIcon />}
+                <p>{alert.message}</p>
+                <CloseAlert
+                  onClick={() => {
+                    alerts.dismiss(alert)
+                  }}
+                />
+              </Alert>
+            )
+          })}
+      </AlertContainer>
+      {alerts.all
+        .filter((alert) => {
+          return alert.level === 'error'
+        })
+        .map((alert, i) => {
+          const AlertMessage = alert.message
+
+          return (
+            <Modal>
+              <PopupModal>
+                <ModalHeader
+                  close={() => {
+                    alerts.dismiss(alert)
+                  }}
+                >
+                  <ErrorIcon className="mr-1 w-6 h-auto fill-current inline-block text-red-600" />{' '}
+                  Error
+                </ModalHeader>
+                <ModalBody padded={true}>
+                  <div className="tina-prose">
+                    <AlertMessage />
+                  </div>
+                </ModalBody>
+                <ModalActions>
+                  <div className="flex-1"></div>
+                  <Button
+                    style={{ flexGrow: 1 }}
+                    onClick={() => {
+                      alerts.dismiss(alert)
+                    }}
+                  >
+                    Close
+                  </Button>
+                </ModalActions>
+              </PopupModal>
+            </Modal>
+          )
+        })}
+    </>
   )
 }
 
