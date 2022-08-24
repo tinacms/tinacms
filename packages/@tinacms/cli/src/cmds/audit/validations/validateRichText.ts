@@ -13,22 +13,36 @@ limitations under the License.
 
 import { AuditIssue, AuditWarning } from '../issue'
 
-export const validateRichText = (node) => {
-  let issues: AuditIssue[] = []
-  Object.keys(node._values)
-    .map((fieldName) => node._values[fieldName])
-    .filter((field) => {
-      return field?.type == 'root'
-    })
+const validateValues = (values, addWarning: (message: string) => void) => {
+  let fields = Object.keys(values)
+    .map((fieldName) => values[fieldName])
+    .filter((field) => typeof field === 'object')
+
+  fields
+    .filter((field) => field?.type == 'root')
     .forEach((field) => {
       const errorMessages = field.children
         .filter((f) => f.type == 'invalid_markdown')
         .map((f) => f.message)
 
       errorMessages.forEach((errorMessage) => {
-        issues.push(new AuditWarning(errorMessage, node._sys.path))
+        addWarning(errorMessage)
       })
     })
 
+  //check nested values
+  fields.forEach((field) => {
+    if (field) {
+      validateValues(field, addWarning)
+    }
+  })
+}
+
+export const validateRichText = (node) => {
+  let issues: AuditIssue[] = []
+
+  validateValues(node._values, (message) =>
+    issues.push(new AuditWarning(message, node._sys.path))
+  )
   return issues
 }
