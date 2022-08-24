@@ -88,7 +88,7 @@
     "lodash": "^4.17.19",
     "lodash.get": "^4.4.2",
     "log4js": "^6.4.0",
-    "multer": "^1.4.4",
+    "multer": "1.4.5-lts.1",
     "normalize-path": "^3.0.0",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
