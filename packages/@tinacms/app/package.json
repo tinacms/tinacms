@@ -51,6 +51,7 @@
     "autoprefixer": "^10.4.0",
     "final-form": "^4.20.7",
     "fs-extra": "^9.0.1",
+    "esbuild": "^0.15.5",
     "graphql": "^15.1.0",
     "jest": "^27.0.6",
     "postcss": "^8.4.14",

@@ -16,6 +16,8 @@ import fs from 'fs-extra'
 import { build, createServer, InlineConfig } from 'vite'
 import path from 'path'
 import { viteTina } from './tailwind'
+import { build as esbuild } from 'esbuild'
+import type { Loader } from 'esbuild'
 
 export const viteBuild = async ({
   rootPath,
@@ -32,6 +34,8 @@ export const viteBuild = async ({
 }) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
+  const packageJSONFilePath = path.join(rootPath, 'package.json')
+  // const pathToTsConfig = path.join(rootPath, 'tsconfig.json')
   const outDir = path.join(rootPath, publicFolder, outputFolder)
   await fs.emptyDir(outDir)
   await fs.ensureDir(outDir)
@@ -41,6 +45,28 @@ export const viteBuild = async ({
 assets/
 vite.svg`
   )
+  // const configFile = `${pathToConfig}.ts`
+  const packageJSON = JSON.parse(
+    fs.readFileSync(packageJSONFilePath).toString() || '{}'
+  )
+  const define = {}
+  const deps = packageJSON?.dependencies || []
+  const peerDeps = packageJSON?.peerDependencies || []
+  const devDeps = packageJSON?.devDependencies || []
+  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
+  const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
+  await esbuild({
+    bundle: true,
+    platform: 'browser',
+    target: ['es2020'],
+    entryPoints: [pathToConfig],
+    format: 'esm',
+    treeShaking: true,
+    outfile: out,
+    external: [...external, './node_modules/*'],
+    loader: loaders,
+    define: define,
+  })
 
   const base = `/${outputFolder}/`
   const config: InlineConfig = {
@@ -52,6 +78,8 @@ vite.svg`
     mode: 'development',
     plugins: [react(), viteTina()],
     define: {
+      global: {},
+      'process.platform': null,
       'process.env': {},
     },
     server: {
@@ -71,7 +99,7 @@ vite.svg`
     },
     resolve: {
       alias: {
-        TINA_IMPORT: pathToConfig,
+        TINA_IMPORT: out,
       },
     },
     build: {
@@ -92,4 +120,30 @@ vite.svg`
   } else {
     await build(config)
   }
+}
+
+const loaders: { [ext: string]: Loader } = {
+  '.aac': 'file',
+  '.css': 'file',
+  '.eot': 'file',
+  '.flac': 'file',
+  '.gif': 'file',
+  '.jpeg': 'file',
+  '.jpg': 'file',
+  '.json': 'json',
+  '.mp3': 'file',
+  '.mp4': 'file',
+  '.ogg': 'file',
+  '.otf': 'file',
+  '.png': 'file',
+  '.svg': 'file',
+  '.ttf': 'file',
+  '.wav': 'file',
+  '.webm': 'file',
+  '.webp': 'file',
+  '.woff': 'file',
+  '.woff2': 'file',
+  '.js': 'jsx',
+  '.jsx': 'jsx',
+  '.tsx': 'tsx',
 }
