@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 0.63.3
+
+### Patch Changes
+
+- b369d7238: Update dependencies to fix vulnerabilities in external packages.
+- Updated dependencies [7506a46b9]
+- Updated dependencies [5fbdd05be]
+  - @tinacms/mdx@0.61.3
+
 ## 0.63.2
 
 ### Patch Changes
