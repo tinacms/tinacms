@@ -651,16 +651,19 @@ const setData = ({
             if (!form) {
               throw new QueryError(`Unable to resolve form for document`, value)
             }
-            nextData[key] = setData({
+            nextData[key] = {
               id: docContext.id,
-              data: { ...docContext.data, ...form.values },
-              // @ts-ignore form.fields is Field
-              fields: form.fields,
-              namespace: [],
-              path: [],
-              blueprint: childBlueprint,
-              context,
-            })
+              ...setData({
+                id: docContext.id,
+                data: { ...docContext.data, ...form.values },
+                // @ts-ignore form.fields is Field
+                fields: form.fields,
+                namespace: [],
+                path: [],
+                blueprint: childBlueprint,
+                context,
+              }),
+            }
           } else {
             // The reference value is null
             nextData[key] = null
