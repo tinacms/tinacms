@@ -1,0 +1,11 @@
+{
+  "title": "Querying Tina Content in React",
+  "steps": [
+    {
+      "title": "Guide",
+      "id": "/guides/tinacms/react-data-fetching/guide/",
+      "slug": "/guides/tinacms/react-data-fetching/guide/",
+      "data": "./guide.md"
+    }
+  ]
+}

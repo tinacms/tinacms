@@ -1,0 +1,32 @@
+[
+  {
+    "id": "home",
+    "label": "Home",
+    "href": "/",
+    "external": false
+  },
+  {
+    "id": "blog",
+    "label": "Blog",
+    "href": "/blog",
+    "external": false
+  },
+  {
+    "id": "showcase",
+    "label": "Showcase",
+    "href": "/showcase",
+    "external": false
+  },
+  {
+    "id": "community",
+    "label": "Community",
+    "href": "/community",
+    "external": false
+  },
+  {
+    "id": "playground",
+    "label": "Playground",
+    "href": "https://tina-gql-playground.vercel.app/",
+    "external": true
+  }
+]

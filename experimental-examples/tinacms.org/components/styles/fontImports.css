@@ -1,0 +1,39 @@
+/* Tuner Regular */
+@font-face {
+  font-family: 'tuner-regular';
+  font-style: normal;
+  font-weight: regular;
+  font-display: fallback;
+  src: url('../../public/fonts/tunerweb-regular.eot') format('eot'),
+    url('../../public/fonts/tunerweb-regular.woff') format('woff');
+}
+
+/* Inter Regular */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: fallback;
+  src: url('../../public/fonts/Inter-Regular.woff2') format('woff2'),
+    url('../../public/fonts/Inter-Regular.woff') format('woff');
+}
+
+/* Inter Italic */
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 400;
+  font-display: fallback;
+  src: url('../../public/fonts/Inter-Italic.woff2') format('woff2'),
+    url('../../public/fonts/Inter-Italic.woff') format('woff');
+}
+
+/* Inter Bold */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: fallback;
+  src: url('../../public/fonts/Inter-Bold.woff2') format('woff2'),
+    url('../../public/fonts/Inter-Bold.woff') format('woff');
+}

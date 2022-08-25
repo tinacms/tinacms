@@ -1,0 +1,525 @@
+{
+  "env": {
+    "GTM_ID": "@gtm_id",
+    "HUBSPOT_TEAMS_FORM_ID": "@hubspot_teams_form_id",
+    "HUBSPOT_PORTAL_ID": "@hubspot_portal_id",
+    "MAILCHIMP_ENDPOINT": "@mailchimp_endpoint"
+  },
+  "build": {
+    "env": {
+      "USE_CONTENT_API": "true",
+      "GTM_ID": "@gtm_id",
+      "HUBSPOT_TEAMS_FORM_ID": "@hubspot_teams_form_id",
+      "HUBSPOT_PORTAL_ID": "@hubspot_portal_id",
+      "MAILCHIMP_ENDPOINT": "@mailchimp_endpoint"
+    }
+  },
+  "redirects": [
+    { "source": "/cloud/", "destination": "/" },
+    {
+      "source": "/blog/tina-v-0.69.0/",
+      "destination": "/blog/tina-v-0.68.14"
+    },
+    {
+      "source": "/docs/extending-tina/customizing-forms/",
+      "destination": "/docs/extending-tina/overview/"
+    },
+    {
+      "source": "/docs/tina-cloud/alpha-faq/",
+      "destination": "/docs/tina-cloud/faq/"
+    },
+    { "source": "/blog/first", "destination": "/blog/announcing-tinacms" },
+    {
+      "source": "/blog/introducing-tina-grande-%F0%9F%8E%89",
+      "destination": "/blog/introducing-tina-grande"
+    },
+    { "source": "/jamstack-conf", "destination": "/teams" },
+    { "source": "/smashing-conf", "destination": "/teams" },
+    { "source": "/docs/concepts/sidebar", "destination": "/docs/cms" },
+    { "source": "/docs/concepts/forms", "destination": "/docs/forms" },
+    { "source": "/docs/plugins/forms", "destination": "/docs/forms" },
+    {
+      "source": "/docs/concepts/fields",
+      "destination": "/docs/fields"
+    },
+    { "source": "/docs/cms/apis", "destination": "/docs/apis" },
+    { "source": "/docs/ui", "destination": "/docs/sidebar-toolbar" },
+    { "source": "/docs/cms/ui", "destination": "/docs/sidebar-toolbar" },
+    { "source": "/docs/cms/alerts", "destination": "/docs/ui/alerts" },
+    {
+      "source": "/docs/cms/styles",
+      "destination": "/docs/advanced/customizing-ui/"
+    },
+    {
+      "source": "/docs/ui/styles/",
+      "destination": "/docs/advanced/customizing-ui/"
+    },
+    { "source": "/docs/cms/events", "destination": "/docs/events" },
+    { "source": "/docs/cms/plugins", "destination": "/docs/plugins" },
+    { "source": "/docs/plugins/fields", "destination": "/docs/fields" },
+    { "source": "/docs/plugins/fields/", "destination": "/docs/fields" },
+    { "source": "/docs/concepts/backends", "destination": "/docs/cms#apis" },
+    { "source": "/docs/concepts/plugins", "destination": "/docs/cms#plugins" },
+    {
+      "source": "/docs/getting-started/how-tina-works/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/getting-started/overview/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/getting-started/introduction/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/getting-started/cms-set-up/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/getting-started/edit-content/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/getting-started/backends/",
+      "destination": "/docs/setup-overview/"
+    },
+    {
+      "source": "/docs/inline-editing/",
+      "destination": "/docs/ui/inline-editing"
+    },
+    {
+      "source": "/docs/nextjs/inline-editing/",
+      "destination": "/docs/ui/inline-editing"
+    },
+    {
+      "source": "/guides/nextjs/github-open-authoring/(.*)",
+      "destination": "/guides/nextjs/github/$1"
+    },
+    {
+      "source": "/docs/gatsby/inline-editing/",
+      "destination": "/docs/ui/inline-editing"
+    },
+    {
+      "source": "/docs/inline-blocks/",
+      "destination": "/docs/ui/inline-editing/inline-blocks"
+    },
+    {
+      "source": "/docs/inline-editing/inline-blocks/",
+      "destination": "/docs/ui/inline-editing/inline-blocks"
+    },
+    {
+      "source": "/docs/inline-blocks/block-text/",
+      "destination": "/docs/ui/inline-editing/inline-text"
+    },
+    {
+      "source": "/docs/inline-blocks/block-textarea/",
+      "destination": "/docs/ui/inline-editing/inline-textarea"
+    },
+    {
+      "source": "/docs/inline-blocks/block-image/",
+      "destination": "/docs/ui/inline-editing/inline-image"
+    },
+    {
+      "source": "/docs/nextjs/bootstrapping/",
+      "destination": "/guides/nextjs/git/getting-started"
+    },
+    {
+      "source": "/docs/nextjs/adding-backends/",
+      "destination": "/guides/nextjs/git/adding-backend"
+    },
+    {
+      "source": "/docs/nextjs/creating-forms/",
+      "destination": "/guides/nextjs/git/creating-git-forms"
+    },
+    {
+      "source": "/docs/nextjs/markdown/",
+      "destination": "/docs/editing/markdown/"
+    },
+    {
+      "source": "/teams",
+      "destination": "/"
+    },
+    {
+      "source": "/enterprise",
+      "destination": "/"
+    },
+    {
+      "source": "/docs/gatsby/quickstart/",
+      "destination": "/guides/gatsby/adding-tina/project-setup"
+    },
+    {
+      "source": "/docs/gatsby/manual-setup/",
+      "destination": "/guides/gatsby/adding-tina/project-setup"
+    },
+    {
+      "source": "/docs/gatsby/markdown/",
+      "destination": "/guides/gatsby/git/installation"
+    },
+    {
+      "source": "/guides/general/inline-editing/",
+      "destination": "/guides/experimental/inline-editing"
+    },
+    {
+      "source": "/docs/gatsby/json",
+      "destination": "/guides/gatsby/git/create-json-form"
+    },
+    {
+      "source": "/docs/git",
+      "destination": "/guides/git/create-new-files"
+    },
+    {
+      "source": "/docs/gatsby/configure-git-plugin",
+      "destination": "/guides/gatsby/git/installation"
+    },
+    {
+      "source": "/docs/gatsby/custom-field",
+      "destination": "/docs/plugins#adding-plugins-in-gatsby"
+    },
+    {
+      "source": "/blog/2020-03-09-release-notes",
+      "destination": "/docs/releases/2020-03-09"
+    },
+    {
+      "source": "/blog/2020-03-16-release-notes",
+      "destination": "/docs/releases/2020-03-16"
+    },
+    {
+      "source": "/blog/2020-03-23-release-notes",
+      "destination": "/docs/releases/2020-03-23"
+    },
+    {
+      "source": "/blog/2020-03-30-release-notes",
+      "destination": "/docs/releases/2020-03-30"
+    },
+    {
+      "source": "/blog/2020-04-06-release-notes",
+      "destination": "/docs/releases/2020-04-06"
+    },
+    {
+      "source": "/blog/2020-04-27-release-notes",
+      "destination": "/docs/releases/2020-04-27"
+    },
+    {
+      "source": "/blog/2020-05-04-release-notes",
+      "destination": "/docs/releases/2020-05-04"
+    },
+    {
+      "source": "/blog/2020-05-11-release-notes",
+      "destination": "/docs/releases/2020-05-11"
+    },
+    {
+      "source": "/blog/2020-05-19-release-notes",
+      "destination": "/docs/releases/2020-05-19"
+    },
+    {
+      "source": "/blog/2020-05-25-release-notes",
+      "destination": "/docs/releases/2020-05-25"
+    },
+    {
+      "source": "/blog/2020-06-07-release-notes",
+      "destination": "/docs/releases/2020-07-07"
+    },
+    {
+      "source": "/blog/2020-06-08-release-notes",
+      "destination": "/docs/releases/2020-06-08"
+    },
+    {
+      "source": "/blog/2020-06-15-release-notes",
+      "destination": "/docs/releases/2020-06-15"
+    },
+    {
+      "source": "/blog/2020-06-23-release-notes",
+      "destination": "/docs/releases/2020-06-23"
+    },
+    {
+      "source": "/blog/2020-06-29-release-notes",
+      "destination": "/docs/releases/2020-06-29"
+    },
+    {
+      "source": "/blog/2020-07-27-release-notes",
+      "destination": "/docs/releases/2020-07-27"
+    },
+    {
+      "source": "/docs/nextjs/next-tinacms-github",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/nextjs/next-tinacms-json",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/nextjs/next-tinacms-markdown",
+      "destination": "/docs/editing/markdown/"
+    },
+    {
+      "source": "/beta-docs",
+      "destination": "/docs"
+    },
+    {
+      "source": "/docs/tina-cloud/beta-faq",
+      "destination": "/docs/tina-cloud/alpha-faq"
+    },
+    {
+      "source": "/guides/tina-cloud/getting-started/(.*)",
+      "destination": "/guides/tina-cloud/add-tinacms-to-existing-site/$1"
+    },
+    {
+      "source": "/guides/tina-cloud/existing-site/(.*)",
+      "destination": "/guides/tina-cloud/add-tinacms-to-existing-site/$1"
+    },
+    {
+      "source": "/docs/tina-cloud/client",
+      "destination": "/docs/tinacms-context/"
+    },
+    {
+      "source": "/guides/nextjs/github/(.*)",
+      "destination": "/guides/experimental/github/$1"
+    },
+    {
+      "source": "/guides/nextjs/tina-with-strapi/(.*)",
+      "destination": "/guides/experimental/tina-with-strapi/$1"
+    },
+    {
+      "source": "/docs/tina-cloud/cli/",
+      "destination": "/docs/cli-overview/"
+    },
+    {
+      "source": "/guides/nextjs/adding-tina/(.*)",
+      "destination": "/guides/tina-cloud/add-tinacms-to-existing-site/overview/"
+    },
+    {
+      "source": "/packages/(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/tinacms-context-advanced/",
+      "destination": "/docs/tinacms-context/"
+    },
+    {
+      "source": "/docs/tinacms-reference/",
+      "destination": "/docs/tinacms-context/"
+    },
+    {
+      "source": "/docs/toolkit/",
+      "destination": "/docs/reference/toolkit/cms/"
+    },
+    {
+      "source": "/docs/content-management/",
+      "destination": "/docs/reference/toolkit/overview/"
+    },
+    {
+      "source": "/docs/cms/",
+      "destination": "/docs/reference/toolkit/cms/"
+    },
+    {
+      "source": "/docs/forms/",
+      "destination": "/docs/reference/toolkit/forms/"
+    },
+    {
+      "source": "/docs/fields/",
+      "destination": "/docs/reference/toolkit/fields/"
+    },
+    {
+      "source": "/docs/fields/text/",
+      "destination": "/docs/reference/toolkit/fields/text/"
+    },
+    {
+      "source": "/docs/fields/textarea/",
+      "destination": "/docs/reference/toolkit/fields/textarea/"
+    },
+    {
+      "source": "/docs/fields/number/",
+      "destination": "/docs/reference/toolkit/fields/number/"
+    },
+    {
+      "source": "/docs/fields/image/",
+      "destination": "/docs/reference/toolkit/fields/image/"
+    },
+    {
+      "source": "/docs/fields/color/",
+      "destination": "/docs/reference/toolkit/fields/color/"
+    },
+    {
+      "source": "/docs/fields/toggle/",
+      "destination": "/docs/reference/toolkit/fields/toggle/"
+    },
+    {
+      "source": "/docs/fields/radio-group/",
+      "destination": "/docs/reference/toolkit/fields/radio-group/"
+    },
+    {
+      "source": "/docs/fields/select/",
+      "destination": "/docs/reference/toolkit/fields/select/"
+    },
+    {
+      "source": "/docs/fields/tags/",
+      "destination": "/docs/reference/toolkit/fields/tags/"
+    },
+    {
+      "source": "/docs/fields/list/",
+      "destination": "/docs/reference/toolkit/fields/list/"
+    },
+    {
+      "source": "/docs/fields/group/",
+      "destination": "/docs/reference/toolkit/fields/group/"
+    },
+    {
+      "source": "/docs/fields/group-list/",
+      "destination": "/docs/reference/toolkit/fields/group-list/"
+    },
+    {
+      "source": "/docs/fields/blocks/",
+      "destination": "/docs/reference/toolkit/fields/blocks/"
+    },
+    {
+      "source": "/docs/fields/date/",
+      "destination": "/docs/reference/toolkit/fields/date/"
+    },
+    {
+      "source": "/docs/fields/markdown/",
+      "destination": "/docs/reference/toolkit/fields/markdown/"
+    },
+    {
+      "source": "/docs/fields/html/",
+      "destination": "/docs/reference/toolkit/fields/html/"
+    },
+    {
+      "source": "/docs/fields/custom-fields/",
+      "destination": "/docs/advanced/configuring-field-plugin/"
+    },
+    {
+      "source": "/docs/reference/toolkit/fields/custom-fields",
+      "destination": "/docs/advanced/configuring-field-plugin/"
+    },
+
+    {
+      "source": "/docs/plugins/content-creators/",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/media/",
+      "destination": "/docs/reference/media/"
+    },
+    {
+      "source": "/docs/apis/",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/user-interface/",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/sidebar-toolbar/",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/extending-tina/",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/events/",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/plugins(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/ui/(.*)",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/getting-started/faq/",
+      "destination": "/docs/tina-cloud/faq/"
+    },
+    {
+      "source": "/docs/integrations(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/guides/experimental(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/guides/gatsby(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/guides/general(.*)",
+      "destination": "/guides/"
+    },
+    {
+      "source": "/guides/nextjs(.*)",
+      "destination": "/guides/tina-cloud/add-tinacms-to-existing-site/overview/"
+    },
+    {
+      "source": "/guides/tina-cloud(.*)",
+      "destination": "/guides/"
+    },
+    {
+      "source": "/docs/features/extending-tina/",
+      "destination": "/docs/advanced/extending-tina/"
+    },
+    {
+      "source": "/docs/mdx/",
+      "destination": "/docs/editing/mdx"
+    },
+    {
+      "source": "/docs/tinacms-package/",
+      "destination": "/docs/tinacms-context"
+    },
+    {
+      "source": "/docs/cli/",
+      "destination": "/docs/cli-overview"
+    },
+    {
+      "source": "/docs/schema-advanced/",
+      "destination": "/docs/graphql/"
+    },
+    {
+      "source": "/docs/graphql/",
+      "destination": "/docs/graphql/overview"
+    },
+    {
+      "source": "/docs/releases(.*)",
+      "destination": "/docs/legacy-redirect"
+    },
+    {
+      "source": "/docs/advanced/extending-tina/",
+      "destination": "/docs/extending-tina/overview/"
+    },
+    {
+      "source": "/docs/advanced/configuring-field-plugin/",
+      "destination": "/docs/extending-tina/custom-field-components/"
+    },
+    {
+      "source": "/docs/advanced/extending-field-plugin/",
+      "destination": "/docs/extending-tina/advanced/extending-field-plugin/"
+    },
+    {
+      "source": "/docs/advanced/creating-field-component/",
+      "destination": "/docs/extending-tina/advanced/creating-field-component/"
+    },
+    {
+      "source": "/docs/advanced/customizing-forms/",
+      "destination": "/docs/extending-tina/customizing-forms/"
+    },
+    {
+      "source": "/docs/advanced/customizing-ui/",
+      "destination": "/docs/extending-tina/customizing-ui/"
+    },
+    {
+      "source": "/docs/advanced/edit-state/",
+      "destination": "/docs/extending-tina/edit-state/"
+    },
+    {
+      "source": "/docs/media-cloudinary/",
+      "destination": "/docs/reference/media/cloudinary/"
+    },
+    {
+      "source": "/docs/tina-cloud/data-layer/",
+      "destination": "/docs/reference/content-api/data-layer/"
+    }
+  ]
+}

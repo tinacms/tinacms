@@ -1,0 +1,11 @@
+{
+  "title": "Adding Internationlization to Tina",
+  "steps": [
+    {
+      "title": "Guide",
+      "id": "/guides/tinacms/adding-internationalization-to-tina/guide/",
+      "slug": "/guides/tinacms/adding-internationalization-to-tina/guide/",
+      "data": "./guide.md"
+    }
+  ]
+}

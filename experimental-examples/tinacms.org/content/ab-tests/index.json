@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "testId": "home",
+      "href": "/",
+      "variants": [
+        {
+          "testId": "b",
+          "href": "/home-b"
+        }
+      ]
+    }
+  ]
+}

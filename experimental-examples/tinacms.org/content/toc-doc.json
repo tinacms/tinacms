@@ -1,0 +1,548 @@
+[
+  {
+    "category": "Introduction",
+    "slug": "/docs/",
+    "description": "Quickly Setup Tina on your site",
+    "items": [
+      {
+        "id": "/docs/",
+        "slug": "/docs/",
+        "title": "Overview"
+      },
+      {
+        "id": "/docs/product-tour/",
+        "slug": "/docs/product-tour/",
+        "title": "Product Tour"
+      },
+      {
+        "id": "/docs/setup-overview/",
+        "slug": "/docs/setup-overview/",
+        "title": "Getting Started",
+        "items": [
+          {
+            "id": "/docs/introduction/using-starter/",
+            "slug": "/docs/introduction/using-starter/",
+            "title": "Using a starter"
+          },
+          {
+            "id": "/docs/introduction/tina-init/",
+            "slug": "/docs/introduction/tina-init/",
+            "title": "Adding Tina to existing NextJS site"
+          }
+        ]
+      },
+      {
+        "id": "/docs/using-tina-editor/",
+        "slug": "/docs/using-tina-editor/",
+        "title": "Using the Tina editor"
+      }
+    ]
+  },
+  {
+    "category": "Core Concepts",
+    "slug": "/docs/schema/",
+    "description": "The JavaScript toolkit for building content management interfaces",
+    "items": [
+      {
+        "title": "Content Modeling",
+        "id": "/docs/schema",
+        "slug": "/docs/schema/"
+      },
+      {
+        "title": "Data Fetching",
+        "id": "/docs/features/data-fetching",
+        "slug": "/docs/features/data-fetching/"
+      },
+      {
+        "title": "Contextual Editing",
+        "id": "/docs/tinacms-context",
+        "slug": "/docs/tinacms-context/"
+      }
+    ]
+  },
+  {
+    "title": "Querying content",
+    "id": "/docs/data-fetching/overview/",
+    "slug": "/docs/data-fetching/overview/",
+    "items": [
+      {
+        "title": "Overview",
+        "id": "/docs/data-fetching/overview/",
+        "slug": "/docs/data-fetching/overview/"
+      },
+      {
+        "title": "Writing custom queries",
+        "id": "/docs/data-fetching/custom-queries/",
+        "slug": "/docs/data-fetching/custom-queries/"
+      }
+    ]
+  },
+  {
+    "title": "Editing",
+    "id": "/docs/editing/overview",
+    "slug": "/docs/editing/overview/",
+    "items": [
+      {
+        "title": "Overview",
+        "id": "/docs/editing/overview",
+        "slug": "/docs/editing/overview/"
+      },
+      {
+        "title": "Markdown",
+        "id": "/docs/editing/markdown",
+        "slug": "/docs/editing/markdown/"
+      },
+      {
+        "title": "Rich Text with MDX",
+        "id": "/docs/editing/mdx",
+        "slug": "/docs/editing/mdx/"
+      },
+      {
+        "title": "Block-based editing",
+        "id": "/docs/editing/blocks",
+        "slug": "/docs/editing/blocks/"
+      },
+      {
+        "title": "Active Field Indicator",
+        "id": "/docs/editing/active-field-indicator",
+        "slug": "/docs/editing/active-field-indicator/",
+        "beta": true
+      }
+    ]
+  },
+  {
+    "title": "Extending Tina",
+    "id": "/docs/extending-tina/overview",
+    "slug": "/docs/extending-tina/overview/",
+    "items": [
+      {
+        "title": "Overview",
+        "id": "/docs/extending-tina/overview",
+        "slug": "/docs/extending-tina/overview/"
+      },
+      {
+        "title": "Validation",
+        "id": "/docs/extending-tina/validation",
+        "slug": "/docs/extending-tina/validation/"
+      },
+      {
+        "title": "Custom field components",
+        "id": "/docs/extending-tina/custom-field-components",
+        "slug": "/docs/extending-tina/custom-field-components/"
+      },
+      {
+        "title": "Custom List Rendering",
+        "id": "/docs/extending-tina/customize-list-ui",
+        "slug": "/docs/extending-tina/customize-list-ui/"
+      },
+      {
+        "title": "Format and parse input",
+        "id": "/docs/extending-tina/format-and-parse",
+        "slug": "/docs/extending-tina/format-and-parse/"
+      }
+    ]
+  },
+  {
+    "category": "Going To Production",
+    "slug": "/docs/tina-cloud",
+    "description": "Powerful Git-based content management for teams",
+    "items": [
+      {
+        "id": "/docs/tina-cloud/",
+        "slug": "/docs/tina-cloud/",
+        "title": "Overview"
+      },
+      {
+        "id": "/docs/tina-cloud/dashboard/",
+        "slug": "/docs/tina-cloud/dashboard/",
+        "title": "Tina Cloud Dashboard",
+        "items": [
+          {
+            "id": "/docs/tina-cloud/dashboard/registration/",
+            "slug": "/docs/tina-cloud/dashboard/registration/",
+            "title": "Registration"
+          },
+          {
+            "id": "/docs/tina-cloud/dashboard/projects/",
+            "slug": "/docs/tina-cloud/dashboard/projects/",
+            "title": "Projects"
+          },
+          {
+            "id": "/docs/tina-cloud/dashboard/users/",
+            "slug": "/docs/tina-cloud/dashboard/users/",
+            "title": "Users"
+          }
+        ]
+      },
+      {
+        "id": "/docs/tina-cloud/connecting-site/",
+        "slug": "/docs/tina-cloud/connecting-site/",
+        "title": "Connecting the site"
+      },
+      {
+        "id": "/docs/tina-cloud/faq/",
+        "slug": "/docs/tina-cloud/faq/",
+        "title": "FAQ"
+      },
+      {
+        "id": "/docs/tina-cloud/api-versioning/",
+        "slug": "/docs/tina-cloud/api-versioning/",
+        "title": "API Versioning"
+      },
+      {
+        "id": "/docs/self-hosted/overview/",
+        "slug": "/docs/self-hosted/overview/",
+        "title": "Self Hosted Tina"
+      },
+      {
+        "id": "/docs/tina-cloud/branching/",
+        "slug": "/docs/tina-cloud/branching/",
+        "title": "Branching",
+        "beta": true
+      }
+    ]
+  },
+  {
+    "category": "Guides",
+    "slug": "/guides",
+    "items": [
+      {
+        "id": "/guides/tinacms/nextjs-data-fetching/guide/",
+        "slug": "/guides/tinacms/nextjs-data-fetching/guide/",
+        "title": "NextJS",
+        "items": [
+          {
+            "id": "/guides/tinacms/nextjs-data-fetching/guide/",
+            "slug": "/guides/tinacms/nextjs-data-fetching/guide/",
+            "title": "Querying Tina Content in NextJS"
+          },
+          {
+            "id": "/guides/tinacms/adding-internationalization-to-tina/guide/",
+            "slug": "/guides/tinacms/adding-internationalization-to-tina/guide/",
+            "title": "Adding Internationalization to Tina"
+          }
+        ]
+      },
+      {
+        "id": "/guides/tinacms/non-react-based-ssg/guide/",
+        "slug": "/guides/tinacms/non-react-based-ssg/guide/",
+        "title": "Non-React-based SSG support",
+        "beta": true
+      },
+      {
+        "id": "/guides/tinacms/react-data-fetching/guide/",
+        "slug": "/guides/tinacms/react-data-fetching/guide/",
+        "title": "Querying Tina Content at Runtime",
+        "considering": true
+      }
+    ]
+  },
+  {
+    "category": "Reference",
+    "slug": "/docs/reference/overview/",
+    "items": [
+      {
+        "id": "/docs/reference/overview/",
+        "slug": "/docs/reference/overview/",
+        "title": "Overview"
+      },
+      {
+        "id": "/docs/reference/schema/",
+        "slug": "/docs/reference/schema/",
+        "title": "Schema",
+        "items": [
+          {
+            "id": "/docs/reference/schema/",
+            "slug": "/docs/reference/schema/",
+            "title": "Overview"
+          },
+          {
+            "id": "/docs/reference/collections/",
+            "slug": "/docs/reference/collections/",
+            "title": "Collections"
+          },
+          {
+            "id": "/docs/reference/fields/",
+            "slug": "/docs/reference/fields/",
+            "title": "Fields"
+          },
+          {
+            "id": "/docs/reference/templates/",
+            "slug": "/docs/reference/templates/",
+            "title": "Templates"
+          },
+          {
+            "id": "/docs/reference/types/",
+            "slug": "/docs/reference/types/",
+            "title": "Field Types",
+            "items": [
+              {
+                "id": "/docs/reference/types/string/",
+                "slug": "/docs/reference/types/string/",
+                "title": "string"
+              },
+              {
+                "id": "/docs/reference/types/number/",
+                "slug": "/docs/reference/types/number/",
+                "title": "number"
+              },
+              {
+                "id": "/docs/reference/types/datetime/",
+                "slug": "/docs/reference/types/datetime/",
+                "title": "datetime"
+              },
+              {
+                "id": "/docs/reference/types/boolean/",
+                "slug": "/docs/reference/types/boolean/",
+                "title": "boolean"
+              },
+              {
+                "id": "/docs/reference/types/image/",
+                "slug": "/docs/reference/types/image/",
+                "title": "image"
+              },
+              {
+                "id": "/docs/reference/types/reference/",
+                "slug": "/docs/reference/types/reference/",
+                "title": "reference"
+              },
+              {
+                "id": "/docs/reference/types/object/",
+                "slug": "/docs/reference/types/object/",
+                "title": "object"
+              },
+              {
+                "id": "/docs/reference/types/rich-text/",
+                "slug": "/docs/reference/types/rich-text/",
+                "title": "rich-text"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "/docs/tina-folder/overview/",
+        "slug": "/docs/tina-folder/overview/",
+        "title": "The \".tina\" folder"
+      },
+      {
+        "id": "/docs/cli-overview/",
+        "slug": "/docs/cli-overview/",
+        "title": "The TinaCMS CLI"
+      },
+      {
+        "title": "Media",
+        "id": "/docs/reference/media/overview/",
+        "slug": "/docs/reference/media/overview/",
+        "items": [
+          {
+            "title": "Overview",
+            "id": "/docs/reference/media/overview/",
+            "slug": "/docs/reference/media/overview/"
+          },
+          {
+            "title": "Repo-based Media",
+            "id": "/docs/reference/media/repo-based/",
+            "slug": "/docs/reference/media/repo-based/"
+          },
+          {
+            "title": "Cloudinary",
+            "id": "/docs/reference/media/cloudinary/",
+            "slug": "/docs/reference/media/cloudinary/"
+          }
+        ]
+      },
+      {
+        "title": "Content API",
+        "id": "/docs/graphql/overview/",
+        "slug": "/docs/graphql/overview/",
+        "items": [
+          {
+            "id": "/docs/graphql/overview/",
+            "slug": "/docs/graphql/overview/",
+            "title": "Overview"
+          },
+          {
+            "id": "/docs/graphql/cli/",
+            "slug": "/docs/graphql/cli/",
+            "title": "Running the Local GraphQL API"
+          },
+          {
+            "id": "/docs/graphql/queries/",
+            "slug": "/docs/graphql/queries/",
+            "title": "Querying the API",
+            "items": [
+              {
+                "id": "/docs/graphql/queries/get-document/",
+                "slug": "/docs/graphql/queries/get-document/",
+                "title": "Getting a Single Document"
+              },
+              {
+                "id": "/docs/graphql/queries/query-documents/",
+                "slug": "/docs/graphql/queries/query-documents/",
+                "title": "Querying a Collection",
+                "items": [
+                  {
+                    "id": "/docs/graphql/queries/advanced/filter-documents/",
+                    "slug": "/docs/graphql/queries/advanced/filter-documents/",
+                    "title": "Filtering"
+                  },
+                  {
+                    "id": "/docs/graphql/queries/advanced/sorting/",
+                    "slug": "/docs/graphql/queries/advanced/sorting/",
+                    "title": "Sorting"
+                  },
+                  {
+                    "id": "/docs/graphql/queries/advanced/pagination/",
+                    "slug": "/docs/graphql/queries/advanced/pagination/",
+                    "title": "Paginating"
+                  },
+                  {
+                    "id": "/docs/graphql/queries/advanced/performance/",
+                    "slug": "/docs/graphql/queries/advanced/performance/",
+                    "title": "Performance"
+                  },
+                  {
+                    "id": "/docs/graphql/queries/advanced/limitations/",
+                    "slug": "/docs/graphql/queries/advanced/limitations/",
+                    "title": "Limitations"
+                  }
+                ]
+              },
+              {
+                "id": "/docs/graphql/queries/update-document/",
+                "slug": "/docs/graphql/queries/update-document/",
+                "title": "Updating a Document"
+              },
+              {
+                "id": "/docs/graphql/queries/add-document/",
+                "slug": "/docs/graphql/queries/add-document/",
+                "title": "Adding a Document"
+              }
+            ]
+          },
+          {
+            "title": "Using Curl & Fetch",
+            "id": "/docs/reference/content-api/content-delivery/",
+            "slug": "/docs/reference/content-api/content-delivery/"
+          },
+          {
+            "id": "/docs/reference/content-api/data-layer/",
+            "slug": "/docs/reference/content-api/data-layer/",
+            "title": "Data Layer"
+          }
+        ]
+      },
+      {
+        "title": "Tina's edit state",
+        "id": "/docs/extending-tina/edit-state",
+        "slug": "/docs/extending-tina/edit-state/"
+      },
+      {
+        "title": "CMS Toolkit",
+        "id": "/docs/reference/toolkit/overview/",
+        "slug": "/docs/reference/toolkit/overview/",
+        "items": [
+          {
+            "id": "/docs/reference/toolkit/cms/",
+            "slug": "/docs/reference/toolkit/cms/",
+            "title": "The CMS"
+          },
+          {
+            "id": "/docs/reference/toolkit/forms/",
+            "slug": "/docs/reference/toolkit/forms/",
+            "title": "Forms"
+          },
+          {
+            "title": "Field Plugins",
+            "id": "fields/",
+            "slug": "/docs/reference/toolkit/fields/",
+            "expandOnSelect": true,
+            "items": [
+              {
+                "id": "/docs/reference/toolkit/fields/text/",
+                "slug": "/docs/reference/toolkit/fields/text/",
+                "title": "Text"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/textarea/",
+                "slug": "/docs/reference/toolkit/fields/textarea/",
+                "title": "Text Area"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/number/",
+                "slug": "/docs/reference/toolkit/fields/number/",
+                "title": "Number"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/image/",
+                "slug": "/docs/reference/toolkit/fields/image/",
+                "title": "Image"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/color/",
+                "slug": "/docs/reference/toolkit/fields/color/",
+                "title": "Color"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/toggle/",
+                "slug": "/docs/reference/toolkit/fields/toggle/",
+                "title": "Toggle"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/radio-group/",
+                "slug": "/docs/reference/toolkit/fields/radio-group/",
+                "title": "Radio Group"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/select/",
+                "slug": "/docs/reference/toolkit/fields/select/",
+                "title": "Select"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/tags/",
+                "slug": "/docs/reference/toolkit/fields/tags/",
+                "title": "Tags"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/list/",
+                "slug": "/docs/reference/toolkit/fields/list/",
+                "title": "List"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/group/",
+                "slug": "/docs/reference/toolkit/fields/group/",
+                "title": "Group"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/group-list/",
+                "slug": "/docs/reference/toolkit/fields/group-list/",
+                "title": "Group List"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/blocks/",
+                "slug": "/docs/reference/toolkit/fields/blocks/",
+                "title": "Blocks"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/date/",
+                "slug": "/docs/reference/toolkit/fields/date/",
+                "title": "Date & Time"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/markdown/",
+                "slug": "/docs/reference/toolkit/fields/markdown/",
+                "title": "Markdown"
+              },
+              {
+                "id": "/docs/reference/toolkit/fields/html/",
+                "slug": "/docs/reference/toolkit/fields/html/",
+                "title": "HTML"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

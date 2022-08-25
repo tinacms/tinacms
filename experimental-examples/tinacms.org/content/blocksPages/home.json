@@ -1,0 +1,84 @@
+{
+  "seo": {
+    "title": "Build contextual editing into your site",
+    "description": "Open-source visual editing experience, backed by git."
+  },
+  "blocks": [
+    {
+      "headline": "Next Gen Content Management",
+      "text": "Tina is an open-source, Git-backed CMS with the ability to add visual editing to your NextJS site",
+      "actions": [
+        {
+          "label": "Get Started",
+          "icon": false,
+          "variant": "orange",
+          "url": "/docs/setup-overview/"
+        },
+        {
+          "label": "npx create-tina-app@latest",
+          "variant": "command"
+        }
+      ],
+      "videoSrc": "v1629294438/tina-io/Beta_Launch_Demo",
+      "_template": "hero"
+    },
+    {
+      "items": [
+        {
+          "headline": "Version Control Your Content",
+          "text": "Retain the benefits of a Git workflow for your content and empower all teammates to update your website through a user-friendly interface.",
+          "media": {
+            "src": "/img/update-from-tina.jpg"
+          },
+          "_template": "feature"
+        },
+        {
+          "headline": "Edit with Real-Time Visual Feedback",
+          "text": "Accelerate productivity; see changes in context as you edit your content on your website.",
+          "media": {
+            "videoSrc": "v1627927996/tina-io/dynamic-editing"
+          },
+          "_template": "feature"
+        },
+        {
+          "headline": "Query Your Content",
+          "text": "Query your content across all your files using Tina Cloud’s GraphQL layer on top of the files stored in your repository.",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/v1628023277/tina-io/query-content.jpg"
+          },
+          "_template": "feature"
+        },
+        {
+          "headline": "Build on Top of Your Components",
+          "text": "Add an editing interface to your React components and give your content team the power to build complex pages.",
+          "media": {
+            "videoSrc": "v1627931840/tina-io/Build_With_Components"
+          },
+          "_template": "feature"
+        },
+        {
+          "headline": "Command Line Quickstart",
+          "text": "[Bootstrap your Next.js project with Tina](/docs/setup-overview/) setup and get started in minutes.",
+          "media": {
+            "cli": true
+          },
+          "_template": "feature"
+        }
+      ],
+      "_template": "features"
+    },
+    {
+      "headline": "New to Tina?",
+      "text": "Learn the basics of the development workflow",
+      "actions": [
+        {
+          "label": "Check out the docs",
+          "icon": true,
+          "variant": "orange",
+          "url": "/docs/"
+        }
+      ],
+      "_template": "flying"
+    }
+  ]
+}

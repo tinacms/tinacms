@@ -1,0 +1,35 @@
+{
+  "title": "Early Access",
+  "description": "The power of Tina for the whole team",
+  "headline": "The power of Tina for the whole team",
+  "supporting_points": [
+    {
+      "_template": "point",
+      "point": "GraphQL API for your content that's backed by Git"
+    },
+    {
+      "_template": "point",
+      "point": "Authentication, user-management, SSO, and roles"
+    },
+    {
+      "_template": "point",
+      "point": "Dashboard to manage sites and users"
+    }
+  ],
+  "default": {
+    "title": "",
+    "headline": "Join the club",
+    "gif": {
+      "src": "/img/rico-replacement.jpg",
+      "alt": "Join the club"
+    },
+    "supporting_headline": "Open source, extensible and community driven",
+    "supporting_body": "Tina is made better by the wisdom of crowds. blah blah blah. "
+  },
+  "gif": {
+    "src": "/img/rico-replacement.jpg",
+    "alt": "Join the club"
+  },
+  "supporting_headline": "Open source, extensible and community driven",
+  "supporting_body": "Tina is made better by the wisdom of crowds. blah blah blah. "
+}

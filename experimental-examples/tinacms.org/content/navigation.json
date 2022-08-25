@@ -1,0 +1,26 @@
+[
+  {
+    "id": "docs",
+    "label": "Docs",
+    "href": "/docs/",
+    "external": false
+  },
+  {
+    "id": "blog",
+    "label": "Blog",
+    "href": "/blog",
+    "external": false
+  },
+  {
+    "id": "showcase",
+    "label": "Showcase",
+    "href": "/showcase",
+    "external": false
+  },
+  {
+    "id": "community",
+    "label": "Community",
+    "href": "/community",
+    "external": false
+  }
+]

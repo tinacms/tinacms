@@ -1,0 +1,11 @@
+{
+  "title": "Non-React-based SSG support",
+  "steps": [
+    {
+      "title": "Guide",
+      "id": "/guides/tinacms/non-react-based-ssg/guide/",
+      "slug": "/guides/tinacms/non-react-based-ssg/guide/",
+      "data": "./guide.md"
+    }
+  ]
+}

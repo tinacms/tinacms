@@ -1,0 +1,30 @@
+query getExpandedPostDocument($relativePath: String!) {
+  post(relativePath: $relativePath) {
+    _sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    title
+    date
+    last_edited
+    author
+    prev {
+      ... on Post {
+        id
+        title
+      }
+    }
+    next {
+      ... on Post {
+        id
+        title
+      }
+    }
+    body
+  }
+}

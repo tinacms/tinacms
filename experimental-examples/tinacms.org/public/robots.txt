@@ -1,0 +1,17 @@
+# *
+User-agent: *
+Disallow: /api/*
+Disallow: /github/*
+Disallow: /rss.xml
+Disallow: /blog/page/*
+
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://tina.io
+
+# Sitemaps
+Sitemap: https://tina.io/sitemap.xml
+Sitemap: https://tina.io/sitemap-0.xml

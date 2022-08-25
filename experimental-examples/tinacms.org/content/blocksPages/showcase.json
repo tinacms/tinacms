@@ -1,0 +1,126 @@
+{
+  "seo": {
+    "title": "Showcase",
+    "description": "Projects built using Tina."
+  },
+  "blocks": [
+    {
+      "headline": "Showcase",
+      "text": "Real projects built with Tina",
+      "_template": "hero"
+    },
+    {
+      "items": [
+        {
+          "headline": "Paradise Helicopters",
+          "text": "A marketing site for Hawaii's largest locally owned and operated helicopter company. Built by [Murmur Creative](https://murmurcreative.com/) in Portland, Oregon. ",
+          "url": "https://paradisecopters.com/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_900,g_face/v1653398867/tina-showcase/paradise-helicopters.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Devolver Digital",
+          "text": "A marketing site for a boutique game label that works with independent developers from all over the world to produce and promote some of the most original, eccentric, and beloved games of the past decade.",
+          "url": "https://www.devolverdigital.com/",
+          "media": {
+            "src": "/img/devolver.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Community Coordinated Modeling Center",
+          "text": "An information site for the CCMC, a group within NASA that enables, supports, and performs space science research.",
+          "url": "https://ccmc.gsfc.nasa.gov/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_1000,g_face/v1651711033/tina-showcase/CCMC.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Labrys",
+          "text": "A marketing site for Labrys, a global leader in blockchain product development. They design, develop and launch products using blockchain technology.",
+          "url": "https://labrys.io/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_900,g_face/v1651840687/tina-showcase/labrys.gif"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Session",
+          "text": "A marketing site for Session, a global online coaching company that connects professionals and companies with world-class business coaches.\n\n",
+          "url": "https://getsession.com/",
+          "media": {
+            "src": "/img/getsession.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Catalyst Miami",
+          "text": "A blog-style site showcasing the work of a non-profit organization built by the team at [Code Nation](https://www.codenation.com/). Catalyst Miami's mission is to identify and collectively solve issues adversely affecting low-wealth communities throughout Miami-Dade County. \n",
+          "url": "https://stories.catalystmiami.org/",
+          "media": {
+            "src": "/img/catalyst.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "pcode",
+          "text": "A marketing site for an Austrian-based agency focused on customer journey development, UX/UI design, software development, and e-commerce. ",
+          "url": "https://www.pcode.at/",
+          "media": {
+            "src": "/img/pcode.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "APFX",
+          "text": "A marketing site for APFX, an international foreign exchange firm providing bespoke services for corporate businesses globally.",
+          "url": "https://www.apfx.com.au/en-us",
+          "media": {
+            "src": "/img/apfx.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Microgen",
+          "text": "A marketing site for Microgen, a site builder for web 3.0 ready websites. Developed by Protocol Labs.",
+          "url": "https://microgen.site/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_1000,g_face/v1651703972/tina-showcase/microgen.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Metrics Watch",
+          "text": "A marketing site for Metrics Watch, a marketing reporting platform for agencies. ",
+          "url": "https://metricswatch.com/",
+          "media": {
+            "src": "/img/metrics-watch.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Broken Heart Horse Farm",
+          "text": "A Marketing site for a full-service boarding, training, sales, lessons, and equestrian show facility and ranch in Colorado, US. ",
+          "url": "https://www.brokenhearthorsefarm.com/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_1000,g_face/v1651703972/tina-showcase/brokenhearthorsefarm.png"
+          },
+          "_template": "project"
+        },
+        {
+          "headline": "Maximum Image",
+          "text": "The corporate website of Maximum Image , a promotional company that creates and maintains corporate images for top level clients. Developed by Sols.mk",
+          "url": "https://www.maximumimage.eu/",
+          "media": {
+            "src": "https://res.cloudinary.com/forestry-demo/image/upload/c_thumb,w_1000,g_face/v1651703972/tina-showcase/maximumimage.png"
+          },
+          "_template": "project"
+        }
+      ],
+      "_template": "showcase"
+    }
+  ]
+}

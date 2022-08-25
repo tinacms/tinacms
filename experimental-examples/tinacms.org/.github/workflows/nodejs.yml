@@ -1,0 +1,40 @@
+name: Node CI
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+env:
+  NEXT_PUBLIC_TINA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TINA_CLIENT_ID }}
+  TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+  NEXT_PUBLIC_TINA_BRANCH: ${{ github.head_ref }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: yarn install, build, and test
+        run: |
+          yarn install
+          yarn build
+          yarn lint
+          yarn test
+        env:
+          CI: true
+      - name: yarn export
+        run: |
+          yarn export
+        env:
+          CI: true
+      - name: 📉 Check HTML
+        uses: chabad360/htmlproofer@master
+        with:
+          directory: './out'
+          arguments: --checks "Links,Images,Scripts,Favicon,OpenGraph" --ignore-status-codes "400, 403, 409, 429" --disable_external=true --check-internal-hash=false --ignore-files "/.+\/(blog|404)\/.+/"

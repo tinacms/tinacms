@@ -1,0 +1,11 @@
+{
+  "title": "Querying Tina Content in NextJS",
+  "steps": [
+    {
+      "title": "Guide",
+      "id": "/guides/tinacms/nextjs-data-fetching/guide/",
+      "slug": "/guides/tinacms/nextjs-data-fetching/guide/",
+      "data": "./guide.md"
+    }
+  ]
+}

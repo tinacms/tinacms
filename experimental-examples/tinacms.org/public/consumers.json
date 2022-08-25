@@ -1,0 +1,393 @@
+{
+  "/content/blog/add-and-delete-files.md": [
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remark-creator-plugin.ts",
+      "details": "Demonstrates use of RemarkCreatorPlugin"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-json/src/create-json-plugin.ts",
+      "details": "Demonstrates use of jsonCreatorPlugin"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/form-actions/delete-action.tsx",
+      "details": "Shows how to add delete action"
+    },
+    {
+      "file": "/packages/tinacms/src/components/CreateContent.tsx",
+      "details": "Has image of what the create form looks like"
+    }
+  ],
+  "/content/blog/dynamic-plugin-system.md": [
+    {
+      "file": "/packages/@tinacms/src/plugins.ts",
+      "details": "Talks at a high level about the plugin manager"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remark-creator-plugin.ts",
+      "details": "Shows example of RemarkCreatorPlugin in use"
+    }
+  ],
+  "/content/blog/using-tinacms-with-nextjs.md": [
+    {
+      "file": "/packages/@tinacms/api-git/src/server.ts",
+      "details": "Uses tina-git-server"
+    },
+    {
+      "file": "/packages/@tinacms/api-git/src/router.ts",
+      "details": "Uses tina-git-server"
+    },
+    {
+      "file": "/packages/@tinacms/api-git/src/server.ts",
+      "details": "Sets up git client to consume backend"
+    },
+    {
+      "file": "/packages/tinacms/src/components/Tina.tsx",
+      "details": "Shows wrapping Next.js app with Tina component"
+    },
+    {
+      "file": "/packages/tinacms/src/tina-cms.tsx",
+      "details": "Creates cms instance with TinaCMS"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/use-form.ts",
+      "details": "Demonstrates using useLocalForm on a Next.js site"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/use-watch-form-values.ts",
+      "details": "Demonstrates usage of useWatchFormValues"
+    },
+    {
+      "file": "/packages/react-tinacms/src/index.ts",
+      "details": "Imports useLocalForm and useWatchFormValues from react-tinacms metapackage"
+    }
+  ],
+  "/content/docs/nextjs/creating-forms.md": [
+    {
+      "file": "/packages/@tinacms/react-core/src/use-form.ts",
+      "details": "Demonstrates using useLocalForm on a Next.js site"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/use-watch-form-values.ts",
+      "details": "Demonstrates usage of useWatchFormValues"
+    },
+    {
+      "file": "/packages/react-tinacms/src/index.ts",
+      "details": "Imports useLocalForm and useWatchFormValues from react-tinacms metapackage"
+    }
+  ],
+  "/content/docs/nextjs/adding-backends.md": [
+    {
+      "file": "/packages/@tinacms/api-git/src/server.ts",
+      "details": "Demonstrates using Express server"
+    },
+    {
+      "file": "/packages/@tinacms/api-git/src/router.ts",
+      "details": "Demonstrates using Express server"
+    },
+    {
+      "file": "/packages/@tinacms/api-git/src/server.ts",
+      "details": "Sets up git client to consume backend"
+    },
+    {
+      "file": "/packages/tinacms/src/components/Tina.tsx",
+      "details": "Shows wrapping Next.js app with Tina component"
+    },
+    {
+      "file": "/packages/tinacms/src/tina-cms.tsx",
+      "details": "Creates cms instance with TinaCMS"
+    }
+  ],
+  "/content/docs/nextjs/bootstrapping.md": [
+    {
+      "file": "/packages/tinacms/src/components/Tina.tsx",
+      "details": "Shows wrapping Next.js app with Tina component"
+    },
+    {
+      "file": "/packages/tinacms/src/tina-cms.tsx",
+      "details": "Creates cms instance with TinaCMS"
+    }
+  ],
+  "/content/docs/gatsby/configure-git-plugin.md": [
+    {
+      "file": "/packages/@tinacms/api-git/src/router.ts",
+      "details": "Describes GitRouterConfig interface"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-git/gatsby-node.ts",
+      "details": "Expects gatsby-tinacms-git to pass options directly to git router"
+    }
+  ],
+  "/content/docs/gatsby/custom-fields.md": [
+    {
+      "file": "/packages/@tinacms/form-builder/src/field-plugin.tsx",
+      "details": "Depends on Field Plugin props"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Depends on Field props"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/plugins.ts",
+      "details": "Depends on plugin manager methods"
+    }
+  ],
+  "/content/docs/gatsby/inline-editing.md": [
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remarkFormHoc.tsx",
+      "details": "Depends on remarkForm & liveRemarkForm hoc in example"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/useRemarkForm.tsx",
+      "details": "HOC examples depends on useLocalRemarkForm hook"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/Wysiwyg/Wysiwyg.tsx",
+      "details": "TinaField uses Wysiwyg component for inline editing"
+    },
+    {
+      "file": "/packages/@tinacms/form-builder/src/Form.tsx",
+      "details": "Depends on TinaField accepting compponent & name, shows example"
+    }
+  ],
+  "/content/docs/gatsby/creating-new-files.md": [
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remark-creator-plugin.ts",
+      "details": "Demonstrates use of RemarkCreatorPlugin"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-json/src/create-json-plugin.ts",
+      "details": "Demonstrates use of jsonCreatorPlugin"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/use-plugin.tsx",
+      "details": "HOC depends on usePlugin to add plugin to cms."
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/with-plugin.tsx",
+      "details": "Shows use of withPlugin HOC."
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/form-actions/delete-action.tsx",
+      "details": "Shows how to add delete action"
+    },
+    {
+      "file": "/packages/tinacms/src/components/CreateContent.tsx",
+      "details": "Has image of what the create form looks like"
+    }
+  ],
+  "/content/docs/gatsby/json.md": [
+    {
+      "file": "/packages/gatsby-tinacms-json/src/use-json-form.ts",
+      "details": "Demonstrates use of useLocalJsonForm and JsonForm"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Explains form options interface"
+    }
+  ],
+  "/content/guides/gatsby/adding-tina/project-setup.md": [
+    {
+      "file": "/packages/gatsby-plugin-tinacms/gatsby-browser.tsx",
+      "details": "Depends on Tina component wrapping the root element"
+    },
+    {
+      "file": "/packages/gatsby-plugin-tinacms/gatsby-ssr.tsx",
+      "details": "Depends on Tina component wrapping the root element"
+    }
+  ],
+  "/content/docs/gatsby/markdown.md": [
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/RemarkForm.tsx",
+      "details": "Demonstrates use of RemarkForm"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remarkFormHoc.tss",
+      "details": "Shows how to use remarkForm HOC"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/useRemarkForm.tsx",
+      "details": "Demonstrates useRemarkForm usage"
+    },
+    {
+      "file": "/packages/gatsby-tinacms-remark/src/remark-fragment.ts",
+      "details": "Explains what the fragment adds"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Explains form options interface"
+    }
+  ],
+  "/content/docs/fields/custom-fields.md": [
+    {
+      "file": "/packages/@tinacms/core/src/plugins.ts",
+      "details": "Uses the add method from plugin manager"
+    },
+    {
+      "file": "/packages/@tinacms/form-builder/src/field-plugin.tsx",
+      "details": "Shows the field plugin interface"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Depends on Field props"
+    }
+  ],
+  "/content/docs/fields/date.md": [
+    {
+      "file": "/packages/@tinacms/fields/src/plugins/DateFieldPlugin.tsx",
+      "details": "Documents how to use the date field plugin"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/plugins/dateFormat.ts",
+      "details": "References date formatting specifics"
+    }
+  ],
+  "/content/docs/contributing/releasing.md": [
+    {
+      "file": "/RELEASE.md",
+      "details": "Shares the release process, should mirror"
+    },
+    { "file": "/lerna.json", "details": "Uses publish command" },
+    { "file": "README.md", "details": "Shows crelease process, should mirror" }
+  ],
+  "/content/docs/concepts/backends.md": [
+    {
+      "file": "/packages/@tinacms/api-git/src/server.ts",
+      "details": "Explains creating a custom Express backend"
+    },
+    {
+      "file": "/packages/@tinacms/api-git/src/router.ts",
+      "details": "Explains creating a custom Express backend"
+    }
+  ],
+  "/content/docs/concepts/plugins.md": [
+    {
+      "file": "/packages/@tinacms/react-core/src/use-plugin.tsx",
+      "details": "Shows usePlugins hook in use"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/with-plugin.tsx",
+      "details": "Shows withPlugin HOC in use"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/plugins.ts",
+      "details": "Uses Plugin interface as an example"
+    },
+    {
+      "file": "/packages/@tinacms/core/src/plugins.ts",
+      "details": "Describes Plugin Manager - add / remove / all methods"
+    }
+  ],
+  "/content/docs/concepts/fields.md": [
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Shows Field interface"
+    }
+  ],
+  "/content/docs/contributing/setting-up.md": [
+    { "file": "/package.json", "details": "Uses scripts for local dev" },
+    { "file": "/lerna.json", "details": "Uses the `run` script" },
+    { "file": "README.md", "details": "Shows commands, how to get started" }
+  ],
+  "/content/docs/concepts/sidebar.md": [
+    {
+      "file": "/packages/tinacms/src/components/Tina.tsx",
+      "details": "Explains setting sidebar position"
+    },
+    {
+      "file": "/packages/tinacms/src/components/Tina.tsx",
+      "details": "Explains hiding sidebar in prod"
+    },
+    {
+      "file": "/packages/@tinacms/styles/src/Styles.tsx",
+      "details": "Shows the Theme interface"
+    }
+  ],
+  "/content/docs/plugins/forms.md": [
+    {
+      "file": "/packages/@tinacms/core/src/cms-forms/form.ts",
+      "details": "Shows Form Options interface"
+    },
+    {
+      "file": "/packages/@tinacms/react-core/src/use-form.ts",
+      "details": "Creates custom form with useForm & useLocalForm"
+    },
+    {
+      "file": "/packages/tinacms/src/react-tinacms/use-form.ts",
+      "details": "Creates custom form with useGlobalForm"
+    }
+  ],
+  "/content/docs/fields/blocks.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/BlocksFieldPlugin.tsx",
+      "details": "Shows blocks interface"
+    }
+  ],
+  "/content/docs/plugins/fields/group-list.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/GroupListFieldPlugin.tsx",
+      "details": "Shows group list interface"
+    }
+  ],
+  "/content/docs/plugins/fields/group.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/GroupFieldPlugin.tsx",
+      "details": "Shows group field interface and how to use"
+    }
+  ],
+  "/content/docs/fields/color.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/ColorFieldPlugin.tsx",
+      "details": "Documents color field plugin"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/ColorPicker/ColorPicker.tsx",
+      "details": "Shows color field in use & interface"
+    }
+  ],
+  "/content/docs/fields/image.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/ImageFieldPlugin.tsx",
+      "details": "Shows image field interface and how to use"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/ImageUpload/ImageUpload.tsx",
+      "details": "References the image field and upload config"
+    }
+  ],
+  "/content/docs/fields/markdown.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/MarkdownFieldPlugin.tsx",
+      "details": "Shows markdown interface and config options"
+    }
+  ],
+  "/content/docs/fields/text.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/TextFieldPlugin.tsx",
+      "details": "Shows text field interface and config options"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/TextField.ts",
+      "details": "Shows text field interface and config options"
+    }
+  ],
+  "/content/docs/fields/textarea.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/TextareaFieldPlugin.tsx",
+      "details": "Shows textarea field interface and config options"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/TextArea.ts",
+      "details": "Shows textarea field interface and config options"
+    }
+  ],
+  "/content/docs/fields/toggle.md": [
+    {
+      "file": "/packages/tinacms/src/plugins/fields/ToggleFieldPlugin.tsx",
+      "details": "Shows toggle field interface and config options"
+    },
+    {
+      "file": "/packages/@tinacms/fields/src/Toggle.ts",
+      "details": "Shows toggle field interface and config options"
+    }
+  ]
+}
