@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 0.1.7
+
+### Patch Changes
+
+- b369d7238: Update dependencies to fix vulnerabilities in external packages.
+
 ## 0.1.6
 
 ### Patch Changes

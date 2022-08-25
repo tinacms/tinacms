@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.69.2
+
+### Patch Changes
+
+- b369d7238: Update dependencies to fix vulnerabilities in external packages.
+- 541605aa8: Fix list page breaking for templates on collection
+- 2182dc2a6: Allow paths to start with numeric characters
+- Updated dependencies [b369d7238]
+  - @tinacms/toolkit@0.57.1
+
 ## 0.69.1
 
 ### Patch Changes
