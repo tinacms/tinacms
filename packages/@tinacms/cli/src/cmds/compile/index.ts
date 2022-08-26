@@ -359,6 +359,22 @@ const transpile = async (
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
 
+  /**
+   * Fake the tsconfig so the `"jsx": "preserve"` setting doesn't
+   * bleed into the build. This breaks when users provide JSX in their
+   * config.
+   *
+   * NOTE: it's probably best to use the user's `tsconfig` as much
+   * as possible, but it's a certainty that their config will be
+   * in the same root directory as the .tina folder, and esbuild
+   * has it's own internal logic for find it, so for now overriding
+   * entirely seems ok. However we may want to revisit this as needs grow.
+   *
+   * https://github.com/tinacms/tinacms/issues/3091
+   */
+  const tempTsConfigPath = path.join(tempDir, 'temp-tsconfig.json')
+  await fs.outputFileSync(tempTsConfigPath, '{}')
+
   const outputPath = path.join(tempDir, outputFile)
   await build({
     bundle: true,
@@ -367,6 +383,7 @@ const transpile = async (
     entryPoints: [inputFile],
     treeShaking: true,
     external: [...external, './node_modules/*'],
+    tsconfig: tempTsConfigPath,
     loader: loaders,
     outfile: outputPath,
     define: define,
