@@ -69,11 +69,16 @@ export function Alerts({ alerts }: AlertsProps) {
         .filter((alert) => {
           return alert.level === 'error'
         })
-        .map((alert, i) => {
-          const AlertMessage = alert.message
+        .map((alert) => {
+          const AlertMessage =
+            typeof alert.message === 'string'
+              ? () => {
+                  return <p className="text-base mb-3">{alert.message}</p>
+                }
+              : alert.message
 
           return (
-            <Modal>
+            <Modal key={alert.id}>
               <PopupModal>
                 <ModalHeader
                   close={() => {
