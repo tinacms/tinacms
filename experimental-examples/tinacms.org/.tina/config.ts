@@ -5,10 +5,7 @@ export const tinaConfig = defineConfig({
   client,
   schema,
   clientId: '3ce51d60-d05b-49f8-8575-c70a6f02f304',
-  branch:
-    process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
-    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env
-    process.env.HEAD!, // Netlify branch env
+  branch: 'add-tinacms',
   token: process.env.TINA_TOKEN!,
   cmsCallback: (cms) => {
     import('react-tinacms-editor').then(({ MarkdownFieldPlugin }) => {
