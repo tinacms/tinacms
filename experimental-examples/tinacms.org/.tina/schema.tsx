@@ -24,7 +24,7 @@ import type { TinaTemplate } from 'tinacms'
 
 export default defineSchema({
   config: {
-    clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
+    clientId: '3ce51d60-d05b-49f8-8575-c70a6f02f304',
     branch:
       process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override
       process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! || // Vercel branch env
