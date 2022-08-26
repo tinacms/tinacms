@@ -369,7 +369,7 @@ const transpile = async (
    * it will be unable to find modules if a user's tsconfig has a `baseurl`
    * configuration.
    */
-  const prebuiltInputPath = path.join(tempDir, outputFile)
+  const prebuiltInputPath = path.join(tempDir, 'temp-output.jsx')
   await build({
     bundle: true,
     platform: 'neutral',
