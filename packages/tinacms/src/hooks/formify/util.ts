@@ -223,13 +223,13 @@ export const buildForm = (
             })
             cms.alerts.success('Document saved!')
           } catch (e) {
-            cms.alerts.error('There was a problem saving your document')
+            cms.alerts.error('There was a problem saving your document.')
             console.error(e)
           }
         }
       } catch (e) {
         console.error(e)
-        cms.alerts.error('There was a problem saving your document')
+        cms.alerts.error('There was a problem saving your document.')
       }
     },
   }
