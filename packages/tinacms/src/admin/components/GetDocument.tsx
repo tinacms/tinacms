@@ -35,8 +35,7 @@ export const useGetDocument = (
           setDocument(response.document)
         } catch (error) {
           cms.alerts.error(
-            `[${error.name}] GetDocument failed: ${error.message}`,
-            30 * 1000 // 30 seconds
+            `[${error.name}] GetDocument failed: ${error.message}`
           )
           console.error(error)
           setDocument(undefined)

@@ -55,8 +55,7 @@ export const useGetCollection = (
           setCollection(collection)
         } catch (error) {
           cms.alerts.error(
-            `[${error.name}] GetCollection failed: ${error.message}`,
-            30 * 1000 // 30 seconds
+            `[${error.name}] GetCollection failed: ${error.message}`
           )
           console.error(error)
           setCollection(undefined)
