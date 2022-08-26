@@ -58,7 +58,7 @@ describe('Alerts', () => {
         const alerts = createMockAlerts([alert])
         const output = render(<Alerts alerts={alerts} />)
 
-        output.getByText(alert.message).click()
+        output.getByRole('button').click()
 
         expect(alerts.dismiss).toHaveBeenCalledWith(alert)
       })
