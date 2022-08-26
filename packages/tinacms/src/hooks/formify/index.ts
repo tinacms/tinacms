@@ -447,7 +447,7 @@ export const useFormify = ({
                 })
               })
               .catch((e) => {
-                cms.alerts.error(`Unexpected error fetching reference`)
+                cms.alerts.error(`Unexpected error fetching reference.`)
                 console.log(e)
               })
           }
