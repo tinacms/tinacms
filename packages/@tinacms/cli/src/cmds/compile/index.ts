@@ -360,15 +360,32 @@ const transpile = async (
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
 
   /**
+   * Pre build into an temporary file so we can respect the user's
+   * tsconfig (eg. `baseUrl` and `jsx` arguments). We'll then
+   * use this file with a custom (empty) tsconfig to ensure
+   * we don't get any unexpected behavior.
+   *
+   * Note that for `viteBuild` we'll want to do something similar as
+   * it will be unable to find modules if a user's tsconfig has a `baseurl`
+   * configuration.
+   */
+  const prebuiltInputPath = path.join(tempDir, outputFile)
+  await build({
+    bundle: true,
+    platform: 'neutral',
+    target: ['es2020'],
+    entryPoints: [inputFile],
+    treeShaking: true,
+    external: [...external, './node_modules/*'],
+    loader: loaders,
+    outfile: prebuiltInputPath,
+    define: define,
+  })
+
+  /**
    * Fake the tsconfig so the `"jsx": "preserve"` setting doesn't
    * bleed into the build. This breaks when users provide JSX in their
    * config.
-   *
-   * NOTE: it's probably best to use the user's `tsconfig` as much
-   * as possible, but it's a certainty that their config will be
-   * in the same root directory as the .tina folder, and esbuild
-   * has it's own internal logic for find it, so for now overriding
-   * entirely seems ok. However we may want to revisit this as needs grow.
    *
    * https://github.com/tinacms/tinacms/issues/3091
    */
@@ -380,7 +397,7 @@ const transpile = async (
     bundle: true,
     platform: 'neutral',
     target: ['node10.4'],
-    entryPoints: [inputFile],
+    entryPoints: [prebuiltInputPath],
     treeShaking: true,
     external: [...external, './node_modules/*'],
     tsconfig: tempTsConfigPath,
