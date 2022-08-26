@@ -44,7 +44,7 @@ export default defineSchema({
         {
           type: 'object',
           name: 'seo',
-          label: 'SEO Information',
+          label: 'SEO Information ',
           fields: [
             { type: 'string', label: 'Title', name: 'title' },
             {

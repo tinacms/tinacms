@@ -250,6 +250,7 @@ export const getStaticProps: GetStaticProps = async function ({
 
   const vars = { relativePath: `${slug}.md` }
   const res = await client.queries.getExpandedPostDocument(vars)
+  console.log('response', slug, res)
 
   return {
     props: {
@@ -263,6 +264,7 @@ export const getStaticProps: GetStaticProps = async function ({
 
 export const getStaticPaths: GetStaticPaths = async function () {
   const blogs = await fg(`./content/blog/**/*.md`)
+  console.log('getstatic', blogs)
   return {
     paths: blogs.map((file) => {
       const slug = fileToUrl(file, 'blog')

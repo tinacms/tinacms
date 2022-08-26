@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tinacms dev  --noTelemetry  -c \"next dev\" ",
     "build": "yarn create-rss && tinacms build && next build",
+    "build-local": "yarn create-rss && tinacms dev  --noTelemetry  -c \"next build\" ",
     "preexport": "npm run build",
     "export": "tinacms build && next export",
     "prestart": "tinacms build  && npm run export",

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getExperiment, getABTestResult } from '../utils/ab-test'
+import { getExperiment, getABTestResult } from './utils/ab-test'
 
 // Check for AB tests on a given page
 export function middleware(req: NextRequest) {
