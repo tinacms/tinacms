@@ -165,7 +165,7 @@ function BlogTemplate({ file, siteConfig, ...props }) {
     variables: props.vars,
   })
 
-  const { body, excerpt, prev, next, ...frontmatter } = data.post
+  const { body, excerpt, prev, next, ...frontmatter } = data?.post
 
   const prevPage = React.useMemo(() => {
     if (!prev) return null
@@ -264,7 +264,6 @@ export const getStaticProps: GetStaticProps = async function ({
 
 export const getStaticPaths: GetStaticPaths = async function () {
   const blogs = await fg(`./content/blog/**/*.md`)
-  console.log('getstatic', blogs)
   return {
     paths: blogs.map((file) => {
       const slug = fileToUrl(file, 'blog')

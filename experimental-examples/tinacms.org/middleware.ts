@@ -20,7 +20,7 @@ export function middleware(req: NextRequest) {
 
   // Add the bucket to cookies if it's not there
   if (!req.cookies[COOKIE_NAME]) {
-    res.cookie(COOKIE_NAME, abTestResult.bucket)
+    res.cookies.set(COOKIE_NAME, abTestResult.bucket)
   }
 
   return res
