@@ -10,7 +10,7 @@
   "scripts": {
     "watch": "pnpm run build && pnpm --filter=\"./packages/@tinacms/scripts\" run watch",
     "build": "turbo run build --filter=\"./packages/**\"",
-    "build-site": "build && turbo run build --filter=\"./experimental-examples/tinacms.org\"",
+    "build-site": "pnpm build && turbo run build --filter=\"./experimental-examples/tinacms.org\"",
     "test": "turbo run test --filter=\"./packages/**\" -- --silent",
     "types": "turbo run types --filter=\"./packages/**\"",
     "build:e2e": "pnpm run build && pnpm --filter=kitchen-sink-starter run build",
