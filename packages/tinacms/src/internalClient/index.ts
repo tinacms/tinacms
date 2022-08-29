@@ -376,7 +376,7 @@ mutation addPendingDocumentMutation(
           `${this.contentApiBase}/events/${this.clientId}/${
             this.branch
           }?limit=${limit || 1}${cursor ? `&cursor=${cursor}` : ''}`,
-          { method: 'POST' }
+          { method: 'GET' }
         )
       ).json()
     }
