@@ -35,6 +35,7 @@ import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
+import { SyncStatus } from './SyncStatus'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -300,6 +301,7 @@ const Sidebar = ({
               displayNav={displayNav}
               renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
+              cms={cms}
             />
             <FormsView>
               <sidebar.placeholder />
@@ -416,7 +418,7 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
+const SidebarHeader = ({ renderNav, displayNav, isLocalMode, cms }) => {
   const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
     React.useContext(SidebarContext)
 
@@ -425,6 +427,7 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
+      <SyncStatus cms={cms} />
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button

@@ -329,6 +329,59 @@ mutation addPendingDocumentMutation(
     return jsonRes
   }
 
+  async fetchEvents(
+    limit?: number,
+    cursor?: string
+  ): Promise<{
+    events: {
+      message: string
+      timestamp: number
+      id: string
+      isError: boolean
+      isGlobal: boolean
+    }[]
+    cursor?: string
+  }> {
+    if (this.isLocalMode) {
+      const timestamp = Date.now()
+      return {
+        events: [
+          {
+            id: 'f22473ba-cb1d-4492-85e8-dfb65385848a' + timestamp,
+            timestamp: 1661278662399,
+            message: 'indexing branch succeeded',
+            isError: false,
+            isGlobal: false,
+          },
+          {
+            id: 'f22473ba-cb1d-4492-85e8-dfb65385848b' + timestamp,
+            timestamp: 1661278672398,
+            message: 'indexing branch failed',
+            isError: true,
+            isGlobal: false,
+          },
+          {
+            id: 'f22473ba-cb1d-4492-85e8-dfb65385848c' + timestamp,
+            timestamp: 1661288672397,
+            message: 'assets synced to github',
+            isError: false,
+            isGlobal: true,
+          },
+        ],
+        cursor: 'foobar' + timestamp,
+      }
+    } else {
+      return (
+        await this.fetchWithToken(
+          `${this.contentApiBase}/events/${this.clientId}/${
+            this.branch
+          }?limit=${limit || 1}${cursor ? `&cursor=${cursor}` : ''}`,
+          { method: 'POST' }
+        )
+      ).json()
+    }
+  }
+
   parseJwt(token) {
     const base64Url = token.split('.')[1]
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')

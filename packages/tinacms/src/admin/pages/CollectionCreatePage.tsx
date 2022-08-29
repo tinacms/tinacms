@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import { Form, FormBuilder, FormStatus, SyncStatus } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
@@ -170,6 +170,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     <PageWrapper>
       <>
         {cms?.api?.tina?.isLocalMode && <LocalWarning />}
+        <SyncStatus cms={cms} />
         <div
           className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
         >
