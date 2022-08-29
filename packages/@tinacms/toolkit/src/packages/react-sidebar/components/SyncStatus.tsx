@@ -17,16 +17,16 @@
  */
 
 import * as React from 'react'
+import { useState } from 'react'
 import { TinaCMS } from '../../../tina-cms'
-import { MdSync, MdSyncProblem, MdSyncDisabled } from 'react-icons/md'
+import { MdSync, MdSyncDisabled, MdSyncProblem } from 'react-icons/md'
 import { FcCancel, FcOk } from 'react-icons/fc'
 import {
+  FullscreenModal,
   Modal,
   ModalBody,
   ModalHeader,
-  FullscreenModal,
 } from '../../react-modals'
-import { useState } from 'react'
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized'
 
@@ -59,7 +59,7 @@ export const useGetEvents = (
       if (cms.api.tina.isAuthorized()) {
         try {
           const { events: nextEvents, cursor: nextCursor } =
-            await cms.api.tina.fetchEvents(10, cursor)
+            await cms.api.tina.fetchEvents(15, cursor)
           setEvents([...existingEvents, ...nextEvents])
           setNextCursor(nextCursor)
         } catch (error) {
@@ -102,6 +102,9 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
 
   React.useEffect(() => {
     const interval = setInterval(async () => {
+      if (eventsOpen) {
+        return
+      }
       if (cms.api.tina.isAuthorized()) {
         const { events } = await cms.api.tina.fetchEvents()
         if (events.length === 0) {
@@ -121,7 +124,7 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
       }
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [eventsOpen, cms])
 
   function openEventsModal() {
     if (syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized') {
@@ -148,20 +151,22 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
           {error && <div>Error: {error.message}</div>}
           {events.length > 0 && (
             <div className="grid grid-cols-12 gap-1">
-              {events.map((event) => {
-                const timestamp = new Date(event.timestamp).toLocaleString()
-                return (
-                  <>
-                    {event.isError && (
-                      <div key={`${event.id}_icon`} className="col-span-1">
+              {events
+                .map((event) => {
+                  const timestamp = new Date(event.timestamp).toLocaleString()
+                  return [
+                    event.isError ? (
+                      <div
+                        key={`${event.id}_error_icon`}
+                        className="col-span-1"
+                      >
                         <FcCancel />
                       </div>
-                    )}
-                    {!event.isError && (
-                      <div key={`${event.id}_icon`} className="col-span-1">
+                    ) : (
+                      <div key={`${event.id}_ok_icon`} className="col-span-1">
                         <FcOk />
                       </div>
-                    )}
+                    ),
                     <div
                       key={`${event.id}_msg`}
                       className={`col-span-9 font-mono text-sm ${
@@ -170,16 +175,16 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
                     >
                       {event.message}
                       {event.isError && ` [${event.id}]`}
-                    </div>
+                    </div>,
                     <div
                       key={`${event.id}_ts`}
                       className="col-span-2 font-mono text-sm"
                     >
                       {timestamp}
-                    </div>
-                  </>
-                )
-              })}
+                    </div>,
+                  ]
+                })
+                .flat()}
             </div>
           )}
         </div>
