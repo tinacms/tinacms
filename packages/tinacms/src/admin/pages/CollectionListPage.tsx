@@ -206,7 +206,10 @@ const CollectionListPage = () => {
                       />
                     )}
 
-                    <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
+                    <PageHeader
+                      isLocalMode={cms?.api?.tina?.isLocalMode}
+                      cms={cms}
+                    >
                       <>
                         <div className="flex flex-col gap-4">
                           <h3 className="font-sans text-2xl text-gray-700">

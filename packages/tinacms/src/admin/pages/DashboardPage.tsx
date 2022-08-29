@@ -23,7 +23,7 @@ const DashboardPage = () => {
       {(cms: TinaCMS) => (
         <PageWrapper>
           <>
-            <PageHeader isLocalMode={cms.api?.tina?.isLocalMode}>
+            <PageHeader isLocalMode={cms.api?.tina?.isLocalMode} cms={cms}>
               <h3 className="text-2xl font-sans text-gray-700">
                 Welcome to Tina!
               </h3>

@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { LocalWarning } from '@tinacms/toolkit'
+import { LocalWarning, SyncStatus, TinaCMS } from '@tinacms/toolkit'
 
 export const PageWrapper = ({
   children,
@@ -29,12 +29,15 @@ export const PageWrapper = ({
 export const PageHeader = ({
   isLocalMode,
   children,
+  cms,
 }: {
   isLocalMode?: boolean
   children: React.ReactChild | React.ReactChildren
+  cms: TinaCMS
 }) => (
   <>
     {isLocalMode && <LocalWarning />}
+    <SyncStatus cms={cms} />
     <div className="bg-white pb-4 pt-16 border-b border-gray-200 px-12">
       <div className="w-full mx-auto max-w-screen-xl">
         <div className="w-full flex justify-between items-end">{children}</div>
