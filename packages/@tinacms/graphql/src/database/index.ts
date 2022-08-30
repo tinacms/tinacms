@@ -56,8 +56,6 @@ type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
 type CreateDatabase = {
   bridge: Bridge
   store: Store
-  /** During audits we need to handle errors differently, specifically with rich-text */
-  isAudit?: boolean
   indexStatusCallback?: IndexStatusCallback
 }
 
@@ -96,7 +94,6 @@ export class Database {
   public bridge: Bridge
   public store: Store
   public indexStatusCallback: IndexStatusCallback | undefined
-  public isAudit: boolean
   private tinaSchema: TinaSchema | undefined
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
@@ -105,7 +102,6 @@ export class Database {
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge
     this.store = config.store
-    this.isAudit = config.isAudit || false
     this.indexStatusCallback =
       config.indexStatusCallback || defaultStatusCallback
   }
@@ -494,7 +490,6 @@ export class Database {
             throw new TinaQueryError({
               originalError: error,
               file: edge.path,
-              includeAuditMessage: !this.isAudit,
               collection,
               stack: error.stack,
             })

@@ -66,6 +66,7 @@ export const auditDocuments = async (args: AuditArgs) => {
       variables: {},
       silenceErrors: true,
       verbose: false,
+      isAudit: true,
     })
 
     if (docResult.errors) {
