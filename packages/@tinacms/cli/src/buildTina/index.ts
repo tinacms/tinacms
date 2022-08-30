@@ -104,7 +104,7 @@ export const buildSetupCmdAudit = async (
 
   const store = new LevelStore(rootPath, false)
 
-  const database = await createDatabase({ store, bridge, isAudit: true })
+  const database = await createDatabase({ store, bridge })
 
   // attach to context
   ctx.bridge = bridge
