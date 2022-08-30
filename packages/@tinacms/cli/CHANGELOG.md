@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.61.8
+
+### Patch Changes
+
+- b1f141e66: Fixes an issue where JSX inside the tina schema would break compilation for users using a later version of esbuild.
+  - @tinacms/app@0.0.8
+
 ## 0.61.7
 
 ### Patch Changes
