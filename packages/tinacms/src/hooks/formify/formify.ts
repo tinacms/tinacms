@@ -222,6 +222,9 @@ export const formify = async ({
        * This is the primary purpose of formify, adding fields like
        * `form`, `values` and `_internalSys`
        */
+      // Note: for template collections this
+      // is getting called twice, it's harmless but
+      // might point to a design falw
       extraFields = util.metaFields
     }
 
@@ -380,6 +383,8 @@ export const formify = async ({
     }
 
     if (util.isFormifiableDocument(type)) {
+      // console.log('formifyInlineFragmentDocument', inlineFragmentNode)
+      // console.trace()
       return formifyInlineFragmentDocument({
         inlineFragmentNode: inlineFragmentNode,
         type,

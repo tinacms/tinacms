@@ -42,6 +42,7 @@ export class TinaGraphQLError extends Error implements GraphQLError {
 export type TypeFetchErrorArgs = {
   stack?: string
   file?: string
+  includeAuditMessage?: boolean
   originalError: Error
   collection?: string
 }
@@ -67,7 +68,9 @@ export class TinaQueryError extends TinaFetchError {
   originalError: Error
   constructor(args: TypeFetchErrorArgs) {
     super(
-      `Error querying file ${args.file} collection ${args.collection}. Please run "tinacms audit" or add the --verbose option for more info`,
+      `Error querying file ${args.file} from collection ${
+        args.collection
+      }. ${auditMessage(args.includeAuditMessage)}`,
       args
     )
   }
@@ -80,7 +83,9 @@ export class TinaParseDocumentError extends TinaFetchError {
   originalError: Error
   constructor(args: TypeFetchErrorArgs) {
     super(
-      `Error Parsing file ${args.file} collection ${args.collection}. Please run "tinacms audit" or add the --verbose option  for more info`,
+      `Error Parsing file ${args.file} from collection ${
+        args.collection
+      }. ${auditMessage(args.includeAuditMessage)}`,
       args
     )
   }
@@ -90,6 +95,11 @@ export class TinaParseDocumentError extends TinaFetchError {
     )
   }
 }
+
+const auditMessage = (includeAuditMessage: boolean = true) =>
+  includeAuditMessage
+    ? `Please run "tinacms audit" or add the --verbose option  for more info`
+    : ''
 
 export const handleFetchErrorError = (e: unknown, verbose) => {
   if (e instanceof Error) {
