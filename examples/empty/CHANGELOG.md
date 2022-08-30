@@ -4,6 +4,15 @@
 
 ### Patch Changes
 
+- Updated dependencies [b1f141e66]
+- Updated dependencies [0ad8075aa]
+  - @tinacms/cli@0.61.8
+  - tinacms@0.69.3
+
+## null
+
+### Patch Changes
+
 - @tinacms/cli@0.61.7
 
 ## null
