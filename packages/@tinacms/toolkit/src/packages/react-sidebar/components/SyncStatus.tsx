@@ -83,26 +83,29 @@ export const useGetEvents = (
   return { events, cursor: nextCursor, loading, error }
 }
 
-export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
+const SyncStatusWidget = ({
+  cms,
+  eventsListOpen,
+  onClick,
+}: {
+  cms: TinaCMS
+  eventsListOpen: boolean
+  onClick: () => void
+}) => {
   const [syncStatus, setSyncStatus] = useState<{
     state: EventListState
     message: string
   }>({ state: 'loading', message: 'Loading...' })
-  const [eventsOpen, setEventsOpen] = React.useState(false)
-  const [cursor, setCursor] = React.useState<string | undefined>(undefined)
-  const [existingEvents, setExistingEvents] = React.useState<
-    {
-      message: string
-      id: string
-      timestamp: number
-      isError: boolean
-      isGlobal: boolean
-    }[]
-  >([])
+
+  function handleClick() {
+    if (syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized') {
+      onClick()
+    }
+  }
 
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      if (eventsOpen) {
+      if (eventsListOpen) {
         return
       }
       if (cms.api.tina.isAuthorized()) {
@@ -124,105 +127,13 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
       }
     }, 5000)
     return () => clearInterval(interval)
-  }, [eventsOpen, cms])
-
-  function openEventsModal() {
-    if (syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized') {
-      setEventsOpen(true)
-    }
-  }
-
-  function closeEventsModal() {
-    setEventsOpen(false)
-  }
-
-  const EventsList = ({}) => {
-    const {
-      events,
-      cursor: nextCursor,
-      loading,
-      error,
-    } = useGetEvents(cms, cursor, existingEvents)
-
-    return (
-      <>
-        <div>
-          {loading && <div>Loading...</div>}
-          {error && <div>Error: {error.message}</div>}
-          {events.length > 0 && (
-            <div className="grid grid-cols-12 gap-1">
-              {events
-                .map((event) => {
-                  const timestamp = new Date(event.timestamp).toLocaleString()
-                  return [
-                    event.isError ? (
-                      <div
-                        key={`${event.id}_error_icon`}
-                        className="col-span-1"
-                      >
-                        <FcCancel />
-                      </div>
-                    ) : (
-                      <div key={`${event.id}_ok_icon`} className="col-span-1">
-                        <FcOk />
-                      </div>
-                    ),
-                    <div
-                      key={`${event.id}_msg`}
-                      className={`col-span-9 font-mono text-sm ${
-                        event.isError ? 'text-gray-600' : 'text-gray-400'
-                      }`}
-                    >
-                      {event.message}
-                      {event.isError && ` [${event.id}]`}
-                    </div>,
-                    <div
-                      key={`${event.id}_ts`}
-                      className="col-span-2 font-mono text-sm"
-                    >
-                      {timestamp}
-                    </div>,
-                  ]
-                })
-                .flat()}
-            </div>
-          )}
-        </div>
-        <div className="text-center">
-          <a
-            className="text-sm underline cursor-pointer"
-            onClick={() => {
-              setExistingEvents(events)
-              setCursor(nextCursor)
-            }}
-          >
-            More
-          </a>
-        </div>
-      </>
-    )
-  }
-
-  const EventsModal = ({}) => {
-    return (
-      <Modal>
-        <FullscreenModal>
-          <ModalHeader close={closeEventsModal}>
-            Repository Synchronization Events
-          </ModalHeader>
-          <ModalBody padded={true}>
-            <EventsList />
-          </ModalBody>
-        </FullscreenModal>
-      </Modal>
-    )
-  }
+  }, [eventsListOpen, cms])
 
   return (
     <div className="flex-grow-0 flex w-full text-xs items-center">
       <div
         title={syncStatus.message}
-        onClick={openEventsModal}
+        onClick={handleClick}
         className={
           syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized'
             ? 'cursor-pointer'
@@ -242,8 +153,127 @@ export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
           <MdSyncProblem className="w-6 h-full ml-2 opacity-70" />
         )}
       </div>
-
-      {eventsOpen && <EventsModal />}
     </div>
+  )
+}
+
+const EventsList = ({ cms }: { cms: TinaCMS }) => {
+  const [cursor, setCursor] = React.useState<string | undefined>(undefined)
+  const [existingEvents, setExistingEvents] = React.useState<
+    {
+      message: string
+      id: string
+      timestamp: number
+      isError: boolean
+      isGlobal: boolean
+    }[]
+  >([])
+
+  const {
+    events,
+    cursor: nextCursor,
+    loading,
+    error,
+  } = useGetEvents(cms, cursor, existingEvents)
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="grow">
+        {loading && <div>Loading...</div>}
+        {error && <div>Error: {error.message}</div>}
+        {events.length > 0 && (
+          <div className="grid grid-cols-12 gap-1 overflow-y-auto">
+            {events
+              .map((event, index) => {
+                const timestamp = new Date(event.timestamp).toLocaleString()
+                return [
+                  event.isError ? (
+                    <div
+                      key={`${event.id}_error_icon`}
+                      className={`col-span-1 p-1 ${
+                        index % 2 === 0 ? '' : 'bg-gray-50'
+                      }`}
+                    >
+                      <FcCancel />
+                    </div>
+                  ) : (
+                    <div
+                      key={`${event.id}_ok_icon`}
+                      className={`col-span-1 p-1 ${
+                        index % 2 === 0 ? '' : 'bg-gray-50'
+                      }`}
+                    >
+                      <FcOk />
+                    </div>
+                  ),
+                  <div
+                    key={`${event.id}_msg`}
+                    className={`col-span-9 font-mono text-sm 'text-gray-400' ${
+                      index % 2 === 0 ? '' : 'bg-gray-50'
+                    }`}
+                  >
+                    {event.message}
+                    {event.isError && ` [${event.id}]`}
+                  </div>,
+                  <div
+                    key={`${event.id}_ts`}
+                    className={`col-span-2 font-mono text-sm ${
+                      index % 2 === 0 ? '' : 'bg-gray-50'
+                    }`}
+                  >
+                    {timestamp}
+                  </div>,
+                ]
+              })
+              .flat()}
+          </div>
+        )}
+      </div>
+      <div className="text-center flex-none">
+        <a
+          className="text-sm underline cursor-pointer"
+          onClick={() => {
+            setExistingEvents(events)
+            setCursor(nextCursor)
+          }}
+        >
+          More
+        </a>
+      </div>
+    </div>
+  )
+}
+
+export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
+  const [eventsOpen, setEventsOpen] = React.useState(false)
+
+  function openEventsModal() {
+    setEventsOpen(true)
+  }
+
+  function closeEventsModal() {
+    setEventsOpen(false)
+  }
+
+  return (
+    <>
+      <SyncStatusWidget
+        cms={cms}
+        eventsListOpen={eventsOpen}
+        onClick={openEventsModal}
+      />
+      {eventsOpen && (
+        <Modal>
+          <FullscreenModal>
+            <ModalHeader close={closeEventsModal}>
+              Repository Synchronization Events
+            </ModalHeader>
+            <ModalBody padded={true}>
+              <EventsList cms={cms} />
+            </ModalBody>
+          </FullscreenModal>
+        </Modal>
+      )}
+    </>
   )
 }
