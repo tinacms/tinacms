@@ -24,6 +24,7 @@ type AuditArgs = {
   rootPath: string
   documents: { node: { path: string } }[]
   useDefaultValues: boolean
+  verbose?: boolean
 }
 export const auditCollection = async (args: AuditArgs) => {
   let warning = false
@@ -65,7 +66,7 @@ export const auditDocuments = async (args: AuditArgs) => {
       query: documentQuery,
       variables: {},
       silenceErrors: true,
-      verbose: false,
+      verbose: args.verbose || false,
       isAudit: true,
     })
 
@@ -120,8 +121,9 @@ export const auditDocuments = async (args: AuditArgs) => {
           collection: collection.name,
           relativePath: relativePath,
         },
+        isAudit: true,
         silenceErrors: true,
-        verbose: true,
+        verbose: args.verbose || false,
       })
       if (mutationRes.errors) {
         mutationRes.errors.forEach((err) => {
