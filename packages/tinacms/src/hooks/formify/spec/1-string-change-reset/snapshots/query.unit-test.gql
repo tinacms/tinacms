@@ -13,13 +13,15 @@
 query MyQuery {
   post(relativePath: "post1.mdx") {
     title
-    _internalSys: _sys {
-      path
-      relativePath
-      collection {
-        name
+    ... on Document {
+      _internalSys: _sys {
+        path
+        relativePath
+        collection {
+          name
+        }
       }
+      _values
     }
-    _values
   }
 }

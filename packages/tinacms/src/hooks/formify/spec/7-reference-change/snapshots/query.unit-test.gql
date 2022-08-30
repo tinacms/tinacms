@@ -25,23 +25,27 @@ query GetBlockPageDocument {
     author {
       ... on Author {
         name
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
+        ... on Document {
+          _internalSys: _sys {
+            path
+            relativePath
+            collection {
+              name
+            }
           }
+          _values
         }
-        _values
       }
     }
-    _internalSys: _sys {
-      path
-      relativePath
-      collection {
-        name
+    ... on Document {
+      _internalSys: _sys {
+        path
+        relativePath
+        collection {
+          name
+        }
       }
+      _values
     }
-    _values
   }
 }
