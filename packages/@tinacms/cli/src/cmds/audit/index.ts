@@ -68,20 +68,39 @@ export const audit = async (ctx: any, next: () => void, options) => {
 
   for (let i = 0; i < collections.length; i++) {
     const collection = collections[i]
-    const returnWarning = await auditCollection({
-      collection,
-      database,
-      rootPath,
-      useDefaultValues: options.useDefaultValues,
-    })
-    const returnError = await auditDocuments({
-      collection,
-      database,
-      rootPath,
-      useDefaultValues: options.useDefaultValues,
-    })
-    warning = warning || returnWarning
-    error = error || returnError
+    try {
+      // Not a huge fan of querying the database from outside of GraphQL
+      // but this allows us to return the list of items unhydrated, so errors
+      // in a single document don't cause the entire list query to fail
+      const docs = await database.query(
+        { collection: collection.name, first: -1, filterChain: [] },
+        (item) => ({ path: item })
+      )
+
+      // I don't think this works now that the datalayer is
+      // on by default because when we index the item we
+      // must do a check to see of the format matches,
+      // so it never actually exists in the collection
+      const returnWarning = await auditCollection({
+        collection,
+        database,
+        rootPath,
+        useDefaultValues: options.useDefaultValues,
+        documents: docs.edges,
+      })
+
+      const returnError = await auditDocuments({
+        collection,
+        database,
+        rootPath,
+        useDefaultValues: options.useDefaultValues,
+        documents: docs.edges,
+      })
+      warning = warning || returnWarning
+      error = error || returnError
+    } catch (e) {
+      console.error(e)
+    }
   }
   ctx.warning = warning
   ctx.error = error
