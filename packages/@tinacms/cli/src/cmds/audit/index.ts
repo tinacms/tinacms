@@ -95,6 +95,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
         rootPath,
         useDefaultValues: options.useDefaultValues,
         documents: docs.edges,
+        verbose: ctx.verbose,
       })
       warning = warning || returnWarning
       error = error || returnError

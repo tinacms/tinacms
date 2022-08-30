@@ -232,7 +232,12 @@ export const baseCmds: Command[] = [
       ),
   },
   {
-    options: [cleanOption, useDefaultValuesOption, noTelemetryOption],
+    options: [
+      cleanOption,
+      useDefaultValuesOption,
+      noTelemetryOption,
+      verboseOption,
+    ],
     command: AUDIT,
     description: 'Audit your schema and the files to check for errors',
     action: (options) =>
