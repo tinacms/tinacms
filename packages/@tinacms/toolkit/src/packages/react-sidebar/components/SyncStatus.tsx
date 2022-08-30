@@ -179,8 +179,6 @@ const EventsList = ({ cms }: { cms: TinaCMS }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="grow">
-        {loading && <div>Loading...</div>}
-        {error && <div>Error: {error.message}</div>}
         {events.length > 0 && (
           <div className="grid grid-cols-12 gap-1 overflow-y-auto">
             {events
@@ -228,6 +226,10 @@ const EventsList = ({ cms }: { cms: TinaCMS }) => {
               .flat()}
           </div>
         )}
+        {loading && (
+          <div className="text-sm text-gray-400 text-center">Loading...</div>
+        )}
+        {error && <div>Error: {error.message}</div>}
       </div>
       <div className="text-center flex-none">
         <a
