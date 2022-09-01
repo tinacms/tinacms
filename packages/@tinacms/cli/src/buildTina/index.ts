@@ -68,7 +68,7 @@ export const buildSetupCmdBuild = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(bridge)
+  ctx.builder = new Builder(bridge, database, store)
 
   next()
 }
@@ -88,7 +88,7 @@ export const buildSetupCmdServerStart = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(ctx.bridge)
+  ctx.builder = new Builder(bridge, database, store)
 
   next()
 }
@@ -110,7 +110,7 @@ export const buildSetupCmdAudit = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(bridge)
+  ctx.builder = new Builder(bridge, database, store)
 
   next()
 }
@@ -167,14 +167,9 @@ export const buildCmdBuild = async (
     'bridge' | 'database' | 'store'
   >
 ) => {
-  const bridge: Bridge = ctx.bridge
-  const database: Database = ctx.database
-  const store: Store = ctx.store
   // always skip indexing in the "build" command
   await ctx.builder.build({
     ...options,
-    database,
-    store,
     ctx: ctx,
     skipIndex: true,
   })
@@ -196,21 +191,21 @@ export const auditCmdBuild = async (
     ...options,
     local: true,
     verbose: true,
-    database,
-    store,
     ctx: ctx,
   })
   next()
 }
 
 class Builder {
-  constructor(private bridge: IsomorphicBridge | FilesystemBridge) {}
+  constructor(
+    private bridge: IsomorphicBridge | FilesystemBridge,
+    private database: Database,
+    private store: Store
+  ) {}
 
   async build({
     noWatch,
     ctx,
-    database,
-    store,
     beforeBuild,
     afterBuild,
     dev,
@@ -226,7 +221,7 @@ class Builder {
     const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
 
     // Clear the cache of the DB passed to the GQL server
-    database.clearCache()
+    this.database.clearCache()
 
     if (beforeBuild) {
       await beforeBuild()
@@ -234,17 +229,20 @@ class Builder {
 
     try {
       await fs.mkdirp(tinaGeneratedPath)
-      await store.close()
+      await this.store.close()
       await resetGeneratedFolder({
         tinaGeneratedPath,
         usingTs: ctx.usingTs,
       })
-      await store.open()
+      await this.store.open()
       const cliFlags = []
       // always enable experimentalData and isomorphicGitBridge on the  backend
       cliFlags.push('experimentalData')
       cliFlags.push('isomorphicGitBridge')
-      const database = await createDatabase({ store, bridge: this.bridge })
+      const database = await createDatabase({
+        store: this.store,
+        bridge: this.bridge,
+      })
       await compileSchema(ctx, null, { verbose, dev })
 
       // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
