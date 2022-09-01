@@ -164,6 +164,11 @@ export const buildCmdBuild = async (
     ctx: ctx,
     skipIndex: true,
   })
+  await buildAdmin({
+    schema: ctx.schema,
+    local: options.local,
+    rootPath: ctx.rootPath,
+  })
   next()
 }
 
@@ -228,19 +233,30 @@ class Builder {
         local,
       }
     )
-    if (ctx.schema?.config?.build) {
-      await spin({
-        text: 'Building static site',
-        waitFor: async () => {
-          await viteBuild({
-            local,
-            rootPath,
-            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
-            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
-          })
-        },
-      })
-      console.log('\nDone building static site')
-    }
+  }
+}
+
+export const buildAdmin = async ({
+  schema,
+  local,
+  rootPath,
+}: {
+  schema: any
+  local: boolean
+  rootPath: string
+}) => {
+  if (schema?.config?.build) {
+    await spin({
+      text: 'Building static site',
+      waitFor: async () => {
+        await viteBuild({
+          local,
+          rootPath,
+          outputFolder: schema?.config?.build?.outputFolder as string,
+          publicFolder: schema?.config?.build?.publicFolder as string,
+        })
+      },
+    })
+    console.log('\nDone building static site')
   }
 }
