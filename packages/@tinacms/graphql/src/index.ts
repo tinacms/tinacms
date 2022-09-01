@@ -14,8 +14,7 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
-import { buildFiles, indexDB } from './build'
-export { indexDB } from './build'
+import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
 export * from './resolver/error'
 export { createDatabase } from './database'
@@ -41,13 +40,14 @@ export const buildSchema = async (
     .toString()
   await fs.rm(tempConfig, { recursive: true })
 
-  // skipIndexing defaults to false
-  if (skipIndexing ?? false) {
-    // only build the files, do not index
-    await buildFiles({ database, config: JSON.parse(config), flags })
-  } else {
-    // Build and index
-    await indexDB({ database, config: JSON.parse(config), flags })
+  // only build the files, do not index
+  const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
+    database,
+    config: JSON.parse(config),
+    flags,
+  })
+  if (!skipIndexing) {
+    await database.indexContent({ graphQLSchema, tinaSchema })
   }
 
   const gqlAst = await database.getGraphQLSchemaFromBridge()

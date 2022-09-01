@@ -13,7 +13,6 @@ limitations under the License.
 
 import path from 'path'
 import fs from 'fs-extra'
-import { indexDB } from '../build'
 import { resolve } from '../resolve'
 import { buildASTSchema, printSchema } from 'graphql'
 import { toMatchFile } from 'jest-file-snapshot'
@@ -24,6 +23,7 @@ import { FilesystemBridge } from '@tinacms/datalayer'
 import type { Store } from '@tinacms/datalayer'
 import type { TinaCloudSchema } from '../types'
 import { sequential } from '../util'
+import { buildDotTinaFiles } from '../build'
 
 class MockFilesystemBridge extends FilesystemBridge {
   constructor(rootPath: string) {
@@ -49,10 +49,12 @@ export const setup = async (
     bridge: setupBridge,
     store,
   })
-  await indexDB({
+  const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database: setupDatabase,
     config: schema,
   })
+  await setupDatabase.indexContent({ graphQLSchema, tinaSchema })
+
   const bridge = new MockFilesystemBridge(rootPath)
   const database = await createDatabase({
     // @ts-ignore
