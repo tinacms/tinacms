@@ -338,6 +338,7 @@ export class Database {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     return this.store.get(normalizePath(graphqlPath))
   }
+  //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     const _graphql = await this.bridge.get(normalizePath(graphqlPath))
