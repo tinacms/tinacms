@@ -33,16 +33,10 @@ import { spin } from '../utils/spinner'
 
 interface BuildOptions {
   ctx: any
-  database: Database
-  store: Store
-  bridge: Bridge
-  isomorphicGitBridge?: boolean
   verbose?: boolean
   dev?: boolean
   local?: boolean
   noSDK?: boolean
-  beforeBuild?: () => Promise<any>
-  afterBuild?: () => Promise<any>
   skipIndex?: boolean
 }
 
@@ -193,16 +187,7 @@ export const auditCmdBuild = async (
 class Builder {
   constructor(private database: Database, private store: Store) {}
 
-  async build({
-    ctx,
-    beforeBuild,
-    afterBuild,
-    dev,
-    local,
-    verbose,
-    noSDK,
-    skipIndex,
-  }: BuildOptions) {
+  async build({ ctx, dev, local, verbose, noSDK, skipIndex }: BuildOptions) {
     const rootPath = ctx.rootPath as string
     if (!rootPath) {
       throw new Error('Root path has not been attached')
@@ -212,62 +197,50 @@ class Builder {
     // Clear the cache of the DB passed to the GQL server
     this.database.clearCache()
 
-    if (beforeBuild) {
-      await beforeBuild()
-    }
+    await fs.mkdirp(tinaGeneratedPath)
+    await this.store.close()
+    await resetGeneratedFolder({
+      tinaGeneratedPath,
+      usingTs: ctx.usingTs,
+    })
+    await this.store.open()
 
-    try {
-      await fs.mkdirp(tinaGeneratedPath)
-      await this.store.close()
-      await resetGeneratedFolder({
-        tinaGeneratedPath,
-        usingTs: ctx.usingTs,
-      })
-      await this.store.open()
+    await compileSchema(ctx, null, { verbose, dev })
 
-      await compileSchema(ctx, null, { verbose, dev })
-
-      // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-      const schema: GraphQLSchema = await retry(
-        async () =>
-          await buildSchema(
+    // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
+    const schema: GraphQLSchema = await retry(
+      async () =>
+        await buildSchema(
+          rootPath,
+          this.database,
+          ['experimentalData', 'isomorphicGitBridge'],
+          skipIndex
+        )
+    )
+    await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
+      noSDK,
+      verbose,
+    })
+    await genClient(
+      { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
+      () => {},
+      {
+        local,
+      }
+    )
+    if (ctx.schema?.config?.build) {
+      await spin({
+        text: 'Building static site',
+        waitFor: async () => {
+          await viteBuild({
+            local,
             rootPath,
-            this.database,
-            ['experimentalData', 'isomorphicGitBridge'],
-            skipIndex
-          )
-      )
-      await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
-        noSDK,
-        verbose,
+            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+          })
+        },
       })
-      await genClient(
-        { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
-        () => {},
-        {
-          local,
-        }
-      )
-      if (ctx.schema?.config?.build) {
-        await spin({
-          text: 'Building static site',
-          waitFor: async () => {
-            await viteBuild({
-              local,
-              rootPath,
-              outputFolder: ctx.schema?.config?.build?.outputFolder as string,
-              publicFolder: ctx.schema?.config?.build?.publicFolder as string,
-            })
-          },
-        })
-        console.log('\nDone building static site')
-      }
-    } catch (error) {
-      throw error
-    } finally {
-      if (afterBuild) {
-        await afterBuild()
-      }
+      console.log('\nDone building static site')
     }
   }
 }

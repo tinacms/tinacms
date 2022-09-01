@@ -152,18 +152,22 @@ export async function startServer(
     })
   }
 
-  const build = () => {
-    return ctx.builder.build({
-      ctx,
-      dev,
-      isomorphicGitBridge,
-      local: true,
-      noSDK,
-      noWatch,
-      verbose,
-      beforeBuild,
-      afterBuild,
-    })
+  const build = async () => {
+    try {
+      await beforeBuild()
+      return ctx.builder.build({
+        ctx,
+        dev,
+        local: true,
+        noSDK,
+        noWatch,
+        verbose,
+      })
+    } catch (error) {
+      throw error
+    } finally {
+      await afterBuild()
+    }
   }
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
