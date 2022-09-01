@@ -224,17 +224,18 @@ class Builder {
         usingTs: ctx.usingTs,
       })
       await this.store.open()
-      const cliFlags = []
-      // always enable experimentalData and isomorphicGitBridge on the  backend
-      cliFlags.push('experimentalData')
-      cliFlags.push('isomorphicGitBridge')
 
       await compileSchema(ctx, null, { verbose, dev })
 
       // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
       const schema: GraphQLSchema = await retry(
         async () =>
-          await buildSchema(rootPath, this.database, cliFlags, skipIndex)
+          await buildSchema(
+            rootPath,
+            this.database,
+            ['experimentalData', 'isomorphicGitBridge'],
+            skipIndex
+          )
       )
       await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
         noSDK,
