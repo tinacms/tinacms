@@ -56,7 +56,6 @@ export const Nav = ({
   sidebarWidth,
   RenderNavSite,
   RenderNavCollection,
-  cms,
   ...props
 }: NavProps) => {
   const { setEdit } = useEditState()
