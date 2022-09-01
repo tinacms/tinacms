@@ -162,7 +162,6 @@ export async function startServer(
         dev,
         local: true,
         noSDK,
-        noWatch,
         verbose,
       })
       await buildAdmin({

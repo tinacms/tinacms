@@ -39,7 +39,6 @@ interface BuildOptions {
   local?: boolean
   noSDK?: boolean
   skipIndex?: boolean
-  usingTs?: boolean
   rootPath?: string
   schema?: TinaCloudSchema<false>
 }
@@ -63,8 +62,7 @@ export const buildSetupCmdBuild = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
-  ctx.builder = new Builder(database, store)
+  ctx.builder = new Builder(database)
 
   next()
 }
@@ -83,8 +81,7 @@ export const buildSetupCmdServerStart = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
-  ctx.builder = new Builder(database, store)
+  ctx.builder = new Builder(database)
 
   next()
 }
@@ -105,8 +102,7 @@ export const buildSetupCmdAudit = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
-  ctx.builder = new Builder(database, store)
+  ctx.builder = new Builder(database)
 
   next()
 }
@@ -197,7 +193,7 @@ export const auditCmdBuild = async (
 }
 
 class Builder {
-  constructor(private database: Database, private store: Store) {}
+  constructor(private database: Database) {}
 
   async build({
     dev,
@@ -219,12 +215,12 @@ class Builder {
     this.database.clearCache()
 
     await fs.mkdirp(tinaGeneratedPath)
-    await this.store.close()
+    await this.database.store.close()
     await resetGeneratedFolder({
       tinaGeneratedPath,
       usingTs,
     })
-    await this.store.open()
+    await this.database.store.open()
 
     const compiledSchema = await compileSchema({
       verbose,
