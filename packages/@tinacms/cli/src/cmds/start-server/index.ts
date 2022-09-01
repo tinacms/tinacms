@@ -156,13 +156,15 @@ export async function startServer(
   const build = async () => {
     try {
       await beforeBuild()
-      const { schema } = await ctx.builder.build({
+      const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
         rootPath: ctx.rootPath,
         dev,
         local: true,
         noSDK,
         verbose,
       })
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
       await buildAdmin({
         local: true,
         rootPath: ctx.rootPath,
