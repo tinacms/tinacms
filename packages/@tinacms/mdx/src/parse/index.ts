@@ -132,11 +132,11 @@ export const parseMDX = (
     } else {
       return { type: 'root', children: [] }
     }
-  } catch (e) {
+  } catch (e: any) {
     if (e instanceof RichTextParseError) {
       return invalidMarkdown(e, value)
     }
-    throw e
+    return invalidMarkdown(new RichTextParseError(e.message), value)
   }
 }
 
