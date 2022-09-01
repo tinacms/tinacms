@@ -31,6 +31,7 @@ import { makeIsomorphicOptions } from './git'
 import type { GraphQLSchema } from 'graphql'
 import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
+import { isProjectTs } from './attachPath'
 
 interface BuildOptions {
   verbose?: boolean
@@ -163,7 +164,6 @@ export const buildCmdBuild = async (
 ) => {
   // always skip indexing in the "build" command
   await ctx.builder.build({
-    usingTs: ctx.usingTs,
     rootPath: ctx.rootPath,
     schema: ctx.schema,
     ...options,
@@ -187,7 +187,6 @@ export const auditCmdBuild = async (
   >
 ) => {
   await ctx.builder.build({
-    usingTs: ctx.usingTs,
     rootPath: ctx.rootPath,
     schema: ctx.schema,
     ...options,
@@ -207,9 +206,10 @@ class Builder {
     noSDK,
     skipIndex,
     rootPath,
-    usingTs,
     schema,
   }: BuildOptions) {
+    const usingTs = await isProjectTs(rootPath)
+
     if (!rootPath) {
       throw new Error('Root path has not been attached')
     }
