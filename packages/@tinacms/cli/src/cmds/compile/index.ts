@@ -314,7 +314,6 @@ export const compileSchema = async (options: {
   verbose?: boolean
   dev?: boolean
   rootPath
-  schema
 }) => {
   const root = options.rootPath
   const tinaPath = path.join(root, '.tina')
