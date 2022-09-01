@@ -29,7 +29,6 @@ import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
 import type { GraphQLSchema } from 'graphql'
 import { viteBuild } from '@tinacms/app'
-import { logger } from '../logger'
 import { spin } from '../utils/spinner'
 
 interface BuildOptions {
@@ -37,7 +36,6 @@ interface BuildOptions {
   database: Database
   store: Store
   bridge: Bridge
-  noWatch?: boolean
   isomorphicGitBridge?: boolean
   verbose?: boolean
   dev?: boolean
@@ -204,7 +202,6 @@ class Builder {
   ) {}
 
   async build({
-    noWatch,
     ctx,
     beforeBuild,
     afterBuild,
@@ -239,15 +236,13 @@ class Builder {
       // always enable experimentalData and isomorphicGitBridge on the  backend
       cliFlags.push('experimentalData')
       cliFlags.push('isomorphicGitBridge')
-      const database = await createDatabase({
-        store: this.store,
-        bridge: this.bridge,
-      })
+
       await compileSchema(ctx, null, { verbose, dev })
 
       // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
       const schema: GraphQLSchema = await retry(
-        async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
+        async () =>
+          await buildSchema(rootPath, this.database, cliFlags, skipIndex)
       )
       await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
         noSDK,
