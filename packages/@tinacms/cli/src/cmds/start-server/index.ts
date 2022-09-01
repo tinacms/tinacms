@@ -68,7 +68,6 @@ export async function startServer(
   })
   const bridge: Bridge = ctx.bridge
   const database: Database = ctx.database
-  const store: Store = ctx.store
 
   // This is only false for tina-cloud media stores
   const shouldBuild = bridge.supportsBuilding()
@@ -176,8 +175,6 @@ export async function startServer(
           if (shouldBuild) {
             await ctx.builder.build({
               ctx,
-              database,
-              store,
               dev,
               isomorphicGitBridge,
               local: true,
@@ -209,8 +206,6 @@ export async function startServer(
             if (shouldBuild) {
               await ctx.builder.build({
                 ctx,
-                database,
-                store,
                 dev,
                 isomorphicGitBridge,
                 local: true,
@@ -243,9 +238,6 @@ export async function startServer(
     }
     if (shouldBuild) {
       await ctx.builder.build({
-        bridge,
-        database,
-        store,
         dev,
         isomorphicGitBridge,
         local: true,
