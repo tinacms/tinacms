@@ -24,6 +24,7 @@ import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
+import { neutralText } from '../../utils/theme'
 
 const rootPath = process.cwd()
 
@@ -63,47 +64,29 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const database = ctx.database
   const schema = await database.getSchema()
   const collections = schema.getCollections()
-  let warning = false
   let error = false
 
   for (let i = 0; i < collections.length; i++) {
     const collection = collections[i]
-    try {
-      // Not a huge fan of querying the database from outside of GraphQL
-      // but this allows us to return the list of items unhydrated, so errors
-      // in a single document don't cause the entire list query to fail
-      const docs = await database.query(
-        { collection: collection.name, first: -1, filterChain: [] },
-        (item) => ({ path: item })
-      )
+    // Not a huge fan of querying the database from outside of GraphQL
+    // but this allows us to return the list of items unhydrated, so errors
+    // in a single document don't cause the entire list query to fail
+    const docs = await database.query(
+      { collection: collection.name, first: -1, filterChain: [] },
+      (item) => ({ path: item })
+    )
+    logger.info(`Checking ${neutralText(collection.name)} collection`)
 
-      // I don't think this works now that the datalayer is
-      // on by default because when we index the item we
-      // must do a check to see of the format matches,
-      // so it never actually exists in the collection
-      const returnWarning = await auditCollection({
-        collection,
-        database,
-        rootPath,
-        useDefaultValues: options.useDefaultValues,
-        documents: docs.edges,
-      })
-
-      const returnError = await auditDocuments({
-        collection,
-        database,
-        rootPath,
-        useDefaultValues: options.useDefaultValues,
-        documents: docs.edges,
-        verbose: ctx.verbose,
-      })
-      warning = warning || returnWarning
-      error = error || returnError
-    } catch (e) {
-      console.error(e)
-    }
+    const returnError = await auditDocuments({
+      collection,
+      database,
+      rootPath,
+      useDefaultValues: options.useDefaultValues,
+      documents: docs.edges,
+      verbose: ctx.verbose,
+    })
+    error = error || returnError
   }
-  ctx.warning = warning
   ctx.error = error
 
   next()

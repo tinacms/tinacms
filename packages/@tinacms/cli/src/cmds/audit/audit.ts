@@ -52,7 +52,6 @@ export const auditDocuments = async (args: AuditArgs) => {
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
     const relativePath = node.path.replace(`${collection.path}/`, '')
-    logger.info(`Checking document: ${node.path}`)
     const documentQuery = `query {
         document(collection: "${collection.name}", relativePath: "${relativePath}") {
           __typename
