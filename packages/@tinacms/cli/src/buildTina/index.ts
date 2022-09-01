@@ -66,7 +66,7 @@ export const buildSetupCmdBuild = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(bridge, database, store)
+  ctx.builder = new Builder(database, store)
 
   next()
 }
@@ -86,7 +86,7 @@ export const buildSetupCmdServerStart = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(bridge, database, store)
+  ctx.builder = new Builder(database, store)
 
   next()
 }
@@ -108,14 +108,13 @@ export const buildSetupCmdAudit = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
-  ctx.builder = new Builder(bridge, database, store)
+  ctx.builder = new Builder(database, store)
 
   next()
 }
 
 const buildSetup = async ({
   isomorphicGitBridge,
-  experimentalData,
   rootPath,
   useMemoryStore,
 }: BuildSetupOptions & {
@@ -182,9 +181,6 @@ export const auditCmdBuild = async (
     'bridge' | 'database' | 'store'
   >
 ) => {
-  const bridge: Bridge = ctx.bridge
-  const database: Database = ctx.database
-  const store: Store = ctx.store
   await ctx.builder.build({
     ...options,
     local: true,
@@ -195,11 +191,7 @@ export const auditCmdBuild = async (
 }
 
 class Builder {
-  constructor(
-    private bridge: IsomorphicBridge | FilesystemBridge,
-    private database: Database,
-    private store: Store
-  ) {}
+  constructor(private database: Database, private store: Store) {}
 
   async build({
     ctx,

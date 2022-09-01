@@ -152,6 +152,20 @@ export async function startServer(
     })
   }
 
+  const build = () => {
+    return ctx.builder.build({
+      ctx,
+      dev,
+      isomorphicGitBridge,
+      local: true,
+      noSDK,
+      noWatch,
+      verbose,
+      beforeBuild,
+      afterBuild,
+    })
+  }
+
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   if (!noWatch && !process.env.CI) {
     chokidar
@@ -173,17 +187,7 @@ export async function startServer(
         if (verbose) console.log('Generating Tina config')
         try {
           if (shouldBuild) {
-            await ctx.builder.build({
-              ctx,
-              dev,
-              isomorphicGitBridge,
-              local: true,
-              noSDK,
-              noWatch,
-              verbose,
-              beforeBuild,
-              afterBuild,
-            })
+            await build()
           }
           ready = true
           isReady = true
@@ -204,17 +208,7 @@ export async function startServer(
           logger.info('Tina change detected, regenerating config')
           try {
             if (shouldBuild) {
-              await ctx.builder.build({
-                ctx,
-                dev,
-                isomorphicGitBridge,
-                local: true,
-                noSDK,
-                noWatch,
-                verbose,
-                beforeBuild,
-                afterBuild,
-              })
+              await build()
             }
             if (isReady) {
               await restart()
@@ -237,16 +231,7 @@ export async function startServer(
       logger.info('Detected CI environment, omitting watch commands...')
     }
     if (shouldBuild) {
-      await ctx.builder.build({
-        dev,
-        isomorphicGitBridge,
-        local: true,
-        noSDK,
-        noWatch,
-        verbose,
-        beforeBuild,
-        afterBuild,
-      })
+      await build()
     }
     await start()
     next()
