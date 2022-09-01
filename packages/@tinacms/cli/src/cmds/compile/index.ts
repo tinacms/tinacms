@@ -183,12 +183,15 @@ export const compileClient = async (
 }
 
 export const compileFile = async (
-  ctx,
-  _next,
-  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean },
+  options: {
+    schemaFileType?: string
+    verbose?: boolean
+    dev?: boolean
+    rootPath: string
+  },
   fileName: string
 ) => {
-  const root = ctx.rootPath
+  const root = options.rootPath
   if (!root) {
     throw new Error('ctx.rootPath has not been attached')
   }
@@ -220,10 +223,6 @@ export const compileFile = async (
     throw new Error(
       `Requested schema file type '${requestedSchemaFileType}' is not valid. Supported schema file types: 'ts, js, tsx, jsx'`
     )
-  }
-
-  if (ctx) {
-    ctx.schemaFileType = schemaFileType
   }
 
   let schemaExists = true
@@ -310,19 +309,21 @@ export const compileFile = async (
   return returnObject
 }
 
-export const compileSchema = async (
-  ctx,
-  _next,
-  options: { schemaFileType?: string; verbose?: boolean; dev?: boolean }
-) => {
-  const root = ctx.rootPath
+export const compileSchema = async (options: {
+  schemaFileType?: string
+  verbose?: boolean
+  dev?: boolean
+  rootPath
+  schema
+}) => {
+  const root = options.rootPath
   const tinaPath = path.join(root, '.tina')
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
-  let schema: any = await compileFile(ctx, _next, options, 'schema')
+  let schema: any = await compileFile(options, 'schema')
   try {
-    const config = (await compileFile(ctx, _next, options, 'config')) as any
+    const config = (await compileFile(options, 'config')) as any
     const configCopy = _.cloneDeep(config)
     delete configCopy.schema
     if (config?.schema) {
@@ -333,12 +334,12 @@ export const compileSchema = async (
   } catch (e) {
     // Do nothing, they are not using a config file
   }
-
-  ctx.schema = schema
   await fs.outputFile(
     path.join(tinaConfigPath, `schema.json`),
     JSON.stringify(schema, null, 2)
   )
+
+  return schema
 }
 
 const transpile = async (

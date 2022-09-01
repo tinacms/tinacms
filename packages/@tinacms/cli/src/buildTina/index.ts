@@ -14,7 +14,8 @@
 import retry from 'async-retry'
 import fs from 'fs-extra'
 
-import { Bridge, buildSchema, createDatabase, Database } from '@tinacms/graphql'
+import { buildSchema, createDatabase, Database } from '@tinacms/graphql'
+import { TinaCloudSchema } from '@tinacms/schema-tools'
 import {
   AuditFileSystemBridge,
   FilesystemBridge,
@@ -32,12 +33,14 @@ import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 
 interface BuildOptions {
-  ctx: any
   verbose?: boolean
   dev?: boolean
   local?: boolean
   noSDK?: boolean
   skipIndex?: boolean
+  usingTs?: boolean
+  rootPath?: string
+  schema?: TinaCloudSchema<false>
 }
 
 interface BuildSetupOptions {
@@ -160,8 +163,11 @@ export const buildCmdBuild = async (
 ) => {
   // always skip indexing in the "build" command
   await ctx.builder.build({
+    usingTs: ctx.usingTs,
+    rootPath: ctx.rootPath,
+    schema: ctx.schema,
     ...options,
-    ctx: ctx,
+
     skipIndex: true,
   })
   await buildAdmin({
@@ -181,10 +187,12 @@ export const auditCmdBuild = async (
   >
 ) => {
   await ctx.builder.build({
+    usingTs: ctx.usingTs,
+    rootPath: ctx.rootPath,
+    schema: ctx.schema,
     ...options,
     local: true,
     verbose: true,
-    ctx: ctx,
   })
   next()
 }
@@ -192,12 +200,20 @@ export const auditCmdBuild = async (
 class Builder {
   constructor(private database: Database, private store: Store) {}
 
-  async build({ ctx, dev, local, verbose, noSDK, skipIndex }: BuildOptions) {
-    const rootPath = ctx.rootPath as string
+  async build({
+    dev,
+    local,
+    verbose,
+    noSDK,
+    skipIndex,
+    rootPath,
+    usingTs,
+    schema,
+  }: BuildOptions) {
     if (!rootPath) {
       throw new Error('Root path has not been attached')
     }
-    const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+    const tinaGeneratedPath = path.join(rootPath!, '.tina', '__generated__')
 
     // Clear the cache of the DB passed to the GQL server
     this.database.clearCache()
@@ -206,14 +222,19 @@ class Builder {
     await this.store.close()
     await resetGeneratedFolder({
       tinaGeneratedPath,
-      usingTs: ctx.usingTs,
+      usingTs,
     })
     await this.store.open()
 
-    await compileSchema(ctx, null, { verbose, dev })
+    const compiledSchema = await compileSchema({
+      verbose,
+      dev,
+      schema,
+      rootPath,
+    })
 
     // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const schema: GraphQLSchema = await retry(
+    const graphqlSchema: GraphQLSchema = await retry(
       async () =>
         await buildSchema(
           rootPath,
@@ -222,17 +243,15 @@ class Builder {
           skipIndex
         )
     )
-    await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
+
+    await genTypes({ schema: graphqlSchema, usingTs }, () => {}, {
       noSDK,
       verbose,
     })
-    await genClient(
-      { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
-      () => {},
-      {
-        local,
-      }
-    )
+
+    await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
+      local,
+    })
   }
 }
 

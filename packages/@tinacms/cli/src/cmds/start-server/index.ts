@@ -157,7 +157,9 @@ export async function startServer(
     try {
       await beforeBuild()
       await ctx.builder.build({
-        ctx,
+        usingTs: ctx.usingTs,
+        rootPath: ctx.rootPath,
+        schema: ctx.schema,
         dev,
         local: true,
         noSDK,
