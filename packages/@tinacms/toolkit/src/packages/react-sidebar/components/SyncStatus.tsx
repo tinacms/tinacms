@@ -90,7 +90,7 @@ const SyncStatusWidget = ({
   eventsListOpen,
   onClick,
 }: {
-  cms: TinaCMS
+  cms: any
   eventsListOpen: boolean
   onClick: () => void
 }) => {
@@ -159,7 +159,7 @@ const SyncStatusWidget = ({
   )
 }
 
-const EventsList = ({ cms }: { cms: TinaCMS }) => {
+const EventsList = ({ cms }) => {
   const [cursor, setCursor] = React.useState<string | undefined>(undefined)
   const [existingEvents, setExistingEvents] = React.useState<
     {
