@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { LocalWarning, TinaCMS } from '@tinacms/toolkit'
+import { LocalWarning } from '@tinacms/toolkit'
 
 export const PageWrapper = ({
   children,
@@ -29,11 +29,9 @@ export const PageWrapper = ({
 export const PageHeader = ({
   isLocalMode,
   children,
-  cms,
 }: {
   isLocalMode?: boolean
   children: React.ReactChild | React.ReactChildren
-  cms: TinaCMS
 }) => (
   <>
     {isLocalMode && <LocalWarning />}
