@@ -342,6 +342,9 @@ const config = (cwd = '') => {
         auto: 'auto',
       },
       extend: {
+        animation: {
+          'spin-reverse': 'spin 1s linear infinite reverse',
+        },
         scale: {
           97: '.97',
           103: '1.03',

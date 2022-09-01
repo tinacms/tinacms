@@ -17,16 +17,18 @@
  */
 
 import * as React from 'react'
+import { useCMS } from '../../react-core'
 import { useState } from 'react'
 import { TinaCMS } from '../../../tina-cms'
 import { MdSync, MdSyncDisabled, MdSyncProblem } from 'react-icons/md'
-import { FcCancel, FcOk } from 'react-icons/fc'
 import {
   FullscreenModal,
   Modal,
   ModalBody,
   ModalHeader,
 } from '../../react-modals'
+import { BsCheckCircleFill, BsExclamationOctagonFill } from 'react-icons/bs'
+import { Button } from '../../styles'
 
 type EventListState = 'loading' | 'success' | 'error' | 'unauthorized'
 
@@ -130,27 +132,27 @@ const SyncStatusWidget = ({
   }, [eventsListOpen, cms])
 
   return (
-    <div className="flex-grow-0 flex w-full text-xs items-center">
+    <div className="flex-grow-0 flex text-xs items-center">
       <div
         title={syncStatus.message}
         onClick={handleClick}
-        className={
+        className={`opacity-70 transition-all duration-150 ease-out ${
           syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized'
-            ? 'cursor-pointer'
+            ? 'cursor-pointer hover:opacity-100'
             : ''
-        }
+        }`}
       >
         {syncStatus.state === 'loading' && (
-          <MdSync className="w-6 h-full ml-2 opacity-70 animate-spin" />
+          <MdSync className="w-6 h-full ml-2 animate-spin-reverse text-blue-500 fill-current" />
         )}
         {syncStatus.state === 'unauthorized' && (
-          <MdSyncDisabled className="w-6 h-full ml-2 opacity-70" />
+          <MdSyncDisabled className="w-6 h-full ml-2 text-orange-500 fill-current" />
         )}
         {syncStatus.state === 'success' && (
-          <MdSync className="w-6 h-full ml-2 opacity-70" />
+          <MdSync className="w-6 h-full ml-2 text-gray-400 fill-current" />
         )}
         {syncStatus.state === 'error' && (
-          <MdSyncProblem className="w-6 h-full ml-2 opacity-70" />
+          <MdSyncProblem className="w-6 h-full ml-2 text-red-500 fill-current" />
         )}
       </div>
     </div>
@@ -177,76 +179,79 @@ const EventsList = ({ cms }: { cms: TinaCMS }) => {
   } = useGetEvents(cms, cursor, existingEvents)
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="grow">
-        {events.length > 0 && (
-          <div className="grid grid-cols-12 gap-1 overflow-y-auto">
+    <div className="flex flex-col gap-4 w-full h-full grow-0">
+      {events.length > 0 && (
+        <div className="shrink grow-0 overflow-scroll w-full rounded-md shadow ring-1 ring-black ring-opacity-5">
+          <table className="w-full divide-y divide-gray-100">
             {events
               .map((event, index) => {
-                const timestamp = new Date(event.timestamp).toLocaleString()
-                return [
-                  event.isError ? (
-                    <div
-                      key={`${event.id}_error_icon`}
-                      className={`col-span-1 p-1 ${
-                        index % 2 === 0 ? '' : 'bg-gray-50'
-                      }`}
+                const date = new Date(event.timestamp).toDateString()
+                const time = new Date(event.timestamp).toTimeString()
+
+                return (
+                  <tr className={index % 2 === 0 ? '' : 'bg-gray-50'}>
+                    {event.isError ? (
+                      <td
+                        key={`${event.id}_error_icon`}
+                        className="py-3 pl-4 pr-0 w-0"
+                      >
+                        <BsExclamationOctagonFill className="text-red-500 fill-current w-5 h-auto" />
+                      </td>
+                    ) : (
+                      <td
+                        key={`${event.id}_ok_icon`}
+                        className="py-3 pl-4 pr-0 w-0"
+                      >
+                        <BsCheckCircleFill className="text-green-500 fill-current w-5 h-auto" />
+                      </td>
+                    )}
+                    <td
+                      key={`${event.id}_msg`}
+                      className="whitespace-nowrap p-3 text-base text-gray-500"
                     >
-                      <FcCancel />
-                    </div>
-                  ) : (
-                    <div
-                      key={`${event.id}_ok_icon`}
-                      className={`col-span-1 p-1 ${
-                        index % 2 === 0 ? '' : 'bg-gray-50'
-                      }`}
+                      {event.message}
+                      {event.isError && (
+                        <div className="w-full text-gray-300 text-xs mt-0.5">
+                          {event.id}
+                        </div>
+                      )}
+                    </td>
+                    <td
+                      key={`${event.id}_ts`}
+                      className="whitespace-nowrap py-3 pl-3 pr-4 text-sm text-gray-500"
                     >
-                      <FcOk />
-                    </div>
-                  ),
-                  <div
-                    key={`${event.id}_msg`}
-                    className={`col-span-9 font-mono text-sm 'text-gray-400' ${
-                      index % 2 === 0 ? '' : 'bg-gray-50'
-                    }`}
-                  >
-                    {event.message}
-                    {event.isError && ` [${event.id}]`}
-                  </div>,
-                  <div
-                    key={`${event.id}_ts`}
-                    className={`col-span-2 font-mono text-sm ${
-                      index % 2 === 0 ? '' : 'bg-gray-50'
-                    }`}
-                  >
-                    {timestamp}
-                  </div>,
-                ]
+                      {date}
+                      <span className="w-full block text-gray-300 text-xs mt-0.5">
+                        {time}
+                      </span>
+                    </td>
+                  </tr>
+                )
               })
               .flat()}
-          </div>
-        )}
-        {loading && (
-          <div className="text-sm text-gray-400 text-center">Loading...</div>
-        )}
-        {error && <div>Error: {error.message}</div>}
-      </div>
-      <div className="text-center flex-none">
-        <a
-          className="text-sm underline cursor-pointer"
+          </table>
+        </div>
+      )}
+      {loading && (
+        <div className="text-sm text-gray-400 text-center">Loading...</div>
+      )}
+      {error && <div>Error: {error.message}</div>}
+      <div className="text-center flex-1">
+        <Button
           onClick={() => {
             setExistingEvents(events)
             setCursor(nextCursor)
           }}
         >
-          More
-        </a>
+          Load More Events
+        </Button>
       </div>
     </div>
   )
 }
 
-export const SyncStatus = ({ cms }: { cms: TinaCMS }) => {
+export const SyncStatus = () => {
+  const cms = useCMS()
   const [eventsOpen, setEventsOpen] = React.useState(false)
 
   function openEventsModal() {
