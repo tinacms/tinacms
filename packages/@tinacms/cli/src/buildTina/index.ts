@@ -68,6 +68,7 @@ export const buildSetupCmdBuild = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
+  ctx.builder = new Builder(bridge)
 
   next()
 }
@@ -87,6 +88,7 @@ export const buildSetupCmdServerStart = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
+  ctx.builder = new Builder(ctx.bridge)
 
   next()
 }
@@ -108,6 +110,7 @@ export const buildSetupCmdAudit = async (
   ctx.bridge = bridge
   ctx.database = database
   ctx.store = store
+  ctx.builder = new Builder(bridge)
 
   next()
 }
@@ -168,9 +171,8 @@ export const buildCmdBuild = async (
   const database: Database = ctx.database
   const store: Store = ctx.store
   // always skip indexing in the "build" command
-  await build({
+  await ctx.builder.build({
     ...options,
-    bridge,
     database,
     store,
     ctx: ctx,
@@ -190,94 +192,96 @@ export const auditCmdBuild = async (
   const bridge: Bridge = ctx.bridge
   const database: Database = ctx.database
   const store: Store = ctx.store
-  await build({
+  await ctx.builder.build({
     ...options,
     local: true,
     verbose: true,
-    bridge,
     database,
     store,
     ctx: ctx,
   })
   next()
 }
-export const build = async ({
-  noWatch,
-  ctx,
-  bridge,
-  database,
-  store,
-  beforeBuild,
-  afterBuild,
-  dev,
-  local,
-  verbose,
-  noSDK,
-  skipIndex,
-}: BuildOptions) => {
-  const rootPath = ctx.rootPath as string
 
-  if (!rootPath) {
-    throw new Error('Root path has not been attached')
-  }
-  const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+class Builder {
+  constructor(private bridge: IsomorphicBridge | FilesystemBridge) {}
 
-  // Clear the cache of the DB passed to the GQL server
-  database.clearCache()
-
-  if (beforeBuild) {
-    await beforeBuild()
-  }
-
-  try {
-    await fs.mkdirp(tinaGeneratedPath)
-    await store.close()
-    await resetGeneratedFolder({
-      tinaGeneratedPath,
-      usingTs: ctx.usingTs,
-    })
-    await store.open()
-    const cliFlags = []
-    // always enable experimentalData and isomorphicGitBridge on the  backend
-    cliFlags.push('experimentalData')
-    cliFlags.push('isomorphicGitBridge')
-    const database = await createDatabase({ store, bridge })
-    await compileSchema(ctx, null, { verbose, dev })
-
-    // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const schema: GraphQLSchema = await retry(
-      async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
-    )
-    await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
-      noSDK,
-      verbose,
-    })
-    await genClient(
-      { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
-      () => {},
-      {
-        local,
-      }
-    )
-    if (ctx.schema?.config?.build) {
-      await spin({
-        text: 'Building static site',
-        waitFor: async () => {
-          await viteBuild({
-            local,
-            rootPath,
-            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
-            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
-          })
-        },
-      })
-      console.log('\nDone building static site')
+  async build({
+    noWatch,
+    ctx,
+    database,
+    store,
+    beforeBuild,
+    afterBuild,
+    dev,
+    local,
+    verbose,
+    noSDK,
+    skipIndex,
+  }: BuildOptions) {
+    const rootPath = ctx.rootPath as string
+    if (!rootPath) {
+      throw new Error('Root path has not been attached')
     }
-  } catch (error) {
-    throw error
-  } finally {
-    if (afterBuild) {
-      await afterBuild()
+    const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+
+    // Clear the cache of the DB passed to the GQL server
+    database.clearCache()
+
+    if (beforeBuild) {
+      await beforeBuild()
+    }
+
+    try {
+      await fs.mkdirp(tinaGeneratedPath)
+      await store.close()
+      await resetGeneratedFolder({
+        tinaGeneratedPath,
+        usingTs: ctx.usingTs,
+      })
+      await store.open()
+      const cliFlags = []
+      // always enable experimentalData and isomorphicGitBridge on the  backend
+      cliFlags.push('experimentalData')
+      cliFlags.push('isomorphicGitBridge')
+      const database = await createDatabase({ store, bridge: this.bridge })
+      await compileSchema(ctx, null, { verbose, dev })
+
+      // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
+      const schema: GraphQLSchema = await retry(
+        async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
+      )
+      await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
+        noSDK,
+        verbose,
+      })
+      await genClient(
+        { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
+        () => {},
+        {
+          local,
+        }
+      )
+      if (ctx.schema?.config?.build) {
+        await spin({
+          text: 'Building static site',
+          waitFor: async () => {
+            await viteBuild({
+              local,
+              rootPath,
+              outputFolder: ctx.schema?.config?.build?.outputFolder as string,
+              publicFolder: ctx.schema?.config?.build?.publicFolder as string,
+            })
+          },
+        })
+        console.log('\nDone building static site')
+      }
+    } catch (error) {
+      throw error
+    } finally {
+      if (afterBuild) {
+        await afterBuild()
+      }
     }
   }
 }
