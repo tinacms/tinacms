@@ -300,7 +300,6 @@ const Sidebar = ({
               displayNav={displayNav}
               renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
-              cms={cms}
             />
             <FormsView>
               <sidebar.placeholder />
@@ -417,7 +416,7 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ renderNav, displayNav, isLocalMode, cms }) => {
+const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
   const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
     React.useContext(SidebarContext)
 

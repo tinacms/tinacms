@@ -262,6 +262,10 @@ export const SyncStatus = () => {
     setEventsOpen(false)
   }
 
+  if (cms.api?.tina?.isLocalMode) {
+    return null
+  }
+
   return (
     <>
       <SyncStatusWidget
