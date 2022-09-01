@@ -17,7 +17,6 @@ import chokidar from 'chokidar'
 
 import { Telemetry } from '@tinacms/metrics'
 
-import { build } from '../../buildTina'
 import { AsyncLock } from './lock'
 import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
@@ -175,8 +174,7 @@ export async function startServer(
         if (verbose) console.log('Generating Tina config')
         try {
           if (shouldBuild) {
-            await build({
-              bridge,
+            await ctx.builder.build({
               ctx,
               database,
               store,
@@ -209,8 +207,7 @@ export async function startServer(
           logger.info('Tina change detected, regenerating config')
           try {
             if (shouldBuild) {
-              await build({
-                bridge,
+              await ctx.builder.build({
                 ctx,
                 database,
                 store,
@@ -245,9 +242,8 @@ export async function startServer(
       logger.info('Detected CI environment, omitting watch commands...')
     }
     if (shouldBuild) {
-      await build({
+      await ctx.builder.build({
         bridge,
-        ctx,
         database,
         store,
         dev,
