@@ -160,8 +160,6 @@ export const buildCmdBuild = async (
   const { schema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
-
-    skipIndex: true,
   })
   await buildAdmin({
     local: options.local,
@@ -179,26 +177,22 @@ export const auditCmdBuild = async (
     'bridge' | 'database' | 'store'
   >
 ) => {
-  await ctx.builder.build({
+  const { graphQLSchema, tinaSchema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
     local: true,
     verbose: true,
   })
+
+  await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
   next()
 }
 
 class Builder {
   constructor(private database: Database) {}
 
-  async build({
-    dev,
-    local,
-    verbose,
-    noSDK,
-    skipIndex,
-    rootPath,
-  }: BuildOptions) {
+  async build({ dev, local, verbose, noSDK, rootPath }: BuildOptions) {
     const usingTs = await isProjectTs(rootPath)
 
     if (!rootPath) {
@@ -224,17 +218,15 @@ class Builder {
     })
 
     // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const graphqlSchema: GraphQLSchema = await retry(
+    const { astSchema, graphQLSchema, tinaSchema } = await retry(
       async () =>
-        await buildSchema(
-          rootPath,
-          this.database,
-          ['experimentalData', 'isomorphicGitBridge'],
-          skipIndex
-        )
+        await buildSchema(rootPath, this.database, [
+          'experimentalData',
+          'isomorphicGitBridge',
+        ])
     )
 
-    await genTypes({ schema: graphqlSchema, usingTs }, () => {}, {
+    await genTypes({ schema: astSchema, usingTs }, () => {}, {
       noSDK,
       verbose,
     })
@@ -243,7 +235,7 @@ class Builder {
       local,
     })
 
-    return { schema: compiledSchema }
+    return { schema: compiledSchema, graphQLSchema, tinaSchema }
   }
 }
 

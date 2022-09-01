@@ -31,8 +31,7 @@ export type DummyType = unknown
 export const buildSchema = async (
   rootPath: string,
   database: Database,
-  flags?: string[],
-  skipIndexing?: boolean
+  flags?: string[]
 ) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
   const config = await fs
@@ -46,12 +45,9 @@ export const buildSchema = async (
     config: JSON.parse(config),
     flags,
   })
-  if (!skipIndexing) {
-    await database.indexContent({ graphQLSchema, tinaSchema })
-  }
 
   const gqlAst = await database.getGraphQLSchemaFromBridge()
-  return buildASTSchema(gqlAst)
+  return { astSchema: buildASTSchema(gqlAst), graphQLSchema, tinaSchema }
 }
 
 import type {
