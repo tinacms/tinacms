@@ -15,7 +15,6 @@ import retry from 'async-retry'
 import fs from 'fs-extra'
 
 import { buildSchema, createDatabase, Database } from '@tinacms/graphql'
-import { TinaCloudSchema } from '@tinacms/schema-tools'
 import {
   AuditFileSystemBridge,
   FilesystemBridge,
@@ -27,7 +26,6 @@ import path from 'path'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
-import type { GraphQLSchema } from 'graphql'
 import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
@@ -37,7 +35,6 @@ interface BuildOptions {
   dev?: boolean
   local?: boolean
   noSDK?: boolean
-  skipIndex?: boolean
   rootPath?: string
 }
 

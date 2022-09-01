@@ -30,8 +30,6 @@ interface Options {
   port?: number
   command?: string
   watchFolders?: string[]
-  experimentalData?: boolean
-  isomorphicGitBridge?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -48,13 +46,11 @@ export async function startServer(
   {
     port = 4001,
     noWatch,
-    isomorphicGitBridge,
     noSDK,
     noTelemetry,
     watchFolders,
     verbose,
     dev,
-    local,
   }: Options
 ) {
   buildLock.disable()
