@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import { LocalWarning, SyncStatus } from '@tinacms/toolkit'
+import { LocalWarning } from '@tinacms/toolkit'
 import type { TinaCMS, ScreenPlugin } from '@tinacms/toolkit'
 
 import GetCMS from '../components/GetCMS'
@@ -37,7 +37,6 @@ const ScreenPage = () => {
         return (
           <div className="relative w-full h-full flex flex-col items-stretch justify-between">
             {cms?.api?.tina?.isLocalMode && <LocalWarning />}
-            <SyncStatus cms={cms} />
             {renderNavToggle && (
               <div className={`py-5 border-b border-gray-200 bg-white pl-18`}>
                 {selectedScreen.name}
