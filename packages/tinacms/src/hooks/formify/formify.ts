@@ -383,8 +383,6 @@ export const formify = async ({
     }
 
     if (util.isFormifiableDocument(type)) {
-      // console.log('formifyInlineFragmentDocument', inlineFragmentNode)
-      // console.trace()
       return formifyInlineFragmentDocument({
         inlineFragmentNode: inlineFragmentNode,
         type,
