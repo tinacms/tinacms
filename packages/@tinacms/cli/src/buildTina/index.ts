@@ -21,7 +21,6 @@ import {
   FilesystemBridge,
   IsomorphicBridge,
   LevelStore,
-  Store,
 } from '@tinacms/datalayer'
 import path from 'path'
 
@@ -40,7 +39,6 @@ interface BuildOptions {
   noSDK?: boolean
   skipIndex?: boolean
   rootPath?: string
-  schema?: TinaCloudSchema<false>
 }
 
 interface BuildSetupOptions {
@@ -54,7 +52,7 @@ export const buildSetupCmdBuild = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database, store } = await buildSetup({
+  const { bridge, database } = await buildSetup({
     ...opts,
     rootPath,
     useMemoryStore: true,
@@ -159,17 +157,16 @@ export const buildCmdBuild = async (
   >
 ) => {
   // always skip indexing in the "build" command
-  await ctx.builder.build({
+  const { schema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
-    schema: ctx.schema,
     ...options,
 
     skipIndex: true,
   })
   await buildAdmin({
-    schema: ctx.schema,
     local: options.local,
     rootPath: ctx.rootPath,
+    schema,
   })
   next()
 }
@@ -184,7 +181,6 @@ export const auditCmdBuild = async (
 ) => {
   await ctx.builder.build({
     rootPath: ctx.rootPath,
-    schema: ctx.schema,
     ...options,
     local: true,
     verbose: true,
@@ -202,7 +198,6 @@ class Builder {
     noSDK,
     skipIndex,
     rootPath,
-    schema,
   }: BuildOptions) {
     const usingTs = await isProjectTs(rootPath)
 
@@ -225,7 +220,6 @@ class Builder {
     const compiledSchema = await compileSchema({
       verbose,
       dev,
-      schema,
       rootPath,
     })
 
@@ -248,6 +242,8 @@ class Builder {
     await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
       local,
     })
+
+    return { schema: compiledSchema }
   }
 }
 

@@ -21,7 +21,7 @@ import { AsyncLock } from './lock'
 import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
-import type { Bridge, Database, Store } from '@tinacms/graphql'
+import type { Bridge, Database } from '@tinacms/graphql'
 import { buildAdmin } from '../../buildTina'
 
 const buildLock = new AsyncLock()
@@ -156,18 +156,17 @@ export async function startServer(
   const build = async () => {
     try {
       await beforeBuild()
-      await ctx.builder.build({
+      const { schema } = await ctx.builder.build({
         rootPath: ctx.rootPath,
-        schema: ctx.schema,
         dev,
         local: true,
         noSDK,
         verbose,
       })
       await buildAdmin({
-        schema: ctx.schema,
         local: true,
         rootPath: ctx.rootPath,
+        schema,
       })
     } catch (error) {
       throw error
