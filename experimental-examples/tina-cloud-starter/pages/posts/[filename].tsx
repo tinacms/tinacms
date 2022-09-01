@@ -1,6 +1,6 @@
 import { Post } from "../../components/post";
 import { client } from "../../.tina/__generated__/client";
-import { useTina } from "tinacms/dist/react";
+import { useTina } from "tinacms/dist/edit-state";
 import { Layout } from "../../components/layout";
 
 // Use the props returned by get static props

@@ -3,17 +3,11 @@ import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { client } from "../.tina/__generated__/client";
 import { Layout } from "../components/layout";
-import { useTina } from "tinacms/dist/react";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  const { data } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
-  });
-  const posts = data.postsConnection.edges;
+  const posts = props.data.postsConnection.edges;
 
   return (
     <Layout>
