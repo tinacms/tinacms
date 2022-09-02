@@ -57,7 +57,7 @@ export const buildSetupCmdBuild = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.builder = new Builder(database)
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
@@ -76,7 +76,7 @@ export const buildSetupCmdServerStart = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.builder = new Builder(database)
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
@@ -97,7 +97,7 @@ export const buildSetupCmdAudit = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.builder = new Builder(database)
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
@@ -186,7 +186,7 @@ export const auditCmdBuild = async (
   next()
 }
 
-class Builder {
+class ConfigBuilder {
   constructor(private database: Database) {}
 
   async build({ dev, local, verbose, noSDK, rootPath }: BuildOptions) {
