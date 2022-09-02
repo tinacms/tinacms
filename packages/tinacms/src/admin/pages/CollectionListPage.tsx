@@ -180,7 +180,7 @@ const CollectionListPage = () => {
               const pageInfo = collection.documents.pageInfo
               const fields = collectionExtra.fields?.filter((x) =>
                 // only allow sortable fields
-                ['string', 'number', 'datetime'].includes(x.type)
+                ['string', 'number', 'datetime', 'boolean'].includes(x.type)
               )
 
               return (
