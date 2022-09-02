@@ -155,7 +155,7 @@ const buildSetup = async ({
 }
 
 export const buildCmdBuild = async (
-  ctx: any,
+  ctx: { builder: ConfigBuilder; rootPath: string; usingTs: boolean },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions & ClientGenOptions,
@@ -183,7 +183,7 @@ export const buildCmdBuild = async (
 }
 
 export const auditCmdBuild = async (
-  ctx: any,
+  ctx: { builder: ConfigBuilder; rootPath: string; database: Database },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
@@ -201,7 +201,7 @@ export const auditCmdBuild = async (
   next()
 }
 
-class ConfigBuilder {
+export class ConfigBuilder {
   constructor(private database: Database) {}
 
   async build({ dev, verbose, rootPath }: BuildOptions) {
