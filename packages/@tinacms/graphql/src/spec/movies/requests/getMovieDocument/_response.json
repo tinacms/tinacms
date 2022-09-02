@@ -38,10 +38,10 @@
                 "text": "this is an** "
               },
               {
-                "bold": true,
                 "type": "text",
                 "text": "inline",
-                "value": "inline"
+                "code": true,
+                "bold": true
               },
               {
                 "type": "text",
@@ -52,6 +52,12 @@
           {
             "type": "mdxJsxFlowElement",
             "name": "Cta",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
             "props": {
               "title": "ok"
             }
@@ -59,6 +65,12 @@
           {
             "type": "mdxJsxFlowElement",
             "name": "BlockQuote",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
             "props": {
               "author": "Darth Vader",
               "categories": [
@@ -83,6 +95,12 @@
           {
             "type": "mdxJsxFlowElement",
             "name": "Hero",
+            "children": [
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
             "props": {
               "subTitle": {
                 "type": "root",
@@ -95,13 +113,6 @@
                         "text": "Some slogan"
                       }
                     ]
-                  },
-                  {
-                    "type": "mdxJsxFlowElement",
-                    "name": "Cta",
-                    "props": {
-                      "title": "Get Started"
-                    }
                   }
                 ]
               },
@@ -123,6 +134,12 @@
                   {
                     "type": "mdxJsxFlowElement",
                     "name": "Cta",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": ""
+                      }
+                    ],
                     "props": {
                       "title": "Get Started",
                       "actions": [

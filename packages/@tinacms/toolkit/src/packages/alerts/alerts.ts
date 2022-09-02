@@ -74,7 +74,7 @@ export class Alerts {
       this.dismiss(alert)
     }
 
-    timeoutId = setTimeout(dismiss, alert.timeout)
+    timeoutId = level !== 'error' ? setTimeout(dismiss, alert.timeout) : null
 
     return dismiss
   }

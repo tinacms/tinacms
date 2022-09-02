@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 0.61.4
+
+### Patch Changes
+
+- 2b60a7bd8: Improve audit so that it doesn't throw errors during the file list process. Also adds support for `--verbose` argument during `audit`.
+
 ## 0.61.3
 
 ### Patch Changes
