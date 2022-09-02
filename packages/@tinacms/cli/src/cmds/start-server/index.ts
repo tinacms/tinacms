@@ -155,9 +155,15 @@ export async function startServer(
       const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
         rootPath: ctx.rootPath,
         dev,
+        verbose,
+      })
+
+      await ctx.builder.genTypedClient({
+        compiledSchema: schema,
         local: true,
         noSDK,
         verbose,
+        usingTs: ctx.usingTs,
       })
       await ctx.database.indexContent({ graphQLSchema, tinaSchema })
 

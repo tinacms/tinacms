@@ -35,11 +35,15 @@ import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
 
-interface BuildOptions {
-  verbose?: boolean
-  dev?: boolean
-  local?: boolean
+interface ClientGenOptions {
   noSDK?: boolean
+  local?: boolean
+  verbose?: boolean
+}
+
+interface BuildOptions {
+  dev?: boolean
+  verbose?: boolean
   rootPath?: string
 }
 
@@ -73,7 +77,7 @@ export const buildSetupCmdServerStart = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database, store } = await buildSetup({
+  const { bridge, database } = await buildSetup({
     ...opts,
     rootPath,
     useMemoryStore: false,
@@ -154,7 +158,7 @@ export const buildCmdBuild = async (
   ctx: any,
   next: () => void,
   options: Omit<
-    BuildOptions & BuildSetupOptions,
+    BuildOptions & BuildSetupOptions & ClientGenOptions,
     'bridge' | 'database' | 'store'
   >
 ) => {
@@ -162,6 +166,13 @@ export const buildCmdBuild = async (
   const { schema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
+  })
+  await ctx.builder.genTypedClient({
+    compiledSchema: schema,
+    local: options.local,
+    noSDK: options.noSDK,
+    verbose: options.verbose,
+    usingTs: ctx.usingTs,
   })
   await buildAdmin({
     local: options.local,
@@ -182,7 +193,6 @@ export const auditCmdBuild = async (
   const { graphQLSchema, tinaSchema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
-    local: true,
     verbose: true,
   })
 
@@ -194,7 +204,7 @@ export const auditCmdBuild = async (
 class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, local, verbose, noSDK, rootPath }: BuildOptions) {
+  async build({ dev, verbose, rootPath }: BuildOptions) {
     const usingTs = await isProjectTs(rootPath)
 
     if (!rootPath) {
@@ -228,7 +238,21 @@ class ConfigBuilder {
         ])
     )
 
+    return { schema: compiledSchema, graphQLSchema, tinaSchema }
+  }
+
+  async genTypedClient({
+    usingTs,
+    compiledSchema,
+    noSDK,
+    verbose,
+    local,
+  }: ClientGenOptions & {
+    usingTs: boolean
+    compiledSchema: any
+  }) {
     const astSchema = await getASTSchema(this.database)
+
     await genTypes({ schema: astSchema, usingTs }, () => {}, {
       noSDK,
       verbose,
@@ -237,8 +261,6 @@ class ConfigBuilder {
     await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
       local,
     })
-
-    return { schema: compiledSchema, graphQLSchema, tinaSchema }
   }
 }
 
