@@ -14,7 +14,12 @@
 import retry from 'async-retry'
 import fs from 'fs-extra'
 
-import { buildSchema, createDatabase, Database } from '@tinacms/graphql'
+import {
+  buildSchema,
+  createDatabase,
+  Database,
+  getASTSchema,
+} from '@tinacms/graphql'
 import {
   AuditFileSystemBridge,
   FilesystemBridge,
@@ -215,7 +220,7 @@ class ConfigBuilder {
     })
 
     // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const { astSchema, graphQLSchema, tinaSchema } = await retry(
+    const { graphQLSchema, tinaSchema } = await retry(
       async () =>
         await buildSchema(rootPath, this.database, [
           'experimentalData',
@@ -223,6 +228,7 @@ class ConfigBuilder {
         ])
     )
 
+    const astSchema = await getASTSchema(this.database)
     await genTypes({ schema: astSchema, usingTs }, () => {}, {
       noSDK,
       verbose,

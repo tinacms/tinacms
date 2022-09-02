@@ -46,8 +46,12 @@ export const buildSchema = async (
     flags,
   })
 
+  return { graphQLSchema, tinaSchema }
+}
+
+export const getASTSchema = async (database: Database) => {
   const gqlAst = await database.getGraphQLSchemaFromBridge()
-  return { astSchema: buildASTSchema(gqlAst), graphQLSchema, tinaSchema }
+  return buildASTSchema(gqlAst)
 }
 
 import type {
