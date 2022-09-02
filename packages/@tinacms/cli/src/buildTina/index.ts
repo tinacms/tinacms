@@ -37,6 +37,8 @@ interface BuildOptions {
   database: Database
   store: Store
   bridge: Bridge
+  /** In some cases (like audit) there's no need to build the SPA */
+  buildFrontend?: boolean
   noWatch?: boolean
   isomorphicGitBridge?: boolean
   verbose?: boolean
@@ -197,6 +199,7 @@ export const auditCmdBuild = async (
     bridge,
     database,
     store,
+    buildFrontend: false,
     ctx: ctx,
   })
   next()
@@ -212,6 +215,7 @@ export const build = async ({
   dev,
   local,
   verbose,
+  buildFrontend = true,
   noSDK,
   skipIndex,
 }: BuildOptions) => {
@@ -259,7 +263,7 @@ export const build = async ({
         local,
       }
     )
-    if (ctx.schema?.config?.build) {
+    if (buildFrontend && ctx.schema?.config?.build) {
       await spin({
         text: 'Building static site',
         waitFor: async () => {

@@ -179,9 +179,17 @@ export const remarkToSlate = (
           case 'thematicBreak':
           case 'table':
           case 'html':
-            throw new Error(`${content.type} inside list item is not supported`)
+            throw new RichTextParseError(
+              `${child.type} inside list item is not supported`,
+              child.position
+            )
           default:
-            throw new Error(`Unknown list item of type ${content.type}`)
+            throw new RichTextParseError(
+              // @ts-expect-error child.type should be 'never'
+              `Unknown list item of type ${child.type}`,
+              // @ts-expect-error child.type should be 'never'
+              child.position
+            )
         }
       }),
     }

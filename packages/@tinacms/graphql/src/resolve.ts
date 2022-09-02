@@ -38,6 +38,7 @@ export const resolve = async ({
   database,
   silenceErrors,
   verbose,
+  isAudit,
 }: {
   config?: GraphQLConfig
   query: string
@@ -45,6 +46,7 @@ export const resolve = async ({
   database: Database
   silenceErrors?: boolean
   verbose?: boolean
+  isAudit?: boolean
 }) => {
   try {
     const verboseValue = verbose ?? true
@@ -59,7 +61,12 @@ export const resolve = async ({
       // @ts-ignore
       flags: tinaConfig?.meta?.flags,
     })) as unknown as TinaSchema
-    const resolver = await createResolver({ config, database, tinaSchema })
+    const resolver = await createResolver({
+      config,
+      database,
+      tinaSchema,
+      isAudit: isAudit || false,
+    })
 
     const res = await graphql({
       schema: graphQLSchema,
