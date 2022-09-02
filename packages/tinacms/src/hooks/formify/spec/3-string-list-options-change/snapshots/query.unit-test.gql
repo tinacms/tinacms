@@ -13,13 +13,15 @@
 query GetBlockPageDocument {
   post(relativePath: "post1.mdx") {
     categories
-    _internalSys: _sys {
-      path
-      relativePath
-      collection {
-        name
+    ... on Document {
+      _internalSys: _sys {
+        path
+        relativePath
+        collection {
+          name
+        }
       }
+      _values
     }
-    _values
   }
 }
