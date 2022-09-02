@@ -22,7 +22,7 @@ import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
-import { buildAdmin } from '../../buildTina'
+import { buildAdmin, ConfigBuilder } from '../../buildTina'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -41,7 +41,13 @@ interface Options {
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 export async function startServer(
-  ctx,
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+  },
   next,
   {
     port = 4001,
