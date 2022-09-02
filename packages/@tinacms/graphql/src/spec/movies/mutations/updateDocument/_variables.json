@@ -31,16 +31,7 @@
           ]
         },
         {
-          "children": [
-            {
-              "children": [
-                {
-                  "text": "let it = “be”"
-                }
-              ],
-              "type": "code_line"
-            }
-          ],
+          "value": "let it = 'be'",
           "lang": "javascript",
           "type": "code_block"
         }

@@ -13,7 +13,7 @@ limitations under the License.
 
 import { resolve } from '@tinacms/graphql'
 import type { Database, TinaCloudCollection } from '@tinacms/graphql'
-import p from 'path'
+import path from 'path'
 import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
@@ -22,94 +22,38 @@ type AuditArgs = {
   collection: TinaCloudCollection
   database: Database
   rootPath: string
+  documents: { node: { path: string } }[]
   useDefaultValues: boolean
+  verbose?: boolean
 }
 export const auditCollection = async (args: AuditArgs) => {
   let warning = false
-  const { collection, database, rootPath } = args
+  const { collection } = args
   logger.info(`Checking collection ${collection.name}`)
-  const query = `query {
-        collection(collection: "${collection.name}") {
-          format
-          documents {
-            edges {
-              node {
-                ...on Document {
-                  _sys {
-                    extension
-                    path
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      `
-  const result = await resolve({
-    database,
-    query,
-    variables: {},
-  })
-  const format = result.data.collection.format
-  const docs = result.data.collection.documents.edges
 
-  // validate file extension
-  docs.forEach((x) => {
-    const node = x.node
-    if (node._sys.extension.replace('.', '') !== format) {
+  const format = collection.format
+  args.documents.forEach((x) => {
+    const docFormat = path.extname(x.node.path)
+    if (docFormat.replace('.', '') !== format) {
       warning = true
       logger.warn(
         chalk.yellowBright(
-          `WARNING: there is a file with extension \`${
-            node._sys.extension
-          }\` but in your schema it is defined to be \`.${format}\`\n\n\location: ${p.join(
-            rootPath,
-            node._sys.path
-          )}`
+          `WARNING: there is a file with extension \`${docFormat}\` but in your schema it is defined to be \`.${format}\`\n\n\location: ${x.node.path}`
         )
       )
     }
   })
-
   return warning
 }
 
 export const auditDocuments = async (args: AuditArgs) => {
-  const { collection, database, rootPath, useDefaultValues } = args
-  const query = `query {
-        collection(collection: "${collection.name}") {
-          format
-          slug
-          documents {
-            edges {
-              node {
-                ...on Document {
-                  _sys {
-                    extension
-                    path
-                    relativePath
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      `
-  const result = await resolve({
-    database,
-    query,
-    variables: {},
-  })
+  const { collection, database, useDefaultValues, documents } = args
   let error = false
-  const documents: any[] = result.data.collection.documents.edges
   for (let i = 0; i < documents.length; i++) {
     const node = documents[i].node
-    const fullPath = p.join(rootPath, node._sys.path)
-    logger.info(`Checking document: ${fullPath}`)
+    const relativePath = node.path.replace(`${collection.path}/`, '')
     const documentQuery = `query {
-        document(collection: "${collection.name}", relativePath: "${node._sys.relativePath}") {
+        document(collection: "${collection.name}", relativePath: "${relativePath}") {
           __typename
           ...on Document {
             _values
@@ -120,30 +64,47 @@ export const auditDocuments = async (args: AuditArgs) => {
       database,
       query: documentQuery,
       variables: {},
+      silenceErrors: true,
+      verbose: args.verbose || false,
+      isAudit: true,
     })
-    const topLevelDefaults = {}
 
-    // TODO: account for when collection is a string
-    if (useDefaultValues && typeof collection.fields !== 'string') {
-      collection.fields
-        .filter((x) => !x.list)
-        .forEach((x) => {
-          const value = x.ui as any
-          if (typeof value !== 'undefined') {
-            topLevelDefaults[x.name] = value.defaultValue
-          }
-        })
-    }
-    const params = transformDocumentIntoMutationRequestPayload(
-      docResult.data.document._values,
-      {
-        includeCollection: true,
-        includeTemplate: typeof collection.templates !== 'undefined',
-      },
-      topLevelDefaults
-    )
+    if (docResult.errors) {
+      error = true
+      docResult.errors.forEach((err) => {
+        logger.error(chalk.red(err.message))
+        // @ts-ignore FIXME: this doesn't seem right
+        if (err.originalError.originalError) {
+          logger.error(
+            // @ts-ignore FIXME: this doesn't seem right
+            chalk.red(`    ${err.originalError.originalError.message}`)
+          )
+        }
+      })
+    } else {
+      const topLevelDefaults = {}
 
-    const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+      // TODO: account for when collection is a string
+      if (useDefaultValues && typeof collection.fields !== 'string') {
+        collection.fields
+          .filter((x) => !x.list)
+          .forEach((x) => {
+            const value = x.ui as any
+            if (typeof value !== 'undefined') {
+              topLevelDefaults[x.name] = value.defaultValue
+            }
+          })
+      }
+      const params = transformDocumentIntoMutationRequestPayload(
+        docResult.data.document._values,
+        {
+          includeCollection: true,
+          includeTemplate: typeof collection.templates !== 'undefined',
+        },
+        topLevelDefaults
+      )
+
+      const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
@@ -151,22 +112,24 @@ export const auditDocuments = async (args: AuditArgs) => {
         ){__typename}
       }`
 
-    const mutationRes = await resolve({
-      database,
-      query: mutation,
-      variables: {
-        params,
-        collection: collection.name,
-        relativePath: node._sys.relativePath,
-      },
-      silenceErrors: true,
-      verbose: true,
-    })
-    if (mutationRes.errors) {
-      mutationRes.errors.forEach((err) => {
-        error = true
-        logger.error(chalk.red(err.message))
+      const mutationRes = await resolve({
+        database,
+        query: mutation,
+        variables: {
+          params,
+          collection: collection.name,
+          relativePath: relativePath,
+        },
+        isAudit: true,
+        silenceErrors: true,
+        verbose: args.verbose || false,
       })
+      if (mutationRes.errors) {
+        mutationRes.errors.forEach((err) => {
+          error = true
+          logger.error(chalk.red(err.message))
+        })
+      }
     }
   }
   return error
