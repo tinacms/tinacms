@@ -42,6 +42,13 @@ export const viteBuild = async ({
 assets/
 vite.svg`
   )
+
+  /**
+   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
+   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
+   * to keep them separate since they run at different times. the compilation step also cleans up after itself
+   * so we can't use it as an artifact for this.
+   */
   const packageJSON = JSON.parse(
     fs.readFileSync(packageJSONFilePath).toString() || '{}'
   )
@@ -50,12 +57,6 @@ vite.svg`
   const peerDeps = packageJSON?.peerDependencies || []
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
-  /**
-   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
-   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
-   * to keep them separate since they run at different times. the compilation step also cleans up after itself
-   * so we can't use it as an artifact for this.
-   */
   const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
   await esbuild({
     bundle: true,
@@ -77,7 +78,6 @@ vite.svg`
     // For some reason this is breaking the React runtime in the end user's application.
     // Not sure what's going on but `development` works for now.
     mode: local ? 'development' : 'production',
-    // mode: 'development',
     plugins: [react(), viteTina()],
     define: {
       'process.env': {},

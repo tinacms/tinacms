@@ -187,7 +187,7 @@ export const auditCmdBuild = async (
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
-    'bridge' | 'database' | 'store' | 'buildFrontend'
+    'bridge' | 'database' | 'store'
   >
 ) => {
   const { graphQLSchema, tinaSchema } = await ctx.builder.build({
