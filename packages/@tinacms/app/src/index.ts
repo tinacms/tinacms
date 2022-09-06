@@ -21,13 +21,11 @@ import type { Loader } from 'esbuild'
 
 export const viteBuild = async ({
   rootPath,
-  watch,
   outputFolder,
   publicFolder,
   local,
 }: {
   local: boolean
-  watch: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
@@ -35,7 +33,6 @@ export const viteBuild = async ({
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
   const packageJSONFilePath = path.join(rootPath, 'package.json')
-  // const pathToTsConfig = path.join(rootPath, 'tsconfig.json')
   const outDir = path.join(rootPath, publicFolder, outputFolder)
   await fs.emptyDir(outDir)
   await fs.ensureDir(outDir)
@@ -45,7 +42,6 @@ export const viteBuild = async ({
 assets/
 vite.svg`
   )
-  // const configFile = `${pathToConfig}.ts`
   const packageJSON = JSON.parse(
     fs.readFileSync(packageJSONFilePath).toString() || '{}'
   )
@@ -54,6 +50,12 @@ vite.svg`
   const peerDeps = packageJSON?.peerDependencies || []
   const devDeps = packageJSON?.devDependencies || []
   const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
+  /**
+   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
+   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
+   * to keep them separate since they run at different times. the compilation step also cleans up after itself
+   * so we can't use it as an artifact for this.
+   */
   const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
   await esbuild({
     bundle: true,
@@ -74,12 +76,10 @@ vite.svg`
     base,
     // For some reason this is breaking the React runtime in the end user's application.
     // Not sure what's going on but `development` works for now.
-    // mode: watch ? 'development' : 'production',
-    mode: 'development',
+    mode: local ? 'development' : 'production',
+    // mode: 'development',
     plugins: [react(), viteTina()],
     define: {
-      global: {},
-      'process.platform': null,
       'process.env': {},
     },
     server: {
@@ -109,17 +109,8 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (watch) {
-    const indexDev = await fs
-      .readFileSync(path.join(root, 'index.dev.html'))
-      .toString()
-    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
-    const server = await createServer(config)
-    await server.listen()
-    await server.printUrls()
-  } else {
-    await build(config)
-  }
+  await build(config)
+  await fs.rmSync(out)
 }
 
 const loaders: { [ext: string]: Loader } = {
