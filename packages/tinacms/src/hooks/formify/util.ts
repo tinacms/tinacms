@@ -159,9 +159,15 @@ export const buildForm = (
   showInSidebar: boolean = false,
   onSubmit?: (args: onSubmitArgs) => void
 ): Form => {
+  const id = doc._internalSys.path
+  const enrichedSchema: TinaSchema = cms.api.tina.schema
+  const collection = enrichedSchema.getCollection(
+    doc._internalSys.collection.name
+  )
   const { createForm, createGlobalForm } = generateFormCreators(
     cms,
-    showInSidebar
+    showInSidebar,
+    collection.ui?.global
   )
   const SKIPPED = 'SKIPPED'
   let form
@@ -171,11 +177,6 @@ export const buildForm = (
   }
   if (skipped) return
 
-  const id = doc._internalSys.path
-  const enrichedSchema: TinaSchema = cms.api.tina.schema
-  const collection = enrichedSchema.getCollection(
-    doc._internalSys.collection.name
-  )
   const template = enrichedSchema.getTemplateForData({
     collection,
     data: doc._values,

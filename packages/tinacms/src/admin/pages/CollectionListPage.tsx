@@ -94,7 +94,10 @@ const TemplateMenu = ({ templates }: { templates: Template[] }) => {
 const handleNavigate = (
   navigate: NavigateFunction,
   cms: TinaCMS,
+  // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
   collection: Collection,
+  // The actual Collection definition
+  collectionDefinition: TinaCloudCollection<true>,
   document: DocumentSys
 ) => {
   /**
@@ -106,7 +109,12 @@ const handleNavigate = (
   /**
    * Determine if the document has a route mapped
    */
-  const routeOverride = routeMapping
+  const routeOverride = collectionDefinition.ui?.router
+    ? collectionDefinition.ui?.router({
+        document,
+        collection: collectionDefinition,
+      })
+    : routeMapping
     ? routeMapping.mapper(collection, document)
     : undefined
 
@@ -181,6 +189,9 @@ const CollectionListPage = () => {
               const fields = collectionExtra.fields?.filter((x) =>
                 // only allow sortable fields
                 ['string', 'number', 'datetime', 'boolean'].includes(x.type)
+              )
+              const collectionDefinition = cms.api.tina.schema.getCollection(
+                collection.name
               )
 
               return (
@@ -313,6 +324,7 @@ const CollectionListPage = () => {
                                             navigate,
                                             cms,
                                             collection,
+                                            collectionDefinition,
                                             document.node
                                           )
                                         }}
