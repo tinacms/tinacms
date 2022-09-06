@@ -24,6 +24,7 @@ import { logger } from '../../logger'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import { Telemetry } from '@tinacms/metrics'
+import { neutralText } from '../../utils/theme'
 
 const rootPath = process.cwd()
 
@@ -63,27 +64,29 @@ export const audit = async (ctx: any, next: () => void, options) => {
   const database = ctx.database
   const schema = await database.getSchema()
   const collections = schema.getCollections()
-  let warning = false
   let error = false
 
   for (let i = 0; i < collections.length; i++) {
     const collection = collections[i]
-    const returnWarning = await auditCollection({
-      collection,
-      database,
-      rootPath,
-      useDefaultValues: options.useDefaultValues,
-    })
+    // Not a huge fan of querying the database from outside of GraphQL
+    // but this allows us to return the list of items unhydrated, so errors
+    // in a single document don't cause the entire list query to fail
+    const docs = await database.query(
+      { collection: collection.name, first: -1, filterChain: [] },
+      (item) => ({ path: item })
+    )
+    logger.info(`Checking ${neutralText(collection.name)} collection`)
+
     const returnError = await auditDocuments({
       collection,
       database,
       rootPath,
       useDefaultValues: options.useDefaultValues,
+      documents: docs.edges,
+      verbose: ctx.verbose,
     })
-    warning = warning || returnWarning
     error = error || returnError
   }
-  ctx.warning = warning
   ctx.error = error
 
   next()

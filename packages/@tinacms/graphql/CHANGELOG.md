@@ -1,5 +1,20 @@
 # tina-graphql
 
+## 0.63.5
+
+### Patch Changes
+
+- 2b60a7bd8: Improve audit so that it doesn't throw errors during the file list process. Also adds support for `--verbose` argument during `audit`.
+- Updated dependencies [2b60a7bd8]
+  - @tinacms/mdx@0.61.4
+
+## 0.63.4
+
+### Patch Changes
+
+- Updated dependencies [1fc0e339e]
+  - @tinacms/datalayer@0.2.3
+
 ## 0.63.3
 
 ### Patch Changes

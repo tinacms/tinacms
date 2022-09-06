@@ -17,12 +17,12 @@ import chokidar from 'chokidar'
 
 import { Telemetry } from '@tinacms/metrics'
 
-import { build } from '../../buildTina'
 import { AsyncLock } from './lock'
 import { dangerText } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
-import type { Bridge, Database, Store } from '@tinacms/graphql'
+import type { Bridge, Database } from '@tinacms/graphql'
+import { buildAdmin, ConfigBuilder } from '../../buildTina'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -30,8 +30,6 @@ interface Options {
   port?: number
   command?: string
   watchFolders?: string[]
-  experimentalData?: boolean
-  isomorphicGitBridge?: boolean
   noWatch?: boolean
   noSDK: boolean
   noTelemetry: boolean
@@ -43,18 +41,22 @@ interface Options {
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 export async function startServer(
-  ctx,
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+  },
   next,
   {
     port = 4001,
     noWatch,
-    isomorphicGitBridge,
     noSDK,
     noTelemetry,
     watchFolders,
     verbose,
     dev,
-    local,
   }: Options
 ) {
   buildLock.disable()
@@ -69,7 +71,6 @@ export async function startServer(
   })
   const bridge: Bridge = ctx.bridge
   const database: Database = ctx.database
-  const store: Store = ctx.store
 
   // This is only false for tina-cloud media stores
   const shouldBuild = bridge.supportsBuilding()
@@ -156,6 +157,36 @@ export async function startServer(
     })
   }
 
+  const build = async () => {
+    try {
+      await beforeBuild()
+      const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
+        rootPath: ctx.rootPath,
+        dev,
+        verbose,
+      })
+
+      await ctx.builder.genTypedClient({
+        compiledSchema: schema,
+        local: true,
+        noSDK,
+        verbose,
+        usingTs: ctx.usingTs,
+      })
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
+      await buildAdmin({
+        local: true,
+        rootPath: ctx.rootPath,
+        schema,
+      })
+    } catch (error) {
+      throw error
+    } finally {
+      await afterBuild()
+    }
+  }
+
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
   if (!noWatch && !process.env.CI) {
     chokidar
@@ -177,21 +208,7 @@ export async function startServer(
         if (verbose) console.log('Generating Tina config')
         try {
           if (shouldBuild) {
-            await build({
-              bridge,
-              ctx,
-              database,
-              store,
-              dev,
-              buildFrontend: true,
-              isomorphicGitBridge,
-              local: true,
-              noSDK,
-              noWatch,
-              verbose,
-              beforeBuild,
-              afterBuild,
-            })
+            await build()
           }
           ready = true
           isReady = true
@@ -212,21 +229,7 @@ export async function startServer(
           logger.info('Tina change detected, regenerating config')
           try {
             if (shouldBuild) {
-              await build({
-                bridge,
-                ctx,
-                database,
-                store,
-                dev,
-                buildFrontend: true,
-                isomorphicGitBridge,
-                local: true,
-                noSDK,
-                noWatch,
-                verbose,
-                beforeBuild,
-                afterBuild,
-              })
+              await build()
             }
             if (isReady) {
               await restart()
@@ -249,21 +252,7 @@ export async function startServer(
       logger.info('Detected CI environment, omitting watch commands...')
     }
     if (shouldBuild) {
-      await build({
-        bridge,
-        ctx,
-        database,
-        store,
-        dev,
-        isomorphicGitBridge,
-        local: true,
-        buildFrontend: true,
-        noSDK,
-        noWatch,
-        verbose,
-        beforeBuild,
-        afterBuild,
-      })
+      await build()
     }
     await start()
     next()

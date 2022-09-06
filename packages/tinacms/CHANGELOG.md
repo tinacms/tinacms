@@ -1,5 +1,20 @@
 # tinacms
 
+## 0.69.4
+
+### Patch Changes
+
+- 5029265ed: Fixes an issue where collections which used `templates` would error on the admin list page due to the recent addition of filters. Filters will only work for collections with `fields` at this time
+- 2b60a7bd8: Fix handling of formify for template collections when `...on Document` is used
+
+## 0.69.3
+
+### Patch Changes
+
+- 0ad8075aa: Errors are now blocking modals.
+- Updated dependencies [0ad8075aa]
+  - @tinacms/toolkit@0.57.2
+
 ## 0.69.2
 
 ### Patch Changes

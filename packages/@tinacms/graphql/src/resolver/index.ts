@@ -38,11 +38,13 @@ import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
+import { GraphQLError } from 'graphql'
 
 interface ResolverConfig {
   config?: GraphQLConfig
   database: Database
   tinaSchema: TinaSchema
+  isAudit: boolean
 }
 
 export const createResolver = (args: ResolverConfig) => {
@@ -57,10 +59,12 @@ export class Resolver {
   public config: GraphQLConfig
   public database: Database
   public tinaSchema: TinaSchema
+  public isAudit: boolean
   constructor(public init: ResolverConfig) {
     this.config = init.config
     this.database = init.database
     this.tinaSchema = init.tinaSchema
+    this.isAudit = init.isAudit
   }
   public resolveCollection = async (
     args,
@@ -125,6 +129,7 @@ export class Resolver {
         throw new TinaParseDocumentError({
           originalError: e,
           collection: collection.name,
+          includeAuditMessage: !this.isAudit,
           file: relativePath,
           stack: e.stack,
         })
@@ -750,6 +755,18 @@ export class Resolver {
             this.tinaSchema.schema
           )
         )
+        if (tree?.children[0]?.type === 'invalid_markdown') {
+          if (this.isAudit) {
+            const invalidNode = tree?.children[0]
+            throw new GraphQLError(
+              `${invalidNode?.message}${
+                invalidNode.position
+                  ? ` at line ${invalidNode.position.start.line}, column ${invalidNode.position.start.column}`
+                  : ''
+              }`
+            )
+          }
+        }
         accumulator[field.name] = tree
         break
       case 'object':
