@@ -62,11 +62,44 @@ export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
 
 type FormatType = 'json' | 'md' | 'markdown' | 'mdx'
 
+type Document = {
+  _sys: {
+    title?: string
+    template: string
+    breadcrumbs: string[]
+    path: string
+    basename: string
+    relativePath: string
+    filename: string
+    extension: string
+  }
+}
+
 interface BaseCollection {
   label?: string
   name: string
   path: string
   format?: FormatType
+  ui?: {
+    /**
+     * Forms for this collection will be editable from the global sidebar rather than the form panel
+     */
+    global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
+    /**
+     * Provide the path that your document is viewable on your site
+     *
+     * eg:
+     * ```ts
+     * router: ({ document }) => {
+     *   return `blog-posts/${document._sys.filename}`;
+     * }
+     * ```
+     */
+    router?: (args: {
+      document: Document
+      collection: TinaCloudCollection<true>
+    }) => string
+  }
   match?: string
 }
 
