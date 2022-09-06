@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import { TinaCMS, useCMS } from '@tinacms/toolkit'
+import { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
