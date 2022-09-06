@@ -27,22 +27,7 @@ import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
 import { Database } from './database'
 
-/**
- *
- * This will build the files (_schema.json, _lookup.json, _graphQL.json)
- */
-// @ts-ignore: FIXME: check that cloud schema is what it says it is
-export const indexDB = async (args: {
-  database: Database
-  config: TinaSchema['config']
-  flags?: string[]
-  buildSDK?: boolean
-}) => {
-  const { graphQLSchema, tinaSchema } = await buildFiles(args)
-  await args.database.indexContent({ graphQLSchema, tinaSchema })
-}
-
-export const buildFiles = async ({
+export const buildDotTinaFiles = async ({
   database,
   config,
   flags = [],

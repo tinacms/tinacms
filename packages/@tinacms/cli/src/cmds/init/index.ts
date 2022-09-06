@@ -187,7 +187,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
       TinaProviderPath,
       TinaProvider.replace(
         /'\.\.\/schema\.ts'/,
-        `'../schema.${_ctx.schemaFileType || 'ts'}'`
+        `'../schema.${_ctx.usingTs ? 'ts' : 'js'}'`
       )
     )
     fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)

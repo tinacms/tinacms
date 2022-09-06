@@ -14,40 +14,37 @@
 import retry from 'async-retry'
 import fs from 'fs-extra'
 
-import { Bridge, buildSchema, createDatabase, Database } from '@tinacms/graphql'
+import {
+  buildSchema,
+  createDatabase,
+  Database,
+  getASTSchema,
+} from '@tinacms/graphql'
 import {
   AuditFileSystemBridge,
   FilesystemBridge,
   IsomorphicBridge,
   LevelStore,
-  Store,
 } from '@tinacms/datalayer'
 import path from 'path'
 
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
-import type { GraphQLSchema } from 'graphql'
 import { viteBuild } from '@tinacms/app'
-import { logger } from '../logger'
 import { spin } from '../utils/spinner'
+import { isProjectTs } from './attachPath'
+
+interface ClientGenOptions {
+  noSDK?: boolean
+  local?: boolean
+  verbose?: boolean
+}
 
 interface BuildOptions {
-  ctx: any
-  database: Database
-  store: Store
-  bridge: Bridge
-  /** In some cases (like audit) there's no need to build the SPA */
-  buildFrontend?: boolean
-  noWatch?: boolean
-  isomorphicGitBridge?: boolean
-  verbose?: boolean
   dev?: boolean
-  local?: boolean
-  noSDK?: boolean
-  beforeBuild?: () => Promise<any>
-  afterBuild?: () => Promise<any>
-  skipIndex?: boolean
+  verbose?: boolean
+  rootPath?: string
 }
 
 interface BuildSetupOptions {
@@ -61,7 +58,7 @@ export const buildSetupCmdBuild = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database, store } = await buildSetup({
+  const { bridge, database } = await buildSetup({
     ...opts,
     rootPath,
     useMemoryStore: true,
@@ -69,7 +66,7 @@ export const buildSetupCmdBuild = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
@@ -80,7 +77,7 @@ export const buildSetupCmdServerStart = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database, store } = await buildSetup({
+  const { bridge, database } = await buildSetup({
     ...opts,
     rootPath,
     useMemoryStore: false,
@@ -88,7 +85,7 @@ export const buildSetupCmdServerStart = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
@@ -109,14 +106,13 @@ export const buildSetupCmdAudit = async (
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.store = store
+  ctx.builder = new ConfigBuilder(database)
 
   next()
 }
 
 const buildSetup = async ({
   isomorphicGitBridge,
-  experimentalData,
   rootPath,
   useMemoryStore,
 }: BuildSetupOptions & {
@@ -159,129 +155,136 @@ const buildSetup = async ({
 }
 
 export const buildCmdBuild = async (
-  ctx: any,
+  ctx: { builder: ConfigBuilder; rootPath: string; usingTs: boolean },
   next: () => void,
   options: Omit<
-    BuildOptions & BuildSetupOptions,
+    BuildOptions & BuildSetupOptions & ClientGenOptions,
     'bridge' | 'database' | 'store'
   >
 ) => {
-  const bridge: Bridge = ctx.bridge
-  const database: Database = ctx.database
-  const store: Store = ctx.store
   // always skip indexing in the "build" command
-  await build({
+  const { schema } = await ctx.builder.build({
+    rootPath: ctx.rootPath,
     ...options,
-    bridge,
-    database,
-    store,
-    ctx: ctx,
-    skipIndex: true,
+  })
+  await ctx.builder.genTypedClient({
+    compiledSchema: schema,
+    local: options.local,
+    noSDK: options.noSDK,
+    verbose: options.verbose,
+    usingTs: ctx.usingTs,
+  })
+  await buildAdmin({
+    local: options.local,
+    rootPath: ctx.rootPath,
+    schema,
   })
   next()
 }
 
 export const auditCmdBuild = async (
-  ctx: any,
+  ctx: { builder: ConfigBuilder; rootPath: string; database: Database },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
     'bridge' | 'database' | 'store'
   >
 ) => {
-  const bridge: Bridge = ctx.bridge
-  const database: Database = ctx.database
-  const store: Store = ctx.store
-  await build({
+  const { graphQLSchema, tinaSchema } = await ctx.builder.build({
+    rootPath: ctx.rootPath,
     ...options,
-    local: true,
     verbose: true,
-    bridge,
-    database,
-    store,
-    buildFrontend: false,
-    ctx: ctx,
   })
+
+  await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
   next()
 }
-export const build = async ({
-  noWatch,
-  ctx,
-  bridge,
-  database,
-  store,
-  beforeBuild,
-  afterBuild,
-  dev,
-  local,
-  verbose,
-  buildFrontend = true,
-  noSDK,
-  skipIndex,
-}: BuildOptions) => {
-  const rootPath = ctx.rootPath as string
 
-  if (!rootPath) {
-    throw new Error('Root path has not been attached')
-  }
-  const tinaGeneratedPath = path.join(rootPath, '.tina', '__generated__')
+export class ConfigBuilder {
+  constructor(private database: Database) {}
 
-  // Clear the cache of the DB passed to the GQL server
-  database.clearCache()
+  async build({ dev, verbose, rootPath }: BuildOptions) {
+    const usingTs = await isProjectTs(rootPath)
 
-  if (beforeBuild) {
-    await beforeBuild()
-  }
+    if (!rootPath) {
+      throw new Error('Root path has not been attached')
+    }
+    const tinaGeneratedPath = path.join(rootPath!, '.tina', '__generated__')
 
-  try {
+    // Clear the cache of the DB passed to the GQL server
+    this.database.clearCache()
+
     await fs.mkdirp(tinaGeneratedPath)
-    await store.close()
+    await this.database.store.close()
     await resetGeneratedFolder({
       tinaGeneratedPath,
-      usingTs: ctx.usingTs,
+      usingTs,
     })
-    await store.open()
-    const cliFlags = []
-    // always enable experimentalData and isomorphicGitBridge on the  backend
-    cliFlags.push('experimentalData')
-    cliFlags.push('isomorphicGitBridge')
-    const database = await createDatabase({ store, bridge })
-    await compileSchema(ctx, null, { verbose, dev })
+    await this.database.store.open()
+
+    const compiledSchema = await compileSchema({
+      verbose,
+      dev,
+      rootPath,
+    })
 
     // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const schema: GraphQLSchema = await retry(
-      async () => await buildSchema(rootPath, database, cliFlags, skipIndex)
+    const { graphQLSchema, tinaSchema } = await retry(
+      async () =>
+        await buildSchema(rootPath, this.database, [
+          'experimentalData',
+          'isomorphicGitBridge',
+        ])
     )
-    await genTypes({ schema, usingTs: ctx.usingTs }, () => {}, {
+
+    return { schema: compiledSchema, graphQLSchema, tinaSchema }
+  }
+
+  async genTypedClient({
+    usingTs,
+    compiledSchema,
+    noSDK,
+    verbose,
+    local,
+  }: ClientGenOptions & {
+    usingTs: boolean
+    compiledSchema: any
+  }) {
+    const astSchema = await getASTSchema(this.database)
+
+    await genTypes({ schema: astSchema, usingTs }, () => {}, {
       noSDK,
       verbose,
     })
-    await genClient(
-      { tinaSchema: ctx.schema, usingTs: ctx.usingTs },
-      () => {},
-      {
-        local,
-      }
-    )
-    if (buildFrontend && ctx.schema?.config?.build) {
-      await spin({
-        text: 'Building static site',
-        waitFor: async () => {
-          await viteBuild({
-            local,
-            rootPath,
-            outputFolder: ctx.schema?.config?.build?.outputFolder as string,
-            publicFolder: ctx.schema?.config?.build?.publicFolder as string,
-          })
-        },
-      })
-      console.log('\nDone building static site')
-    }
-  } catch (error) {
-    throw error
-  } finally {
-    if (afterBuild) {
-      await afterBuild()
-    }
+
+    await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
+      local,
+    })
+  }
+}
+
+export const buildAdmin = async ({
+  schema,
+  local,
+  rootPath,
+}: {
+  schema: any
+  local: boolean
+  rootPath: string
+}) => {
+  if (schema?.config?.build) {
+    await spin({
+      text: 'Building static site',
+      waitFor: async () => {
+        await viteBuild({
+          local,
+          rootPath,
+          outputFolder: schema?.config?.build?.outputFolder as string,
+          publicFolder: schema?.config?.build?.publicFolder as string,
+        })
+      },
+    })
+    console.log('\nDone building static site')
   }
 }

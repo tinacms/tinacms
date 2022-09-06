@@ -17,10 +17,15 @@ import path from 'path'
 export const attachPath = async (ctx: any, next: () => void, _options: any) => {
   ctx.rootPath = process.cwd()
 
-  const tinaPath = path.join(ctx.rootPath, '.tina')
+  ctx.usingTs = await isProjectTs(ctx.rootPath)
+  next()
+}
 
-  ctx.usingTs =
+export const isProjectTs = async (rootPath: string) => {
+  const tinaPath = path.join(rootPath, '.tina')
+
+  return (
     (await pathExists(path.join(tinaPath, 'schema.ts'))) ||
     (await pathExists(path.join(tinaPath, 'schema.tsx')))
-  next()
+  )
 }
