@@ -65,6 +65,11 @@ const BlocksTemplate: TinaTemplate = {
 };
 
 const schema = defineSchema({
+  // FIXME: right now this needs to be defined here
+  // and in config.ts when using static build mode.
+  // This is because for the backend we're transforming things
+  // like `config.media` to be present on `schema`, but not before
+  // passing it into TinaCMS.
   config: {
     build: {
       outputFolder: "tina",
@@ -74,12 +79,6 @@ const schema = defineSchema({
     clientId: "foobar",
     token: "foo",
     media: {
-      // If you wanted cloudinary do this
-      // loadCustomStore: async () => {
-      //   const pack = await import("next-tinacms-cloudinary");
-      //   return pack.TinaCloudCloudinaryMediaStore;
-      // },
-      // this is the config for the tina cloud media store
       tina: {
         publicFolder: "public",
         mediaRoot: "",
@@ -90,8 +89,13 @@ const schema = defineSchema({
     {
       label: "Blog Posts",
       name: "posts",
-      path: "content/post",
+      path: "content/posts",
       format: "mdx",
+      ui: {
+        router: ({ document, collection }) => {
+          return `/${collection.name}/${document._sys.filename}`;
+        },
+      },
       fields: [
         {
           label: "3 layer nesting",
@@ -251,6 +255,9 @@ const schema = defineSchema({
       label: "Global",
       name: "global",
       path: "content/global",
+      ui: {
+        global: true
+      },
       format: "json",
       fields: [
         {
@@ -462,6 +469,17 @@ const schema = defineSchema({
       label: "Pages",
       name: "pages",
       path: "content/pages",
+      ui: {
+        router: ({ document }) => {
+          if (document._sys.filename === "home") {
+            return "/";
+          }
+          if (document._sys.filename === "about") {
+            return `/about`;
+          }
+          return undefined;
+        },
+      },
       fields: [
         {
           type: "object",
@@ -484,54 +502,3 @@ const schema = defineSchema({
 });
 
 export default schema;
-
-export const tinaConfig = defineConfig({
-  client,
-  schema,
-  // Can add this back in if we want to use the cloudinary media store
-  // mediaStore: async () => {
-  //   const pack = await import("next-tinacms-cloudinary");
-  //   return pack.TinaCloudCloudinaryMediaStore;
-  // },
-  cmsCallback: (cms) => {
-    /**
-     * Enables experimental branch switcher
-     */
-    cms.flags.set("branch-switcher", true);
-
-    // cms.sidebar.position = "overlay";
-    // cms.sidebar.defaultState = "closed";
-    // cms.sidebar.renderNav = false;
-
-    /**
-     * When `tina-admin` is enabled, this plugin configures contextual editing for collections
-     */
-    import("tinacms").then(({ RouteMappingPlugin }) => {
-      const RouteMapping = new RouteMappingPlugin((collection, document) => {
-        if (["authors", "global"].includes(collection.name)) {
-          return undefined;
-        }
-        if (["pages"].includes(collection.name)) {
-          if (document._sys.filename === "home") {
-            return `/`;
-          }
-          if (document._sys.filename === "about") {
-            return `/about`;
-          }
-          return undefined;
-        }
-        return `/${collection.name}/${document._sys.filename}`;
-      });
-      cms.plugins.add(RouteMapping);
-    });
-
-    return cms;
-  },
-  formifyCallback: ({ formConfig, createForm, createGlobalForm }) => {
-    if (formConfig.id === "content/global/index.json") {
-      return createGlobalForm(formConfig);
-    }
-
-    return createForm(formConfig);
-  },
-});
