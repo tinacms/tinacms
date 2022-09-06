@@ -329,6 +329,35 @@ mutation addPendingDocumentMutation(
     return jsonRes
   }
 
+  async fetchEvents(
+    limit?: number,
+    cursor?: string
+  ): Promise<{
+    events: {
+      message: string
+      timestamp: number
+      id: string
+      isError: boolean
+      isGlobal: boolean
+    }[]
+    cursor?: string
+  }> {
+    if (this.isLocalMode) {
+      return {
+        events: [],
+      }
+    } else {
+      return (
+        await this.fetchWithToken(
+          `${this.contentApiBase}/events/${this.clientId}/${
+            this.branch
+          }?limit=${limit || 1}${cursor ? `&cursor=${cursor}` : ''}`,
+          { method: 'GET' }
+        )
+      ).json()
+    }
+  }
+
   parseJwt(token) {
     const base64Url = token.split('.')[1]
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')

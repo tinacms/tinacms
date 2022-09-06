@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.2
+
+### Patch Changes
+
+- 0ad8075aa: Errors are now blocking modals.
+
 ## 0.57.1
 
 ### Patch Changes

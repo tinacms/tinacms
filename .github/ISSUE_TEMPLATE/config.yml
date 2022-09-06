@@ -1,7 +1,10 @@
 contact_links:
-  - name: Website Issues
+  - name: Tina.io Website Issues 📖
     url: https://github.com/tinacms/tinacms.org/issues/new
-    about: If you're reporting on our website, blog, or documentation please visit the tinacms.org repository.
-  - name: Questions
+    about: If you're reporting on Tina.io's website, blog, or documentation please visit the tina.io repository.
+  - name: Feature Request 💡
+    url: https://github.com/tinacms/tinacms/discussions/new
+    about: Suggest a new idea for the project.
+  - name: Questions ❓
     url: https://community.tinacms.org/
     about: Looking for advice on how to use TinaCMS? Ask a question on our forum!

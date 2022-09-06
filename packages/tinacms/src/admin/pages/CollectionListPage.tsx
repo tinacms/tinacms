@@ -183,7 +183,7 @@ const CollectionListPage = () => {
               const pageInfo = collection.documents.pageInfo
               const fields = collectionExtra.fields?.filter((x) =>
                 // only allow sortable fields
-                ['string', 'number', 'datetime'].includes(x.type)
+                ['string', 'number', 'datetime', 'boolean'].includes(x.type)
               )
 
               return (
@@ -218,7 +218,7 @@ const CollectionListPage = () => {
                               : collection.name}
                           </h3>
 
-                          {fields.length > 0 && (
+                          {fields?.length > 0 && (
                             <div className="flex gap-2 items-center">
                               <label
                                 htmlFor="sort"

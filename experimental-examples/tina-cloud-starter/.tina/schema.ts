@@ -90,7 +90,7 @@ const schema = defineSchema({
     {
       label: "Blog Posts",
       name: "posts",
-      path: "content/posts",
+      path: "content/post",
       format: "mdx",
       fields: [
         {

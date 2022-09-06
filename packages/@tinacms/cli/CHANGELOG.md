@@ -1,5 +1,29 @@
 # tinacms-cli
 
+## 0.61.9
+
+### Patch Changes
+
+- 2b60a7bd8: Improve audit so that it doesn't throw errors during the file list process. Also adds support for `--verbose` argument during `audit`.
+- Updated dependencies [2b60a7bd8]
+  - @tinacms/graphql@0.63.5
+  - @tinacms/app@0.0.9
+
+## 0.61.8
+
+### Patch Changes
+
+- b1f141e66: Fixes an issue where JSX inside the tina schema would break compilation for users using a later version of esbuild.
+  - @tinacms/app@0.0.8
+
+## 0.61.7
+
+### Patch Changes
+
+- Updated dependencies [1fc0e339e]
+  - @tinacms/datalayer@0.2.3
+  - @tinacms/graphql@0.63.4
+
 ## 0.61.6
 
 ### Patch Changes

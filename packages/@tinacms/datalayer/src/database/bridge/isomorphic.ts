@@ -23,6 +23,7 @@ import type { Bridge } from './index'
 import globParent from 'glob-parent'
 import normalize from 'normalize-path'
 import { GraphQLError } from 'graphql'
+import { dirname } from 'path'
 
 const flat =
   typeof Array.prototype.flat === 'undefined'
@@ -196,8 +197,18 @@ export class IsomorphicBridge implements Bridge {
     const result = await git.walk({
       ...this.isomorphicConfig,
       map: async (filepath, [head]) => {
-        if ((head as any)._fullpath === '.' || path.startsWith(filepath)) {
+        if ((head as any)._fullpath === '.') {
           return head
+        }
+        if (path.startsWith(filepath)) {
+          if (dirname(path) === dirname(filepath)) {
+            if (path === filepath) {
+              // same parent directory so this is the entry
+              return head
+            }
+          } else {
+            return head
+          }
         }
       },
       cache: this.cache,
