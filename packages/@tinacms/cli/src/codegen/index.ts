@@ -34,73 +34,49 @@ export const generateTypes = async (
   }
 ) => {
   if (options.verbose) logger.info('Generating types...')
-  try {
-    let docs = []
-    let fragDocs = []
 
-    // Load GQL queries from user queries folder
-    try {
-      if (!options.noSDK) {
-        docs = await loadDocuments(queryPathGlob, {
-          loaders: [new GraphQLFileLoader()],
-        })
-      }
-    } catch (e) {
-      let showErrorMessage = true
-      const message: string = e.message || ''
-      if (
-        message.includes(
-          'Unable to find any GraphQL type definitions for the following pointers:'
-        )
-      ) {
-        showErrorMessage = false
-      }
-      if (showErrorMessage) {
-        console.error(e)
-      }
-    }
+  let docs = []
+  let fragDocs = []
 
-    // Load fragments from generated document
-    try {
-      if (!options.noSDK) {
-        fragDocs = await loadDocuments(fragDocPath, {
-          loaders: [new GraphQLFileLoader()],
-        })
-      }
-    } catch (error) {
-      console.error(error)
-    }
-
-    // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
-    const res = await codegen({
-      // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
-      filename: process.cwd(),
-      schema: parse(printSchema(schema)),
-      documents: [...docs, ...fragDocs],
-      config: {},
-      plugins: [
-        { typescript: {} },
-        { typescriptOperations: {} },
-        {
-          typescriptSdk: {},
-        },
-        { AddGeneratedClient: {} },
-      ],
-      pluginMap: {
-        typescript: {
-          plugin: typescriptPlugin,
-        },
-        typescriptOperations: {
-          plugin: typescriptOperationsPlugin,
-        },
-        typescriptSdk: {
-          plugin: typescriptSdkPlugin,
-        },
-        AddGeneratedClient,
-      },
+  if (!options.noSDK) {
+    docs = await loadDocuments(queryPathGlob, {
+      loaders: [new GraphQLFileLoader()],
     })
-    return res
-  } catch (e) {
-    console.error(e)
   }
+
+  if (!options.noSDK) {
+    fragDocs = await loadDocuments(fragDocPath, {
+      loaders: [new GraphQLFileLoader()],
+    })
+  }
+
+  // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
+  const res = await codegen({
+    // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
+    filename: process.cwd(),
+    schema: parse(printSchema(schema)),
+    documents: [...docs, ...fragDocs],
+    config: {},
+    plugins: [
+      { typescript: {} },
+      { typescriptOperations: {} },
+      {
+        typescriptSdk: {},
+      },
+      { AddGeneratedClient: {} },
+    ],
+    pluginMap: {
+      typescript: {
+        plugin: typescriptPlugin,
+      },
+      typescriptOperations: {
+        plugin: typescriptOperationsPlugin,
+      },
+      typescriptSdk: {
+        plugin: typescriptSdkPlugin,
+      },
+      AddGeneratedClient,
+    },
+  })
+  return res
 }
