@@ -20,6 +20,9 @@ export function addNamespaceToSchema<T extends object | string>(
   if (typeof maybeNode === 'boolean') {
     return maybeNode
   }
+  if (typeof maybeNode === 'function') {
+    return maybeNode
+  }
 
   // @ts-ignore
   const newNode: {
