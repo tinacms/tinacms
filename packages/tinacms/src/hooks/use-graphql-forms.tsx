@@ -108,11 +108,23 @@ const transformParams = (data: unknown) => {
   }
 }
 
-export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
+export const generateFormCreators = (
+  cms: TinaCMS,
+  showInSidebar?: boolean,
+  global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
+) => {
   const createForm = (formConfig) => {
     const form = new Form(formConfig)
     if (showInSidebar) {
-      cms.forms.add(form)
+      if (global) {
+        const options =
+          typeof global === 'boolean'
+            ? [null, 'fullscreen']
+            : [global.icon, global.layout]
+        cms.plugins.add(new GlobalFormPlugin(form, ...options))
+      } else {
+        cms.forms.add(form)
+      }
     }
     return form
   }
