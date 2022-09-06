@@ -255,7 +255,9 @@ const schema = defineSchema({
       label: "Global",
       name: "global",
       path: "content/global",
-      ui: true,
+      ui: {
+        global: true
+      },
       format: "json",
       fields: [
         {
