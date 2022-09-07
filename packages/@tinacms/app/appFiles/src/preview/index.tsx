@@ -37,7 +37,6 @@ export const Preview = (props) => {
       }),
     []
   )
-  cms.flags.set('tina-preview', true)
 
   const [state, send] = useMachine(machine)
   const ref = React.useRef<HTMLIFrameElement>(null)

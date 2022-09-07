@@ -73,6 +73,11 @@ const schema = defineSchema({
       name: 'post',
       path: 'content/post',
       format: 'md',
+      ui: {
+        router: ({ document }) => {
+          return `/posts/${document._sys.filename}`
+        },
+      },
       fields: [
         {
           type: 'string',
