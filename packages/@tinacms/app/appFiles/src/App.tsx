@@ -21,7 +21,7 @@ import config from 'TINA_IMPORT'
 
 export const TinaAdminWrapper = () => {
   return (
-    <TinaCMS {...config}>
+    <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
       <TinaAdmin />
     </TinaCMS>
   )
