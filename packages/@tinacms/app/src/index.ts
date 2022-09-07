@@ -109,7 +109,7 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (false) {
+  if (true) {
     await build(config)
     await fs.rmSync(out)
   } else {
