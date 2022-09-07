@@ -23,6 +23,7 @@ import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
 import { buildAdmin, ConfigBuilder } from '../../buildTina'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -47,6 +48,12 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
+    // FIXME: these types live in TinaCMS
+    schema?: TinaSchema & {
+      config?: {
+        build?: { outputFolder: string; publicFolder: string }
+      }
+    }
   },
   next,
   {
