@@ -105,7 +105,7 @@ const handleNavigate = (
    */
   const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
   const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
-  const hasIframe = cms.flags.get('tina-preview') === false ? false : true
+  const hasIframe = cms.flags.get('tina-preview') || false
 
   /**
    * Determine if the document has a route mapped

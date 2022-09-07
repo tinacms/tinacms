@@ -84,7 +84,7 @@ const GetReference = ({ cms, id, children }) => {
 
 const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
   const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
-  const hasIframe = cms.flags.get('tina-preview') === false ? false : true
+  const hasIframe = cms.flags.get('tina-preview') || false
 
   if (!hasTinaAdmin) {
     return null
