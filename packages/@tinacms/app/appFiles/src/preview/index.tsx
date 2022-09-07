@@ -40,7 +40,6 @@ export const Preview = (props) => {
 
   const [state, send] = useMachine(machine)
   const ref = React.useRef<HTMLIFrameElement>(null)
-  console.log(state.value)
 
   React.useEffect(() => {
     if (ref.current) {

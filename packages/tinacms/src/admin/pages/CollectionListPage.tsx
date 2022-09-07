@@ -105,7 +105,7 @@ const handleNavigate = (
    */
   const plugins = cms.plugins.all<RouteMappingPlugin>('tina-admin')
   const routeMapping = plugins.find(({ name }) => name === 'route-mapping')
-  const hasIframe = cms.flags.get('tina-preview') || false
+  const tinaPreview = cms.flags.get('tina-preview') || false
 
   /**
    * Determine if the document has a route mapped
@@ -123,7 +123,7 @@ const handleNavigate = (
    * Redirect the browser if 'yes', else navigate react-router.
    */
   if (routeOverride) {
-    hasIframe
+    tinaPreview
       ? navigate(`/preview?iframe-url=${encodeURIComponent(routeOverride)}`)
       : (window.location.href = routeOverride)
     return null

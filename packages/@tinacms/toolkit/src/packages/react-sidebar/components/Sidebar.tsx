@@ -515,16 +515,22 @@ const SidebarCollectionLink = ({
     name: string
   }
   onClick: () => void
-}) => (
-  <a
-    onClick={onClick}
-    href={`/tina/index.html#/collections/${collection.name}`}
-    className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
-  >
-    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
-    {collection.label ? collection.label : collection.name}
-  </a>
-)
+}) => {
+  const cms = useCMS()
+  const tinaPreview = cms.flags.get('tina-preview') || false
+  return (
+    <a
+      onClick={onClick}
+      href={`${
+        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+      }/collections/${collection.name}`}
+      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+    >
+      <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+      {collection.label ? collection.label : collection.name}
+    </a>
+  )
+}
 
 const EditButton = ({}) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)

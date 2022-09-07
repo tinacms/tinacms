@@ -84,7 +84,7 @@ const GetReference = ({ cms, id, children }) => {
 
 const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
   const hasTinaAdmin = cms.flags.get('tina-admin') === false ? false : true
-  const hasIframe = cms.flags.get('tina-preview') || false
+  const tinaPreview = cms.flags.get('tina-preview') || false
 
   if (!hasTinaAdmin) {
     return null
@@ -94,7 +94,9 @@ const ReferenceLink: React.FC<ReferenceLinkProps> = ({ cms, input }) => {
     <GetReference cms={cms} id={input.value}>
       {(document: Document) => (
         <a
-          href={`${hasIframe ? '/tina/index.html#' : '/admin#'}/collections/${
+          href={`${
+            tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+          }/collections/${
             document._sys.collection.name
           }/${document._sys.breadcrumbs.join('/')}`}
           className="text-gray-700 hover:text-blue-500 flex items-center uppercase text-sm mt-2 mb-2 leading-none"
