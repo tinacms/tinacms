@@ -31,6 +31,7 @@ export const chain = async (
       )
     } catch (err) {
       console.error(`  ${dangerText(err)}`)
+      console.log(err.stack)
       process.exit(1)
     }
   }
