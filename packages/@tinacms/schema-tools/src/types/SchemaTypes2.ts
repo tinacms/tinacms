@@ -107,6 +107,4 @@ export type TinaCMSConfig<
   documentCreatorCallback?: DocumentCreatorCallback
 }
 
-export const defineStaticConfig = (config: TinaCMSConfig) => {
-  return config
-}
+export {}
