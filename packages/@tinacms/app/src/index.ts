@@ -109,7 +109,7 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (true) {
+  if (false) {
     await build(config)
     await fs.rmSync(out)
   } else {
@@ -119,13 +119,13 @@ vite.svg`
      * And will run into port issues when the build server
      * restart itself
      */
-    // const indexDev = await fs
-    //   .readFileSync(path.join(root, 'index.dev.html'))
-    //   .toString()
-    // await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
-    // const server = await createServer(config)
-    // await server.listen()
-    // await server.printUrls()
+    const indexDev = await fs
+      .readFileSync(path.join(root, 'index.dev.html'))
+      .toString()
+    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
+    const server = await createServer(config)
+    await server.listen()
+    await server.printUrls()
   }
 }
 

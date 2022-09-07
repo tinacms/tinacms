@@ -201,6 +201,7 @@ export const queryMachine = createMachine(
               src: 'onChangeCallback',
             },
             on: {
+              UPDATE_URL: 'idle',
               REMOVE_QUERY: 'idle',
               SELECT_DOCUMENT: {
                 actions: 'selectDocument',
