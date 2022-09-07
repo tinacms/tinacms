@@ -20,9 +20,9 @@ import { Preview } from './preview'
 // @ts-expect-error
 import config from 'TINA_IMPORT'
 
-const SetPreview = () => {
+const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
   const cms = useCMS()
-  cms.flags.set('tina-preview', true)
+  cms.flags.set('tina-preview', outputFolder)
   return null
 }
 
@@ -30,7 +30,7 @@ export const TinaAdminWrapper = () => {
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config}>
-      <SetPreview />
+      <SetPreview outputFolder={config.build.outputFolder} />
       <TinaAdmin preview={<Preview {...config} />} />
     </TinaCMS>
   )
