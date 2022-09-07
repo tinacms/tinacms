@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { assign, ContextFrom, createMachine, spawn } from 'xstate'
-import { DocumentBlueprint, OnChangeEvent } from '../formify/types'
+import { DocumentBlueprint } from '../formify/types'
 import { Form, GlobalFormPlugin, TinaCMS, TinaField } from 'tinacms'
 import { setIn } from 'final-form'
 import * as G from 'graphql'
@@ -137,7 +137,6 @@ export const queryMachine = createMachine(
           }
         | {
             type: 'FIELD_CHANGE'
-            value: OnChangeEvent
           },
     },
     type: 'parallel',
@@ -471,12 +470,12 @@ export const queryMachine = createMachine(
       },
       onChangeCallback: (context) => (callback, _onReceive) => {
         if (context.cms) {
-          context.cms.events.subscribe(
-            `forms:fields:onChange`,
-            (event: OnChangeEvent) => {
-              callback({ type: 'FIELD_CHANGE', value: event })
-            }
-          )
+          context.cms.events.subscribe(`forms:fields:onChange`, () => {
+            callback({ type: 'FIELD_CHANGE' })
+          })
+          context.cms.events.subscribe(`forms:reset`, () => {
+            callback({ type: 'FIELD_CHANGE' })
+          })
         }
       },
     },
