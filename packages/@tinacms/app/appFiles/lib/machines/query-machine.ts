@@ -647,6 +647,10 @@ const setData = ({
         // This value is a reference (eg. "content/authors/pedro.md")
         if (childBlueprint) {
           if (typeof value === 'string') {
+            if (!value) {
+              nextData[key] = null
+              return
+            }
             const doc = context.documentMap[value]
             const docContext = doc?.ref?.getSnapshot()?.context
             const form = docContext?.form
