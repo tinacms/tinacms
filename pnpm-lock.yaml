@@ -67,6 +67,31 @@ importers:
       eslint: 7.32.0
       eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
 
+  examples/basic-iframe:
+    specifiers:
+      '@tinacms/cli': workspace:*
+      '@types/node': ^17.0.21
+      eslint: '7'
+      eslint-config-next: 12.0.3
+      next: 12.2.4
+      react: 17.0.2
+      react-dom: 17.0.2
+      react-is: ^17.0.2
+      styled-components: ^5.1.3
+      tinacms: workspace:*
+    dependencies:
+      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      react-is: 17.0.2
+      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+      tinacms: link:../../packages/tinacms
+    devDependencies:
+      '@tinacms/cli': link:../../packages/@tinacms/cli
+      '@types/node': 17.0.45
+      eslint: 7.32.0
+      eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
+
   examples/empty:
     specifiers:
       '@tinacms/cli': workspace:*
@@ -4891,6 +4916,26 @@ packages:
     transitivePeerDependencies:
       - supports-color
 
+  /@babel/traverse/7.18.13_supports-color@5.5.0:
+    resolution:
+      {
+        integrity: sha512-N6kt9X1jRMLPxxxPYWi7tgvJRH/rtoU+dbKAPDM44RFHiMH8igdsaSBgFeskhSl/kLWLDUvIh1RXCrTmg0/zvA==,
+      }
+    engines: { node: '>=6.9.0' }
+    dependencies:
+      '@babel/code-frame': 7.18.6
+      '@babel/generator': 7.18.13
+      '@babel/helper-environment-visitor': 7.18.9
+      '@babel/helper-function-name': 7.18.9
+      '@babel/helper-hoist-variables': 7.18.6
+      '@babel/helper-split-export-declaration': 7.18.6
+      '@babel/parser': 7.18.13
+      '@babel/types': 7.18.13
+      debug: 4.3.4_supports-color@5.5.0
+      globals: 11.12.0
+    transitivePeerDependencies:
+      - supports-color
+
   /@babel/traverse/7.18.6:
     resolution:
       {
@@ -4907,26 +4952,6 @@ packages:
       '@babel/parser': 7.18.6
       '@babel/types': 7.18.6
       debug: 4.3.4
-      globals: 11.12.0
-    transitivePeerDependencies:
-      - supports-color
-
-  /@babel/traverse/7.18.6_supports-color@5.5.0:
-    resolution:
-      {
-        integrity: sha512-zS/OKyqmD7lslOtFqbscH6gMLFYOfG1YPqCKfAW5KrTeolKqvB8UelR49Fpr6y93kYkW2Ik00mT1LOGiAGvizw==,
-      }
-    engines: { node: '>=6.9.0' }
-    dependencies:
-      '@babel/code-frame': 7.18.6
-      '@babel/generator': 7.18.6
-      '@babel/helper-environment-visitor': 7.18.6
-      '@babel/helper-function-name': 7.18.6
-      '@babel/helper-hoist-variables': 7.18.6
-      '@babel/helper-split-export-declaration': 7.18.6
-      '@babel/parser': 7.18.6
-      '@babel/types': 7.18.6
-      debug: 4.3.4_supports-color@5.5.0
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -16484,6 +16509,7 @@ packages:
         integrity: sha512-VHZ8gX+EDfz+97jGcgyGCyRia/dPOd6Xh9yPv8Bl1+SoaIwD+a/vlrOmGRUyOYu7MwUhc7CxqeaDZU13S4+EpA==,
       }
     engines: { node: ^10.12.0 || >=12.0.0 }
+    hasBin: true
     dependencies:
       '@babel/code-frame': 7.12.11
       '@eslint/eslintrc': 0.4.3
@@ -28397,7 +28423,7 @@ packages:
       react-is: '>= 16.8.0'
     dependencies:
       '@babel/helper-module-imports': 7.18.6
-      '@babel/traverse': 7.18.6_supports-color@5.5.0
+      '@babel/traverse': 7.18.13_supports-color@5.5.0
       '@emotion/is-prop-valid': 1.1.3
       '@emotion/stylis': 0.8.5
       '@emotion/unitless': 0.7.5
@@ -28423,7 +28449,7 @@ packages:
       react-is: '>= 16.8.0'
     dependencies:
       '@babel/helper-module-imports': 7.18.6
-      '@babel/traverse': 7.18.6_supports-color@5.5.0
+      '@babel/traverse': 7.18.13_supports-color@5.5.0
       '@emotion/is-prop-valid': 1.1.3
       '@emotion/stylis': 0.8.5
       '@emotion/unitless': 0.7.5

@@ -71,10 +71,10 @@ const schema = defineSchema({
   // like `config.media` to be present on `schema`, but not before
   // passing it into TinaCMS.
   config: {
-    build: {
-      outputFolder: "tina",
-      publicFolder: "public",
-    },
+    // build: {
+    //   outputFolder: "tina",
+    //   publicFolder: "public",
+    // },
     branch: "main",
     clientId: "foobar",
     token: "foo",
