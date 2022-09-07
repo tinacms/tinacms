@@ -17,10 +17,10 @@
  */
 
 import * as React from 'react'
-import { useCMS } from '../../react-core'
 import { useState } from 'react'
 import { TinaCMS } from '../../../tina-cms'
-import { MdSync, MdSyncDisabled, MdSyncProblem } from 'react-icons/md'
+import { MdSyncProblem } from 'react-icons/md'
+import { HiOutlineClipboardList } from 'react-icons/hi'
 import {
   FullscreenModal,
   Modal,
@@ -85,31 +85,14 @@ export const useGetEvents = (
   return { events, cursor: nextCursor, loading, error }
 }
 
-const SyncStatusWidget = ({
-  cms,
-  eventsListOpen,
-  onClick,
-}: {
-  cms: any
-  eventsListOpen: boolean
-  onClick: () => void
-}) => {
+function useSyncStatus(cms) {
   const [syncStatus, setSyncStatus] = useState<{
     state: EventListState
     message: string
   }>({ state: 'loading', message: 'Loading...' })
 
-  function handleClick() {
-    if (syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized') {
-      onClick()
-    }
-  }
-
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      if (eventsListOpen) {
-        return
-      }
       if (cms.api.tina.isAuthorized()) {
         const { events } = await cms.api.tina.fetchEvents()
         if (events.length === 0) {
@@ -129,32 +112,24 @@ const SyncStatusWidget = ({
       }
     }, 5000)
     return () => clearInterval(interval)
-  }, [eventsListOpen, cms])
+  }, [cms])
+
+  return syncStatus
+}
+
+export const SyncErrorWidget = ({ cms }: { cms: any }) => {
+  const syncStatus = useSyncStatus(cms)
+
+  if (syncStatus.state !== 'error') {
+    return null
+  }
 
   return (
-    <div className="flex-grow-0 flex text-xs items-center">
-      <div
-        title={syncStatus.message}
-        onClick={handleClick}
-        className={`opacity-70 transition-all duration-150 ease-out ${
-          syncStatus.state !== 'loading' && syncStatus.state !== 'unauthorized'
-            ? 'cursor-pointer hover:opacity-100'
-            : ''
-        }`}
-      >
-        {syncStatus.state === 'loading' && (
-          <MdSync className="w-6 h-full ml-2 animate-spin-reverse text-blue-500 fill-current" />
-        )}
-        {syncStatus.state === 'unauthorized' && (
-          <MdSyncDisabled className="w-6 h-full ml-2 text-orange-500 fill-current" />
-        )}
-        {syncStatus.state === 'success' && (
-          <MdSync className="w-6 h-full ml-2 text-gray-400 fill-current" />
-        )}
-        {syncStatus.state === 'error' && (
-          <MdSyncProblem className="w-6 h-full ml-2 text-red-500 fill-current" />
-        )}
-      </div>
+    <div
+      title={syncStatus.message}
+      className="flex-grow-0 flex text-xs items-center"
+    >
+      <MdSyncProblem className="w-6 h-full ml-2 text-red-500 fill-current" />
     </div>
   )
 }
@@ -250,8 +225,8 @@ const EventsList = ({ cms }) => {
   )
 }
 
-export const SyncStatus = () => {
-  const cms = useCMS()
+export const SyncStatus = ({ cms }) => {
+  const syncStatus = useSyncStatus(cms)
   const [eventsOpen, setEventsOpen] = React.useState(false)
 
   function openEventsModal() {
@@ -268,17 +243,21 @@ export const SyncStatus = () => {
 
   return (
     <>
-      <SyncStatusWidget
-        cms={cms}
-        eventsListOpen={eventsOpen}
+      <button
+        className={`text-lg px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400 hover:bg-gray-50 hover:opacity-100`}
         onClick={openEventsModal}
-      />
+      >
+        {syncStatus.state !== 'error' ? (
+          <HiOutlineClipboardList className="w-6 h-auto mr-2 text-blue-400" />
+        ) : (
+          <MdSyncProblem className="w-6 h-auto mr-2 text-red-400" />
+        )}{' '}
+        Event Log
+      </button>
       {eventsOpen && (
         <Modal>
           <FullscreenModal>
-            <ModalHeader close={closeEventsModal}>
-              Repository Synchronization Events
-            </ModalHeader>
+            <ModalHeader close={closeEventsModal}>Event Log</ModalHeader>
             <ModalBody padded={true}>
               <EventsList cms={cms} />
             </ModalBody>
