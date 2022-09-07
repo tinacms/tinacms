@@ -419,16 +419,15 @@ export const formify = async ({
      * are considered blueprints. I'm pretty sure we only want
      * the top-level one.
      */
-    // if (util.isFormifiableDocument(type)) {
-    //   console.log('callonme', G.print(inlineFragmentNode))
-    //   return formifyInlineFragmentDocument({
-    //     inlineFragmentNode: inlineFragmentNode,
-    //     type,
-    //     path,
-    //     showInSidebar: false,
-    //     isTopLevel,
-    //   })
-    // }
+    if (util.isFormifiableDocument(type)) {
+      return formifyInlineFragmentDocument({
+        inlineFragmentNode: inlineFragmentNode,
+        type,
+        path,
+        showInSidebar: false,
+        isTopLevel,
+      })
+    }
 
     return {
       ...inlineFragmentNode,
