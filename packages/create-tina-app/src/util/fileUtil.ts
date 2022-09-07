@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import fs from 'fs'
+import fs from 'fs-extra'
 import path from 'path'
 import chalk from 'chalk'
 
@@ -24,11 +24,8 @@ export async function isWriteable(directory: string): Promise<boolean> {
     return false
   }
 }
-export function makeDir(
-  root: string,
-  options = { recursive: true }
-): Promise<string | undefined> {
-  return fs.promises.mkdir(root, options)
+export function makeDir(root: string): Promise<void> {
+  return fs.mkdirp(root)
 }
 
 export function isFolderEmpty(root: string, name: string): boolean {
