@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import TinaCMS, { TinaAdmin } from 'tinacms'
+import TinaCMS, { TinaAdmin, useCMS } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
 
@@ -20,10 +20,17 @@ import { Preview } from './preview'
 // @ts-expect-error
 import config from 'TINA_IMPORT'
 
+const SetPreview = () => {
+  const cms = useCMS()
+  cms.flags.set('tina-preview', true)
+  return null
+}
+
 export const TinaAdminWrapper = () => {
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config}>
+      <SetPreview />
       <TinaAdmin preview={<Preview {...config} />} />
     </TinaCMS>
   )
