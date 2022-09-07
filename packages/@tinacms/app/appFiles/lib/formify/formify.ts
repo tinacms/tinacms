@@ -403,15 +403,32 @@ export const formify = async ({
       return inlineFragmentNode
     }
 
-    if (util.isFormifiableDocument(type)) {
-      return formifyInlineFragmentDocument({
-        inlineFragmentNode: inlineFragmentNode,
-        type,
-        path,
-        showInSidebar: false,
-        isTopLevel,
-      })
-    }
+    /**
+     * FIXME: this returns true for template collections on
+     * both the query field level and the inline fragment level so
+     * ```graphql
+     * query {
+     *   page(relativePath: "") {
+     *     ...on MyBlockPage {
+     *       title
+     *     }
+     *   }
+     * }
+     * ```
+     * Both the `page` field and the `...on MyBlockPage` field
+     * are considered blueprints. I'm pretty sure we only want
+     * the top-level one.
+     */
+    // if (util.isFormifiableDocument(type)) {
+    //   console.log('callonme', G.print(inlineFragmentNode))
+    //   return formifyInlineFragmentDocument({
+    //     inlineFragmentNode: inlineFragmentNode,
+    //     type,
+    //     path,
+    //     showInSidebar: false,
+    //     isTopLevel,
+    //   })
+    // }
 
     return {
       ...inlineFragmentNode,

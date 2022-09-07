@@ -201,21 +201,50 @@ export class TinaSchema {
   public transformPayload = (collectionName: string, payload: object) => {
     const collection = this.getCollection(collectionName)
     if (collection.templates) {
-    } else {
-      const accumulator = {}
-      Object.entries(payload).forEach(([key, value]) => {
-        const field = collection.fields.find((field) => {
-          if (typeof field === 'string') {
-            throw new Error('Global templates not supported')
-          }
-          return field.name === key
-        })
-        if (field) {
-          accumulator[key] = this.transformField(field, value)
+      const template = collection.templates.find((template) => {
+        if (typeof template === 'string') {
+          throw new Error('Global templates not supported')
         }
+        return payload['_template'] === template.name
       })
-      return { [collectionName]: accumulator }
+      if (!template) {
+        console.error(payload)
+        throw new Error(`Unable to find template for payload`)
+      }
+      if (typeof template === 'string') {
+        throw new Error('Global templates not supported')
+      }
+      return {
+        [collectionName]: {
+          [template.name]: this.transformCollectablePayload(payload, template),
+        },
+      }
+    } else {
+      return {
+        [collectionName]: this.transformCollectablePayload(payload, collection),
+      }
     }
+  }
+  private transformCollectablePayload = (
+    payload: object,
+    collection: Collectable
+  ) => {
+    const accumulator = {}
+    Object.entries(payload).forEach(([key, value]) => {
+      if (typeof collection.fields === 'string') {
+        throw new Error('Global templates not supported')
+      }
+      const field = collection.fields.find((field) => {
+        if (typeof field === 'string') {
+          throw new Error('Global templates not supported')
+        }
+        return field.name === key
+      })
+      if (field) {
+        accumulator[key] = this.transformField(field, value)
+      }
+    })
+    return accumulator
   }
 
   private transformField = (field: TinaFieldEnriched, value: unknown) => {

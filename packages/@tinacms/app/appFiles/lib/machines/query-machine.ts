@@ -431,17 +431,19 @@ export const queryMachine = createMachine(
               }
             }
 
-            const nextData: Record<string, unknown> = setData({
-              id: docContext.id,
-              data: { ...docContext.data, ...form.values },
-              // @ts-ignore form.fields is Field
-              fields: form.fields,
-              namespace: [docContext.data._internalSys.collection.name],
-              path: [],
-              blueprint,
-              context,
-            })
-            newData = setIn(newData, location, nextData)
+            if (docContext.data) {
+              const nextData: Record<string, unknown> = setData({
+                id: docContext.id,
+                data: { ...docContext.data, ...form.values },
+                // @ts-ignore form.fields is Field
+                fields: form.fields,
+                namespace: [docContext.data._internalSys.collection.name],
+                path: [],
+                blueprint,
+                context,
+              })
+              newData = setIn(newData, location, nextData)
+            }
           })
         })
         return { data: newData }
