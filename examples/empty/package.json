@@ -6,7 +6,7 @@
     "start": "next start",
     "lint": "next lint",
     "init-dev": "tinacms init",
-    "init-static": "USE_WORKSPACE=true yarn exec ../../packages/@tinacms/cli/bin/tinacms init --static"
+    "init-static": "USE_WORKSPACE=true pnpm exec ../../packages/@tinacms/cli/bin/tinacms init --static"
   },
   "dependencies": {
     "@tinacms/cli": "workspace:*",
