@@ -11,7 +11,6 @@
  limitations under the License.
  */
 
-import retry from 'async-retry'
 import fs from 'fs-extra'
 
 import {
@@ -27,7 +26,7 @@ import {
   LevelStore,
 } from '@tinacms/datalayer'
 import path from 'path'
-
+import { DocumentNode } from 'graphql'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
@@ -204,7 +203,11 @@ export const auditCmdBuild = async (
 export class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, verbose, rootPath }: BuildOptions) {
+  async build({ dev, verbose, rootPath }: BuildOptions): Promise<{
+    schema: any
+    graphQLSchema: DocumentNode
+    tinaSchema: any
+  }> {
     const usingTs = await isProjectTs(rootPath)
 
     if (!rootPath) {
@@ -229,13 +232,10 @@ export class ConfigBuilder {
       rootPath,
     })
 
-    // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const { graphQLSchema, tinaSchema } = await retry(
-      async () =>
-        await buildSchema(rootPath, this.database, [
-          'experimentalData',
-          'isomorphicGitBridge',
-        ])
+    const { graphQLSchema, tinaSchema } = await buildSchema(
+      rootPath,
+      this.database,
+      ['experimentalData', 'isomorphicGitBridge']
     )
 
     return { schema: compiledSchema, graphQLSchema, tinaSchema }

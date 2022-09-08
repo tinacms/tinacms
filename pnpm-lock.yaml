@@ -303,7 +303,6 @@ importers:
       add: ^2.0.6
       ajv: ^6.12.3
       altair-express-middleware: 4.0.6
-      async-retry: ^1.3.3
       auto-bind: ^4.0.0
       axios: 0.21.2
       body-parser: ^1.19.0
@@ -349,7 +348,6 @@ importers:
       add: 2.0.6
       ajv: 6.12.6
       altair-express-middleware: 4.0.6
-      async-retry: 1.3.3
       auto-bind: 4.0.0
       axios: 0.21.2
       body-parser: 1.20.0
@@ -10366,15 +10364,6 @@ packages:
       }
     dependencies:
       retry: 0.12.0
-    dev: false
-
-  /async-retry/1.3.3:
-    resolution:
-      {
-        integrity: sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==,
-      }
-    dependencies:
-      retry: 0.13.1
     dev: false
 
   /async/3.2.4:
@@ -23765,14 +23754,6 @@ packages:
 
   /retry/0.12.0:
     resolution: { integrity: sha1-G0KmJmoh8HQh0bC1S33BZ7AcATs= }
-    engines: { node: '>= 4' }
-    dev: false
-
-  /retry/0.13.1:
-    resolution:
-      {
-        integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==,
-      }
     engines: { node: '>= 4' }
     dev: false
 
