@@ -187,9 +187,7 @@ export async function chooseFramework(ctx: any, next: () => void, options) {
   ctx.framework = framework['choice']
   const choice = framework['choice']
   if (choice === 'hugo') {
-    console.log('check packagejson')
     const packageJSONExists = await fs.existsSync(packageJSONPath)
-    console.log('exists', packageJSONExists)
     if (!packageJSONExists) {
       logger.info('No package.json found, creating one...')
       await execShellCommand('npm init --yes')
