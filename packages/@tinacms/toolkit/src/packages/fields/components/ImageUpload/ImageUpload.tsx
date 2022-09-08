@@ -56,6 +56,7 @@ const ImgPlaceholder = styled.div`
 const StyledImage = styled.img`
   max-width: 100%;
   min-height: 100px;
+  max-height: 400px;
   border-radius: var(--tina-radius-small);
   transition: opacity var(--tina-timing-short) ease-out;
   margin: 0;
@@ -86,6 +87,7 @@ const DeleteButton = styled(IconButton)`
 `
 
 const StyledImageContainer = styled.div`
+  width: fit-content;
   position: relative;
   overflow: hidden;
   &:hover {
@@ -133,7 +135,7 @@ export const ImageUpload = ({
           )}
         </StyledImageContainer>
       ) : (
-        <StyledImageContainer>
+        <StyledImageContainer className="w-full">
           {loading ? (
             <ImageLoadingIndicator />
           ) : (
