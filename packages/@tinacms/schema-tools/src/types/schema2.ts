@@ -142,3 +142,5 @@ type TinaCMSCollection = {
 type TinaCMSSchema = {
   collections: TinaCMSCollection[]
 }
+
+export {}
