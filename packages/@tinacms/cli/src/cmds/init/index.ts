@@ -28,6 +28,7 @@ import chalk from 'chalk'
 import { logger } from '../../logger'
 import p from 'path'
 import prompts from 'prompts'
+import { defaultStaticConfig } from '../compile/defaultSchema'
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -161,8 +162,48 @@ export async function installDeps(ctx: any, next: () => void, options) {
   next()
 }
 
+export async function installDepsStatic(ctx: any, next: () => void, options) {
+  const bar = new Progress(
+    'Installing Tina packages. This might take a moment... :prog',
+    2
+  )
+
+  const deps = ['tinacms', '@tinacms/cli']
+  const packageManager = await prompts({
+    name: 'choice',
+    type: 'select',
+    choices: [
+      { title: 'pnpm', value: 'pnpm' },
+      { title: 'npm', value: 'npm' },
+      { title: 'yarn', value: 'yarn' },
+    ],
+    message: `Which package manager are you using?`,
+  })
+
+  bar.tick({
+    prog: '',
+  })
+  const packageManagers = {
+    pnpm: `pnpm add `,
+    npm: `npm install `,
+    yarn: `yarn install `,
+  }
+  const installCMD = `${packageManagers[packageManager['choice']]}${deps.join(
+    ' '
+  )}${process.env.USE_WORKSPACE ? ' --workspace' : ''}` // PNPM requires this flag on a monorepo install
+  await execShellCommand(installCMD)
+  bar.tick({
+    prog: '✅',
+  })
+  logger.level = 'fatal'
+  // Set the option for later
+  ctx.packageManager = packageManager['choice']
+  next()
+}
+
 const baseDir = process.cwd()
 const packageJSONPath = p.join(baseDir, 'package.json')
+const tsconfigPath = p.join(baseDir, 'tsconfig.json')
 const blogContentPath = p.join(baseDir, 'content', 'posts')
 const blogPostPath = p.join(blogContentPath, 'HelloWorld.mdx')
 const TinaFolder = p.join(baseDir, '.tina')
@@ -274,6 +315,86 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   next()
 }
 
+export async function tinaStaticSetup(_ctx: any, next: () => void, _options) {
+  // 1. Create a content/blog Folder and add one or two blog posts
+  // if (!fs.pathExistsSync(blogPostPath)) {
+  //   logger.info(logText('Adding a content folder...'))
+  //   fs.mkdirpSync(blogContentPath)
+  //   fs.writeFileSync(blogPostPath, blogPost)
+  // }
+  logger.level = 'info'
+  const foundExtensions: string[] = []
+  await Promise.all(
+    ['ts', 'tsx', 'js', 'jsx'].map(async (extension) => {
+      const schemaPath = p.join(TinaFolder, `config.${extension}`)
+      if (fs.pathExistsSync(schemaPath)) {
+        foundExtensions.push(schemaPath)
+      }
+    })
+  )
+  if (foundExtensions.length > 0) {
+    if (foundExtensions.length > 1) {
+      throw new Error(
+        `Found multiple config files in .tina folder, please provide only 1`
+      )
+    }
+    logger.info(`Found config file at ${foundExtensions[0]}`)
+  } else {
+    let useTs: boolean
+    if (fs.pathExistsSync(tsconfigPath)) {
+      useTs = true
+    } else {
+      const packageManager = await prompts({
+        name: 'useTs',
+        type: 'confirm',
+        message: `Would you like to use Typescript?`,
+      })
+      useTs = packageManager['useTs']
+    }
+    const configFilePath = p.join(TinaFolder, `config.${useTs ? 'tsx' : 'jsx'}`)
+    logger.info(`Adding config file at ${configFilePath}`)
+    fs.outputFileSync(configFilePath, defaultStaticConfig({ preset: 'nextjs' }))
+  }
+
+  if (!fs.pathExistsSync(blogPostPath)) {
+    logger.info(logText('Adding a content folder...'))
+    fs.mkdirpSync(blogContentPath)
+    fs.writeFileSync(blogPostPath, blogPost)
+  }
+
+  // This is next.js specific
+  const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
+  const pagesPath = p.join(baseDir, usingSrc ? 'src' : '', 'pages')
+  const tinaBlogPagePath = p.join(pagesPath, 'demo', 'blog')
+  const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
+  if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
+    fs.mkdirpSync(tinaBlogPagePath)
+    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+  }
+  logger.info('Adding a pages folder... ✅')
+
+  // 4. update the users package.json
+  if (!fs.existsSync(packageJSONPath)) {
+    throw new Error(
+      'No package.json Found. Please run tinacms init at the root of your app'
+    )
+  } else {
+    const pack = JSON.parse(readFileSync(packageJSONPath).toString())
+    const oldScripts = pack.scripts || {}
+    const newPack = JSON.stringify(
+      {
+        ...pack,
+        scripts: extendNextScripts(oldScripts),
+      },
+      null,
+      2
+    )
+    writeFileSync(packageJSONPath, newPack)
+  }
+
+  next()
+}
+
 export async function successMessage(ctx: any, next: () => void, options) {
   const usingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
 
@@ -294,6 +415,31 @@ export async function successMessage(ctx: any, next: () => void, options) {
 
   logger.info(`${chalk.bold('Start Editing')}`)
   logger.info(`  Go to 'http://localhost:3000/admin' \n`)
+
+  logger.info(`${chalk.bold('Read the docs')}`)
+  logger.info(
+    `  Check out 'https://tina.io/docs/introduction/tina-init/#adding-tina' for help getting started with Tina \n`
+  )
+
+  logger.info(`Enjoy Tina! 🦙`)
+
+  next()
+}
+
+export async function staticSuccessMessage(
+  ctx: any,
+  next: () => void,
+  options
+) {
+  logger.info(`Tina setup ${chalk.underline.green('done')} ✅\n`)
+
+  logger.info('Next Steps: \n')
+
+  logger.info(`${chalk.bold('Run your site with Tina')}`)
+  logger.info(`  ${ctx.packageManager || 'yarn'} run dev \n`)
+
+  logger.info(`${chalk.bold('Start Editing')}`)
+  logger.info(`  Go to [your site url]/admin/index.html \n`)
 
   logger.info(`${chalk.bold('Read the docs')}`)
   logger.info(

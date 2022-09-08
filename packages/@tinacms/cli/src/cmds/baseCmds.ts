@@ -17,7 +17,10 @@ import {
   initTina,
   installDeps,
   successMessage,
+  staticSuccessMessage,
   tinaSetup,
+  tinaStaticSetup,
+  installDepsStatic,
 } from './init'
 
 import 'dotenv/config'
@@ -64,6 +67,10 @@ const schemaFileType = {
 const subCommand = {
   name: '-c, --command <command>',
   description: 'The sub-command to run',
+}
+const staticAsset = {
+  name: '--static',
+  description: 'Whether to initialize the Tina project as a static asset',
 }
 const noWatchOption = {
   name: '--noWatch',
@@ -213,23 +220,45 @@ export const baseCmds: Command[] = [
       isomorphicGitBridge,
       noTelemetryOption,
       schemaFileType,
+      staticAsset,
     ],
     description: 'Add Tina Cloud to an existing project',
-    action: (options) =>
-      chain(
-        [
-          attachPath,
-          checkOptions,
-          checkDeps,
-          initTina,
-          installDeps,
-          buildSetupCmdBuild,
-          buildCmdBuild,
-          tinaSetup,
-          successMessage,
-        ],
-        options
-      ),
+    action: (options) => {
+      if (options.static) {
+        return chain(
+          [
+            async (ctx: any, next: () => void, _options: any) => {
+              ctx.static = true
+              next()
+            },
+            attachPath,
+            checkOptions,
+            initTina,
+            installDepsStatic,
+            tinaStaticSetup,
+            buildSetupCmdBuild,
+            buildCmdBuild,
+            staticSuccessMessage,
+          ],
+          options
+        )
+      } else {
+        return chain(
+          [
+            attachPath,
+            checkOptions,
+            checkDeps,
+            initTina,
+            installDeps,
+            buildSetupCmdBuild,
+            buildCmdBuild,
+            tinaSetup,
+            successMessage,
+          ],
+          options
+        )
+      }
+    },
   },
   {
     options: [
