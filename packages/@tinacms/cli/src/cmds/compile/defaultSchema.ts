@@ -37,7 +37,7 @@ const schema = defineSchema({
       ui: {
         router: ({ document }) => {
           // This can be used to add contextual editing to your site. See https://tina.io/docs/tinacms-context/#accessing-contextual-editing-from-the-cms for more information.
-          return undefined
+          return \`/demo/blog/\${document._sys.filename}\`
         },
       },
       fields: [
