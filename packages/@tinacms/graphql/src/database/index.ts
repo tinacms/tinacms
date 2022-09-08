@@ -114,7 +114,7 @@ export class Database {
     | undefined
   > => {
     const tinaSchema = await this.getSchema()
-    const collection = await tinaSchema.getCollectionByFullPath(filepath)
+    const collection = tinaSchema.getCollectionByFullPath(filepath)
     return collection
   }
 
@@ -255,7 +255,7 @@ export class Database {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
-      const collection = await tinaSchema.getCollectionByFullPath(filepath)
+      const collection = tinaSchema.getCollectionByFullPath(filepath)
 
       const templateInfo = await tinaSchema.getTemplatesForCollectable(
         collection
