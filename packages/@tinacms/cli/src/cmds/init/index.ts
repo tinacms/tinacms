@@ -162,6 +162,42 @@ export async function installDeps(ctx: any, next: () => void, options) {
   next()
 }
 
+const baseDir = process.cwd()
+const packageJSONPath = p.join(baseDir, 'package.json')
+const tsconfigPath = p.join(baseDir, 'tsconfig.json')
+const blogContentPath = p.join(baseDir, 'content', 'posts')
+const blogPostPath = p.join(blogContentPath, 'HelloWorld.mdx')
+const TinaFolder = p.join(baseDir, '.tina')
+const componentFolder = p.join(TinaFolder, 'components')
+const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
+const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
+
+export async function chooseFramework(ctx: any, next: () => void, options) {
+  const framework = await prompts({
+    name: 'choice',
+    type: 'select',
+    choices: [
+      { title: 'NextJS', value: 'nextjs' },
+      { title: 'Hugo', value: 'hugo' },
+      { title: 'Other', value: 'other' },
+    ],
+    message: `Which framekwork are you using?`,
+  })
+
+  ctx.framework = framework['choice']
+  const choice = framework['choice']
+  if (choice === 'hugo') {
+    console.log('check packagejson')
+    const packageJSONExists = await fs.existsSync(packageJSONPath)
+    console.log('exists', packageJSONExists)
+    if (!packageJSONExists) {
+      logger.info('No package.json found, creating one...')
+      await execShellCommand('npm init --yes')
+    }
+  }
+  next()
+}
+
 export async function installDepsStatic(ctx: any, next: () => void, options) {
   const bar = new Progress(
     'Installing Tina packages. This might take a moment... :prog',
@@ -196,20 +232,9 @@ export async function installDepsStatic(ctx: any, next: () => void, options) {
     prog: '✅',
   })
   logger.level = 'fatal'
-  // Set the option for later
   ctx.packageManager = packageManager['choice']
   next()
 }
-
-const baseDir = process.cwd()
-const packageJSONPath = p.join(baseDir, 'package.json')
-const tsconfigPath = p.join(baseDir, 'tsconfig.json')
-const blogContentPath = p.join(baseDir, 'content', 'posts')
-const blogPostPath = p.join(blogContentPath, 'HelloWorld.mdx')
-const TinaFolder = p.join(baseDir, '.tina')
-const componentFolder = p.join(TinaFolder, 'components')
-const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
-const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
 
 export async function tinaSetup(_ctx: any, next: () => void, _options) {
   const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
@@ -315,7 +340,7 @@ export async function tinaSetup(_ctx: any, next: () => void, _options) {
   next()
 }
 
-export async function tinaStaticSetup(_ctx: any, next: () => void, _options) {
+export async function tinaStaticSetup(ctx: any, next: () => void, _options) {
   // 1. Create a content/blog Folder and add one or two blog posts
   // if (!fs.pathExistsSync(blogPostPath)) {
   //   logger.info(logText('Adding a content folder...'))
@@ -353,25 +378,33 @@ export async function tinaStaticSetup(_ctx: any, next: () => void, _options) {
     }
     const configFilePath = p.join(TinaFolder, `config.${useTs ? 'tsx' : 'jsx'}`)
     logger.info(`Adding config file at ${configFilePath}`)
-    fs.outputFileSync(configFilePath, defaultStaticConfig({ preset: 'nextjs' }))
+    fs.outputFileSync(
+      configFilePath,
+      defaultStaticConfig({ framework: ctx.framekwork })
+    )
   }
 
-  if (!fs.pathExistsSync(blogPostPath)) {
-    logger.info(logText('Adding a content folder...'))
-    fs.mkdirpSync(blogContentPath)
-    fs.writeFileSync(blogPostPath, blogPost)
-  }
+  // For hugo, its safe to assume they already have markdown content
+  // since this is required for hugo to work
 
   // This is next.js specific
-  const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
-  const pagesPath = p.join(baseDir, usingSrc ? 'src' : '', 'pages')
-  const tinaBlogPagePath = p.join(pagesPath, 'demo', 'blog')
-  const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
-  if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
-    fs.mkdirpSync(tinaBlogPagePath)
-    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+  if (ctx.framekwork === 'nextjs') {
+    if (!fs.pathExistsSync(blogPostPath)) {
+      logger.info(logText('Adding a content folder...'))
+      fs.mkdirpSync(blogContentPath)
+      fs.writeFileSync(blogPostPath, blogPost)
+    }
+
+    const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
+    const pagesPath = p.join(baseDir, usingSrc ? 'src' : '', 'pages')
+    const tinaBlogPagePath = p.join(pagesPath, 'demo', 'blog')
+    const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
+    if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
+      fs.mkdirpSync(tinaBlogPagePath)
+      fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+    }
+    logger.info('Adding a pages folder... ✅')
   }
-  logger.info('Adding a pages folder... ✅')
 
   // 4. update the users package.json
   if (!fs.existsSync(packageJSONPath)) {

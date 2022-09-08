@@ -92,6 +92,14 @@ importers:
       eslint: 7.32.0
       eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
 
+  examples/quickstart:
+    specifiers:
+      '@tinacms/cli': workspace:^0.61.9
+      tinacms: workspace:^0.69.4
+    dependencies:
+      '@tinacms/cli': link:../../packages/@tinacms/cli
+      tinacms: link:../../packages/tinacms
+
   experimental-examples/kitchen-sink:
     specifiers:
       '@tinacms/cli': workspace:*

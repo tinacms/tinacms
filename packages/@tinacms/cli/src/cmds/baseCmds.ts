@@ -21,6 +21,7 @@ import {
   tinaSetup,
   tinaStaticSetup,
   installDepsStatic,
+  chooseFramework,
 } from './init'
 
 import 'dotenv/config'
@@ -234,6 +235,7 @@ export const baseCmds: Command[] = [
             attachPath,
             checkOptions,
             initTina,
+            chooseFramework,
             installDepsStatic,
             tinaStaticSetup,
             buildSetupCmdBuild,

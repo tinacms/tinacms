@@ -106,19 +106,19 @@ export const tinaConfig = defineConfig({
 `
 
 export const defaultStaticConfig = ({
-  preset,
+  framework,
 }: {
-  preset: 'nextjs' | 'hugo'
+  framework: 'nextjs' | 'hugo'
 }) => {
-  let collectionUi: string = ''
-  if (preset === 'nextjs') {
-    collectionUi = `
-        ui:{
-          router: ({document}) => {
-            // Tell Tina where you
-            return \`demo/blog/\${document._sys.filename}\`
-          }
-        },`
+  let publicFolder: string = ''
+  let frameworkCollection: string = ''
+  if (framework === 'nextjs') {
+    frameworkCollection = nextjsCollection
+    publicFolder = 'public'
+  }
+  if (framework === 'hugo') {
+    frameworkCollection = hugoCollection
+    publicFolder = 'static'
   }
   return `import { defineStaticConfig } from 'tinacms'
 
@@ -134,22 +134,63 @@ export default defineStaticConfig({
   clientId: '<Your Client ID>', // generated on app.tina.io
   branch,
   build: {
-    publicFolder: "public",
+    publicFolder: "${publicFolder}",
     outputFolder: "admin"
   },
   media: {
     tina: {
-      publicFolder: "public",
+      publicFolder: "${publicFolder}",
       mediaRoot: "uploads"
     }
   },
   schema: {
     collections: [
-      {
+      ${frameworkCollection},
+    ],
+  }
+})
+`
+}
+
+const hugoCollection = `{
+      label: 'Blog Posts',
+      name: 'post',
+      path: 'content/posts',
+      format: 'md',
+      fields: [
+        {
+          type: 'string',
+          label: 'Title',
+          name: 'title',
+        },
+        {
+          type: 'datetime',
+          label: 'Date',
+          name: 'date',
+        },
+        {
+          type: 'boolean',
+          label: 'Draft',
+          name: 'draft',
+        },
+        {
+          type: 'rich-text',
+          label: 'Blog Post Body',
+          name: 'body',
+          isBody: true,
+        },
+      ],
+    }`
+const nextjsCollection = `{
         label: 'Blog Posts',
         name: 'post',
         path: 'content/posts',
-        format: 'mdx',${collectionUi}
+        format: 'mdx',
+        ui: {
+          router: ({document}) => {
+            return \`/demo/blog/\${document._sys.filename}\`
+          }
+        },
         fields: [
           {
             type: 'string',
@@ -184,9 +225,4 @@ export default defineStaticConfig({
             ],
           },
         ],
-      },
-    ],
-  }
-})
-`
-}
+      }`
