@@ -39,15 +39,8 @@ export const generateTypes = async (
   let fragDocs = []
 
   if (!options.noSDK) {
-    docs = await loadDocuments(queryPathGlob, {
-      loaders: [new GraphQLFileLoader()],
-    })
-  }
-
-  if (!options.noSDK) {
-    fragDocs = await loadDocuments(fragDocPath, {
-      loaders: [new GraphQLFileLoader()],
-    })
+    docs = await loadGraphQLDocuments(queryPathGlob)
+    fragDocs = await loadGraphQLDocuments(fragDocPath)
   }
 
   // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
@@ -79,4 +72,25 @@ export const generateTypes = async (
     },
   })
   return res
+}
+
+const loadGraphQLDocuments = async (globPath: string) => {
+  let result = []
+  try {
+    result = await loadDocuments(globPath, {
+      loaders: [new GraphQLFileLoader()],
+    })
+  } catch (e) {
+    if (
+      // https://www.graphql-tools.com/docs/documents-loading#no-files-found
+      (e.message || '').includes(
+        'Unable to find any GraphQL type definitions for the following pointers:'
+      )
+    ) {
+      // don't blow up if folder doesn't exist
+    } else {
+      throw e
+    }
+  }
+  return result
 }
