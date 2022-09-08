@@ -181,7 +181,7 @@ export async function chooseFramework(ctx: any, next: () => void, options) {
       { title: 'Hugo', value: 'hugo' },
       { title: 'Other', value: 'other' },
     ],
-    message: `Which framekwork are you using?`,
+    message: `Which framework are you using?`,
   })
 
   ctx.framework = framework['choice']
@@ -380,7 +380,7 @@ export async function tinaStaticSetup(ctx: any, next: () => void, _options) {
     logger.info(`Adding config file at ${configFilePath}`)
     fs.outputFileSync(
       configFilePath,
-      defaultStaticConfig({ framework: ctx.framekwork })
+      defaultStaticConfig({ framework: ctx.framework })
     )
   }
 
@@ -388,7 +388,7 @@ export async function tinaStaticSetup(ctx: any, next: () => void, _options) {
   // since this is required for hugo to work
 
   // This is next.js specific
-  if (ctx.framekwork === 'nextjs') {
+  if (ctx.framework === 'nextjs') {
     if (!fs.pathExistsSync(blogPostPath)) {
       logger.info(logText('Adding a content folder...'))
       fs.mkdirpSync(blogContentPath)
@@ -417,7 +417,7 @@ export async function tinaStaticSetup(ctx: any, next: () => void, _options) {
     const newPack = JSON.stringify(
       {
         ...pack,
-        scripts: extendNextScripts(oldScripts),
+        scripts: extendNextScripts(oldScripts, ctx.framework),
       },
       null,
       2
