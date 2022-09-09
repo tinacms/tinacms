@@ -1,5 +1,48 @@
 # tinacms
 
+## 0.69.5
+
+### Patch Changes
+
+- bf89a3720: allow boolean fields in admin collection list sort control
+- fd4d8c8ff: Add `router` property on collections. This replaces the need for using the RouteMapper plugin.
+
+  ```ts
+  ...
+    name: 'post',
+    path: 'posts',
+    ui: {
+      router: ({ document }) => {
+        // eg. post items can be previewed at posts/hello-world
+        return `/posts/${document._sys.filename}`;
+      },
+    },
+  ...
+  ```
+
+  Add `global` property on collections. This replaces the need for `formifyCallback` in most cases
+
+  ```ts
+  ...
+    name: 'post',
+    path: 'posts',
+    ui: {
+      global: true
+    },
+  ...
+  ```
+
+- e650bc571: User interface for synchronization log event display
+- Updated dependencies [59ff1bb10]
+- Updated dependencies [232ae6d52]
+- Updated dependencies [1dd9d01e2]
+- Updated dependencies [fd4d8c8ff]
+- Updated dependencies [54dd48115]
+- Updated dependencies [e650bc571]
+- Updated dependencies [9e5da3103]
+  - @tinacms/schema-tools@0.1.1
+  - @tinacms/toolkit@0.57.3
+
 ## 0.69.4
 
 ### Patch Changes

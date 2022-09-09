@@ -1,5 +1,18 @@
 # tina-graphql
 
+## 0.63.6
+
+### Patch Changes
+
+- 75b9a1b56: enhancement: Don't build client on tinacms audit
+- 59ff1bb10: fix: fix collection fetching when paths overlap
+- Updated dependencies [59ff1bb10]
+- Updated dependencies [232ae6d52]
+- Updated dependencies [fd4d8c8ff]
+- Updated dependencies [9e5da3103]
+  - @tinacms/schema-tools@0.1.1
+  - @tinacms/mdx@0.61.5
+
 ## 0.63.5
 
 ### Patch Changes
