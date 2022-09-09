@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.61.11
+
+### Patch Changes
+
+- Updated dependencies [777b1e08a]
+  - @tinacms/schema-tools@0.1.2
+  - @tinacms/graphql@0.63.7
+  - @tinacms/app@0.0.11
+
 ## 0.61.10
 
 ### Patch Changes

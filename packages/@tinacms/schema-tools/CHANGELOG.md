@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.1.2
+
+### Patch Changes
+
+- 777b1e08a: add better error messages for duplicate values in zod
+
 ## 0.1.1
 
 ### Patch Changes
