@@ -39,7 +39,7 @@ const nameProp = z
   .superRefine((val, ctx) => {
     if (val.includes(' '))
       ctx.addIssue({
-        message: 'name cannot contain spaces',
+        message: `name "${val}" cannot contain spaces`,
         code: z.ZodIssueCode.custom,
         fatal: true,
       })
@@ -231,13 +231,21 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
           if (val.list) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'You can not have `list: true` when using `isTitle`',
+              message: `Can not have \`list: true\` when using \`isTitle\`. Error in value \n${JSON.stringify(
+                val,
+                null,
+                2
+              )}\n`,
             })
           }
           if (!val.required) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: 'You must have { required: true } when using `isTitle`',
+              message: `Must have { required: true } when using \`isTitle\` Error in value \n${JSON.stringify(
+                val,
+                null,
+                2
+              )}\n`,
             })
           }
         }
