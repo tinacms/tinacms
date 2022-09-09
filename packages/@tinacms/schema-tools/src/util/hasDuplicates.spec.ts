@@ -29,11 +29,11 @@ describe('findDuplicates', () => {
   it('returns the duplicate when it has duplicates', () => {
     expect(findDuplicates(['a', 'f', 'a'])).toEqual('"a"')
   })
-  it('returns false when does not have duplicates', () => {
-    expect(findDuplicates(['a', 'f', 'v'])).toEqual(false)
+  it('returns undefined when does not have duplicates', () => {
+    expect(findDuplicates(['a', 'f', 'v'])).toEqual(undefined)
   })
-  it('returns false when undefined is passed', () => {
-    expect(findDuplicates(undefined)).toEqual(false)
+  it('returns undefined when undefined is passed', () => {
+    expect(findDuplicates(undefined)).toEqual(undefined)
   })
   it('returns a list of the duplicate when there is more then one', () => {
     expect(findDuplicates(['a', 'a', 'b', 'b'])).toEqual('"a", "b"')

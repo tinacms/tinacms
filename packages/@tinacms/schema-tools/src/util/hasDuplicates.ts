@@ -11,12 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export function hasDuplicates<T = any>(array: T[] | undefined) {
-  if (!array) {
-    return false
-  } else {
-    return new Set(array).size !== array.length
-  }
+export function hasDuplicates<T = any>(array: T[] = []) {
+  return new Set(array).size !== array.length
 }
 
 /**
@@ -25,17 +21,13 @@ export function hasDuplicates<T = any>(array: T[] | undefined) {
  * @returns False if the array is undefined or has no duplicates.
  */
 export function findDuplicates<T = any>(
-  array: T[] | undefined
-): false | string {
-  if (!array) {
-    return false
-  } else {
-    // get a list of unique duplicates in array
-    const duplicates = [
-      ...new Set(array.filter((item, index) => array.indexOf(item) !== index)),
-    ].map((x) => `"${x}"`)
-    if (duplicates.length) {
-      return duplicates.join(', ')
-    } else return false
-  }
+  array: T[] | undefined = []
+): undefined | string {
+  // get a list of unique duplicates in array
+  const duplicates = [
+    ...new Set(array.filter((item, index) => array.indexOf(item) !== index)),
+  ].map((x) => `"${x}"`)
+  if (duplicates.length) {
+    return duplicates.join(', ')
+  } else return undefined
 }
