@@ -13,7 +13,7 @@ limitations under the License.
 
 import { z } from 'zod'
 import { TinaFieldInner } from '../types/SchemaTypes'
-import { hasDuplicates } from '../util'
+import { findDuplicates } from '../util'
 
 const TypeName = [
   'string',
@@ -132,8 +132,14 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
         })
         .optional(),
     })
-    .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
-      message: 'Fields must have a unique name',
+    .superRefine((val, ctx) => {
+      const dups = findDuplicates(val?.fields.map((x) => x.name))
+      if (dups) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Fields must have a unique name, duplicate field names: ${dups}`,
+        })
+      }
     })
 
   const ObjectField = FieldWithList.extend({
@@ -146,15 +152,27 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
       .array(TinaFieldZod)
       .min(1)
       .optional()
-      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
-        message: 'Fields must have a unique name',
+      .superRefine((val, ctx) => {
+        const dups = findDuplicates(val?.map((x) => x.name))
+        if (dups) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Fields must have a unique name, duplicate field names: ${dups}`,
+          })
+        }
       }),
     templates: z
       .array(TemplateTemp)
       .min(1)
       .optional()
-      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
-        message: 'Templates must have a unique name',
+      .superRefine((val, ctx) => {
+        const dups = findDuplicates(val?.map((x) => x.name))
+        if (dups) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+          })
+        }
       }),
   })
 
@@ -166,8 +184,14 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
     templates: z
       .array(TemplateTemp)
       .optional()
-      .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
-        message: 'Templates must have a unique name',
+      .superRefine((val, ctx) => {
+        const dups = findDuplicates(val?.map((x) => x.name))
+        if (dups) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Templates must have a unique name, duplicate template names: ${dups}`,
+          })
+        }
       }),
   })
 
@@ -200,60 +224,48 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
         },
       }
     )
-    .superRefine(
-      (val, ctx) => {
-        if (val.type === 'string') {
-          // refine isTitle to make sure the proper args are passed
-          if (val.isTitle) {
-            if (val.list) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: 'You can not have `list: true` when using `isTitle`',
-              })
-            }
-            if (!val.required) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message:
-                  'You must have { required: true } when using `isTitle`',
-              })
-            }
+    .superRefine((val, ctx) => {
+      if (val.type === 'string') {
+        // refine isTitle to make sure the proper args are passed
+        if (val.isTitle) {
+          if (val.list) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'You can not have `list: true` when using `isTitle`',
+            })
+          }
+          if (!val.required) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'You must have { required: true } when using `isTitle`',
+            })
           }
         }
-        // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
-        if (val.type === 'object') {
-          // TODO: Maybe clean up this code its sorta messy
-          const message =
-            'Must provide one of templates or fields in your collection'
-          let isValid = Boolean(val?.templates) || Boolean(val?.fields)
+      }
+      // Adding the refine to ObjectField broke the discriminatedUnion so it will be added here
+      if (val.type === 'object') {
+        // TODO: Maybe clean up this code its sorta messy
+        const message =
+          'Must provide one of templates or fields in your collection'
+        let isValid = Boolean(val?.templates) || Boolean(val?.fields)
+        if (!isValid) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message,
+          })
+          return false
+        } else {
+          isValid = !(val?.templates && val?.fields)
           if (!isValid) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message,
             })
-            return false
-          } else {
-            isValid = !(val?.templates && val?.fields)
-            if (!isValid) {
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message,
-              })
-            }
-            return isValid
           }
+          return isValid
         }
-
-        return true
       }
-      // (val) => {
 
-      //   if (val.type === 'object') {
-      //     return {
-      //       message:
-      //         'Must provide one of templates or fields in your collection',
-      //     }
-      //   }
-      // }
-    )
+      return true
+    })
 })
