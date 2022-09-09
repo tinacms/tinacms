@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.63.8
+
+### Patch Changes
+
+- 87369d34c: export functions needed for indexing
+
 ## 0.63.7
 
 ### Patch Changes
