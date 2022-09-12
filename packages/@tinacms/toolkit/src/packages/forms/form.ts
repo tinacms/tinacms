@@ -22,6 +22,12 @@ import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
 import { Plugin } from '../core'
 import { Field, AnyField } from './field'
 
+type GlobalOptions = {
+  global: true
+  icon?: any
+  layout?: 'fullscreen' | 'popup'
+}
+
 export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   id: any
   label: string
@@ -29,6 +35,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   __type?: string
   reset?(): void
   actions?: any[]
+  global?: GlobalOptions
   buttons?: {
     save: string
     reset: string
@@ -50,6 +57,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     save: string
     reset: string
   }
+  global: GlobalOptions | null = null
   loading: boolean = false
 
   constructor({
@@ -58,6 +66,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     fields,
     actions,
     buttons,
+    global,
     reset,
     loadInitialValues,
     onChange,
@@ -67,6 +76,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.__type = options.__type || 'form'
     this.id = id
     this.label = label
+    this.global = global
     this.fields = fields || []
     this.onSubmit = options.onSubmit
     this.finalForm = createForm<S>({
