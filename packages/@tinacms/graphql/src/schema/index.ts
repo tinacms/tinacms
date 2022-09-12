@@ -139,7 +139,9 @@ export class TinaSchema {
   }
   public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
-      return filepath.replace('\\', '/').startsWith(collection.path)
+      return filepath
+        .replace(/\\/g, '/')
+        .startsWith(collection.path.replace(/\/?$/, '/'))
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
