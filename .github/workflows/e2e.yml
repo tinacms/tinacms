@@ -14,7 +14,7 @@ jobs:
           version: 7.4.0
           run_install: true
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           install: false
           browser: ${{ matrix.browser }}
