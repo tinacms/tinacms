@@ -785,7 +785,7 @@ importers:
       normalize-path: 3.0.0
       postcss: 8.4.14
       postcss-nested: 5.0.6_postcss@8.4.14
-      tailwindcss: 3.1.4
+      tailwindcss: 3.1.4_postcss@8.4.14
       tsup: 4.14.0_m3gf5jmpd2aiwepqhoxxcqgnwi
       typescript: 4.7.4
       vite: 2.9.13
@@ -1107,6 +1107,7 @@ importers:
       final-form: 4.20.1
       graphql: ^15.1.0
       graphql-tag: ^2.11.0
+      history: ^5.3.0
       identity-obj-proxy: ^3.0.0
       isomorphic-fetch: ^3.0.0
       jest: ^27.0.6
@@ -1119,6 +1120,7 @@ importers:
       react-dom: 17.0.2
       react-icons: ^4.3.1
       react-is: ^17.0.2
+      react-router: '6'
       react-router-dom: '6'
       styled-components: ^5.2.0
       typescript: 4.3.5
@@ -1137,10 +1139,12 @@ importers:
       final-form: 4.20.1
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
+      history: 5.3.0
       lodash.set: 4.3.2
       prism: 4.1.2_react@17.0.2
       prism-react-renderer: 1.3.5_react@17.0.2
       react-icons: 4.4.0_react@17.0.2
+      react-router: 6.3.0_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       url-pattern: 1.0.3
       yup: 0.32.11
@@ -6877,7 +6881,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.1.4
+      tailwindcss: 3.1.4_postcss@8.4.14
     dev: false
 
   /@tailwindcss/line-clamp/0.3.1_tailwindcss@3.1.4:
@@ -6888,7 +6892,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.1.4
+      tailwindcss: 3.1.4_postcss@8.4.14
     dev: false
 
   /@tailwindcss/typography/0.4.1_tailwindcss@2.2.19:
@@ -6917,7 +6921,7 @@ packages:
       lodash.castarray: 4.4.0
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
-      tailwindcss: 3.1.4
+      tailwindcss: 3.1.4_postcss@8.4.14
     dev: false
 
   /@testing-library/dom/8.14.0:
@@ -25391,13 +25395,15 @@ packages:
     transitivePeerDependencies:
       - ts-node
 
-  /tailwindcss/3.1.4:
+  /tailwindcss/3.1.4_postcss@8.4.14:
     resolution:
       {
         integrity: sha512-NrxbFV4tYsga/hpWbRyUfIaBrNMXDxx5BsHgBS4v5tlyjf+sDsgBg5m9OxjrXIqAS/uR9kicxLKP+bEHI7BSeQ==,
       }
     engines: { node: '>=12.13.0' }
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
