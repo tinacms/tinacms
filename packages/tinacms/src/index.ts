@@ -22,16 +22,19 @@ export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
-import { TinaCMSProvider2 } from './tina-cms'
+import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'
 import type { TinaCMSProviderDefaultProps } from './types/cms'
 export type { TinaCMSProviderDefaultProps }
 export default TinaCMSProvider2
+import { TinaCMS } from '@tinacms/toolkit'
+import { formifyCallback } from './hooks/use-graphql-forms'
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
   TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
+  TinaCMSConfig,
 } from '@tinacms/schema-tools'
 
 import { validateSchema } from '@tinacms/schema-tools'
@@ -52,6 +55,16 @@ export const defineSchema = (config: TinaCloudSchema) => {
 
 export const defineConfig = (
   config: Omit<TinaCMSProviderDefaultProps, 'children'>
+) => {
+  return config
+}
+
+export const defineStaticConfig = (
+  config: TinaCMSConfig<
+    (cms: TinaCMS) => TinaCMS,
+    formifyCallback,
+    DocumentCreatorCallback
+  >
 ) => {
   return config
 }
