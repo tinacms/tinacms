@@ -9,14 +9,12 @@ jobs:
         browser: ['chrome', 'firefox']
     steps:
       - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: pnpm/action-setup@v2
         with:
-          version: 7.4.0
-          run_install: true
+          version: latest
       - name: Cypress run
         uses: cypress-io/github-action@v4
         with:
-          install: false
           browser: ${{ matrix.browser }}
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: pnpm build:e2e
@@ -53,7 +51,7 @@ jobs:
           version: 7.4.0
           run_install: true
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           install: false
           browser: ${{ matrix.browser }}
