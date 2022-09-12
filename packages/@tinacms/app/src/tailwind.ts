@@ -20,7 +20,7 @@ import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
-export const viteTina = () => {
+export const viteTina = ({ content }: { content?: string }) => {
   return {
     name: 'vite-plugin-tina',
     config: () => {
@@ -234,12 +234,7 @@ export const viteTina = () => {
             },
           },
         },
-        content: [
-          path.join(
-            __dirname,
-            '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'
-          ),
-        ],
+        content: [content],
         plugins: [
           twTypography({ className: 'tina-prose' }),
           lineClamp,

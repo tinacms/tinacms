@@ -32,6 +32,10 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
+  if (process.env.USE_PROTOTYPE) {
+    viteBuildPrototype({ rootPath, outputFolder, publicFolder, local, apiUrl })
+    return
+  }
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
   const packageJSONFilePath = path.join(rootPath, 'package.json')
@@ -80,7 +84,15 @@ vite.svg`
     // For some reason this is breaking the React runtime in the end user's application.
     // Not sure what's going on but `development` works for now.
     mode: local ? 'development' : 'production',
-    plugins: [react(), viteTina()],
+    plugins: [
+      react(),
+      viteTina({
+        content: path.join(
+          __dirname,
+          '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'
+        ),
+      }),
+    ],
     define: {
       'process.env': {},
       __API_URL__: `"${apiUrl}"`,
@@ -116,6 +128,128 @@ vite.svg`
     await build(config)
     await fs.rmSync(out)
   } else {
+    /**
+     * Uncomment to run the dev server
+     * Note that this assumes the outputFile is 'admin'
+     * And will run into port issues when the build server
+     * restart itself
+     */
+    const indexDev = await fs
+      .readFileSync(path.join(root, 'index.dev.html'))
+      .toString()
+    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
+    const server = await createServer(config)
+    await server.listen()
+    await server.printUrls()
+  }
+}
+
+export const viteBuildPrototype = async ({
+  rootPath,
+  outputFolder,
+  publicFolder,
+  local,
+  apiUrl,
+}: {
+  local: boolean
+  rootPath: string
+  publicFolder: string
+  outputFolder: string
+  apiUrl: string
+}) => {
+  const root = path.resolve(__dirname, '..', 'prototypeFiles')
+  const pathToConfig = path.join(rootPath, '.tina', 'config')
+  const packageJSONFilePath = path.join(rootPath, 'package.json')
+  const outDir = path.join(rootPath, publicFolder, outputFolder)
+  await fs.emptyDir(outDir)
+  await fs.ensureDir(outDir)
+  await fs.writeFile(
+    path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
+    `index.html
+assets/
+vite.svg`
+  )
+
+  /**
+   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
+   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
+   * to keep them separate since they run at different times. the compilation step also cleans up after itself
+   * so we can't use it as an artifact for this.
+   */
+  const packageJSON = JSON.parse(
+    fs.readFileSync(packageJSONFilePath).toString() || '{}'
+  )
+  const define = {}
+  const deps = packageJSON?.dependencies || []
+  const peerDeps = packageJSON?.peerDependencies || []
+  const devDeps = packageJSON?.devDependencies || []
+  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
+  const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
+  await esbuild({
+    bundle: true,
+    platform: 'browser',
+    target: ['es2020'],
+    entryPoints: [pathToConfig],
+    format: 'esm',
+    treeShaking: true,
+    outfile: out,
+    external: [...external, './node_modules/*'],
+    loader: loaders,
+    define: define,
+  })
+
+  const base = `/${outputFolder}/`
+  const config: InlineConfig = {
+    root,
+    base,
+    // For some reason this is breaking the React runtime in the end user's application.
+    // Not sure what's going on but `development` works for now.
+    mode: local ? 'development' : 'production',
+    plugins: [
+      react(),
+      viteTina({
+        content: path.join(
+          __dirname,
+          '../prototypeFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'
+        ),
+      }),
+    ],
+    define: {
+      'process.env': {},
+      __API_URL__: `"${apiUrl}"`,
+    },
+    server: {
+      strictPort: true,
+      port: 5173,
+      fs: {
+        // allow isn't working yet, so be lax with it (maybe just do this for dev mode)
+        strict: false,
+        // /**
+        //  * From the monorepo Vite is importing from a node_modules folder relative to itself, which
+        //  * works as expected. But when published and used from a yarn setup, the node_modules
+        //  * are flattened, meaning we need to access the global node_modules folder instead of
+        //  * our own. I believe this is fine, but something to keep an eye on.
+        //  */
+        // allow: ['..'],
+      },
+    },
+    resolve: {
+      alias: {
+        TINA_IMPORT: out,
+      },
+    },
+    build: {
+      sourcemap: true,
+      outDir,
+      emptyOutDir: false,
+    },
+    logLevel: 'silent',
+  }
+  if (false) {
+    await build(config)
+    await fs.rmSync(out)
+  } else {
+    console.log('running dev server', config)
     /**
      * Uncomment to run the dev server
      * Note that this assumes the outputFile is 'admin'

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "yarn tinacms dev -c \"next dev\" --noTelemetry",
+    "dev-prototype": "USE_PROTOTYPE=true yarn tinacms dev -c \"next dev\" --noTelemetry",
     "start": "yarn tinacms build -c \"next start\"",
     "lint": "next lint"
   },
