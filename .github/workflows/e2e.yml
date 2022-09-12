@@ -3,7 +3,6 @@ on: [push]
 jobs:
   cypress-run-windows:
     runs-on: windows-latest
-    container: cypress/browsers:node14.17.0-chrome88-ff89
     name: E2E on Tests (Windows)
     strategy:
       matrix:
