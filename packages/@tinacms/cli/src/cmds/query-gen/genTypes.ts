@@ -29,7 +29,6 @@ export async function genClient(
     tinaSchema,
     usingTs,
   }: { tinaSchema: TinaCloudSchema<false>; usingTs?: boolean },
-  next: () => void,
   options
 ) {
   const branch = tinaSchema?.config?.branch
@@ -62,7 +61,7 @@ export const client = createClient({ url: '${apiURL}', token: '${token}', querie
 export default client;
   `
   )
-  return next()
+  return apiURL
 }
 
 export async function genTypes(

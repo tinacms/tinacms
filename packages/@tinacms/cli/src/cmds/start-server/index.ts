@@ -173,7 +173,7 @@ export async function startServer(
         verbose,
       })
 
-      await ctx.builder.genTypedClient({
+      const apiUrl = await ctx.builder.genTypedClient({
         compiledSchema: schema,
         local: true,
         noSDK,
@@ -186,6 +186,7 @@ export async function startServer(
         local: true,
         rootPath: ctx.rootPath,
         schema,
+        apiUrl,
       })
     } catch (error) {
       throw error
