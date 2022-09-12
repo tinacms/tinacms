@@ -14,8 +14,6 @@ limitations under the License.
 import { Telemetry } from '@tinacms/metrics'
 import { Command } from 'commander'
 import prompts from 'prompts'
-// TODO: add and implement async-retry
-// import retry from 'async-retry'
 import path from 'path'
 //@ts-ignore
 import { version, name } from '../package.json'

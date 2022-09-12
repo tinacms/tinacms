@@ -1,5 +1,46 @@
 # @tinacms/schema-tools
 
+## 0.1.2
+
+### Patch Changes
+
+- 777b1e08a: add better error messages for duplicate values in zod
+
+## 0.1.1
+
+### Patch Changes
+
+- 59ff1bb10: fix: fix collection fetching when paths overlap
+- 232ae6d52: Added better checks for name field in schema
+- fd4d8c8ff: Add `router` property on collections. This replaces the need for using the RouteMapper plugin.
+
+  ```ts
+  ...
+    name: 'post',
+    path: 'posts',
+    ui: {
+      router: ({ document }) => {
+        // eg. post items can be previewed at posts/hello-world
+        return `/posts/${document._sys.filename}`;
+      },
+    },
+  ...
+  ```
+
+  Add `global` property on collections. This replaces the need for `formifyCallback` in most cases
+
+  ```ts
+  ...
+    name: 'post',
+    path: 'posts',
+    ui: {
+      global: true
+    },
+  ...
+  ```
+
+- 9e5da3103: Add router to default schema
+
 ## 0.1.0
 
 ### Minor Changes

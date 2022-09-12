@@ -25,6 +25,8 @@ export type { Store } from '@tinacms/datalayer'
 export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
+export { createSchema } from './schema'
+export { buildDotTinaFiles }
 
 export type DummyType = unknown
 

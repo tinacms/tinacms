@@ -13,7 +13,7 @@ limitations under the License.
 
 import { z } from 'zod'
 import { name } from './properties'
-import { hasDuplicates } from '../util'
+import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
 const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
@@ -27,8 +27,14 @@ const Template = z
     name: name,
     fields: z.array(TinaFieldZod),
   })
-  .refine((val) => !hasDuplicates(val.fields?.map((x) => x.name)), {
-    message: 'Fields must have a unique name',
+  .superRefine((val, ctx) => {
+    const dups = findDuplicates(val.fields?.map((x) => x.name))
+    if (dups) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Fields must have a unique name, duplicate field names: ${dups}`,
+      })
+    }
   })
 
 const TinaCloudCollectionBase = z.object({
@@ -43,8 +49,14 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
     .array(TinaFieldZod)
     .min(1)
     .optional()
-    .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
-      message: 'Fields must have a unique name',
+    .superRefine((val, ctx) => {
+      const dups = findDuplicates(val?.map((x) => x.name))
+      if (dups) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Fields must have a unique name, duplicate field names: ${dups}`,
+        })
+      }
     })
     .refine(
       // It is valid if it is 0 or 1
@@ -60,8 +72,14 @@ const TinaCloudCollection = TinaCloudCollectionBase.extend({
     .array(Template)
     .min(1)
     .optional()
-    .refine((val) => !hasDuplicates(val?.map((x) => x.name)), {
-      message: 'Templates must have a unique name',
+    .superRefine((val, ctx) => {
+      const dups = findDuplicates(val?.map((x) => x.name))
+      if (dups) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Templates must have a unique name, duplicate template names: ${dups}`,
+        })
+      }
     }),
 }).refine(
   (val) => {
@@ -82,10 +100,11 @@ export const TinaCloudSchemaZod = z
     config: tinaConfigZod.optional(),
   })
   .superRefine((val, ctx) => {
-    if (hasDuplicates(val.collections.map((x) => x.name))) {
+    const dups = findDuplicates(val.collections?.map((x) => x.name))
+    if (dups) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'can not have two collections with the same name',
+        message: `${dups} are duplicate names in your collections. Collection names must be unique.`,
         fatal: true,
       })
     }

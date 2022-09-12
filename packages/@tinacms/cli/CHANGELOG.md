@@ -1,5 +1,38 @@
 # tinacms-cli
 
+## 0.61.12
+
+### Patch Changes
+
+- Updated dependencies [87369d34c]
+  - @tinacms/graphql@0.63.8
+
+## 0.61.11
+
+### Patch Changes
+
+- Updated dependencies [777b1e08a]
+  - @tinacms/schema-tools@0.1.2
+  - @tinacms/graphql@0.63.7
+  - @tinacms/app@0.0.11
+
+## 0.61.10
+
+### Patch Changes
+
+- 75b9a1b56: enhancement: Don't build client on tinacms audit
+- 10cce31b7: fix: surface errors from type-gen
+- 9e5da3103: Add router to default schema
+- 098102a89: fix: exit with error with tina schema build fails
+- Updated dependencies [75b9a1b56]
+- Updated dependencies [59ff1bb10]
+- Updated dependencies [232ae6d52]
+- Updated dependencies [fd4d8c8ff]
+- Updated dependencies [9e5da3103]
+  - @tinacms/graphql@0.63.6
+  - @tinacms/schema-tools@0.1.1
+  - @tinacms/app@0.0.10
+
 ## 0.61.9
 
 ### Patch Changes
