@@ -94,6 +94,8 @@ Cypress.Commands.add(
 
     cy.save()
 
+    cy.wait(4000)
+
     cy.task('readrawmdx').then((content) => {
       console.info('readrawmdx', content)
       expect(content).to.contain(wantedMD)
