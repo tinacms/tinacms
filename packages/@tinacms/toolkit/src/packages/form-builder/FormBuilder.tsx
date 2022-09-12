@@ -310,7 +310,7 @@ export const FormStatus = ({ pristine }) => {
 export const FormWrapper = ({ children, id }) => {
   return (
     <div
-      data-test={`form:${id}`}
+      data-test={`form:${id?.replace(/\\/g, '/')}`}
       className="h-full overflow-y-auto max-h-full bg-gray-50 pt-6 px-6 pb-2"
     >
       <div className="w-full flex justify-center">
