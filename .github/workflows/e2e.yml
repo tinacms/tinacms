@@ -19,7 +19,7 @@ jobs:
           install: false
           browser: ${{ matrix.browser }}
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: pnpm cypress install --force && pnpm build:e2e
+          build: 'pnpm cypress install --force && pnpm build:e2e'
           command: pnpm test:e2e
           start: pnpm start:e2e
           wait-on: 'http://localhost:3000'
