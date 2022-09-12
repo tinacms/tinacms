@@ -22,6 +22,7 @@ import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
 import { PageWrapper } from '../components/Page'
 import { TinaAdminApi } from '../api'
+import usePrompt from '../../hooks/use-prompt'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
@@ -165,6 +166,8 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   const windowWidth = useWindowWidth()
   const renderNavToggle = windowWidth < navBreakpoint + 1
   const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
+
+  usePrompt('Changes you made may not be saved.', !formIsPristine)
 
   return (
     <PageWrapper>
