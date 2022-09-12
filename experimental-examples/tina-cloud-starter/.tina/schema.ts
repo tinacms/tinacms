@@ -1,6 +1,5 @@
-import { defineSchema, defineConfig } from "tinacms";
+import { defineSchema } from "tinacms";
 import type { TinaTemplate } from "tinacms";
-import { client } from "./__generated__/client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
