@@ -24,11 +24,13 @@ export const viteBuild = async ({
   outputFolder,
   publicFolder,
   local,
+  apiUrl,
 }: {
   local: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
+  apiUrl: string
 }) => {
   const root = path.resolve(__dirname, '..', 'appFiles')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
@@ -81,6 +83,7 @@ vite.svg`
     plugins: [react(), viteTina()],
     define: {
       'process.env': {},
+      __API_URL__: `"${apiUrl}"`,
     },
     server: {
       strictPort: true,
