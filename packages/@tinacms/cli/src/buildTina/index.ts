@@ -166,7 +166,7 @@ export const buildCmdBuild = async (
     rootPath: ctx.rootPath,
     ...options,
   })
-  await ctx.builder.genTypedClient({
+  const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
     noSDK: options.noSDK,
@@ -177,6 +177,7 @@ export const buildCmdBuild = async (
     local: options.local,
     rootPath: ctx.rootPath,
     schema,
+    apiUrl,
   })
   next()
 }
@@ -258,9 +259,12 @@ export class ConfigBuilder {
       verbose,
     })
 
-    await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
-      local,
-    })
+    return genClient(
+      { tinaSchema: compiledSchema, usingTs },
+      {
+        local,
+      }
+    )
   }
 }
 
@@ -268,10 +272,12 @@ export const buildAdmin = async ({
   schema,
   local,
   rootPath,
+  apiUrl,
 }: {
   schema: any
   local: boolean
   rootPath: string
+  apiUrl: string
 }) => {
   if (schema?.config?.build) {
     await spin({
@@ -282,6 +288,7 @@ export const buildAdmin = async ({
           rootPath,
           outputFolder: schema?.config?.build?.outputFolder as string,
           publicFolder: schema?.config?.build?.publicFolder as string,
+          apiUrl,
         })
       },
     })

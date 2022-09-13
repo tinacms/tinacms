@@ -257,11 +257,14 @@ export const TinaCMSProvider2 = ({
   )
 }
 
+export type DocumentCreatorCallback = Parameters<
+  typeof useDocumentCreatorPlugin
+>[0]
 const DocumentCreator = ({
   documentCreatorCallback,
 }: {
   /** Callback if you need access to the "document creator" API */
-  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
+  documentCreatorCallback?: DocumentCreatorCallback
 }) => {
   useDocumentCreatorPlugin(documentCreatorCallback)
 

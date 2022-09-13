@@ -41,6 +41,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({
   styled = true,
 }) => {
   const cms = useCMS()
+  const [resizingSidebar, setResizingSidebar] = React.useState(false)
 
   return (
     <MutationSignalProvider>
@@ -52,11 +53,19 @@ export const TinaUI: React.FC<TinaUIProps> = ({
           {cms.enabled && cms.toolbar && <Toolbar />}
           <MediaManager />
           {cms.sidebar && (
-            <SidebarProvider position={position} sidebar={cms.sidebar} />
+            <SidebarProvider
+              resizingSidebar={resizingSidebar}
+              setResizingSidebar={setResizingSidebar}
+              position={position}
+              sidebar={cms.sidebar}
+            />
           )}
           <ActiveFieldIndicator />
         </div>
-        {children}
+        {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
+        <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>
+          {children}
+        </div>
       </ModalProvider>
     </MutationSignalProvider>
   )
