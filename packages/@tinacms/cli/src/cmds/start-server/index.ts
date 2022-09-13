@@ -23,6 +23,7 @@ import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
 import { buildAdmin, ConfigBuilder } from '../../buildTina'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -47,6 +48,12 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
+    // FIXME: these types live in TinaCMS
+    schema?: TinaSchema & {
+      config?: {
+        build?: { outputFolder: string; publicFolder: string }
+      }
+    }
   },
   next,
   {
@@ -107,7 +114,9 @@ export async function startServer(
 
       state.server.listen(port, () => {
         const altairUrl = `http://localhost:${port}/altair/`
-        const cmsUrl = `[your-development-url]/admin`
+        const cmsUrl = ctx.schema?.config?.build
+          ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
+          : `[your-development-url]/admin`
         if (verbose)
           logger.info(`Started Filesystem GraphQL server on port: ${port}`)
         logger.info(
@@ -164,7 +173,7 @@ export async function startServer(
         verbose,
       })
 
-      await ctx.builder.genTypedClient({
+      const apiUrl = await ctx.builder.genTypedClient({
         compiledSchema: schema,
         local: true,
         noSDK,
@@ -177,6 +186,7 @@ export async function startServer(
         local: true,
         rootPath: ctx.rootPath,
         schema,
+        apiUrl,
       })
     } catch (error) {
       throw error

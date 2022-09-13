@@ -12,17 +12,26 @@ limitations under the License.
 */
 
 import React from 'react'
-import TinaCMS, { TinaAdmin } from 'tinacms'
+import TinaCMS, { TinaAdmin, useCMS } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
+import { Preview } from './preview'
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
 import config from 'TINA_IMPORT'
 
+const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
+  const cms = useCMS()
+  cms.flags.set('tina-preview', outputFolder)
+  return null
+}
+
 export const TinaAdminWrapper = () => {
   return (
-    <TinaCMS {...config}>
-      <TinaAdmin />
+    // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
+     <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
+      <SetPreview outputFolder={config.build.outputFolder} />
+      <TinaAdmin preview={<Preview {...config} />} />
     </TinaCMS>
   )
 }

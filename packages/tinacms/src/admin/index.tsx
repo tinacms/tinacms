@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import type { TinaCMS } from '@tinacms/toolkit'
+import { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -39,10 +39,24 @@ const Redirect = () => {
   return null
 }
 
-export const TinaAdmin = () => {
+const SetPreviewFlag = ({
+  preview,
+  cms,
+}: {
+  preview?: JSX.Element
+  cms: TinaCMS
+}) => {
+  React.useEffect(() => {
+    if (preview) {
+      cms.flags.set('tina-iframe', true)
+    }
+  }, [preview])
+  return null
+}
+
+export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
   const isSSR = typeof window === 'undefined'
   const { edit } = useEditState()
-
   if (isSSR) {
     return null
   }
@@ -60,41 +74,62 @@ export const TinaAdmin = () => {
       {(cms: TinaCMS) => {
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true
-
         if (isTinaAdminEnabled) {
           return (
-            <Layout>
-              <Router>
-                <div className="flex items-stretch h-screen overflow-hidden">
-                  <Sidebar cms={cms} />
-                  <div className="flex-1 relative">
-                    <Routes>
-                      <Route
-                        path="collections/:collectionName/new"
-                        element={<CollectionCreatePage />}
-                      />
-                      <Route
-                        path="collections/:collectionName/:templateName/new"
-                        element={<CollectionCreatePage />}
-                      />
-                      <Route
-                        path="collections/:collectionName/*"
-                        element={<CollectionUpdatePage />}
-                      />
-                      <Route
-                        path="collections/:collectionName"
-                        element={<CollectionListPage />}
-                      />
-                      <Route
-                        path="screens/:screenName"
-                        element={<ScreenPage />}
-                      />
-                      <Route path="/" element={<DashboardPage />} />
-                    </Routes>
-                  </div>
-                </div>
-              </Router>
-            </Layout>
+            <Router>
+              <SetPreviewFlag preview={preview} cms={cms} />
+              <Routes>
+                {preview && <Route path="preview" element={preview} />}
+                <Route
+                  path="collections/:collectionName/new"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <CollectionCreatePage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="collections/:collectionName/:templateName/new"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <CollectionCreatePage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="collections/:collectionName/*"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <CollectionUpdatePage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="collections/:collectionName"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <CollectionListPage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="screens/:screenName"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <ScreenPage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="/"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <DashboardPage />
+                    </DefaultWrapper>
+                  }
+                />
+              </Routes>
+            </Router>
           )
         } else {
           return (
@@ -110,5 +145,22 @@ export const TinaAdmin = () => {
         }
       }}
     </GetCMS>
+  )
+}
+
+const DefaultWrapper = ({
+  cms,
+  children,
+}: {
+  cms: TinaCMS
+  children: React.ReactNode
+}) => {
+  return (
+    <Layout>
+      <div className="flex items-stretch h-screen overflow-hidden">
+        <Sidebar cms={cms} />
+        <div className="flex-1 relative">{children}</div>
+      </div>
+    </Layout>
   )
 }
