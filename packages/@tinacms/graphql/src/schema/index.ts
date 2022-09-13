@@ -140,7 +140,7 @@ export class TinaSchema {
   public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
       return filepath
-        .replace('\\', '/')
+        .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
     })
     if (!collection) {
