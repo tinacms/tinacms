@@ -281,7 +281,7 @@ const Sidebar = ({
       }}
     >
       <>
-        <SidebarWrapper>
+        <SidebarWrapper loading={collectionsInfo.loading}>
           <EditButton />
           {displayNav && (
             <Nav
@@ -552,19 +552,19 @@ const EditButton = ({}) => {
   )
 }
 
-const SidebarWrapper = ({ children }) => {
+const SidebarWrapper = ({ children, loading }) => {
   const { displayState, sidebarWidth, resizingSidebar } =
     React.useContext(SidebarContext)
 
   return (
     <div
       className={`fixed top-0 left-0 h-screen z-base ${
-        displayState === 'closed' ? `pointer-events-none` : ``
+        displayState === 'closed' || loading ? `pointer-events-none` : ``
       }`}
     >
       <div
         className={`relative h-screen transform flex ${
-          displayState !== 'closed' ? `` : `-translate-x-full`
+          displayState !== 'closed' && !loading ? `` : `-translate-x-full`
         } ${
           resizingSidebar
             ? `transition-none`
