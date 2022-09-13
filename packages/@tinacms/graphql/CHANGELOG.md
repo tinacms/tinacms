@@ -1,5 +1,16 @@
 # tina-graphql
 
+## 0.63.9
+
+### Patch Changes
+
+- f8b89379c: Fixed an issue with windows paths not working.
+- Updated dependencies [9183157c4]
+- Updated dependencies [4adf12619]
+- Updated dependencies [f8b89379c]
+  - @tinacms/schema-tools@0.1.3
+  - @tinacms/mdx@0.61.7
+
 ## 0.63.8
 
 ### Patch Changes
