@@ -51,7 +51,7 @@ function execShellCommand(cmd): Promise<string> {
 
 export async function initTina(ctx: any, next: () => void, options) {
   const telemetry = new Telemetry({ disabled: options.noTelemetry })
-  const root = options.rootPath
+  const root = ctx.rootPath
   const tsConfigPath = path.join(root, 'tsconfig.json')
   const usingTs = await fs.pathExists(tsConfigPath)
 
