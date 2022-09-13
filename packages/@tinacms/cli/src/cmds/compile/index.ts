@@ -18,8 +18,7 @@ import path from 'path'
 import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
-import { dangerText, logText } from '../../utils/theme'
-import { defaultSchema } from './defaultSchema'
+import { logText } from '../../utils/theme'
 import { fileExists, getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
 
@@ -115,7 +114,6 @@ export const compileClient = async (
     clientExists = false
   }
 
-  // TODO: Do we want to introduce a `defaultClient()` like we do with `defaultSchema()`?
   if (!clientExists) {
     // The client.ts file does not exist
     if (options.verbose) {
@@ -318,20 +316,9 @@ export const compileSchema = async (options: {
 
   // If there is not Schema and no config
   if (!schemaExists && !configExists) {
-    logger.info(
-      dangerText(`
-      .tina/schema.${options.schemaFileType} not found, Creating one for you...
-      See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
-      `)
+    throw new Error(
+      'No schema or config file found in .tina folder. Please run `npx @tinacms/cli@latest init` to generate a schema file.'
     )
-    const file = path.join(tinaPath, `schema.${options.schemaFileType}`)
-    // Ensure there is a .tina/schema.ts file
-    await fs.ensureFile(file)
-    // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema)
-
-    // now the schema exists
-    schemaExists = true
   }
 
   let schema: any
