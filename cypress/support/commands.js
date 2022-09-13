@@ -94,6 +94,7 @@ Cypress.Commands.add(
 
     cy.save()
 
+    // TODO: See why this is needed on windows
     cy.wait(4000)
 
     cy.task('readrawmdx').then((content) => {
