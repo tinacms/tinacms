@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.69.6",
+  "version": "0.69.7",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
