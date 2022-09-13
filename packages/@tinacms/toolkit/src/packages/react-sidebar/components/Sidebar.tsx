@@ -51,6 +51,8 @@ const defaultSidebarState = 'open'
 
 export interface SidebarProviderProps {
   sidebar: SidebarState
+  resizingSidebar: boolean
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
   defaultWidth?: SidebarStateOptions['defaultWidth']
   position?: SidebarStateOptions['position']
   defaultState?: SidebarStateOptions['defaultState']
@@ -58,6 +60,8 @@ export interface SidebarProviderProps {
 
 export function SidebarProvider({
   position = defaultSidebarPosition,
+  resizingSidebar,
+  setResizingSidebar,
   defaultWidth = defaultSidebarWidth,
   defaultState = defaultSidebarState,
   sidebar,
@@ -74,6 +78,8 @@ export function SidebarProvider({
       defaultWidth={cms?.sidebar?.defaultWidth || defaultWidth}
       // @ts-ignore
       defaultState={cms?.sidebar?.defaultState || defaultState}
+      resizingSidebar={resizingSidebar}
+      setResizingSidebar={setResizingSidebar}
       renderNav={
         // @ts-ignore
         typeof cms?.sidebar?.renderNav !== 'undefined'
@@ -88,6 +94,8 @@ export function SidebarProvider({
 
 interface SidebarProps {
   sidebar: SidebarState
+  resizingSidebar: boolean
+  setResizingSidebar: React.Dispatch<React.SetStateAction<boolean>>
   defaultWidth?: SidebarStateOptions['defaultWidth']
   defaultState?: SidebarStateOptions['defaultState']
   position?: SidebarStateOptions['position']
@@ -132,6 +140,8 @@ const Sidebar = ({
   defaultState,
   position,
   renderNav,
+  resizingSidebar,
+  setResizingSidebar,
 }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
@@ -146,7 +156,6 @@ const Sidebar = ({
   const [displayState, setDisplayState] =
     React.useState<displayStates>(defaultState)
   const [sidebarWidth, setSidebarWidth] = React.useState<any>(defaultWidth)
-  const [resizingSidebar, setResizingSidebar] = React.useState(false)
   const [formIsPristine, setFormIsPristine] = React.useState(true)
 
   /* Set sidebar open state and width to local values if available */
@@ -291,7 +300,12 @@ const Sidebar = ({
                 />
               )}
               RenderNavCollection={({ collection }) => (
-                <SidebarCollectionLink collection={collection} />
+                <SidebarCollectionLink
+                  onClick={() => {
+                    setMenuIsOpen(false)
+                  }}
+                  collection={collection}
+                />
               )}
             />
           )}
@@ -342,7 +356,12 @@ const Sidebar = ({
                     />
                   )}
                   RenderNavCollection={({ collection }) => (
-                    <SidebarCollectionLink collection={collection} />
+                    <SidebarCollectionLink
+                      onClick={() => {
+                        setMenuIsOpen(false)
+                      }}
+                      collection={collection}
+                    />
                   )}
                 >
                   <div className="absolute top-8 right-0 transform translate-x-full overflow-hidden">
@@ -489,20 +508,29 @@ const SidebarSiteLink = ({
 
 const SidebarCollectionLink = ({
   collection,
+  onClick,
 }: {
   collection: {
     label: string
     name: string
   }
-}) => (
-  <a
-    href={`/admin#/collections/${collection.name}`}
-    className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
-  >
-    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
-    {collection.label ? collection.label : collection.name}
-  </a>
-)
+  onClick: () => void
+}) => {
+  const cms = useCMS()
+  const tinaPreview = cms.flags.get('tina-preview') || false
+  return (
+    <a
+      onClick={onClick}
+      href={`${
+        tinaPreview ? `/${tinaPreview}/index.html#` : '/admin#'
+      }/collections/${collection.name}`}
+      className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100"
+    >
+      <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+      {collection.label ? collection.label : collection.name}
+    </a>
+  )
+}
 
 const EditButton = ({}) => {
   const { displayState, toggleSidebarOpen } = React.useContext(SidebarContext)

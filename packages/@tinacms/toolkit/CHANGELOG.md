@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.57.4
+
+### Patch Changes
+
+- 4adf12619: Add support for experimental iframe mode
+- f8b89379c: Fixed an issue with windows paths not working.
+
+## 0.57.3
+
+### Patch Changes
+
+- 1dd9d01e2: Sets max height on image field to prevent it from getting too big
+- 54dd48115: Improve sync event UI
+- e650bc571: User interface for synchronization log event display
+
 ## 0.57.2
 
 ### Patch Changes
