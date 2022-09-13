@@ -232,7 +232,7 @@ export const TinaCMSProvider2 = ({
         isLocalClient={isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
-        schema={schema}
+        schema={{ ...schema, config: { ...schema.config, ...props } }}
       >
         <style>{styles}</style>
         <ErrorBoundary>
