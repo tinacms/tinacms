@@ -1,9 +1,46 @@
 name: e2e Tests
 on: [push]
 jobs:
-  cypress-run:
+  cypress-run-windows:
+    runs-on: windows-latest
+    name: E2E on Tests (Windows)
+    strategy:
+      matrix:
+        browser: ['chrome', 'firefox']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          # run_install: true
+      - name: Cypress run
+        uses: cypress-io/github-action@v4.2.0
+        with:
+          # install: false
+          browser: ${{ matrix.browser }}
+          env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
+          build: pnpm build:e2e
+          command: pnpm test:e2e
+          start: pnpm start:e2e
+          wait-on: 'http://localhost:3000'
+          # wait for 3 minutes for the server to respond
+          wait-on-timeout: 180
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+      # Test run video was always captured, so this action uses "always()" condition
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
+
+  cypress-run-ubuntu:
     runs-on: ubuntu-20.04
-    # There is currently a bug on chrome 100 that adds an extra space in the editor.=
+    # There is currently a bug on chrome 100 that adds an extra space in the editor
     # container: cypress/browsers:node14.17.6-chrome100-ff98
     container: cypress/browsers:node14.17.0-chrome88-ff89
     name: E2E on Tests
@@ -17,7 +54,7 @@ jobs:
           version: 7.4.0
           run_install: true
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4
         with:
           install: false
           browser: ${{ matrix.browser }}
