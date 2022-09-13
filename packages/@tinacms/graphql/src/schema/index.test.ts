@@ -17,7 +17,6 @@ describe('TinaSchema', () => {
   describe('with sibling collections of similar names', () => {
     test('fetches correct collection with getCollectionByFullPath', async () => {
       const schema = createSchema()
-      console.log({ collections: schema.getCollections() })
 
       const collection1 = schema.getCollectionByFullPath('content/test/foobar')
       expect(collection1.name).toEqual('test')
