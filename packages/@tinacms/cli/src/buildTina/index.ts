@@ -11,7 +11,6 @@
  limitations under the License.
  */
 
-import retry from 'async-retry'
 import fs from 'fs-extra'
 
 import {
@@ -27,7 +26,7 @@ import {
   LevelStore,
 } from '@tinacms/datalayer'
 import path from 'path'
-
+import { DocumentNode } from 'graphql'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
 import { makeIsomorphicOptions } from './git'
@@ -167,7 +166,7 @@ export const buildCmdBuild = async (
     rootPath: ctx.rootPath,
     ...options,
   })
-  await ctx.builder.genTypedClient({
+  const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
     noSDK: options.noSDK,
@@ -178,6 +177,7 @@ export const buildCmdBuild = async (
     local: options.local,
     rootPath: ctx.rootPath,
     schema,
+    apiUrl,
   })
   next()
 }
@@ -204,7 +204,11 @@ export const auditCmdBuild = async (
 export class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, verbose, rootPath }: BuildOptions) {
+  async build({ dev, verbose, rootPath }: BuildOptions): Promise<{
+    schema: any
+    graphQLSchema: DocumentNode
+    tinaSchema: any
+  }> {
     const usingTs = await isProjectTs(rootPath)
 
     if (!rootPath) {
@@ -229,13 +233,10 @@ export class ConfigBuilder {
       rootPath,
     })
 
-    // This retry is in place to allow retrying when another process is building at the same time. This causes a race condition when cretin files might be deleted
-    const { graphQLSchema, tinaSchema } = await retry(
-      async () =>
-        await buildSchema(rootPath, this.database, [
-          'experimentalData',
-          'isomorphicGitBridge',
-        ])
+    const { graphQLSchema, tinaSchema } = await buildSchema(
+      rootPath,
+      this.database,
+      ['experimentalData', 'isomorphicGitBridge']
     )
 
     return { schema: compiledSchema, graphQLSchema, tinaSchema }
@@ -258,9 +259,12 @@ export class ConfigBuilder {
       verbose,
     })
 
-    await genClient({ tinaSchema: compiledSchema, usingTs }, () => {}, {
-      local,
-    })
+    return genClient(
+      { tinaSchema: compiledSchema, usingTs },
+      {
+        local,
+      }
+    )
   }
 }
 
@@ -268,10 +272,12 @@ export const buildAdmin = async ({
   schema,
   local,
   rootPath,
+  apiUrl,
 }: {
   schema: any
   local: boolean
   rootPath: string
+  apiUrl: string
 }) => {
   if (schema?.config?.build) {
     await spin({
@@ -282,6 +288,7 @@ export const buildAdmin = async ({
           rootPath,
           outputFolder: schema?.config?.build?.outputFolder as string,
           publicFolder: schema?.config?.build?.publicFolder as string,
+          apiUrl,
         })
       },
     })

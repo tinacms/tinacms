@@ -1,5 +1,43 @@
 # tina-graphql
 
+## 0.63.9
+
+### Patch Changes
+
+- f8b89379c: Fixed an issue with windows paths not working.
+- Updated dependencies [9183157c4]
+- Updated dependencies [4adf12619]
+- Updated dependencies [f8b89379c]
+  - @tinacms/schema-tools@0.1.3
+  - @tinacms/mdx@0.61.7
+
+## 0.63.8
+
+### Patch Changes
+
+- 87369d34c: export functions needed for indexing
+
+## 0.63.7
+
+### Patch Changes
+
+- Updated dependencies [777b1e08a]
+  - @tinacms/schema-tools@0.1.2
+  - @tinacms/mdx@0.61.6
+
+## 0.63.6
+
+### Patch Changes
+
+- 75b9a1b56: enhancement: Don't build client on tinacms audit
+- 59ff1bb10: fix: fix collection fetching when paths overlap
+- Updated dependencies [59ff1bb10]
+- Updated dependencies [232ae6d52]
+- Updated dependencies [fd4d8c8ff]
+- Updated dependencies [9e5da3103]
+  - @tinacms/schema-tools@0.1.1
+  - @tinacms/mdx@0.61.5
+
 ## 0.63.5
 
 ### Patch Changes

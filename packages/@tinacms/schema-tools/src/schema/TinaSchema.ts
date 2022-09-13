@@ -116,7 +116,9 @@ export class TinaSchema {
   }
   public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
-      return filepath.replace('\\', '/').startsWith(collection.path)
+      return filepath
+        .replace(/\\/g, '/')
+        .startsWith(collection.path.replace(/\/?$/, '/'))
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
@@ -131,14 +133,8 @@ export class TinaSchema {
     template: Templateable
   } => {
     let template
-    const collection = this.getCollections().find((collection) => {
-      // FIXME: searching by startsWith will break for collections
-      // that only differ by their "matches" property (eg. **/*.en.md vs **/*.fr.md)
-      return filepath.replace('\\', '/').startsWith(collection.path)
-    })
-    if (!collection) {
-      throw new Error(`Unable to find collection for file at ${filepath}`)
-    }
+    const collection = this.getCollectionByFullPath(filepath)
+
     const templates = this.getTemplatesForCollectable(collection)
     if (templates.type === 'union') {
       if (templateName) {
@@ -197,6 +193,82 @@ export class TinaSchema {
         return template
     }
   }
+
+  public transformPayload = (collectionName: string, payload: object) => {
+    const collection = this.getCollection(collectionName)
+    if (collection.templates) {
+      const template = collection.templates.find((template) => {
+        if (typeof template === 'string') {
+          throw new Error('Global templates not supported')
+        }
+        return payload['_template'] === template.name
+      })
+      if (!template) {
+        console.error(payload)
+        throw new Error(`Unable to find template for payload`)
+      }
+      if (typeof template === 'string') {
+        throw new Error('Global templates not supported')
+      }
+      return {
+        [collectionName]: {
+          [template.name]: this.transformCollectablePayload(payload, template),
+        },
+      }
+    } else {
+      return {
+        [collectionName]: this.transformCollectablePayload(payload, collection),
+      }
+    }
+  }
+  private transformCollectablePayload = (
+    payload: object,
+    collection: Collectable
+  ) => {
+    const accumulator = {}
+    Object.entries(payload).forEach(([key, value]) => {
+      if (typeof collection.fields === 'string') {
+        throw new Error('Global templates not supported')
+      }
+      const field = collection.fields.find((field) => {
+        if (typeof field === 'string') {
+          throw new Error('Global templates not supported')
+        }
+        return field.name === key
+      })
+      if (field) {
+        accumulator[key] = this.transformField(field, value)
+      }
+    })
+    return accumulator
+  }
+
+  private transformField = (field: TinaFieldEnriched, value: unknown) => {
+    if (field.type === 'object')
+      if (field.templates) {
+        if (field.list) {
+          assertShape<{ _template: string }[]>(value, (yup) =>
+            yup.array(yup.object({ _template: yup.string().required() }))
+          )
+          return value.map((item) => {
+            const { _template, ...rest } = item
+            return { [_template]: rest }
+          })
+        } else {
+          assertShape<{ _template: string }>(value, (yup) =>
+            yup.object({ _template: yup.string().required() })
+          )
+          const { _template, ...rest } = value
+          return { [_template]: rest }
+        }
+      } else {
+        return value
+      }
+    else {
+      return value
+    }
+  }
+
   public isMarkdownCollection = (collectionName: string) => {
     const collection = this.getCollection(collectionName)
     const format = collection.format

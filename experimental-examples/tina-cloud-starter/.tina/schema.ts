@@ -1,6 +1,5 @@
-import { defineSchema, defineConfig } from "tinacms";
+import { defineSchema } from "tinacms";
 import type { TinaTemplate } from "tinacms";
-import { client } from "./__generated__/client";
 import { contentBlockSchema } from "../components/blocks/content";
 import { featureBlockShema } from "../components/blocks/features";
 import { heroBlockSchema } from "../components/blocks/hero";
@@ -71,10 +70,10 @@ const schema = defineSchema({
   // like `config.media` to be present on `schema`, but not before
   // passing it into TinaCMS.
   config: {
-    build: {
-      outputFolder: "tina",
-      publicFolder: "public",
-    },
+    // build: {
+    //   outputFolder: "tina",
+    //   publicFolder: "public",
+    // },
     branch: "main",
     clientId: "foobar",
     token: "foo",
@@ -256,7 +255,7 @@ const schema = defineSchema({
       name: "global",
       path: "content/global",
       ui: {
-        global: true
+        global: true,
       },
       format: "json",
       fields: [

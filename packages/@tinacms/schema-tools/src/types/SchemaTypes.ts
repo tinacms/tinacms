@@ -98,7 +98,7 @@ interface BaseCollection {
     router?: (args: {
       document: Document
       collection: TinaCloudCollection<true>
-    }) => string
+    }) => string | undefined
   }
   match?: string
 }

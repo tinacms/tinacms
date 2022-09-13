@@ -137,9 +137,11 @@ export class TinaSchema {
     }
     return globalTemplate
   }
-  public getCollectionByFullPath = async (filepath: string) => {
+  public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
-      return filepath.replace('\\', '/').startsWith(collection.path)
+      return filepath
+        .replace(/\\/g, '/')
+        .startsWith(collection.path.replace(/\/?$/, '/'))
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
@@ -154,14 +156,7 @@ export class TinaSchema {
     template: Templateable
   } => {
     let template
-    const collection = this.getCollections().find((collection) => {
-      // FIXME: searching by startsWith will break for collections
-      // that only differ by their "matches" property (eg. **/*.en.md vs **/*.fr.md)
-      return filepath.replace('\\', '/').startsWith(collection.path)
-    })
-    if (!collection) {
-      throw new Error(`Unable to find collection for file at ${filepath}`)
-    }
+    const collection = this.getCollectionByFullPath(filepath)
     const templates = this.getTemplatesForCollectable(collection)
     if (templates.type === 'union') {
       if (templateName) {

@@ -111,7 +111,7 @@ export class Resolver {
       } = path.parse(fullPath)
 
       const relativePath = fullPath
-        .replace('\\', '/')
+        .replace(/\\/g, '/')
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
 

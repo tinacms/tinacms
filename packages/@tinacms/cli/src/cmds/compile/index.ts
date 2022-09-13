@@ -62,6 +62,7 @@ types.d.ts
 frags.gql
 queries.gql
 schema.gql
+out.jsx
 `
   )
 }

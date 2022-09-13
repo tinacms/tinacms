@@ -25,12 +25,18 @@ import { lastItem, NAMER } from '../util'
  * @returns unknown
  */
 export const resolveField = (
-  { namespace, ...field }: TinaFieldEnriched,
+  field: TinaFieldEnriched,
   schema: TinaSchema
-): unknown => {
+): {
+  [key: string]: unknown
+  name: string
+  component: string
+  type: string
+} => {
+  field
   field.parentTypename = NAMER.dataTypeName(
     // Get the type of the parent namespace
-    namespace.filter((_, i) => i < namespace.length - 1)
+    field.namespace.filter((_, i) => i < field.namespace.length - 1)
   )
   const extraFields = field.ui || {}
   switch (field.type) {
@@ -98,10 +104,7 @@ export const resolveField = (
         ...extraFields,
       }
     case 'object':
-      const templateInfo = schema.getTemplatesForCollectable({
-        ...field,
-        namespace,
-      })
+      const templateInfo = schema.getTemplatesForCollectable(field)
       if (templateInfo.type === 'object') {
         // FIXME: need to finish group/group-list
         return {
@@ -123,6 +126,7 @@ export const resolveField = (
             // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
+            namespace: [...field.namespace, templateName],
             fields: template.fields.map((field) => resolveField(field, schema)),
             ...extraFields,
           }
@@ -132,6 +136,7 @@ export const resolveField = (
         return {
           ...field,
           typeMap,
+          namespace: field.namespace,
           component: field.list ? 'blocks' : 'not-implemented',
           templates,
           ...extraFields,

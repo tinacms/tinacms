@@ -3,10 +3,11 @@ import schema from "./schema";
 import client from "./__generated__/client";
 
 export default defineConfig({
-  build: {
-    outputFolder: "tina",
-    publicFolder: "public",
-  },
+  // Uncomment to enable standalone/iframe-mode
+  // build: {
+  //   outputFolder: "tina",
+  //   publicFolder: "public",
+  // },
   branch: "main",
   clientId: "foobar",
   token: "foo",

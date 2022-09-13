@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 0.1.8
+
+### Patch Changes
+
+- 4deaf0d54: fix: fix windows directory creation
+
 ## 0.1.7
 
 ### Patch Changes
