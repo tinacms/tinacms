@@ -1,16 +1,15 @@
+import Progress from 'progress'
 import { logger } from '../../logger'
 import { logText, successText } from '../../utils/theme'
 
 export const checkClientInfo = async (
   ctx,
   next,
-  options: { verbose?: boolean }
+  _options: { verbose?: boolean }
 ) => {
   const client = ctx.client
 
-  if (options.verbose) {
-    logger.info(logText('Checking client information...'))
-  }
+  const bar = new Progress('Checking clientId, token and branch. :prog', 1)
 
   try {
     await client.request({
@@ -20,8 +19,13 @@ export const checkClientInfo = async (
         }
       }`,
     })
-    logger.info(successText('Client information is valid'))
+    bar.tick({
+      prog: '✅',
+    })
   } catch (e) {
+    bar.tick({
+      prog: '❌',
+    })
     console.warn(
       'Error when checking client information. Please check you have the correct client ID, URL and read only token configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/'
     )
