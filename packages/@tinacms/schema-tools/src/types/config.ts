@@ -39,4 +39,14 @@ export interface TinaCloudSchemaConfig<Store = any> {
       mediaRoot: string
     }
   }
+
+  /**
+   * Used to override the default Tina Cloud API URL
+   */
+  tinaioConfig?: {
+    assetsApiUrlOverride?: string // https://assets.tinajs.io
+    frontendUrlOverride?: string // https://app.tina.io
+    identityApiUrlOverride?: string // https://identity.tinajs.io
+    contentApiUrlOverride?: string // https://content.tinajs.io
+  }
 }

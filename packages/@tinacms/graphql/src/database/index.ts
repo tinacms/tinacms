@@ -448,7 +448,7 @@ export class Database {
     } else if (last) {
       storeQueryOptions.limit = last
     } else {
-      storeQueryOptions.limit = 10
+      storeQueryOptions.limit = 50
     }
 
     if (after) {

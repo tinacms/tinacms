@@ -108,7 +108,7 @@ export class TinaAdminApi {
                   collection: collectionName,
                   includeDocuments,
                   sort,
-                  limit: 10,
+                  limit: 50,
                   after,
                 },
               }
@@ -153,7 +153,7 @@ export class TinaAdminApi {
                   collection: collectionName,
                   includeDocuments,
                   sort,
-                  limit: 10,
+                  limit: 50,
                   after,
                 },
               }
