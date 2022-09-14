@@ -11,8 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Progress from 'progress'
+
 import { logger } from '../../logger'
-import { logText, successText } from '../../utils/theme'
+import { spin } from '../../utils/spinner'
+import { logText } from '../../utils/theme'
 
 const POLLING_INTERVAL = 5000
 
@@ -47,7 +50,10 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
   if (isLocalClient) {
     return next()
   }
-  logger.info(logText('Waiting for indexing process in tina-cloud...'))
+  const bar = new Progress(
+    'Checking indexing process in Tina Cloud... :prog',
+    1
+  )
 
   const pollForStatus = async () => {
     try {
@@ -73,7 +79,9 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
 
       // Index Complete
       if (status === STATUS_COMPLETE) {
-        logger.info(successText(`${statusMessage}`))
+        bar.tick({
+          prog: '✅',
+        })
         return next()
 
         // Index Inprogress
@@ -100,6 +108,9 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
       }
     } catch (e) {
       if (e instanceof IndexFailedError) {
+        bar.tick({
+          prog: '❌',
+        })
         throw e
       } else {
         throw new Error(
@@ -109,5 +120,8 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
     }
   }
 
-  pollForStatus()
+  spin({
+    text: 'Checking indexing process in Tina Cloud...',
+    waitFor: pollForStatus,
+  })
 }
