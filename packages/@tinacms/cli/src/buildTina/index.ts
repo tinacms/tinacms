@@ -196,7 +196,12 @@ export const auditCmdBuild = async (
     verbose: true,
   })
 
-  await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+  await spin({
+    waitFor: async () => {
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+    },
+    text: 'Indexing local files',
+  })
 
   next()
 }
