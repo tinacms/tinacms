@@ -48,7 +48,7 @@ export function FieldsBuilder({
   return (
     // @ts-ignore FIXME twind
     <FieldsGroup padding={padding}>
-      {fields.map((field: Field) => (
+      {[...fields].reverse().map((field: Field) => (
         <InnerField
           key={field.name}
           field={field}
@@ -156,7 +156,7 @@ export const FieldsGroup = ({
 }) => {
   return (
     <div
-      className={`relative block w-full h-full whitespace-nowrap overflow-x-visible ${
+      className={`relative w-full h-full whitespace-nowrap overflow-x-visible flex flex-col-reverse ${
         padding ? `pb-5` : ``
       }`}
     >
