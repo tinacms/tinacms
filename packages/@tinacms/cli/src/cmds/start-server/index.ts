@@ -179,6 +179,7 @@ export async function startServer(
         noSDK,
         verbose,
         usingTs: ctx.usingTs,
+        port,
       })
       await ctx.database.indexContent({ graphQLSchema, tinaSchema })
 
