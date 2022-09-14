@@ -48,10 +48,8 @@ export async function genClient(
     )
   }
 
-  const portIndex = process.argv.findIndex((a) => a === '--port') + 1
-  const PORT = (portIndex ? process.argv[portIndex] : null) || 4001
   const apiURL = options.local
-    ? `http://localhost:${PORT}/graphql`
+    ? `http://localhost:${options.port || 4001}/graphql`
     : `https://${TINA_HOST}/content/${clientId}/github/${branch}`
 
   const clientPath = p.join(generatedPath, `client.${usingTs ? 'ts' : 'js'}`)
