@@ -83,6 +83,7 @@ vite.svg`
     plugins: [react(), viteTina()],
     define: {
       'process.env': {},
+      'process.platform': '',
       __API_URL__: `"${apiUrl}"`,
     },
     server: {
