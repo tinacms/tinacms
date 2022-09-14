@@ -36,6 +36,7 @@ import {
   auditCmdBuild,
   buildSetupCmdAudit,
 } from '../buildTina'
+import { initStaticTina } from './init/static'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 
@@ -78,7 +79,10 @@ const cleanOption = {
   description:
     'Updates all content files to remove any data not explicitly permitted by the current schema definition',
 }
-
+const staticOption = {
+  name: '--static',
+  description: 'Bundle Tina as a static assset',
+}
 const useDefaultValuesOption = {
   name: '--useDefaultValues',
   description:
@@ -213,23 +217,29 @@ export const baseCmds: Command[] = [
       isomorphicGitBridge,
       noTelemetryOption,
       schemaFileType,
+      staticOption,
     ],
     description: 'Add Tina Cloud to an existing project',
-    action: (options) =>
-      chain(
-        [
-          attachPath,
-          checkOptions,
-          checkDeps,
-          initTina,
-          installDeps,
-          buildSetupCmdBuild,
-          buildCmdBuild,
-          tinaSetup,
-          successMessage,
-        ],
-        options
-      ),
+    action: (options) => {
+      if (options.static) {
+        chain([attachPath, checkOptions, initStaticTina], options)
+      } else {
+        chain(
+          [
+            attachPath,
+            checkOptions,
+            checkDeps,
+            initTina,
+            installDeps,
+            buildSetupCmdBuild,
+            buildCmdBuild,
+            tinaSetup,
+            successMessage,
+          ],
+          options
+        )
+      }
+    },
   },
   {
     options: [
