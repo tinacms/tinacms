@@ -34,6 +34,9 @@ export async function genClient(
   const branch = tinaSchema?.config?.branch
   const clientId = tinaSchema?.config?.clientId
   const token = tinaSchema.config?.token
+  const baseUrl =
+    tinaSchema?.config?.tinaioConfig?.contentApiUrlOverride ||
+    `https://${TINA_HOST}`
 
   if ((!branch || !clientId || !token) && !options?.local) {
     const missing = []
@@ -50,7 +53,7 @@ export async function genClient(
 
   const apiURL = options.local
     ? `http://localhost:${options.port || 4001}/graphql`
-    : `https://${TINA_HOST}/content/${clientId}/github/${branch}`
+    : `${baseUrl}/content/${clientId}/github/${branch}`
 
   const clientPath = p.join(generatedPath, `client.${usingTs ? 'ts' : 'js'}`)
   fs.writeFileSync(
