@@ -122,12 +122,6 @@ export class TinaClient<GenQueries> {
 
     // TODO if !result || !result.clientId || !result.branch, throw an error
 
-    if (params.host !== TINA_HOST) {
-      throw new Error(
-        `The only supported hosts are ${TINA_HOST} or localhost, but received ${params.host}.`
-      )
-    }
-
     return {
       host: params.host,
       clientId,
