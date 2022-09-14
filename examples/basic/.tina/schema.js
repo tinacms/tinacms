@@ -14,6 +14,14 @@ limitations under the License.
 import { defineSchema, defineConfig } from 'tinacms'
 
 const schema = defineSchema({
+  config: {
+    media: {
+      tina: {
+        mediaRoot: 'public',
+        publicFolder: 'images',
+      },
+    },
+  },
   collections: [
     {
       name: 'test',
