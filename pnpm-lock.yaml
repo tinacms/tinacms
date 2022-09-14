@@ -117,14 +117,6 @@ importers:
       eslint: 7.32.0
       eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
 
-  examples/hugo-quickstart:
-    specifiers:
-      '@tinacms/cli': workspace:^0.61.13
-      tinacms: workspace:^0.69.7
-    dependencies:
-      '@tinacms/cli': link:../../packages/@tinacms/cli
-      tinacms: link:../../packages/tinacms
-
   experimental-examples/kitchen-sink:
     specifiers:
       '@tinacms/cli': workspace:*
