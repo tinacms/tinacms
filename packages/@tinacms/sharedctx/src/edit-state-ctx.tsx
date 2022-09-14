@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useContext, useState } from 'react'
+import React, { ReactNode, useContext, useState } from 'react'
 
 const LOCALSTORAGEKEY = 'tina.isEditing'
 
@@ -38,14 +38,16 @@ export const setEditing = (isEditing: boolean) => {
 
 export const EditContext = React.createContext({
   edit: isEditing(),
-  setEdit: undefined as (edit: boolean) => void,
+  setEdit: undefined as (_edit: boolean) => void,
+  formsRegistering: false,
+  setFormsRegistering: undefined as (_value: boolean) => void,
 })
 
 export const TinaDataContext = React.createContext<{
   state: {
     payload: object
   }
-  setRequest: (props: { query: string; variables: object }) => void
+  setRequest: (_props: { query: string; variables: object }) => void
   isLoading: boolean
   isDummyContainer?: boolean
 }>({
@@ -60,18 +62,23 @@ export const TinaDataContext = React.createContext<{
 /*
   We will wrap our app in this so we will always be able to get the editmode state with `useEditMode`
 */
-export const EditProvider: React.FC = ({ children }) => {
+export const EditProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [edit, setEditState] = useState(
     // grabs the correct initial edit state from localstorage
     isEditing()
   )
+  const [formsRegistering, setFormsRegistering] = useState(false)
   const setEdit = (edit: boolean) => {
     // set React state and localstorage
     setEditState(edit)
     setEditing(edit)
   }
   return (
-    <EditContext.Provider value={{ edit, setEdit }}>
+    <EditContext.Provider
+      value={{ edit, setEdit, formsRegistering, setFormsRegistering }}
+    >
       {children}
     </EditContext.Provider>
   )
