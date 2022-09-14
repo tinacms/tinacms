@@ -11,7 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CMS, CMSConfig, PluginType } from './packages/core'
+import {
+  CMS,
+  CMSConfig,
+  CMSEvent,
+  MediaUploadOptions,
+  PluginType,
+} from './packages/core'
 import { FieldPlugin } from './packages/form-builder'
 import { ScreenPlugin } from './packages/react-screens'
 import {
@@ -85,10 +91,17 @@ export class TinaCMS extends CMS {
     super(config)
 
     this.alerts.setMap({
-      'media:upload:failure': () => ({
-        level: 'error',
-        message: 'Failed to upload file.',
-      }),
+      'media:upload:failure': (
+        event: CMSEvent & { error: Error; uploaded: MediaUploadOptions[] }
+      ) => {
+        return {
+          error: event.error,
+          level: 'error',
+          message: `Failed to upload file(s) ${event?.uploaded
+            .map((x) => x.file.name)
+            .join(', ')}. See error message: \n\n ${event?.error.toString()}`,
+        }
+      },
       'media:delete:failure': () => ({
         level: 'error',
         message: 'Failed to delete file.',
