@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { logger } from '../../logger'
-import { logText } from '../../utils/theme'
+import { logText, successText } from '../../utils/theme'
 
 const POLLING_INTERVAL = 5000
 
@@ -34,15 +34,10 @@ class IndexFailedError extends Error {
 }
 
 export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
-  if (options.verbose) {
-    logger.info(logText('Waiting for DB...'))
-  }
-
   if (!ctx.client) {
-    if (options.verbose) {
-      logger.info(logText('client is unavailable, skipping...'))
-    }
-    return next()
+    throw new Error(
+      'No Tina Cloud find. For more information on how to setup the tina cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
+    )
   }
 
   const client = ctx.client
@@ -50,11 +45,9 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
   const { host, clientId, branch, isLocalClient } = client.parseURL()
 
   if (isLocalClient) {
-    if (options.verbose) {
-      logger.info(logText('client is local, skipping...'))
-    }
     return next()
   }
+  logger.info(logText('Waiting for indexing process in tina-cloud...'))
 
   const pollForStatus = async () => {
     try {
@@ -76,13 +69,11 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
       )
       const { status, error } = (await response.json()) as IndexStatusResponse
 
-      const statusMessage = `DB responded with: '${status}'`
+      const statusMessage = `Indexing status: '${status}'`
 
       // Index Complete
       if (status === STATUS_COMPLETE) {
-        if (options.verbose) {
-          logger.info(logText(`${statusMessage}`))
-        }
+        logger.info(successText(`${statusMessage}`))
         return next()
 
         // Index Inprogress
@@ -95,14 +86,16 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index DB responded with status 'failed', ${error}`
+          `Attempting to index but responded with status 'failed', ${error}`
         )
 
         // Index Unknown
       } else {
-        if (options.verbose) {
-          logger.info(logText(`${statusMessage}`))
-        }
+        // TODO: Should we throw an error here?
+        logger.warn(
+          'Unknown status returned from Tina Cloud. Error message below:'
+        )
+        logger.info(logText(`${statusMessage}`))
         return next()
       }
     } catch (e) {
