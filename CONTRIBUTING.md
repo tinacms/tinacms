@@ -15,10 +15,15 @@ You _should_ :fingers_crossed: be able to just run these commands. (Please make 
 ```sh
 # check the node version, 14 or greater is required
 node -v
+# you can use nvm (https://github.com/nvm-sh/nvm) to switch version
 # install pnpm (see docs for other options https://pnpm.io/installation)
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 # ensure you have the latest (at the time of this writing this is 7.4.0)
 pnpm -v
+# some packages rely on yarn, so you may need to install that too
+npm install -g yarn
+# install dependencies
+pnpm install
 # build all the packages
 pnpm run build
 # watch all packages
