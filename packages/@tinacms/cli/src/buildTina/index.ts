@@ -98,6 +98,9 @@ export const buildSetupCmdAudit = async (
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
 
+  if (!fs.pathExistsSync(path.join(rootPath, '.tina', '__generated__'))) {
+    fs.mkdirSync(path.join(rootPath, '.tina', '__generated__'))
+  }
   const store = new LevelStore(rootPath, false)
 
   const database = await createDatabase({ store, bridge })
@@ -145,6 +148,10 @@ const buildSetup = async ({
   // const store = experimentalData
   //   ? new LevelStore(rootPath, useMemoryStore)
   //   : new FilesystemStore({ rootPath })
+
+  if (!fs.pathExistsSync(path.join(rootPath, '.tina', '__generated__'))) {
+    fs.mkdirSync(path.join(rootPath, '.tina', '__generated__'))
+  }
 
   const store = new LevelStore(rootPath, useMemoryStore)
 
