@@ -73,7 +73,11 @@ export function Alerts({ alerts }: AlertsProps) {
           const AlertMessage =
             typeof alert.message === 'string'
               ? () => {
-                  return <p className="text-base mb-3">{alert.message}</p>
+                  return (
+                    <p className="text-base mb-3 overflow-y-auto">
+                      {alert.message}
+                    </p>
+                  )
                 }
               : alert.message
 
