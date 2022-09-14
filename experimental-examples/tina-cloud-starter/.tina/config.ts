@@ -8,6 +8,9 @@ export default defineConfig({
   //   outputFolder: "tina",
   //   publicFolder: "public",
   // },
+  // tinaioConfig: {
+  //   contentApiUrlOverride: "foo.io",
+  // },
   branch: "main",
   clientId: "foobar",
   token: "foo",

@@ -1,5 +1,5 @@
 {
-  "name": "starter-basic",
+  "name": "starter-basic-iframe",
   "private": true,
   "scripts": {
     "dev": "yarn tinacms dev -c \"next dev\" --noTelemetry",
