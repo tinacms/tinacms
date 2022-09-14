@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import type { TinaCMS } from '../../../../tina-cms'
-import type { ReferenceFieldProps } from './index'
-import { selectFieldClasses } from '../Select'
-import { LoadingDots } from '../../../form-builder'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import type { TinaCMS } from '../../../../tina-cms'
+import { LoadingDots } from '../../../form-builder'
+import { selectFieldClasses } from '../Select'
+import type { ReferenceFieldProps } from './index'
 
 interface ReferenceSelectProps {
   cms: TinaCMS
@@ -61,7 +61,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
               `#graphql
             query ($collection: String!){
               collection(collection: $collection) {
-                documents {
+                documents(first: -1) {
                   edges {
                     node {
                       ...on Node {
