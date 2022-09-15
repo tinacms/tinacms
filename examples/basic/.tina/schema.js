@@ -15,6 +15,9 @@ import { defineSchema, defineConfig } from 'tinacms'
 
 const schema = defineSchema({
   config: {
+    branch: 'foo',
+    clientId: 'some-client-id',
+    token: 'some-token',
     media: {
       tina: {
         mediaRoot: 'public',

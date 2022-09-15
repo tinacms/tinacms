@@ -154,7 +154,12 @@ const buildSetup = async ({
 }
 
 export const buildCmdBuild = async (
-  ctx: { builder: ConfigBuilder; rootPath: string; usingTs: boolean },
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    usingTs: boolean
+    schema: unknown
+  },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions & ClientGenOptions,
@@ -166,6 +171,7 @@ export const buildCmdBuild = async (
     rootPath: ctx.rootPath,
     ...options,
   })
+  ctx.schema = schema
   const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
@@ -196,7 +202,12 @@ export const auditCmdBuild = async (
     verbose: true,
   })
 
-  await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+  await spin({
+    waitFor: async () => {
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+    },
+    text: 'Indexing local files',
+  })
 
   next()
 }
