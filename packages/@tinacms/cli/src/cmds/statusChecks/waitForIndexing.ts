@@ -99,12 +99,9 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
 
         // Index Unknown
       } else {
-        // TODO: Should we throw an error here?
-        logger.warn(
-          'Unknown status returned from Tina Cloud. Error message below:'
+        throw new IndexFailedError(
+          `Attempting to index but responded with status 'unknown', ${error}`
         )
-        logger.info(logText(`${statusMessage}`))
-        return next()
       }
     } catch (e) {
       if (e instanceof IndexFailedError) {
