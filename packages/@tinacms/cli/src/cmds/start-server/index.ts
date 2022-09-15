@@ -23,7 +23,8 @@ import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
 import { buildAdmin, ConfigBuilder } from '../../buildTina'
-import { TinaSchema } from '@tinacms/schema-tools'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { spin } from '../../utils/spinner'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -48,12 +49,7 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
-    // FIXME: these types live in TinaCMS
-    schema?: TinaSchema & {
-      config?: {
-        build?: { outputFolder: string; publicFolder: string }
-      }
-    }
+    schema?: TinaCloudSchema<false>
   },
   next,
   {
@@ -172,6 +168,7 @@ export async function startServer(
         dev,
         verbose,
       })
+      ctx.schema = schema
 
       const apiUrl = await ctx.builder.genTypedClient({
         compiledSchema: schema,
@@ -180,7 +177,13 @@ export async function startServer(
         verbose,
         usingTs: ctx.usingTs,
       })
-      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
+      await spin({
+        waitFor: async () => {
+          await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+        },
+        text: 'Indexing local files',
+      })
 
       await buildAdmin({
         local: true,

@@ -11,7 +11,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import Progress from 'progress'
+
 import { logger } from '../../logger'
+import { spin } from '../../utils/spinner'
 import { logText } from '../../utils/theme'
 
 const POLLING_INTERVAL = 5000
@@ -34,15 +37,10 @@ class IndexFailedError extends Error {
 }
 
 export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
-  if (options.verbose) {
-    logger.info(logText('Waiting for DB...'))
-  }
-
   if (!ctx.client) {
-    if (options.verbose) {
-      logger.info(logText('client is unavailable, skipping...'))
-    }
-    return next()
+    throw new Error(
+      'No Tina Cloud found. For more information on how to setup the tina cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
+    )
   }
 
   const client = ctx.client
@@ -50,11 +48,12 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
   const { host, clientId, branch, isLocalClient } = client.parseURL()
 
   if (isLocalClient) {
-    if (options.verbose) {
-      logger.info(logText('client is local, skipping...'))
-    }
     return next()
   }
+  const bar = new Progress(
+    'Checking indexing process in Tina Cloud... :prog',
+    1
+  )
 
   const pollForStatus = async () => {
     try {
@@ -76,13 +75,13 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
       )
       const { status, error } = (await response.json()) as IndexStatusResponse
 
-      const statusMessage = `DB responded with: '${status}'`
+      const statusMessage = `Indexing status: '${status}'`
 
       // Index Complete
       if (status === STATUS_COMPLETE) {
-        if (options.verbose) {
-          logger.info(logText(`${statusMessage}`))
-        }
+        bar.tick({
+          prog: '✅',
+        })
         return next()
 
         // Index Inprogress
@@ -95,18 +94,20 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index DB responded with status 'failed', ${error}`
+          `Attempting to index but responded with status 'failed', ${error}`
         )
 
         // Index Unknown
       } else {
-        if (options.verbose) {
-          logger.info(logText(`${statusMessage}`))
-        }
-        return next()
+        throw new IndexFailedError(
+          `Attempting to index but responded with status 'unknown', ${error}`
+        )
       }
     } catch (e) {
       if (e instanceof IndexFailedError) {
+        bar.tick({
+          prog: '❌',
+        })
         throw e
       } else {
         throw new Error(
@@ -116,5 +117,8 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
     }
   }
 
-  pollForStatus()
+  spin({
+    text: 'Checking indexing process in Tina Cloud...',
+    waitFor: pollForStatus,
+  })
 }

@@ -36,5 +36,6 @@ export async function spin<T>({
   const res = await waitFor()
   // spinner stop
   spinner.stop()
+  console.log('')
   return res
 }
