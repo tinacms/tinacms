@@ -146,6 +146,9 @@ const buildSetup = async ({
   //   ? new LevelStore(rootPath, useMemoryStore)
   //   : new FilesystemStore({ rootPath })
 
+  console.log(
+    'Content is being indexed now. This can take a few minutes with large amounts of content...'
+  )
   const store = new LevelStore(rootPath, useMemoryStore)
 
   const database = await createDatabase({ store, bridge })
