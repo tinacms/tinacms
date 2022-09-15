@@ -5,6 +5,7 @@
     "dev": "yarn tinacms dev -c \"next dev\" --noTelemetry --port 4004",
     "dev-data": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry",
     "start": "yarn tinacms server:start -c \"next start\"",
+    "build-prod": "yarn tinacms build --noTelemetry && next build",
     "lint": "next lint"
   },
   "dependencies": {

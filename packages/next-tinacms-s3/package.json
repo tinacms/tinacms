@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.150.0",
     "@aws-sdk/signature-v4-crt": "3.163.0",
-    "multer": "1.4.2"
+    "multer": "1.4.5-lts.1"
   },
   "devDependencies": {
     "@tinacms/toolkit": "workspace:*",

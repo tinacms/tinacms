@@ -27,7 +27,7 @@ import chalk from 'chalk'
 import { compileClient } from './compile'
 import { logger } from '../logger'
 import { startServer } from './start-server'
-import { waitForDB } from './waitForDB'
+import { waitForDB } from './statusChecks/waitForIndexing'
 import { startSubprocess } from './startSubprocess'
 import {
   buildCmdBuild,
@@ -38,6 +38,7 @@ import {
 } from '../buildTina'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
+import { checkClientInfo } from './statusChecks/checkClientInformation'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
@@ -201,6 +202,7 @@ export const baseCmds: Command[] = [
           buildSetupCmdBuild,
           buildCmdBuild,
           compileClient,
+          checkClientInfo,
           waitForDB,
         ],
         options
