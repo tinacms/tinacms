@@ -15,9 +15,9 @@ import { defineSchema, defineConfig } from 'tinacms'
 
 const schema = defineSchema({
   config: {
-    branch: 'main',
-    clientId: 'ce702ac4-743f-434a-bb50-48b84ec75b04',
-    token: '07b20ae78b8bf163447f17f142fccaf6a9ac50d4',
+    branch: 'foo',
+    clientId: 'some-client-id',
+    token: 'some-token',
   },
   collections: [
     {
