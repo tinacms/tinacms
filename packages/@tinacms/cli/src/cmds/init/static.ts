@@ -139,7 +139,7 @@ const addNodeModulesToGitignore = async () => {
 }
 const addDependencies = async (packageManager) => {
   logger.info(logText('Adding dependencies, this might take a moment...'))
-  const deps = ['tinacms', '@tinacms/cli']
+  const deps = ['tinacms', '@tinacms/cli', 'styled-components']
   const packageManagers = {
     pnpm: `pnpm add ${deps.join(' ')}${
       process.env.USE_WORKSPACE ? ' --workspace' : ''
