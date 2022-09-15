@@ -12,13 +12,25 @@ limitations under the License.
 */
 
 import Progress from 'progress'
+import type { Bridge, Database } from '@tinacms/graphql'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { ConfigBuilder } from '../../buildTina'
 
 export const checkClientInfo = async (
-  ctx,
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+    schema?: TinaCloudSchema<false>
+    client: any
+  },
   next,
   _options: { verbose?: boolean }
 ) => {
   const client = ctx.client
+  const config = ctx.schema?.config
 
   const bar = new Progress('Checking clientId, token and branch. :prog', 1)
 
@@ -38,7 +50,15 @@ export const checkClientInfo = async (
       prog: '❌',
     })
     console.warn(
-      'Error when checking client information. Please check you have the correct client ID, URL and read only token configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/'
+      `Error when checking client information. You provided \n\n ${JSON.stringify(
+        {
+          branch: config?.branch,
+          clientId: config?.clientId,
+          token: config?.token,
+        },
+        null,
+        2
+      )}\n\n Please check you have the correct "clientId", "branch" and "token" configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/`
     )
     throw e
   }
