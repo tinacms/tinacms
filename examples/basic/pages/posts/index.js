@@ -1,4 +1,4 @@
-import { staticRequest } from 'tinacms'
+import { client } from '../../.tina/__generated__/client'
 import { Layout } from '../../components/Layout'
 import Link from 'next/link'
 import { useTina } from 'tinacms/dist/edit-state'
@@ -40,16 +40,8 @@ export default function Home(props) {
 }
 
 export const getStaticProps = async () => {
-  let data = {}
   const variables = {}
-  try {
-    data = await staticRequest({
-      query,
-      variables,
-    })
-  } catch {
-    // swallow errors related to document creation
-  }
+  const { data } = await client.request({ query, variables })
 
   return {
     props: {

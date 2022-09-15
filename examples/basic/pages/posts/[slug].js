@@ -1,4 +1,4 @@
-import { staticRequest } from 'tinacms'
+import { client } from '../../.tina/__generated__/client'
 import { Layout } from '../../components/Layout'
 import { useTina } from 'tinacms/dist/edit-state'
 
@@ -45,7 +45,7 @@ export default function Home(props) {
 }
 
 export const getStaticPaths = async () => {
-  const tinaProps = await staticRequest({
+  const tinaProps = await client.request({
     query: `{
         postConnection {
           edges {
@@ -59,7 +59,7 @@ export const getStaticPaths = async () => {
       }`,
     variables: {},
   })
-  const paths = tinaProps.postConnection.edges.map((x) => {
+  const paths = tinaProps.data.postConnection.edges.map((x) => {
     return { params: { slug: x.node._sys.filename } }
   })
 
@@ -72,15 +72,10 @@ export const getStaticProps = async (ctx) => {
   const variables = {
     relativePath: ctx.params.slug + '.md',
   }
-  let data = {}
-  try {
-    data = await staticRequest({
-      query,
-      variables,
-    })
-  } catch (error) {
-    // swallow errors related to document creation
-  }
+  const { data } = await client.request({
+    query,
+    variables,
+  })
 
   return {
     props: {
