@@ -147,7 +147,7 @@ const addDependencies = async (packageManager) => {
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
   }
-  logger.info(logText(packageManagers[packageManager]))
+  logger.info(`  ${logText(packageManagers[packageManager])}`)
   await execShellCommand(packageManagers[packageManager])
 }
 
