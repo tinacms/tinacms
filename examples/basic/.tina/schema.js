@@ -18,6 +18,12 @@ const schema = defineSchema({
     branch: 'foo',
     clientId: 'some-client-id',
     token: 'some-token',
+    media: {
+      tina: {
+        mediaRoot: 'public',
+        publicFolder: 'images',
+      },
+    },
   },
   collections: [
     {
