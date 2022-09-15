@@ -960,6 +960,15 @@ export const astBuilder = {
                         kind: 'Field',
                         name: {
                           kind: 'Name',
+                          value: 'cursor',
+                        },
+                        arguments: [],
+                        directives: [],
+                      },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
                           value: 'node',
                         },
                         arguments: [],
