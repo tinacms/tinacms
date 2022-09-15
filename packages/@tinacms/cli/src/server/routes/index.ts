@@ -29,6 +29,7 @@ export const createMediaRouter = (config: PathConfig): Router => {
   })
 
   const upload = multer({ storage })
+  const uploadRoute = upload.single('file')
 
   const mediaModel = new MediaModel(config)
 
@@ -52,10 +53,19 @@ export const createMediaRouter = (config: PathConfig): Router => {
     res.json(didDelete)
   })
 
-  mediaRouter.post('/upload/*', upload.single('file'), function (req, res) {
-    // req.files is array of `photos` files
-    // req.body will contain the text fields, if there were any
-    res.json({ success: true })
+  mediaRouter.post('/upload/*', async function (req, res) {
+    // do it this way for better error handling
+    await uploadRoute(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        res.status(500).json({ message: err.message })
+        // A Multer error occurred when uploading.
+      } else if (err) {
+        // An unknown error occurred when uploading.
+        res.status(500).json({ message: err.message })
+      } else {
+        res.json({ success: true })
+      }
+    })
   })
 
   return mediaRouter

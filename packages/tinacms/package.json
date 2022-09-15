@@ -70,7 +70,6 @@
     "graphql-tag": "^2.11.0",
     "lodash.set": "^4.3.2",
     "prism-react-renderer": "^1.3.5",
-    "prism": "^4.1.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "6",
     "url-pattern": "^1.0.3",
