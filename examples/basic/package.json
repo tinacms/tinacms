@@ -2,7 +2,7 @@
   "name": "starter-basic",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\" --noTelemetry",
+    "dev": "yarn tinacms dev -c \"next dev\" --noTelemetry --port 4004",
     "dev-data": "yarn tinacms server:start -c \"next dev\" --experimentalData --noTelemetry",
     "start": "yarn tinacms server:start -c \"next start\"",
     "lint": "next lint"
