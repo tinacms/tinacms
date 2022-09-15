@@ -176,6 +176,7 @@ export async function startServer(
         noSDK,
         verbose,
         usingTs: ctx.usingTs,
+        port,
       })
 
       await spin({

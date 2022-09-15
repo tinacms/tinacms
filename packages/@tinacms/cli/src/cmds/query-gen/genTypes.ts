@@ -52,7 +52,7 @@ export async function genClient(
   }
 
   const apiURL = options.local
-    ? 'http://localhost:4001/graphql'
+    ? `http://localhost:${options.port || 4001}/graphql`
     : `${baseUrl}/content/${clientId}/github/${branch}`
 
   const clientPath = p.join(generatedPath, `client.${usingTs ? 'ts' : 'js'}`)

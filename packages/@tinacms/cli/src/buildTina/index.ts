@@ -38,6 +38,7 @@ interface ClientGenOptions {
   noSDK?: boolean
   local?: boolean
   verbose?: boolean
+  port?: number
 }
 
 interface BuildOptions {
@@ -178,6 +179,7 @@ export const buildCmdBuild = async (
     noSDK: options.noSDK,
     verbose: options.verbose,
     usingTs: ctx.usingTs,
+    port: options.port,
   })
   await buildAdmin({
     local: options.local,
@@ -259,6 +261,7 @@ export class ConfigBuilder {
     noSDK,
     verbose,
     local,
+    port,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
@@ -274,6 +277,7 @@ export class ConfigBuilder {
       { tinaSchema: compiledSchema, usingTs },
       {
         local,
+        port,
       }
     )
   }
