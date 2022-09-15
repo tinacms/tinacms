@@ -39,7 +39,7 @@ class IndexFailedError extends Error {
 export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
   if (!ctx.client) {
     throw new Error(
-      'No Tina Cloud find. For more information on how to setup the tina cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
+      'No Tina Cloud found. For more information on how to setup the tina cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
     )
   }
 
