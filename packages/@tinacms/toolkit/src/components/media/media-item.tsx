@@ -21,6 +21,7 @@ import { Media } from '../../packages/core'
 import { Folder, File } from '../../packages/icons'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
+import getMime from './get-mime'
 
 interface MediaItemProps {
   item: Media
@@ -38,7 +39,7 @@ export function MediaItem({
   return (
     <ListItem onClick={() => onClick(item)} type={item.type}>
       <ItemPreview>
-        {item.previewSrc ? (
+        {item.previewSrc && getMime(item.filename) === 'image' ? (
           <img src={item.previewSrc} alt={item.filename} />
         ) : (
           <FileIcon type={item.type} />

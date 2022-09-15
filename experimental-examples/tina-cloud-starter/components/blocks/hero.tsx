@@ -172,6 +172,23 @@ export const heroBlockSchema: TinaTemplate = {
       ],
     },
     {
+      type: "object",
+      label: "Video",
+      name: "video",
+      fields: [
+        {
+          name: "src",
+          label: "Video Source",
+          type: "video",
+        },
+        {
+          name: "alt",
+          label: "Alt Text",
+          type: "string",
+        },
+      ],
+    },
+    {
       type: "string",
       label: "Color",
       name: "color",

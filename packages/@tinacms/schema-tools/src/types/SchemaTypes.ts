@@ -194,6 +194,7 @@ type TinaScalarField =
   | DateTimeField
   | NumberField
   | ImageField
+  | VideoField
 
 type StringField =
   | {
@@ -259,6 +260,18 @@ type ImageField =
     }
   | {
       type: 'image'
+      list: true
+      ui?: object | UIField<any, string[]>
+    }
+
+type VideoField =
+  | {
+      type: 'video'
+      list?: false
+      ui?: object | UIField<any, string>
+    }
+  | {
+      type: 'video'
       list: true
       ui?: object | UIField<any, string[]>
     }

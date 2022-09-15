@@ -690,6 +690,13 @@ export class Resolver {
             this.tinaSchema.schema
           )
           break
+        case 'video':
+          accum[fieldName] = resolveMediaCloudToRelative(
+            fieldValue as string,
+            this.config,
+            this.tinaSchema.schema
+          )
+          break
         case 'object':
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
@@ -740,6 +747,13 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'image':
+        accumulator[field.name] = resolveMediaRelativeToCloud(
+          value as string,
+          this.config,
+          this.tinaSchema.schema
+        )
+        break
+      case 'video':
         accumulator[field.name] = resolveMediaRelativeToCloud(
           value as string,
           this.config,

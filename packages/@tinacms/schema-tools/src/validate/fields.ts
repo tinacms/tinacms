@@ -21,6 +21,7 @@ const TypeName = [
   'number',
   'datetime',
   'image',
+  'video',
   'object',
   'reference',
   'rich-text',
@@ -96,7 +97,12 @@ const ImageField = TinaScalerBase.extend({
     required_error: typeRequiredError,
   }),
 })
-
+const VideoField = TinaScalerBase.extend({
+  type: z.literal('video' as const, {
+    invalid_type_error: typeTypeError,
+    required_error: typeRequiredError,
+  }),
+})
 const DateTimeField = TinaScalerBase.extend({
   type: z.literal('datetime' as const, {
     invalid_type_error: typeTypeError,
@@ -203,6 +209,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
         BooleanField,
         NumberField,
         ImageField,
+        VideoField,
         DateTimeField,
         ReferenceField,
         ObjectField,

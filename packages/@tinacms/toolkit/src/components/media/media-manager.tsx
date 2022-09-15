@@ -41,6 +41,8 @@ import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
+import mime from 'mime-types'
+import getMime from './get-mime.js'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -103,6 +105,7 @@ const join = function (...parts) {
 
 export interface MediaRequest {
   directory?: string
+  filter?: string
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
@@ -145,6 +148,7 @@ const defaultListError = new MediaListError({
 
 export function MediaPicker({
   allowDelete,
+  filter,
   onSelect,
   close,
   ...props
@@ -263,7 +267,7 @@ export function MediaPicker({
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: cms.media.accept || 'image/*',
+    accept: cms.media.accept || `${filter}/*`,
     multiple: true,
     onDrop: async (files) => {
       try {
@@ -341,7 +345,19 @@ export function MediaPicker({
     }
   }
 
-  useEffect(disableScrollBody, [])
+  function filterMedia(item: Media) {
+    if (!filter) return true
+    const mime = getMime(item.filename)
+    if (filter === 'video') {
+      return mime === 'video'
+    } else if (filter === 'image') {
+      return mime === 'image'
+    } else {
+      return false
+    }
+  }
+
+  function useEffect(disableScrollBody, [])
 
   if (listState === 'loading' || uploading) {
     return <LoadingMediaList extraText={loadingText} />
@@ -392,8 +408,7 @@ export function MediaPicker({
           {listState === 'loaded' && list.items.length === 0 && (
             <EmptyMediaList />
           )}
-
-          {list.items.map((item: Media) => (
+          {list.items.filter(filterMedia).map((item: Media) => (
             <MediaItem
               key={item.id}
               item={item}

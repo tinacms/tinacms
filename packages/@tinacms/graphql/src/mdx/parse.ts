@@ -180,6 +180,13 @@ const parseField = (
         schema
       )
       break
+    case 'video':
+      props[field.name] = resolveMediaRelativeToCloud(
+        attribute.value,
+        graphQLconfig,
+        schema
+      )
+      break
     case 'number':
     case 'string':
       if (field.list) {
@@ -406,6 +413,7 @@ export interface NodeTypes {
   code_block: string
   link: string
   image: string
+  video: string
   ul_list: string
   ol_list: string
   listItem: string
@@ -494,6 +502,11 @@ export type SlateNodeType =
       caption: string
     }
   | {
+      type: 'video'
+      link: string
+      caption: string
+    }
+  | {
       type: 'thematic_break'
     }
 //   block_quote: 'block_quote',
@@ -527,6 +540,8 @@ export interface OptionType {
   linkDestinationKey?: string
   imageSourceKey?: string
   imageCaptionKey?: string
+  videoSourceKey?: string
+  videoCaptionKey?: string
 }
 
 export interface MdastNode {
@@ -580,6 +595,7 @@ export const plateElements = {
   ELEMENT_CODE_LINE: 'code',
   ELEMENT_DEFAULT: 'p',
   ELEMENT_IMAGE: 'img',
+  ELEMENT_VIDEO: 'video',
   ELEMENT_LI: 'li',
   ELEMENT_LIC: 'lic',
   ELEMENT_LINK: 'a',
@@ -622,6 +638,7 @@ export const defaultNodeTypes: NodeTypes = {
   thematic_break: plateElements.ELEMENT_HR,
   break: 'break',
   image: plateElements.ELEMENT_IMAGE,
+  video: plateElements.ELEMENT_VIDEO,
 }
 
 export default function remarkToSlate(
@@ -694,6 +711,14 @@ export default function remarkToSlate(
       const url = resolveMediaRelativeToCloud(node.url, graphQLconfig, schema)
       return {
         type: types.image,
+        url: url,
+        alt: node.alt,
+        caption: node.title,
+      }
+    case 'video':
+      const url = resolveMediaRelativeToCloud(node.url, graphQLconfig, schema)
+      return {
+        type: types.video,
         url: url,
         alt: node.alt,
         caption: node.title,

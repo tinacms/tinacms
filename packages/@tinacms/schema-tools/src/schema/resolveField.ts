@@ -65,6 +65,13 @@ export const resolveField = (
         ...field,
         ...extraFields,
       }
+    case 'video':
+      return {
+        component: 'video',
+        clearable: true,
+        ...field,
+        ...extraFields,
+      }
     case 'string':
       if (field.options) {
         // TODO: correct the type

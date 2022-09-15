@@ -18,13 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { InputProps, ImageUpload } from '../components'
+import { InputProps, VideoUpload } from '../components'
 import { Media, MediaStore } from '../../core'
 import { useCMS } from '../../react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
 
-interface ImageProps {
+interface VideoProps {
   path: string
   previewSrc?: MediaStore['previewSrc']
   uploadDir?(formValues: any): string
@@ -68,7 +68,7 @@ export function usePreviewSrc(
   return [src, loading]
 }
 
-export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
+export const VideoField = wrapFieldsWithMeta<InputProps, VideoProps>(
   (props) => {
     const cms = useCMS()
     const { form, field } = props
@@ -100,7 +100,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     const uploadDir = props.field.uploadDir || (() => '')
 
     return (
-      <ImageUpload
+      <VideoUpload
         value={value}
         previewSrc={src}
         loading={isImgUploading || srcIsLoading}
@@ -108,7 +108,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           const directory = uploadDir(props.form.getState().values)
           cms.media.open({
             allowDelete: true,
-            filter: 'image',
+            filter: 'video',
             directory,
             onSelect: onChange,
           })
@@ -138,8 +138,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
   }
 )
 
-export const ImageFieldPlugin = {
-  name: 'image',
-  Component: ImageField,
+export const VideoFieldPlugin = {
+  name: 'video',
+  Component: VideoField,
   parse,
 }

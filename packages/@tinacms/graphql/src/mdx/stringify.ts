@@ -258,6 +258,14 @@ export const stringify = (
         alt: node.alt,
         url: url,
       }
+    case plateElements.ELEMENT_VIDEO:
+      const url = resolveMediaCloudToRelative(node.url, graphQLconfig, schema)
+      return {
+        type: 'video',
+        title: node.caption,
+        alt: node.alt,
+        url: url,
+      }
     case plateElements.ELEMENT_HR:
       return {
         type: 'thematicBreak',
@@ -309,6 +317,7 @@ export const stringify = (
               case 'boolean':
               case 'datetime':
               case 'image':
+              case 'video':
               case 'number':
               case 'string':
                 if (field.list) {
@@ -320,6 +329,7 @@ export const stringify = (
                         case 'number':
                           return `${item}`
                         case 'image':
+                        case 'video':
                         case 'datetime':
                         case 'string':
                           return `"${item}"`
@@ -356,6 +366,7 @@ export const stringify = (
                               innerValue[innerField.name] = `${fieldValue}`
                               break
                             case 'image':
+                            case 'video':
                             case 'datetime':
                             case 'string':
                               innerValue[innerField.name] = `"${fieldValue}"`
@@ -396,6 +407,7 @@ export const stringify = (
                                 v[field.name] = `${fieldValue}`
                                 break
                               case 'image':
+                              case 'video':
                               case 'datetime':
                               case 'string':
                                 v[field.name] = `"${fieldValue}"`
@@ -443,6 +455,7 @@ export const stringify = (
                           v[field.name] = `${fieldValue}`
                           break
                         case 'image':
+                        case 'video':
                         case 'datetime':
                         case 'string':
                           v[field.name] = `"${fieldValue}"`

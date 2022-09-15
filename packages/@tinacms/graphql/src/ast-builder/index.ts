@@ -530,6 +530,7 @@ export const astBuilder = {
         number: 'Float', // FIXME - needs to be float or int
         datetime: 'String', // FIXME
         image: 'String', // FIXME
+        video: 'String',
         text: 'String',
       }
       return scalars[type]
@@ -1040,6 +1041,7 @@ type scalarNames =
   | 'boolean'
   | 'datetime'
   | 'image'
+  | 'video'
   | 'text'
   | 'number'
 

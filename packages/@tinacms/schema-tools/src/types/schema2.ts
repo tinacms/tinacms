@@ -86,6 +86,9 @@ type DateTimeField = {
 type ImageField = {
   type: 'image'
 } & BaseField<string>
+type VideoField = {
+  type: 'video'
+} & BaseField<string>
 type ReferenceField = {
   type: 'reference'
   collections: string[]
@@ -107,6 +110,7 @@ type Field =
   | BooleanField
   | DateTimeField
   | ImageField
+  | VideoField
   | ReferenceField
   | RichTextField
   | ObjectField

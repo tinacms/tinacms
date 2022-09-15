@@ -528,6 +528,7 @@ export class Builder {
     switch (field.type) {
       case 'string':
       case 'image':
+      case 'video':
       case 'datetime':
       case 'number':
       case 'boolean':
@@ -1049,6 +1050,7 @@ export class Builder {
           }),
         })
       case 'image':
+      case 'video':
       case 'string':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1141,6 +1143,7 @@ export class Builder {
         })
       case 'datetime':
       case 'image':
+      case 'video':
       case 'string':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -1341,6 +1344,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
       case 'boolean':
       case 'datetime':
       case 'image':
+      case 'video':
       case 'number':
         if (field.list) {
           console.warn(listWarningMsg)

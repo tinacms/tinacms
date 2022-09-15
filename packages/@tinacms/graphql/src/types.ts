@@ -158,7 +158,9 @@ type DateTimeField = {
 type ImageField = {
   type: 'image'
 }
-
+type VideoField = {
+  type: 'video'
+}
 export type ReferenceType<WithNamespace extends boolean> =
   WithNamespace extends true ? ReferenceTypeWithNamespace : ReferenceTypeInner
 

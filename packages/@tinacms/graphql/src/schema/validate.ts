@@ -34,6 +34,7 @@ const FIELD_TYPES: TinaField['type'][] = [
   'boolean',
   'datetime',
   'image',
+  'video',
   'reference',
   'object',
   'rich-text',

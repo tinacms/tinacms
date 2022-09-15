@@ -33,12 +33,14 @@ const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 export class DummyMediaStore implements MediaStore {
   accept = '*'
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    return files.map(({ directory, file }) => ({
-      id: file.name,
-      type: 'file',
-      directory,
-      filename: file.name,
-    }))
+    return files.map(({ directory, file }) => {
+      return {
+        id: file.name,
+        type: 'file',
+        directory,
+        filename: file.name,
+      }
+    })
   }
   async previewSrc(filename: string) {
     return filename
@@ -93,8 +95,6 @@ export class TinaMediaStore implements MediaStore {
     this.setup()
     return await this.api.isAuthenticated()
   }
-
-  accept = 'image/*'
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
