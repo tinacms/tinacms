@@ -37,7 +37,7 @@ import { defaultSchema } from '../compile/defaultSchema'
  * @param cmd {string}
  * @return {Promise<string>}
  */
-function execShellCommand(cmd): Promise<string> {
+export function execShellCommand(cmd): Promise<string> {
   const exec = require('child_process').exec
   return new Promise((resolve, _reject) => {
     exec(cmd, (error, stdout, stderr) => {
