@@ -61,7 +61,7 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
               `#graphql
             query ($collection: String!){
               collection(collection: $collection) {
-                documents {
+                documents(first: -1) {
                   edges {
                     node {
                       ...on Node {
