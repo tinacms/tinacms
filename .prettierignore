@@ -24,3 +24,4 @@ terraform/**/.terraform
 **/*.tfstate
 # Ignore any .next folder
 **/.next/**
+examples/hugo-quickstart
