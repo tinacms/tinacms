@@ -66,7 +66,7 @@ export class LevelStore implements Store {
       sort = DEFAULT_COLLECTION_SORT_KEY,
       collection,
       indexDefinitions,
-      limit = 10,
+      limit = 50,
       ...query
     } = queryOptions
 
