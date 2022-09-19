@@ -1,5 +1,14 @@
 # @tinacms/mdx
 
+## 0.61.7
+
+### Patch Changes
+
+- Updated dependencies [9183157c4]
+- Updated dependencies [4adf12619]
+- Updated dependencies [f8b89379c]
+  - @tinacms/schema-tools@0.1.3
+
 ## 0.61.6
 
 ### Patch Changes

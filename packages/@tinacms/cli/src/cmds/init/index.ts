@@ -1,3 +1,4 @@
+import path from 'path'
 import {
   AppJsContent,
   AppJsContentPrintout,
@@ -28,13 +29,15 @@ import chalk from 'chalk'
 import { logger } from '../../logger'
 import p from 'path'
 import prompts from 'prompts'
+import { fileExists } from '../../lib/getPath'
+import { defaultSchema } from '../compile/defaultSchema'
 
 /**
  * Executes a shell command and return it as a Promise.
  * @param cmd {string}
  * @return {Promise<string>}
  */
-function execShellCommand(cmd): Promise<string> {
+export function execShellCommand(cmd): Promise<string> {
   const exec = require('child_process').exec
   return new Promise((resolve, _reject) => {
     exec(cmd, (error, stdout, stderr) => {
@@ -48,13 +51,35 @@ function execShellCommand(cmd): Promise<string> {
 
 export async function initTina(ctx: any, next: () => void, options) {
   const telemetry = new Telemetry({ disabled: options.noTelemetry })
+  const root = ctx.rootPath
+  const tsConfigPath = path.join(root, 'tsconfig.json')
+  const usingTs = await fs.pathExists(tsConfigPath)
+
+  const schemaFileType = options?.schemaFileType || usingTs ? 'ts' : 'js'
+
   await telemetry.submitRecord({
     event: {
       name: 'tinacms:cli:init:invoke',
-      schemaFileType: options.schemaFileType || 'ts',
+      schemaFileType,
     },
   })
   logger.info(successText('Setting up Tina...'))
+  const tinaPath = path.join(root, '.tina')
+
+  const schemaExists = fileExists({
+    projectDir: tinaPath,
+    filename: 'schema',
+    allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
+  })
+
+  // If there is not Schema and no config
+  if (!schemaExists) {
+    const file = path.join(tinaPath, `schema.${schemaFileType}`)
+    // Ensure there is a .tina/schema.ts file
+    await fs.ensureFile(file)
+    // Write a basic schema to it
+    await fs.writeFile(file, defaultSchema)
+  }
   next()
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

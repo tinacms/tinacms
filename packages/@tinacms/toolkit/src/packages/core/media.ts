@@ -176,6 +176,7 @@ export class MediaManager implements MediaStore {
       })
       return media
     } catch (error) {
+      console.error(error)
       this.events.dispatch({
         type: 'media:upload:failure',
         uploaded: files,

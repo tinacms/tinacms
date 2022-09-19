@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.57.4
+
+### Patch Changes
+
+- 4adf12619: Add support for experimental iframe mode
+- f8b89379c: Fixed an issue with windows paths not working.
+
 ## 0.57.3
 
 ### Patch Changes

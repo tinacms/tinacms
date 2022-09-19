@@ -18,9 +18,8 @@ import path from 'path'
 import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
-import { dangerText, logText } from '../../utils/theme'
-import { defaultSchema } from './defaultSchema'
-import { getClientPath, getPath } from '../../lib'
+import { logText } from '../../utils/theme'
+import { fileExists, getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
 
 export const resetGeneratedFolder = async ({
@@ -115,7 +114,6 @@ export const compileClient = async (
     clientExists = false
   }
 
-  // TODO: Do we want to introduce a `defaultClient()` like we do with `defaultSchema()`?
   if (!clientExists) {
     // The client.ts file does not exist
     if (options.verbose) {
@@ -238,22 +236,6 @@ export const compileFile = async (
     // getSchemaPath will throw an error if it is not found
     schemaExists = false
   }
-  // TODO: refactor this
-  if (!schemaExists && fileName === 'schema') {
-    // The schema.ts file does not exist
-    logger.info(
-      dangerText(`
-      .tina/schema.${schemaFileType} not found, Creating one for you...
-      See Documentation: https://tina.io/docs/tina-cloud/cli/#getting-started"
-      `)
-    )
-    const file = path.join(tinaPath, `schema.${schemaFileType}`)
-    // Ensure there is a .tina/schema.ts file
-    await fs.ensureFile(file)
-    // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema)
-  }
-
   // Turns the schema into JS files so they can be run
   try {
     const define = {}
@@ -314,15 +296,38 @@ export const compileSchema = async (options: {
   schemaFileType?: string
   verbose?: boolean
   dev?: boolean
-  rootPath
+  rootPath: string
 }) => {
   const root = options.rootPath
   const tinaPath = path.join(root, '.tina')
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
-  let schema: any = await compileFile(options, 'schema')
-  try {
+  let schemaExists = fileExists({
+    projectDir: tinaPath,
+    filename: 'schema',
+    allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
+  })
+  const configExists = fileExists({
+    projectDir: tinaPath,
+    filename: 'config',
+    allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
+  })
+
+  // If there is not Schema and no config
+  if (!schemaExists && !configExists) {
+    throw new Error(
+      'No schema or config file found in .tina folder. Please run `npx @tinacms/cli@latest init` to generate a schema file.'
+    )
+  }
+
+  let schema: any
+
+  // only do this if there is a schema file
+  if (schemaExists) {
+    schema = await compileFile(options, 'schema')
+  }
+  if (configExists) {
     const config = (await compileFile(options, 'config')) as any
     const configCopy = _.cloneDeep(config)
     delete configCopy.schema
@@ -331,8 +336,6 @@ export const compileSchema = async (options: {
       // EX: {collections: [], config: {...}}
       schema = { ...config.schema, config: configCopy }
     }
-  } catch (e) {
-    // Do nothing, they are not using a config file
   }
   await fs.outputFile(
     path.join(tinaConfigPath, `schema.json`),

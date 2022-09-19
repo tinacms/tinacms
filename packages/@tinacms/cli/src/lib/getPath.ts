@@ -21,6 +21,32 @@ interface GetPathParams {
   errorMessage: string
 }
 
+export const fileExists = ({
+  projectDir,
+  filename,
+  allowedTypes,
+}: Omit<GetPathParams, 'errorMessage'>) => {
+  if (!fs.existsSync(projectDir)) {
+    return false
+  }
+  // Get file
+  const filePaths = allowedTypes.map((ext) =>
+    path.join(projectDir, `${filename}.${ext}`)
+  )
+
+  // Find the file the user provided
+  let inputFile = undefined
+  filePaths.every((path) => {
+    if (fs.existsSync(path)) {
+      inputFile = path
+      return false
+    }
+    return true
+  })
+
+  return Boolean(inputFile)
+}
+
 export const getPath = ({
   projectDir,
   filename,
@@ -50,17 +76,6 @@ export const getPath = ({
   }
 
   return inputFile
-}
-
-/*
- * Get the schemaPath for a given project dir.
- * It throws an error if there is no `.tina/schema.{ts,js,tsx,jsx}` present
- */
-export const getSchemaPath = ({ projectDir }: { projectDir: string }) => {
-  const filename = 'schema'
-  const allowedTypes = ['js', 'jsx', 'ts', 'tsx']
-  const errorMessage = 'Must provide a `.tina/schema.{ts,js,tsx,jsx}`'
-  return getPath({ projectDir, filename, allowedTypes, errorMessage })
 }
 
 /*

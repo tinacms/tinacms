@@ -1,7 +1,7 @@
-import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
 import { useTina } from 'tinacms/dist/edit-state'
+import { client } from '../.tina/__generated__/client'
 
 const query = `{
   page(relativePath: "home.mdx"){
@@ -25,15 +25,7 @@ export default function Home(props) {
 
 export const getStaticProps = async () => {
   const variables = {}
-  let data = {}
-  try {
-    data = await staticRequest({
-      query,
-      variables,
-    })
-  } catch {
-    // swallow errors related to document creation
-  }
+  const { data } = await client.request({ query, variables })
 
   return {
     props: {
