@@ -26,6 +26,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
         with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 2
 
       - uses: pnpm/action-setup@v2.0.1
