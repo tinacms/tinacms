@@ -402,6 +402,9 @@ const transpile = async (
     platform: 'neutral',
     target: ['node10.4'],
     entryPoints: [prebuiltInputPath],
+    // Since this code is run via CLI, convert it to cjs
+    // for simplicity.
+    format: 'cjs',
     treeShaking: true,
     external: [...external, './node_modules/*'],
     tsconfig: tempTsConfigPath,
