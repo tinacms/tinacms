@@ -367,7 +367,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
-    setFormsRegistering(isLoading)
+    setFormsRegistering && setFormsRegistering(isLoading)
   }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (
