@@ -374,7 +374,6 @@ importers:
       cors: ^2.8.5
       dotenv: ^16.0.1
       esbuild: ^0.15.5
-      esm: 3.2.25
       express: ^4.17.1
       fast-glob: ^3.2.4
       fs-extra: ^9.0.1
@@ -419,7 +418,6 @@ importers:
       cors: 2.8.5
       dotenv: 16.0.1
       esbuild: 0.15.5
-      esm: 3.2.25
       express: 4.18.1
       fast-glob: 3.2.11
       fs-extra: 9.1.0
@@ -807,7 +805,6 @@ importers:
       commander: ^7.2.0
       esbuild: ^0.12.9
       esbuild-jest: ^0.5.0
-      esm: 3.2.25
       execa: ^5.1.1
       express: ^4.17.1
       fs-extra: ^9.0.1
@@ -836,7 +833,6 @@ importers:
       commander: 7.2.0
       esbuild: 0.12.29
       esbuild-jest: 0.5.0_esbuild@0.12.29
-      esm: 3.2.25
       execa: 5.1.1
       express: 4.18.1
       fs-extra: 9.1.0
@@ -1010,7 +1006,6 @@ importers:
       chalk: ^4.1.2
       commander: ^8.3.0
       cross-spawn: ^7.0.3
-      esm: 3.2.25
       fs-extra: ^10.0.0
       got: ^11.8.5
       prompts: ^2.4.2
@@ -1022,7 +1017,6 @@ importers:
       chalk: 4.1.2
       commander: 8.3.0
       cross-spawn: 7.0.3
-      esm: 3.2.25
       fs-extra: 10.1.0
       got: 11.8.5
       prompts: 2.4.2
@@ -15571,14 +15565,6 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
-
-  /esm/3.2.25:
-    resolution:
-      {
-        integrity: sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==,
-      }
-    engines: { node: '>=6' }
-    dev: false
 
   /espree/6.2.1:
     resolution:
