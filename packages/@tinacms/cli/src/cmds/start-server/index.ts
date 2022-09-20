@@ -124,8 +124,8 @@ export async function startServer(
       })
       state.server.on('error', function (e) {
         if (e.code === 'EADDRINUSE') {
-          logger.error(dangerText(`Port 4001 already in use`))
-          process.exit()
+          logger.error(dangerText(`Port ${port} already in use`))
+          process.exit(1)
         }
         throw e
       })
