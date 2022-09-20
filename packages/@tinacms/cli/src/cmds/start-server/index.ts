@@ -104,33 +104,38 @@ export async function startServer(
 
     // hold the lock
     buildLock.enable()
+
     try {
       const s = require('./server')
       state.server = await s.default(database)
 
-      state.server.listen(port, () => {
-        const altairUrl = `http://localhost:${port}/altair/`
-        const cmsUrl = ctx.schema?.config?.build
-          ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
-          : `[your-development-url]/admin`
-        if (verbose)
-          logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-        logger.info(
-          `Visit the GraphQL playground at ${chalk.underline.blueBright(
-            altairUrl
-          )}\nor`
-        )
-        logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
-      })
-      state.server.on('error', function (e) {
-        if (e.code === 'EADDRINUSE') {
-          logger.error(dangerText(`Port ${port} already in use`))
-          process.exit(1)
-        }
-        throw e
-      })
-      state.server.on('connection', (socket) => {
-        state.sockets.push(socket)
+      await new Promise<void>((resolve, reject) => {
+        state.server.listen(port, () => {
+          const altairUrl = `http://localhost:${port}/altair/`
+          const cmsUrl = ctx.schema?.config?.build
+            ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
+            : `[your-development-url]/admin`
+          if (verbose)
+            logger.info(`Started Filesystem GraphQL server on port: ${port}`)
+          logger.info(
+            `Visit the GraphQL playground at ${chalk.underline.blueBright(
+              altairUrl
+            )}\nor`
+          )
+          logger.info(
+            `Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`
+          )
+          resolve()
+        })
+        state.server.on('error', function (e) {
+          if (e.code === 'EADDRINUSE') {
+            logger.error(dangerText(`Port ${port} already in use`))
+          }
+          reject(e)
+        })
+        state.server.on('connection', (socket) => {
+          state.sockets.push(socket)
+        })
       })
     } catch (error) {
       throw error
@@ -228,9 +233,7 @@ export async function startServer(
           next()
         } catch (e) {
           handleServerErrors(e)
-          // FIXME: make this a debug flag
-          console.log(e)
-          process.exit(0)
+          throw e
         }
       })
       .on('all', async () => {
