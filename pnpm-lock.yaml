@@ -235,7 +235,7 @@ importers:
       '@types/fs-extra': ^9.0.1
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
-      '@vitejs/plugin-react': ^1.3.2
+      '@vitejs/plugin-react': ^2.1.0
       '@xstate/react': ^3.0.0
       autoprefixer: ^10.4.0
       esbuild: ^0.15.5
@@ -253,7 +253,7 @@ importers:
       tailwindcss: ^3.1.6
       tinacms: workspace:*
       typescript: ^4.6.4
-      vite: 2.9.15
+      vite: ^3.1.3
       vite-node: ^0.23.4
       xstate: ^4.32.1
     dependencies:
@@ -264,7 +264,7 @@ importers:
       '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.8
       '@tinacms/schema-tools': link:../schema-tools
       '@tinacms/scripts': link:../scripts
-      '@vitejs/plugin-react': 1.3.2
+      '@vitejs/plugin-react': 2.1.0_vite@3.1.3
       '@xstate/react': 3.0.1_e7tgwmixjcyln2mcnxsuzpfpuu
       autoprefixer: 10.4.7_postcss@8.4.14
       esbuild: 0.15.5
@@ -282,7 +282,7 @@ importers:
       tailwindcss: 3.1.8_postcss@8.4.14
       tinacms: link:../../tinacms
       typescript: 4.7.4
-      vite: 2.9.15
+      vite: 3.1.3
       vite-node: 0.23.4
       xstate: 4.33.2
     devDependencies:
@@ -7183,17 +7183,6 @@ packages:
       react: 17.0.2
     dev: false
 
-  /@rollup/pluginutils/4.2.1:
-    resolution:
-      {
-        integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==,
-      }
-    engines: { node: '>= 8.0.0' }
-    dependencies:
-      estree-walker: 2.0.2
-      picomatch: 2.3.1
-    dev: false
-
   /@rushstack/eslint-patch/1.1.3:
     resolution:
       {
@@ -10460,21 +10449,23 @@ packages:
       - scheduler
     dev: false
 
-  /@vitejs/plugin-react/1.3.2:
+  /@vitejs/plugin-react/2.1.0_vite@3.1.3:
     resolution:
       {
-        integrity: sha512-aurBNmMo0kz1O4qRoY+FM4epSA39y3ShWGuqfLRA/3z0oEJAdtoSfgA3aO98/PCCHAqMaduLxIxErWrVKIFzXA==,
+        integrity: sha512-am6rPyyU3LzUYne3Gd9oj9c4Rzbq5hQnuGXSMT6Gujq45Il/+bunwq3lrB7wghLkiF45ygMwft37vgJ/NE8IAA==,
       }
-    engines: { node: '>=12.0.0' }
+    engines: { node: ^14.18.0 || >=16.0.0 }
+    peerDependencies:
+      vite: ^3.0.0
     dependencies:
       '@babel/core': 7.18.13
       '@babel/plugin-transform-react-jsx': 7.18.10_@babel+core@7.18.13
       '@babel/plugin-transform-react-jsx-development': 7.18.6_@babel+core@7.18.13
       '@babel/plugin-transform-react-jsx-self': 7.18.6_@babel+core@7.18.13
       '@babel/plugin-transform-react-jsx-source': 7.18.6_@babel+core@7.18.13
-      '@rollup/pluginutils': 4.2.1
-      react-refresh: 0.13.0
-      resolve: 1.22.1
+      magic-string: 0.26.3
+      react-refresh: 0.14.0
+      vite: 3.1.3
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -15657,13 +15648,6 @@ packages:
       '@types/unist': 2.0.6
     dev: false
 
-  /estree-walker/2.0.2:
-    resolution:
-      {
-        integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==,
-      }
-    dev: false
-
   /estree-walker/3.0.1:
     resolution:
       {
@@ -20713,6 +20697,16 @@ packages:
     engines: { node: '>=6' }
     dev: false
 
+  /magic-string/0.26.3:
+    resolution:
+      {
+        integrity: sha512-u1Po0NDyFcwdg2nzHT88wSK0+Rih0N1M+Ph1Sp08k8yvFFU3KR72wryS7e1qMPJypt99WB7fIFVCA92mQrMjrg==,
+      }
+    engines: { node: '>=12' }
+    dependencies:
+      sourcemap-codec: 1.4.8
+    dev: false
+
   /make-dir/3.1.0:
     resolution:
       {
@@ -23802,10 +23796,10 @@ packages:
       react-is: 17.0.2
     dev: false
 
-  /react-refresh/0.13.0:
+  /react-refresh/0.14.0:
     resolution:
       {
-        integrity: sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==,
+        integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==,
       }
     engines: { node: '>=0.10.0' }
     dev: false
@@ -25294,6 +25288,13 @@ packages:
         integrity: sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==,
       }
     engines: { node: '>= 8' }
+
+  /sourcemap-codec/1.4.8:
+    resolution:
+      {
+        integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==,
+      }
+    dev: false
 
   /space-separated-tokens/1.1.5:
     resolution:
@@ -27823,33 +27824,6 @@ packages:
     dependencies:
       esbuild: 0.14.47
       postcss: 8.4.14
-      resolve: 1.22.1
-      rollup: 2.75.7
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: false
-
-  /vite/2.9.15:
-    resolution:
-      {
-        integrity: sha512-fzMt2jK4vQ3yK56te3Kqpkaeq9DkcZfBbzHwYpobasvgYmP2SoAr6Aic05CsB4CzCZbsDv4sujX3pkEGhLabVQ==,
-      }
-    engines: { node: '>=12.2.0' }
-    hasBin: true
-    peerDependencies:
-      less: '*'
-      sass: '*'
-      stylus: '*'
-    peerDependenciesMeta:
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-    dependencies:
-      esbuild: 0.14.47
-      postcss: 8.4.16
       resolve: 1.22.1
       rollup: 2.75.7
     optionalDependencies:
