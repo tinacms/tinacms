@@ -24,9 +24,9 @@ export const NoFormsPlaceholder = () => (
   <EmptyState>
     <Emoji>🔎</Emoji>
     <p className="mb-4">
-      Tina didn't find <br />
-      any queries to <br />
-      generate forms for.
+      Looks like there's <br />
+      nothing to edit on <br />
+      this page.
     </p>
     <p>
       <Button
