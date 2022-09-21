@@ -11,12 +11,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
+import type {
   ObjectType,
   ReferenceTypeInner,
   Template,
   TinaFieldInner,
-} from '../types'
+} from '@tinacms/schema-tools'
 import type { FilterCondition } from '@tinacms/datalayer'
 
 export type ReferenceResolver = (

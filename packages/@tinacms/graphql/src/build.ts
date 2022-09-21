@@ -20,7 +20,7 @@ import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 import { astBuilder, NAMER } from './ast-builder'
 import { sequential } from './util'
 import { createBuilder } from './builder'
-import { createSchema } from './schema'
+import { createSchema } from './schema/createSchema'
 import { extractInlineTypes } from './ast-builder'
 import path from 'path'
 
