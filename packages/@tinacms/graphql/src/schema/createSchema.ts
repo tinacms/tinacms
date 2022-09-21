@@ -23,8 +23,6 @@ export const createSchema = async ({
   schema: TinaCloudSchemaBase
   flags?: string[]
 }) => {
-  // TODO: fix types
-  // @ts-ignore
   const validSchema = await validateSchema(schema)
   const [major, minor, patch] = packageJSON.version.split('.')
   const meta = {}
