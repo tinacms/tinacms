@@ -46,7 +46,7 @@ const prebuild = async () => {
         external: 'TINA_IMPORT',
       },
       outDir,
-      emptyOutDir: false,
+      emptyOutDir: true,
       lib: {
         entry,
         formats: ['es'],
