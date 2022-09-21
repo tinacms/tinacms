@@ -38,15 +38,13 @@ const FIELD_TYPES: TinaFieldBase['type'][] = [
   'rich-text',
 ]
 
-// TODO: fix types to use @tinacms/schema-tools
 export const validateSchema = async (
   schema: TinaCloudSchemaBase
 ): Promise<TinaCloudSchemaBase> => {
-  // TODO: fix types
-  // @ts-ignore
-  const schema2 = addNamespaceToSchema(
-    _.cloneDeep(schema)
-  ) as TinaCloudSchemaEnriched
+  const schema2: TinaCloudSchemaEnriched =
+    addNamespaceToSchema<TinaCloudSchemaEnriched>(
+      _.cloneDeep(schema) as unknown as TinaCloudSchemaEnriched
+    )
   const collections = await sequential(
     schema2.collections,
     async (collection) => validateCollection(collection)
