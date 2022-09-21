@@ -13,11 +13,13 @@ limitations under the License.
 
 import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
-import { build, createServer, InlineConfig } from 'vite'
+import { build, createServer, InlineConfig, ViteDevServer } from 'vite'
 import path from 'path'
 import { viteTina } from './tailwind'
 import { build as esbuild } from 'esbuild'
 import type { Loader } from 'esbuild'
+
+let server: ViteDevServer
 
 export const viteBuild = async ({
   rootPath,
@@ -32,7 +34,7 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const root = path.resolve(__dirname, '..', 'appFiles')
+  const prebuildPath = path.resolve(__dirname, 'bundle')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
   const packageJSONFilePath = path.join(rootPath, 'package.json')
   const outDir = path.join(rootPath, publicFolder, outputFolder)
@@ -75,13 +77,16 @@ vite.svg`
 
   const base = `/${outputFolder}/`
   const config: InlineConfig = {
-    root,
+    root: outDir,
     base,
     // For some reason this is breaking the React runtime in the end user's application.
     // Not sure what's going on but `development` works for now.
     mode: local ? 'development' : 'production',
     plugins: [react(), viteTina()],
     define: {
+      // Not sure this is needed anymore, but does seem like
+      // somewhere `process.env.NODE_ENV` is getting populated
+      // Maybe some context? https://github.com/vitejs/vite/pull/8090#issuecomment-1184929037
       'process.env': {},
       __API_URL__: `"${apiUrl}"`,
     },
@@ -112,23 +117,24 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (true) {
-    await build(config)
-    await fs.rmSync(out)
-  } else {
-    /**
-     * Uncomment to run the dev server
-     * Note that this assumes the outputFile is 'admin'
-     * And will run into port issues when the build server
-     * restart itself
-     */
+  if (local) {
     const indexDev = await fs
-      .readFileSync(path.join(root, 'index.dev.html'))
+      .readFileSync(path.join(__dirname, 'index.dev.html'))
       .toString()
-    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
-    const server = await createServer(config)
+    await fs.outputFileSync(
+      path.join(outDir, 'index.html'),
+      indexDev.replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
+    )
+    await fs.copySync(prebuildPath, path.join(outDir, 'bundle'))
+    if (server) {
+      await server.close()
+    }
+    server = await createServer(config)
     await server.listen()
     await server.printUrls()
+  } else {
+    await build(config)
+    await fs.rmSync(out)
   }
 }
 

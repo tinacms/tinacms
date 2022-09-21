@@ -11,14 +11,7 @@
   },
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "script.mjs",
-    "package.json",
-    "public",
-    "appFiles",
-    "tsconfig.json",
-    "tsconfig.node.json",
-    "vite.config.ts"
+    "dist"
   ],
   "license": "Apache-2.0",
   "buildConfig": {
@@ -26,12 +19,16 @@
       {
         "name": "src/index.ts",
         "target": "node"
+      },
+      {
+        "name": "src/prebuild.ts",
+        "target": "node"
       }
     ]
   },
   "scripts": {
     "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build && node dist/prebuild.js"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
@@ -58,7 +55,9 @@
     "postcss-nested": "^5.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-is": "18.2.0",
     "react-router-dom": "6",
+    "styled-components": "5.3.5",
     "tailwindcss": "^3.1.6",
     "tinacms": "workspace:*",
     "typescript": "^4.6.4",

@@ -244,7 +244,9 @@ importers:
       postcss-nested: ^5.0.6
       react: 17.0.2
       react-dom: 17.0.2
+      react-is: 18.2.0
       react-router-dom: '6'
+      styled-components: 5.3.5
       tailwindcss: ^3.1.6
       tinacms: workspace:*
       typescript: ^4.6.4
@@ -271,7 +273,9 @@ importers:
       postcss-nested: 5.0.6_postcss@8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
+      react-is: 18.2.0
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
+      styled-components: 5.3.5_v5ja746gkdtknuc6tj46sve3be
       tailwindcss: 3.1.8_postcss@8.4.14
       tinacms: link:../../tinacms
       typescript: 4.7.4
@@ -389,7 +393,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -2900,7 +2904,7 @@ packages:
       '@babel/helper-module-imports': 7.18.6
       '@babel/helper-simple-access': 7.18.6
       '@babel/helper-split-export-declaration': 7.18.6
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       '@babel/template': 7.18.10
       '@babel/traverse': 7.18.13
       '@babel/types': 7.18.13
@@ -4885,7 +4889,7 @@ packages:
     engines: { node: '>=6.9.0' }
     dependencies:
       '@babel/helper-string-parser': 7.18.10
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 
   /@babel/types/7.18.6:
@@ -5407,17 +5411,17 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-tools/schema': 8.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
     dev: false
 
-  /@graphql-codegen/plugin-helpers/2.7.0_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/2.7.1_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-+a2VP/4Ob0fwP8YLrQ/hhYlAA9UZUdDFNqwS543DmyiGFUkNIsa7TnTsE/mBDKJSMsCVWLw78949fCpzjyw/9Q==,
+        integrity: sha512-wpEShhwbQp8pqXolnSCNaj0pU91LbuBvYHpYqm96TUqyeKQYAYRVmw3JIt0g8UQpKYhg8lYIDwWdcINOYqkGLg==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -5439,7 +5443,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.3.1
@@ -5454,7 +5458,7 @@ packages:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-tag: ^2.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
       graphql: 15.8.0
@@ -5472,7 +5476,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -5491,7 +5495,7 @@ packages:
     peerDependencies:
       graphql: ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-codegen/schema-ast': 2.4.1_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
       auto-bind: 4.0.0
@@ -5510,7 +5514,7 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-codegen/plugin-helpers': 2.7.0_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 2.7.1_graphql@15.8.0
       '@graphql-tools/optimize': 1.3.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
@@ -16221,7 +16225,7 @@ packages:
         integrity: sha512-ii3X9wNfyBYFnDPunYN5jh1/HAvtOZ9aJI/TVk0MB86hZuOeYkb+W5L3icgwW9WWNztZR6MDU3En6eoZTUoFPg==,
       }
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
     dev: false
 
   /finalhandler/1.2.0:
@@ -17216,7 +17220,7 @@ packages:
         integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==,
       }
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
     dev: false
 
   /hoist-non-react-statics/3.3.2:
@@ -23754,7 +23758,6 @@ packages:
       {
         integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==,
       }
-    dev: true
 
   /react-onclickoutside/6.12.2_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -25837,6 +25840,33 @@ packages:
       shallowequal: 1.1.0
       supports-color: 5.5.0
     dev: true
+
+  /styled-components/5.3.5_v5ja746gkdtknuc6tj46sve3be:
+    resolution:
+      {
+        integrity: sha512-ndETJ9RKaaL6q41B69WudeqLzOpY1A/ET/glXkNZ2T7dPjPqpPCXXQjDFYZWwNnE5co0wX+gTCqx9mfxTmSIPg==,
+      }
+    engines: { node: '>=10' }
+    requiresBuild: true
+    peerDependencies:
+      react: '>= 16.8.0'
+      react-dom: '>= 16.8.0'
+      react-is: '>= 16.8.0'
+    dependencies:
+      '@babel/helper-module-imports': 7.18.6
+      '@babel/traverse': 7.18.13_supports-color@5.5.0
+      '@emotion/is-prop-valid': 1.1.3
+      '@emotion/stylis': 0.8.5
+      '@emotion/unitless': 0.7.5
+      babel-plugin-styled-components: 2.0.7_styled-components@5.3.5
+      css-to-react-native: 3.0.0
+      hoist-non-react-statics: 3.3.2
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+      react-is: 18.2.0
+      shallowequal: 1.1.0
+      supports-color: 5.5.0
+    dev: false
 
   /styled-jsx/3.4.7_react@17.0.2:
     resolution:
