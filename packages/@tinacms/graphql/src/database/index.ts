@@ -13,7 +13,7 @@ limitations under the License.
 
 import path from 'path'
 import { GraphQLError } from 'graphql'
-import { createSchema } from '../schema'
+import { createSchema } from '../schema/createSchema'
 import { lastItem } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import { sequential } from '../util'

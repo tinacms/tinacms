@@ -70,9 +70,7 @@ export const gqlServer = async (database, verbose: boolean) => {
 
   const db: Database = database
   const schema = await db.getSchema()
-  // TODO: fix types
-  // @ts-ignore
-  const mediaPaths = schema?.schema?.config?.media?.tina || {}
+  const mediaPaths = schema?.schema?.config?.media?.tina
 
   app.use(
     '/media',

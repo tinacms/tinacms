@@ -13,15 +13,16 @@ limitations under the License.
 
 import path from 'path'
 import fs from 'fs-extra'
-import { resolve } from '../resolve'
-import { buildASTSchema, printSchema } from 'graphql'
 import { toMatchFile } from 'jest-file-snapshot'
+import { buildASTSchema, printSchema } from 'graphql'
+
+import { FilesystemBridge } from '@tinacms/datalayer'
+import type { Store } from '@tinacms/datalayer'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
+
+import { resolve } from '../resolve'
 import { createDatabase } from '../database'
 import { Database } from '../database'
-import { FilesystemBridge } from '@tinacms/datalayer'
-
-import type { Store } from '@tinacms/datalayer'
-import type { TinaCloudSchema } from '../types'
 import { sequential } from '../util'
 import { buildDotTinaFiles } from '../build'
 
