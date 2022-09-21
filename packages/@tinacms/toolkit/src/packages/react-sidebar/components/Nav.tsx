@@ -26,7 +26,7 @@ import { FormModal } from '../../react-forms'
 import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '../../react-screens'
 import { LoadingDots } from '../../form-builder'
-import { SyncStatus, SyncErrorWidget } from './SyncStatus'
+import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './SyncStatus'
 import { useCMS } from '../../react-core'
 
 interface NavProps {
@@ -61,6 +61,11 @@ export const Nav = ({
 }: NavProps) => {
   const cms = useCMS()
   const { setEdit } = useEditState()
+  const [eventsOpen, setEventsOpen] = React.useState(false)
+
+  function closeEventsModal() {
+    setEventsOpen(false)
+  }
 
   return (
     <div
@@ -125,7 +130,7 @@ export const Nav = ({
                       </button>
                     </Menu.Item>
                     <Menu.Item>
-                      <SyncStatus cms={cms} />
+                      <SyncStatus cms={cms} setEventsOpen={setEventsOpen} />
                     </Menu.Item>
                   </Menu.Items>
                 </Transition>
@@ -134,6 +139,9 @@ export const Nav = ({
           )}
         </Menu>
       </div>
+      {eventsOpen && (
+        <SyncStatusModal cms={cms} closeEventsModal={closeEventsModal} />
+      )}
       {children}
       <div className="px-6 flex-1 overflow-auto">
         {showCollections && (
