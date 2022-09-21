@@ -28,6 +28,7 @@ import type { ScreenPlugin } from '../../react-screens'
 import { LoadingDots } from '../../form-builder'
 import { SyncStatus, SyncErrorWidget } from './SyncStatus'
 import { useCMS } from '../../react-core'
+import { CloudConfigPlugin } from '../../react-cloud-config'
 
 interface NavProps {
   children?: any
@@ -40,8 +41,10 @@ interface NavProps {
   }
   contentCreators?: any
   screens?: ScreenPlugin[]
+  cloudConfigs?: CloudConfigPlugin[]
   sidebarWidth?: number
   RenderNavSite: React.ComponentType<{ view: ScreenPlugin }>
+  RenderNavCloud: React.ComponentType<{ config: CloudConfigPlugin }>
   RenderNavCollection: React.ComponentType<{
     collection: { label: string; name: string }
   }>
@@ -53,9 +56,11 @@ export const Nav = ({
   showCollections,
   collectionsInfo,
   screens,
+  cloudConfigs,
   contentCreators,
   sidebarWidth,
   RenderNavSite,
+  RenderNavCloud,
   RenderNavCollection,
   ...props
 }: NavProps) => {
@@ -164,6 +169,22 @@ export const Nav = ({
               {contentCreators.map((plugin, idx) => {
                 return (
                   <CreateContentNavItem key={`plugin-${idx}`} plugin={plugin} />
+                )
+              })}
+            </ul>
+          </>
+        )}
+        {!!cloudConfigs?.length && (
+          <>
+            <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
+              Cloud
+            </h4>
+            <ul className="flex flex-col gap-4">
+              {cloudConfigs.map((config) => {
+                return (
+                  <li key={`nav-site-${config.name}`}>
+                    <RenderNavCloud config={config} />
+                  </li>
                 )
               })}
             </ul>
