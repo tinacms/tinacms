@@ -74,11 +74,18 @@ type Document = {
     extension: string
   }
 }
+export type TinaIndex = {
+  name: string
+  fields: {
+    name: string
+  }[]
+}
 
 interface BaseCollection {
   label?: string
   name: string
   path: string
+  indexes?: TinaIndex[]
   format?: FormatType
   ui?: {
     /**
@@ -155,11 +162,12 @@ export type TinaFieldEnriched = TinaFieldInner<true> & {
   parentTypename?: string
 }
 
-interface TinaField {
+export interface TinaField {
   name: string
   label?: string
   description?: string
   required?: boolean
+  indexed?: boolean
   // list?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.
