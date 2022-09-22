@@ -1,5 +1,11 @@
 # @tinacms/sharedctx
 
+## 0.1.3
+
+### Patch Changes
+
+- f3439ea35: Replace loading message and hide forms while loading.
+
 ## 0.1.2
 
 ### Patch Changes

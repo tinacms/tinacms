@@ -1,5 +1,14 @@
 # @tinacms/schema-tools
 
+## 0.1.4
+
+### Patch Changes
+
+- f581f263d: Add --static option for `tina init`
+- 7ae1b0697: Remove duplicate TinaSchema class
+- f3439ea35: Replace loading message and hide forms while loading.
+- 48032e2ba: Use tinaio url config override in the client
+
 ## 0.1.3
 
 ### Patch Changes
