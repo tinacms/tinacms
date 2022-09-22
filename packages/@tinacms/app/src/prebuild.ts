@@ -25,12 +25,14 @@ import { viteTina } from './tailwind'
  * The viteBuild will then use this output + user's config to build the actual vite app
  */
 const prebuild = async () => {
-  const outDir = path.join(__dirname, '../dist/bundle')
-  const outHTML = path.join(__dirname, '../dist/index.dev.html')
+  const outDir = path.join(__dirname, '../dist/assets')
+  const outDevHTML = path.join(__dirname, '../dist/index.dev.html')
   await fs.copyFileSync(
     path.join(__dirname, '../appFiles/index.dev.html'),
-    outHTML
+    outDevHTML
   )
+  const outHTML = path.join(__dirname, '../dist/index.html')
+  await fs.copyFileSync(path.join(__dirname, '../appFiles/index.html'), outHTML)
   const entry = path.join(__dirname, '../appFiles/src/main.tsx')
   const libConfig: InlineConfig = {
     plugins: [react(), viteTina()],
@@ -55,7 +57,6 @@ const prebuild = async () => {
     },
     logLevel: 'silent',
   }
-  console.log('building lib')
   await build(libConfig)
 }
 
