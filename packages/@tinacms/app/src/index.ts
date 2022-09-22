@@ -168,7 +168,7 @@ vite.svg`
      * This is kind of awkward, we're putting files in the specified
      * output folder because we want to run the vite build
      * from the context of the user's site, so dependencies are
-     * discovered properly. So his drops in the scaffolding
+     * discovered properly. So this drops in the scaffolding
      * and then builds over it
      */
     await fs.copyFileSync(
