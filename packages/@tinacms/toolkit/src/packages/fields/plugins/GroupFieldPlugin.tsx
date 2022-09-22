@@ -143,6 +143,7 @@ export const PanelHeader = ({ onClick, children }) => {
       className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
        border-gray-100 px-6 -mt-px`}
       onClick={onClick}
+      tabIndex={-1}
     >
       <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
         {children}
