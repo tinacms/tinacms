@@ -42,11 +42,11 @@ const FakeForm = () => {
 const Preview = () => {
   return (
     <div className="flex justify-between h-screen items-stretch">
-      <div className="flex relative shadow-lg">
+      <div className="flex-1 max-h-screen flex relative shadow-lg">
         <div className="border-r border-gray-100">
           <Nav />
         </div>
-        <div className="flex flex-col border-r border-gray-100">
+        <div className="flex-1 flex flex-col border-r border-gray-100">
           <Toolbar />
           <FormHeader />
           <FakeForm />
@@ -62,8 +62,8 @@ const Preview = () => {
 
 const Nav = () => {
   return (
-    <div className="bg-white w-[18rem]">
-      <button className="bg-white hover:bg-gray-50 transition-all duration-150 ease-out group border-b border-gray-100 px-5 h-[3.75rem] w-full flex justify-between items-center">
+    <div className="bg-white w-[18rem] max-h-screen flex flex-col">
+      <button className="flex-shrink-0 bg-white hover:bg-gray-50 transition-all duration-150 ease-out group border-b border-gray-100 px-5 h-[3.75rem] w-full flex justify-between items-center">
         <span className="text-left inline-flex items-center text-lg font-medium tracking-wide text-gray-800 flex-1 gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
           <TinaSVG />
           <span className="">Tina</span>
@@ -72,17 +72,24 @@ const Nav = () => {
           className={`flex-0 w-6 h-full inline-block group-hover:opacity-80 transition-all duration-300 ease-in-out transform text-gray-400 opacity-50`}
         />
       </button>
-      <div className="py-4">
-        <div className="px-6 py-2">
+      <div className="py-6 flex-1 overflow-auto">
+        <div className="px-6 pt-2 pb-4">
           <NavList
             title="Page Documents"
             items={[
-              { label: 'Just Another Blog Post', Icon: ImFileEmpty },
-              { label: 'Scott Byrne', Icon: FiUser },
+              {
+                label: 'Just Another Blog Post',
+                Icon: ImFileEmpty,
+                items: [
+                  { label: 'Scott Byrne', Icon: FiUser },
+                  { label: 'Some Reference', Icon: ImFileEmpty },
+                ],
+              },
+              { label: 'Page Nav', Icon: ImFileEmpty },
             ]}
           />
         </div>
-        <div className="px-6 py-2">
+        <div className="px-6 pt-2 pb-4">
           <NavList
             title="Collections"
             items={[
@@ -92,7 +99,7 @@ const Nav = () => {
             ]}
           />
         </div>
-        <div className="px-6 py-2">
+        <div className="px-6 pt-2 pb-4">
           <NavList
             title="Global"
             items={[
@@ -109,18 +116,18 @@ const Nav = () => {
 
 const NavList = ({
   title = '',
-  items = [{ label: '', Icon: ImFilesEmpty }],
+  items = [{ label: '', Icon: ImFilesEmpty, items: [] }],
 }) => {
   if (!items.length) return null
 
   return (
     <>
       {title && (
-        <h4 className="text-xs uppercase text-gray-800 font-bold tracking-wide">
+        <h4 className="text-xs uppercase text-gray-800 font-bold tracking-wide mb-3">
           {title}
         </h4>
       )}
-      <ul className="flex flex-col gap-1.5 py-3">
+      <ul className="flex flex-col gap-1.5">
         {items.map((item) => {
           const { label, Icon } = item
 
@@ -136,6 +143,11 @@ const NavList = ({
                 )}
                 <span className="truncate">{item.label}</span>
               </a>
+              {item.items && (
+                <div className="pl-4 py-2">
+                  <NavList items={item.items} />
+                </div>
+              )}
             </li>
           )
         })}
@@ -215,10 +227,10 @@ const ResizeHandle = () => {
   return (
     <div
       onMouseDown={() => {}}
-      className={`z-100 absolute top-1/2 right-0 w-2 h-32 bg-white rounded-r-md border border-gray-100 shadow-sm hover:shadow-md transition-all duration-150 ease-out transform translate-x-full -translate-y-1/2 group hover:bg-gray-50`}
+      className={`z-100 absolute top-1/2 right-0 w-[10px] h-32 bg-white rounded-l-md border border-gray-100  transition-all duration-150 ease-out transform -translate-y-1/2 group hover:bg-blue-50 hover:border-blue-100`}
       style={{ cursor: 'grab' }}
     >
-      <span className="absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-300 transform -translate-y-1/2 -translate-x-1/2 opacity-50 transition-opacity duration-150 ease-out group-hover:opacity-100"></span>
+      <span className="absolute top-1/2 left-1/2 h-4/6 w-px bg-gray-200 transform -translate-y-1/2 -translate-x-1/2 opacity-50 transition-opacity duration-150 ease-out group-hover:opacity-100 group-hover:bg-blue-200"></span>
     </div>
   )
 }
