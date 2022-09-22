@@ -43,10 +43,6 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
         }
       }
       document.addEventListener('mouseup', handleClick, false)
-      if (input.value) {
-        // set the initial value of the date picker
-        input.onChange(input.value)
-      }
       return () => {
         document.removeEventListener('mouseup', handleClick, false)
       }

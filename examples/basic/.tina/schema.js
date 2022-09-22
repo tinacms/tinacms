@@ -111,6 +111,7 @@ const schema = defineSchema({
           title: 'new post',
           filename: 'new-post',
           date: new Date().toISOString(),
+          foo: { bar: 'bar' },
         }
       },
       fields: [
@@ -123,6 +124,12 @@ const schema = defineSchema({
           type: 'datetime',
           label: 'Date',
           name: 'date',
+        },
+        {
+          type: 'object',
+          name: 'foo',
+          label: 'Foo',
+          fields: [{ name: 'bar', label: 'Bar', type: 'string' }],
         },
         {
           type: 'object',
