@@ -33,7 +33,7 @@ interface BreadcrumbProps {
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   directory = directory.replace(/^\/|\/$/g, '')
 
-  let prevDir = dirname(directory)
+  let prevDir = dirname(directory) || ''
   if (prevDir === '.') {
     prevDir = ''
   }
