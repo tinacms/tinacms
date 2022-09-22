@@ -2,8 +2,9 @@
   "name": "starter-basic-iframe",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms dev -c \"next dev\" --noTelemetry",
-    "start": "yarn tinacms build -c \"next start\"",
+    "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\" --noTelemetry",
+    "build": "tinacms build && next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
