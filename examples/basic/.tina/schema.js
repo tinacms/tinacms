@@ -49,13 +49,28 @@ const schema = defineSchema({
       path: 'content/page',
       label: 'Page',
       format: 'mdx',
+
+      // An example of a defaultItem
+      // defaultItem: () => {
+      //   const m = new Date()
+      //   return {
+      //     title: 'New Page',
+      //     test: 'This is a default value of the test field',
+      //     filename: `new-page-${
+      //       m.getUTCFullYear() +
+      //       '-' +
+      //       (m.getUTCMonth() + 1) +
+      //       '-' +
+      //       m.getUTCDate()
+      //     }`,
+      //   }
+      // },
       fields: [
         {
           label: 'Title',
           name: 'Title',
           type: 'string',
           ui: {
-            // defaultValue: 'Title',
             // Examples of how you COULD use a custom form
             // component: ({ form, field, input }) => {
             //   return (
@@ -71,6 +86,12 @@ const schema = defineSchema({
             //   }
             // },
           },
+        },
+        {
+          label: 'Test',
+          name: 'test',
+          type: 'string',
+          description: 'This is a test',
         },
         {
           name: 'body',
