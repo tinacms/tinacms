@@ -35,6 +35,7 @@ import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
+import { CloudConfigPlugin } from '../../react-cloud-config'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -147,9 +148,12 @@ const Sidebar = ({
   const collectionsInfo = useFetchCollections(cms)
 
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
+  const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config')
+
   useSubscribable(sidebar)
   useSubscribable(screens)
   const allScreens = screens.all()
+  const allConfigs = cloudConfigs.all()
 
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
@@ -288,6 +292,7 @@ const Sidebar = ({
               showCollections={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
               screens={allScreens}
+              cloudConfigs={allConfigs}
               contentCreators={contentCreators}
               sidebarWidth={sidebarWidth}
               RenderNavSite={({ view }) => (
@@ -298,6 +303,9 @@ const Sidebar = ({
                     setMenuIsOpen(false)
                   }}
                 />
+              )}
+              RenderNavCloud={({ config }) => (
+                <SidebarCloudLink config={config} />
               )}
               RenderNavCollection={({ collection }) => (
                 <SidebarCollectionLink
@@ -344,6 +352,7 @@ const Sidebar = ({
                   showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
                   screens={allScreens}
+                  cloudConfigs={allConfigs}
                   contentCreators={contentCreators}
                   sidebarWidth={sidebarWidth}
                   RenderNavSite={({ view }) => (
@@ -354,6 +363,9 @@ const Sidebar = ({
                         setMenuIsOpen(false)
                       }}
                     />
+                  )}
+                  RenderNavCloud={({ config }) => (
+                    <SidebarCloudLink config={config} />
                   )}
                   RenderNavCollection={({ collection }) => (
                     <SidebarCollectionLink
@@ -503,6 +515,31 @@ const SidebarSiteLink = ({
     >
       <view.Icon className="mr-2 h-6 opacity-80 w-auto" /> {view.name}
     </button>
+  )
+}
+
+const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
+  if (config.text) {
+    return (
+      <span className="text-base tracking-wide text-gray-500 flex items-center opacity-90">
+        {config.text}{' '}
+        <a
+          target="_blank"
+          className="ml-1 text-blue-600 hover:opacity-60"
+          href={config.link.href}
+        >
+          {config.link.text}
+        </a>
+      </span>
+    )
+  }
+  return (
+    <span className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100">
+      <config.Icon className="mr-2 h-6 opacity-80 w-auto" />
+      <a target="_blank" href={config.link.href}>
+        {config.link.text}
+      </a>
+    </span>
   )
 }
 
