@@ -35,7 +35,7 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const prebuildPath = path.resolve(__dirname, 'bundle')
+  const prebuildPath = path.resolve(__dirname, 'assets')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
   const packageJSONFilePath = path.join(rootPath, 'package.json')
   const outDir = path.join(rootPath, publicFolder, outputFolder)
@@ -45,7 +45,6 @@ export const viteBuild = async ({
     path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
     `index.html
 assets/
-bundle/
 vite.svg`
   )
 
@@ -130,7 +129,7 @@ vite.svg`
     )
     // Copy the pre-built assets into the user's public output folder
     // This will be used as the entry point by the vite dev server
-    await fs.copySync(prebuildPath, path.join(outDir, 'bundle'))
+    await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
 
     // This build is called every time the user makes a change to their config,
     // so ensure we don't run into an existing server error
@@ -141,6 +140,20 @@ vite.svg`
     await server.listen()
     await server.printUrls()
   } else {
+    /**
+     * This is kind of awkward, we're putting files in the specified
+     * output folder because we want to run the vite build
+     * from the context of the user's site, so dependencies are
+     * discovered properly. So his drops in the scaffolding
+     * and then builds over it
+     */
+    await fs.copyFileSync(
+      path.join(__dirname, 'index.html'),
+      path.join(outDir, 'index.html')
+    )
+    // Copy the pre-built assets into the user's public output folder
+    // This will be used as the entry point by the vite dev server
+    await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
     await build(config)
     await fs.rmSync(out)
   }
