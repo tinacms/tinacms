@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { ModalProvider } from '../packages/react-modals'
-import { Theme } from '../packages/styles'
 import { SidebarProvider, SidebarPosition } from '../packages/react-sidebar'
 import { Toolbar } from '../packages/react-toolbar'
 import { useCMS } from '../react-tinacms/use-cms'
@@ -35,21 +34,21 @@ export interface TinaUIProps {
   children?: React.ReactNode
 }
 
-export const TinaUI: React.FC<TinaUIProps> = ({
-  children,
-  position,
-  styled = true,
-}) => {
+export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
   const cms = useCMS()
   const [resizingSidebar, setResizingSidebar] = React.useState(false)
 
   return (
     <MutationSignalProvider>
       <style>{styles}</style>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Inter:400,600"
+        media="all"
+      ></link>
       <ModalProvider>
         <div className="tina-tailwind">
           <Alerts alerts={cms.alerts} />
-          {cms.enabled && styled && <Theme />}
           {cms.enabled && cms.toolbar && <Toolbar />}
           <MediaManager />
           {cms.sidebar && (
