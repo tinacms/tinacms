@@ -28,8 +28,6 @@ import type {
   NamedTypeNode,
 } from 'graphql'
 
-// TODO: update types. Import from @tinacms/schema-tools
-
 import type {
   TinaCloudCollectionEnriched,
   TinaFieldEnriched,
@@ -38,8 +36,8 @@ import type {
   Templateable,
   TinaFieldInner,
   Template,
-} from '../types'
-import { TinaSchema } from '../schema'
+} from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 export const createBuilder = async ({
   database,
