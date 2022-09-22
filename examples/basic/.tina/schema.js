@@ -106,11 +106,23 @@ const schema = defineSchema({
       name: 'post',
       path: 'content/post',
       format: 'md',
+      defaultItem: () => {
+        return {
+          title: 'new post',
+          filename: 'new-post',
+          date: new Date().toISOString(),
+        }
+      },
       fields: [
         {
           type: 'string',
           label: 'Title',
           name: 'title',
+        },
+        {
+          type: 'datetime',
+          label: 'Date',
+          name: 'date',
         },
         {
           type: 'object',
@@ -130,18 +142,6 @@ const schema = defineSchema({
             },
             {
               name: 'label',
-              type: 'string',
-            },
-          ],
-        },
-        {
-          type: 'object',
-          label: 'Something',
-          name: 'foo',
-          fields: [
-            {
-              name: 'bar',
-              label: 'Bar',
               type: 'string',
             },
           ],
