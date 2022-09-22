@@ -120,7 +120,7 @@ function useSyncStatus(cms) {
 export const SyncErrorWidget = ({ cms }: { cms: any }) => {
   const syncStatus = useSyncStatus(cms)
 
-  if (syncStatus.state !== 'error') {
+  if (cms.api?.tina?.isLocalMode || syncStatus.state !== 'error') {
     return null
   }
 
