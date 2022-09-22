@@ -1,5 +1,30 @@
 # tinacms
 
+## 0.69.8
+
+### Patch Changes
+
+- 0513ae416: Increase defualt file limit from 10 to 50
+- 64c40e6fc: change hardcoded content api url to be dynamic
+- f3439ea35: Replace loading message and hide forms while loading.
+- 48032e2ba: Use tinaio url config override in the client
+- 112b7271d: fix vulnerabilities
+- 8688dbff9: Add links to Tina Cloud project setting from sidebar
+- Updated dependencies [4b9a2252f]
+- Updated dependencies [f581f263d]
+- Updated dependencies [4e0a609cd]
+- Updated dependencies [fd90b7f49]
+- Updated dependencies [7ae1b0697]
+- Updated dependencies [ee354c708]
+- Updated dependencies [f3439ea35]
+- Updated dependencies [48032e2ba]
+- Updated dependencies [112b7271d]
+- Updated dependencies [4efe31214]
+- Updated dependencies [8688dbff9]
+  - @tinacms/toolkit@0.57.5
+  - @tinacms/schema-tools@0.1.4
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.69.7
 
 ### Patch Changes
@@ -798,7 +823,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   // _app.tsx
   // ...
   <TinaCMS apiURL={process.env.NEXT_PUBLIC_TINA_API_URL} {...pageProps}>
-    {livePageProps => <Component {...livePageProps} />}
+    {(livePageProps) => <Component {...livePageProps} />}
   </TinaCMS>
   ```
 
@@ -1206,13 +1231,13 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
         // Optional: Your identifier when connecting to Tina Cloud
         clientId="<some-id-from-tina-cloud>"
         // Optional: A callback for altering the CMS object if needed
-        cmsCallback={cms => {}}
+        cmsCallback={(cms) => {}}
         // Optional: A callback for altering the form generation if needed
-        formifyCallback={args => {}}
+        formifyCallback={(args) => {}}
         // Optional: A callback for altering the document creator plugin
-        documentCreatorCallback={args => {}}
+        documentCreatorCallback={(args) => {}}
       >
-        {livePageProps => <Component {...livePageProps} />}
+        {(livePageProps) => <Component {...livePageProps} />}
       </TinaCMS>
     )
   }
@@ -1380,7 +1405,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
     name: 'myText',
-    validate: value => {
+    validate: (value) => {
       someValidationLogic(value)
     },
   })
@@ -1397,7 +1422,7 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   1. The data is not a required property. That is to say, if I have a blog post document, and "category" is an optional field, we'll need to make sure we factor that into how we render our page:
 
   ```tsx
-  const MyPage = props => {
+  const MyPage = (props) => {
     return (
       <>
         <h2>{props.getPostDocument.data.title}</h2>
@@ -1462,8 +1487,8 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   It's possible for Tina's editing capabilities to introduce an invalid state during edits to list items. Imagine the scenario where you are iterating through an array of objects, and each object has a categories array on it we'd like to render:
 
   ```tsx
-  const MyPage = props => {
-    return props.blocks.map(block => {
+  const MyPage = (props) => {
+    return props.blocks.map((block) => {
       return (
         <>
           <h2>{block.categories.split(',')}</h2>
@@ -1733,9 +1758,12 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   ```md
   ---
   ---
+
   myBlocks:
-    - template: hero
-      title: Hello
+
+  - template: hero
+    title: Hello
+
   ---
   ```
 
@@ -1744,9 +1772,12 @@ Note: For root tinacms changes, please refer to the [CHANGELOG.md](https://githu
   ```md
   ---
   ---
+
   myBlocks:
-    - \_template: hero
-      title: Hello
+
+  - \_template: hero
+    title: Hello
+
   ---
   ```
 

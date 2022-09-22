@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.57.5
+
+### Patch Changes
+
+- 4b9a2252f: Fixes rich text dropdown menu z-index issue
+- 4e0a609cd: Disable tabbing into panel header
+- fd90b7f49: Fix reference field loading only 10 first nodes in collection
+- ee354c708: Fix event log dialog closing issue
+- f3439ea35: Replace loading message and hide forms while loading.
+- 112b7271d: fix vulnerabilities
+- 4efe31214: Include error message in file failed upload model
+- 8688dbff9: Add links to Tina Cloud project setting from sidebar
+- Updated dependencies [f3439ea35]
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.57.4
 
 ### Patch Changes
@@ -425,13 +440,13 @@
 - 106549814: Add a CMS event for when a field's value changes. To listen for events:
 
   ```ts
-  cms.events.subscribe(`forms:fields:onChange`, event => console.log(event))
+  cms.events.subscribe(`forms:fields:onChange`, (event) => console.log(event))
   ```
 
   Add a CMS event for when a field is reset. To listen for form resets:
 
   ```ts
-  cms.events.subscribe(`forms:reset`, event => console.log(event))
+  cms.events.subscribe(`forms:reset`, (event) => console.log(event))
   ```
 
 - 4923a2d66: Checks isAuthenticated() before making requests to the GraphQL client
