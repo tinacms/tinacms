@@ -298,18 +298,25 @@ export const buildAdmin = async ({
   apiUrl: string
 }) => {
   if (schema?.config?.build) {
-    await spin({
-      text: 'Building static site',
-      waitFor: async () => {
-        await viteBuild({
-          local,
-          rootPath,
-          outputFolder: schema?.config?.build?.outputFolder as string,
-          publicFolder: schema?.config?.build?.publicFolder as string,
-          apiUrl,
-        })
-      },
-    })
-    console.log('\nDone building static site')
+    const buildVite = async () => {
+      await viteBuild({
+        local,
+        rootPath,
+        outputFolder: schema?.config?.build?.outputFolder as string,
+        publicFolder: schema?.config?.build?.publicFolder as string,
+        apiUrl,
+      })
+    }
+    // Local runs an asset server as a long-lived task, don't show spinning animation
+    if (local) {
+      console.log('Starting Tina asset server')
+      await buildVite()
+    } else {
+      await spin({
+        text: 'Building static site',
+        waitFor: buildVite,
+      })
+      console.log('\nDone building static site')
+    }
   }
 }
