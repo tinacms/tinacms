@@ -30,6 +30,9 @@ export type UIField<F extends UIField = any, Shape = any> = {
     meta: any,
     field: UIField<F, Shape>
   ): string | object | undefined | void
+  /**
+   * @deprecated use `defaultItem` at the collection level instead
+   */
   defaultValue?: Shape
 }
 
@@ -85,6 +88,7 @@ interface BaseCollection {
   label?: string
   name: string
   path: string
+  defaultItem?: () => unknown | unknown
   indexes?: TinaIndex[]
   format?: FormatType
   ui?: {
