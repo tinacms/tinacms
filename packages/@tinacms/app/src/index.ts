@@ -77,8 +77,22 @@ vite.svg`
   })
 
   const base = `/${outputFolder}/`
+
+  /**
+   * HEADS UP
+   *
+   * This is an experimental feature to make development within the monorepo faster.
+   *
+   * We can avoid the prebuild by just treating the appFiles directory
+   * as root but this will fail to find user-supplied modules in the config file.
+   *
+   * This is opt-in and new features should always be tested with this flag off
+   */
+  const MONOREPO_DEV = process.env.MONOREPO_DEV
+
+  const root = MONOREPO_DEV ? path.join(__dirname, '../appFiles') : outDir
   const config: InlineConfig = {
-    root: outDir,
+    root,
     base,
     // For some reason this is breaking the React runtime in the end user's application.
     // Not sure what's going on but `development` works for now.
@@ -123,13 +137,23 @@ vite.svg`
     const indexDev = await fs
       .readFileSync(path.join(__dirname, 'index.dev.html'))
       .toString()
-    await fs.outputFileSync(
-      path.join(outDir, 'index.html'),
-      indexDev.replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
-    )
-    // Copy the pre-built assets into the user's public output folder
-    // This will be used as the entry point by the vite dev server
-    await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
+    if (MONOREPO_DEV) {
+      console.warn('MONOREPO_DEV mode, vite root is @tinacms/app')
+      await fs.outputFileSync(
+        path.join(outDir, 'index.html'),
+        indexDev
+          .replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
+          .replace('assets/out.es.js', 'src/main.tsx')
+      )
+    } else {
+      await fs.outputFileSync(
+        path.join(outDir, 'index.html'),
+        indexDev.replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
+      )
+      // Copy the pre-built assets into the user's public output folder
+      // This will be used as the entry point by the vite dev server
+      await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
+    }
 
     // This build is called every time the user makes a change to their config,
     // so ensure we don't run into an existing server error
