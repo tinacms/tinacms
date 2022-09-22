@@ -20,5 +20,6 @@
     "@types/node": "^17.0.21",
     "eslint": "7",
     "eslint-config-next": "12.0.3"
-  }
+  },
+  "version": null
 }
