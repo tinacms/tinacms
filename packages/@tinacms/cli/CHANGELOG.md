@@ -1,5 +1,31 @@
 # tinacms-cli
 
+## 0.61.14
+
+### Patch Changes
+
+- f581f263d: Add --static option for `tina init`
+- c06b6a2f0: fix: Don't run subprocess if main process fails with occupied port
+- 47f99085d: Do not require a schema file when a config is provided.
+- 64c40e6fc: change hardcoded content api url to be dynamic
+- 2444cf047: - Makes cli checks the error message clearer
+  - Adds a "Spinner" to the messages to make it cleaner
+  - Does a GQL request to check the clientID, token, branch are all valid.
+- f3439ea35: Replace loading message and hide forms while loading.
+- 48032e2ba: Use tinaio url config override in the client
+- 4efe31214: Include error message in file failed upload model
+- Updated dependencies [f581f263d]
+- Updated dependencies [e5da05a8c]
+- Updated dependencies [0513ae416]
+- Updated dependencies [7ae1b0697]
+- Updated dependencies [f3439ea35]
+- Updated dependencies [48032e2ba]
+- Updated dependencies [6e137ea85]
+  - @tinacms/schema-tools@0.1.4
+  - @tinacms/app@0.0.13
+  - @tinacms/datalayer@0.2.4
+  - @tinacms/graphql@0.63.10
+
 ## 0.61.13
 
 ### Patch Changes
@@ -1061,7 +1087,7 @@
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
     name: 'myText',
-    validate: value => {
+    validate: (value) => {
       someValidationLogic(value)
     },
   })
@@ -1078,7 +1104,7 @@
   1. The data is not a required property. That is to say, if I have a blog post document, and "category" is an optional field, we'll need to make sure we factor that into how we render our page:
 
   ```tsx
-  const MyPage = props => {
+  const MyPage = (props) => {
     return (
       <>
         <h2>{props.getPostDocument.data.title}</h2>
@@ -1143,8 +1169,8 @@
   It's possible for Tina's editing capabilities to introduce an invalid state during edits to list items. Imagine the scenario where you are iterating through an array of objects, and each object has a categories array on it we'd like to render:
 
   ```tsx
-  const MyPage = props => {
-    return props.blocks.map(block => {
+  const MyPage = (props) => {
+    return props.blocks.map((block) => {
       return (
         <>
           <h2>{block.categories.split(',')}</h2>
@@ -1414,9 +1440,12 @@
   ```md
   ---
   ---
+
   myBlocks:
-    - template: hero
-      title: Hello
+
+  - template: hero
+    title: Hello
+
   ---
   ```
 
@@ -1425,9 +1454,12 @@
   ```md
   ---
   ---
+
   myBlocks:
-    - \_template: hero
-      title: Hello
+
+  - \_template: hero
+    title: Hello
+
   ---
   ```
 
