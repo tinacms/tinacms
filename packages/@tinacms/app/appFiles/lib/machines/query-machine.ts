@@ -418,7 +418,11 @@ export const queryMachine = createMachine(
             if (blueprint.path.some((item) => item.list)) {
               // do nothing
             } else {
-              if (form.global) {
+              const schema = context.cms.api.tina.schema
+              const collection = schema.getCollection(
+                value.value._internalSys.collection.name
+              )
+              if (form.global || collection?.ui?.global) {
                 context.cms.plugins.add(
                   new GlobalFormPlugin(
                     form,
