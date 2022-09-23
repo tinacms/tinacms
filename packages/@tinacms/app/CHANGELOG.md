@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 0.0.14
+
+### Patch Changes
+
+- tinacms@0.69.9
+
 ## 0.0.13
 
 ### Patch Changes
