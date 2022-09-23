@@ -171,6 +171,7 @@ export class TinaMediaStore implements MediaStore {
           filename: file.name,
           directory,
           previewSrc: path,
+          src: path,
         }
 
         newFiles.push(parsedRes)
