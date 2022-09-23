@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.61.16
+
+### Patch Changes
+
+- a4a829734: Remove styled-components from static install
+  - @tinacms/app@0.0.15
+
 ## 0.61.15
 
 ### Patch Changes
