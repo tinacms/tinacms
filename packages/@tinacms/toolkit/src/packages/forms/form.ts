@@ -119,7 +119,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
             onChange(formState)
           }
         },
-        { values: true }
+        // TODO: maybe this should be configurable
+        { values: true, active: true, submitting: true }
       )
     }
   }
