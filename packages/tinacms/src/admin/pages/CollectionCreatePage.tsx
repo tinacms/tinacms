@@ -131,7 +131,8 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           slugFunction &&
           typeof values.active === 'string' &&
           values?.active !== 'filename' &&
-          !values?.submitting
+          !values?.submitting &&
+          !values.touched?.filename
         ) {
           const value = slugFunction(values?.values)
           form.finalForm.change('filename', value)
