@@ -30,8 +30,13 @@ import mime from 'mime-types'
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 
+export const defaultMediaAcceptOptions = {
+  'image/png': ['.png'],
+  'image/jpg': ['.jpg', '.jpeg'],
+  'image/avif': ['.avif'],
+}
 export class DummyMediaStore implements MediaStore {
-  accept = '*'
+  accept = defaultMediaAcceptOptions
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     return files.map(({ directory, file }) => ({
       id: file.name,
@@ -94,7 +99,7 @@ export class TinaMediaStore implements MediaStore {
     return await this.api.isAuthenticated()
   }
 
-  accept = 'image/*'
+  accept = defaultMediaAcceptOptions
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
@@ -171,6 +176,7 @@ export class TinaMediaStore implements MediaStore {
           filename: file.name,
           directory,
           previewSrc: path,
+          src: path,
         }
 
         newFiles.push(parsedRes)

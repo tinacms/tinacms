@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 
+import { Accept } from 'react-dropzone'
 import { EventBus } from './event'
 import { DummyMediaStore } from './media-store.default'
 
@@ -72,7 +73,7 @@ export interface MediaStore {
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.
    */
-  accept: string
+  accept: Accept
   /**
    * Uploads a set of files to the Media Store and
    * returns a Promise containing the Media objects
