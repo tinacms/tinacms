@@ -194,7 +194,7 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          'mb-4 pl-4 list-disc list-inside last:mb-0'
+          'mb-4 pl-6 list-disc list-inside last:mb-0'
         )}
         {...attributes}
         {...props}
@@ -205,7 +205,7 @@ export const components = () => {
         className={classNames(
           blockClasses,
           className,
-          'mb-4 pl-2 list-decimal list-inside last:mb-0'
+          'mb-4 pl-6 list-decimal list-inside last:mb-0'
         )}
         {...attributes}
         {...props}
@@ -222,7 +222,7 @@ export const components = () => {
     [ELEMENT_LIC]: ({ attributes, editor, element, className, ...props }) => (
       <span
         // without a min-width the cursor is hidden when the list is empty
-        className={classNames(className, 'inline-block align-top mb-2')}
+        className={classNames(className, 'inline-block align-top min-w-[1px]')}
         {...attributes}
         {...props}
       />
