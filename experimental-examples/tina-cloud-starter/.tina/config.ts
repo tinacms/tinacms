@@ -1,13 +1,12 @@
-import { defineConfig } from "tinacms";
+import { defineStaticConfig } from "tinacms";
 import schema from "./schema";
-import client from "./__generated__/client";
 
-export default defineConfig({
+export default defineStaticConfig({
   // Uncomment to enable standalone/iframe-mode
-  // build: {
-  //   outputFolder: "tina",
-  //   publicFolder: "public",
-  // },
+  build: {
+    outputFolder: "tina",
+    publicFolder: "public",
+  },
   // tinaioConfig: {
   //   contentApiUrlOverride: "foo.io",
   // },
@@ -20,7 +19,6 @@ export default defineConfig({
       mediaRoot: "",
     },
   },
-  client,
   schema,
   cmsCallback: (cms) => {
     /**
