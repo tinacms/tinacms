@@ -110,7 +110,19 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     schema: schema,
     template,
   })
-  const slugFunction = schemaCollection?.ui?.filename?.slugify
+
+  let slugFunction = schemaCollection?.ui?.filename?.slugify
+
+  if (!slugFunction) {
+    const titleField = schemaCollection.fields.find(
+      (x) => x.required && x.type === 'string' && x.isTitle
+    )?.name
+    // If the collection does not a slugify function and is has a title field, use the default slugify function
+    if (titleField) {
+      // TODO: the default slugify function should strip out all characters that are not allowed in a filename
+      slugFunction = (values: unknown) => values[titleField]?.replace(/ /g, '-')
+    }
+  }
 
   const form = useMemo(() => {
     return new Form({
@@ -132,7 +144,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
-          disabled: true,
+          disabled: schemaCollection?.ui?.filename?.disabled,
           description: (
             <span>
               A unique filename for the content.
