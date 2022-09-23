@@ -24,9 +24,17 @@ import { parse } from './textFormat'
 export const TextField = wrapFieldsWithMeta<
   { placeholder: string },
   InputProps
->(({ input, field }) => (
-  <BaseTextField {...input} placeholder={field.placeholder} />
-))
+>(({ input, field }) => {
+  return (
+    <BaseTextField
+      {...input}
+      // TODO: fix types
+      // @ts-ignore
+      disabled={field?.disabled ?? false}
+      placeholder={field.placeholder}
+    />
+  )
+})
 
 export const TextFieldPlugin = {
   name: 'text',

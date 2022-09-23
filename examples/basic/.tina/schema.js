@@ -85,6 +85,15 @@ const schema = defineSchema({
       name: 'post',
       path: 'content/post',
       format: 'md',
+      ui: {
+        filename: {
+          disabled: true,
+          // Example of how slugify could be used
+          slugify: (values) => {
+            return values?.title?.toLowerCase().replace(/ /g, '-')
+          },
+        },
+      },
       fields: [
         {
           type: 'string',

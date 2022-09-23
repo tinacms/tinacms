@@ -110,9 +110,21 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     schema: schema,
     template,
   })
+  const slugFunction = schemaCollection?.ui?.filename?.slugify
 
   const form = useMemo(() => {
     return new Form({
+      onChange: (values) => {
+        if (
+          slugFunction &&
+          typeof values.active === 'string' &&
+          values?.active !== 'filename' &&
+          !values?.submitting
+        ) {
+          const value = slugFunction(values?.values)
+          form.finalForm.change('filename', value)
+        }
+      },
       id: 'create-form',
       label: 'form',
       fields: [
@@ -120,6 +132,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
+          disabled: true,
           description: (
             <span>
               A unique filename for the content.
