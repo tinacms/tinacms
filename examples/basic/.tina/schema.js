@@ -51,24 +51,24 @@ const schema = defineSchema({
       format: 'mdx',
 
       // An example of a defaultItem
-      // defaultItem: () => {
-      //   const m = new Date()
-      //   return {
-      //     title: 'New Page',
-      //     test: 'This is a default value of the test field',
-      //     filename: `new-page-${
-      //       m.getUTCFullYear() +
-      //       '-' +
-      //       (m.getUTCMonth() + 1) +
-      //       '-' +
-      //       m.getUTCDate()
-      //     }`,
-      //   }
-      // },
+      defaultItem: () => {
+        const m = new Date()
+        return {
+          title: 'New Page',
+          test: 'This is a default value of the test field',
+          filename: `new-page-${
+            m.getUTCFullYear() +
+            '-' +
+            (m.getUTCMonth() + 1) +
+            '-' +
+            m.getUTCDate()
+          }`,
+        }
+      },
       fields: [
         {
           label: 'Title',
-          name: 'Title',
+          name: 'title',
           type: 'string',
           ui: {
             // Examples of how you COULD use a custom form
