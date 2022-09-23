@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.6
+
+### Patch Changes
+
+- 566386f30: Fix issue where drag-n-drop on image fields wasn't working with the repo-based media on local dev
+
 ## 0.57.5
 
 ### Patch Changes
