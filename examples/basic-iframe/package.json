@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\" --noTelemetry",
+    "dev2": "tinacms dev -c \"next dev\" --noTelemetry",
     "build": "tinacms build && next build",
     "start": "next start",
     "lint": "next lint"
