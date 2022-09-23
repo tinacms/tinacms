@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.7
+
+### Patch Changes
+
+- 4dc971b95: Upgrade react-dropzone due to es build issue with older versions
+
 ## 0.57.6
 
 ### Patch Changes
