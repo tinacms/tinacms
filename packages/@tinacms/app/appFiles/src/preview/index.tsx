@@ -45,7 +45,6 @@ export const Preview = (props) => {
     if (ref.current) {
       send({ type: 'IFRAME_MOUNTED', value: ref.current })
       window.addEventListener('message', (event) => {
-        console.log('parent: event received', event.data.type)
         if (event.data.type === 'open') {
           send({ type: 'ADD_QUERY', value: event.data })
         }
