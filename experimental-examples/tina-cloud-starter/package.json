@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "MONOREPO_DEV=true tinacms dev --noTelemetry -c \"next build\"",
+    "dev": "MONOREPO_DEV=true tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
     "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\"",
     "dev:audit": "tinacms audit",
