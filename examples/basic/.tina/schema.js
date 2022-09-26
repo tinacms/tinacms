@@ -66,27 +66,27 @@ const schema = defineSchema({
         }
       },
       fields: [
-        {
-          label: 'Title',
-          name: 'title',
-          type: 'string',
-          ui: {
-            // Examples of how you COULD use a custom form
-            // component: ({ form, field, input }) => {
-            //   return (
-            //     <div>
-            //       <label>This is a test</label>
-            //       <input {...input}></input>
-            //     </div>
-            //   )
-            // },
-            // validate: (val) => {
-            //   if (val?.length > 5) {
-            //     return 'Too Long!!!'
-            //   }
-            // },
-          },
-        },
+        // {
+        // label: 'Title',
+        // name: 'title',
+        // type: 'string',
+        // ui: {
+        // Examples of how you COULD use a custom form
+        // component: ({ form, field, input }) => {
+        //   return (
+        //     <div>
+        //       <label>This is a test</label>
+        //       <input {...input}></input>
+        //     </div>
+        //   )
+        // },
+        // validate: (val) => {
+        //   if (val?.length > 5) {
+        //     return 'Too Long!!!'
+        //   }
+        // },
+        // },
+        // },
         {
           label: 'Test',
           name: 'test',
@@ -114,11 +114,23 @@ const schema = defineSchema({
           foo: { bar: 'bar' },
         }
       },
+      ui: {
+        // Example of using a custom slugify function
+        filename: {
+          disabled: true,
+          // Example of how slugify could be used
+          // slugify: (values) => {
+          //   return values?.title?.toLowerCase().replace(/ /g, '-')
+          // },
+        },
+      },
       fields: [
         {
           type: 'string',
           label: 'Title',
           name: 'title',
+          required: true,
+          isTitle: true,
         },
         {
           type: 'datetime',
@@ -155,7 +167,6 @@ const schema = defineSchema({
         },
         {
           type: 'string',
-
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
