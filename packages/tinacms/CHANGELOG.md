@@ -1,5 +1,49 @@
 # tinacms
 
+## 0.69.12
+
+### Patch Changes
+
+- 183249b11: - deprecate: `defaultValue`
+  - add `defaultItem` to the collection (as a function or an object)
+  ```ts
+  defaultItem: () => {
+    const m = new Date()
+    return {
+      title: 'New Page',
+      test: 'This is a default value of the test field',
+      filename: `new-page-${
+        m.getUTCFullYear() +
+        '-' +
+        (m.getUTCMonth() + 1) +
+        '-' +
+        m.getUTCDate()
+      }`,
+    }
+  },
+  ```
+  - Allow `datetime` field to be undefined or empty
+- 8060d0949: Provide filename customization API.
+
+  ```ts
+  name: 'posts',
+  path: 'content/posts',
+  ui: {
+       filename: {
+          slugify: (values) => mySlugifyFunc(values),
+          disabled: true
+          // other field props like `label`, `component`, `parse` can still be used too
+        }
+  },
+  ```
+
+  If one is using `isTitle` a default slugify function is added that slugifys the title.
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - @tinacms/toolkit@0.57.9
+
 ## 0.69.11
 
 ### Patch Changes
