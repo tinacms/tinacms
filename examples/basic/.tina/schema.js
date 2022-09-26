@@ -66,27 +66,27 @@ const schema = defineSchema({
         }
       },
       fields: [
-        {
-          label: 'Title',
-          name: 'title',
-          type: 'string',
-          ui: {
-            // Examples of how you COULD use a custom form
-            // component: ({ form, field, input }) => {
-            //   return (
-            //     <div>
-            //       <label>This is a test</label>
-            //       <input {...input}></input>
-            //     </div>
-            //   )
-            // },
-            // validate: (val) => {
-            //   if (val?.length > 5) {
-            //     return 'Too Long!!!'
-            //   }
-            // },
-          },
-        },
+        // {
+        // label: 'Title',
+        // name: 'title',
+        // type: 'string',
+        // ui: {
+        // Examples of how you COULD use a custom form
+        // component: ({ form, field, input }) => {
+        //   return (
+        //     <div>
+        //       <label>This is a test</label>
+        //       <input {...input}></input>
+        //     </div>
+        //   )
+        // },
+        // validate: (val) => {
+        //   if (val?.length > 5) {
+        //     return 'Too Long!!!'
+        //   }
+        // },
+        // },
+        // },
         {
           label: 'Test',
           name: 'test',
@@ -167,7 +167,6 @@ const schema = defineSchema({
         },
         {
           type: 'string',
-
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
