@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.8
+
+### Patch Changes
+
+- eeab510d9: Revert "Fix rich text dropdown overlap issue" which was causing field labels to live underneath their inputs
+
 ## 0.57.7
 
 ### Patch Changes
