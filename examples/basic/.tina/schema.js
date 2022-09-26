@@ -49,13 +49,28 @@ const schema = defineSchema({
       path: 'content/page',
       label: 'Page',
       format: 'mdx',
+
+      // An example of a defaultItem
+      defaultItem: () => {
+        const m = new Date()
+        return {
+          title: 'New Page',
+          test: 'This is a default value of the test field',
+          filename: `new-page-${
+            m.getUTCFullYear() +
+            '-' +
+            (m.getUTCMonth() + 1) +
+            '-' +
+            m.getUTCDate()
+          }`,
+        }
+      },
       fields: [
         {
           label: 'Title',
-          name: 'Title',
+          name: 'title',
           type: 'string',
           ui: {
-            // defaultValue: 'Title',
             // Examples of how you COULD use a custom form
             // component: ({ form, field, input }) => {
             //   return (
@@ -73,6 +88,12 @@ const schema = defineSchema({
           },
         },
         {
+          label: 'Test',
+          name: 'test',
+          type: 'string',
+          description: 'This is a test',
+        },
+        {
           name: 'body',
           label: 'Main Content',
           type: 'rich-text',
@@ -85,6 +106,14 @@ const schema = defineSchema({
       name: 'post',
       path: 'content/post',
       format: 'md',
+      defaultItem: () => {
+        return {
+          title: 'new post',
+          filename: 'new-post',
+          date: new Date().toISOString(),
+          foo: { bar: 'bar' },
+        }
+      },
       ui: {
         // Example of using a custom slugify function
         filename: {
@@ -104,6 +133,17 @@ const schema = defineSchema({
           isTitle: true,
         },
         {
+          type: 'datetime',
+          label: 'Date',
+          name: 'date',
+        },
+        {
+          type: 'object',
+          name: 'foo',
+          label: 'Foo',
+          fields: [{ name: 'bar', label: 'Bar', type: 'string' }],
+        },
+        {
           type: 'object',
           label: 'Related Posts',
           name: 'posts',
@@ -121,18 +161,6 @@ const schema = defineSchema({
             },
             {
               name: 'label',
-              type: 'string',
-            },
-          ],
-        },
-        {
-          type: 'object',
-          label: 'Something',
-          name: 'foo',
-          fields: [
-            {
-              name: 'bar',
-              label: 'Bar',
               type: 'string',
             },
           ],
