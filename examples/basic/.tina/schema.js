@@ -87,13 +87,13 @@ const schema = defineSchema({
       format: 'md',
       ui: {
         // Example of using a custom slugify function
-        // filename: {
-        // disabled: true,
-        // Example of how slugify could be used
-        // slugify: (values) => {
-        //   return values?.title?.toLowerCase().replace(/ /g, '-')
-        // },
-        // },
+        filename: {
+          disabled: true,
+          // Example of how slugify could be used
+          // slugify: (values) => {
+          //   return values?.title?.toLowerCase().replace(/ /g, '-')
+          // },
+        },
       },
       fields: [
         {

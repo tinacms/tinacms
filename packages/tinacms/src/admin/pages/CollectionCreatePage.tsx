@@ -127,6 +127,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   const form = useMemo(() => {
     return new Form({
+      extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (
           slugFunction &&
