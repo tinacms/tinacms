@@ -23,6 +23,8 @@ export const format = (
   _name: string,
   field: DatetimepickerProps
 ): string => {
+  // allow the date to be empty
+  if (!val) return val
   const dateFormat = parseDateFormat(field.dateFormat)
   const timeFormat = parseTimeFormat(field.timeFormat)
 
@@ -39,6 +41,8 @@ export const format = (
 
 // parses a function from the given format to default datetime format
 export const parse = (val: string) => {
+  // allow the date to be empty
+  if (!val) return val
   const date = new Date(val)
   if (!isNaN(date.getTime())) {
     return new Date(val).toISOString()

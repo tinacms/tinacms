@@ -95,7 +95,7 @@ export const FieldWrapper = ({
   children: React.ReactNode
 } & Partial<React.ComponentPropsWithoutRef<'div'>>) => {
   return (
-    <div className={`relative ${margin ? `mb-5 first:mb-0` : ``}`} {...props}>
+    <div className={`relative ${margin ? `mb-5 last:mb-0` : ``}`} {...props}>
       {children}
     </div>
   )

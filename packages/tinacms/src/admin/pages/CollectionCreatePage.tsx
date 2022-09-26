@@ -127,6 +127,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   const form = useMemo(() => {
     return new Form({
+      initialValues:
+        typeof schemaCollection?.defaultItem === 'function'
+          ? schemaCollection.defaultItem()
+          : schemaCollection?.defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (
