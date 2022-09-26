@@ -113,6 +113,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   const form = useMemo(() => {
     return new Form({
+      initialValues:
+        typeof schemaCollection?.defaultItem === 'function'
+          ? schemaCollection.defaultItem()
+          : schemaCollection?.defaultItem,
       id: 'create-form',
       label: 'form',
       fields: [
