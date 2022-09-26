@@ -28,7 +28,7 @@ export type InputFieldType<ExtraFieldProps, InputProps> =
 // Add any other fields that the Field component should expect onto the ExtraFieldProps generic type
 export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   Field:
-    | React.StatelessComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
     | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
 ) {
   return (props: InputFieldType<ExtraFieldProps, InputProps>) => (

@@ -92,6 +92,10 @@ interface BaseCollection {
   indexes?: TinaIndex[]
   format?: FormatType
   ui?: {
+    filename?: {
+      slugify?: (values: unknown) => string
+      disabled?: boolean
+    }
     /**
      * Forms for this collection will be editable from the global sidebar rather than the form panel
      */
