@@ -119,8 +119,9 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     )?.name
     // If the collection does not a slugify function and is has a title field, use the default slugify function
     if (titleField) {
-      // TODO: the default slugify function should strip out all characters that are not allowed in a filename
-      slugFunction = (values: unknown) => values[titleField]?.replace(/ /g, '-')
+      // default slugify function strips out all non-alphanumeric characters
+      slugFunction = (values: unknown) =>
+        values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')
     }
   }
 
