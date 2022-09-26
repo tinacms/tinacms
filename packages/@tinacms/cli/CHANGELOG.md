@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.61.17
+
+### Patch Changes
+
+- @tinacms/app@0.0.16
+
 ## 0.61.16
 
 ### Patch Changes
