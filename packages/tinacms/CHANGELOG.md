@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.69.13
+
+### Patch Changes
+
+- ea4a8e1b0: Fixed issue where filename would not always update.
+
 ## 0.69.12
 
 ### Patch Changes
