@@ -113,7 +113,7 @@ const reportTelemetry = async (
 
 const createPackageJSON = async () => {
   logger.info(logText('No package.json found, creating one'))
-  execShellCommand(`npm init --yes`)
+  await execShellCommand(`npm init --yes`)
 }
 const createGitignore = async () => {
   logger.info(logText('No .gitignore found, creating one'))
