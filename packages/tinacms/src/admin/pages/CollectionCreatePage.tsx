@@ -135,7 +135,6 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
       onChange: (values) => {
         if (
           slugFunction &&
-          typeof values.active === 'string' &&
           values?.active !== 'filename' &&
           !values?.submitting &&
           !values.touched?.filename
