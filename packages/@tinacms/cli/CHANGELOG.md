@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.61.19
+
+### Patch Changes
+
+- 802381abd: Fix an issue where npm init didn't get awaited during init
+  - @tinacms/app@0.0.18
+
 ## 0.61.18
 
 ### Patch Changes
