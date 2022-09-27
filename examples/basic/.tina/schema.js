@@ -117,10 +117,12 @@ const schema = defineSchema({
       ui: {
         // Example of using a custom slugify function
         filename: {
-          disabled: true,
+          // disabled: true,
           // Example of how slugify could be used
           // slugify: (values) => {
-          //   return values?.title?.toLowerCase().replace(/ /g, '-')
+          //   return `${values?.topic?.join('-') || ''}-${values?.title
+          //     ?.toLowerCase()
+          //     .replace(/ /g, '-')}`
           // },
         },
       },
