@@ -16,12 +16,15 @@ limitations under the License.
 
 */
 
-import styled from 'styled-components'
+import React from 'react'
 
-export const DesktopLabel = styled.span`
-  all: unset;
-  display: none;
-  @media (min-width: 1030px) {
-    display: inline;
-  }
-`
+export const DesktopLabel = ({ className = '', style = {}, ...props }) => (
+  <span
+    className={'hidden lg:inline ' + className}
+    style={{
+      all: 'unset',
+      ...style,
+    }}
+    {...props}
+  />
+)
