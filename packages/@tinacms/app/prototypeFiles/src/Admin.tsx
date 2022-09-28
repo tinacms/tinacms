@@ -213,7 +213,7 @@ const Toolbar = () => {
           </svg>
         </button>
         <button
-          className="icon-parent border-0 inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center justify-center transition-all duration-150 ease-out  shadow text-gray-400 hover:text-blue-500 bg-white text-sm h-10 px-4  rounded-l-full "
+          className="icon-parent border border-gray-50 inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center justify-center transition-all duration-150 ease-out  shadow text-gray-400 hover:text-blue-500 bg-white text-sm h-10 px-4  rounded-l-full "
           aria-label="closes cms sidebar"
         >
           <MdOutlineRemoveRedEye className="w-6 h-auto" />
