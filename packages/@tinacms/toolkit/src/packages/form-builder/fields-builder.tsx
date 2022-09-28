@@ -21,7 +21,6 @@ import { Form, Field } from '../forms'
 import { useCMS, useEventSubscription } from '../react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
-import styled, { css } from 'styled-components'
 
 export interface FieldsBuilderProps {
   form: Form
@@ -46,7 +45,6 @@ export function FieldsBuilder({
   useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
 
   return (
-    // @ts-ignore FIXME twind
     <FieldsGroup padding={padding}>
       {[...fields].reverse().map((field: Field) => (
         <InnerField
