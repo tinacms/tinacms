@@ -1,5 +1,31 @@
 # tina-graphql
 
+## 0.63.11
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - @tinacms/mdx@0.61.9
+
+## 0.63.10
+
+### Patch Changes
+
+- 0513ae416: Increase defualt file limit from 10 to 50
+- 7ae1b0697: Remove duplicate TinaSchema class
+- 6e137ea85: Adds cursor definition to generated queries in the client
+- Updated dependencies [f581f263d]
+- Updated dependencies [0513ae416]
+- Updated dependencies [7ae1b0697]
+- Updated dependencies [f3439ea35]
+- Updated dependencies [48032e2ba]
+- Updated dependencies [112b7271d]
+  - @tinacms/schema-tools@0.1.4
+  - @tinacms/datalayer@0.2.4
+  - @tinacms/mdx@0.61.8
+
 ## 0.63.9
 
 ### Patch Changes
@@ -1003,7 +1029,7 @@
   cms.fields.add({
     ...TextFieldPlugin, // spread existing text plugin
     name: 'myText',
-    validate: value => {
+    validate: (value) => {
       someValidationLogic(value)
     },
   })
@@ -1020,7 +1046,7 @@
   1. The data is not a required property. That is to say, if I have a blog post document, and "category" is an optional field, we'll need to make sure we factor that into how we render our page:
 
   ```tsx
-  const MyPage = props => {
+  const MyPage = (props) => {
     return (
       <>
         <h2>{props.getPostDocument.data.title}</h2>
@@ -1085,8 +1111,8 @@
   It's possible for Tina's editing capabilities to introduce an invalid state during edits to list items. Imagine the scenario where you are iterating through an array of objects, and each object has a categories array on it we'd like to render:
 
   ```tsx
-  const MyPage = props => {
-    return props.blocks.map(block => {
+  const MyPage = (props) => {
+    return props.blocks.map((block) => {
       return (
         <>
           <h2>{block.categories.split(',')}</h2>
@@ -1356,9 +1382,12 @@
   ```md
   ---
   ---
+
   myBlocks:
-    - template: hero
-      title: Hello
+
+  - template: hero
+    title: Hello
+
   ---
   ```
 
@@ -1367,9 +1396,12 @@
   ```md
   ---
   ---
+
   myBlocks:
-    - \_template: hero
-      title: Hello
+
+  - \_template: hero
+    title: Hello
+
   ---
   ```
 

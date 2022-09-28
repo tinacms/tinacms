@@ -30,6 +30,9 @@ export type UIField<F extends UIField = any, Shape = any> = {
     meta: any,
     field: UIField<F, Shape>
   ): string | object | undefined | void
+  /**
+   * @deprecated use `defaultItem` at the collection level instead
+   */
   defaultValue?: Shape
 }
 
@@ -74,13 +77,25 @@ type Document = {
     extension: string
   }
 }
+export type TinaIndex = {
+  name: string
+  fields: {
+    name: string
+  }[]
+}
 
 interface BaseCollection {
   label?: string
   name: string
   path: string
+  defaultItem?: () => unknown | unknown
+  indexes?: TinaIndex[]
   format?: FormatType
   ui?: {
+    filename?: {
+      slugify?: (values: unknown) => string
+      disabled?: boolean
+    }
     /**
      * Forms for this collection will be editable from the global sidebar rather than the form panel
      */
@@ -155,11 +170,12 @@ export type TinaFieldEnriched = TinaFieldInner<true> & {
   parentTypename?: string
 }
 
-interface TinaField {
+export interface TinaField {
   name: string
   label?: string
   description?: string
   required?: boolean
+  indexed?: boolean
   // list?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.

@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/toolkit",
-  "version": "0.57.4",
+  "version": "0.57.9",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "./dist/index.es.js",
@@ -92,7 +92,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.17.3",
     "react-datetime": "^2.16.3",
-    "react-dropzone": "10.1.8",
+    "react-dropzone": "12.1.0",
     "react-final-form": "^6.3.0",
     "react-icons": "^4.3.1",
     "react-onclickoutside": "^6.12.2",

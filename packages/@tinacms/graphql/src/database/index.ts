@@ -13,7 +13,7 @@ limitations under the License.
 
 import path from 'path'
 import { GraphQLError } from 'graphql'
-import { createSchema } from '../schema'
+import { createSchema } from '../schema/createSchema'
 import { lastItem } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import { sequential } from '../util'
@@ -27,13 +27,13 @@ import type {
 } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
-import type { TinaSchema } from '../schema'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import type {
   TinaCloudSchemaBase,
   CollectionFieldsWithNamespace,
   CollectionTemplatesWithNamespace,
   TinaFieldInner,
-} from '../types'
+} from '@tinacms/schema-tools'
 import type { Bridge } from './bridge'
 import {
   atob,
@@ -41,11 +41,7 @@ import {
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
-import {
-  TinaFetchError,
-  TinaGraphQLError,
-  TinaQueryError,
-} from '../resolver/error'
+import { TinaFetchError, TinaQueryError } from '../resolver/error'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'

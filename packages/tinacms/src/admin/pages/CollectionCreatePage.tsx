@@ -111,8 +111,38 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     template,
   })
 
+  let slugFunction = schemaCollection?.ui?.filename?.slugify
+
+  if (!slugFunction) {
+    const titleField = schemaCollection.fields.find(
+      (x) => x.required && x.type === 'string' && x.isTitle
+    )?.name
+    // If the collection does not a slugify function and is has a title field, use the default slugify function
+    if (titleField) {
+      // default slugify function strips out all non-alphanumeric characters
+      slugFunction = (values: unknown) =>
+        values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')
+    }
+  }
+
   const form = useMemo(() => {
     return new Form({
+      initialValues:
+        typeof schemaCollection?.defaultItem === 'function'
+          ? schemaCollection.defaultItem()
+          : schemaCollection?.defaultItem,
+      extraSubscribeValues: { active: true, submitting: true, touched: true },
+      onChange: (values) => {
+        if (
+          slugFunction &&
+          values?.active !== 'filename' &&
+          !values?.submitting &&
+          !values.touched?.filename
+        ) {
+          const value = slugFunction(values?.values)
+          form.finalForm.change('filename', value)
+        }
+      },
       id: 'create-form',
       label: 'form',
       fields: [
@@ -120,6 +150,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
+          disabled: schemaCollection?.ui?.filename?.disabled,
           description: (
             <span>
               A unique filename for the content.

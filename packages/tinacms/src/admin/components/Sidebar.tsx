@@ -24,6 +24,7 @@ import { useWindowWidth } from '@react-hook/window-size'
 import { useGetCollections } from './GetCollections'
 import { IoMdClose } from 'react-icons/io'
 import { BiMenu } from 'react-icons/bi'
+import { CloudConfigPlugin } from '@tinacms/toolkit/dist/packages/react-cloud-config'
 
 export const slugify = (text) => {
   return text
@@ -38,6 +39,9 @@ export const slugify = (text) => {
 const Sidebar = ({ cms }: { cms: TinaCMS }) => {
   const collectionsInfo = useGetCollections(cms)
   const screens = cms.plugins.getType<ScreenPlugin>('screen').all()
+  const cloudConfigs = cms.plugins
+    .getType<CloudConfigPlugin>('cloud-config')
+    .all()
   const [menuIsOpen, setMenuIsOpen] = React.useState(false)
 
   const isLocalMode = cms.api?.tina?.isLocalMode
@@ -53,6 +57,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           showCollections={true}
           collectionsInfo={collectionsInfo}
           screens={screens}
+          cloudConfigs={cloudConfigs}
           contentCreators={[]}
           RenderNavSite={({ view }) => (
             <SidebarLink
@@ -61,6 +66,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
               Icon={view.Icon ? view.Icon : ImFilesEmpty}
             />
           )}
+          RenderNavCloud={({ config }) => <SidebarCloudLink config={config} />}
           RenderNavCollection={({ collection }) => (
             <SidebarLink
               label={collection.label ? collection.label : collection.name}
@@ -88,6 +94,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                 showCollections={true}
                 collectionsInfo={collectionsInfo}
                 screens={screens}
+                cloudConfigs={cloudConfigs}
                 contentCreators={[]}
                 RenderNavSite={({ view }) => (
                   <SidebarLink
@@ -98,6 +105,9 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
                       setMenuIsOpen(false)
                     }}
                   />
+                )}
+                RenderNavCloud={({ config }) => (
+                  <SidebarCloudLink config={config} />
                 )}
                 RenderNavCollection={({ collection }) => (
                   <SidebarLink
@@ -183,6 +193,31 @@ const SidebarLink = (props: {
     >
       <Icon className="mr-2 h-6 opacity-80 w-auto" /> {label}
     </NavLink>
+  )
+}
+
+const SidebarCloudLink = ({ config }: { config: CloudConfigPlugin }) => {
+  if (config.text) {
+    return (
+      <span className="text-base tracking-wide text-gray-500 flex items-center opacity-90">
+        {config.text}{' '}
+        <a
+          target="_blank"
+          className="ml-1 text-blue-600 hover:opacity-60"
+          href={config.link.href}
+        >
+          {config.link.text}
+        </a>
+      </span>
+    )
+  }
+  return (
+    <span className="text-base tracking-wide text-gray-500 hover:text-blue-600 flex items-center opacity-90 hover:opacity-100">
+      <config.Icon className="mr-2 h-6 opacity-80 w-auto" />
+      <a target="_blank" href={config.link.href}>
+        {config.link.text}
+      </a>
+    </span>
   )
 }
 

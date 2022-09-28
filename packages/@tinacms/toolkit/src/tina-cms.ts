@@ -48,6 +48,7 @@ import {
   HtmlFieldPlaceholder,
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
+import { createCloudConfig } from './packages/react-cloud-config'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -75,6 +76,8 @@ export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
   alerts?: EventsToAlerts
+  isLocalClient?: boolean
+  clientId?: string
 }
 
 export class TinaCMS extends CMS {
@@ -86,6 +89,8 @@ export class TinaCMS extends CMS {
     sidebar,
     toolbar,
     alerts = {},
+    isLocalClient,
+    clientId,
     ...config
   }: TinaCMSConfig = {}) {
     super(config)
@@ -125,6 +130,39 @@ export class TinaCMS extends CMS {
       }
     })
     this.plugins.add(MediaManagerScreenPlugin)
+    if (isLocalClient !== true) {
+      if (clientId) {
+        this.plugins.add(
+          createCloudConfig({
+            name: 'Project Config',
+            link: {
+              text: 'Project Config',
+              href: `https://app.tina.io/projects/${clientId}/0`,
+            },
+          })
+        )
+        this.plugins.add(
+          createCloudConfig({
+            name: 'User Management',
+            link: {
+              text: 'User Management',
+              href: `https://app.tina.io/projects/${clientId}/3`,
+            },
+          })
+        )
+      } else {
+        this.plugins.add(
+          createCloudConfig({
+            name: 'Setup Cloud',
+            text: 'No project configured, set one up ',
+            link: {
+              text: 'here',
+              href: `https://app.tina.io`,
+            },
+          })
+        )
+      }
+    }
   }
 
   get alerts() {
