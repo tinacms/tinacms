@@ -127,12 +127,12 @@ type CollectionTemplates<WithNamespace extends boolean> =
 
 interface CollectionTemplatesInner<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | Template<WithNamespace>)[]
+  templates: (string | GlobalTemplate<WithNamespace>)[]
   fields?: undefined
 }
 export interface CollectionTemplatesWithNamespace<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | Template<WithNamespace>)[]
+  templates: (string | GlobalTemplate<WithNamespace>)[]
   fields?: undefined
   references?: ReferenceType<WithNamespace>[]
   namespace: WithNamespace extends true ? string[] : undefined
