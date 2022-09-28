@@ -69,7 +69,11 @@ const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
     <Modal>
       <Wrapper>
         <ModalHeader close={close}>{name}</ModalHeader>
-        <ModalBody>{children}</ModalBody>
+        <ModalBody
+          className={layout === 'fullscreen' ? 'flex h-full flex-col' : ''}
+        >
+          {children}
+        </ModalBody>
       </Wrapper>
     </Modal>
   )

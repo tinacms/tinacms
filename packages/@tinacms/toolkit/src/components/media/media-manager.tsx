@@ -103,7 +103,7 @@ const join = function (...parts) {
 
 export interface MediaRequest {
   directory?: string
-  onSelect?(media: Media): void
+  onSelect?(_media: Media): void
   close?(): void
   allowDelete?: boolean
 }
@@ -127,7 +127,7 @@ export function MediaManager() {
     <Modal>
       <FullscreenModal>
         <ModalHeader close={close}>Media Manager</ModalHeader>
-        <ModalBody>
+        <ModalBody className="flex h-full flex-col">
           <MediaPicker {...request} close={close} />
         </ModalBody>
       </FullscreenModal>
@@ -243,7 +243,7 @@ export function MediaPicker({
     }
   }
 
-  let deleteMediaItem: (item: Media) => void
+  let deleteMediaItem: (_item: Media) => void
   if (allowDelete) {
     deleteMediaItem = (item: Media) => {
       if (confirm('Are you sure you want to delete this file?')) {
@@ -252,7 +252,7 @@ export function MediaPicker({
     }
   }
 
-  let selectMediaItem: (item: Media) => void
+  let selectMediaItem: (_item: Media) => void
 
   if (onSelect) {
     selectMediaItem = (item: Media) => {
