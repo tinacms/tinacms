@@ -15,39 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import styled from 'styled-components'
+import React from 'react'
 import { Button } from '../../styles'
 
 // Type of property 'defaultProps' circularly references itself in mapped type
-// @ts-ignore
-export const ToolbarButton = styled(Button)`
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  padding: 0 10px;
-
-  &:focus {
-    outline: none;
-  }
-
-  svg {
-    fill: currentColor;
-    opacity: 0.7;
-    width: 2.5em;
-    height: 2.5em;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    filter: grayscale(25%);
-  }
-
-  @media (min-width: 1030px) {
-    padding: 0 20px;
-
-    svg {
-      margin-right: 4px;
+export const ToolbarButton = ({ className = '', ...props }) => (
+  <Button
+    className={
+      'flex items-center whitespace-nowrap px-2.5 focus:outline-none disabled:opacity-60 filter-[grayscale(25%)] lg:px-5 ' +
+      className
     }
-  }
-`
+    {...props}
+  />
+)
