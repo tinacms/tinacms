@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 
 type Option = {
   value: string
@@ -69,14 +68,15 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
     const checked = option.value === input.value
 
     return (
-      <RadioOptionWrap
+      <div
+        className={field.variant === 'button' ? 'flex-1' : ''}
         key={option.value}
-        variant={field.variant}
         ref={(ref) => {
           radioRefs[`radio_${option.value}`] = ref
         }}
       >
         <input
+          className="absolute w-0 h-0 opacity-0 cursor-pointer"
           type="radio"
           id={optionId}
           name={input.name}
@@ -92,7 +92,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
         >
           <Label variant={field.variant}>{option.label}</Label>
         </RadioOption>
-      </RadioOptionWrap>
+      </div>
     )
   }
 
@@ -116,149 +116,60 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   )
 }
 
-const Label = styled.span<{ variant?: 'radio' | 'button' }>`
-  ${(p) => (p.variant === 'button' ? `position: relative;` : ``)}
-`
+const Label = ({ variant, ...props }) => (
+  <span className={variant === 'button' ? 'relative' : ''} {...props} />
+)
+const ActiveRadioIndicator = ({
+  hasValue,
+  left,
+  top,
+  width,
+  height,
+  style = {},
+  className = '',
+  ...props
+}) => (
+  <div
+    className={`absolute transition-all duration-100 ease-out bg-blue-500 shadow-[0_2px_3px_rgba(0,0,0,0.12)] rounded-3xl h-[34px] pointer-events-none ${className}`}
+    style={{
+      backfaceVisibility: 'hidden',
+      width,
+      height: height ? width : '',
+      left,
+      top,
+      transform: `scale(${hasValue ? `1` : `0`})`,
+      ...style,
+    }}
+    {...props}
+  />
+)
 
-const ActiveRadioIndicator = styled.div<{
-  hasValue: boolean
-  left: number | undefined
-  top: number | undefined
-  width: number | undefined
-  height: number | undefined
-}>`
-  position: absolute;
-  ${(p) => (p.width ? `width: ${p.width}px;` : ``)};
-  ${(p) => (p.height ? `height: ${p.width}px;` : ``)};
-  ${(p) => (p.left ? `left: ${p.left}px;` : ``)};
-  ${(p) => (p.top ? `top: ${p.top}px;` : ``)}
-  ${(p) => `transform: scale(${p.hasValue ? `1` : `0`});`}
-  transition: all 85ms ease-out;
-  backface-visibility: hidden;
-  background-color: var(--tina-color-primary);
-  box-shadow: var(--tina-shadow-small);
-  border-radius: var(--tina-radius-big);
-  height: calc(40px - 6px);
-  pointer-events: none;
-`
+const RadioOptions = ({ direction, variant, className = '', ...props }) => (
+  <div
+    className={`flex pt-1 ${
+      variant === 'button'
+        ? 'min-h-[42px] bg-white rounded-3xl text-blue-500 padding-[3px] shadow-[0_0_0_0_#e1ddec] transition-all duration-100 ease-out gap-[3px] [&:not(:active)]:[&:not(:focus-within)]:hover:shadow-[0_0_0_2px_#e1ddec] focus-within:shadow-[0_0_0_2px_#0084ff] active:shadow-[0_0_0_2px_#0084ff]'
+        : 'gap-3 flex-wrap'
+    } ${direction === 'vertical' ? 'flex-col' : ''} ${className}`}
+    {...props}
+  />
+)
 
-const RadioOptions = styled.div<{
-  direction?: 'horizontal' | 'vertical'
-  variant?: 'radio' | 'button'
-}>`
-  display: flex;
-  padding-top: 4px;
-  ${(p) =>
-    p.variant === 'button'
-      ? `
-    min-height: calc(40px + 2px);
-    background-color: var(--tina-color-grey-0);
-    border-radius: var(--tina-radius-big);
-    box-shadow: var(--tina-shadow-small);
-    background-color: var(--tina-color-grey-0);
-    border: 1px solid var(--tina-color-grey-2);
-    color: var(--tina-color-primary);
-    padding: 3px;
-    box-shadow: 0 0 0 0 var(--tina-color-grey-3);
-    transition: all 85ms ease-out;
-    gap: 3px;
-    &:hover {
-      box-shadow: 0 0 0 2px var(--tina-color-grey-3);
-    }
-    &:focus-within, &:active {
-      box-shadow: 0 0 0 2px var(--tina-color-primary);
-    }
-  `
-      : `
-    gap: 12px;
-    flex-wrap: wrap;
-  `}
-  ${(p) => (p.direction === 'vertical' ? `flex-direction: column;` : ``)}
-`
-const RadioOptionWrap = styled.div<{
-  direction?: 'horizontal' | 'vertical'
-  variant?: 'radio' | 'button'
-}>`
-  ${(p) =>
-    p.variant === 'button'
-      ? `
-      
-    flex: 1;
-    `
-      : ``}
-  & > input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-`
-
-const RadioOption = styled.label<{
-  checked: boolean
-  variant?: 'radio' | 'button'
-  htmlFor: string
-}>`
-  display: flex;
-  align-items: center;
-  font-size: var(--tina-font-size-1);
-  ${(p) =>
-    p.variant === 'button'
-      ? `
-    flex: 1;
-    text-align: center;
-    border-radius: var(--tina-radius-big);
-    border: 1px solid var(--tina-color-grey-2);
-    color: var(--tina-color-primary);
-    font-weight: var(--tina-font-weight-regular);
-    cursor: pointer;
-    font-size: var(--tina-font-size-1);
-    height: calc(40px - 6px);
-    padding: 0 var(--tina-padding-small);
-    transition: all 85ms ease-out;
-    margin: 0;
-    border: none;
-    text-align: center;
-    justify-content: center;
-    input:checked + & {
-      color: var(--tina-color-grey-0);
-    }
-    &:hover {
-      background-color: var(--tina-color-grey-1);
-    }
-    &:active {
-      background-color: var(--tina-color-grey-2);
-    }
-  `
-      : `
-  &:before {
-    content: '';
-    display: block;
-    width: 16px;
-    height: 16px;
-    margin-right: 4px;
-    border-radius: var(--tina-radius-big);
-    background-color: var(--tina-color-primary);
-    border: 1px solid var(${(p: { checked: boolean }) =>
-      p.checked ? `--tina-color-primary` : `--tina-color-grey-2`});
-    box-shadow: 0 0 0 0 var(--tina-color-grey-3), inset 0 0 0 8px white;
-    transition: all 85ms ease-out;
-  }
-  &:hover:before {
-    box-shadow: 0 0 0 2px var(--tina-color-grey-3), inset 0 0 0 8px white;
-  }
-  input:focus + &:before {
-    border: 1px solid var(--tina-color-grey-2);
-    box-shadow: 0 0 0 2px var(--tina-color-primary), inset 0 0 0 8px white;
-  }
-  input:checked + &:before {
-    border: 1px solid var(--tina-color-primary);
-    box-shadow: 0 0 0 0 var(--tina-color-primary), inset 0 0 0 4px white;
-  }
-  input:checked:focus + &:before {
-    border: 1px solid var(--tina-color-grey-2);
-    box-shadow: 0 0 0 2px var(--tina-color-primary), inset 0 0 0 4px white;
-  }
-  `}
-`
+const RadioOption = ({ checked, variant, htmlFor, ...props }) => (
+  <label
+    className={`flex items-center text-[13px] ${
+      variant === 'button'
+        ? `flex-1 text-center rounded-3xl font-normal cursor-pointer h-[34px] px-3 transition-all duration-100 ease-out m-0 border-none justify-center ${
+            checked ? 'text-white' : 'text-blue-500'
+          } [&:not(:active)]:hover:bg-gray-50 active:bg-gray-100`
+        : `before:content-[""] before:block before:w-4 before:h-4 before:mr-1 before:rounded-3xl before:bg-blue-500 before:border-[1px] before:border-solid ${
+            checked ? 'before:border-blue-500' : 'before:border-gray-100'
+          } before:shadow-[0_0_0_0_#e1ddec,_inset_0_0_0_8px_white] before:transition-all before:duration-100 before:ease-out hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white] ${
+            checked
+              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white]'
+              : ''
+          }`
+    }`}
+    {...props}
+  />
+)
