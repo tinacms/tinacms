@@ -149,12 +149,8 @@ export const Toolbar = () => {
             <FormStatus dirty={!pristine} />
           </Status>
           <Actions>
-            <ToolbarButton
-              disabled={disabled || pristine}
-              //@ts-ignore
-              onClick={reset}
-            >
-              <ResetIcon />
+            <ToolbarButton disabled={disabled || pristine} onClick={reset}>
+              <ResetIcon className="fill-current opacity-70 w-[2.5em] h-[2.5em] lg:mr-1" />
               <DesktopLabel>{buttons.reset}</DesktopLabel>
             </ToolbarButton>
             <SaveButton
