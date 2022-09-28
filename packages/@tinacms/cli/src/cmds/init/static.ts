@@ -113,7 +113,7 @@ const reportTelemetry = async (
 
 const createPackageJSON = async () => {
   logger.info(logText('No package.json found, creating one'))
-  execShellCommand(`npm init --yes`)
+  await execShellCommand(`npm init --yes`)
 }
 const createGitignore = async () => {
   logger.info(logText('No .gitignore found, creating one'))
@@ -139,14 +139,10 @@ const addNodeModulesToGitignore = async () => {
 }
 const addDependencies = async (packageManager) => {
   logger.info(logText('Adding dependencies, this might take a moment...'))
-  const internalDeps = ['tinacms', '@tinacms/cli']
-  const externalDeps = ['styled-components']
-  const deps = [...internalDeps, externalDeps]
+  const deps = ['tinacms', '@tinacms/cli']
   const packageManagers = {
     pnpm: process.env.USE_WORKSPACE
-      ? `pnpm add ${internalDeps.join(
-          ' '
-        )} --workspace && pnpm add ${externalDeps.join(' ')}`
+      ? `pnpm add ${deps.join(' ')} --workspace`
       : `pnpm add ${deps.join(' ')}`,
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
@@ -208,10 +204,15 @@ const addContentFile = async () => {
 }
 
 const logNextSteps = (packageManager: string) => {
+  const packageManagers = {
+    pnpm: `pnpm `,
+    npm: `npx `, // npx is the way to run executables that aren't in your "scripts"
+    yarn: `yarn `,
+  }
   logger.info(`
 ${successText('TinaCMS has been initialized, to get started run:')}
 
-    ${packageManager} tinacms dev -c "<your dev command>"
+    ${packageManagers[packageManager]} tinacms dev -c "<your dev command>"
 `)
 }
 

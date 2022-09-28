@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 0.1.2
+
+### Patch Changes
+
+- 112b7271d: fix vulnerabilities
+
 ## 0.1.1
 
 ### Patch Changes

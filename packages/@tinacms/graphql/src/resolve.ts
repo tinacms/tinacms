@@ -20,7 +20,8 @@ import {
   parse,
 } from 'graphql'
 import type { TinaSchema } from '@tinacms/schema-tools'
-import { createSchema } from './schema'
+import type { GraphQLConfig } from './types'
+import { createSchema } from './schema/createSchema'
 import { createResolver } from './resolver'
 import { assertShape } from './util'
 import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
@@ -28,7 +29,6 @@ import { optimizeDocuments } from '@graphql-tools/relay-operation-optimizer'
 import type { GraphQLResolveInfo } from 'graphql'
 import type { Database } from './database'
 import { NAMER } from './ast-builder'
-import type { GraphQLConfig } from './types'
 import { handleFetchErrorError } from './resolver/error'
 
 export const resolve = async ({

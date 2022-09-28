@@ -155,6 +155,8 @@ export const TinaCloudProvider = (
       new TinaCMS({
         enabled: true,
         sidebar: true,
+        isLocalClient: props.isLocalClient,
+        clientId: props.clientId,
       }),
     [props.cms]
   )
