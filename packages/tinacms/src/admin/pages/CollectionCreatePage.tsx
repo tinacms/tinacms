@@ -15,6 +15,7 @@ import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import type { GlobalTemplate } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -99,10 +100,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
-  const template = schema.getTemplateForData({
+  const template: GlobalTemplate<true> = schema.getTemplateForData({
     collection: schemaCollection,
     data: { _template: templateName },
-  })
+  }) as GlobalTemplate<true>
 
   const formInfo = resolveForm({
     collection: schemaCollection,
@@ -111,10 +112,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     template,
   })
 
-  let slugFunction = schemaCollection?.ui?.filename?.slugify
+  let slugFunction = template?.ui?.filename?.slugify
 
   if (!slugFunction) {
-    const titleField = schemaCollection.fields.find(
+    const titleField = template?.fields.find(
       (x) => x.required && x.type === 'string' && x.isTitle
     )?.name
     // If the collection does not a slugify function and is has a title field, use the default slugify function
@@ -150,7 +151,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
-          disabled: schemaCollection?.ui?.filename?.disabled,
+          disabled: template?.ui?.filename?.disabled,
           description: (
             <span>
               A unique filename for the content.
