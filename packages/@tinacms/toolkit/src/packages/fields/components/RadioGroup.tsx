@@ -82,7 +82,12 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           name={input.name}
           value={option.value}
           // https://github.com/final-form/react-final-form/issues/392#issuecomment-543118944
-          onChange={(event) => input.onChange(event.target.value)}
+          onChange={(event) => {
+            console.log(optionId, event)
+            console.log(event.target)
+            console.log(event.target.value)
+            input.onChange(event.target.value)
+          }}
           checked={checked}
         />
         <RadioOption
@@ -155,20 +160,22 @@ const RadioOptions = ({ direction, variant, className = '', ...props }) => (
   />
 )
 
-const RadioOption = ({ checked, variant, htmlFor, ...props }) => (
+const RadioOption = ({ checked, variant, className = '', ...props }) => (
   <label
     className={`flex items-center text-[13px] ${
       variant === 'button'
         ? `flex-1 text-center rounded-3xl font-normal cursor-pointer h-[34px] px-3 transition-all duration-100 ease-out m-0 border-none justify-center ${
             checked ? 'text-white' : 'text-blue-500'
           } [&:not(:active)]:hover:bg-gray-50 active:bg-gray-100`
-        : `before:content-[""] before:block before:w-4 before:h-4 before:mr-1 before:rounded-3xl before:bg-blue-500 before:border-[1px] before:border-solid ${
-            checked ? 'before:border-blue-500' : 'before:border-gray-100'
-          } before:shadow-[0_0_0_0_#e1ddec,_inset_0_0_0_8px_white] before:transition-all before:duration-100 before:ease-out hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white] ${
+        : `before:content-[""] before:block before:w-4 before:h-4 before:mr-1 before:rounded-3xl before:bg-blue-500 ${
             checked
-              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white]'
-              : ''
-          }`
+              ? 'before:border-[1px] before:border-solid before:border-blue-500'
+              : 'before:border-gray-100'
+          } before:shadow-[0_0_0_0_#e1ddec,_inset_0_0_0_8px_white] before:transition-all before:duration-100 before:ease-out ${
+            checked
+              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white] [input:focus+&:before]:border-[1px] [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_4px_white]'
+              : '[input:focus+&:before]:border-[1px] [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_8px_white] hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white]'
+          } ${className}`
     }`}
     {...props}
   />
