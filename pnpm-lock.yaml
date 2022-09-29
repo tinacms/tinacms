@@ -1,5 +1,8 @@
 lockfileVersion: 5.4
 
+overrides:
+  vm2@<3.9.11: '>=3.9.11'
+
 importers:
   .:
     specifiers:
