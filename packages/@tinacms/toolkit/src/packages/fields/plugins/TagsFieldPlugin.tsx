@@ -76,7 +76,7 @@ const Tag = ({ tinaForm, field, index, children, ...styleProps }) => {
     >
       <span
         style={{ maxHeight: 'calc(var(--tina-sidebar-width) - 50px)' }}
-        className="flex-shrink overflow-ellipsis overflow-hidden"
+        className="text-[15px] flex-shrink overflow-ellipsis overflow-hidden"
       >
         {children}
       </span>
