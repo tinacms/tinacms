@@ -16,7 +16,7 @@ import git from 'isomorphic-git'
 import { IsomorphicBridge } from './isomorphic'
 
 // Fix issue with test timing out
-jest.setTimeout(10000)
+jest.setTimeout(20000)
 
 describe('isomorphic bridge', () => {
   let contentMap: Record<string, string>
