@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.10
+
+### Patch Changes
+
+- a60d96862: Fix rich-text dropdown overlap issue
+
 ## 0.57.9
 
 ### Patch Changes
