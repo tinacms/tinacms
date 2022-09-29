@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - @tinacms/schema-tools@0.1.6
+  - tinacms@0.69.14
+
 ## 0.0.18
 
 ### Patch Changes
