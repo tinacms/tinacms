@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.69.14
+
+### Patch Changes
+
+- c6e3bd321: Fix issue where slugify function breaks templates
+- Updated dependencies [c6e3bd321]
+- Updated dependencies [a60d96862]
+  - @tinacms/schema-tools@0.1.6
+  - @tinacms/toolkit@0.57.10
+
 ## 0.69.13
 
 ### Patch Changes
