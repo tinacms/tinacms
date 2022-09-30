@@ -64,3 +64,12 @@
   --tina-sidebar-header-height: 60px;
   --tina-toolbar-height: 62px;
 }
+
+@keyframes fly-in-left {
+  0% {
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
