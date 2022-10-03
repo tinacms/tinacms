@@ -122,10 +122,12 @@ interface BaseCollection {
   match?: string
 }
 
-type CollectionTemplates<WithNamespace extends boolean> =
+export type CollectionTemplates<WithNamespace extends boolean> =
   WithNamespace extends true
     ? CollectionTemplatesWithNamespace<WithNamespace>
     : CollectionTemplatesInner<WithNamespace>
+
+export type TinaTemplate = Template<false>
 
 interface CollectionTemplatesInner<WithNamespace extends boolean>
   extends BaseCollection {
