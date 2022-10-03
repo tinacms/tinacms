@@ -169,12 +169,12 @@ const RadioOption = ({ checked, variant, className = '', ...props }) => (
           } [&:not(:active)]:hover:bg-gray-50 active:bg-gray-100`
         : `before:content-[""] before:block before:w-4 before:h-4 before:mr-1 before:rounded-3xl before:bg-blue-500 ${
             checked
-              ? 'before:border-[1px] before:border-solid before:border-blue-500'
+              ? 'before:border before:border-solid before:border-blue-500'
               : 'before:border-gray-100'
           } before:shadow-[0_0_0_0_#e1ddec,_inset_0_0_0_8px_white] before:transition-all before:duration-100 before:ease-out ${
             checked
-              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white] [input:focus+&:before]:border-[1px] [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_4px_white]'
-              : '[input:focus+&:before]:border-[1px] [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_8px_white] hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white]'
+              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white] [input:focus+&:before]:border [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_4px_white]'
+              : '[input:focus+&:before]:border [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_8px_white] hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white]'
           } ${className}`
     }`}
     {...props}
