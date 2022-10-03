@@ -11,7 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import {
+  BaseTextField,
+  Form,
+  FormBuilder,
+  FormStatus,
+  wrapFieldsWithMeta,
+} from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
@@ -26,6 +32,7 @@ import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
+import { BiPencil } from 'react-icons/bi'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -93,6 +100,37 @@ const CollectionCreatePage = () => {
   )
 }
 
+const FilenameInput = (props) => {
+  const [filenameTouched, setFilenameTouched] = React.useState(false)
+
+  return (
+    <div
+      className="group relative block cursor-pointer"
+      onClick={() => {
+        setFilenameTouched(true)
+      }}
+    >
+      <input
+        type="text"
+        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pl-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded-md ${
+          props.readonly || !filenameTouched
+            ? 'bg-gray-50 text-gray-300  border-gray-100 pointer-events-none pr-8'
+            : 'bg-white text-gray-600  border-gray-200 pr-3'
+        }`}
+        {...props}
+        disabled={props.readonly || !filenameTouched}
+      />
+      <BiPencil
+        className={`absolute top-1/2 right-2 -translate-y-1/2 h-6 w-auto transition-opacity duration-150 ease-out ${
+          !filenameTouched && !props.readonly
+            ? 'opacity-30 group-hover:opacity-80'
+            : 'opacity-0'
+        }`}
+      />
+    </div>
+  )
+}
+
 const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
@@ -151,7 +189,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
         {
           name: 'filename',
           label: 'Filename',
-          component: 'text',
+          component: wrapFieldsWithMeta(({ field, input, meta }) => {
+            return (
+              <FilenameInput
+                readonly={template?.ui?.filename?.readonly}
+                {...input}
+              />
+            )
+          }),
           disabled: template?.ui?.filename?.readonly,
           description: (
             <span>
