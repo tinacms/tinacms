@@ -109,13 +109,13 @@ export interface UICollection {
   }) => string | undefined
 }
 
-type DefaultItem = () => Record<string, any> | Record<string, any>
+type DefaultItem<ReturnType> = () => ReturnType | ReturnType
 
 interface BaseCollection {
   label?: string
   name: string
   path: string
-  defaultItem?: DefaultItem
+  defaultItem?: DefaultItem<Record<string, any>>
   indexes?: TinaIndex[]
   format?: FormatType
   ui?: UICollection
@@ -230,7 +230,7 @@ type StringField =
       isBody?: boolean
       list: true
       isTitle?: never
-      ui?: UIField<any, string[]>
+      ui?: UIField<any, string[]> & { defaultItem?: DefaultItem<string> }
     }
 
 type BooleanField =
@@ -375,7 +375,9 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
-  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   list?: boolean
   /**
    * templates can either be an array of Tina templates or a reference to
@@ -398,7 +400,9 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
   visualSelector?: boolean
   required?: false
-  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -415,7 +419,9 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
-  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -487,7 +493,9 @@ export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
   visualSelector?: boolean
-  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   required?: false
   template: Templateable
 }
