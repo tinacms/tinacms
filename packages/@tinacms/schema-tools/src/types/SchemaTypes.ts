@@ -86,7 +86,7 @@ export type TinaIndex = {
 
 export interface UICollection {
   filename?: {
-    slugify?: (values: unknown) => string
+    slugify?: (values: Record<string, unknown>) => string
     disabled?: boolean
   }
   /**
