@@ -147,6 +147,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
       id: 'create-form',
       label: 'form',
       fields: [
+        ...(formInfo.fields as any),
         {
           name: 'filename',
           label: 'Filename',
@@ -175,7 +176,6 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             }
           },
         },
-        ...(formInfo.fields as any),
       ],
       onSubmit: async (values) => {
         try {
