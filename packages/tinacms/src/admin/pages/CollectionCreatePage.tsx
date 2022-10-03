@@ -152,7 +152,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           name: 'filename',
           label: 'Filename',
           component: 'text',
-          disabled: template?.ui?.filename?.disabled,
+          disabled: template?.ui?.filename?.readonly,
           description: (
             <span>
               A unique filename for the content.
