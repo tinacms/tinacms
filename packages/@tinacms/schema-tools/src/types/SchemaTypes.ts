@@ -109,11 +109,13 @@ export interface UICollection {
   }) => string | undefined
 }
 
+type DefaultItem = () => Record<string, unknown> | Record<string, unknown>
+
 interface BaseCollection {
   label?: string
   name: string
   path: string
-  defaultItem?: () => unknown | unknown
+  defaultItem?: DefaultItem
   indexes?: TinaIndex[]
   format?: FormatType
   ui?: UICollection
@@ -371,6 +373,7 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
   list?: boolean
   /**
    * templates can either be an array of Tina templates or a reference to
@@ -393,6 +396,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -409,6 +413,7 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -480,6 +485,7 @@ export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
   visualSelector?: boolean
+  ui?: UIField<any, Record<string, any>> & { defaultItem?: DefaultItem }
   required?: false
   template: Templateable
 }
