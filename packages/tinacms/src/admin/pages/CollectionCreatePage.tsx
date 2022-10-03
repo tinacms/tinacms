@@ -123,7 +123,7 @@ const FilenameInput = (props) => {
       <BiPencil
         className={`absolute top-1/2 right-2 -translate-y-1/2 h-6 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
-            ? 'opacity-30 group-hover:opacity-80'
+            ? 'opacity-20 group-hover:opacity-80'
             : 'opacity-0'
         }`}
       />
@@ -189,14 +189,16 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
         {
           name: 'filename',
           label: 'Filename',
-          component: wrapFieldsWithMeta(({ field, input, meta }) => {
-            return (
-              <FilenameInput
-                readonly={template?.ui?.filename?.readonly}
-                {...input}
-              />
-            )
-          }),
+          component: slugFunction
+            ? wrapFieldsWithMeta(({ field, input, meta }) => {
+                return (
+                  <FilenameInput
+                    readonly={template?.ui?.filename?.readonly}
+                    {...input}
+                  />
+                )
+              })
+            : 'text',
           disabled: template?.ui?.filename?.readonly,
           description: (
             <span>
