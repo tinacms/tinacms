@@ -26,9 +26,6 @@ const InnerTemplate: TinaTemplate = {
       name: "nestedBlockc",
       type: "object",
       list: true,
-      ui: {
-        visualSelector: true,
-      },
       fields: [
         {
           label: "title",
