@@ -119,7 +119,6 @@ const schema = defineSchema({
       ui: {
         // Example of using a custom slugify function
         filename: {
-          // disabled: true,
           // Example of how slugify could be used
           slugify: (values) => {
             return 'WORKING'

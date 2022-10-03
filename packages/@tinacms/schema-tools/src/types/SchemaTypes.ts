@@ -87,7 +87,7 @@ export type TinaIndex = {
 export interface UICollection {
   filename?: {
     slugify?: (values: Record<string, unknown>) => string
-    disabled?: boolean
+    readonly?: boolean
   }
   /**
    * Forms for this collection will be editable from the global sidebar rather than the form panel
