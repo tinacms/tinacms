@@ -86,7 +86,7 @@ export type TinaIndex = {
 
 export interface UICollection {
   filename?: {
-    slugify?: (values: Record<string, unknown>) => string
+    slugify?: (values: Record<string, any>) => string
     readonly?: boolean
   }
   /**
@@ -109,7 +109,7 @@ export interface UICollection {
   }) => string | undefined
 }
 
-type DefaultItem = () => Record<string, unknown> | Record<string, unknown>
+type DefaultItem = () => Record<string, any> | Record<string, any>
 
 interface BaseCollection {
   label?: string
