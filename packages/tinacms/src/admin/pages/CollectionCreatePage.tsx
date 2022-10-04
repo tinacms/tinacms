@@ -114,14 +114,14 @@ const FilenameInput = (props) => {
         type="text"
         className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded-md ${
           props.readonly || !filenameTouched
-            ? 'bg-gray-50 text-gray-300  border-gray-100 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
+            ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
             : 'bg-white text-gray-600  border-gray-200 pl-3'
         }`}
         {...props}
         disabled={props.readonly || !filenameTouched}
       />
       <FaLock
-        className={`absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
+        className={`text-gray-400 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
           !filenameTouched && !props.readonly
             ? 'opacity-20 group-hover:opacity-0 group-active:opacity-0'
             : 'opacity-0'
