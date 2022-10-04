@@ -205,9 +205,9 @@ const addContentFile = async () => {
 
 const logNextSteps = (packageManager: string) => {
   const packageManagers = {
-    pnpm: `pnpm `,
-    npm: `npx `, // npx is the way to run executables that aren't in your "scripts"
-    yarn: `yarn `,
+    pnpm: `pnpm`,
+    npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
+    yarn: `yarn`,
   }
   logger.info(`
 ${successText('TinaCMS has been initialized, to get started run:')}
