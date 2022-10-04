@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { ModalProvider } from '../packages/react-modals'
 import { SidebarProvider, SidebarPosition } from '../packages/react-sidebar'
-import { Toolbar } from '../packages/react-toolbar'
 import { useCMS } from '../react-tinacms/use-cms'
 import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
@@ -49,7 +48,6 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
       <ModalProvider>
         <div className="tina-tailwind">
           <Alerts alerts={cms.alerts} />
-          {cms.enabled && cms.toolbar && <Toolbar />}
           <MediaManager />
           {cms.sidebar && (
             <SidebarProvider
