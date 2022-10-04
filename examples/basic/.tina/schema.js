@@ -35,7 +35,9 @@ const schema = defineSchema({
         {
           name: 'tem1',
           label: 'Template 1',
-          fields: [{ type: 'string', name: 'foo' }],
+          fields: [
+            { type: 'string', name: 'foo', required: true, isTitle: true },
+          ],
         },
         {
           name: 'tem2',
@@ -117,13 +119,10 @@ const schema = defineSchema({
       ui: {
         // Example of using a custom slugify function
         filename: {
-          // disabled: true,
           // Example of how slugify could be used
-          // slugify: (values) => {
-          //   return `${values?.topic?.join('-') || ''}-${values?.title
-          //     ?.toLowerCase()
-          //     .replace(/ /g, '-')}`
-          // },
+          slugify: (values) => {
+            return 'WORKING'
+          },
         },
       },
       fields: [

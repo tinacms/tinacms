@@ -46,19 +46,20 @@ export function FieldsBuilder({
 
   return (
     <FieldsGroup padding={padding}>
-      {fields.map((field: Field) => (
+      {fields.map((field: Field, index) => (
         <InnerField
           key={field.name}
           field={field}
           form={form}
           fieldPlugins={fieldPlugins}
+          index={index}
         />
       ))}
     </FieldsGroup>
   )
 }
 
-const InnerField = ({ field, form, fieldPlugins }) => {
+const InnerField = ({ field, form, fieldPlugins, index }) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
    */
@@ -130,6 +131,7 @@ const InnerField = ({ field, form, fieldPlugins }) => {
               form={form.finalForm}
               tinaForm={form}
               field={field}
+              index={index}
             />
           )
         }
