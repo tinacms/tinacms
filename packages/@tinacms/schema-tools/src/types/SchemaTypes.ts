@@ -84,53 +84,59 @@ export type TinaIndex = {
   }[]
 }
 
+export interface UICollection {
+  filename?: {
+    slugify?: (values: Record<string, any>) => string
+    readonly?: boolean
+  }
+  /**
+   * Forms for this collection will be editable from the global sidebar rather than the form panel
+   */
+  global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
+  /**
+   * Provide the path that your document is viewable on your site
+   *
+   * eg:
+   * ```ts
+   * router: ({ document }) => {
+   *   return `blog-posts/${document._sys.filename}`;
+   * }
+   * ```
+   */
+  router?: (args: {
+    document: Document
+    collection: TinaCloudCollection<true>
+  }) => string | undefined
+}
+
+type DefaultItem<ReturnType> = () => ReturnType | ReturnType
+
 interface BaseCollection {
   label?: string
   name: string
   path: string
-  defaultItem?: () => unknown | unknown
+  defaultItem?: DefaultItem<Record<string, any>>
   indexes?: TinaIndex[]
   format?: FormatType
-  ui?: {
-    filename?: {
-      slugify?: (values: unknown) => string
-      disabled?: boolean
-    }
-    /**
-     * Forms for this collection will be editable from the global sidebar rather than the form panel
-     */
-    global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
-    /**
-     * Provide the path that your document is viewable on your site
-     *
-     * eg:
-     * ```ts
-     * router: ({ document }) => {
-     *   return `blog-posts/${document._sys.filename}`;
-     * }
-     * ```
-     */
-    router?: (args: {
-      document: Document
-      collection: TinaCloudCollection<true>
-    }) => string | undefined
-  }
+  ui?: UICollection
   match?: string
 }
 
-type CollectionTemplates<WithNamespace extends boolean> =
+export type CollectionTemplates<WithNamespace extends boolean> =
   WithNamespace extends true
     ? CollectionTemplatesWithNamespace<WithNamespace>
     : CollectionTemplatesInner<WithNamespace>
 
+export type TinaTemplate = Template<false>
+
 interface CollectionTemplatesInner<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | Template<WithNamespace>)[]
+  templates: (string | GlobalTemplate<WithNamespace>)[]
   fields?: undefined
 }
 export interface CollectionTemplatesWithNamespace<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | Template<WithNamespace>)[]
+  templates: (string | GlobalTemplate<WithNamespace>)[]
   fields?: undefined
   references?: ReferenceType<WithNamespace>[]
   namespace: WithNamespace extends true ? string[] : undefined
@@ -224,7 +230,7 @@ type StringField =
       isBody?: boolean
       list: true
       isTitle?: never
-      ui?: UIField<any, string[]>
+      ui?: UIField<any, string[]> & { defaultItem?: DefaultItem<string> }
     }
 
 type BooleanField =
@@ -369,6 +375,9 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   list?: boolean
   /**
    * templates can either be an array of Tina templates or a reference to
@@ -391,6 +400,9 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -407,6 +419,9 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   type: 'object'
   visualSelector?: boolean
   required?: false
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   /**
    * fields can either be an array of Tina fields, or a reference to the fields
    * of a global template definition.
@@ -429,14 +444,14 @@ export type GlobalTemplate<WithNamespace extends boolean> =
     ? {
         label: string
         name: string
-        ui?: object | (UIField<any, any> & { previewSrc: string })
+        ui?: UICollection
         fields: TinaFieldInner<WithNamespace>[]
         namespace: WithNamespace extends true ? string[] : undefined
       }
     : {
         label: string
         name: string
-        ui?: object | (UIField<any, any> & { previewSrc: string })
+        ui?: UICollection
         fields: TinaFieldInner<WithNamespace>[]
       }
 
@@ -478,6 +493,9 @@ export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
   visualSelector?: boolean
+  ui?: UIField<any, Record<string, any>> & {
+    defaultItem?: DefaultItem<Record<string, any>>
+  }
   required?: false
   template: Templateable
 }
