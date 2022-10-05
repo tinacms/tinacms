@@ -16,31 +16,18 @@ limitations under the License.
 
 */
 
-import styled, { keyframes, StyledComponent } from 'styled-components'
+import React from 'react'
 
-const ModalPopupKeyframes = keyframes`
-  0% {
-    transform: translate3d( 0, -2rem, 0 );
-    opacity: 0;
-  }
-
-  100% {
-    transform: translate3d( 0, 0, 0 );
-    opacity: 1;
-  }
-`
-
-export const PopupModal: StyledComponent<'div', {}, {}> = styled.div`
-  display: block;
-  z-index: var(--tina-z-index-0);
-  overflow: visible; /* Keep this as "visible", select component needs to overflow */
-  background-color: var(--tina-color-grey-1);
-  border-radius: var(--tina-radius-small);
-  margin: 40px auto;
-  width: 460px;
-  max-width: 90%;
-  animation: ${ModalPopupKeyframes} 150ms ease-out 1;
-`
+export const PopupModal = ({ className = '', style = {}, ...props }) => (
+  <div
+    className={`block z-0 overflow-visible bg-gray-50 rounded-[5px] my-10 mx-auto w-[460px] max-w-[90%] ${className}`}
+    style={{
+      animation: 'popup-down 150ms ease-out 1',
+      ...style,
+    }}
+    {...props}
+  />
+)
 
 /**
  * @alias [PopupModal]

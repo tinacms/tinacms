@@ -37,7 +37,7 @@ export const NoFormsPlaceholder = () => (
       nothing to edit on <br />
       this page.
     </p>
-    <p className="block pb-5">
+    <p className="block">
       <Button
         href="https://tina.io/docs/tinacms-context/"
         target="_blank"
