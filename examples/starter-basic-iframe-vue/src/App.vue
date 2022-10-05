@@ -1,28 +1,69 @@
 <template>
-  <main>{{ JSON.stringify({ post: this.data }) }}</main>
+  <main>
+    <pre>
+      <!-- @ts-ignore -->
+      {{ JSON.stringify(this.data, null, 2) }}
+    </pre>
+  </main>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { client } from '../.tina/__generated__/client'
+import type { PostQuery, Exact } from '../.tina/__generated__/types'
+
+interface Data {
+  data: PostQuery
+  variables: Exact<{
+    relativePath: string
+  }>
+  query: string
+}
+
+export default defineComponent<
+  {},
+  { fetchPost: () => Promise<void>; setUpWatchData: () => void },
+  { data: Data; loading: boolean }
+>({
   data() {
     return {
       loading: false,
-      data: null,
+      data: null as unknown as Data,
       error: null,
     }
   },
   mounted() {
-    this.fetchPost()
+    this.fetchPost().then(() => {
+      this.setUpWatchData()
+    })
   },
   methods: {
-    fetchPost() {
-      this.error = this.data = null
+    async fetchPost() {
       this.loading = true
-      setTimeout(() => {
-        this.data = { foo: 'bar' }
-        this.loading = false
-      }, 1000)
+      this.data = await client.queries.post({ relativePath: 'hello-world.md' })
+    },
+    setUpWatchData() {
+      const id = btoa(JSON.stringify({ query: this.data.query }))
+      parent.postMessage(
+        JSON.parse(
+          JSON.stringify({
+            type: 'open',
+            id,
+            data: JSON.stringify(this.data.data),
+            query: this.data.query,
+            variables: this.data.variables,
+          })
+        ),
+        window.location.origin
+      )
+      window.addEventListener('message', (event) => {
+        console.log('child received message', event)
+        if (event.data.id === id) {
+          console.log('child: event received')
+          this.data = { ...this.data, ...event.data }
+        }
+      })
     },
   },
-}
+})
 </script>

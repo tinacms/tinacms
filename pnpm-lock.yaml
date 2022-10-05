@@ -122,16 +122,22 @@ importers:
 
   examples/starter-basic-iframe-vue:
     specifiers:
+      '@tinacms/cli': workspace:^0.61.20
       '@types/node': ^16.11.56
       '@vitejs/plugin-vue': ^3.0.3
       '@vitejs/plugin-vue-jsx': ^2.0.1
       '@vue/tsconfig': ^0.1.3
       npm-run-all: ^4.1.5
+      styled-components: ^5.1.3
+      tinacms: workspace:^0.69.14
       typescript: ~4.7.4
       vite: ^3.0.9
       vue: ^3.2.38
       vue-tsc: ^0.40.7
     dependencies:
+      '@tinacms/cli': link:../../packages/@tinacms/cli
+      styled-components: 5.3.5
+      tinacms: link:../../packages/tinacms
       vue: 3.2.40
     devDependencies:
       '@types/node': 16.11.64
@@ -25931,6 +25937,30 @@ packages:
     dependencies:
       escape-string-regexp: 1.0.5
     dev: true
+
+  /styled-components/5.3.5:
+    resolution:
+      {
+        integrity: sha512-ndETJ9RKaaL6q41B69WudeqLzOpY1A/ET/glXkNZ2T7dPjPqpPCXXQjDFYZWwNnE5co0wX+gTCqx9mfxTmSIPg==,
+      }
+    engines: { node: '>=10' }
+    requiresBuild: true
+    peerDependencies:
+      react: '>= 16.8.0'
+      react-dom: '>= 16.8.0'
+      react-is: '>= 16.8.0'
+    dependencies:
+      '@babel/helper-module-imports': 7.18.6
+      '@babel/traverse': 7.18.13_supports-color@5.5.0
+      '@emotion/is-prop-valid': 1.1.3
+      '@emotion/stylis': 0.8.5
+      '@emotion/unitless': 0.7.5
+      babel-plugin-styled-components: 2.0.7_styled-components@5.3.5
+      css-to-react-native: 3.0.0
+      hoist-non-react-statics: 3.3.2
+      shallowequal: 1.1.0
+      supports-color: 5.5.0
+    dev: false
 
   /styled-components/5.3.5_fane7jikarojcev26y27hpbhu4:
     resolution:
