@@ -136,7 +136,7 @@ const Alert: React.FC<{ level: AlertLevel }> = ({ level, ...props }) => {
       className={`text-center rounded-[5px] bg-gray-50 border border-solid border-gray-100 text-gray-800 fill-blue-500 font-normal cursor-pointer text-[15px] py-2 pr-1 pl-3 transition-all duration-100 ease-out mb-4 flex items-center min-w-[350px] max-w-full `}
       style={{
         pointerEvents: 'all',
-        animationName: 'fly-in-top, fade-in',
+        animationName: 'fly-in-up, fade-in',
         animationTimingFunction: 'ease-out',
         animationIterationCount: 1,
         animationFillMode: 'both',
