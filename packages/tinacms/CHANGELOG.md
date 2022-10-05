@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.69.15
+
+### Patch Changes
+
+- 0c8c571d5: Custom filename field component, fix text field classes
+- Updated dependencies [b1a357f60]
+- Updated dependencies [0c8c571d5]
+  - @tinacms/schema-tools@0.1.7
+  - @tinacms/toolkit@0.57.11
+
 ## 0.69.14
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @tinacms/mdx
 
+## 0.61.11
+
+### Patch Changes
+
+- Updated dependencies [b1a357f60]
+  - @tinacms/schema-tools@0.1.7
+
 ## 0.61.10
 
 ### Patch Changes
