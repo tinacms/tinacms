@@ -1,5 +1,4 @@
 ---
-title: This is a new doc asdf
+title: This is new-doc-1
 ---
 
-fasdf

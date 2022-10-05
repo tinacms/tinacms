@@ -26,13 +26,31 @@ export default defineComponent<
   { fetchPost: () => Promise<void>; setUpWatchData: () => void },
   { data: Data; loading: boolean }
 >({
-  name: 'Home',
+  name: 'Post',
   data() {
     return {
       loading: false,
       data: null as unknown as Data,
       error: null,
     }
+  },
+  created() {
+    // watch the params of the route to fetch the data again
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.fetchPost().then(() => {
+          this.setUpWatchData()
+        })
+      },
+      // fetch the data when the view is created and the data is
+      // already being observed
+      { immediate: true }
+    )
+  },
+  unmounted() {
+    const id = btoa(JSON.stringify({ query: this.data.query }))
+    parent.postMessage({ type: 'close', id }, window.location.origin)
   },
   mounted() {
     this.fetchPost().then(() => {
