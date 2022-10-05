@@ -1,9 +1,9 @@
 <template>
   <main>
-    <h1>{{ this.data?.data?.post?.title }}</h1>
+    <h1>{{ data?.data?.post.title }}</h1>
     <pre>
         <!-- @ts-ignore -->
-        {{ JSON.stringify(this.data, null, 2) }}
+        {{ JSON.stringify(data?.data?.post?.body, null, 2) }}
       </pre>
   </main>
 </template>
@@ -42,7 +42,9 @@ export default defineComponent<
   methods: {
     async fetchPost() {
       this.loading = true
-      this.data = await client.queries.post({ relativePath: 'hello-world.md' })
+      this.data = await client.queries.post({
+        relativePath: this.$route.params.id + '.md',
+      })
     },
     setUpWatchData() {
       const id = btoa(JSON.stringify({ query: this.data.query }))

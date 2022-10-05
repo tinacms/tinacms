@@ -1,69 +1,16 @@
 <template>
-  <main>
-    <pre>
-      <!-- @ts-ignore -->
-      {{ JSON.stringify(this.data, null, 2) }}
-    </pre>
-  </main>
+  <div id="app">
+    <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/posts">Posts</router-link> |
+      <router-link to="/contact">Contact</router-link>
+    </nav>
+    <main>
+      <router-view />
+    </main>
+  </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import { client } from '../.tina/__generated__/client'
-import type { PostQuery, Exact } from '../.tina/__generated__/types'
-
-interface Data {
-  data: PostQuery
-  variables: Exact<{
-    relativePath: string
-  }>
-  query: string
-}
-
-export default defineComponent<
-  {},
-  { fetchPost: () => Promise<void>; setUpWatchData: () => void },
-  { data: Data; loading: boolean }
->({
-  data() {
-    return {
-      loading: false,
-      data: null as unknown as Data,
-      error: null,
-    }
-  },
-  mounted() {
-    this.fetchPost().then(() => {
-      this.setUpWatchData()
-    })
-  },
-  methods: {
-    async fetchPost() {
-      this.loading = true
-      this.data = await client.queries.post({ relativePath: 'hello-world.md' })
-    },
-    setUpWatchData() {
-      const id = btoa(JSON.stringify({ query: this.data.query }))
-      parent.postMessage(
-        JSON.parse(
-          JSON.stringify({
-            type: 'open',
-            id,
-            data: JSON.stringify(this.data.data),
-            query: this.data.query,
-            variables: this.data.variables,
-          })
-        ),
-        window.location.origin
-      )
-      window.addEventListener('message', (event) => {
-        console.log('child received message', event)
-        if (event.data.id === id) {
-          console.log('child: event received')
-          this.data = { ...this.data, ...event.data }
-        }
-      })
-    },
-  },
-})
+<script>
+export default {}
 </script>

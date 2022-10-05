@@ -21,7 +21,7 @@ export default defineStaticConfig({
     collections: [
       {
         ui: {
-          router: () => '/',
+          router: ({ document }) => `/posts/${document._sys.filename}`,
         },
         name: 'post',
         label: 'Posts',
