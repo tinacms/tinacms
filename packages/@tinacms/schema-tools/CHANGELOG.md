@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.1.7
+
+### Patch Changes
+
+- b1a357f60: Update object field types to include `defaultItem`
+
 ## 0.1.6
 
 ### Patch Changes

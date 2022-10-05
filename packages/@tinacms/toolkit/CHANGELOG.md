@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.11
+
+### Patch Changes
+
+- 0c8c571d5: Custom filename field component, fix text field classes
+
 ## 0.57.10
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 0.61.21
+
+### Patch Changes
+
+- 97225d5f0: Exit tinacms init when there's an error with dependency install
+- fce51ddd8: Remove extra space in tina init console.log
+- Updated dependencies [b1a357f60]
+  - @tinacms/schema-tools@0.1.7
+  - @tinacms/app@0.0.20
+  - @tinacms/graphql@0.63.13
+
 ## 0.61.20
 
 ### Patch Changes
