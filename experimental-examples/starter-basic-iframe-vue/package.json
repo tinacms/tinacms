@@ -2,7 +2,7 @@
   "name": "starter-basic-iframe-vue",
   "version": "0.0.0",
   "scripts": {
-    "dev": "tinacms dev -c \"vite\"",
+    "dev": "MONOREPO_DEV=true tinacms dev -c \"vite\"",
     "build": "run-p type-check build-only",
     "preview": "vite preview --port 4173",
     "build-only": "vite build",
