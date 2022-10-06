@@ -257,6 +257,9 @@ const schema = defineSchema({
               name: "nav",
               list: true,
               ui: {
+                itemProps: (item) => {
+                  return { label: item?.label };
+                },
                 defaultItem: {
                   href: "home",
                   label: "Home",
