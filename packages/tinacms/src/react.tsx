@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import React from 'react'
+import { closeTinaConnection, getTinaUpdates } from './tinaUpdate'
 
 /**
  * This is an experimental version of the useTina hook,
@@ -23,17 +24,14 @@ export function useTina<T extends object>(props: {
 }): { data: T } {
   const [data, setData] = React.useState(props.data)
   React.useEffect(() => {
-    const id = btoa(JSON.stringify({ query: props.query }))
-    parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
-    window.addEventListener('message', (event) => {
-      if (event.data.id === id) {
-        console.log('child: event received')
-        setData(event.data.data)
-      }
+    getTinaUpdates({
+      ...props,
+      cb: (data) => {
+        setData(data)
+      },
     })
 
-    return () =>
-      parent.postMessage({ type: 'close', id }, window.location.origin)
+    return () => closeTinaConnection({ query: props.query })
   }, [])
   return { data } as any
 }

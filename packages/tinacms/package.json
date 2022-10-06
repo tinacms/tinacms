@@ -24,6 +24,11 @@
       "import": "./dist/react.es.js",
       "require": "./dist/react.js"
     },
+    "./dist/tinaUpdate": {
+       "types": "./dist/tinaUpdate.d.ts",
+       "import": "./dist/tinaUpdate.es.js",
+       "require": "./dist/tinaUpdate.js"
+    },
     "./dist/rich-text": {
       "types": "./dist/rich-text/index.d.ts",
       "import": "./dist/rich-text/index.es.js",
@@ -44,7 +49,8 @@
       "src/edit-state.tsx",
       "src/rich-text/index.tsx",
       "src/react.tsx",
-      "src/client.ts"
+      "src/client.ts",
+      "src/tinaUpdate.ts"
     ]
   },
   "typings": "dist/index.d.ts",

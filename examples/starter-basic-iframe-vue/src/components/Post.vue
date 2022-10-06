@@ -10,6 +10,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+
+import { closeTinaConnection, getTinaUpdates } from 'tinacms/dist/tinaUpdate'
+
 import { client } from '../../.tina/__generated__/client'
 import type { PostQuery, Exact } from '../../.tina/__generated__/types'
 
@@ -23,7 +26,7 @@ interface Data {
 
 export default defineComponent<
   {},
-  { fetchPost: () => Promise<void>; setUpWatchData: () => void },
+  { fetchPost: () => Promise<void> },
   { data: Data; loading: boolean }
 >({
   name: 'Post',
@@ -40,7 +43,17 @@ export default defineComponent<
       () => this.$route.params,
       () => {
         this.fetchPost().then(() => {
-          this.setUpWatchData()
+          getTinaUpdates({
+            cb: (newData) => {
+              this.$data.data = {
+                ...this.$data.data,
+                data: newData,
+              }
+            },
+            data: this.data.data,
+            query: this.data.query,
+            variables: this.data.variables,
+          })
         })
       },
       // fetch the data when the view is created and the data is
@@ -49,12 +62,21 @@ export default defineComponent<
     )
   },
   unmounted() {
-    const id = btoa(JSON.stringify({ query: this.data.query }))
-    parent.postMessage({ type: 'close', id }, window.location.origin)
+    closeTinaConnection({ query: this.data.query })
   },
   mounted() {
     this.fetchPost().then(() => {
-      this.setUpWatchData()
+      getTinaUpdates({
+        cb: (newData) => {
+          this.$data.data = {
+            ...this.$data.data,
+            data: newData,
+          }
+        },
+        data: this.data.data,
+        query: this.data.query,
+        variables: this.data.variables,
+      })
     })
   },
   methods: {
@@ -62,28 +84,6 @@ export default defineComponent<
       this.loading = true
       this.data = await client.queries.post({
         relativePath: this.$route.params.id + '.md',
-      })
-    },
-    setUpWatchData() {
-      const id = btoa(JSON.stringify({ query: this.data.query }))
-      parent.postMessage(
-        JSON.parse(
-          JSON.stringify({
-            type: 'open',
-            id,
-            data: this.data.data,
-            query: this.data.query,
-            variables: this.data.variables,
-          })
-        ),
-        window.location.origin
-      )
-      window.addEventListener('message', (event) => {
-        console.log('child received message', event)
-        if (event.data.id === id) {
-          console.log('child: event received')
-          this.data = { ...this.data, ...event.data }
-        }
       })
     },
   },
