@@ -109,7 +109,7 @@ export interface UICollection {
   }) => string | undefined
 }
 
-type DefaultItem<ReturnType> = () => ReturnType | ReturnType
+type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
 
 interface BaseCollection {
   label?: string
@@ -344,6 +344,7 @@ interface ObjectTemplatesInnerWithList<WithNamespace extends boolean>
           key?: string
           label?: string
         }
+        defaultItem?: DefaultItem<Record<string, any>>
       } & UIField<any, string>)
 }
 interface ObjectTemplatesInnerWithoutList<WithNamespace extends boolean>
@@ -376,6 +377,10 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
   visualSelector?: boolean
   required?: false
   ui?: UIField<any, Record<string, any>> & {
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      label?: string
+    }
     defaultItem?: DefaultItem<Record<string, any>>
   }
   list?: boolean
@@ -401,6 +406,10 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   visualSelector?: boolean
   required?: false
   ui?: UIField<any, Record<string, any>> & {
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      label?: string
+    }
     defaultItem?: DefaultItem<Record<string, any>>
   }
   /**
@@ -420,6 +429,10 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
   visualSelector?: boolean
   required?: false
   ui?: UIField<any, Record<string, any>> & {
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      label?: string
+    }
     defaultItem?: DefaultItem<Record<string, any>>
   }
   /**
@@ -494,6 +507,10 @@ export type CollectionTemplateableObject = {
   type: 'object'
   visualSelector?: boolean
   ui?: UIField<any, Record<string, any>> & {
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      label?: string
+    }
     defaultItem?: DefaultItem<Record<string, any>>
   }
   required?: false
