@@ -1,5 +1,95 @@
 # Change Log
 
+## 0.57.12
+
+### Patch Changes
+
+- 46bc9c4e5: Fix to use mime-type from file object instead of mime-types library
+
+## 0.57.11
+
+### Patch Changes
+
+- 0c8c571d5: Custom filename field component, fix text field classes
+
+## 0.57.10
+
+### Patch Changes
+
+- a60d96862: Fix rich-text dropdown overlap issue
+
+## 0.57.9
+
+### Patch Changes
+
+- 183249b11: - deprecate: `defaultValue`
+  - add `defaultItem` to the collection (as a function or an object)
+  ```ts
+  defaultItem: () => {
+    const m = new Date()
+    return {
+      title: 'New Page',
+      test: 'This is a default value of the test field',
+      filename: `new-page-${
+        m.getUTCFullYear() +
+        '-' +
+        (m.getUTCMonth() + 1) +
+        '-' +
+        m.getUTCDate()
+      }`,
+    }
+  },
+  ```
+  - Allow `datetime` field to be undefined or empty
+- 8060d0949: Provide filename customization API.
+
+  ```ts
+  name: 'posts',
+  path: 'content/posts',
+  ui: {
+       filename: {
+          slugify: (values) => mySlugifyFunc(values),
+          disabled: true
+          // other field props like `label`, `component`, `parse` can still be used too
+        }
+  },
+  ```
+
+  If one is using `isTitle` a default slugify function is added that slugifys the title.
+
+## 0.57.8
+
+### Patch Changes
+
+- eeab510d9: Revert "Fix rich text dropdown overlap issue" which was causing field labels to live underneath their inputs
+
+## 0.57.7
+
+### Patch Changes
+
+- 4dc971b95: Upgrade react-dropzone due to es build issue with older versions
+
+## 0.57.6
+
+### Patch Changes
+
+- 566386f30: Fix issue where drag-n-drop on image fields wasn't working with the repo-based media on local dev
+
+## 0.57.5
+
+### Patch Changes
+
+- 4b9a2252f: Fixes rich text dropdown menu z-index issue
+- 4e0a609cd: Disable tabbing into panel header
+- fd90b7f49: Fix reference field loading only 10 first nodes in collection
+- ee354c708: Fix event log dialog closing issue
+- f3439ea35: Replace loading message and hide forms while loading.
+- 112b7271d: fix vulnerabilities
+- 4efe31214: Include error message in file failed upload model
+- 8688dbff9: Add links to Tina Cloud project setting from sidebar
+- Updated dependencies [f3439ea35]
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.57.4
 
 ### Patch Changes
@@ -425,13 +515,13 @@
 - 106549814: Add a CMS event for when a field's value changes. To listen for events:
 
   ```ts
-  cms.events.subscribe(`forms:fields:onChange`, event => console.log(event))
+  cms.events.subscribe(`forms:fields:onChange`, (event) => console.log(event))
   ```
 
   Add a CMS event for when a field is reset. To listen for form resets:
 
   ```ts
-  cms.events.subscribe(`forms:reset`, event => console.log(event))
+  cms.events.subscribe(`forms:reset`, (event) => console.log(event))
   ```
 
 - 4923a2d66: Checks isAuthenticated() before making requests to the GraphQL client

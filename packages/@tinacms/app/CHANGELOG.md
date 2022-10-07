@@ -1,5 +1,80 @@
 # @tinacms/app
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [005e1d699]
+  - @tinacms/schema-tools@0.1.8
+  - tinacms@0.69.16
+
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [b1a357f60]
+- Updated dependencies [0c8c571d5]
+  - @tinacms/schema-tools@0.1.7
+  - tinacms@0.69.15
+
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - @tinacms/schema-tools@0.1.6
+  - tinacms@0.69.14
+
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [ea4a8e1b0]
+  - tinacms@0.69.13
+
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - tinacms@0.69.12
+
+## 0.0.16
+
+### Patch Changes
+
+- tinacms@0.69.11
+
+## 0.0.15
+
+### Patch Changes
+
+- tinacms@0.69.10
+
+## 0.0.14
+
+### Patch Changes
+
+- tinacms@0.69.9
+
+## 0.0.13
+
+### Patch Changes
+
+- e5da05a8c: Enable the dev server when using Tina standalone for faster builds
+- Updated dependencies [f581f263d]
+- Updated dependencies [0513ae416]
+- Updated dependencies [64c40e6fc]
+- Updated dependencies [7ae1b0697]
+- Updated dependencies [f3439ea35]
+- Updated dependencies [48032e2ba]
+- Updated dependencies [112b7271d]
+- Updated dependencies [8688dbff9]
+  - @tinacms/schema-tools@0.1.4
+  - tinacms@0.69.8
+
 ## 0.0.12
 
 ### Patch Changes

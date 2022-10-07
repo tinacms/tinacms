@@ -29,6 +29,7 @@ import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
+import { EditContext } from '@tinacms/sharedctx'
 
 export const FormsView = ({
   children,
@@ -45,6 +46,7 @@ export const FormsView = ({
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
+  const { formsRegistering } = React.useContext(EditContext)
 
   /**
    * If there's only one form, make it the active form.
@@ -84,6 +86,7 @@ export const FormsView = ({
    * No Forms
    */
   if (!forms.length) {
+    if (formsRegistering) return <></>
     return <> {children} </>
   }
 

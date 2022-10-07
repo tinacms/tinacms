@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import type { TinaSchema } from '../schema'
+import type { TinaSchema } from '@tinacms/schema-tools'
 import { NAMER } from '../ast-builder'
 
 export const buildSKD = (tinaSchema: TinaSchema) => {

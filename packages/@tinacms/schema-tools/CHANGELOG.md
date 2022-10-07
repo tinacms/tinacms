@@ -1,5 +1,71 @@
 # @tinacms/schema-tools
 
+## 0.1.8
+
+### Patch Changes
+
+- 005e1d699: update itemProps types
+
+## 0.1.7
+
+### Patch Changes
+
+- b1a357f60: Update object field types to include `defaultItem`
+
+## 0.1.6
+
+### Patch Changes
+
+- c6e3bd321: Fix issue where slugify function breaks templates
+
+## 0.1.5
+
+### Patch Changes
+
+- 183249b11: - deprecate: `defaultValue`
+  - add `defaultItem` to the collection (as a function or an object)
+  ```ts
+  defaultItem: () => {
+    const m = new Date()
+    return {
+      title: 'New Page',
+      test: 'This is a default value of the test field',
+      filename: `new-page-${
+        m.getUTCFullYear() +
+        '-' +
+        (m.getUTCMonth() + 1) +
+        '-' +
+        m.getUTCDate()
+      }`,
+    }
+  },
+  ```
+  - Allow `datetime` field to be undefined or empty
+- 8060d0949: Provide filename customization API.
+
+  ```ts
+  name: 'posts',
+  path: 'content/posts',
+  ui: {
+       filename: {
+          slugify: (values) => mySlugifyFunc(values),
+          disabled: true
+          // other field props like `label`, `component`, `parse` can still be used too
+        }
+  },
+  ```
+
+  If one is using `isTitle` a default slugify function is added that slugifys the title.
+
+## 0.1.4
+
+### Patch Changes
+
+- f581f263d: Add --static option for `tina init`
+- 7ae1b0697: Remove duplicate TinaSchema class
+- f3439ea35: Replace loading message and hide forms while loading.
+- 48032e2ba: Use tinaio url config override in the client
+
 ## 0.1.3
 
 ### Patch Changes

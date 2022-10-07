@@ -16,7 +16,7 @@ import { TinaCloudProvider } from './auth'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 
 import { LocalClient } from './internalClient/index'
-import { TinaDataContext } from '@tinacms/sharedctx'
+import { EditContext, TinaDataContext } from '@tinacms/sharedctx'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
 import styles from './styles.css'
@@ -351,6 +351,7 @@ const FormRegistrar = ({
   onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
 }) => {
   const cms = useCMS()
+  const { setFormsRegistering } = React.useContext(EditContext)
 
   const [payload, isLoading] = useGraphqlForms({
     query: request?.query,
@@ -366,6 +367,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
+    setFormsRegistering && setFormsRegistering(isLoading)
   }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (

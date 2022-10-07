@@ -1,12 +1,16 @@
 import schema from './schema'
-import { defineConfig } from 'tinacms'
-import client from './__generated__/client'
+import { defineStaticConfig } from 'tinacms'
 
-export default defineConfig({
-  client,
+export default defineStaticConfig({
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
+  },
+  media: {
+    tina: {
+      mediaRoot: 'uploads',
+      publicFolder: 'public',
+    },
   },
   schema,
 })

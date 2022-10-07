@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaSchema } from './index'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 describe('TinaSchema', () => {
   describe('with sibling collections of similar names', () => {

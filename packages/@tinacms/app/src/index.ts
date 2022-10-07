@@ -14,10 +14,13 @@ limitations under the License.
 import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
 import { build, createServer, InlineConfig } from 'vite'
+import type { ViteDevServer } from 'vite'
 import path from 'path'
 import { viteTina } from './tailwind'
 import { build as esbuild } from 'esbuild'
 import type { Loader } from 'esbuild'
+
+let server: ViteDevServer
 
 export const viteBuild = async ({
   rootPath,
@@ -32,7 +35,7 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const root = path.resolve(__dirname, '..', 'appFiles')
+  const prebuildPath = path.resolve(__dirname, 'assets')
   const pathToConfig = path.join(rootPath, '.tina', 'config')
   const packageJSONFilePath = path.join(rootPath, 'package.json')
   const outDir = path.join(rootPath, publicFolder, outputFolder)
@@ -74,6 +77,20 @@ vite.svg`
   })
 
   const base = `/${outputFolder}/`
+
+  /**
+   * HEADS UP
+   *
+   * This is an experimental feature to make development within the monorepo faster.
+   *
+   * We can avoid the prebuild by just treating the appFiles directory
+   * as root but this will fail to find user-supplied modules in the config file.
+   *
+   * This is opt-in and new features should always be tested with this flag off
+   */
+  const MONOREPO_DEV = process.env.MONOREPO_DEV
+
+  const root = MONOREPO_DEV ? path.join(__dirname, '../appFiles') : outDir
   const config: InlineConfig = {
     root,
     base,
@@ -82,6 +99,9 @@ vite.svg`
     mode: local ? 'development' : 'production',
     plugins: [react(), viteTina()],
     define: {
+      // Not sure this is needed anymore, but does seem like
+      // somewhere `process.env.NODE_ENV` is getting populated
+      // Maybe some context? https://github.com/vitejs/vite/pull/8090#issuecomment-1184929037
       'process.env': {},
       __API_URL__: `"${apiUrl}"`,
     },
@@ -112,23 +132,54 @@ vite.svg`
     },
     logLevel: 'silent',
   }
-  if (true) {
-    await build(config)
-    await fs.rmSync(out)
-  } else {
-    /**
-     * Uncomment to run the dev server
-     * Note that this assumes the outputFile is 'admin'
-     * And will run into port issues when the build server
-     * restart itself
-     */
+  if (local) {
+    // Copy the dev index which has instructions for talking to the vite dev asset server
     const indexDev = await fs
-      .readFileSync(path.join(root, 'index.dev.html'))
+      .readFileSync(path.join(__dirname, 'index.dev.html'))
       .toString()
-    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
-    const server = await createServer(config)
+    if (MONOREPO_DEV) {
+      console.warn('MONOREPO_DEV mode, vite root is @tinacms/app')
+      await fs.outputFileSync(
+        path.join(outDir, 'index.html'),
+        indexDev
+          .replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
+          .replace('assets/out.es.js', 'src/main.tsx')
+      )
+    } else {
+      await fs.outputFileSync(
+        path.join(outDir, 'index.html'),
+        indexDev.replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
+      )
+      // Copy the pre-built assets into the user's public output folder
+      // This will be used as the entry point by the vite dev server
+      await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
+    }
+
+    // This build is called every time the user makes a change to their config,
+    // so ensure we don't run into an existing server error
+    if (server) {
+      await server.close()
+    }
+    server = await createServer(config)
     await server.listen()
     await server.printUrls()
+  } else {
+    /**
+     * This is kind of awkward, we're putting files in the specified
+     * output folder because we want to run the vite build
+     * from the context of the user's site, so dependencies are
+     * discovered properly. So this drops in the scaffolding
+     * and then builds over it
+     */
+    await fs.copyFileSync(
+      path.join(__dirname, 'index.html'),
+      path.join(outDir, 'index.html')
+    )
+    // Copy the pre-built assets into the user's public output folder
+    // This will be used as the entry point by the vite dev server
+    await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
+    await build(config)
+    await fs.rmSync(out)
   }
 }
 

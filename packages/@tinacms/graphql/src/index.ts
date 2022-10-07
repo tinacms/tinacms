@@ -14,6 +14,15 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
+
+export type { Store } from '@tinacms/datalayer'
+import type {
+  TinaCloudSchema as TinaCloudSchemaBase,
+  TinaCloudCollection as TinaCloudCollectionBase,
+  TinaCloudTemplateBase as TinaTemplate,
+  TinaFieldBase,
+} from '@tinacms/schema-tools'
+
 import { buildDotTinaFiles } from './build'
 export { resolve } from './resolve'
 export * from './resolver/error'
@@ -21,11 +30,11 @@ export { createDatabase } from './database'
 export type { QueryOptions } from './database'
 import type { Database } from './database'
 export type { Database } from './database'
-export type { Store } from '@tinacms/datalayer'
+
 export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
-export { createSchema } from './schema'
+export { createSchema } from './schema/createSchema'
 export { buildDotTinaFiles }
 
 export type DummyType = unknown
@@ -39,7 +48,7 @@ export const buildSchema = async (
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
-  await fs.rm(tempConfig, { recursive: true })
+  await fs.remove(tempConfig)
 
   // only build the files, do not index
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
@@ -55,13 +64,6 @@ export const getASTSchema = async (database: Database) => {
   const gqlAst = await database.getGraphQLSchemaFromBridge()
   return buildASTSchema(gqlAst)
 }
-
-import type {
-  TinaCloudSchema as TinaCloudSchemaBase,
-  TinaCloudCollection as TinaCloudCollectionBase,
-  TinaCloudTemplateBase as TinaTemplate,
-  TinaFieldBase,
-} from './types'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
