@@ -1031,6 +1031,17 @@
         "bug",
         "ideas"
       ]
+    },
+    {
+      "login": "Phoenix-Alpha",
+      "name": "Phoenix-Alpha",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71273009?v=4",
+      "profile": "https://github.com/Phoenix-Alpha",
+      "contributions": [
+        "code",
+        "bug",
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
