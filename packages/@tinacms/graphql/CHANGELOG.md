@@ -1,5 +1,39 @@
 # tina-graphql
 
+## 0.63.14
+
+### Patch Changes
+
+- ce6c1ccfb: Fix for "callback is not a function" when running tinacms dev
+- Updated dependencies [005e1d699]
+  - @tinacms/schema-tools@0.1.8
+  - @tinacms/mdx@0.61.12
+
+## 0.63.13
+
+### Patch Changes
+
+- Updated dependencies [b1a357f60]
+  - @tinacms/schema-tools@0.1.7
+  - @tinacms/mdx@0.61.11
+
+## 0.63.12
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - @tinacms/schema-tools@0.1.6
+  - @tinacms/mdx@0.61.10
+
+## 0.63.11
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - @tinacms/mdx@0.61.9
+
 ## 0.63.10
 
 ### Patch Changes

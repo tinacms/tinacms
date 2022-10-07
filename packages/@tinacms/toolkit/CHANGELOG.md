@@ -1,5 +1,68 @@
 # Change Log
 
+## 0.57.12
+
+### Patch Changes
+
+- 46bc9c4e5: Fix to use mime-type from file object instead of mime-types library
+
+## 0.57.11
+
+### Patch Changes
+
+- 0c8c571d5: Custom filename field component, fix text field classes
+
+## 0.57.10
+
+### Patch Changes
+
+- a60d96862: Fix rich-text dropdown overlap issue
+
+## 0.57.9
+
+### Patch Changes
+
+- 183249b11: - deprecate: `defaultValue`
+  - add `defaultItem` to the collection (as a function or an object)
+  ```ts
+  defaultItem: () => {
+    const m = new Date()
+    return {
+      title: 'New Page',
+      test: 'This is a default value of the test field',
+      filename: `new-page-${
+        m.getUTCFullYear() +
+        '-' +
+        (m.getUTCMonth() + 1) +
+        '-' +
+        m.getUTCDate()
+      }`,
+    }
+  },
+  ```
+  - Allow `datetime` field to be undefined or empty
+- 8060d0949: Provide filename customization API.
+
+  ```ts
+  name: 'posts',
+  path: 'content/posts',
+  ui: {
+       filename: {
+          slugify: (values) => mySlugifyFunc(values),
+          disabled: true
+          // other field props like `label`, `component`, `parse` can still be used too
+        }
+  },
+  ```
+
+  If one is using `isTitle` a default slugify function is added that slugifys the title.
+
+## 0.57.8
+
+### Patch Changes
+
+- eeab510d9: Revert "Fix rich text dropdown overlap issue" which was causing field labels to live underneath their inputs
+
 ## 0.57.7
 
 ### Patch Changes

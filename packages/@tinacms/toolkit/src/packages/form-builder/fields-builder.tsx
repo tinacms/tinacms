@@ -21,7 +21,6 @@ import { Form, Field } from '../forms'
 import { useCMS, useEventSubscription } from '../react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
-import styled, { css } from 'styled-components'
 
 export interface FieldsBuilderProps {
   form: Form
@@ -48,19 +47,20 @@ export function FieldsBuilder({
   return (
     // @ts-ignore FIXME twind
     <FieldsGroup padding={padding}>
-      {[...fields].reverse().map((field: Field) => (
+      {fields.map((field: Field, index) => (
         <InnerField
           key={field.name}
           field={field}
           form={form}
           fieldPlugins={fieldPlugins}
+          index={index}
         />
       ))}
     </FieldsGroup>
   )
 }
 
-const InnerField = ({ field, form, fieldPlugins }) => {
+const InnerField = ({ field, form, fieldPlugins, index }) => {
   /**
    * We double-render form builders for some reason which reults in useMemo not working here
    */
@@ -90,12 +90,6 @@ const InnerField = ({ field, form, fieldPlugins }) => {
     format = plugin.format
   }
 
-  let defaultValue = field.defaultValue
-
-  if (!parse && plugin && plugin.defaultValue) {
-    defaultValue = plugin.defaultValue
-  }
-
   return (
     <FinalField
       name={field.name}
@@ -111,7 +105,8 @@ const InnerField = ({ field, form, fieldPlugins }) => {
           ? (value: any, name: string) => format!(value, name, field)
           : undefined
       }
-      defaultValue={defaultValue}
+      // don't use the default value anymore
+      // defaultValue={defaultValue}
       validate={(value, values, meta) => {
         if (validate) {
           return validate(value, values, meta, field)
@@ -137,6 +132,7 @@ const InnerField = ({ field, form, fieldPlugins }) => {
               form={form.finalForm}
               tinaForm={form}
               field={field}
+              index={index}
             />
           )
         }
@@ -156,7 +152,7 @@ export const FieldsGroup = ({
 }) => {
   return (
     <div
-      className={`relative w-full h-full whitespace-nowrap overflow-x-visible flex flex-col-reverse ${
+      className={`relative block w-full h-full whitespace-nowrap overflow-x-visible ${
         padding ? `pb-5` : ``
       }`}
     >

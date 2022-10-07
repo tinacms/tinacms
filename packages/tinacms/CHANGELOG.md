@@ -1,5 +1,91 @@
 # tinacms
 
+## 0.69.16
+
+### Patch Changes
+
+- Updated dependencies [005e1d699]
+- Updated dependencies [46bc9c4e5]
+  - @tinacms/schema-tools@0.1.8
+  - @tinacms/toolkit@0.57.12
+
+## 0.69.15
+
+### Patch Changes
+
+- 0c8c571d5: Custom filename field component, fix text field classes
+- Updated dependencies [b1a357f60]
+- Updated dependencies [0c8c571d5]
+  - @tinacms/schema-tools@0.1.7
+  - @tinacms/toolkit@0.57.11
+
+## 0.69.14
+
+### Patch Changes
+
+- c6e3bd321: Fix issue where slugify function breaks templates
+- Updated dependencies [c6e3bd321]
+- Updated dependencies [a60d96862]
+  - @tinacms/schema-tools@0.1.6
+  - @tinacms/toolkit@0.57.10
+
+## 0.69.13
+
+### Patch Changes
+
+- ea4a8e1b0: Fixed issue where filename would not always update.
+
+## 0.69.12
+
+### Patch Changes
+
+- 183249b11: - deprecate: `defaultValue`
+  - add `defaultItem` to the collection (as a function or an object)
+  ```ts
+  defaultItem: () => {
+    const m = new Date()
+    return {
+      title: 'New Page',
+      test: 'This is a default value of the test field',
+      filename: `new-page-${
+        m.getUTCFullYear() +
+        '-' +
+        (m.getUTCMonth() + 1) +
+        '-' +
+        m.getUTCDate()
+      }`,
+    }
+  },
+  ```
+  - Allow `datetime` field to be undefined or empty
+- 8060d0949: Provide filename customization API.
+
+  ```ts
+  name: 'posts',
+  path: 'content/posts',
+  ui: {
+       filename: {
+          slugify: (values) => mySlugifyFunc(values),
+          disabled: true
+          // other field props like `label`, `component`, `parse` can still be used too
+        }
+  },
+  ```
+
+  If one is using `isTitle` a default slugify function is added that slugifys the title.
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - @tinacms/toolkit@0.57.9
+
+## 0.69.11
+
+### Patch Changes
+
+- Updated dependencies [eeab510d9]
+  - @tinacms/toolkit@0.57.8
+
 ## 0.69.10
 
 ### Patch Changes

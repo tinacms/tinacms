@@ -32,7 +32,8 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
-  TinaCloudTemplateBase as TinaTemplate,
+  TinaCloudTemplateBase,
+  TinaTemplate,
   TinaFieldBase,
   TinaCMSConfig,
 } from '@tinacms/schema-tools'
@@ -46,7 +47,7 @@ export type TinaCloudCollection = TinaCloudCollectionBase<false>
 // Alias to remove Cloud
 export type TinaCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
-export type { TinaTemplate }
+export type { TinaTemplate, TinaCloudTemplateBase }
 
 export const defineSchema = (config: TinaCloudSchema) => {
   validateSchema({ config })

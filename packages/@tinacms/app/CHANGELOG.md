@@ -1,5 +1,52 @@
 # @tinacms/app
 
+## 0.0.21
+
+### Patch Changes
+
+- Updated dependencies [005e1d699]
+  - @tinacms/schema-tools@0.1.8
+  - tinacms@0.69.16
+
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [b1a357f60]
+- Updated dependencies [0c8c571d5]
+  - @tinacms/schema-tools@0.1.7
+  - tinacms@0.69.15
+
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - @tinacms/schema-tools@0.1.6
+  - tinacms@0.69.14
+
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [ea4a8e1b0]
+  - tinacms@0.69.13
+
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - tinacms@0.69.12
+
+## 0.0.16
+
+### Patch Changes
+
+- tinacms@0.69.11
+
 ## 0.0.15
 
 ### Patch Changes

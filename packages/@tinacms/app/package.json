@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "0.0.15",
+  "version": "0.0.21",
   "main": "dist/index.js",
   "exports": {
     ".": {

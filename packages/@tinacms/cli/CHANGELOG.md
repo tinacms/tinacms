@@ -1,5 +1,58 @@
 # tinacms-cli
 
+## 0.61.22
+
+### Patch Changes
+
+- Updated dependencies [005e1d699]
+- Updated dependencies [ce6c1ccfb]
+  - @tinacms/schema-tools@0.1.8
+  - @tinacms/graphql@0.63.14
+  - @tinacms/app@0.0.21
+
+## 0.61.21
+
+### Patch Changes
+
+- 97225d5f0: Exit tinacms init when there's an error with dependency install
+- fce51ddd8: Remove extra space in tina init console.log
+- Updated dependencies [b1a357f60]
+  - @tinacms/schema-tools@0.1.7
+  - @tinacms/app@0.0.20
+  - @tinacms/graphql@0.63.13
+
+## 0.61.20
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - @tinacms/schema-tools@0.1.6
+  - @tinacms/app@0.0.19
+  - @tinacms/graphql@0.63.12
+
+## 0.61.19
+
+### Patch Changes
+
+- 802381abd: Fix an issue where npm init didn't get awaited during init
+  - @tinacms/app@0.0.18
+
+## 0.61.18
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - @tinacms/schema-tools@0.1.5
+  - @tinacms/app@0.0.17
+  - @tinacms/graphql@0.63.11
+
+## 0.61.17
+
+### Patch Changes
+
+- @tinacms/app@0.0.16
+
 ## 0.61.16
 
 ### Patch Changes
