@@ -48,7 +48,7 @@ export const buildSchema = async (
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
-  await fs.rm(tempConfig, { recursive: true })
+  await fs.remove(tempConfig)
 
   // only build the files, do not index
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
