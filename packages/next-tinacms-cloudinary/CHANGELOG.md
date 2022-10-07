@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.31
+
+### Patch Changes
+
+- ed168ce43: Bump to update vm2
+
 ## 3.5.30
 
 ### Patch Changes
