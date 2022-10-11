@@ -38,7 +38,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const usingTypescript = await chooseTypescript()
 
   // Choose public folder
-  const publicFolder = await choosePublicFolder({ framework })
+  const publicFolder: string = await choosePublicFolder({ framework })
 
   // Report telemetry
   await reportTelemetry(usingTypescript, options.noTelemetry)
@@ -66,8 +66,10 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
 
   await addDependencies(packageManager)
 
+  // add .tina/config.{js,ts}
   await addConfigFile({ publicFolder, baseDir, usingTypescript, framework })
 
+  // add /content/posts/hello-world.md
   await addContentFile({ baseDir })
 
   if (framework.reactive) {
@@ -78,7 +80,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     })
   }
 
-  logNextSteps(packageManager)
+  logNextSteps({ packageManager, framework })
 }
 
 const choosePackageManager = async () => {
@@ -128,9 +130,9 @@ const chooseFramework = async () => {
         title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
         value: { name: 'ssg', reactive: false },
       },
-    ],
+    ] as { title: string; value: Framework }[],
   })
-  return option['selection']
+  return option['selection'] as Framework
 }
 
 const reportTelemetry = async (
@@ -256,17 +258,43 @@ const addContentFile = async ({ baseDir }: { baseDir: string }) => {
   }
 }
 
-const logNextSteps = (packageManager: string) => {
-  const packageManagers = {
-    pnpm: `pnpm`,
-    npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
-    yarn: `yarn`,
-  }
-  logger.info(`
-${successText('TinaCMS has been initialized, to get started run:')}
-
-    ${packageManagers[packageManager]} tinacms dev -c "<your dev command>"
-`)
+const logNextSteps = ({
+  framework,
+  packageManager,
+}: {
+  packageManager: string
+  framework: Framework
+}) => {
+  logSteps[framework.name]({ packageManager })
+}
+const logSteps = {
+  other: ({ packageManager }: { packageManager: string }) => {
+    const packageManagers = {
+      pnpm: `pnpm`,
+      npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
+      yarn: `yarn`,
+    }
+    logger.info(`
+  ${successText('TinaCMS has been initialized, to get started run:')}
+  
+      ${packageManagers[packageManager]} tinacms dev -c "<your dev command>"
+  `)
+  },
+  next: ({ packageManager }: { packageManager: string }) => {
+    const packageManagers = {
+      pnpm: `pnpm`,
+      npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
+      yarn: `yarn`,
+    }
+    logger.info(`
+  ${successText('TinaCMS has been initialized, to get started run:')}
+  
+      ${packageManagers[packageManager]} dev"
+  `)
+    logger.info(`
+  ${successText('TinaCMS user interface is available at: /admin/index.html')}
+  `)
+  },
 }
 
 const config = (args: { publicFolder: string; framework: Framework }) => {
