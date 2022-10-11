@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 0.1.8
+
+### Patch Changes
+
+- 005e1d699: update itemProps types
+
 ## 0.1.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.57.12
+
+### Patch Changes
+
+- 46bc9c4e5: Fix to use mime-type from file object instead of mime-types library
+
 ## 0.57.11
 
 ### Patch Changes
