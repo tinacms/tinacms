@@ -289,10 +289,12 @@ const logSteps = {
     logger.info(`
   ${successText('TinaCMS has been initialized, to get started run:')}
   
-      ${packageManagers[packageManager]} dev"
+     "${packageManagers[packageManager]} dev"
   `)
     logger.info(`
-  ${successText('TinaCMS user interface is available at: /admin/index.html')}
+  ${successText(
+    'TinaCMS user interface is available at: <YourDevURL>/admin/index.html'
+  )}
   `)
   },
 }
