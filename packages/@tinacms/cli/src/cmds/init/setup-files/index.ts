@@ -142,7 +142,7 @@ export const nextPostPage = ({
   export const getStaticProps = async ({ params }) => {
     let data = {}
     let query = {}
-    let variables = { relativePath: \`\${params.filename}.mdx\` }
+    let variables = { relativePath: \`\${params.filename}.md\` }
     try {
       const res = await client.queries.post(variables)
       query = res.query
