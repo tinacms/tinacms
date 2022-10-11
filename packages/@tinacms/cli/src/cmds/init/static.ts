@@ -19,6 +19,7 @@ import { execShellCommand } from '.'
 import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
+import { configExamples } from './setup-files/config'
 
 interface Framework {
   name: 'next' | 'other'
@@ -218,7 +219,10 @@ const addConfigFile = async ({
     })
     if (override['selection']) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(fullConfigPath, config({ publicFolder }))
+      await fs.outputFileSync(
+        fullConfigPath,
+        config({ publicFolder, framework })
+      )
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
@@ -228,7 +232,7 @@ const addConfigFile = async ({
         `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
-    await fs.outputFileSync(fullConfigPath, config({ publicFolder }))
+    await fs.outputFileSync(fullConfigPath, config({ publicFolder, framework }))
   }
 }
 
@@ -266,51 +270,9 @@ ${successText('TinaCMS has been initialized, to get started run:')}
 `)
 }
 
-const config = (args: { publicFolder: string }) => `
-import { defineStaticConfig } from "tinacms";
-
-// Your hosting provider likely exposes this as an environment variable
-const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
-
-export default defineStaticConfig({
-  branch,
-  clientId: null,   // Get this from tina.io
-  token: null,      // Get this from tina.io
-  build: {
-    outputFolder: "admin",
-    publicFolder: "${args.publicFolder}",
-  },
-  media: {
-    tina: {
-      mediaRoot: "uploads",
-      publicFolder: "${args.publicFolder}",
-    },
-  },
-  schema: {
-    collections: [
-      {
-        name: "post",
-        label: "Posts",
-        path: "content/posts",
-        fields: [
-          {
-            type: "string",
-            name: "title",
-            label: "Title",
-            isTitle: true,
-          },
-          {
-            type: "rich-text",
-            name: "body",
-            label: "Body",
-            isBody: true,
-          },
-        ],
-      },
-    ],
-  },
-});
-`
+const config = (args: { publicFolder: string; framework: Framework }) => {
+  return configExamples[args.framework.name](args)
+}
 
 const content = `---
 title: Hello, World!
