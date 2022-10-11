@@ -212,24 +212,6 @@ export const baseCmds: Command[] = [
     description: 'Add Tina Cloud to an existing project',
     action: (options) => {
       chain([attachPath, checkOptions, initStaticTina], options)
-
-      // if (options.static) {
-      // } else {
-      //   chain(
-      //     [
-      //       attachPath,
-      //       checkOptions,
-      //       checkDeps,
-      //       initTina,
-      //       installDeps,
-      //       buildSetupCmdBuild,
-      //       buildCmdBuild,
-      //       tinaSetup,
-      //       successMessage,
-      //     ],
-      //     options
-      //   )
-      // }
     },
   },
   {
