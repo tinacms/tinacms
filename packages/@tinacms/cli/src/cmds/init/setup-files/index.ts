@@ -54,7 +54,7 @@ export const nextPostPage = ({
   import Head from 'next/head'
   import { createGlobalStyle } from 'styled-components'
   import { useTina } from 'tinacms/dist/edit-state'
-  import { TinaMarkdown } from 'tinacms/dist/rich-text'
+  import { TinaMarkdown } from 'tinacms/dist/react'
   import client from '${
     usingSrc ? '../' : ''
   }../../../.tina/__generated__/client'

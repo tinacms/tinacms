@@ -17,17 +17,28 @@ import fs from 'fs-extra'
 import prompts from 'prompts'
 import { execShellCommand } from '.'
 import { Telemetry } from '@tinacms/metrics'
+import { nextPostPage } from './setup-files'
+import { extendNextScripts } from '../../utils/script-helpers'
+
+interface Framework {
+  name: 'next' | 'other'
+  reactive: boolean
+}
 
 export async function initStaticTina(ctx: any, next: () => void, options) {
+  const baseDir = ctx.rootPath
   logger.level = 'info'
   // Choose package manager
   const packageManager = await choosePackageManager()
+
+  // Choose framework
+  const framework: Framework = await chooseFramework()
 
   // Choose typescript
   const usingTypescript = await chooseTypescript()
 
   // Choose public folder
-  const publicFolder = await choosePublicFolder()
+  const publicFolder = await choosePublicFolder({ framework })
 
   // Report telemetry
   await reportTelemetry(usingTypescript, options.noTelemetry)
@@ -43,23 +54,32 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const hasGitignore = await fs.pathExistsSync('.gitignore')
   // if no .gitignore, create one
   if (!hasGitignore) {
-    await createGitignore()
+    await createGitignore({ baseDir })
   } else {
-    const hasNodeModulesIgnored = await checkGitignoreForNodeModules()
+    const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
+      baseDir,
+    })
     if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore()
+      await addNodeModulesToGitignore({ baseDir })
     }
   }
 
   await addDependencies(packageManager)
 
-  await addConfigFile(publicFolder, usingTypescript)
+  await addConfigFile({ publicFolder, baseDir, usingTypescript, framework })
 
-  await addContentFile()
+  await addContentFile({ baseDir })
+
+  if (framework.reactive) {
+    await addReactiveFile[framework.name]({
+      baseDir,
+      framework,
+      usingTypescript,
+    })
+  }
 
   logNextSteps(packageManager)
 }
-const baseDir = process.cwd()
 
 const choosePackageManager = async () => {
   const option = await prompts({
@@ -85,13 +105,32 @@ const chooseTypescript = async () => {
   return option['selection']
 }
 
-const choosePublicFolder = async () => {
+const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
+  if (framework.name === 'next') {
+    return 'public'
+  }
   const option = await prompts({
     name: 'selection',
     type: 'text',
     message: 'Where are public assets stored? (default: "public")',
   })
   return option['selection'] || 'public'
+}
+
+const chooseFramework = async () => {
+  const option = await prompts({
+    name: 'selection',
+    type: 'select',
+    message: 'What framework are you using?',
+    choices: [
+      { title: 'Next.js', value: { name: 'next', reactive: true } },
+      {
+        title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
+        value: { name: 'ssg', reactive: false },
+      },
+    ],
+  })
+  return option['selection']
 }
 
 const reportTelemetry = async (
@@ -115,18 +154,22 @@ const createPackageJSON = async () => {
   logger.info(logText('No package.json found, creating one'))
   await execShellCommand(`npm init --yes`)
 }
-const createGitignore = async () => {
+const createGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('No .gitignore found, creating one'))
   await fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
 }
 
-const checkGitignoreForNodeModules = async () => {
+const checkGitignoreForNodeModules = async ({
+  baseDir,
+}: {
+  baseDir: string
+}) => {
   const gitignoreContent = await fs
     .readFileSync(path.join(baseDir, '.gitignore'))
     .toString()
   return gitignoreContent.split('\n').some((item) => item === 'node_modules')
 }
-const addNodeModulesToGitignore = async () => {
+const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
   logger.info(logText('Adding node_modules to .gitignore'))
   const gitignoreContent = await fs
     .readFileSync(path.join(baseDir, '.gitignore'))
@@ -151,10 +194,17 @@ const addDependencies = async (packageManager) => {
   await execShellCommand(packageManagers[packageManager])
 }
 
-const addConfigFile = async (
-  publicFolder: string,
+const addConfigFile = async ({
+  framework,
+  baseDir,
+  publicFolder,
+  usingTypescript,
+}: {
+  publicFolder: string
+  baseDir: string
   usingTypescript: boolean
-) => {
+  framework: Framework
+}) => {
   const configPath = path.join(
     '.tina',
     `config.${usingTypescript ? 'ts' : 'js'}`
@@ -182,7 +232,7 @@ const addConfigFile = async (
   }
 }
 
-const addContentFile = async () => {
+const addContentFile = async ({ baseDir }: { baseDir: string }) => {
   const contentPath = path.join('content', 'posts', 'hello-world.md')
   const fullContentPath = path.join(baseDir, contentPath)
   if (fs.pathExistsSync(fullContentPath)) {
@@ -272,3 +322,40 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut non lorem diam. Quis
 
 Suspendisse facilisis, mi ac scelerisque interdum, ligula ex imperdiet felis, a posuere eros justo nec sem. Nullam laoreet accumsan metus, sit amet tincidunt orci egestas nec. Pellentesque ut aliquet ante, at tristique nunc. Donec non massa nibh. Ut posuere lacus non aliquam laoreet. Fusce pharetra ligula a felis porttitor, at mollis ipsum maximus. Donec quam tortor, vehicula a magna sit amet, tincidunt dictum enim. In hac habitasse platea dictumst. Mauris sit amet ornare ligula, blandit consequat risus. Duis malesuada pellentesque lectus, non feugiat turpis eleifend a. Nullam tempus ante et diam pretium, ac faucibus ligula interdum.
 `
+const addReactiveFile = {
+  next: ({
+    baseDir,
+    usingTypescript,
+  }: {
+    baseDir: string
+    usingTypescript: boolean
+  }) => {
+    const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
+    const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
+    const packageJSONPath = path.join(baseDir, 'package.json')
+
+    const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
+    const tinaBlogPagePathFile = path.join(
+      tinaBlogPagePath,
+      `[filename].${usingTypescript ? 'tsx' : 'js'}`
+    )
+    if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
+      fs.mkdirpSync(tinaBlogPagePath)
+      fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+    }
+    logger.info('Adding a nextjs example... ✅')
+
+    // 4. update the users package.json
+    const pack = JSON.parse(fs.readFileSync(packageJSONPath).toString())
+    const oldScripts = pack.scripts || {}
+    const newPack = JSON.stringify(
+      {
+        ...pack,
+        scripts: extendNextScripts(oldScripts),
+      },
+      null,
+      2
+    )
+    fs.writeFileSync(packageJSONPath, newPack)
+  },
+}
