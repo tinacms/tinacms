@@ -29,7 +29,7 @@ import {
   auditCmdBuild,
   buildSetupCmdAudit,
 } from '../buildTina'
-import { initStaticTina } from './init/static'
+import { initStaticTina } from './init'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
