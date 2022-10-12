@@ -7,7 +7,7 @@
     "react-dom": "17.0.2",
     "@xstate/react": "3.0.0",
     "xstate": "4.32.1",
-    "tinacms": "file:../../../tinacms",
+    "tinacms": "../../../tinacms",
     "@headlessui/react": "1.6.6",
     "final-form": "4.20.7",
     "graphql": "15.1.0",
