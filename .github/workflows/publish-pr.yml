@@ -33,8 +33,8 @@ jobs:
         run: pnpm build
       - name: Build Types
         run: pnpm types
-      - name: Link TinaCMS
-        run: pnpm link:tinacms
+      # - name: Link TinaCMS
+      #   run: pnpm link:tinacms
       - name: Set NPMRC
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
         env:

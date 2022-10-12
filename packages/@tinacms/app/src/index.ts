@@ -133,6 +133,10 @@ export const viteBuild = async ({
     logLevel: 'silent',
   }
   await fs.copy(appCopyPath, appRootPath)
+
+  await execShellCommand(
+    `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+  )
   await fs.outputFile(
     path.join(outputPath, '.gitignore'),
     `index.html
@@ -155,4 +159,16 @@ assets/`
     await fs.outputFile(prodHTMLPath, prodHTML)
     await build(config)
   }
+}
+
+function execShellCommand(cmd: string): Promise<string> {
+  const exec = require('child_process').exec
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error: string, stdout: string, stderr: string) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(stdout ? stdout : stderr)
+    })
+  })
 }
