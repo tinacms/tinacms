@@ -2,6 +2,7 @@ import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
 import { useTina } from 'tinacms/dist/react'
+import { version } from 'react'
 
 const query = `query PageQuery {
   page(relativePath: "home.mdx"){
@@ -18,6 +19,7 @@ export default function Home(props) {
   const content = data.page.body
   return (
     <Layout>
+      React version: {version}
       <TinaMarkdown content={content} />
     </Layout>
   )

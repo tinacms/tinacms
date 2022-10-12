@@ -20,7 +20,7 @@ import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
-export const viteTina = () => {
+export const viteTina = (): Plugin => {
   return {
     name: 'vite-plugin-tina',
     config: () => {

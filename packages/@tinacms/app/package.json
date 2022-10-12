@@ -10,18 +10,11 @@
     }
   },
   "typings": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "license": "Apache-2.0",
   "buildConfig": {
     "entryPoints": [
       {
         "name": "src/index.ts",
-        "target": "node"
-      },
-      {
-        "name": "src/prebuild.ts",
         "target": "node"
       }
     ]
