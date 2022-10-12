@@ -12,5 +12,3 @@ limitations under the License.
 */
 
 /// <reference types="vite/client" />
-/** This value is injected globally at build time */
-declare const __API_URL__: string

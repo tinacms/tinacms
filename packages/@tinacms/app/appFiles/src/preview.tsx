@@ -12,7 +12,7 @@ limitations under the License.
 */
 import React from 'react'
 import { useMachine } from '@xstate/react'
-import { queryMachine, initialContext } from '../../lib/machines/query-machine'
+import { queryMachine, initialContext } from './lib/machines/query-machine'
 import { ChevronRightIcon, textFieldClasses, useCMS } from 'tinacms'
 import { ArrowRightIcon, ChevronLeftIcon } from '@heroicons/react/outline'
 import { useSearchParams } from 'react-router-dom'
