@@ -130,7 +130,7 @@ export const viteBuild = async ({
     logLevel: 'silent',
   }
   // await fs.copy(appCopyPath, appRootPath)
-  await fs.writeFile(
+  await fs.outputFile(
     path.join(outputPath, '.gitignore'),
     `index.html
 assets/`
