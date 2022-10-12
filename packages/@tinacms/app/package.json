@@ -9,6 +9,7 @@
       "require": "./dist/index.js"
     }
   },
+  "files": ["appFiles", "dist"],
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "buildConfig": {
