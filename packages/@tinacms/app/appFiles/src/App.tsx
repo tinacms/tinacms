@@ -13,6 +13,7 @@ limitations under the License.
 
 import TinaCMS, { TinaAdmin, useCMS } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
+import { Preview } from './preview'
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
@@ -29,7 +30,7 @@ export const TinaAdminWrapper = () => {
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
       <SetPreview outputFolder={config.build.outputFolder} />
-      {/* <TinaAdmin preview={<Preview {...config} />} /> */}
+      <TinaAdmin preview={<Preview {...config} />} />
       <TinaAdmin />
     </TinaCMS>
   )

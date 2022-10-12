@@ -11,11 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
-import { build, createServer, InlineConfig } from 'vite'
-import type { ViteDevServer } from 'vite'
 import path from 'path'
+import { build, createServer } from 'vite'
+import type { InlineConfig, ViteDevServer } from 'vite'
+import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
 import { devHTML, prodHTML } from './html'
 

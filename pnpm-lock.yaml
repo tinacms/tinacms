@@ -225,23 +225,16 @@ importers:
 
   packages/@tinacms/app:
     specifiers:
-      '@headlessui/react': ^1.6.6
-      '@heroicons/react': ^1.0.6
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@tailwindcss/line-clamp': ^0.3.1
       '@tailwindcss/typography': ^0.5.4
-      '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/fs-extra': ^9.0.1
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
       '@vitejs/plugin-react': ^2.1.0
-      '@xstate/react': ^3.0.0
       autoprefixer: ^10.4.0
-      esbuild: ^0.15.5
-      final-form: ^4.20.7
       fs-extra: ^9.0.1
-      graphql: ^15.1.0
       jest: ^27.0.6
       postcss: ^8.4.14
       postcss-nested: ^5.0.6
@@ -249,46 +242,31 @@ importers:
       react-dom: 17.0.2
       react-is: 18.2.0
       react-router-dom: '6'
-      styled-components: 5.3.5
       tailwindcss: ^3.1.6
-      tinacms: workspace:*
       typescript: ^4.6.4
       vite: ^3.1.3
-      vite-node: ^0.23.4
-      xstate: ^4.32.1
     dependencies:
-      '@headlessui/react': 1.6.6_sfoxds7t5ydpegc3knd667wn6m
-      '@heroicons/react': 1.0.6_react@17.0.2
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.8
       '@tailwindcss/line-clamp': 0.3.1_tailwindcss@3.1.8
       '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.8
-      '@tinacms/schema-tools': link:../schema-tools
-      '@tinacms/scripts': link:../scripts
       '@vitejs/plugin-react': 2.1.0_vite@3.1.3
-      '@xstate/react': 3.0.1_e7tgwmixjcyln2mcnxsuzpfpuu
       autoprefixer: 10.4.7_postcss@8.4.14
-      esbuild: 0.15.5
-      final-form: 4.20.7
       fs-extra: 9.1.0
-      graphql: 15.8.0
-      jest: 27.5.1
       postcss: 8.4.14
       postcss-nested: 5.0.6_postcss@8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 18.2.0
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
-      styled-components: 5.3.5_v5ja746gkdtknuc6tj46sve3be
       tailwindcss: 3.1.8_postcss@8.4.14
-      tinacms: link:../../tinacms
       typescript: 4.7.4
       vite: 3.1.3
-      vite-node: 0.23.4
-      xstate: 4.33.2
     devDependencies:
+      '@tinacms/scripts': link:../scripts
       '@types/fs-extra': 9.0.13
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
+      jest: 27.5.1
 
   packages/@tinacms/auth:
     specifiers:
@@ -5658,20 +5636,6 @@ packages:
       react-dom: 17.0.2_react@17.0.2
     dev: false
 
-  /@headlessui/react/1.6.6_sfoxds7t5ydpegc3knd667wn6m:
-    resolution:
-      {
-        integrity: sha512-MFJtmj9Xh/hhBMhLccGbBoSk+sk61BlP6sJe4uQcVMtXZhCgGqd2GyIQzzmsdPdTEWGSF434CBi8mnhR6um46Q==,
-      }
-    engines: { node: '>=10' }
-    peerDependencies:
-      react: ^16 || ^17 || ^18
-      react-dom: ^16 || ^17 || ^18
-    dependencies:
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-    dev: false
-
   /@heroicons/react/1.0.6_react@17.0.2:
     resolution:
       {
@@ -8763,6 +8727,7 @@ packages:
     dependencies:
       '@types/prop-types': 15.7.5
       csstype: 3.1.0
+    dev: true
 
   /@types/react/17.0.47:
     resolution:
@@ -10468,29 +10433,6 @@ packages:
       vite: 3.1.3
     transitivePeerDependencies:
       - supports-color
-    dev: false
-
-  /@xstate/react/3.0.1_e7tgwmixjcyln2mcnxsuzpfpuu:
-    resolution:
-      {
-        integrity: sha512-/tq/gg92P9ke8J+yDNDBv5/PAxBvXJf2cYyGDByzgtl5wKaxKxzDT82Gj3eWlCJXkrBg4J5/V47//gRJuVH2fA==,
-      }
-    peerDependencies:
-      '@xstate/fsm': ^2.0.0
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      xstate: ^4.33.0
-    peerDependenciesMeta:
-      '@xstate/fsm':
-        optional: true
-      xstate:
-        optional: true
-    dependencies:
-      react: 17.0.2
-      use-isomorphic-layout-effect: 1.1.2_7u6mpky5dbb5b3hgdescs5ficq
-      use-sync-external-store: 1.2.0_react@17.0.2
-      xstate: 4.33.2
-    transitivePeerDependencies:
-      - '@types/react'
     dev: false
 
   /@yarnpkg/core/2.4.0:
@@ -19883,13 +19825,6 @@ packages:
     engines: { node: '>=6' }
     hasBin: true
 
-  /jsonc-parser/3.2.0:
-    resolution:
-      {
-        integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==,
-      }
-    dev: false
-
   /jsonfile/4.0.0:
     resolution:
       {
@@ -21700,18 +21635,6 @@ packages:
       }
     engines: { node: '>=10' }
 
-  /mlly/0.5.16:
-    resolution:
-      {
-        integrity: sha512-LaJ8yuh4v0zEmge/g3c7jjFlhoCPfQn6RCjXgm9A0Qiuochq4BcuOxVfWmdnCoLTlg2MV+hqhOek+W2OhG0Lwg==,
-      }
-    dependencies:
-      acorn: 8.8.0
-      pathe: 0.3.8
-      pkg-types: 0.3.5
-      ufo: 0.8.5
-    dev: false
-
   /modern-normalize/1.1.0:
     resolution:
       {
@@ -22946,20 +22869,6 @@ packages:
       }
     engines: { node: '>=8' }
 
-  /pathe/0.2.0:
-    resolution:
-      {
-        integrity: sha512-sTitTPYnn23esFR3RlqYBWn4c45WGeLcsKzQiUpXJAyfcWkolvlYpV8FLo7JishK946oQwMFUCHXQ9AjGPKExw==,
-      }
-    dev: false
-
-  /pathe/0.3.8:
-    resolution:
-      {
-        integrity: sha512-c71n61F1skhj/jzZe+fWE9XDoTYjWbUwIKVwFftZ5IOgiX44BVkTkD+/803YDgR50tqeO4eXWxLyVHBLWQAD1g==,
-      }
-    dev: false
-
   /pathval/1.1.1:
     resolution:
       {
@@ -23031,17 +22940,6 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       find-up: 4.1.0
-
-  /pkg-types/0.3.5:
-    resolution:
-      {
-        integrity: sha512-VkxCBFVgQhNHYk9subx+HOhZ4jzynH11ah63LZsprTKwPCWG9pfWBlkElWFbvkP9BVR0dP1jS9xPdhaHQNK74Q==,
-      }
-    dependencies:
-      jsonc-parser: 3.2.0
-      mlly: 0.5.16
-      pathe: 0.3.8
-    dev: false
 
   /pluralize/7.0.0:
     resolution:
@@ -25947,33 +25845,6 @@ packages:
       supports-color: 5.5.0
     dev: true
 
-  /styled-components/5.3.5_v5ja746gkdtknuc6tj46sve3be:
-    resolution:
-      {
-        integrity: sha512-ndETJ9RKaaL6q41B69WudeqLzOpY1A/ET/glXkNZ2T7dPjPqpPCXXQjDFYZWwNnE5co0wX+gTCqx9mfxTmSIPg==,
-      }
-    engines: { node: '>=10' }
-    requiresBuild: true
-    peerDependencies:
-      react: '>= 16.8.0'
-      react-dom: '>= 16.8.0'
-      react-is: '>= 16.8.0'
-    dependencies:
-      '@babel/helper-module-imports': 7.18.6
-      '@babel/traverse': 7.18.13_supports-color@5.5.0
-      '@emotion/is-prop-valid': 1.1.3
-      '@emotion/stylis': 0.8.5
-      '@emotion/unitless': 0.7.5
-      babel-plugin-styled-components: 2.0.7_styled-components@5.3.5
-      css-to-react-native: 3.0.0
-      hoist-non-react-statics: 3.3.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 18.2.0
-      shallowequal: 1.1.0
-      supports-color: 5.5.0
-    dev: false
-
   /styled-jsx/3.4.7_react@17.0.2:
     resolution:
       {
@@ -27187,13 +27058,6 @@ packages:
       }
     dev: false
 
-  /ufo/0.8.5:
-    resolution:
-      {
-        integrity: sha512-e4+UtA5IRO+ha6hYklwj6r7BjiGMxS0O+UaSg9HbaTefg4kMkzj4tXzEBajRR+wkxf+golgAWKzLbytCUDMJAA==,
-      }
-    dev: false
-
   /unbox-primitive/1.0.2:
     resolution:
       {
@@ -27640,22 +27504,6 @@ packages:
       react: 17.0.2
     dev: false
 
-  /use-isomorphic-layout-effect/1.1.2_7u6mpky5dbb5b3hgdescs5ficq:
-    resolution:
-      {
-        integrity: sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==,
-      }
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@types/react': 17.0.2
-      react: 17.0.2
-    dev: false
-
   /use-isomorphic-layout-effect/1.1.2_sudpmbbyhqtxq6t4xf6jlicdem:
     resolution:
       {
@@ -27903,26 +27751,6 @@ packages:
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.2
       vfile-message: 3.1.2
-    dev: false
-
-  /vite-node/0.23.4:
-    resolution:
-      {
-        integrity: sha512-8VuDGwTWIvwPYcbw8ZycMlwAwqCmqZfLdFrDK75+o+6bWYpede58k6AAXN9ioU+icW82V4u1MzkxLVhhIoQ9xA==,
-      }
-    engines: { node: '>=v14.16.0' }
-    hasBin: true
-    dependencies:
-      debug: 4.3.4
-      mlly: 0.5.16
-      pathe: 0.2.0
-      vite: 3.1.3
-    transitivePeerDependencies:
-      - less
-      - sass
-      - stylus
-      - supports-color
-      - terser
     dev: false
 
   /vite-plugin-dts/0.5.3_vite@2.9.14:
@@ -28383,13 +28211,6 @@ packages:
     resolution: { integrity: sha1-UqY+VsoLhKfzpfPWGHLxJq16WUM= }
     dev: false
     optional: true
-
-  /xstate/4.33.2:
-    resolution:
-      {
-        integrity: sha512-hIcoubJm6zuHyTPtE4tKp0Keb94Bs11ohQ1bBE3pwua5PuTDpAPut6gSTJeU/xI1akd1LsTrCvZTil6Kc4LqEA==,
-      }
-    dev: false
 
   /xtend/4.0.2:
     resolution:
