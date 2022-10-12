@@ -51,9 +51,15 @@ export function Alerts({ alerts }: AlertsProps) {
           .map((alert) => {
             return (
               <Alert key={alert.id} level={alert.level}>
-                {alert.level === 'info' && <InfoIcon />}
-                {alert.level === 'success' && <AlertIcon />}
-                {alert.level === 'warn' && <WarningIcon />}
+                {alert.level === 'info' && (
+                  <InfoIcon className="w-5 h-5 mr-2" />
+                )}
+                {alert.level === 'success' && (
+                  <AlertIcon className="w-5 h-5 mr-2" />
+                )}
+                {alert.level === 'warn' && (
+                  <WarningIcon className="w-5 h-5 mr-2" />
+                )}
                 <p className="m-0 flex-1 max-w-[680px] text-left">
                   {alert.message}
                 </p>
