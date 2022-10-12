@@ -151,6 +151,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
+      key={`${field.name}.${index}`}
     >
       {(provider, snapshot) => (
         <>
