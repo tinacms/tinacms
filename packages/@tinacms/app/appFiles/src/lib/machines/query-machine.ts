@@ -12,7 +12,7 @@ limitations under the License.
 */
 import { assign, ContextFrom, createMachine, spawn } from 'xstate'
 import { DocumentBlueprint } from '../formify/types'
-import { Form, GlobalFormPlugin, TinaCMS, TinaField } from 'tinacms'
+import { Form, GlobalFormPlugin, TinaCMS, TinaField, NAMER } from 'tinacms'
 import { setIn } from 'final-form'
 import * as G from 'graphql'
 import * as util from './util'
@@ -20,7 +20,6 @@ import { formify } from '../formify'
 import { spliceLocation } from '../formify/util'
 import { documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
-import { NAMER } from '@tinacms/schema-tools'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {

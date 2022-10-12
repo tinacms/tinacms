@@ -11,14 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
-import { build, createServer, InlineConfig } from 'vite'
-import type { ViteDevServer } from 'vite'
 import path from 'path'
+import { build, createServer } from 'vite'
+import type { InlineConfig, ViteDevServer } from 'vite'
+import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
-import { build as esbuild } from 'esbuild'
-import type { Loader } from 'esbuild'
+import { devHTML, prodHTML } from './html'
 
 let server: ViteDevServer
 
@@ -35,67 +34,77 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const prebuildPath = path.resolve(__dirname, 'assets')
-  const pathToConfig = path.join(rootPath, '.tina', 'config')
-  const packageJSONFilePath = path.join(rootPath, 'package.json')
-  const outDir = path.join(rootPath, publicFolder, outputFolder)
-  await fs.emptyDir(outDir)
-  await fs.ensureDir(outDir)
-  await fs.writeFile(
-    path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
-    `index.html
-assets/
-vite.svg`
-  )
-
+  const generatedPath = path.join(rootPath, '.tina/__generated__')
   /**
-   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
-   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
-   * to keep them separate since they run at different times. the compilation step also cleans up after itself
-   * so we can't use it as an artifact for this.
+   * The final location of the SPA assets
+   * @example public/admin
    */
-  const packageJSON = JSON.parse(
-    fs.readFileSync(packageJSONFilePath).toString() || '{}'
-  )
-  const define = {}
-  const deps = packageJSON?.dependencies || []
-  const peerDeps = packageJSON?.peerDependencies || []
-  const devDeps = packageJSON?.devDependencies || []
-  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
-  const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
-  await esbuild({
-    bundle: true,
-    platform: 'browser',
-    target: ['es2020'],
-    entryPoints: [pathToConfig],
-    format: 'esm',
-    treeShaking: true,
-    outfile: out,
-    external: [...external, './node_modules/*'],
-    loader: loaders,
-    define: define,
-  })
-
-  const base = `/${outputFolder}/`
-
+  const outputPath = path.join(rootPath, publicFolder, outputFolder)
   /**
-   * HEADS UP
-   *
-   * This is an experimental feature to make development within the monorepo faster.
-   *
-   * We can avoid the prebuild by just treating the appFiles directory
-   * as root but this will fail to find user-supplied modules in the config file.
-   *
-   * This is opt-in and new features should always be tested with this flag off
+   * The location to copy source files FROM
+   * @example node_modules/@tinacms/app/appFiles
    */
-  const MONOREPO_DEV = process.env.MONOREPO_DEV
+  const appCopyPath = path.join(__dirname, '..', 'appFiles')
+  /**
+   * The location to copy source files
+   * @example .tina/__generated__/app
+   */
+  // const appRootPath = path.join(__dirname, '..', 'appFiles')
+  const appRootPath = path.join(generatedPath, 'app')
+  /**
+   * The location to write the dev HTML file to.
+   * This file retrieves assets via HTTP request to the Vite dev server
+   */
+  const devHTMLPath = path.join(outputPath, 'index.html')
+  /**
+   * The location to write the production HTML file to.
+   * In contrast to the dev HTML file, the production file needs
+   * to be adjacent to the source files that are copied over
+   */
+  const prodHTMLPath = path.join(appRootPath, 'index.html')
+  /**
+   * The location of the user-defined config
+   */
+  const configPath = path.join(rootPath, '.tina', 'config')
+  /**
+   * The location where the user-defined config is "prebuilt" to.
+   */
+  const configPrebuildPath = path.join(generatedPath, 'prebuild', 'config.js')
+  /**
+   * The prebuild step takes the user-defined config and bundles it, leaving out
+   * dependencies we bring with us (react, react-dom, tinacms) of the bundle.
+   *
+   * It then treats the output as the source of truth for user-defined config
+   */
+  const prebuildConfig: InlineConfig = {
+    // This doesn't do anything in this case, but without it, Vite seems
+    // to assume the cwd, and copies values from `/public` automatically
+    // it seems like it just needs to be any folder that does not have a 'public' folder
+    root: path.join(generatedPath, 'prebuild'),
+    build: {
+      outDir: path.join(generatedPath, 'prebuild'),
+      lib: {
+        entry: configPath,
+        fileName: () => {
+          return 'config.js'
+        },
+        formats: ['es'],
+      },
+      rollupOptions: {
+        external: ['react', 'react-dom', 'tinacms'],
+      },
+    },
+    logLevel: 'silent',
+  }
+  await build(prebuildConfig)
 
-  const root = MONOREPO_DEV ? path.join(__dirname, '../appFiles') : outDir
+  const alias = {
+    TINA_IMPORT: configPrebuildPath,
+  }
+
   const config: InlineConfig = {
-    root,
-    base,
-    // For some reason this is breaking the React runtime in the end user's application.
-    // Not sure what's going on but `development` works for now.
+    root: appRootPath,
+    base: `/${outputFolder}/`,
     mode: local ? 'development' : 'production',
     plugins: [react(), viteTina()],
     define: {
@@ -106,105 +115,68 @@ vite.svg`
       __API_URL__: `"${apiUrl}"`,
     },
     server: {
-      strictPort: true,
       port: 5173,
       fs: {
-        // allow isn't working yet, so be lax with it (maybe just do this for dev mode)
         strict: false,
-        // /**
-        //  * From the monorepo Vite is importing from a node_modules folder relative to itself, which
-        //  * works as expected. But when published and used from a yarn setup, the node_modules
-        //  * are flattened, meaning we need to access the global node_modules folder instead of
-        //  * our own. I believe this is fine, but something to keep an eye on.
-        //  */
-        // allow: ['..'],
       },
     },
     resolve: {
-      alias: {
-        TINA_IMPORT: out,
-      },
+      alias,
     },
     build: {
       sourcemap: true,
-      outDir,
+      outDir: outputPath,
       emptyOutDir: false,
     },
     logLevel: 'silent',
   }
-  if (local) {
-    // Copy the dev index which has instructions for talking to the vite dev asset server
-    const indexDev = await fs
-      .readFileSync(path.join(__dirname, 'index.dev.html'))
-      .toString()
-    if (MONOREPO_DEV) {
-      console.warn('MONOREPO_DEV mode, vite root is @tinacms/app')
-      await fs.outputFileSync(
-        path.join(outDir, 'index.html'),
-        indexDev
-          .replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
-          .replace('assets/out.es.js', 'src/main.tsx')
-      )
-    } else {
-      await fs.outputFileSync(
-        path.join(outDir, 'index.html'),
-        indexDev.replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
-      )
-      // Copy the pre-built assets into the user's public output folder
-      // This will be used as the entry point by the vite dev server
-      await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
-    }
+  if (true) {
+    await fs.copy(appCopyPath, appRootPath)
+  } else {
+    await fs.createSymlink(
+      path.join(appCopyPath, 'src'),
+      path.join(appRootPath, 'src'),
+      'dir'
+    )
+    await fs.createSymlink(
+      path.join(appCopyPath, 'package.json'),
+      path.join(appRootPath, 'package.json'),
+      'file'
+    )
+  }
 
-    // This build is called every time the user makes a change to their config,
-    // so ensure we don't run into an existing server error
+  await execShellCommand(
+    `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+  )
+  await fs.outputFile(
+    path.join(outputPath, '.gitignore'),
+    `index.html
+assets/`
+  )
+  if (local) {
+    await fs.outputFile(
+      devHTMLPath,
+      devHTML.replaceAll('INSERT_OUTPUT_FOLDER_NAME', outputFolder)
+    )
     if (server) {
       await server.close()
     }
     server = await createServer(config)
     await server.listen()
-    await server.printUrls()
   } else {
-    /**
-     * This is kind of awkward, we're putting files in the specified
-     * output folder because we want to run the vite build
-     * from the context of the user's site, so dependencies are
-     * discovered properly. So this drops in the scaffolding
-     * and then builds over it
-     */
-    await fs.copyFileSync(
-      path.join(__dirname, 'index.html'),
-      path.join(outDir, 'index.html')
-    )
-    // Copy the pre-built assets into the user's public output folder
-    // This will be used as the entry point by the vite dev server
-    await fs.copySync(prebuildPath, path.join(outDir, 'assets'))
+    await fs.outputFile(prodHTMLPath, prodHTML)
     await build(config)
-    await fs.rmSync(out)
   }
 }
 
-const loaders: { [ext: string]: Loader } = {
-  '.aac': 'file',
-  '.css': 'file',
-  '.eot': 'file',
-  '.flac': 'file',
-  '.gif': 'file',
-  '.jpeg': 'file',
-  '.jpg': 'file',
-  '.json': 'json',
-  '.mp3': 'file',
-  '.mp4': 'file',
-  '.ogg': 'file',
-  '.otf': 'file',
-  '.png': 'file',
-  '.svg': 'file',
-  '.ttf': 'file',
-  '.wav': 'file',
-  '.webm': 'file',
-  '.webp': 'file',
-  '.woff': 'file',
-  '.woff2': 'file',
-  '.js': 'jsx',
-  '.jsx': 'jsx',
-  '.tsx': 'tsx',
+function execShellCommand(cmd: string): Promise<string> {
+  const exec = require('child_process').exec
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error: string, stdout: string, stderr: string) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(stdout ? stdout : stderr)
+    })
+  })
 }
