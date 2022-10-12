@@ -9,60 +9,56 @@
       "require": "./dist/index.js"
     }
   },
+  "files": ["appFiles", "dist"],
   "typings": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "license": "Apache-2.0",
   "buildConfig": {
     "entryPoints": [
       {
         "name": "src/index.ts",
         "target": "node"
-      },
-      {
-        "name": "src/prebuild.ts",
-        "target": "node"
       }
     ]
   },
   "scripts": {
     "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
-    "build": "tinacms-scripts build && node dist/prebuild.js"
+    "build": "tinacms-scripts build",
+    "inline": "cd appFiles && npm --prefix ./ i --legacy-peer-deps --omit=dev --no-package-lock && cd .. && npm run unlink",
+    "unlink": "cd appFiles && cp -RL node_modules node_modules2 && rm -rf node_modules && mv node_modules2 node_modules"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
     "@types/react": "17.0.2",
-    "@types/react-dom": "17.0.2"
+    "@types/react-dom": "17.0.2",
+    "@tinacms/scripts": "workspace:*",
+    "tinacms": "workspace:*",
+    "jest": "^27.0.6"
   },
   "dependencies": {
-    "@headlessui/react": "^1.6.6",
-    "@heroicons/react": "^1.0.6",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "@xstate/react": "3.0.0",
+    "xstate": "4.32.1",
+    "@headlessui/react": "1.6.6",
+    "final-form": "4.20.7",
+    "graphql": "15.1.0",
+    "@heroicons/react": "1.0.6",
+    "react-is": "17.0.2",
+    "react-router-dom": "6.4.2",
+    "styled-components": "5.3.5",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/line-clamp": "^0.3.1",
     "@tailwindcss/typography": "^0.5.4",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@vitejs/plugin-react": "^1.3.2",
-    "@xstate/react": "^3.0.0",
     "autoprefixer": "^10.4.0",
-    "final-form": "^4.20.7",
     "fs-extra": "^9.0.1",
-    "esbuild": "^0.15.5",
-    "graphql": "^15.1.0",
-    "jest": "^27.0.6",
     "postcss": "^8.4.14",
     "postcss-nested": "^5.0.6",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "react-is": "18.2.0",
-    "react-router-dom": "6",
-    "styled-components": "5.3.5",
     "tailwindcss": "^3.1.6",
-    "tinacms": "workspace:*",
     "typescript": "^4.6.4",
     "vite": "2.9.15",
-    "vite-node": "^0.23.4",
-    "xstate": "^4.32.1"
+    "vite-node": "^0.23.4"
   }
 }

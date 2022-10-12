@@ -52,7 +52,9 @@ export default client
   )
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
-    `db
+    `app
+db
+prebuild
 client.ts
 client.js
 types.ts
