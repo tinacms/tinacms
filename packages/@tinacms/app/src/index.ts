@@ -118,6 +118,9 @@ export const viteBuild = async ({
     },
     server: {
       port: 5173,
+      fs: {
+        strict: false,
+      },
     },
     resolve: {
       alias,
