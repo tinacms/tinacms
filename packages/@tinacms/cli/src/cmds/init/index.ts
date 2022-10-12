@@ -128,7 +128,7 @@ const chooseFramework = async () => {
       { title: 'Next.js', value: { name: 'next', reactive: true } },
       {
         title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
-        value: { name: 'ssg', reactive: false },
+        value: { name: 'other', reactive: false },
       },
     ] as { title: string; value: Framework }[],
   })
