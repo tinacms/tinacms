@@ -21,7 +21,7 @@
   },
   "scripts": {
     "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
-    "build": "tinacms-scripts build",
+    "build": "pnpm run inline && tinacms-scripts build",
     "inline": "cd appFiles && npm --prefix ./ i --global-style --legacy-peer-deps --no-package-lock --production"
   },
   "devDependencies": {
