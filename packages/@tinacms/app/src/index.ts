@@ -49,8 +49,8 @@ export const viteBuild = async ({
    * The location to copy source files
    * @example .tina/__generated__/app
    */
-  const appRootPath = path.join(__dirname, '..', 'appFiles')
-  // const appRootPath = path.join(generatedPath, 'app')
+  // const appRootPath = path.join(__dirname, '..', 'appFiles')
+  const appRootPath = path.join(generatedPath, 'app')
   /**
    * The location to write the dev HTML file to.
    * This file retrieves assets via HTTP request to the Vite dev server
@@ -132,7 +132,7 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  // await fs.copy(appCopyPath, appRootPath)
+  await fs.copy(appCopyPath, appRootPath)
   await fs.outputFile(
     path.join(outputPath, '.gitignore'),
     `index.html
