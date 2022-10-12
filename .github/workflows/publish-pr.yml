@@ -31,6 +31,8 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+      - name: Link TinaCMS
+        run: pnpm link:tinacms
       - name: Build Types
         run: pnpm types
       - name: Set NPMRC
