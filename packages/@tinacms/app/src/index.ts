@@ -132,7 +132,20 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  await fs.copy(appCopyPath, appRootPath)
+  if (true) {
+    await fs.copy(appCopyPath, appRootPath)
+  } else {
+    await fs.createSymlink(
+      path.join(appCopyPath, 'src'),
+      path.join(appRootPath, 'src'),
+      'dir'
+    )
+    await fs.createSymlink(
+      path.join(appCopyPath, 'package.json'),
+      path.join(appRootPath, 'package.json'),
+      'file'
+    )
+  }
 
   await execShellCommand(
     `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
