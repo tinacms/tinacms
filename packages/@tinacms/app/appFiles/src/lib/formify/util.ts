@@ -23,7 +23,6 @@ import type {
   ChangeSet,
   BlueprintPath,
 } from './types'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
 
 // import {
 //   generateFormCreators,

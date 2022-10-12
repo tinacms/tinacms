@@ -49,7 +49,8 @@ export const viteBuild = async ({
    * The location to copy source files
    * @example .tina/__generated__/app
    */
-  const appRootPath = path.join(generatedPath, 'app')
+  const appRootPath = path.join(__dirname, '..', 'appFiles')
+  // const appRootPath = path.join(generatedPath, 'app')
   /**
    * The location to write the dev HTML file to.
    * This file retrieves assets via HTTP request to the Vite dev server
@@ -78,7 +79,8 @@ export const viteBuild = async ({
   const prebuildConfig: InlineConfig = {
     // This doesn't do anything in this case, but without it, Vite seems
     // to assume the cwd, and copies values from `/public` automatically
-    root: appRootPath,
+    // it seems like it just needs to be any folder that does not have a 'public' folder
+    root: path.join(generatedPath, 'prebuild'),
     build: {
       outDir: path.join(generatedPath, 'prebuild'),
       lib: {
@@ -99,6 +101,8 @@ export const viteBuild = async ({
   const alias = {
     TINA_IMPORT: configPrebuildPath,
   }
+
+  console.log({ appRootPath })
 
   const config: InlineConfig = {
     root: appRootPath,
@@ -125,7 +129,12 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  await fs.copy(appCopyPath, appRootPath)
+  // await fs.copy(appCopyPath, appRootPath)
+  await fs.writeFile(
+    path.join(outputPath, '.gitignore'),
+    `index.html
+assets/`
+  )
   if (local) {
     await fs.outputFile(
       devHTMLPath,
@@ -135,6 +144,9 @@ export const viteBuild = async ({
       await server.close()
     }
     server = await createServer(config)
+    server.watcher.on('change', (path) => {
+      console.log('ghot a change', path)
+    })
     await server.listen()
   } else {
     await fs.outputFile(prodHTMLPath, prodHTML)

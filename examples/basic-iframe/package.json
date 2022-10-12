@@ -6,14 +6,10 @@
     "dev2": "tinacms dev -c \"next dev\" --noTelemetry",
     "build": "tinacms build && next build",
     "start": "next start",
-    "lint": "next lint",
-    "link": "ln -s /Users/jeffsee/code/tinacms2/packages/@tinacms/app2 ./.tina/__generated__/app",
-    "unlink": "unlink ./.tina/__generated__/app",
-    "remove:app": "rm ./.tina/__generated__/app",
-    "prebuild": "cp ./.tina/config.tsx ./.tina/__generated__/config.tsx",
-    "app": "cd ./.tina/__generated__/app && pnpm run dev"
+    "lint": "next lint"
   },
   "dependencies": {
+    "date-fns": "^2.29.3",
     "next": "12.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

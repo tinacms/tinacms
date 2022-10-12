@@ -1,5 +1,6 @@
 import { defineStaticConfig } from 'tinacms'
 import React, { version } from 'react'
+import { format } from 'date-fns'
 
 export default defineStaticConfig({
   branch: '',
@@ -45,7 +46,10 @@ export default defineStaticConfig({
               component: ({ form, field, input }) => {
                 return (
                   <div>
-                    <label>This is a test React version {version}</label>
+                    <label>
+                      This is a test React version {version}. The time is{' '}
+                      {format(new Date(), "'Today is a' eeee'")}
+                    </label>
                     <input {...input}></input>
                   </div>
                 )

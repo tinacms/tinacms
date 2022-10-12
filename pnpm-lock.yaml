@@ -74,6 +74,7 @@ importers:
     specifiers:
       '@tinacms/cli': workspace:*
       '@types/node': ^17.0.21
+      date-fns: ^2.29.3
       eslint: '7'
       eslint-config-next: 12.0.3
       next: 12.2.4
@@ -83,6 +84,7 @@ importers:
       styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
+      date-fns: 2.29.3
       next: 12.2.4_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -4868,7 +4870,7 @@ packages:
     engines: { node: '>=6.9.0' }
     dependencies:
       '@babel/helper-string-parser': 7.18.10
-      '@babel/helper-validator-identifier': 7.18.6
+      '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 
   /@babel/types/7.18.6:
@@ -11486,7 +11488,7 @@ packages:
       babel-plugin-syntax-jsx: 6.18.0
       lodash: 4.17.21
       picomatch: 2.3.1
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+      styled-components: 5.3.5_7i5myeigehqah43i5u7wbekgba
 
   /babel-plugin-syntax-jsx/6.18.0:
     resolution:
@@ -13372,6 +13374,14 @@ packages:
     engines: { node: '>=0.11' }
     dev: false
 
+  /date-fns/2.29.3:
+    resolution:
+      {
+        integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==,
+      }
+    engines: { node: '>=0.11' }
+    dev: false
+
   /date-format/4.0.11:
     resolution:
       {
@@ -15130,7 +15140,7 @@ packages:
       eslint-plugin-jsx-a11y: 6.6.0_eslint@7.32.0
       eslint-plugin-react: 7.31.8_eslint@7.32.0
       eslint-plugin-react-hooks: 4.6.0_eslint@7.32.0
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
+      next: 12.2.4_biqbaboplfbrettd7655fr4n2y
     transitivePeerDependencies:
       - eslint-import-resolver-webpack
       - supports-color
@@ -16166,7 +16176,7 @@ packages:
         integrity: sha512-ii3X9wNfyBYFnDPunYN5jh1/HAvtOZ9aJI/TVk0MB86hZuOeYkb+W5L3icgwW9WWNztZR6MDU3En6eoZTUoFPg==,
       }
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
     dev: false
 
   /finalhandler/1.2.0:
@@ -21931,7 +21941,6 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-    dev: false
 
   /next/12.2.4_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -23644,7 +23653,6 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
-    dev: false
 
   /react-dropzone/12.1.0_react@17.0.2:
     resolution:
@@ -23847,7 +23855,6 @@ packages:
     engines: { node: '>=0.10.0' }
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /reactcss/1.2.3_react@17.0.2:
     resolution:
@@ -24722,7 +24729,6 @@ packages:
       }
     dependencies:
       loose-envify: 1.4.0
-    dev: false
 
   /scroll-into-view-if-needed/2.2.29:
     resolution:
@@ -25791,7 +25797,6 @@ packages:
       react-is: 18.2.0
       shallowequal: 1.1.0
       supports-color: 5.5.0
-    dev: false
 
   /styled-components/5.3.5_fane7jikarojcev26y27hpbhu4:
     resolution:
@@ -25916,7 +25921,6 @@ packages:
         optional: true
     dependencies:
       react: 18.2.0
-    dev: false
 
   /stylis-rule-sheet/0.0.10_stylis@3.5.4:
     resolution:
@@ -27576,7 +27580,6 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
-    dev: false
 
   /use/3.1.1:
     resolution:

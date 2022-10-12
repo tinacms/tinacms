@@ -40,7 +40,8 @@ import type {
 
 import { validateSchema } from '@tinacms/schema-tools'
 
-export { NAMER } from '@tinacms/schema-tools'
+export { NAMER, resolveForm } from '@tinacms/schema-tools'
+export type { Templateable } from '@tinacms/schema-tools'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud

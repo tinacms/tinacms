@@ -11,9 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Client, Form, FormOptions, TinaCMS } from 'tinacms'
-import { GlobalFormPlugin } from 'tinacms'
 import { assign, createMachine } from 'xstate'
-import { resolveForm, Templateable } from '@tinacms/schema-tools'
+import { resolveForm, Templateable } from 'tinacms'
 import { sendParent } from 'xstate/lib/actions'
 import * as util from './util'
 import * as G from 'graphql'
