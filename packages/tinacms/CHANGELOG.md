@@ -1,5 +1,17 @@
 # tinacms
 
+## 0.69.17
+
+### Patch Changes
+
+- 2422e505d: Removed styled-components as a dependency in tinacms.
+  Removed deprecated react-toolbar in @tinacms/toolkit.
+- Updated dependencies [2422e505d]
+- Updated dependencies [431d73980]
+  - @tinacms/toolkit@0.58.0
+  - @tinacms/schema-tools@0.1.8
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.69.16
 
 ### Patch Changes
