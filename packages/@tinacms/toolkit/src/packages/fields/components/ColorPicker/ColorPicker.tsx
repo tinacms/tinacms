@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.
@@ -20,15 +21,16 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Dismissible } from '../../../react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
-import styled, { css, keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
 import { useFormPortal } from '../../../form-builder'
+// @ts-ignore importing css is not recognized
+import keyframes from './index.css'
 
 type DivProps = any
 type WrappedFieldProps = any
 interface SwatchProps extends DivProps {
   colorRGBA?: ColorRGBA
-  onClick(): void
+  onClick: (_event: React.SyntheticEvent) => void
   colorFormat: ColorFormat
 }
 
@@ -43,155 +45,67 @@ const GetTextColorForBackground = function (backgroundColor?: ColorRGBA) {
     : '#ffffff'
 }
 
-export const Swatch = styled(
-  ({ colorRGBA, colorFormat, unselectable, ...props }: SwatchProps) => (
-    <div {...props}>
-      <div className="swatch-inner">
-        {!colorRGBA
-          ? 'Click to add color'
-          : ColorFormatter[colorFormat].getLabel(colorRGBA)}
-      </div>
+const Swatch = ({
+  colorRGBA,
+  colorFormat,
+  unselectable,
+  ...props
+}: SwatchProps) => (
+  <div
+    className="bg-gray-100 rounded-3xl shadow-[0_2px_3px_rgba(0,0,0,0.12)] cursor-pointer w-full m-0"
+    {...props}
+  >
+    <div
+      className="swatch-inner flex items-center justify-center text-[13px] font-bold w-full h-10 rounded-3xl hover:opacity-[.6]"
+      style={{
+        background: colorRGBA
+          ? `rgba(${colorRGBA.r}, ${colorRGBA.g}, ${colorRGBA.b}, ${colorRGBA.a})`
+          : `#fff`,
+        color: GetTextColorForBackground(colorRGBA),
+        transition: 'all var(--tina-timing-short) ease-out',
+      }}
+    >
+      {!colorRGBA
+        ? 'Click to add color'
+        : ColorFormatter[colorFormat].getLabel(colorRGBA)}
     </div>
-  )
-)`
-  background: var(--tina-color-grey-2);
-  border-radius: var(--tina-radius-big);
-  box-shadow: var(--tina-shadow-small);
-  cursor: pointer;
-  width: 100%;
-  margin: 0;
+  </div>
+)
 
-  > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: var(--tina-font-size-1);
-    font-weight: bold;
-
-    width: 100%;
-    height: 40px;
-    border-radius: var(--tina-radius-big);
-    box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
-    background: ${(props) =>
-      props.colorRGBA
-        ? `rgba(${props.colorRGBA.r}, ${props.colorRGBA.g}, ${props.colorRGBA.b}, ${props.colorRGBA.a})`
-        : `#fff`};
-    color: ${(props) => GetTextColorForBackground(props.colorRGBA)};
-    transition: all var(--tina-timing-short) ease-out;
-  }
-
-  &:hover {
-    > div {
-      opacity: 0.6;
-    }
-  }
-`
-
-const ColorPopupKeyframes = keyframes`
-  0% {
-    transform: translate3d(-50%, 0, 0) scale3d(0.5,0.5,1)
-  }
-  100% {
-    transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
-  }
-`
-
-const ColorPopupOpenTopKeyframes = keyframes`
-  0% {
-    transform: translate3d(-50%, -100%, 0) scale3d(0.5,0.5,1)
-  }
-  100% {
-    transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
-  }
-`
-
-export const Popover = styled.div<{
-  triggerBoundingBox: any
-  openTop: boolean
-}>`
-  position: fixed;
-  top: ${(props) =>
-    props.triggerBoundingBox ? props.triggerBoundingBox.bottom : '0'}px;
-  left: ${(props) =>
-    props.triggerBoundingBox
-      ? props.triggerBoundingBox.left + props.triggerBoundingBox.width / 2
-      : '0'}px;
-  transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
-  transform-origin: 50% 0;
-  animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: var(--tina-z-index-5);
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    margin-top: 1px;
-    transform: translate3d(-50%, -100%, 0);
-    width: 18px;
-    height: 14px;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background-color: var(--tina-color-grey-3);
-    z-index: var(--tina-z-index-1);
-  }
-
-  &:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    margin-top: 2px;
-    transform: translate3d(-50%, -100%, 0);
-    width: 16px;
-    height: 13px;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background-color: white;
-    z-index: var(--tina-z-index-2);
-  }
-
-  ${(props) =>
-    props.openTop &&
-    css`
-      top: ${props.triggerBoundingBox ? props.triggerBoundingBox.top : '0'}px;
-      transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
-      animation: ${ColorPopupOpenTopKeyframes} 85ms ease-out both 1;
-      transform-origin: 50% 100%;
-
-      &:before,
-      &:after {
-        top: auto;
-        bottom: 0;
-        transform: translate3d(-50%, 100%, 0);
-        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-      }
-
-      &:before {
-        margin-top: 0;
-        margin-bottom: 1px;
-      }
-
-      &:after {
-        margin-top: 0;
-        margin-bottom: 2px;
-      }
-    `};
-`
-
-export const Cover = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: var(--tina-z-index-1);
-`
-
-const ColorPickerWrapper = styled.div`
-  position: relative;
-`
+const Popover = ({
+  triggerBoundingBox,
+  openTop,
+  className = '',
+  style = {},
+  ...props
+}) => (
+  <div
+    className={`fixed z-50 before:content-[""] before:absolute before:left-1/2 before:-translate-x-1/2 before:w-[18px] before:h-[14px] before:bg-gray-200 before:z-10 after:content-[""] after:absolute after:left-1/2 after:-translate-x-1/2 after:w-4 after:h-[13px] after:bg-white after:z-20 ${
+      openTop
+        ? 'before:bottom-0 before:mt-[1px] before:translate-y-full color-picker-on-top-clip-path after:bottom-0 after:mb-0.5 after:translate-y-full'
+        : 'before:top-0 before:mb-[1px] before:-translate-y-full color-picker-clip-path after:top-0 after:mt-0.5 after:-translate-y-full'
+    } ${className}`}
+    style={{
+      top: triggerBoundingBox
+        ? openTop
+          ? triggerBoundingBox.top
+          : triggerBoundingBox.bottom
+        : 0,
+      left: triggerBoundingBox
+        ? triggerBoundingBox.left + triggerBoundingBox.width / 2
+        : 0,
+      transform: openTop
+        ? 'translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1)'
+        : 'translate3d(-50%, 8px, 0) scale3d(1, 1, 1)',
+      animation: `${
+        openTop ? 'color-popup-open-top-keyframes' : 'color-popup-keyframes'
+      } 85ms ease-out both 1`,
+      transformOrigin: `50% ${openTop ? '100%' : '0'}`,
+      ...style,
+    }}
+    {...props}
+  />
+)
 
 interface Props {
   colorFormat: ColorFormat
@@ -223,7 +137,7 @@ const presetColors = [
 interface WidgetProps {
   presetColors: string[]
   color: ColorRGBA
-  onChange: (pickerColor: any) => void
+  onChange: (_pickerColor: any) => void
   disableAlpha?: boolean
   width: string
 }
@@ -303,7 +217,9 @@ export const ColorPicker: React.FC<Props> = ({
 
   const [displayColorPicker, setDisplayColorPicker] = useState(false)
 
-  const getColorFormat = (colorFormat || ColorFormat.Hex).toLowerCase()
+  const getColorFormat = (
+    colorFormat || ColorFormat.Hex
+  ).toLowerCase() as ColorFormat
   const getColorRGBA = input.value
     ? ColorFormatter[getColorFormat].parse(input.value)
     : null
@@ -327,7 +243,8 @@ export const ColorPicker: React.FC<Props> = ({
   }
 
   return (
-    <ColorPickerWrapper ref={triggerRef}>
+    <div className="relative" ref={triggerRef}>
+      <style>{keyframes}</style>
       <Swatch
         onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
@@ -359,6 +276,6 @@ export const ColorPicker: React.FC<Props> = ({
           )}
         </FormPortal>
       )}
-    </ColorPickerWrapper>
+    </div>
   )
 }

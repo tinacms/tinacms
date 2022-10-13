@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { FC } from 'react'
-import styled from 'styled-components'
 import * as React from 'react'
 import { Field } from '../../forms'
 
@@ -26,9 +25,9 @@ export interface ToggleProps {
   input: any
   field: ToggleFieldDefinition
   disabled?: boolean
-  onBlur: <T>(event?: React.FocusEvent<T>) => void
-  onChange: <T>(event: React.ChangeEvent<T> | any) => void
-  onFocus: <T>(event?: React.FocusEvent<T>) => void
+  onBlur: <T>(_event?: React.FocusEvent<T>) => void
+  onChange: <T>(_event: React.ChangeEvent<T> | any) => void
+  onFocus: <T>(_event?: React.FocusEvent<T>) => void
 }
 
 interface ToggleFieldDefinition extends Field {
@@ -61,77 +60,46 @@ export const Toggle: FC<ToggleProps> = ({
   }
 
   return (
-    <ToggleWrap>
-      {labels && <span>{labels.false}</span>}
-      <ToggleElement hasToggleLabels={labels !== null}>
+    <div className="flex items-center">
+      {labels && <span className="text-gray-700">{labels.false}</span>}
+      <div
+        className="relative w-12 h-7"
+        style={{ margin: labels !== null ? '0 10px' : '0' }}
+      >
         <ToggleInput id={name} type="checkbox" {...input} />
-        <ToggleLabel htmlFor={name} role="switch" disabled={disabled}>
-          <ToggleSwitch checked={checked}>
-            <span></span>
-          </ToggleSwitch>
-        </ToggleLabel>
-      </ToggleElement>
-      {labels && <span>{labels.true}</span>}
-    </ToggleWrap>
+        <label
+          className="bg-none p-0 outline-none w-12 h-7"
+          style={{
+            opacity: disabled ? 0.4 : 1,
+            pointerEvents: disabled ? 'none' : 'inherit',
+          }}
+          htmlFor={name}
+          role="switch"
+        >
+          <div className="relative w-12 h-7 rounded-3xl bg-white pointer-events-none -ml-0.5">
+            <span
+              className="absolute rounded-3xl left-0.5 top-1/2 w-[22px] h-[22px]"
+              style={{
+                background: checked
+                  ? 'var(--tina-color-primary)'
+                  : 'var(--tina-color-grey-4)',
+                border: `1px solid ${
+                  checked
+                    ? 'var(--tina-color-primary-dark)'
+                    : 'var(--tina-color-grey-5)'
+                }`,
+                transform: `translate3d(${checked ? '20px' : '0'}, -50%, 0)`,
+                transition: 'all 150ms ease-out',
+                boxShadow: 'var(--tina-shadow-big)',
+              }}
+            />
+          </div>
+        </label>
+      </div>
+      {labels && <span className="text-gray-700">{labels.true}</span>}
+    </div>
   )
 }
-
-const ToggleWrap = styled.div`
-  display: flex;
-  align-items: center;
-
-  > span {
-    color: var(--tina-color-grey-8);
-  }
-`
-
-const ToggleElement = styled.div<{ hasToggleLabels?: boolean }>`
-  position: relative;
-  width: 48px;
-  height: 28px;
-  margin: ${(props) => (props.hasToggleLabels ? '0 10px' : '0')};
-`
-
-const ToggleLabel = styled.label<{
-  disabled?: boolean
-}>`
-  background: none;
-  padding: 0;
-  opacity: ${(props) => (props.disabled ? '0.4' : '1')};
-  outline: none;
-  width: 48px;
-  height: 28px;
-  pointer-events: ${(props) => (props.disabled ? 'none' : 'inherit')};
-`
-
-const ToggleSwitch = styled.div<{ checked: boolean }>`
-  position: relative;
-  width: 48px;
-  height: 28px;
-  border-radius: var(--tina-radius-big);
-  background-color: white;
-  border: 1px solid var(--tina-color-grey-2);
-  pointer-events: none;
-  margin-left: -2px;
-  span {
-    position: absolute;
-    border-radius: var(--tina-radius-big);
-    left: 2px;
-    top: 50%;
-    width: calc(28px - 6px);
-    height: calc(28px - 6px);
-    background: ${(p) =>
-      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-4)'};
-    border: 1px solid
-      ${(p) =>
-        p.checked
-          ? 'var(--tina-color-primary-dark)'
-          : 'var(--tina-color-grey-5)'};
-    transform: translate3d(${(p) => (p.checked ? '20px' : '0')}, -50%, 0);
-    transition: all 150ms ease-out;
-    box-shadow: var(--tina-shadow-big);
-  }
-`
 
 const ToggleInput = ({ disabled, ...props }) => {
   return (
