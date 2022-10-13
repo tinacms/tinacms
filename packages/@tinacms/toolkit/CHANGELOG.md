@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.58.0
+
+### Minor Changes
+
+- 431d73980: Fix #3253 bullet/numbered list items overflow out of text fields
+
+  # Change
+
+  - Add `w-full` class to list item content to prevent text overflow to the right of sidebar as shown in #3253.
+  - Also change `<ol></ol>` element class from `pl-2` to `pl-4` to fix numbered list's marker overflow to the left of text field.
+
+### Patch Changes
+
+- 2422e505d: Removed styled-components as a dependency in tinacms.
+  Removed deprecated react-toolbar in @tinacms/toolkit.
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.57.12
 
 ### Patch Changes
