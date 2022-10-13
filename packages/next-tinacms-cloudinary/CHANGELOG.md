@@ -1,5 +1,12 @@
 # next-tinacms-cloudinary
 
+## 3.5.32
+
+### Patch Changes
+
+- 2422e505d: Removed styled-components as a dependency in tinacms.
+  Removed deprecated react-toolbar in @tinacms/toolkit.
+
 ## 3.5.31
 
 ### Patch Changes

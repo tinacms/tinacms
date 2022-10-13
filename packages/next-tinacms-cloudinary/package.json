@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "3.5.31",
+  "version": "3.5.32",
   "main": "dist/index.js",
   "files": [
     "dist"
