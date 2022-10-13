@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../forms'
-import styled, { keyframes, css } from 'styled-components'
 import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
@@ -68,7 +67,7 @@ export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
 })
 
 interface PanelProps {
-  setExpanded(next: boolean): void
+  setExpanded(_next: boolean): void
   isExpanded: boolean
   tinaForm: Form
   field: GroupFieldDefinititon
@@ -168,48 +167,34 @@ export const PanelBody = ({ id, children }) => {
   )
 }
 
-const GroupPanelKeyframes = keyframes`
-  0% {
-    transform: translate3d( 100%, 0, 0 );
-  }
-  100% {
-    transform: translate3d( 0, 0, 0 );
-  }
-`
-
-export const GroupPanel = styled.div<{ isExpanded: boolean }>`
-  position: absolute;
-  width: 100%;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-  pointer-events: ${(p) => (p.isExpanded ? 'all' : 'none')};
-
-  > * {
-    ${(p) =>
-      p.isExpanded &&
-      css`
-        animation-name: ${GroupPanelKeyframes};
-        animation-duration: 150ms;
-        animation-delay: 0;
-        animation-iteration-count: 1;
-        animation-timing-function: ease-out;
-        animation-fill-mode: backwards;
-      `};
-
-    ${(p) =>
-      !p.isExpanded &&
-      css`
-        transition: transform 150ms ease-out;
-        transform: translate3d(100%, 0, 0);
-      `};
-  }
-`
+export const GroupPanel = ({
+  isExpanded,
+  className = '',
+  style = {},
+  ...props
+}) => (
+  <div
+    className={`absolute w-full top-0 bottom-0 left-0 flex flex-col justify-between overflow-hidden z-10 ${className}`}
+    style={{
+      pointerEvents: isExpanded ? 'all' : 'none',
+      ...(isExpanded
+        ? {
+            animationName: 'fly-in-left',
+            animationDuration: '150ms',
+            animationDelay: '0',
+            animationIterationCount: 1,
+            animationTimingFunction: 'ease-out',
+            animationFillMode: 'backwards',
+          }
+        : {
+            transition: 'transform 150ms ease-out',
+            transform: 'translate3d(100%, 0, 0)',
+          }),
+      ...style,
+    }}
+    {...props}
+  />
+)
 
 export interface GroupFieldProps {
   field: Field
