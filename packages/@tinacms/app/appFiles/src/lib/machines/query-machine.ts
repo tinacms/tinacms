@@ -11,15 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { assign, ContextFrom, createMachine, spawn } from 'xstate'
-import { DocumentBlueprint } from '../formify/types'
-import { Form, GlobalFormPlugin, TinaCMS, TinaField, NAMER } from 'tinacms'
-import { setIn } from 'final-form'
+import {
+  Form,
+  TinaCMS,
+  NAMER,
+  Template,
+  TinaFieldEnriched,
+  TinaCollection,
+  TinaSchema,
+  GlobalFormPlugin,
+} from 'tinacms'
 import * as G from 'graphql'
-import * as util from './util'
 import { formify } from '../formify'
-import { spliceLocation } from '../formify/util'
-import { documentMachine } from './document-machine'
+import { documentMachine, FieldType, FormValues } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
+import { Blueprint2 } from '../formify'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -41,7 +47,7 @@ type ContextType = {
   iframeWidth: string
   formifyCallback: (args: any) => Form
   documentMap: DocumentMap
-  blueprints: DocumentBlueprint[]
+  blueprints: Blueprint2[]
   documentsToResolve: { id: string; location: string }[]
 }
 export const initialContext: ContextType = {
@@ -61,426 +67,393 @@ export const initialContext: ContextType = {
   iframe: null,
   documentsToResolve: [],
 }
-export const queryMachine = createMachine(
-  {
-    tsTypes: {} as import('./query-machine.typegen').Typegen0,
-    // Breaks stuff:
-    // predictableActionArguments: true,
-    schema: {
-      context: {} as ContextType,
-      services: {} as {
-        initializer: {
-          data: {
-            data: DataType
-            blueprints: DocumentBlueprint[]
-          }
-        }
-        setter: {
-          data: { data: DataType }
-        }
-        subDocumentResolver: {
-          data: {
-            id: string
-            location: string
-          }[]
-        }
-        onChangeCallback: {
-          data: undefined
-        }
-      },
-      events: {} as
-        | {
-            type: 'IFRAME_MOUNTED'
-            value: HTMLIFrameElement
-          }
-        | {
-            type: 'SET_URL'
-            value: string
-          }
-        | {
-            type: 'SET_INPUT_URL'
-            value: string
-          }
-        | {
-            type: 'SET_DISPLAY_URL'
-            value: string
-          }
-        | {
-            type: 'UPDATE_URL'
-          }
-        | {
-            type: 'SELECT_DOCUMENT'
-            value: string
-          }
-        | {
-            type: 'DOCUMENT_READY'
-            value: string
-          }
-        | {
-            type: 'ADD_QUERY'
-            value: {
-              id: string
-              type: 'open' | 'close'
-              query: string
-              data: object
-              variables: object
+export const queryMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgFcAnAGxNwirAGIBlAUQBUB9AVQCUAZRKAAOAe1i4ALrlH4hIAB6IAjAAYALCXXqAnACZVAVmUAOAGxmAzMp1mANCACeidXpMkdnnSZvLDh1X11AF9ghzQsPEJSSho6BhYOTgBJADkABW4uPkEkEDEJaVl5JQQAdh0SMtVqvTqassN1M0MHZwRLdWUPLx8dPwCg0PCMHAJicmpaeiY2LgARZOZ0-gBBAE0eAXkCqRk5PNKyvRJVM-OL8+U2xD0mns8+gcC9ELCQCLHoybiZxm50vNVuxWFtciJxHtiodECZKqoLOpVMpjiYTGUyp0bghlGYyg9vL5-C83iNIuNSMJcMIwFRxtMEqt5vNOABFbisXjrHaQooHUBHPSWEiGSw6VSWUWYvRWHTYsro07nSzIpE+CrDD6jKITKk0umEBmzbgAIXmAHkAMLcACyrFS7GYPMK+xKiGOwtF4sllmlsuxOlcIquJlUJm04pMms+Osp1Np9PiTGSADFeKs7ZwbebuA7WPNnVD+YpEKKzCKFWG0dZkSZWk5YRKlWdDMc8f5SVryd89QnDQQ9ug6QAvAhQRgQWRgWj4ABuogA1tOYxSSL2DdOB9Ih7hR-goAgCPPMOg+QBtVQAXULfLdOLU+Neej8yksNdM9faCs0l3FrleorRtqq7rom+CDiOY6MGAFAUKIFBrlQp4AGbwagJArj28YbjOEG7mOh5zqIJ7nleN6ujC941CQT4vm+agftiZg6Piv4aHU6iAe8mG6th9IAO7oHs+6MBa1p2g6nC8KwTLcnkuy3pRygPjRrh0e+dbYspujNmcf4cU0QHdrx+r0jS+AQFBk79kRS4YcBWGmYa5mWfuhHHqe+wXte8m8hRAoqKYmiSn4Mr0bWn4qJYipeJ4gSto0zRGV8Jl9tOLlQTBcEIcISGSKhFDoTxcZOelYAWQRR7EZ5sjeeR0IBVRj5qcY4WMQ2OIIicbH-pxnbFWufGGhQYDoBAjj-ICwKgjk9XFqUlh4iQnS+kiOgJU09gdfo5YXCqyhqiiOjJbGg2lSQI1jRN0nZgAaqC7KcnJEIug1JYdEtK1lGtG3NNi6LuBc6gmHUophmUJ0gUN06XeNiT8KwloLFatr2uwc13sphgijYooJcpdRmCYWnKeWsXiutGKbZDjlpRdo1wymySsPwLKWgAEqsqQAOKsBjlGLfiX0-VTf0dcoMruIYoTvPgogQHA8gDbERr841ynuDK63WHclyWNihgGASTzEvoNMTLEavvcDumXBcB0Btj5PxaLZh6ObJV00mVulE02Nu7oROSs+XR6P9626a2MqNIZ3EOalOFbrgO57lAPuIH+VQ+M+0UaZF5SGLt5xR+2sdkilns4YJwlp75r3zRn3inDovoaAq6LSiTb4kCYb4qvoBh4sdcfGZXZnla5tcvUWmO+t0am99WDGaeL1juAqraGCDRg2O7I8V2ddOw+00+KY1GJaQY7jO5TiVmB7h84Vl8Hpzic9aM+i+98v+dlGoBIU1+vffep1QKEFfqKJidxdKmDDBGBEHtX6vFtnbM4DsOpCgAeTXowDQhAA */
+  createMachine(
+    {
+      tsTypes: {} as import('./query-machine.typegen').Typegen0,
+      schema: {
+        context: {} as ContextType,
+        services: {} as {
+          initializer: {
+            data: {
+              data: DataType
+              blueprints: Blueprint2[]
             }
           }
-        | {
-            type: 'REMOVE_QUERY'
-            value: string
+          setter: {
+            data: { data: DataType }
           }
-        | {
-            type: 'SUBDOCUMENTS'
-            value: { id: string; location: string }[]
+          subDocumentResolver: {
+            data: {
+              id: string
+              location: string
+            }[]
           }
-        | {
-            type: 'FIELD_CHANGE'
-          },
-    },
-    type: 'parallel',
-    states: {
-      url: {
-        initial: 'idle',
-        states: {
-          idle: {
-            on: {
-              SET_URL: { actions: 'setUrl' },
-              SET_INPUT_URL: { actions: 'setInputUrl' },
-              SET_DISPLAY_URL: { actions: 'setDisplayUrl' },
-              UPDATE_URL: { actions: 'updateUrl' },
+          onChangeCallback: {
+            data: undefined
+          }
+        },
+        events: {} as
+          | {
+              type: 'IFRAME_MOUNTED'
+              value: HTMLIFrameElement
+            }
+          | {
+              type: 'SET_URL'
+              value: string
+            }
+          | {
+              type: 'SET_INPUT_URL'
+              value: string
+            }
+          | {
+              type: 'SET_DISPLAY_URL'
+              value: string
+            }
+          | {
+              type: 'UPDATE_URL'
+            }
+          | {
+              type: 'SELECT_DOCUMENT'
+              value: string
+            }
+          | {
+              type: 'DOCUMENT_READY'
+              value: string
+            }
+          | {
+              type: 'ADD_QUERY'
+              value: {
+                id: string
+                type: 'open' | 'close'
+                query: string
+                data: object
+                variables: object
+              }
+            }
+          | {
+              type: 'REMOVE_QUERY'
+              value: string
+            }
+          | {
+              type: 'SUBDOCUMENTS'
+              value: { id: string; location: string }[]
+            }
+          | {
+              type: 'FIELD_CHANGE'
+            },
+      },
+      id: '(machine)',
+      type: 'parallel',
+      states: {
+        url: {
+          initial: 'idle',
+          states: {
+            idle: {
+              on: {
+                SET_URL: {
+                  actions: 'setUrl',
+                },
+                SET_INPUT_URL: {
+                  actions: 'setInputUrl',
+                },
+                SET_DISPLAY_URL: {
+                  actions: 'setDisplayUrl',
+                },
+                UPDATE_URL: {
+                  actions: 'updateUrl',
+                },
+              },
             },
           },
         },
-      },
-      pipeline: {
-        initial: 'idle',
-        states: {
-          idle: {
-            entry: 'clear',
-            on: {
-              ADD_QUERY: 'initializing',
-              SUBDOCUMENTS: 'pending',
-              IFRAME_MOUNTED: {
-                actions: 'setIframe',
+        pipeline: {
+          initial: 'idle',
+          states: {
+            idle: {
+              entry: 'clear',
+              on: {
+                ADD_QUERY: {
+                  target: 'initializing',
+                },
+                SUBDOCUMENTS: {
+                  target: 'pending',
+                },
+                IFRAME_MOUNTED: {
+                  actions: 'setIframe',
+                },
               },
             },
+            initializing: {
+              invoke: {
+                src: 'initializer',
+                onDone: [
+                  {
+                    actions: 'storeInitialValues',
+                    target: 'pending',
+                  },
+                ],
+                onError: [
+                  {
+                    actions: 'handleError',
+                    target: 'error',
+                  },
+                ],
+              },
+            },
+            waiting: {
+              on: {
+                DOCUMENT_READY: {
+                  target: 'pending',
+                },
+              },
+            },
+            pending: {
+              invoke: {
+                src: 'setter',
+                onDone: [
+                  {
+                    target: 'ready',
+                  },
+                ],
+                onError: [
+                  {
+                    actions: 'handleMissingDocument',
+                    target: 'waiting',
+                  },
+                ],
+              },
+            },
+            ready: {
+              entry: 'resolveData',
+              invoke: {
+                src: 'onChangeCallback',
+              },
+              on: {
+                UPDATE_URL: {
+                  target: 'idle',
+                },
+                REMOVE_QUERY: {
+                  target: 'idle',
+                },
+                SELECT_DOCUMENT: {
+                  actions: 'selectDocument',
+                },
+                FIELD_CHANGE: {
+                  target: 'pending',
+                },
+              },
+            },
+            error: {},
           },
-          initializing: {
-            invoke: {
-              src: 'initializer',
-              onDone: {
-                actions: ['storeInitialValues', 'scanForInitialDocuments'],
-                target: 'pending',
-              },
-              onError: {
-                target: 'error',
-                actions: 'handleError',
-              },
-            },
-          },
-          waiting: {
-            on: {
-              DOCUMENT_READY: 'pending',
-            },
-          },
-          pending: {
-            invoke: {
-              src: 'setter',
-              onDone: 'ready',
-              onError: {
-                target: 'waiting',
-                actions: 'handleMissingDocument',
-              },
-            },
-          },
-          ready: {
-            entry: 'resolveData',
-            invoke: {
-              src: 'onChangeCallback',
-            },
-            on: {
-              UPDATE_URL: 'idle',
-              REMOVE_QUERY: 'idle',
-              SELECT_DOCUMENT: {
-                actions: 'selectDocument',
-              },
-              // TODO: for most _change_ events we could probably
-              // optimize this and not go through the pending
-              // process, but for now it keeps things simple and totally works
-              // to just totally restart the process on each change
-              FIELD_CHANGE: {
-                target: 'pending',
-                // actions: 'rescanForInitialDocuments',
-              },
-            },
-          },
-          error: {},
         },
       },
     },
-  },
-  {
-    actions: {
-      handleError: (_context, event) => console.error(event.data),
-      handleMissingDocument: assign((context, event) => {
-        count = count + 1
-        if (count > 50) {
-          throw new Error('infinite loop')
-        }
-        if (event.data instanceof QueryError) {
-          if (context.documentMap[event.data.id]) {
-            // Already exists
+    {
+      actions: {
+        handleError: (_context, event) => console.error(event.data),
+        handleMissingDocument: assign((context, event) => {
+          count = count + 1
+          if (count > 50) {
+            throw new Error('infinite loop')
+          }
+          if (event.data instanceof QueryError) {
+            if (context.documentMap[event.data.id]) {
+              // Already exists
+              return context
+            }
+            if (!event.data.id) {
+              return context
+            }
+            const doc = {
+              ref: spawn(
+                documentMachine.withContext({
+                  id: event.data.id,
+                  cms: context.cms,
+                  formifyCallback: context.formifyCallback,
+                  form: null,
+                  data: null,
+                })
+              ),
+            }
+
+            return {
+              ...context,
+              documentMap: {
+                ...context.documentMap,
+                [event.data.id]: doc,
+              },
+            }
+          } else {
+            console.error(event.data)
             return context
           }
-          const doc = {
-            ref: spawn(
-              documentMachine.withContext({
-                id: event.data.id,
-                locations: [],
-                cms: context.cms,
-                formifyCallback: context.formifyCallback,
-                form: null,
-                data: null,
-                subDocuments: [],
-                allBlueprints: context.blueprints,
-              })
-            ),
-          }
-
-          return {
-            ...context,
-            documentMap: {
-              ...context.documentMap,
-              [event.data.id]: doc,
-            },
-          }
-        } else {
-          console.error(event.data)
-          return context
-        }
-      }),
-      clear: assign((context) => {
-        Object.values(context.documentMap).forEach((doc) => {
-          const form = doc.ref.getSnapshot()?.context?.form
-          if (form) {
+        }),
+        clear: assign((context) => {
+          context.cms.forms.all().forEach((form) => {
             context.cms.forms.remove(form.id)
-          }
-        })
-        return {
-          ...initialContext,
-          formifyCallback: context.formifyCallback,
-          cms: context.cms,
-          // documentMap: context.documentMap, // to preserve docs across pages
-          iframe: context.iframe,
-          url: context.url,
-        }
-      }),
-      setUrl: assign((context, event) => {
-        return {
-          ...context,
-          url: event.value,
-        }
-      }),
-      setDisplayUrl: assign((context, event) => {
-        localStorage.setItem('tina-url', event.value)
-        return {
-          ...context,
-          displayURL: event.value,
-        }
-      }),
-      setInputUrl: assign((context, event) => {
-        return {
-          ...context,
-          inputURL: event.value.startsWith('/')
-            ? event.value
-            : `/${event.value}`,
-        }
-      }),
-      updateUrl: assign((context) => {
-        if (context.inputURL) {
-          Object.values(context.documentMap).forEach((doc) => {
-            const form = doc.ref.getSnapshot()?.context?.form
-            if (form) {
-              context.cms.forms.remove(form.id)
-            }
           })
           return {
-            ...context,
-            selectedDocument: initialContext.selectedDocument,
-            documentMap: initialContext.documentMap,
-            blueprints: initialContext.blueprints,
-            data: initialContext.data,
-            inputURL: null,
-            displayURL: context.inputURL,
-            url: context.inputURL,
+            ...initialContext,
+            formifyCallback: context.formifyCallback,
+            cms: context.cms,
+            // documentMap: context.documentMap, // to preserve docs across pages
+            iframe: context.iframe,
+            url: context.url,
           }
-        } else {
-          return context
-        }
-      }),
-      storeInitialValues: assign((context, event) => {
-        return {
-          ...context,
-          ...event.data,
-        }
-      }),
-      selectDocument: assign((context, event) => {
-        return {
-          ...context,
-          selectedDocument: event.value,
-        }
-      }),
-      setIframe: assign((context, event) => {
-        return {
-          ...context,
-          iframe: event.value,
-        }
-      }),
-      resolveData: assign((context, event) => {
-        if (context.iframe) {
-          context.iframe?.contentWindow?.postMessage({
-            id: context.id,
+        }),
+        setUrl: assign((context, event) => {
+          return {
+            ...context,
+            url: event.value,
+          }
+        }),
+        setDisplayUrl: assign((context, event) => {
+          localStorage.setItem('tina-url', event.value)
+          return {
+            ...context,
+            displayURL: event.value,
+          }
+        }),
+        setInputUrl: assign((context, event) => {
+          return {
+            ...context,
+            inputURL: event.value.startsWith('/')
+              ? event.value
+              : `/${event.value}`,
+          }
+        }),
+        updateUrl: assign((context) => {
+          if (context.inputURL) {
+            context.cms.forms.all().forEach((form) => {
+              context.cms.forms.remove(form.id)
+            })
+            return {
+              ...context,
+              selectedDocument: initialContext.selectedDocument,
+              documentMap: initialContext.documentMap,
+              blueprints: initialContext.blueprints,
+              data: initialContext.data,
+              inputURL: null,
+              displayURL: context.inputURL,
+              url: context.inputURL,
+            }
+          } else {
+            return context
+          }
+        }),
+        storeInitialValues: assign((context, event) => {
+          return {
+            ...context,
+            ...event.data,
+          }
+        }),
+        selectDocument: assign((context, event) => {
+          return {
+            ...context,
+            selectedDocument: event.value,
+          }
+        }),
+        setIframe: assign((context, event) => {
+          return {
+            ...context,
+            iframe: event.value,
+          }
+        }),
+        resolveData: assign((context, event) => {
+          if (context.iframe) {
+            context.iframe?.contentWindow?.postMessage({
+              id: context.id,
+              data: event.data.data,
+            })
+          }
+          return {
+            ...context,
             data: event.data.data,
-          })
-        }
-        return {
-          ...context,
-        }
-      }),
-      scanForInitialDocuments: assign((context, event) => {
-        const blueprints = event.data.blueprints.filter(
-          (blueprint) => blueprint.isTopLevel
-        )
-        const newDocuments: DocumentMap = {}
-        blueprints.forEach((blueprint) => {
-          const values = util.getAllIn(context.data, blueprint.id)
-
-          values?.forEach((value) => {
-            const location = spliceLocation(blueprint.id, value.location || [])
-            const existing = context.documentMap[value.value.id]
-            if (existing) {
-              existing.ref.send({ type: 'ADD_LOCATION', value: location })
-            } else {
-              newDocuments[value.value.id] = {
-                ref: spawn(
-                  documentMachine.withContext({
-                    id: value.value.id,
-                    form: null,
-                    cms: context.cms,
-                    formifyCallback: context.formifyCallback,
-                    data: null,
-                    locations: [location],
-                    subDocuments: [],
-                    allBlueprints: context.blueprints,
-                  })
-                ),
+          }
+        }),
+      },
+      services: {
+        setter: async (context) => {
+          const walk = (obj: Record<string, unknown>, path: string[] = []) => {
+            const accum: Record<string, unknown> = {}
+            if (isScalar(obj)) {
+              return obj
+            }
+            Object.entries(obj).map(([key, value]) => {
+              if (Array.isArray(value)) {
+                accum[key] = value.map((item) => walk(item, [...path, key]))
+              } else {
+                const blueprint = context.blueprints.find(
+                  (bp) => bp.path?.join('.') === [...path, key].join('.')
+                )
+                if (blueprint) {
+                  accum[key] = setData(value, blueprint, context)
+                } else {
+                  accum[key] = walk(value, [...path, key])
+                }
               }
-            }
-          })
-        })
-        const nextDocumentMap = { ...context.documentMap, ...newDocuments }
-        return {
-          ...context,
-          documentMap: nextDocumentMap,
-        }
-      }),
-    },
-    services: {
-      setter: async (context) => {
-        let newData = {}
-        const initialBlueprints = context.blueprints.filter(
-          (blueprint) => blueprint.isTopLevel
-        )
-        initialBlueprints.forEach((blueprint) => {
-          const values = util.getAllInBlueprint(context.data, blueprint.id)
+            })
+            return accum
+          }
+          const accum = walk(context.data)
+          const schema = context.cms.api.tina.schema as TinaSchema
+          Object.values(context.documentMap).forEach((documentMachine) => {
+            const documentContext = documentMachine.ref.getSnapshot()?.context
+            const collectionName =
+              documentContext?.data?._internalSys.collection.name
 
-          values?.forEach((value) => {
-            const location = spliceLocation(blueprint.id, value.location || [])
-            if (!value.value) {
-              return
-            }
-            const doc = context.documentMap[value.value._internalSys.path]
-            const docContext = doc.ref.getSnapshot()?.context
-            const form = docContext?.form
-            if (!form) {
-              throw new QueryError(
-                `Unable to resolve form for initial document`,
-                value.value._internalSys.path
-              )
-            }
-
-            /**
-             * This section can be removed when we support forms for list
-             * and nested items.
-             */
-            if (blueprint.path.some((item) => item.list)) {
-              // do nothing
-            } else {
-              if (form.global) {
+            const collection = schema.getCollection(
+              collectionName || ''
+            ) as TinaCollection
+            if (documentContext?.form) {
+              if (collection.ui?.global) {
                 context.cms.plugins.add(
-                  new GlobalFormPlugin(
-                    form,
-                    form.global?.icon,
-                    form.global?.layout
-                  )
+                  new GlobalFormPlugin(documentContext.form)
                 )
               } else {
-                context.cms.forms.add(form)
+                context.cms.forms.add(documentContext.form)
               }
             }
-
-            if (docContext.data) {
-              const nextData: Record<string, unknown> = setData({
-                id: docContext.id,
-                data: { ...docContext.data, ...form.values },
-                // @ts-ignore form.fields is Field
-                fields: form.fields,
-                namespace: [docContext.data._internalSys.collection.name],
-                path: [],
-                blueprint,
-                context,
-              })
-              newData = setIn(newData, location, nextData)
-            }
           })
-        })
-        return { data: newData }
-      },
-      initializer: async (context, event) => {
-        const schema = await context.cms.api.tina.getSchema()
-        const documentNode = G.parse(event.value.query)
-        const optimizedQuery = await context.cms.api.tina.getOptimizedQuery(
-          documentNode
-        )
-        if (!optimizedQuery) {
-          throw new Error(`Unable to optimize query`)
-        }
-        const { blueprints, formifiedQuery } = await formify({
-          schema,
-          optimizedDocumentNode: optimizedQuery,
-        })
-        const data = await context.cms.api.tina.request<DataType>(
-          G.print(formifiedQuery),
-          {
-            variables: event.value.variables,
+          return { data: accum }
+          // return { data: context.data }
+        },
+        initializer: async (context, event) => {
+          const schema = await context.cms.api.tina.getSchema()
+          const documentNode = G.parse(event.value.query)
+          const optimizedQuery = await context.cms.api.tina.getOptimizedQuery(
+            documentNode
+          )
+          if (!optimizedQuery) {
+            throw new Error(`Unable to optimize query`)
           }
-        )
-        return { data, blueprints, id: event.value.id }
-      },
-      onChangeCallback: (context) => (callback, _onReceive) => {
-        if (context.cms) {
-          context.cms.events.subscribe(`forms:fields:onChange`, () => {
-            callback({ type: 'FIELD_CHANGE' })
+          const { blueprints, formifiedQuery } = await formify({
+            schema,
+            optimizedDocumentNode: optimizedQuery,
           })
-          context.cms.events.subscribe(`forms:reset`, () => {
-            callback({ type: 'FIELD_CHANGE' })
-          })
-        }
+          const data = (await context.cms.api.tina.request(
+            G.print(formifiedQuery),
+            {
+              variables: event.value.variables,
+            }
+          )) as DataType
+          return { data, blueprints, id: event.value.id }
+        },
+        onChangeCallback: (context) => (callback, _onReceive) => {
+          if (context.cms) {
+            context.cms.events.subscribe(`forms:fields:onChange`, () => {
+              callback({ type: 'FIELD_CHANGE' })
+            })
+            context.cms.events.subscribe(`forms:reset`, () => {
+              callback({ type: 'FIELD_CHANGE' })
+            })
+          }
+        },
       },
-    },
-  }
-)
+    }
+  )
 class QueryError extends Error {
   public id: string
   constructor(message: string, id: string) {
@@ -493,7 +466,7 @@ let count = 0
 
 // https://github.com/oleics/node-is-scalar/blob/master/index.js
 const withSymbol = typeof Symbol !== 'undefined'
-function isScalar(value) {
+function isScalar(value: unknown) {
   const type = typeof value
   if (type === 'string') return true
   if (type === 'number') return true
@@ -509,219 +482,213 @@ function isScalar(value) {
   return false
 }
 
-const excludedValues = ['_internalValues', '_collection', '_template']
-const excludedTinaFieldValues = [
-  '_sys',
-  '_internalSys',
-  '_internalValues',
-  '_values',
-  '_collection',
-  '_template',
-]
+const setData = (
+  data: { [key: string]: unknown },
+  blueprint: Blueprint2,
+  context: ContextFrom<typeof queryMachine>
+) => {
+  if (data?._internalSys) {
+    const id = data._internalSys?.path
+    const doc = context.documentMap[id]
+    const docContext = doc?.ref?.getSnapshot()?.context
+    const form = docContext?.form
+    if (!form) {
+      throw new QueryError(`Unable to resolve form for initial document`, id)
+    }
+    const _internalSys = docContext.data?._internalSys
+    if (!_internalSys) {
+      throw new Error(`No system information found for document ${id}`)
+    }
 
-const setData = ({
+    const fields = form.fields
+    const result = resolveForm({
+      id,
+      fields,
+      sys: _internalSys,
+      values: form.values,
+      fieldsToInclude: blueprint.fields,
+      context,
+    })
+    return { ...docContext.data, ...result }
+  } else {
+    // this isn't a node
+  }
+  return data
+}
+
+const resolveForm = ({
   id,
-  data,
-  path,
   fields,
-  namespace,
-  blueprint,
+  sys,
+  values,
+  fieldsToInclude,
   context,
 }: {
   id: string
-  data: Record<string, unknown>
-  path: (string | number)[]
-  fields: TinaField[]
-  namespace: string[]
-  blueprint: DocumentBlueprint
+  fields: FieldType[]
+  sys: Record<string, unknown>
+  values: FormValues | undefined
+  fieldsToInclude: Blueprint2['fields']
   context: ContextFrom<typeof queryMachine>
 }) => {
-  const nextData: Record<string, unknown> = {}
-  nextData['__typename'] = NAMER.dataTypeName(namespace)
-  nextData['_tinaField'] = {
-    id,
-    keys: Object.keys(data)
-      .filter((key) => !excludedTinaFieldValues.includes(key))
-      .map((item) => [...path, item].join('.')),
+  const accum: Record<string, unknown> = {}
+  if (!values) {
+    return accum
   }
-  Object.entries(data).forEach(([key, value]) => {
-    const field = fields.find((field) => field.name === key)
-    const nextPath = [...path, key]
-    if (!value) {
-      nextData[key] = null
-    }
-    // This is a property not controlled by the form, so it
-    // cannot change. Eg. _sys
+
+  fieldsToInclude?.forEach((fieldToInclude) => {
+    const field = fields.find((field) => fieldToInclude.name === field.name)
     if (!field) {
-      if (!excludedValues.includes(key)) {
-        nextData[key] = value
-      }
-      return
-    }
-    if (Array.isArray(value)) {
-      if (field) {
-        if (!field.list) {
-          throw new Error(
-            `Expected field for array value to be have property list: true`
-          )
-        } else {
-          if (field.type === 'object') {
-            if (field.templates) {
-              nextData[key] = value.map((item, index) => {
-                const template = Object.values(field.templates).find(
-                  (template) => {
-                    // @ts-ignore FIXME: template is transformed to an
-                    // object that the `blocks` field plugin expects
-                    return template.key === item._template
-                  }
-                )
-                if (!template) {
-                  throw new Error(
-                    `Unable to find template for field ${field.name}`
-                  )
-                }
-                return setData({
-                  id,
-                  data: item,
-                  path: [...nextPath, index],
-                  // @ts-ignore form.fields is Field
-                  fields: template.fields,
-                  namespace: template.namespace,
-                  blueprint,
-                  context,
-                })
-              })
-            } else {
-              if (typeof field?.fields === 'string') {
-                throw new Error('Global templates not supported')
-              }
-              nextData[key] = value.map((item, index) =>
-                setData({
-                  id,
-                  data: item,
-                  path: [...nextPath, index],
-                  // @ts-ignore form.fields is Field
-                  fields: field.fields,
-                  namespace: field.namespace,
-                  blueprint,
-                  context,
-                })
-              )
-            }
-          } else {
-            nextData[key] = value
-          }
+      if (fieldToInclude.name === 'id') {
+        accum[fieldToInclude.alias] = id
+      } else if (fieldToInclude.name === '_sys') {
+        if (fieldToInclude.alias !== '_internalSys') {
+          const sysAccum: Record<string, unknown> = {}
+          // TODO: loop through these and actually use their alias values
+          fieldToInclude.fields?.forEach((field) => {
+            sysAccum[field.alias] = sys[field.name]
+          })
+          accum[fieldToInclude.alias] = sysAccum
+        }
+      } else if (fieldToInclude.name === '__typename') {
+        // field namespaces are one level deeper than what we need, so grab the first
+        // one and remove the last string on the namespace
+        accum[fieldToInclude.alias] = NAMER.dataTypeName(
+          fields[0].namespace.slice(0, fields[0].namespace.length - 1)
+        )
+      } else if (fieldToInclude.name === '_values') {
+        if (fieldToInclude.alias !== '_internalValues') {
+          accum[fieldToInclude.alias] = values
         }
       } else {
-        nextData[key] = value.map((item, index) =>
-          isScalar(item)
-            ? item
-            : setData({
-                id,
-                data: item,
-                path: [...nextPath, index],
-                namespace: field.namespace,
-                fields: [],
-                blueprint,
-                context,
-              })
-        )
       }
     } else {
-      const fieldBlueprintPath = `${blueprint.id}.${nextPath
-        .map((item) => (isNaN(Number(item)) ? item : '[]'))
-        .join('.')}`
-
-      const childBlueprint = context.blueprints.find(
-        ({ id }) => id === fieldBlueprintPath
-      )
-      const blueprintField = blueprint.fields.find(
-        ({ id }) => id === fieldBlueprintPath
-      )
-      // If the query isn't requesting this data, don't populate it
-      if (!blueprintField && !childBlueprint) {
-        return
-      }
-      if (isScalar(value)) {
-        // This value is a reference (eg. "content/authors/pedro.md")
-        if (childBlueprint) {
-          if (typeof value === 'string') {
-            if (!value) {
-              nextData[key] = null
-              return
-            }
-            const doc = context.documentMap[value]
-            const docContext = doc?.ref?.getSnapshot()?.context
-            const form = docContext?.form
-            if (!form) {
-              throw new QueryError(`Unable to resolve form for document`, value)
-            }
-            nextData[key] = {
-              id: docContext.id,
-              ...setData({
-                id: docContext.id,
-                data: { ...docContext.data, ...form.values },
-                // @ts-ignore form.fields is Field
-                fields: form.fields,
-                namespace: [],
-                path: [],
-                blueprint: childBlueprint,
-                context,
-              }),
-            }
-          } else {
-            // The reference value is null
-            nextData[key] = null
-          }
-        } else {
-          // This is a reference that's not formified.
-          // That is - we don't generate form for it because the query didn't ask us to
-          if (field && field.type === 'reference') {
-            if (value) {
-              nextData[key] = { id: value }
-            } else {
-              nextData[key] = null
-            }
-          } else {
-            nextData[key] = value
-          }
-        }
-      } else {
-        // TODO: when rich-text is {json: {}, embeds: {}[]} we'll need to resolve the embeds
-        if (field.type === 'rich-text') {
-          nextData[key] = value
-          return
-        }
-        if (field.type !== 'object') {
-          throw new Error(
-            `Expected field for object values to be of type "object", but got ${field.type}`
-          )
-        }
-        if (field?.templates) {
-          throw new Error(`Unexpected path ${field.name}`)
-        } else {
-          if (typeof field?.fields === 'string') {
-            throw new Error('Global templates not supported')
-          }
-          const nextValue = value as Record<string, unknown>
-          const nextDataResult = setData({
-            id,
-            data: nextValue,
-            path: nextPath,
-            namespace: field.namespace,
-            fields: field.fields,
-            blueprint,
-            context,
-          })
-          // Don't populate an empty key {someValue: {}}
-          if (Object.keys(nextDataResult).length > 0) {
-            nextData[key] = nextDataResult
-          } else {
-            nextData[key] = null
-          }
-        }
+      const result = resolveField({
+        id,
+        field,
+        sys,
+        value: values[field.name],
+        fieldsToInclude: fieldsToInclude.find(({ name }) => name === field.name)
+          ?.fields,
+        context,
+      })
+      if (result) {
+        accum[fieldToInclude.alias] = result
       }
     }
   })
-  return nextData
+
+  return accum
+}
+const resolveField = ({
+  id,
+  field,
+  sys,
+  value,
+  fieldsToInclude,
+  context,
+}: {
+  id: string
+  field: TinaFieldEnriched
+  sys: Record<string, unknown>
+  value: unknown
+  fieldsToInclude: Blueprint2['fields']
+  context: ContextFrom<typeof queryMachine>
+}) => {
+  switch (field.type) {
+    case 'reference':
+      if (!value) {
+        return
+      }
+      if (typeof value === 'string') {
+        const doc = context.documentMap[value]
+        const docContext = doc?.ref?.getSnapshot()?.context
+        const form = docContext?.form
+        if (!form) {
+          throw new QueryError(`Unable to resolve form for document`, value)
+        }
+        const _internalSys = docContext.data?._internalSys
+        if (!_internalSys) {
+          throw new Error(`No system information found for document ${id}`)
+        }
+        return resolveForm({
+          id: value,
+          fields: form.fields,
+          sys: _internalSys,
+          values: form.values,
+          fieldsToInclude,
+          context,
+        })
+      }
+      throw new Error(`Unexpected value for type "reference"`)
+    case 'object':
+      if (field.fields) {
+        if (typeof field.fields === 'string') {
+          throw new Error('Global templates not supported')
+        }
+        field.fields
+        if (field.list) {
+          if (Array.isArray(value)) {
+            return value.map((item) => {
+              if (typeof field.fields === 'string') {
+                throw new Error('Global templates not supported')
+              }
+              return resolveForm({
+                id,
+                fields: field.fields,
+                sys,
+                values: item,
+                fieldsToInclude,
+                context,
+              })
+            })
+          }
+        } else {
+          return resolveForm({
+            id,
+            fields: field.fields,
+            sys,
+            values: value,
+            fieldsToInclude,
+            context,
+          })
+        }
+      }
+      if (field.templates) {
+        if (field.list) {
+          if (!value) {
+            return
+          }
+          if (!Array.isArray(value)) {
+            return
+          }
+          return value.map((item) => {
+            let t: Template<true>
+            Object.entries(field.templates).forEach(([name, template]) => {
+              if (name === item._template) {
+                if (typeof template === 'string') {
+                  throw new Error('Global templates not supported')
+                }
+                t = template
+              }
+            })
+            return {
+              _template: item._template,
+              ...resolveForm({
+                id,
+                fields: t.fields,
+                sys,
+                values: item,
+                fieldsToInclude,
+                context,
+              }),
+            }
+          })
+        } else {
+          // not supported yet
+        }
+      }
+    default:
+      return value
+  }
 }
