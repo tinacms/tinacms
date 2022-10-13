@@ -343,6 +343,7 @@ export const queryMachine = createMachine(
           context.iframe?.contentWindow?.postMessage({
             id: context.id,
             data: event.data.data,
+            type: 'tina:updateData',
           })
         }
         return {
