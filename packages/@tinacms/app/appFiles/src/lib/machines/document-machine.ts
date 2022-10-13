@@ -10,14 +10,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { Client, Form, FormOptions, TinaCMS } from 'tinacms'
+import { Client, Field, Form, FormOptions, TinaCMS } from 'tinacms'
 import { assign, createMachine } from 'xstate'
-import { resolveForm, Templateable } from 'tinacms'
+import {
+  resolveForm,
+  Templateable,
+  TinaFieldEnriched,
+  TinaSchema,
+} from 'tinacms'
 import { sendParent } from 'xstate/lib/actions'
-import * as util from './util'
-import * as G from 'graphql'
-import type { DocumentBlueprint } from '../formify/types'
-import { SelectionNode } from 'graphql'
+
+export type FieldType = Field & TinaFieldEnriched
+export type FormValues = Record<string, unknown>
+export type FormType = Form<FormValues, FieldType>
 
 export type DataType = Record<string, unknown>
 
@@ -49,103 +54,94 @@ type Data = {
 type ContextType = {
   id: string
   data: null | Data
-  form: null | Form
+  form: null | FormType
   cms: TinaCMS
-  formifyCallback: (args: any) => Form
-  locations: string[]
-  subDocuments: string[]
-  allBlueprints: DocumentBlueprint[]
+  formifyCallback: (args: any, cms: TinaCMS) => Form
 }
 
-export const documentMachine = createMachine(
-  {
-    tsTypes: {} as import('./document-machine.typegen').Typegen0,
-    // predictableActionArguments: true,
-    schema: {
-      context: {} as ContextType,
-      services: {} as {
-        initializer: {
-          data: {
-            form: Form
-            data: Data
+export const documentMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgNwBdd0AbXALwKgGIIB7Qs-ANzYGswJNFjyFS5KrQZMEBXpnRUOAbQAMAXUSgADm1iVcHLSAAeiAEwAWSyUsA2VQE4AzAHYArABoQAT0QAORxJHEMdLd1d7d3NXWIBfOO9hHAJiLgMpRnwWMAAnXLZckm0aRQAzQtQhDBSxdMk6LKhZHjYFJXw1TSQQXX0O4zMEKxt7JzcvXwtVd2DQu2d-ZwBGVWX-dwTEkHw2CDhjZNE0iWpGpmM+gyMeoctzbz8EVaDLUNdAtfvIze2j1NIuTA6AgTx0emu+EGiEszlUtlcdncdnMkyey3WtlC-mWjmW7ncTlRCSSNWOpDyBVylwhA1uMLhCKRKLRFlxcxC4UiSJikRJIH+Yhp-UMUPpz38j0Q6y2cSAA */
+  createMachine(
+    {
+      tsTypes: {} as import('./document-machine.typegen').Typegen0,
+      schema: {
+        context: {} as ContextType,
+        services: {} as {
+          initializer: {
+            data: {
+              form: FormType | undefined
+              data: Data
+            }
           }
-        }
-        scanner: {
-          data: {
-            data: object
+          scanner: {
+            data: {
+              data: object
+            }
           }
-        }
+        },
+        events: {} as
+          | {
+              type: 'ADD_LOCATION'
+              value: string
+            }
+          | {
+              type: 'INIT'
+            }
+          | {
+              type: 'SCAN'
+            }
+          | {
+              type: 'RESCAN'
+            },
       },
-      events: {} as
-        | {
-            type: 'ADD_LOCATION'
-            value: string
-          }
-        | {
-            type: 'INIT'
-          }
-        | {
-            type: 'SCAN'
-          }
-        | {
-            type: 'RESCAN'
-          },
-    },
-    initial: 'initializing',
-    states: {
-      initializing: {
-        invoke: {
-          src: 'initializer',
-          onDone: {
-            actions: ['storeFormAndData', 'notifyParent'],
-            target: 'ready',
-          },
-          onError: {
-            target: 'error',
-            actions: 'handleError',
+      id: '(machine)',
+      initial: 'initializing',
+      states: {
+        initializing: {
+          invoke: {
+            src: 'initializer',
+            onDone: [
+              {
+                actions: ['storeFormAndData', 'notifyParent'],
+                target: 'ready',
+              },
+            ],
+            onError: [
+              {
+                actions: 'handleError',
+                target: 'error',
+              },
+            ],
           },
         },
+        ready: {},
+        error: {},
       },
-      ready: {},
-      error: {},
     },
-  },
-  {
-    actions: {
-      notifyParent: sendParent((context) => {
-        return {
-          type: 'DOCUMENT_READY',
-          value: context.id,
-        }
-      }),
-      handleError: (_context, event) => {
-        console.error(event.data)
+    {
+      actions: {
+        notifyParent: sendParent((context) => {
+          return {
+            type: 'DOCUMENT_READY',
+            value: context.id,
+          }
+        }),
+        handleError: (_context, event) => {
+          console.error(event.data)
+        },
+        storeFormAndData: assign((context, event) => {
+          // context.cms.forms.add(event.data.form)
+          return { ...context, form: event.data.form, data: event.data.data }
+        }),
       },
-      storeFormAndData: assign((context, event) => {
-        // context.cms.forms.add(event.data.form)
-        return { ...context, form: event.data.form, data: event.data.data }
-      }),
-    },
-    services: {
-      initializer: async (context) => {
-        const selections: SelectionNode[] = []
-        context.locations.forEach((location) => {
-          const blueprint = util.getBlueprintFromLocation(
-            location,
-            context.allBlueprints
-          )
-          // TODO: probably makes more sense to combine
-          // the selections if possible so we don't get conflicting
-          // return types
-          selections.push(blueprint.selection)
-        })
-        const tina = context.cms.api.tina as Client
-        const response = await tina.request<{
-          node: Data
-        }>(
-          `query GetNode($id: String!) {
+      services: {
+        initializer: async (context) => {
+          const tina = context.cms.api.tina as Client
+          const response = await tina.request<{
+            node: Data
+          }>(
+            `query GetNode($id: String!) {
         node(id: $id) {
-          ${selections.map((selection) => G.print(selection)).join('\n')}
           ...on Document {
             _internalValues: _values
             _internalSys: _sys {
@@ -173,40 +169,40 @@ export const documentMachine = createMachine(
           }
         }
       }`,
-          { variables: { id: context.id } }
-        )
-        const schema = context.cms.api.tina.schema
-        if (!schema) {
-          throw new Error(`Schema must be provided`)
-        }
-        const collection = schema.getCollection(
-          response.node._internalSys.collection.name
-        )
-        let template: Templateable
-        if (collection.templates) {
-          template = collection.templates.find((template) => {
-            if (typeof template === 'string') {
-              throw new Error(`Global templates not supported`)
-            }
-            return template.name === response.node._internalSys.template
-          }) as Templateable
-        } else {
-          template = collection
-        }
-        if (!template) {
-          throw new Error(
-            `Unable to find template for node ${response.node._internalSys.path}`
+            { variables: { id: context.id } }
           )
-        }
-        const resolvedForm = resolveForm({
-          collection,
-          basename: response.node._internalSys.filename,
-          schema,
-          template,
-        })
-        const onSubmit = async (payload) => {
-          try {
-            const mutationString = `#graphql
+          const schema = context.cms.api.tina.schema as TinaSchema
+          if (!schema) {
+            throw new Error(`Schema must be provided`)
+          }
+          const collection = schema.getCollection(
+            response.node._internalSys.collection.name
+          )
+          let template: Templateable
+          if (collection.templates) {
+            template = collection.templates.find((template) => {
+              if (typeof template === 'string') {
+                throw new Error(`Global templates not supported`)
+              }
+              return template.name === response.node._internalSys.template
+            }) as Templateable
+          } else {
+            template = collection
+          }
+          if (!template) {
+            throw new Error(
+              `Unable to find template for node ${response.node._internalSys.path}`
+            )
+          }
+          const resolvedForm = resolveForm({
+            collection,
+            basename: response.node._internalSys.filename,
+            schema,
+            template,
+          })
+          const onSubmit = async (payload: Record<string, unknown>) => {
+            try {
+              const mutationString = `#graphql
               mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
                 updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {
                   __typename
@@ -214,50 +210,52 @@ export const documentMachine = createMachine(
               }
             `
 
-            await context.cms.api.tina.request(mutationString, {
-              variables: {
-                collection: response.node._internalSys.collection.name,
-                relativePath: response.node._internalSys.relativePath,
-                params: schema.transformPayload(
-                  response.node._internalSys.collection.name,
-                  payload
-                ),
-              },
-            })
-            context.cms.alerts.success('Document saved!')
-          } catch (e) {
-            context.cms.alerts.error('There was a problem saving your document')
-            console.error(e)
-          }
-        }
-        const formConfig = {
-          id: context.id,
-          label:
-            response.node._internalSys.title ||
-            response.node._internalSys.collection.label,
-          initialValues: response.node._internalValues,
-          fields: resolvedForm.fields,
-          onSubmit,
-        }
-        const formifyCallback = context.formifyCallback
-        const form = buildForm(
-          formConfig,
-          context.cms,
-          (args) => {
-            if (formifyCallback) {
-              return formifyCallback(args, context.cms)
-            } else {
-              return args.createForm(args.formConfig)
+              await context.cms.api.tina.request(mutationString, {
+                variables: {
+                  collection: response.node._internalSys.collection.name,
+                  relativePath: response.node._internalSys.relativePath,
+                  params: schema.transformPayload(
+                    response.node._internalSys.collection.name,
+                    payload
+                  ),
+                },
+              })
+              context.cms.alerts.success('Document saved!')
+            } catch (e) {
+              context.cms.alerts.error(
+                'There was a problem saving your document'
+              )
+              console.error(e)
             }
-          },
-          true,
-          onSubmit
-        )
-        return { form, data: response.node }
+          }
+          const formConfig = {
+            id: context.id,
+            label:
+              response.node._internalSys.title ||
+              response.node._internalSys.collection.label,
+            initialValues: response.node._internalValues,
+            fields: resolvedForm.fields,
+            onSubmit,
+          }
+          const formifyCallback = context.formifyCallback
+          const form = buildForm(
+            formConfig,
+            context.cms,
+            (args) => {
+              if (formifyCallback) {
+                return formifyCallback(args, context.cms)
+              } else {
+                return args.createForm(args.formConfig)
+              }
+            },
+            true,
+            onSubmit
+          )
+          return { form, data: response.node }
+        },
       },
-    },
-  }
-)
+    }
+  )
 
 type FormCreator = (formConfig: FormOptions<any>) => Form
 interface GlobalFormOptions {
@@ -290,7 +288,7 @@ export type onSubmitArgs = {
 }
 
 export const generateFormCreators = (cms: TinaCMS, showInSidebar?: boolean) => {
-  const createForm = (formConfig) => {
+  const createForm = (formConfig: FormOptions<any, any>) => {
     return new Form(formConfig)
   }
   const createGlobalForm: GlobalFormCreator = (
@@ -312,7 +310,7 @@ export const buildForm = (
   formify: formifyCallback,
   showInSidebar: boolean = false,
   onSubmit?: (args: any) => void
-): Form | undefined => {
+): FormType | undefined => {
   const { createForm, createGlobalForm } = generateFormCreators(
     cms,
     showInSidebar
