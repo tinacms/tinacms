@@ -11,8 +11,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { MediaListError } from '@tinacms/toolkit'
+interface MediaListErrorConfig {
+  title: string
+  message: string
+  docsLink: string
+}
 
+class MediaListError extends Error {
+  public ERR_TYPE = 'MediaListError'
+  public title: string
+  public docsLink: string
+
+  constructor(config: MediaListErrorConfig) {
+    super(config.message)
+    this.title = config.title
+    this.docsLink = config.docsLink
+  }
+}
 export const E_DEFAULT = new MediaListError({
   title: 'An Error Occurred',
   message: 'Something went wrong fetching your media from Digital Ocean Space.',
