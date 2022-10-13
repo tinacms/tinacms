@@ -1,0 +1,45 @@
+{
+  "name": "@tinacms/starter-iframe",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
+    "build": "tinacms dev --noWatch  --noTelemetry -c\"next build\"",
+    "start": "tinacms dev --noWatch  --noTelemetry -c\"next start\"",
+    "dev:audit": "tinacms audit",
+    "build:prod": "tinacms build && next build"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "6.3.1",
+    "@tinacms/cli": "workspace:*",
+    "@types/js-cookie": "^3.0.0",
+    "@types/node": "^16.11.7",
+    "@types/react": "^17.0.35",
+    "@types/styled-components": "^5.1.15",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.3.11",
+    "postcss-import": "^14.0.2",
+    "postcss-nesting": "^10.1.0",
+    "tailwindcss": "^2.2.19"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.5.0",
+    "@tailwindcss/typography": "^0.4.1",
+    "@tinacms/auth": "workspace:*",
+    "date-fns": "^2.23.0",
+    "next": "12.2.4",
+    "next-tinacms-cloudinary": "workspace:*",
+    "react": "17.0.2",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
+    "react-is": "^17.0.2",
+    "styled-components": "^5.1.3",
+    "styled-jsx": "^3.2.5",
+    "tinacms": "workspace:*",
+    "typescript": "4.3.5"
+  },
+  "resolutions": {
+    "final-form": "4.20.1",
+    "@headlessui/react": "1.4.4"
+  }
+}
