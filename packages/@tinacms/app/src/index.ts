@@ -143,7 +143,7 @@ vite.svg`
         path.join(outDir, 'index.html'),
         indexDev
           .replace(`INSERT_OUTPUT_FOLDER_NAME`, outputFolder)
-          .replace('assets/out.es.js', 'src/main.tsx')
+          .replace('assets/out.mjs', 'src/main.tsx')
       )
     } else {
       await fs.outputFileSync(
