@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { S3MediaStore } from './s3-media-store'
-import { Client } from 'tinacms'
+import type { Client } from 'tinacms'
 
 export class TinaCloudS3MediaStore extends S3MediaStore {
   client: Client
