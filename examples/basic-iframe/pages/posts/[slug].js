@@ -1,6 +1,6 @@
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
-import { useTina } from 'tinacms/dist/react'
+import { useEditState, useTina } from 'tinacms/dist/react'
 
 const query = `query getPost($relativePath: String!) {
   post(relativePath: $relativePath) {
@@ -28,6 +28,8 @@ export default function Home(props) {
     variables: props.variables,
     data: props.data,
   })
+  const { edit } = useEditState()
+  console.log('edit', edit)
 
   return (
     <Layout>
