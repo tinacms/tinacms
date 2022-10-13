@@ -81,6 +81,11 @@ export const viteBuild = async ({
     // to assume the cwd, and copies values from `/public` automatically
     // it seems like it just needs to be any folder that does not have a 'public' folder
     root: path.join(generatedPath, 'prebuild'),
+    // NextJS forces es5 on tsconfig, specifying it here ignores that
+    // https://github.com/evanw/esbuild/issues/1355
+    esbuild: {
+      target: 'es2020',
+    },
     build: {
       outDir: path.join(generatedPath, 'prebuild'),
       lib: {
@@ -114,6 +119,11 @@ export const viteBuild = async ({
       'process.env': {},
       __API_URL__: `"${apiUrl}"`,
     },
+    // NextJS forces es5 on tsconfig, specifying it here ignores that
+    // https://github.com/evanw/esbuild/issues/1355
+    esbuild: {
+      target: 'es2020',
+    },
     server: {
       port: 5173,
       fs: {
@@ -130,7 +140,7 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  if (true) {
+  if (false) {
     await fs.copy(appCopyPath, appRootPath)
   } else {
     await fs.createSymlink(
