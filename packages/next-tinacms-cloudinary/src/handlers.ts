@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { v2 as cloudinary } from 'cloudinary'
-import { Media, MediaListOptions } from '@tinacms/toolkit'
+import type { Media, MediaListOptions } from '@tinacms/toolkit'
 import path from 'path'
 import { NextApiRequest, NextApiResponse } from 'next'
 import multer from 'multer'
