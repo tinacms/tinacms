@@ -22,7 +22,7 @@ import {
   DeleteObjectCommand,
   DeleteObjectCommandInput,
 } from '@aws-sdk/client-s3'
-import { Media, MediaListOptions } from '@tinacms/toolkit'
+import type { Media, MediaListOptions } from '@tinacms/toolkit'
 import path from 'path'
 import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'

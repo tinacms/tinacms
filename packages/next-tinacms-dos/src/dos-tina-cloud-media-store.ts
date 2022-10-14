@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { DOSMediaStore } from './dos-media-store'
-import { Client } from 'tinacms'
+import type { Client } from 'tinacms'
 
 export class TinaCloudDOSMediaStore extends DOSMediaStore {
   client: Client
