@@ -362,7 +362,7 @@ const CollectionListPage = () => {
                                         </span>
                                       </td>
                                     )}
-                                    <td className="px-3 py-4 truncate w-0">
+                                    <td className="px-3 py-4 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Extension
                                       </span>
@@ -370,7 +370,7 @@ const CollectionListPage = () => {
                                         {document.node._sys.extension}
                                       </span>
                                     </td>
-                                    <td className="px-3 py-4 truncate w-0">
+                                    <td className="px-3 py-4 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Template
                                       </span>
