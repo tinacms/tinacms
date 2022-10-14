@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 import React from 'react'
-import styled, { css } from 'styled-components'
 import { Media } from '../../packages/core'
 import { Folder, File } from '../../packages/icons'
 import { Button, IconButton } from '../../packages/styles'
@@ -24,9 +23,9 @@ import { TrashIcon } from '../../packages/icons'
 
 interface MediaItemProps {
   item: Media
-  onClick(item: Media): void
-  onSelect?(item: Media): void
-  onDelete?(item: Media): void
+  onClick(_item: Media): void
+  onSelect?(_item: Media): void
+  onDelete?(_item: Media): void
 }
 
 export function MediaItem({
@@ -35,15 +34,26 @@ export function MediaItem({
   onSelect,
   onDelete,
 }: MediaItemProps) {
+  const FileIcon = item.type === 'dir' ? Folder : File
   return (
-    <ListItem onClick={() => onClick(item)} type={item.type}>
-      <ItemPreview>
+    <li
+      className={
+        'flex items-center p-2 bg-white rounded-[5px] transition duration-300 ease-linear hover:drop-shadow-md ' +
+        (item.type === 'dir' ? 'cursor-pointer' : '')
+      }
+      onClick={() => onClick(item)}
+    >
+      <div className="w-[56px] h-[56px] rounded-[5px] overflow-hidden flex justify-center flex-shrink-0 mr-3">
         {item.previewSrc ? (
-          <img src={item.previewSrc} alt={item.filename} />
+          <img
+            className="object-cover w-full min-h-full object-center"
+            src={item.previewSrc}
+            alt={item.filename}
+          />
         ) : (
-          <FileIcon type={item.type} />
+          <FileIcon className="w-[47%] h-full fill-gray-300" />
         )}
-      </ItemPreview>
+      </div>
       <Filename>{item.filename}</Filename>
       <div className="flex justify-end gap-2 items-center ml-2">
         {onSelect && item.type === 'file' && (
@@ -57,70 +67,13 @@ export function MediaItem({
           </IconButton>
         )}
       </div>
-    </ListItem>
+    </li>
   )
 }
 
-function FileIcon({ type }: { type: Media['type'] }) {
-  return type === 'dir' ? <Folder /> : <File />
-}
-
-interface ListItemProps {
-  type: Media['type']
-}
-
-const ListItem = styled.li<ListItemProps>`
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  background-color: white;
-  filter: drop-shadow(0 0 0 transparent);
-  transition: filter 300ms ease;
-  border-radius: var(--tina-radius-small);
-
-  > :first-child {
-    margin-right: var(--tina-padding-small);
-  }
-
-  &:hover {
-    filter: drop-shadow(var(--tina-shadow-small));
-    ${(p) =>
-      p.type === 'dir' &&
-      css`
-        cursor: pointer;
-      `}
-  }
-`
-
-const ItemPreview = styled.div`
-  width: 56px;
-  height: 56px;
-  border-radius: var(--tina-radius-small);
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0;
-
-  > img {
-    object-fit: cover;
-    width: 100%;
-    min-height: 100%;
-    object-position: center;
-  }
-
-  > svg {
-    width: 47%;
-    height: 100%;
-    fill: var(--tina-color-grey-4);
-  }
-`
-
-const Filename = styled.span`
-  flex-grow: 1;
-  font-size: var(--tina-font-size-2);
-  overflow: hidden;
-  width: 100%;
-  overflow-wrap: break-word;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`
+const Filename = ({ className = '', ...props }) => (
+  <span
+    className={'text-[15px] flex-grow w-full break-words truncate ' + className}
+    {...props}
+  />
+)

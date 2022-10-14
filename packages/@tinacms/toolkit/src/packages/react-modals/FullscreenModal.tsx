@@ -16,46 +16,18 @@ limitations under the License.
 
 */
 
-import styled, { keyframes } from 'styled-components'
-import { ModalBody } from './Modal'
+import React from 'react'
 
-const ModalFullscreenKeyframes = keyframes`
-  0% {
-    transform: translate3d( -2rem, 0, 0 );
-    opacity: 0;
-  }
-
-  100% {
-    transform: translate3d( 0, 0, 0 );
-    opacity: 1;
-  }
-`
-
-export const FullscreenModal = styled.div`
-  display: flex;
-  flex-direction: column;
-  z-index: var(--tina-z-index-0);
-  overflow: visible;
-  background-color: #fff;
-  border-radius: 0;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  max-width: 1500px;
-  height: 100%;
-  animation: ${ModalFullscreenKeyframes} 150ms ease-out 1;
-
-  ${ModalBody} {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  @media (min-width: 721px) {
-    width: calc(100% - 170px);
-  }
-`
+export const FullscreenModal = ({ className = '', style = {}, ...props }) => (
+  <div
+    className={`flex flex-col z-0 overflow-visible bg-white rounded-none absolute top-0 left-0 w-full max-w-[1500px] h-full ${className} md:w-[calc(100%-170px)]`}
+    style={{
+      animation: 'popup-right 150ms ease-out 1',
+      ...style,
+    }}
+    {...props}
+  />
+)
 
 /**
  * @alias [FullscreenModal]
