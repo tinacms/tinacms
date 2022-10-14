@@ -1,10 +1,9 @@
 import React from "react";
 import Link from "next/link";
 import { Container } from "./container";
-// @ts-ignore
-import TinaIconSvg from "../public/tina.svg";
 import { ThemeContext } from "./theme";
 import { Icon } from "./icon";
+import { useRouter } from "next/router";
 
 export const Header = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -40,21 +39,7 @@ export const Header = ({ data }) => {
     yellow: "border-b-3 border-yellow-300 dark:border-yellow-600",
   };
 
-  // If we're on an admin path, other links should also link to their admin paths
-  const [prefix, setPrefix] = React.useState("");
-  const [windowUrl, setUrl] = React.useState("");
-  const isBrowser = typeof window !== "undefined";
-  const hasUrl = isBrowser ? window.location.href : "";
-
-  React.useEffect(() => {
-    setUrl(hasUrl);
-  }, [hasUrl]);
-
-  React.useEffect(() => {
-    if (window.location.pathname.startsWith("/admin")) {
-      setPrefix("/admin");
-    }
-  });
+  const router = useRouter();
 
   return (
     <div className={`bg-gradient-to-b ${headerColorCss}`}>
@@ -80,16 +65,14 @@ export const Header = ({ data }) => {
             {data.nav &&
               data.nav.map((item, i) => {
                 const activeItem =
-                  item.href === ""
-                    ? typeof location !== "undefined" &&
-                      location.pathname == "/"
-                    : windowUrl.includes(item.href);
+                  item.href === router.asPath ||
+                  (router.asPath.startsWith(item.href) && item.href !== "/");
                 return (
                   <li
                     key={`${item.label}-${i}`}
                     className={activeItem ? activeItemClasses[theme.color] : ""}
                   >
-                    <Link href={`${prefix}/${item.href}`} passHref>
+                    <Link href={item.href} passHref>
                       <a className="select-none	text-base inline-block tracking-wide font-regular transition duration-150 ease-out opacity-70 hover:opacity-100 py-8">
                         {item.label}
                       </a>

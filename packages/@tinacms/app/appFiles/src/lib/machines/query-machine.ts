@@ -20,6 +20,7 @@ import {
   TinaCollection,
   TinaSchema,
   GlobalFormPlugin,
+  Client,
 } from 'tinacms'
 import * as G from 'graphql'
 import { formify } from '../formify'
@@ -32,7 +33,10 @@ type DocumentInfo = {
   ref: ActorRefFrom<typeof documentMachine>
 }
 type DocumentMap = {
-  [documentId: string]: DocumentInfo
+  [documentId: string]: DocumentInfo & {
+    /** We don't support nested forms or forms for list queries */
+    skipFormRegister: boolean
+  }
 }
 
 type ContextType = {
@@ -40,9 +44,6 @@ type ContextType = {
   data: null | DataType
   cms: TinaCMS
   selectedDocument: string | null
-  url: string
-  inputURL: null | string
-  displayURL: null | string
   iframe: null | HTMLIFrameElement
   iframeWidth: string
   formifyCallback: (args: any) => Form
@@ -57,10 +58,7 @@ export const initialContext: ContextType = {
   blueprints: [],
   // @ts-ignore
   cms: null,
-  url: '/',
   iframeWidth: '200px',
-  inputURL: null,
-  displayURL: null,
   documentMap: {},
   // @ts-ignore
   formifyCallback: null,
@@ -100,27 +98,15 @@ export const queryMachine =
               value: HTMLIFrameElement
             }
           | {
-              type: 'SET_URL'
-              value: string
-            }
-          | {
-              type: 'SET_INPUT_URL'
-              value: string
-            }
-          | {
-              type: 'SET_DISPLAY_URL'
-              value: string
-            }
-          | {
-              type: 'UPDATE_URL'
-            }
-          | {
               type: 'SELECT_DOCUMENT'
               value: string
             }
           | {
               type: 'DOCUMENT_READY'
               value: string
+            }
+          | {
+              type: 'NAVIGATE'
             }
           | {
               type: 'ADD_QUERY'
@@ -147,27 +133,6 @@ export const queryMachine =
       id: '(machine)',
       type: 'parallel',
       states: {
-        url: {
-          initial: 'idle',
-          states: {
-            idle: {
-              on: {
-                SET_URL: {
-                  actions: 'setUrl',
-                },
-                SET_INPUT_URL: {
-                  actions: 'setInputUrl',
-                },
-                SET_DISPLAY_URL: {
-                  actions: 'setDisplayUrl',
-                },
-                UPDATE_URL: {
-                  actions: 'updateUrl',
-                },
-              },
-            },
-          },
-        },
         pipeline: {
           initial: 'idle',
           states: {
@@ -231,7 +196,7 @@ export const queryMachine =
                 src: 'onChangeCallback',
               },
               on: {
-                UPDATE_URL: {
+                NAVIGATE: {
                   target: 'idle',
                 },
                 REMOVE_QUERY: {
@@ -282,7 +247,10 @@ export const queryMachine =
               ...context,
               documentMap: {
                 ...context.documentMap,
-                [event.data.id]: doc,
+                [event.data.id]: {
+                  ...doc,
+                  skipFormRegister: event.data.skipFormRegister,
+                },
               },
             }
           } else {
@@ -300,47 +268,6 @@ export const queryMachine =
             cms: context.cms,
             // documentMap: context.documentMap, // to preserve docs across pages
             iframe: context.iframe,
-            url: context.url,
-          }
-        }),
-        setUrl: assign((context, event) => {
-          return {
-            ...context,
-            url: event.value,
-          }
-        }),
-        setDisplayUrl: assign((context, event) => {
-          localStorage.setItem('tina-url', event.value)
-          return {
-            ...context,
-            displayURL: event.value,
-          }
-        }),
-        setInputUrl: assign((context, event) => {
-          return {
-            ...context,
-            inputURL: event.value.startsWith('/')
-              ? event.value
-              : `/${event.value}`,
-          }
-        }),
-        updateUrl: assign((context) => {
-          if (context.inputURL) {
-            context.cms.forms.all().forEach((form) => {
-              context.cms.forms.remove(form.id)
-            })
-            return {
-              ...context,
-              selectedDocument: initialContext.selectedDocument,
-              documentMap: initialContext.documentMap,
-              blueprints: initialContext.blueprints,
-              data: initialContext.data,
-              inputURL: null,
-              displayURL: context.inputURL,
-              url: context.inputURL,
-            }
-          } else {
-            return context
           }
         }),
         storeInitialValues: assign((context, event) => {
@@ -364,6 +291,7 @@ export const queryMachine =
         resolveData: assign((context, event) => {
           if (context.iframe) {
             context.iframe?.contentWindow?.postMessage({
+              type: 'updateData',
               id: context.id,
               data: event.data.data,
             })
@@ -376,12 +304,12 @@ export const queryMachine =
       },
       services: {
         setter: async (context) => {
-          const walk = (obj: Record<string, unknown>, path: string[] = []) => {
+          const walk = (obj: unknown, path: string[] = []) => {
             const accum: Record<string, unknown> = {}
             if (isScalar(obj)) {
               return obj
             }
-            Object.entries(obj).map(([key, value]) => {
+            Object.entries(obj as object).map(([key, value]) => {
               if (Array.isArray(value)) {
                 accum[key] = value.map((item) => walk(item, [...path, key]))
               } else {
@@ -400,6 +328,9 @@ export const queryMachine =
           const accum = walk(context.data)
           const schema = context.cms.api.tina.schema as TinaSchema
           Object.values(context.documentMap).forEach((documentMachine) => {
+            if (documentMachine.skipFormRegister) {
+              return
+            }
             const documentContext = documentMachine.ref.getSnapshot()?.context
             const collectionName =
               documentContext?.data?._internalSys.collection.name
@@ -418,14 +349,12 @@ export const queryMachine =
             }
           })
           return { data: accum }
-          // return { data: context.data }
         },
         initializer: async (context, event) => {
-          const schema = await context.cms.api.tina.getSchema()
+          const tina = context.cms.api.tina as Client
+          const schema = await tina.getSchema()
           const documentNode = G.parse(event.value.query)
-          const optimizedQuery = await context.cms.api.tina.getOptimizedQuery(
-            documentNode
-          )
+          const optimizedQuery = await tina.getOptimizedQuery(documentNode)
           if (!optimizedQuery) {
             throw new Error(`Unable to optimize query`)
           }
@@ -456,10 +385,12 @@ export const queryMachine =
   )
 class QueryError extends Error {
   public id: string
-  constructor(message: string, id: string) {
+  public skipFormRegister: boolean
+  constructor(message: string, id: string, skipFormRegister: boolean) {
     super(message) // (1)
     this.name = 'QueryError' // (2)
     this.id = id
+    this.skipFormRegister = skipFormRegister
   }
 }
 let count = 0
@@ -493,7 +424,12 @@ const setData = (
     const docContext = doc?.ref?.getSnapshot()?.context
     const form = docContext?.form
     if (!form) {
-      throw new QueryError(`Unable to resolve form for initial document`, id)
+      const skipFormRegiester = (blueprint.path?.length || 0) > 2
+      throw new QueryError(
+        `Unable to resolve form for initial document`,
+        id,
+        skipFormRegiester
+      )
     }
     const _internalSys = docContext.data?._internalSys
     if (!_internalSys) {
@@ -605,7 +541,11 @@ const resolveField = ({
         const docContext = doc?.ref?.getSnapshot()?.context
         const form = docContext?.form
         if (!form) {
-          throw new QueryError(`Unable to resolve form for document`, value)
+          throw new QueryError(
+            `Unable to resolve form for document`,
+            value,
+            true
+          )
         }
         const _internalSys = docContext.data?._internalSys
         if (!_internalSys) {

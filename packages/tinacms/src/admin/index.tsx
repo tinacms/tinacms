@@ -79,7 +79,7 @@ export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
             <Router>
               <SetPreviewFlag preview={preview} cms={cms} />
               <Routes>
-                {preview && <Route path="preview" element={preview} />}
+                {preview && <Route path="/preview/*" element={preview} />}
                 <Route
                   path="collections/:collectionName/new"
                   element={
