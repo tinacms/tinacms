@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled, { css } from 'styled-components'
 import { LeftArrowIcon } from '../../packages/icons'
 
 // Fixed issue where dirname was being used in the frontend
@@ -27,8 +26,18 @@ function dirname(path) {
 
 interface BreadcrumbProps {
   directory?: string
-  setDirectory: (directory: string) => void
+  setDirectory: (_directory: string) => void
 }
+
+const BreadcrumbButton = ({ className = '', ...props }) => (
+  <button
+    className={
+      "capitalize transition-colors duration-200 border-0 bg-transparent hover:text-gray-900 md:text-[15px] after:pl-2 after:content-['/'] " +
+      className
+    }
+    {...props}
+  />
+)
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   directory = directory.replace(/^\/|\/$/g, '')
@@ -39,121 +48,48 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   }
 
   return (
-    <BreadcrumbWrapper showArrow={directory !== ''}>
+    <div className="w-full flex items-center text-[16px] text-gray-300">
       {directory !== '' && (
-        <span onClick={() => setDirectory(prevDir)}>
-          <LeftArrowIcon className="w-8 h-auto" />
+        <span className="flex" onClick={() => setDirectory(prevDir)}>
+          <LeftArrowIcon
+            className={`w-8 h-auto fill-gray-300 self-center cursor-pointer hover:fill-gray-900 md:-ml-2 ${
+              directory === ''
+                ? 'opacity-0 translate-x-1.5'
+                : 'opacity-100 md:-translate-x-1'
+            }`}
+            style={{
+              transition:
+                directory === ''
+                  ? 'opacity 200ms ease, transform 300ms ease-out'
+                  : 'opacity 180ms ease, transform 300ms ease-in',
+            }}
+          />
         </span>
       )}
-      <button onClick={() => setDirectory('')}>Media</button>
+      <BreadcrumbButton
+        onClick={() => setDirectory('')}
+        className={directory === '' ? '' : 'hidden md:flex'}
+      >
+        Media
+      </BreadcrumbButton>
       {directory &&
         directory.split('/').map((part, index, parts) => {
           const currentDir = parts.slice(0, index + 1).join('/')
           return (
-            <button
+            <BreadcrumbButton
+              className={
+                'pl-2 ' +
+                (index + 1 === parts.length ? 'flex' : 'hidden md:flex')
+              }
               key={currentDir}
               onClick={() => {
                 setDirectory(currentDir)
               }}
             >
               {part}
-            </button>
+            </BreadcrumbButton>
           )
         })}
-    </BreadcrumbWrapper>
+    </div>
   )
 }
-
-interface BreadcrumbWrapperProps {
-  showArrow: boolean
-}
-
-const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  color: var(--tina-color-grey-4);
-  font-size: var(--tina-font-size-3);
-
-  button {
-    text-transform: capitalize;
-    transition: color 180ms ease;
-    border: 0;
-    background-color: transparent;
-    font-size: inherit;
-  }
-
-  > span {
-    display: flex;
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--tina-color-grey-4);
-    transform: translateX(6px);
-    opacity: 0;
-    transition: opacity 200ms ease, transform 300ms ease-out;
-    align-self: center;
-  }
-
-  ${(p) =>
-    p.showArrow &&
-    css`
-      svg {
-        opacity: 1;
-        transform: translateX(0px);
-        transition: opacity 180ms ease, transform 300ms ease-in;
-      }
-    `}
-
-  svg:hover {
-    cursor: pointer;
-    fill: var(--tina-color-grey-9);
-  }
-
-  button:hover {
-    color: var(--tina-color-grey-9);
-  }
-
-  > :not(:last-child) {
-    display: none;
-  }
-
-  > :first-child {
-    display: inline;
-  }
-
-  *:not(span)::after {
-    content: '/';
-    padding-left: 8px;
-  }
-
-  > *:not(:first-of-type) {
-    padding-left: 8px;
-  }
-
-  @media (min-width: 720px) {
-    font-size: var(--tina-font-size-2);
-
-    svg {
-      margin-left: -8px;
-    }
-
-    ${(p) =>
-      p.showArrow &&
-      css`
-        svg {
-          transform: translateX(-4px);
-        }
-      `}
-
-    > :not(:last-child) {
-      display: flex;
-    }
-
-    > *:not(:first-of-type) {
-      padding-left: 8px;
-    }
-  }
-`

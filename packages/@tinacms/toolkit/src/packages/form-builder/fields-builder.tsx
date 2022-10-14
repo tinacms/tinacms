@@ -45,7 +45,6 @@ export function FieldsBuilder({
   useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
 
   return (
-    // @ts-ignore FIXME twind
     <FieldsGroup padding={padding}>
       {fields.map((field: Field, index) => (
         <InnerField

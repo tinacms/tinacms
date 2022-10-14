@@ -20,13 +20,11 @@ import * as React from 'react'
 import { InputProps, BaseTextField } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
-import styled from 'styled-components'
 import { CloseIcon } from '../../icons'
 
 export const TagsField = wrapFieldsWithMeta<
   { placeholder: string },
   InputProps
-  // @ts-ignore
 >(({ input, field, form, tinaForm }) => {
   const [value, setValue] = React.useState<string>('')
   const addTag = React.useCallback(
@@ -56,30 +54,32 @@ export const TagsField = wrapFieldsWithMeta<
           }
         }}
       />
-      <TagGrid>
+      <span className="flex flex-wrap mt-1 -mx-1 mb-0">
         {items.map((tag: string, index: number) => (
           <Tag key={tag} tinaForm={tinaForm} field={field} index={index}>
             {tag}
           </Tag>
         ))}
-      </TagGrid>
+      </span>
     </>
   )
 })
 
-const TagGrid = styled.span`
-  display: flex;
-  flex-wrap: wrap;
-  margin: 4px -4px 0 -4px;
-`
-
-const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
+const Tag = ({ tinaForm, field, index, children, ...styleProps }) => {
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   return (
-    <span {...styleProps}>
-      <span>{children}</span>
+    <span
+      className="rounded-[5px] shadow-[0_2px_3px_rgba(0,0,0,0.12)] bg-white flex items-center font-semibold tracking-[0.01em] leading-none text-gray-700 pl-2.5 m-1 truncate"
+      {...styleProps}
+    >
+      <span
+        style={{ maxHeight: 'calc(var(--tina-sidebar-width) - 50px)' }}
+        className="text-[15px] flex-shrink overflow-ellipsis overflow-hidden"
+      >
+        {children}
+      </span>
       <button
         className="text-center flex-shrink-0 border-0 bg-transparent p-2 flex items-center justify-center cursor-pointer"
         onClick={removeItem}
@@ -88,31 +88,8 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
       </button>
     </span>
   )
-})`
-  border-radius: var(--tina-radius-small);
-  box-shadow: var(--tina-shadow-small);
-  background-color: var(--tina-color-grey-0);
-  border: 1px solid var(--tina-color-grey-2);
-  display: flex;
-  align-items: center;
-  font-size: var(--tina-font-size-2);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  line-height: 1;
-  color: var(--tina-color-grey-8);
-  padding: 0 0 0 10px;
-  margin: 4px;
-  text-overflow: ellipsis;
-  overflow: hidden;
+}
 
-  span {
-    max-width: calc(var(--tina-sidebar-width) - 50px);
-    flex-shrink: 1;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-`
 export const TagsFieldPlugin = {
   name: 'tags',
   Component: TagsField,

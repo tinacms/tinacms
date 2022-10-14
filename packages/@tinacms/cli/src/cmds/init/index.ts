@@ -169,7 +169,7 @@ export async function installDeps(ctx: any, next: () => void, options) {
     'Installing Tina packages. This might take a moment... :prog',
     2
   )
-  const deps = ['tinacms', 'styled-components', '@tinacms/cli']
+  const deps = ['tinacms', '@tinacms/cli']
 
   bar.tick({
     prog: '',

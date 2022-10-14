@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { CloseIcon } from '../../icons'
 
 export interface ModalHeaderProps {
@@ -30,9 +29,12 @@ export const ModalHeader = ({ children, close }: ModalHeaderProps) => {
     <div className="h-14 flex items-center justify-between px-5 border-b border-gray-200 m-0">
       <ModalTitle>{children}</ModalTitle>
       {close && (
-        <CloseButton onClick={close}>
-          <CloseIcon />
-        </CloseButton>
+        <div
+          onClick={close}
+          className="flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700"
+        >
+          <CloseIcon className="w-6 h-auto" />
+        </div>
       )}
     </div>
   )
@@ -45,18 +47,3 @@ const ModalTitle = ({ children }) => {
     </h2>
   )
 }
-
-const CloseButton = styled.div`
-  display: flex;
-  align-items: center;
-  fill: var(--tina-color-grey-5);
-  cursor: pointer;
-  transition: fill 85ms ease-out;
-  svg {
-    width: 24px;
-    height: auto;
-  }
-  &:hover {
-    fill: var(--tina-color-grey-8);
-  }
-`
