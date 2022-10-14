@@ -1,4 +1,6 @@
+app
 db
+prebuild
 client.ts
 client.js
 types.ts

@@ -1,6 +1,6 @@
 query PageQuery {
   ...LayoutQueryFragment
-  postsConnection {
+  postsConnection(first: 3) {
     edges {
       node {
         id

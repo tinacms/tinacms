@@ -3,11 +3,14 @@ import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { client } from "../.tina/__generated__/client";
 import { Layout } from "../components/layout";
+import { useTina } from "tinacms/dist/react";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  const posts = props.data.postsConnection.edges;
+  // Still allow global form to be edited from this page
+  const { data } = useTina(props);
+  const posts = data.postsConnection.edges;
 
   return (
     <Layout>

@@ -26,10 +26,12 @@ export function useTina<T extends object>(props: {
     JSON.stringify({ query: props.query, variables: props.variables })
   )
   React.useEffect(() => {
+    setData(props.data)
+  }, [id])
+  React.useEffect(() => {
     parent.postMessage({ type: 'open', ...props, id }, window.location.origin)
     window.addEventListener('message', (event) => {
-      if (event.data.id === id) {
-        console.log('child: event received')
+      if (event.data.id === id && event.data.type === 'updateData') {
         setData(event.data.data)
       }
     })
