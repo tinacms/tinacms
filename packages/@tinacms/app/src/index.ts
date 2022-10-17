@@ -158,8 +158,8 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  // Set to true during monorepo dev (TODO: automate this)
-  if (false) {
+  // Set to false during monorepo dev (TODO: automate this)
+  if (true) {
     await fs.copy(appCopyPath, appRootPath)
   } else {
     await fs.createSymlink(
