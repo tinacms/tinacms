@@ -124,6 +124,7 @@ export const TinaAdmin = ({
         if (isTinaAdminEnabled) {
           return (
             <Router>
+              {/* @ts-ignore */}
               <SetPreviewFlag preview={preview} cms={cms} />
               <Routes>
                 {preview && (
