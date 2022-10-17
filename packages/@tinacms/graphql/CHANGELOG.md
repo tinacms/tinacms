@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 0.63.15
+
+### Patch Changes
+
+- 2422e505d: Removed styled-components as a dependency in tinacms.
+  Removed deprecated react-toolbar in @tinacms/toolkit.
+  - @tinacms/datalayer@0.2.4
+  - @tinacms/mdx@0.61.12
+  - @tinacms/schema-tools@0.1.8
+
 ## 0.63.14
 
 ### Patch Changes

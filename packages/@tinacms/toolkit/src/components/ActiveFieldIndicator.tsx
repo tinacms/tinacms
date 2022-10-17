@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 import * as React from 'react'
-import styled from 'styled-components'
 import { ChevronUpIcon, ChevronDownIcon } from '../packages/icons'
 import { useEvent } from '../packages/react-core/use-cms-event'
 import {
@@ -25,27 +24,27 @@ import {
 } from '../packages/fields/field-events'
 import { useFieldReference } from '../hooks/use-field-reference'
 
-const IndicatorWrap = styled.div`
-  position: fixed;
-  z-index: var(--tina-z-index-3);
-  left: 0;
-  padding: 8px 0;
-  margin-left: var(--tina-sidebar-width);
-  width: calc(100% - var(--tina-sidebar-width));
-  text-align: center;
-  top: ${(props: { position?: 'top' | 'bottom' }) =>
-    props.position === 'top' ? 0 : 'auto'};
-  bottom: ${(props: { position?: 'top' | 'bottom' }) =>
-    props.position === 'top' ? 'auto' : 0};
-`
+const IndicatorWrap = ({ style = {}, position, ...props }) => (
+  <div
+    className="fixed left-0 py-2 px-0 text-center"
+    style={{
+      ...style,
+      marginLeft: 'var(--tina-sidebar-width)',
+      width: 'calc(100% - var(--tina-sidebar-width))',
+      top: position === 'top' ? 0 : 'auto',
+      bottom: position === 'top' ? 'auto' : 0,
+      zIndex: 'var(--tina-z-index-3)',
+    }}
+    {...props}
+  />
+)
 
-const ArrowWrap = styled.div`
-  display: inline-block;
-  fill: white;
-  background-color: var(--tina-color-primary);
-  border-radius: 50%;
-  box-shadow: 0 0 10px -5px;
-`
+const ArrowWrap = (props) => (
+  <div
+    className="inline-block fill-white rounded-[50%] bg-blue-500 shadow-md"
+    {...props}
+  />
+)
 
 const AboveViewportIndicator = () => {
   return (
@@ -187,8 +186,7 @@ export const ActiveFieldIndicator = () => {
     <div
       style={{
         position: 'absolute',
-        // @ts-ignore it's a number, trust me
-        zIndex: `var(--tina-z-index-3)`,
+        zIndex: 'var(--tina-z-index-3)',
         top: position.top + window.scrollY,
         left: position.left + window.scrollX,
         width: position.width,

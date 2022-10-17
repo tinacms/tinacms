@@ -16,21 +16,13 @@ limitations under the License.
 
 */
 
-import styled from 'styled-components'
+import React from 'react'
 
-export interface ModalBodyProps {
-  padded?: boolean
-}
-
-export const ModalBody = styled.div<ModalBodyProps>`
-  padding: ${(p) => (p.padded ? 'var(--tina-padding-big)' : '0')};
-  margin: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  min-height: 160px;
-
-  &:last-child {
-    border-radius: 0 0 5px 5px;
-  }
-`
+export const ModalBody = ({ className = '', padded = false, ...props }) => (
+  <div
+    className={`${
+      padded ? 'p-5' : 'p-0'
+    } m-0 overflow-hidden flex flex-col min-h-[160px] [&:last-child]:rounded-[0_0_5px_5px] ${className}`}
+    {...props}
+  />
+)

@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css, StyledComponent } from 'styled-components'
 import { EllipsisVerticalIcon } from '../icons'
 import { useState, FC } from 'react'
 import { Dismissible } from '../../packages/react-dismissible'
@@ -54,76 +53,34 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   )
 }
 
-const MoreActionsButton = styled((p) => (
-  <button {...p}>
+const MoreActionsButton = ({ className = '', ...props }) => (
+  <button
+    className={`h-16 w-10 self-stretch bg-transparent bg-center bg-[length:auto_18px] -mr-4 ml-2 outline-none cursor-pointer transition-opacity duration-100 ease-out flex justify-center items-center hover:bg-gray-50 hover:fill-gray-700 ${className}`}
+    {...props}
+  >
     <EllipsisVerticalIcon />
   </button>
-))`
-  height: 64px;
-  width: 40px;
-  align-self: stretch;
-  background-color: transparent;
-  background-position: center;
-  background-size: auto 18px;
-  background-repeat: no-repeat;
-  border: 0;
-  margin: 0 -16px 0 8px;
-  outline: none;
-  cursor: pointer;
-  transition: opacity 85ms ease-out;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-    fill: var(--tina-color-grey-8);
-  }
-`
+)
 
-const ActionsOverlay = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  bottom: var(--tina-padding-big);
-  right: var(--tina-padding-big);
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 85ms ease-out;
-  transform-origin: 100% 100%;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-  ${(props) =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, -28px, 0) scale3d(1, 1, 1);
-    `};
-`
+const ActionsOverlay = ({ open, className = '', style = {}, ...props }) => (
+  <div
+    className={`min-w-[192px] rounded-3xl border border-solid border-[#efefef] block absolute bottom-5 right-5 ${
+      open ? 'opacity-100' : 'opacity-0'
+    } transition-all duration-100 ease-out origin-bottom-right shadow-[0_2px_3px_rgba(0,0,0,0.05)] bg-white overflow-hidden z-10 ${className}`}
+    style={{
+      transform: open
+        ? 'translate3d(0, -28px, 0) scale3d(1, 1, 1)'
+        : 'translate3d(0, 0, 0) scale3d(0.5, 0.5, 1)',
+      pointerEvents: open ? 'all' : 'none',
+      ...style,
+    }}
+    {...props}
+  />
+)
 
-export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-1);
-  padding: 0 12px;
-  height: 40px;
-  font-weight: var(--tina-font-weight-regular);
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all var(--tina-timing-medium) ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: var(--tina-color-grey-1);
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--tina-color-grey-2);
-  }
-`
+export const ActionButton = ({ className = '', ...props }) => (
+  <button
+    className={`relative text-center text-[13px] px-3 h-10 font-normal w-full bg-none cursor-pointer outline-none border-0 transition-all duration-[150ms] ease-out hover:text-blue-500 hover:bg-gray50 [&:not(:last-child)]: border-b-[1px] border-solid border-b-[#edecf3] ${className}`}
+    {...props}
+  />
+)

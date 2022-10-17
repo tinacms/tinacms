@@ -12,10 +12,9 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
 import { Form } from '../forms'
-import { Form as FinalForm, FormSpy } from 'react-final-form'
+import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '../styles'
@@ -32,21 +31,41 @@ export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
   label?: string
-  onPristineChange?: (pristine: boolean) => unknown
+  onPristineChange?: (_pristine: boolean) => unknown
 }
 
 const NoFieldsPlaceholder = () => (
-  <EmptyState>
-    <Emoji>🤔</Emoji>
-    <h3 className="font-sans font-normal text-lg">
+  <div
+    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    style={{
+      animationName: 'fade-in',
+      animationDelay: '300ms',
+      animationTimingFunction: 'ease-out',
+      animationIterationCount: 1,
+      animationFillMode: 'both',
+      animationDuration: '150ms',
+    }}
+  >
+    <Emoji className="block pb-5">🤔</Emoji>
+    <h3 className="font-sans font-normal text-lg block pb-5">
       Hey, you don't have any fields added to this form.
     </h3>
-    <p>
-      <LinkButton href="https://tinacms.org/docs/fields" target="_blank">
-        <Emoji>📖</Emoji> Field Setup Guide
-      </LinkButton>
+    <p className="block pb-5">
+      <a
+        className="text-center rounded-3xl border border-solid border-gray-100 shadow-[0_2px_3px_rgba(0,0,0,0.12)] font-normal cursor-pointer text-[12px] transition-all duration-100 ease-out bg-white text-gray-700 py-3 pr-5 pl-14 relative no-underline inline-block hover:text-blue-500"
+        href="https://tinacms.org/docs/fields"
+        target="_blank"
+      >
+        <Emoji
+          className="absolute left-5 top-1/2 origin-center -translate-y-1/2 transition-all duration-100 ease-out"
+          style={{ fontSize: 24 }}
+        >
+          📖
+        </Emoji>{' '}
+        Field Setup Guide
+      </a>
     </p>
-  </EmptyState>
+  </div>
 )
 
 export const FormBuilder: FC<FormBuilderProps> = ({
@@ -147,7 +166,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
-                        // @ts-ignore FIXME twind
                         style={{ flexGrow: 1 }}
                       >
                         {tinaForm.buttons.reset}
@@ -242,7 +260,6 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                           finalForm.reset()
                           await tinaForm.reset!()
                         }}
-                        // @ts-ignore FIXME twind
                         style={{ flexBasis: '7rem' }}
                       >
                         {tinaForm.buttons.reset}
@@ -422,90 +439,9 @@ const useOnChangeEventDispatch = ({
   }, [JSON.stringify(formValues)])
 }
 
-const Emoji = styled.span`
-  font-size: 40px;
-  line-height: 1;
-  display: inline-block;
-`
-
-const EmptyStateAnimation = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`
-
-const EmptyState = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--tina-padding-big) var(--tina-padding-big) 64px
-    var(--tina-padding-big);
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  animation-name: ${EmptyStateAnimation};
-  animation-delay: 300ms;
-  animation-timing-function: ease-out;
-  animation-iteration-count: 1;
-  animation-fill-mode: both;
-  animation-duration: 150ms;
-  > *:first-child {
-    margin: 0 0 var(--tina-padding-big) 0;
-  }
-  > ${Emoji} {
-    display: block;
-  }
-  h3 {
-    font-size: var(--tina-font-size-5);
-    font-weight: normal;
-    display: block;
-    margin: 0 0 var(--tina-padding-big) 0;
-    ${Emoji} {
-      font-size: 1em;
-    }
-  }
-  p {
-    display: block;
-    margin: 0 0 var(--tina-padding-big) 0;
-  }
-`
-
-const LinkButton = styled.a`
-  text-align: center;
-  border: 0;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid var(--tina-color-grey-2);
-  box-shadow: var(--tina-shadow-small);
-  font-weight: var(--tina-font-weight-regular);
-  cursor: pointer;
-  font-size: var(--tina-font-size-0);
-  transition: all var(--tina-timing-short) ease-out;
-  background-color: white;
-  color: var(--tina-color-grey-8);
-  padding: var(--tina-padding-small) var(--tina-padding-big)
-    var(--tina-padding-small) 56px;
-  position: relative;
-  text-decoration: none;
-  display: inline-block;
-  ${Emoji} {
-    font-size: 24px;
-    position: absolute;
-    left: var(--tina-padding-big);
-    top: 50%;
-    transform-origin: 50% 50%;
-    transform: translate3d(0, -50%, 0);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-  &:hover {
-    color: var(--tina-color-primary);
-    ${Emoji} {
-      transform: translate3d(0, -50%, 0);
-    }
-  }
-`
+const Emoji = ({ className = '', ...props }) => (
+  <span
+    className={`text-[40px] leading-none inline-block ${className}`}
+    {...props}
+  />
+)

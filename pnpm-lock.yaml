@@ -55,14 +55,12 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -80,14 +78,12 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -105,7 +101,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -113,7 +108,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@types/node': 17.0.45
@@ -129,14 +123,12 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -153,7 +145,6 @@ importers:
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
       '@types/react': ^17.0.35
-      '@types/styled-components': ^5.1.15
       autoprefixer: ^10.4.0
       date-fns: ^2.23.0
       next: 12.2.4
@@ -165,7 +156,6 @@ importers:
       react-dom: ^17.0.2
       react-icons: ^4.2.0
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       styled-jsx: ^3.2.5
       tailwindcss: ^2.2.19
       tinacms: workspace:*
@@ -181,7 +171,6 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       react-icons: 4.4.0_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       styled-jsx: 3.4.7_react@17.0.2
       tinacms: link:../../packages/tinacms
       typescript: 4.3.5
@@ -191,7 +180,6 @@ importers:
       '@types/js-cookie': 3.0.2
       '@types/node': 16.11.41
       '@types/react': 17.0.47
-      '@types/styled-components': 5.1.25
       autoprefixer: 10.4.7_postcss@8.4.14
       postcss: 8.4.14
       postcss-import: 14.1.0_postcss@8.4.14
@@ -263,7 +251,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2
       react-is: ^17.0.2
-      styled-components: ^5.1.3
       tinacms: workspace:*
     dependencies:
       glob: 7.2.3
@@ -271,7 +258,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tinacms: link:../../packages/tinacms
     devDependencies:
       '@tinacms/cli': link:../../packages/@tinacms/cli
@@ -944,7 +930,6 @@ importers:
       '@types/react-dom': ^17.0.9
       '@types/react-select': ^2.0.11
       '@types/storybook__react': ^4.0.2
-      '@types/styled-components': 4.1.8
       '@udecode/plate-headless': ^14.0.2
       atob: 2.1.2
       color-string: ^1.5.3
@@ -973,7 +958,6 @@ importers:
       slate-history: ^0.66.0
       slate-hyperscript: ^0.77.0
       slate-react: ^0.81.0
-      styled-components: '>=4.1'
       tslib: ^2.3.0
       typescript: 4.3.5
       webfontloader: 1.6.28
@@ -1033,12 +1017,10 @@ importers:
       '@types/react-dom': 17.0.17
       '@types/react-select': 2.0.19
       '@types/storybook__react': 4.0.2
-      '@types/styled-components': 4.1.8
       jest: 27.5.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tslib: 2.4.0
       typescript: 4.3.5
 
@@ -1087,14 +1069,9 @@ importers:
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
-      '@types/react': ^16.9.43
-      '@types/styled-components': ^5.1.3
       cloudinary: ^1.25.2
       multer: 1.4.5-lts.1
       next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      styled-components: ^5.2.0
       tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
@@ -1106,12 +1083,7 @@ importers:
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
-      '@types/react': 16.14.28
-      '@types/styled-components': 5.1.25
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      styled-components: 5.3.5_sfoxds7t5ydpegc3knd667wn6m
+      next: 12.2.4
       tinacms: link:../tinacms
       typescript: 4.3.5
 
@@ -1123,13 +1095,8 @@ importers:
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
-      '@types/react': ^16.9.43
-      '@types/styled-components': ^5.1.3
       multer: 1.4.5-lts.1
       next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      styled-components: ^5.2.0
       tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
@@ -1141,12 +1108,7 @@ importers:
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
-      '@types/react': 16.14.28
-      '@types/styled-components': 5.1.25
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      styled-components: 5.3.5_sfoxds7t5ydpegc3knd667wn6m
+      next: 12.2.4
       tinacms: link:../tinacms
       typescript: 4.3.5
 
@@ -1160,12 +1122,8 @@ importers:
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
       '@types/react': ^16.9.43
-      '@types/styled-components': ^5.1.3
       multer: 1.4.5-lts.1
       next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      styled-components: ^5.2.0
       tinacms: workspace:*
       typescript: 4.3.5
     dependencies:
@@ -1179,11 +1137,7 @@ importers:
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
       '@types/react': 16.14.28
-      '@types/styled-components': 5.1.25
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      styled-components: 5.3.5_sfoxds7t5ydpegc3knd667wn6m
+      next: 12.2.4
       tinacms: link:../tinacms
       typescript: 4.3.5
 
@@ -1224,7 +1178,6 @@ importers:
       react-icons: ^4.3.1
       react-is: ^17.0.2
       react-router-dom: '6'
-      styled-components: ^5.2.0
       typescript: 4.3.5
       url-pattern: ^1.0.3
       yup: ^0.32.0
@@ -1267,7 +1220,6 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       typescript: 4.3.5
 
 packages:
@@ -4909,6 +4861,7 @@ packages:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
 
   /@babel/traverse/7.18.6:
     resolution:
@@ -5307,24 +5260,28 @@ packages:
       }
     dependencies:
       '@emotion/memoize': 0.7.5
+    dev: false
 
   /@emotion/memoize/0.7.5:
     resolution:
       {
         integrity: sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ==,
       }
+    dev: false
 
   /@emotion/stylis/0.8.5:
     resolution:
       {
         integrity: sha512-h6KtPihKFn3T9fuIrwvXXUOwlx3rfUvfZIcP5a6rh8Y7zjE3O06hT5Ss4S/YI1AYhuZ1kjaE/5EaOOI2NqSylQ==,
       }
+    dev: false
 
   /@emotion/unitless/0.7.5:
     resolution:
       {
         integrity: sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==,
       }
+    dev: false
 
   /@esbuild/android-arm/0.15.8:
     resolution:
@@ -8943,17 +8900,6 @@ packages:
       '@types/webpack-env': 1.17.0
     dev: true
 
-  /@types/styled-components/4.1.8:
-    resolution:
-      {
-        integrity: sha512-NrG0wmB9Rafy5i00GFxUM/uEge148bX2QPr+Q/MI2fXrew6WOp1hN2A3YEG0AeT45z47CMdJ3BEffPsdQCWayA==,
-      }
-    dependencies:
-      '@types/node': 18.0.0
-      '@types/react': 17.0.47
-      csstype: 2.6.20
-    dev: true
-
   /@types/styled-components/5.1.25:
     resolution:
       {
@@ -11633,12 +11579,14 @@ packages:
       lodash: 4.17.21
       picomatch: 2.3.1
       styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
+    dev: false
 
   /babel-plugin-syntax-jsx/6.18.0:
     resolution:
       {
         integrity: sha512-qrPaCSo9c8RHNRHIotaufGbuOBN8rtdC4QrrFFc43vyWCCz7Kl7GL1PGaXtMGQZUXrkCjNEgxDfmAuAabr/rlw==,
       }
+    dev: false
 
   /babel-plugin-syntax-trailing-function-commas/7.0.0-beta.0:
     resolution:
@@ -12251,6 +12199,7 @@ packages:
       {
         integrity: sha512-W2lPwkBkMZwFlPCXhIlYgxu+7gC/NUlCtdK652DAJ1JdgV0sTrvuPFshNPrFa1TY2JOkLhgdeEBplB4ezEa+xg==,
       }
+    dev: false
 
   /caniuse-lite/1.0.30001359:
     resolution:
@@ -13205,6 +13154,7 @@ packages:
         integrity: sha512-FyyrDHZKEjXDpNJYvVsV960FiqQyXc/LlYmsxl2BcdMb2WPx0OGRVgTg55rPSyLSNMqP52R9r8geSp7apN3Ofg==,
       }
     engines: { node: '>=4' }
+    dev: false
 
   /css-color-names/0.0.4:
     resolution:
@@ -13234,6 +13184,7 @@ packages:
       camelize: 1.0.0
       css-color-keywords: 1.0.0
       postcss-value-parser: 4.2.0
+    dev: false
 
   /css-tree/1.1.3:
     resolution:
@@ -13316,13 +13267,6 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       cssom: 0.3.8
-
-  /csstype/2.6.20:
-    resolution:
-      {
-        integrity: sha512-/WwNkdXfckNgw6S5R125rrW8ez139lBHWouiBvX8dfMFtcn6V81REDqnH7+CRpRipfYlyU1CmOnOxrmGcFOjeA==,
-      }
-    dev: true
 
   /csstype/3.1.0:
     resolution:
@@ -13630,6 +13574,7 @@ packages:
     dependencies:
       ms: 2.1.2
       supports-color: 5.5.0
+    dev: false
 
   /debug/4.3.4_supports-color@8.1.1:
     resolution:
@@ -25042,6 +24987,7 @@ packages:
       {
         integrity: sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==,
       }
+    dev: false
 
   /shebang-command/1.2.0:
     resolution:
@@ -25958,32 +25904,7 @@ packages:
       react-is: 17.0.2
       shallowequal: 1.1.0
       supports-color: 5.5.0
-
-  /styled-components/5.3.5_sfoxds7t5ydpegc3knd667wn6m:
-    resolution:
-      {
-        integrity: sha512-ndETJ9RKaaL6q41B69WudeqLzOpY1A/ET/glXkNZ2T7dPjPqpPCXXQjDFYZWwNnE5co0wX+gTCqx9mfxTmSIPg==,
-      }
-    engines: { node: '>=10' }
-    requiresBuild: true
-    peerDependencies:
-      react: '>= 16.8.0'
-      react-dom: '>= 16.8.0'
-      react-is: '>= 16.8.0'
-    dependencies:
-      '@babel/helper-module-imports': 7.18.6
-      '@babel/traverse': 7.18.13_supports-color@5.5.0
-      '@emotion/is-prop-valid': 1.1.3
-      '@emotion/stylis': 0.8.5
-      '@emotion/unitless': 0.7.5
-      babel-plugin-styled-components: 2.0.7_styled-components@5.3.5
-      css-to-react-native: 3.0.0
-      hoist-non-react-statics: 3.3.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      shallowequal: 1.1.0
-      supports-color: 5.5.0
-    dev: true
+    dev: false
 
   /styled-jsx/3.4.7_react@17.0.2:
     resolution:
