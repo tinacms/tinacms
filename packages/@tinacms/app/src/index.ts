@@ -25,7 +25,7 @@ export const viteBuild = async ({
   rootPath,
   outputFolder,
   publicFolder,
-  local: l,
+  local,
   apiUrl,
 }: {
   local: boolean
@@ -34,7 +34,6 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const local = true
   const node_env = JSON.stringify(process.env.NODE_ENV)
   const generatedPath = path.join(rootPath, '.tina/__generated__')
   /**
