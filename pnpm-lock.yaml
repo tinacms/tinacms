@@ -280,14 +280,14 @@ importers:
       autoprefixer: ^10.4.0
       final-form: 4.20.7
       fs-extra: ^9.0.1
-      graphql: 15.1.0
+      graphql: 15.8.0
       jest: ^27.0.6
       postcss: ^8.4.14
       postcss-nested: ^5.0.6
       react: 17.0.2
       react-dom: 17.0.2
       react-is: 17.0.2
-      react-router-dom: 6.4.2
+      react-router-dom: 6.3.0
       styled-components: 5.3.5
       tailwindcss: ^3.1.6
       tinacms: workspace:*
@@ -305,13 +305,13 @@ importers:
       autoprefixer: 10.4.7_postcss@8.4.14
       final-form: 4.20.7
       fs-extra: 9.1.0
-      graphql: 15.1.0
+      graphql: 15.8.0
       postcss: 8.4.14
       postcss-nested: 5.0.6_postcss@8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       react-is: 17.0.2
-      react-router-dom: 6.4.2_sfoxds7t5ydpegc3knd667wn6m
+      react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       styled-components: 5.3.5_fane7jikarojcev26y27hpbhu4
       tailwindcss: 3.1.8_postcss@8.4.14
       typescript: 4.7.4
@@ -7200,14 +7200,6 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
     dependencies:
       react: 17.0.2
-    dev: false
-
-  /@remix-run/router/1.0.2:
-    resolution:
-      {
-        integrity: sha512-GRSOFhJzjGN+d4sKHTMSvNeUPoZiDHWmRnXfzaxrqe7dE/Nzlc8BiMSJdLDESZlndM7jIUrZ/F4yWqVYlI0rwQ==,
-      }
-    engines: { node: '>=14' }
     dev: false
 
   /@rushstack/eslint-patch/1.1.3:
@@ -16990,14 +16982,6 @@ packages:
       graphql: 15.8.0
     dev: false
 
-  /graphql/15.1.0:
-    resolution:
-      {
-        integrity: sha512-0TVyfOlCGhv/DBczQkJmwXOK6fjWkjzY3Pt7wY8i0gcYXq8aogG3weCsg48m72lywKSeOqedEHvVPOvZvSD51Q==,
-      }
-    engines: { node: '>= 10.x' }
-    dev: false
-
   /graphql/15.8.0:
     resolution:
       {
@@ -17261,7 +17245,7 @@ packages:
         integrity: sha512-ZqaKwjjrAYUYfLG+htGaIIZ4nioX2L70ZUMIFysS3xvBsSG4x/n1V6TXV3N8ZYNuFGlDirFg32T7B6WOUPDYcQ==,
       }
     dependencies:
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
     dev: false
 
   /hoist-non-react-statics/3.3.2:
@@ -23880,22 +23864,6 @@ packages:
       react-router: 6.3.0_react@17.0.2
     dev: false
 
-  /react-router-dom/6.4.2_sfoxds7t5ydpegc3knd667wn6m:
-    resolution:
-      {
-        integrity: sha512-yM1kjoTkpfjgczPrcyWrp+OuQMyB1WleICiiGfstnQYo/S8hPEEnVjr/RdmlH6yKK4Tnj1UGXFSa7uwAtmDoLQ==,
-      }
-    engines: { node: '>=14' }
-    peerDependencies:
-      react: '>=16.8'
-      react-dom: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.0.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-router: 6.4.2_react@17.0.2
-    dev: false
-
   /react-router/6.3.0_react@17.0.2:
     resolution:
       {
@@ -23905,19 +23873,6 @@ packages:
       react: '>=16.8'
     dependencies:
       history: 5.3.0
-      react: 17.0.2
-    dev: false
-
-  /react-router/6.4.2_react@17.0.2:
-    resolution:
-      {
-        integrity: sha512-Rb0BAX9KHhVzT1OKhMvCDMw776aTYM0DtkxqUBP8dNBom3mPXlfNs76JNGK8wKJ1IZEY1+WGj+cvZxHVk/GiKw==,
-      }
-    engines: { node: '>=14' }
-    peerDependencies:
-      react: '>=16.8'
-    dependencies:
-      '@remix-run/router': 1.0.2
       react: 17.0.2
     dev: false
 

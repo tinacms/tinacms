@@ -25,7 +25,7 @@ export const viteBuild = async ({
   rootPath,
   outputFolder,
   publicFolder,
-  local,
+  local: l,
   apiUrl,
 }: {
   local: boolean
@@ -34,6 +34,8 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
+  const local = l
+  const localBuild = l
   const node_env = JSON.stringify(process.env.NODE_ENV)
   const generatedPath = path.join(rootPath, '.tina/__generated__')
   /**
@@ -149,6 +151,7 @@ export const viteBuild = async ({
     },
     resolve: {
       alias,
+      dedupe: ['graphql'],
     },
     build: {
       sourcemap: true,
@@ -181,7 +184,7 @@ export const viteBuild = async ({
     `index.html
 assets/`
   )
-  if (local) {
+  if (localBuild) {
     const replaceAll = (string: string, target: string, value: string) => {
       const regex = new RegExp(target, 'g')
       return string.valueOf().replace(regex, value)
