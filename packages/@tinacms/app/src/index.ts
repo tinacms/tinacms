@@ -13,7 +13,7 @@ limitations under the License.
 
 import fs from 'fs-extra'
 import path from 'path'
-import { build, createServer } from 'vite'
+import { build, createServer, splitVendorChunkPlugin } from 'vite'
 import type { InlineConfig, ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
@@ -25,7 +25,7 @@ export const viteBuild = async ({
   rootPath,
   outputFolder,
   publicFolder,
-  local,
+  local: l,
   apiUrl,
 }: {
   local: boolean
@@ -34,6 +34,8 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
+  const local = true
+  const node_env = JSON.stringify(process.env.NODE_ENV)
   const generatedPath = path.join(rootPath, '.tina/__generated__')
   /**
    * The final location of the SPA assets
@@ -86,6 +88,7 @@ export const viteBuild = async ({
     esbuild: {
       target: 'es2020',
     },
+    mode: local ? 'development' : 'production',
     build: {
       outDir: path.join(generatedPath, 'prebuild'),
       lib: {
@@ -96,7 +99,7 @@ export const viteBuild = async ({
         formats: ['es'],
       },
       rollupOptions: {
-        external: ['react', 'react-dom', 'tinacms'],
+        external: ['react', 'react-dom', 'tinacms', 'next'],
       },
     },
     logLevel: 'silent',
@@ -111,12 +114,27 @@ export const viteBuild = async ({
     root: appRootPath,
     base: `/${outputFolder}/`,
     mode: local ? 'development' : 'production',
-    plugins: [react(), viteTina()],
+    /**
+     * `splitVendorChunkPlugin` is needed because `tinacms` and `@tinacms/toolkit` are quite large,
+     * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
+     */
+    plugins: [splitVendorChunkPlugin(), react(), viteTina()],
     define: {
-      // Not sure this is needed anymore, but does seem like
-      // somewhere `process.env.NODE_ENV` is getting populated
-      // Maybe some context? https://github.com/vitejs/vite/pull/8090#issuecomment-1184929037
-      'process.env': {},
+      /**
+       * Since we prebuild the config.ts, it's possible for modules to be loaded which make
+       * use of `process`. The main scenario where this is an issue is when co-locating schema
+       * definitions with source files, and specifically source files which impor from NextJS.
+       *
+       * Some examples of what NextJS uses for `process.env` are:
+       *  - `process.env.__NEXT_TRAILING_SLASH`
+       *  - `process.env.__NEXT_CROSS_ORIGIN`
+       *  - `process.env.__NEXT_I18N_SUPPORT`
+       *
+       * Also, interestingly some of the advice for handling this doesn't work, references to replacing
+       * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
+       * but node does. This was a surprise, but using `new Object()` seems to do the trick.
+       */
+      'process.env': 'new Object()',
       __API_URL__: `"${apiUrl}"`,
     },
     // NextJS forces es5 on tsconfig, specifying it here ignores that
@@ -176,6 +194,16 @@ assets/`
   } else {
     await fs.outputFile(prodHTMLPath, prodHTML)
     await build(config)
+  }
+  /**
+   * Vite alters the value of `process.env.NODE_ENV` on production builds.
+   * Set it back to the previous value, and if there wasn't a value, remove
+   * it from `process.env`.
+   */
+  if (!node_env) {
+    delete process.env.NODE_ENV
+  } else {
+    process.env.NODE_ENV = node_env
   }
 }
 
