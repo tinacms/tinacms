@@ -12,6 +12,9 @@ limitations under the License.
 */
 import React from 'react'
 
+const btoa = (string: string) =>
+  Buffer.from(string, 'binary').toString('base64')
+
 /**
  * This is an experimental version of the useTina hook,
  * it is only meant to be used with Tina in "iframe mode".
