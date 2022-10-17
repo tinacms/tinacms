@@ -137,6 +137,9 @@ export const queryMachine = createMachine(
           }
         | {
             type: 'FIELD_CHANGE'
+          }
+        | {
+            type: 'EDIT_MODE'
           },
     },
     type: 'parallel',
@@ -155,6 +158,11 @@ export const queryMachine = createMachine(
         },
       },
       pipeline: {
+        on: {
+          EDIT_MODE: {
+            actions: 'editMode',
+          },
+        },
         initial: 'idle',
         states: {
           idle: {
@@ -223,6 +231,17 @@ export const queryMachine = createMachine(
   },
   {
     actions: {
+      editMode: (context) => {
+        console.log('editMode foo')
+        if (context.iframe) {
+          context.iframe?.contentWindow?.postMessage({
+            type: 'tina:editMode',
+          })
+        }
+        return {
+          ...context,
+        }
+      },
       handleError: (_context, event) => console.error(event.data),
       handleMissingDocument: assign((context, event) => {
         count = count + 1

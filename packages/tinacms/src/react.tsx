@@ -40,12 +40,15 @@ export function useTina<T extends object>(props: {
 
 export function useEditState(): { edit: boolean } {
   const [edit, setEdit] = React.useState(false)
-  if (typeof window !== 'undefined') {
-    window.addEventListener('message', (event) => {
-      if (event.data?.type === 'tina:updateData') {
-        setEdit(true)
-      }
-    })
-  }
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      parent.postMessage({ type: 'isEditMode' }, window.location.origin)
+      window.addEventListener('message', (event) => {
+        if (event.data?.type === 'tina:editMode') {
+          setEdit(true)
+        }
+      })
+    }
+  }, [])
   return { edit } as any
 }

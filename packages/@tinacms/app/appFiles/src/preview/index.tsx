@@ -49,6 +49,9 @@ export const Preview = (props) => {
         if (event.data.type === 'open') {
           send({ type: 'ADD_QUERY', value: event.data })
         }
+        if (event.data.type === 'isEditMode') {
+          send({ type: 'EDIT_MODE' })
+        }
         if (event.data.type === 'close') {
           send({ type: 'REMOVE_QUERY', value: event.data.id })
         }
