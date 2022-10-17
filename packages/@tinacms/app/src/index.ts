@@ -183,9 +183,13 @@ export const viteBuild = async ({
 assets/`
   )
   if (local) {
+    const replaceAll = (string: string, target: string, value: string) => {
+      const regex = new RegExp(target, 'g')
+      return string.valueOf().replace(regex, value)
+    }
     await fs.outputFile(
       devHTMLPath,
-      devHTML.replaceAll('INSERT_OUTPUT_FOLDER_NAME', outputFolder)
+      replaceAll(devHTML, 'INSERT_OUTPUT_FOLDER_NAME', outputFolder)
     )
     if (server) {
       await server.close()
