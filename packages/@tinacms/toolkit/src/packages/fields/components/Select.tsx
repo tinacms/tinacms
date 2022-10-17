@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { MdKeyboardArrowDown } from 'react-icons/md'
 
 type Option = {

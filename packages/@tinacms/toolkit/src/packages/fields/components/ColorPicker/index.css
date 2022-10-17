@@ -1,0 +1,27 @@
+@keyframes color-popup-keyframes {
+  0% {
+    transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
+  }
+}
+
+@keyframes color-popup-open-top-keyframes {
+  0% {
+    transform: translate3d(-50%, -100%, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
+  }
+}
+
+.color-picker-clip-path::before,
+.color-picker-clip-path::after {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.color-picker-on-top-clip-path::before,
+.color-picker-on-top-clip-path::after {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}

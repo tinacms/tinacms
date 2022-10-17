@@ -232,6 +232,12 @@ export const viteTina = (): Plugin => {
             maxWidth: {
               form: '900px',
             },
+            screens: {
+              xs: '320px',
+              sm: '560px',
+              md: '720px',
+              lg: '1030px',
+            },
           },
         },
         content: [

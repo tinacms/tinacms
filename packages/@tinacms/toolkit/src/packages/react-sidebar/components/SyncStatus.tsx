@@ -229,7 +229,7 @@ export const SyncStatusModal = ({ closeEventsModal, cms }) => (
   <Modal>
     <FullscreenModal>
       <ModalHeader close={closeEventsModal}>Event Log</ModalHeader>
-      <ModalBody padded={true}>
+      <ModalBody className="flex h-full flex-col" padded={true}>
         <EventsList cms={cms} />
       </ModalBody>
     </FullscreenModal>

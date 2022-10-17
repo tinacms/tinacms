@@ -408,6 +408,12 @@ const config = (cwd = '') => {
         maxWidth: {
           form: '900px',
         },
+        screens: {
+          xs: '320px',
+          sm: '560px',
+          md: '720px',
+          lg: '1030px',
+        },
       },
     },
     content: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
