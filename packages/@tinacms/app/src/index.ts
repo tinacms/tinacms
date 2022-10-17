@@ -158,6 +158,7 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
+  // Set to true during monorepo dev (TODO: automate this)
   if (false) {
     await fs.copy(appCopyPath, appRootPath)
   } else {
