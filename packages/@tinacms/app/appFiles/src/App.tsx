@@ -30,8 +30,7 @@ export const TinaAdminWrapper = () => {
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
       <SetPreview outputFolder={config.build.outputFolder} />
-      <TinaAdmin preview={<Preview {...config} />} />
-      <TinaAdmin />
+      <TinaAdmin preview={Preview} config={config} />
     </TinaCMS>
   )
 }
