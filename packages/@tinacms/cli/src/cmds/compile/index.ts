@@ -254,7 +254,7 @@ export const compileFile = async (
     })
     await transpile(
       inputFile,
-      `${fileName}.js`,
+      `${fileName}.cjs`,
       tinaTempPath,
       options.verbose,
       define,
@@ -274,7 +274,7 @@ export const compileFile = async (
   let returnObject = {}
 
   try {
-    const schemaFunc = require(path.join(tinaTempPath, `${fileName}.js`))
+    const schemaFunc = require(path.join(tinaTempPath, `${fileName}.cjs`))
     returnObject = schemaFunc.default
     await cleanup({ tinaTempPath })
   } catch (e) {
