@@ -69,7 +69,11 @@ export const RichEditor = (props: RichTextType) => {
         initialValue={initialValue}
         plugins={plugins}
         onChange={(value) => {
-          props.input.onChange({ type: 'root', children: value })
+          const newVal = {
+            ...props.input.value,
+            json: { type: 'root', children: value },
+          }
+          props.input.onChange(newVal)
         }}
         firstChildren={
           <>
