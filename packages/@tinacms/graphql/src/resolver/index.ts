@@ -694,17 +694,18 @@ export class Resolver {
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
         case 'rich-text':
-          // @ts-ignore
-          accum[fieldName] = {
-            json: stringifyMDX(fieldValue as any, field, (fieldValue) =>
-              resolveMediaCloudToRelative(
+          accum[fieldName] = stringifyMDX(
+            (fieldValue as any).json as any,
+            field,
+            (fieldValue) => {
+              return resolveMediaCloudToRelative(
                 fieldValue as string,
                 this.config,
                 this.tinaSchema.schema
               )
-            ),
-            raw: fieldValue,
-          }
+            }
+          )
+
           break
         case 'reference':
           accum[fieldName] = fieldValue
