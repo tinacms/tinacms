@@ -20,11 +20,6 @@
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/tina-graphql"
   },
-  "peerDependencies": {
-    "next": ">=10.0.5",
-    "react": ">=16.14.0",
-    "react-dom": ">=16.14.0"
-  },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",

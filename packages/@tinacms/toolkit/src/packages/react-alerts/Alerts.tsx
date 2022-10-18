@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled, { css, keyframes } from 'styled-components'
 import { Alerts as AlertsCollection, AlertLevel } from '../alerts'
 import {
   AlertIcon,
@@ -44,18 +43,26 @@ export function Alerts({ alerts }: AlertsProps) {
 
   return (
     <>
-      <AlertContainer>
+      <div className="fixed bottom-0 left-0 right-0 p-6 flex flex-col items-center z-[999999] pointer-events-none">
         {alerts.all
           .filter((alert) => {
             return alert.level !== 'error'
           })
-          .map((alert, i) => {
+          .map((alert) => {
             return (
-              <Alert key={alert.id} index={i} level={alert.level}>
-                {alert.level === 'info' && <InfoIcon />}
-                {alert.level === 'success' && <AlertIcon />}
-                {alert.level === 'warn' && <WarningIcon />}
-                <p>{alert.message}</p>
+              <Alert key={alert.id} level={alert.level}>
+                {alert.level === 'info' && (
+                  <InfoIcon className="w-5 h-5 mr-2" />
+                )}
+                {alert.level === 'success' && (
+                  <AlertIcon className="w-5 h-5 mr-2" />
+                )}
+                {alert.level === 'warn' && (
+                  <WarningIcon className="w-5 h-5 mr-2" />
+                )}
+                <p className="m-0 flex-1 max-w-[680px] text-left">
+                  {alert.message}
+                </p>
                 <CloseAlert
                   onClick={() => {
                     alerts.dismiss(alert)
@@ -64,7 +71,7 @@ export function Alerts({ alerts }: AlertsProps) {
               </Alert>
             )
           })}
-      </AlertContainer>
+      </div>
       {alerts.all
         .filter((alert) => {
           return alert.level === 'error'
@@ -116,120 +123,43 @@ export function Alerts({ alerts }: AlertsProps) {
   )
 }
 
-const AlertContainer = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 999999;
-  pointer-events: none;
-`
-
-const AlertEntranceAnimation = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 100%, 0);
+const Alert: React.FC<{ level: AlertLevel }> = ({ level, ...props }) => {
+  const fillColor = {
+    info: 'var(--tina-color-primary)',
+    success: 'var(--tina-color-success)',
+    warn: 'var(--tina-color-dark)',
+    error: 'var(--tina-color-error)',
   }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-`
-
-const Alert = styled.div<{ level: AlertLevel; index: number }>`
-  text-align: center;
-  border: 0;
-  border-radius: var(--tina-radius-small);
-  box-shadow: var(--tina-shadow-small);
-  background-color: var(--tina-color-grey-1);
-  border: 1px solid var(--tina-color-grey-2);
-  color: var(--tina-color-grey-9);
-  fill: var(--tina-color-primary);
-  font-weight: var(--tina-font-weight-regular);
-  pointer-events: all;
-  cursor: pointer;
-  font-size: var(--tina-font-size-2);
-  padding: 8px 4px 8px 12px;
-  transition: all var(--tina-timing-short) ease-out;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  min-width: 350px;
-  max-width: 100%;
-
-  animation-name: ${AlertEntranceAnimation};
-  animation-timing-function: ease-out;
-  animation-iteration-count: 1;
-  animation-fill-mode: both;
-  animation-duration: 150ms;
-
-  p {
-    margin: 0;
-    flex: 1 1 auto;
-    white-space: wrap;
-    max-width: 680px;
-    text-align: left;
+  const borderColor = {
+    info: 'var(--tina-color-primary)',
+    success: 'var(--tina-color-success)',
+    warn: 'var(--tina-color-warning)',
+    error: 'var(--tina-color-error)',
   }
 
-  svg {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-    flex: 0 0 auto;
-  }
-
-  ${(props) =>
-    props.level === 'info' &&
-    css`
-      fill: var(--tina-color-primary);
-      border-left: 6px solid var(--tina-color-primary);
-    `};
-
-  ${(props) =>
-    props.level === 'success' &&
-    css`
-      fill: var(--tina-color-success);
-      border-left: 6px solid var(--tina-color-success);
-    `};
-
-  ${(props) =>
-    props.level === 'warn' &&
-    css`
-      fill: var(--tina-color-warning-dark);
-      border-left: 6px solid var(--tina-color-warning);
-    `};
-
-  ${(props) =>
-    props.level === 'error' &&
-    css`
-      fill: var(--tina-color-error);
-      border-left: 6px solid var(--tina-color-error);
-    `};
-`
-
-const CloseAlert = styled(({ ...styleProps }) => {
   return (
-    <button {...styleProps}>
-      <CloseIcon />
-    </button>
+    <div
+      className={`text-center rounded-[5px] bg-gray-50 border border-solid border-gray-100 text-gray-800 fill-blue-500 font-normal cursor-pointer text-[15px] py-2 pr-1 pl-3 transition-all duration-100 ease-out mb-4 flex items-center min-w-[350px] max-w-full `}
+      style={{
+        pointerEvents: 'all',
+        animationName: 'fly-in-up, fade-in',
+        animationTimingFunction: 'ease-out',
+        animationIterationCount: 1,
+        animationFillMode: 'both',
+        animationDuration: '150ms',
+        fill: fillColor[level],
+        borderLeft: `6px solid ${borderColor[level]}`,
+      }}
+      {...props}
+    />
   )
-})`
-  border: none;
-  background: transparent;
-  padding: 0;
-  margin-left: 14px;
-  outline: none;
-  fill: var(--tina-color-grey-5);
-  display: flex;
-  align-items: center;
+}
 
-  svg {
-    width: 20px;
-    height: 20px;
-    flex: 0 0 auto;
-  }
-`
+const CloseAlert = ({ ...styleProps }) => (
+  <button
+    className="border-none bg-transparent p-0 ml-[14px] outline-none fill-gray-400 flex items-center"
+    {...styleProps}
+  >
+    <CloseIcon className="w-5 h-5 flex-grow-0 flex-shrink-0 basis-[auto] mr-2" />
+  </button>
+)

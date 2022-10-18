@@ -31,6 +31,7 @@ interface ResetFormProps {
   children: any
   pristine: boolean
   reset(): void
+  style?: React.CSSProperties
 }
 
 export const ResetForm: FC<ResetFormProps> = ({

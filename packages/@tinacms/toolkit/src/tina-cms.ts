@@ -42,7 +42,6 @@ import {
 import { Form } from './packages/forms'
 import { Alerts, EventsToAlerts } from './packages/alerts'
 import { SidebarState, SidebarStateOptions } from './packages/react-sidebar'
-import { ToolbarStateOptions, ToolbarState } from './packages/react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
@@ -74,7 +73,6 @@ const DEFAULT_FIELDS = [
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
-  toolbar?: ToolbarStateOptions | boolean
   alerts?: EventsToAlerts
   isLocalClient?: boolean
   clientId?: string
@@ -82,12 +80,10 @@ export interface TinaCMSConfig extends CMSConfig {
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
-  toolbar?: ToolbarState
   _alerts?: Alerts
 
   constructor({
     sidebar,
-    toolbar,
     alerts = {},
     isLocalClient,
     clientId,
@@ -117,11 +113,6 @@ export class TinaCMS extends CMS {
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
       this.sidebar = new SidebarState(this.events, sidebarConfig)
-    }
-
-    if (toolbar) {
-      const toolbarConfig = typeof toolbar === 'object' ? toolbar : undefined
-      this.toolbar = new ToolbarState(toolbarConfig)
     }
 
     DEFAULT_FIELDS.forEach((field) => {
