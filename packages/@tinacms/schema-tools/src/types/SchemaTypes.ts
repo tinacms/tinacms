@@ -85,8 +85,23 @@ export type TinaIndex = {
 }
 
 export interface UICollection {
+  /**
+   * Customize the way filenames are generated during content creation
+   */
   filename?: {
+    /**
+     * A callback which receives form values as an argument. The return value
+     * here will be used as the filename (the extension is not necessary)
+     *
+     * eg:
+     * ```ts
+     * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
+     * ```
+     */
     slugify?: (values: Record<string, any>) => string
+    /**
+     * When set to `true`, editors won't be able to modify the filename
+     */
     readonly?: boolean
   }
   /**
@@ -109,7 +124,7 @@ export interface UICollection {
   }) => string | undefined
 }
 
-type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
+export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
 
 interface BaseCollection {
   label?: string
@@ -195,7 +210,7 @@ type ScalarType<WithNamespace extends boolean> = WithNamespace extends true
   ? ScalarTypeWithNamespace
   : ScalarTypeInner
 
-type Option =
+export type Option =
   | string
   | {
       label: string
