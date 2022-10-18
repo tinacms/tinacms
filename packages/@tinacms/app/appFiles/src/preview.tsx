@@ -14,7 +14,6 @@ import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
 import { useCMS, defineStaticConfig } from 'tinacms'
-import {} from 'tinacms/dist/edit-state'
 
 type Config = Parameters<typeof defineStaticConfig>[0]
 
