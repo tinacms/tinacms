@@ -51,7 +51,6 @@ export const FormsView = ({
   React.useMemo(
     () =>
       cms.events.subscribe('forms:register', (event) => {
-        console.log('forms:register', event)
         if (event.value === 'start') {
           setFormsRegistering(true)
         } else {
