@@ -14,8 +14,15 @@ import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
 import { useCMS, defineStaticConfig } from 'tinacms'
+import {} from 'tinacms/dist/edit-state'
 
 type Config = Parameters<typeof defineStaticConfig>[0]
+
+type PostMessage = {
+  type: 'open' | 'close'
+  id: string
+  data: object
+}
 
 export const Preview = (
   props: Config & {
@@ -23,30 +30,13 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
-  const cms = useCMS()
-
-  const machine = React.useMemo(
-    () =>
-      queryMachine.withContext({
-        ...initialContext,
-        cms,
-        // @ts-ignore FIXME: add formifyCallback args to Config type
-        formifyCallback: props.formifyCallback,
-      }),
-    []
-  )
-
-  const [, send] = useMachine(machine)
+  const [activeQuery, setActiveQuery] = React.useState<PostMessage | null>(null)
 
   React.useEffect(() => {
     if (props.iframeRef.current) {
-      send({ type: 'IFRAME_MOUNTED', value: props.iframeRef.current })
-      window.addEventListener('message', (event) => {
+      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
         if (event.data.type === 'open') {
-          send({ type: 'ADD_QUERY', value: event.data })
-        }
-        if (event.data.type === 'close') {
-          send({ type: 'REMOVE_QUERY', value: event.data.id })
+          setActiveQuery(event.data)
         }
       })
     }
@@ -54,6 +44,13 @@ export const Preview = (
 
   return (
     <div className="tina-tailwind">
+      {activeQuery && (
+        <QueryMachine
+          key={activeQuery.id}
+          payload={activeQuery}
+          iframeRef={props.iframeRef}
+        />
+      )}
       <div className="h-full overflow-scroll">
         <div className="">
           <div className="col-span-5 ">
@@ -71,4 +68,41 @@ export const Preview = (
       </div>
     </div>
   )
+}
+
+const QueryMachine = (props: {
+  payload: PostMessage
+  iframeRef: React.MutableRefObject<HTMLIFrameElement>
+}) => {
+  const cms = useCMS()
+
+  const machine = React.useMemo(
+    () =>
+      queryMachine.withContext({
+        ...initialContext,
+        cms,
+        // @ts-ignore FIXME: add formifyCallback args to Config type
+        formifyCallback: props.formifyCallback,
+      }),
+    []
+  )
+
+  const [state, send] = useMachine(machine)
+  React.useEffect(() => {
+    if (state.matches('pipeline.ready')) {
+      cms.events.dispatch({ type: 'forms:register', value: 'complete' })
+    } else {
+      cms.events.dispatch({ type: 'forms:register', value: 'start' })
+    }
+  }, [JSON.stringify(state.value)])
+
+  React.useEffect(() => {
+    if (props.iframeRef.current) {
+      if (props.payload.type === 'open') {
+        send({ type: 'ADD_QUERY', value: props.payload })
+      }
+    }
+  }, [props.iframeRef.current])
+
+  return null
 }
