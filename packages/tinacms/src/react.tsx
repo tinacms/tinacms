@@ -12,9 +12,6 @@ limitations under the License.
 */
 import React from 'react'
 
-const btoa = (string: string) =>
-  Buffer.from(string, 'binary').toString('base64')
-
 /**
  * This is an experimental version of the useTina hook,
  * it is only meant to be used with Tina in "iframe mode".
@@ -25,9 +22,7 @@ export function useTina<T extends object>(props: {
   data: T
 }): { data: T } {
   const [data, setData] = React.useState(props.data)
-  const id = btoa(
-    JSON.stringify({ query: props.query, variables: props.variables })
-  )
+  const id = JSON.stringify({ query: props.query, variables: props.variables })
   React.useEffect(() => {
     setData(props.data)
   }, [id])
