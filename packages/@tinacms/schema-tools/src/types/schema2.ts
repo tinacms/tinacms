@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { Option, UICollection } from './SchemaTypes'
+
 /**
  * NOTE this is WIP - it's not being used but ideally
  * we can start to leverage it for the `defineStaticConfig`
@@ -37,6 +39,9 @@ type UIField<Type> = {
     meta: any
     // field: UIField<F, Shape>
   ): Type | undefined | void
+  /**
+   * @deprecated use `defaultItem` at the collection level instead
+   */
   defaultValue?: Type
 }
 
@@ -62,14 +67,18 @@ type FieldGeneric<Type> =
       ui?: UIField<Type | undefined>
     }
 
-type BaseField<Type> = {
+type BaseField<Type, Ui extends object = undefined> = {
   name: string
   label?: string
   description?: string
+  ui?: Ui extends object ? UIField<Type> & Ui : UIField<Type>
 } & FieldGeneric<Type>
 
 type StringFieldBase = {
   type: 'string'
+  /** Designate this field's value as the document title  */
+  isTitle?: boolean
+  options?: Option[]
 } & BaseField<string>
 
 type StringField = StringFieldBase & FieldGeneric<string>
@@ -92,13 +101,25 @@ type ReferenceField = {
 } & BaseField<string> // TODO: Reference with `list: true` not yet supported
 type RichTextField = {
   type: 'rich-text'
+  /**
+   * For markdown or MDX formats, this value will be
+   * saved to the document body
+   */
   isBody?: boolean
 } & BaseField<object> &
-  WithTemplates
+  WithTemplates<true>
 // FIXME: This produces `any` on the Type generic
 type ObjectField = ({
   type: 'object'
-} & BaseField<object>) &
+} & BaseField<
+  object,
+  {
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      label?: string
+    }
+  }
+>) &
   (WithFields | WithTemplates)
 
 type Field =
@@ -126,10 +147,15 @@ type Template = {
   }
 }
 
-type WithTemplates = {
-  templates: Template[]
-  fields?: never
-}
+type WithTemplates<Optional extends boolean = false> = Optional extends true
+  ? {
+      templates?: Template[]
+      fields?: never
+    }
+  : {
+      templates: Template[]
+      fields?: never
+    }
 
 type TinaCMSCollection = {
   label?: string
@@ -137,9 +163,15 @@ type TinaCMSCollection = {
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx'
   match?: string
+  ui?: UICollection
 } & (WithTemplates | WithFields)
 
-type TinaCMSSchema = {
+/**
+ * @deprecated use TinaCMSSchema instead
+ */
+export type TinaCloudSchema = TinaCMSSchema
+
+export type TinaCMSSchema = {
   collections: TinaCMSCollection[]
 }
 
