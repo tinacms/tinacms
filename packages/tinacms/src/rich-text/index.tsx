@@ -85,14 +85,15 @@ export const TinaMarkdown = ({
   content,
   components = {},
 }: {
-  content: TinaMarkdownContent | TinaMarkdownContent[]
+  content: { json: TinaMarkdownContent | TinaMarkdownContent[] }
   // FIXME: {} should be passed in
   components?: Components<{}>
 }) => {
-  if (!content) {
+  const jsonContent = content.json
+  if (!jsonContent) {
     return null
   }
-  const nodes = Array.isArray(content) ? content : content.children
+  const nodes = Array.isArray(jsonContent) ? jsonContent : jsonContent.children
   if (!nodes) {
     return null
   }

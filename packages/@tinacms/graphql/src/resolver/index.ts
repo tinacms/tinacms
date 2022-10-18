@@ -695,13 +695,16 @@ export class Resolver {
           break
         case 'rich-text':
           // @ts-ignore
-          accum[fieldName] = stringifyMDX(fieldValue, field, (fieldValue) =>
-            resolveMediaCloudToRelative(
-              fieldValue as string,
-              this.config,
-              this.tinaSchema.schema
-            )
-          )
+          accum[fieldName] = {
+            json: stringifyMDX(fieldValue as any, field, (fieldValue) =>
+              resolveMediaCloudToRelative(
+                fieldValue as string,
+                this.config,
+                this.tinaSchema.schema
+              )
+            ),
+            raw: fieldValue,
+          }
           break
         case 'reference':
           accum[fieldName] = fieldValue
@@ -767,7 +770,7 @@ export class Resolver {
             )
           }
         }
-        accumulator[field.name] = tree
+        accumulator[field.name] = { json: tree, raw: value }
         break
       case 'object':
         if (field.list) {

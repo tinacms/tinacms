@@ -26,6 +26,7 @@ import path from 'path'
 
 import type { Builder } from './builder'
 import { Database } from './database'
+import { staticDefinitions } from './builder/static-definitions'
 
 export const buildDotTinaFiles = async ({
   database,
@@ -177,7 +178,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    * Definitions for the GraphQL AST
    */
   const definitions = []
-  definitions.push(await builder.buildStaticDefinitions())
+  definitions.push(staticDefinitions)
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 

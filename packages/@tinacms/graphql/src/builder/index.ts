@@ -14,7 +14,6 @@ limitations under the License.
 import { Database } from '../database'
 import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
-import { staticDefinitions } from './static-definitions'
 
 import type {
   UnionTypeDefinitionNode,
@@ -752,12 +751,6 @@ export class Builder {
     })
   }
 
-  /**
-   * GraphQL type definitions which remain unchanged regardless
-   * of the supplied Tina schema. Ex. "node" interface
-   */
-  public buildStaticDefinitions = () => staticDefinitions
-
   private _buildCollectionDocumentType = async (
     collection: TinaCloudCollectionEnriched,
     suffix: string = '',
@@ -1080,8 +1073,8 @@ export class Builder {
         })
       case 'rich-text':
         if (!field.templates || field.templates.length === 0) {
-          return astBuilder.InputValueDefinition({
-            name: field.name,
+          const jsonNode = astBuilder.InputValueDefinition({
+            name: 'json',
             type: astBuilder.InputObjectTypeDefinition({
               name: NAMER.dataFilterTypeName(['richText']),
               fields: [
@@ -1098,6 +1091,19 @@ export class Builder {
                   type: astBuilder.TYPES.Boolean,
                 }),
               ],
+            }),
+          })
+
+          const rawNode = astBuilder.InputValueDefinition({
+            name: 'raw',
+            type: astBuilder.TYPES.String,
+          })
+
+          return astBuilder.InputValueDefinition({
+            name: field.name,
+            type: astBuilder.InputObjectTypeDefinition({
+              name: field.name,
+              fields: [jsonNode, rawNode],
             }),
           })
         }

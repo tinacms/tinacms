@@ -31,8 +31,8 @@ import { RichTextType } from '..'
 export const RichEditor = (props: RichTextType) => {
   const initialValue = React.useMemo(
     () =>
-      props.input.value?.children?.length
-        ? props.input.value.children.map(helpers.normalize)
+      props.input.value?.json?.children?.length
+        ? props.input.value?.json?.children.map(helpers.normalize)
         : [{ type: 'p', children: [{ type: 'text', text: '' }] }],
     []
   )
