@@ -97,6 +97,7 @@ const QueryMachine = (props: {
 
   React.useEffect(() => {
     if (props.iframeRef.current) {
+      send({ type: 'IFRAME_MOUNTED', value: props.iframeRef.current })
       if (props.payload.type === 'open') {
         send({ type: 'ADD_QUERY', value: props.payload })
       }
