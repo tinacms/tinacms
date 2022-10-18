@@ -28,6 +28,7 @@ import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
 import { EditContext } from '@tinacms/sharedctx'
+import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
 
 export const FormsView = ({
   children,
@@ -44,7 +45,21 @@ export const FormsView = ({
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
-  const { formsRegistering } = React.useContext(EditContext)
+  const { formsRegistering, setFormsRegistering } =
+    React.useContext(EditContext)
+
+  React.useMemo(
+    () =>
+      cms.events.subscribe('forms:register', (event) => {
+        console.log('forms:register', event)
+        if (event.value === 'start') {
+          setFormsRegistering(true)
+        } else {
+          setFormsRegistering(false)
+        }
+      }),
+    []
+  )
 
   /**
    * If there's only one form, make it the active form.
@@ -84,7 +99,7 @@ export const FormsView = ({
    * No Forms
    */
   if (!forms.length) {
-    if (formsRegistering) return <></>
+    if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 

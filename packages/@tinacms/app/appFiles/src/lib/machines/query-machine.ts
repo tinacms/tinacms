@@ -45,25 +45,17 @@ type ContextType = {
   cms: TinaCMS
   selectedDocument: string | null
   iframe: null | HTMLIFrameElement
-  iframeWidth: string
   formifyCallback: (args: any) => Form
   documentMap: DocumentMap
   blueprints: Blueprint2[]
-  documentsToResolve: { id: string; location: string }[]
 }
-export const initialContext: ContextType = {
+export const initialContext: Omit<ContextType, 'cms' | 'formifyCallback'> = {
   id: null,
   data: null,
   selectedDocument: null,
   blueprints: [],
-  // @ts-ignore
-  cms: null,
-  iframeWidth: '200px',
   documentMap: {},
-  // @ts-ignore
-  formifyCallback: null,
   iframe: null,
-  documentsToResolve: [],
 }
 export const queryMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgFcAnAGxNwirAGIBlAUQBUB9AVQCUAZRKAAOAe1i4ALrlH4hIAB6IAjAAYALCXXqAnACZVAVmUAOAGxmAzMp1mANCACeidXpMkdnnSZvLDh1X11AF9ghzQsPEJSSho6BhYOTgBJADkABW4uPkEkEDEJaVl5JQQAdh0SMtVqvTqassN1M0MHZwRLdWUPLx8dPwCg0PCMHAJicmpaeiY2LgARZOZ0-gBBAE0eAXkCqRk5PNKyvRJVM-OL8+U2xD0mns8+gcC9ELCQCLHoybiZxm50vNVuxWFtciJxHtiodECZKqoLOpVMpjiYTGUyp0bghlGYyg9vL5-C83iNIuNSMJcMIwFRxtMEqt5vNOABFbisXjrHaQooHUBHPSWEiGSw6VSWUWYvRWHTYsro07nSzIpE+CrDD6jKITKk0umEBmzbgAIXmAHkAMLcACyrFS7GYPMK+xKiGOwtF4sllmlsuxOlcIquJlUJm04pMms+Osp1Np9PiTGSADFeKs7ZwbebuA7WPNnVD+YpEKKzCKFWG0dZkSZWk5YRKlWdDMc8f5SVryd89QnDQQ9ug6QAvAhQRgQWRgWj4ABuogA1tOYxSSL2DdOB9Ih7hR-goAgCPPMOg+QBtVQAXULfLdOLU+Neej8yksNdM9faCs0l3FrleorRtqq7rom+CDiOY6MGAFAUKIFBrlQp4AGbwagJArj28YbjOEG7mOh5zqIJ7nleN6ujC941CQT4vm+agftiZg6Piv4aHU6iAe8mG6th9IAO7oHs+6MBa1p2g6nC8KwTLcnkuy3pRygPjRrh0e+dbYspujNmcf4cU0QHdrx+r0jS+AQFBk79kRS4YcBWGmYa5mWfuhHHqe+wXte8m8hRAoqKYmiSn4Mr0bWn4qJYipeJ4gSto0zRGV8Jl9tOLlQTBcEIcISGSKhFDoTxcZOelYAWQRR7EZ5sjeeR0IBVRj5qcY4WMQ2OIIicbH-pxnbFWufGGhQYDoBAjj-ICwKgjk9XFqUlh4iQnS+kiOgJU09gdfo5YXCqyhqiiOjJbGg2lSQI1jRN0nZgAaqC7KcnJEIug1JYdEtK1lGtG3NNi6LuBc6gmHUophmUJ0gUN06XeNiT8KwloLFatr2uwc13sphgijYooJcpdRmCYWnKeWsXiutGKbZDjlpRdo1wymySsPwLKWgAEqsqQAOKsBjlGLfiX0-VTf0dcoMruIYoTvPgogQHA8gDbERr841ynuDK63WHclyWNihgGASTzEvoNMTLEavvcDumXBcB0Btj5PxaLZh6ObJV00mVulE02Nu7oROSs+XR6P9626a2MqNIZ3EOalOFbrgO57lAPuIH+VQ+M+0UaZF5SGLt5xR+2sdkilns4YJwlp75r3zRn3inDovoaAq6LSiTb4kCYb4qvoBh4sdcfGZXZnla5tcvUWmO+t0am99WDGaeL1juAqraGCDRg2O7I8V2ddOw+00+KY1GJaQY7jO5TiVmB7h84Vl8Hpzic9aM+i+98v+dlGoBIU1+vffep1QKEFfqKJidxdKmDDBGBEHtX6vFtnbM4DsOpCgAeTXowDQhAA */
@@ -326,6 +318,33 @@ export const queryMachine =
             return accum
           }
           const accum = walk(context.data)
+          return { data: accum }
+        },
+        initializer: async (context, event) => {
+          const tina = context.cms.api.tina as Client
+          const schema = await tina.getSchema()
+          const documentNode = G.parse(event.value.query)
+          const optimizedQuery = await tina.getOptimizedQuery(documentNode)
+          if (!optimizedQuery) {
+            throw new Error(`Unable to optimize query`)
+          }
+          const { blueprints, formifiedQuery } = await formify({
+            schema,
+            optimizedDocumentNode: optimizedQuery,
+          })
+          const data = (await context.cms.api.tina.request(
+            G.print(formifiedQuery),
+            {
+              variables: event.value.variables,
+            }
+          )) as DataType
+          return {
+            data,
+            blueprints,
+            id: event.value.id,
+          }
+        },
+        onChangeCallback: (context) => (callback, _onReceive) => {
           const schema = context.cms.api.tina.schema as TinaSchema
           Object.values(context.documentMap).forEach((documentMachine) => {
             if (documentMachine.skipFormRegister) {
@@ -348,29 +367,6 @@ export const queryMachine =
               }
             }
           })
-          return { data: accum }
-        },
-        initializer: async (context, event) => {
-          const tina = context.cms.api.tina as Client
-          const schema = await tina.getSchema()
-          const documentNode = G.parse(event.value.query)
-          const optimizedQuery = await tina.getOptimizedQuery(documentNode)
-          if (!optimizedQuery) {
-            throw new Error(`Unable to optimize query`)
-          }
-          const { blueprints, formifiedQuery } = await formify({
-            schema,
-            optimizedDocumentNode: optimizedQuery,
-          })
-          const data = (await context.cms.api.tina.request(
-            G.print(formifiedQuery),
-            {
-              variables: event.value.variables,
-            }
-          )) as DataType
-          return { data, blueprints, id: event.value.id }
-        },
-        onChangeCallback: (context) => (callback, _onReceive) => {
           if (context.cms) {
             context.cms.events.subscribe(`forms:fields:onChange`, () => {
               callback({ type: 'FIELD_CHANGE' })
