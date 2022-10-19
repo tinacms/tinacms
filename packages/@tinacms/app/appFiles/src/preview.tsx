@@ -18,7 +18,7 @@ import { useCMS, defineStaticConfig } from 'tinacms'
 type Config = Parameters<typeof defineStaticConfig>[0]
 
 type PostMessage = {
-  type: 'open' | 'close'
+  type: 'open' | 'close' | 'isEditMode'
   id: string
   data: object
 }
@@ -97,12 +97,15 @@ const QueryMachine = (props: {
 
   React.useEffect(() => {
     if (props.iframeRef.current) {
+      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
+        if (event?.data?.type === 'isEditMode') {
+          console.log('sending edit mode')
+          send({ type: 'EDIT_MODE' })
+        }
+      })
       send({ type: 'IFRAME_MOUNTED', value: props.iframeRef.current })
       if (props.payload.type === 'open') {
         send({ type: 'ADD_QUERY', value: props.payload })
-      }
-      if (props.payload.type === 'isEditMode') {
-        send({ type: 'EDIT_MODE' })
       }
     }
   }, [props.iframeRef.current])
