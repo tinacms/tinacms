@@ -110,7 +110,7 @@ const handleNavigate = (
   /**
    * Determine if the document has a route mapped
    */
-  const routeOverride = collectionDefinition.ui?.router
+  let routeOverride = collectionDefinition.ui?.router
     ? collectionDefinition.ui?.router({
         document,
         collection: collectionDefinition,
@@ -123,8 +123,12 @@ const handleNavigate = (
    * Redirect the browser if 'yes', else navigate react-router.
    */
   if (routeOverride) {
+    // remove leading /
+    if (routeOverride.startsWith('/')) {
+      routeOverride = routeOverride.slice(1)
+    }
     tinaPreview
-      ? navigate(`/preview?iframe-url=${encodeURIComponent(routeOverride)}`)
+      ? navigate(`/preview/${routeOverride}`)
       : (window.location.href = routeOverride)
     return null
   } else {

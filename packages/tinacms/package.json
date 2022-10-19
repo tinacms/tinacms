@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.69.17",
+  "version": "0.69.18",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
@@ -66,7 +66,7 @@
     "crypto-js": "^4.0.0",
     "fetch-ponyfill": "^7.1.0",
     "final-form": "4.20.1",
-    "graphql": "^15.1.0",
+    "graphql": "15.8.0",
     "graphql-tag": "^2.11.0",
     "lodash.set": "^4.3.2",
     "prism-react-renderer": "^1.3.5",

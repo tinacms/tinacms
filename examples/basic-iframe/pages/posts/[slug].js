@@ -1,3 +1,4 @@
+import React from 'react'
 import { staticRequest } from 'tinacms'
 import { Layout } from '../../components/Layout'
 import { useTina } from 'tinacms/dist/react'
@@ -29,6 +30,16 @@ export default function Home(props) {
     data: props.data,
   })
 
+  const cleanedObject = React.useMemo(() => {
+    const obj = {}
+    Object.entries(data.post).forEach(([key, value]) => {
+      if (!['_internalValues', '_internalSys'].includes(key)) {
+        obj[key] = value
+      }
+    })
+    return obj
+  }, [JSON.stringify(data)])
+
   return (
     <Layout>
       <code>
@@ -37,7 +48,7 @@ export default function Home(props) {
             backgroundColor: 'lightgray',
           }}
         >
-          {JSON.stringify(data.post, null, 2)}
+          {JSON.stringify(cleanedObject, null, 2)}
         </pre>
       </code>
     </Layout>
