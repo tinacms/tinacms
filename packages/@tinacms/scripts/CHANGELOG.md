@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.51.3
+
+### Patch Changes
+
+- 03aa3e09e: Remove the use of ESM package, which allowed CJS scripts to run as ES modules. This was initially used for yarn pnp support but is no longer necessary.
+
 ## 0.51.2
 
 ### Patch Changes

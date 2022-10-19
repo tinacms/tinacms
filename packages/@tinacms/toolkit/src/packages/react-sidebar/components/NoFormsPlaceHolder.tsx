@@ -17,7 +17,29 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { LoadingDots } from '../../form-builder'
 import { Button } from '../../styles'
+
+export const PendingFormsPlaceholder = () => (
+  <div
+    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    style={{
+      animationName: 'fade-in',
+      animationDelay: '300ms',
+      animationTimingFunction: 'ease-out',
+      animationIterationCount: 1,
+      animationFillMode: 'both',
+      animationDuration: '150ms',
+    }}
+  >
+    <p className="block pb-5">
+      Please wait while Tina
+      <br />
+      loads your forms
+    </p>
+    <LoadingDots color={'var(--tina-color-primary)'} />
+  </div>
+)
 
 export const NoFormsPlaceholder = () => (
   <div

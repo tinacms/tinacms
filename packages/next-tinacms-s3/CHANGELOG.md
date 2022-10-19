@@ -1,5 +1,11 @@
 # next-tinacms-s3
 
+## 0.0.5
+
+### Patch Changes
+
+- be40bfd71: Remove unnecessary media helper deps
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # tinacms
 
+## 0.69.18
+
+### Patch Changes
+
+- 31a2fefed: Fix text truncation in list and modal
+- 009fe3180: Re-export helper utilities from @tinacms/schema-tools
+- Updated dependencies [31a2fefed]
+  - @tinacms/toolkit@0.58.1
+  - @tinacms/schema-tools@0.1.8
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.69.17
 
 ### Patch Changes
