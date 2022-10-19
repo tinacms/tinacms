@@ -49,34 +49,19 @@ query DocumentQuery($collection: String!, $relativePath: String!) {
           bio
           hobbies
           image
-          ... on Document {
-            _internalSys: _sys {
-              path
-              relativePath
-              collection {
-                name
-              }
-            }
-            _values
-          }
         }
         ... on Document {
           id
+        }
+        ... on Document {
+          _internalSys: _sys {
+            path
+          }
         }
       }
       categories
       body
       image
-      ... on Document {
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
-          }
-        }
-        _values
-      }
     }
     ... on Documentation {
       title
@@ -86,48 +71,28 @@ query DocumentQuery($collection: String!, $relativePath: String!) {
           ... on Tag {
             title
             description
-            ... on Document {
-              _internalSys: _sys {
-                path
-                relativePath
-                collection {
-                  name
-                }
-              }
-              _values
-            }
           }
           ... on Document {
             id
           }
+          ... on Document {
+            _internalSys: _sys {
+              path
+            }
+          }
         }
       }
       body
-      ... on Document {
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
-          }
-        }
-        _values
-      }
     }
     ... on Author {
       name
       bio
       hobbies
       image
-      ... on Document {
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
-          }
-        }
-        _values
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
       }
     }
   }

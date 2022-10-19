@@ -103,23 +103,7 @@ describe('Rich Text Editor', () => {
   })
 
   describe('paragraphs', () => {
-    /**
-     * Skipping because the markdown ast sent from the API will remove any empty blocks before sending it down
-     */
-    it.skip('is correctly rendered from markdown', () => {
-      cy.assertRTE(
-        'P 1\nP 2\nP 3\n\nP 4',
-        '',
-        '<p>P 1</p><p>P 2</p><p>P 3</p><p></p><p>P 4</p>'
-      )
-      cy.assertRTE(
-        '\nP 1\n\nP 2\n\nP 3\n\nP 4\n',
-        '',
-        '<p>P 1</p><p>P 2</p><p>P 3</p><p></p><p>P 4</p>'
-      )
-    })
-
-    it.only('can be typed', () => {
+    it('can be typed', () => {
       cy.assertRTE(
         '',
         'P 1{enter}P 2{enter}P 3{enter}{enter}P 4',

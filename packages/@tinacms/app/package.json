@@ -7,6 +7,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.js"
+    },
+    "./dist/test-utils": {
+      "types": "./dist/test-utils.d.ts",
+      "import": "./dist/test-utils.es.js",
+      "require": "./dist/test-utils.js"
     }
   },
   "files": ["appFiles", "dist"],
@@ -16,6 +21,10 @@
     "entryPoints": [
       {
         "name": "src/index.ts",
+        "target": "node"
+      },
+      {
+        "name": "src/test-utils.ts",
         "target": "node"
       }
     ]

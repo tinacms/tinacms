@@ -7,19 +7,14 @@ query documentation($relativePath: String!) {
         ... on Tag {
           title
           description
-          ... on Document {
-            _internalSys: _sys {
-              path
-              relativePath
-              collection {
-                name
-              }
-            }
-            _values
-          }
         }
         ... on Document {
           id
+        }
+        ... on Document {
+          _internalSys: _sys {
+            path
+          }
         }
       }
     }
@@ -38,12 +33,7 @@ query documentation($relativePath: String!) {
     ... on Document {
       _internalSys: _sys {
         path
-        relativePath
-        collection {
-          name
-        }
       }
-      _values
     }
   }
 }

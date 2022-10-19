@@ -7,19 +7,14 @@ query post($relativePath: String!) {
         bio
         hobbies
         image
-        ... on Document {
-          _internalSys: _sys {
-            path
-            relativePath
-            collection {
-              name
-            }
-          }
-          _values
-        }
       }
       ... on Document {
         id
+      }
+      ... on Document {
+        _internalSys: _sys {
+          path
+        }
       }
     }
     categories
@@ -39,12 +34,7 @@ query post($relativePath: String!) {
     ... on Document {
       _internalSys: _sys {
         path
-        relativePath
-        collection {
-          name
-        }
       }
-      _values
     }
   }
 }
