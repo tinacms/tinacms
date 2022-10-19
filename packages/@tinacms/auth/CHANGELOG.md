@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 0.50.5
+
+### Patch Changes
+
+- be40bfd71: Remove unnecessary media helper deps
+
 ## 0.50.4
 
 ### Patch Changes

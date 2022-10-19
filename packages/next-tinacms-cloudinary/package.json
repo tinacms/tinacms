@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "3.5.32",
+  "version": "3.5.33",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -34,8 +34,7 @@
     "tinacms": "workspace:*",
     "typescript": "4.3.5"
   },
-  "peerDependencies": {
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
