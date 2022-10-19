@@ -267,6 +267,37 @@ export const astBuilder = {
       }),
     }
   },
+  ImageFieldNodeDefinition: ({
+    name,
+    type,
+    args = [],
+    list,
+    required,
+  }: {
+    name: string
+    type: string | TypeDefinitionNode
+    required?: boolean
+    list?: boolean
+    args?: InputValueDefinitionNode[]
+  }) => {
+    return {
+      name: { kind: 'Name' as const, value: name },
+      kind: 'Field' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections: [
+          {
+            kind: 'Field' as const,
+            name: { kind: 'Name' as const, value: 'src' },
+          },
+          {
+            kind: 'Field' as const,
+            name: { kind: 'Name' as const, value: 'path' },
+          },
+        ],
+      },
+    } as FieldNode
+  },
   FieldNodeDefinition: ({
     name,
     type,
@@ -548,6 +579,7 @@ export const astBuilder = {
     Connection: 'Connection',
     Number: 'Float',
     Document: 'Document',
+    ImageField: 'ImageField',
   },
 
   QueryOperationDefinition: ({

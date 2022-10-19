@@ -180,6 +180,21 @@ const scalarDefinitions = [
       }),
     ],
   }),
+  astBuilder.ObjectTypeDefinition({
+    name: 'ImageField',
+    fields: [
+      astBuilder.FieldDefinition({
+        name: 'src',
+        required: true,
+        type: astBuilder.TYPES.String,
+      }),
+      astBuilder.FieldDefinition({
+        name: 'path',
+        required: true,
+        type: astBuilder.TYPES.String,
+      }),
+    ],
+  }),
 ]
 
 export const staticDefinitions = [...scalarDefinitions, interfaceDefinitions]

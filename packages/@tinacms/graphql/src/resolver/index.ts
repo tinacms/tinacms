@@ -684,11 +684,14 @@ export class Resolver {
           accum[fieldName] = fieldValue
           break
         case 'image':
-          accum[fieldName] = resolveMediaCloudToRelative(
-            fieldValue as string,
-            this.config,
-            this.tinaSchema.schema
-          )
+          accum[fieldName] = {
+            path: fieldValue,
+            src: resolveMediaCloudToRelative(
+              fieldValue as string,
+              this.config,
+              this.tinaSchema.schema
+            ),
+          }
           break
         case 'object':
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)

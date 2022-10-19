@@ -525,12 +525,13 @@ export class Builder {
   ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
       case 'string':
-      case 'image':
       case 'datetime':
       case 'number':
       case 'boolean':
       case 'rich-text':
         return astBuilder.FieldNodeDefinition(field)
+      case 'image':
+        return astBuilder.ImageFieldNodeDefinition(field)
       case 'object':
         if (typeof field.fields === 'object') {
           const selections = []
@@ -1338,7 +1339,6 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
     switch (field.type) {
       case 'boolean':
       case 'datetime':
-      case 'image':
       case 'number':
         if (field.list) {
           console.warn(listWarningMsg)
@@ -1349,6 +1349,13 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           list: field.list,
           required: field.required,
           type: astBuilder.TYPES.Scalar(field.type),
+        })
+      case 'image':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.TYPES.ImageField,
         })
       case 'object':
         return astBuilder.FieldDefinition({
