@@ -89,11 +89,21 @@ export const TinaMarkdown = ({
   // FIXME: {} should be passed in
   components?: Components<{}>
 }) => {
-  const jsonContent = content.json
-  if (!jsonContent) {
+  return <InnerTinaMarkdown content={content.json} components={components} />
+}
+
+export const InnerTinaMarkdown = ({
+  content,
+  components = {},
+}: {
+  content: TinaMarkdownContent | TinaMarkdownContent[]
+  // FIXME: {} should be passed in
+  components?: Components<{}>
+}) => {
+  if (!content) {
     return null
   }
-  const nodes = Array.isArray(jsonContent) ? jsonContent : jsonContent.children
+  const nodes = Array.isArray(content) ? content : content.children
   if (!nodes) {
     return null
   }
@@ -234,17 +244,19 @@ const Node = ({ components, child }) => {
         const Component = components[child.type]
         return (
           <Component {...props}>
-            <TinaMarkdown components={components} content={children} />
+            <InnerTinaMarkdown components={components} content={children} />
           </Component>
         )
       }
       return React.createElement(child.type, {
-        children: <TinaMarkdown components={components} content={children} />,
+        children: (
+          <InnerTinaMarkdown components={components} content={children} />
+        ),
       })
     case 'lic': // List Item Content
       return (
         <div>
-          <TinaMarkdown components={components} content={child.children} />
+          <InnerTinaMarkdown components={components} content={child.children} />
         </div>
       )
     case 'img':
@@ -261,14 +273,14 @@ const Node = ({ components, child }) => {
         return (
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
           <Component {...props}>
-            <TinaMarkdown components={components} content={children} />
+            <InnerTinaMarkdown components={components} content={children} />
           </Component>
         )
       }
       return (
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
         <a href={child.url}>
-          <TinaMarkdown components={components} content={children} />
+          <InnerTinaMarkdown components={components} content={children} />
         </a>
       )
     case 'code_block':
