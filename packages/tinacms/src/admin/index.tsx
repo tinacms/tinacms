@@ -11,8 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import React, { useState } from 'react'
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  useParams,
+} from 'react-router-dom'
 import { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
@@ -54,7 +60,48 @@ const SetPreviewFlag = ({
   return null
 }
 
-export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
+const PreviewInner = ({ preview, config }) => {
+  const params = useParams()
+  const navigate = useNavigate()
+  const [url, setURL] = React.useState(`/${params['*']}`)
+  const [reportedURL, setReportedURL] = useState<string | null>(null)
+  const ref = React.useRef<HTMLIFrameElement>(null)
+  const paramURL = `/${params['*']}`
+
+  React.useEffect(() => {
+    if (reportedURL !== paramURL && paramURL) {
+      setURL(paramURL)
+    }
+  }, [paramURL])
+  React.useEffect(() => {
+    if ((reportedURL !== url || reportedURL !== paramURL) && reportedURL) {
+      navigate(`/preview${reportedURL}`)
+    }
+  }, [reportedURL])
+
+  React.useEffect(() => {
+    setInterval(() => {
+      if (ref.current) {
+        const url = new URL(ref.current.contentWindow?.location.href || '')
+        if (url.origin === 'null') {
+          return
+        }
+        const href = url.href.replace(url.origin, '')
+        setReportedURL(href)
+      }
+    }, 100)
+  }, [ref.current])
+  const Preview = preview
+  return <Preview url={url} iframeRef={ref} {...config} />
+}
+
+export const TinaAdmin = ({
+  preview,
+  config,
+}: {
+  preview?: (props: object) => JSX.Element
+  config: object
+}) => {
   const isSSR = typeof window === 'undefined'
   const { edit } = useEditState()
   if (isSSR) {
@@ -77,9 +124,15 @@ export const TinaAdmin = ({ preview }: { preview?: JSX.Element }) => {
         if (isTinaAdminEnabled) {
           return (
             <Router>
+              {/* @ts-ignore */}
               <SetPreviewFlag preview={preview} cms={cms} />
               <Routes>
-                {preview && <Route path="preview" element={preview} />}
+                {preview && (
+                  <Route
+                    path="/preview/*"
+                    element={<PreviewInner config={config} preview={preview} />}
+                  />
+                )}
                 <Route
                   path="collections/:collectionName/new"
                   element={
