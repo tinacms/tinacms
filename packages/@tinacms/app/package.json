@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "main": "dist/index.js",
   "exports": {
     ".": {
@@ -9,7 +9,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["appFiles", "dist"],
+  "files": [
+    "appFiles",
+    "dist"
+  ],
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "buildConfig": {

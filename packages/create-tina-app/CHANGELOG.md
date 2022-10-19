@@ -1,5 +1,12 @@
 # create-tina-app
 
+## 0.1.9
+
+### Patch Changes
+
+- 03aa3e09e: Remove the use of ESM package, which allowed CJS scripts to run as ES modules. This was initially used for yarn pnp support but is no longer necessary.
+  - @tinacms/metrics@0.0.3
+
 ## 0.1.8
 
 ### Patch Changes
