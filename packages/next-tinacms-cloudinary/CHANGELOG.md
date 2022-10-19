@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.33
+
+### Patch Changes
+
+- be40bfd71: Remove unnecessary media helper deps
+
 ## 3.5.32
 
 ### Patch Changes
