@@ -2,10 +2,7 @@
 title: Some Title
 ---
 
-P 1
+This is a line\
+And here is a soft line break
 
-P 2
-
-P 3
-
-P 4
+But this is a new paragraph

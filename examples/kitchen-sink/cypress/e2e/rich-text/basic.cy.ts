@@ -34,9 +34,7 @@ describe('Rich Text Editor', () => {
       },
     })
 
-    cy.visit(
-      'http://localhost:3000/admin/index.html#/preview/post/tinacms-v0.69.7'
-    )
+    cy.visit('http://localhost:3000/admin/index.html#/~/post/tinacms-v0.69.7')
   })
   describe('italic', () => {
     it('is correctly rendered from markdown', () => {
