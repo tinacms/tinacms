@@ -759,25 +759,20 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'image':
-        if (typeof value === 'object') {
-          console.log({ ERROR: value })
-          accumulator[field.name] = isValues ? value?.src : value
+        if (isValues) {
+          accumulator[field.name] = resolveMediaRelativeToCloud(
+            value as string,
+            this.config,
+            this.tinaSchema.schema
+          )
         } else {
-          if (isValues) {
-            accumulator[field.name] = resolveMediaRelativeToCloud(
+          accumulator[field.name] = {
+            path: value,
+            src: resolveMediaRelativeToCloud(
               value as string,
               this.config,
               this.tinaSchema.schema
-            )
-          } else {
-            accumulator[field.name] = {
-              path: value,
-              src: resolveMediaRelativeToCloud(
-                value as string,
-                this.config,
-                this.tinaSchema.schema
-              ),
-            }
+            ),
           }
         }
         // accumulator[field.name] = resolveMediaRelativeToCloud(

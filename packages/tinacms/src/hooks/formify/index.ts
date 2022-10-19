@@ -47,6 +47,7 @@ export const useFormify = ({
 }): State => {
   /** These will be used to ensure the appropriate forms are removed when we unmount */
   const formIds = React.useRef<string[]>([])
+  console.log('asdf')
 
   const [state, dispatch] = React.useReducer(reducer, {
     status: 'idle',
@@ -340,7 +341,16 @@ export const useFormify = ({
    */
   React.useEffect(() => {
     state.changeSets.forEach((changeSet) => {
-      if (changeSet.mutationType.type === 'reset') {
+      // @ts-ignore
+      if (changeSet.fieldDefinition.type === 'image') {
+        dispatch({
+          type: 'setIn',
+          value: {
+            ...changeSet,
+            value: { src: changeSet.value },
+          },
+        })
+      } else if (changeSet.mutationType.type === 'reset') {
         const form = cms.forms.find(changeSet.formId)
         resolveSubFields({
           formNode: changeSet.formNode,
@@ -686,7 +696,20 @@ export const useFormify = ({
             })
 
             break
+          case 'image':
+            console.log('image', value, fieldBlueprints)
+            fieldBlueprints.forEach((fieldBlueprint) => {
+              const keyName = util.getFieldNameOrAlias(fieldBlueprint)
+              if (!value) {
+                data[keyName] = null
+              } else {
+                data[keyName] = value
+              }
+            })
+            break
           default:
+            console.log('default', value, fieldBlueprints)
+
             fieldBlueprints.forEach((fieldBlueprint) => {
               const keyName = util.getFieldNameOrAlias(fieldBlueprint)
               if (!value) {
