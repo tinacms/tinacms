@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 0.0.23
+
+### Patch Changes
+
+- 009fe3180: Reorganize @tinacms/app so that it runs a local install in the working directory to ensure consistent dependencies
+- 2f6a3596d: Upgrade to Vite 3
+
 ## 0.0.22
 
 ### Patch Changes
