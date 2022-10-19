@@ -52,7 +52,9 @@ export default client
   )
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
-    `db
+    `app
+db
+prebuild
 client.ts
 client.js
 types.ts
@@ -252,7 +254,7 @@ export const compileFile = async (
     })
     await transpile(
       inputFile,
-      `${fileName}.js`,
+      `${fileName}.cjs`,
       tinaTempPath,
       options.verbose,
       define,
@@ -272,7 +274,7 @@ export const compileFile = async (
   let returnObject = {}
 
   try {
-    const schemaFunc = require(path.join(tinaTempPath, `${fileName}.js`))
+    const schemaFunc = require(path.join(tinaTempPath, `${fileName}.cjs`))
     returnObject = schemaFunc.default
     await cleanup({ tinaTempPath })
   } catch (e) {
@@ -402,6 +404,9 @@ const transpile = async (
     platform: 'neutral',
     target: ['node10.4'],
     entryPoints: [prebuiltInputPath],
+    // Since this code is run via CLI, convert it to cjs
+    // for simplicity.
+    format: 'cjs',
     treeShaking: true,
     external: [...external, './node_modules/*'],
     tsconfig: tempTsConfigPath,

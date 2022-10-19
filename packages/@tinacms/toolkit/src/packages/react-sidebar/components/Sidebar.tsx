@@ -627,9 +627,9 @@ const SidebarBody = ({ children }) => {
 
   return (
     <div
-      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white shadow-2xl overflow-hidden transition-opacity duration-300 ease-out ${
+      className={`relative left-0 w-full h-full flex flex-col items-stretch bg-white border-r border-gray-200 overflow-hidden transition-opacity duration-300 ease-out ${
         displayState !== 'closed' ? 'opacity-100' : 'opacity-0'
-      } ${displayState === 'fullscreen' ? '' : 'rounded-r-md'}`}
+      } ${displayState === 'fullscreen' ? '' : ''}`}
     >
       {children}
     </div>

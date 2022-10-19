@@ -5,7 +5,8 @@ jobs:
     runs-on: ubuntu-20.04
     # There is currently a bug on chrome 100 that adds an extra space in the editor.=
     # container: cypress/browsers:node14.17.6-chrome100-ff98
-    container: cypress/browsers:node14.17.0-chrome88-ff89
+    # container: cypress/browsers:node14.17.0-chrome88-ff89
+    container: cypress/browsers:node16.5.0-chrome94-ff93
     name: E2E on Tests (DEV)
     strategy:
       matrix:
