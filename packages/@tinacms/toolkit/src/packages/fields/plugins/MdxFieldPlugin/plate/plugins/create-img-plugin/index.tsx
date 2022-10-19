@@ -42,7 +42,7 @@ export const insertImg = (editor: PlateEditor) => {
   insertBlockElement(editor, {
     type: ELEMENT_IMG,
     children: [{ text: '' }],
-    url: '',
+    url: { src: '' },
     caption: '',
     alt: '',
   })

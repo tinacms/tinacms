@@ -19,6 +19,7 @@ export default function HomePage(
 }
 
 export const getStaticProps = async ({ params }) => {
+  console.log("getStaticProps", params.filename);
   const tinaProps = await client.queries.ContentQuery({
     relativePath: `${params.filename}.md`,
   });

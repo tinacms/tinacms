@@ -47,7 +47,6 @@ export const useFormify = ({
 }): State => {
   /** These will be used to ensure the appropriate forms are removed when we unmount */
   const formIds = React.useRef<string[]>([])
-  console.log('asdf')
 
   const [state, dispatch] = React.useReducer(reducer, {
     status: 'idle',

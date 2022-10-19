@@ -528,6 +528,9 @@ const resolveField = ({
   context: ContextFrom<typeof queryMachine>
 }) => {
   switch (field.type) {
+    case 'image':
+      // TODO: FIX
+      return { src: value }
     case 'reference':
       if (!value) {
         return

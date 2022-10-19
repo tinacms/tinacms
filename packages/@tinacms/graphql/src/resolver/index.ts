@@ -715,7 +715,7 @@ export class Resolver {
           // @ts-ignore
           accum[fieldName] = stringifyMDX(fieldValue, field, (fieldValue) =>
             resolveMediaCloudToRelative(
-              fieldValue as string,
+              fieldValue?.src as string,
               this.config,
               this.tinaSchema.schema
             )
@@ -782,14 +782,27 @@ export class Resolver {
         // )
         break
       case 'rich-text':
+        // only do this for isValues is true
         // @ts-ignore value is unknown
-        const tree = parseMDX(value, field, (value) =>
-          resolveMediaRelativeToCloud(
-            value,
-            this.config,
-            this.tinaSchema.schema
-          )
-        )
+
+        const tree = parseMDX(value, field, (value) => {
+          // if (isValues) {
+          //   return resolveMediaRelativeToCloud(
+          //     value,
+          //     this.config,
+          //     this.tinaSchema.schema
+          //   )
+          // }
+          // always send down an object to mdx
+          return {
+            src: resolveMediaRelativeToCloud(
+              value,
+              this.config,
+              this.tinaSchema.schema
+            ),
+            path: value,
+          }
+        })
         if (tree?.children[0]?.type === 'invalid_markdown') {
           if (this.isAudit) {
             const invalidNode = tree?.children[0]

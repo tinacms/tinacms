@@ -70,7 +70,7 @@ export const ImgEmbed = ({
             {element.url ? (
               <img
                 className="my-0"
-                src={element.url}
+                src={element.url.src}
                 title={element.caption}
                 alt={element.alt}
               />
@@ -102,7 +102,7 @@ export const ImageForm = (props) => {
       fields={[
         {
           label: 'URL',
-          name: 'url',
+          name: 'url.src',
           component: 'image',
           // @ts-ignore Field type doesn't like this
           clearable: true,
