@@ -1,0 +1,21 @@
+[
+  {
+    "id": "post",
+    "fields": [
+      "post.title",
+      "post.author",
+      "post.categories.[]",
+      "post.body",
+      "post.image"
+    ]
+  },
+  {
+    "id": "post.author",
+    "fields": [
+      "post.author.name",
+      "post.author.bio",
+      "post.author.hobbies.[]",
+      "post.author.image"
+    ]
+  }
+]

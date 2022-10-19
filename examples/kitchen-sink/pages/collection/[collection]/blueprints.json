@@ -1,0 +1,36 @@
+[
+  {
+    "id": "document",
+    "fields": [
+      "document.title",
+      "document.author",
+      "document.categories.[]",
+      "document.body",
+      "document.image",
+      "document.title",
+      "document.tags.[]",
+      "document.tags.[].reference",
+      "document.body",
+      "document.name",
+      "document.bio",
+      "document.hobbies.[]",
+      "document.image"
+    ]
+  },
+  {
+    "id": "document.author",
+    "fields": [
+      "document.author.name",
+      "document.author.bio",
+      "document.author.hobbies.[]",
+      "document.author.image"
+    ]
+  },
+  {
+    "id": "document.tags.[].reference",
+    "fields": [
+      "document.tags.[].reference.title",
+      "document.tags.[].reference.description"
+    ]
+  }
+]

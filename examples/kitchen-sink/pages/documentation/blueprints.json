@@ -1,0 +1,18 @@
+[
+  {
+    "id": "documentation",
+    "fields": [
+      "documentation.title",
+      "documentation.tags.[]",
+      "documentation.tags.[].reference",
+      "documentation.body"
+    ]
+  },
+  {
+    "id": "documentation.tags.[].reference",
+    "fields": [
+      "documentation.tags.[].reference.title",
+      "documentation.tags.[].reference.description"
+    ]
+  }
+]
