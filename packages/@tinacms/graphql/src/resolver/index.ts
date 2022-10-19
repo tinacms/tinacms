@@ -123,7 +123,25 @@ export class Resolver {
       }
       try {
         await sequential(template.fields, async (field) => {
-          return this.resolveFieldData(field, rawData, data)
+          return this.resolveFieldData(field, rawData, data, false)
+        })
+      } catch (e) {
+        throw new TinaParseDocumentError({
+          originalError: e,
+          collection: collection.name,
+          includeAuditMessage: !this.isAudit,
+          file: relativePath,
+          stack: e.stack,
+        })
+      }
+
+      const values = {
+        _collection: rawData._collection,
+        _template: rawData._template,
+      }
+      try {
+        await sequential(template.fields, async (field) => {
+          return this.resolveFieldData(field, rawData, values, true)
         })
       } catch (e) {
         throw new TinaParseDocumentError({
@@ -161,7 +179,7 @@ export class Resolver {
           collection,
           template: lastItem(template.namespace),
         },
-        _values: data,
+        _values: values,
       }
     } catch (e) {
       if (e instanceof TinaGraphQLError) {
@@ -684,14 +702,11 @@ export class Resolver {
           accum[fieldName] = fieldValue
           break
         case 'image':
-          accum[fieldName] = {
-            path: fieldValue,
-            src: resolveMediaCloudToRelative(
-              fieldValue as string,
-              this.config,
-              this.tinaSchema.schema
-            ),
-          }
+          accum[fieldName] = resolveMediaCloudToRelative(
+            fieldValue as string,
+            this.config,
+            this.tinaSchema.schema
+          )
           break
         case 'object':
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
@@ -720,7 +735,8 @@ export class Resolver {
   private resolveFieldData = async (
     { namespace, ...field }: TinaFieldEnriched,
     rawData: unknown,
-    accumulator: { [key: string]: unknown }
+    accumulator: { [key: string]: unknown },
+    isValues?: boolean
   ) => {
     if (!rawData) {
       return undefined
@@ -743,11 +759,32 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'image':
-        accumulator[field.name] = resolveMediaRelativeToCloud(
-          value as string,
-          this.config,
-          this.tinaSchema.schema
-        )
+        if (typeof value === 'object') {
+          console.log({ ERROR: value })
+          accumulator[field.name] = isValues ? value?.src : value
+        } else {
+          if (isValues) {
+            accumulator[field.name] = resolveMediaRelativeToCloud(
+              value as string,
+              this.config,
+              this.tinaSchema.schema
+            )
+          } else {
+            accumulator[field.name] = {
+              path: value,
+              src: resolveMediaRelativeToCloud(
+                value as string,
+                this.config,
+                this.tinaSchema.schema
+              ),
+            }
+          }
+        }
+        // accumulator[field.name] = resolveMediaRelativeToCloud(
+        //   value as string,
+        //   this.config,
+        //   this.tinaSchema.schema
+        // )
         break
       case 'rich-text':
         // @ts-ignore value is unknown
@@ -791,7 +828,7 @@ export class Resolver {
             })
             const payload = {}
             await sequential(template.fields, async (field) => {
-              await this.resolveFieldData(field, item, payload)
+              await this.resolveFieldData(field, item, payload, isValues)
             })
             const isUnion = !!field.templates
             return isUnion
@@ -815,7 +852,7 @@ export class Resolver {
           })
           const payload = {}
           await sequential(template.fields, async (field) => {
-            await this.resolveFieldData(field, value, payload)
+            await this.resolveFieldData(field, value, payload, isValues)
           })
           const isUnion = !!field.templates
           accumulator[field.name] = isUnion

@@ -78,7 +78,7 @@ export const Hero = ({ data, parentField }) => {
             <img
               className="w-full max-w-xs lg:max-w-none h-auto"
               alt={data.image.alt}
-              src={data.image.src}
+              src={data.image.src?.src}
             />
           </div>
         )}

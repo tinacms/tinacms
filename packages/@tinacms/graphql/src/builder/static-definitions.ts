@@ -185,12 +185,12 @@ const scalarDefinitions = [
     fields: [
       astBuilder.FieldDefinition({
         name: 'src',
-        required: true,
+        required: false,
         type: astBuilder.TYPES.String,
       }),
       astBuilder.FieldDefinition({
         name: 'path',
-        required: true,
+        required: false,
         type: astBuilder.TYPES.String,
       }),
     ],

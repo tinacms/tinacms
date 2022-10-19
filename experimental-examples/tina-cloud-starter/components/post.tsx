@@ -171,7 +171,7 @@ export const Post = (data) => {
       {data.heroImg && (
         <div data-tinafield="heroImg" className="">
           <img
-            src={data.heroImg}
+            src={data.heroImg.src}
             className="mb-14 block h-auto max-w-4xl lg:max-w-6xl mx-auto"
           />
         </div>
