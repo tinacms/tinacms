@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 0.61.24
+
+### Patch Changes
+
+- 009fe3180: Reorganize @tinacms/app so that it runs a local install in the working directory to ensure consistent dependencies
+- 03aa3e09e: Remove the use of ESM package, which allowed CJS scripts to run as ES modules. This was initially used for yarn pnp support but is no longer necessary.
+- Updated dependencies [009fe3180]
+- Updated dependencies [2f6a3596d]
+  - @tinacms/app@0.0.23
+  - @tinacms/datalayer@0.2.4
+  - @tinacms/graphql@0.63.15
+  - @tinacms/metrics@0.0.3
+  - @tinacms/schema-tools@0.1.8
+
 ## 0.61.23
 
 ### Patch Changes

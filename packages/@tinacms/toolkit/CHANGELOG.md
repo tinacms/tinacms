@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.58.1
+
+### Patch Changes
+
+- 31a2fefed: Fix text truncation in list and modal
+  - @tinacms/sharedctx@0.1.3
+
 ## 0.58.0
 
 ### Minor Changes
