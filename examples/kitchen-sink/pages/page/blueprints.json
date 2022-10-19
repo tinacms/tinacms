@@ -1,0 +1,28 @@
+[
+  {
+    "id": "page",
+    "fields": [
+      "page.title",
+      "page.items.[]",
+      "page.items.[].title",
+      "page.items.[].description",
+      "page.items.[].image",
+      "page.title",
+      "page.blocks.[]",
+      "page.blocks.[].headline",
+      "page.blocks.[].description",
+      "page.blocks.[].actions.[]",
+      "page.blocks.[].actions.[].label",
+      "page.blocks.[].actions.[].url",
+      "page.blocks.[].actions.[].variant",
+      "page.blocks.[].title",
+      "page.blocks.[].items.[]",
+      "page.blocks.[].title",
+      "page.blocks.[].description",
+      "page.blocks.[].actions.[]",
+      "page.blocks.[].actions.[].label",
+      "page.blocks.[].actions.[].url",
+      "page.blocks.[].actions.[].variant"
+    ]
+  }
+]

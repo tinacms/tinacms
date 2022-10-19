@@ -1,0 +1,50 @@
+query post($relativePath: String!) {
+  post(relativePath: $relativePath) {
+    title
+    author {
+      ... on Author {
+        name
+        bio
+        hobbies
+        image
+        ... on Document {
+          _internalSys: _sys {
+            path
+            relativePath
+            collection {
+              name
+            }
+          }
+          _values
+        }
+      }
+      ... on Document {
+        id
+      }
+    }
+    categories
+    body
+    image
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
+        relativePath
+        collection {
+          name
+        }
+      }
+      _values
+    }
+  }
+}
