@@ -45,6 +45,23 @@ const Redirect = () => {
   return null
 }
 
+const MaybeRedirectToPreview = ({
+  redirect,
+  children,
+}: {
+  redirect: boolean
+  children: JSX.Element
+}) => {
+  const navigate = useNavigate()
+  React.useEffect(() => {
+    if (redirect) {
+      navigate('/~')
+    }
+  }, [redirect])
+
+  return children
+}
+
 const SetPreviewFlag = ({
   preview,
   cms,
@@ -75,7 +92,7 @@ const PreviewInner = ({ preview, config }) => {
   }, [paramURL])
   React.useEffect(() => {
     if ((reportedURL !== url || reportedURL !== paramURL) && reportedURL) {
-      navigate(`/preview${reportedURL}`)
+      navigate(`/~${reportedURL}`)
     }
   }, [reportedURL])
 
@@ -129,7 +146,7 @@ export const TinaAdmin = ({
               <Routes>
                 {preview && (
                   <Route
-                    path="/preview/*"
+                    path="/~/*"
                     element={<PreviewInner config={config} preview={preview} />}
                   />
                 )}
@@ -176,9 +193,11 @@ export const TinaAdmin = ({
                 <Route
                   path="/"
                   element={
-                    <DefaultWrapper cms={cms}>
-                      <DashboardPage />
-                    </DefaultWrapper>
+                    <MaybeRedirectToPreview redirect={!!preview}>
+                      <DefaultWrapper cms={cms}>
+                        <DashboardPage />
+                      </DefaultWrapper>
+                    </MaybeRedirectToPreview>
                   }
                 />
               </Routes>

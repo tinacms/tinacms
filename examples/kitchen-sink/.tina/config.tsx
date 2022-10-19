@@ -1,4 +1,5 @@
 import { defineStaticConfig } from 'tinacms'
+import React from 'react'
 
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
@@ -46,6 +47,28 @@ export default defineStaticConfig({
                 type: 'string',
                 required: true,
                 isTitle: true,
+                ui: {
+                  component: ({ input }) => {
+                    return (
+                      <div className="my-4">
+                        <label
+                          htmlFor={input.name}
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          {input.name} (this is a custom component)
+                        </label>
+                        <div className="mt-1">
+                          <input
+                            type="text"
+                            id={input.name}
+                            className="py-2 px-4 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            {...input}
+                          />
+                        </div>
+                      </div>
+                    )
+                  },
+                },
               },
               {
                 name: 'items',
