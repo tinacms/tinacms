@@ -19,16 +19,6 @@ query page($relativePath: String!) {
         description
         image
       }
-      ... on Document {
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
-          }
-        }
-        _values
-      }
     }
     ... on PageBlockPage {
       title
@@ -59,15 +49,10 @@ query page($relativePath: String!) {
           }
         }
       }
-      ... on Document {
-        _internalSys: _sys {
-          path
-          relativePath
-          collection {
-            name
-          }
-        }
-        _values
+    }
+    ... on Document {
+      _internalSys: _sys {
+        path
       }
     }
   }

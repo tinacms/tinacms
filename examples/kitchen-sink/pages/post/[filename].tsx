@@ -1,15 +1,19 @@
 import { InferGetStaticPropsType } from 'next'
-import { Json } from '../../components/json'
+import { Json, Markdown } from '../../components/json'
 import { useTina } from 'tinacms/dist/react'
 import client from '../../.tina/__generated__/client'
-import { TinaMarkdown } from 'tinacms/dist/rich-text'
 
 export default function Home(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const { data } = useTina(props)
 
-  return <Json src={data} />
+  return (
+    <>
+      <Markdown content={data.post.body} />
+      <Json src={data} />
+    </>
+  )
 }
 
 export const getStaticProps = async ({ params }) => {

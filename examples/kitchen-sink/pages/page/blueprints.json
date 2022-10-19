@@ -1,28 +1,159 @@
 [
   {
-    "id": "page",
+    "name": "page",
+    "alias": "page",
     "fields": [
-      "page.title",
-      "page.items.[]",
-      "page.items.[].title",
-      "page.items.[].description",
-      "page.items.[].image",
-      "page.title",
-      "page.blocks.[]",
-      "page.blocks.[].headline",
-      "page.blocks.[].description",
-      "page.blocks.[].actions.[]",
-      "page.blocks.[].actions.[].label",
-      "page.blocks.[].actions.[].url",
-      "page.blocks.[].actions.[].variant",
-      "page.blocks.[].title",
-      "page.blocks.[].items.[]",
-      "page.blocks.[].title",
-      "page.blocks.[].description",
-      "page.blocks.[].actions.[]",
-      "page.blocks.[].actions.[].label",
-      "page.blocks.[].actions.[].url",
-      "page.blocks.[].actions.[].variant"
+      {
+        "name": "_sys",
+        "alias": "_sys",
+        "fields": [
+          {
+            "name": "filename",
+            "alias": "filename"
+          },
+          {
+            "name": "basename",
+            "alias": "basename"
+          },
+          {
+            "name": "breadcrumbs",
+            "alias": "breadcrumbs"
+          },
+          {
+            "name": "path",
+            "alias": "path"
+          },
+          {
+            "name": "relativePath",
+            "alias": "relativePath"
+          },
+          {
+            "name": "extension",
+            "alias": "extension"
+          }
+        ]
+      },
+      {
+        "name": "id",
+        "alias": "id"
+      },
+      {
+        "name": "title",
+        "alias": "title"
+      },
+      {
+        "name": "items",
+        "alias": "items",
+        "fields": [
+          {
+            "name": "__typename",
+            "alias": "__typename"
+          },
+          {
+            "name": "title",
+            "alias": "title"
+          },
+          {
+            "name": "description",
+            "alias": "description"
+          },
+          {
+            "name": "image",
+            "alias": "image"
+          }
+        ]
+      },
+      {
+        "name": "blocks",
+        "alias": "blocks",
+        "fields": [
+          {
+            "name": "__typename",
+            "alias": "__typename"
+          },
+          {
+            "name": "headline",
+            "alias": "headline"
+          },
+          {
+            "name": "description",
+            "alias": "description"
+          },
+          {
+            "name": "actions",
+            "alias": "actions",
+            "fields": [
+              {
+                "name": "__typename",
+                "alias": "__typename"
+              },
+              {
+                "name": "label",
+                "alias": "label"
+              },
+              {
+                "name": "url",
+                "alias": "url"
+              },
+              {
+                "name": "variant",
+                "alias": "variant"
+              }
+            ]
+          },
+          {
+            "name": "title",
+            "alias": "title"
+          },
+          {
+            "name": "items",
+            "alias": "items"
+          },
+          {
+            "name": "title",
+            "alias": "title"
+          },
+          {
+            "name": "description",
+            "alias": "description"
+          },
+          {
+            "name": "actions",
+            "alias": "actions",
+            "fields": [
+              {
+                "name": "__typename",
+                "alias": "__typename"
+              },
+              {
+                "name": "label",
+                "alias": "label"
+              },
+              {
+                "name": "url",
+                "alias": "url"
+              },
+              {
+                "name": "variant",
+                "alias": "variant"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "_internalSys",
+        "alias": "_internalSys",
+        "fields": [
+          {
+            "name": "path",
+            "alias": "path"
+          }
+        ]
+      }
+    ],
+    "path": [
+      "page"
     ]
   }
 ]
