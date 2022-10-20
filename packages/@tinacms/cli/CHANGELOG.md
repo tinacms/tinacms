@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 0.61.25
+
+### Patch Changes
+
+- ec73f1ea6: Check config.ts/config.tsx additionally for usingTs
+- Updated dependencies [15f7c18ef]
+- Updated dependencies [c4f9607ce]
+  - @tinacms/app@0.0.24
+  - @tinacms/schema-tools@0.1.9
+  - @tinacms/graphql@0.63.16
+
 ## 0.61.24
 
 ### Patch Changes
