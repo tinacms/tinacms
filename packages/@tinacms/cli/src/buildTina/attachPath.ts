@@ -26,6 +26,8 @@ export const isProjectTs = async (rootPath: string) => {
 
   return (
     (await pathExists(path.join(tinaPath, 'schema.ts'))) ||
-    (await pathExists(path.join(tinaPath, 'schema.tsx')))
+    (await pathExists(path.join(tinaPath, 'schema.tsx'))) ||
+    (await pathExists(path.join(tinaPath, 'config.ts'))) ||
+    (await pathExists(path.join(tinaPath, 'config.tsx')))
   )
 }
