@@ -430,72 +430,72 @@ const schemaWithIsTitleNotValid2 = {
 }
 describe('validateSchema', () => {
   it('Passes on a valid schema', () => {
-    validateSchema({ config: validSchema })
+    validateSchema({ schema: validSchema })
     expect(consoleErrMock).not.toHaveBeenCalled()
-    validateSchema({ config: validSchemaWithTemplates })
+    validateSchema({ schema: validSchemaWithTemplates })
     expect(consoleErrMock).not.toHaveBeenCalled()
   })
   it('fails when a bad format is given', () => {
     expect(() => {
-      validateSchema({ config: schemaWithBadFormat })
+      validateSchema({ schema: schemaWithBadFormat })
     }).toThrow()
   })
   it('fails when a no name is given', () => {
     expect(() => {
-      validateSchema({ config: schemaWitNoName })
+      validateSchema({ schema: schemaWitNoName })
     }).toThrow()
   })
   it('fails when two collections have the same name', () => {
     expect(() => {
-      validateSchema({ config: schemaWithDuplicateName })
+      validateSchema({ schema: schemaWithDuplicateName })
     }).toThrow()
   })
 
   it('fails when two templates have the same name', () => {
     expect(() => {
-      validateSchema({ config: schemaWithDuplicateTemplates })
+      validateSchema({ schema: schemaWithDuplicateTemplates })
     }).toThrow()
   })
   it('fails on deeply nested incorrect object', () => {
     expect(() => {
-      validateSchema({ config: schemaWithDeeplyNestedError })
+      validateSchema({ schema: schemaWithDeeplyNestedError })
     }).toThrow()
   })
   it('fails when templates and fields are provided', () => {
     expect(() => {
-      validateSchema({ config: schemaWithTemplatesAndFields })
+      validateSchema({ schema: schemaWithTemplatesAndFields })
     }).toThrow()
   })
   it('fails when fields is empty', () => {
     expect(() => {
-      validateSchema({ config: schemaWithEmptyFields })
+      validateSchema({ schema: schemaWithEmptyFields })
     }).toThrow()
   })
   it('fails when templates is empty', () => {
     expect(() => {
-      validateSchema({ config: schemaWithEmptyTemplates })
+      validateSchema({ schema: schemaWithEmptyTemplates })
     }).toThrow()
   })
   it('fails when a deeply nested field under a template is invalid', () => {
     expect(() => {
-      validateSchema({ config: schemaWithInvalidFiledNesterUnderRichText })
+      validateSchema({ schema: schemaWithInvalidFiledNesterUnderRichText })
     }).toThrow()
   })
   it('fails when a invalid type is given', () => {
     expect(() => {
-      validateSchema({ config: schemaWithBadType })
+      validateSchema({ schema: schemaWithBadType })
     }).toThrow()
   })
   it('fails when a invalid configuration for `isTitle` is given', () => {
     expect(() => {
-      validateSchema({ config: schemaWithIsTitleNotValid1 })
+      validateSchema({ schema: schemaWithIsTitleNotValid1 })
     }).toThrow()
     expect(() => {
-      validateSchema({ config: schemaWithIsTitleNotValid2 })
+      validateSchema({ schema: schemaWithIsTitleNotValid2 })
     }).toThrow()
   })
   it('passes when a valid configuration for `isTitle` is given', () => {
-    validateSchema({ config: schemaWithIsTitleValid })
+    validateSchema({ schema: schemaWithIsTitleValid })
     expect(consoleErrMock).not.toHaveBeenCalled()
   })
 })
