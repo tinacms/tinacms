@@ -16,7 +16,6 @@
     "react-router-dom": "6.3.0",
     "styled-components": "5.3.5",
     "@monaco-editor/react": "4.4.5",
-    "@tinacms/mdx": "update-kitchen-sink",
     "monaco-editor": "0.31.0"
   }
 }

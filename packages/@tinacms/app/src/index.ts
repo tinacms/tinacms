@@ -163,33 +163,10 @@ export const viteBuild = async ({
   }
   if (process.env.MONOREPO_DEV) {
     console.warn('Using monorepo dev mode, source files will be symlinked')
-    await fs.createSymlink(
-      path.join(appCopyPath, 'src'),
-      path.join(appRootPath, 'src'),
-      'dir'
-    )
+    await fs.createSymlink(appCopyPath, appRootPath, 'dir')
   } else {
     await fs.copy(appCopyPath, appRootPath)
   }
-
-  const packageJSONpath = path.join(appCopyPath, 'package.json')
-  const packageJSON = JSON.parse(
-    (await fs.readFile(packageJSONpath)).toString()
-  )
-  await fs.outputFile(
-    path.join(appRootPath, 'package.json'),
-    JSON.stringify(
-      {
-        ...packageJSON,
-        dependencies: {
-          ...packageJSON.dependencies,
-          '@tinacms/mdx': mdxPackageeJSON.version,
-        },
-      },
-      null,
-      2
-    )
-  )
 
   await execShellCommand(
     `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
