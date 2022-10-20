@@ -26,12 +26,12 @@ export class TinaSchemaValidationError extends Error {
 }
 
 export const validateSchema = ({
-  config,
+  schema,
 }: {
-  config: TinaCloudSchema<false>
+  schema: TinaCloudSchema<false>
 }) => {
   try {
-    TinaCloudSchemaZod.parse(config)
+    TinaCloudSchemaZod.parse(schema)
   } catch (e) {
     if (e instanceof ZodError) {
       const errors = parseZodError({ zodError: e })

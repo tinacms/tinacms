@@ -57,13 +57,14 @@ export type TinaField = TinaFieldBase
 export type { TinaTemplate, TinaCloudTemplateBase }
 
 export const defineSchema = (config: TinaCloudSchema) => {
-  validateSchema({ config })
+  validateSchema({ schema: config })
   return config
 }
 
 export const defineConfig = (
   config: Omit<TinaCMSProviderDefaultProps, 'children'>
 ) => {
+  validateSchema({ schema: config.schema })
   return config
 }
 
@@ -74,5 +75,6 @@ export const defineStaticConfig = (
     DocumentCreatorCallback
   >
 ) => {
+  validateSchema({ schema: config.schema })
   return config
 }
