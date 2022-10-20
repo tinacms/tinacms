@@ -187,6 +187,7 @@ export default defineStaticConfig({
         name: 'post',
         label: 'Post',
         path: 'content/post',
+        format: 'mdx',
         ui: {
           router,
           filename: {
@@ -220,6 +221,28 @@ export default defineStaticConfig({
             type: 'rich-text',
             name: 'body',
             isBody: true,
+            templates: [
+              {
+                name: 'Hero',
+                label: 'Hero',
+                fields: [
+                  {
+                    name: 'header',
+                    type: 'string',
+                    isTitle: true,
+                    required: true,
+                  },
+                  {
+                    name: 'description',
+                    type: 'rich-text',
+                  },
+                  {
+                    name: 'image',
+                    type: 'image',
+                  },
+                ],
+              },
+            ],
           },
           {
             type: 'image',
