@@ -437,7 +437,7 @@ export const updateBodyDisplacement = ({
         sidebarWidth,
         windowWidth - minPreviewWidth
       )
-      body.style.paddingLeft = bodyDisplacement - 6 + 'px'
+      body.style.paddingLeft = bodyDisplacement + 'px'
     } else {
       body.style.paddingLeft = '0'
     }
