@@ -488,6 +488,12 @@ export const buildIt = async (entryPoint, packageJSON) => {
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external,
       })
+      /**
+       * For MDX, we need to use it in the frontend with rich-text's raw mode. And we use
+       * a package.json to install most modules at dev time for the user. But in order
+       * to do that with the latest version of @tinacms/mdx, it's easiest to inline the dependency
+       * directly. Especially because this package bundles its dependencies
+       */
       const appMDXPath = path.join(
         process.cwd(),
         '..',
