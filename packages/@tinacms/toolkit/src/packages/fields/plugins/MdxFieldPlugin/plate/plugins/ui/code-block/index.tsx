@@ -44,12 +44,25 @@ loader.config({
 })
 
 const languages: Record<string, string> = {
-  typescript: 'TypeScript',
-  javascript: 'JavaScript',
   css: 'CSS',
-  json: 'JSON',
+  'C#': 'C#',
+  'C++': 'C++',
+  diff: 'Diff',
+  'F#': 'F#',
+  graphql: 'GraphQL',
   html: 'HTML',
+  json: 'JSON',
+  java: 'Java',
+  javascript: 'JavaScript',
   markdown: 'Markdown',
+  php: 'PHP',
+  powershell: 'Powershell',
+  python: 'Python',
+  ruby: 'Ruby',
+  r: 'R',
+  'Objective-C': 'Objective-C',
+  typescript: 'TypeScript',
+  xml: 'XML',
 }
 
 /**
