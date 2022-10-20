@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 0.0.24
+
+### Patch Changes
+
+- 15f7c18ef: Fixed issue where forms would sometimes not unmount when navigating away from a page.
+
 ## 0.0.23
 
 ### Patch Changes

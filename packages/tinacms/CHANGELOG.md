@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.69.19
+
+### Patch Changes
+
+- c4f9607ce: Add validation to schema
+- Updated dependencies [c4f9607ce]
+  - @tinacms/schema-tools@0.1.9
+
 ## 0.69.18
 
 ### Patch Changes
