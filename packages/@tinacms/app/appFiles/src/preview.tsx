@@ -90,7 +90,7 @@ const QueryMachine = (props: {
   React.useEffect(() => {
     if (state.matches('pipeline.ready')) {
       cms.events.dispatch({ type: 'forms:register', value: 'complete' })
-    } else {
+    } else if (state.matches('pipeline.initializing')) {
       cms.events.dispatch({ type: 'forms:register', value: 'start' })
     }
   }, [JSON.stringify(state.value)])
@@ -101,6 +101,12 @@ const QueryMachine = (props: {
       if (props.payload.type === 'open') {
         send({ type: 'ADD_QUERY', value: props.payload })
       }
+      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
+        // useTinaHook cleans itself up when the component unmounts by sending a close message
+        if (event.data.type === 'close') {
+          send({ type: 'REMOVE_QUERY' })
+        }
+      })
     }
   }, [props.iframeRef.current])
 
