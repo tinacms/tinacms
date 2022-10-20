@@ -11,14 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import { Client, Field, Form, FormOptions, TinaCMS } from 'tinacms'
-import { assign, createMachine } from 'xstate'
+import { assign, createMachine, sendParent } from 'xstate'
 import {
   resolveForm,
   Templateable,
   TinaFieldEnriched,
   TinaSchema,
 } from 'tinacms'
-import { sendParent } from 'xstate/lib/actions'
 
 export type FieldType = Field & TinaFieldEnriched
 export type FormValues = Record<string, unknown>

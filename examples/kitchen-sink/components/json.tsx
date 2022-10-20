@@ -15,7 +15,7 @@ export function Json(props: { src: object }) {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="">Loading...</div>}>
       <div className="mx-auto my-8 border rounded-lg p-8 shadow-lg max-w-5xl mx-auto shadow-lg">
         <ReactJson
           src={props.src}
@@ -50,7 +50,14 @@ export const Markdown = (props) => {
       data-test="rich-text-body"
       className="mx-auto border max-w-5xl rounded-lg p-8 shadow-lg prose"
     >
-      <TinaMarkdown content={props.content} />
+      <TinaMarkdown
+        content={props.content}
+        components={{
+          Hero: (props) => {
+            return <Json src={props} />
+          },
+        }}
+      />
     </div>
   )
 }

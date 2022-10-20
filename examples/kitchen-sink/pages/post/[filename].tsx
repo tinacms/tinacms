@@ -17,7 +17,7 @@ export default function Home(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const variables = { relativePath: `${params.filename}.md` }
+  const variables = { relativePath: `${params.filename}.mdx` }
   const props = await client.queries.post(variables)
   return {
     props: { ...props, variables },
