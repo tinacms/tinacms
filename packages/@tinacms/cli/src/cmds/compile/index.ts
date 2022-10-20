@@ -226,18 +226,6 @@ export const compileFile = async (
     )
   }
 
-  let schemaExists = true
-  try {
-    getPath({
-      projectDir: tinaPath,
-      filename: fileName,
-      allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
-      errorMessage: `Must provide a ${fileName}.{js,jsx,tsx,ts}`,
-    })
-  } catch {
-    // getSchemaPath will throw an error if it is not found
-    schemaExists = false
-  }
   // Turns the schema into JS files so they can be run
   try {
     const define = {}
@@ -305,7 +293,7 @@ export const compileSchema = async (options: {
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 
-  let schemaExists = fileExists({
+  const schemaExists = fileExists({
     projectDir: tinaPath,
     filename: 'schema',
     allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
@@ -327,6 +315,10 @@ export const compileSchema = async (options: {
 
   // only do this if there is a schema file
   if (schemaExists) {
+    console.warn(
+      `schema.{ts,tsx,js,jsx} will soon be deprecated, in favor of the new config.{ts,tsx,js,jsx}\nSee here for migration steps, see here: https://tina.io/blog/upgrading-to-iframe`
+    )
+
     schema = await compileFile(options, 'schema')
   }
   if (configExists) {
