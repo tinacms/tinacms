@@ -488,13 +488,25 @@ export const buildIt = async (entryPoint, packageJSON) => {
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external,
       })
+      const appMDXPath = path.join(
+        process.cwd(),
+        '..',
+        '..',
+        '..',
+        'app',
+        'appFiles',
+        'src',
+        'fields',
+        'rich-text',
+        'monaco',
+        'mdx.js'
+      )
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         format: 'esm',
         // outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
-        outfile:
-          '/Users/jeffsee/code/tinacms/packages/@tinacms/app/appFiles/src/fields/rich-text/monaco/mdx.js',
+        outfile: appMDXPath,
         external,
       })
     } else {
