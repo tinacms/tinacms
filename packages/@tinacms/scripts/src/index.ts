@@ -491,8 +491,6 @@ export const buildIt = async (entryPoint, packageJSON) => {
       const appMDXPath = path.join(
         process.cwd(),
         '..',
-        '..',
-        '..',
         'app',
         'appFiles',
         'src',
@@ -505,7 +503,6 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         format: 'esm',
-        // outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
         outfile: appMDXPath,
         external,
       })

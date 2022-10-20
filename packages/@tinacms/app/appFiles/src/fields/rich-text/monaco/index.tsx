@@ -24,7 +24,6 @@ import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
  * easily install the current version of the mdx package in all scenarios
  * (when we're working in the monorepo, or working with a tagged npm version)
  */
-// @ts-ignore (doesn't like .js ending)
 import { parseMDX, stringifyMDX } from './mdx'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
