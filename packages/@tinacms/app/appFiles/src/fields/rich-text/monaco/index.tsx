@@ -67,8 +67,6 @@ const retryFocus = (ref) => {
 
 export const RawEditor = (props: RichTextType) => {
   const monaco = useMonaco() as Monaco
-  // const { setRawMode } = useEditorContext()
-  const { rawMode, setRawMode } = props
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const [height, setHeight] = React.useState(100)
@@ -168,7 +166,7 @@ export const RawEditor = (props: RichTextType) => {
   return (
     <div className="relative">
       <div className="sticky -top-4 w-full flex justify-between mb-2 z-50 max-w-full">
-        <Button onClick={() => setRawMode(false)}>
+        <Button onClick={() => props.setRawMode(false)}>
           View in rich-text editor
         </Button>
         <ErrorMessage error={error} />
