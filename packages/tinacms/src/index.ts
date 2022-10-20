@@ -22,6 +22,8 @@ export { TinaAdmin } from './admin'
 export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 export { TinaAdminApi } from './admin/api'
 
+export { MdxFieldPluginExtendible } from '@tinacms/toolkit'
+
 import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'
 import type { TinaCMSProviderDefaultProps } from './types/cms'
 export type { TinaCMSProviderDefaultProps }

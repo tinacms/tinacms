@@ -488,6 +488,13 @@ export const buildIt = async (entryPoint, packageJSON) => {
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
         external,
       })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        external,
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

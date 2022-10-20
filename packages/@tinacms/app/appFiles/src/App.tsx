@@ -11,7 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import TinaCMS, { TinaAdmin, useCMS } from 'tinacms'
+import React, { Suspense } from 'react'
+import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
 
@@ -19,9 +20,32 @@ import { Preview } from './preview'
 // @ts-expect-error
 import config from 'TINA_IMPORT'
 
+const RawEditor = React.lazy(() => import('./fields/rich-text'))
+
+const Editor = (props) => {
+  const [rawMode, setRawMode] = React.useState(false)
+  return (
+    <MdxFieldPluginExtendible.Component
+      rawMode={rawMode}
+      setRawMode={setRawMode}
+      {...props}
+      rawEditor={
+        <Suspense fallback={<div>Loading raw editor...</div>}>
+          <RawEditor {...props} setRawMode={setRawMode} rawMode={rawMode} />
+        </Suspense>
+      }
+    />
+  )
+}
+
 const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
   const cms = useCMS()
   cms.flags.set('tina-preview', outputFolder)
+  // Override original 'rich-text' field with one that has raw mode support
+  cms.fields.add({
+    ...MdxFieldPluginExtendible,
+    Component: Editor,
+  })
   return null
 }
 
