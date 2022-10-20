@@ -492,7 +492,9 @@ export const buildIt = async (entryPoint, packageJSON) => {
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
         format: 'esm',
-        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        // outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        outfile:
+          '/Users/jeffsee/code/tinacms/packages/@tinacms/app/appFiles/src/fields/rich-text/monaco/mdx.js',
         external,
       })
     } else {

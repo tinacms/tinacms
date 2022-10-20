@@ -18,7 +18,14 @@ limitations under the License.
 
 import React from 'react'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
-import { parseMDX, stringifyMDX } from '@tinacms/mdx'
+/**
+ * MDX is built directly to the app because of how we load dependencies.
+ * Since we drop the package.json in to the end users folder, we can't
+ * easily install the current version of the mdx package in all scenarios
+ * (when we're working in the monorepo, or working with a tagged npm version)
+ */
+// @ts-ignore (doesn't like .js ending)
+import { parseMDX, stringifyMDX } from './mdx'
 import { useDebounce } from './use-debounce'
 import type * as monaco from 'monaco-editor'
 import {
