@@ -4,6 +4,126 @@
 
 ### Patch Changes
 
+- Updated dependencies [ec73f1ea6]
+- Updated dependencies [c4f9607ce]
+  - @tinacms/cli@0.61.25
+  - tinacms@0.69.19
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [31a2fefed]
+- Updated dependencies [009fe3180]
+- Updated dependencies [03aa3e09e]
+- Updated dependencies [009fe3180]
+  - tinacms@0.69.18
+  - @tinacms/cli@0.61.24
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [2422e505d]
+  - @tinacms/cli@0.61.23
+  - tinacms@0.69.17
+
+## null
+
+### Patch Changes
+
+- @tinacms/cli@0.61.22
+- tinacms@0.69.16
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [97225d5f0]
+- Updated dependencies [0c8c571d5]
+- Updated dependencies [fce51ddd8]
+  - @tinacms/cli@0.61.21
+  - tinacms@0.69.15
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [c6e3bd321]
+  - tinacms@0.69.14
+  - @tinacms/cli@0.61.20
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [802381abd]
+- Updated dependencies [ea4a8e1b0]
+  - @tinacms/cli@0.61.19
+  - tinacms@0.69.13
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [183249b11]
+- Updated dependencies [8060d0949]
+  - tinacms@0.69.12
+  - @tinacms/cli@0.61.18
+
+## null
+
+### Patch Changes
+
+- tinacms@0.69.11
+- @tinacms/cli@0.61.17
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [a4a829734]
+  - @tinacms/cli@0.61.16
+  - tinacms@0.69.10
+
+## null
+
+### Patch Changes
+
+- tinacms@0.69.9
+- @tinacms/cli@0.61.15
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [f581f263d]
+- Updated dependencies [c06b6a2f0]
+- Updated dependencies [47f99085d]
+- Updated dependencies [0513ae416]
+- Updated dependencies [64c40e6fc]
+- Updated dependencies [2444cf047]
+- Updated dependencies [f3439ea35]
+- Updated dependencies [48032e2ba]
+- Updated dependencies [112b7271d]
+- Updated dependencies [4efe31214]
+- Updated dependencies [8688dbff9]
+  - @tinacms/cli@0.61.14
+  - tinacms@0.69.8
+
+## null
+
+### Patch Changes
+
+- Updated dependencies [9183157c4]
+- Updated dependencies [4adf12619]
+  - @tinacms/cli@0.61.13
+  - tinacms@0.69.7
+
+## null
+
+### Patch Changes
+
 - @tinacms/cli@0.61.12
 
 ## null

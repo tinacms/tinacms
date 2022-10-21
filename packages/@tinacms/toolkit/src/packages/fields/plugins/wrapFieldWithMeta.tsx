@@ -28,7 +28,7 @@ export type InputFieldType<ExtraFieldProps, InputProps> =
 // Add any other fields that the Field component should expect onto the ExtraFieldProps generic type
 export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   Field:
-    | React.StatelessComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
     | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
 ) {
   return (props: InputFieldType<ExtraFieldProps, InputProps>) => (
@@ -37,6 +37,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
       label={props.field.label}
       description={props.field.description}
       error={props.meta.error}
+      index={props.index}
     >
       <Field {...props} />
     </FieldMeta>
@@ -50,6 +51,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   description?: string
   error?: string
   margin?: boolean
+  index?: number
 }
 
 export const FieldMeta = ({
@@ -59,6 +61,7 @@ export const FieldMeta = ({
   error,
   margin = true,
   children,
+  index,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
@@ -69,6 +72,7 @@ export const FieldMeta = ({
       onMouseOver={() => setHoveredField({ fieldName: name })}
       onMouseOut={() => setHoveredField({ fieldName: null })}
       onClick={() => setFocusedField({ fieldName: name })}
+      style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}
     >
       <FieldLabel name={name}>

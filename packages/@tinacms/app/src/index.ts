@@ -11,19 +11,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import react from '@vitejs/plugin-react'
 import fs from 'fs-extra'
-import { build, createServer, InlineConfig } from 'vite'
 import path from 'path'
+import { build, createServer, splitVendorChunkPlugin } from 'vite'
+import type { InlineConfig, ViteDevServer } from 'vite'
+import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
-import { build as esbuild } from 'esbuild'
-import type { Loader } from 'esbuild'
+import { devHTML, prodHTML } from './html'
+
+let server: ViteDevServer
 
 export const viteBuild = async ({
   rootPath,
   outputFolder,
   publicFolder,
-  local,
+  local: l,
   apiUrl,
 }: {
   local: boolean
@@ -32,128 +34,194 @@ export const viteBuild = async ({
   outputFolder: string
   apiUrl: string
 }) => {
-  const root = path.resolve(__dirname, '..', 'appFiles')
-  const pathToConfig = path.join(rootPath, '.tina', 'config')
-  const packageJSONFilePath = path.join(rootPath, 'package.json')
-  const outDir = path.join(rootPath, publicFolder, outputFolder)
-  await fs.emptyDir(outDir)
-  await fs.ensureDir(outDir)
-  await fs.writeFile(
-    path.join(rootPath, publicFolder, outputFolder, '.gitignore'),
-    `index.html
-assets/
-vite.svg`
-  )
-
+  const local = l
+  const localBuild = l
+  const node_env = JSON.stringify(process.env.NODE_ENV)
+  const generatedPath = path.join(rootPath, '.tina/__generated__')
   /**
-   * This pre-build logic is the same as what we do in packages/@tinacms/cli/src/cmds/compile/index.ts.
-   * The logic should be merged, possibly from moving `viteBuild` to a higher-level but for now it's easiest
-   * to keep them separate since they run at different times. the compilation step also cleans up after itself
-   * so we can't use it as an artifact for this.
+   * The final location of the SPA assets
+   * @example public/admin
    */
-  const packageJSON = JSON.parse(
-    fs.readFileSync(packageJSONFilePath).toString() || '{}'
-  )
-  const define = {}
-  const deps = packageJSON?.dependencies || []
-  const peerDeps = packageJSON?.peerDependencies || []
-  const devDeps = packageJSON?.devDependencies || []
-  const external = Object.keys({ ...deps, ...peerDeps, ...devDeps })
-  const out = path.join(rootPath, '.tina', '__generated__', 'out.jsx')
-  await esbuild({
-    bundle: true,
-    platform: 'browser',
-    target: ['es2020'],
-    entryPoints: [pathToConfig],
-    format: 'esm',
-    treeShaking: true,
-    outfile: out,
-    external: [...external, './node_modules/*'],
-    loader: loaders,
-    define: define,
-  })
-
-  const base = `/${outputFolder}/`
-  const config: InlineConfig = {
-    root,
-    base,
-    // For some reason this is breaking the React runtime in the end user's application.
-    // Not sure what's going on but `development` works for now.
+  const outputPath = path.join(rootPath, publicFolder, outputFolder)
+  /**
+   * The location to copy source files FROM
+   * @example node_modules/@tinacms/app/appFiles
+   */
+  const appCopyPath = path.join(__dirname, '..', 'appFiles')
+  /**
+   * The location to copy source files
+   * @example .tina/__generated__/app
+   */
+  // const appRootPath = path.join(__dirname, '..', 'appFiles')
+  const appRootPath = path.join(generatedPath, 'app')
+  /**
+   * The location to write the dev HTML file to.
+   * This file retrieves assets via HTTP request to the Vite dev server
+   */
+  const devHTMLPath = path.join(outputPath, 'index.html')
+  /**
+   * The location to write the production HTML file to.
+   * In contrast to the dev HTML file, the production file needs
+   * to be adjacent to the source files that are copied over
+   */
+  const prodHTMLPath = path.join(appRootPath, 'index.html')
+  /**
+   * The location of the user-defined config
+   */
+  const configPath = path.join(rootPath, '.tina', 'config')
+  /**
+   * The location where the user-defined config is "prebuilt" to.
+   */
+  const configPrebuildPath = path.join(generatedPath, 'prebuild', 'config.js')
+  /**
+   * The prebuild step takes the user-defined config and bundles it, leaving out
+   * dependencies we bring with us (react, react-dom, tinacms) of the bundle.
+   *
+   * It then treats the output as the source of truth for user-defined config
+   */
+  const prebuildConfig: InlineConfig = {
+    // This doesn't do anything in this case, but without it, Vite seems
+    // to assume the cwd, and copies values from `/public` automatically
+    // it seems like it just needs to be any folder that does not have a 'public' folder
+    root: path.join(generatedPath, 'prebuild'),
+    // NextJS forces es5 on tsconfig, specifying it here ignores that
+    // https://github.com/evanw/esbuild/issues/1355
+    esbuild: {
+      target: 'es2020',
+    },
     mode: local ? 'development' : 'production',
-    plugins: [react(), viteTina()],
+    build: {
+      outDir: path.join(generatedPath, 'prebuild'),
+      lib: {
+        entry: configPath,
+        fileName: () => {
+          return 'config.js'
+        },
+        formats: ['es'],
+      },
+      rollupOptions: {
+        external: ['react', 'react-dom', 'tinacms', 'next'],
+      },
+    },
+    logLevel: 'silent',
+  }
+  await build(prebuildConfig)
+
+  const alias = {
+    TINA_IMPORT: configPrebuildPath,
+  }
+
+  const config: InlineConfig = {
+    root: appRootPath,
+    base: `/${outputFolder}/`,
+    mode: local ? 'development' : 'production',
+    /**
+     * `splitVendorChunkPlugin` is needed because `tinacms` and `@tinacms/toolkit` are quite large,
+     * Vite's chunking strategy chokes on memory issues for smaller machines (ie. on CI).
+     */
+    plugins: [splitVendorChunkPlugin(), react(), viteTina()],
     define: {
-      'process.env': {},
+      /**
+       * Since we prebuild the config.ts, it's possible for modules to be loaded which make
+       * use of `process`. The main scenario where this is an issue is when co-locating schema
+       * definitions with source files, and specifically source files which impor from NextJS.
+       *
+       * Some examples of what NextJS uses for `process.env` are:
+       *  - `process.env.__NEXT_TRAILING_SLASH`
+       *  - `process.env.__NEXT_CROSS_ORIGIN`
+       *  - `process.env.__NEXT_I18N_SUPPORT`
+       *
+       * Also, interestingly some of the advice for handling this doesn't work, references to replacing
+       * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
+       * but node does. This was a surprise, but using `new Object()` seems to do the trick.
+       */
+      'process.env': 'new Object()',
       __API_URL__: `"${apiUrl}"`,
     },
+    // NextJS forces es5 on tsconfig, specifying it here ignores that
+    // https://github.com/evanw/esbuild/issues/1355
+    esbuild: {
+      target: 'es2020',
+    },
     server: {
-      strictPort: true,
       port: 5173,
       fs: {
-        // allow isn't working yet, so be lax with it (maybe just do this for dev mode)
         strict: false,
-        // /**
-        //  * From the monorepo Vite is importing from a node_modules folder relative to itself, which
-        //  * works as expected. But when published and used from a yarn setup, the node_modules
-        //  * are flattened, meaning we need to access the global node_modules folder instead of
-        //  * our own. I believe this is fine, but something to keep an eye on.
-        //  */
-        // allow: ['..'],
       },
     },
     resolve: {
-      alias: {
-        TINA_IMPORT: out,
-      },
+      alias,
+      dedupe: ['graphql'],
     },
     build: {
       sourcemap: true,
-      outDir,
+      outDir: outputPath,
       emptyOutDir: false,
     },
     logLevel: 'silent',
   }
+  // Set to false during monorepo dev (TODO: automate this)
   if (true) {
-    await build(config)
-    await fs.rmSync(out)
+    await fs.copy(appCopyPath, appRootPath)
   } else {
-    /**
-     * Uncomment to run the dev server
-     * Note that this assumes the outputFile is 'admin'
-     * And will run into port issues when the build server
-     * restart itself
-     */
-    const indexDev = await fs
-      .readFileSync(path.join(root, 'index.dev.html'))
-      .toString()
-    await fs.writeFileSync(path.join(outDir, 'index.html'), indexDev)
-    const server = await createServer(config)
+    await fs.createSymlink(
+      path.join(appCopyPath, 'src'),
+      path.join(appRootPath, 'src'),
+      'dir'
+    )
+    await fs.createSymlink(
+      path.join(appCopyPath, 'package.json'),
+      path.join(appRootPath, 'package.json'),
+      'file'
+    )
+  }
+
+  await execShellCommand(
+    `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+  )
+  await fs.outputFile(
+    path.join(outputPath, '.gitignore'),
+    `index.html
+assets/`
+  )
+  if (localBuild) {
+    const replaceAll = (string: string, target: string, value: string) => {
+      const regex = new RegExp(target, 'g')
+      return string.valueOf().replace(regex, value)
+    }
+    await fs.outputFile(
+      devHTMLPath,
+      replaceAll(devHTML, 'INSERT_OUTPUT_FOLDER_NAME', outputFolder)
+    )
+    if (server) {
+      await server.close()
+    }
+    server = await createServer(config)
     await server.listen()
-    await server.printUrls()
+  } else {
+    await fs.outputFile(prodHTMLPath, prodHTML)
+    await build(config)
+  }
+  /**
+   * Vite alters the value of `process.env.NODE_ENV` on production builds.
+   * Set it back to the previous value, and if there wasn't a value, remove
+   * it from `process.env`.
+   */
+  if (!node_env) {
+    delete process.env.NODE_ENV
+  } else {
+    process.env.NODE_ENV = node_env
   }
 }
 
-const loaders: { [ext: string]: Loader } = {
-  '.aac': 'file',
-  '.css': 'file',
-  '.eot': 'file',
-  '.flac': 'file',
-  '.gif': 'file',
-  '.jpeg': 'file',
-  '.jpg': 'file',
-  '.json': 'json',
-  '.mp3': 'file',
-  '.mp4': 'file',
-  '.ogg': 'file',
-  '.otf': 'file',
-  '.png': 'file',
-  '.svg': 'file',
-  '.ttf': 'file',
-  '.wav': 'file',
-  '.webm': 'file',
-  '.webp': 'file',
-  '.woff': 'file',
-  '.woff2': 'file',
-  '.js': 'jsx',
-  '.jsx': 'jsx',
-  '.tsx': 'tsx',
+function execShellCommand(cmd: string): Promise<string> {
+  const exec = require('child_process').exec
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error: string, stdout: string, stderr: string) => {
+      if (error) {
+        reject(error)
+      }
+      resolve(stdout ? stdout : stderr)
+    })
+  })
 }

@@ -16,7 +16,7 @@ import { TinaCloudProvider } from './auth'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 
 import { LocalClient } from './internalClient/index'
-import { TinaDataContext } from '@tinacms/sharedctx'
+import { EditContext, TinaDataContext } from '@tinacms/sharedctx'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
 import styles from './styles.css'
@@ -232,7 +232,9 @@ export const TinaCMSProvider2 = ({
         isLocalClient={isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
-        schema={schema}
+        apiUrl={apiURL}
+        // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
+        schema={{ ...schema, config: { ...schema.config, ...props } }}
       >
         <style>{styles}</style>
         <ErrorBoundary>
@@ -349,6 +351,7 @@ const FormRegistrar = ({
   onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
 }) => {
   const cms = useCMS()
+  const { setFormsRegistering } = React.useContext(EditContext)
 
   const [payload, isLoading] = useGraphqlForms({
     query: request?.query,
@@ -364,6 +367,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
+    setFormsRegistering && setFormsRegistering(isLoading)
   }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (

@@ -1,5 +1,24 @@
 # next-tinacms-cloudinary
 
+## 0.1.4
+
+### Patch Changes
+
+- be40bfd71: Remove unnecessary media helper deps
+
+## 0.1.3
+
+### Patch Changes
+
+- 2422e505d: Removed styled-components as a dependency in tinacms.
+  Removed deprecated react-toolbar in @tinacms/toolkit.
+
+## 0.1.2
+
+### Patch Changes
+
+- 112b7271d: fix vulnerabilities
+
 ## 0.1.1
 
 ### Patch Changes

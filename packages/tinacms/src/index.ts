@@ -32,12 +32,20 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
-  TinaCloudTemplateBase as TinaTemplate,
+  TinaCloudTemplateBase,
+  TinaTemplate,
   TinaFieldBase,
   TinaCMSConfig,
 } from '@tinacms/schema-tools'
 
 import { validateSchema } from '@tinacms/schema-tools'
+export { NAMER, resolveForm } from '@tinacms/schema-tools'
+export type {
+  TinaFieldEnriched,
+  TinaSchema,
+  Template,
+  Templateable,
+} from '@tinacms/schema-tools'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
@@ -46,16 +54,17 @@ export type TinaCloudCollection = TinaCloudCollectionBase<false>
 // Alias to remove Cloud
 export type TinaCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
-export type { TinaTemplate }
+export type { TinaTemplate, TinaCloudTemplateBase }
 
 export const defineSchema = (config: TinaCloudSchema) => {
-  validateSchema({ config })
+  validateSchema({ schema: config })
   return config
 }
 
 export const defineConfig = (
   config: Omit<TinaCMSProviderDefaultProps, 'children'>
 ) => {
+  validateSchema({ schema: config.schema })
   return config
 }
 
@@ -66,5 +75,6 @@ export const defineStaticConfig = (
     DocumentCreatorCallback
   >
 ) => {
+  validateSchema({ schema: config.schema })
   return config
 }

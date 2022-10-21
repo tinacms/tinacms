@@ -11,10 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import {
+  BaseTextField,
+  Form,
+  FormBuilder,
+  FormStatus,
+  wrapFieldsWithMeta,
+} from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import type { GlobalTemplate } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -26,6 +33,7 @@ import usePrompt from '../../hooks/use-prompt'
 import type { TinaCMS } from '@tinacms/toolkit'
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 import { useWindowWidth } from '@react-hook/window-size'
+import { FaLock, FaUnlock } from 'react-icons/fa'
 
 const createDocument = async (
   cms: TinaCMS,
@@ -93,6 +101,44 @@ const CollectionCreatePage = () => {
   )
 }
 
+const FilenameInput = (props) => {
+  const [filenameTouched, setFilenameTouched] = React.useState(false)
+
+  return (
+    <div
+      className="group relative block cursor-pointer"
+      onClick={() => {
+        setFilenameTouched(true)
+      }}
+    >
+      <input
+        type="text"
+        className={`shadow-inner focus:shadow-outline focus:border-blue-500 focus:outline-none block text-base pr-3 truncate py-2 w-full border transition-all ease-out duration-150 focus:text-gray-900 rounded-md ${
+          props.readonly || !filenameTouched
+            ? 'bg-gray-50 text-gray-300  border-gray-150 pointer-events-none pl-8 group-hover:bg-white group-hover:text-gray-600  group-hover:border-gray-200'
+            : 'bg-white text-gray-600  border-gray-200 pl-3'
+        }`}
+        {...props}
+        disabled={props.readonly || !filenameTouched}
+      />
+      <FaLock
+        className={`text-gray-400 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
+          !filenameTouched && !props.readonly
+            ? 'opacity-20 group-hover:opacity-0 group-active:opacity-0'
+            : 'opacity-0'
+        }`}
+      />
+      <FaUnlock
+        className={`text-blue-500 absolute top-1/2 left-2 -translate-y-1/2 pointer-events-none h-5 w-auto transition-opacity duration-150 ease-out ${
+          !filenameTouched && !props.readonly
+            ? 'opacity-0 group-hover:opacity-80 group-active:opacity-80'
+            : 'opacity-0'
+        }`}
+      />
+    </div>
+  )
+}
+
 const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   const navigate = useNavigate()
   const [formIsPristine, setFormIsPristine] = useState(true)
@@ -100,10 +146,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
-  const template = schema.getTemplateForData({
+  const template: GlobalTemplate<true> = schema.getTemplateForData({
     collection: schemaCollection,
     data: { _template: templateName },
-  })
+  }) as GlobalTemplate<true>
 
   const formInfo = resolveForm({
     collection: schemaCollection,
@@ -112,15 +158,56 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     template,
   })
 
+  let slugFunction = template?.ui?.filename?.slugify
+
+  if (!slugFunction) {
+    const titleField = template?.fields.find(
+      (x) => x.required && x.type === 'string' && x.isTitle
+    )?.name
+    // If the collection does not a slugify function and is has a title field, use the default slugify function
+    if (titleField) {
+      // default slugify function strips out all non-alphanumeric characters
+      slugFunction = (values: unknown) =>
+        values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')
+    }
+  }
+
   const form = useMemo(() => {
     return new Form({
+      initialValues:
+        typeof schemaCollection?.defaultItem === 'function'
+          ? schemaCollection.defaultItem()
+          : schemaCollection?.defaultItem,
+      extraSubscribeValues: { active: true, submitting: true, touched: true },
+      onChange: (values) => {
+        if (
+          slugFunction &&
+          values?.active !== 'filename' &&
+          !values?.submitting &&
+          !values.touched?.filename
+        ) {
+          const value = slugFunction(values?.values)
+          form.finalForm.change('filename', value)
+        }
+      },
       id: 'create-form',
       label: 'form',
       fields: [
+        ...(formInfo.fields as any),
         {
           name: 'filename',
           label: 'Filename',
-          component: 'text',
+          component: slugFunction
+            ? wrapFieldsWithMeta(({ field, input, meta }) => {
+                return (
+                  <FilenameInput
+                    readonly={template?.ui?.filename?.readonly}
+                    {...input}
+                  />
+                )
+              })
+            : 'text',
+          disabled: template?.ui?.filename?.readonly,
           description: (
             <span>
               A unique filename for the content.
@@ -144,7 +231,6 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             }
           },
         },
-        ...(formInfo.fields as any),
       ],
       onSubmit: async (values) => {
         try {

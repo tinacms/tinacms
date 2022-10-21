@@ -16,19 +16,18 @@ import _ from 'lodash'
 import { sequential } from '../util'
 import * as yup from 'yup'
 
-import type {
+import {
+  TinaFieldBase,
   TinaFieldEnriched,
   TinaCloudSchemaEnriched,
   TinaCloudSchemaBase,
   TinaCloudCollectionEnriched,
   TinaCloudTemplateEnriched,
   TinaCloudCollection,
-} from '../types'
+  validateTinaCloudSchemaConfig,
+} from '@tinacms/schema-tools'
 
-import { validateTinaCloudSchemaConfig } from '@tinacms/schema-tools'
-import { TinaField } from '..'
-
-const FIELD_TYPES: TinaField['type'][] = [
+const FIELD_TYPES: TinaFieldBase['type'][] = [
   'string',
   'number',
   'boolean',
@@ -39,26 +38,22 @@ const FIELD_TYPES: TinaField['type'][] = [
   'rich-text',
 ]
 
-// TODO: fix types to use @tinacms/schema-tools
 export const validateSchema = async (
   schema: TinaCloudSchemaBase
 ): Promise<TinaCloudSchemaBase> => {
-  // @ts-ignore
-  const schema2 = addNamespaceToSchema(
-    _.cloneDeep(schema)
-  ) as TinaCloudSchemaEnriched
+  const schema2: TinaCloudSchemaEnriched =
+    addNamespaceToSchema<TinaCloudSchemaEnriched>(
+      _.cloneDeep(schema) as unknown as TinaCloudSchemaEnriched
+    )
   const collections = await sequential(
     schema2.collections,
     async (collection) => validateCollection(collection)
   )
   validationCollectionsPathAndMatch(collections)
-  // @ts-ignore
   if (schema2.config) {
-    // @ts-ignore
     const config = validateTinaCloudSchemaConfig(schema2.config)
     return {
       collections,
-      // @ts-ignore
       config,
     }
   }

@@ -24,6 +24,7 @@ export interface CreateClientProps {
   repo?: string
   branch?: string
   schema?: TinaCloudSchema<false>
+  apiUrl?: string
 }
 export const createClient = ({
   clientId,
@@ -31,9 +32,10 @@ export const createClient = ({
   branch,
   tinaioConfig,
   schema,
+  apiUrl,
 }: CreateClientProps) => {
   return isLocalClient
-    ? new LocalClient({ schema })
+    ? new LocalClient({ customContentApiUrl: apiUrl, schema })
     : new Client({
         clientId: clientId || '',
         branch: branch || 'main',

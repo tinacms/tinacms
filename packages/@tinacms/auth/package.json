@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/auth",
-  "version": "0.50.4",
+  "version": "0.50.5",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -19,11 +19,6 @@
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/tina-graphql"
-  },
-  "peerDependencies": {
-    "next": ">=10.0.5",
-    "react": ">=16.14.0",
-    "react-dom": ">=16.14.0"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",

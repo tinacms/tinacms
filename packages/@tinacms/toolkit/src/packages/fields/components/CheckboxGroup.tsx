@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { Circle, CircleCheck } from '../../icons'
 
 type Option = {
@@ -68,8 +67,9 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
     const checked = input.value ? input.value.includes(option.value) : false
     return (
-      <CheckboxOptionWrap key={option.value}>
+      <div className="flex-1" key={option.value}>
         <input
+          className="absolute w-0 h-0 opacity-0 cursor-pointer"
           type="checkbox"
           name={input.name}
           id={optionId}
@@ -92,83 +92,27 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
             }
           }}
         />
-        <CheckboxOption htmlFor={optionId} checked={checked}>
+        <label
+          className="flex items-center text-[13px] flex-grow rounded-3xl text-blue-500 font-normal cursor-pointer h-[34px] px-3 transition-all duration-100 ease-out m-0 border-0"
+          htmlFor={optionId}
+        >
           {checked === true ? (
-            <CircleCheck className="w-5 h-auto text-black" />
+            <CircleCheck className="w-5 h-auto text-black mr-[5px]" />
           ) : (
-            <Circle className="w-5 h-auto text-black" />
+            <Circle className="w-5 h-auto text-black mr-[5px]" />
           )}
-          <Label>{option.label}</Label>
-        </CheckboxOption>
-      </CheckboxOptionWrap>
+          <span className="relative">{option.label}</span>
+        </label>
+      </div>
     )
   }
 
   return (
-    <CheckboxOptions id={input.name}>
+    <div
+      className="flex flex-col min-h-[42px] bg-white rounded-3xl shadow-none  text-blue-500 p-[3px] transition-all duration-100 ease-out gap-[3px] [&:not(:active)]:[&:not(:focus-within)]:hover:shadow-[0_0_0_2px_#e1ddec] focus-within:shadow-[0_0_0_2px_#0084ff] active:shadow-[0_0_0_2px_#0084ff]"
+      id={input.name}
+    >
       {checkboxOptions?.map(toProps).map(toComponent)}
-    </CheckboxOptions>
+    </div>
   )
 }
-
-const CheckboxOptions = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 4px;
-  min-height: calc(40px + 2px);
-  background-color: var(--tina-color-grey-0);
-  border-radius: var(--tina-radius-big);
-  box-shadow: var(--tina-shadow-small);
-  background-color: var(--tina-color-grey-0);
-  border: 1px solid var(--tina-color-grey-2);
-  color: var(--tina-color-primary);
-  padding: 3px;
-  box-shadow: 0 0 0 0 var(--tina-color-grey-3);
-  transition: all 85ms ease-out;
-  gap: 3px;
-  &:hover {
-    box-shadow: 0 0 0 2px var(--tina-color-grey-3);
-  }
-  &:focus-within,
-  &:active {
-    box-shadow: 0 0 0 2px var(--tina-color-primary);
-  }
-`
-
-const CheckboxOptionWrap = styled.div`
-  flex: 1;
-
-  & > input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-}
-`
-
-const CheckboxOption = styled.label<{ checked: boolean; htmlFor: string }>`
-  display: flex;
-  align-items: center;
-  font-size: var(--tina-font-size-1);
-  flex: 1;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid var(--tina-color-grey-2);
-  color: var(--tina-color-primary);
-  font-weight: var(--tina-font-weight-regular);
-  cursor: pointer;
-  font-size: var(--tina-font-size-1);
-  height: calc(40px - 6px);
-  padding: 0 var(--tina-padding-small);
-  transition: all 85ms ease-out;
-  margin: 0;
-  border: none;
-  svg {
-    margin-right: 5px;
-  }
-`
-
-const Label = styled.span`
-  position: relative;
-`

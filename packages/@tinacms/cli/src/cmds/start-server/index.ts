@@ -23,7 +23,8 @@ import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
 import { buildAdmin, ConfigBuilder } from '../../buildTina'
-import { TinaSchema } from '@tinacms/schema-tools'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { spin } from '../../utils/spinner'
 
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
@@ -48,12 +49,7 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
-    // FIXME: these types live in TinaCMS
-    schema?: TinaSchema & {
-      config?: {
-        build?: { outputFolder: string; publicFolder: string }
-      }
-    }
+    schema?: TinaCloudSchema<false>
   },
   next,
   {
@@ -108,33 +104,38 @@ export async function startServer(
 
     // hold the lock
     buildLock.enable()
+
     try {
       const s = require('./server')
       state.server = await s.default(database)
 
-      state.server.listen(port, () => {
-        const altairUrl = `http://localhost:${port}/altair/`
-        const cmsUrl = ctx.schema?.config?.build
-          ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
-          : `[your-development-url]/admin`
-        if (verbose)
-          logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-        logger.info(
-          `Visit the GraphQL playground at ${chalk.underline.blueBright(
-            altairUrl
-          )}\nor`
-        )
-        logger.info(`Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`)
-      })
-      state.server.on('error', function (e) {
-        if (e.code === 'EADDRINUSE') {
-          logger.error(dangerText(`Port 4001 already in use`))
-          process.exit()
-        }
-        throw e
-      })
-      state.server.on('connection', (socket) => {
-        state.sockets.push(socket)
+      await new Promise<void>((resolve, reject) => {
+        state.server.listen(port, () => {
+          const altairUrl = `http://localhost:${port}/altair/`
+          const cmsUrl = ctx.schema?.config?.build
+            ? `[your-development-url]/${ctx.schema.config.build.outputFolder}/index.html`
+            : `[your-development-url]/admin`
+          if (verbose)
+            logger.info(`Started Filesystem GraphQL server on port: ${port}`)
+          logger.info(
+            `Visit the GraphQL playground at ${chalk.underline.blueBright(
+              altairUrl
+            )}\nor`
+          )
+          logger.info(
+            `Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`
+          )
+          resolve()
+        })
+        state.server.on('error', function (e) {
+          if (e.code === 'EADDRINUSE') {
+            logger.error(dangerText(`Port ${port} already in use`))
+          }
+          reject(e)
+        })
+        state.server.on('connection', (socket) => {
+          state.sockets.push(socket)
+        })
       })
     } catch (error) {
       throw error
@@ -172,6 +173,7 @@ export async function startServer(
         dev,
         verbose,
       })
+      ctx.schema = schema
 
       const apiUrl = await ctx.builder.genTypedClient({
         compiledSchema: schema,
@@ -179,8 +181,15 @@ export async function startServer(
         noSDK,
         verbose,
         usingTs: ctx.usingTs,
+        port,
       })
-      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+
+      await spin({
+        waitFor: async () => {
+          await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+        },
+        text: 'Indexing local files',
+      })
 
       await buildAdmin({
         local: true,
@@ -224,9 +233,7 @@ export async function startServer(
           next()
         } catch (e) {
           handleServerErrors(e)
-          // FIXME: make this a debug flag
-          console.log(e)
-          process.exit(0)
+          throw e
         }
       })
       .on('all', async () => {

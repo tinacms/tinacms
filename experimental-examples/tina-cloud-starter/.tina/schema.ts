@@ -26,9 +26,6 @@ const InnerTemplate: TinaTemplate = {
       name: "nestedBlockc",
       type: "object",
       list: true,
-      ui: {
-        visualSelector: true,
-      },
       fields: [
         {
           label: "title",
@@ -64,26 +61,6 @@ const BlocksTemplate: TinaTemplate = {
 };
 
 const schema = defineSchema({
-  // FIXME: right now this needs to be defined here
-  // and in config.ts when using static build mode.
-  // This is because for the backend we're transforming things
-  // like `config.media` to be present on `schema`, but not before
-  // passing it into TinaCMS.
-  config: {
-    // build: {
-    //   outputFolder: "tina",
-    //   publicFolder: "public",
-    // },
-    branch: "main",
-    clientId: "foobar",
-    token: "foo",
-    media: {
-      tina: {
-        publicFolder: "public",
-        mediaRoot: "",
-      },
-    },
-  },
   collections: [
     {
       label: "Blog Posts",
@@ -280,6 +257,9 @@ const schema = defineSchema({
               name: "nav",
               list: true,
               ui: {
+                itemProps: (item) => {
+                  return { label: item?.label };
+                },
                 defaultItem: {
                   href: "home",
                   label: "Home",

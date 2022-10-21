@@ -20,7 +20,6 @@ import {
 } from '@tinacms/toolkit'
 import { LoadingDots, Button } from '@tinacms/toolkit'
 import React, { useCallback, useState } from 'react'
-import styled from 'styled-components'
 
 interface ModalBuilderProps {
   title: string
@@ -49,9 +48,9 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
   )
 }
 
-export const ErrorLabel = styled.p`
-  color: var(--tina-color-error) !important;
-`
+export const ErrorLabel = ({ style = {}, ...props }) => (
+  <p style={{ ...style, color: 'var(--tina-color-error)' }} {...props} />
+)
 
 interface ButtonProps {
   name: string

@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.63.8",
+  "version": "0.63.16",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -41,7 +41,7 @@
     "fast-glob": "^3.2.5",
     "flat": "^5.0.2",
     "fs-extra": "^9.0.1",
-    "graphql": "^15.3.0",
+    "graphql": "15.8.0",
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",

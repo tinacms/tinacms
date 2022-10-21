@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
 import TinaCMS, { TinaAdmin, useCMS } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
@@ -29,9 +28,9 @@ const SetPreview = ({ outputFolder }: { outputFolder: string }) => {
 export const TinaAdminWrapper = () => {
   return (
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
-     <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
+    <TinaCMS {...config} client={{ apiUrl: __API_URL__ }}>
       <SetPreview outputFolder={config.build.outputFolder} />
-      <TinaAdmin preview={<Preview {...config} />} />
+      <TinaAdmin preview={Preview} config={config} />
     </TinaCMS>
   )
 }
@@ -50,3 +49,15 @@ function App() {
   )
 }
 export default App
+
+// import config from './config'
+
+// function App() {
+//   return (
+//     <div className="max-w-6xl mx-4 xl:mx-auto border rounded-md shadow-lg my-24 p-4 sm:p-12">
+//       <pre>{JSON.stringify(config, null, 2)}</pre>
+//     </div>
+//   )
+// }
+
+// export default App

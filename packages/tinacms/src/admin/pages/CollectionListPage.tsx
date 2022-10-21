@@ -110,7 +110,7 @@ const handleNavigate = (
   /**
    * Determine if the document has a route mapped
    */
-  const routeOverride = collectionDefinition.ui?.router
+  let routeOverride = collectionDefinition.ui?.router
     ? collectionDefinition.ui?.router({
         document,
         collection: collectionDefinition,
@@ -123,8 +123,12 @@ const handleNavigate = (
    * Redirect the browser if 'yes', else navigate react-router.
    */
   if (routeOverride) {
+    // remove leading /
+    if (routeOverride.startsWith('/')) {
+      routeOverride = routeOverride.slice(1)
+    }
     tinaPreview
-      ? navigate(`/preview?iframe-url=${encodeURIComponent(routeOverride)}`)
+      ? navigate(`/preview/${routeOverride}`)
       : (window.location.href = routeOverride)
     return null
   } else {
@@ -319,9 +323,9 @@ const CollectionListPage = () => {
                                     key={`document-${document.node._sys.relativePath}`}
                                     className=""
                                   >
-                                    <td className="px-6 py-2 whitespace-nowrap">
+                                    <td className="pl-5 pr-3 py-2 truncate max-w-0">
                                       <a
-                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer"
+                                        className="text-blue-600 hover:text-blue-400 flex items-center gap-3 cursor-pointer truncate"
                                         onClick={() => {
                                           handleNavigate(
                                             navigate,
@@ -332,12 +336,12 @@ const CollectionListPage = () => {
                                           )
                                         }}
                                       >
-                                        <BiEdit className="inline-block h-6 w-auto opacity-70" />
-                                        <span>
+                                        <BiEdit className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
+                                        <span className="truncate block">
                                           <span className="block text-xs text-gray-400 mb-1 uppercase">
                                             {hasTitle ? 'Title' : 'Filename'}
                                           </span>
-                                          <span className="h-5 leading-5 block whitespace-nowrap">
+                                          <span className="h-5 leading-5 block truncate">
                                             {subfolders && (
                                               <span className="text-xs text-gray-400">
                                                 {`${subfolders}/`}
@@ -353,16 +357,16 @@ const CollectionListPage = () => {
                                       </a>
                                     </td>
                                     {hasTitle && (
-                                      <td className="px-6 py-4 whitespace-nowrap">
+                                      <td className="px-3 py-4 truncate max-w-0 ">
                                         <span className="block text-xs text-gray-400 mb-1 uppercase">
                                           Filename
                                         </span>
-                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                        <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
                                           {document.node._sys.filename}
                                         </span>
                                       </td>
                                     )}
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-3 py-4 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Extension
                                       </span>
@@ -370,7 +374,7 @@ const CollectionListPage = () => {
                                         {document.node._sys.extension}
                                       </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-3 py-4 truncate w-[15%]">
                                       <span className="block text-xs text-gray-400 mb-1 uppercase">
                                         Template
                                       </span>

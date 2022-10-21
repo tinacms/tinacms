@@ -38,6 +38,7 @@ interface ClientGenOptions {
   noSDK?: boolean
   local?: boolean
   verbose?: boolean
+  port?: number
 }
 
 interface BuildOptions {
@@ -98,6 +99,7 @@ export const buildSetupCmdAudit = async (
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
 
+  await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
   const store = new LevelStore(rootPath, false)
 
   const database = await createDatabase({ store, bridge })
@@ -146,6 +148,8 @@ const buildSetup = async ({
   //   ? new LevelStore(rootPath, useMemoryStore)
   //   : new FilesystemStore({ rootPath })
 
+  await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
+
   const store = new LevelStore(rootPath, useMemoryStore)
 
   const database = await createDatabase({ store, bridge })
@@ -154,7 +158,12 @@ const buildSetup = async ({
 }
 
 export const buildCmdBuild = async (
-  ctx: { builder: ConfigBuilder; rootPath: string; usingTs: boolean },
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    usingTs: boolean
+    schema: unknown
+  },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions & ClientGenOptions,
@@ -166,12 +175,14 @@ export const buildCmdBuild = async (
     rootPath: ctx.rootPath,
     ...options,
   })
+  ctx.schema = schema
   const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
     noSDK: options.noSDK,
     verbose: options.verbose,
     usingTs: ctx.usingTs,
+    port: options.port,
   })
   await buildAdmin({
     local: options.local,
@@ -196,7 +207,12 @@ export const auditCmdBuild = async (
     verbose: true,
   })
 
-  await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+  await spin({
+    waitFor: async () => {
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+    },
+    text: 'Indexing local files',
+  })
 
   next()
 }
@@ -248,6 +264,7 @@ export class ConfigBuilder {
     noSDK,
     verbose,
     local,
+    port,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
@@ -263,6 +280,7 @@ export class ConfigBuilder {
       { tinaSchema: compiledSchema, usingTs },
       {
         local,
+        port,
       }
     )
   }
@@ -280,18 +298,25 @@ export const buildAdmin = async ({
   apiUrl: string
 }) => {
   if (schema?.config?.build) {
-    await spin({
-      text: 'Building static site',
-      waitFor: async () => {
-        await viteBuild({
-          local,
-          rootPath,
-          outputFolder: schema?.config?.build?.outputFolder as string,
-          publicFolder: schema?.config?.build?.publicFolder as string,
-          apiUrl,
-        })
-      },
-    })
-    console.log('\nDone building static site')
+    const buildVite = async () => {
+      await viteBuild({
+        local,
+        rootPath,
+        outputFolder: schema?.config?.build?.outputFolder as string,
+        publicFolder: schema?.config?.build?.publicFolder as string,
+        apiUrl,
+      })
+    }
+    // Local runs an asset server as a long-lived task, don't show spinning animation
+    if (local) {
+      console.log('Starting Tina asset server')
+      await buildVite()
+    } else {
+      await spin({
+        text: 'Building static site',
+        waitFor: buildVite,
+      })
+      console.log('\nDone building static site')
+    }
   }
 }

@@ -1,3 +1,4 @@
+@import 'global.css';
 @import 'preflight.css';
 @tailwind base;
 @tailwind components;

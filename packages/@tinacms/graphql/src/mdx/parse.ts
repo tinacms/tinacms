@@ -19,12 +19,15 @@ limitations under the License.
 import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
+import { visit } from 'unist-util-visit'
+import { isNull } from 'lodash'
+
+import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { GraphQLConfig } from '../types'
+import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
+
 import { TinaField } from '..'
 import type { Content } from 'mdast'
-import { visit } from 'unist-util-visit'
-import type { GraphQLConfig, RichTypeInner } from '../types'
-import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
-import { isNull } from 'lodash'
 import { resolveMediaRelativeToCloud } from '../resolver/media-utils'
 
 export const parseMDX = (

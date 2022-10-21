@@ -50,7 +50,7 @@ export type TinaCMSConfig<
      */
     referenceDepth?: number
   }
-  build?: {
+  build: {
     /**
      * The folder where your application stores assets, eg. `"public"`
      */

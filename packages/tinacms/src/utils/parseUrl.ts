@@ -35,12 +35,6 @@ export const parseURL = (url: string): { branch; isLocalClient; clientId } => {
 
   // TODO if !result || !result.clientId || !result.branch, throw an error
 
-  if (params.host !== TINA_HOST) {
-    throw new Error(
-      `The only supported hosts are ${TINA_HOST} or localhost, but received ${params.host}.`
-    )
-  }
-
   return {
     branch,
     clientId,

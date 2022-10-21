@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field, Form } from '../../forms'
-import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
@@ -39,11 +38,15 @@ interface ListFieldDefinititon extends Field {
   field: {
     component: 'text' | 'textarea' | 'number' | 'select'
   }
+
+  type?: string
+  list?: boolean
+  parentTypename?: string
   /**
    * An optional function which generates `props` for
    * this items's `li`.
    */
-  itemProps?: (item: object) => {
+  itemProps?: (_item: object) => {
     /**
      * The `key` property used to optimize the rendering of lists.
      *
@@ -88,20 +91,20 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
   return (
     <>
       <ListHeader>
-        <ListMeta>
+        <div className="leading-none">
           <Label>{field.label || field.name}</Label>
           {field.description && (
             <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
               {field.description}
             </FieldDescription>
           )}
-        </ListMeta>
+        </div>
         <IconButton onClick={addItem} variant="primary" size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
       </ListHeader>
       <ListPanel>
-        <ItemList>
+        <div>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
               <div ref={provider.innerRef}>
@@ -121,7 +124,7 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
               </div>
             )}
           </Droppable>
-        </ItemList>
+        </div>
       </ListPanel>
     </>
   )
@@ -143,11 +146,8 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   }, [tinaForm, field, index])
   const fields = [
     {
-      // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
       type: field.type,
-      // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
       list: field.list,
-      // @ts-ignore FIXME: this is needed for the new event system, so we know what type to record when we get a change
       parentTypename: field.parentTypename,
       ...field.field,
       label: 'Value',
@@ -173,65 +173,35 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     </Draggable>
   )
 }
+const Label = ({ error = false, className = '', ...props }) => (
+  <span
+    className={`truncate m-0 text-[13px] font-bold tracking-[0.01em] leading-[1.35] flex-grow flex-shrink flex-auto transition-all duration-100 ease-out text-left ${
+      error ? 'text-orange-500' : 'text-gray-700'
+    } ${className}`}
+    {...props}
+  />
+)
 
-const Label = styled.span<{ error?: boolean }>`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin: 0;
-  font-size: var(--tina-font-size-1);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--tina-color-grey-8);
-  transition: all 85ms ease-out;
-  text-align: left;
+const ListHeader = ({ className = '', ...props }) => (
+  <div
+    className={`relative flex w-full justify-between items-center mb-2 ${className}`}
+    {...props}
+  />
+)
 
-  ${(props) =>
-    props.error &&
-    css`
-      color: var(--tina-color-error) !important;
-    `};
-`
+const ListPanel = ({ className = '', ...props }) => (
+  <div
+    className={`max-h-[initial] relative h-auto mb-6 rounded-[5px] bg-gray-100 ${className}`}
+    {...props}
+  />
+)
 
-const ListHeader = styled.div`
-  position: relative;
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-`
-
-const ListMeta = styled.div`
-  line-height: 1;
-`
-
-const ListPanel = styled.div`
-  max-height: initial;
-  position: relative;
-  height: auto;
-  margin-bottom: 24px;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-`
-
-const EmptyList = styled.div`
-  text-align: center;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-  color: var(--tina-color-grey-4);
-  line-height: 1.35;
-  padding: 12px 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: var(--tina-font-weight-regular);
-`
-
-const ItemList = styled.div``
+const EmptyList = ({ className = '', ...props }) => (
+  <div
+    className={`text-center rounded-[5px] bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal ${className}`}
+    {...props}
+  />
+)
 
 export const ListField = List
 

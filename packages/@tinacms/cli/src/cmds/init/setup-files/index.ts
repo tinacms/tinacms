@@ -52,46 +52,11 @@ export const nextPostPage = ({
   // This is a demo file once you have tina setup feel free to delete this file
   
   import Head from 'next/head'
-  import { createGlobalStyle } from 'styled-components'
   import { useTina } from 'tinacms/dist/edit-state'
   import { TinaMarkdown } from 'tinacms/dist/rich-text'
   import client from '${
     usingSrc ? '../' : ''
   }../../../.tina/__generated__/client'
-  
-  // Styles for markdown
-  const GlobalStyle = createGlobalStyle\`
-    h1,h2,h3,h4,h5 {
-      margin-bottom: 1.5rem;
-      margin-top: 1.5rem;
-    }
-    blockquote {
-      background-color: rgb(209,250,229);
-    }
-    h1 {
-      font-size: 45px;
-    }
-    h2 {
-      font-size: 35px;
-    }
-    h3 {
-      font-size: 25px;
-    }
-    h4 {
-      font-size: 22px;
-    }
-    ul {
-      padding-left: 0;
-    }
-    li {
-      list-style-type: none;
-    }
-    a {
-      font-weight: bold;
-      color: rgb(59,130,246);
-      text-decoration: underline;
-    }
-    \`
   
   const BlogPage = (props) => {
     const { data } = useTina({
@@ -297,7 +262,6 @@ export const nextPostPage = ({
         <div className="relative px-4 sm:px-6 lg:px-8">
           <div className="text-lg max-w-prose mx-auto">
             <TinaMarkdown components={components} content={content} />
-            <GlobalStyle />
           </div>
         </div>
       </div>

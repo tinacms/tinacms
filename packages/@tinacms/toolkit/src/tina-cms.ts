@@ -11,7 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { CMS, CMSConfig, PluginType } from './packages/core'
+import {
+  CMS,
+  CMSConfig,
+  CMSEvent,
+  MediaUploadOptions,
+  PluginType,
+} from './packages/core'
 import { FieldPlugin } from './packages/form-builder'
 import { ScreenPlugin } from './packages/react-screens'
 import {
@@ -36,12 +42,12 @@ import {
 import { Form } from './packages/forms'
 import { Alerts, EventsToAlerts } from './packages/alerts'
 import { SidebarState, SidebarStateOptions } from './packages/react-sidebar'
-import { ToolbarStateOptions, ToolbarState } from './packages/react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
+import { createCloudConfig } from './packages/react-cloud-config'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -67,28 +73,36 @@ const DEFAULT_FIELDS = [
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
-  toolbar?: ToolbarStateOptions | boolean
   alerts?: EventsToAlerts
+  isLocalClient?: boolean
+  clientId?: string
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
-  toolbar?: ToolbarState
   _alerts?: Alerts
 
   constructor({
     sidebar,
-    toolbar,
     alerts = {},
+    isLocalClient,
+    clientId,
     ...config
   }: TinaCMSConfig = {}) {
     super(config)
 
     this.alerts.setMap({
-      'media:upload:failure': () => ({
-        level: 'error',
-        message: 'Failed to upload file.',
-      }),
+      'media:upload:failure': (
+        event: CMSEvent & { error: Error; uploaded: MediaUploadOptions[] }
+      ) => {
+        return {
+          error: event.error,
+          level: 'error',
+          message: `Failed to upload file(s) ${event?.uploaded
+            .map((x) => x.file.name)
+            .join(', ')}. See error message: \n\n ${event?.error.toString()}`,
+        }
+      },
       'media:delete:failure': () => ({
         level: 'error',
         message: 'Failed to delete file.',
@@ -101,17 +115,45 @@ export class TinaCMS extends CMS {
       this.sidebar = new SidebarState(this.events, sidebarConfig)
     }
 
-    if (toolbar) {
-      const toolbarConfig = typeof toolbar === 'object' ? toolbar : undefined
-      this.toolbar = new ToolbarState(toolbarConfig)
-    }
-
     DEFAULT_FIELDS.forEach((field) => {
       if (!this.fields.find(field.name)) {
         this.fields.add(field)
       }
     })
     this.plugins.add(MediaManagerScreenPlugin)
+    if (isLocalClient !== true) {
+      if (clientId) {
+        this.plugins.add(
+          createCloudConfig({
+            name: 'Project Config',
+            link: {
+              text: 'Project Config',
+              href: `https://app.tina.io/projects/${clientId}/0`,
+            },
+          })
+        )
+        this.plugins.add(
+          createCloudConfig({
+            name: 'User Management',
+            link: {
+              text: 'User Management',
+              href: `https://app.tina.io/projects/${clientId}/3`,
+            },
+          })
+        )
+      } else {
+        this.plugins.add(
+          createCloudConfig({
+            name: 'Setup Cloud',
+            text: 'No project configured, set one up ',
+            link: {
+              text: 'here',
+              href: `https://app.tina.io`,
+            },
+          })
+        )
+      }
+    }
   }
 
   get alerts() {

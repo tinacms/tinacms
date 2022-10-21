@@ -16,86 +16,64 @@ limitations under the License.
 
 */
 
-import styled, { keyframes } from 'styled-components'
 import * as React from 'react'
+import { LoadingDots } from '../../form-builder'
 import { Button } from '../../styles'
 
-export const NoFormsPlaceholder = () => (
-  <EmptyState>
-    <Emoji>🔎</Emoji>
-    <p className="mb-4">
-      Tina didn't find <br />
-      any queries to <br />
-      generate forms for.
+export const PendingFormsPlaceholder = () => (
+  <div
+    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    style={{
+      animationName: 'fade-in',
+      animationDelay: '300ms',
+      animationTimingFunction: 'ease-out',
+      animationIterationCount: 1,
+      animationFillMode: 'both',
+      animationDuration: '150ms',
+    }}
+  >
+    <p className="block pb-5">
+      Please wait while Tina
+      <br />
+      loads your forms
     </p>
-    <p>
+    <LoadingDots color={'var(--tina-color-primary)'} />
+  </div>
+)
+
+export const NoFormsPlaceholder = () => (
+  <div
+    className="relative flex flex-col items-center justify-center text-center p-5 pb-16 w-full h-full overflow-y-auto"
+    style={{
+      animationName: 'fade-in',
+      animationDelay: '300ms',
+      animationTimingFunction: 'ease-out',
+      animationIterationCount: 1,
+      animationFillMode: 'both',
+      animationDuration: '150ms',
+    }}
+  >
+    <Emoji className="pb-5">🔎</Emoji>
+    <p className="block pb-5">
+      Looks like there's <br />
+      nothing to edit on <br />
+      this page.
+    </p>
+    <p className="block">
       <Button
         href="https://tina.io/docs/tinacms-context/"
         target="_blank"
         as="a"
       >
-        <Emoji>📖</Emoji> Contextual Editing
+        <Emoji className="mr-1.5">📖</Emoji> Contextual Editing
       </Button>
     </p>
-  </EmptyState>
+  </div>
 )
 
-const Emoji = styled.span`
-  font-size: 40px;
-  line-height: 1;
-  display: inline-block;
-`
-
-const EmptyStateAnimation = keyframes`
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-`
-
-const EmptyState = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--tina-padding-big) var(--tina-padding-big) 64px
-    var(--tina-padding-big);
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  animation-name: ${EmptyStateAnimation};
-  animation-delay: 300ms;
-  animation-timing-function: ease-out;
-  animation-iteration-count: 1;
-  animation-fill-mode: both;
-  animation-duration: 150ms;
-  > *:first-child {
-    margin: 0 0 var(--tina-padding-big) 0;
-  }
-  ${Emoji} {
-    display: block;
-    font-size: 24px;
-  }
-  a {
-    ${Emoji} {
-      margin-right: 0.25em;
-    }
-  }
-  h3 {
-    font-size: var(--tina-font-size-5);
-    font-weight: normal;
-    display: block;
-    margin: 0 0 var(--tina-padding-big) 0;
-    ${Emoji} {
-      font-size: 1em;
-    }
-  }
-  p {
-    display: block;
-    margin: 0 0 var(--tina-padding-big) 0;
-  }
-`
+const Emoji = ({ className = '', ...props }) => (
+  <span
+    className={`text-[24px] leading-none inline-block ${className}`}
+    {...props}
+  />
+)

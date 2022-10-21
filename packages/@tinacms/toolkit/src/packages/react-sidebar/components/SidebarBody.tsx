@@ -20,8 +20,6 @@ import * as React from 'react'
 
 import { Form } from '../../forms'
 import { useState } from 'react'
-import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { Button } from '../../styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { FormBuilder, FormStatus } from '../../form-builder'
@@ -29,6 +27,8 @@ import { FormMetaPlugin } from '../../../plugins/form-meta'
 import { SidebarContext, navBreakpoint } from './Sidebar'
 import { BiChevronLeft } from 'react-icons/bi'
 import { useWindowWidth } from '@react-hook/window-size'
+import { EditContext } from '@tinacms/sharedctx'
+import { PendingFormsPlaceholder } from './NoFormsPlaceHolder'
 
 export const FormsView = ({
   children,
@@ -45,6 +45,20 @@ export const FormsView = ({
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
+  const { formsRegistering, setFormsRegistering } =
+    React.useContext(EditContext)
+
+  React.useMemo(
+    () =>
+      cms.events.subscribe('forms:register', (event) => {
+        if (event.value === 'start') {
+          setFormsRegistering(true)
+        } else {
+          setFormsRegistering(false)
+        }
+      }),
+    []
+  )
 
   /**
    * If there's only one form, make it the active form.
@@ -84,6 +98,7 @@ export const FormsView = ({
    * No Forms
    */
   if (!forms.length) {
+    if (formsRegistering) return <PendingFormsPlaceholder />
     return <> {children} </>
   }
 
@@ -129,73 +144,35 @@ export const FormsView = ({
   )
 }
 
-export const Wrapper = styled.div`
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-`
-
-export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
-  position: relative;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  overflow: auto;
-  border-top: 1px solid var(--tina-color-grey-2);
-  background-color: var(--tina-color-grey-1);
-
-  ${Wrapper} {
-    height: 100%;
-  }
-`
-
-const FormAnimationKeyframes = keyframes`
-  0% {
-    transform: translate3d( 100%, 0, 0 );
-  }
-  100% {
-    transform: translate3d( 0, 0, 0 );
-  }
-`
-
 interface FormWrapperProps {
   isEditing: Boolean
   isMultiform: Boolean
 }
 
-const FormWrapper = styled.div<FormWrapperProps>`
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  position: relative;
-  background: white;
-
-  > * {
-    transform: translate3d(100%, 0, 0);
-  }
-
-  ${(p) =>
-    p.isEditing &&
-    css`
-      > * {
-        transform: none;
-        animation-name: ${FormAnimationKeyframes};
-        animation-duration: 150ms;
-        animation-delay: 0;
-        animation-iteration-count: 1;
-        animation-timing-function: ease-out;
-      }
-    `};
-`
+const FormWrapper: React.FC<FormWrapperProps> = (props) => (
+  <div
+    className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
+    style={
+      props.isEditing
+        ? {
+            transform: 'none',
+            animationName: 'fly-in-left',
+            animationDuration: '150ms',
+            animationDelay: '0',
+            animationIterationCount: 1,
+            animationTimingFunction: 'ease-out',
+          }
+        : {
+            transform: 'translate3d(100%, 0, 0)',
+          }
+    }
+    {...props}
+  />
+)
 
 export interface MultiformFormHeaderProps {
   activeForm: Form
-  setActiveFormId(id: string): void
+  setActiveFormId(_id: string): void
   renderNav?: boolean
 }
 
@@ -284,10 +261,3 @@ export const FormHeader = ({ renderNav, activeForm }: FormHeaderProps) => {
     </div>
   )
 }
-
-export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
-  Button as any
-)`
-  flex: 1.5 0 auto;
-  padding: 12px 24px;
-`

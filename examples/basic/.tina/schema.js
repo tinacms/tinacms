@@ -12,8 +12,20 @@ limitations under the License.
 */
 
 import { defineSchema, defineConfig } from 'tinacms'
+import { client } from './__generated__/client'
 
 const schema = defineSchema({
+  config: {
+    branch: 'foo',
+    clientId: 'some-client-id',
+    token: 'some-token',
+    media: {
+      tina: {
+        mediaRoot: 'public',
+        publicFolder: 'images',
+      },
+    },
+  },
   collections: [
     {
       name: 'test',
@@ -23,7 +35,9 @@ const schema = defineSchema({
         {
           name: 'tem1',
           label: 'Template 1',
-          fields: [{ type: 'string', name: 'foo' }],
+          fields: [
+            { type: 'string', name: 'foo', required: true, isTitle: true },
+          ],
         },
         {
           name: 'tem2',
@@ -37,28 +51,49 @@ const schema = defineSchema({
       path: 'content/page',
       label: 'Page',
       format: 'mdx',
+
+      // An example of a defaultItem
+      defaultItem: () => {
+        const m = new Date()
+        return {
+          title: 'New Page',
+          test: 'This is a default value of the test field',
+          filename: `new-page-${
+            m.getUTCFullYear() +
+            '-' +
+            (m.getUTCMonth() + 1) +
+            '-' +
+            m.getUTCDate()
+          }`,
+        }
+      },
       fields: [
+        // {
+        // label: 'Title',
+        // name: 'title',
+        // type: 'string',
+        // ui: {
+        // Examples of how you COULD use a custom form
+        // component: ({ form, field, input }) => {
+        //   return (
+        //     <div>
+        //       <label>This is a test</label>
+        //       <input {...input}></input>
+        //     </div>
+        //   )
+        // },
+        // validate: (val) => {
+        //   if (val?.length > 5) {
+        //     return 'Too Long!!!'
+        //   }
+        // },
+        // },
+        // },
         {
-          label: 'Title',
-          name: 'Title',
+          label: 'Test',
+          name: 'test',
           type: 'string',
-          ui: {
-            // defaultValue: 'Title',
-            // Examples of how you COULD use a custom form
-            // component: ({ form, field, input }) => {
-            //   return (
-            //     <div>
-            //       <label>This is a test</label>
-            //       <input {...input}></input>
-            //     </div>
-            //   )
-            // },
-            // validate: (val) => {
-            //   if (val?.length > 5) {
-            //     return 'Too Long!!!'
-            //   }
-            // },
-          },
+          description: 'This is a test',
         },
         {
           name: 'body',
@@ -73,11 +108,41 @@ const schema = defineSchema({
       name: 'post',
       path: 'content/post',
       format: 'md',
+      defaultItem: () => {
+        return {
+          title: 'new post',
+          filename: 'new-post',
+          date: new Date().toISOString(),
+          foo: { bar: 'bar' },
+        }
+      },
+      ui: {
+        // Example of using a custom slugify function
+        filename: {
+          // Example of how slugify could be used
+          slugify: (values) => {
+            return 'WORKING'
+          },
+        },
+      },
       fields: [
         {
           type: 'string',
           label: 'Title',
           name: 'title',
+          required: true,
+          isTitle: true,
+        },
+        {
+          type: 'datetime',
+          label: 'Date',
+          name: 'date',
+        },
+        {
+          type: 'object',
+          name: 'foo',
+          label: 'Foo',
+          fields: [{ name: 'bar', label: 'Bar', type: 'string' }],
         },
         {
           type: 'object',
@@ -102,20 +167,7 @@ const schema = defineSchema({
           ],
         },
         {
-          type: 'object',
-          label: 'Something',
-          name: 'foo',
-          fields: [
-            {
-              name: 'bar',
-              label: 'Bar',
-              type: 'string',
-            },
-          ],
-        },
-        {
           type: 'string',
-
           label: 'Topic',
           name: 'topic',
           options: ['programming', 'blacksmithing'],
@@ -174,17 +226,9 @@ const schema = defineSchema({
   ],
 })
 
-const branch = 'main'
-// When working locally, hit our local filesystem.
-// On a Vercel deployment, hit the Tina Cloud API
-const apiURL =
-  process.env.NODE_ENV == 'development'
-    ? 'http://localhost:4001/graphql'
-    : `https://content.tinajs.io/content/${process.env.NEXT_PUBLIC_TINA_CLIENT_ID}/github/${branch}`
-
 export const tinaConfig = defineConfig({
   schema,
-  apiURL,
+  client,
 })
 
 export default schema

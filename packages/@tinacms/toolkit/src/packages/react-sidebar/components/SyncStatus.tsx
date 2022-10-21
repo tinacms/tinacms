@@ -225,16 +225,21 @@ const EventsList = ({ cms }) => {
   )
 }
 
-export const SyncStatus = ({ cms }) => {
+export const SyncStatusModal = ({ closeEventsModal, cms }) => (
+  <Modal>
+    <FullscreenModal>
+      <ModalHeader close={closeEventsModal}>Event Log</ModalHeader>
+      <ModalBody className="flex h-full flex-col" padded={true}>
+        <EventsList cms={cms} />
+      </ModalBody>
+    </FullscreenModal>
+  </Modal>
+)
+export const SyncStatus = ({ cms, setEventsOpen }) => {
   const syncStatus = useSyncStatus(cms)
-  const [eventsOpen, setEventsOpen] = React.useState(false)
 
   function openEventsModal() {
     setEventsOpen(true)
-  }
-
-  function closeEventsModal() {
-    setEventsOpen(false)
   }
 
   if (cms.api?.tina?.isLocalMode) {
@@ -254,16 +259,6 @@ export const SyncStatus = ({ cms }) => {
         )}{' '}
         Event Log
       </button>
-      {eventsOpen && (
-        <Modal>
-          <FullscreenModal>
-            <ModalHeader close={closeEventsModal}>Event Log</ModalHeader>
-            <ModalBody padded={true}>
-              <EventsList cms={cms} />
-            </ModalBody>
-          </FullscreenModal>
-        </Modal>
-      )}
     </>
   )
 }
