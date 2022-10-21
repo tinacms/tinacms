@@ -43,6 +43,7 @@
       "src/index.ts",
       "src/edit-state.tsx",
       "src/rich-text/index.tsx",
+      "src/rich-text/prism.tsx",
       "src/react.tsx",
       "src/client.ts"
     ]
