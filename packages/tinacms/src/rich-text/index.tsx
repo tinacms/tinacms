@@ -30,7 +30,7 @@ type BaseComponents = {
   ul?: { children: JSX.Element }
   ol?: { children: JSX.Element }
   block_quote?: { children: JSX.Element }
-  code_block?: { lang?: string; children: JSX.Element }
+  code_block?: { lang?: string; value: string }
   img?: { url: string; caption?: string; alt?: string }
   hr?: {}
   break?: {}
@@ -276,10 +276,7 @@ const Node = ({ components, child }) => {
         const Component = components[child.type]
         return (
           // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
-          <Component {...props}>
-            {/* @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types */}
-            {value}
-          </Component>
+          <Component {...props} />
         )
       }
       return (
