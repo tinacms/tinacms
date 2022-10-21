@@ -314,7 +314,7 @@ export const compileSchema = async (options: {
   let schema: any
 
   // only do this if there is a schema file
-  if (schemaExists) {
+  if (schemaExists && !configExists) {
     console.warn(
       `schema.{ts,tsx,js,jsx} will soon be deprecated, in favor of the new config.{ts,tsx,js,jsx}\nSee here for migration steps, see here: https://tina.io/blog/upgrading-to-iframe`
     )
