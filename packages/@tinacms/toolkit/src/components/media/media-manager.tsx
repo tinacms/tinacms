@@ -390,7 +390,7 @@ export function MediaPicker({
           <input {...getInputProps()} />
 
           {listState === 'loaded' && list.items.length === 0 && (
-            <EmptyMediaList />
+            <EmptyMediaList hasTinaMedia={hasTinaMedia} />
           )}
 
           {list.items.map((item: Media) => (
@@ -470,6 +470,8 @@ const EmptyMediaList = (props) => {
   return (
     <div className={`text-2xl opacity-50 p-12 text-center`} {...props}>
       Drag and Drop assets here
+      {props.hasTinaMedia &&
+        " or click 'Sync' to sync your media to Tina Cloud"}
     </div>
   )
 }
@@ -498,8 +500,7 @@ const SyncModal = ({ close, syncFunc, folder, branch }) => {
         <ModalHeader close={close}>Sync Media</ModalHeader>
         <ModalBody padded={true}>
           <p>
-            {`This will copy all media from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud. Are
-            you sure you would like to perform this action?`}
+            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service for better performance.`}
           </p>
         </ModalBody>
         <ModalActions>
