@@ -51,9 +51,10 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
   const region = config.config.region || 'us-east-1'
   const endpoint =
     config.config.endpoint || `https://s3.${region}.amazonaws.com`
-  const cdnUrl =
+  let cdnUrl =
     options?.cdnUrl ||
     endpoint.toString().replace(/http(s|):\/\//i, `https://${bucket}.`)
+  cdnUrl = cdnUrl + (cdnUrl.endsWith('/') ? '' : '/')
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const isAuthorized = await config.authorized(req, res)
@@ -66,7 +67,7 @@ export const createMediaHandler = (config: S3Config, options?: S3Options) => {
       case 'GET':
         return listMedia(req, res, client, bucket, cdnUrl)
       case 'POST':
-        return uploadMedia(req, res, client, bucket)
+        return uploadMedia(req, res, client, bucket, cdnUrl)
       case 'DELETE':
         return deleteAsset(req, res, client, bucket)
       default:
@@ -79,7 +80,8 @@ async function uploadMedia(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string
+  bucket: string,
+  cdnUrl: string
 ) {
   try {
     const upload = promisify(
@@ -108,16 +110,27 @@ async function uploadMedia(
     // @ts-ignore
     const filePath = req.file.path
     const blob = fs.readFileSync(filePath)
+    const filename = path.basename(filePath)
     const params: PutObjectCommandInput = {
       Bucket: bucket,
-      Key: prefix + path.basename(filePath),
+      Key: prefix + filename,
       Body: blob,
       ACL: 'public-read',
     }
     const command = new PutObjectCommand(params)
-    const result = await client.send(command)
-
-    res.json(result)
+    try {
+      await client.send(command)
+      res.json({
+        type: 'file',
+        id: prefix + filename,
+        filename,
+        directory: prefix,
+        previewSrc: cdnUrl + prefix + filename,
+        src: cdnUrl + prefix + filename,
+      })
+    } catch (e) {
+      res.status(500).send(findErrorMessage(e))
+    }
   } catch (e) {
     res.status(500)
     const message = findErrorMessage(e)
@@ -228,8 +241,8 @@ function getS3ToTinaFunc(cdnUrl) {
       id: file.Key,
       filename,
       directory,
-      src: cdnUrl + '/' + file.Key,
-      previewSrc: cdnUrl + '/' + file.Key,
+      src: cdnUrl + file.Key,
+      previewSrc: cdnUrl + file.Key,
       type: 'file',
     }
   }
