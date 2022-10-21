@@ -500,7 +500,7 @@ const SyncModal = ({ close, syncFunc, folder, branch }) => {
         <ModalHeader close={close}>Sync Media</ModalHeader>
         <ModalBody padded={true}>
           <p>
-            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service for better performance.`}
+            {`This will copy media assets from the \`${folder}\` folder on branch \`${branch}\` in your git repository to Tina Cloud's asset service. This will allow you to use these assets in your site with tina cloud`}
           </p>
         </ModalBody>
         <ModalActions>
