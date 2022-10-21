@@ -254,14 +254,16 @@ const CollectionListPage = () => {
                                   ...fields
                                     .map((x) => [
                                       {
-                                        label: x.label + ' (Ascending)',
+                                        label:
+                                          x.label || x.name + ' (Ascending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'asc',
                                         }),
                                       },
                                       {
-                                        label: x.label + ' (Descending)',
+                                        label:
+                                          x.label || x.name + ' (Descending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'desc',
