@@ -109,7 +109,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    return img.src
+    return img.previewSrc
   }
 
   private buildQuery(options: MediaListOptions) {

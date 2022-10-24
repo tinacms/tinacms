@@ -59,15 +59,8 @@ export class S3MediaStore implements MediaStore {
        * Valid S3 `resource_type` values: `image`, `video`, `raw` and `auto`
        * uploading a directory is not supported as such, type is defaulted to `file`
        */
-      const parsedRes: Media = {
-        type: 'file',
-        id: fileRes.public_id,
-        filename: fileRes.original_filename,
-        directory: '/',
-        previewSrc: fileRes.url,
-      }
 
-      newFiles.push(parsedRes)
+      newFiles.push(fileRes)
     }
     return newFiles
   }

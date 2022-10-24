@@ -60,15 +60,8 @@ export class DOSMediaStore implements MediaStore {
        * uploading a directory is not supported as such, type is defaulted to `file`
        * https://dos.com/documentation/upload_images#uploading_with_a_direct_call_to_the_rest_api
        */
-      const parsedRes: Media = {
-        type: 'file',
-        id: fileRes.public_id,
-        filename: fileRes.original_filename,
-        directory: '/',
-        previewSrc: fileRes.url,
-      }
 
-      newFiles.push(parsedRes)
+      newFiles.push(fileRes)
     }
     return newFiles
   }
