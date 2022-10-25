@@ -76,12 +76,13 @@ export const stringifyMDX = (
     if (template.match) {
       preprocessedString = replaceAll(
         preprocessedString,
-        `<${template.name}>\``,
+        // replace all instances of the match string with the template. Looks like this: <Match>{any number of spaces}`
+        `<${template.name}>[\n\r\\s]*\``,
         `${template.match.start} `
       )
       preprocessedString = replaceAll(
         preprocessedString,
-        `\`</${template.name}>`,
+        `\`[\n\r\\s]*</${template.name}>`,
         ` ${template.match.end}`
       )
     }
