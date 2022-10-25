@@ -23,16 +23,7 @@ undefined
 const out = output({
   type: 'root',
   children: [
-    {
-      type: 'invalid_markdown',
-      value: 'Hello {{ world! }}\n',
-      message: '1:15: Could not parse expression with acorn: Unexpected token',
-      children: [{ type: 'text', text: '' }],
-      position: {
-        start: { line: 1, column: 15, offset: 14 },
-        end: { line: null, column: null },
-      },
-    },
+    { type: 'p', children: [{ type: 'text', text: 'Hello {{ world! }}' }] },
   ],
 })
 

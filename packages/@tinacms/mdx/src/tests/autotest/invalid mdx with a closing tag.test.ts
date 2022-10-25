@@ -24,15 +24,16 @@ const out = output({
   type: 'root',
   children: [
     {
-      type: 'invalid_markdown',
-      value: 'This is a </a> broken html tag\n',
-      message:
-        '1:12-1:13: Unexpected closing slash `/` in tag, expected an open tag first',
-      children: [{ type: 'text', text: '' }],
-      position: {
-        start: { line: 1, column: 12, offset: 11, _index: 0, _bufferIndex: 11 },
-        end: { line: 1, column: 13, offset: 12, _index: 0, _bufferIndex: 12 },
-      },
+      type: 'p',
+      children: [
+        { type: 'text', text: 'This is a ' },
+        {
+          type: 'html_inline',
+          value: '</a>',
+          children: [{ type: 'text', text: '' }],
+        },
+        { type: 'text', text: ' broken html tag' },
+      ],
     },
   ],
 })

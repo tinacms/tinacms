@@ -71,7 +71,11 @@ import type * as Plate from './plate'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (value: string, field: RichTypeInner) => {
+export const markdownToAst = (
+  value: string,
+  field: RichTypeInner,
+  useMDX: boolean = true
+) => {
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -95,23 +99,22 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
       }
     }
   })
-  try {
-    // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-    if (!tree) {
-      throw new Error('Error parsing markdown')
-    }
-    // NOTE: if we want to provide error highlighing in the raw editor
-    // we could keep this info around in edit mode
-    // Delete useless position info
-    // visit(tree, (node) => {
-    //   delete node.position
-    // })
-    return tree
-  } catch (e) {
-    // @ts-ignore VMessage is the error type but it's not accessible
-    throw new RichTextParseError(e, e.position)
+  // Remark Root is not the same as mdast for some reason
+  const tree = (
+    useMDX
+      ? remark().use(remarkMdx).parse(preprocessedString)
+      : remark().parse(preprocessedString)
+  ) as Md.Root
+  if (!tree) {
+    throw new Error('Error parsing markdown')
   }
+  // NOTE: if we want to provide error highlighing in the raw editor
+  // we could keep this info around in edit mode
+  // Delete useless position info
+  // visit(tree, (node) => {
+  //   delete node.position
+  // })
+  return tree
 }
 
 export const MDX_PARSE_ERROR_MSG =
@@ -133,10 +136,20 @@ export const parseMDX = (
       return { type: 'root', children: [] }
     }
   } catch (e: any) {
-    if (e instanceof RichTextParseError) {
-      return invalidMarkdown(e, value)
+    // Try again, without MDX
+    try {
+      tree = markdownToAst(value, field, false)
+      if (tree) {
+        return remarkToSlate(tree, field, imageCallback)
+      } else {
+        return { type: 'root', children: [] }
+      }
+    } catch (e: any) {
+      if (e instanceof RichTextParseError) {
+        return invalidMarkdown(e, value)
+      }
+      return invalidMarkdown(new RichTextParseError(e.message), value)
     }
-    return invalidMarkdown(new RichTextParseError(e.message), value)
   }
 }
 
