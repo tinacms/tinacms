@@ -99,8 +99,9 @@ const QueryMachine = (props: {
     if (props.iframeRef.current) {
       window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
         if (event?.data?.type === 'isEditMode') {
-          console.log('sending edit mode')
-          send({ type: 'EDIT_MODE' })
+          props.iframeRef?.current?.contentWindow?.postMessage({
+            type: 'tina:editMode',
+          })
         }
       })
       send({ type: 'IFRAME_MOUNTED', value: props.iframeRef.current })

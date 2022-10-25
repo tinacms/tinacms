@@ -129,11 +129,6 @@ export const queryMachine =
       type: 'parallel',
       states: {
         pipeline: {
-          on: {
-            EDIT_MODE: {
-              actions: 'editMode',
-            },
-          },
           initial: 'idle',
           states: {
             idle: {
@@ -217,16 +212,6 @@ export const queryMachine =
     },
     {
       actions: {
-        editMode: (context) => {
-          if (context.iframe) {
-            context.iframe?.contentWindow?.postMessage({
-              type: 'tina:editMode',
-            })
-          }
-          return {
-            ...context,
-          }
-        },
         handleError: (_context, event) => console.error(event.data),
         handleMissingDocument: assign((context, event) => {
           count = count + 1
