@@ -43,6 +43,7 @@ export const configExamples = {
               name: 'title',
               label: 'Title',
               isTitle: true,
+              required: true,
             },
             {
               type: 'rich-text',
@@ -93,6 +94,7 @@ export const configExamples = {
               name: "title",
               label: "Title",
               isTitle: true,
+              required: true,
             },
             {
               type: "rich-text",
