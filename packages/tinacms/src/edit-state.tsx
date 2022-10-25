@@ -16,10 +16,17 @@ import {
   TinaDataContext,
   isEditing,
   setEditing,
-  useEditState,
+  useEditState as _useEditState,
 } from '@tinacms/sharedctx'
 
 import React, { useEffect, useState } from 'react'
+
+/**
+ * @deprecated since version 1.0.
+ * Use "import { useEditState } from 'tinacms/dist/react'" instead.
+ * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
+ */
+const useEditState = _useEditState
 
 export { isEditing, setEditing, useEditState }
 
