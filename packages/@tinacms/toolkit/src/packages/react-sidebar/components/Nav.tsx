@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { BiExit } from 'react-icons/bi'
-import { FiMoreVertical } from 'react-icons/fi'
+import { FiMoreVertical, FiInfo } from 'react-icons/fi'
 import { VscNewFile } from 'react-icons/vsc'
 import { Menu, Transition } from '@headlessui/react'
 import { updateBodyDisplacement } from './Sidebar'
@@ -151,8 +151,16 @@ export const Nav = ({
       <div className="px-6 flex-1 overflow-auto">
         {showCollections && (
           <>
-            <h4 className="uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
-              Collections
+            <h4 className="flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
+              <span>Collections</span>
+              <span className="flex items-center">
+                <a
+                  href="https://tina.io/docs/schema/#defining-collections"
+                  target="_blank"
+                >
+                  <FiInfo />
+                </a>
+              </span>
             </h4>
             <CollectionsList
               RenderNavCollection={RenderNavCollection}
