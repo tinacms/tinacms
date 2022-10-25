@@ -18,10 +18,12 @@ export const EditorContext = React.createContext<{
   templates: MdxTemplate[]
   rawMode: boolean
   setRawMode: (mode: boolean) => void
+  rawModeSupported: boolean
 }>({
   rawMode: false,
   setRawMode: () => {},
   templates: [],
+  rawModeSupported: false,
 })
 export const useEditorContext = () => {
   return React.useContext(EditorContext)

@@ -73,7 +73,7 @@
     "@react-types/shared": "^3.10.0",
     "@sambego/storybook-styles": "^1.0.0",
     "@tinacms/sharedctx": "workspace:*",
-    "@udecode/plate-headless": "^14.0.2",
+    "@udecode/plate-headless": "^18.5.0",
     "atob": "2.1.2",
     "color-string": "^1.5.3",
     "final-form": "^4.20.2",
@@ -93,10 +93,10 @@
     "react-final-form": "^6.3.0",
     "react-icons": "^4.3.1",
     "react-onclickoutside": "^6.12.2",
-    "slate": "^0.81.1",
+    "slate": "^0.84.0",
     "slate-history": "^0.66.0",
     "slate-hyperscript": "^0.77.0",
-    "slate-react": "^0.81.0",
+    "slate-react": "^0.83.2",
     "webfontloader": "1.6.28"
   },
   "peerDependencies": {

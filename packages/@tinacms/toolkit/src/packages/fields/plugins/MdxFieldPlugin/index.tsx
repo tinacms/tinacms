@@ -59,7 +59,12 @@ export const MdxFieldPlugin = {
       return (
         <EditorContext.Provider
           key={key}
-          value={{ templates: props.field.templates, rawMode, setRawMode }}
+          value={{
+            templates: props.field.templates,
+            rawMode,
+            setRawMode,
+            rawModeSupported: false,
+          }}
         >
           <div
             className={
@@ -102,6 +107,7 @@ export const MdxFieldPluginExtendible = {
             templates: props.field.templates,
             rawMode: props.rawMode,
             setRawMode: props.setRawMode,
+            rawModeSupported: true,
           }}
         >
           <div
