@@ -23,6 +23,11 @@ import React, { useEffect, useState } from 'react'
 
 export { isEditing, setEditing, useEditState }
 
+/**
+ * @deprecated since version 1.0.
+ * Tina no longer requires wrapping your site in the TinaProvider
+ * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
+ */
 export const TinaEditProvider = ({
   showEditButton,
   ...props
@@ -39,6 +44,11 @@ export const TinaEditProvider = ({
   )
 }
 
+/**
+ * @deprecated since version 1.0.
+ * Use "import { useTina } from 'tinacms/dist/react'" instead.
+ * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
+ */
 export function useTina<T extends object>({
   query,
   variables,
@@ -48,6 +58,14 @@ export function useTina<T extends object>({
   variables: object
   data: T
 }): { data: T; isLoading: boolean } {
+  React.useEffect(() => {
+    console.warn(`
+  "useTina" from 'tinacms/dist/edit-state' is now deprecated
+  * Use "import { useTina } from 'tinacms/dist/react" instead.
+  * See https://tina.io/blog/upgrading-to-iframe/ for full migration details
+  `)
+  }, [])
+
   const {
     setRequest,
     state,
