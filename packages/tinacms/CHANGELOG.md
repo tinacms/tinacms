@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.69.20
+
+### Patch Changes
+
+- 97f0b6472: Add raw editor support for static mode. Use `~` for preview path.
+- Updated dependencies [194123d26]
+  - @tinacms/toolkit@0.58.2
+
 ## 0.69.19
 
 ### Patch Changes
