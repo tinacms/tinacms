@@ -31,6 +31,7 @@ import { useCMS } from '../../react-core'
 import { CloudConfigPlugin } from '../../react-cloud-config'
 
 interface NavProps {
+  isLocalMode: boolean
   children?: any
   className?: string
   userName?: string
@@ -51,6 +52,7 @@ interface NavProps {
 }
 
 export const Nav = ({
+  isLocalMode,
   className = '',
   children,
   showCollections,
@@ -153,14 +155,16 @@ export const Nav = ({
           <>
             <h4 className="flex space-x-1 justify-items-start uppercase font-sans font-bold text-sm mb-3 mt-8 text-gray-700">
               <span>Collections</span>
-              <span className="flex items-center">
-                <a
-                  href="https://tina.io/docs/schema/#defining-collections"
-                  target="_blank"
-                >
-                  <FiInfo />
-                </a>
-              </span>
+              {isLocalMode && (
+                <span className="flex items-center">
+                  <a
+                    href="https://tina.io/docs/schema/#defining-collections"
+                    target="_blank"
+                  >
+                    <FiInfo />
+                  </a>
+                </span>
+              )}
             </h4>
             <CollectionsList
               RenderNavCollection={RenderNavCollection}
