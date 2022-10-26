@@ -90,6 +90,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
           >
             <div className="fixed left-0 top-0 z-overlay h-full transform">
               <Nav
+                isLocalMode={isLocalMode}
                 className="rounded-r-md"
                 sidebarWidth={360}
                 showCollections={true}
