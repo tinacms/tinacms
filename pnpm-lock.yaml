@@ -1223,6 +1223,7 @@ importers:
       '@types/react': ^16.9.38
       '@types/yup': ^0.29.10
       crypto-js: ^4.0.0
+      encoding: 0.1.13
       fetch-ponyfill: ^7.1.0
       final-form: 4.20.1
       graphql: 15.8.0
@@ -1243,7 +1244,7 @@ importers:
       url-pattern: ^1.0.3
       yup: ^0.32.0
     dependencies:
-      '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
+      '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
       '@react-hook/window-size': 3.0.7_react@17.0.2
@@ -1251,7 +1252,8 @@ importers:
       '@tinacms/sharedctx': link:../@tinacms/sharedctx
       '@tinacms/toolkit': link:../@tinacms/toolkit
       crypto-js: 4.1.1
-      fetch-ponyfill: 7.1.0
+      encoding: 0.1.13
+      fetch-ponyfill: 7.1.0_encoding@0.1.13
       final-form: 4.20.1
       graphql: 15.8.0
       graphql-tag: 2.12.6_graphql@15.8.0
@@ -1274,7 +1276,7 @@ importers:
       '@types/react': 16.14.28
       '@types/yup': 0.29.14
       identity-obj-proxy: 3.0.0
-      isomorphic-fetch: 3.0.0
+      isomorphic-fetch: 3.0.0_encoding@0.1.13
       jest: 27.5.1
       jest-file-snapshot: 0.5.0
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
@@ -1328,6 +1330,38 @@ packages:
       invariant: 2.2.4
       nullthrows: 1.1.1
       relay-runtime: 12.0.0
+      signedsource: 1.0.0
+      yargs: 15.4.1
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+    dev: false
+
+  /@ardatan/relay-compiler/12.0.0_qyboaezk4cm6zsf5jfobzggyaa:
+    resolution:
+      {
+        integrity: sha512-9anThAaj1dQr6IGmzBMcfzOQKTa5artjuPmw8NYK/fiGEMjADbSguBY2FMDykt+QhilR3wc9VA/3yVju7JHg7Q==,
+      }
+    hasBin: true
+    peerDependencies:
+      graphql: '*'
+    dependencies:
+      '@babel/core': 7.18.6
+      '@babel/generator': 7.18.6
+      '@babel/parser': 7.18.6
+      '@babel/runtime': 7.18.6
+      '@babel/traverse': 7.18.6
+      '@babel/types': 7.18.6
+      babel-preset-fbjs: 3.4.0_@babel+core@7.18.6
+      chalk: 4.1.2
+      fb-watchman: 2.0.1
+      fbjs: 3.0.4_encoding@0.1.13
+      glob: 7.2.3
+      graphql: 15.8.0
+      immutable: 3.7.6
+      invariant: 2.2.4
+      nullthrows: 1.1.1
+      relay-runtime: 12.0.0_encoding@0.1.13
       signedsource: 1.0.0
       yargs: 15.4.1
     transitivePeerDependencies:
@@ -5729,6 +5763,23 @@ packages:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       '@ardatan/relay-compiler': 12.0.0_graphql@15.8.0
+      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
+      graphql: 15.8.0
+      tslib: 2.4.0
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+    dev: false
+
+  /@graphql-tools/relay-operation-optimizer/6.5.0_qyboaezk4cm6zsf5jfobzggyaa:
+    resolution:
+      {
+        integrity: sha512-snqmdPiM2eBex6pijRFx4H9MPumVd8ZWM3y+aaRwzc73VUNnjHE4NyVZEEIdlbmJ2HoQ9Zrm9aFlHVMK7B59zg==,
+      }
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      '@ardatan/relay-compiler': 12.0.0_qyboaezk4cm6zsf5jfobzggyaa
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
       tslib: 2.4.0
@@ -13406,6 +13457,17 @@ packages:
     transitivePeerDependencies:
       - encoding
 
+  /cross-fetch/3.1.5_encoding@0.1.13:
+    resolution:
+      {
+        integrity: sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==,
+      }
+    dependencies:
+      node-fetch: 2.6.7_encoding@0.1.13
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /cross-spawn-async/2.2.5:
     resolution:
       {
@@ -14571,6 +14633,14 @@ packages:
       level-codec: 10.0.0
       level-errors: 3.0.1
     dev: false
+
+  /encoding/0.1.13:
+    resolution:
+      {
+        integrity: sha512-ETBauow1T35Y/WZMkio9jiM0Z5xjHHmJ4XmjZOq1l/dXz3lr2sRn87nJy20RupqSh1F2m3HHPSp8ShIPQJrJ3A==,
+      }
+    dependencies:
+      iconv-lite: 0.6.3
 
   /end-of-stream/1.1.0:
     resolution:
@@ -16767,6 +16837,23 @@ packages:
       - encoding
     dev: false
 
+  /fbjs/3.0.4_encoding@0.1.13:
+    resolution:
+      {
+        integrity: sha512-ucV0tDODnGV3JCnnkmoszb5lf4bNpzjv80K41wd4k798Etq+UYD0y0TIfalLjZoKgjive6/adkRnszwapiDgBQ==,
+      }
+    dependencies:
+      cross-fetch: 3.1.5_encoding@0.1.13
+      fbjs-css-vars: 1.0.2
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      promise: 7.3.1
+      setimmediate: 1.0.5
+      ua-parser-js: 0.7.31
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
   /fd-slicer/1.1.0:
     resolution:
       {
@@ -16775,13 +16862,13 @@ packages:
     dependencies:
       pend: 1.2.0
 
-  /fetch-ponyfill/7.1.0:
+  /fetch-ponyfill/7.1.0_encoding@0.1.13:
     resolution:
       {
         integrity: sha512-FhbbL55dj/qdVO3YNK7ZEkshvj3eQ7EuIGV2I6ic/2YiocvyWv+7jg2s4AyS0wdRU75s3tA8ZxI/xPigb0v5Aw==,
       }
     dependencies:
-      node-fetch: 2.6.7
+      node-fetch: 2.6.7_encoding@0.1.13
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -18203,6 +18290,15 @@ packages:
     dependencies:
       safer-buffer: 2.1.2
 
+  /iconv-lite/0.6.3:
+    resolution:
+      {
+        integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==,
+      }
+    engines: { node: '>=0.10.0' }
+    dependencies:
+      safer-buffer: 2.1.2
+
   /identity-obj-proxy/3.0.0:
     resolution:
       {
@@ -19111,6 +19207,19 @@ packages:
       whatwg-fetch: 3.6.2
     transitivePeerDependencies:
       - encoding
+    dev: false
+
+  /isomorphic-fetch/3.0.0_encoding@0.1.13:
+    resolution:
+      {
+        integrity: sha512-qvUtwJ3j6qwsF3jLxkZ72qCgjMysPzDfeV240JHiGZsANBYd+EEuu35v7dfrJ9Up0Ak07D7GGSkGhCHTqg/5wA==,
+      }
+    dependencies:
+      node-fetch: 2.6.7_encoding@0.1.13
+      whatwg-fetch: 3.6.2
+    transitivePeerDependencies:
+      - encoding
+    dev: true
 
   /isomorphic-git/1.18.3:
     resolution:
@@ -22913,6 +23022,21 @@ packages:
     dependencies:
       whatwg-url: 5.0.0
 
+  /node-fetch/2.6.7_encoding@0.1.13:
+    resolution:
+      {
+        integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==,
+      }
+    engines: { node: 4.x || >=6.0.0 }
+    peerDependencies:
+      encoding: ^0.1.0
+    peerDependenciesMeta:
+      encoding:
+        optional: true
+    dependencies:
+      encoding: 0.1.13
+      whatwg-url: 5.0.0
+
   /node-gyp-build/4.4.0:
     resolution:
       {
@@ -25413,6 +25537,19 @@ packages:
     dependencies:
       '@babel/runtime': 7.18.6
       fbjs: 3.0.4
+      invariant: 2.2.4
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /relay-runtime/12.0.0_encoding@0.1.13:
+    resolution:
+      {
+        integrity: sha512-QU6JKr1tMsry22DXNy9Whsq5rmvwr3LSZiiWV/9+DFpuTWvp+WFhobWMc8TC4OjKFfNhEZy7mOiqUAn5atQtug==,
+      }
+    dependencies:
+      '@babel/runtime': 7.18.6
+      fbjs: 3.0.4_encoding@0.1.13
       invariant: 2.2.4
     transitivePeerDependencies:
       - encoding
