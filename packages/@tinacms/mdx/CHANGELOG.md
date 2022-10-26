@@ -1,5 +1,11 @@
 # @tinacms/mdx
 
+## 0.61.14
+
+### Patch Changes
+
+- 97f0b6472: Add raw editor support for static mode. Use `~` for preview path.
+
 ## 0.61.13
 
 ### Patch Changes

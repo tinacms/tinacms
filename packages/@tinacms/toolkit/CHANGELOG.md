@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.58.2
+
+### Patch Changes
+
+- 194123d26: Update error message
+
 ## 0.58.1
 
 ### Patch Changes
