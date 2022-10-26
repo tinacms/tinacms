@@ -53,6 +53,7 @@ const Sidebar = ({ cms }: { cms: TinaCMS }) => {
     <>
       {renderDesktopNav && (
         <Nav
+          isLocalMode={isLocalMode}
           sidebarWidth={360}
           showCollections={true}
           collectionsInfo={collectionsInfo}
