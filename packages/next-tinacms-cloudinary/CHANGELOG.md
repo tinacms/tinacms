@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.34
+
+### Patch Changes
+
+- 86dae3189: Fix dran'n'drop uploaded image not shown issue
+
 ## 3.5.33
 
 ### Patch Changes
