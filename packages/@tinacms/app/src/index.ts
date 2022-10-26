@@ -18,6 +18,7 @@ import type { InlineConfig, ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
 import { devHTML, prodHTML } from './html'
+import mdxPackageeJSON from '@tinacms/mdx/package.json'
 
 let server: ViteDevServer
 
@@ -160,20 +161,11 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  // Set to false during monorepo dev (TODO: automate this)
-  if (true) {
-    await fs.copy(appCopyPath, appRootPath)
+  if (process.env.MONOREPO_DEV) {
+    console.warn('Using monorepo dev mode, source files will be symlinked')
+    await fs.createSymlink(appCopyPath, appRootPath, 'dir')
   } else {
-    await fs.createSymlink(
-      path.join(appCopyPath, 'src'),
-      path.join(appRootPath, 'src'),
-      'dir'
-    )
-    await fs.createSymlink(
-      path.join(appCopyPath, 'package.json'),
-      path.join(appRootPath, 'package.json'),
-      'file'
-    )
+    await fs.copy(appCopyPath, appRootPath)
   }
 
   await execShellCommand(
