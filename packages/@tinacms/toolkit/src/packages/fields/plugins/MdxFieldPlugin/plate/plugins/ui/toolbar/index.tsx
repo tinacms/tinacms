@@ -187,12 +187,12 @@ export function Toolbar({
         key: MARK_ITALIC,
       }),
     },
-    // {
-    //   name: 'raw',
-    //   label: 'Raw',
-    //   active: false,
-    //   onMouseDown: () => setRawMode(true),
-    // },
+    {
+      name: 'raw',
+      label: 'Raw',
+      active: false,
+      onMouseDown: () => setRawMode(true),
+    },
   ]
   const [itemsShown, setItemsShown] = React.useState(toolbarItems.length)
 

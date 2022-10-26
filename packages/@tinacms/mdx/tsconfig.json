@@ -11,6 +11,7 @@
     "moduleResolution": "node",
     "module": "ESNext",
     "lib": ["ESNext"],
+    "target": "ESNext",
     "types": ["vite/client"]
   },
   "exclude": ["node_modules", "dist"],
