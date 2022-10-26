@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.58.4
+
+### Patch Changes
+
+- 6ce6085e8: fix DotMenu Popover displayed under blocks
+
 ## 0.58.3
 
 ### Patch Changes
