@@ -30,8 +30,6 @@ const generatedFilesToRemove = [
   'queries.gql',
   'schema.gql',
   'db',
-  'app',
-  'prebuild',
 ]
 
 export const resetGeneratedFolder = async ({
@@ -45,6 +43,7 @@ export const resetGeneratedFolder = async ({
 }) => {
   try {
     if (isBuild) {
+      console.log('isbuild?')
       // When running `tinacms build` we can still remove all generated files
       await fs.emptyDir(tinaGeneratedPath)
     } else {
