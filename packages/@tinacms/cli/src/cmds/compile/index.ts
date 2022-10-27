@@ -52,7 +52,11 @@ export const resetGeneratedFolder = async ({
         const file = generatedFilesToRemove[index]
         if (file === 'db') {
           // avoid https://github.com/tinacms/tinacms/issues/3076
-          await fs.emptyDir(path.join(tinaGeneratedPath, file))
+          try {
+            await fs.remove(path.join(tinaGeneratedPath, file))
+          } catch (_e) {
+            // fail silently as this is problematic on windows
+          }
         } else {
           await fs.remove(path.join(tinaGeneratedPath, file))
         }
