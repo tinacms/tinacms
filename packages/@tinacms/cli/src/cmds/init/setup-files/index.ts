@@ -10,40 +10,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import chalk from 'chalk'
-export const adminPage = `import { TinaAdmin } from 'tinacms';
-export default TinaAdmin;
-`
-
-export const blogPost = `---
-title: Vote For Pedro
----
-# Welcome to the blog.
-
-> To edit this site head over to the [\`/admin\`](/admin) route. Then click the pencil icon in the bottom lefthand corner to start editing 🦙.
-
-# Dixi gaude Arethusa
-
-<PageSection heading="Oscula mihi" content="Lorem markdownum numerabilis armentorum platanus, cultros coniunx sibi per
-silvas, nostris clausit sequemur diverso scopulosque. Fecit tum alta sed non
-falcato murmura, geminas donata Amyntore, quoque Nox. Invitam inquit, modo
-nocte; ut ignis faciemque manes in imagine sinistra ut mucrone non ramos
-sepulcro supplex. Crescentesque populos motura, fit cumque. Verumque est; retro
-sibi tristia bracchia Aetola telae caruerunt et."/>
-
-
-## Mutato fefellimus sit demisit aut alterius sollicito
-
-Phaethonteos vestes quem involvite iuvenca; furiali anne: sati totumque,
-**corpora** cum rapacibus nunc! Nervis repetatne, miserabile doleas, deprensum
-hunc, fluctus Threicio, ad urbes, magicaeque, quid. Per credensque series adicis
-poteram [quidem](#)! Iam uni mensas victrix
-vittas ut flumina Satyri adulter; bellum iacet domitae repercusso truncis urnis
-mille rigidi sub taurum.
-
-
-`
-
 export const nextPostPage = ({
   usingSrc,
 }: {
@@ -52,7 +18,7 @@ export const nextPostPage = ({
   // This is a demo file once you have tina setup feel free to delete this file
   
   import Head from 'next/head'
-  import { useTina } from 'tinacms/dist/edit-state'
+  import { useTina } from 'tinacms/dist/react'
   import { TinaMarkdown } from 'tinacms/dist/rich-text'
   import client from '${
     usingSrc ? '../' : ''
@@ -107,7 +73,7 @@ export const nextPostPage = ({
   export const getStaticProps = async ({ params }) => {
     let data = {}
     let query = {}
-    let variables = { relativePath: \`\${params.filename}.mdx\` }
+    let variables = { relativePath: \`\${params.filename}.md\` }
     try {
       const res = await client.queries.post(variables)
       query = res.query
@@ -267,47 +233,3 @@ export const nextPostPage = ({
       </div>
     )
   }`
-
-export const AppJsContent = (usingSrc: boolean, extraImports?: string) => {
-  const importLine = `import Tina from '${
-    usingSrc ? '../' : ''
-  }../.tina/components/TinaDynamicProvider.js'`
-
-  return `${importLine}
-${extraImports || ''}
-
-const App = ({ Component, pageProps }) => {
-  return (
-    <Tina>
-      <Component {...pageProps} />
-    </Tina>
-  )
-}
-
-export default App
-`
-}
-export const AppJsContentPrintout = (
-  usingSrc: boolean,
-  extraImports?: string
-) => {
-  const importLine = chalk.green(
-    `+ import Tina from '${
-      usingSrc ? '../' : ''
-    }../.tina/components/TinaDynamicProvider.js'`
-  )
-
-  return `${importLine}
-  ${extraImports || ''}
-
-  const App = ({ Component, pageProps }) => {
-  return (
-    ${chalk.green('+ <Tina>')}
-        <Component {...pageProps} />
-    ${chalk.green('+ </Tina>')}
-  )
-}
-
-export default App
-`
-}
