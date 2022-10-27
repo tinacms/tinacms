@@ -240,6 +240,7 @@ export class ConfigBuilder {
     await resetGeneratedFolder({
       tinaGeneratedPath,
       usingTs,
+      isBuild: !dev,
     })
     await this.database.store.open()
 
