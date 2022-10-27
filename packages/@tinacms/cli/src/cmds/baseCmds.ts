@@ -12,13 +12,6 @@ limitations under the License.
 */
 
 import { audit, printFinalMessage } from './audit'
-import {
-  checkDeps,
-  initTina,
-  installDeps,
-  successMessage,
-  tinaSetup,
-} from './init'
 
 import 'dotenv/config'
 import { Command } from '../command'
@@ -36,7 +29,7 @@ import {
   auditCmdBuild,
   buildSetupCmdAudit,
 } from '../buildTina'
-import { initStaticTina } from './init/static'
+import { initStaticTina } from './init'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
@@ -79,10 +72,6 @@ const cleanOption = {
   name: '--clean',
   description:
     'Updates all content files to remove any data not explicitly permitted by the current schema definition',
-}
-const staticOption = {
-  name: '--static',
-  description: 'Bundle Tina as a static assset',
 }
 const useDefaultValuesOption = {
   name: '--useDefaultValues',
@@ -219,28 +208,10 @@ export const baseCmds: Command[] = [
       isomorphicGitBridge,
       noTelemetryOption,
       schemaFileType,
-      staticOption,
     ],
     description: 'Add Tina Cloud to an existing project',
     action: (options) => {
-      if (options.static) {
-        chain([attachPath, checkOptions, initStaticTina], options)
-      } else {
-        chain(
-          [
-            attachPath,
-            checkOptions,
-            checkDeps,
-            initTina,
-            installDeps,
-            buildSetupCmdBuild,
-            buildCmdBuild,
-            tinaSetup,
-            successMessage,
-          ],
-          options
-        )
-      }
+      chain([attachPath, checkOptions, initStaticTina], options)
     },
   },
   {

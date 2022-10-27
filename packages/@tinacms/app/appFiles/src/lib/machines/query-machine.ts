@@ -120,6 +120,9 @@ export const queryMachine =
             }
           | {
               type: 'FIELD_CHANGE'
+            }
+          | {
+              type: 'EDIT_MODE'
             },
       },
       id: '(machine)',
