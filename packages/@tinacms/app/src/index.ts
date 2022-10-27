@@ -14,6 +14,7 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import { build, createServer, splitVendorChunkPlugin } from 'vite'
+import { build as esbuild } from 'esbuild'
 import type { InlineConfig, ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
@@ -73,40 +74,20 @@ export const viteBuild = async ({
   /**
    * The location where the user-defined config is "prebuilt" to.
    */
-  const configPrebuildPath = path.join(generatedPath, 'prebuild', 'config.js')
+  const configPrebuildPath = path.join(generatedPath, 'prebuild', 'config.jsx')
   /**
    * The prebuild step takes the user-defined config and bundles it, leaving out
    * dependencies we bring with us (react, react-dom, tinacms) of the bundle.
    *
    * It then treats the output as the source of truth for user-defined config
    */
-  const prebuildConfig: InlineConfig = {
-    // This doesn't do anything in this case, but without it, Vite seems
-    // to assume the cwd, and copies values from `/public` automatically
-    // it seems like it just needs to be any folder that does not have a 'public' folder
-    root: path.join(generatedPath, 'prebuild'),
-    // NextJS forces es5 on tsconfig, specifying it here ignores that
-    // https://github.com/evanw/esbuild/issues/1355
-    esbuild: {
-      target: 'es2020',
-    },
-    mode: local ? 'development' : 'production',
-    build: {
-      outDir: path.join(generatedPath, 'prebuild'),
-      lib: {
-        entry: configPath,
-        fileName: () => {
-          return 'config.js'
-        },
-        formats: ['es'],
-      },
-      rollupOptions: {
-        external: ['react', 'react-dom', 'tinacms', 'next'],
-      },
-    },
-    logLevel: 'silent',
-  }
-  await build(prebuildConfig)
+  esbuild({
+    format: 'esm',
+    entryPoints: [configPath],
+    outfile: configPrebuildPath,
+    external: ['react', 'react-dom', 'tinacms', 'next'],
+    bundle: true,
+  })
 
   const alias = {
     TINA_IMPORT: configPrebuildPath,
