@@ -22,6 +22,15 @@ import { logText } from '../../utils/theme'
 import { fileExists, getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
 
+const generatedFilesToRemove = [
+  '_graphql.json',
+  '__lookup.json',
+  '__schema.json',
+  'frags.gql',
+  'queries.gql',
+  'schema.gql',
+]
+
 export const resetGeneratedFolder = async ({
   tinaGeneratedPath,
   usingTs,
@@ -30,26 +39,35 @@ export const resetGeneratedFolder = async ({
   usingTs: boolean
 }) => {
   try {
-    await fs.emptyDir(tinaGeneratedPath)
+    for (let index = 0; index < generatedFilesToRemove.length; index++) {
+      const file = generatedFilesToRemove[index]
+      fs.remove(path.join(tinaGeneratedPath, file))
+    }
   } catch (e) {
     console.log(e)
   }
   await fs.mkdirp(tinaGeneratedPath)
   const ext = usingTs ? 'ts' : 'js'
+
   // temp types file to allows the client to build
-  await fs.writeFile(
-    path.join(tinaGeneratedPath, `types.${ext}`),
-    `
-export const queries = (client)=>({})
-`
-  )
-  await fs.writeFile(
-    path.join(tinaGeneratedPath, `client.${ext}`),
-    `
+  if (await !fs.pathExists(path.join(tinaGeneratedPath, `types.${ext}`))) {
+    await fs.writeFile(
+      path.join(tinaGeneratedPath, `types.${ext}`),
+      `
+      export const queries = (client)=>({})
+      `
+    )
+  }
+  if (await !fs.pathExists(path.join(tinaGeneratedPath, `client.${ext}`))) {
+    await fs.writeFile(
+      path.join(tinaGeneratedPath, `client.${ext}`),
+      `
 export const client = ()=>{}
 export default client
 `
-  )
+    )
+  }
+
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
     `app
