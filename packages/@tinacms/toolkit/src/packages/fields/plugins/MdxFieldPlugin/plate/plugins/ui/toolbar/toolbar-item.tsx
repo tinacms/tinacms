@@ -208,7 +208,7 @@ export const EmbedButton = ({
             onMouseDown={(e) => {
               e.preventDefault()
             }}
-            className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border  text-sm font-medium transition-all ease-out duration-150 hover:bg-blue-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`cursor-pointer relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium transition-all ease-out duration-150 focus:z-10 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
               open
                 ? `bg-gray-50 border-gray-200 text-blue-500`
                 : `text-white border-blue-500 bg-blue-500`
