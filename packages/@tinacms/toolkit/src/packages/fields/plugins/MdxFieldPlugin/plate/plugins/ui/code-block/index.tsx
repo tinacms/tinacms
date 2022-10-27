@@ -30,11 +30,11 @@ import {
   getPointBefore,
   isCollapsed,
 } from '@udecode/plate-headless'
-import { Dropdown } from '../dropdown'
 import { uuid } from '../helpers'
 import MonacoEditor, { useMonaco, loader } from '@monaco-editor/react'
 import type * as monaco from 'monaco-editor'
 import { useSelected } from 'slate-react'
+import { Autocomplete } from '../autocomplete'
 
 type Monaco = typeof monaco
 
@@ -42,15 +42,6 @@ type Monaco = typeof monaco
 loader.config({
   paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.31.1/min/vs' },
 })
-
-const languages: Record<string, string> = {
-  typescript: 'TypeScript',
-  javascript: 'JavaScript',
-  css: 'CSS',
-  json: 'JSON',
-  html: 'HTML',
-  markdown: 'Markdown',
-}
 
 /**
  * Since monaco lazy-loads we may have a delay from when the block is inserted
@@ -107,6 +98,14 @@ export const CodeBlock = ({
 
   const language = restrictLanguage || element.lang
   const id = React.useMemo(() => uuid(), [])
+  const languages = React.useMemo(() => {
+    const defaultLangSet = { '': 'plain text' }
+    if (!monaco) return defaultLangSet
+    return monaco.languages.getLanguages().reduce((ac, cv) => {
+      if (cv.id === 'plaintext') return ac
+      return { ...ac, [cv.id]: cv.id }
+    }, defaultLangSet)
+  }, [monaco])
 
   React.useEffect(() => {
     if (monaco) {
@@ -119,15 +118,11 @@ export const CodeBlock = ({
     }
   }, [monaco])
 
-  const items = Object.entries(languages).map(([key, item]) => {
-    return {
-      key,
-      onClick: () => {
-        setNodes(editor, { lang: key })
-      },
-      render: item,
-    }
-  })
+  const items = Object.entries(languages).map(([key, label]) => ({
+    key,
+    label,
+    render: (item: { label: string }) => item.label,
+  }))
 
   React.useEffect(() => {
     if (navigateAway) {
@@ -281,8 +276,14 @@ export const CodeBlock = ({
     })
   }
 
-  const activeLanguageLabel =
-    typeof language === 'string' ? languages[language] : 'Plaintext'
+  const currentItem = React.useMemo(() => {
+    return (
+      items.find((item) => item.key === language) ?? {
+        key: '',
+        label: 'Plain Text',
+      }
+    )
+  }, [items, language])
 
   return (
     <div
@@ -301,7 +302,12 @@ export const CodeBlock = ({
         {!restrictLanguage && (
           <div className="flex justify-between pb-2">
             <div />
-            <Dropdown label={activeLanguageLabel} items={items} />
+            <Autocomplete
+              items={items}
+              value={currentItem}
+              defaultQuery={'plaintext'}
+              onChange={(item) => setNodes(editor, { lang: item.key })}
+            />
           </div>
         )}
         <div style={{ height: `${height}px` }}>
