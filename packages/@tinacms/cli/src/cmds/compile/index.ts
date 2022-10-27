@@ -29,19 +29,29 @@ const generatedFilesToRemove = [
   'frags.gql',
   'queries.gql',
   'schema.gql',
+  'db',
+  'app',
+  'prebuild',
 ]
 
 export const resetGeneratedFolder = async ({
   tinaGeneratedPath,
   usingTs,
+  isBuild,
 }: {
   tinaGeneratedPath: string
   usingTs: boolean
+  isBuild: boolean
 }) => {
   try {
-    for (let index = 0; index < generatedFilesToRemove.length; index++) {
-      const file = generatedFilesToRemove[index]
-      fs.remove(path.join(tinaGeneratedPath, file))
+    if (isBuild) {
+      // When running `tinacms build` we can still remove all generated files
+      await fs.emptyDir(tinaGeneratedPath)
+    } else {
+      for (let index = 0; index < generatedFilesToRemove.length; index++) {
+        const file = generatedFilesToRemove[index]
+        fs.remove(path.join(tinaGeneratedPath, file))
+      }
     }
   } catch (e) {
     console.log(e)
