@@ -11,7 +11,6 @@ const tem = {
   label: "test",
   fields: [{ type: "string", name: "yo" }],
 };
-// const CreateInnerTemplate = () => {
 const InnerTemplate: TinaTemplate = {
   label: "List Items",
   name: "items",
@@ -36,8 +35,6 @@ const InnerTemplate: TinaTemplate = {
     },
   ],
 };
-// return InnerTemplate;
-// };
 
 const BlocksTemplate: TinaTemplate = {
   label: "Page Blocks",

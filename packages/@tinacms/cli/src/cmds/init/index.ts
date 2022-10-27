@@ -1,14 +1,3 @@
-import path from 'path'
-import {
-  AppJsContent,
-  AppJsContentPrintout,
-  adminPage,
-  blogPost,
-  nextPostPage,
-} from './setup-files'
-import { TinaProvider, TinaProviderDynamic } from './setup-files/tinaProvider'
-import { logText, successText } from '../../utils/theme'
-import { extendNextScripts } from '../../utils/script-helpers'
 /**
 Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,16 +10,346 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import fs, { outputFileSync, readFileSync, writeFileSync } from 'fs-extra'
-
-import Progress from 'progress'
-import { Telemetry } from '@tinacms/metrics'
-import chalk from 'chalk'
+import path from 'path'
+import { logText, successText } from '../../utils/theme'
 import { logger } from '../../logger'
-import p from 'path'
+import fs from 'fs-extra'
 import prompts from 'prompts'
-import { fileExists } from '../../lib/getPath'
-import { defaultSchema } from '../compile/defaultSchema'
+import { Telemetry } from '@tinacms/metrics'
+import { nextPostPage } from './setup-files'
+import { extendNextScripts } from '../../utils/script-helpers'
+import { configExamples } from './setup-files/config'
+
+interface Framework {
+  name: 'next' | 'other'
+  reactive: boolean
+}
+
+export async function initStaticTina(ctx: any, next: () => void, options) {
+  const baseDir = ctx.rootPath
+  logger.level = 'info'
+  // Choose package manager
+  const packageManager = await choosePackageManager()
+
+  // Choose framework
+  const framework: Framework = await chooseFramework()
+
+  // Choose typescript
+  const usingTypescript = await chooseTypescript()
+
+  // Choose public folder
+  const publicFolder: string = await choosePublicFolder({ framework })
+
+  // Report telemetry
+  await reportTelemetry(usingTypescript, options.noTelemetry)
+
+  // Check for package.json
+  const hasPackageJSON = await fs.pathExistsSync('package.json')
+  // if no package.json, init
+  if (!hasPackageJSON) {
+    await createPackageJSON()
+  }
+
+  // Check if .gitignore exists
+  const hasGitignore = await fs.pathExistsSync('.gitignore')
+  // if no .gitignore, create one
+  if (!hasGitignore) {
+    await createGitignore({ baseDir })
+  } else {
+    const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
+      baseDir,
+    })
+    if (!hasNodeModulesIgnored) {
+      await addNodeModulesToGitignore({ baseDir })
+    }
+  }
+
+  await addDependencies(packageManager)
+
+  // add .tina/config.{js,ts}
+  await addConfigFile({ publicFolder, baseDir, usingTypescript, framework })
+
+  // add /content/posts/hello-world.md
+  await addContentFile({ baseDir })
+
+  if (framework.reactive) {
+    await addReactiveFile[framework.name]({
+      baseDir,
+      framework,
+      usingTypescript,
+    })
+  }
+
+  logNextSteps({ packageManager, framework })
+}
+
+const choosePackageManager = async () => {
+  const option = await prompts({
+    name: 'selection',
+    type: 'select',
+    message: 'Choose your package manager',
+    choices: [
+      { title: 'PNPM', value: 'pnpm' },
+      { title: 'Yarn', value: 'yarn' },
+      { title: 'NPM', value: 'npm' },
+    ],
+  })
+  return option['selection']
+}
+
+const chooseTypescript = async () => {
+  const option = await prompts({
+    name: 'selection',
+    type: 'confirm',
+    initial: true,
+    message: 'Would you like to use Typescript?',
+  })
+  return option['selection']
+}
+
+const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
+  if (framework.name === 'next') {
+    return 'public'
+  }
+  const option = await prompts({
+    name: 'selection',
+    type: 'text',
+    message: 'Where are public assets stored? (default: "public")',
+  })
+  return option['selection'] || 'public'
+}
+
+const chooseFramework = async () => {
+  const option = await prompts({
+    name: 'selection',
+    type: 'select',
+    message: 'What framework are you using?',
+    choices: [
+      { title: 'Next.js', value: { name: 'next', reactive: true } },
+      {
+        title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
+        value: { name: 'other', reactive: false },
+      },
+    ] as { title: string; value: Framework }[],
+  })
+  return option['selection'] as Framework
+}
+
+const reportTelemetry = async (
+  usingTypescript: boolean,
+  noTelemetry: boolean
+) => {
+  if (noTelemetry) {
+    logger.info(logText('Telemetry disabled'))
+  }
+  const telemetry = new Telemetry({ disabled: noTelemetry })
+  const schemaFileType = usingTypescript ? 'ts' : 'js'
+  await telemetry.submitRecord({
+    event: {
+      name: 'tinacms:cli:init:invoke',
+      schemaFileType,
+    },
+  })
+}
+
+const createPackageJSON = async () => {
+  logger.info(logText('No package.json found, creating one'))
+  await execShellCommand(`npm init --yes`)
+}
+const createGitignore = async ({ baseDir }: { baseDir: string }) => {
+  logger.info(logText('No .gitignore found, creating one'))
+  await fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
+}
+
+const checkGitignoreForNodeModules = async ({
+  baseDir,
+}: {
+  baseDir: string
+}) => {
+  const gitignoreContent = await fs
+    .readFileSync(path.join(baseDir, '.gitignore'))
+    .toString()
+  return gitignoreContent.split('\n').some((item) => item === 'node_modules')
+}
+const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
+  logger.info(logText('Adding node_modules to .gitignore'))
+  const gitignoreContent = await fs
+    .readFileSync(path.join(baseDir, '.gitignore'))
+    .toString()
+  const newGitignoreContent = [
+    ...gitignoreContent.split('\n'),
+    'node_modules',
+  ].join('\n')
+  await fs.writeFileSync(path.join(baseDir, '.gitignore'), newGitignoreContent)
+}
+const addDependencies = async (packageManager) => {
+  logger.info(logText('Adding dependencies, this might take a moment...'))
+  const deps = ['tinacms', '@tinacms/cli']
+  const packageManagers = {
+    pnpm: process.env.USE_WORKSPACE
+      ? `pnpm add ${deps.join(' ')} --workspace`
+      : `pnpm add ${deps.join(' ')}`,
+    npm: `npm install ${deps.join(' ')}`,
+    yarn: `yarn add ${deps.join(' ')}`,
+  }
+  logger.info(`  ${logText(packageManagers[packageManager])}`)
+  await execShellCommand(packageManagers[packageManager])
+}
+
+const addConfigFile = async ({
+  framework,
+  baseDir,
+  publicFolder,
+  usingTypescript,
+}: {
+  publicFolder: string
+  baseDir: string
+  usingTypescript: boolean
+  framework: Framework
+}) => {
+  const configPath = path.join(
+    '.tina',
+    `config.${usingTypescript ? 'ts' : 'js'}`
+  )
+  const fullConfigPath = path.join(baseDir, configPath)
+  if (fs.pathExistsSync(fullConfigPath)) {
+    const override = await prompts({
+      name: 'selection',
+      type: 'confirm',
+      message: `Found existing file at ${configPath}. Would you like to override?`,
+    })
+    if (override['selection']) {
+      logger.info(logText(`Overriding file at ${configPath}.`))
+      await fs.outputFileSync(
+        fullConfigPath,
+        config({ publicFolder, framework })
+      )
+    } else {
+      logger.info(logText(`Not overriding file at ${configPath}.`))
+    }
+  } else {
+    logger.info(
+      logText(
+        `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
+      )
+    )
+    await fs.outputFileSync(fullConfigPath, config({ publicFolder, framework }))
+  }
+}
+
+const addContentFile = async ({ baseDir }: { baseDir: string }) => {
+  const contentPath = path.join('content', 'posts', 'hello-world.md')
+  const fullContentPath = path.join(baseDir, contentPath)
+  if (fs.pathExistsSync(fullContentPath)) {
+    const override = await prompts({
+      name: 'selection',
+      type: 'confirm',
+      message: `Found existing file at ${contentPath}. Would you like to override?`,
+    })
+    if (override['selection']) {
+      logger.info(logText(`Overriding file at ${contentPath}.`))
+      await fs.outputFileSync(fullContentPath, content)
+    } else {
+      logger.info(logText(`Not overriding file at ${contentPath}.`))
+    }
+  } else {
+    logger.info(logText(`Adding content file at ${contentPath}`))
+    await fs.outputFileSync(fullContentPath, content)
+  }
+}
+
+const logNextSteps = ({
+  framework,
+  packageManager,
+}: {
+  packageManager: string
+  framework: Framework
+}) => {
+  logSteps[framework.name]({ packageManager })
+}
+const logSteps = {
+  other: ({ packageManager }: { packageManager: string }) => {
+    const packageManagers = {
+      pnpm: `pnpm`,
+      npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
+      yarn: `yarn`,
+    }
+    logger.info(`
+  ${successText('TinaCMS has been initialized, to get started run:')}
+  
+      ${packageManagers[packageManager]} tinacms dev -c "<your dev command>"
+  `)
+  },
+  next: ({ packageManager }: { packageManager: string }) => {
+    const packageManagers = {
+      pnpm: `pnpm`,
+      npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
+      yarn: `yarn`,
+    }
+    logger.info(`
+  ${successText('TinaCMS has been initialized, to get started run:')}
+  
+     "${packageManagers[packageManager]} dev"
+  `)
+    logger.info(`
+  ${successText(
+    'TinaCMS user interface is available at: <YourDevURL>/admin/index.html'
+  )}
+  `)
+  },
+}
+
+const config = (args: { publicFolder: string; framework: Framework }) => {
+  return configExamples[args.framework.name](args)
+}
+
+const content = `---
+title: Hello, World!
+---
+
+## Hello World!
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut non lorem diam. Quisque vulputate nibh sodales eros pretium tincidunt. Aenean porttitor efficitur convallis. Nulla sagittis finibus convallis. Phasellus in fermentum quam, eu egestas tortor. Maecenas ac mollis leo. Integer maximus eu nisl vel sagittis.
+
+Suspendisse facilisis, mi ac scelerisque interdum, ligula ex imperdiet felis, a posuere eros justo nec sem. Nullam laoreet accumsan metus, sit amet tincidunt orci egestas nec. Pellentesque ut aliquet ante, at tristique nunc. Donec non massa nibh. Ut posuere lacus non aliquam laoreet. Fusce pharetra ligula a felis porttitor, at mollis ipsum maximus. Donec quam tortor, vehicula a magna sit amet, tincidunt dictum enim. In hac habitasse platea dictumst. Mauris sit amet ornare ligula, blandit consequat risus. Duis malesuada pellentesque lectus, non feugiat turpis eleifend a. Nullam tempus ante et diam pretium, ac faucibus ligula interdum.
+`
+const addReactiveFile = {
+  next: ({
+    baseDir,
+    usingTypescript,
+  }: {
+    baseDir: string
+    usingTypescript: boolean
+  }) => {
+    const usingSrc = !fs.pathExistsSync(path.join(baseDir, 'pages'))
+    const pagesPath = path.join(baseDir, usingSrc ? 'src' : '', 'pages')
+    const packageJSONPath = path.join(baseDir, 'package.json')
+
+    const tinaBlogPagePath = path.join(pagesPath, 'demo', 'blog')
+    const tinaBlogPagePathFile = path.join(
+      tinaBlogPagePath,
+      `[filename].${usingTypescript ? 'tsx' : 'js'}`
+    )
+    if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
+      fs.mkdirpSync(tinaBlogPagePath)
+      fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
+    }
+    logger.info('Adding a nextjs example... ✅')
+
+    // 4. update the users package.json
+    const pack = JSON.parse(fs.readFileSync(packageJSONPath).toString())
+    const oldScripts = pack.scripts || {}
+    const newPack = JSON.stringify(
+      {
+        ...pack,
+        scripts: extendNextScripts(oldScripts),
+      },
+      null,
+      2
+    )
+    fs.writeFileSync(packageJSONPath, newPack)
+  },
+}
 
 /**
  * Executes a shell command and return it as a Promise.
@@ -47,285 +366,4 @@ export function execShellCommand(cmd): Promise<string> {
       resolve(stdout ? stdout : stderr)
     })
   })
-}
-
-export async function initTina(ctx: any, next: () => void, options) {
-  const telemetry = new Telemetry({ disabled: options.noTelemetry })
-  const root = ctx.rootPath
-  const tsConfigPath = path.join(root, 'tsconfig.json')
-  const usingTs = await fs.pathExists(tsConfigPath)
-
-  const schemaFileType = options?.schemaFileType || usingTs ? 'ts' : 'js'
-
-  await telemetry.submitRecord({
-    event: {
-      name: 'tinacms:cli:init:invoke',
-      schemaFileType,
-    },
-  })
-  logger.info(successText('Setting up Tina...'))
-  const tinaPath = path.join(root, '.tina')
-
-  const schemaExists = fileExists({
-    projectDir: tinaPath,
-    filename: 'schema',
-    allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
-  })
-
-  // If there is not Schema and no config
-  if (!schemaExists) {
-    const file = path.join(tinaPath, `schema.${schemaFileType}`)
-    // Ensure there is a .tina/schema.ts file
-    await fs.ensureFile(file)
-    // Write a basic schema to it
-    await fs.writeFile(file, defaultSchema)
-  }
-  next()
-}
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-export const MIN_REACT_VERSION = '>=16.14.0'
-
-export async function checkDeps(ctx: any, next: () => void, options) {
-  const bar = new Progress('Checking dependencies. :prog', 1)
-
-  if (!fs.existsSync(packageJSONPath)) {
-    throw new Error(
-      'No package.json Found. Please run tinacms init at the root of your app'
-    )
-  }
-  const packageJSON = JSON.parse(
-    (await fs.readFileSync(packageJSONPath)).toString()
-  )
-  if (
-    !checkPackage(packageJSON, 'react') ||
-    !checkPackage(packageJSON, 'react-dom')
-  ) {
-    const message = `Unable to initialize Tina due to outdated dependencies, try upgrading the following packages:
-      "react@${MIN_REACT_VERSION}"
-      "react-dom@${MIN_REACT_VERSION}"
-
-  Then re-rerun "@tinacms/cli init"`
-    throw new Error(message)
-  }
-
-  bar.tick({
-    prog: '✅',
-  })
-  logger.level = 'fatal'
-  next()
-}
-
-export const checkPackage = (packageJSON, packageName) => {
-  let strippedVersion
-  Object.entries(packageJSON.dependencies).map(
-    ([depPackageName, version]: [string, string]) => {
-      if (depPackageName === packageName) {
-        strippedVersion = version.replace(/^[^a-zA-Z0-9]*|[^a-zA-Z0-9]*$/g, '')
-      }
-    }
-  )
-  if (!strippedVersion) {
-    throw new Error(`Please add ${packageName} to your project`)
-  }
-  return checkVersion(strippedVersion)
-}
-
-/**
- * Checks for MIN_REACT_VERSION of 16.14.0
- */
-const checkVersion = (version) => {
-  const majorMin = 16
-  const minorMin = 14
-  const parts = version.split('.')
-  const major = Number(parts[0])
-  const minor = Number(parts[1])
-
-  if (parts.length === 1) {
-    if (isNaN(major)) {
-      return true
-    } else if (major > majorMin) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  if (major > majorMin) {
-    return true
-  } else if (major === majorMin) {
-    if (minor >= minorMin) {
-      return true
-    } else {
-      return false
-    }
-  } else {
-    return false
-  }
-}
-
-export async function installDeps(ctx: any, next: () => void, options) {
-  const bar = new Progress(
-    'Installing Tina packages. This might take a moment... :prog',
-    2
-  )
-  const deps = ['tinacms', '@tinacms/cli']
-
-  bar.tick({
-    prog: '',
-  })
-  const installCMD = `yarn add ${deps.join(' ')}`
-  await execShellCommand(installCMD)
-
-  // Fake installed used for dev
-  // await delay(2000)
-  bar.tick({
-    prog: '✅',
-  })
-  logger.level = 'fatal'
-  next()
-}
-
-const baseDir = process.cwd()
-const packageJSONPath = p.join(baseDir, 'package.json')
-const blogContentPath = p.join(baseDir, 'content', 'posts')
-const blogPostPath = p.join(blogContentPath, 'HelloWorld.mdx')
-const TinaFolder = p.join(baseDir, '.tina')
-const componentFolder = p.join(TinaFolder, 'components')
-const TinaProviderPath = p.join(componentFolder, 'TinaProvider.js')
-const TinaDynamicProvider = p.join(componentFolder, 'TinaDynamicProvider.js')
-
-export async function tinaSetup(_ctx: any, next: () => void, _options) {
-  const usingSrc = !fs.pathExistsSync(p.join(baseDir, 'pages'))
-
-  // 1. Create a content/blog Folder and add one or two blog posts
-  if (!fs.pathExistsSync(blogPostPath)) {
-    logger.info(logText('Adding a content folder...'))
-    fs.mkdirpSync(blogContentPath)
-    fs.writeFileSync(blogPostPath, blogPost)
-  }
-
-  // 2. Create a Tina Provider
-  if (!fs.existsSync(TinaProviderPath) && !fs.existsSync(TinaDynamicProvider)) {
-    fs.mkdirpSync(componentFolder)
-    fs.writeFileSync(
-      TinaProviderPath,
-      TinaProvider.replace(
-        /'\.\.\/schema\.ts'/,
-        `'../schema.${_ctx.usingTs ? 'ts' : 'js'}'`
-      )
-    )
-    fs.writeFileSync(TinaDynamicProvider, TinaProviderDynamic)
-  }
-  logger.level = 'info'
-
-  // 3. Create an _app.js
-  const pagesPath = p.join(baseDir, usingSrc ? 'src' : '', 'pages')
-  const appPath = p.join(pagesPath, '_app.js')
-  const appPathTS = p.join(pagesPath, '_app.tsx')
-  const appExtension = fs.existsSync(appPath) ? '.js' : '.tsx'
-
-  if (!fs.pathExistsSync(appPath) && !fs.pathExistsSync(appPathTS)) {
-    // if they don't have a _app.js or an _app.tsx just make one
-    logger.info(logText('Adding _app.js ... ✅'))
-    fs.writeFileSync(appPath, AppJsContent(usingSrc))
-  } else {
-    const override = await prompts({
-      name: 'res',
-      type: 'confirm',
-      message: `do you want us to ${chalk.bold(
-        `override`
-      )} your _app${appExtension}?`,
-    })
-    // Ask the user if they want to update there _app.js
-    _ctx.overrideApp = override.res
-    if (override.res) {
-      logger.info(logText(`Adding _app${appExtension} ... ✅`))
-      const appPathWithExtension = p.join(pagesPath, `_app${appExtension}`)
-      const fileContent = fs.pathExistsSync(appPath)
-        ? readFileSync(appPath)
-        : readFileSync(appPathTS)
-      const matches = [
-        // @ts-ignore
-        ...fileContent.toString().matchAll(/^.*import.*\.css("|').*$/gm),
-      ]
-      // This gets the primary match. see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#using_match
-      const primaryMatches = matches.map((x) => x[0])
-      fs.writeFileSync(
-        appPathWithExtension,
-        AppJsContent(usingSrc, primaryMatches.join('\n'))
-      )
-    }
-  }
-
-  // 3. Create a /page/blog/[slug].tsx file with all of the Tina pieces wrapped up in one file
-
-  const tinaBlogPagePath = p.join(pagesPath, 'demo', 'blog')
-  const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
-  if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
-    fs.mkdirpSync(tinaBlogPagePath)
-    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ usingSrc }))
-  }
-  logger.info('Adding a content folder... ✅')
-  // 4. update the users package.json
-  if (!fs.existsSync(packageJSONPath)) {
-    throw new Error(
-      'No package.json Found. Please run tinacms init at the root of your app'
-    )
-  } else {
-    const pack = JSON.parse(readFileSync(packageJSONPath).toString())
-    const oldScripts = pack.scripts || {}
-    const newPack = JSON.stringify(
-      {
-        ...pack,
-        scripts: extendNextScripts(oldScripts),
-      },
-      null,
-      2
-    )
-    writeFileSync(packageJSONPath, newPack)
-  }
-
-  // pages/admin.tsx
-  const adminPath = p.join(pagesPath, 'admin.js')
-  if (fs.pathExistsSync(p.join(pagesPath, 'admin'))) {
-    logger.warn(`Unable to add /pages/admin.js, this path already exists.
-\tLearn more about toggling edit-mode at https://tina.io/docs/tinacms-context/#manually-toggling-edit-mode`)
-    return next()
-  }
-
-  outputFileSync(adminPath, adminPage)
-
-  next()
-}
-
-export async function successMessage(ctx: any, next: () => void, options) {
-  const usingSrc = fs.pathExistsSync(p.join(baseDir, 'src'))
-
-  logger.info(`Tina setup ${chalk.underline.green('done')} ✅\n`)
-
-  logger.info('Next Steps: \n')
-
-  if (!ctx.overrideApp) {
-    logger.info(`${chalk.bold('Add the Tina wrapper')}`)
-    logger.info(
-      `⚠️ Before using Tina, you will NEED to add the Tina wrapper to your _app.jsx \n`
-    )
-    logger.info(`${AppJsContentPrintout(usingSrc)}`)
-  }
-
-  logger.info(`${chalk.bold('Run your site with Tina')}`)
-  logger.info(`  yarn dev \n`)
-
-  logger.info(`${chalk.bold('Start Editing')}`)
-  logger.info(`  Go to 'http://localhost:3000/admin' \n`)
-
-  logger.info(`${chalk.bold('Read the docs')}`)
-  logger.info(
-    `  Check out 'https://tina.io/docs/introduction/tina-init/#adding-tina' for help getting started with Tina \n`
-  )
-
-  logger.info(`Enjoy Tina! 🦙`)
-
-  next()
 }

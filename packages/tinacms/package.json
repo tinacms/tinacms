@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.69.20",
+  "version": "0.69.22",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
@@ -65,6 +65,7 @@
     "@tinacms/sharedctx": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
     "crypto-js": "^4.0.0",
+    "encoding": "0.1.13",
     "fetch-ponyfill": "^7.1.0",
     "final-form": "4.20.1",
     "graphql": "15.8.0",

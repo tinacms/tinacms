@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 0.0.25
+
+### Patch Changes
+
+- 6d06e18a3: Pin vite to 3.1.8 as 3.2.0 introduces a bug
+
 ## 0.0.24
 
 ### Patch Changes

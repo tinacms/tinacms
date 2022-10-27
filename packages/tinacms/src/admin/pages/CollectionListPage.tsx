@@ -255,7 +255,7 @@ const CollectionListPage = () => {
                                     .map((x) => [
                                       {
                                         label:
-                                          x.label || x.name + ' (Ascending)',
+                                          (x.label || x.name) + ' (Ascending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'asc',
@@ -263,7 +263,7 @@ const CollectionListPage = () => {
                                       },
                                       {
                                         label:
-                                          x.label || x.name + ' (Descending)',
+                                          (x.label || x.name) + ' (Descending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'desc',
