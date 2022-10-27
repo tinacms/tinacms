@@ -85,6 +85,7 @@ export const viteBuild = async ({
     format: 'esm',
     entryPoints: [configPath],
     outfile: configPrebuildPath,
+    target: 'es2020',
     external: ['react', 'react-dom', 'tinacms', 'next'],
     bundle: true,
   })
