@@ -1,5 +1,22 @@
 # tinacms-cli
 
+## 0.61.27
+
+### Patch Changes
+
+- Updated dependencies [6d06e18a3]
+  - @tinacms/app@0.0.25
+
+## 0.61.26
+
+### Patch Changes
+
+- 194123d26: Update error message
+- 97f0b6472: Add raw editor support for static mode. Use `~` for preview path.
+- 660dc62fb: Show a deperecated notification for old schema file usage
+  - @tinacms/app@0.0.24
+  - @tinacms/graphql@0.63.17
+
 ## 0.61.25
 
 ### Patch Changes

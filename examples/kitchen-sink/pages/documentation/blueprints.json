@@ -1,0 +1,101 @@
+[
+  {
+    "name": "documentation",
+    "alias": "documentation",
+    "fields": [
+      {
+        "name": "title",
+        "alias": "title"
+      },
+      {
+        "name": "tags",
+        "alias": "tags",
+        "fields": [
+          {
+            "name": "__typename",
+            "alias": "__typename"
+          },
+          {
+            "name": "reference",
+            "alias": "reference",
+            "fields": [
+              {
+                "name": "title",
+                "alias": "title"
+              },
+              {
+                "name": "description",
+                "alias": "description"
+              },
+              {
+                "name": "id",
+                "alias": "id"
+              },
+              {
+                "name": "_sys",
+                "alias": "_internalSys",
+                "fields": [
+                  {
+                    "name": "path",
+                    "alias": "path"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "body",
+        "alias": "body"
+      },
+      {
+        "name": "_sys",
+        "alias": "_sys",
+        "fields": [
+          {
+            "name": "filename",
+            "alias": "filename"
+          },
+          {
+            "name": "basename",
+            "alias": "basename"
+          },
+          {
+            "name": "breadcrumbs",
+            "alias": "breadcrumbs"
+          },
+          {
+            "name": "path",
+            "alias": "path"
+          },
+          {
+            "name": "relativePath",
+            "alias": "relativePath"
+          },
+          {
+            "name": "extension",
+            "alias": "extension"
+          }
+        ]
+      },
+      {
+        "name": "id",
+        "alias": "id"
+      },
+      {
+        "name": "_internalSys",
+        "alias": "_internalSys",
+        "fields": [
+          {
+            "name": "path",
+            "alias": "path"
+          }
+        ]
+      }
+    ],
+    "path": [
+      "documentation"
+    ]
+  }
+]

@@ -128,7 +128,7 @@ const handleNavigate = (
       routeOverride = routeOverride.slice(1)
     }
     tinaPreview
-      ? navigate(`/preview/${routeOverride}`)
+      ? navigate(`/~/${routeOverride}`)
       : (window.location.href = routeOverride)
     return null
   } else {
@@ -254,14 +254,16 @@ const CollectionListPage = () => {
                                   ...fields
                                     .map((x) => [
                                       {
-                                        label: x.label + ' (Ascending)',
+                                        label:
+                                          (x.label || x.name) + ' (Ascending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'asc',
                                         }),
                                       },
                                       {
-                                        label: x.label + ' (Descending)',
+                                        label:
+                                          (x.label || x.name) + ' (Descending)',
                                         value: JSON.stringify({
                                           name: x.name,
                                           order: 'desc',

@@ -289,6 +289,7 @@ const Sidebar = ({
           <EditButton />
           {displayNav && (
             <Nav
+              isLocalMode={cms.api?.tina?.isLocalMode}
               showCollections={isTinaAdminEnabled}
               collectionsInfo={collectionsInfo}
               screens={allScreens}
@@ -348,6 +349,7 @@ const Sidebar = ({
             >
               <div className="fixed left-0 top-0 z-overlay h-full transform">
                 <Nav
+                  isLocalMode={cms.api?.tina?.isLocalMode}
                   className="rounded-r-md"
                   showCollections={isTinaAdminEnabled}
                   collectionsInfo={collectionsInfo}
@@ -437,7 +439,7 @@ export const updateBodyDisplacement = ({
         sidebarWidth,
         windowWidth - minPreviewWidth
       )
-      body.style.paddingLeft = bodyDisplacement - 6 + 'px'
+      body.style.paddingLeft = bodyDisplacement + 'px'
     } else {
       body.style.paddingLeft = '0'
     }

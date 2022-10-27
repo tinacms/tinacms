@@ -149,26 +149,29 @@ interface FormWrapperProps {
   isMultiform: Boolean
 }
 
-const FormWrapper: React.FC<FormWrapperProps> = (props) => (
-  <div
-    className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
-    style={
-      props.isEditing
-        ? {
-            transform: 'none',
-            animationName: 'fly-in-left',
-            animationDuration: '150ms',
-            animationDelay: '0',
-            animationIterationCount: 1,
-            animationTimingFunction: 'ease-out',
-          }
-        : {
-            transform: 'translate3d(100%, 0, 0)',
-          }
-    }
-    {...props}
-  />
-)
+const FormWrapper: React.FC<FormWrapperProps> = ({ isEditing, children }) => {
+  return (
+    <div
+      className="flex-1 flex flex-col flex-nowrap overflow-hidden h-full w-full relative bg-white"
+      style={
+        isEditing
+          ? {
+              transform: 'none',
+              animationName: 'fly-in-left',
+              animationDuration: '150ms',
+              animationDelay: '0',
+              animationIterationCount: 1,
+              animationTimingFunction: 'ease-out',
+            }
+          : {
+              transform: 'translate3d(100%, 0, 0)',
+            }
+      }
+    >
+      {children}
+    </div>
+  )
+}
 
 export interface MultiformFormHeaderProps {
   activeForm: Form

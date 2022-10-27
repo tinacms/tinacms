@@ -1,5 +1,23 @@
 # Change Log
 
+## 0.58.4
+
+### Patch Changes
+
+- 6ce6085e8: fix DotMenu Popover displayed under blocks
+
+## 0.58.3
+
+### Patch Changes
+
+- 48de42bc0: Add an info button to the collections label in the sidebar
+
+## 0.58.2
+
+### Patch Changes
+
+- 194123d26: Update error message
+
 ## 0.58.1
 
 ### Patch Changes

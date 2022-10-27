@@ -60,9 +60,30 @@ export default defineStaticConfig({
           },
           {
             name: 'body',
-            label: 'Main Content',
+            label: 'Body',
             type: 'rich-text',
             isBody: true,
+            templates: [
+              {
+                name: 'WarningCallout',
+                label: 'WarningCallout',
+                match: {
+                  start: '{%',
+                  end: '%}',
+                },
+                fields: [
+                  {
+                    name: 'text',
+                    label: 'Text',
+                    type: 'string',
+                    required: true,
+                    ui: {
+                      component: 'textarea',
+                    },
+                  },
+                ],
+              },
+            ],
           },
         ],
       },

@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.69.19",
+  "version": "0.69.22",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
@@ -43,6 +43,7 @@
       "src/index.ts",
       "src/edit-state.tsx",
       "src/rich-text/index.tsx",
+      "src/rich-text/prism.tsx",
       "src/react.tsx",
       "src/client.ts"
     ]

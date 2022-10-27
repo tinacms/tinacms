@@ -27,6 +27,7 @@ export type {
   MediaListOptions,
   MediaList,
 } from './packages/core'
+export { MdxFieldPluginExtendible } from './packages/fields/plugins/MdxFieldPlugin'
 export {
   MediaManager,
   MediaListError,

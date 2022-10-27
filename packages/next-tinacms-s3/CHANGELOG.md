@@ -1,5 +1,11 @@
 # next-tinacms-s3
 
+## 0.0.6
+
+### Patch Changes
+
+- 86dae3189: Fix dran'n'drop uploaded image not shown issue
+
 ## 0.0.5
 
 ### Patch Changes

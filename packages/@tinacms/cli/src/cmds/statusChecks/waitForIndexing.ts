@@ -39,7 +39,7 @@ class IndexFailedError extends Error {
 export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
   if (!ctx.client) {
     throw new Error(
-      'No Tina Cloud found. For more information on how to setup the tina cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
+      'No Tina Cloud found. For more information on how to setup the Tina Cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
     )
   }
 
@@ -94,13 +94,13 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
         // Index Failed
       } else if (status === STATUS_FAILED) {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'failed', ${error}`
+          `Attempting to index but responded with status 'failed', To retry the indexing process, click “Reset Repository Cache” in tina cloud advance settings.  ${error}`
         )
 
         // Index Unknown
       } else {
         throw new IndexFailedError(
-          `Attempting to index but responded with status 'unknown', ${error}`
+          `Attempting to index but responded with status 'unknown', To retry the indexing process, click “Reset Repository Cache” in tina cloud advance settings.  ${error}`
         )
       }
     } catch (e) {
