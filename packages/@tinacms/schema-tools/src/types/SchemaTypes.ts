@@ -39,6 +39,9 @@ export type UIField<F extends UIField = any, Shape = any> = {
 export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
   templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
+  /**
+   * @deprecated use `defineConfig` in a config.{js,ts} file instead
+   */
   config?: TinaCloudSchemaConfig<Store>
 }
 export type TinaCloudSchemaBase = TinaCloudSchema<false>
