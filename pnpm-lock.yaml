@@ -333,6 +333,7 @@ importers:
       '@vitejs/plugin-react': ^2.1.0
       '@xstate/react': 3.0.0
       autoprefixer: ^10.4.0
+      esbuild: ^0.15.12
       final-form: 4.20.7
       fs-extra: ^9.0.1
       graphql: 15.8.0
@@ -361,6 +362,7 @@ importers:
       '@vitejs/plugin-react': 2.1.0_vite@3.1.8
       '@xstate/react': 3.0.0_cgmtdnh7hbcv55nluxt3gdbquy
       autoprefixer: 10.4.7_postcss@8.4.14
+      esbuild: 0.15.12
       final-form: 4.20.7
       fs-extra: 9.1.0
       graphql: 15.8.0
