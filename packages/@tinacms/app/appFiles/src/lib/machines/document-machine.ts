@@ -12,12 +12,7 @@ limitations under the License.
 */
 import { Client, Field, Form, FormOptions, TinaCMS } from 'tinacms'
 import { assign, createMachine, sendParent } from 'xstate'
-import {
-  resolveForm,
-  Templateable,
-  TinaFieldEnriched,
-  TinaSchema,
-} from 'tinacms'
+import { Templateable, TinaFieldEnriched, TinaSchema } from 'tinacms'
 
 export type FieldType = Field & TinaFieldEnriched
 export type FormValues = Record<string, unknown>
@@ -193,12 +188,10 @@ export const documentMachine =
               `Unable to find template for node ${response.node._internalSys.path}`
             )
           }
-          const resolvedForm = resolveForm({
-            collection,
-            basename: response.node._internalSys.filename,
-            schema,
-            template,
-          })
+          const resolvedForm = schema.resolveForm(
+            collection.name,
+            template.name
+          )
           const onSubmit = async (payload: Record<string, unknown>) => {
             try {
               const mutationString = `#graphql

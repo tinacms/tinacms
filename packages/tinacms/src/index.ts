@@ -41,7 +41,7 @@ import type {
 } from '@tinacms/schema-tools'
 
 import { validateSchema } from '@tinacms/schema-tools'
-export { NAMER, resolveForm } from '@tinacms/schema-tools'
+export { NAMER } from '@tinacms/schema-tools'
 export type {
   TinaFieldEnriched,
   TinaSchema,

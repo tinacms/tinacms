@@ -24,7 +24,7 @@ import type {
   ChangeSet,
   BlueprintPath,
 } from './types'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 import {
   generateFormCreators,
@@ -236,12 +236,7 @@ export const buildForm = (
   }
   let formConfig = {} as FormOptions<any, AnyField>
 
-  const formInfo = resolveForm({
-    collection,
-    basename: collection.name,
-    schema: enrichedSchema,
-    template,
-  })
+  const formInfo = enrichedSchema.resolveForm(collection.name, template.name)
   formConfig = {
     label: formInfo.label,
     // TODO: return correct type

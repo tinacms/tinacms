@@ -21,6 +21,7 @@ import {
   TinaFieldEnriched,
 } from '../types'
 import { lastItem, assertShape } from '../util'
+import { resolveForm } from './resolveForm'
 
 type Version = {
   fullVersion: string
@@ -125,6 +126,20 @@ export class TinaSchema {
     }
     return collection
   }
+  public resolveForm = (collectionName: string, templateName: string) => {
+    const collection = this.getCollection(collectionName)
+    const template = this.getTemplateForData({
+      collection: collection,
+      data: { _template: templateName },
+    })
+    return resolveForm({
+      collection,
+      basename: collection.name,
+      template,
+      schema: this,
+    })
+  }
+
   public getCollectionAndTemplateByFullPath = (
     filepath: string,
     templateName?: string

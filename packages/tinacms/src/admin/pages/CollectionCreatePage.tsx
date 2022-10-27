@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import {
-  BaseTextField,
   Form,
   FormBuilder,
   FormStatus,
@@ -20,7 +19,7 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
 import type { GlobalTemplate } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
@@ -150,12 +149,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     data: { _template: templateName },
   }) as GlobalTemplate<true>
 
-  const formInfo = resolveForm({
-    collection: schemaCollection,
-    basename: schemaCollection.name,
-    schema: schema,
-    template,
-  })
+  const formInfo = schema.resolveForm(collection.name, templateName)
 
   let slugFunction = template?.ui?.filename?.slugify
 
