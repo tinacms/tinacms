@@ -139,16 +139,11 @@ const out = output({
       ],
     },
     {
-      type: 'p',
-      children: [
-        {
-          type: 'img',
-          url: 'https://get.svg.workers.dev',
-          alt: 'Alt Text',
-          caption: 'Image Title',
-          children: [{ type: 'text', text: '' }],
-        },
-      ],
+      type: 'img',
+      url: 'https://get.svg.workers.dev',
+      alt: 'Alt Text',
+      caption: 'Image Title',
+      children: [{ type: 'text', text: '' }],
     },
     {
       type: 'p',
