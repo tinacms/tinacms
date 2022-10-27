@@ -1,7 +1,7 @@
-import { defineStaticConfig } from "tinacms";
+import { defineConfig } from "tinacms";
 import { schema } from "./schema";
 
-export default defineStaticConfig({
+export default defineConfig({
   clientId: process.env.NEXT_PUBLIC_TINA_CLIENT_ID!,
   branch:
     process.env.NEXT_PUBLIC_TINA_BRANCH! || // custom branch env override

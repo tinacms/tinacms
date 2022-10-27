@@ -12,12 +12,12 @@ limitations under the License.
 */
 
 export const configExamples = {
-  next: () => `import { defineStaticConfig } from 'tinacms'
+  next: () => `import { defineConfig } from 'tinacms'
 
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
   
-  export default defineStaticConfig({
+  export default defineConfig({
     branch,
     clientId: null, // Get this from tina.io
     token: null, // Get this from tina.io
@@ -63,12 +63,12 @@ export const configExamples = {
   `,
   other: (args: { publicFolder: string }) => {
     return `
-  import { defineStaticConfig } from "tinacms";
+  import { defineConfig } from "tinacms";
   
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
   
-  export default defineStaticConfig({
+  export default defineConfig({
     branch,
     clientId: null,   // Get this from tina.io
     token: null,      // Get this from tina.io
