@@ -251,6 +251,7 @@ const apiURL =
 
 // @ts-ignore
 export const tinaConfig = defineConfig({
+  // @ts-ignore
   apiURL,
   schema,
   cmsCallback: (cms) => {
