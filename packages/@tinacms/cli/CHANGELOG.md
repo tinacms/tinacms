@@ -1,5 +1,23 @@
 # tinacms-cli
 
+## 0.62.0
+
+### Minor Changes
+
+- 0fb26ac91: Updated to use new init for iframe way of editing.
+
+### Patch Changes
+
+- 2a03abe66: Remove console.log
+- 4b1e773ae: Fix issue caused by removing client and types file
+- Updated dependencies [fd7e4f636]
+- Updated dependencies [f7d3cf532]
+- Updated dependencies [774abcf9c]
+- Updated dependencies [245a65dfe]
+  - @tinacms/app@0.0.26
+  - @tinacms/schema-tools@0.2.0
+  - @tinacms/graphql@0.63.18
+
 ## 0.61.27
 
 ### Patch Changes

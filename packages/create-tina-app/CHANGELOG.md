@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 0.2.0
+
+### Minor Changes
+
+- 0fb26ac91: Updated to use new init for iframe way of editing.
+
 ## 0.1.9
 
 ### Patch Changes
