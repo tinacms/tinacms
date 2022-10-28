@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.58.5
+
+### Patch Changes
+
+- 7dda334e5: fix wrong background when hovering the "Embed" button inside the toolbar
+
 ## 0.58.4
 
 ### Patch Changes
