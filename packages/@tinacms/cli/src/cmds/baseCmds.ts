@@ -218,7 +218,7 @@ export const baseCmds: Command[] = [
         [
           attachPath,
           async (ctx, next, _options) => {
-            ctx.skipBuild = true
+            ctx.skipAdminBuild = true
             next()
           },
           checkOptions,

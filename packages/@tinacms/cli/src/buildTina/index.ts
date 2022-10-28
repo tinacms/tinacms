@@ -186,7 +186,7 @@ export const buildCmdBuild = async (
     port: options.port,
   })
   // @ts-ignore
-  if (ctx?.skipBuild) {
+  if (ctx?.skipAdminBuild) {
     return next()
   }
   await buildAdmin({
