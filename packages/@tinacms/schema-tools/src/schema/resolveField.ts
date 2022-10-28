@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaFieldEnriched } from '../types'
+import { TinaFieldEnriched } from '../types/schema2'
 import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
@@ -32,6 +32,7 @@ export const resolveField = (
   name: string
   component: string
   type: string
+  parentTypename: string
 } => {
   field
   field.parentTypename = NAMER.dataTypeName(

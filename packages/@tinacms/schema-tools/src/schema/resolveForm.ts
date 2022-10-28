@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { resolveField } from './resolveField'
-import type { ResolveFormArgs } from '../types'
+import type { ResolveFormArgs } from '../types/schema2'
 
 /**
  *  Given a collection, basename, template and schema. This will transform the given information into a valid frontend form config

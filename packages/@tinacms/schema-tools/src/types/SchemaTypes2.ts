@@ -28,7 +28,8 @@ export type TinaCMSConfig<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > = {
-  schema: TinaCloudSchema<false>
+  // schema: TinaCloudSchema<false>
+  schema: TinaCMSSchema
   /**
    * The base branch to pull content from. Note that this is ignored for local development
    */

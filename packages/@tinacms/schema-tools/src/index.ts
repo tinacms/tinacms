@@ -11,7 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export * from './schema'
-export * from './types'
+// export * from './'
+export * from './schema/TinaSchema'
+export * from './types/schema2'
 export * from './validate'
 export * from './util/namer'

@@ -542,7 +542,7 @@ export type Collectable = {
   references?: ReferenceType<true>[]
 }
 
-export type Templateable = {
+type Templateable = {
   name: string
   namespace: string[]
   fields: TinaFieldEnriched[]

@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import { Option, UICollection } from './SchemaTypes'
+import type { TinaSchema } from '../schema/TinaSchema'
 
 /**
  * NOTE this is WIP - it's not being used but ideally
@@ -45,6 +46,8 @@ type UIField<Type> = {
   defaultValue?: Type
 }
 
+type Namespace = { namespace: string[] }
+
 type FieldGeneric<Type> =
   | {
       required: true
@@ -67,7 +70,7 @@ type FieldGeneric<Type> =
       ui?: UIField<Type | undefined>
     }
 
-type BaseField<Type, Ui extends object = undefined> = {
+type CommonField<Type, Ui extends object = undefined> = {
   name: string
   label?: string
   description?: string
@@ -79,26 +82,26 @@ type StringFieldBase = {
   /** Designate this field's value as the document title  */
   isTitle?: boolean
   options?: Option[]
-} & BaseField<string>
+} & CommonField<string>
 
 type StringField = StringFieldBase & FieldGeneric<string>
 
 type NumberField = {
   type: 'number'
-} & BaseField<number>
+} & CommonField<number>
 type BooleanField = {
   type: 'boolean'
-} & BaseField<boolean>
+} & CommonField<boolean>
 type DateTimeField = {
   type: 'datetime'
-} & BaseField<string>
+} & CommonField<string>
 type ImageField = {
   type: 'image'
-} & BaseField<string>
+} & CommonField<string>
 type ReferenceField = {
   type: 'reference'
   collections: string[]
-} & BaseField<string> // TODO: Reference with `list: true` not yet supported
+} & CommonField<string> // TODO: Reference with `list: true` not yet supported
 type RichTextField = {
   type: 'rich-text'
   /**
@@ -106,12 +109,12 @@ type RichTextField = {
    * saved to the document body
    */
   isBody?: boolean
-} & BaseField<object> &
+} & CommonField<object> &
   WithTemplates<true>
 // FIXME: This produces `any` on the Type generic
 type ObjectField = ({
   type: 'object'
-} & BaseField<
+} & CommonField<
   object,
   {
     itemProps?(item: Record<string, any>): {
@@ -122,7 +125,7 @@ type ObjectField = ({
 >) &
   (WithFields | WithTemplates)
 
-type Field =
+type BaseField =
   | StringField
   | NumberField
   | BooleanField
@@ -132,47 +135,97 @@ type Field =
   | RichTextField
   | ObjectField
 
-type WithFields = {
+type Field<WithNamespace extends boolean = false> = WithNamespace extends true
+  ? BaseField & Namespace
+  : BaseField
+
+type BaseWithFields = {
   fields: Field[]
   templates?: never
 }
 
-type Template = {
+type WithFields<WithNamespace extends boolean = false> =
+  WithNamespace extends true ? BaseWithFields & Namespace : BaseWithFields
+
+export type BaseTemplate<WithNamespace extends boolean = false> = {
   name: string
   label?: string
-  fields: Field[]
+  fields: Field<WithNamespace>[]
   match?: {
     start: string
     end: string
   }
 }
+export type Template<WithNamespace extends boolean = false> =
+  WithNamespace extends true ? BaseTemplate<true> & Namespace : BaseTemplate
 
-type WithTemplates<Optional extends boolean = false> = Optional extends true
+type BaseWithTemplates<Optional extends boolean = false> = Optional extends true
   ? {
+      name: string
       templates?: Template[]
       fields?: never
     }
   : {
+      name: string
       templates: Template[]
       fields?: never
     }
 
-type TinaCMSCollection = {
+type WithTemplates<
+  Optional extends boolean = false,
+  WithNamespace extends boolean = false
+> = WithNamespace extends true
+  ? BaseWithTemplates<Optional> & Namespace
+  : BaseWithTemplates<Optional>
+
+type BaseTinaCMSCollection<WithNamespace extends boolean = false> = {
   label?: string
   name: string
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx'
   match?: string
   ui?: UICollection
-} & (WithTemplates | WithFields)
+} & (WithTemplates<true, WithNamespace> | WithFields<WithNamespace>)
+
+export type TinaCMSCollection<WithNamespace extends boolean = false> =
+  WithNamespace extends true
+    ? BaseTinaCMSCollection<true> & Namespace
+    : BaseTinaCMSCollection
+
+export type BaseTinaCMSSchema<WithNamespace extends boolean = false> = {
+  collections: TinaCMSCollection<WithNamespace>[]
+}
+
+export type TinaCMSSchema<WithNamespace extends boolean = false> =
+  WithNamespace extends true
+    ? BaseTinaCMSSchema<true> & Namespace
+    : BaseTinaCMSSchema
+
+/** LEGACY TYPES */
 
 /**
  * @deprecated use TinaCMSSchema instead
  */
+export type TinaCloudSchemaEnriched = TinaCMSSchema<true>
 export type TinaCloudSchema = TinaCMSSchema
+export type TinaCloudSchemaBase = TinaCMSSchema
+export type TinaCloudCollection<WithNamespace extends boolean = false> =
+  TinaCMSCollection<WithNamespace>
+export type Templateable = WithTemplates<true, true> | WithFields<true>
+export type Collectable = Templateable
+export type CollectionTemplateable =
+  | { type: 'union'; templates: Template<true>[] }
+  | { type: 'object'; template: WithFields<true> }
+export type TinaFieldEnriched = Field<true>
+export type TinaFieldInner<WithNamespace extends boolean = false> =
+  Field<WithNamespace>
+export type ReferenceTypeWithNamespace = ReferenceField & Namespace
 
-export type TinaCMSSchema = {
-  collections: TinaCMSCollection[]
+export type ResolveFormArgs = {
+  collection: TinaCloudCollection<true>
+  basename: string
+  template: WithFields<true>
+  schema: TinaSchema
 }
 
 export {}

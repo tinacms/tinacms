@@ -70,7 +70,7 @@ export class Resolver {
     args,
     collectionName: string,
     hasDocuments?: boolean
-  ) => {
+  ): Promise<TinaCloudCollection<true>> => {
     const collection = this.tinaSchema.getCollection(collectionName)
     const extraFields = {}
     // const res = this.tinaSchema.getTemplatesForCollectable(collection);
@@ -184,10 +184,7 @@ export class Resolver {
 
   public buildObjectMutations = (fieldValue: any, field: Collectable) => {
     if (field.fields) {
-      const objectTemplate =
-        typeof field.fields === 'string'
-          ? this.tinaSchema.getGlobalTemplate(field.fields)
-          : field
+      const objectTemplate = field
       if (Array.isArray(fieldValue)) {
         return fieldValue.map((item) =>
           // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
@@ -211,12 +208,7 @@ export class Resolver {
               `Expected object for template value for field ${field.name}`
             )
           }
-          const templates = field.templates.map((templateOrTemplateName) => {
-            if (typeof templateOrTemplateName === 'string') {
-              return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
-            }
-            return templateOrTemplateName
-          })
+          const templates = field.templates
           const [templateName] = Object.entries(item)[0]
           const template = templates.find(
             //@ts-ignore
@@ -239,12 +231,7 @@ export class Resolver {
             `Expected object for template value for field ${field.name}`
           )
         }
-        const templates = field.templates.map((templateOrTemplateName) => {
-          if (typeof templateOrTemplateName === 'string') {
-            return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
-          }
-          return templateOrTemplateName
-        })
+        const templates = field.templates
         const [templateName] = Object.entries(fieldValue)[0]
         const template = templates.find(
           //@ts-ignore

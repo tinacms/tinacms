@@ -11,6 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// import {
+//   TinaCloudSchemaEnriched,
+//   TinaCloudSchemaBase,
+//   TinaCloudCollection,
+//   Templateable,
+//   Collectable,
+//   CollectionTemplateable,
+//   TinaFieldEnriched,
+// } from '../types'
 import {
   TinaCloudSchemaEnriched,
   TinaCloudSchemaBase,
@@ -19,7 +28,9 @@ import {
   Collectable,
   CollectionTemplateable,
   TinaFieldEnriched,
-} from '../types'
+  Template,
+} from '../types/schema2'
+// import { TinaCMSSchema } from '../types/schema2'
 import { lastItem, assertShape } from '../util'
 import { resolveForm } from './resolveForm'
 
@@ -59,7 +70,9 @@ export class TinaSchema {
     return field?.name
   }
 
-  public getCollectionsByName = (collectionNames: string[]) => {
+  public getCollectionsByName = (
+    collectionNames: string[]
+  ): TinaCloudCollection<true>[] => {
     return this.schema.collections.filter((collection) =>
       collectionNames.includes(collection.name)
     )
@@ -97,25 +110,17 @@ export class TinaSchema {
       format: collection.format || 'md',
     }
   }
-  public getCollections = () => {
+  public getCollections = (): TinaCloudCollection<true>[] => {
     return (
       this.schema.collections.map((collection) =>
         this.getCollection(collection.name)
       ) || []
     )
   }
-  public getGlobalTemplate = (templateName: string) => {
-    const globalTemplate = this.schema.templates?.find(
-      (template) => template.name === templateName
-    )
-    if (!globalTemplate) {
-      throw new Error(
-        `Expected to find global template of name ${templateName}`
-      )
-    }
-    return globalTemplate
-  }
-  public getCollectionByFullPath = (filepath: string) => {
+
+  public getCollectionByFullPath = (
+    filepath: string
+  ): TinaCloudCollection<true> => {
     const collection = this.getCollections().find((collection) => {
       return filepath
         .replace(/\\/g, '/')
@@ -184,7 +189,7 @@ export class TinaSchema {
   }: {
     data?: unknown
     collection: Collectable
-  }): Templateable => {
+  }): Template<true> => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':
@@ -312,14 +317,8 @@ export class TinaSchema {
     collection: Collectable
   ): CollectionTemplateable => {
     let extraFields: TinaFieldEnriched[] = []
-    if (collection.references) {
-      extraFields = collection.references
-    }
     if (collection.fields) {
-      const template =
-        typeof collection.fields === 'string'
-          ? this.getGlobalTemplate(collection.fields)
-          : collection
+      const template = collection
 
       if (
         typeof template.fields === 'string' ||
@@ -331,7 +330,6 @@ export class TinaSchema {
       return {
         namespace: collection.namespace,
         type: 'object',
-        // @ts-ignore FIXME: Templateable should have a 'name' property
         template: {
           ...template,
           fields: [...template.fields, ...extraFields],
@@ -343,10 +341,7 @@ export class TinaSchema {
           namespace: collection.namespace,
           type: 'union',
           templates: collection.templates.map((templateOrTemplateString) => {
-            const template =
-              typeof templateOrTemplateString === 'string'
-                ? this.getGlobalTemplate(templateOrTemplateString)
-                : templateOrTemplateString
+            const template = templateOrTemplateString
             return {
               ...template,
               fields: [...template.fields, ...extraFields],
