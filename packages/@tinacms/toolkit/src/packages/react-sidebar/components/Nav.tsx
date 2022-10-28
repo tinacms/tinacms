@@ -130,6 +130,9 @@ export const Nav = ({
                             resizingSidebar: false,
                           })
                           setEdit(false)
+                          if (cms?.api?.tina?.setToken) {
+                            cms.api.tina.setToken(null)
+                          }
                         }}
                       >
                         <BiExit className="w-6 h-auto mr-2 text-blue-400" /> Log
