@@ -41,7 +41,6 @@ export const resetGeneratedFolder = async ({
   usingTs: boolean
   isBuild: boolean
 }) => {
-  console.log('called resetGeneratedFolder')
   try {
     if (isBuild) {
       // When running `tinacms build` we can still remove all generated files
