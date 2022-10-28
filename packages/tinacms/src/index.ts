@@ -63,7 +63,7 @@ export const defineSchema = (config: TinaCloudSchema) => {
   return config
 }
 
-export const defineConfig = (
+export const defineLegacyConfig = (
   config: Omit<TinaCMSProviderDefaultProps, 'children'>
 ) => {
   validateSchema({ schema: config.schema })
@@ -77,6 +77,10 @@ export const defineStaticConfig = (
     DocumentCreatorCallback
   >
 ) => {
+  if (!config.schema) {
+    throw new Error('Static config must have a schema')
+  }
   validateSchema({ schema: config.schema })
   return config
 }
+export const defineConfig = defineStaticConfig
