@@ -13,9 +13,9 @@ limitations under the License.
 import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
-import { useCMS, defineStaticConfig } from 'tinacms'
+import { useCMS, defineConfig } from 'tinacms'
 
-type Config = Parameters<typeof defineStaticConfig>[0]
+type Config = Parameters<typeof defineConfig>[0]
 
 type PostMessage = {
   type: 'open' | 'close' | 'isEditMode'
