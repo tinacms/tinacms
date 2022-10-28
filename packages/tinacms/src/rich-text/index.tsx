@@ -29,6 +29,7 @@ type BaseComponents = {
   code?: { children: JSX.Element }
   ul?: { children: JSX.Element }
   ol?: { children: JSX.Element }
+  li?: { children: JSX.Element }
   block_quote?: { children: JSX.Element }
   code_block?: { lang?: string; value: string }
   img?: { url: string; caption?: string; alt?: string }
@@ -81,13 +82,20 @@ export type TinaMarkdownContent = {
   children: TinaMarkdownContent[]
 }
 
-export const TinaMarkdown = ({
+export const TinaMarkdown = <
+  CustomComponents extends { [key: string]: object } = any
+>({
   content,
   components = {},
 }: {
   content: TinaMarkdownContent | TinaMarkdownContent[]
-  // FIXME: {} should be passed in
-  components?: Components<{}>
+  components?:
+    | Components<{}>
+    | Components<{
+        [BK in keyof CustomComponents]: (
+          props: CustomComponents[BK]
+        ) => JSX.Element
+      }>
 }) => {
   if (!content) {
     return null
