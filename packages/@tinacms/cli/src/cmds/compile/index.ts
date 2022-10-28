@@ -69,7 +69,6 @@ export const resetGeneratedFolder = async ({
 
   // temp types file to allows the client to build
   if (!(await fs.pathExists(path.join(tinaGeneratedPath, `types.${ext}`)))) {
-    console.log('creating types file')
     await fs.writeFile(
       path.join(tinaGeneratedPath, `types.${ext}`),
       `
