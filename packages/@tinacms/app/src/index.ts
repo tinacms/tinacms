@@ -18,9 +18,9 @@ import type { InlineConfig, ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import { viteTina } from './tailwind'
 import { devHTML, prodHTML } from './html'
-import mdxPackageeJSON from '@tinacms/mdx/package.json'
 
 let server: ViteDevServer
+let hasCopiedFiles = false
 
 export const viteBuild = async ({
   rootPath,
@@ -38,7 +38,7 @@ export const viteBuild = async ({
   const local = l
   const localBuild = l
   const node_env = JSON.stringify(process.env.NODE_ENV)
-  const generatedPath = path.join(rootPath, '.tina/__generated__')
+  const generatedPath = path.join(rootPath, '.tina', '__generated__')
   /**
    * The final location of the SPA assets
    * @example public/admin
@@ -106,6 +106,11 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
+  if (!hasCopiedFiles) {
+    // Remove old files
+    fs.remove(path.join(generatedPath, 'prebuild'))
+    fs.remove(path.join(generatedPath, 'app'))
+  }
   await build(prebuildConfig)
 
   const alias = {
@@ -161,35 +166,39 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
-  if (process.env.MONOREPO_DEV) {
-    console.warn('Using monorepo dev mode, source files will be symlinked')
-    await fs.createSymlink(appCopyPath, appRootPath, 'dir')
-  } else {
-    await fs.copy(appCopyPath, appRootPath)
-  }
+  if (!hasCopiedFiles) {
+    if (process.env.MONOREPO_DEV) {
+      console.warn('Using monorepo dev mode, source files will be symlinked')
+      await fs.createSymlink(appCopyPath, appRootPath, 'dir')
+    } else {
+      await fs.copy(appCopyPath, appRootPath)
+    }
 
-  await execShellCommand(
-    `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
-  )
-  await fs.outputFile(
-    path.join(outputPath, '.gitignore'),
-    `index.html
-assets/`
-  )
-  if (localBuild) {
-    const replaceAll = (string: string, target: string, value: string) => {
-      const regex = new RegExp(target, 'g')
-      return string.valueOf().replace(regex, value)
-    }
-    await fs.outputFile(
-      devHTMLPath,
-      replaceAll(devHTML, 'INSERT_OUTPUT_FOLDER_NAME', outputFolder)
+    await execShellCommand(
+      `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
     )
-    if (server) {
-      await server.close()
+    await fs.outputFile(
+      path.join(outputPath, '.gitignore'),
+      `index.html
+assets/`
+    )
+  }
+  if (localBuild) {
+    if (!hasCopiedFiles) {
+      const replaceAll = (string: string, target: string, value: string) => {
+        const regex = new RegExp(target, 'g')
+        return string.valueOf().replace(regex, value)
+      }
+      await fs.outputFile(
+        devHTMLPath,
+        replaceAll(devHTML, 'INSERT_OUTPUT_FOLDER_NAME', outputFolder)
+      )
     }
-    server = await createServer(config)
-    await server.listen()
+    if (!server) {
+      server = await createServer(config)
+      await server.listen()
+    }
+    hasCopiedFiles = true
   } else {
     await fs.outputFile(prodHTMLPath, prodHTML)
     await build(config)
