@@ -1,5 +1,26 @@
 # tinacms
 
+## 0.70.0
+
+### Minor Changes
+
+- 774abcf9c: - `staticConfig` becomes `defineConfig`
+  - `defineConfig` becomes `defineLegacyConfig`
+  - Deprecate `config` property in the schema
+
+### Patch Changes
+
+- 2e0a98d61: Improve types on TinaMarkdown
+- f7d3cf532: Add useEditState hook
+- c3f307f46: Add deprecation warnings on pre-iframe apis
+- 0ead00fa8: Fix warning about missing "encoding" dependency
+- 8f28bfbd5: Fix the option labels
+- Updated dependencies [774abcf9c]
+- Updated dependencies [245a65dfe]
+- Updated dependencies [7dda334e5]
+  - @tinacms/schema-tools@0.2.0
+  - @tinacms/toolkit@0.58.5
+
 ## 0.69.22
 
 ### Patch Changes
