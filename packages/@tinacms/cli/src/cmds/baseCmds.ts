@@ -39,6 +39,7 @@ export const CMD_DEV = 'dev'
 export const INIT = 'init'
 export const AUDIT = 'audit'
 export const CMD_BUILD = 'build'
+export const CMD_BUILD_CLIENT = 'build:client'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -197,6 +198,50 @@ export const baseCmds: Command[] = [
           compileClient,
           checkClientInfo,
           waitForDB,
+        ],
+        options
+      ),
+  },
+  {
+    command: CMD_BUILD_CLIENT,
+    description: 'Build the Tina client',
+    options: [
+      isomorphicGitBridge,
+      noSDKCodegenOption,
+      noTelemetryOption,
+      verboseOption,
+      developmentOption,
+      localOption,
+    ],
+    action: (options) =>
+      chain(
+        [
+          attachPath,
+          async (ctx, next, _options) => {
+            ctx.skipBuild = true
+            next()
+          },
+          checkOptions,
+          buildSetupCmdServerStart,
+          async (ctx, next, options) => {
+            const { schema } = await ctx.builder.build({
+              rootPath: ctx.rootPath,
+              verbose: options.verbose,
+              local: true,
+            })
+
+            ctx.schema = schema
+
+            await ctx.builder.genTypedClient({
+              compiledSchema: schema,
+              local: true,
+              noSDK: options.noSDK,
+              verbose: options.verbose,
+              usingTs: ctx.usingTs,
+              port: options.port,
+            })
+            next()
+          },
         ],
         options
       ),

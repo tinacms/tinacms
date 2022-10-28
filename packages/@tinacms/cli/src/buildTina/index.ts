@@ -185,6 +185,10 @@ export const buildCmdBuild = async (
     usingTs: ctx.usingTs,
     port: options.port,
   })
+  // @ts-ignore
+  if (ctx?.skipBuild) {
+    return next()
+  }
   await buildAdmin({
     local: options.local,
     rootPath: ctx.rootPath,
