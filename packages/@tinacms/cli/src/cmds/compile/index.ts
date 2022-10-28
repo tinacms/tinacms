@@ -63,11 +63,12 @@ export const resetGeneratedFolder = async ({
   } catch (e) {
     console.log(e)
   }
+
   await fs.mkdirp(tinaGeneratedPath)
   const ext = usingTs ? 'ts' : 'js'
 
   // temp types file to allows the client to build
-  if (await !fs.pathExists(path.join(tinaGeneratedPath, `types.${ext}`))) {
+  if (!(await fs.pathExists(path.join(tinaGeneratedPath, `types.${ext}`)))) {
     await fs.writeFile(
       path.join(tinaGeneratedPath, `types.${ext}`),
       `
@@ -75,7 +76,7 @@ export const resetGeneratedFolder = async ({
       `
     )
   }
-  if (await !fs.pathExists(path.join(tinaGeneratedPath, `client.${ext}`))) {
+  if (!(await fs.pathExists(path.join(tinaGeneratedPath, `client.${ext}`)))) {
     await fs.writeFile(
       path.join(tinaGeneratedPath, `client.${ext}`),
       `
