@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 0.0.26
+
+### Patch Changes
+
+- fd7e4f636: Don't restart vite server on every schema change when working locally.
+- f7d3cf532: Add useEditState hook
+
 ## 0.0.25
 
 ### Patch Changes

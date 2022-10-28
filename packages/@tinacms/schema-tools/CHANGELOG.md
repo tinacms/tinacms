@@ -1,5 +1,17 @@
 # @tinacms/schema-tools
 
+## 0.2.0
+
+### Minor Changes
+
+- 774abcf9c: - `staticConfig` becomes `defineConfig`
+  - `defineConfig` becomes `defineLegacyConfig`
+  - Deprecate `config` property in the schema
+
+### Patch Changes
+
+- 245a65dfe: Fix issue saving deeply nested objects in visual mode
+
 ## 0.1.9
 
 ### Patch Changes
