@@ -1,4 +1,4 @@
-import { defineStaticConfig } from 'tinacms'
+import { defineConfig } from 'tinacms'
 import React from 'react'
 
 const slugify = (values) => {
@@ -10,7 +10,7 @@ const slugify = (values) => {
 const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
-export default defineStaticConfig({
+export default defineConfig({
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
