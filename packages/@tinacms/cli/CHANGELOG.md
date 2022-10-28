@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.62.1
+
+### Patch Changes
+
+- a4de4fa6e: Fix typo in !
+
 ## 0.62.0
 
 ### Minor Changes
