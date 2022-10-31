@@ -66,6 +66,7 @@ export class CloudinaryMediaStore implements MediaStore {
         filename: fileRes.original_filename,
         directory: '/',
         previewSrc: fileRes.url,
+        src: fileRes.url,
       }
 
       newFiles.push(parsedRes)
