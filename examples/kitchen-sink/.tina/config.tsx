@@ -48,7 +48,11 @@ export default defineStaticConfig({
                 required: true,
                 isTitle: true,
                 ui: {
-                  // parse: (value) => '',
+                  parse: (value) => '',
+                  format: (value) => '',
+                  validate: (a, b, c, d) => {
+                    console.log({ a, b, c, d })
+                  },
                   component: (props) => {
                     const { input } = props
                     return (

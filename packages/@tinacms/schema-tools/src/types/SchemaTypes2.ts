@@ -14,7 +14,13 @@ import { UICollection, Option } from './SchemaTypes'
 // import { TinaCMSSchema } from './schema2'
 import type React from 'react'
 
-type FC<Type, List> = (props: {
+type Meta = {
+  active?: boolean
+  dirty?: boolean
+  error?: any
+}
+
+type Component<Type, List> = (props: {
   field: SchemaField & { namespace: string[] }
   input: {
     /**
@@ -36,34 +42,89 @@ type FC<Type, List> = (props: {
     type?: string
     value: List extends true ? Type[] : Type
   }
-  meta: {
-    active?: boolean
-    dirty?: boolean
-    error?: any
-  }
+  meta: Meta
 }) => any
 
 type UIField<Type, List extends boolean> = {
+  /**
+   * Override the label from parent object
+   */
   label?: string
+  /**
+   * Override the description from parent object
+   */
   description?: string
-  // TODO type component
-  component?: FC<Type, List> | string | null
+  /**
+   * A React component which will be used in the Tina form. Be sure
+   * to import React into the config file.
+   *
+   * Note: Any Tailwind classes provided here will be compiled as part
+   * of the Tina stylesheet
+   *
+   * eg:
+   * ```tsx
+   *  component: (props) => {
+   *    const { input, field } = props
+   *    return (
+   *      <div className="my-4">
+   *        <label
+   *          htmlFor={input.name}
+   *          className="block text-sm font-medium"
+   *        >
+   *          {field.name}
+   *        </label>
+   *        <div className="mt-1">
+   *          <input
+   *            id={input.name}
+   *            className="py-2 px-4 block"
+   *            type="text"
+   *            {...input}
+   *          />
+   *        </div>
+   *      </div>
+   *    )
+   *  }
+   * ```
+   *
+   * Note: If the form has already been registered with the cms, you
+   * can provide it's name here (eg. `textarea`)
+   */
+  component?: Component<Type, List> | string | null
+  /**
+   * Optional: Prepare data for use in the component. This is useful
+   * if you don't have access to the component directly
+   */
   parse?: (
     value: List extends true ? Type[] : Type,
     name: string,
     field: Field
   ) => List extends true ? Type[] : Type
+  /**
+   * Optional: Prepare data for saving. This is useful
+   * if you don't have access to the component directly
+   */
   format?: (
     value: Type,
     name: string,
     field: Field
   ) => List extends true ? Type[] : Type
+  /**
+   * Optional: Return undefined when valid. Return a string or an object when there are errors.
+   *
+   * ```ts
+   * validate: (value) => {
+   *   if(value.length > 40){
+   *      return 'Title cannot be more than 40 characters long'
+   *   }
+   * }
+   * ```
+   */
   validate?(
-    value: Type,
-    allValues: any,
-    meta: any
-    // field: UIField<F, Shape>
-  ): Type | undefined | void
+    value: List extends true ? Type[] : Type,
+    allValues: { [key: string]: any },
+    meta: Meta,
+    field: UIField<Type, List>
+  ): (List extends true ? Type[] : Type) | undefined | void
   /**
    * @deprecated use `defaultItem` at the collection level instead
    */
