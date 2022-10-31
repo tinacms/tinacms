@@ -15,9 +15,14 @@ export default defineLegacyConfig({
   clientId: "foobar",
   token: "foo",
   media: {
-    loadCustomStore: async () => {
-      const pack = await import("next-tinacms-cloudinary");
-      return pack.TinaCloudCloudinaryMediaStore;
+    // Media store config example
+    // loadCustomStore: async () => {
+    //   const pack = await import("next-tinacms-cloudinary");
+    //   return pack.TinaCloudCloudinaryMediaStore;
+    // },
+    tina: {
+      publicFolder: "public",
+      mediaRoot: "",
     },
   },
   client,
