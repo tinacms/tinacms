@@ -8,6 +8,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.js"
+    },
+    "./dist/types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.es.js",
+      "require": "./dist/types.js"
     }
   },
   "typings": "dist/index.d.ts",
@@ -19,6 +24,9 @@
     "entryPoints": [
       {
         "name": "src/index.ts"
+      },
+      {
+        "name": "src/types.ts"
       }
     ]
   },
