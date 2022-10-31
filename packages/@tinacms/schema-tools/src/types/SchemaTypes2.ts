@@ -10,7 +10,52 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { UICollection, Option } from './SchemaTypes'
+
+export interface UICollection {
+  /**
+   * Customize the way filenames are generated during content creation
+   */
+  filename?: {
+    /**
+     * A callback which receives form values as an argument. The return value
+     * here will be used as the filename (the extension is not necessary)
+     *
+     * eg:
+     * ```ts
+     * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
+     * ```
+     */
+    slugify?: (values: Record<string, any>) => string
+    /**
+     * When set to `true`, editors won't be able to modify the filename
+     */
+    readonly?: boolean
+  }
+  /**
+   * Forms for this collection will be editable from the global sidebar rather than the form panel
+   */
+  global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
+  /**
+   * Provide the path that your document is viewable on your site
+   *
+   * eg:
+   * ```ts
+   * router: ({ document }) => {
+   *   return `blog-posts/${document._sys.filename}`;
+   * }
+   * ```
+   */
+  router?: (args: {
+    document: Document
+    collection: Collection
+  }) => string | undefined
+}
+export type Option =
+  | string
+  | {
+      label: string
+      value: string
+    }
 // import { TinaCMSSchema } from './schema2'
 import type React from 'react'
 
@@ -130,19 +175,23 @@ type UIField<Type, List extends boolean> = {
    */
   defaultValue?: List extends true ? Type[] : Type
 }
-type FieldGeneric<Type, List extends boolean | undefined> = List extends true
+type FieldGeneric<
+  Type,
+  List extends boolean | undefined,
+  ExtraFieldUIProps = {}
+> = List extends true
   ? {
       list: true
-      ui?: UIField<Type, true>
+      ui?: UIField<Type, true> & ExtraFieldUIProps
     }
   : List extends false
   ? {
       list: false
-      ui?: UIField<Type, false>
+      ui?: UIField<Type, false> & ExtraFieldUIProps
     }
   : {
       list?: never
-      ui?: UIField<Type, false>
+      ui?: UIField<Type, false> & ExtraFieldUIProps
     }
 
 export interface BaseField {
@@ -151,55 +200,196 @@ export interface BaseField {
   name: string
 }
 
-export type StringFieldBase = BaseField & {
-  type: 'string'
-  isTitle?: boolean
-  options?: Option[]
-}
-
 export type StringField = (
   | FieldGeneric<string, undefined>
   | FieldGeneric<string, true>
   | FieldGeneric<string, false>
 ) &
-  StringFieldBase
+  BaseField & {
+    type: 'string'
+    isTitle?: boolean
+    options?: Option[]
+  }
 
-export interface NumberField extends BaseField {
-  type: 'number'
+export type NumberField = (
+  | FieldGeneric<number, undefined>
+  | FieldGeneric<number, true>
+  | FieldGeneric<number, false>
+) &
+  BaseField & {
+    type: 'number'
+  }
+
+export type BooleanField = (
+  | FieldGeneric<boolean, undefined>
+  | FieldGeneric<boolean, true>
+  | FieldGeneric<boolean, false>
+) &
+  BaseField & {
+    type: 'boolean'
+  }
+
+export type DateTimeField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, true>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'datetime'
+  }
+
+export type ImageField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, true>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'image'
+  }
+
+export type ReferenceField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'reference'
+    /**
+     * The names of the collections this field can use as a reference
+     * ```ts
+     * {
+     *   type: 'reference',
+     *   name: 'author',
+     *   collections: ['author'],
+     * }
+     * ```
+     */
+    collections: string[]
+  }
+
+type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
+export type RichTextField = (
+  | FieldGeneric<RichTextAst, undefined>
+  | FieldGeneric<RichTextAst, false>
+) &
+  BaseField & {
+    type: 'rich-text'
+    /**
+     * When using Markdown or MDX formats, this field's value
+     * will be saved to the markdown body, while all other values
+     * will be stored as frontmatter
+     */
+    isBody?: boolean
+    templates?: (Template & {
+      inline?: boolean
+      /**
+       * If you have some custom shortcode logic in your markdown,
+       * you can specify it in the 'match' property and Tina will
+       * handle it as if it were a jsx element:
+       *
+       * ```
+       * # This is my markdown, it uses some custom shortcode
+       * syntax {{ myshortcode title="hello!" }}.
+       *
+       * {
+       *   match: {
+       *     start: "{{"
+       *     end: "}}"
+       *   }
+       * }
+       * ```
+       */
+      match?: {
+        start: string
+        end: string
+      }
+    })[]
+  }
+
+type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
+
+type ExtraFieldUIProps = {
+  /**
+   * Override the properties passed to the field
+   * component. This is mostly useful for controlling
+   * the display value via callback on `itemProps.label`
+   */
+  itemProps?(item: Record<string, any>): {
+    key?: string
+    /**
+     * Control the display value when object
+     * items are shown in a compact list, eg:
+     *
+     * ```ts
+     * itemProps: (values) => ({
+     *   label: values?.title || 'Showcase Item',
+     * }),
+     * ```
+     */
+    label?: string
+  }
+  /**
+   * The value will be used when a new object is inserted, eg:
+   *
+   * ```ts
+   * {
+   *   title: "My Headline",
+   *   description: "Some description"
+   * }
+   * ```
+   *
+   * Note: when supplying a value for a `rich-text` field, you must supply
+   * the the value as an object.
+   * ```ts
+   * {
+   *   title: "My Headline",
+   *   description: "Some description"
+   *   // This is field a rich-text field
+   *   body: {
+   *     type: "root",
+   *     children: [{
+   *       type: "p",
+   *       children: [{
+   *         type: "text",
+   *         value: "This is some placeholder text"
+   *       }]
+   *     }]
+   *   }
+   * }
+   * ```
+   *
+   */
+  defaultItem?: DefaultItem<Record<string, any>>
 }
 
-export interface BooleanField extends BaseField {
-  type: 'boolean'
-}
+export type ObjectField =
+  | (
+      | FieldGeneric<string, undefined>
+      | FieldGeneric<string, true, ExtraFieldUIProps>
+      | FieldGeneric<string, false>
+    ) &
+      BaseField &
+      (
+        | {
+            type: 'object'
+            fields: Field[]
+            templates?: undefined
+          }
+        | {
+            type: 'object'
+            fields?: undefined
+            templates: Template[]
+          }
+      )
 
-export interface DateTimeField extends BaseField {
-  type: 'datetime'
-}
-
-export interface ImageField extends BaseField {
-  type: 'image'
-}
-
-export interface ReferenceField extends BaseField {
-  type: 'reference'
-}
-
-export interface RichTextField extends BaseField {
-  type: 'rich-text'
-}
-
-export interface ObjectField extends BaseField {
-  type: 'object'
-}
-
-type Field = StringField
-// | NumberField
-// | BooleanField
-// | DateTimeField
-// | ImageField
-// | ReferenceField
-// | RichTextField
-// | ObjectField
+type Field =
+  | StringField
+  | NumberField
+  | BooleanField
+  | DateTimeField
+  | ImageField
+  | ReferenceField
+  | RichTextField
+  | ObjectField
 
 type SchemaField = Field
 
@@ -241,13 +431,15 @@ export interface TemplateCollection {
   fields?: never
 }
 
+export type Collection = FieldCollection | TemplateCollection
+
 export interface Schema {
   /**
    * Collections represent a type of content (EX, blog post, page, author, etc). We recommend using singular naming in a collection (Ex: use post and not posts).
    *
    * https://tina.io/docs/reference/collections/
    */
-  collections: (FieldCollection | TemplateCollection)[]
+  collections: Collection[]
 }
 
 /**
