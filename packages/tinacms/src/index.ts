@@ -47,6 +47,7 @@ export type {
   TinaSchema,
   Template,
   Templateable,
+  SchemaField,
 } from '@tinacms/schema-tools'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
@@ -70,6 +71,11 @@ export const defineConfig = (
   return config
 }
 
+/**
+ *
+ * Used to define and validate the TinaCMS configuration
+ *
+ */
 export const defineStaticConfig = (
   config: TinaCMSConfig<
     (cms: TinaCMS) => TinaCMS,

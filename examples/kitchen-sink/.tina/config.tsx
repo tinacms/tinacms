@@ -48,7 +48,9 @@ export default defineStaticConfig({
                 required: true,
                 isTitle: true,
                 ui: {
-                  component: ({ input }) => {
+                  // parse: (value) => '',
+                  component: (props) => {
+                    const { input } = props
                     return (
                       <div className="my-4">
                         <label

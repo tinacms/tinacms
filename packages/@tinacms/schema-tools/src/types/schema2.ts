@@ -156,7 +156,7 @@ export type BaseTemplate<WithNamespace extends boolean = false> = {
     end: string
   }
 }
-export type Template<WithNamespace extends boolean = false> =
+type Template<WithNamespace extends boolean = false> =
   WithNamespace extends true ? BaseTemplate<true> & Namespace : BaseTemplate
 
 type BaseWithTemplates<Optional extends boolean = false> = Optional extends true
@@ -196,17 +196,22 @@ export type BaseTinaCMSSchema<WithNamespace extends boolean = false> = {
   collections: TinaCMSCollection<WithNamespace>[]
 }
 
-export type TinaCMSSchema<WithNamespace extends boolean = false> =
+export type TinaCMSSchemaInternal<WithNamespace extends boolean = false> =
   WithNamespace extends true
     ? BaseTinaCMSSchema<true> & Namespace
     : BaseTinaCMSSchema
+
+/**
+ * This is the schema
+ */
+export type TinaCMSSchema = TinaCMSSchemaInternal<false>
 
 /** LEGACY TYPES */
 
 /**
  * @deprecated use TinaCMSSchema instead
  */
-export type TinaCloudSchemaEnriched = TinaCMSSchema<true>
+export type TinaCloudSchemaEnriched = TinaCMSSchemaInternal<true>
 export type TinaCloudSchema = TinaCMSSchema
 export type TinaCloudSchemaBase = TinaCMSSchema
 export type TinaCloudCollection<WithNamespace extends boolean = false> =

@@ -130,6 +130,7 @@ importers:
       graphql: ^15.1.0
       jest-file-snapshot: ^0.5.0
       next: 12.2.4
+      next-tinacms-cloudinary: workspace:*
       postcss: ^8.4.18
       puppeteer: ^18.0.5
       react: 18.2.0
@@ -148,6 +149,7 @@ importers:
       graphql: 15.8.0
       jest-file-snapshot: 0.5.0
       next: 12.2.4_biqbaboplfbrettd7655fr4n2y
+      next-tinacms-cloudinary: link:../../packages/next-tinacms-cloudinary
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-json-view: 1.21.3_biqbaboplfbrettd7655fr4n2y
