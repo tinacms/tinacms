@@ -31,21 +31,33 @@ export default TinaCMSProvider2
 import { TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
+import { validateSchema } from '@tinacms/schema-tools'
+export { NAMER, resolveForm } from '@tinacms/schema-tools'
+
+import type { Config } from '@tinacms/schema-tools/dist/types'
+export type {
+  Config,
+  Schema,
+  Collection,
+  Template,
+  SchemaField,
+} from '@tinacms/schema-tools/dist/types'
+
+/**
+ *
+ * TODO: deprecate these
+ *
+ */
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
   TinaCloudTemplateBase,
   TinaTemplate,
   TinaFieldBase,
-  TinaCMSConfig,
 } from '@tinacms/schema-tools'
-
-import { validateSchema } from '@tinacms/schema-tools'
-export { NAMER, resolveForm } from '@tinacms/schema-tools'
 export type {
   TinaFieldEnriched,
   TinaSchema,
-  Template,
   Templateable,
 } from '@tinacms/schema-tools'
 
@@ -71,7 +83,7 @@ export const defineLegacyConfig = (
 }
 
 export const defineStaticConfig = (
-  config: TinaCMSConfig<
+  config: Config<
     (cms: TinaCMS) => TinaCMS,
     formifyCallback,
     DocumentCreatorCallback

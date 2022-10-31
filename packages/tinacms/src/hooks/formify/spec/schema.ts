@@ -10,9 +10,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { defineSchema, defineConfig } from '../../..'
+import { defineConfig } from '../../..'
 
-const schema = defineSchema({
+const schema = {
   collections: [
     {
       label: 'Post',
@@ -239,7 +239,7 @@ const schema = defineSchema({
       ],
     },
   ],
-})
+} as any
 
 const branch = 'main'
 // When working locally, hit our local filesystem.
