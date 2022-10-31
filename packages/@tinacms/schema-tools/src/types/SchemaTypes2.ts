@@ -11,6 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/**
+ *
+ */
 export interface UICollection {
   /**
    * Customize the way filenames are generated during content creation
@@ -486,16 +489,21 @@ export interface Config<
      */
     referenceDepth?: number
   }
+  /**
+   * Tina is compiled as a single-page app and placed in the public directory
+   * of your application.
+   */
   build: {
     /**
      * The folder where your application stores assets, eg. `"public"`
      */
     publicFolder: string
     /**
-     * TinaCMS is shipped as a single-page app, the value specified here will
-     * determine the path when visiting the TinaCMS dashboard.
+     * The value specified here will determine the path when visiting the TinaCMS dashboard.
      *
      * Eg. `"admin"` will be viewable at `[your-development-url]/admin/index.html`
+     *
+     * Note that for most framworks you can omit the `index.html` portion, for Next.js see the [rewrites section](https://nextjs.org/docs/api-reference/next.config.js/rewrites)
      */
     outputFolder: string
   }

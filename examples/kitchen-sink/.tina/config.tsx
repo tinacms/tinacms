@@ -230,7 +230,7 @@ export default defineStaticConfig({
             templates: [
               {
                 name: 'Hero',
-                label: 'Hero',
+                // label: 'Hero',
                 fields: [
                   {
                     name: 'header',
