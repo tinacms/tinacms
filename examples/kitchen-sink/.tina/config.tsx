@@ -224,7 +224,6 @@ export default defineConfig({
             templates: [
               {
                 name: 'Hero',
-                label: 'Hero',
                 fields: [
                   {
                     name: 'header',
