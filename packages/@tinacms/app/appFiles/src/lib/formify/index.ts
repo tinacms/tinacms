@@ -304,8 +304,28 @@ export const formify = async ({
 const node = G.parse(`
  query Sample {
   ...on Document {
+    _internalValues: _values
     _internalSys: _sys {
+      breadcrumbs
+      basename
+      filename
       path
+      extension
+      relativePath
+      title
+      template
+      collection {
+        name
+        slug
+        label
+        path
+        format
+        matches
+        templates
+        fields
+        __typename
+      }
+      __typename
     }
   }
  }`)
