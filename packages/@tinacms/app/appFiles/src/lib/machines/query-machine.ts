@@ -412,7 +412,6 @@ export const queryMachine =
         onChangeCallback: (context) => (callback, _onReceive) => {
           const schema = context.cms.api.tina.schema as TinaSchema
           Object.values(context.documentMap).forEach((documentMachine) => {
-            console.log('registerSubForms?', context.registerSubForms)
             if (!context.registerSubForms) {
               if (documentMachine.skipFormRegister) {
                 return
