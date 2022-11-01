@@ -12,6 +12,10 @@ limitations under the License.
 */
 
 import Progress from 'progress'
+import UrlPattern from 'url-pattern'
+import { TinaCloudSchema } from '../..'
+import { Database, Bridge } from '../../../../graphql/src'
+import { ConfigBuilder } from '../../buildTina'
 
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
@@ -36,16 +40,21 @@ class IndexFailedError extends Error {
   }
 }
 
-export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
-  if (!ctx.client) {
-    throw new Error(
-      'No Tina Cloud found. For more information on how to setup the Tina Cloud see https://tina.io/docs/features/data-fetching/#making-requests-with-the-tina-client'
-    )
-  }
-
-  const client = ctx.client
-
-  const { host, clientId, branch, isLocalClient } = client.parseURL()
+export const waitForDB = async (
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+    schema?: TinaCloudSchema
+    apiUrl: string
+  },
+  next,
+  options: { verbose?: boolean }
+) => {
+  const token = ctx.schema.config.token
+  const { clientId, branch, isLocalClient, host } = parseURL(ctx.apiUrl)
 
   if (isLocalClient) {
     return next()
@@ -62,8 +71,9 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
       }
       const headers = new Headers()
       headers.append('Content-Type', 'application/json')
-      if (client.readonlyToken) {
-        headers.append('X-API-KEY', client.readonlyToken)
+
+      if (token) {
+        headers.append('X-API-KEY', token)
       }
 
       const response = await fetch(
@@ -121,4 +131,47 @@ export const waitForDB = async (ctx, next, options: { verbose?: boolean }) => {
     text: 'Checking indexing process in Tina Cloud...',
     waitFor: pollForStatus,
   })
+}
+
+// this was copied from packages/tinacms/src/utils/parseURL.ts
+// TODO: maybe we should move this to its own "util" package
+export const parseURL = (
+  url: string
+): {
+  branch: string
+  isLocalClient: boolean
+  clientId: string
+  host: string
+} => {
+  if (url.includes('localhost')) {
+    return {
+      host: 'localhost',
+      branch: null,
+      isLocalClient: true,
+      clientId: null,
+    }
+  }
+
+  const params = new URL(url)
+  const pattern = new UrlPattern('/content/:clientId/github/*', {
+    escapeChar: ' ',
+  })
+  const result = pattern.match(params.pathname)
+  const branch = result?._
+  const clientId = result?.clientId
+
+  if (!branch || !clientId) {
+    throw new Error(
+      `Invalid URL format provided. Expected: https://content.tinajs.io/content/<ClientID>/github/<Branch> but but received ${url}`
+    )
+  }
+
+  // TODO if !result || !result.clientId || !result.branch, throw an error
+
+  return {
+    host: params.host,
+    clientId,
+    branch,
+    isLocalClient: false,
+  }
 }
