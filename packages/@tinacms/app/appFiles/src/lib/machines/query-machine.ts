@@ -44,6 +44,7 @@ type ContextType = {
   documentNode: G.DocumentNode
   variables: object
   iframe: null | HTMLIFrameElement
+  registerSubForms?: boolean
   formifyCallback: (args: any) => Form
   documentMap: DocumentMap
   documents: Data[]
@@ -290,6 +291,7 @@ export const queryMachine =
         setter: async (context) => {
           const tinaSchema = context.cms.api.tina.schema as TinaSchema
           const gqlSchema = context.cms.api.tina.gqlSchema
+          const missingForms: { id: string; skipFormRegister: boolean }[] = []
           const newData = await G.graphql({
             schema: gqlSchema,
             source: G.print(context.documentNode),
@@ -306,12 +308,14 @@ export const queryMachine =
               }
               if (isNodeType(info.returnType)) {
                 const existingValue = source[fieldName]
+                let skipFormRegister = false
                 if (!existingValue) {
                   return null
                 }
                 let path: string = ''
                 if (typeof existingValue === 'string') {
                   // this is a reference value (eg. post.author)
+                  skipFormRegister = true
                   path = existingValue
                 } else {
                   path = existingValue._internalSys.path
@@ -320,12 +324,16 @@ export const queryMachine =
                   const documentMachine = context.documentMap[path].ref
                   const documentContext = documentMachine.getSnapshot()?.context
                   if (!documentContext) {
-                    throw new QueryError(`MISSING_FORM:${path}`, path, false)
+                    throw new Error(
+                      `Document not set up properly for id: ${path}`
+                    )
                   }
                   const { data, form } = documentContext
                   const values = form?.values
                   if (!data || !form || !values) {
-                    throw new QueryError(`MISSING_FORM:${path}`, path, false)
+                    throw new Error(
+                      `Document not set up properly for id: ${path}`
+                    )
                   }
                   const collectionName = data._internalSys.collection.name
                   const extraValues = documentContext.data
@@ -346,20 +354,27 @@ export const queryMachine =
                     __typename: NAMER.dataTypeName(template.namespace),
                   }
                 } else {
-                  throw new QueryError(`MISSING_FORM:${path}`, path, false)
+                  // TODO: when we support forms in lists, remove this check
+                  // This checks that we're at least 2 levels deep, meaning top-level
+                  // queries list page(relativePath: '...') will be registered, but
+                  // not connection nodes like pageConnection.edges.node
+                  if (info.path?.prev?.prev) {
+                    skipFormRegister = true
+                  }
+                  missingForms.push({ id: path, skipFormRegister })
+                  return null
                 }
               }
               return source[fieldName]
             },
           })
-          if (newData.errors?.length) {
-            console.log(newData.errors)
-            const error = newData.errors[0]
-            const id = error.message.split('MISSING_FORM:')[1]
+          if (missingForms.length > 0) {
+            // Only run this one at a time
+            const missingForm = missingForms[0]
             throw new QueryError(
               `Unable to resolve form for initial document`,
-              id,
-              false
+              missingForm.id,
+              missingForm.skipFormRegister
             )
           }
           return { data: newData.data }
@@ -397,8 +412,11 @@ export const queryMachine =
         onChangeCallback: (context) => (callback, _onReceive) => {
           const schema = context.cms.api.tina.schema as TinaSchema
           Object.values(context.documentMap).forEach((documentMachine) => {
-            if (documentMachine.skipFormRegister) {
-              return
+            console.log('registerSubForms?', context.registerSubForms)
+            if (!context.registerSubForms) {
+              if (documentMachine.skipFormRegister) {
+                return
+              }
             }
             const documentContext = documentMachine.ref.getSnapshot()?.context
             const collectionName =
