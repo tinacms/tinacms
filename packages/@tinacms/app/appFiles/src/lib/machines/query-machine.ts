@@ -23,9 +23,8 @@ import {
 } from 'tinacms'
 import * as G from 'graphql'
 import { formify } from '../formify'
-import { documentMachine } from './document-machine'
+import { Data, documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
-import { Blueprint2 } from '../formify'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -44,19 +43,17 @@ type ContextType = {
   cms: TinaCMS
   documentNode: G.DocumentNode
   variables: object
-  selectedDocument: string | null
   iframe: null | HTMLIFrameElement
   formifyCallback: (args: any) => Form
   documentMap: DocumentMap
-  blueprints: Blueprint2[]
+  documents: Data[]
 }
 export const initialContext: Omit<ContextType, 'cms' | 'formifyCallback'> = {
   id: null,
   data: null,
-  selectedDocument: null,
-  blueprints: [],
   variables: {},
   documentMap: {},
+  documents: [],
   documentNode: { kind: 'Document', definitions: [] },
   iframe: null,
 }
@@ -71,7 +68,6 @@ export const queryMachine =
           initializer: {
             data: {
               data: DataType
-              blueprints: Blueprint2[]
             }
           }
           setter: {
@@ -200,9 +196,6 @@ export const queryMachine =
                 REMOVE_QUERY: {
                   target: 'idle',
                 },
-                SELECT_DOCUMENT: {
-                  actions: 'selectDocument',
-                },
                 FIELD_CHANGE: {
                   target: 'pending',
                 },
@@ -225,6 +218,9 @@ export const queryMachine =
             if (!event.data.id) {
               return context
             }
+            const existingData = context.documents.find(
+              (doc) => doc._internalSys.path === event.data.id
+            )
             const doc = {
               ref: spawn(
                 documentMachine.withContext({
@@ -232,7 +228,7 @@ export const queryMachine =
                   cms: context.cms,
                   formifyCallback: context.formifyCallback,
                   form: null,
-                  data: null,
+                  data: existingData || null,
                 })
               ),
             }
@@ -268,12 +264,6 @@ export const queryMachine =
           return {
             ...context,
             ...event.data,
-          }
-        }),
-        selectDocument: assign((context, event) => {
-          return {
-            ...context,
-            selectedDocument: event.value,
           }
         }),
         setIframe: assign((context, event) => {
@@ -378,13 +368,9 @@ export const queryMachine =
           const tina = context.cms.api.tina as Client
           const schema = await tina.getSchema()
           const documentNode = G.parse(event.value.query)
-          const optimizedQuery = await tina.getOptimizedQuery(documentNode)
-          if (!optimizedQuery) {
-            throw new Error(`Unable to optimize query`)
-          }
-          const { blueprints, formifiedQuery } = await formify({
+          const { formifiedQuery } = await formify({
             schema,
-            optimizedDocumentNode: optimizedQuery,
+            optimizedDocumentNode: documentNode,
           })
           const data = (await context.cms.api.tina.request(
             G.print(formifiedQuery),
@@ -392,10 +378,18 @@ export const queryMachine =
               variables: event.value.variables,
             }
           )) as DataType
+          const documents: Data[] = []
+          // step through every value in the payload to find the documents
+          JSON.stringify(data, (key, value) => {
+            if (value?._internalValues) {
+              documents.push(value)
+            }
+            return value
+          })
           return {
             data,
+            documents,
             variables: event.value.variables,
-            blueprints,
             documentNode: formifiedQuery,
             id: event.value.id,
           }
