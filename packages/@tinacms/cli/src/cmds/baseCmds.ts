@@ -17,7 +17,6 @@ import 'dotenv/config'
 import { Command } from '../command'
 import { chain } from '../middleware'
 import chalk from 'chalk'
-import { compileClient } from './compile'
 import { logger } from '../logger'
 import { startServer } from './start-server'
 import { waitForDB } from './statusChecks/waitForIndexing'
@@ -194,7 +193,6 @@ export const baseCmds: Command[] = [
           checkOptions,
           buildSetupCmdBuild,
           buildCmdBuild,
-          compileClient,
           checkClientInfo,
           waitForDB,
         ],
