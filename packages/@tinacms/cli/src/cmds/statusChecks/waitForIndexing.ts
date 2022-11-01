@@ -13,8 +13,8 @@ limitations under the License.
 
 import Progress from 'progress'
 import UrlPattern from 'url-pattern'
-import { TinaCloudSchema } from '../..'
-import { Database, Bridge } from '../../../../graphql/src'
+import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { Database, Bridge } from '@tinacms/graphql'
 import { ConfigBuilder } from '../../buildTina'
 
 import { logger } from '../../logger'
@@ -47,7 +47,7 @@ export const waitForDB = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema
+    schema?: TinaCloudSchema<true>
     apiUrl: string
   },
   next,
