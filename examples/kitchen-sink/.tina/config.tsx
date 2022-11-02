@@ -116,6 +116,15 @@ export default defineConfig({
                   {
                     label: 'Hero',
                     name: 'hero',
+                    ui: {
+                      itemProps: (item) => {
+                        return { label: item?.headline }
+                      },
+                      defaultItem: {
+                        _template: 'hero',
+                        headline: 'ok',
+                      },
+                    },
                     fields: [
                       { type: 'string', name: 'headline' },
                       { type: 'string', name: 'description' },
