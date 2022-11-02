@@ -18,6 +18,8 @@ limitations under the License.
 
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
+import remarkTOC from 'remark-toc'
+import { toc } from 'mdast-util-toc'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -127,8 +129,20 @@ export const parseMDX = (
   let tree
   try {
     tree = markdownToAst(value, field)
+    // const tree2 = remarkTOC({})(tree)
+    const tocTree = toc(tree)
+    let tocSlateTree = {}
+    if (tocTree.map) {
+      tocSlateTree = remarkToSlate(
+        // @ts-ignore FIXME: just for testing puproses
+        { type: 'root', children: [tocTree.map] },
+        field,
+        imageCallback
+      )
+    }
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback)
+      // @ts-ignore FIXME: just for testing puproses
+      return { ...remarkToSlate(tree, field, imageCallback), toc: tocSlateTree }
     } else {
       return { type: 'root', children: [] }
     }

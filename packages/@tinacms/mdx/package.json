@@ -33,9 +33,11 @@
     "lodash-es": "^4.17.21",
     "mdast-util-mdx-jsx": "^2.0.1",
     "mdast-util-to-markdown": "^1.3.0",
+    "mdast-util-toc": "^6.1.0",
     "prettier": "^2.7.1",
     "remark": "^14.0.2",
     "remark-mdx": "^2.1.2",
+    "remark-toc": "^8.0.1",
     "unist-util-visit": "^4.1.0",
     "vfile": "^4.2.0"
   },

@@ -800,10 +800,12 @@ importers:
       mdast: ^3.0.0
       mdast-util-mdx-jsx: ^2.0.1
       mdast-util-to-markdown: ^1.3.0
+      mdast-util-toc: ^6.1.0
       nodemon: 2.0.19
       prettier: ^2.7.1
       remark: ^14.0.2
       remark-mdx: ^2.1.2
+      remark-toc: ^8.0.1
       ts-node: ^10.8.2
       typescript: ^4.7.4
       unist-util-visit: ^4.1.0
@@ -816,9 +818,11 @@ importers:
       lodash-es: 4.17.21
       mdast-util-mdx-jsx: 2.0.2
       mdast-util-to-markdown: 1.3.0
+      mdast-util-toc: 6.1.0
       prettier: 2.7.1
       remark: 14.0.2
       remark-mdx: 2.1.2
+      remark-toc: 8.0.1
       unist-util-visit: 4.1.0
       vfile: 4.2.1
     devDependencies:
@@ -8459,6 +8463,13 @@ packages:
       '@types/serve-static': 1.13.10
     dev: true
 
+  /@types/extend/3.0.1:
+    resolution:
+      {
+        integrity: sha512-R1g/VyKFFI2HLC1QGAeTtCBWCo6n75l41OnsVYNbmKG+kempOESaodf6BeJyUM3Q0rKa/NQcTHbB2+66lNnxLw==,
+      }
+    dev: false
+
   /@types/figlet/1.2.0:
     resolution:
       {
@@ -8474,6 +8485,13 @@ packages:
     dependencies:
       '@types/node': 18.0.0
     dev: true
+
+  /@types/github-slugger/1.3.0:
+    resolution:
+      {
+        integrity: sha512-J/rMZa7RqiH/rT29TEVZO4nBoDP9XJOjnbbIofg7GQKs4JIduEO3WLpte+6WeUz/TcrXKlY+bM7FYrp8yFB+3g==,
+      }
+    dev: false
 
   /@types/graceful-fs/4.1.5:
     resolution:
@@ -17862,6 +17880,13 @@ packages:
       homedir-polyfill: 1.0.3
     dev: false
 
+  /github-slugger/1.5.0:
+    resolution:
+      {
+        integrity: sha512-wIh+gKBI9Nshz2o46B0B3f5k/W+WI9ZAv6y5Dn5WJ5SK1t0TnDimB4WE5rmTD05ZAIn8HALCZVmCsvj0w0v0lw==,
+      }
+    dev: false
+
   /gitlab/10.2.1:
     resolution:
       {
@@ -22202,6 +22227,22 @@ packages:
       }
     dev: false
 
+  /mdast-util-toc/6.1.0:
+    resolution:
+      {
+        integrity: sha512-0PuqZELXZl4ms1sF7Lqigrqik4Ll3UhbI+jdTrfw7pZ9QPawgl7LD4GQ8MkU7bT/EwiVqChNTbifa2jLLKo76A==,
+      }
+    dependencies:
+      '@types/extend': 3.0.1
+      '@types/github-slugger': 1.3.0
+      '@types/mdast': 3.0.10
+      extend: 3.0.2
+      github-slugger: 1.5.0
+      mdast-util-to-string: 3.1.0
+      unist-util-is: 5.1.1
+      unist-util-visit: 3.1.0
+    dev: false
+
   /mdast/3.0.0:
     resolution:
       {
@@ -25971,6 +26012,17 @@ packages:
       mdast-util-to-markdown: 0.6.5
     dev: false
 
+  /remark-toc/8.0.1:
+    resolution:
+      {
+        integrity: sha512-7he2VOm/cy13zilnOTZcyAoyoolV26ULlon6XyCFU+vG54Z/LWJnwphj/xKIDLOt66QmJUgTyUvLVHi2aAElyg==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      mdast-util-toc: 6.1.0
+      unified: 10.1.2
+    dev: false
+
   /remark/13.0.0:
     resolution:
       {
@@ -28983,6 +29035,16 @@ packages:
       unist-util-is: 4.1.0
     dev: false
 
+  /unist-util-visit-parents/4.1.1:
+    resolution:
+      {
+        integrity: sha512-1xAFJXAKpnnJl8G7K5KgU7FY55y3GcLIXqkzUj5QF/QVP7biUm0K0O2oqVkYsdjzJKifYeWn9+o6piAK2hGSHw==,
+      }
+    dependencies:
+      '@types/unist': 2.0.6
+      unist-util-is: 5.1.1
+    dev: false
+
   /unist-util-visit-parents/5.1.0:
     resolution:
       {
@@ -29002,6 +29064,17 @@ packages:
       '@types/unist': 2.0.6
       unist-util-is: 4.1.0
       unist-util-visit-parents: 3.1.1
+    dev: false
+
+  /unist-util-visit/3.1.0:
+    resolution:
+      {
+        integrity: sha512-Szoh+R/Ll68QWAyQyZZpQzZQm2UPbxibDvaY8Xc9SUtYgPsDzx5AWSk++UUt2hJuow8mvwR+rG+LQLw+KsuAKA==,
+      }
+    dependencies:
+      '@types/unist': 2.0.6
+      unist-util-is: 5.1.1
+      unist-util-visit-parents: 4.1.1
     dev: false
 
   /unist-util-visit/4.1.0:
