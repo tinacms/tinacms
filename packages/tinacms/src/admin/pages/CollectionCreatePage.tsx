@@ -170,13 +170,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
         values[titleField]?.replace(/ /g, '-').replace(/[^a-zA-Z0-9-]/g, '')
     }
   }
+  const defaultItem =
+    // @ts-ignore
+    schemaCollection.ui?.defaultItem || schemaCollection?.defaultItem
 
   const form = useMemo(() => {
     return new Form({
       initialValues:
-        typeof schemaCollection?.defaultItem === 'function'
-          ? schemaCollection.defaultItem()
-          : schemaCollection?.defaultItem,
+        typeof defaultItem === 'function' ? defaultItem() : defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (
