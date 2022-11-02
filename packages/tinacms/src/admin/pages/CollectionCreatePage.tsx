@@ -172,7 +172,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   }
   const defaultItem =
     // @ts-ignore
-    schemaCollection.ui?.defaultItem || schemaCollection?.defaultItem
+    template.ui?.defaultItem || template?.defaultItem
 
   const form = useMemo(() => {
     return new Form({
