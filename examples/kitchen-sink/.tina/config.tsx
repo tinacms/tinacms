@@ -41,6 +41,12 @@ export default defineConfig({
           {
             label: 'Showcase',
             name: 'showcase',
+            ui: {
+              defaultItem: {
+                title: 'New!',
+                _template: 'showcase',
+              },
+            },
             fields: [
               {
                 name: 'title',
