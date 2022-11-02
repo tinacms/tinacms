@@ -164,6 +164,7 @@ export const buildCmdBuild = async (
     rootPath: string
     usingTs: boolean
     schema: unknown
+    apiUrl: string
   },
   next: () => void,
   options: Omit<
@@ -185,6 +186,7 @@ export const buildCmdBuild = async (
     usingTs: ctx.usingTs,
     port: options.port,
   })
+  ctx.apiUrl = apiUrl
   await buildAdmin({
     local: options.local,
     rootPath: ctx.rootPath,
