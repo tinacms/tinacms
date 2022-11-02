@@ -11,11 +11,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+type Doc = {
+  _sys: {
+    title?: string
+    template: string
+    breadcrumbs: string[]
+    path: string
+    basename: string
+    relativePath: string
+    filename: string
+    extension: string
+  }
+}
+
 /**
  *
  */
 export interface UICollection {
-  /**
+  /*ObjectUiProps*
    * Customize the way filenames are generated during content creation
    */
   filename?: {
@@ -49,7 +62,7 @@ export interface UICollection {
    * ```
    */
   router?: (args: {
-    document: Document
+    document: Doc
     collection: Collection
   }) => string | undefined
 }
@@ -189,11 +202,11 @@ type FieldGeneric<
     }
   : List extends false
   ? {
-      list: false
+      list?: false
       ui?: UIField<Type, false> & ExtraFieldUIProps
     }
   : {
-      list?: never
+      list?: undefined
       ui?: UIField<Type, false> & ExtraFieldUIProps
     }
 
@@ -201,6 +214,7 @@ export interface BaseField {
   label?: string
   required?: boolean
   name: string
+  description?: string
 }
 
 export type StringField = (
@@ -232,10 +246,20 @@ export type BooleanField = (
     type: 'boolean'
   }
 
+type DateFormatProps = {
+  /**
+   * Customize the way the format is rendered
+   * ```
+   * dateFormat: 'YYYY MM DD'
+   * ```
+   */
+  dateFormat?: string
+  timeFormat?: string
+}
 export type DateTimeField = (
-  | FieldGeneric<string, undefined>
-  | FieldGeneric<string, true>
-  | FieldGeneric<string, false>
+  | FieldGeneric<string, undefined, DateFormatProps>
+  | FieldGeneric<string, true, DateFormatProps>
+  | FieldGeneric<string, false, DateFormatProps>
 ) &
   BaseField & {
     type: 'datetime'
@@ -310,7 +334,7 @@ export type RichTextField = (
 
 type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
 
-type ExtraFieldUIProps = {
+type ObjectListUiProps = {
   /**
    * Override the properties passed to the field
    * component. This is mostly useful for controlling
@@ -364,11 +388,15 @@ type ExtraFieldUIProps = {
   defaultItem?: DefaultItem<Record<string, any>>
 }
 
+type ObjectUiProps = {
+  visualSelector?: boolean
+}
+
 export type ObjectField =
   | (
-      | FieldGeneric<string, undefined>
-      | FieldGeneric<string, true, ExtraFieldUIProps>
-      | FieldGeneric<string, false>
+      | FieldGeneric<string, undefined, ObjectUiProps>
+      | FieldGeneric<string, true, ObjectUiProps & ObjectListUiProps>
+      | FieldGeneric<string, false, ObjectUiProps>
     ) &
       BaseField &
       (
@@ -402,6 +430,15 @@ export type { SchemaField }
 export interface Template {
   label?: string
   name: string
+  ui?: {
+    defaultItem?: DefaultItem<Record<string, any>>
+    /**
+     * When used in relation to the `visualSelector`,
+     * provide an image URL to be used as the preview
+     * in the blocks selector menu
+     */
+    previewSrc?: string
+  }
   fields: Field[]
 }
 
@@ -410,7 +447,11 @@ export interface FieldCollection {
   name: string
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx'
-  ui?: UICollection
+  ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
+  /**
+   * @deprecated - use `ui.defaultItem` instead
+   */
+  defaultItem?: DefaultItem<Record<string, any>>
   templates?: never
   /**
    * Fields define the shape of the content and the user input.
@@ -426,6 +467,10 @@ export interface TemplateCollection {
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx'
   ui?: UICollection
+  /**
+   * @deprecated - use `ui.defaultItem` on the each `template` instead
+   */
+  defaultItem?: DefaultItem<Record<string, any>>
   /**
    * In most cases, just using fields is enough, however templates can be used when there are multiple variants of the same collection or object. For example in a "page" collection there might be a need for a marketing page template and a content page template, both under the collection "page".
    *

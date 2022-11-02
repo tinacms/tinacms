@@ -34,43 +34,54 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
-import type { Config } from '@tinacms/schema-tools/dist/types'
-export type {
+import type {
   Config,
+  SchemaField,
   Schema,
   Collection,
   Template,
-  SchemaField,
 } from '@tinacms/schema-tools/dist/types'
 
+export type { Config, Schema, Collection, Template, SchemaField }
+
 /**
- *
- * TODO: deprecate these
- *
+ * @deprecated use `SchemaField` instead
  */
-import type {
-  TinaCloudSchema as TinaCloudSchemaBase,
-  TinaCloudCollection as TinaCloudCollectionBase,
-  TinaCloudTemplateBase,
-  TinaTemplate,
-  TinaFieldBase,
-} from '@tinacms/schema-tools'
-export type {
-  TinaFieldEnriched,
-  TinaSchema,
-  Templateable,
-} from '@tinacms/schema-tools'
+export type TinaFieldEnriched = SchemaField
+/**
+ * @deprecated use `SchemaField` instead
+ */
+export type TinaField = SchemaField
+/**
+ * @deprecated use `Template` instead
+ */
+export type TinaTemplate = Template
+/**
+ * @deprecated use `Template` instead
+ */
+export type Templateable = Template
+/**
+ * @deprecated use `Template` instead
+ */
+export type TinaCloudTemplatebase = Template
+/**
+ * @deprecated use `Collection` instead
+ */
+export type TinaCloudCollection = Collection
+/**
+ * @deprecated use `Collection` instead
+ */
+export type TinaCollection = Collection
+/**
+ * @deprecated use `Schema` instead
+ */
+export type TinaSchema = Schema
+/**
+ * @deprecated use `Schema` instead
+ */
+export type TinaCloudSchema = Schema
 
-export type TinaCloudSchema = TinaCloudSchemaBase<false>
-// Alias to remove Cloud
-// export type TinaSchema = TinaCloudSchema
-export type TinaCloudCollection = TinaCloudCollectionBase<false>
-// Alias to remove Cloud
-export type TinaCollection = TinaCloudCollectionBase<false>
-export type TinaField = TinaFieldBase
-export type { TinaTemplate, TinaCloudTemplateBase }
-
-export const defineSchema = (config: TinaCloudSchema) => {
+export const defineSchema = (config: Schema) => {
   validateSchema({ schema: config })
   return config
 }
