@@ -395,7 +395,7 @@ type ObjectUiProps = {
 export type ObjectField =
   | (
       | FieldGeneric<string, undefined, ObjectUiProps>
-      | FieldGeneric<string, true, ObjectUiProps & ObjectListUiProps>
+      | FieldGeneric<string, true, ObjectUiProps>
       | FieldGeneric<string, false, ObjectUiProps>
     ) &
       BaseField &
@@ -404,6 +404,7 @@ export type ObjectField =
             type: 'object'
             fields: Field[]
             templates?: undefined
+            ui?: Template['ui']
           }
         | {
             type: 'object'
@@ -431,6 +432,25 @@ export interface Template {
   label?: string
   name: string
   ui?: {
+    /**
+     * Override the properties passed to the field
+     * component. This is mostly useful for controlling
+     * the display value via callback on `itemProps.label`
+     */
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      /**
+       * Control the display value when object
+       * items are shown in a compact list, eg:
+       *
+       * ```ts
+       * itemProps: (values) => ({
+       *   label: values?.title || 'Showcase Item',
+       * }),
+       * ```
+       */
+      label?: string
+    }
     defaultItem?: DefaultItem<Record<string, any>>
     /**
      * When used in relation to the `visualSelector`,
