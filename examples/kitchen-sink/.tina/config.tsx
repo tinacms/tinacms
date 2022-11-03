@@ -41,6 +41,12 @@ export default defineConfig({
           {
             label: 'Showcase',
             name: 'showcase',
+            ui: {
+              defaultItem: {
+                title: 'New!',
+                _template: 'showcase',
+              },
+            },
             fields: [
               {
                 name: 'title',
@@ -116,6 +122,15 @@ export default defineConfig({
                   {
                     label: 'Hero',
                     name: 'hero',
+                    ui: {
+                      itemProps: (item) => {
+                        return { label: item?.headline }
+                      },
+                      defaultItem: {
+                        _template: 'hero',
+                        headline: 'ok',
+                      },
+                    },
                     fields: [
                       { type: 'string', name: 'headline' },
                       { type: 'string', name: 'description' },
@@ -224,7 +239,6 @@ export default defineConfig({
             templates: [
               {
                 name: 'Hero',
-                label: 'Hero',
                 fields: [
                   {
                     name: 'header',

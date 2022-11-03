@@ -19,7 +19,7 @@ import {
   Collectable,
   CollectionTemplateable,
   TinaFieldEnriched,
-} from '../types'
+} from '../types/index'
 import { lastItem, assertShape } from '../util'
 
 type Version = {
