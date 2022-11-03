@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.5.35
+
+### Patch Changes
+
+- 3370cefd8: Fix preview images in cloudinary
+
 ## 3.5.34
 
 ### Patch Changes
