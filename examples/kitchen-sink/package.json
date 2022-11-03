@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
+    "dev2": "tinacms dev -c \"next dev\"",
     "dev-sandbox": "MONOREPO_DEV=true tinacms dev -c \"next dev\" --sandbox",
     "test": "MONOREPO_DEV=true tinacms dev -c \"vitest\"",
     "test:dev": "vitest",
