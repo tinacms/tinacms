@@ -263,20 +263,7 @@ const extractRaw = (attribute: MdxJsxAttribute): string => {
   assertHasType(attribute.value)
   assertType(attribute.value, 'mdxJsxAttributeValueExpression')
   const rawValue = attribute.value.value
-  let raw = ''
-  const valueArr = rawValue.split('\n')
-  valueArr.forEach((item, index) => {
-    if (index === 0 && item.trim() === '<>') {
-      // skip
-      return
-    }
-    if (index === valueArr.length - 1 && item.trim() === '</>') {
-      // skip
-      return
-    }
-    raw = raw + item + '\n'
-  })
-  return raw
+  return trimFragments(rawValue)
 }
 
 function assertType<T extends { type: string }, U extends T['type']>(
@@ -307,4 +294,32 @@ const throwError = (field: TinaFieldBase) => {
       field.list ? ' with "list": true' : ''
     }`
   )
+}
+
+// import { remark } from 'remark'
+// import remarkMdx from 'remark-mdx'
+export const trimFragments = (string: string) => {
+  const rawArr = string.split('\n')
+  let openingFragmentIndex: number | null = null
+  let closingFragmentIndex: number | null = null
+  rawArr.forEach((item, index) => {
+    if (item.trim() === '<>') {
+      if (!openingFragmentIndex) {
+        openingFragmentIndex = index + 1
+      }
+    }
+  })
+  rawArr.reverse().forEach((item, index) => {
+    if (item.trim() === '</>') {
+      const length = rawArr.length - 1
+      if (!closingFragmentIndex) {
+        closingFragmentIndex = length - index
+      }
+    }
+  })
+  const value = rawArr
+    .reverse()
+    .slice(openingFragmentIndex || 0, closingFragmentIndex || rawArr.length - 1)
+    .join('\n')
+  return value
 }
