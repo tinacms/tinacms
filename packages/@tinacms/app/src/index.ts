@@ -174,9 +174,9 @@ export const viteBuild = async ({
       await fs.copy(appCopyPath, appRootPath)
     }
 
-    await execShellCommand(
-      `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
-    )
+    // await execShellCommand(
+    //   `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+    // )
     await fs.outputFile(
       path.join(outputPath, '.gitignore'),
       `index.html
