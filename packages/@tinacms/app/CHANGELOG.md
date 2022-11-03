@@ -1,5 +1,13 @@
 # @tinacms/app
 
+## 0.0.27
+
+### Patch Changes
+
+- d58401231: Simplify the way form values are resolved into the data payload on iframe
+- 3370cefd8: Fix preview images in cloudinary
+- e720590e1: Ensure complex queries with multiple fragments for the same node don't throw a console error
+
 ## 0.0.26
 
 ### Patch Changes

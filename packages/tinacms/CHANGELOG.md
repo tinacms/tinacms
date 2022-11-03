@@ -1,5 +1,14 @@
 # tinacms
 
+## 0.70.1
+
+### Patch Changes
+
+- 6c93834a2: Update config and schema types
+- b12957885: Nest `defaultItem` under UI
+- Updated dependencies [6c93834a2]
+  - @tinacms/schema-tools@0.2.1
+
 ## 0.70.0
 
 ### Minor Changes
