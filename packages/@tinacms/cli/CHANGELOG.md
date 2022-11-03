@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 0.62.2
+
+### Patch Changes
+
+- 41a0e946c: Don't compile client since we have all info needed to create client.
+- Updated dependencies [d58401231]
+- Updated dependencies [3370cefd8]
+- Updated dependencies [6c93834a2]
+- Updated dependencies [e720590e1]
+  - @tinacms/app@0.0.27
+  - @tinacms/schema-tools@0.2.1
+  - @tinacms/graphql@0.63.19
+
 ## 0.62.1
 
 ### Patch Changes
