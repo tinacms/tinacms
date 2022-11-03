@@ -296,8 +296,6 @@ const throwError = (field: TinaFieldBase) => {
   )
 }
 
-// import { remark } from 'remark'
-// import remarkMdx from 'remark-mdx'
 export const trimFragments = (string: string) => {
   const rawArr = string.split('\n')
   let openingFragmentIndex: number | null = null
