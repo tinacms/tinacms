@@ -98,12 +98,7 @@ const extractAttribute = (
     case 'object':
       return extractObject(extractExpression(attribute), field)
     case 'rich-text':
-      const JSXString = extractJSXFragment(
-        // @ts-ignore FIXME: estree-jsx needs to be merged with estree
-        extractExpression(attribute),
-        attribute,
-        field
-      )
+      const JSXString = extractRaw(attribute)
       if (JSXString) {
         return parseMDX(JSXString, field, imageCallback)
       } else {
@@ -183,29 +178,6 @@ const getField = (
   }
 }
 
-const extractJSXFragment = <
-  T extends Extract<TinaFieldBase, { type: 'rich-text' }>
->(
-  attribute: { expression: JSXFragment },
-  baseAttribute: MdxJsxAttribute,
-  field: T
-) => {
-  if (field.list) {
-  } else {
-    if (attribute.expression.type === 'JSXFragment') {
-      assertHasType(attribute.expression)
-      if (attribute.expression.children[0]) {
-        const firstChild = attribute.expression.children[0]
-        if (attribute.expression.children[0].type === 'JSXText') {
-          const child = firstChild as JSXText
-          return child.value.trim()
-        }
-      }
-    }
-  }
-  throwError(field)
-}
-
 const extractKeyValue = (
   property: Property,
   parentField: Extract<TinaFieldBase, { type: 'object' }>
@@ -267,6 +239,44 @@ const extractExpression = (attribute: MdxJsxAttribute): ExpressionStatement => {
   assertHasType(attribute.value)
   assertType(attribute.value, 'mdxJsxAttributeValueExpression')
   return extractStatement(attribute.value)
+}
+
+/**
+ * When rich-text is nested in non-children elements, we use a
+ * fragment to denote it's MDX:
+ *
+ * ```mdx
+ * ## hello
+ *
+ * <MyComponent description={<>
+ *   # My nested description
+ * </>}>
+ *   ## Some children
+ * </MyComponent>
+ * ```
+ * This grabs the inner fragment and strips out the `<></>` portions
+ * so when we pass it into our parser it's treated as markdown instead
+ * of an expression
+ */
+const extractRaw = (attribute: MdxJsxAttribute): string => {
+  assertType(attribute, 'mdxJsxAttribute')
+  assertHasType(attribute.value)
+  assertType(attribute.value, 'mdxJsxAttributeValueExpression')
+  const rawValue = attribute.value.value
+  let raw = ''
+  const valueArr = rawValue.split('\n')
+  valueArr.forEach((item, index) => {
+    if (index === 0 && item.trim() === '<>') {
+      // skip
+      return
+    }
+    if (index === valueArr.length - 1 && item.trim() === '</>') {
+      // skip
+      return
+    }
+    raw = raw + item + '\n'
+  })
+  return raw
 }
 
 function assertType<T extends { type: string }, U extends T['type']>(
