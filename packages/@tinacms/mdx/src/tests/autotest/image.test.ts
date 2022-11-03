@@ -23,40 +23,25 @@ const out = output({
   type: 'root',
   children: [
     {
-      type: 'p',
-      children: [
-        {
-          type: 'img',
-          url: 'https://some-image.jpg',
-          alt: 'alt description',
-          caption: 'Some Title',
-          children: [{ type: 'text', text: '' }],
-        },
-      ],
+      type: 'img',
+      url: 'https://some-image.jpg',
+      alt: 'alt description',
+      caption: 'Some Title',
+      children: [{ type: 'text', text: '' }],
     },
     {
-      type: 'p',
-      children: [
-        {
-          type: 'img',
-          url: 'https://some-image.jpg',
-          alt: '',
-          caption: 'Some title',
-          children: [{ type: 'text', text: '' }],
-        },
-      ],
+      type: 'img',
+      url: 'https://some-image.jpg',
+      alt: '',
+      caption: 'Some title',
+      children: [{ type: 'text', text: '' }],
     },
     {
-      type: 'p',
-      children: [
-        {
-          type: 'img',
-          url: 'https://some-image.jpg',
-          alt: '',
-          caption: null,
-          children: [{ type: 'text', text: '' }],
-        },
-      ],
+      type: 'img',
+      url: 'https://some-image.jpg',
+      alt: '',
+      caption: null,
+      children: [{ type: 'text', text: '' }],
     },
   ],
 })

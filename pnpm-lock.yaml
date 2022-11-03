@@ -806,6 +806,7 @@ importers:
       prettier: ^2.7.1
       remark: ^14.0.2
       remark-mdx: ^2.1.2
+      remark-unwrap-images: ^3.0.1
       ts-node: ^10.8.2
       typescript: ^4.7.4
       unist-util-visit: ^4.1.0
@@ -821,6 +822,7 @@ importers:
       prettier: 2.7.1
       remark: 14.0.2
       remark-mdx: 2.1.2
+      remark-unwrap-images: 3.0.1
       unist-util-visit: 4.1.0
       vfile: 4.2.1
     devDependencies:
@@ -18285,6 +18287,13 @@ packages:
       }
     dev: false
 
+  /hast-util-whitespace/2.0.0:
+    resolution:
+      {
+        integrity: sha512-Pkw+xBHuV6xFeJprJe2BBEoDV+AvQySaz3pPDRUs5PNZEMQjpXJJueqrpcHIXxnWTcAGi/UOCgVShlkY6kLoqg==,
+      }
+    dev: false
+
   /hasurl/1.0.0:
     resolution:
       {
@@ -25968,6 +25977,18 @@ packages:
       }
     dependencies:
       mdast-util-to-markdown: 0.6.5
+    dev: false
+
+  /remark-unwrap-images/3.0.1:
+    resolution:
+      {
+        integrity: sha512-5VUY0n+J9lPTPfkct5S3/SbutryBjp8J/4mbgtlkDrOk3h8jde0hyqdYUJOoJKherZezS08tjd6i4+nnQ+wl5w==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      hast-util-whitespace: 2.0.0
+      unified: 10.1.2
+      unist-util-visit: 4.1.0
     dev: false
 
   /remark/13.0.0:
