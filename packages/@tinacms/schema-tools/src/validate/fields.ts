@@ -122,7 +122,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
   // needs to be redefined here to avoid circle deps
   const TemplateTemp = z
     .object({
-      label: z.string(),
+      label: z.string().optional(),
       name: nameProp,
       fields: z.array(TinaFieldZod),
       match: z

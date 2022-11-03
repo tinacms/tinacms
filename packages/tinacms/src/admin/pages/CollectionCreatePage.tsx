@@ -171,12 +171,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     }
   }
 
+  const defaultItem =
+    // @ts-ignore internal types aren't up to date
+    template.ui?.defaultItem || template?.defaultItem
+
   const form = useMemo(() => {
     return new Form({
       initialValues:
-        typeof schemaCollection?.defaultItem === 'function'
-          ? schemaCollection.defaultItem()
-          : schemaCollection?.defaultItem,
+        typeof defaultItem === 'function' ? defaultItem() : defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (
