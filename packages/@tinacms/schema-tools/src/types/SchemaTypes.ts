@@ -107,6 +107,12 @@ export interface UICollection {
      */
     readonly?: boolean
   }
+
+  allowedActions?: {
+    create?: boolean
+    delete?: boolean
+  }
+
   /**
    * Forms for this collection will be editable from the global sidebar rather than the form panel
    */

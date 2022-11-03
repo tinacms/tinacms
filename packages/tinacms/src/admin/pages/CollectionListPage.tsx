@@ -201,6 +201,11 @@ const CollectionListPage = () => {
                 collection.name
               )
 
+              const allowCreate =
+                collectionDefinition?.ui?.allowedActions?.create ?? true
+              const allowDelete =
+                collectionDefinition?.ui?.allowedActions?.delete ?? true
+
               return (
                 <PageWrapper>
                   <>
@@ -292,7 +297,7 @@ const CollectionListPage = () => {
                             </div>
                           )}
                         </div>
-                        {!collection.templates && (
+                        {!collection.templates && allowCreate && (
                           <Link
                             to={`new`}
                             className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
@@ -301,7 +306,7 @@ const CollectionListPage = () => {
                             <BiPlus className="w-5 h-full ml-1 opacity-70" />
                           </Link>
                         )}
-                        {collection.templates && (
+                        {collection.templates && allowCreate && (
                           <TemplateMenu templates={collection.templates} />
                         )}
                       </>
@@ -400,7 +405,7 @@ const CollectionListPage = () => {
                                               )
                                             },
                                           },
-                                          {
+                                          allowDelete && {
                                             name: 'delete',
                                             label: 'Delete',
                                             Icon: (
@@ -421,7 +426,7 @@ const CollectionListPage = () => {
                                               setOpen(true)
                                             },
                                           },
-                                        ]}
+                                        ].filter(Boolean)}
                                       />
                                     </td>
                                   </tr>

@@ -230,6 +230,10 @@ const schema = defineSchema({
       path: "content/global",
       ui: {
         global: true,
+        allowedActions: {
+          create: false,
+          delete: false,
+        },
       },
       format: "json",
       fields: [
