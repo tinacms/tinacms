@@ -25,7 +25,7 @@ export type FormType = Form<FormValues, FieldType>
 
 export type DataType = Record<string, unknown>
 
-type Data = {
+export type Data = {
   _internalValues: object
   _internalSys: {
     breadcrumbs: string[]
@@ -136,10 +136,14 @@ export const documentMachine =
       services: {
         initializer: async (context) => {
           const tina = context.cms.api.tina as Client
-          const response = await tina.request<{
-            node: Data
-          }>(
-            `query GetNode($id: String!) {
+          let node: Data
+          if (context.data) {
+            node = context.data
+          } else {
+            const response = await tina.request<{
+              node: Data
+            }>(
+              `query GetNode($id: String!) {
         node(id: $id) {
           ...on Document {
             _internalValues: _values
@@ -168,14 +172,16 @@ export const documentMachine =
           }
         }
       }`,
-            { variables: { id: context.id } }
-          )
+              { variables: { id: context.id } }
+            )
+            node = response.node
+          }
           const schema = context.cms.api.tina.schema as TinaSchema
           if (!schema) {
             throw new Error(`Schema must be provided`)
           }
           const collection = schema.getCollection(
-            response.node._internalSys.collection.name
+            node._internalSys.collection.name
           )
           let template: Templateable
           if (collection.templates) {
@@ -183,19 +189,19 @@ export const documentMachine =
               if (typeof template === 'string') {
                 throw new Error(`Global templates not supported`)
               }
-              return template.name === response.node._internalSys.template
+              return template.name === node._internalSys.template
             }) as Templateable
           } else {
             template = collection
           }
           if (!template) {
             throw new Error(
-              `Unable to find template for node ${response.node._internalSys.path}`
+              `Unable to find template for node ${node._internalSys.path}`
             )
           }
           const resolvedForm = resolveForm({
             collection,
-            basename: response.node._internalSys.filename,
+            basename: node._internalSys.filename,
             schema,
             template,
           })
@@ -211,10 +217,10 @@ export const documentMachine =
 
               await context.cms.api.tina.request(mutationString, {
                 variables: {
-                  collection: response.node._internalSys.collection.name,
-                  relativePath: response.node._internalSys.relativePath,
+                  collection: node._internalSys.collection.name,
+                  relativePath: node._internalSys.relativePath,
                   params: schema.transformPayload(
-                    response.node._internalSys.collection.name,
+                    node._internalSys.collection.name,
                     payload
                   ),
                 },
@@ -230,9 +236,8 @@ export const documentMachine =
           const formConfig = {
             id: context.id,
             label:
-              response.node._internalSys.title ||
-              response.node._internalSys.collection.label,
-            initialValues: response.node._internalValues,
+              node._internalSys.title || node._internalSys.collection.label,
+            initialValues: node._internalValues,
             fields: resolvedForm.fields,
             onSubmit,
           }
@@ -250,7 +255,7 @@ export const documentMachine =
             true,
             onSubmit
           )
-          return { form, data: response.node }
+          return { form, data: node }
         },
       },
     }
