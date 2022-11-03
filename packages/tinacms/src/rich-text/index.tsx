@@ -206,7 +206,18 @@ const Leaf = (props: {
       </code>
     )
   }
-  return <>{props.text}</>
+  return props.text ? (
+    <>
+      {props.text.split('\n').map((text, index) => (
+        <>
+          {!!index && <br />}
+          {text}
+        </>
+      ))}
+    </>
+  ) : (
+    <>&nbsp;</>
+  )
 }
 
 // FIXME: this needs more testing. But in theory all props
