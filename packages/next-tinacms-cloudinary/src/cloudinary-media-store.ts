@@ -66,6 +66,7 @@ export class CloudinaryMediaStore implements MediaStore {
         filename: fileRes.original_filename,
         directory: '/',
         previewSrc: fileRes.url,
+        src: fileRes.url,
       }
 
       newFiles.push(parsedRes)
@@ -109,7 +110,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    return img.previewSrc
+    return img.src
   }
 
   private buildQuery(options: MediaListOptions) {

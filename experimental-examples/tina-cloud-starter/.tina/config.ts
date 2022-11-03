@@ -1,8 +1,8 @@
-import { defineConfig } from "tinacms";
+import { defineConfig, defineLegacyConfig } from "tinacms";
 import schema from "./schema";
 import client from "./__generated__/client";
 
-export default defineConfig({
+export default defineLegacyConfig({
   // Uncomment to enable standalone/iframe-mode
   // build: {
   //   outputFolder: "tina",
@@ -15,6 +15,11 @@ export default defineConfig({
   clientId: "foobar",
   token: "foo",
   media: {
+    // Media store config example
+    // loadCustomStore: async () => {
+    //   const pack = await import("next-tinacms-cloudinary");
+    //   return pack.TinaCloudCloudinaryMediaStore;
+    // },
     tina: {
       publicFolder: "public",
       mediaRoot: "",
