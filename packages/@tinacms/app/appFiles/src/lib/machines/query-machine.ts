@@ -298,13 +298,20 @@ export const queryMachine =
             rootValue: context.data,
             variableValues: context.variables,
             fieldResolver: (source, args, _context, info) => {
-              const fieldNode = info.fieldNodes[0]
-              const fieldName = fieldNode.alias?.value || fieldNode.name.value
-              if (info.fieldNodes.length > 1) {
-                // Not sure this happens much https://github.com/graphql/graphql-js/issues/605
-                console.error(
-                  'Unexpected multiple field nodes, is the query optimized?'
-                )
+              const fieldName = info.fieldName
+              /**
+               * Formify adds `_internalSys` and `_internalValues` to the query
+               * and a user's query might also include `_values` or `_sys`, but
+               * it may not contain all of the info we need, so the actual
+               * source of truth for these values is our alias ones, which are
+               * also guaranteed to include all of the values another `_sys` query
+               * might include
+               */
+              if (fieldName === '_sys') {
+                return source._internalSys
+              }
+              if (fieldName === '_values') {
+                return source._internalValues
               }
               if (isNodeType(info.returnType)) {
                 const existingValue = source[fieldName]
