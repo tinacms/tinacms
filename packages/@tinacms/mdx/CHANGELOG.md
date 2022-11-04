@@ -1,5 +1,13 @@
 # @tinacms/mdx
 
+## 0.61.17
+
+### Patch Changes
+
+- 14c5cdffe: Fixes an issue where deeply nested rich-text wasn't being parsed properly
+- Updated dependencies [a5d6722c7]
+  - @tinacms/schema-tools@0.2.2
+
 ## 0.61.16
 
 ### Patch Changes

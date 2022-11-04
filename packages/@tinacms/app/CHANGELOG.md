@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 0.0.28
+
+### Patch Changes
+
+- f4dcf3e27: Include dependencies as part of the build artifacts for @tinacms/app
+- 231dcab2e: Remove favicon
+
 ## 0.0.27
 
 ### Patch Changes
