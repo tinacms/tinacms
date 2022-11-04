@@ -24,6 +24,29 @@ export const field: RichTypeInner = {
   type: 'rich-text',
   templates: [
     {
+      name: 'Test',
+      label: 'Two Column Layout',
+      fields: [
+        {
+          name: 'leftColumn',
+          label: 'Left Column',
+          type: 'rich-text',
+        },
+        {
+          name: 'rightColumn',
+          label: 'Right Column',
+          type: 'rich-text',
+          templates: [
+            {
+              name: 'Highlight',
+              label: 'Highlight block',
+              fields: [{ name: 'content', label: 'Body', type: 'rich-text' }],
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'Greeting',
       label: 'Greeting',
       inline: true,
