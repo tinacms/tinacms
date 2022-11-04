@@ -1,5 +1,12 @@
 # e2e-next
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [a5d6722c7]
+  - tinacms@0.70.2
+
 ## 0.1.5
 
 ### Patch Changes
