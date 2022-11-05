@@ -143,7 +143,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       key={`${i}: ${tinaForm.id}`}
       onSubmit={tinaForm.onSubmit}
     >
-      {({ handleSubmit, pristine, invalid, submitting }) => {
+      {({
+        handleSubmit,
+        pristine,
+        invalid,
+        submitting,
+        dirtySinceLastSubmit,
+        hasValidationErrors,
+      }) => {
         return (
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
@@ -173,7 +180,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     )}
                     <Button
                       onClick={() => handleSubmit()}
-                      disabled={pristine || submitting || invalid}
+                      disabled={
+                        pristine ||
+                        submitting ||
+                        hasValidationErrors ||
+                        (invalid && !dirtySinceLastSubmit)
+                      }
                       busy={submitting}
                       variant="primary"
                       style={{ flexGrow: 3 }}
