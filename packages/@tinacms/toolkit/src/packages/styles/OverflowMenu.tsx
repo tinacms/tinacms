@@ -63,9 +63,9 @@ export const OverflowMenu = ({ toolbarItems }) => {
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Popover.Panel>
+            <Popover.Panel className="absolute z-20 origin-top-right right-0">
               {({ close }) => (
-                <div className="z-20 origin-top-right absolute right-0 mt-0 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
+                <div className="mt-0 -mr-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none py-1">
                   {toolbarItems.map((toolbarItem) => {
                     return (
                       <span
