@@ -240,7 +240,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           navigate(`/collections/${collection.name}`)
         } catch (error) {
           console.error(error)
-
+          const defaultErrorText = 'There was a problem saving your document.'
+          if (error.message.includes('already exists')) {
+            cms.alerts.error(
+              `${defaultErrorText} The "Filename" is alredy used for another document, please modify it.`
+            )
+          } else {
+            cms.alerts.error(defaultErrorText)
+          }
           throw new Error(
             `[${error.name}] CreateDocument failed: ${error.message}`
           )
