@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/sharedctx",
-  "version": "0.1.3",
+  "version": "1.0.0",
   "main": "dist/index.js",
   "module": "./dist/index.es.js",
   "exports": {
