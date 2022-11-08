@@ -29,10 +29,16 @@ interface ReferenceSelectProps {
   field: ReferenceFieldProps
 }
 
+interface Node {
+  id: string
+  _internalSys: {
+    title: string | null
+  }
+}
 interface OptionSet {
   collection: string
   edges: {
-    node: { id: string }
+    node: Node
   }[]
 }
 
@@ -40,9 +46,7 @@ interface Response {
   collection: {
     documents: {
       edges: {
-        node: {
-          id: string
-        }
+        node: Node
       }[]
     }
   }
@@ -65,7 +69,12 @@ const useGetOptionSets = (cms: TinaCMS, collections: string[]) => {
                   edges {
                     node {
                       ...on Node {
-                        id
+                        id,
+                      }
+                      ...on Document {
+                        _internalSys: _sys {
+                          title
+                        }
                       }
                     }
                   }
@@ -127,11 +136,18 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
         {optionSets.length > 0 &&
           optionSets.map(({ collection, edges }: OptionSet) => (
             <optgroup key={`${collection}-group`} label={collection}>
-              {edges.map(({ node: { id } }) => (
-                <option key={`${id}-option`} value={id}>
-                  {id}
-                </option>
-              ))}
+              {edges.map(
+                ({
+                  node: {
+                    id,
+                    _internalSys: { title },
+                  },
+                }) => (
+                  <option key={`${id}-option`} value={id}>
+                    {title || id}
+                  </option>
+                )
+              )}
             </optgroup>
           ))}
       </select>
