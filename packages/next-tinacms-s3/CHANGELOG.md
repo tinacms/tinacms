@@ -1,5 +1,13 @@
 # next-tinacms-s3
 
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
 ## 0.0.6
 
 ### Patch Changes
