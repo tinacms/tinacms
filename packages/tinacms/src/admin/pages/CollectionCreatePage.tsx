@@ -239,11 +239,20 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           cms.alerts.success('Document created!')
           navigate(`/collections/${collection.name}`)
         } catch (error) {
-          console.error(error)
-
-          throw new Error(
-            `[${error.name}] CreateDocument failed: ${error.message}`
-          )
+          if (error.message.includes('already exists')) {
+            cms.alerts.error(
+              'The "Filename" is alredy used for another document, please modify it.'
+            )
+          } else {
+            const errorMessage =
+              error.message || 'There was a problem saving your document.'
+            cms.alerts.error(
+              errorMessage
+                .replace('Unable to fetch, ', '')
+                .replace('errors: ', '')
+            )
+          }
+          return {}
         }
       },
     })

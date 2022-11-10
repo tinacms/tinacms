@@ -234,7 +234,7 @@ export class Database {
       }
       return true
     } catch (error) {
-      throw new TinaFetchError(`Error in PUT for ${filepath}`, {
+      throw new TinaFetchError(`Unable to write to ${filepath}`, {
         originalError: error,
         file: filepath,
         collection: collection,
