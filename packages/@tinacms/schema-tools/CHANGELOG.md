@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.0.1
+
+### Patch Changes
+
+- 08e02ec21: Add types for allowedActions in the config
+
 ## 1.0.0
 
 ### Major Changes
