@@ -98,12 +98,13 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   })
   try {
     // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    const tree = remark()
+      .use(remarkMdx)
+      .use(remarkUnwrapImages)
+      .parse(preprocessedString) as Md.Root
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
-    // @ts-ignore Not really how plugins are designed in remark https://github.com/remarkjs/remark/discussions/1014#discussioncomment-3139992
-    remarkUnwrapImages({})(tree)
     return tree
   } catch (e) {
     // @ts-ignore VMessage is the error type but it's not accessible
