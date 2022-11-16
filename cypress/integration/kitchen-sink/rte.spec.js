@@ -119,7 +119,7 @@ describe('Rich Text Editor', () => {
       cy.assertRTE(
         '',
         'P 1{enter}P 2{enter}P 3{enter}{enter}P 4',
-        '<p>P 1</p><p>P 2</p><p>P 3</p><p></p><p>P 4</p>',
+        '<p>P 1</p><p>P 2</p><p>P 3</p><p>&nbsp;</p><p>P 4</p>',
         '\nP 1\n\nP 2\n\nP 3\n\nP 4\n'
       )
     })
