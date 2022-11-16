@@ -386,7 +386,8 @@ const useOnChangeEventDispatch = ({
       })
       setNewUpdate(null)
     } else if (newUpdate?.name) {
-      const previousValue = newUpdate.field.value
+      // it seems that on the first update newUpdate?field was undefined (only mattered if calling `onChange` on your own)
+      const previousValue = newUpdate?.field?.value
       const newValue = getIn(formValues, newUpdate?.name)
       cms.events.dispatch({
         type: `forms:fields:onChange`,
