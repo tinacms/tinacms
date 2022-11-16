@@ -6,7 +6,6 @@ import { ChevronDownIcon } from '@heroicons/react/solid'
 interface AutocompleteItem {
   key: string
   label: string
-  render: (item: Omit<AutocompleteItem, 'render'>) => string | JSX.Element
 }
 
 interface AutocompleteProps {
@@ -27,7 +26,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
     try {
       const reFilter = new RegExp(query, 'i')
       const _items = items.filter((item) => reFilter.test(item.label))
-      if (_items.length === 0) return items
+      if (_items.length === 0) return []
       return _items
     } catch (err) {
       return items
@@ -68,16 +67,35 @@ export const Autocomplete: React.FC<AutocompleteProps> = ({
         leaveTo="transform opacity-0 scale-95"
       >
         <Combobox.Options className="origin-top-right absolute right-0 mt-1 w-full max-h-[300px] overflow-y-auto rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+          {query.length > 0 &&
+            // Allow custom values here, but omit if the filtered items has an exact match
+            !filteredItems.find((item) => item.label === query) && (
+              <Combobox.Option
+                value={{ key: query, label: query }}
+                className="px-2"
+              >
+                {({ active }) => (
+                  <button
+                    className={classNames(
+                      active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                      'block px-4 py-2 text-xs w-full text-right rounded-sm'
+                    )}
+                  >
+                    {query}
+                  </button>
+                )}
+              </Combobox.Option>
+            )}
           {filteredItems.map((item) => (
-            <Combobox.Option key={item.key} value={item}>
+            <Combobox.Option key={item.key} value={item} className="px-2">
               {({ active }) => (
                 <button
                   className={classNames(
                     active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                    'block px-4 py-2 text-xs w-full text-right'
+                    'block px-4 py-2 text-xs w-full text-right rounded-sm'
                   )}
                 >
-                  {item.render(item)}
+                  {item.label}
                 </button>
               )}
             </Combobox.Option>

@@ -48,16 +48,30 @@ loader.config({
  * to when monaco has intantiated, keep trying to focus on it.
  *
  * Will try for 3 seconds before moving on
+ *
+ * This also takes the autocomplete combobox into consideration, if that element was
+ * what the user clicked on first, then we should re-focus that element after focusing
+ * the code block container.
  */
 let retryCount = 0
-const retryFocus = (ref) => {
+const retryFocus = (
+  ref: { current: monaco.editor.IStandaloneCodeEditor },
+  containerRef: React.MutableRefObject<HTMLDivElement>
+) => {
+  const activeElement = document.activeElement
   if (ref.current) {
     ref.current.focus()
+    if (containerRef.current.contains(activeElement)) {
+      if (activeElement instanceof HTMLElement) {
+        // refocus the element
+        activeElement.focus()
+      }
+    }
   } else {
     if (retryCount < 30) {
       setTimeout(() => {
         retryCount = retryCount + 1
-        retryFocus(ref)
+        retryFocus(ref, containerRef)
       }, 100)
     }
   }
@@ -82,29 +96,133 @@ export const CodeBlock = ({
   const monaco = useMonaco() as Monaco
   const monacoEditorRef =
     React.useRef<monaco.editor.IStandaloneCodeEditor>(null)
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const selected = useSelected()
   const [height, setHeight] = React.useState(28)
 
   React.useEffect(() => {
     if (selected && isCollapsed(editor.selection)) {
-      retryFocus(monacoEditorRef)
+      if (monacoEditorRef.current) {
+        retryFocus(monacoEditorRef, containerRef)
+      }
     }
-  }, [selected, monacoEditorRef.current])
+  }, [selected, monacoEditorRef.current, containerRef.current])
 
   const value = element.value || ''
   if (typeof value !== 'string') {
     throw new Error(`Element must be of type string for code block`)
   }
 
-  const language = restrictLanguage || element.lang
+  const language =
+    restrictLanguage || (typeof element.lang === 'string' && element.lang) || ''
   const id = React.useMemo(() => uuid(), [])
-  const languages = React.useMemo(() => {
-    const defaultLangSet = { '': 'plain text' }
-    if (!monaco) return defaultLangSet
-    return monaco.languages.getLanguages().reduce((ac, cv) => {
-      if (cv.id === 'plaintext') return ac
-      return { ...ac, [cv.id]: cv.id }
-    }, defaultLangSet)
+  const items: { key: string; label: string }[] = React.useMemo(() => {
+    const defaultLangSet = { key: '', label: 'Plain text' }
+    if (!monaco) return [defaultLangSet]
+    // Some languages are sort of obscure, we can always turn them back on if asked
+    const includedLanguages = [
+      'plaintext',
+      'json',
+      // 'abap',
+      // 'apex',
+      // 'azcli',
+      // 'bat',
+      // 'bicep',
+      // 'cameligo',
+      'clojure',
+      'coffeescript',
+      'c',
+      // 'cpp',
+      'csharp',
+      // 'csp',
+      'css',
+      'dart',
+      'dockerfile',
+      // 'ecl',
+      'elixir',
+      // 'flow9',
+      'fsharp',
+      'go',
+      'graphql',
+      'handlebars',
+      // 'hcl',
+      'html',
+      // 'ini',
+      'java',
+      'javascript',
+      // 'julia',
+      'kotlin',
+      'less',
+      // 'lexon',
+      'lua',
+      // 'liquid',
+      // 'm3',
+      'markdown',
+      // 'mips',
+      // 'msdax',
+      // 'mysql', // just SQL should be enough
+      'objective-c',
+      // 'pascal',
+      // 'pascaligo',
+      'perl',
+      // 'pgsql', // just SQL should be enough
+      'php',
+      // 'pla',
+      // 'postiats',
+      // 'powerquery',
+      'powershell',
+      // 'proto',
+      'pug',
+      'python',
+      'qsharp',
+      'r',
+      'razor',
+      'redis',
+      // 'redshift',
+      // 'restructuredtext',
+      'ruby',
+      'rust',
+      // 'sb',
+      'scala',
+      // 'scheme',
+      'scss',
+      'shell',
+      // 'sol',
+      // 'aes',
+      // 'sparql',
+      'sql',
+      // 'st',
+      'swift',
+      // 'systemverilog',
+      // 'verilog',
+      // 'tcl',
+      'twig',
+      'typescript',
+      'vb',
+      'xml',
+      'yaml',
+    ]
+    return monaco.languages
+      .getLanguages()
+      .filter((cv) => {
+        if (includedLanguages.includes(cv.id)) {
+          return true
+        }
+        return false
+      })
+      .map((cv) => {
+        if (cv.id === 'plaintext') {
+          return {
+            key: '',
+            label: 'Plain text',
+          }
+        }
+        const label = cv.aliases?.length > 0 ? cv.aliases[0] : cv.id
+        return {
+          key: cv.id,
+          label: label,
+        }
+      })
   }, [monaco])
 
   React.useEffect(() => {
@@ -117,12 +235,6 @@ export const CodeBlock = ({
       })
     }
   }, [monaco])
-
-  const items = Object.entries(languages).map(([key, label]) => ({
-    key,
-    label,
-    render: (item: { label: string }) => item.label,
-  }))
 
   React.useEffect(() => {
     if (navigateAway) {
@@ -277,10 +389,16 @@ export const CodeBlock = ({
   }
 
   const currentItem = React.useMemo(() => {
-    return (
-      items.find((item) => item.key === language) ?? {
+    if (!language) {
+      return {
         key: '',
         label: 'Plain Text',
+      }
+    }
+    return (
+      items.find((item) => item.key === language) ?? {
+        key: language,
+        label: language,
       }
     )
   }, [items, language])
@@ -298,7 +416,7 @@ export const CodeBlock = ({
         }`}
       </style>
       {props.children}
-      <div contentEditable={false}>
+      <div contentEditable={false} ref={containerRef}>
         {!restrictLanguage && (
           <div className="flex justify-between pb-2">
             <div />
