@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.0.1
+
+### Patch Changes
+
+- 8a92941bb: Show title for reference field with isTitle
+- 03d83633b: Fixed issue with previous value
+- 93234705a: Better user experience when the document creation fails due to existing filename
+- 55ab9c26c: Fix elements displayed above the OverflowMenu
+
 ## 1.0.0
 
 ### Major Changes
