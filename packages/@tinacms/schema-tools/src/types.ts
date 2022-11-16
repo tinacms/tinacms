@@ -65,6 +65,14 @@ export interface UICollection {
     document: Doc
     collection: Collection
   }) => string | undefined
+  /**
+   * Determines whether or not this collection can accept new docments
+   * or allow documents to be deleted from the CMS.
+   */
+  allowedActions?: {
+    create?: boolean
+    delete?: boolean
+  }
 }
 export type Option =
   | string
