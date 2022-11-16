@@ -1,12 +1,13 @@
 import { InferGetServerSidePropsType } from 'next'
 import { useTina } from 'tinacms/dist/react'
 import client from '../../../.tina/__generated__/client'
+import { Json } from '../../../components/json'
 
 export default function Home(
   props: InferGetServerSidePropsType<typeof getServerSideProps>
 ) {
   const { data } = useTina(props)
-  return <pre>{JSON.stringify(data, null, 2)}</pre>
+  return <Json src={data} />
 }
 
 export const getServerSideProps = async ({

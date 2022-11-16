@@ -1,5 +1,35 @@
 # @tinacms/app
 
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+## 0.0.28
+
+### Patch Changes
+
+- f4dcf3e27: Include dependencies as part of the build artifacts for @tinacms/app
+- 231dcab2e: Remove favicon
+
+## 0.0.27
+
+### Patch Changes
+
+- d58401231: Simplify the way form values are resolved into the data payload on iframe
+- 3370cefd8: Fix preview images in cloudinary
+- e720590e1: Ensure complex queries with multiple fragments for the same node don't throw a console error
+
+## 0.0.26
+
+### Patch Changes
+
+- fd7e4f636: Don't restart vite server on every schema change when working locally.
+- f7d3cf532: Add useEditState hook
+
 ## 0.0.25
 
 ### Patch Changes

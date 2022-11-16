@@ -1,5 +1,70 @@
 # tinacms-cli
 
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/app@1.0.0
+  - @tinacms/datalayer@1.0.0
+  - @tinacms/graphql@1.0.0
+  - @tinacms/metrics@1.0.0
+  - @tinacms/schema-tools@1.0.0
+
+## 0.62.3
+
+### Patch Changes
+
+- Updated dependencies [f4dcf3e27]
+- Updated dependencies [a5d6722c7]
+- Updated dependencies [231dcab2e]
+  - @tinacms/app@0.0.28
+  - @tinacms/schema-tools@0.2.2
+  - @tinacms/graphql@0.63.20
+
+## 0.62.2
+
+### Patch Changes
+
+- 41a0e946c: Don't compile client since we have all info needed to create client.
+- Updated dependencies [d58401231]
+- Updated dependencies [3370cefd8]
+- Updated dependencies [6c93834a2]
+- Updated dependencies [e720590e1]
+  - @tinacms/app@0.0.27
+  - @tinacms/schema-tools@0.2.1
+  - @tinacms/graphql@0.63.19
+
+## 0.62.1
+
+### Patch Changes
+
+- a4de4fa6e: Fix typo in !
+
+## 0.62.0
+
+### Minor Changes
+
+- 0fb26ac91: Updated to use new init for iframe way of editing.
+
+### Patch Changes
+
+- 2a03abe66: Remove console.log
+- 4b1e773ae: Fix issue caused by removing client and types file
+- Updated dependencies [fd7e4f636]
+- Updated dependencies [f7d3cf532]
+- Updated dependencies [774abcf9c]
+- Updated dependencies [245a65dfe]
+  - @tinacms/app@0.0.26
+  - @tinacms/schema-tools@0.2.0
+  - @tinacms/graphql@0.63.18
+
 ## 0.61.27
 
 ### Patch Changes

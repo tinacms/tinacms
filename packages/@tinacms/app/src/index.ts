@@ -38,7 +38,7 @@ export const viteBuild = async ({
   const local = l
   const localBuild = l
   const node_env = JSON.stringify(process.env.NODE_ENV)
-  const generatedPath = path.join(rootPath, '.tina/__generated__')
+  const generatedPath = path.join(rootPath, '.tina', '__generated__')
   /**
    * The final location of the SPA assets
    * @example public/admin
@@ -106,6 +106,11 @@ export const viteBuild = async ({
     },
     logLevel: 'silent',
   }
+  if (!hasCopiedFiles) {
+    // Remove old files
+    fs.remove(path.join(generatedPath, 'prebuild'))
+    fs.remove(path.join(generatedPath, 'app'))
+  }
   await build(prebuildConfig)
 
   const alias = {
@@ -168,10 +173,11 @@ export const viteBuild = async ({
     } else {
       await fs.copy(appCopyPath, appRootPath)
     }
+    
+    // await execShellCommand(
+    //   `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+    // )
 
-    await execShellCommand(
-      `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
-    )
     await fs.outputFile(
       path.join(outputPath, '.gitignore'),
       `index.html

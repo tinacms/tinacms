@@ -64,6 +64,8 @@ export const remarkToSlate = (
         return code(content)
       case 'paragraph':
         return paragraph(content)
+      case 'image':
+        return image(content)
       case 'mdxJsxFlowElement':
         return mdxJsxElement(content, field, imageCallback)
       case 'thematicBreak':

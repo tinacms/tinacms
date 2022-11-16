@@ -1,6 +1,6 @@
-import { defineStaticConfig } from 'tinacms'
+import { defineConfig } from 'tinacms'
 
-export default defineStaticConfig({
+export default defineConfig({
   branch: '',
   clientId: null,
   token: null,

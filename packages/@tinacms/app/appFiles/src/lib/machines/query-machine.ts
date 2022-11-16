@@ -10,12 +10,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { assign, ContextFrom, createMachine, spawn } from 'xstate'
+import { assign, createMachine, spawn } from 'xstate'
 import {
   Form,
   TinaCMS,
   NAMER,
-  Template,
   TinaFieldEnriched,
   TinaCollection,
   TinaSchema,
@@ -24,9 +23,8 @@ import {
 } from 'tinacms'
 import * as G from 'graphql'
 import { formify } from '../formify'
-import { documentMachine, FieldType, FormValues } from './document-machine'
+import { Data, documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
-import { Blueprint2 } from '../formify'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -43,18 +41,21 @@ type ContextType = {
   id: null | string
   data: null | DataType
   cms: TinaCMS
-  selectedDocument: string | null
+  documentNode: G.DocumentNode
+  variables: object
   iframe: null | HTMLIFrameElement
+  registerSubForms?: boolean
   formifyCallback: (args: any) => Form
   documentMap: DocumentMap
-  blueprints: Blueprint2[]
+  documents: Data[]
 }
 export const initialContext: Omit<ContextType, 'cms' | 'formifyCallback'> = {
   id: null,
   data: null,
-  selectedDocument: null,
-  blueprints: [],
+  variables: {},
   documentMap: {},
+  documents: [],
+  documentNode: { kind: 'Document', definitions: [] },
   iframe: null,
 }
 export const queryMachine =
@@ -68,7 +69,6 @@ export const queryMachine =
           initializer: {
             data: {
               data: DataType
-              blueprints: Blueprint2[]
             }
           }
           setter: {
@@ -120,6 +120,9 @@ export const queryMachine =
             }
           | {
               type: 'FIELD_CHANGE'
+            }
+          | {
+              type: 'EDIT_MODE'
             },
       },
       id: '(machine)',
@@ -194,9 +197,6 @@ export const queryMachine =
                 REMOVE_QUERY: {
                   target: 'idle',
                 },
-                SELECT_DOCUMENT: {
-                  actions: 'selectDocument',
-                },
                 FIELD_CHANGE: {
                   target: 'pending',
                 },
@@ -211,10 +211,6 @@ export const queryMachine =
       actions: {
         handleError: (_context, event) => console.error(event.data),
         handleMissingDocument: assign((context, event) => {
-          count = count + 1
-          if (count > 50) {
-            throw new Error('infinite loop')
-          }
           if (event.data instanceof QueryError) {
             if (context.documentMap[event.data.id]) {
               // Already exists
@@ -223,6 +219,9 @@ export const queryMachine =
             if (!event.data.id) {
               return context
             }
+            const existingData = context.documents.find(
+              (doc) => doc._internalSys.path === event.data.id
+            )
             const doc = {
               ref: spawn(
                 documentMachine.withContext({
@@ -230,7 +229,7 @@ export const queryMachine =
                   cms: context.cms,
                   formifyCallback: context.formifyCallback,
                   form: null,
-                  data: null,
+                  data: existingData || null,
                 })
               ),
             }
@@ -268,12 +267,6 @@ export const queryMachine =
             ...event.data,
           }
         }),
-        selectDocument: assign((context, event) => {
-          return {
-            ...context,
-            selectedDocument: event.value,
-          }
-        }),
         setIframe: assign((context, event) => {
           return {
             ...context,
@@ -296,41 +289,110 @@ export const queryMachine =
       },
       services: {
         setter: async (context) => {
-          const walk = (obj: unknown, path: string[] = []) => {
-            const accum: Record<string, unknown> = {}
-            if (isScalar(obj)) {
-              return obj
-            }
-            Object.entries(obj as object).map(([key, value]) => {
-              if (Array.isArray(value)) {
-                accum[key] = value.map((item) => walk(item, [...path, key]))
-              } else {
-                const blueprint = context.blueprints.find(
-                  (bp) => bp.path?.join('.') === [...path, key].join('.')
-                )
-                if (blueprint) {
-                  accum[key] = setData(value, blueprint, context)
+          const tinaSchema = context.cms.api.tina.schema as TinaSchema
+          const gqlSchema = context.cms.api.tina.gqlSchema
+          const missingForms: { id: string; skipFormRegister: boolean }[] = []
+          const newData = await G.graphql({
+            schema: gqlSchema,
+            source: G.print(context.documentNode),
+            rootValue: context.data,
+            variableValues: context.variables,
+            fieldResolver: (source, args, _context, info) => {
+              const fieldName = info.fieldName
+              /**
+               * Formify adds `_internalSys` and `_internalValues` to the query
+               * and a user's query might also include `_values` or `_sys`, but
+               * it may not contain all of the info we need, so the actual
+               * source of truth for these values is our alias ones, which are
+               * also guaranteed to include all of the values another `_sys` query
+               * might include
+               */
+              if (fieldName === '_sys') {
+                return source._internalSys
+              }
+              if (fieldName === '_values') {
+                return source._internalValues
+              }
+              if (isNodeType(info.returnType)) {
+                const existingValue = source[fieldName]
+                let skipFormRegister = false
+                if (!existingValue) {
+                  return null
+                }
+                let path: string = ''
+                if (typeof existingValue === 'string') {
+                  // this is a reference value (eg. post.author)
+                  skipFormRegister = true
+                  path = existingValue
                 } else {
-                  accum[key] = walk(value, [...path, key])
+                  path = existingValue._internalSys.path
+                }
+                if (context.documentMap[path]) {
+                  const documentMachine = context.documentMap[path].ref
+                  const documentContext = documentMachine.getSnapshot()?.context
+                  if (!documentContext) {
+                    throw new Error(
+                      `Document not set up properly for id: ${path}`
+                    )
+                  }
+                  const { data, form } = documentContext
+                  const values = form?.values
+                  if (!data || !form || !values) {
+                    throw new Error(
+                      `Document not set up properly for id: ${path}`
+                    )
+                  }
+                  const collectionName = data._internalSys.collection.name
+                  const extraValues = documentContext.data
+                  const formVal = resolveFormValue({
+                    fields: form.fields,
+                    values: values,
+                    tinaSchema,
+                  })
+                  const template = tinaSchema.getTemplateForData({
+                    data: form.values,
+                    collection: tinaSchema.getCollection(collectionName),
+                  })
+                  return {
+                    ...extraValues,
+                    ...formVal,
+                    _sys: data._internalSys,
+                    id: path,
+                    __typename: NAMER.dataTypeName(template.namespace),
+                  }
+                } else {
+                  // TODO: when we support forms in lists, remove this check
+                  // This checks that we're at least 2 levels deep, meaning top-level
+                  // queries list page(relativePath: '...') will be registered, but
+                  // not connection nodes like pageConnection.edges.node
+                  if (info.path?.prev?.prev) {
+                    skipFormRegister = true
+                  }
+                  missingForms.push({ id: path, skipFormRegister })
+                  return null
                 }
               }
-            })
-            return accum
+              return source[fieldName]
+            },
+          })
+          if (missingForms.length > 0) {
+            // Only run this one at a time
+            const missingForm = missingForms[0]
+            throw new QueryError(
+              `Unable to resolve form for initial document`,
+              missingForm.id,
+              missingForm.skipFormRegister
+            )
           }
-          const accum = walk(context.data)
-          return { data: accum }
+          return { data: newData.data }
         },
         initializer: async (context, event) => {
           const tina = context.cms.api.tina as Client
           const schema = await tina.getSchema()
           const documentNode = G.parse(event.value.query)
-          const optimizedQuery = await tina.getOptimizedQuery(documentNode)
-          if (!optimizedQuery) {
-            throw new Error(`Unable to optimize query`)
-          }
-          const { blueprints, formifiedQuery } = await formify({
+          const { formifiedQuery } = await formify({
             schema,
-            optimizedDocumentNode: optimizedQuery,
+            optimizedDocumentNode: documentNode,
           })
           const data = (await context.cms.api.tina.request(
             G.print(formifiedQuery),
@@ -338,17 +400,29 @@ export const queryMachine =
               variables: event.value.variables,
             }
           )) as DataType
+          const documents: Data[] = []
+          // step through every value in the payload to find the documents
+          JSON.stringify(data, (key, value) => {
+            if (value?._internalValues) {
+              documents.push(value)
+            }
+            return value
+          })
           return {
             data,
-            blueprints,
+            documents,
+            variables: event.value.variables,
+            documentNode: formifiedQuery,
             id: event.value.id,
           }
         },
         onChangeCallback: (context) => (callback, _onReceive) => {
           const schema = context.cms.api.tina.schema as TinaSchema
           Object.values(context.documentMap).forEach((documentMachine) => {
-            if (documentMachine.skipFormRegister) {
-              return
+            if (!context.registerSubForms) {
+              if (documentMachine.skipFormRegister) {
+                return
+              }
             }
             const documentContext = documentMachine.ref.getSnapshot()?.context
             const collectionName =
@@ -394,242 +468,121 @@ class QueryError extends Error {
     this.skipFormRegister = skipFormRegister
   }
 }
-let count = 0
 
-// https://github.com/oleics/node-is-scalar/blob/master/index.js
-const withSymbol = typeof Symbol !== 'undefined'
-function isScalar(value: unknown) {
-  const type = typeof value
-  if (type === 'string') return true
-  if (type === 'number') return true
-  if (type === 'boolean') return true
-  if (withSymbol === true && type === 'symbol') return true
-
-  if (value == null) return true
-  if (withSymbol === true && value instanceof Symbol) return true
-  if (value instanceof String) return true
-  if (value instanceof Number) return true
-  if (value instanceof Boolean) return true
-
-  return false
-}
-
-const setData = (
-  data: { [key: string]: unknown },
-  blueprint: Blueprint2,
-  context: ContextFrom<typeof queryMachine>
-) => {
-  if (data?._internalSys) {
-    const id = data._internalSys?.path
-    const doc = context.documentMap[id]
-    const docContext = doc?.ref?.getSnapshot()?.context
-    const form = docContext?.form
-    if (!form) {
-      const skipFormRegiester = (blueprint.path?.length || 0) > 2
-      throw new QueryError(
-        `Unable to resolve form for initial document`,
-        id,
-        skipFormRegiester
-      )
+const isNodeType = (type: G.GraphQLOutputType) => {
+  const namedType = G.getNamedType(type)
+  if (G.isInterfaceType(namedType)) {
+    if (namedType.name === 'Node') {
+      return true
     }
-    const _internalSys = docContext.data?._internalSys
-    if (!_internalSys) {
-      throw new Error(`No system information found for document ${id}`)
-    }
-
-    const fields = form.fields
-    const result = resolveForm({
-      id,
-      fields,
-      sys: _internalSys,
-      values: form.values,
-      fieldsToInclude: blueprint.fields,
-      context,
-    })
-    return { ...docContext.data, ...result }
-  } else {
-    // this isn't a node
   }
-  return data
-}
-
-const resolveForm = ({
-  id,
-  fields,
-  sys,
-  values,
-  fieldsToInclude,
-  context,
-}: {
-  id: string
-  fields: FieldType[]
-  sys: Record<string, unknown>
-  values: FormValues | undefined
-  fieldsToInclude: Blueprint2['fields']
-  context: ContextFrom<typeof queryMachine>
-}) => {
-  const accum: Record<string, unknown> = {}
-  if (!values) {
-    return accum
-  }
-
-  fieldsToInclude?.forEach((fieldToInclude) => {
-    const field = fields.find((field) => fieldToInclude.name === field.name)
-    if (!field) {
-      if (fieldToInclude.name === 'id') {
-        accum[fieldToInclude.alias] = id
-      } else if (fieldToInclude.name === '_sys') {
-        if (fieldToInclude.alias !== '_internalSys') {
-          const sysAccum: Record<string, unknown> = {}
-          // TODO: loop through these and actually use their alias values
-          fieldToInclude.fields?.forEach((field) => {
-            sysAccum[field.alias] = sys[field.name]
-          })
-          accum[fieldToInclude.alias] = sysAccum
-        }
-      } else if (fieldToInclude.name === '__typename') {
-        // field namespaces are one level deeper than what we need, so grab the first
-        // one and remove the last string on the namespace
-        accum[fieldToInclude.alias] = NAMER.dataTypeName(
-          fields[0].namespace.slice(0, fields[0].namespace.length - 1)
-        )
-      } else if (fieldToInclude.name === '_values') {
-        if (fieldToInclude.alias !== '_internalValues') {
-          accum[fieldToInclude.alias] = values
-        }
-      } else {
-      }
-    } else {
-      const result = resolveField({
-        id,
-        field,
-        sys,
-        value: values[field.name],
-        fieldsToInclude: fieldsToInclude.find(({ name }) => name === field.name)
-          ?.fields,
-        context,
+  if (G.isUnionType(namedType)) {
+    const types = namedType.getTypes()
+    if (
+      types.every((type) => {
+        return type.getInterfaces().some((intfc) => intfc.name === 'Node')
       })
-      if (result) {
-        accum[fieldToInclude.alias] = result
-      }
+    ) {
+      return true
     }
-  })
-
-  return accum
+  }
+  if (G.isObjectType(namedType)) {
+    if (namedType.getInterfaces().some((intfc) => intfc.name === 'Node')) {
+      return true
+    }
+  }
 }
-const resolveField = ({
-  id,
-  field,
-  sys,
-  value,
-  fieldsToInclude,
-  context,
+
+const resolveFormValue = <T extends Record<string, unknown>>({
+  fields,
+  values,
+  tinaSchema,
 }: {
-  id: string
+  fields: TinaFieldEnriched[]
+  values: T
+  tinaSchema: TinaSchema
+}): T & { __typename?: string } => {
+  const accum: Record<string, unknown> = {}
+  fields.forEach((field) => {
+    const v = values[field.name]
+    if (!v) {
+      return
+    }
+    accum[field.name] = resolveFieldValue({
+      field,
+      value: v,
+      tinaSchema,
+    })
+  })
+  return accum as T & { __typename?: string }
+}
+const resolveFieldValue = ({
+  field,
+  value,
+  tinaSchema,
+}: {
   field: TinaFieldEnriched
-  sys: Record<string, unknown>
   value: unknown
-  fieldsToInclude: Blueprint2['fields']
-  context: ContextFrom<typeof queryMachine>
+  tinaSchema: TinaSchema
 }) => {
   switch (field.type) {
-    case 'reference':
-      if (!value) {
-        return
-      }
-      if (typeof value === 'string') {
-        const doc = context.documentMap[value]
-        const docContext = doc?.ref?.getSnapshot()?.context
-        const form = docContext?.form
-        if (!form) {
-          throw new QueryError(
-            `Unable to resolve form for document`,
-            value,
-            true
-          )
-        }
-        const _internalSys = docContext.data?._internalSys
-        if (!_internalSys) {
-          throw new Error(`No system information found for document ${id}`)
-        }
-        return resolveForm({
-          id: value,
-          fields: form.fields,
-          sys: _internalSys,
-          values: form.values,
-          fieldsToInclude,
-          context,
-        })
-      }
-      throw new Error(`Unexpected value for type "reference"`)
-    case 'object':
-      if (field.fields) {
-        if (typeof field.fields === 'string') {
-          throw new Error('Global templates not supported')
-        }
-        field.fields
+    case 'object': {
+      if (field.templates) {
         if (field.list) {
           if (Array.isArray(value)) {
             return value.map((item) => {
-              if (typeof field.fields === 'string') {
+              const template = field.templates[item._template]
+              if (typeof template === 'string') {
                 throw new Error('Global templates not supported')
               }
-              return resolveForm({
-                id,
-                fields: field.fields,
-                sys,
-                values: item,
-                fieldsToInclude,
-                context,
-              })
+              return {
+                __typename: NAMER.dataTypeName(template.namespace),
+                ...resolveFormValue({
+                  fields: template.fields,
+                  values: item,
+                  tinaSchema,
+                }),
+              }
             })
           }
         } else {
-          return resolveForm({
-            id,
-            fields: field.fields,
-            sys,
-            values: value,
-            fieldsToInclude,
-            context,
-          })
+          // not implemented
         }
       }
-      if (field.templates) {
-        if (field.list) {
-          if (!value) {
-            return
-          }
-          if (!Array.isArray(value)) {
-            return
-          }
+
+      const templateFields = field.fields
+      if (typeof templateFields === 'string') {
+        throw new Error('Global templates not supported')
+      }
+      if (!templateFields) {
+        throw new Error(`Expected to find sub-fields on field ${field.name}`)
+      }
+      if (field.list) {
+        if (Array.isArray(value)) {
           return value.map((item) => {
-            let t: Template<true>
-            Object.entries(field.templates).forEach(([name, template]) => {
-              if (name === item._template) {
-                if (typeof template === 'string') {
-                  throw new Error('Global templates not supported')
-                }
-                t = template
-              }
-            })
             return {
-              _template: item._template,
-              ...resolveForm({
-                id,
-                fields: t.fields,
-                sys,
+              __typename: NAMER.dataTypeName(field.namespace),
+              ...resolveFormValue({
+                fields: templateFields,
                 values: item,
-                fieldsToInclude,
-                context,
+                tinaSchema,
               }),
             }
           })
-        } else {
-          // not supported yet
+        }
+      } else {
+        return {
+          __typename: NAMER.dataTypeName(field.namespace),
+          ...resolveFormValue({
+            fields: templateFields,
+            values: value as any,
+            tinaSchema,
+          }),
         }
       }
-    default:
+    }
+    default: {
       return value
+    }
   }
 }

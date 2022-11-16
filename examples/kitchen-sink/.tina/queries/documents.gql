@@ -14,6 +14,17 @@ query CollectionQuery {
   }
 }
 
+query NodeQuery($id: String!) {
+  node(id: $id) {
+    ...on Document {
+      ...PageParts
+      ...PostParts
+      ...DocumentationParts
+      ...AuthorParts
+    }
+  }
+}
+
 query MenuQuery {
   collections {
     label
@@ -23,6 +34,7 @@ query MenuQuery {
         node {
           ...on Document {
             _sys {
+                path
                 filename
               }
             }

@@ -1,5 +1,84 @@
 # tinacms
 
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/schema-tools@1.0.0
+  - @tinacms/sharedctx@1.0.0
+  - @tinacms/toolkit@1.0.0
+
+## 0.70.2
+
+### Patch Changes
+
+- a5d6722c7: Adds the ability to hide the delete and create buttons.
+
+  EX,
+
+  ```ts
+  export default defineConfig({
+    collections: [
+      {
+        label: 'Global',
+        name: 'global',
+        path: 'content/global',
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        format: 'json',
+        fields: [
+          //...
+        ],
+      },
+    ],
+  })
+  ```
+
+- Updated dependencies [a5d6722c7]
+  - @tinacms/schema-tools@0.2.2
+
+## 0.70.1
+
+### Patch Changes
+
+- 6c93834a2: Update config and schema types
+- b12957885: Nest `defaultItem` under UI
+- Updated dependencies [6c93834a2]
+  - @tinacms/schema-tools@0.2.1
+
+## 0.70.0
+
+### Minor Changes
+
+- 774abcf9c: - `staticConfig` becomes `defineConfig`
+  - `defineConfig` becomes `defineLegacyConfig`
+  - Deprecate `config` property in the schema
+
+### Patch Changes
+
+- 2e0a98d61: Improve types on TinaMarkdown
+- f7d3cf532: Add useEditState hook
+- c3f307f46: Add deprecation warnings on pre-iframe apis
+- 0ead00fa8: Fix warning about missing "encoding" dependency
+- 8f28bfbd5: Fix the option labels
+- Updated dependencies [774abcf9c]
+- Updated dependencies [245a65dfe]
+- Updated dependencies [7dda334e5]
+  - @tinacms/schema-tools@0.2.0
+  - @tinacms/toolkit@0.58.5
+
 ## 0.69.22
 
 ### Patch Changes

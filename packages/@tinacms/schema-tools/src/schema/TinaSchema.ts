@@ -19,7 +19,7 @@ import {
   Collectable,
   CollectionTemplateable,
   TinaFieldEnriched,
-} from '../types'
+} from '../types/index'
 import { lastItem, assertShape } from '../util'
 
 type Version = {
@@ -252,14 +252,25 @@ export class TinaSchema {
           )
           return value.map((item) => {
             const { _template, ...rest } = item
-            return { [_template]: rest }
+            const template = field.templates.find((template) => {
+              if (typeof template === 'string') {
+                return false
+              }
+              return template.name === _template
+            })
+            if (typeof template === 'string') {
+              throw new Error('Global templates not supported')
+            }
+            return {
+              [_template]: this.transformCollectablePayload(rest, template),
+            }
           })
         } else {
           assertShape<{ _template: string }>(value, (yup) =>
             yup.object({ _template: yup.string().required() })
           )
           const { _template, ...rest } = value
-          return { [_template]: rest }
+          return { [_template]: this.transformCollectablePayload(rest, field) }
         }
       } else {
         return value

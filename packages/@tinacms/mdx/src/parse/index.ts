@@ -18,6 +18,7 @@ limitations under the License.
 
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
+import remarkUnwrapImages from 'remark-unwrap-images'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -101,12 +102,8 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
-    // NOTE: if we want to provide error highlighing in the raw editor
-    // we could keep this info around in edit mode
-    // Delete useless position info
-    // visit(tree, (node) => {
-    //   delete node.position
-    // })
+    // @ts-ignore Not really how plugins are designed in remark https://github.com/remarkjs/remark/discussions/1014#discussioncomment-3139992
+    remarkUnwrapImages({})(tree)
     return tree
   } catch (e) {
     // @ts-ignore VMessage is the error type but it's not accessible

@@ -171,12 +171,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     }
   }
 
+  const defaultItem =
+    // @ts-ignore internal types aren't up to date
+    template.ui?.defaultItem || template?.defaultItem
+
   const form = useMemo(() => {
     return new Form({
       initialValues:
-        typeof schemaCollection?.defaultItem === 'function'
-          ? schemaCollection.defaultItem()
-          : schemaCollection?.defaultItem,
+        typeof defaultItem === 'function' ? defaultItem() : defaultItem,
       extraSubscribeValues: { active: true, submitting: true, touched: true },
       onChange: (values) => {
         if (
@@ -238,7 +240,14 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
           navigate(`/collections/${collection.name}`)
         } catch (error) {
           console.error(error)
-
+          const defaultErrorText = 'There was a problem saving your document.'
+          if (error.message.includes('already exists')) {
+            cms.alerts.error(
+              `${defaultErrorText} The "Filename" is alredy used for another document, please modify it.`
+            )
+          } else {
+            cms.alerts.error(defaultErrorText)
+          }
           throw new Error(
             `[${error.name}] CreateDocument failed: ${error.message}`
           )

@@ -1,5 +1,62 @@
 # @tinacms/schema-tools
 
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+## 0.2.2
+
+### Patch Changes
+
+- a5d6722c7: Adds the ability to hide the delete and create buttons.
+
+  EX,
+
+  ```ts
+  export default defineConfig({
+    collections: [
+      {
+        label: 'Global',
+        name: 'global',
+        path: 'content/global',
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        format: 'json',
+        fields: [
+          //...
+        ],
+      },
+    ],
+  })
+  ```
+
+## 0.2.1
+
+### Patch Changes
+
+- 6c93834a2: Update config and schema types
+
+## 0.2.0
+
+### Minor Changes
+
+- 774abcf9c: - `staticConfig` becomes `defineConfig`
+  - `defineConfig` becomes `defineLegacyConfig`
+  - Deprecate `config` property in the schema
+
+### Patch Changes
+
+- 245a65dfe: Fix issue saving deeply nested objects in visual mode
+
 ## 0.1.9
 
 ### Patch Changes

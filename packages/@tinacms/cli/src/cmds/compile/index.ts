@@ -22,34 +22,70 @@ import { logText } from '../../utils/theme'
 import { fileExists, getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
 
+const generatedFilesToRemove = [
+  '_graphql.json',
+  '__lookup.json',
+  '__schema.json',
+  'frags.gql',
+  'queries.gql',
+  'schema.gql',
+  'db',
+]
+
 export const resetGeneratedFolder = async ({
   tinaGeneratedPath,
   usingTs,
+  isBuild,
 }: {
   tinaGeneratedPath: string
   usingTs: boolean
+  isBuild: boolean
 }) => {
   try {
-    await fs.emptyDir(tinaGeneratedPath)
+    if (isBuild) {
+      // When running `tinacms build` we can still remove all generated files
+      await fs.emptyDir(tinaGeneratedPath)
+    } else {
+      for (let index = 0; index < generatedFilesToRemove.length; index++) {
+        const file = generatedFilesToRemove[index]
+        if (file === 'db') {
+          // avoid https://github.com/tinacms/tinacms/issues/3076
+          try {
+            await fs.remove(path.join(tinaGeneratedPath, file))
+          } catch (_e) {
+            // fail silently as this is problematic on windows
+          }
+        } else {
+          await fs.remove(path.join(tinaGeneratedPath, file))
+        }
+      }
+    }
   } catch (e) {
     console.log(e)
   }
+
   await fs.mkdirp(tinaGeneratedPath)
   const ext = usingTs ? 'ts' : 'js'
+
   // temp types file to allows the client to build
-  await fs.writeFile(
-    path.join(tinaGeneratedPath, `types.${ext}`),
-    `
-export const queries = (client)=>({})
-`
-  )
-  await fs.writeFile(
-    path.join(tinaGeneratedPath, `client.${ext}`),
-    `
+  if (!(await fs.pathExists(path.join(tinaGeneratedPath, `types.${ext}`)))) {
+    await fs.writeFile(
+      path.join(tinaGeneratedPath, `types.${ext}`),
+      `
+      export const queries = (client)=>({})
+      `
+    )
+  }
+  if (!(await fs.pathExists(path.join(tinaGeneratedPath, `client.${ext}`)))) {
+    await fs.writeFile(
+      path.join(tinaGeneratedPath, `client.${ext}`),
+      `
 export const client = ()=>{}
 export default client
 `
-  )
+    )
+  }
+
   await fs.outputFile(
     path.join(tinaGeneratedPath, '.gitignore'),
     `app
@@ -71,116 +107,6 @@ out.jsx
 // Cleanup function that is guaranteed to run
 const cleanup = async ({ tinaTempPath }: { tinaTempPath: string }) => {
   await fs.remove(tinaTempPath)
-}
-
-export const compileClient = async (
-  ctx,
-  next,
-  options: { clientFileType?: string; verbose?: boolean; dev?: boolean }
-) => {
-  const root = ctx.rootPath
-  if (!root) {
-    throw new Error('ctx.rootPath has not been attached')
-  }
-  const tinaPath = path.join(root, '.tina')
-
-  const tinaGeneratedPath = path.join(tinaPath, '__generated__')
-  const packageJSONFilePath = path.join(root, 'package.json')
-
-  const tinaTempPath = path.join(tinaGeneratedPath, 'temp_client')
-
-  if (!options.clientFileType) options = { ...options, clientFileType: 'ts' }
-
-  if (options.verbose) {
-    logger.info(logText('Compiling Client...'))
-  }
-
-  const { clientFileType: requestedClientFileType = 'ts' } = options
-  const allowedFileTypes = ['ts', 'js']
-
-  if (allowedFileTypes.includes(requestedClientFileType) === false) {
-    throw new Error(
-      `Requested schema file type '${requestedClientFileType}' is not valid. Supported schema file types: 'ts, js'`
-    )
-  }
-
-  if (ctx) {
-    ctx.clientFileType = requestedClientFileType
-  }
-
-  let clientExists = true
-  const projectDir = path.join(tinaPath, '__generated__')
-  try {
-    getClientPath({ projectDir })
-  } catch {
-    clientExists = false
-  }
-
-  if (!clientExists) {
-    // The client.ts file does not exist
-    if (options.verbose) {
-      logger.info(
-        logText(
-          `.tina/client.${requestedClientFileType} not found, skipping compile client...`
-        )
-      )
-    }
-    return next()
-  }
-
-  try {
-    const define = {}
-    if (!process.env.NODE_ENV) {
-      define['process.env.NODE_ENV'] = options.dev
-        ? '"development"'
-        : '"production"'
-    }
-    const inputFile = getClientPath({
-      projectDir,
-    })
-    await transpile(
-      inputFile,
-      'client.js',
-      tinaTempPath,
-      options.verbose,
-      define,
-      packageJSONFilePath
-    )
-  } catch (e) {
-    await cleanup({ tinaTempPath })
-    throw new BuildSchemaError(e)
-  }
-
-  // Delete the node require cache for .tina temp folder
-  Object.keys(require.cache).map((key) => {
-    if (key.startsWith(tinaTempPath)) {
-      delete require.cache[require.resolve(key)]
-    }
-  })
-
-  try {
-    const clientFunc = require(path.join(tinaTempPath, 'client.js'))
-    const client = clientFunc.default
-
-    ctx.client = client
-
-    await cleanup({ tinaTempPath })
-  } catch (e) {
-    // Always remove the temp code
-    await cleanup({ tinaTempPath })
-
-    // Keep TinaSchemaValidationErrors around
-    if (e instanceof Error) {
-      if (e.name === 'TinaSchemaValidationError') {
-        throw e
-      }
-    }
-
-    // Throw an execution error
-    throw new ExecuteSchemaError(e)
-  }
-
-  return next()
 }
 
 export const compileFile = async (

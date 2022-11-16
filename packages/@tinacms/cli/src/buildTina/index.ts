@@ -42,6 +42,7 @@ interface ClientGenOptions {
 }
 
 interface BuildOptions {
+  local: boolean
   dev?: boolean
   verbose?: boolean
   rootPath?: string
@@ -163,6 +164,7 @@ export const buildCmdBuild = async (
     rootPath: string
     usingTs: boolean
     schema: unknown
+    apiUrl: string
   },
   next: () => void,
   options: Omit<
@@ -184,6 +186,7 @@ export const buildCmdBuild = async (
     usingTs: ctx.usingTs,
     port: options.port,
   })
+  ctx.apiUrl = apiUrl
   await buildAdmin({
     local: options.local,
     rootPath: ctx.rootPath,
@@ -220,7 +223,7 @@ export const auditCmdBuild = async (
 export class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, verbose, rootPath }: BuildOptions): Promise<{
+  async build({ dev, verbose, rootPath, local }: BuildOptions): Promise<{
     schema: any
     graphQLSchema: DocumentNode
     tinaSchema: any
@@ -240,6 +243,7 @@ export class ConfigBuilder {
     await resetGeneratedFolder({
       tinaGeneratedPath,
       usingTs,
+      isBuild: !local,
     })
     await this.database.store.open()
 

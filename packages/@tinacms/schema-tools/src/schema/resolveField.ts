@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaFieldEnriched } from '../types'
+import { TinaFieldEnriched } from '../types/index'
 import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 

@@ -1,4 +1,4 @@
-import { defineStaticConfig } from 'tinacms'
+import { defineConfig } from 'tinacms'
 import React from 'react'
 
 const slugify = (values) => {
@@ -10,7 +10,7 @@ const slugify = (values) => {
 const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
-export default defineStaticConfig({
+export default defineConfig({
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
@@ -41,6 +41,12 @@ export default defineStaticConfig({
           {
             label: 'Showcase',
             name: 'showcase',
+            ui: {
+              defaultItem: {
+                title: 'New!',
+                _template: 'showcase',
+              },
+            },
             fields: [
               {
                 name: 'title',
@@ -116,6 +122,15 @@ export default defineStaticConfig({
                   {
                     label: 'Hero',
                     name: 'hero',
+                    ui: {
+                      itemProps: (item) => {
+                        return { label: item?.headline }
+                      },
+                      defaultItem: {
+                        _template: 'hero',
+                        headline: 'ok',
+                      },
+                    },
                     fields: [
                       { type: 'string', name: 'headline' },
                       { type: 'string', name: 'description' },
@@ -224,7 +239,6 @@ export default defineStaticConfig({
             templates: [
               {
                 name: 'Hero',
-                label: 'Hero',
                 fields: [
                   {
                     name: 'header',

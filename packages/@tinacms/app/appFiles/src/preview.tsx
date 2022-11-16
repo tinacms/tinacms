@@ -13,12 +13,12 @@ limitations under the License.
 import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
-import { useCMS, defineStaticConfig } from 'tinacms'
+import { useCMS, defineConfig } from 'tinacms'
 
-type Config = Parameters<typeof defineStaticConfig>[0]
+type Config = Parameters<typeof defineConfig>[0]
 
 type PostMessage = {
-  type: 'open' | 'close'
+  type: 'open' | 'close' | 'isEditMode'
   id: string
   data: object
 }
@@ -80,6 +80,8 @@ const QueryMachine = (props: {
       queryMachine.withContext({
         ...initialContext,
         cms,
+        // Enable registration of sub forms
+        // registerSubForms: true,
         // @ts-ignore FIXME: add formifyCallback args to Config type
         formifyCallback: props.formifyCallback,
       }),
@@ -97,6 +99,13 @@ const QueryMachine = (props: {
 
   React.useEffect(() => {
     if (props.iframeRef.current) {
+      window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
+        if (event?.data?.type === 'isEditMode') {
+          props.iframeRef?.current?.contentWindow?.postMessage({
+            type: 'tina:editMode',
+          })
+        }
+      })
       send({ type: 'IFRAME_MOUNTED', value: props.iframeRef.current })
       if (props.payload.type === 'open') {
         send({ type: 'ADD_QUERY', value: props.payload })

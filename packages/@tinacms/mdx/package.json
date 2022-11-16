@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/mdx",
-  "version": "0.61.14",
+  "version": "1.0.0",
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -36,6 +36,7 @@
     "prettier": "^2.7.1",
     "remark": "^14.0.2",
     "remark-mdx": "^2.1.2",
+    "remark-unwrap-images": "^3.0.1",
     "unist-util-visit": "^4.1.0",
     "vfile": "^4.2.0"
   },
