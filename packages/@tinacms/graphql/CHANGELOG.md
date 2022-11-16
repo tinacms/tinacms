@@ -1,5 +1,14 @@
 # tina-graphql
 
+## 1.0.1
+
+### Patch Changes
+
+- 94a5da311: Fix generated frags.gql missing body issue
+- Updated dependencies [08e02ec21]
+  - @tinacms/schema-tools@1.0.1
+  - @tinacms/mdx@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

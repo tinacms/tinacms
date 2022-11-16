@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.0.1
+
+### Patch Changes
+
+- 93234705a: Better user experience when the document creation fails due to existing filename
+- Updated dependencies [8a92941bb]
+- Updated dependencies [08e02ec21]
+- Updated dependencies [03d83633b]
+- Updated dependencies [93234705a]
+- Updated dependencies [55ab9c26c]
+  - @tinacms/toolkit@1.0.1
+  - @tinacms/schema-tools@1.0.1
+
 ## 1.0.0
 
 ### Major Changes

@@ -1,5 +1,11 @@
 # next-tinacms-s3
 
+## 1.1.0
+
+### Minor Changes
+
+- 48c4b3d48: Fix accept key in media stores
+
 ## 1.0.0
 
 ### Major Changes
