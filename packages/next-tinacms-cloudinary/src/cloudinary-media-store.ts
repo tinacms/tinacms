@@ -25,7 +25,7 @@ export class CloudinaryMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
   }
-  accept = 'text/*,  application/*, image/*'
+  accept = 'text/*,application/*,image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     let newFiles: Media[] = []
