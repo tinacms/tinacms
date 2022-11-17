@@ -97,6 +97,10 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   })
   try {
     // Remark Root is not the same as mdast for some reason
+    preprocessedString = preprocessedString.replace(
+      '\n\n\n\n',
+      '\n\n&#8203;\n\n'
+    )
     const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
     if (!tree) {
       throw new Error('Error parsing markdown')

@@ -127,13 +127,6 @@ export const blockElement = (
         children: eat(content.children, field, imageCallback),
       }
     case 'p':
-      // Ignore empty blocks
-      if (content.children.length === 1) {
-        const onlyChild = content.children[0]
-        if (onlyChild && onlyChild.type === 'text' && onlyChild.text === '') {
-          return null
-        }
-      }
       return {
         type: 'paragraph',
         children: eat(content.children, field, imageCallback),
