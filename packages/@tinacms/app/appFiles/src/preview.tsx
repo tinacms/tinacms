@@ -14,6 +14,7 @@ import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
 import { useCMS, defineConfig } from 'tinacms'
+import type { formifyCallback as FormifyCallback } from 'tinacms/dist/hooks/use-graphql-forms'
 
 type Config = Parameters<typeof defineConfig>[0]
 
@@ -48,6 +49,7 @@ export const Preview = (
           key={activeQuery.id}
           payload={activeQuery}
           iframeRef={props.iframeRef}
+          formifyCallback={props.formifyCallback}
         />
       )}
       <div className="h-full overflow-scroll">
@@ -72,6 +74,7 @@ export const Preview = (
 const QueryMachine = (props: {
   payload: PostMessage
   iframeRef: React.MutableRefObject<HTMLIFrameElement>
+  formifyCallback: FormifyCallback
 }) => {
   const cms = useCMS()
 
