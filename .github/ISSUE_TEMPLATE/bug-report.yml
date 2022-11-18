@@ -17,7 +17,7 @@ body:
     id: reproduction
     attributes:
       label: Reproduction
-      description: Please provide a link to a repo that can reproduce the problem you ran into. `npx create-tina-app@latest`can be used as a starter template, if your repo is private. 
+      description: Please provide a link to a repo that can reproduce the problem you ran into. `npx create-tina-app@latest`can be used as a starter template, if your repo is private.
       placeholder: Reproduction URL
     validations:
       required: true
