@@ -5,6 +5,6 @@ contact_links:
   - name: Feature Request 💡
     url: https://github.com/tinacms/tinacms/discussions/new
     about: Suggest a new idea for the project.
-  - name: Questions ❓
-    url: https://community.tinacms.org/
-    about: Looking for advice on how to use TinaCMS? Ask a question on our forum!
+  - name: Questions & Discussion ❓
+    url: https://discord.com/invite/zumN63Ybpf
+    about: Looking for realtime help on using TinaCMS? Join our Discord community!
