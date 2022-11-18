@@ -1,52 +1,49 @@
----
 name: Bug Report 🐞
-about: Something isn't working as expected? Here is the right place to report.
-labels: bug
----
-
-<!--
-  Please fill out each section below, otherwise your issue will be closed. This info allows Tina maintainers to diagnose (and fix!) your issue as quickly as possible.
-
-  Before opening a new issue, please search existing issues: https://github.com/tinacms/tinacms/issues
--->
-
-## Description
-
-Describe the issue that you're seeing.
-
-### Steps to reproduce
-
-Clear steps describing how to reproduce the issue. Please please please link to a demo project if possible, this makes your issue _much_ easier to diagnose (seriously).
-
-### Expected result
-
-What should happen?
-
-### Actual result
-
-What actually happened?
-
-### Environment
-
-#### Tinacms Package Versions
-<!--
-Run the following command to get the list of tinacms-package versions in your node_modules:
-
-    npm ls | grep tinacms | grep -v deduped
--->
-
-```text
-
-```
-
-<!-- Please add as much information about your environment as possible. -->
-
-#### Tools
-
-| Tool    | Version |
-| ------- | ------- |
-| browser |         |
-| os      |         |
-| node    |         |
-| npm     |         |
-
+description: Something isn't working as expected? Here is the right place to report.
+labels: [bug, pending triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! This info allows Tina maintainers to diagnose (and fix!) your issue as quickly as possible.
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Describe the issue that you're seeing. Any loom videos or screenshots usually help a lot!
+      placeholder: I am doing ... What I expect is ... What actually happening is ...
+    validations:
+      required: true
+  - type: input
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Please provide a link to a repo that can reproduce the problem you ran into. `npx create-tina-app@latest`can be used as a starter template, if your repo is private. 
+      placeholder: Reproduction URL
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce
+      description: Please provide clear steps describing how to reproduce the issue.
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Info
+      description: Output of `npx envinfo --system --npmPackages '{tinacms,@tinacms/*}' --binaries --browsers`
+      render: shell
+      placeholder: System, Binaries, Browsers
+    validations:
+      required: true
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Validations
+      description: Before submitting the issue, please confirm the following
+      options:
+        - label: Follow our [Code of Conduct](https://github.com/tinacms/tinacms/blob/main/CODE_OF_CONDUCT.md)
+          required: true
+        - label: Read the [docs](https://tina.io/docs).
+          required: true
+        - label: Check that there isn't [already an issue](https://github.com/tinacms/tinacms/issues) that reports the same bug.
+          required: true
