@@ -21,6 +21,7 @@ import type { TinaCloudSchema } from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
 import { fileExists, getClientPath, getPath } from '../../lib'
 import { logger } from '../../logger'
+import { esbuildWatcherSetter } from '../start-server'
 
 const generatedFilesToRemove = [
   '_graphql.json',
@@ -115,6 +116,7 @@ export const compileFile = async (
     verbose?: boolean
     dev?: boolean
     rootPath: string
+    watch: () => void
   },
   fileName: string
 ) => {
@@ -172,7 +174,8 @@ export const compileFile = async (
       tinaTempPath,
       options.verbose,
       define,
-      packageJSONFilePath
+      packageJSONFilePath,
+      options.watch
     )
   } catch (e) {
     await cleanup({ tinaTempPath })
@@ -213,6 +216,7 @@ export const compileSchema = async (options: {
   verbose?: boolean
   dev?: boolean
   rootPath: string
+  watch: () => void
 }) => {
   const root = options.rootPath
   const tinaPath = path.join(root, '.tina')
@@ -271,7 +275,8 @@ const transpile = async (
   tempDir,
   verbose,
   define,
-  packageJSONFilePath: string
+  packageJSONFilePath: string,
+  watch: () => void
 ) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
@@ -304,6 +309,15 @@ const transpile = async (
     loader: loaders,
     outfile: prebuiltInputPath,
     define: define,
+    watch: !!watch && {
+      onRebuild(error) {
+        if (!error) {
+          watch()
+        }
+      },
+    },
+  }).then((watcher) => {
+    esbuildWatcherSetter(watcher)
   })
 
   /**

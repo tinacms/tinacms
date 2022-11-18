@@ -46,6 +46,7 @@ interface BuildOptions {
   dev?: boolean
   verbose?: boolean
   rootPath?: string
+  watch?: () => void
 }
 
 interface BuildSetupOptions {
@@ -223,7 +224,7 @@ export const auditCmdBuild = async (
 export class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, verbose, rootPath, local }: BuildOptions): Promise<{
+  async build({ dev, verbose, rootPath, local, watch }: BuildOptions): Promise<{
     schema: any
     graphQLSchema: DocumentNode
     tinaSchema: any
@@ -251,6 +252,7 @@ export class ConfigBuilder {
       verbose,
       dev,
       rootPath,
+      watch,
     })
 
     const { graphQLSchema, tinaSchema } = await buildSchema(

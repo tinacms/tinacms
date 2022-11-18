@@ -42,6 +42,12 @@ interface Options {
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
+let esbuildWatcher = null
+
+export const esbuildWatcherSetter = (watcher) => {
+  esbuildWatcher = watcher
+}
+
 export async function startServer(
   ctx: {
     builder: ConfigBuilder
@@ -92,6 +98,11 @@ export async function startServer(
     await buildLock.promise
     // Enable the lock so that no two builds can happen at once
     buildLock.enable()
+    // Stop esbuild watcher if exists
+    if (esbuildWatcher) {
+      esbuildWatcher.stop()
+      esbuildWatcher = null
+    }
   }
   const afterBuild = async () => {
     // Disable the lock so a new build can run
@@ -172,6 +183,7 @@ export async function startServer(
         rootPath: ctx.rootPath,
         verbose,
         local: true,
+        watch: !noWatch && !process.env.CI && (() => onChange()),
       })
       ctx.schema = schema
 
@@ -201,6 +213,33 @@ export async function startServer(
       throw error
     } finally {
       await afterBuild()
+    }
+  }
+
+  const onChange = async () => {
+    if (ready) {
+      await reBuildLock.promise
+      // hold the rebuild lock
+      reBuildLock.enable()
+      logger.info('Tina change detected, regenerating config')
+      try {
+        if (shouldBuild) {
+          await build()
+        }
+        if (isReady) {
+          await restart()
+        }
+      } catch (e) {
+        handleServerErrors(e)
+        t.submitRecord({
+          event: {
+            name: 'tinacms:cli:server:error',
+            errorMessage: e.message,
+          },
+        })
+      } finally {
+        reBuildLock.disable()
+      }
     }
   }
 
@@ -236,31 +275,15 @@ export async function startServer(
           throw e
         }
       })
-      .on('all', async () => {
-        if (ready) {
-          await reBuildLock.promise
-          // hold the rebuild lock
-          reBuildLock.enable()
-          logger.info('Tina change detected, regenerating config')
-          try {
-            if (shouldBuild) {
-              await build()
-            }
-            if (isReady) {
-              await restart()
-            }
-          } catch (e) {
-            handleServerErrors(e)
-            t.submitRecord({
-              event: {
-                name: 'tinacms:cli:server:error',
-                errorMessage: e.message,
-              },
-            })
-          } finally {
-            reBuildLock.disable()
-          }
+      .on('all', async (eventName, path) => {
+        if (eventName === 'change' && path.match(/\.(js|jsx|ts|tsx)$/)) {
+          return
         }
+        if (esbuildWatcher) {
+          esbuildWatcher.stop()
+          esbuildWatcher = null
+        }
+        await onChange()
       })
   } else {
     if (process.env.CI) {
