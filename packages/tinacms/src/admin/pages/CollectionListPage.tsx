@@ -205,6 +205,7 @@ const CollectionListPage = () => {
                 collectionDefinition?.ui?.allowedActions?.create ?? true
               const allowDelete =
                 collectionDefinition?.ui?.allowedActions?.delete ?? true
+              const itemPropsFunction = collectionDefinition?.ui?.itemProps
 
               return (
                 <PageWrapper>
@@ -317,9 +318,10 @@ const CollectionListPage = () => {
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
-                                const hasTitle = Boolean(
-                                  document.node._sys.title
-                                )
+                                const { label, ...rowProps } =
+                                  itemPropsFunction?.(document.node._values) ||
+                                  {}
+                                const title = label ?? document.node._sys.title
                                 const subfolders =
                                   document.node._sys.breadcrumbs
                                     .slice(0, -1)
@@ -329,6 +331,7 @@ const CollectionListPage = () => {
                                   <tr
                                     key={`document-${document.node._sys.relativePath}`}
                                     className=""
+                                    {...rowProps}
                                   >
                                     <td className="pl-5 pr-3 py-2 truncate max-w-0">
                                       <a
@@ -346,7 +349,7 @@ const CollectionListPage = () => {
                                         <BiEdit className="inline-block h-6 w-auto flex-shrink-0 opacity-70" />
                                         <span className="truncate block">
                                           <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                            {hasTitle ? 'Title' : 'Filename'}
+                                            {!!title ? 'Title' : 'Filename'}
                                           </span>
                                           <span className="h-5 leading-5 block truncate">
                                             {subfolders && (
@@ -355,15 +358,14 @@ const CollectionListPage = () => {
                                               </span>
                                             )}
                                             <span>
-                                              {hasTitle
-                                                ? document.node._sys?.title
-                                                : document.node._sys.filename}
+                                              {title ||
+                                                document.node._sys.filename}
                                             </span>
                                           </span>
                                         </span>
                                       </a>
                                     </td>
-                                    {hasTitle && (
+                                    {!!title && (
                                       <td className="px-3 py-4 truncate max-w-0 ">
                                         <span className="block text-xs text-gray-400 mb-1 uppercase">
                                           Filename

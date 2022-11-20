@@ -29,6 +29,7 @@ export interface DocumentNode {
       extension: string
       title?: string
     }
+    _values: Record<string, any>
   }
 }
 

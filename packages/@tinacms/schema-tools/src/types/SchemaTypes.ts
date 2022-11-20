@@ -131,6 +131,15 @@ export interface UICollection {
     document: Document
     collection: TinaCloudCollection<true>
   }) => string | undefined
+  /**
+   * An optional function to override the properties of the collecion table
+   * row component. Except for the `label` property:
+   * that is used as the title of the collection element.
+   */
+  itemProps?: (item: Record<string, any>) => {
+    key?: string
+    label?: string
+  } & Record<string, any>
 }
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
