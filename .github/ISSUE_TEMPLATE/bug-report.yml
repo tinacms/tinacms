@@ -9,7 +9,7 @@ body:
   - type: textarea
     id: bug-description
     attributes:
-      label: Describe the issue that you're seeing. Any loom videos or screenshots usually help a lot!
+      label: Describe the issue that you're seeing. Any Loom videos or screenshots usually help a lot!
       placeholder: I am doing ... What I expect is ... What actually happening is ...
     validations:
       required: true
