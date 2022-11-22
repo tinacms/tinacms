@@ -50,21 +50,11 @@ export const Preview = (
           iframeRef={props.iframeRef}
         />
       )}
-      <div className="h-full overflow-scroll">
-        <div className="">
-          <div className="col-span-5 ">
-            <div className="h-screen flex flex-col">
-              <div className="relative flex-1 bg-gray-300 col-span-2 overflow-scroll flex items-center justify-center">
-                <iframe
-                  ref={props.iframeRef}
-                  className="h-full w-full bg-white"
-                  src={props.url}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <iframe
+        ref={props.iframeRef}
+        className="h-screen w-full bg-white"
+        src={props.url}
+      />
     </div>
   )
 }
