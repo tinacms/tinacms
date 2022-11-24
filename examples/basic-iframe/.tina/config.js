@@ -1,6 +1,13 @@
 import { defineConfig } from 'tinacms'
 
 export default defineConfig({
+  admin: {
+    auth: {
+      onLogin: () => {
+        console.log('On Log in!')
+      },
+    },
+  },
   branch: '',
   clientId: null,
   token: null,

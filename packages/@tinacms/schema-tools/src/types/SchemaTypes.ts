@@ -13,6 +13,7 @@ limitations under the License.
 import type { FC } from 'react'
 
 import { TinaSchema } from '../schema'
+import { Config } from '../types'
 import type { TinaCloudSchemaConfig } from './config'
 
 export type UIField<F extends UIField = any, Shape = any> = {
@@ -42,7 +43,7 @@ export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
   /**
    * @deprecated use `defineConfig` in a config.{js,ts} file instead
    */
-  config?: TinaCloudSchemaConfig<Store>
+  config?: Config
 }
 export type TinaCloudSchemaBase = TinaCloudSchema<false>
 export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
