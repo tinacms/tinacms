@@ -69,9 +69,7 @@ describe('Tina side bar', () => {
     cy.visit('/')
 
     // Fake Login
-    localStorage.setItem('tina.isEditing', 'true')
-    // cy.reload().wait(['@graphQL', '@next', '@next'])
-    cy.reload()
+    cy.login()
 
     // Open the sidebar (note: sidebar is defaulting to open)
     // cy.get(`[aria-label="opens cms sidebar"]`, { timeout: 5000 }).click()

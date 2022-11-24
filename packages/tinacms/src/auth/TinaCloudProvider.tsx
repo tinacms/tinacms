@@ -127,7 +127,9 @@ export const AuthWallInner = ({
               name: isLocal ? 'Enter Edit Mode' : 'Continue to Tina Cloud',
               action: async () => {
                 const token = await client.authenticate()
-                await client?.onLogin({ token })
+                if (typeof client?.onLogin === 'function') {
+                  await client?.onLogin({ token })
+                }
                 onAuthSuccess()
               },
               primary: true,
