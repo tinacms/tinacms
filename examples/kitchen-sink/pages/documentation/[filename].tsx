@@ -10,12 +10,6 @@ export default function Home(
 ) {
   const { data } = useTina(props)
 
-  // return (
-  //   <div className="mx-4 border rounded-lg p-8 shadow-lg prose">
-  //     <TinaMarkdown content={data.documentation.body} />
-  //   </div>
-  // )
-
   return <Json src={data} />
 }
 
