@@ -440,6 +440,7 @@ export const queryMachine =
               })
               value[META_KEY] = {
                 id: value?._internalSys.path,
+                name: path.slice(nearestParent.length).join('.'),
                 fields,
               }
             } else if (
@@ -477,6 +478,7 @@ export const queryMachine =
                   })
                   value[META_KEY] = {
                     id,
+                    name: path.slice(nearestParent.length).join('.'),
                     fields,
                   }
                 }

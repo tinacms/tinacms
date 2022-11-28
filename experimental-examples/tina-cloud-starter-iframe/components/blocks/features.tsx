@@ -4,6 +4,7 @@ import { Container } from "../container";
 import { Icon } from "../icon";
 import type { TinaTemplate } from "tinacms";
 import { iconSchema } from "../icon";
+import { tinaField as tField } from "tinacms/dist/react";
 
 export const Feature = ({ featuresColor, data, tinaField }) => {
   return (
@@ -14,14 +15,14 @@ export const Feature = ({ featuresColor, data, tinaField }) => {
     >
       {data.icon && (
         <Icon
-          tinaField={`${tinaField}.icon`}
+          tinaField={tField(data, "icon")}
           parentColor={featuresColor}
           data={data.icon}
         />
       )}
       {data.title && (
         <h3
-          data-tinafield={`${tinaField}.title`}
+          data-tinaField={tField(data, "title")}
           className="text-2xl font-semibold title-font"
         >
           {data.title}
@@ -29,7 +30,7 @@ export const Feature = ({ featuresColor, data, tinaField }) => {
       )}
       {data.text && (
         <p
-          data-tinafield={`${tinaField}.text`}
+          data-tinaField={tField(data, "text")}
           className="text-base opacity-80 leading-relaxed"
         >
           {data.text}
@@ -51,7 +52,7 @@ export const Features = ({ data, parentField }) => {
           data.items.map(function (block, i) {
             return (
               <Feature
-                tinaField={`${parentField}.items.${i}`}
+                tinaField={tField(block)}
                 featuresColor={data.color}
                 key={i}
                 data={block}
