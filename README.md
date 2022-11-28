@@ -4,7 +4,7 @@
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
 
-> Tina is an open-source toolkit for building content management directly into your website.
+> Tina is a Git-backed headless content management system with support for visual editing.
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tina.io/)
 
