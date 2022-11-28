@@ -39,7 +39,11 @@ export const HtmlFieldPlaceholder = {
 function createPlaceholder(name: string, _pr: string) {
   return (props: any) => {
     return (
-      <FieldMeta name={props.input.name} label={`${name} Field not Registered`}>
+      <FieldMeta
+        name={props.input.name}
+        label={`${name} Field not Registered`}
+        tinaForm={props.tinaForm}
+      >
         <p className="whitespace-normal text-[15px] mt-2">
           The {name} field is not registered. Some built-in field types are not
           bundled by default in an effort to control bundle size. Consult the
