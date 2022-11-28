@@ -69,14 +69,12 @@ export const tinaField = <
   field?: keyof Omit<T, '__typename' | '_sys'>
 ) => {
   if (!field) {
-    return obj.__meta__?.name
+    return `${obj.__meta__?.id}#${obj.__meta__?.name}`
   }
   if (obj?.__meta__) {
     if (typeof field === 'string') {
-      return obj.__meta__.fields[field]
+      return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
     }
-    // TODO: when we're ready, append the form id for more reliable behavior
-    // return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
   }
   return ''
 }

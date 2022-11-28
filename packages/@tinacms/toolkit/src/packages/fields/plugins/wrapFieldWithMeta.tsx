@@ -20,6 +20,7 @@ import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
+import { Form } from '../../forms'
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps
@@ -31,17 +32,20 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
     | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
     | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
 ) {
-  return (props: InputFieldType<ExtraFieldProps, InputProps>) => (
-    <FieldMeta
-      name={props.input.name}
-      label={props.field.label}
-      description={props.field.description}
-      error={props.meta.error}
-      index={props.index}
-    >
-      <Field {...props} />
-    </FieldMeta>
-  )
+  return (props: InputFieldType<ExtraFieldProps, InputProps>) => {
+    return (
+      <FieldMeta
+        name={props.input.name}
+        label={props.field.label}
+        description={props.field.description}
+        error={props.meta.error}
+        index={props.index}
+        tinaForm={props.tinaForm}
+      >
+        <Field {...props} />
+      </FieldMeta>
+    )
+  }
 }
 
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
@@ -52,6 +56,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   error?: string
   margin?: boolean
   index?: number
+  tinaForm: Form
 }
 
 export const FieldMeta = ({
@@ -62,6 +67,7 @@ export const FieldMeta = ({
   margin = true,
   children,
   index,
+  tinaForm,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
@@ -69,9 +75,9 @@ export const FieldMeta = ({
   return (
     <FieldWrapper
       margin={margin}
-      onMouseOver={() => setHoveredField({ fieldName: name })}
-      onMouseOut={() => setHoveredField({ fieldName: null })}
-      onClick={() => setFocusedField({ fieldName: name })}
+      onMouseOver={() => setHoveredField({ id: tinaForm.id, fieldName: name })}
+      onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
+      onClick={() => setFocusedField({ id: tinaForm.id, fieldName: name })}
       style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}
     >

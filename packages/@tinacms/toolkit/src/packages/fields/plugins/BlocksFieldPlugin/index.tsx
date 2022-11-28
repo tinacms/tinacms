@@ -215,12 +215,18 @@ const BlockListItem = ({
                 }
 
                 setExpanded(true)
-                setFocusedField({ fieldName: `${field.name}.${index}` })
+                setFocusedField({
+                  id: tinaForm.id,
+                  fieldName: `${field.name}.${index}`,
+                })
               }}
               onMouseOver={() =>
-                setHoveredField({ fieldName: `${field.name}.${index}` })
+                setHoveredField({
+                  id: tinaForm.id,
+                  fieldName: `${field.name}.${index}`,
+                })
               }
-              onMouseOut={() => setHoveredField({ fieldName: null })}
+              onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
               <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />

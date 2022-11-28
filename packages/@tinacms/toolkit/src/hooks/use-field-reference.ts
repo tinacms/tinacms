@@ -44,7 +44,21 @@ export const useFieldReference = (fieldName: string | null) => {
     const fieldEle = doc.querySelector<HTMLElement>(
       `[data-tinafield="${fieldName}"]`
     )
-    setEle(fieldEle)
+    if (!fieldEle) {
+      // fall back to searching for elements with `data-tinafield` with
+      // no form id attached. This isn't ideal as 2 forms on the same page
+      // with fields of the same name would conflict, but was previously
+      // how the API worked
+      if (fieldName?.includes('#')) {
+        const fieldNameWithoutFormId = fieldName.split('#')[1]
+        const fieldEle = doc.querySelector<HTMLElement>(
+          `[data-tinafield="${fieldNameWithoutFormId}"]`
+        )
+        setEle(fieldEle)
+      }
+    } else {
+      setEle(fieldEle)
+    }
   }, [signal, fieldName])
   return ele
 }

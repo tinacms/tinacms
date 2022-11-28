@@ -163,8 +163,8 @@ export const ActiveFieldIndicator = () => {
   const { subscribe } = useEvent<FieldHoverEvent>('field:hover')
 
   React.useEffect(() =>
-    subscribe(({ fieldName }) => {
-      setActiveFieldName(fieldName)
+    subscribe(({ fieldName, id }) => {
+      setActiveFieldName(`${id}#${fieldName}`)
     })
   )
 
