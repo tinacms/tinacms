@@ -127,6 +127,7 @@ export const ActiveFieldIndicator = () => {
   )
   const [display, setDisplay] = React.useState<boolean>(false)
   const [position, setPosition] = React.useState<any>(false)
+  const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 })
   const activeEle = useFieldReference(activeFieldName)
 
   React.useEffect(() => {
@@ -134,6 +135,10 @@ export const ActiveFieldIndicator = () => {
     if (activeEle) {
       setDisplay(true)
       setPosition(activeEle.getBoundingClientRect())
+      const iframe = document.getElementById('tina-iframe') as HTMLIFrameElement
+      if (iframe) {
+        setIframePosition(iframe.getBoundingClientRect())
+      }
     } else {
       displayTimeout = setTimeout(() => {
         setDisplay(false)
@@ -188,7 +193,7 @@ export const ActiveFieldIndicator = () => {
         position: 'absolute',
         zIndex: 'var(--tina-z-index-3)',
         top: position.top + window.scrollY,
-        left: position.left + window.scrollX,
+        left: position.left + window.scrollX + iframePosition.left,
         width: position.width,
         height: position.height,
         outline: '2px dashed var(--tina-color-indicator)',

@@ -25,6 +25,7 @@ import * as G from 'graphql'
 import { formify } from '../formify'
 import { Data, documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
+import { getIn } from 'final-form'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -383,6 +384,104 @@ export const queryMachine =
               missingForm.id,
               missingForm.skipFormRegister
             )
+          }
+          // Populate __meta__ property for use
+          // in active field indicator utility
+          const META_KEY = '__meta__'
+          function* traverse(o) {
+            const memory = new Set()
+            function* innerTraversal(o, path = []) {
+              if (memory.has(o)) {
+                // we've seen this object before don't iterate it
+                return
+              }
+              // add the new object to our memory.
+              memory.add(o)
+              for (var i of Object.keys(o)) {
+                const itemPath = path.concat(i)
+                yield [i, o[i], itemPath, o]
+                if (o[i] !== null && typeof o[i] == 'object') {
+                  if (i !== META_KEY) {
+                    //going one step down in the object tree!!
+                    yield* innerTraversal(o[i], itemPath)
+                  }
+                }
+              }
+            }
+            yield* innerTraversal(o)
+          }
+          const nodePaths = []
+          for (var [key, value, path, parent] of traverse(newData.data)) {
+            if (value?._internalSys) {
+              nodePaths.push(path)
+              const fields = {}
+              const parents = nodePaths.filter((nodePath) => {
+                return path.join('.').startsWith(nodePath.join('.'))
+              })
+
+              const nearestParent = parents.reduce(function (a, b) {
+                return a.length < b.length ? a : b
+              })
+              Object.keys(value).map((key) => {
+                if (
+                  [
+                    '__typename',
+                    '_internalSys',
+                    '_internalValues',
+                    '_sys',
+                  ].includes(key)
+                ) {
+                  return false
+                }
+                fields[key] = [
+                  ...path.slice(nearestParent.length + 1),
+                  key,
+                ].join('.')
+              })
+              value[META_KEY] = {
+                id: value?._internalSys.path,
+                fields,
+              }
+            } else if (
+              typeof value === 'object' &&
+              !Array.isArray(value) &&
+              value !== null
+            ) {
+              if (key !== META_KEY) {
+                const parents = nodePaths.filter((nodePath) => {
+                  return path.join('.').startsWith(nodePath.join('.'))
+                })
+                if (parents.length) {
+                  const nearestParent = parents.reduce(function (a, b) {
+                    return a.length < b.length ? a : b
+                  })
+                  const parent = getIn(newData.data, nearestParent.join('.'))
+                  const id = parent._internalSys.path
+                  const fields = {}
+                  Object.keys(value).map((key) => {
+                    if (
+                      [
+                        '__typename',
+                        '_internalSys',
+                        '_internalValues',
+                        '_sys',
+                      ].includes(key)
+                    ) {
+                      return false
+                    }
+
+                    fields[key] = [
+                      ...path.slice(nearestParent.length),
+                      key,
+                    ].join('.')
+                  })
+                  value[META_KEY] = {
+                    id,
+                    fields,
+                  }
+                }
+              }
+            }
           }
           return { data: newData.data }
         },

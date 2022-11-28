@@ -54,3 +54,26 @@ export function useEditState(): { edit: boolean } {
   }, [])
   return { edit } as any
 }
+
+/**
+ * Grab the field name for the given attribute
+ * to signal to Tina which DOM element the field
+ * is working with.
+ */
+export const tinaField = <
+  T extends object & {
+    __meta__?: { id: string; fields: Record<string, string> }
+  }
+>(
+  obj: T,
+  field: keyof Omit<T, '__typename' | '_sys'>
+) => {
+  if (!parent) {
+    console.error('tinaField is only supporting when using Tina in iframe mode')
+  }
+  if (obj?.__meta__) {
+    return `${obj.__meta__.fields[field]}`
+    // return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
+  }
+  return ''
+}
