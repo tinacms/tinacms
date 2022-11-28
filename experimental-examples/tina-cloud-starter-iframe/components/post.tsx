@@ -18,6 +18,7 @@ import { ThemeContext } from "./theme";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 import type { TinaMarkdownContent, Components } from "tinacms/dist/rich-text";
+import { tinaField } from "tinacms/dist/react";
 
 const components: Components<{
   BlockQuote: {
@@ -128,7 +129,7 @@ export const Post = (data) => {
     <Section className="flex-1">
       <Container className={`flex-1 max-w-4xl pb-2`} size="large">
         <h2
-          data-tinafield="title"
+          data-tinafield={tinaField(data, "title")}
           className={`w-full relative	mb-8 text-6xl font-extrabold tracking-normal text-center title-font`}
         >
           <span
@@ -140,7 +141,7 @@ export const Post = (data) => {
           </span>
         </h2>
         <div
-          data-tinafield="author"
+          data-tinafield={tinaField(data, "author")}
           className="flex items-center justify-center mb-16"
         >
           {data.author && (
@@ -161,7 +162,7 @@ export const Post = (data) => {
             </>
           )}
           <p
-            data-tinafield="date"
+            data-tinafield={tinaField(data, "date")}
             className="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150"
           >
             {formattedDate}
@@ -169,7 +170,7 @@ export const Post = (data) => {
         </div>
       </Container>
       {data.heroImg && (
-        <div data-tinafield="heroImg" className="">
+        <div data-tinafield={tinaField(data, "heroImg")} className="">
           <img
             src={data.heroImg}
             className="mb-14 block h-auto max-w-4xl lg:max-w-6xl mx-auto"

@@ -62,17 +62,20 @@ export function useEditState(): { edit: boolean } {
  */
 export const tinaField = <
   T extends object & {
-    __meta__?: { id: string; fields: Record<string, string> }
+    __meta__?: { id: string; name?: string; fields: Record<string, string> }
   }
 >(
   obj: T,
-  field: keyof Omit<T, '__typename' | '_sys'>
+  field?: keyof Omit<T, '__typename' | '_sys'>
 ) => {
-  if (!parent) {
-    console.error('tinaField is only supporting when using Tina in iframe mode')
+  if (!field) {
+    return obj.__meta__?.name
   }
   if (obj?.__meta__) {
-    return `${obj.__meta__.fields[field]}`
+    if (typeof field === 'string') {
+      return obj.__meta__.fields[field]
+    }
+    // TODO: when we're ready, append the form id for more reliable behavior
     // return `${obj.__meta__?.id}#${obj.__meta__.fields[field]}`
   }
   return ''
