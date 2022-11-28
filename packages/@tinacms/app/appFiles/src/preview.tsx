@@ -53,6 +53,7 @@ export const Preview = (
         />
       )}
       <iframe
+        id="tina-iframe"
         ref={props.iframeRef}
         className="h-screen w-full bg-white"
         src={props.url}

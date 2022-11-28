@@ -34,7 +34,14 @@ export const useFieldReference = (fieldName: string | null) => {
   const signal = React.useContext(MutationSignalContext)
   const [ele, setEle] = React.useState<HTMLElement | null>(null)
   React.useEffect(() => {
-    const fieldEle = document.querySelector<HTMLElement>(
+    let doc: Document
+    const iframe = document.getElementById('tina-iframe') as HTMLIFrameElement
+    if (iframe) {
+      doc = iframe.contentDocument
+    } else {
+      doc = document
+    }
+    const fieldEle = doc.querySelector<HTMLElement>(
       `[data-tinafield="${fieldName}"]`
     )
     setEle(fieldEle)

@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Prism } from 'tinacms/dist/rich-text/prism'
+import { tinaField } from 'tinacms/dist/react'
 import { Explorer2 } from './explorer'
 
 // react-json-view assumes global.document exists
@@ -30,8 +31,21 @@ export function Json(props: { src: object }) {
                   </div>
                 )
               }}
-              renderValue={({ value }) => {
-                return <span className="text-orange-600">{value}</span>
+              renderValue={({ value, keyName, parentValue, parentKeyName }) => {
+                let fieldName = ''
+                if (!isNaN(Number(keyName))) {
+                  fieldName = `${tinaField(
+                    parentValue,
+                    parentKeyName
+                  )}.${keyName}`
+                } else {
+                  fieldName = tinaField(parentValue, keyName)
+                }
+                return (
+                  <span className="text-orange-600" data-tinafield={fieldName}>
+                    {value}
+                  </span>
+                )
               }}
             />
           </div>
