@@ -162,9 +162,12 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             <DragHandle isDragging={snapshot.isDragging} />
             <ItemClickTarget
               onMouseOver={() =>
-                setHoveredField({ fieldName: `${field.name}.${index}` })
+                setHoveredField({
+                  id: tinaForm.id,
+                  fieldName: `${field.name}.${index}`,
+                })
               }
-              onMouseOut={() => setHoveredField({ fieldName: null })}
+              onMouseOut={() => setHoveredField({ id: null, fieldName: null })}
               onClick={() => {
                 const state = tinaForm.finalForm.getState()
                 if (state.invalid === true) {
@@ -174,7 +177,10 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
                 }
 
                 setExpanded(true)
-                setFocusedField({ fieldName: `${field.name}.${index}` })
+                setFocusedField({
+                  id: tinaForm.id,
+                  fieldName: `${field.name}.${index}`,
+                })
               }}
             >
               <GroupLabel>{title}</GroupLabel>
