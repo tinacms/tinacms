@@ -299,6 +299,30 @@ export const queryMachine =
             variableValues: context.variables,
             fieldResolver: (source, args, _context, info) => {
               const fieldName = info.fieldName
+
+              /**
+               * Since the `source` for this resolver is the query that
+               * ran before passing it into `useTina`, we need to take aliases
+               * into consideration, so if an alias is provided we try to
+               * see if that has the value we're looking for. This isn't a perfect
+               * solution as the `value` gets overwritten depending on the alias
+               * query.
+               */
+              const aliases: string[] = []
+              info.fieldNodes.forEach((fieldNode) => {
+                if (fieldNode.alias) {
+                  aliases.push(fieldNode.alias.value)
+                }
+              })
+              let value = source[fieldName]
+              if (!value) {
+                aliases.forEach((alias) => {
+                  const aliasValue = source[alias]
+                  if (aliasValue) {
+                    value = aliasValue
+                  }
+                })
+              }
               /**
                * Formify adds `_internalSys` and `_internalValues` to the query
                * and a user's query might also include `_values` or `_sys`, but
@@ -372,9 +396,10 @@ export const queryMachine =
                   return null
                 }
               }
-              return source[fieldName]
+              return value
             },
           })
+          console.log(newData)
           if (missingForms.length > 0) {
             // Only run this one at a time
             const missingForm = missingForms[0]
