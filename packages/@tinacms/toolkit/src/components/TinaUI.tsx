@@ -22,7 +22,10 @@ import { SidebarProvider, SidebarPosition } from '../packages/react-sidebar'
 import { useCMS } from '../react-tinacms/use-cms'
 import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
-import { ActiveFieldIndicator } from './ActiveFieldIndicator'
+import {
+  ActiveFieldIndicator,
+  ReverseActiveFieldIndicator,
+} from './ActiveFieldIndicator'
 import { MutationSignalProvider } from './MutationSignal'
 // @ts-ignore importing css is not recognized
 import styles from '../styles.css'
@@ -58,6 +61,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({ children, position }) => {
             />
           )}
           <ActiveFieldIndicator />
+          <ReverseActiveFieldIndicator />
         </div>
         {/* Dragging across the iframe causes mouse events to stop propagating so there's a laggy feeling without this */}
         <div className={`${resizingSidebar ? 'pointer-events-none' : ''}`}>

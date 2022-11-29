@@ -208,3 +208,151 @@ export const ActiveFieldIndicator = () => {
     ></div>
   )
 }
+
+type Position = {
+  tinafield: string
+  top: number
+  left: number
+  height: number
+  width: number
+}
+
+export const ReverseActiveFieldIndicator = () => {
+  const [selecting, setSelecting] = React.useState(false)
+  const [iframePosition, setIframePosition] = React.useState<any>({ left: 0 })
+  const [nodes, setNodes] = React.useState<Element[]>([])
+
+  React.useMemo(() => {
+    const observer = new MutationObserver(function (mutations_list) {
+      mutations_list.forEach(function (mutation) {
+        mutation.addedNodes.forEach(function (node) {
+          if (node.nodeType === 1) {
+            const tinaFieldNodes = node.querySelectorAll('[data-tinafield]')
+            tinaFieldNodes.forEach((node) => {
+              setNodes((nodes) => [...nodes.filter((n) => n !== node), node])
+            })
+          }
+        })
+        mutation.removedNodes.forEach(function (node) {
+          if (node.nodeType === 1) {
+            const tinaFieldNodes = node.querySelectorAll('[data-tinafield]')
+            tinaFieldNodes.forEach((node) => {
+              setNodes((nodes) => nodes.filter((n) => n !== node))
+            })
+          }
+        })
+      })
+    })
+
+    const iframe = document.getElementById('tina-iframe') as HTMLIFrameElement
+    if (iframe) {
+      observer.observe(iframe?.contentDocument, {
+        subtree: true,
+        childList: true,
+      })
+    }
+  }, [selecting, setNodes])
+
+  React.useEffect(() => {
+    if (selecting) {
+      const iframe = document.getElementById('tina-iframe') as HTMLIFrameElement
+      if (iframe) {
+        setIframePosition(iframe.getBoundingClientRect())
+      }
+      const tinaFieldNodes =
+        iframe?.contentDocument.querySelectorAll('[data-tinafield]')
+
+      for (const node of tinaFieldNodes) {
+        const tinafield = node.getAttribute('data-tinafield')
+        const [formId, fieldName] = tinafield.split('#')
+        if (fieldName) {
+          // const position = node.getBoundingClientRect()
+          // const top = position.top
+          // const left = position.left
+          // const height = position.height
+          // const width = position.width
+          // const pos = { tinafield, top, left, height, width }
+          setNodes((nodes) => [...nodes.filter((n) => n !== node), node])
+          // setPositions((positions) => [...positions, pos])
+        }
+      }
+    }
+  }, [selecting])
+
+  const display = true
+  const activeEle = true
+
+  return (
+    <div>
+      <button
+        onClick={() => setSelecting((selecting) => !selecting)}
+        className="absolute right-5 bottom-5 p-5 rounded-full bg-gray-100 shadow-lg border"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          {selecting ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
+            />
+          )}
+        </svg>
+      </button>
+      {selecting &&
+        nodes.map((node) => {
+          return (
+            <Indicator
+              key={node.getAttribute('data-tinafield')}
+              node={node}
+              iframePosition={iframePosition}
+            />
+          )
+        })}
+    </div>
+  )
+}
+
+const Indicator = ({
+  node,
+  iframePosition,
+}: {
+  node: Element
+  iframePosition: Omit<Position, 'tinafield'>
+}) => {
+  const position = node.getBoundingClientRect()
+  const tinafield = node.getAttribute('data-tinafield')
+  const [display, setDisplay] = React.useState(false)
+  return (
+    <div
+      onMouseOver={() => setDisplay(true)}
+      onClick={() => console.log(tinafield)}
+      onMouseOut={() => setDisplay(false)}
+      style={{
+        position: 'absolute',
+        cursor: 'pointer',
+        zIndex: 'var(--tina-z-index-3)',
+        top: position.top + window.scrollY,
+        left: position.left + window.scrollX + iframePosition.left,
+        width: position.width,
+        height: position.height,
+        outline: '2px dashed var(--tina-color-indicator)',
+        borderRadius: 'var(--tina-radius-small)',
+        transition: `opacity 150ms ease-in`,
+        opacity: display ? 0.8 : 0,
+      }}
+    ></div>
+  )
+}
