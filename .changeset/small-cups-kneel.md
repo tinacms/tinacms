@@ -1,5 +1,6 @@
 ---
 '@tinacms/app': patch
+'@tinacms/auth': patch
 '@tinacms/schema-tools': patch
 '@tinacms/toolkit': patch
 'tinacms': patch
