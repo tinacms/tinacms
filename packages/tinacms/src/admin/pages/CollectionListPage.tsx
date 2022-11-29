@@ -349,7 +349,7 @@ const CollectionListPage = () => {
                                             {hasTitle ? 'Title' : 'Filename'}
                                           </span>
                                           <span className="h-5 leading-5 block truncate">
-                                            {subfolders && (
+                                            {!hasTitle && subfolders && (
                                               <span className="text-xs text-gray-400">
                                                 {`${subfolders}/`}
                                               </span>
@@ -369,7 +369,14 @@ const CollectionListPage = () => {
                                           Filename
                                         </span>
                                         <span className="h-5 leading-5 block text-sm font-medium text-gray-900 truncate">
-                                          {document.node._sys.filename}
+                                          {subfolders && (
+                                            <span className="text-xs text-gray-400">
+                                              {`${subfolders}/`}
+                                            </span>
+                                          )}
+                                          <span>
+                                            {document.node._sys.filename}
+                                          </span>
                                         </span>
                                       </td>
                                     )}
