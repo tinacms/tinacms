@@ -73,7 +73,7 @@ export const Hero = ({ data, parentField }) => {
         </div>
         {data.image && (
           <div
-            data-tinafield={tinaField(data, "image")}
+            data-tinafield={tinaField(data.image, "src")}
             className="row-start-1 flex justify-center"
           >
             <img

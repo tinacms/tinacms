@@ -439,7 +439,7 @@ const schema = defineSchema({
           isTitle: true,
         },
         {
-          type: "string",
+          type: "image",
           label: "Avatar",
           name: "avatar",
         },

@@ -75,7 +75,7 @@ const QueryMachine = (props: {
         ...initialContext,
         cms,
         // Enable registration of sub forms
-        // registerSubForms: true,
+        registerSubForms: true,
         // @ts-ignore FIXME: add formifyCallback args to Config type
         formifyCallback: props.formifyCallback,
       }),

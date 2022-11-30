@@ -26,6 +26,7 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { IoMdClose } from 'react-icons/io'
 
 export interface FormBuilderProps {
   form: Form
@@ -70,6 +71,7 @@ const NoFieldsPlaceholder = () => (
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
+  setActiveFormId,
   onPristineChange,
   ...rest
 }) => {
@@ -92,6 +94,54 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [tinaForm])
 
   const finalForm = tinaForm.finalForm
+  const [activeFields, setActiveFields] = React.useState(null)
+  const [selectedField, setSelectedField] = React.useState(null)
+  const [path, setPath] = React.useState(null)
+
+  const cms = useCMS()
+
+  React.useMemo(() => {
+    cms.events.subscribe('field:selected', (e) => {
+      setSelectedField(e.value)
+    })
+  }, [setSelectedField])
+
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField.split('#')
+      if (formId !== tinaForm.id) {
+        setActiveFormId(formId)
+      } else {
+        const [formId, fieldName] = selectedField?.split('#')
+        const result = getFieldGroup(
+          tinaForm,
+          fieldName,
+          tinaForm.finalForm.getState().values,
+          []
+        )
+        if (result) {
+          setPath(result.path)
+          setActiveFields(result.fieldGroup)
+        }
+      }
+    }
+  }, [selectedField, tinaForm.id])
+
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField?.split('#')
+      const result = getFieldGroup(
+        tinaForm,
+        fieldName,
+        tinaForm.finalForm.getState().values,
+        []
+      )
+      if (result) {
+        setPath(result.path)
+        setActiveFields(result.fieldGroup)
+      }
+    }
+  }, [tinaForm.id])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -137,6 +187,32 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
 
+  const fields = activeFields || tinaForm.fields
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField?.split('#')
+      const activeFieldFound = fields.find((f) => f.name === fieldName)
+      if (activeFieldFound) {
+        setTimeout(() => {
+          finalForm.focus(fieldName)
+          setSelectedField(null)
+        }, 400)
+      }
+    }
+  }, [selectedField])
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField?.split('#')
+      const activeFieldFound = fields.find((f) => f.name === fieldName)
+      if (activeFieldFound) {
+        setTimeout(() => {
+          finalForm.focus(fieldName)
+          setSelectedField(null)
+        }, 400)
+      }
+    }
+  }, [JSON.stringify(fields)])
+
   return (
     <FinalForm
       form={finalForm}
@@ -155,9 +231,27 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
+                {path &&
+                  path.map((item, index) => {
+                    if (isNaN(Number(item))) {
+                      return (
+                        <PanelHeader
+                          key={path.slice(0, index).join('.')}
+                          onClick={() => {
+                            const selectedField = `${tinaForm.id}#${path
+                              .slice(0, index + 1)
+                              .join('.')}`
+                            setSelectedField(selectedField)
+                          }}
+                        >
+                          {item}
+                        </PanelHeader>
+                      )
+                    }
+                  })}
                 <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                  {tinaForm && fields.length ? (
+                    <FieldsBuilder form={tinaForm} fields={fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
@@ -458,3 +552,103 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+const getFieldGroup = (
+  form: Form,
+  fieldName: string,
+  values: object,
+  prefix: string[]
+) => {
+  const [name, ...rest] = fieldName.split('.')
+  const field = form.fields.find((field) => field.name === name)
+  const value = values[name]
+  if (field.type === 'object') {
+    if (field.templates) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        const value2 = value[index]
+        const template = field.templates[value2._template]
+        if (rest2.length) {
+          const result = getFieldGroup(template, rest2.join('.'), value2, [
+            ...prefix,
+            name,
+            index,
+          ])
+          if (result) {
+            return result
+          }
+        }
+        return {
+          path: [...prefix, name, index],
+          fieldGroup: template.fields.map((field) => {
+            return {
+              ...field,
+              name: `${[...prefix, name, index].join('.')}.${field.name}`,
+            }
+          }),
+        }
+      } else {
+      }
+    }
+    if (field.fields) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        const value2 = value[index]
+        if (rest2.length) {
+          const result = getFieldGroup(field, rest2.join('.'), value2, [
+            ...prefix,
+            name,
+            index,
+          ])
+          if (result) {
+            return result
+          }
+        }
+        return {
+          path: [...prefix, name, index],
+          fieldGroup: field.fields.map((field) => {
+            return {
+              ...field,
+              name: `${[...prefix, name, index].join('.')}.${field.name}`,
+            }
+          }),
+        }
+      } else {
+        if (rest.length) {
+          const result = getFieldGroup(field, rest.join('.'), value, [
+            ...prefix,
+            name,
+          ])
+          if (result) {
+            return result
+          }
+        }
+        return {
+          path: [...prefix, name],
+          fieldGroup: field.fields.map((field) => {
+            return {
+              ...field,
+              name: `${[...prefix, name].join('.')}.${field.name}`,
+            }
+          }),
+        }
+      }
+    }
+  }
+}
+
+export const PanelHeader = ({ onClick, children }) => {
+  return (
+    <button
+      className={`relative z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm
+       border-gray-100 px-6 -mt-px`}
+      onClick={onClick}
+      tabIndex={-1}
+    >
+      <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+        {children}
+        <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+      </div>
+    </button>
+  )
+}

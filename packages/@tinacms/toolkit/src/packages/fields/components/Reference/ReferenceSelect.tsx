@@ -27,6 +27,10 @@ interface ReferenceSelectProps {
   cms: TinaCMS
   input: any
   field: ReferenceFieldProps
+  meta: {
+    active?: boolean
+    dirty?: boolean
+  }
 }
 
 interface Node {
@@ -116,8 +120,16 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
   cms,
   input,
   field,
+  meta,
 }) => {
   const { optionSets, loading } = useGetOptionSets(cms, field.collections)
+  const ref = React.useRef(null)
+
+  React.useEffect(() => {
+    if (meta.active && ref.current) {
+      ref.current.focus()
+    }
+  }, [meta.active])
 
   if (loading === true) {
     return <LoadingDots color="var(--tina-color-primary)" />
@@ -127,6 +139,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
     <>
       <select
         id={input.name}
+        ref={ref}
         value={input.value}
         onChange={input.onChange}
         className={selectFieldClasses}

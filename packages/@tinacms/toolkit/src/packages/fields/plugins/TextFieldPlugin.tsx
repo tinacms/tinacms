@@ -25,10 +25,11 @@ interface ExtraProps {
   disabled?: boolean
 }
 export const TextField = wrapFieldsWithMeta<{}, InputProps & ExtraProps>(
-  ({ input, field }) => {
+  ({ input, field, meta }) => {
     return (
       <BaseTextField
         {...input}
+        meta={meta}
         disabled={field?.disabled ?? false}
         placeholder={field.placeholder}
       />

@@ -23,6 +23,7 @@ import {
   FieldFocusEvent,
 } from '../packages/fields/field-events'
 import { useFieldReference } from '../hooks/use-field-reference'
+import { useCMS } from '../react-tinacms'
 
 const IndicatorWrap = ({ style = {}, position, ...props }) => (
   <div
@@ -279,9 +280,6 @@ export const ReverseActiveFieldIndicator = () => {
     }
   }, [selecting])
 
-  const display = true
-  const activeEle = true
-
   return (
     <div>
       <button
@@ -332,13 +330,16 @@ const Indicator = ({
   node: Element
   iframePosition: Omit<Position, 'tinafield'>
 }) => {
+  const cms = useCMS()
   const position = node.getBoundingClientRect()
   const tinafield = node.getAttribute('data-tinafield')
   const [display, setDisplay] = React.useState(false)
   return (
     <div
       onMouseOver={() => setDisplay(true)}
-      onClick={() => console.log(tinafield)}
+      onClick={() => {
+        cms.events.dispatch({ type: 'field:selected', value: tinafield })
+      }}
       onMouseOut={() => setDisplay(false)}
       style={{
         position: 'absolute',
