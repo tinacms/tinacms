@@ -399,7 +399,6 @@ export const queryMachine =
               return value
             },
           })
-          console.log(newData)
           if (missingForms.length > 0) {
             // Only run this one at a time
             const missingForm = missingForms[0]
