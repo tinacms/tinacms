@@ -111,7 +111,7 @@ export const TinaCloudSchemaZod = z
     val?.collections?.map((x) => {
       if (!x.format) {
         console.warn(
-          `No format provided for collection ${x.name}, defaulting to .md`
+          `No format provided for collection "${x.name}", defaulting to .md`
         )
       }
     })

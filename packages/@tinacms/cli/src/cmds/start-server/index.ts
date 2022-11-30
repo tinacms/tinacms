@@ -18,7 +18,13 @@ import chokidar from 'chokidar'
 import { Telemetry } from '@tinacms/metrics'
 
 import { AsyncLock } from './lock'
-import { dangerText } from '../../utils/theme'
+import {
+  dangerText,
+  focusText,
+  linkText,
+  logText,
+  titleText,
+} from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
 import type { Bridge, Database } from '@tinacms/graphql'
@@ -117,14 +123,9 @@ export async function startServer(
             : `[your-development-url]/admin`
           if (verbose)
             logger.info(`Started Filesystem GraphQL server on port: ${port}`)
-          logger.info(
-            `Visit the GraphQL playground at ${chalk.underline.blueBright(
-              altairUrl
-            )}\nor`
-          )
-          logger.info(
-            `Enter the CMS at ${chalk.underline.blueBright(cmsUrl)} \n`
-          )
+          console.log('')
+          logger.info(`  ┃ GraphQL playground: ${linkText(altairUrl)}`)
+          logger.info(`  ┃ CMS: ${linkText(cmsUrl)} \n`)
           resolve()
         })
         state.server.on('error', function (e) {
@@ -166,6 +167,8 @@ export async function startServer(
   }
 
   const build = async () => {
+    logger.info(titleText(' TinaCMS ') + focusText(' - Build Started\n'))
+
     try {
       await beforeBuild()
       const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
@@ -188,7 +191,7 @@ export async function startServer(
         waitFor: async () => {
           await ctx.database.indexContent({ graphQLSchema, tinaSchema })
         },
-        text: 'Indexing local files',
+        text: logText('Indexing local files'),
       })
 
       await buildAdmin({
