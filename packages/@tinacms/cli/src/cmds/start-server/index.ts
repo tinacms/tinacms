@@ -24,6 +24,7 @@ import {
   linkText,
   logText,
   titleText,
+  warnText,
 } from '../../utils/theme'
 import { handleServerErrors } from './errors'
 import { logger } from '../../logger'
@@ -177,6 +178,18 @@ export async function startServer(
         local: true,
       })
       ctx.schema = schema
+
+      const missingFormat = tinaSchema?.schema?.collections
+        ?.filter((x) => !x.format)
+        .map((x) => x.name)
+        .join(', ')
+      if (missingFormat) {
+        logger.warn(
+          warnText(
+            `No format provided for collection(s) "${missingFormat}", defaulting to .md`
+          )
+        )
+      }
 
       const apiUrl = await ctx.builder.genTypedClient({
         compiledSchema: schema,

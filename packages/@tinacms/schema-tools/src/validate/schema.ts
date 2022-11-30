@@ -108,13 +108,7 @@ export const TinaCloudSchemaZod = z
         fatal: true,
       })
     }
-    val?.collections?.map((x) => {
-      if (!x.format) {
-        console.warn(
-          `No format provided for collection "${x.name}", defaulting to .md`
-        )
-      }
-    })
+
     const media = val?.config?.media
     if (media && media.tina && media.loadCustomStore) {
       ctx.addIssue({
