@@ -168,7 +168,7 @@ export const run = async () => {
   console.log('Next steps:')
   console.log()
   console.log(
-    `📝 Edit some content on ${linkText(
+    `• 📝 Edit some content on ${linkText(
       'http://localhost:3000'
     )} (See ${linkText('https://tina.io/docs/using-tina-editor')})`
   )
