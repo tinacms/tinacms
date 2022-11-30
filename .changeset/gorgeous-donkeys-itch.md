@@ -1,5 +1,4 @@
 ---
-'@tinacms/starter': patch
 '@tinacms/cli': patch
 '@tinacms/schema-tools': patch
 'create-tina-app': patch
