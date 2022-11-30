@@ -75,6 +75,7 @@ export type ListItemChildrenElement =
   | ListItemContentElement
   | UnorderedListElement
   | OrderedListElement
+  | CodeBlockElement
 
 export type ListItemElement = {
   type: 'li'
@@ -89,6 +90,10 @@ export type OrderedListElement = {
   children: ListItemElement[]
 }
 export type List = OrderedListElement | UnorderedListElement
+export type TableElement = {
+  type: 'table' | 'thead' | 'tbody' | 'tr' | 'th' | 'td'
+  children: any[]
+}
 export type BlockElement =
   | HeadingElement
   | ParagraphElement
@@ -102,6 +107,7 @@ export type BlockElement =
   | ListItemElement
   | HrElement
   | InvalidMarkdownElement
+  | TableElement
 
 export type MdxInlineElement = {
   type: 'mdxJsxTextElement'

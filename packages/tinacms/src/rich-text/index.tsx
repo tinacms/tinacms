@@ -308,6 +308,30 @@ const Node = ({ components, child }) => {
     case 'text':
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
       return <Leaf components={components} {...child} />
+    case 'table':
+      return (
+        <table>
+          <thead>
+            <TinaMarkdown
+              components={components}
+              content={children.slice(0, 1)}
+            />
+          </thead>
+          <tbody>
+            <TinaMarkdown components={components} content={children.slice(1)} />
+          </tbody>
+        </table>
+      )
+    case 'tr':
+    case 'th':
+    case 'td': {
+      const Component = child.type as any
+      return (
+        <Component>
+          <TinaMarkdown components={components} content={children} />
+        </Component>
+      )
+    }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
       // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
@@ -346,6 +370,7 @@ const Node = ({ components, child }) => {
         // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
         return <Leaf components={components} {...child} />
       }
+      return null
 
     // console.log(`No tina renderer for ${child.type}`, child)
   }

@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { remark } from 'remark'
-import remarkMdx from 'remark-mdx'
+import remarkGfm from 'remark-gfm'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -97,7 +97,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   })
   try {
     // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    const tree = remark().use(remarkGfm).parse(preprocessedString) as Md.Root
     if (!tree) {
       throw new Error('Error parsing markdown')
     }

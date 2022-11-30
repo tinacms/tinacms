@@ -249,6 +249,12 @@ const blockContentElement = (
           listItemElement(child, field, imageCallback)
         ),
       }
+    case 'code_block':
+      return {
+        type: 'code',
+        lang: content.lang,
+        value: content.value,
+      }
     default:
       throw new Error(
         `BlockContentElement: ${content.type} is not yet supported`

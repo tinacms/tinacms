@@ -22,6 +22,7 @@ import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import { table } from 'console'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -87,6 +88,8 @@ export const remarkToSlate = (
         return list(content)
       case 'html':
         return html(content)
+      case 'table':
+        return table(content)
       // @ts-ignore
       case 'mdxFlowExpression':
       // @ts-ignore
@@ -104,6 +107,28 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+    }
+  }
+
+  const table = (content: Md.Table): Plate.TableElement => {
+    return {
+      type: 'table',
+      children: content.children.map((row, index) => ({
+        type: 'tr',
+        children: row.children.map((cell) => td(cell, index ? 'td' : 'th')),
+      })),
+    }
+  }
+
+  const td = (
+    content: Md.TableCell,
+    cellType: 'td' | 'th' = 'td'
+  ): Plate.TableElement => {
+    const children = content.children.map(phrasingContent).flat()
+    if (!children.length) children.push({ type: 'text', text: '' })
+    return {
+      type: cellType,
+      children,
     }
   }
 
@@ -176,6 +201,7 @@ export const remarkToSlate = (
               ],
             }
           case 'code':
+            return code(child)
           case 'thematicBreak':
           case 'table':
           case 'html':

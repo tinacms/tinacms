@@ -12,7 +12,11 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Plate, createPlugins } from '@udecode/plate-headless'
+import {
+  Plate,
+  createPlugins,
+  createTablePlugin,
+} from '@udecode/plate-headless'
 import { components } from './plugins/ui/components'
 import { Toolbar, FloatingToolbar, FloatingLink } from './plugins/ui/toolbar'
 import { formattingPlugins, commonPlugins } from './plugins/core'
@@ -48,6 +52,7 @@ export const RichEditor = (props: RichTextType) => {
           createImgPlugin(),
           createInvalidMarkdownPlugin(),
           createLinkPlugin(),
+          createTablePlugin(),
           // This is a bit buggy
           // createSlashPlugin(),
         ],
