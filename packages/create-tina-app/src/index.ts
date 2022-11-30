@@ -157,7 +157,7 @@ export const run = async () => {
     console.log()
   }
 
-  console.log(`${successText('Starter successfuly created!')}`)
+  console.log(`${successText('Starter successfully created!')}`)
 
   console.log(chalk.bold('\nTo launch your app, run:\n'))
   console.log('  ' + cmdText(`cd ${appName}`))
