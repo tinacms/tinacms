@@ -77,7 +77,6 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    console.log({ schema: options?.schema })
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
