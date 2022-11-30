@@ -272,7 +272,7 @@ const logNextSteps = ({
   packageManager: string
   framework: Framework
 }) => {
-  logger.info(focusText(`\n${titleText('TinaCMS')} has been initialized!`))
+  logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
   logger.info(
     'To get started run: ' +
       cmdText(frameworkDevCmds[framework.name]({ packageManager }))
