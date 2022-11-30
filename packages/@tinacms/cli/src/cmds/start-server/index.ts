@@ -21,6 +21,7 @@ import { AsyncLock } from './lock'
 import {
   dangerText,
   focusText,
+  indentedCmd,
   linkText,
   logText,
   titleText,
@@ -125,8 +126,8 @@ export async function startServer(
           if (verbose)
             logger.info(`Started Filesystem GraphQL server on port: ${port}`)
           console.log('')
-          logger.info(`  ┃ GraphQL playground: ${linkText(altairUrl)}`)
-          logger.info(`  ┃ CMS: ${linkText(cmsUrl)} \n`)
+          logger.info(indentedCmd(`GraphQL playground: ${linkText(altairUrl)}`))
+          logger.info(indentedCmd(`CMS: ${linkText(cmsUrl)} \n`))
           resolve()
         })
         state.server.on('error', function (e) {
