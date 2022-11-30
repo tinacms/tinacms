@@ -8,12 +8,7 @@ export default function Home(
 ) {
   const { data } = useTina(props)
 
-  return (
-    <>
-      <Markdown content={data.post.body} />
-      <Json src={data} />
-    </>
-  )
+  return <Json src={data} />
 }
 
 export const getStaticProps = async ({ params }) => {

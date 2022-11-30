@@ -1,6 +1,8 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Prism } from 'tinacms/dist/rich-text/prism'
+import { tinaField } from 'tinacms/dist/react'
+import { Explorer2 } from './explorer'
 
 // react-json-view assumes global.document exists
 const ReactJson = React.lazy(() => import('react-json-view'))
@@ -19,28 +21,34 @@ export function Json(props: { src: object }) {
     <Suspense fallback={<div className="">Loading...</div>}>
       <div className="px-4">
         <div className="mx-auto my-8 border rounded-lg p-8 shadow-lg max-w-5xl mx-auto shadow-lg">
-          <ReactJson
-            src={props.src}
-            name={false}
-            enableClipboard={false}
-            iconStyle="square"
-            displayDataTypes={false}
-            quotesOnKeys={false}
-            displayObjectSize={false}
-            displayArrayKey={false}
-            shouldCollapse={(item) => {
-              if (
-                ['_sys', '_internalValues', '_internalSys'].includes(item?.name)
-              ) {
-                return true
-              }
-              // Hide rich-text objects by default
-              if (item?.src?.type === 'root') {
-                return true
-              }
-              return false
-            }}
-          />
+          <div className="h-full overflow-scroll">
+            <Explorer2
+              value={props.src}
+              renderRichText={({ value }) => {
+                return (
+                  <div className="font-sans px-2 border-l-2 bg-gray-50 w-full prose">
+                    <TinaMarkdown content={value} />
+                  </div>
+                )
+              }}
+              renderValue={({ value, keyName, parentValue, parentKeyName }) => {
+                let fieldName = ''
+                if (!isNaN(Number(keyName))) {
+                  fieldName = `${tinaField(
+                    parentValue,
+                    parentKeyName
+                  )}.${keyName}`
+                } else {
+                  fieldName = tinaField(parentValue, keyName)
+                }
+                return (
+                  <span className="text-orange-600" data-tinafield={fieldName}>
+                    {value}
+                  </span>
+                )
+              }}
+            />
+          </div>
         </div>
       </div>
     </Suspense>
