@@ -4,7 +4,7 @@ export default defineConfig({
   admin: {
     auth: {
       onLogin: () => {
-        console.log('On Log in!')
+        // Your Login Logic Goes Here
       },
     },
   },
