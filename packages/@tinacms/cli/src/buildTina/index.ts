@@ -33,6 +33,8 @@ import { makeIsomorphicOptions } from './git'
 import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
+import { logger } from '../logger'
+import { logText } from '../utils/theme'
 
 interface ClientGenOptions {
   noSDK?: boolean
@@ -313,14 +315,14 @@ export const buildAdmin = async ({
     }
     // Local runs an asset server as a long-lived task, don't show spinning animation
     if (local) {
-      console.log('Starting Tina asset server')
+      logger.info(logText('Starting Tina asset server'))
       await buildVite()
     } else {
       await spin({
-        text: 'Building static site',
+        text: logText('Building static site'),
         waitFor: buildVite,
       })
-      console.log('\nDone building static site')
+      logger.info(logText('\nDone building static site'))
     }
   }
 }
