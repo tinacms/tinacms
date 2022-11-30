@@ -25,6 +25,7 @@ import {
   TinaCloudTemplateEnriched,
   TinaCloudCollection,
   validateTinaCloudSchemaConfig,
+  TinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
 const FIELD_TYPES: TinaFieldBase['type'][] = [
@@ -54,6 +55,7 @@ export const validateSchema = async (
     const config = validateTinaCloudSchemaConfig(schema2.config)
     return {
       collections,
+      // @ts-ignore
       config,
     }
   }

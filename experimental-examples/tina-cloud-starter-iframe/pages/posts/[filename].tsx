@@ -1,6 +1,6 @@
 import { Post } from "../../components/post";
 import { client } from "../../.tina/__generated__/client";
-import { useEditState, useTina } from "tinacms/dist/react";
+import { useTina } from "tinacms/dist/react";
 import { Layout } from "../../components/layout";
 
 // Use the props returned by get static props
@@ -12,8 +12,6 @@ export default function BlogPostPage(
     variables: props.variables,
     data: props.data,
   });
-  const { edit } = useEditState();
-  console.log("edit", edit);
   if (data && data.posts) {
     return (
       <Layout rawData={data} data={data.global}>

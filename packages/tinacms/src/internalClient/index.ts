@@ -33,6 +33,8 @@ import {
   TinaCloudSchema,
 } from '@tinacms/schema-tools'
 
+export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
+
 export type TinaIOConfig = {
   assetsApiUrlOverride?: string // https://assets.tinajs.io
   frontendUrlOverride?: string // https://app.tina.io
@@ -45,6 +47,7 @@ interface ServerOptions {
   branch: string
   customContentApiUrl?: string
   getTokenFn?: () => Promise<TokenObject>
+  onLogin?: OnLoginFunc
   tinaioConfig?: TinaIOConfig
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
@@ -56,6 +59,7 @@ const parseRefForBranchName = (ref: string) => {
 }
 
 export class Client {
+  onLogin: OnLoginFunc
   frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
@@ -73,6 +77,7 @@ export class Client {
   events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
+    this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -137,7 +142,7 @@ export class Client {
   }
 
   public get isLocalMode() {
-    return this.contentApiUrl.includes('localhost')
+    return false
   }
 
   setBranch(branchName: string) {
@@ -172,7 +177,7 @@ mutation addPendingDocumentMutation(
     collection: $collection
   ) {
     ... on Document {
-      sys {
+      _sys {
         relativePath
         path
         breadcrumbs
@@ -420,6 +425,10 @@ mutation addPendingDocumentMutation(
     return !!(await this.getUser())
   }
 
+  async onLogout() {
+    this.setToken(null)
+  }
+
   async authenticate() {
     const token = await authenticate(this.clientId, this.frontendUrl)
     this.setToken(token)
@@ -502,11 +511,15 @@ mutation addPendingDocumentMutation(
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
+const LOCAL_CLIENT_KEY = 'tina.local.isLogedIn'
+
 export class LocalClient extends Client {
-  constructor(props?: {
-    customContentApiUrl?: string
-    schema?: TinaCloudSchema<false>
-  }) {
+  constructor(
+    props?: {
+      customContentApiUrl?: string
+      schema?: TinaCloudSchema<false>
+    } & Omit<ServerOptions, 'clientId' | 'branch'>
+  ) {
     const clientProps = {
       ...props,
       clientId: '',
@@ -519,11 +532,25 @@ export class LocalClient extends Client {
     super(clientProps)
   }
 
-  async isAuthorized(): Promise<boolean> {
+  public get isLocalMode() {
     return true
   }
 
+  // These functions allow the local client to have a login state so that we can correctly call the "OnLogin" callback. This is important for things like preview mode
+  async onLogout() {
+    localStorage.removeItem(LOCAL_CLIENT_KEY)
+  }
+
+  async authenticate() {
+    localStorage.setItem(LOCAL_CLIENT_KEY, 'true')
+    return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' }
+  }
+
+  async isAuthorized(): Promise<boolean> {
+    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
+  }
+
   async isAuthenticated(): Promise<boolean> {
-    return true
+    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
 }

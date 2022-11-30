@@ -60,6 +60,7 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
+  const isLocal = client.isLocalMode
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
@@ -99,8 +100,12 @@ export const AuthWallInner = ({
     <>
       {activeModal === 'authenticate' && (
         <ModalBuilder
-          title="Tina Cloud Authorization"
-          message="To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account."
+          title={isLocal ? 'Enter into edit mode' : 'Tina Cloud Authorization'}
+          message={
+            isLocal
+              ? 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
+              : 'To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account.'
+          }
           close={close}
           actions={[
             ...otherModalActions,
@@ -119,9 +124,12 @@ export const AuthWallInner = ({
               primary: false,
             },
             {
-              name: 'Continue to Tina Cloud',
+              name: isLocal ? 'Enter Edit Mode' : 'Continue to Tina Cloud',
               action: async () => {
-                await client.authenticate()
+                const token = await client.authenticate()
+                if (typeof client?.onLogin === 'function') {
+                  await client?.onLogin({ token })
+                }
                 onAuthSuccess()
               },
               primary: true,
