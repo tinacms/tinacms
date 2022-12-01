@@ -31,6 +31,7 @@
     "@tinacms/schema-tools": "workspace:*",
     "acorn": "^8.7.1",
     "lodash-es": "^4.17.21",
+    "mdast-util-gfm": "^2.0.1",
     "mdast-util-mdx-jsx": "^2.0.1",
     "mdast-util-to-markdown": "^1.3.0",
     "prettier": "^2.7.1",

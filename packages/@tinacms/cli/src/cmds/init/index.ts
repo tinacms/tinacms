@@ -21,7 +21,7 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 
 interface Framework {
-  name: 'next' | 'hugo' | 'jekyll' | 'other'
+  name: 'next' | 'other'
   reactive: boolean
 }
 
@@ -108,13 +108,8 @@ const chooseTypescript = async () => {
 }
 
 const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
-  switch (framework.name) {
-    case 'next':
-      return 'public'
-    case 'hugo':
-      return 'assets'
-    case 'jekyll':
-      return 'assets'
+  if (framework.name === 'next') {
+    return 'public'
   }
   const option = await prompts({
     name: 'selection',
@@ -131,10 +126,8 @@ const chooseFramework = async () => {
     message: 'What framework are you using?',
     choices: [
       { title: 'Next.js', value: { name: 'next', reactive: true } },
-      { title: 'Hugo', value: { name: 'hugo', reactive: false } },
-      { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
       {
-        title: 'Other',
+        title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
         value: { name: 'other', reactive: false },
       },
     ] as { title: string; value: Framework }[],

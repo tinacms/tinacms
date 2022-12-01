@@ -22,6 +22,7 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
+import { gfmToMarkdown } from 'mdast-util-gfm'
 import { replaceAll } from '../parse'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -62,7 +63,7 @@ export const stringifyMDX = (
     }
   }
   const res = toMarkdown(rootElement(value, field, imageCallback), {
-    extensions: [mdxJsxToMarkdown()],
+    extensions: [mdxJsxToMarkdown(), gfmToMarkdown()],
     listItemIndent: 'one',
   })
   const templatesWithMatchers = field.templates?.filter(
@@ -193,6 +194,18 @@ export const blockElement = (
         url: imageCallback(content.url),
         alt: content.alt,
         title: content.caption,
+      }
+    case 'table':
+      return {
+        type: 'table',
+        align: [],
+        children: content.children.map((row: Plate.TableElement) => ({
+          type: 'tableRow',
+          children: row.children.map((cell) => ({
+            type: 'tableCell',
+            children: eat(cell.children, field, imageCallback),
+          })),
+        })),
       }
     default:
       throw new Error(`BlockElement: ${content.type} is not yet supported`)
