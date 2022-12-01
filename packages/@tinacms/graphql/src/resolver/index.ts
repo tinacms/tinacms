@@ -162,6 +162,7 @@ export class Resolver {
           template: lastItem(template.namespace),
         },
         _values: data,
+        _rawData: rawData,
       }
     } catch (e) {
       if (e instanceof TinaGraphQLError) {
@@ -340,6 +341,12 @@ export class Resolver {
     isAddPendingDocument: boolean
     isCollectionSpecific: boolean
   }) => {
+    const doc = await this.getDocument(realPath)
+
+    const shouldMergeUpdates = this.tinaSchema.schema.config?.gql?.mergeUpdates
+
+    // The oldDoc is {} if shouldMergeUpdates is false. If true, it's the current document.
+    const oldDoc = shouldMergeUpdates ? doc?._rawData || {} : {}
     /**
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */
@@ -355,7 +362,11 @@ export class Resolver {
               params,
               templateInfo.template
             )
-            await this.database.put(realPath, values, collection.name)
+            await this.database.put(
+              realPath,
+              { ...oldDoc, ...values },
+              collection.name
+            )
           }
           break
         case 'union':
@@ -369,6 +380,7 @@ export class Resolver {
                 )
               }
               const values = {
+                ...oldDoc,
                 // @ts-ignore FIXME: failing on unknown, which we don't need to know because it's recursive
                 ...this.buildFieldMutations(templateParams, template),
                 _template: lastItem(template.namespace),
@@ -386,7 +398,7 @@ export class Resolver {
       collection
     )
     //@ts-ignore
-    await this.database.put(realPath, params, collection.name)
+    await this.database.put(realPath, { ...oldDoc, ...params }, collection.name)
     return this.getDocument(realPath)
   }
 
