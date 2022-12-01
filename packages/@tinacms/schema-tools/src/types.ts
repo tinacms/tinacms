@@ -531,6 +531,9 @@ export interface Config<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  gql?: {
+    mergeUpdates?: boolean
+  }
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
