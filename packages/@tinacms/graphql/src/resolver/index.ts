@@ -32,13 +32,13 @@ import type {
 import type { GraphQLConfig } from '../types'
 
 import { TinaGraphQLError, TinaParseDocumentError } from './error'
-import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
 import { GraphQLError } from 'graphql'
+import { FilterCondition, makeFilterChain } from '../database/datalayer'
 
 interface ResolverConfig {
   config?: GraphQLConfig

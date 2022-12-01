@@ -10,9 +10,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-export {
-  FilesystemBridge,
-  AuditFileSystemBridge,
-} from './database/bridge/filesystem'
-export { IsomorphicBridge } from './database/bridge/isomorphic'
+import { TinaField } from '../../..';
+export declare const richBody: TinaField;

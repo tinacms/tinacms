@@ -82,10 +82,15 @@ export const checkClientInfo = async (
     usingTs: boolean
     schema?: TinaCloudSchema<false>
     apiUrl: string
+    isSelfHostedDatabase: boolean
   },
   next,
   _options: { verbose?: boolean }
 ) => {
+  if (ctx.isSelfHostedDatabase) {
+    next()
+  }
+
   const config = ctx.schema?.config
   const token = config.token
   const url = ctx.apiUrl

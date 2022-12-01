@@ -19,7 +19,7 @@ import { build } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
-import { fileExists, getClientPath, getPath } from '../../lib'
+import { fileExists, getPath } from '../../lib'
 import { logger } from '../../logger'
 
 const generatedFilesToRemove = [
@@ -265,7 +265,7 @@ export const compileSchema = async (options: {
   return schema
 }
 
-const transpile = async (
+export const transpile = async (
   inputFile,
   outputFile,
   tempDir,

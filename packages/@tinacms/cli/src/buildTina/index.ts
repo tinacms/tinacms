@@ -19,17 +19,12 @@ import {
   Database,
   getASTSchema,
 } from '@tinacms/graphql'
-import {
-  AuditFileSystemBridge,
-  FilesystemBridge,
-  IsomorphicBridge,
-  LevelStore,
-} from '@tinacms/datalayer'
+import { AuditFileSystemBridge, FilesystemBridge } from '@tinacms/datalayer'
+import { MemoryLevel } from 'memory-level'
 import path from 'path'
 import { DocumentNode } from 'graphql'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
-import { makeIsomorphicOptions } from './git'
 import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
@@ -61,15 +56,12 @@ export const buildSetupCmdBuild = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database } = await buildSetup({
+  await buildSetup({
     ...opts,
     rootPath,
-    useMemoryStore: true,
   })
   // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
@@ -80,15 +72,12 @@ export const buildSetupCmdServerStart = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database } = await buildSetup({
+  await buildSetup({
     ...opts,
     rootPath,
-    useMemoryStore: false,
   })
   // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
@@ -103,70 +92,36 @@ export const buildSetupCmdAudit = async (
     : new AuditFileSystemBridge(rootPath)
 
   await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
-  const store = new LevelStore(rootPath, false)
 
-  const database = await createDatabase({ store, bridge })
+  const database = await createDatabase({
+    level: new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    }),
+    bridge,
+  })
 
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
 
-const buildSetup = async ({
-  isomorphicGitBridge,
-  rootPath,
-  useMemoryStore,
-}: BuildSetupOptions & {
-  rootPath: string
-  useMemoryStore: boolean
-}) => {
-  const fsBridge = new FilesystemBridge(rootPath)
-  const isomorphicOptions =
-    isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
-
-  /**
-   * To work with Github directly, replace the Bridge and Store
-   * and ensure you've provided your access token.
-   * NOTE: when talking the the tinacms repo, you must
-   * give your personal access token access to the TinaCMS org
-   */
-  // const ghConfig = {
-  //   rootPath: 'examples/tina-cloud-starter',
-  //   accessToken: '<my-token>',
-  //   owner: 'tinacms',
-  //   repo: 'tinacms',
-  //   ref: 'add-data-store',
-  // }
-  // const bridge = new GithubBridge(ghConfig)
-  // const store = new GithubStore(ghConfig)
-
-  const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(rootPath, isomorphicOptions)
-    : fsBridge
-
-  // const store = experimentalData
-  //   ? new LevelStore(rootPath, useMemoryStore)
-  //   : new FilesystemStore({ rootPath })
-
+const buildSetup = async ({ rootPath }: { rootPath: string }) => {
   await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
-
-  const store = new LevelStore(rootPath, useMemoryStore)
-
-  const database = await createDatabase({ store, bridge })
-
-  return { database, bridge, store }
 }
 
 export const buildCmdBuild = async (
   ctx: {
     builder: ConfigBuilder
+    database: Database
+    graphQLSchema: DocumentNode
     rootPath: string
     usingTs: boolean
     schema: unknown
     apiUrl: string
+    tinaSchema: any
   },
   next: () => void,
   options: Omit<
@@ -175,11 +130,13 @@ export const buildCmdBuild = async (
   >
 ) => {
   // always skip indexing in the "build" command
-  const { schema } = await ctx.builder.build({
+  const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
   })
   ctx.schema = schema
+  ctx.graphQLSchema = graphQLSchema
+  ctx.tinaSchema = tinaSchema
   const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
@@ -199,7 +156,11 @@ export const buildCmdBuild = async (
 }
 
 export const auditCmdBuild = async (
-  ctx: { builder: ConfigBuilder; rootPath: string; database: Database },
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+  },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
@@ -217,6 +178,34 @@ export const auditCmdBuild = async (
       await ctx.database.indexContent({ graphQLSchema, tinaSchema })
     },
     text: 'Indexing local files',
+  })
+
+  next()
+}
+
+export const indexIntoSelfHostedDatabase = async (
+  ctx: {
+    builder: ConfigBuilder
+    isSelfHostedDatabase?: boolean
+    rootPath: string
+    database: Database
+    graphQLSchema: DocumentNode
+    schema: any
+    tinaSchema: any
+  },
+  next: () => void
+) => {
+  if (!ctx.isSelfHostedDatabase) {
+    return next()
+  }
+
+  const { graphQLSchema, tinaSchema } = ctx
+
+  await spin({
+    waitFor: async () => {
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+    },
+    text: 'Indexing to self-hosted database',
   })
 
   next()
@@ -241,13 +230,11 @@ export class ConfigBuilder {
     this.database.clearCache()
 
     await fs.mkdirp(tinaGeneratedPath)
-    await this.database.store.close()
     await resetGeneratedFolder({
       tinaGeneratedPath,
       usingTs,
       isBuild: !local,
     })
-    await this.database.store.open()
 
     const compiledSchema = await compileSchema({
       verbose,

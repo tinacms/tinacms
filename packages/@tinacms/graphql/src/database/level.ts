@@ -1,0 +1,46 @@
+import {
+  AbstractLevel,
+  AbstractSublevel,
+  AbstractSublevelOptions,
+} from 'abstract-level'
+import { INDEX_KEY_FIELD_SEPARATOR } from './datalayer'
+
+export type Level = AbstractLevel<
+  Buffer | Uint8Array | string,
+  string,
+  Record<string, any>
+>
+
+export type PutOp = {
+  type: 'put'
+  key: string
+  value: Record<string, any>
+  sublevel?: AbstractSublevel<
+    Level,
+    Buffer | Uint8Array | string,
+    string,
+    Record<string, any>
+  >
+}
+
+export type DelOp = {
+  type: 'del'
+  key: string
+  sublevel?: AbstractSublevel<
+    Level,
+    Buffer | Uint8Array | string,
+    string,
+    Record<string, Record<string, any>>
+  >
+}
+
+export type BatchOp = PutOp | DelOp
+
+export const ROOT_PREFIX = '~'
+export const SUBLEVEL_OPTIONS: AbstractSublevelOptions<
+  string,
+  Record<string, any>
+> = {
+  separator: INDEX_KEY_FIELD_SEPARATOR,
+  valueEncoding: 'json',
+}

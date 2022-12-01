@@ -38,10 +38,8 @@ export const buildDotTinaFiles = async ({
   flags?: string[]
   buildSDK?: boolean
 }) => {
-  if (database.store.supportsIndexing()) {
-    if (flags.indexOf('experimentalData') === -1) {
-      flags.push('experimentalData')
-    }
+  if (flags.indexOf('experimentalData') === -1) {
+    flags.push('experimentalData')
   }
   const tinaSchema = await createSchema({ schema: config, flags })
   const builder = await createBuilder({

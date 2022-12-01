@@ -14,22 +14,12 @@ limitations under the License.
 import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
+import { MemoryLevel } from 'memory-level'
 const rootPath = path.join(__dirname, '/')
-import { LevelStore } from '@tinacms/datalayer'
 
-class FilesystemStoreTest extends LevelStore {
-  constructor(rootPath: string, useMemory: boolean = false) {
-    super(rootPath, useMemory)
-  }
-  public supportsSeeding() {
-    return true
-  }
-  public supportsIndexing() {
-    return false
-  }
-}
-
-const store = new FilesystemStoreTest(rootPath, true)
+const level = new MemoryLevel<string, Record<string, any>>({
+  valueEncoding: 'json',
+})
 
 const fixtures: Fixture[] = [
   {
@@ -87,7 +77,7 @@ describe('A schema without indexing', () => {
       const { responses, expectedResponsePaths } = await setupFixture(
         rootPath,
         tinaSchema,
-        store,
+        level,
         fixture,
         'movies'
       )
@@ -109,7 +99,7 @@ describe('A schema without indexing', () => {
       const { responses, expectedResponsePaths } = await setupFixture2(
         rootPath,
         tinaSchema,
-        store,
+        level,
         fixture,
         'movies',
         '_mutation',

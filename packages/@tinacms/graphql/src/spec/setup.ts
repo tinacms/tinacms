@@ -17,7 +17,6 @@ import { toMatchFile } from 'jest-file-snapshot'
 import { buildASTSchema, printSchema } from 'graphql'
 
 import { FilesystemBridge } from '@tinacms/datalayer'
-import type { Store } from '@tinacms/datalayer'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 
 import { resolve } from '../resolve'
@@ -25,6 +24,7 @@ import { createDatabase } from '../database'
 import { Database } from '../database'
 import { sequential } from '../util'
 import { buildDotTinaFiles } from '../build'
+import { Level } from '../database/level'
 
 class MockFilesystemBridge extends FilesystemBridge {
   constructor(rootPath: string) {
@@ -41,14 +41,14 @@ jest.setTimeout(10000)
 export const setup = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
-  store: Store
+  level: Level
 ): Promise<{
   database: Database
 }> => {
   const setupBridge = new FilesystemBridge(rootPath)
   const setupDatabase = await createDatabase({
     bridge: setupBridge,
-    store,
+    level,
   })
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database: setupDatabase,
@@ -60,7 +60,7 @@ export const setup = async (
   const database = await createDatabase({
     // @ts-ignore
     bridge,
-    store,
+    level,
   })
   const schemaString = await database.getGraphQLSchemaFromBridge()
   // @ts-ignore
@@ -103,13 +103,13 @@ export type Fixture =
 export const setupFixture = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
-  store: Store,
+  level: Level,
   fixture: Fixture,
   suffix?: string,
   queryName: string = '_query',
   folder: string = 'requests'
 ) => {
-  const { database } = await setup(rootPath, schema, store)
+  const { database } = await setup(rootPath, schema, level)
   const basePath = path.join(rootPath, folder, fixture.name)
 
   const query = await fs
@@ -207,13 +207,13 @@ export const setupFixture = async (
 export const setupFixture2 = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
-  store: Store,
+  level: Level,
   fixture: Fixture,
   suffix?: string,
   queryName: string = '_query',
   folder: string = 'requests'
 ) => {
-  const { database } = await setup(rootPath, schema, store)
+  const { database } = await setup(rootPath, schema, level)
   const basePath = path.join(rootPath, folder, fixture.name)
 
   const query = await fs

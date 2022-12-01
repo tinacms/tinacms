@@ -27,8 +27,10 @@ import {
   buildSetupCmdBuild,
   auditCmdBuild,
   buildSetupCmdAudit,
+  indexIntoSelfHostedDatabase,
 } from '../buildTina'
 import { initStaticTina } from './init'
+import { attachDatabase } from '../buildTina/attachDatabase'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
@@ -133,6 +135,7 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           async (ctx, next, _) => {
             logger.warn(
               warnText(
@@ -166,12 +169,13 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           checkOptions,
           buildSetupCmdServerStart,
           startServer,
           startSubprocess,
         ],
-        options
+        { ...options, useLocalDatabase: true }
       ),
   },
   {
@@ -190,11 +194,13 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           checkOptions,
           buildSetupCmdBuild,
           buildCmdBuild,
           checkClientInfo,
           waitForDB,
+          indexIntoSelfHostedDatabase,
         ],
         options
       ),

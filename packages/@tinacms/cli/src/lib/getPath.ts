@@ -18,7 +18,7 @@ interface GetPathParams {
   projectDir: string
   filename: string
   allowedTypes: string[]
-  errorMessage: string
+  errorMessage?: string
 }
 
 export const fileExists = ({
@@ -54,7 +54,11 @@ export const getPath = ({
   errorMessage,
 }: GetPathParams) => {
   if (!fs.existsSync(projectDir)) {
-    throw new Error(errorMessage)
+    if (errorMessage) {
+      throw new Error(errorMessage)
+    } else {
+      throw new Error(`Could not find ${projectDir}`)
+    }
   }
   // Get file
   const filePaths = allowedTypes.map((ext) =>
@@ -71,7 +75,7 @@ export const getPath = ({
     return true
   })
 
-  if (!inputFile) {
+  if (!inputFile && errorMessage) {
     throw new Error(errorMessage)
   }
 

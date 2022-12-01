@@ -34,12 +34,7 @@
     "gray-matter": "^4.0.2",
     "isomorphic-git": "^1.10.3",
     "js-yaml": "^3.14.0",
-    "jsonpath-plus": "^6.0.1",
-    "level": "^7.0.1",
-    "leveldown": "^6.1.0",
-    "levelup": "^5.1.1",
     "lodash": "^4.17.20",
-    "memdown": "^6.1.1",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "yup": "^0.32.9"

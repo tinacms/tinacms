@@ -15,7 +15,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { buildASTSchema } from 'graphql'
 
-export type { Store } from '@tinacms/datalayer'
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,

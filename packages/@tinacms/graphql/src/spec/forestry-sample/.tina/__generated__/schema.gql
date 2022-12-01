@@ -48,13 +48,20 @@ type Query {
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
   author(relativePath: String): Author!
-  authorConnection(before: String, after: String, first: Float, last: Float, sort: String): AuthorConnection!
+  authorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: AuthorFilter): AuthorConnection!
   post(relativePath: String): Post!
-  postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
+  postConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PostFilter): PostConnection!
   stuff(relativePath: String): Stuff!
-  stuffConnection(before: String, after: String, first: Float, last: Float, sort: String): StuffConnection!
+  stuffConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: StuffFilter): StuffConnection!
   page(relativePath: String): Page!
-  pageConnection(before: String, after: String, first: Float, last: Float, sort: String): PageConnection!
+  pageConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: PageFilter): PageConnection!
+}
+
+input DocumentFilter {
+  author: AuthorFilter
+  post: PostFilter
+  stuff: StuffFilter
+  page: PageFilter
 }
 
 type DocumentConnectionEdges {
@@ -77,7 +84,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = AuthorAuthor | PostPost | StuffTemplate_1 | StuffTemplate_2 | StuffTemplate_3 | Page
@@ -96,6 +103,27 @@ type AuthorAuthor implements Node & Document {
 }
 
 union Author = AuthorAuthor
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input AuthorAuthorSocialMediaFilter {
+  platform: StringFilter
+  handle: StringFilter
+}
+
+input AuthorAuthorFilter {
+  name: StringFilter
+  socialMedia: AuthorAuthorSocialMediaFilter
+}
+
+input AuthorFilter {
+  author: AuthorAuthorFilter
+}
 
 type AuthorConnectionEdges {
   cursor: String!
@@ -120,6 +148,20 @@ type PostPost implements Node & Document {
 }
 
 union Post = PostPost
+
+input PostPostAuthorFilter {
+  author: AuthorFilter
+}
+
+input PostPostFilter {
+  title: StringFilter
+  body: StringFilter
+  author: PostPostAuthorFilter
+}
+
+input PostFilter {
+  post: PostPostFilter
+}
 
 type PostConnectionEdges {
   cursor: String!
@@ -154,6 +196,24 @@ type StuffTemplate_3 implements Node & Document {
 }
 
 union Stuff = StuffTemplate_1 | StuffTemplate_2 | StuffTemplate_3
+
+input StuffTemplate_1Filter {
+  title: StringFilter
+}
+
+input StuffTemplate_2Filter {
+  title: StringFilter
+}
+
+input StuffTemplate_3Filter {
+  title: StringFilter
+}
+
+input StuffFilter {
+  template_1: StuffTemplate_1Filter
+  template_2: StuffTemplate_2Filter
+  template_3: StuffTemplate_3Filter
+}
 
 type StuffConnectionEdges {
   cursor: String!
@@ -191,6 +251,40 @@ type Page implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input PageSeoFilter {
+  seoTitle: StringFilter
+  ogImage: ImageFilter
+  ogDescription: StringFilter
+}
+
+input PageBlocksHeroFilter {
+  description: StringFilter
+  backgroundImage: ImageFilter
+}
+
+input PageBlocksCtaFilter {
+  ctaText: StringFilter
+  ctaStyle: StringFilter
+}
+
+input PageBlocksFilter {
+  hero: PageBlocksHeroFilter
+  cta: PageBlocksCtaFilter
+}
+
+input PageFilter {
+  title: StringFilter
+  seo: PageSeoFilter
+  blocks: PageBlocksFilter
 }
 
 type PageConnectionEdges {

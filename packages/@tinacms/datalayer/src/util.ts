@@ -69,13 +69,6 @@ export function assertShape<T extends unknown>(
   }
 }
 
-export const atob = (b64Encoded: string) => {
-  return Buffer.from(b64Encoded, 'base64').toString()
-}
-export const btoa = (string: string) => {
-  return Buffer.from(string).toString('base64')
-}
-
 export const lastItem = (arr: (number | string)[]) => {
   return arr[arr.length - 1]
 }

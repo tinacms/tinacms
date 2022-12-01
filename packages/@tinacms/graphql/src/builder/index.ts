@@ -1280,16 +1280,14 @@ export class Builder {
     collection?: Collectable
     collections?: Collectable[]
   }) => {
-    const extra = this.database.store.supportsIndexing()
-      ? [
-          await this._connectionFilterBuilder({
-            fieldName,
-            namespace,
-            collection,
-            collections,
-          }),
-        ]
-      : []
+    const extra = [
+      await this._connectionFilterBuilder({
+        fieldName,
+        namespace,
+        collection,
+        collections,
+      }),
+    ]
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,

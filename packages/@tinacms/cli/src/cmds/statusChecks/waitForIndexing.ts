@@ -14,8 +14,6 @@ limitations under the License.
 import Progress from 'progress'
 import UrlPattern from 'url-pattern'
 import { TinaCloudSchema } from '@tinacms/schema-tools'
-import { Database, Bridge } from '@tinacms/graphql'
-import { ConfigBuilder } from '../../buildTina'
 
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
@@ -42,13 +40,9 @@ class IndexFailedError extends Error {
 
 export const waitForDB = async (
   ctx: {
-    builder: ConfigBuilder
-    rootPath: string
-    database: Database
-    bridge: Bridge
-    usingTs: boolean
     schema?: TinaCloudSchema<true>
     apiUrl: string
+    isSelfHostedDatabase?: boolean
   },
   next,
   options: { verbose?: boolean }
@@ -56,7 +50,7 @@ export const waitForDB = async (
   const token = ctx.schema.config.token
   const { clientId, branch, isLocalClient, host } = parseURL(ctx.apiUrl)
 
-  if (isLocalClient) {
+  if (isLocalClient || ctx.isSelfHostedDatabase) {
     return next()
   }
   const bar = new Progress(

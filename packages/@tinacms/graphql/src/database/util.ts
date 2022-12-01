@@ -86,3 +86,11 @@ export const parseFile = <T extends object>(
 export type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
 
 export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/')
+
+export const atob = (b64Encoded: string) => {
+  return Buffer.from(b64Encoded, 'base64').toString()
+}
+
+export const btoa = (string: string) => {
+  return Buffer.from(string).toString('base64')
+}

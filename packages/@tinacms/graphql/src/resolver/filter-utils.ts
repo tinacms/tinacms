@@ -17,7 +17,7 @@ import type {
   Template,
   TinaFieldInner,
 } from '@tinacms/schema-tools'
-import type { FilterCondition } from '@tinacms/datalayer'
+import { FilterCondition } from '../database/datalayer'
 
 export type ReferenceResolver = (
   filter: Record<string, object>,

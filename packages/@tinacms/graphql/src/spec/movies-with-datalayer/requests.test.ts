@@ -13,8 +13,8 @@ limitations under the License.
 
 import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
-import { LevelStore } from '@tinacms/datalayer'
 import { tinaSchema } from './.tina/schema'
+import { MemoryLevel } from 'memory-level'
 const rootPath = path.join(__dirname, '/')
 
 const fixtures: Fixture[] = [
@@ -77,16 +77,18 @@ afterEach(() => {
 })
 
 describe('A schema with indexing', () => {
-  let store
+  let level
   beforeEach(() => {
-    store = new LevelStore(rootPath, true)
+    level = new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    })
   })
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
       const { responses, expectedResponsePaths } = await setupFixture(
         rootPath,
         tinaSchema,
-        store,
+        level,
         fixture,
         'movies-with-datalayer'
       )
@@ -110,7 +112,7 @@ describe('A schema with indexing', () => {
       const { responses, expectedResponsePaths } = await setupFixture2(
         rootPath,
         tinaSchema,
-        store,
+        level,
         fixture,
         'movies-with-datalayer',
         '_mutation',
