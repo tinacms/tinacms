@@ -630,7 +630,10 @@ const resolveFormValue = <T extends Record<string, unknown>>({
   const accum: Record<string, unknown> = {}
   fields.forEach((field) => {
     const v = values[field.name]
-    if (!v) {
+    if (typeof v === 'undefined') {
+      return
+    }
+    if (v === null) {
       return
     }
     accum[field.name] = resolveFieldValue({
