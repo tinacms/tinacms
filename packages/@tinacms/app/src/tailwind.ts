@@ -29,7 +29,6 @@ export const viteTina = (): Plugin => {
         path.join(__dirname, '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
         path.join(viteConfig.root, '../prebuild/config.js'),
       ]
-      console.log(content)
 
       const tw = tailwind({
         important: '.tina-tailwind',
