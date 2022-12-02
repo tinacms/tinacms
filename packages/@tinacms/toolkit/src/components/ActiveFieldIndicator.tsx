@@ -252,6 +252,8 @@ export const ReverseActiveFieldIndicator = () => {
         childList: true,
       })
     }
+
+    return () => observer.disconnect()
   }, [selecting, setNodes])
 
   React.useEffect(() => {
