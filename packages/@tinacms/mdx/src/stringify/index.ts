@@ -23,7 +23,7 @@ import {
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
 import { replaceAll } from '../parse'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
@@ -47,7 +47,7 @@ declare module 'mdast' {
 
 export const stringifyMDX = (
   value: Plate.RootElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ) => {
   if (!value) {
@@ -92,7 +92,7 @@ export const stringifyMDX = (
 
 export const rootElement = (
   content: Plate.RootElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = []
@@ -110,7 +110,7 @@ export const rootElement = (
 
 export const blockElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
@@ -200,7 +200,7 @@ export const blockElement = (
 }
 const listItemElement = (
   content: Plate.ListItemElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
@@ -221,7 +221,7 @@ const listItemElement = (
 }
 const blockContentElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {

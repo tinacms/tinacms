@@ -28,12 +28,7 @@ import type {
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '@tinacms/schema-tools'
-import type {
-  TinaCloudSchemaBase,
-  CollectionFieldsWithNamespace,
-  CollectionTemplatesWithNamespace,
-  TinaFieldInner,
-} from '@tinacms/schema-tools'
+import type { Schema, SchemaField, Collection } from '@tinacms/schema-tools'
 import type { Bridge } from './bridge'
 import {
   atob,
@@ -104,11 +99,7 @@ export class Database {
 
   private collectionForPath = async (
     filepath: string
-  ): Promise<
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
-    | undefined
-  > => {
+  ): Promise<Collection | undefined> => {
     const tinaSchema = await this.getSchema()
     const collection = tinaSchema.getCollectionByFullPath(filepath)
     return collection
@@ -117,11 +108,7 @@ export class Database {
   private async partitionPathsByCollection(documentPaths: string[]) {
     const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
-    const collections: Record<
-      string,
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-    > = {}
+    const collections: Record<string, Collection> = {}
     for (const documentPath of documentPaths) {
       const collection = await this.collectionForPath(documentPath)
       if (collection) {
@@ -340,7 +327,7 @@ export class Database {
     const _graphql = await this.bridge.get(normalizePath(graphqlPath))
     return JSON.parse(_graphql)
   }
-  public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
+  public getTinaSchema = async (): Promise<Schema> => {
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
     return this.store.get(normalizePath(schemaPath))
   }
@@ -368,7 +355,7 @@ export class Database {
             }
 
             if (collection.fields) {
-              for (const field of collection.fields as TinaFieldInner<true>[]) {
+              for (const field of collection.fields as SchemaField[]) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
                   field.type ===
@@ -398,7 +385,7 @@ export class Database {
                 indexDefinitions[index.name] = {
                   fields: index.fields.map((indexField) => ({
                     name: indexField.name,
-                    type: (collection.fields as TinaFieldInner<true>[]).find(
+                    type: (collection.fields as SchemaField[]).find(
                       (field) => indexField.name === field.name
                     )?.type,
                   })),
@@ -705,9 +692,7 @@ type UnionDataLookup = {
 const _indexContent = async (
   database: Database,
   documentPaths: string[],
-  collection?:
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
+  collection?: Collection
 ) => {
   let seedOptions: object | undefined = undefined
 
@@ -754,9 +739,7 @@ const _indexContent = async (
 const _deleteIndexContent = async (
   database: Database,
   documentPaths: string[],
-  collection?:
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
+  collection?: Collection
 ) => {
   let deleteOptions: object | undefined = undefined
   if (collection) {

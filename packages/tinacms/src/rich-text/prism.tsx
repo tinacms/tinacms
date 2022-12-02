@@ -17,6 +17,7 @@ import theme from 'prism-react-renderer/themes/github'
 
 export const Prism = (props: { value: string; lang?: string }) => {
   return (
+    // @ts-ignore same problem as here https://github.com/bvaughn/react-error-boundary/issues/113#issuecomment-1262939912
     <Highlight
       {...defaultProps}
       theme={theme}

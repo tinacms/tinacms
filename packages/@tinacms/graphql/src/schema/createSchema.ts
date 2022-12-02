@@ -10,9 +10,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { TinaSchema, TinaCloudSchemaBase } from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools/dist/types'
+import type { Schema as SchemaWithNamespace } from '@tinacms/schema-tools'
 
-import { validateSchema } from './validate'
 // @ts-ignore File '...' is not under 'rootDir'
 import packageJSON from '../../package.json'
 
@@ -20,10 +21,9 @@ export const createSchema = async ({
   schema,
   flags = [],
 }: {
-  schema: TinaCloudSchemaBase
+  schema: Schema | SchemaWithNamespace
   flags?: string[]
 }) => {
-  const validSchema = await validateSchema(schema)
   const [major, minor, patch] = packageJSON.version.split('.')
   const meta = {}
   if (flags && flags.length > 0) {
@@ -37,6 +37,6 @@ export const createSchema = async ({
       patch,
     },
     meta,
-    ...validSchema,
+    ...schema,
   })
 }

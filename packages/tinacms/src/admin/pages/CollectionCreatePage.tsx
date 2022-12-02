@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import {
-  BaseTextField,
   Form,
   FormBuilder,
   FormStatus,
@@ -20,8 +19,7 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
-import type { GlobalTemplate } from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -145,19 +143,19 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
-  const template: GlobalTemplate<true> = schema.getTemplateForData({
+  const template = schema.getTemplateForData({
     collection: schemaCollection,
     data: { _template: templateName },
-  }) as GlobalTemplate<true>
+  })
 
-  const formInfo = resolveForm({
+  const formInfo = schema.resolveForm({
     collection: schemaCollection,
     basename: schemaCollection.name,
     schema: schema,
-    template,
+    templateName: template.name,
   })
 
-  let slugFunction = template?.ui?.filename?.slugify
+  let slugFunction = schemaCollection?.ui?.filename?.slugify
 
   if (!slugFunction) {
     const titleField = template?.fields.find(
@@ -202,13 +200,13 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             ? wrapFieldsWithMeta(({ field, input, meta }) => {
                 return (
                   <FilenameInput
-                    readonly={template?.ui?.filename?.readonly}
+                    readonly={schemaCollection?.ui?.filename?.readonly}
                     {...input}
                   />
                 )
               })
             : 'text',
-          disabled: template?.ui?.filename?.readonly,
+          disabled: schemaCollection?.ui?.filename?.readonly,
           description: (
             <span>
               A unique filename for the content.

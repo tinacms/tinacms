@@ -13,7 +13,6 @@ limitations under the License.
 
 import { ZodError } from 'zod'
 import { Schema } from '../types'
-import { TinaCloudSchema } from '../types/index'
 import { parseZodError } from '../util/parseZodErrors'
 import { TinaCloudSchemaZod } from './schema'
 
@@ -26,12 +25,7 @@ export class TinaSchemaValidationError extends Error {
   }
 }
 
-export const validateSchema = ({
-  schema,
-}: {
-  // TODO: deprecate TinaClouSchema
-  schema: Schema | TinaCloudSchema<false>
-}) => {
+export const validateSchema = ({ schema }: { schema: Schema }) => {
   try {
     TinaCloudSchemaZod.parse(schema)
   } catch (e) {

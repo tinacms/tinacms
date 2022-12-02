@@ -13,6 +13,11 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/types.es.js",
       "require": "./dist/types.js"
+    },
+    "./dist/internal": {
+      "types": "./dist/internal.d.ts",
+      "import": "./dist/internal.es.js",
+      "require": "./dist/internal.js"
     }
   },
   "typings": "dist/index.d.ts",
@@ -26,7 +31,7 @@
         "name": "src/index.ts"
       },
       {
-        "name": "src/types.ts"
+        "name": "src/types/index.ts"
       }
     ]
   },
@@ -34,12 +39,10 @@
     "@tinacms/scripts": "workspace:*",
     "@types/yup": "^0.29.10",
     "jest": "^27.0.6",
-    "react": "17.0.2",
     "typescript": "4.3.5",
     "yup": "^0.32.0"
   },
   "peerDependencies": {
-    "react": ">=16.14.0",
     "yup": "^0.32.0"
   },
   "scripts": {

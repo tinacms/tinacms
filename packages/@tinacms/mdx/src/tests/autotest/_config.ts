@@ -15,11 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 export { output } from '../setup'
 export { parseMDX, stringifyMDX } from '../..'
 
-export const field: RichTypeInner = {
+export const field: RichTextField = {
   name: 'body',
   type: 'rich-text',
   templates: [

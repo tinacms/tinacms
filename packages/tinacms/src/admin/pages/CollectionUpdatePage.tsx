@@ -16,7 +16,7 @@ import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
 import { Link, useParams } from 'react-router-dom'
 import { HiChevronRight } from 'react-icons/hi'
 import { LocalWarning } from '@tinacms/toolkit'
@@ -106,16 +106,11 @@ const RenderForm = ({
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
-
-  const template = schema.getTemplateForData({
-    collection: schemaCollection,
-    data: document._values,
-  })
-  const formInfo = resolveForm({
+  const formInfo = schema.resolveForm({
     collection: schemaCollection,
     basename: schemaCollection.name,
     schema: schema,
-    template,
+    templateName: document._values.template,
   })
 
   const form = useMemo(() => {

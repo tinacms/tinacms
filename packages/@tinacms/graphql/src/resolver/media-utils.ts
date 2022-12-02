@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import type { GraphQLConfig } from '../types'
-import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 
 /**
  * Strips away the Tina Cloud Asset URL from an `image` value
@@ -25,7 +25,7 @@ import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
 export const resolveMediaCloudToRelative = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true },
-  schema: TinaCloudSchemaEnriched
+  schema: Schema
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
@@ -62,7 +62,7 @@ export const resolveMediaCloudToRelative = (
 export const resolveMediaRelativeToCloud = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true },
-  schema: TinaCloudSchemaEnriched
+  schema: Schema
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
@@ -88,7 +88,7 @@ const cleanUpSlashes = (path: string): string => {
   return ''
 }
 
-const hasTinaMediaConfig = (schema: TinaCloudSchemaEnriched): boolean => {
+const hasTinaMediaConfig = (schema: Schema): boolean => {
   if (
     schema.config?.media?.tina?.publicFolder &&
     schema.config?.media?.tina?.mediaRoot

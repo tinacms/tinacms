@@ -19,7 +19,7 @@ limitations under the License.
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 /**
@@ -71,7 +71,7 @@ import type * as Plate from './plate'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (value: string, field: RichTypeInner) => {
+export const markdownToAst = (value: string, field: RichTextField) => {
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -121,7 +121,7 @@ export const MDX_PARSE_ERROR_MSG_HTML =
 
 export const parseMDX = (
   value: string,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   let tree

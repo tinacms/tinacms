@@ -12,14 +12,9 @@ limitations under the License.
 */
 import { Client, Field, Form, FormOptions, TinaCMS } from 'tinacms'
 import { assign, createMachine, sendParent } from 'xstate'
-import {
-  resolveForm,
-  Templateable,
-  TinaFieldEnriched,
-  TinaSchema,
-} from 'tinacms'
+import type { TinaSchema, SchemaField } from '@tinacms/schema-tools'
 
-export type FieldType = Field & TinaFieldEnriched
+export type FieldType = Field & SchemaField
 export type FormValues = Record<string, unknown>
 export type FormType = Form<FormValues, FieldType>
 
@@ -183,27 +178,11 @@ export const documentMachine =
           const collection = schema.getCollection(
             node._internalSys.collection.name
           )
-          let template: Templateable
-          if (collection.templates) {
-            template = collection.templates.find((template) => {
-              if (typeof template === 'string') {
-                throw new Error(`Global templates not supported`)
-              }
-              return template.name === node._internalSys.template
-            }) as Templateable
-          } else {
-            template = collection
-          }
-          if (!template) {
-            throw new Error(
-              `Unable to find template for node ${node._internalSys.path}`
-            )
-          }
-          const resolvedForm = resolveForm({
+          const resolvedForm = schema.resolveForm({
             collection,
             basename: node._internalSys.filename,
             schema,
-            template,
+            templateName: node._internalSys.template,
           })
           const onSubmit = async (payload: Record<string, unknown>) => {
             try {

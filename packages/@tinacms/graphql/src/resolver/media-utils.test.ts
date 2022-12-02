@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from '../types'
 import {
   resolveMediaRelativeToCloud,
@@ -19,7 +19,7 @@ import {
 } from './media-utils'
 
 describe('resolveMedia', () => {
-  const schema: TinaCloudSchemaEnriched = {
+  const schema: Schema = {
     config: {
       media: {
         tina: {
@@ -96,7 +96,7 @@ describe('resolveMedia', () => {
    * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
    */
   it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {
-    const otherSchema: TinaCloudSchemaEnriched = {
+    const otherSchema: Schema = {
       config: {
         media: {},
       },

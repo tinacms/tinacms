@@ -12,14 +12,15 @@ limitations under the License.
 */
 
 import { resolve } from '@tinacms/graphql'
-import type { Database, TinaCloudCollection } from '@tinacms/graphql'
+import type { Database } from '@tinacms/graphql'
+import type { Collection } from '@tinacms/schema-tools/dist/types'
 import path from 'path'
 import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
 type AuditArgs = {
-  collection: TinaCloudCollection
+  collection: Collection
   database: Database
   rootPath: string
   documents: { node: { path: string } }[]

@@ -48,7 +48,7 @@ export interface DocumentSys {
   }
 }
 
-export interface Collection {
+export interface CollectionResponse {
   label: string
   name: string
   slug: string

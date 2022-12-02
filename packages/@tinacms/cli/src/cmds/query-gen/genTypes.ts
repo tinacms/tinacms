@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { GraphQLSchema, printSchema } from 'graphql'
-import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools/dist/types'
 
 import fs from 'fs-extra'
 import p from 'path'
@@ -25,10 +25,7 @@ const root = process.cwd()
 const generatedPath = p.join(root, '.tina', '__generated__')
 
 export async function genClient(
-  {
-    tinaSchema,
-    usingTs,
-  }: { tinaSchema: TinaCloudSchema<false>; usingTs?: boolean },
+  { tinaSchema, usingTs }: { tinaSchema: Schema; usingTs?: boolean },
   options
 ) {
   const branch = tinaSchema?.config?.branch

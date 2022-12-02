@@ -18,7 +18,7 @@ import { buildASTSchema, printSchema } from 'graphql'
 
 import { FilesystemBridge } from '@tinacms/datalayer'
 import type { Store } from '@tinacms/datalayer'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 
 import { resolve } from '../resolve'
 import { createDatabase } from '../database'
@@ -40,7 +40,7 @@ jest.setTimeout(10000)
 
 export const setup = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
+  schema: Schema,
   store: Store
 ): Promise<{
   database: Database
@@ -102,7 +102,7 @@ export type Fixture =
 
 export const setupFixture = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
+  schema: Schema,
   store: Store,
   fixture: Fixture,
   suffix?: string,
@@ -206,7 +206,7 @@ export const setupFixture = async (
 
 export const setupFixture2 = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
+  schema: Schema,
   store: Store,
   fixture: Fixture,
   suffix?: string,

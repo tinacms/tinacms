@@ -17,11 +17,19 @@ import { useCMS, defineConfig } from 'tinacms'
 
 type Config = Parameters<typeof defineConfig>[0]
 
-type PostMessage = {
-  type: 'open' | 'close' | 'isEditMode'
-  id: string
-  data: object
-}
+type PostMessage =
+  | {
+      type: 'open' | 'close'
+      id: string
+      query: string
+      data: object
+      variables: object
+    }
+  | {
+      type: 'isEditMode'
+      id: string
+      data: object
+    }
 
 export const Preview = (
   props: Config & {

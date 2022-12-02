@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type * as Plate from './plate'
 import { extractAttributes } from './acorn'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -27,19 +27,19 @@ export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxTextElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Plate.MdxInlineElement
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxFlowElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Plate.MdxBlockElement
 export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ):
   | Plate.MdxInlineElement

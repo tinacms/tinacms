@@ -13,7 +13,7 @@ limitations under the License.
 
 import Progress from 'progress'
 import type { Bridge, Database } from '@tinacms/graphql'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools/dist/types'
 import { ConfigBuilder } from '../../buildTina'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
@@ -78,7 +78,7 @@ export const checkClientInfo = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema<false>
+    schema?: Schema
     apiUrl: string
   },
   next,

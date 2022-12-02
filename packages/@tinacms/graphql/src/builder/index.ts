@@ -29,13 +29,10 @@ import type {
 } from 'graphql'
 
 import type {
-  TinaCloudCollectionEnriched,
-  TinaFieldEnriched,
-  CollectionTemplateable,
-  Collectable,
-  Templateable,
-  TinaFieldInner,
+  SchemaField,
   Template,
+  Collection,
+  ObjectField,
 } from '@tinacms/schema-tools'
 import { TinaSchema } from '@tinacms/schema-tools'
 
@@ -84,9 +81,7 @@ export class Builder {
    *
    * @param collections
    */
-  public buildCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
+  public buildCollectionDefinition = async (collections: Collection[]) => {
     const name = 'collection'
     const typeName = 'Collection'
     const args = [
@@ -172,9 +167,7 @@ export class Builder {
    *
    * @param collections
    */
-  public buildMultiCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
+  public buildMultiCollectionDefinition = async (collections: Collection[]) => {
     const name = 'collections'
     const typeName = 'Collection'
 
@@ -232,9 +225,7 @@ export class Builder {
    *
    * @param collections
    */
-  public multiCollectionDocument = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
+  public multiCollectionDocument = async (collections: Collection[]) => {
     const name = 'document'
     const args = [
       astBuilder.InputValueDefinition({
@@ -313,7 +304,7 @@ export class Builder {
    * @param collections
    */
   public buildCreateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'createDocument',
@@ -356,7 +347,7 @@ export class Builder {
    * @param collections
    */
   public buildUpdateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'updateDocument',
@@ -398,7 +389,7 @@ export class Builder {
    * @param collections
    */
   public buildDeleteCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'deleteDocument',
@@ -432,9 +423,7 @@ export class Builder {
    *
    * @param collection
    */
-  public collectionDocument = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionDocument = async (collection: Collection) => {
     const name = NAMER.queryName([collection.name])
     const type = await this._buildCollectionDocumentType(collection)
     const args = [
@@ -467,9 +456,7 @@ export class Builder {
    * @public
    * @param collection a Tina Cloud collection
    */
-  public collectionFragment = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionFragment = async (collection: Collection) => {
     const name = NAMER.dataTypeName(collection.namespace)
     const fragmentName = NAMER.fragmentName(collection.namespace)
     const selections = await this._getCollectionFragmentSelections(
@@ -499,7 +486,7 @@ export class Builder {
    *
    * */
   private _getCollectionFragmentSelections = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: Collection,
     depth: number
   ) => {
     const selections = []
@@ -520,7 +507,7 @@ export class Builder {
   }
 
   private _buildFieldNodeForFragments: (
-    field: TinaFieldInner<true>,
+    field: SchemaField,
     depth: number
   ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
@@ -632,7 +619,7 @@ export class Builder {
   }
 
   public async buildTemplateFragments(
-    template: Template<true>,
+    template: Template,
     depth: number
   ): Promise<InlineFragmentNode> {
     const selections = []
@@ -660,9 +647,7 @@ export class Builder {
    *
    * @param collection
    */
-  public updateCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public updateCollectionDocumentMutation = async (collection: Collection) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
       name: NAMER.updateName([collection.name]),
@@ -695,9 +680,7 @@ export class Builder {
    *
    * @param collection
    */
-  public createCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public createCollectionDocumentMutation = async (collection: Collection) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
       name: NAMER.createName([collection.name]),
@@ -733,9 +716,7 @@ export class Builder {
    *
    * @param collection
    */
-  public collectionDocumentList = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionDocumentList = async (collection: Collection) => {
     const connectionName = NAMER.referenceConnectionType(collection.namespace)
 
     await this.database.addToLookupMap({
@@ -759,7 +740,7 @@ export class Builder {
   public buildStaticDefinitions = () => staticDefinitions
 
   private _buildCollectionDocumentType = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: Collection,
     suffix: string = '',
     extraFields: FieldDefinitionNode[] = [],
     extraInterfaces: NamedTypeNode[] = []
@@ -832,7 +813,7 @@ export class Builder {
   }
 
   private _filterCollectionDocumentType = async (
-    collection: Collectable
+    collection: Collection | ObjectField
   ): Promise<InputObjectTypeDefinitionNode> => {
     const t = this.tinaSchema.getTemplatesForCollectable(collection)
     if (t.type === 'union') {
@@ -850,7 +831,7 @@ export class Builder {
     return this._buildTemplateFilter(t.template)
   }
 
-  private _buildTemplateFilter = async (template: Templateable) => {
+  private _buildTemplateFilter = async (template: Template) => {
     const fields = []
     await sequential(template.fields, async (field) => {
       const f = await this._buildFieldFilter(field)
@@ -866,7 +847,7 @@ export class Builder {
   }
 
   private _updateCollectionDocumentMutationType = async (
-    collection: Collectable
+    collection: Collection | ObjectField
   ): Promise<InputObjectTypeDefinitionNode> => {
     const t = this.tinaSchema.getTemplatesForCollectable(collection)
     if (t.type === 'union') {
@@ -884,7 +865,7 @@ export class Builder {
     return this._buildTemplateMutation(t.template)
   }
 
-  private _buildTemplateMutation = async (template: Templateable) => {
+  private _buildTemplateMutation = async (template: Template) => {
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(template.namespace),
       fields: await sequential(template.fields, (field) => {
@@ -898,7 +879,7 @@ export class Builder {
     collections,
   }: {
     fieldName: string
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection[]
   }) => {
     const types: string[] = []
     collections.forEach((collection) => {
@@ -940,7 +921,7 @@ export class Builder {
     fieldName: string
     namespace: string[]
     nodeType: string | TypeDefinitionNode
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection[]
     connectionNamespace: string[]
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
@@ -959,7 +940,7 @@ export class Builder {
     })
   }
 
-  private _buildFieldFilter = async (field: TinaFieldEnriched) => {
+  private _buildFieldFilter = async (field: SchemaField) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1103,6 +1084,7 @@ export class Builder {
         }
         return astBuilder.InputValueDefinition({
           name: field.name,
+          // @ts-ignore FIXME: this filter doesn't really make much sense
           type: await this._filterCollectionDocumentType(field),
         })
       case 'reference':
@@ -1123,7 +1105,7 @@ export class Builder {
     }
   }
 
-  private _buildFieldMutation = async (field: TinaFieldEnriched) => {
+  private _buildFieldMutation = async (field: SchemaField) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1189,10 +1171,12 @@ export class Builder {
   }
 
   private _buildObjectOrUnionData = async (
-    collectableTemplate: CollectionTemplateable,
+    collectableTemplate:
+      | { type: 'union'; namespace: string[]; templates: Template[] }
+      | { type: 'object'; namespace: string[]; template: Template },
     extraFields = [],
     extraInterfaces = [],
-    collection?: TinaCloudCollectionEnriched
+    collection?: Collection
   ): Promise<UnionTypeDefinitionNode | ObjectTypeDefinitionNode> => {
     if (collectableTemplate.type === 'union') {
       const name = NAMER.dataTypeName(collectableTemplate.namespace)
@@ -1232,8 +1216,8 @@ export class Builder {
   }: {
     fieldName: string
     namespace: string[]
-    collection?: Collectable
-    collections?: Collectable[]
+    collection?: Collection | ObjectField
+    collections?: Collection[]
   }) => {
     let filter
     if (collections) {
@@ -1275,8 +1259,8 @@ export class Builder {
     namespace: string[]
     connectionName: string
     nodeType: string | TypeDefinitionNode
-    collection?: Collectable
-    collections?: Collectable[]
+    collection?: Collection | ObjectField
+    collections?: Collection[]
   }) => {
     const extra = this.database.store.supportsIndexing()
       ? [
@@ -1328,7 +1312,7 @@ export class Builder {
     })
   }
 
-  private _buildDataField = async (field: TinaFieldEnriched) => {
+  private _buildDataField = async (field: SchemaField) => {
     const listWarningMsg = `
 WARNING: The user interface for ${field.type} does not support \`list: true\`
 Visit https://tina.io/docs/errors/ui-not-supported/ for more information
@@ -1403,7 +1387,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
   }
 
   private _buildTemplateData = async (
-    { namespace, fields }: Templateable,
+    { namespace, fields }: Template,
     extraFields = [],
     extraInterfaces = []
   ) => {

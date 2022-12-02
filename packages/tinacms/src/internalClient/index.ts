@@ -27,11 +27,8 @@ import { formify } from './formify'
 import { formify as formify2 } from '../hooks/formify'
 
 import gql from 'graphql-tag'
-import {
-  TinaSchema,
-  addNamespaceToSchema,
-  TinaCloudSchema,
-} from '@tinacms/schema-tools'
+import { TinaSchema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools'
 
 export type TinaIOConfig = {
   assetsApiUrlOverride?: string // https://assets.tinajs.io
@@ -40,7 +37,7 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
-  schema?: TinaCloudSchema<false>
+  schema?: Schema
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -77,7 +74,7 @@ export class Client {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
         meta: { flags: [] },
-        ...addNamespaceToSchema({ ...options.schema }, []),
+        ...options.schema,
       })
       this.schema = enrichedSchema
     }
@@ -172,7 +169,7 @@ mutation addPendingDocumentMutation(
     collection: $collection
   ) {
     ... on Document {
-      sys {
+      _sys {
         relativePath
         path
         breadcrumbs
@@ -503,10 +500,7 @@ mutation addPendingDocumentMutation(
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
 export class LocalClient extends Client {
-  constructor(props?: {
-    customContentApiUrl?: string
-    schema?: TinaCloudSchema<false>
-  }) {
+  constructor(props?: { customContentApiUrl?: string; schema?: Schema }) {
     const clientProps = {
       ...props,
       clientId: '',

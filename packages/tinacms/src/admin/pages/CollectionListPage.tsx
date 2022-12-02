@@ -32,7 +32,7 @@ import {
   OverflowMenu,
   Select,
 } from '@tinacms/toolkit'
-import type { Collection, Template, DocumentSys } from '../types'
+import type { CollectionResponse, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
@@ -41,7 +41,7 @@ import { TinaAdminApi } from '../api'
 import { useState } from 'react'
 import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
-import type { TinaCloudCollection } from '@tinacms/schema-tools'
+import type { Collection } from '@tinacms/schema-tools/dist/types'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
@@ -95,9 +95,9 @@ const handleNavigate = (
   navigate: NavigateFunction,
   cms: TinaCMS,
   // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
-  collection: Collection,
+  collection: CollectionResponse,
   // The actual Collection definition
-  collectionDefinition: TinaCloudCollection<true>,
+  collectionDefinition: Collection,
   document: DocumentSys
 ) => {
   /**
@@ -184,10 +184,10 @@ const CollectionListPage = () => {
             sortKey={sortKey}
           >
             {(
-              collection: Collection,
+              collection: CollectionResponse,
               _loading,
               reFetchCollection,
-              collectionExtra: TinaCloudCollection<true>
+              collectionExtra: Collection
             ) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges

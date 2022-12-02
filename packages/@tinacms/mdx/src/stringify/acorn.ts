@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -24,26 +24,26 @@ import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] }
 export function stringifyProps(
   element: Plate.MdxBlockElement,
-  parentField: RichTypeInner,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] }
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichTextField,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {

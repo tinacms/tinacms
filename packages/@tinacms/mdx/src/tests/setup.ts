@@ -15,14 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import { format } from 'prettier'
 import type { BlockElement, RootElement } from '../parse/plate'
 import { parseMDX } from '../parse/index'
 import { writeFile } from 'fs'
 import { join } from 'path'
 
-export type { BlockElement, RichTypeInner }
+export type { BlockElement, RichTextField }
 
 export const output = (object: RootElement) => object
 
@@ -64,7 +64,7 @@ export const run = (
   dirname: string,
   content: any,
   outputString: any,
-  field: RichTypeInner
+  field: RichTextField
 ) => {
   Object.entries(content).forEach(([name, content]) => {
     if (typeof content !== 'string') {
@@ -110,7 +110,7 @@ export const runInner = (
   dirname: string,
   content: string,
   outputString: Record<string, string>,
-  field: RichTypeInner
+  field: RichTextField
 ) => {
   const tsFilename = name.replace('.md', '.test.ts')
   if (!outputString[tsFilename]) {

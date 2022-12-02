@@ -22,18 +22,18 @@ import type {
 } from 'mdast-util-mdx-jsx'
 import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
-import type { TinaFieldBase } from '@tinacms/schema-tools'
+import type { SchemaField } from '@tinacms/schema-tools/dist/types'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
 
 type TinaStringField =
-  | Extract<TinaFieldBase, { type: 'string' }>
-  | Extract<TinaFieldBase, { type: 'datetime' }>
-  | Extract<TinaFieldBase, { type: 'image' }>
-  | Extract<TinaFieldBase, { type: 'reference' }>
+  | Extract<SchemaField, { type: 'string' }>
+  | Extract<SchemaField, { type: 'datetime' }>
+  | Extract<SchemaField, { type: 'image' }>
+  | Extract<SchemaField, { type: 'reference' }>
 
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
-  fields: TinaFieldBase[],
+  fields: SchemaField[],
   imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
@@ -64,7 +64,7 @@ export const extractAttributes = (
 }
 const extractAttribute = (
   attribute: MdxJsxAttribute,
-  field: TinaFieldBase,
+  field: SchemaField,
   imageCallback: (image: string) => string
 ) => {
   switch (field.type) {
@@ -117,7 +117,7 @@ const extractAttribute = (
 
 const extractScalar = <
   T extends Extract<
-    TinaFieldBase,
+    SchemaField,
     | { type: 'string' }
     | { type: 'boolean' }
     | { type: 'number' }
@@ -142,7 +142,7 @@ const extractScalar = <
   }
 }
 
-const extractObject = <T extends Extract<TinaFieldBase, { type: 'object' }>>(
+const extractObject = <T extends Extract<SchemaField, { type: 'object' }>>(
   attribute: ExpressionStatement,
   field: T
 ) => {
@@ -160,7 +160,7 @@ const extractObject = <T extends Extract<TinaFieldBase, { type: 'object' }>>(
 }
 const extractObjectExpression = (
   expression: ObjectExpression,
-  field: Extract<TinaFieldBase, { type: 'object' }>
+  field: Extract<SchemaField, { type: 'object' }>
 ) => {
   const properties: Record<string, unknown> = {}
   expression.properties.forEach((property) => {
@@ -172,7 +172,7 @@ const extractObjectExpression = (
 }
 
 const getField = (
-  objectField: Extract<TinaFieldBase, { type: 'object' }>,
+  objectField: Extract<SchemaField, { type: 'object' }>,
   name: string
 ) => {
   if (objectField.fields) {
@@ -184,7 +184,7 @@ const getField = (
 }
 
 const extractJSXFragment = <
-  T extends Extract<TinaFieldBase, { type: 'rich-text' }>
+  T extends Extract<SchemaField, { type: 'rich-text' }>
 >(
   attribute: { expression: JSXFragment },
   baseAttribute: MdxJsxAttribute,
@@ -208,7 +208,7 @@ const extractJSXFragment = <
 
 const extractKeyValue = (
   property: Property,
-  parentField: Extract<TinaFieldBase, { type: 'object' }>
+  parentField: Extract<SchemaField, { type: 'object' }>
 ) => {
   assertType(property.key, 'Identifier')
   const key = property.key.name
@@ -291,7 +291,7 @@ function assertHasType(
   throw new Error(`Expect value to be an object with property "type"`)
 }
 
-const throwError = (field: TinaFieldBase) => {
+const throwError = (field: SchemaField) => {
   throw new Error(
     `Unexpected expression for field "${field.name}"${
       field.list ? ' with "list": true' : ''

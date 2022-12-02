@@ -19,14 +19,6 @@ import { baseCmds as baseCommands } from './cmds/baseCmds'
 import { logText } from './utils/theme'
 export { defineSchema } from './cmds/compile'
 import { logger } from './logger'
-export type {
-  TinaCloudSchema,
-  TinaSchema,
-  TinaCloudCollection,
-  TinaCollection,
-  TinaField,
-  TinaTemplate,
-} from '@tinacms/graphql'
 
 const program = new commander.Command(name)
 const registerCommands = (commands: Command[], noHelp: boolean = false) => {

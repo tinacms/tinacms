@@ -14,7 +14,7 @@ limitations under the License.
 import { Client, LocalClient } from '../internalClient'
 import type { TinaIOConfig } from '../internalClient'
 import * as yup from 'yup'
-import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools'
 
 export interface CreateClientProps {
   clientId?: string
@@ -23,7 +23,7 @@ export interface CreateClientProps {
   owner?: string
   repo?: string
   branch?: string
-  schema?: TinaCloudSchema<false>
+  schema?: Schema
   apiUrl?: string
 }
 export const createClient = ({

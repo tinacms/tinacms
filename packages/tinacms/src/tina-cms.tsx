@@ -179,7 +179,8 @@ class ErrorBoundary extends React.Component {
       return <Loader>Let's try that again.</Loader>
     }
 
-    return this.props.children
+    // https://github.com/bvaughn/react-error-boundary/issues/113#issuecomment-1262939912
+    return <>{this.props.children}</>
   }
 }
 
@@ -213,7 +214,6 @@ export const TinaCMSProvider2 = ({
     : {
         branch: props.branch,
         clientId: props.clientId,
-        // @ts-expect-error this is for backwards compatibility
         isLocalClient: props?.isLocalClient,
       }
   if (
@@ -359,9 +359,10 @@ const FormRegistrar = ({
 }: {
   request: { query: string; variables: object }
   formifyCallback: formifyCallback
-  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
+  onPayloadStateChange: (args: { payload: object; isLoading: boolean }) => void
 }) => {
   const cms = useCMS()
+  //@ts-ignore
   const { setFormsRegistering } = React.useContext(EditContext)
 
   const [payload, isLoading] = useGraphqlForms({

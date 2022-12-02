@@ -11,8 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export * from './schema'
-// Note, these will be deprecated, new types are in ./types.ts
-export * from './types/index'
+export { TinaSchema } from './schema'
 export * from './validate'
 export * from './util/namer'
+export * from './types/internal'

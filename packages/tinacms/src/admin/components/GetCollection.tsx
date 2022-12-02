@@ -16,7 +16,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaSchema } from '@tinacms/schema-tools'
 import { TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
-import type { Collection } from '../types'
+import type { CollectionResponse } from '../types'
 
 export const useGetCollection = (
   cms: TinaCMS,
@@ -28,7 +28,7 @@ export const useGetCollection = (
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
   const collectionExtra = schema.getCollection(collectionName)
-  const [collection, setCollection] = useState<Collection | undefined>(
+  const [collection, setCollection] = useState<CollectionResponse | undefined>(
     undefined
   )
   const [loading, setLoading] = useState<boolean>(true)

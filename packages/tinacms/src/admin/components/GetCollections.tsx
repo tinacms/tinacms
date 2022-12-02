@@ -13,13 +13,13 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 
-import type { Collection } from '../types'
+import type { CollectionResponse } from '../types'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
-  const [collections, setCollections] = useState<Collection[]>([])
+  const [collections, setCollections] = useState<CollectionResponse[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<Error | undefined>(undefined)
 

@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { z } from 'zod'
-import { TinaFieldInner } from '../types/SchemaTypes'
+import { TinaFieldInner } from '../types'
 import { findDuplicates } from '../util'
 
 const TypeName = [

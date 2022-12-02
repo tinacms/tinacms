@@ -33,7 +33,7 @@ export function useGraphqlForms<T extends object>({
    * for usage.
    */
   eventList?: []
-}): [T, Boolean] {
+}): [T, boolean] {
   const cms = useCMS()
 
   const state = useFormify({

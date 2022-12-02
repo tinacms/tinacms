@@ -16,18 +16,16 @@ import { Database } from '../database'
 import { assertShape, lastItem, sequential } from '../util'
 import { NAMER } from '../ast-builder'
 import isValid from 'date-fns/isValid'
-import { parseMDX, stringifyMDX } from '../mdx'
+import { parseMDX, stringifyMDX } from '@tinacms/mdx'
 
 import type {
-  Collectable,
-  ReferenceTypeWithNamespace,
-  Templateable,
-  TinaCloudCollection,
-  TinaFieldEnriched,
+  Collection,
+  ObjectField,
+  ReferenceField,
+  SchemaField,
   Template,
-  TinaFieldInner,
-  TinaSchema,
 } from '@tinacms/schema-tools'
+import type { TinaSchema } from '@tinacms/schema-tools'
 
 import type { GraphQLConfig } from '../types'
 
@@ -73,13 +71,6 @@ export class Resolver {
   ) => {
     const collection = this.tinaSchema.getCollection(collectionName)
     const extraFields = {}
-    // const res = this.tinaSchema.getTemplatesForCollectable(collection);
-    // if (res.type === "object") {
-    //   extraFields["fields"] = res.template.fields;
-    // }
-    // if (res.type === "union") {
-    //   extraFields["templates"] = res.templates;
-    // }
 
     return {
       // return the collection and hasDocuments to resolve documents at a lower level
@@ -182,7 +173,10 @@ export class Resolver {
     await this.database.delete(fullPath)
   }
 
-  public buildObjectMutations = (fieldValue: any, field: Collectable) => {
+  public buildObjectMutations = (
+    fieldValue: any,
+    field: Collection | ObjectField
+  ) => {
     if (field.fields) {
       const objectTemplate =
         typeof field.fields === 'string'
@@ -269,7 +263,7 @@ export class Resolver {
     args,
     isAddPendingDocument,
   }: {
-    collection: TinaCloudCollection<true>
+    collection: Collection
     realPath: string
     args: unknown
     isAddPendingDocument: boolean
@@ -334,7 +328,7 @@ export class Resolver {
     isAddPendingDocument,
     isCollectionSpecific,
   }: {
-    collection: TinaCloudCollection<true>
+    collection: Collection
     realPath: string
     args: unknown
     isAddPendingDocument: boolean
@@ -505,7 +499,7 @@ export class Resolver {
 
   private referenceResolver = async (
     filter: Record<string, object>,
-    fieldDefinition: ReferenceTypeWithNamespace
+    fieldDefinition: ReferenceField
   ) => {
     const referencedCollection = this.tinaSchema.getCollection(
       fieldDefinition.collections[0]
@@ -540,7 +534,7 @@ export class Resolver {
 
   private async resolveFilterConditions(
     filter: Record<string, Record<string, object>>,
-    fields: TinaFieldInner<false>[],
+    fields: SchemaField[],
     collectionName
   ) {
     const conditions: FilterCondition[] = []
@@ -585,7 +579,7 @@ export class Resolver {
     hydrator,
   }: {
     args: Record<string, Record<string, object> | string | number>
-    collection: TinaCloudCollection<true>
+    collection: Collection
     hydrator?: (string) => any
   }) => {
     let conditions: FilterCondition[]
@@ -593,19 +587,19 @@ export class Resolver {
       if (collection.fields) {
         conditions = await this.resolveFilterConditions(
           args.filter as Record<string, Record<string, object>>,
-          collection.fields as TinaFieldInner<false>[],
+          collection.fields,
           collection.name
         )
       } else if (collection.templates) {
         for (const templateName of Object.keys(args.filter)) {
-          const template = (collection.templates as Template<false>[]).find(
+          const template = (collection.templates as Template[]).find(
             (template) => template.name === templateName
           )
 
           if (template) {
             conditions = await this.resolveFilterConditions(
               args.filter[templateName],
-              template.fields as TinaFieldInner<false>[],
+              template.fields,
               `${collection.name}.${templateName}`
             )
           } else {
@@ -660,7 +654,7 @@ export class Resolver {
 
   private buildFieldMutations = (
     fieldParams: FieldParams,
-    template: Templateable
+    template: Template
   ) => {
     const accum: { [key: string]: unknown } = {}
     Object.entries(fieldParams).forEach(([fieldName, fieldValue]) => {
@@ -715,7 +709,7 @@ export class Resolver {
   }
 
   private resolveFieldData = async (
-    { namespace, ...field }: TinaFieldEnriched,
+    { namespace, ...field }: SchemaField,
     rawData: unknown,
     accumulator: { [key: string]: unknown }
   ) => {

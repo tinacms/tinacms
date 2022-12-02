@@ -10,17 +10,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 import {
-  TinaCloudSchemaEnriched,
-  TinaCloudSchemaBase,
-  TinaCloudCollection,
-  Templateable,
-  Collectable,
-  CollectionTemplateable,
-  TinaFieldEnriched,
-} from '../types/index'
-import { lastItem, assertShape } from '../util'
+  Schema,
+  Collection,
+  SchemaField,
+  Template,
+  ObjectField,
+} from './types/internal'
+import { Schema as SchemaBase } from './types'
+import { lastItem, assertShape, addNamespaceToSchema, NAMER } from './util'
 
 type Version = {
   fullVersion: string
@@ -39,18 +37,18 @@ type Meta = {
  *
  */
 export class TinaSchema {
-  public schema: TinaCloudSchemaEnriched
+  public schema: Schema
   /**
    *
    * Create a schema class from a user defined schema object
    *
-   * @param  {{version?:Version;meta?:Meta}&TinaCloudSchemaBase} config
+   * @param  {{version?:Version;meta?:Meta}&Schema} config
    */
   constructor(
-    public config: { version?: Version; meta?: Meta } & TinaCloudSchemaBase
+    public config: { version?: Version; meta?: Meta } & (Schema | SchemaBase)
   ) {
     // @ts-ignore
-    this.schema = config
+    this.schema = addNamespaceToSchema(config)
   }
   public getIsTitleFieldName = (collection: string) => {
     const col = this.getCollection(collection)
@@ -69,9 +67,7 @@ export class TinaSchema {
     )
     return paths
   }
-  public getCollection = (
-    collectionName: string
-  ): TinaCloudCollection<true> => {
+  public getCollection = (collectionName: string): Collection => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
     )
@@ -103,16 +99,20 @@ export class TinaSchema {
       ) || []
     )
   }
+  /**
+   * @deprecated gobal templates not supported
+   */
   public getGlobalTemplate = (templateName: string) => {
-    const globalTemplate = this.schema.templates?.find(
-      (template) => template.name === templateName
-    )
-    if (!globalTemplate) {
-      throw new Error(
-        `Expected to find global template of name ${templateName}`
-      )
-    }
-    return globalTemplate
+    // const globalTemplate = this.schema.templates?.find(
+    //   (template) => template.name === templateName
+    // )
+    // if (!globalTemplate) {
+    //   throw new Error(
+    //     `Expected to find global template of name ${templateName}`
+    //   )
+    // }
+    // return globalTemplate
+    return null
   }
   public getCollectionByFullPath = (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
@@ -129,8 +129,8 @@ export class TinaSchema {
     filepath: string,
     templateName?: string
   ): {
-    collection: TinaCloudCollection<true>
-    template: Templateable
+    collection: Collection
+    template: Template
   } => {
     let template
     const collection = this.getCollectionByFullPath(filepath)
@@ -168,8 +168,8 @@ export class TinaSchema {
     collection,
   }: {
     data?: unknown
-    collection: Collectable
-  }): Templateable => {
+    collection: Collection | ObjectField
+  }): Template => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':
@@ -223,14 +223,14 @@ export class TinaSchema {
   }
   private transformCollectablePayload = (
     payload: object,
-    collection: Collectable
+    template: Collection | Template | ObjectField
   ) => {
     const accumulator = {}
     Object.entries(payload).forEach(([key, value]) => {
-      if (typeof collection.fields === 'string') {
+      if (typeof template.fields === 'string') {
         throw new Error('Global templates not supported')
       }
-      const field = collection.fields.find((field) => {
+      const field = template.fields.find((field) => {
         if (typeof field === 'string') {
           throw new Error('Global templates not supported')
         }
@@ -243,7 +243,7 @@ export class TinaSchema {
     return accumulator
   }
 
-  private transformField = (field: TinaFieldEnriched, value: unknown) => {
+  private transformField = (field: SchemaField, value: unknown) => {
     if (field.type === 'object')
       if (field.templates) {
         if (field.list) {
@@ -305,12 +305,15 @@ export class TinaSchema {
    *
    */
   public getTemplatesForCollectable = (
-    collection: Collectable
-  ): CollectionTemplateable => {
-    let extraFields: TinaFieldEnriched[] = []
-    if (collection.references) {
-      extraFields = collection.references
-    }
+    collection: Collection | ObjectField
+  ):
+    | { type: 'object'; namespace: string[]; template: Template }
+    | { type: 'union'; namespace: string[]; templates: Template[] } => {
+    let extraFields: SchemaField[] = []
+    // collection.references deprecated
+    // if (collection.references) {
+    //   extraFields = collection.references
+    // }
     if (collection.fields) {
       const template =
         typeof collection.fields === 'string'
@@ -327,7 +330,6 @@ export class TinaSchema {
       return {
         namespace: collection.namespace,
         type: 'object',
-        // @ts-ignore FIXME: Templateable should have a 'name' property
         template: {
           ...template,
           fields: [...template.fields, ...extraFields],
@@ -356,6 +358,197 @@ export class TinaSchema {
           )}`
         )
       }
+    }
+  }
+
+  public resolveForm = ({
+    collection,
+    basename,
+    templateName,
+    schema,
+  }: {
+    collection: Collection
+    basename: string
+    templateName?: string
+    schema: TinaSchema
+  }) => {
+    const template = collection.templates
+      ? collection.templates.find((template) => template.name === templateName)
+      : collection
+    return {
+      id: basename,
+      label: collection.label,
+      name: basename,
+      fields: template.fields.map((field) => {
+        return this.resolveField(field, schema)
+      }),
+    }
+  }
+
+  public resolveField = (
+    field: SchemaField,
+    schema: TinaSchema
+  ): { [key: string]: unknown } => {
+    field
+    // @ts-ignore this logic will soon be deprecated
+    field.parentTypename = NAMER.dataTypeName(
+      // Get the type of the parent namespace
+      field.namespace.filter((_, i) => i < field.namespace.length - 1)
+    )
+    const extraFields = field.ui || {}
+    switch (field.type) {
+      case 'number':
+        return {
+          component: 'number',
+          ...field,
+          ...extraFields,
+        }
+      case 'datetime':
+        return {
+          component: 'date',
+          ...field,
+          ...extraFields,
+        }
+      case 'boolean':
+        return {
+          component: 'toggle',
+          ...field,
+          ...extraFields,
+        }
+      case 'image':
+        return {
+          component: 'image',
+          clearable: true,
+          ...field,
+          ...extraFields,
+        }
+      case 'string':
+        if (field.options) {
+          // TODO: correct the type
+          // @ts-ignore
+          if (field.list) {
+            return {
+              component: 'checkbox-group',
+              ...field,
+              ...extraFields,
+              options: field.options,
+            }
+          }
+          return {
+            component: 'select',
+            ...field,
+            ...extraFields,
+            options: [
+              { label: `Choose an option`, value: '' },
+              ...field.options,
+            ],
+          }
+        }
+        // TODO: correct the type
+        // @ts-ignore
+        if (field.list) {
+          return {
+            // Allows component to be overridden for scalars
+            component: 'list',
+            field: {
+              component: 'text',
+            },
+            ...field,
+            ...extraFields,
+          }
+        }
+        return {
+          // Allows component to be overridden for scalars
+          component: 'text',
+          ...field,
+          ...extraFields,
+        }
+      case 'object':
+        const templateInfo = schema.getTemplatesForCollectable(field)
+        if (templateInfo.type === 'object') {
+          // FIXME: need to finish group/group-list
+          return {
+            ...field,
+            component: field.list ? 'group-list' : 'group',
+            fields: templateInfo.template.fields.map((field) =>
+              this.resolveField(field, schema)
+            ),
+            ...extraFields,
+          }
+        } else if (templateInfo.type === 'union') {
+          const templates: { [key: string]: object } = {}
+          const typeMap: { [key: string]: string } = {}
+          templateInfo.templates.forEach((template) => {
+            const extraFields = template.ui || {}
+            const templateName = lastItem(template.namespace)
+            typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+            templates[lastItem(template.namespace)] = {
+              // @ts-ignore FIXME `Templateable` should have name and label properties
+              label: template.label || templateName,
+              key: templateName,
+              namespace: [...field.namespace, templateName],
+              fields: template.fields.map((field) =>
+                this.resolveField(field, schema)
+              ),
+              ...extraFields,
+            }
+            return true
+          })
+
+          return {
+            ...field,
+            typeMap,
+            namespace: field.namespace,
+            component: field.list ? 'blocks' : 'not-implemented',
+            templates,
+            ...extraFields,
+          }
+        } else {
+          throw new Error(`Unknown object for resolveField function`)
+        }
+      case 'rich-text':
+        const templates: { [key: string]: object } = {}
+        const typeMap: { [key: string]: string } = {}
+        field.templates?.forEach((template) => {
+          if (typeof template === 'string') {
+            throw new Error(`Global templates not yet supported for rich-text`)
+          } else {
+            const extraFields = template.ui || {}
+            // console.log({ namespace: template.namespace })
+
+            // template.namespace is undefined
+            const templateName = lastItem(template.namespace)
+            typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+            templates[lastItem(template.namespace)] = {
+              // @ts-ignore FIXME `Templateable` should have name and label properties
+              label: template.label || templateName,
+              key: templateName,
+              inline: template.inline,
+              name: templateName,
+              match: template.match,
+              fields: template.fields.map((field) =>
+                this.resolveField(field, schema)
+              ),
+              ...extraFields,
+            }
+            return true
+          }
+        })
+        return {
+          ...field,
+          templates: Object.values(templates),
+          component: 'rich-text',
+          ...extraFields,
+        }
+      case 'reference':
+        return {
+          ...field,
+          component: 'reference',
+          ...extraFields,
+        }
+      default:
+        // @ts-ignore
+        throw new Error(`Unknown field type ${field.type}`)
     }
   }
 }
