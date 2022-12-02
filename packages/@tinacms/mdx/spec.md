@@ -1,4 +1,12 @@
-[@tinacms/mdx](README.md) / Exports
+
+<a name="readmemd"></a>
+
+@tinacms/mdx / [Exports](#modulesmd)
+
+
+<a name="modulesmd"></a>
+
+[@tinacms/mdx](#readmemd) / Exports
 
 # @tinacms/mdx
 
@@ -6,55 +14,55 @@
 
 ### BlockElement
 
-- [BlockElement](modules.md#blockelement)
-- [BlockquoteElement](modules.md#blockquoteelement)
-- [CodeBlockElement](modules.md#codeblockelement)
-- [HTMLElement](modules.md#htmlelement)
-- [HeadingElement](modules.md#headingelement)
-- [HrElement](modules.md#hrelement)
-- [InvalidMarkdownElement](modules.md#invalidmarkdownelement)
-- [ListItemElement](modules.md#listitemelement)
-- [MdxBlockElement](modules.md#mdxblockelement)
-- [OrderedListElement](modules.md#orderedlistelement)
-- [ParagraphElement](modules.md#paragraphelement)
-- [UnorderedListElement](modules.md#unorderedlistelement)
+- [BlockElement](#blockelement)
+- [BlockquoteElement](#blockquoteelement)
+- [CodeBlockElement](#codeblockelement)
+- [HTMLElement](#htmlelement)
+- [HeadingElement](#headingelement)
+- [HrElement](#hrelement)
+- [InvalidMarkdownElement](#invalidmarkdownelement)
+- [ListItemElement](#listitemelement)
+- [MdxBlockElement](#mdxblockelement)
+- [OrderedListElement](#orderedlistelement)
+- [ParagraphElement](#paragraphelement)
+- [UnorderedListElement](#unorderedlistelement)
 
 ### InlineElement
 
-- [BreakElement](modules.md#breakelement)
-- [HTMLInlineElement](modules.md#htmlinlineelement)
-- [ImageElement](modules.md#imageelement)
-- [InlineElement](modules.md#inlineelement)
-- [LinkElement](modules.md#linkelement)
-- [MdxInlineElement](modules.md#mdxinlineelement)
-- [TextElement](modules.md#textelement)
+- [BreakElement](#breakelement)
+- [HTMLInlineElement](#htmlinlineelement)
+- [ImageElement](#imageelement)
+- [InlineElement](#inlineelement)
+- [LinkElement](#linkelement)
+- [MdxInlineElement](#mdxinlineelement)
+- [TextElement](#textelement)
 
 ### MiscellaneousElement
 
-- [EmptyTextElement](modules.md#emptytextelement)
+- [EmptyTextElement](#emptytextelement)
 
 ### ListElements
 
-- [LicElement](modules.md#licelement)
-- [List](modules.md#list)
-- [ListItemChildrenElement](modules.md#listitemchildrenelement)
-- [ListItemContentElement](modules.md#listitemcontentelement)
+- [LicElement](#licelement)
+- [List](#list)
+- [ListItemChildrenElement](#listitemchildrenelement)
+- [ListItemContentElement](#listitemcontentelement)
 
 ### _MiscellaneousElement
 
-- [Position](modules.md#position)
-- [PositionItem](modules.md#positionitem)
-- [RootElement](modules.md#rootelement)
+- [Position](#position)
+- [PositionItem](#positionitem)
+- [RootElement](#rootelement)
 
 ## BlockElement
 
 ### BlockElement
 
-Ƭ **BlockElement**: [`BlockquoteElement`](modules.md#blockquoteelement) \| [`CodeBlockElement`](modules.md#codeblockelement) \| [`HeadingElement`](modules.md#headingelement) \| [`HrElement`](modules.md#hrelement) \| [`HTMLElement`](modules.md#htmlelement) \| [`ImageElement`](modules.md#imageelement) \| [`InvalidMarkdownElement`](modules.md#invalidmarkdownelement) \| [`ListItemElement`](modules.md#listitemelement) \| [`MdxBlockElement`](modules.md#mdxblockelement) \| [`ParagraphElement`](modules.md#paragraphelement) \| [`OrderedListElement`](modules.md#orderedlistelement) \| [`UnorderedListElement`](modules.md#unorderedlistelement)
+Ƭ **BlockElement**: [`BlockquoteElement`](#blockquoteelement) \| [`CodeBlockElement`](#codeblockelement) \| [`HeadingElement`](#headingelement) \| [`HrElement`](#hrelement) \| [`HTMLElement`](#htmlelement) \| [`ImageElement`](#imageelement) \| [`InvalidMarkdownElement`](#invalidmarkdownelement) \| [`ListItemElement`](#listitemelement) \| [`MdxBlockElement`](#mdxblockelement) \| [`ParagraphElement`](#paragraphelement) \| [`OrderedListElement`](#orderedlistelement) \| [`UnorderedListElement`](#unorderedlistelement)
 
 #### Defined in
 
-[plate.ts:144](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L144)
+[plate.ts:144](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L144)
 
 ___
 
@@ -66,12 +74,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`InlineElement`](modules.md#inlineelement)[] |
+| `children` | [`InlineElement`](#inlineelement)[] |
 | `type` | ``"blockquote"`` |
 
 #### Defined in
 
-[plate.ts:30](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L30)
+[plate.ts:30](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L30)
 
 ___
 
@@ -83,14 +91,14 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `lang?` | `string` |
 | `type` | ``"code_block"`` |
 | `value` | `string` |
 
 #### Defined in
 
-[plate.ts:37](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L37)
+[plate.ts:37](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L37)
 
 ___
 
@@ -102,13 +110,13 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `type` | ``"html"`` |
 | `value` | `string` |
 
 #### Defined in
 
-[plate.ts:61](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L61)
+[plate.ts:61](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L61)
 
 ___
 
@@ -120,12 +128,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`InlineElement`](modules.md#inlineelement)[] |
+| `children` | [`InlineElement`](#inlineelement)[] |
 | `type` | ``"h1"`` \| ``"h2"`` \| ``"h3"`` \| ``"h4"`` \| ``"h5"`` \| ``"h6"`` |
 
 #### Defined in
 
-[plate.ts:46](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L46)
+[plate.ts:46](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L46)
 
 ___
 
@@ -137,12 +145,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `type` | ``"hr"`` |
 
 #### Defined in
 
-[plate.ts:54](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L54)
+[plate.ts:54](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L54)
 
 ___
 
@@ -154,15 +162,15 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `message` | `string` |
-| `position?` | [`Position`](modules.md#position) |
+| `position?` | [`Position`](#position) |
 | `type` | ``"invalid_markdown"`` |
 | `value` | `string` |
 
 #### Defined in
 
-[plate.ts:77](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L77)
+[plate.ts:77](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L77)
 
 ___
 
@@ -174,12 +182,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`ListItemChildrenElement`](modules.md#listitemchildrenelement)[] |
+| `children` | [`ListItemChildrenElement`](#listitemchildrenelement)[] |
 | `type` | ``"li"`` |
 
 #### Defined in
 
-[plate.ts:106](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L106)
+[plate.ts:106](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L106)
 
 ___
 
@@ -191,14 +199,14 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `name` | `string` \| ``null`` |
 | `props` | `Record`<`string`, `unknown`\> |
 | `type` | ``"mdxJsxFlowElement"`` |
 
 #### Defined in
 
-[plate.ts:120](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L120)
+[plate.ts:120](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L120)
 
 ___
 
@@ -210,12 +218,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`ListItemElement`](modules.md#listitemelement)[] |
+| `children` | [`ListItemElement`](#listitemelement)[] |
 | `type` | ``"ol"`` |
 
 #### Defined in
 
-[plate.ts:129](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L129)
+[plate.ts:129](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L129)
 
 ___
 
@@ -227,12 +235,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`InlineElement`](modules.md#inlineelement)[] |
+| `children` | [`InlineElement`](#inlineelement)[] |
 | `type` | ``"p"`` |
 
 #### Defined in
 
-[plate.ts:136](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L136)
+[plate.ts:136](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L136)
 
 ___
 
@@ -244,12 +252,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`ListItemElement`](modules.md#listitemelement)[] |
+| `children` | [`ListItemElement`](#listitemelement)[] |
 | `type` | ``"ul"`` |
 
 #### Defined in
 
-[plate.ts:113](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L113)
+[plate.ts:113](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L113)
 
 ## InlineElement
 
@@ -261,12 +269,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `type` | ``"break"`` |
 
 #### Defined in
 
-[plate.ts:211](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L211)
+[plate.ts:211](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L211)
 
 ___
 
@@ -278,13 +286,13 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `type` | ``"html_inline"`` |
 | `value` | `string` |
 
 #### Defined in
 
-[plate.ts:69](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L69)
+[plate.ts:69](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L69)
 
 ___
 
@@ -302,23 +310,23 @@ It may be beneficial to treat this as a block element
 | :------ | :------ |
 | `alt?` | `string` |
 | `caption?` | `string` \| ``null`` |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `type` | ``"img"`` |
 | `url` | `string` |
 
 #### Defined in
 
-[plate.ts:192](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L192)
+[plate.ts:192](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L192)
 
 ___
 
 ### InlineElement
 
-Ƭ **InlineElement**: [`TextElement`](modules.md#textelement) \| [`MdxInlineElement`](modules.md#mdxinlineelement) \| [`BreakElement`](modules.md#breakelement) \| [`LinkElement`](modules.md#linkelement) \| [`ImageElement`](modules.md#imageelement) \| [`HTMLInlineElement`](modules.md#htmlinlineelement)
+Ƭ **InlineElement**: [`TextElement`](#textelement) \| [`MdxInlineElement`](#mdxinlineelement) \| [`BreakElement`](#breakelement) \| [`LinkElement`](#linkelement) \| [`ImageElement`](#imageelement) \| [`HTMLInlineElement`](#htmlinlineelement)
 
 #### Defined in
 
-[plate.ts:224](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L224)
+[plate.ts:224](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L224)
 
 ___
 
@@ -330,14 +338,14 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`InlineElement`](modules.md#inlineelement)[] |
+| `children` | [`InlineElement`](#inlineelement)[] |
 | `title?` | `string` \| ``null`` |
 | `type` | ``"a"`` |
 | `url` | `string` |
 
 #### Defined in
 
-[plate.ts:202](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L202)
+[plate.ts:202](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L202)
 
 ___
 
@@ -349,14 +357,14 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [[`EmptyTextElement`](modules.md#emptytextelement)] |
+| `children` | [[`EmptyTextElement`](#emptytextelement)] |
 | `name` | `string` \| ``null`` |
 | `props` | `Record`<`string`, `unknown`\> |
 | `type` | ``"mdxJsxTextElement"`` |
 
 #### Defined in
 
-[plate.ts:161](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L161)
+[plate.ts:161](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L161)
 
 ___
 
@@ -376,7 +384,7 @@ ___
 
 #### Defined in
 
-[plate.ts:179](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L179)
+[plate.ts:179](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L179)
 
 ## MiscellaneousElement
 
@@ -398,37 +406,37 @@ the frontend rich-text editor for void nodes
 
 #### Defined in
 
-[plate.ts:175](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L175)
+[plate.ts:175](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L175)
 
 ## ListElements
 
 ### LicElement
 
-Ƭ **LicElement**: [`InlineElement`](modules.md#inlineelement)
+Ƭ **LicElement**: [`InlineElement`](#inlineelement)
 
 #### Defined in
 
-[plate.ts:219](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L219)
+[plate.ts:219](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L219)
 
 ___
 
 ### List
 
-Ƭ **List**: [`OrderedListElement`](modules.md#orderedlistelement) \| [`UnorderedListElement`](modules.md#unorderedlistelement)
+Ƭ **List**: [`OrderedListElement`](#orderedlistelement) \| [`UnorderedListElement`](#unorderedlistelement)
 
 #### Defined in
 
-[plate.ts:87](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L87)
+[plate.ts:87](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L87)
 
 ___
 
 ### ListItemChildrenElement
 
-Ƭ **ListItemChildrenElement**: [`ListItemContentElement`](modules.md#listitemcontentelement) \| [`UnorderedListElement`](modules.md#unorderedlistelement) \| [`OrderedListElement`](modules.md#orderedlistelement)
+Ƭ **ListItemChildrenElement**: [`ListItemContentElement`](#listitemcontentelement) \| [`UnorderedListElement`](#unorderedlistelement) \| [`OrderedListElement`](#orderedlistelement)
 
 #### Defined in
 
-[plate.ts:98](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L98)
+[plate.ts:98](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L98)
 
 ___
 
@@ -440,12 +448,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`LicElement`](modules.md#licelement)[] |
+| `children` | [`LicElement`](#licelement)[] |
 | `type` | ``"lic"`` |
 
 #### Defined in
 
-[plate.ts:91](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L91)
+[plate.ts:91](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L91)
 
 ## _MiscellaneousElement
 
@@ -461,12 +469,12 @@ Positional information for error reporting
 
 | Name | Type |
 | :------ | :------ |
-| `end` | [`PositionItem`](modules.md#positionitem) |
-| `start` | [`PositionItem`](modules.md#positionitem) |
+| `end` | [`PositionItem`](#positionitem) |
+| `start` | [`PositionItem`](#positionitem) |
 
 #### Defined in
 
-[plate.ts:238](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L238)
+[plate.ts:238](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L238)
 
 ___
 
@@ -490,7 +498,7 @@ Positional information for error reporting
 
 #### Defined in
 
-[plate.ts:249](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L249)
+[plate.ts:249](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L249)
 
 ___
 
@@ -502,9 +510,9 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `children` | [`BlockElement`](modules.md#blockelement)[] |
+| `children` | [`BlockElement`](#blockelement)[] |
 | `type` | ``"root"`` |
 
 #### Defined in
 
-[plate.ts:22](https://github.com/tinacms/tinacms/blob/b43c45cbf/packages/@tinacms/mdx/src/parse/plate.ts#L22)
+[plate.ts:22](https://github.com/tinacms/tinacms/blob/17d510e7b/packages/@tinacms/mdx/src/parse/plate.ts#L22)
