@@ -1,5 +1,11 @@
 # create-tina-app
 
+## 1.0.1
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+
 ## 1.0.0
 
 ### Major Changes
