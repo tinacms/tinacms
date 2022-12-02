@@ -21,7 +21,7 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "tinacms-scripts build",
-    "docs": "yarn typedoc",
+    "docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts && cp ./docs/modules.md ./spec.md",
     "serve": "yarn nodemon dist/server.js",
     "test": "vitest",
     "coverage": "vitest run --coverage",
@@ -36,6 +36,8 @@
     "prettier": "^2.7.1",
     "remark": "^14.0.2",
     "remark-mdx": "^2.1.2",
+    "typedoc": "^0.23.21",
+    "typedoc-plugin-markdown": "^3.13.6",
     "unist-util-visit": "^4.1.0",
     "vfile": "^4.2.0"
   },
