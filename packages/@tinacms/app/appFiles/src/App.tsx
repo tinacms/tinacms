@@ -74,15 +74,3 @@ function App() {
   )
 }
 export default App
-
-// import config from './config'
-
-// function App() {
-//   return (
-//     <div className="max-w-6xl mx-4 xl:mx-auto border rounded-md shadow-lg my-24 p-4 sm:p-12">
-//       <pre>{JSON.stringify(config, null, 2)}</pre>
-//     </div>
-//   )
-// }
-
-// export default App

@@ -1,5 +1,53 @@
 # @tinacms/mdx
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/schema-tools@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [08e02ec21]
+  - @tinacms/schema-tools@1.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/schema-tools@1.0.0
+
+## 0.61.17
+
+### Patch Changes
+
+- 14c5cdffe: Fixes an issue where deeply nested rich-text wasn't being parsed properly
+- Updated dependencies [a5d6722c7]
+  - @tinacms/schema-tools@0.2.2
+
+## 0.61.16
+
+### Patch Changes
+
+- 4b174e14b: Treat images as block-level when they're isolated in a paragraph.
+
+  Previously all images were nested inside `<p>` elements when coming from the server, but treated as block level by the rich-text editor. This resulted in a scenario where new paragraphs adjacent to images were nested
+  in parent `<p>` tags, which caused an error.
+
+- Updated dependencies [6c93834a2]
+  - @tinacms/schema-tools@0.2.1
+
 ## 0.61.15
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # create-tina-app
 
+## 1.0.1
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/metrics@1.0.0
+
 ## 0.2.0
 
 ### Minor Changes

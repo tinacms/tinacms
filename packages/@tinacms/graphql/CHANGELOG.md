@@ -1,5 +1,56 @@
 # tina-graphql
 
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/schema-tools@1.0.2
+  - @tinacms/mdx@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- 94a5da311: Fix generated frags.gql missing body issue
+- Updated dependencies [08e02ec21]
+  - @tinacms/schema-tools@1.0.1
+  - @tinacms/mdx@1.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/datalayer@1.0.0
+  - @tinacms/mdx@1.0.0
+  - @tinacms/schema-tools@1.0.0
+
+## 0.63.20
+
+### Patch Changes
+
+- Updated dependencies [a5d6722c7]
+- Updated dependencies [14c5cdffe]
+  - @tinacms/schema-tools@0.2.2
+  - @tinacms/mdx@0.61.17
+
+## 0.63.19
+
+### Patch Changes
+
+- Updated dependencies [6c93834a2]
+- Updated dependencies [4b174e14b]
+  - @tinacms/schema-tools@0.2.1
+  - @tinacms/mdx@0.61.16
+
 ## 0.63.18
 
 ### Patch Changes

@@ -1,5 +1,58 @@
 # @tinacms/app
 
+## 1.0.1
+
+### Patch Changes
+
+- 38438bad6: use env vars when building
+- 78b9668b1: Fix issue with formify logic that returned undefined for falsy values like "" or 0
+- 0b2164645: Simplifies preview markup
+- 7c1425a82: - Add active field for iframe
+  - Introduce `tinaField` utility helper
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+- 9d4943a82: Fix issue resolving alias fields when passing through the `useTina` hook
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+## 0.0.28
+
+### Patch Changes
+
+- f4dcf3e27: Include dependencies as part of the build artifacts for @tinacms/app
+- 231dcab2e: Remove favicon
+
+## 0.0.27
+
+### Patch Changes
+
+- d58401231: Simplify the way form values are resolved into the data payload on iframe
+- 3370cefd8: Fix preview images in cloudinary
+- e720590e1: Ensure complex queries with multiple fragments for the same node don't throw a console error
+
 ## 0.0.26
 
 ### Patch Changes

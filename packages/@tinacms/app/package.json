@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "0.0.26",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "exports": {
     ".": {
@@ -34,7 +34,7 @@
   },
   "scripts": {
     "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
-    "build": "tinacms-scripts build",
+    "build": "tinacms-scripts build && npm --prefix ./appFiles i --legacy-peer-deps --omit=dev --no-package-lock",
     "inline": "cd appFiles && npm --prefix ./ i --legacy-peer-deps --omit=dev --no-package-lock && cd .. && npm run unlink",
     "unlink": "cd appFiles && cp -RL node_modules node_modules2 && rm -rf node_modules && mv node_modules2 node_modules"
   },

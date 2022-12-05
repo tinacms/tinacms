@@ -1,5 +1,80 @@
 # @tinacms/schema-tools
 
+## 1.0.2
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+## 1.0.1
+
+### Patch Changes
+
+- 08e02ec21: Add types for allowedActions in the config
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+## 0.2.2
+
+### Patch Changes
+
+- a5d6722c7: Adds the ability to hide the delete and create buttons.
+
+  EX,
+
+  ```ts
+  export default defineConfig({
+    collections: [
+      {
+        label: 'Global',
+        name: 'global',
+        path: 'content/global',
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        format: 'json',
+        fields: [
+          //...
+        ],
+      },
+    ],
+  })
+  ```
+
+## 0.2.1
+
+### Patch Changes
+
+- 6c93834a2: Update config and schema types
+
 ## 0.2.0
 
 ### Minor Changes

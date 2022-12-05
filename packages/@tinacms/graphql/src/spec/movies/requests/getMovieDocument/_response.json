@@ -113,6 +113,19 @@
                         "text": "Some slogan"
                       }
                     ]
+                  },
+                  {
+                    "type": "mdxJsxFlowElement",
+                    "name": "Cta",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": ""
+                      }
+                    ],
+                    "props": {
+                      "title": "Get Started"
+                    }
                   }
                 ]
               },

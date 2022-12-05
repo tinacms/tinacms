@@ -245,6 +245,7 @@ export const TinaCMSProvider2 = ({
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
         // Not ideal but we need this for backwards compatibility for now. We can clean this up when we require a config.{js,ts} file
+        // @ts-ignore
         schema={{ ...schema, config: { ...schema.config, ...props } }}
       >
         <style>{styles}</style>

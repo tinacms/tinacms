@@ -1,6 +1,6 @@
 {
   "name": "create-tina-app",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "files": [
     "dist",

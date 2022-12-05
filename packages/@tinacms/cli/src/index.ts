@@ -27,7 +27,6 @@ const registerCommands = (commands: Command[], noHelp: boolean = false) => {
       .command(command.command, { noHelp })
       .description(command.description)
       .action((...args) => {
-        logger.info('')
         command.action(...args)
       })
 

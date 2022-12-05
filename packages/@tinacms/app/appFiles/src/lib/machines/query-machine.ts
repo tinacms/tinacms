@@ -17,6 +17,7 @@ import * as G from 'graphql'
 import { formify } from '../formify'
 import { Data, documentMachine } from './document-machine'
 import type { ActorRefFrom } from 'xstate'
+import { getIn } from 'final-form'
 
 export type DataType = Record<string, unknown>
 type DocumentInfo = {
@@ -277,7 +278,7 @@ export const queryMachine = createMachine(
       }),
     },
     services: {
-      setter: async (context): Promise<SetterResponse> => {
+      setter: async (context) => {
         const tinaSchema = context.cms.api.tina.schema as TinaSchema
         const gqlSchema = context.cms.api.tina.gqlSchema
         const missingForms: { id: string; skipFormRegister: boolean }[] = []
@@ -353,6 +354,8 @@ export const queryMachine = createMachine(
                 missingForms.push({ id: path, skipFormRegister })
                 return null
               }
+              missingForms.push({ id: path, skipFormRegister })
+              return null
             }
             return source[fieldName]
           },
@@ -365,12 +368,6 @@ export const queryMachine = createMachine(
             missingForm.id,
             missingForm.skipFormRegister
           )
-        }
-        if (!newData.data) {
-          throw new Error('Expected data to be hydrated with Tina form values')
-        }
-        if (newData.errors) {
-          throw new Error(newData.errors[0].message)
         }
         return { data: newData.data }
       },
@@ -406,6 +403,10 @@ export const queryMachine = createMachine(
       },
       onChangeCallback: (context) => (callback, _onReceive) => {
         const schema = context.cms.api.tina.schema as TinaSchema
+        console.log(
+          'ctx',
+          context.documentMap['content/documentation/intro-to-tina.md']
+        )
         Object.values(context.documentMap).forEach((documentMachine) => {
           if (!context.registerSubForms) {
             if (documentMachine.skipFormRegister) {
@@ -491,7 +492,10 @@ const resolveFormValue = <T extends Record<string, unknown>>({
   const accum: Record<string, unknown> = {}
   fields.forEach((field) => {
     const v = values[field.name]
-    if (!v) {
+    if (typeof v === 'undefined') {
+      return
+    }
+    if (v === null) {
       return
     }
     accum[field.name] = resolveFieldValue({

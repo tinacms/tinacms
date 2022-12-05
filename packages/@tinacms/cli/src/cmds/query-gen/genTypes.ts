@@ -94,7 +94,6 @@ export async function genTypes(
   `
   if (usingTs) {
     await fs.outputFile(typesPath, code)
-    logger.info(`\tTypescript types => ${logText(typesPath)}`)
   } else {
     await fs.outputFile(typesDPath, code)
     const jsCode = await transform(code, { loader: 'ts' })
@@ -114,6 +113,5 @@ schema {
 }
   `
   )
-  logger.info(`\tGraphQL types ====> ${logText(schemaPath)}\n`)
   next()
 }

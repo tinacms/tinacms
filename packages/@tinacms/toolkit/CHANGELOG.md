@@ -1,5 +1,57 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- 5a1e6faaf: - added autocomplete component
+  - made codeblock in rich-text to support all languages registered in Monaco editor
+
+### Patch Changes
+
+- 7c1425a82: - Add active field for iframe
+  - Introduce `tinaField` utility helper
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+## 1.0.1
+
+### Patch Changes
+
+- 8a92941bb: Show title for reference field with isTitle
+- 03d83633b: Fixed issue with previous value
+- 93234705a: Better user experience when the document creation fails due to existing filename
+- 55ab9c26c: Fix elements displayed above the OverflowMenu
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/sharedctx@1.0.0
+
 ## 0.58.5
 
 ### Patch Changes

@@ -1,5 +1,106 @@
 # tinacms
 
+## 1.0.2
+
+### Patch Changes
+
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+- Updated dependencies [5a1e6faaf]
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [7c1425a82]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/toolkit@1.1.0
+  - @tinacms/schema-tools@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- 93234705a: Better user experience when the document creation fails due to existing filename
+- Updated dependencies [8a92941bb]
+- Updated dependencies [08e02ec21]
+- Updated dependencies [03d83633b]
+- Updated dependencies [93234705a]
+- Updated dependencies [55ab9c26c]
+  - @tinacms/toolkit@1.0.1
+  - @tinacms/schema-tools@1.0.1
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/schema-tools@1.0.0
+  - @tinacms/sharedctx@1.0.0
+  - @tinacms/toolkit@1.0.0
+
+## 0.70.2
+
+### Patch Changes
+
+- a5d6722c7: Adds the ability to hide the delete and create buttons.
+
+  EX,
+
+  ```ts
+  export default defineConfig({
+    collections: [
+      {
+        label: 'Global',
+        name: 'global',
+        path: 'content/global',
+        ui: {
+          global: true,
+          allowedActions: {
+            create: false,
+            delete: false,
+          },
+        },
+        format: 'json',
+        fields: [
+          //...
+        ],
+      },
+    ],
+  })
+  ```
+
+- Updated dependencies [a5d6722c7]
+  - @tinacms/schema-tools@0.2.2
+
+## 0.70.1
+
+### Patch Changes
+
+- 6c93834a2: Update config and schema types
+- b12957885: Nest `defaultItem` under UI
+- Updated dependencies [6c93834a2]
+  - @tinacms/schema-tools@0.2.1
+
 ## 0.70.0
 
 ### Minor Changes

@@ -141,7 +141,7 @@ export const viteBuild = async ({
        * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
        * but node does. This was a surprise, but using `new Object()` seems to do the trick.
        */
-      'process.env': 'new Object()',
+      'process.env': `new Object(${JSON.stringify(process.env)})`,
       __API_URL__: `"${apiUrl}"`,
     },
     // NextJS forces es5 on tsconfig, specifying it here ignores that
@@ -174,9 +174,9 @@ export const viteBuild = async ({
       await fs.copy(appCopyPath, appRootPath)
     }
 
-    await execShellCommand(
-      `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
-    )
+    // await execShellCommand(
+    //   `npm --prefix ${appRootPath} i --legacy-peer-deps --omit=dev --no-package-lock`
+    // )
     await fs.outputFile(
       path.join(outputPath, '.gitignore'),
       `index.html

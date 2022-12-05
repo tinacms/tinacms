@@ -22,6 +22,35 @@ export interface TinaCloudUser {
   fullName: string
 }
 
+export const isUserAuthorized = async (args: {
+  clientID: string
+  token: string
+}): Promise<TinaCloudUser | undefined> => {
+  const clientID = args.clientID
+  const token = args.token
+  try {
+    // fetch identity from content server
+    const tinaCloudRes = await fetch(
+      `https://identity.tinajs.io/v2/apps/${clientID}/currentUser`,
+      {
+        headers: new Headers({
+          'Content-Type': 'application/json',
+          authorization: token,
+        }),
+        method: 'GET',
+      }
+    )
+    if (tinaCloudRes.ok) {
+      const user: TinaCloudUser = await tinaCloudRes.json()
+      return user
+    }
+    return
+  } catch (e) {
+    console.error(e)
+    throw e
+  }
+}
+
 /**
  *
  * @description Takes in the `req` and returns `undefined` if there is no user and returns a `TinaCloudUser` if the user is logged in.
@@ -54,26 +83,7 @@ export const isAuthorized = async (
   const clientID = req.query.clientID
   const token = req.headers.authorization
   if (typeof clientID === 'string' && typeof token === 'string') {
-    try {
-      // fetch identity from content server
-      const tinaCloudRes = await fetch(
-        `https://identity.tinajs.io/v2/apps/${clientID}/currentUser`,
-        {
-          headers: new Headers({
-            'Content-Type': 'application/json',
-            authorization: token,
-          }),
-          method: 'GET',
-        }
-      )
-      if (tinaCloudRes.ok) {
-        const user: TinaCloudUser = await tinaCloudRes.json()
-        return user
-      }
-    } catch (e) {
-      console.error(e)
-      throw e
-    }
+    return await isUserAuthorized({ clientID, token })
   }
   const errorMessage = (queryParam: string) => {
     return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`
@@ -85,3 +95,31 @@ export const isAuthorized = async (
     )
   return undefined
 }
+
+/**
+ *
+ * @description Takes in the `req` and returns `undefined` if there is no user and returns a `TinaCloudUser` if the user is logged in.
+ *
+ * @example
+ * import { NextApiHandler } from 'next'
+ * import { isAuthorized } from '@tinacms/auth'
+ * const apiHandler: NextApiHandler = async (req, res) => {
+ *   const user = await isAuthorized(req)
+ *   if (user && user.verified) {
+ *       res.json({
+ *         validUser: true,
+ *        })
+ *       return
+ *   } else {
+ *     console.log('this user NOT is logged in')
+ *     res.json({
+ *      validUser: false,
+ *      })
+ *   }
+ *}
+ * export default apiHandler
+ *
+ * @param {NextApiRequest} req - the request. It must contain a req.query.org, req.query.clientID and req.headers.authorization
+ *
+ */
+export const isAuthorizedNext = isAuthorized

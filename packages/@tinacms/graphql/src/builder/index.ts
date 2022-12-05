@@ -621,15 +621,17 @@ export class Builder {
   public async buildTemplateFragments(
     template: Template,
     depth: number
-  ): Promise<InlineFragmentNode> {
+  ): Promise<InlineFragmentNode | boolean> {
     const selections = []
 
     await sequential(template.fields || [], async (item) => {
       const field = await this._buildFieldNodeForFragments(item, depth)
       selections.push(field)
     })
+    const filteredSelections = filterSelections(selections)
+    if (!filteredSelections.length) return false
     return astBuilder.InlineFragmentDefinition({
-      selections: filterSelections(selections),
+      selections: filteredSelections,
       name: NAMER.dataTypeName(template.namespace),
     })
   }

@@ -23,8 +23,12 @@ import path from 'path'
 export const viteTina = (): Plugin => {
   return {
     name: 'vite-plugin-tina',
-    config: () => {
+    config: (viteConfig) => {
       const plugins: Plugin[] = []
+      const content = [
+        path.join(__dirname, '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
+        path.join(viteConfig.root, '../prebuild/config.js'),
+      ]
 
       const tw = tailwind({
         important: '.tina-tailwind',
@@ -240,12 +244,7 @@ export const viteTina = (): Plugin => {
             },
           },
         },
-        content: [
-          path.join(
-            __dirname,
-            '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'
-          ),
-        ],
+        content,
         plugins: [
           twTypography({ className: 'tina-prose' }),
           lineClamp,

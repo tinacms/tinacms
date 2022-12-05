@@ -1,5 +1,72 @@
 # tinacms-cli
 
+## 1.0.2
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- Updated dependencies [38438bad6]
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [78b9668b1]
+- Updated dependencies [0b2164645]
+- Updated dependencies [7c1425a82]
+- Updated dependencies [c1ac4bf10]
+- Updated dependencies [9d4943a82]
+  - @tinacms/app@1.0.1
+  - @tinacms/schema-tools@1.0.2
+  - @tinacms/graphql@1.0.2
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [08e02ec21]
+- Updated dependencies [94a5da311]
+  - @tinacms/schema-tools@1.0.1
+  - @tinacms/graphql@1.0.1
+  - @tinacms/app@1.0.0
+
+## 1.0.0
+
+### Major Changes
+
+- 958d10c82: Tina 1.0 Release
+
+  Make sure you have updated to th "iframe" path: https://tina.io/blog/upgrading-to-iframe/
+
+### Patch Changes
+
+- Updated dependencies [958d10c82]
+  - @tinacms/app@1.0.0
+  - @tinacms/datalayer@1.0.0
+  - @tinacms/graphql@1.0.0
+  - @tinacms/metrics@1.0.0
+  - @tinacms/schema-tools@1.0.0
+
+## 0.62.3
+
+### Patch Changes
+
+- Updated dependencies [f4dcf3e27]
+- Updated dependencies [a5d6722c7]
+- Updated dependencies [231dcab2e]
+  - @tinacms/app@0.0.28
+  - @tinacms/schema-tools@0.2.2
+  - @tinacms/graphql@0.63.20
+
+## 0.62.2
+
+### Patch Changes
+
+- 41a0e946c: Don't compile client since we have all info needed to create client.
+- Updated dependencies [d58401231]
+- Updated dependencies [3370cefd8]
+- Updated dependencies [6c93834a2]
+- Updated dependencies [e720590e1]
+  - @tinacms/app@0.0.27
+  - @tinacms/schema-tools@0.2.1
+  - @tinacms/graphql@0.63.19
+
 ## 0.62.1
 
 ### Patch Changes
