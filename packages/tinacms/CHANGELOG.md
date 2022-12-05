@@ -1,5 +1,35 @@
 # tinacms
 
+## 1.0.2
+
+### Patch Changes
+
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+- Updated dependencies [5a1e6faaf]
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [7c1425a82]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/toolkit@1.1.0
+  - @tinacms/schema-tools@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
