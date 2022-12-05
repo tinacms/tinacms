@@ -24,18 +24,19 @@ export const LogoutRedirect = () => {
   const { setEdit } = useEditState()
   const [searchParams] = useSearchParams()
   const slug = searchParams.get('slug') || '/'
-  const logout = () => {
+  const logout = async () => {
     if (cms?.api?.tina?.logout) {
-      cms.api.tina.logout()
+      await cms.api.tina.logout()
       if (cms?.api?.tina?.onLogout) {
-        cms?.api?.tina?.onLogout()
+        await cms?.api?.tina?.onLogout()
       }
     }
     setEdit(false)
   }
   useEffect(() => {
-    logout()
-    window.location.href = slug
+    logout().then(() => {
+      window.location.href = slug
+    })
   }, [])
 
   return <div>Redirecting to {slug} ...</div>
