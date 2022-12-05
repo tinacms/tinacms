@@ -18,17 +18,13 @@ import type { TinaCMS } from '@tinacms/toolkit'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
-  return { collections: api.fetchCollections(), loading: false, error: false }
+  return { collections: api.fetchCollections() }
 }
 
 const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
-  const { collections, loading, error } = useGetCollections(cms)
+  const { collections } = useGetCollections(cms)
 
-  if (loading || error) {
-    return null
-  }
-
-  return <>{children(collections, loading)}</>
+  return <>{children(collections)}</>
 }
 
 export default GetCollections
