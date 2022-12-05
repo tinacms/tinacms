@@ -400,12 +400,15 @@ importers:
       '@types/lru-cache': ^5.1.0
       '@types/ws': ^7.2.6
       '@types/yup': ^0.29.7
+      fetch-ponyfill: ^7.1.0
       jest: ^27.0.6
       jest-diff: ^26.4.2
       jest-matcher-utils: ^26.4.2
       next: 12.2.4
       nodemon: 2.0.19
       typescript: 4.3.5
+    dependencies:
+      fetch-ponyfill: 7.1.0
     devDependencies:
       '@tinacms/scripts': link:../scripts
       '@types/cors': 2.8.12
@@ -17160,6 +17163,17 @@ packages:
       }
     dependencies:
       pend: 1.2.0
+
+  /fetch-ponyfill/7.1.0:
+    resolution:
+      {
+        integrity: sha512-FhbbL55dj/qdVO3YNK7ZEkshvj3eQ7EuIGV2I6ic/2YiocvyWv+7jg2s4AyS0wdRU75s3tA8ZxI/xPigb0v5Aw==,
+      }
+    dependencies:
+      node-fetch: 2.6.7
+    transitivePeerDependencies:
+      - encoding
+    dev: false
 
   /fetch-ponyfill/7.1.0_encoding@0.1.13:
     resolution:
