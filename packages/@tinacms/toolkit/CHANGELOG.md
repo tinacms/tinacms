@@ -1,5 +1,35 @@
 # Change Log
 
+## 1.1.0
+
+### Minor Changes
+
+- 5a1e6faaf: - added autocomplete component
+  - made codeblock in rich-text to support all languages registered in Monaco editor
+
+### Patch Changes
+
+- 7c1425a82: - Add active field for iframe
+  - Introduce `tinaField` utility helper
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
 ## 1.0.1
 
 ### Patch Changes
