@@ -67,6 +67,14 @@ export interface UICollection {
     document: Doc
     collection: Collection
   }) => string | undefined
+  /**
+   * Determines whether or not this collection can accept new docments
+   * or allow documents to be deleted from the CMS.
+   */
+  allowedActions?: {
+    create?: boolean
+    delete?: boolean
+  }
 }
 export type Option =
   | string
@@ -481,6 +489,12 @@ export interface Schema<WithNamespace extends boolean = false> {
   config?: any
 }
 
+export type TokenObject = {
+  id_token: string
+  access_token: string
+  refresh_token: string
+}
+
 export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
@@ -488,6 +502,11 @@ export interface Config<
   Store = undefined,
   WithNamespace extends boolean = false
 > {
+  admin?: {
+    auth?: {
+      onLogin?: (args: { token: TokenObject }) => Promise<void>
+    }
+  }
   // schema: TinaCloudSchema<false>
   /**
    * The Schema is used to define the shape of the content.
