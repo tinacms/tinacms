@@ -28,7 +28,7 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 
 interface Framework {
-  name: 'next' | 'other'
+  name: 'next' | 'hugo' | 'jekyll' | 'other'
   reactive: boolean
 }
 
@@ -115,15 +115,23 @@ const chooseTypescript = async () => {
 }
 
 const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
-  if (framework.name === 'next') {
-    return 'public'
+  let suggestion = 'public'
+  switch (framework.name) {
+    case 'next':
+      return 'public'
+    case 'hugo':
+      return 'static'
+    case 'jekyll':
+      suggestion = 'public'
+      break
   }
   const option = await prompts({
     name: 'selection',
     type: 'text',
-    message: 'Where are public assets stored? (default: "public")',
+    message: `Where are public assets stored? (default: "${suggestion}")
+Not sure what value to use? Refer to our "Frameworks" doc: https://tina.io/docs/integration/frameworks/`,
   })
-  return option['selection'] || 'public'
+  return option['selection'] || suggestion
 }
 
 const chooseFramework = async () => {
@@ -133,8 +141,10 @@ const chooseFramework = async () => {
     message: 'What framework are you using?',
     choices: [
       { title: 'Next.js', value: { name: 'next', reactive: true } },
+      { title: 'Hugo', value: { name: 'hugo', reactive: false } },
+      { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
       {
-        title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
+        title: 'Other (SSG frameworks like gatsby, etc.)',
         value: { name: 'other', reactive: false },
       },
     ] as { title: string; value: Framework }[],
