@@ -129,10 +129,13 @@ export const Nav = ({
                             sidebarWidth: null,
                             resizingSidebar: false,
                           })
-                          setEdit(false)
-                          if (cms?.api?.tina?.onLogout) {
-                            cms.api.tina.onLogout()
+                          if (cms?.api?.tina?.logout) {
+                            cms.api.tina.logout()
+                            if (cms?.api?.tina?.onLogout) {
+                              cms?.api?.tina?.onLogout()
+                            }
                           }
+                          setEdit(false)
                         }}
                       >
                         <BiExit className="w-6 h-auto mr-2 text-blue-400" /> Log
