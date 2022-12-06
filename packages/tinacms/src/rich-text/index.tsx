@@ -31,6 +31,7 @@ type BaseComponents = {
   ul?: { children: JSX.Element }
   ol?: { children: JSX.Element }
   li?: { children: JSX.Element }
+  lic?: { children: JSX.Element }
   block_quote?: { children: JSX.Element }
   code_block?: { lang?: string; value: string }
   img?: { url: string; caption?: string; alt?: string }
@@ -254,6 +255,14 @@ const Node = ({ components, child }) => {
         children: <TinaMarkdown components={components} content={children} />,
       })
     case 'lic': // List Item Content
+      if (components.lic) {
+        const Component = components.lic
+        return (
+          <Component {...props}>
+            <TinaMarkdown components={components} content={children} />
+          </Component>
+        )
+      }
       return (
         <div>
           <TinaMarkdown components={components} content={child.children} />
