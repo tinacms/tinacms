@@ -64,7 +64,7 @@ export function stringifyProps(
   Object.entries(element.props).forEach(([name, value]) => {
     const field = template.fields.find((field) => field.name === name)
     if (!field) {
-      if (name === 'children') {
+      if (name === 'children' || name === '__meta__') {
         return
       }
       throw new Error(`No field definition found for property ${name}`)
