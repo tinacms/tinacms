@@ -1,5 +1,11 @@
 # tinacms
 
+## 1.1.0
+
+### Minor Changes
+
+- 11b32f712: Enable custom component for text in TinaMarkdown
+
 ## 1.0.2
 
 ### Patch Changes

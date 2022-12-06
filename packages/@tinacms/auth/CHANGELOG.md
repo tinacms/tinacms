@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 1.0.2
+
+### Patch Changes
+
+- 4e2edde70: Use a fetch ponyfill in `@tinacms/auth`
+
 ## 1.0.1
 
 ### Patch Changes

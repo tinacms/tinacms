@@ -425,7 +425,14 @@ export const queryMachine =
                 const itemPath = path.concat(i)
                 yield [i, o[i], itemPath, o]
                 if (o[i] !== null && typeof o[i] == 'object') {
-                  if (i !== META_KEY) {
+                  if (
+                    [
+                      '_internalSys',
+                      '_internalValues',
+                      '_sys',
+                      META_KEY,
+                    ].includes(i)
+                  ) {
                     //going one step down in the object tree!!
                     yield* innerTraversal(o[i], itemPath)
                   }
