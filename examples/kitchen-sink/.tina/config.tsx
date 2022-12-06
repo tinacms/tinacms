@@ -59,7 +59,7 @@ export default defineConfig({
                       <div className="my-4">
                         <label
                           htmlFor={input.name}
-                          className="block text-sm font-medium text-gray-700"
+                          className="block text-sm font-medium text-blue-700 underline"
                         >
                           {input.name} (this is a custom component)
                         </label>
