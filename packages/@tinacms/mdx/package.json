@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/mdx",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -21,7 +21,7 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "tinacms-scripts build",
-    "docs": "yarn typedoc",
+    "docs": "typedoc --plugin typedoc-plugin-markdown src/parse/plate.ts --theme markdown && concat-md --decrease-title-levels --dir-name-as-title docs > spec.md",
     "serve": "yarn nodemon dist/server.js",
     "test": "vitest",
     "coverage": "vitest run --coverage",
@@ -30,12 +30,15 @@
   "dependencies": {
     "@tinacms/schema-tools": "workspace:*",
     "acorn": "^8.7.1",
+    "concat-md": "^0.5.0",
     "lodash-es": "^4.17.21",
     "mdast-util-mdx-jsx": "^2.0.1",
     "mdast-util-to-markdown": "^1.3.0",
     "prettier": "^2.7.1",
     "remark": "^14.0.2",
     "remark-mdx": "^2.1.2",
+    "typedoc": "^0.23.21",
+    "typedoc-plugin-markdown": "^3.13.6",
     "unist-util-visit": "^4.1.0",
     "vfile": "^4.2.0"
   },
