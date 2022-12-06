@@ -25,13 +25,7 @@ describe('Rich Text Editor', () => {
     cy.request({
       method: 'POST',
       url: 'http://localhost:4001/graphql',
-      body: {
-        query: `mutation {
-          updateDocument(collection: "page" relativePath: "home.mdx"  params: {page: {heading: "" subtitle: "" body: ""}}){
-            __typename
-          }
-        }`,
-      },
+      body: '{"query":"#graphql\\n          mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {\\n            updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {\\n              __typename\\n            }\\n          }\\n        ","variables":{"collection":"page","relativePath":"home.mdx","params":{"page":{"heading":"","subtitle":"","body":{"type":"root","children":[{"type":"p","id":1670359265678,"children":[{"type":"text","id":1670359265677,"text":""}]},{"type":"p","id":1670359265794,"children":[{"type":"text","id":1670359265793,"text":""}]},{"type":"p","id":1670359265813,"children":[{"type":"text","id":1670359265812,"text":""}]}]}}}}}',
     })
   })
   describe('italic', () => {
