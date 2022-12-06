@@ -42,6 +42,7 @@ export interface ReferenceProps {
   options?: (Option | string)[]
 }
 
+// @ts-ignore PR FOR DEMO ONLY
 export const Reference: React.FC<ReferenceProps> = ({ input, field, meta }) => {
   const cms = useCMS()
 

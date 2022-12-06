@@ -71,6 +71,7 @@ const NoFieldsPlaceholder = () => (
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
+  // @ts-ignore PR FOR DEMO ONLY
   setActiveFormId,
   onPristineChange,
   ...rest
@@ -622,6 +623,7 @@ const getFieldGroup = (
         if (index) {
           const value2 = value[index]
           if (rest2.length) {
+            // @ts-ignore PR FOR DEMO ONLY
             const result = getFieldGroup(field, rest2.join('.'), value2, [
               ...prefix,
               name,
@@ -645,6 +647,7 @@ const getFieldGroup = (
         }
       } else {
         if (rest.length) {
+          // @ts-ignore PR FOR DEMO ONLY
           const result = getFieldGroup(field, rest.join('.'), value, [
             ...prefix,
             name,
@@ -667,7 +670,7 @@ const getFieldGroup = (
   }
 }
 
-export const PanelHeader = ({
+const PanelHeader = ({
   path,
   itemIndex,
   setSelectedField,

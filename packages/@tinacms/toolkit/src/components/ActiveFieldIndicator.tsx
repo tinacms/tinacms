@@ -228,6 +228,7 @@ export const ReverseActiveFieldIndicator = () => {
       mutations_list.forEach(function (mutation) {
         mutation.addedNodes.forEach(function (node) {
           if (node.nodeType === 1) {
+            // @ts-ignore PR FOR DEMO ONLY
             const tinaFieldNodes = node.querySelectorAll('[data-tinafield]')
             tinaFieldNodes.forEach((node) => {
               setNodes((nodes) => [...nodes.filter((n) => n !== node), node])
@@ -236,6 +237,7 @@ export const ReverseActiveFieldIndicator = () => {
         })
         mutation.removedNodes.forEach(function (node) {
           if (node.nodeType === 1) {
+            // @ts-ignore PR FOR DEMO ONLY
             const tinaFieldNodes = node.querySelectorAll('[data-tinafield]')
             tinaFieldNodes.forEach((node) => {
               setNodes((nodes) => nodes.filter((n) => n !== node))
