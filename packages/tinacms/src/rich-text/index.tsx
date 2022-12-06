@@ -27,6 +27,7 @@ type BaseComponents = {
   strikethrough?: { children: JSX.Element }
   underline?: { children: JSX.Element }
   code?: { children: JSX.Element }
+  text?: { children: string }
   ul?: { children: JSX.Element }
   ol?: { children: JSX.Element }
   li?: { children: JSX.Element }
@@ -123,7 +124,7 @@ const Leaf = (props: {
   code?: boolean
   components: Pick<
     BaseComponentSignature,
-    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code'
+    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code' | 'text'
   >
 }) => {
   if (props.bold) {
@@ -205,6 +206,10 @@ const Leaf = (props: {
         <Leaf {...rest} />
       </code>
     )
+  }
+  if (props.components.text) {
+    const Component = props.components.text
+    return <Component>{props.text}</Component>
   }
   return <>{props.text}</>
 }
