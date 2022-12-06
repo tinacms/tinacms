@@ -343,10 +343,7 @@ export class Resolver {
   }) => {
     const doc = await this.getDocument(realPath)
 
-    const shouldMergeUpdates = this.tinaSchema.schema.config?.gql?.mergeUpdates
-
-    // The oldDoc is {} if shouldMergeUpdates is false. If true, it's the current document.
-    const oldDoc = shouldMergeUpdates ? doc?._rawData || {} : {}
+    const oldDoc = doc?._rawData || {}
     /**
      * TODO: Remove when `addPendingDocument` is no longer needed.
      */

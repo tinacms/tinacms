@@ -3,17 +3,4 @@
 '@tinacms/schema-tools': patch
 ---
 
-Added feature where you can merge the content with its existing content.
-
-### How to enable
-
-```ts
-// .tina/config
-
-export default defineConfig({
-    gql: {
-        mergeUpdates: true
-    }
-})
-
-```
+Contented is not merged with existing content. This means if you have a field that is not defined in the schema it will not be overridden. 
