@@ -1,0 +1,96 @@
+---
+label: Design Tokens
+hide_body: true
+fields:
+  - type: field_group
+    name: size-scale
+    label: size-scale
+    fields:
+      - type: text
+        name: base
+        label: base
+      - type: text
+        name: '300'
+        label: '300'
+      - type: text
+        name: '500'
+        label: '500'
+      - type: text
+        name: '600'
+        label: '600'
+      - type: text
+        name: '700'
+        label: '700'
+      - type: text
+        name: '800'
+        label: '800'
+      - type: text
+        name: '900'
+        label: '900'
+      - type: text
+        name: max
+        label: max
+  - type: field_group
+    name: colors
+    label: colors
+    fields:
+      - type: color
+        name: primary
+        label: primary
+        config:
+          color_format: Hex
+        default: '#173854'
+      - type: color
+        name: primary-shade
+        label: primary-shade
+        config:
+          color_format: Hex
+        default: '#102538'
+      - type: color
+        name: primary-glare
+        label: primary-glare
+        config:
+          color_format: Hex
+        default: '#22547c'
+      - type: color
+        name: highlight
+        label: highlight
+        config:
+          color_format: Hex
+        default: '#fedb8b'
+      - type: color
+        name: light
+        label: light
+        config:
+          color_format: Hex
+        default: '#ffffff'
+      - type: color
+        name: mid
+        label: mid
+        config:
+          color_format: Hex
+        default: '#cccccc'
+      - type: color
+        name: dark
+        label: dark
+        config:
+          color_format: Hex
+        default: '#333333'
+      - type: color
+        name: slate
+        label: slate
+        config:
+          color_format: Hex
+        default: '#404040'
+  - type: field_group
+    name: fonts
+    label: fonts
+    fields:
+      - type: textarea
+        name: base
+        label: base
+      - type: text
+        name: serif
+        label: serif
+pages:
+  - src/_data/tokens.json

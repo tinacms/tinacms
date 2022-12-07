@@ -92,7 +92,8 @@
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
     "yarn": "^1.22.17",
-    "yup": "^0.32.9"
+    "yup": "^0.32.9",
+    "zod": "^3.14.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
