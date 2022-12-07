@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import path from 'path'
+import { format } from 'prettier'
 import {
   cmdText,
   focusText,
@@ -71,13 +72,19 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     }
   }
 
-  await addDependencies(packageManager)
+  // await addDependencies(packageManager)
 
-  // add .tina/config.{js,ts}
-  await addConfigFile({ publicFolder, baseDir, usingTypescript, framework })
+  // add .tina/config.{js,ts}]
+  await addConfigFile({
+    publicFolder,
+    baseDir,
+    usingTypescript,
+    framework,
+    collections: ctx.collections,
+  })
 
   // add /content/posts/hello-world.md
-  await addContentFile({ baseDir })
+  // await addContentFile({ baseDir })
 
   if (framework.reactive) {
     await addReactiveFile[framework.name]({
@@ -208,11 +215,13 @@ const addConfigFile = async ({
   baseDir,
   publicFolder,
   usingTypescript,
+  collections,
 }: {
   publicFolder: string
   baseDir: string
   usingTypescript: boolean
   framework: Framework
+  collections?: string
 }) => {
   const configPath = path.join(
     '.tina',
@@ -229,7 +238,7 @@ const addConfigFile = async ({
       logger.info(logText(`Overriding file at ${configPath}.`))
       await fs.outputFileSync(
         fullConfigPath,
-        config({ publicFolder, framework })
+        config({ publicFolder, framework, collections })
       )
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
@@ -240,7 +249,10 @@ const addConfigFile = async ({
         `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
-    await fs.outputFileSync(fullConfigPath, config({ publicFolder, framework }))
+    await fs.outputFileSync(
+      fullConfigPath,
+      config({ publicFolder, framework, collections })
+    )
   }
 }
 
@@ -304,8 +316,12 @@ const frameworkDevCmds = {
   },
 }
 
-const config = (args: { publicFolder: string; framework: Framework }) => {
-  return configExamples[args.framework.name](args)
+const config = (args: {
+  publicFolder: string
+  framework: Framework
+  collections?: string
+}) => {
+  return format(configExamples[args.framework.name](args))
 }
 
 const content = `---

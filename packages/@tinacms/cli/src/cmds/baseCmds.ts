@@ -211,12 +211,7 @@ export const baseCmds: Command[] = [
     description: 'Add Tina Cloud to an existing project',
     action: (options) => {
       chain(
-        [
-          attachPath,
-          // checkOptions,
-          forestryMigrate,
-          // initStaticTina
-        ],
+        [attachPath, checkOptions, forestryMigrate, initStaticTina],
         options
       )
     },

@@ -488,6 +488,7 @@ importers:
       log4js: ^6.4.0
       multer: 1.4.5-lts.1
       normalize-path: ^3.0.0
+      prettier: ^2.2.1
       progress: ^2.0.3
       prompts: ^2.4.1
       typescript: 4.3.5
@@ -497,7 +498,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 2.7.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 3.1.1_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -533,6 +534,7 @@ importers:
       log4js: 6.5.2
       multer: 1.4.5-lts.1
       normalize-path: 3.0.0
+      prettier: 2.7.1
       progress: 2.0.3
       prompts: 2.4.2
       url-pattern: 1.0.3
@@ -5626,6 +5628,23 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /@graphql-codegen/plugin-helpers/3.1.1_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-+V1WK4DUhejVSbkZrAsyv9gA4oQABVrtEUkT7vWq7gSf7Ln6OEM59lDUDsjp5wpLPTBIDJANbAe3qEd+iCB3Ow==,
+      }
+    peerDependencies:
+      graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
+      change-case-all: 1.0.15
+      common-tags: 1.8.2
+      graphql: 15.8.0
+      import-from: 4.0.0
+      lodash: 4.17.21
+      tslib: 2.4.0
+    dev: false
+
   /@graphql-codegen/schema-ast/2.4.1_graphql@15.8.0:
     resolution:
       {
@@ -8003,7 +8022,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
-      tailwindcss: 2.2.19_3vnygek3yzhyjlvmmgk3sqgzme
+      tailwindcss: 2.2.19_ugi4xkrfysqkt4c4y6hkyfj344
     dev: false
 
   /@tailwindcss/typography/0.5.2_tailwindcss@3.1.4:
@@ -11710,6 +11729,7 @@ packages:
       picocolors: 1.0.0
       postcss: 8.4.16
       postcss-value-parser: 4.2.0
+    dev: true
 
   /autoprefixer/10.4.7_postcss@8.4.18:
     resolution:
@@ -12763,6 +12783,24 @@ packages:
     resolution:
       {
         integrity: sha512-CWVm2uT7dmSHdO/z1CXT/n47mWonyypzBbuCy5tN7uMg22BsfkhwT6oHmFCAk+gL1LOOxhdbB9SZz3J1KTY3gA==,
+      }
+    dependencies:
+      change-case: 4.1.2
+      is-lower-case: 2.0.2
+      is-upper-case: 2.0.2
+      lower-case: 2.0.2
+      lower-case-first: 2.0.2
+      sponge-case: 1.0.1
+      swap-case: 2.0.2
+      title-case: 3.0.3
+      upper-case: 2.0.2
+      upper-case-first: 2.0.2
+    dev: false
+
+  /change-case-all/1.0.15:
+    resolution:
+      {
+        integrity: sha512-3+GIFhk3sNuvFAJKU46o26OdzudQlPNBCu1ZQi3cMeMHhty1bhDxu2WrEilVNYaGvqUtR1VSigFcJOiS13dRhQ==,
       }
     dependencies:
       change-case: 4.1.2
@@ -24726,6 +24764,7 @@ packages:
       lilconfig: 2.0.6
       postcss: 8.4.16
       yaml: 1.10.2
+    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.18:
     resolution:
@@ -24769,6 +24808,7 @@ packages:
     dependencies:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
+    dev: true
 
   /postcss-nested/5.0.6_postcss@8.4.18:
     resolution:
@@ -28061,6 +28101,7 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
+    dev: true
 
   /tailwindcss/2.2.19_ugi4xkrfysqkt4c4y6hkyfj344:
     resolution:
@@ -28109,7 +28150,6 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
-    dev: true
 
   /tailwindcss/3.1.4_postcss@8.4.14:
     resolution:

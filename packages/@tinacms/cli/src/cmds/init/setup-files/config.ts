@@ -61,7 +61,7 @@ export const configExamples = {
     },
   })
   `,
-  other: (args: { publicFolder: string }) => {
+  other: (args: { publicFolder: string; collections?: string }) => {
     return `
   import { defineConfig } from "tinacms";
   
@@ -83,7 +83,9 @@ export const configExamples = {
       },
     },
     schema: {
-      collections: [
+      collections: ${
+        args.collections ||
+        `[
         {
           name: "post",
           label: "Posts",
@@ -104,7 +106,8 @@ export const configExamples = {
             },
           ],
         },
-      ],
+      ]`
+      },
     },
   });
   `
