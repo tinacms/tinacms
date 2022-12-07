@@ -208,8 +208,9 @@ export const getFieldsFromTemplates = ({
     if (field) {
       if (forestryField.config?.required) {
         // @ts-ignore
-        field = { ...field, ui: { ...(field?.ui || {}), required: true } }
+        field = { ...field, required: true }
       }
+
       fields.push(field)
     }
   })
