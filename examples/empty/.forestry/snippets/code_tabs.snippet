@@ -1,0 +1,29 @@
+{{% code_tabs %}}
+{{% tab "Hugo" %}}
+```go-html-template
+{{ range .Params.page_sections }}
+    {{ if eq "hero-section" .template }}
+        {{ partial "blocks/hero" . }}
+    {{ end }}
+    {{ if eq "call-to-action" .template }}
+        {{ partial "blocks/cta" . }}
+    {{ end }}
+{{ end }}
+
+```
+{{% /tab %}}
+{{% tab "Jekyll" %}}
+```html
+{% for block in page.page_sections %}
+    {% assign template = block.template %}
+    {% case template%}
+    {% when 'hero-section' %}
+        {% include blocks/hero.html %}
+    {% when 'call-to-action' %}
+        {% include blocks/cta.html %}
+    {% endcase %}
+{% endfor %}
+
+```
+{{% /tab %}}
+{{% /code_tabs %}}

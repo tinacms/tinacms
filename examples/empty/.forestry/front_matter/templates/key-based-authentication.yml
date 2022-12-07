@@ -1,0 +1,98 @@
+---
+label: Sunset Notices
+hide_body: false
+fields:
+  - name: title
+    label: Title
+    type: text
+    hidden: false
+    default: ''
+  - name: description
+    label: Description
+    type: textarea
+    hidden: false
+    default: ''
+  - name: date
+    label: Date
+    type: datetime
+    hidden: false
+    default: ''
+  - name: authors
+    label: Authors
+    type: list
+    hidden: false
+    default: ''
+  - name: publishdate
+    label: Publishdate
+    type: datetime
+    hidden: false
+    default: now
+  - name: expirydate
+    label: Expirydate
+    type: datetime
+    hidden: false
+    default: '2030-07-13T19:00:00-03:00'
+  - name: headline
+    label: Headline
+    type: text
+    hidden: false
+    default: ''
+  - name: textline
+    label: Textline
+    type: text
+    hidden: false
+    default: ''
+  - name: images
+    label: Images
+    type: image_gallery
+    hidden: false
+    default: ''
+  - name: categories
+    label: Categories
+    type: tag_list
+    hidden: false
+    default: ''
+  - name: tags
+    label: Tags
+    type: tag_list
+    hidden: false
+    default: ''
+  - name: cta
+    label: Cta
+    type: field_group
+    fields:
+      - name: headline
+        label: Headline
+        type: text
+        hidden: false
+        default: ''
+      - name: textline
+        label: Textline
+        type: text
+        hidden: false
+        default: ''
+      - name: calls_to_action
+        label: Calls to action
+        type: list
+        hidden: false
+        default: ''
+    hidden: false
+    default: ''
+  - name: weight
+    label: Weight
+    type: text
+    hidden: false
+    default: ''
+  - name: aliases
+    label: Aliases
+    type: list
+    hidden: false
+    default: ''
+  - name: layout
+    label: Layout
+    type: text
+    hidden: true
+    default: single
+pages:
+  - hugo/content/docs/sunset/custom-configuration-for-data-files.md
+  - hugo/content/docs/sunset/deployments.md

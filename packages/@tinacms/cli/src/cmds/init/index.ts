@@ -84,7 +84,9 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   })
 
   // add /content/posts/hello-world.md
-  // await addContentFile({ baseDir })
+  if (!ctx.hasForestryConfig) {
+    await addContentFile({ baseDir })
+  }
 
   if (framework.reactive) {
     await addReactiveFile[framework.name]({

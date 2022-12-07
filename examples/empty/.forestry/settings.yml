@@ -1,37 +1,86 @@
 ---
 new_page_extension: md
 auto_deploy: false
-admin_path: ''
+admin_path: '/admin'
 webhook_url:
 sections:
   - type: heading
     label: Content
   - type: directory
-    path: src/posts
-    label: Posts
-    create: documents
-    match: '*.md'
+    path: hugo/content
+    label: Pages
+    create: all
+    match: '*'
+  - type: directory
+    path: hugo/content/showcase
+    label: Showcase
+    create: all
+    match: '**/*'
     templates:
-      - post
+      - showcase
+  - type: directory
+    path: hugo/content/blog
+    label: Blog
+    create: all
+    match: '**/*'
   - type: heading
-    label: Globals
+    label: Documentation
+  - type: directory
+    path: hugo/content/docs
+    label: Docs
+    create: all
+    match: '**/*'
+    exclude: '{changelog,sunset,faqs}/*'
+    templates:
+      - doc
+  - type: directory
+    path: hugo/content/docs/changelog
+    label: Changelog
+    create: all
+    match: '*'
+    templates:
+      - changelog
+  - type: directory
+    path: hugo/content/docs/sunset
+    label: Sunset Notices
+    create: all
+    match: '*'
+  - type: directory
+    path: hugo/content/docs/faqs
+    label: FAQ
+    create: all
+    match: '**/*'
+    templates:
+      - doc
+  - type: heading
+    label: Data
   - type: document
-    path: src/_data/navigation.json
-    label: Navigation
+    path: hugo/data/starters.yml
+    label: Starters
   - type: document
-    path: src/_data/tokens.json
-    label: Theme settings
-upload_dir: src/images
-public_path: '/images'
-front_matter_path: ''
+    path: hugo/data/authors.yml
+    label: Authors
+  - type: document
+    path: hugo/data/testimonials.yml
+    label: Testimonials
+  - type: document
+    path: hugo/data/pricing.yml
+    label: Pricing
+upload_dir: hugo/static/uploads
+public_path: '/uploads'
+front_matter_path: '/uploads'
 use_front_matter_path: false
-file_template: ':filename:'
+file_template: ':year:/:month:/:filename:'
 build:
   preview_env:
-    - ELEVENTY_ENV=staging
-  preview_output_directory: src/dist
+    - HUGO_ENV=staging
+    - HUGO_VERSION=0.87.0
+    - PREVIEW_IP=0.0.0.0
+    - PREVIEW_PORT=8080
+  preview_output_directory: dist
   install_dependencies_command: npm install
-  preview_docker_image: node:10
+  preview_docker_image: forestryio/hugo:node12
   mount_path: '/srv'
-  working_dir: '/srv/src'
-  instant_preview_command: npm start
+  working_dir: '/srv'
+  instant_preview_command: npm run forestry:instant-preview
+version: 0.42.2

@@ -1,0 +1,73 @@
+---
+label: Authors
+hide_body: true
+fields:
+  - type: field_group
+    name: map
+    label: map
+    fields:
+      - type: text
+        name: Forestry Team
+        label: Forestry Team
+      - type: text
+        name: Chris Macrae
+        label: Chris Macrae
+      - type: text
+        name: Scott Gallant
+        label: Scott Gallant
+      - type: text
+        name: Jordan Patterson
+        label: Jordan Patterson
+      - type: text
+        name: Colin Garvey
+        label: Colin Garvey
+      - type: text
+        name: Michael Soolee
+        label: Michael Soolee
+      - type: text
+        name: Matt Duffy
+        label: Matt Duffy
+      - type: text
+        name: Sebastian Engels
+        label: Sebastian Engels
+      - type: text
+        name: DJ Walker
+        label: DJ Walker
+      - type: text
+        name: Régis Philibert
+        label: Régis Philibert
+      - type: text
+        name: Josh Dzielak
+        label: Josh Dzielak
+      - type: text
+        name: Nolan Phillips
+        label: Nolan Phillips
+  - type: field_group_list
+    name: authors
+    label: authors
+    fields:
+      - type: file
+        name: avatar
+        label: avatar
+      - type: text
+        name: bio
+        label: bio
+      - type: text
+        name: firstName
+        label: firstName
+      - type: text
+        name: fullName
+        label: fullName
+      - type: text
+        name: shortBio
+        label: shortBio
+      - type: text
+        name: twitter
+        label: twitter
+      - type: text
+        name: title
+        label: title
+    config:
+      labelField: fullName
+pages:
+  - hugo/data/authors.yml

@@ -1,6 +1,11 @@
 import fs from 'fs-extra'
 import yaml from 'js-yaml'
-import type { TinaCloudCollection } from '@tinacms/schema-tools'
+import type {
+  TinaCloudCollection,
+  Template,
+  UICollection,
+  TinaFieldInner,
+} from '@tinacms/schema-tools'
 import {
   getFieldsFromTemplates,
   hasForestryConfig,
@@ -13,6 +18,8 @@ export const forestryMigrate = async (
   _options: any
 ) => {
   const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
+
+  ctx.hasForestryConfig = forestryPath.exists
 
   // if there is no forestry config, we can skip this
   if (!forestryPath.exists) {
@@ -38,19 +45,53 @@ export const forestryMigrate = async (
             description: 'This is the markdown body',
           },
         ]
-        section.templates.forEach((tem) => {
-          const additionalFields = getFieldsFromTemplates({
-            tem,
-            rootPath: ctx.rootPath,
+        if ((section.templates?.length || 0) > 1) {
+          // deal with templates
+          const templates: {
+            label: string
+            name: string
+            ui?: UICollection
+            fields: TinaFieldInner<false>[]
+          }[] = []
+          section.templates.forEach((tem) => {
+            try {
+              const fields = getFieldsFromTemplates({
+                tem,
+                rootPath: ctx.rootPath,
+              })
+              templates.push({ fields, label: tem, name: tem.toLowerCase() })
+            } catch (e) {
+              console.log('Error parsing template ', tem)
+              console.error(e)
+            }
           })
-          fields.push(...(additionalFields as any))
-        })
-        collections.push({
-          label: section.label,
-          name: section.label.toLowerCase(),
-          path: section.path,
-          fields: fields,
-        })
+          collections.push({
+            label: section.label,
+            name: section.label.toLowerCase(),
+            path: section.path,
+            templates,
+          })
+        } else {
+          // deal with fields
+          section.templates?.forEach((tem) => {
+            try {
+              const additionalFields = getFieldsFromTemplates({
+                tem,
+                rootPath: ctx.rootPath,
+              })
+              fields.push(...(additionalFields as any))
+            } catch (e) {
+              console.log('Error parsing template ', tem)
+              console.error(e)
+            }
+          })
+          collections.push({
+            label: section.label,
+            name: section.label.toLowerCase(),
+            path: section.path,
+            fields: fields,
+          })
+        }
         break
     }
   })
