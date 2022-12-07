@@ -2,7 +2,6 @@ import fs from 'fs-extra'
 import yaml from 'js-yaml'
 import type {
   TinaCloudCollection,
-  Template,
   UICollection,
   TinaFieldInner,
 } from '@tinacms/schema-tools'
@@ -65,12 +64,21 @@ export const forestryMigrate = async (
               console.error(e)
             }
           })
-          collections.push({
+          const c: TinaCloudCollection<false> = {
             label: section.label,
             name: section.label.toLowerCase(),
             path: section.path,
             templates,
-          })
+          }
+          if (section?.create === 'none') {
+            c.ui = {
+              ...c.ui,
+              allowedActions: {
+                create: false,
+              },
+            }
+          }
+          collections.push(c)
         } else {
           // deal with fields
           section.templates?.forEach((tem) => {
@@ -85,12 +93,21 @@ export const forestryMigrate = async (
               console.error(e)
             }
           })
-          collections.push({
+          const c: TinaCloudCollection<false> = {
             label: section.label,
             name: section.label.toLowerCase(),
             path: section.path,
-            fields: fields,
-          })
+            fields,
+          }
+          if (section?.create === 'none') {
+            c.ui = {
+              ...c.ui,
+              allowedActions: {
+                create: false,
+              },
+            }
+          }
+          collections.push(c)
         }
         break
     }
