@@ -98,17 +98,13 @@ export default defineConfig({
             type: 'string',
             name: 'title',
             label: 'Title',
-            ui: {
-              required: true,
-            },
+            required: true,
           },
           {
             type: 'datetime',
             name: 'publishdate',
             label: 'Publish Date',
-            ui: {
-              required: true,
-            },
+            required: true,
           },
           {
             type: 'string',
@@ -185,9 +181,7 @@ export default defineConfig({
             type: 'datetime',
             name: 'date',
             label: 'Date',
-            ui: {
-              required: true,
-            },
+            required: true,
           },
           {
             type: 'string',
@@ -227,17 +221,13 @@ export default defineConfig({
             type: 'string',
             name: 'title',
             label: 'Title',
-            ui: {
-              required: true,
-            },
+            required: true,
           },
           {
             type: 'datetime',
             name: 'publishdate',
             label: 'Publish Date',
-            ui: {
-              required: true,
-            },
+            required: true,
           },
           {
             type: 'string',
