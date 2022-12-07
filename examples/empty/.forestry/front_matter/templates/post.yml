@@ -1,0 +1,22 @@
+---
+label: Post
+hide_body: false
+fields:
+  - type: text
+    name: title
+    label: title
+  - type: datetime
+    name: date
+    label: date
+    default: now
+    config:
+      date_format: YYYY-MM-DD
+      export_format: YYYY-MM-DD
+  - type: list
+    name: tags
+    label: tags
+  - name: image
+    type: file
+    config:
+      maxSize: 64
+    label: image
