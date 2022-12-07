@@ -150,7 +150,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
       list: field.list,
       parentTypename: field.parentTypename,
       ...field.field,
-      label: 'Value',
+      label: false,
       name: field.name + '.' + index,
     },
   ]
@@ -191,7 +191,7 @@ const ListHeader = ({ className = '', ...props }) => (
 
 const ListPanel = ({ className = '', ...props }) => (
   <div
-    className={`max-h-[initial] relative h-auto mb-6 rounded-[5px] bg-gray-100 ${className}`}
+    className={`max-h-[initial] relative h-auto mb-6 rounded-md shadow bg-gray-100 ${className}`}
     {...props}
   />
 )

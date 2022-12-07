@@ -20,7 +20,7 @@ export type AnyField = Field & { [key: string]: any }
 
 export interface Field<F extends Field = AnyField> {
   name: string
-  label?: string
+  label?: string | boolean
   description?: string
   component: React.FC<any> | string | null
   inlineComponent?: React.FC<any>
