@@ -1,0 +1,21 @@
+---
+label: landing-page
+hide_body: true
+fields:
+  - type: text
+    name: title
+    label: Title
+  - type: blocks
+    name: blocks
+    label: Blocks
+    template_types:
+      - call-to-action
+      - feature
+      - hero
+  - type: text
+    name: layout
+    label: Layout
+    hidden: true
+    default: blocks
+pages:
+  - hugo/content/blocks.md

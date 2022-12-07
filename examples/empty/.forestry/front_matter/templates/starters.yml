@@ -1,0 +1,50 @@
+---
+label: starters
+hide_body: true
+fields:
+  - type: field_group_list
+    name: starters
+    label: starters
+    fields:
+      - type: text
+        name: name
+        label: Name
+      - type: text
+        name: textline
+        label: Textline
+      - name: image
+        type: text
+        label: Image
+      - type: text
+        name: preview
+        label: Preview Link
+      - type: field_group_list
+        name: versions
+        label: Versions
+        fields:
+          - type: text
+            name: name
+            label: Name
+          - type: text
+            name: repo
+            label: Repo
+          - name: branch
+            type: text
+            config:
+              required: false
+            label: Branch
+            default: master
+          - name: engine
+            type: text
+            config:
+              required: false
+            label: Engine
+  - type: field_group_list
+    name: filters
+    label: Filters
+    fields:
+      - type: text
+        name: name
+        label: Name
+pages:
+  - hugo/data/starters.yml

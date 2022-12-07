@@ -35,6 +35,7 @@ const FrontmatterTemplateSchema = z.object({
 
   fields: z.array(
     z.object({
+      // TODO: maybe better type this?
       type: z.union([
         z.literal('text'),
         z.literal('datetime'),
@@ -45,20 +46,29 @@ const FrontmatterTemplateSchema = z.object({
         z.literal('tag_list'),
         z.literal('number'),
         z.literal('boolean'),
+        z.literal('field_group'),
+        z.literal('field_group_list'),
+        z.literal('select'),
+        z.literal('include'),
+        z.literal('blocks'),
+        z.literal('color'),
       ]),
       name: z.string(),
       label: z.string(),
-      // TODO: maybe better type this?
       default: z.any().optional(),
-      // TODO going to skip config for now
-      //   config: z.object({
-      //     date_format: z.string(),
-      //     export_format: z.string(),
-      //     maxSize: z.number(),
-      //   }),
+      config: z
+        .object({
+          required: z.boolean().optional(),
+          use_select: z.boolean().optional(),
+          date_format: z.string().optional(),
+          time_format: z.string().optional(),
+          options: z.array(z.string()).optional(),
+        })
+        .optional(),
     })
   ),
 })
+
 export const getFieldsFromTemplates = ({
   tem,
   rootPath,
@@ -73,87 +83,134 @@ export const getFieldsFromTemplates = ({
     'templates',
     `${tem}.yml`
   )
-  const templateString = fs.readFileSync(templatePath)
-  const templateObj = yaml.load(templateString.toString())
+  let templateString = ''
+  try {
+    templateString = fs.readFileSync(templatePath).toString()
+  } catch {
+    throw new Error(
+      `Could not find template ${tem} at ${templatePath}\n\n This will require manual migration.`
+    )
+  }
+
+  const templateObj = yaml.load(templateString)
   const template = parseTemplates({ val: templateObj })
   const fields: TinaFieldInner<false>[] = []
   template.fields.forEach((forestryField) => {
+    let field: TinaFieldInner<false>
     switch (forestryField.type) {
+      // Single filed types
       case 'text':
-        fields.push({
+        field = {
           type: 'string',
           name: forestryField.name,
           label: forestryField.label,
-        })
+        }
         break
       case 'textarea':
-        fields.push({
+        field = {
           type: 'string',
           name: forestryField.name,
           label: forestryField.label,
           ui: {
             component: 'textarea',
           },
-        })
+        }
         break
       case 'datetime':
-        fields.push({
+        field = {
           type: forestryField.type,
           name: forestryField.name,
           label: forestryField.label,
-        })
+        }
         break
       case 'number':
-        fields.push({
+        field = {
           type: 'number',
           name: forestryField.name,
           label: forestryField.label,
-        })
+        }
         break
       case 'boolean':
-        fields.push({
+        field = {
           type: 'boolean',
           name: forestryField.name,
           label: forestryField.label,
-        })
+        }
         break
-      case 'list':
-        // TODO: make list work
-
-        // TODO habnde options
-        // EX:
-        // - type: list
-        //   name: categories
-        //   label: Categories
-        //   config:
-        //     use_select: true
-        //     source:
-        //       type: simple
-        //     options:
-        //     - CMS
-        //     - Jekyll
-        //     - Hugo
-        //     - Static Sites
-        //     - Static Site Generators
-        //     - Company
+      case 'color':
+        field = {
+          type: 'string',
+          name: forestryField.name,
+          label: forestryField.label,
+          ui: {
+            component: 'color',
+          },
+        }
         break
       case 'file':
-        fields.push({
+        field = {
           type: 'image',
           name: forestryField.name || 'image',
           label: forestryField.label,
-        })
+        }
         break
-      case 'image_gallery':
-        console.log('image gallery not supported')
+      case 'select':
+        field = {
+          type: 'string',
+          name: forestryField.name,
+          label: forestryField.label,
+          options: forestryField.config?.options || [],
+        }
+      // List Types
       case 'tag_list':
-        fields.push({
+        field = {
           type: 'string',
           name: forestryField.name,
           label: forestryField.label,
           list: true,
-        })
+        }
         break
+      //   case 'list':
+      // TODO: make list work
+
+      // TODO habnde options
+      // EX:
+      // - type: list
+      //   name: categories
+      //   label: Categories
+      //   config:
+      //     use_select: true
+      //     source:
+      //       type: simple
+      //     options:
+      //     - CMS
+      //     - Jekyll
+      //     - Hugo
+      //     - Static Sites
+      //     - Static Site Generators
+      //     - Company
+      // break
+
+      // Object (Group) types
+
+      // Unsupported types
+      case 'image_gallery':
+      case 'include':
+        console.log(
+          `Unsupported field type: ${forestryField.type}, in template ${tem}. This will not be added to the schema.`
+        )
+        break
+      default:
+        console.log(
+          `${forestryField.type} has not been implemented yet. This will require manual migration.`
+        )
+    }
+    if (field) {
+      if (forestryField.config?.required) {
+        // @ts-ignore
+        field = { ...field, ui: { ...(field?.ui || {}), required: true } }
+      }
+      fields.push(field)
     }
   })
   return fields

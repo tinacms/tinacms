@@ -1,0 +1,140 @@
+---
+label: pricing
+hide_body: false
+fields:
+  - type: text
+    label: Title
+    name: title
+    description: Used for SEO. Fallback for Headline.
+    config:
+      required: true
+  - type: text
+    name: headline
+    label: Page Headline
+    description: Optional override for title
+  - type: textarea
+    name: description
+    label: Description
+    description: Used for SEO
+    config:
+      required: false
+  - type: textarea
+    name: textline
+    label: Page Textline
+    description: Optional override for description
+  - type: list
+    name: authors
+    label: Authors
+    config:
+      use_select: true
+      source:
+        type: documents
+        file: hugo/data/authors.yml
+        section: authors
+        path: map
+    default: []
+  - type: list
+    name: categories
+    label: Categories
+    config:
+      use_select: true
+      source:
+        type: simple
+      options:
+        - CMS
+        - Jekyll
+        - Hugo
+        - Static Sites
+        - Static Site Generators
+        - Company
+  - type: tag_list
+    name: tags
+    label: Tags
+  - type: datetime
+    name: publishdate
+    label: Publish Date
+    description: Date this page should be made public
+    config:
+      date_format: MMMM DD, YYYY
+      time_format: h:mmA
+      required: true
+    default: '2017-12-07T04:00:00.000+00:00'
+  - type: datetime
+    name: expirydate
+    label: Expiry Date
+    description: Date this page should be unpublished
+    config:
+      date_format: MMMM DD, YYYY
+      time_format: h:mmA
+    default: '2030-01-01T04:00:00.000+00:00'
+  - type: field_group
+    label: Footer Call To Action
+    name: cta
+    description: Configure the CTA in the page's footer
+    fields:
+      - type: text
+        name: headline
+        label: Headline
+        description: Optional; defaults will be used if empty
+      - type: textarea
+        name: textline
+        label: Textline
+        description: Optional; defaults will be used if empty
+      - type: field_group_list
+        name: calls_to_action
+        label: Calls to Action
+        description: Configure buttons/links in the CTA
+        fields:
+          - type: text
+            label: Permalink
+            name: permalink
+            config:
+              required: true
+          - type: text
+            name: textline
+            label: Textline
+            hidden: false
+            config:
+              required: true
+          - type: boolean
+            name: button
+            label: Is button?
+        config:
+          labelField: textline
+  - type: boolean
+    name: private
+    label: Exclude from sitemap?
+  - type: number
+    name: weight
+    label: Weight
+    description: Used to handle sorting order, menu order, etc.
+  - type: list
+    name: aliases
+    label: Aliases
+    description: Create page redirects. Put in relative path
+    config:
+      use_select: false
+      source:
+        type: datafiles
+  - type: text
+    name: type
+    label: Type
+    description: Sets the Hugo's Content Type (https://gohugo.io/content-management/types/)
+    default: pricing
+    hidden: true
+  - type: field_group_list
+    name: faqs
+    label: FAQs
+    fields:
+      - type: text
+        name: headline
+        label: headline
+      - type: textarea
+        name: textline
+        label: textline
+        config:
+          wysiwyg: true
+          schema:
+            format: markdown
+    config:
+      labelField: headline
