@@ -97,7 +97,7 @@ export const forestryMigrate = async (
   })
   ctx.collections = JSON.stringify(collections, null, 2)
 
-  console.log(JSON.stringify(forestrySchema, null, 2))
-  console.log(JSON.stringify(collections, null, 2))
+  // console.log(JSON.stringify(forestrySchema, null, 2))
+  // console.log(JSON.stringify(collections, null, 2))
   next()
 }
