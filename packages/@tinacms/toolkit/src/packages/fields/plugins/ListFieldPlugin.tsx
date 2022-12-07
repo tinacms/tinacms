@@ -25,6 +25,8 @@ import { AddIcon } from '../../icons'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {
   DragHandle,
+  GroupListHeader,
+  GroupListMeta,
   ItemClickTarget,
   ItemDeleteButton,
   ItemHeader,
@@ -90,19 +92,19 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
 
   return (
     <>
-      <ListHeader>
-        <div className="leading-none">
-          <Label>{field.label || field.name}</Label>
+      <GroupListHeader>
+        <GroupListMeta>
+          {field.label !== false && <Label>{field.label || field.name}</Label>}
           {field.description && (
             <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
               {field.description}
             </FieldDescription>
           )}
-        </div>
+        </GroupListMeta>
         <IconButton onClick={addItem} variant="primary" size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
-      </ListHeader>
+      </GroupListHeader>
       <ListPanel>
         <div>
           <Droppable droppableId={field.name} type={field.name}>
@@ -178,13 +180,6 @@ const Label = ({ error = false, className = '', ...props }) => (
     className={`truncate m-0 text-[13px] font-bold tracking-[0.01em] leading-[1.35] flex-grow flex-shrink flex-auto transition-all duration-100 ease-out text-left ${
       error ? 'text-orange-500' : 'text-gray-700'
     } ${className}`}
-    {...props}
-  />
-)
-
-const ListHeader = ({ className = '', ...props }) => (
-  <div
-    className={`relative flex w-full justify-between items-center mb-2 ${className}`}
     {...props}
   />
 )
