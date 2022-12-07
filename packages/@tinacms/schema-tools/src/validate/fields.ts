@@ -58,7 +58,7 @@ const Option = z.union(
 )
 const TinaField = z.object({
   name: nameProp,
-  label: z.string().optional(),
+  label: z.string().or(z.boolean()).optional(),
   description: z.string().optional(),
   required: z.boolean().optional(),
 })
