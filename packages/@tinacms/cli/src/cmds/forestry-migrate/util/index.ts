@@ -43,59 +43,69 @@ const forestryConfigSchema = z.object({
   ),
 })
 
-const FrontmatterTemplateSchema = z.object({
+const forestryFieldWithoutField = z.object({
+  // TODO: maybe better type this?
+  type: z.union([
+    z.literal('text'),
+    z.literal('datetime'),
+    z.literal('list'),
+    z.literal('file'),
+    z.literal('image_gallery'),
+    z.literal('textarea'),
+    z.literal('tag_list'),
+    z.literal('number'),
+    z.literal('boolean'),
+    z.literal('field_group'),
+    z.literal('field_group_list'),
+    z.literal('select'),
+    z.literal('include'),
+    z.literal('blocks'),
+    z.literal('color'),
+  ]),
+  name: z.string(),
   label: z.string(),
-  hide_body: z.boolean().optional(),
-
-  fields: z.array(
-    z.object({
-      // TODO: maybe better type this?
-      type: z.union([
-        z.literal('text'),
-        z.literal('datetime'),
-        z.literal('list'),
-        z.literal('file'),
-        z.literal('image_gallery'),
-        z.literal('textarea'),
-        z.literal('tag_list'),
-        z.literal('number'),
-        z.literal('boolean'),
-        z.literal('field_group'),
-        z.literal('field_group_list'),
-        z.literal('select'),
-        z.literal('include'),
-        z.literal('blocks'),
-        z.literal('color'),
-      ]),
-      name: z.string(),
-      label: z.string(),
-      default: z.any().optional(),
-      config: z
+  default: z.any().optional(),
+  config: z
+    .object({
+      required: z.boolean().optional(),
+      use_select: z.boolean().optional(),
+      date_format: z.string().optional(),
+      time_format: z.string().optional(),
+      options: z.array(z.string()).optional(),
+      source: z
         .object({
-          required: z.boolean().optional(),
-          use_select: z.boolean().optional(),
-          date_format: z.string().optional(),
-          time_format: z.string().optional(),
-          options: z.array(z.string()).optional(),
-          source: z
-            .object({
-              type: z
-                .union([
-                  z.literal('custom'),
-                  z.literal('pages'),
-                  z.literal('documents'),
-                  z.literal('simple'),
-                  // TODO: I want to ignore this key if its invalid
-                  z.string(),
-                ])
-                .optional(),
-              section: z.string().optional(),
-            })
+          type: z
+            .union([
+              z.literal('custom'),
+              z.literal('pages'),
+              z.literal('documents'),
+              z.literal('simple'),
+              // TODO: I want to ignore this key if its invalid
+              z.string(),
+            ])
             .optional(),
+          section: z.string().optional(),
         })
         .optional(),
     })
-  ),
+    .optional(),
+})
+type ForestryFieldWithoutFieldType = z.infer<typeof forestryFieldWithoutField>
+
+interface ForestryFieldType extends ForestryFieldWithoutFieldType {
+  fields?: ForestryFieldType[]
+}
+
+const forestryField: z.ZodType<ForestryFieldType> = z.lazy(() =>
+  forestryFieldWithoutField.extend({
+    fields: z.array(forestryField).optional(),
+  })
+)
+
+const FrontmatterTemplateSchema = z.object({
+  label: z.string(),
+  hide_body: z.boolean().optional(),
+  fields: z.array(forestryField).optional(),
 })
 
 // Takes a field from forestry and converts it to a Tina field
@@ -234,6 +244,17 @@ export const transformForestryFieldsToTinaFields = ({
       // break
 
       // Object (Group) types
+      case 'field_group':
+        field = {
+          type: 'object',
+          name: forestryField.name,
+          label: forestryField.label,
+          fields: transformForestryFieldsToTinaFields({
+            fields: forestryField.fields,
+            collection,
+          }),
+        }
+        break
 
       // Unsupported types
       case 'image_gallery':
