@@ -101,7 +101,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     }
   }
 
-  // await addDependencies(packageManager)
+  await addDependencies(packageManager)
 
   // add .tina/config.{js,ts}]
   await addConfigFile({
