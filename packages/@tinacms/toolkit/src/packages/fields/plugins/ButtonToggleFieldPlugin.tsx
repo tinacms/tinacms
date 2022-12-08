@@ -16,15 +16,12 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './RadioGroup'
-export * from './CheckboxGroup'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Input'
-export * from './Reference'
-export * from './ButtonToggle'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { ButtonToggle } from '../components'
+
+export const ButtonToggleField = wrapFieldsWithMeta(ButtonToggle)
+
+export const ButtonToggleFieldPlugin = {
+  name: 'button-toggle',
+  Component: ButtonToggleField,
+}
