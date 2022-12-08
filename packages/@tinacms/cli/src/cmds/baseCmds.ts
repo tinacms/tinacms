@@ -32,7 +32,6 @@ import { initStaticTina } from './init'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
-import { forestryMigrate } from './forestry-migrate'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
@@ -210,10 +209,7 @@ export const baseCmds: Command[] = [
     ],
     description: 'Add Tina Cloud to an existing project',
     action: (options) => {
-      chain(
-        [attachPath, checkOptions, forestryMigrate, initStaticTina],
-        options
-      )
+      chain([attachPath, checkOptions, initStaticTina], options)
     },
   },
   {

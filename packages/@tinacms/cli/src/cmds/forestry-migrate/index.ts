@@ -24,21 +24,14 @@ import {
   parseSections,
 } from './util'
 
-export const forestryMigrate = async (
-  ctx: any,
-  next: () => void,
-  _options: any
-) => {
-  const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
-
-  ctx.hasForestryConfig = forestryPath.exists
-
-  // if there is no forestry config, we can skip this
-  if (!forestryPath.exists) {
-    return next()
-  }
-
-  const forestryConfig = await fs.readFile(forestryPath.path)
+export const generateCollections = async ({
+  forestryPath,
+  rootPath,
+}: {
+  forestryPath: string
+  rootPath: string
+}) => {
+  const forestryConfig = await fs.readFile(forestryPath)
   const forestryYaml = yaml.load(forestryConfig.toString())
 
   const forestrySchema = parseSections({ val: forestryYaml })
@@ -69,7 +62,7 @@ export const forestryMigrate = async (
             try {
               const fields = getFieldsFromTemplates({
                 tem,
-                rootPath: ctx.rootPath,
+                rootPath,
               })
               templates.push({ fields, label: tem, name: tem.toLowerCase() })
             } catch (e) {
@@ -98,7 +91,7 @@ export const forestryMigrate = async (
             try {
               const additionalFields = getFieldsFromTemplates({
                 tem,
-                rootPath: ctx.rootPath,
+                rootPath,
               })
               fields.push(...(additionalFields as any))
             } catch (e) {
@@ -125,9 +118,5 @@ export const forestryMigrate = async (
         break
     }
   })
-  ctx.collections = JSON.stringify(collections, null, 2)
-
-  // console.log(JSON.stringify(forestrySchema, null, 2))
-  // console.log(JSON.stringify(collections, null, 2))
-  next()
+  return collections
 }
