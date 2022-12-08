@@ -27,14 +27,16 @@ describe('Rich Text Editor', () => {
       url: 'http://localhost:4001/graphql',
       body: {
         query: `mutation {
-          updatePage(
+          updateDocument(
             relativePath: "home.mdx"
-            params: { heading: "", subtitle: "", body: { type: "root", children: [] } }
+            params: {
+              page: { heading: "", subtitle: "", body: { type: "root", children: [] } }
+            }
           ) {
             __typename
-            id
           }
-        }`,
+        }
+        `,
         variables: {},
       },
     })
