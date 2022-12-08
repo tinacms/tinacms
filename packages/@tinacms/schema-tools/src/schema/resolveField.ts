@@ -81,7 +81,10 @@ export const resolveField = (
           component: 'select',
           ...field,
           ...extraFields,
-          options: [{ label: `Choose an option`, value: '' }, ...field.options],
+          options:
+            field.ui && field.ui.component !== 'select'
+              ? field.options
+              : [{ label: `Choose an option`, value: '' }, ...field.options],
         }
       }
       // TODO: correct the type
