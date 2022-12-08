@@ -39,6 +39,15 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   const baseDir = ctx.rootPath
   logger.level = 'info'
 
+  // Choose your ClientID
+  const clientId = await chooseClientId()
+
+  let token: string | null = null
+  // Choose your Read Only token
+  if (clientId) {
+    token = await chooseToken({ clientId })
+  }
+
   // Choose package manager
   const packageManager = await choosePackageManager()
 
@@ -101,6 +110,8 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     usingTypescript,
     framework,
     collections,
+    token,
+    clientId,
   })
 
   if (!forestryPath.exists) {
@@ -117,6 +128,28 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   }
 
   logNextSteps({ packageManager, framework })
+}
+
+const chooseClientId = async () => {
+  const option = await prompts({
+    name: 'clientId',
+    type: 'text',
+    message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
+      "Don't have a Client ID? Create one here: "
+    )}${linkText('https://app.tina.io/projects/new')}`,
+  })
+  return option['clientId'] as string
+}
+
+const chooseToken = async ({ clientId }: { clientId: string }) => {
+  const option = await prompts({
+    name: 'token',
+    type: 'text',
+    message: `What is your Tina Cloud Read Only Token?\n${logText(
+      "Don't have a Read Only Token? Create one here: "
+    )}${linkText(`https://app.tina.io/projects/${clientId}/tokens`)}`,
+  })
+  return option['token'] as string
 }
 
 const choosePackageManager = async () => {
@@ -197,8 +230,9 @@ const forestryMigrate = async ({
     name: 'selection',
     type: 'confirm',
     initial: true,
-    message:
-      'Would you like to use to run an migration?\n\tNote: This migration will not be perfect, but it will get you started.',
+    message: `Would you like to migrate your Forestry templates?\n${logText(
+      'Note: This migration will not be perfect, but it will get you started.'
+    )}`,
   })
   if (!option['selection']) {
     return null
@@ -277,19 +311,17 @@ const addDependencies = async (packageManager) => {
   await execShellCommand(packageManagers[packageManager])
 }
 
-const addConfigFile = async ({
-  framework,
-  baseDir,
-  publicFolder,
-  usingTypescript,
-  collections,
-}: {
+export interface AddConfigArgs {
   publicFolder: string
   baseDir: string
   usingTypescript: boolean
   framework: Framework
   collections?: string
-}) => {
+  token?: string
+  clientId?: string
+}
+const addConfigFile = async (args: AddConfigArgs) => {
+  const { baseDir, usingTypescript } = args
   const configPath = path.join(
     '.tina',
     `config.${usingTypescript ? 'ts' : 'js'}`
@@ -303,10 +335,7 @@ const addConfigFile = async ({
     })
     if (override['selection']) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(
-        fullConfigPath,
-        config({ publicFolder, framework, collections })
-      )
+      await fs.outputFileSync(fullConfigPath, config(args))
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
@@ -316,10 +345,7 @@ const addConfigFile = async ({
         `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
-    await fs.outputFileSync(
-      fullConfigPath,
-      config({ publicFolder, framework, collections })
-    )
+    await fs.outputFileSync(fullConfigPath, config(args))
   }
 }
 
@@ -390,11 +416,7 @@ const frameworkDevCmds: {
   },
 }
 
-const config = (args: {
-  publicFolder: string
-  framework: Framework
-  collections?: string
-}) => {
+const config = (args: AddConfigArgs) => {
   return format(configExamples[args.framework.name](args))
 }
 
