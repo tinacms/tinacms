@@ -24,18 +24,6 @@ export default defineConfig({
   schema: {
     collections: [
       {
-        name: 'dummy',
-        path: 'content',
-        label: 'Test',
-        templates: [
-          {
-            name: 'tem2',
-            label: 'Template 2',
-            fields: [{ type: 'string', name: 'bar' }],
-          },
-        ],
-      },
-      {
         name: 'test',
         path: 'content/test',
         label: 'Test',
