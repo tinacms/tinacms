@@ -255,6 +255,18 @@ export const transformForestryFieldsToTinaFields = ({
           }),
         }
         break
+      case 'field_group_list':
+        field = {
+          type: 'object',
+          name: forestryField.name,
+          label: forestryField.label,
+          list: true,
+          fields: transformForestryFieldsToTinaFields({
+            fields: forestryField.fields,
+            collection,
+          }),
+        }
+        break
 
       // Unsupported types
       case 'image_gallery':
