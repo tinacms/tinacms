@@ -77,6 +77,21 @@ const FrontmatterTemplateSchema = z.object({
           date_format: z.string().optional(),
           time_format: z.string().optional(),
           options: z.array(z.string()).optional(),
+          source: z
+            .object({
+              type: z
+                .union([
+                  z.literal('custom'),
+                  z.literal('pages'),
+                  z.literal('documents'),
+                  z.literal('simple'),
+                  // TODO: I want to ignore this key if its invalid
+                  z.string(),
+                ])
+                .optional(),
+              section: z.string().optional(),
+            })
+            .optional(),
         })
         .optional(),
     })
@@ -84,42 +99,16 @@ const FrontmatterTemplateSchema = z.object({
 })
 
 // Takes a field from forestry and converts it to a Tina field
-export const transformForestryToTina = ({
+export const transformForestryFieldsToTinaFields = ({
   fields,
-}: {
-  fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
-}) => {}
-
-export const getFieldsFromTemplates = ({
-  tem,
-  rootPath,
   collection,
 }: {
-  tem: string
+  fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
   collection: string
-  rootPath: string
 }) => {
-  const templatePath = path.join(
-    rootPath,
-    '.forestry',
-    'front_matter',
-    'templates',
-    `${tem}.yml`
-  )
-  let templateString = ''
-  try {
-    templateString = fs.readFileSync(templatePath).toString()
-  } catch {
-    throw new Error(
-      `Could not find template ${tem} at ${templatePath}\n\n This will require manual migration.`
-    )
-  }
+  const tinaFields: TinaFieldInner<false>[] = []
 
-  const templateObj = yaml.load(templateString)
-  const template = parseTemplates({ val: templateObj })
-  const fields: TinaFieldInner<false>[] = []
-
-  template.fields.forEach((forestryField) => {
+  fields?.forEach((forestryField) => {
     let field: TinaFieldInner<false>
     switch (forestryField.type) {
       // Single filed types
@@ -179,21 +168,50 @@ export const getFieldsFromTemplates = ({
         }
         break
       case 'select':
-        field = {
-          type: 'string',
-          name: forestryField.name,
-          label: forestryField.label,
-          options: forestryField.config?.options || [],
+        if (forestryField.config?.source?.type === 'pages') {
+          console.log('Pages!')
+          field = {
+            type: 'reference',
+            name: forestryField.name,
+            label: forestryField.label,
+            collections: [forestryField.config?.source?.section].filter(
+              Boolean
+            ),
+          }
+        } else {
+          field = {
+            type: 'string',
+            name: forestryField.name,
+            label: forestryField.label,
+            options: forestryField.config?.options || [],
+          }
         }
+        break
+
       // List Types
-      case 'tag_list':
+      case 'list':
         field = {
           type: 'string',
           name: forestryField.name,
           label: forestryField.label,
           list: true,
         }
+        if (forestryField.config?.options) {
+          field.options = forestryField.config.options
+        }
         break
+      case 'tag_list':
+        field = {
+          type: 'string',
+          name: forestryField.name,
+          label: forestryField.label,
+          list: true,
+          ui: {
+            component: 'tags',
+          },
+        }
+        break
+
       //   case 'list':
       // TODO: make list work
 
@@ -235,8 +253,42 @@ export const getFieldsFromTemplates = ({
         field = { ...field, required: true }
       }
 
-      fields.push(field)
+      tinaFields.push(field)
     }
+  })
+  return tinaFields
+}
+
+export const getFieldsFromTemplates = ({
+  tem,
+  rootPath,
+  collection,
+}: {
+  tem: string
+  collection: string
+  rootPath: string
+}) => {
+  const templatePath = path.join(
+    rootPath,
+    '.forestry',
+    'front_matter',
+    'templates',
+    `${tem}.yml`
+  )
+  let templateString = ''
+  try {
+    templateString = fs.readFileSync(templatePath).toString()
+  } catch {
+    throw new Error(
+      `Could not find template ${tem} at ${templatePath}\n\n This will require manual migration.`
+    )
+  }
+
+  const templateObj = yaml.load(templateString)
+  const template = parseTemplates({ val: templateObj })
+  const fields = transformForestryFieldsToTinaFields({
+    fields: template.fields,
+    collection,
   })
   return fields
 }
