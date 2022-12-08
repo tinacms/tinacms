@@ -178,24 +178,30 @@ export const transformForestryFieldsToTinaFields = ({
         }
         break
       case 'select':
-        if (forestryField.config?.source?.type === 'pages') {
-          console.log('Pages!')
-          field = {
-            type: 'reference',
-            name: forestryField.name,
-            label: forestryField.label,
-            collections: [forestryField.config?.source?.section].filter(
-              Boolean
-            ),
-          }
-        } else {
+        if (forestryField.config?.options) {
           field = {
             type: 'string',
             name: forestryField.name,
             label: forestryField.label,
             options: forestryField.config?.options || [],
           }
+        } else {
+          logger.info(
+            `Warning in collection ${collection}. "select" field migration has only been implemented for simple select. Other versions of select have not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
+          )
         }
+
+        // Forestry has lots of options for 'select' we are only going to support the most basic for now.
+        // if (forestryField.config?.source?.type === 'pages') {
+        //   // TODO: this collection may or may not exist
+        //   field = {
+        //     type: 'reference',
+        //     name: forestryField.name,
+        //     label: forestryField.label,
+        //     collections: [forestryField.config?.source?.section].filter(
+        //       Boolean
+        //     ),
+        //   }
         break
 
       // List Types
