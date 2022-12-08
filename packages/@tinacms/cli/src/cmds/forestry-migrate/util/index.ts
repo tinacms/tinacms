@@ -83,6 +83,13 @@ const FrontmatterTemplateSchema = z.object({
   ),
 })
 
+// Takes a field from forestry and converts it to a Tina field
+export const transformForestryToTina = ({
+  fields,
+}: {
+  fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
+}) => {}
+
 export const getFieldsFromTemplates = ({
   tem,
   rootPath,
@@ -111,6 +118,7 @@ export const getFieldsFromTemplates = ({
   const templateObj = yaml.load(templateString)
   const template = parseTemplates({ val: templateObj })
   const fields: TinaFieldInner<false>[] = []
+
   template.fields.forEach((forestryField) => {
     let field: TinaFieldInner<false>
     switch (forestryField.type) {

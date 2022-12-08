@@ -60,7 +60,7 @@ export const generateCollections = async ({
             try {
               const fields = getFieldsFromTemplates({
                 tem,
-                collection: c.name,
+                collection: section.label.toLowerCase(),
                 rootPath,
               })
               templates.push({ fields, label: tem, name: tem.toLowerCase() })
@@ -91,7 +91,7 @@ export const generateCollections = async ({
               const additionalFields = getFieldsFromTemplates({
                 tem,
                 rootPath,
-                collection: c.name,
+                collection: section.label.toLowerCase(),
               })
               fields.push(...(additionalFields as any))
             } catch (e) {
