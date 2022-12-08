@@ -30,7 +30,7 @@ import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
 
-interface Framework {
+export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
   reactive: boolean
 }
@@ -92,7 +92,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     }
   }
 
-  await addDependencies(packageManager)
+  // await addDependencies(packageManager)
 
   // add .tina/config.{js,ts}]
   await addConfigFile({
@@ -103,7 +103,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     collections,
   })
 
-  if (forestryPath.exists) {
+  if (!forestryPath.exists) {
     // add /content/posts/hello-world.md
     await addContentFile({ baseDir })
   }
@@ -362,16 +362,23 @@ const logNextSteps = ({
     )}`
   )
 }
-const frameworkDevCmds = {
-  other: ({ packageManager }: { packageManager: string }) => {
-    const packageManagers = {
-      pnpm: `pnpm`,
-      npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
-      yarn: `yarn`,
-    }
-    const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
-    return installText
-  },
+
+const other = ({ packageManager }: { packageManager: string }) => {
+  const packageManagers = {
+    pnpm: `pnpm`,
+    npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
+    yarn: `yarn`,
+  }
+  const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
+  return installText
+}
+
+const frameworkDevCmds: {
+  [key in Framework['name']]: (args?: { packageManager: string }) => string
+} = {
+  other,
+  hugo: other,
+  jekyll: other,
   next: ({ packageManager }: { packageManager: string }) => {
     const packageManagers = {
       pnpm: `pnpm`,

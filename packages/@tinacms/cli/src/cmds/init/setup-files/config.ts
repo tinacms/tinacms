@@ -11,8 +11,68 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const configExamples = {
-  next: () => `import { defineConfig } from 'tinacms'
+import { Framework } from '..'
+
+export interface ConfigArgs {
+  publicFolder: string
+  collections?: string
+}
+const other = (args?: ConfigArgs) => {
+  return `
+import { defineConfig } from "tinacms";
+
+// Your hosting provider likely exposes this as an environment variable
+const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
+
+export default defineConfig({
+  branch,
+  clientId: null,   // Get this from tina.io
+  token: null,      // Get this from tina.io
+  build: {
+    outputFolder: "admin",
+    publicFolder: "${args.publicFolder}",
+  },
+  media: {
+    tina: {
+      mediaRoot: "uploads",
+      publicFolder: "${args.publicFolder}",
+    },
+  },
+  schema: {
+    collections: ${
+      args.collections ||
+      `[
+      {
+        name: "post",
+        label: "Posts",
+        path: "content/posts",
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            label: "Title",
+            isTitle: true,
+            required: true,
+          },
+          {
+            type: "rich-text",
+            name: "body",
+            label: "Body",
+            isBody: true,
+          },
+        ],
+      },
+    ]`
+    },
+  },
+});
+`
+}
+type Keys = Framework['name']
+
+export const configExamples: { [key in Keys]: (args?: ConfigArgs) => string } =
+  {
+    next: () => `import { defineConfig } from 'tinacms'
 
   // Your hosting provider likely exposes this as an environment variable
   const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || 'main'
@@ -61,55 +121,7 @@ export const configExamples = {
     },
   })
   `,
-  other: (args: { publicFolder: string; collections?: string }) => {
-    return `
-  import { defineConfig } from "tinacms";
-  
-  // Your hosting provider likely exposes this as an environment variable
-  const branch = process.env.HEAD || process.env.VERCEL_GIT_COMMIT_REF || "main";
-  
-  export default defineConfig({
-    branch,
-    clientId: null,   // Get this from tina.io
-    token: null,      // Get this from tina.io
-    build: {
-      outputFolder: "admin",
-      publicFolder: "${args.publicFolder}",
-    },
-    media: {
-      tina: {
-        mediaRoot: "uploads",
-        publicFolder: "${args.publicFolder}",
-      },
-    },
-    schema: {
-      collections: ${
-        args.collections ||
-        `[
-        {
-          name: "post",
-          label: "Posts",
-          path: "content/posts",
-          fields: [
-            {
-              type: "string",
-              name: "title",
-              label: "Title",
-              isTitle: true,
-              required: true,
-            },
-            {
-              type: "rich-text",
-              name: "body",
-              label: "Body",
-              isBody: true,
-            },
-          ],
-        },
-      ]`
-      },
-    },
-  });
-  `
-  },
-}
+    other,
+    hugo: other,
+    jekyll: other,
+  }
