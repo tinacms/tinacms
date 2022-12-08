@@ -18,11 +18,7 @@ import type {
   UICollection,
   TinaFieldInner,
 } from '@tinacms/schema-tools'
-import {
-  getFieldsFromTemplates,
-  hasForestryConfig,
-  parseSections,
-} from './util'
+import { getFieldsFromTemplates, parseSections } from './util'
 
 export const generateCollections = async ({
   forestryPath,
@@ -64,6 +60,7 @@ export const generateCollections = async ({
             try {
               const fields = getFieldsFromTemplates({
                 tem,
+                collection: c.name,
                 rootPath,
               })
               templates.push({ fields, label: tem, name: tem.toLowerCase() })
@@ -94,6 +91,7 @@ export const generateCollections = async ({
               const additionalFields = getFieldsFromTemplates({
                 tem,
                 rootPath,
+                collection: c.name,
               })
               fields.push(...(additionalFields as any))
             } catch (e) {

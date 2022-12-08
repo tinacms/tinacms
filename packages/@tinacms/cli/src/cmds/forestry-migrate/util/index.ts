@@ -16,6 +16,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
 import type { TinaFieldInner } from '@tinacms/schema-tools'
+import { logger } from '../../../logger'
 
 // A zod schema for the information we need from the .forestry/settings.yml file
 const forestryConfigSchema = z.object({
@@ -85,8 +86,10 @@ const FrontmatterTemplateSchema = z.object({
 export const getFieldsFromTemplates = ({
   tem,
   rootPath,
+  collection,
 }: {
   tem: string
+  collection: string
   rootPath: string
 }) => {
   const templatePath = path.join(
@@ -210,12 +213,12 @@ export const getFieldsFromTemplates = ({
       case 'image_gallery':
       case 'include':
         console.log(
-          `Unsupported field type: ${forestryField.type}, in template ${tem}. This will not be added to the schema.`
+          `Unsupported field type: ${forestryField.type}, in collection ${collection}. This will not be added to the schema.`
         )
         break
       default:
-        console.log(
-          `${forestryField.type} has not been implemented yet. This will require manual migration.`
+        logger.info(
+          `Warning in collection ${collection}. "${forestryField.type}" migration has not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
         )
     }
     if (field) {
