@@ -42,12 +42,14 @@ export const generateCollections = async ({
 
     switch (section.type) {
       case 'directory':
-        const fields = [
+        const fields: TinaFieldInner<false>[] = [
           {
+            // This is the body field
             type: 'rich-text' as const,
             name: 'body',
             label: 'Body of Document',
             description: 'This is the markdown body',
+            isBody: true,
           },
         ]
         if ((section.templates?.length || 0) > 1) {
