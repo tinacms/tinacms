@@ -27,6 +27,8 @@ import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
+import { hasForestryConfig } from '../forestry-migrate/util'
+import { generateCollections } from '../forestry-migrate'
 
 interface Framework {
   name: 'next' | 'other'
@@ -36,6 +38,7 @@ interface Framework {
 export async function initStaticTina(ctx: any, next: () => void, options) {
   const baseDir = ctx.rootPath
   logger.level = 'info'
+
   // Choose package manager
   const packageManager = await choosePackageManager()
 
@@ -48,8 +51,25 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   // Choose public folder
   const publicFolder: string = await choosePublicFolder({ framework })
 
+  // Detect forestry config
+  const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
+
+  let collections: string | null | undefined
+
+  // If there is a forestry config, ask user to migrate it to tina collections
+  if (forestryPath.exists) {
+    collections = await forestryMigrate({
+      forestryPath: forestryPath.path,
+      rootPath: ctx.rootPath,
+    })
+  }
+
   // Report telemetry
-  await reportTelemetry(usingTypescript, options.noTelemetry)
+  await reportTelemetry({
+    usingTypescript,
+    hasForestryConfig: forestryPath.exists,
+    noTelemetry: options.noTelemetry,
+  })
 
   // Check for package.json
   const hasPackageJSON = await fs.pathExistsSync('package.json')
@@ -72,7 +92,7 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     }
   }
 
-  // await addDependencies(packageManager)
+  await addDependencies(packageManager)
 
   // add .tina/config.{js,ts}]
   await addConfigFile({
@@ -80,11 +100,11 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
     baseDir,
     usingTypescript,
     framework,
-    collections: ctx.collections,
+    collections,
   })
 
-  // add /content/posts/hello-world.md
-  if (!ctx.hasForestryConfig) {
+  if (forestryPath.exists) {
+    // add /content/posts/hello-world.md
     await addContentFile({ baseDir })
   }
 
@@ -151,10 +171,44 @@ const chooseFramework = async () => {
   return option['selection'] as Framework
 }
 
-const reportTelemetry = async (
-  usingTypescript: boolean,
+const forestryMigrate = async ({
+  forestryPath,
+  rootPath,
+}: {
+  forestryPath: string
+  rootPath: string
+}): Promise<string> => {
+  logger.info(
+    `It looks like you have a ${focusText(
+      '.forestry/settings.yml'
+    )} file in your project.`
+  )
+  const option = await prompts({
+    name: 'selection',
+    type: 'confirm',
+    initial: true,
+    message:
+      'Would you like to use to run an migration?\n\tNote: This migration will not be perfect, but it will get you started.',
+  })
+  if (!option['selection']) {
+    return null
+  }
+  const collections = await generateCollections({
+    forestryPath,
+    rootPath,
+  })
+  return JSON.stringify(collections, null, 2)
+}
+
+const reportTelemetry = async ({
+  hasForestryConfig,
+  noTelemetry,
+  usingTypescript,
+}: {
+  usingTypescript: boolean
   noTelemetry: boolean
-) => {
+  hasForestryConfig: boolean
+}) => {
   if (noTelemetry) {
     logger.info(logText('Telemetry disabled'))
   }
@@ -164,6 +218,7 @@ const reportTelemetry = async (
     event: {
       name: 'tinacms:cli:init:invoke',
       schemaFileType,
+      hasForestryConfig,
     },
   })
 }
