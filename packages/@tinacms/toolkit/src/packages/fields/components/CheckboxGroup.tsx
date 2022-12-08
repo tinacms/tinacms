@@ -29,6 +29,7 @@ export interface CheckboxGroupFieldProps {
   label?: string
   component: string
   options: (Option | string)[]
+  direction?: 'horizontal' | 'vertical'
 }
 
 export interface CheckboxGroupProps {
@@ -37,6 +38,7 @@ export interface CheckboxGroupProps {
   field: CheckboxGroupFieldProps
   disabled?: boolean
   options?: (Option | string)[]
+  direction?: 'horizontal' | 'vertical'
 }
 
 export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -67,7 +69,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
     const checked = input.value ? input.value.includes(option.value) : false
     return (
-      <div className="flex-1" key={option.value}>
+      <div key={option.value}>
         <input
           className="absolute w-0 h-0 opacity-0 cursor-pointer"
           type="checkbox"
@@ -126,7 +128,14 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-1" id={input.name}>
+    <div
+      className={`flex w-full ${
+        field.direction === 'horizontal'
+          ? 'flex-wrap gap-y-1 gap-x-3'
+          : 'flex-col gap-1'
+      }`}
+      id={input.name}
+    >
       {checkboxOptions?.map(toProps).map(toComponent)}
     </div>
   )
