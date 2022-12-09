@@ -170,11 +170,24 @@ export default defineConfig({
                   {
                     label: 'Features',
                     name: 'features',
+                    ui: {
+                      defaultItem: {
+                        title: 'Default Title',
+                        hidden: 'Default hidden value',
+                      },
+                    },
                     fields: [
                       {
                         type: 'string',
                         name: 'title',
                         ui: { component: 'textarea' },
+                      },
+                      {
+                        type: 'string',
+                        name: 'hidden',
+                        ui: {
+                          component: 'hidden',
+                        },
                       },
                       {
                         label: 'Boolean With Labels',
