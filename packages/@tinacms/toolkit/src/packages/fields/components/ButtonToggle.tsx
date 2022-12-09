@@ -20,7 +20,8 @@ import * as React from 'react'
 
 type Option = {
   value: string
-  label: string
+  label?: string
+  icon?: JSX.Element
 }
 
 interface ButtonToggleFieldProps {
@@ -59,14 +60,25 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
         {toggleOptions
           ? toggleOptions.map((toggleOption) => {
               const option = toProps(toggleOption)
-              return (
-                <ButtonOption
-                  key={option.value}
-                  input={input}
-                  value={option.value}
-                  label={option.label}
-                />
-              )
+              if (option.icon) {
+                return (
+                  <ButtonOption
+                    key={option.value}
+                    input={input}
+                    value={option.value}
+                    icon={option.icon}
+                  />
+                )
+              } else {
+                return (
+                  <ButtonOption
+                    key={option.value}
+                    input={input}
+                    value={option.value}
+                    label={option.label}
+                  />
+                )
+              }
             })
           : input.value}
       </div>
@@ -74,12 +86,27 @@ export const ButtonToggle: React.FC<ButtonToggleProps> = ({
   )
 }
 
-const ButtonOption = ({ input, value, label, ...props }) => {
+interface ButtonOptionProps {
+  input: any
+  value: string
+  label?: string
+  icon?: JSX.Element
+}
+
+const ButtonOption = ({
+  input,
+  value,
+  label = '',
+  icon,
+  ...props
+}: ButtonOptionProps) => {
+  const Icon = icon as JSX.Element | null
+
   return (
     <button
-      className={`flex-1 truncate border border-transparent block font-medium text-base px-3 py-2 text-gray-400 transition-all ease-out duration-150 ${
+      className={`flex items-center justify-center flex-1 truncate border border-transparent block font-medium text-base px-3 py-2 text-gray-400 transition-all ease-out duration-150 ${
         input.value === value
-          ? 'bg-white border border-gray-200 origin-center scale-[1.01] rounded-md shadow text-blue-500'
+          ? 'bg-white border !border-gray-200 origin-center scale-[1.01] rounded-md shadow text-blue-500'
           : ''
       }`}
       onClick={() => {
@@ -87,7 +114,7 @@ const ButtonOption = ({ input, value, label, ...props }) => {
       }}
       {...props}
     >
-      {label}
+      {Icon ? <Icon className="w-6 h-auto opacity-70" /> : label}
     </button>
   )
 }
