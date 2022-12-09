@@ -1,5 +1,6 @@
 import { defineConfig } from 'tinacms'
 import React from 'react'
+import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
@@ -344,7 +345,37 @@ export default defineConfig({
                         ],
                       },
                       {
-                        label: 'Button Toggle',
+                        label: 'Icon Button Toggle',
+                        name: 'buttonToggleIcon',
+                        type: 'string',
+                        ui: {
+                          component: 'button-toggle',
+                        },
+                        options: [
+                          {
+                            value: 'football',
+                            // @ts-ignore
+                            icon: BiBall,
+                          },
+                          {
+                            value: 'basketball',
+                            // @ts-ignore
+                            icon: BiBasketball,
+                          },
+                          {
+                            value: 'baseball',
+                            // @ts-ignore
+                            icon: BiBaseball,
+                          },
+                          {
+                            value: 'soccer',
+                            // @ts-ignore
+                            icon: BiFootball,
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Vertical Button Toggle',
                         name: 'buttonToggleVertical',
                         type: 'string',
                         ui: {

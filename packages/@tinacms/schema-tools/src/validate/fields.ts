@@ -46,12 +46,16 @@ const nameProp = z
   })
 
 const Option = z.union(
-  [z.string(), z.object({ label: z.string(), value: z.string() })],
+  [
+    z.string(),
+    z.object({ label: z.string(), value: z.string() }),
+    z.object({ icon: z.any(), value: z.string() }),
+  ],
   {
     errorMap: () => {
       return {
         message:
-          'Invalid option array. Must be a string[] or {label: string, value: string}[]',
+          'Invalid option array. Must be a string[] or {label: string, value: string}[] or {icon: React.ComponentType<any>, value: string}[]',
       }
     },
   }

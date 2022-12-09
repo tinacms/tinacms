@@ -77,6 +77,18 @@ export const resolveField = (
             options: field.options,
           }
         }
+        if (
+          field.options[0] &&
+          typeof field.options[0] === 'object' &&
+          field.options[0].icon
+        ) {
+          return {
+            component: 'button-toggle',
+            ...field,
+            ...extraFields,
+            options: field.options,
+          }
+        }
         return {
           component: 'select',
           ...field,
