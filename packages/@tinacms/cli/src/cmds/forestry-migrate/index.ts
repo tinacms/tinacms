@@ -20,6 +20,10 @@ import type {
 } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 
+const stringifyLabel = (label: string) => {
+  return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
+}
+
 export const generateCollections = async ({
   forestryPath,
   rootPath,
@@ -60,10 +64,10 @@ export const generateCollections = async ({
             try {
               const fields = getFieldsFromTemplates({
                 tem,
-                collection: section.label.toLowerCase(),
+                collection: stringifyLabel(section.label),
                 rootPath,
               })
-              templates.push({ fields, label: tem, name: tem.toLowerCase() })
+              templates.push({ fields, label: tem, name: stringifyLabel(tem) })
             } catch (e) {
               console.log('Error parsing template ', tem)
               console.error(e)
@@ -71,7 +75,7 @@ export const generateCollections = async ({
           })
           const c: TinaCloudCollection<false> = {
             label: section.label,
-            name: section.label.toLowerCase(),
+            name: stringifyLabel(section.label),
             path: section.path,
             templates,
           }
@@ -91,7 +95,7 @@ export const generateCollections = async ({
               const additionalFields = getFieldsFromTemplates({
                 tem,
                 rootPath,
-                collection: section.label.toLowerCase(),
+                collection: stringifyLabel(section.label),
               })
               fields.push(...(additionalFields as any))
             } catch (e) {
@@ -101,7 +105,7 @@ export const generateCollections = async ({
           })
           const c: TinaCloudCollection<false> = {
             label: section.label,
-            name: section.label.toLowerCase(),
+            name: stringifyLabel(section.label),
             path: section.path,
             fields,
           }
