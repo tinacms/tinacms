@@ -21,7 +21,7 @@ import * as React from 'react'
 type Option = {
   value: string
   label?: string
-  icon?: JSX.Element
+  icon?: React.ComponentType<any>
 }
 
 interface ButtonToggleFieldProps {
@@ -90,7 +90,7 @@ interface ButtonOptionProps {
   input: any
   value: string
   label?: string
-  icon?: JSX.Element
+  icon?: React.ComponentType<any>
 }
 
 const ButtonOption = ({
@@ -100,7 +100,7 @@ const ButtonOption = ({
   icon,
   ...props
 }: ButtonOptionProps) => {
-  const Icon = icon as JSX.Element | null
+  const Icon = icon as React.ComponentType<any> | null
 
   return (
     <button
