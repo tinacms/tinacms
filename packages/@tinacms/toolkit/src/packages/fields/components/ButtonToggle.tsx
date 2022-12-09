@@ -104,17 +104,28 @@ const ButtonOption = ({
 
   return (
     <button
-      className={`flex items-center justify-center flex-1 truncate border border-transparent block font-medium text-base px-3 py-2 text-gray-400 transition-all ease-out duration-150 ${
-        input.value === value
-          ? 'bg-white border !border-gray-200 origin-center scale-[1.01] rounded-md shadow text-blue-500'
-          : ''
-      }`}
+      className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-3 py-2 text-gray-400 transition-all ease-out duration-150`}
       onClick={() => {
         input.onChange(value)
       }}
       {...props}
     >
-      {Icon ? <Icon className="w-6 h-auto opacity-70" /> : label}
+      {Icon ? (
+        <Icon className="w-6 h-auto opacity-70" />
+      ) : (
+        <span className="flex-1 truncate max-w-full w-0">{label}</span>
+      )}
+      <span
+        className={`absolute whitespace-nowrap px-3 py-2 z-20 font-medium text-base flex items-center justify-center -top-0.5 -right-0.5 -bottom-0.5 -left-0.5 truncate bg-white border border-gray-200 origin-center rounded-md shadow text-blue-500 transition-all ease-out duration-150 ${
+          input.value === value ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        {Icon ? (
+          <Icon className="w-6 h-auto opacity-70" />
+        ) : (
+          <span className="flex-1 truncate max-w-full w-0">{label}</span>
+        )}
+      </span>
     </button>
   )
 }
