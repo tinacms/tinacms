@@ -29,6 +29,11 @@ export default defineConfig({
         label: 'Test',
         templates: [
           {
+            name: 'tem1',
+            label: 'Template 1',
+            fields: [{ type: 'string', name: 'foo' }],
+          },
+          {
             name: 'tem2',
             label: 'Template 2',
             fields: [{ type: 'string', name: 'bar' }],
