@@ -1,7 +1,7 @@
 import { staticRequest } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
 import { Layout } from '../components/Layout'
-import { useEditState, useTina } from 'tinacms/dist/react'
+import { useTina } from 'tinacms/dist/react'
 
 const query = `query PageQuery {
   page(relativePath: "home.mdx"){
@@ -9,9 +9,6 @@ const query = `query PageQuery {
   }
 }`
 export default function Home(props) {
-  const { edit } = useEditState()
-  console.log('edit', edit)
-
   const { data } = useTina({
     query,
     variables: {},
