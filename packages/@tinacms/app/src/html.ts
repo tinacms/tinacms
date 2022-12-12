@@ -34,7 +34,6 @@ export const devHTML = `<!DOCTYPE html>
   ></script>
   <body class="tina-tailwind">
     <div id="root"></div>
-    <script src="https://vercel.live/_next-live/feedback/feedback.js"></script>
   </body>
  
 </html>`
