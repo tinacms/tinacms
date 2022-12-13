@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 1.0.2
+
+### Patch Changes
+
+- f13878798: Fix a bug where meta data was added to the form values payload
+- c62d2bad4: Fix issue where tailwind styles from within the user config weren't being picked up
+
 ## 1.0.1
 
 ### Patch Changes
