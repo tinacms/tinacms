@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.1
+
+### Patch Changes
+
+- 7495f032b: Added `onLogout` hook function and a logout redirect page in the admin
+- de693ea17: remove network request for redundant collection fetch
+
 ## 1.1.0
 
 ### Minor Changes

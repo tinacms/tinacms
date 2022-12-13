@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.1.1
+
+### Patch Changes
+
+- 7495f032b: Added `onLogout` hook function and a logout redirect page in the admin
+- 64599e300: Enable custom component for lic in TinaMarkdown
+- de693ea17: remove network request for redundant collection fetch
+- Updated dependencies [7495f032b]
+- Updated dependencies [de37c9eff]
+- Updated dependencies [de693ea17]
+  - @tinacms/schema-tools@1.0.3
+  - @tinacms/toolkit@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes
