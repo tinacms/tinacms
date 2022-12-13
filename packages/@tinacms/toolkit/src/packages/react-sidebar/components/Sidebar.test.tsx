@@ -35,6 +35,11 @@ const createClient = (isLocal) =>
 describe('Sidebar', () => {
   describe('with local client', () => {
     const cms = createClient(true)
+    cms.registerApi('admin', {
+      fetchCollections: () => {
+        return []
+      },
+    })
 
     it('shows local banner', () => {
       const { queryByText } = render(
@@ -52,6 +57,11 @@ describe('Sidebar', () => {
 
   describe('with prod client', () => {
     const cms = createClient(false)
+    cms.registerApi('admin', {
+      fetchCollections: () => {
+        return []
+      },
+    })
 
     it('doesnt show local banner', () => {
       const { queryByText } = render(
