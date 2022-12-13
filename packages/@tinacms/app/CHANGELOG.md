@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 1.0.3
+
+### Patch Changes
+
+- 66ed1452b: Updated so that `useEditState` does not require `useTina` to be called first.
+
 ## 1.0.2
 
 ### Patch Changes
