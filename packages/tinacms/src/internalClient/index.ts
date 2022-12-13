@@ -59,7 +59,8 @@ const parseRefForBranchName = (ref: string) => {
 }
 
 export class Client {
-  onLogin: OnLoginFunc
+  onLogin?: OnLoginFunc
+  onLogout?: () => Promise<void>
   frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
@@ -78,6 +79,7 @@ export class Client {
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
+    this.onLogout = options.schema?.config?.admin?.auth?.onLogout
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -425,7 +427,7 @@ mutation addPendingDocumentMutation(
     return !!(await this.getUser())
   }
 
-  async onLogout() {
+  async logout() {
     this.setToken(null)
   }
 
@@ -537,7 +539,7 @@ export class LocalClient extends Client {
   }
 
   // These functions allow the local client to have a login state so that we can correctly call the "OnLogin" callback. This is important for things like preview mode
-  async onLogout() {
+  async logout() {
     localStorage.removeItem(LOCAL_CLIENT_KEY)
   }
 

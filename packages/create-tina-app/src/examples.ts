@@ -44,12 +44,6 @@ export const EXAMPLES: Example[] = [
     gitURL: 'https://github.com/tinacms/tina-cloud-starter',
   },
   {
-    title: 'Documentation Starter',
-    value: 'tina-docs-starter',
-    isInternal: false,
-    gitURL: 'https://github.com/tinacms/tina-docs-starter',
-  },
-  {
     title: 'Hugo Starter',
     value: 'tina-hugo-starter',
     isInternal: false,
