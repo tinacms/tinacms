@@ -37,8 +37,7 @@ interface NavProps {
   userName?: string
   showCollections: boolean
   collectionsInfo: {
-    collections: { label: string; name: string }[]
-    loading: boolean
+    collections: { label?: string; name: string }[]
   }
   contentCreators?: any
   screens?: ScreenPlugin[]
@@ -223,19 +222,13 @@ export const Nav = ({
 
 const CollectionsList = ({
   collections,
-  loading,
   RenderNavCollection,
 }: {
-  collections: { label: string; name: string }[]
-  loading: boolean
+  collections: { label?: string; name: string }[]
   RenderNavCollection: React.ComponentType<{
-    collection: { label: string; name: string }
+    collection: { label?: string; name: string }
   }>
 }) => {
-  if (loading === true) {
-    return <LoadingDots color="var(--tina-color-primary)" />
-  }
-
   if (collections.length === 0) {
     return <div>No collections found</div>
   }
