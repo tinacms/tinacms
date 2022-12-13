@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.0.3
+
+### Patch Changes
+
+- 7495f032b: Added `onLogout` hook function and a logout redirect page in the admin
+- de37c9eff: Content is now merged with existing content. This means if you have a field that is not defined in the schema it will not be overridden.
+
 ## 1.0.2
 
 ### Patch Changes
