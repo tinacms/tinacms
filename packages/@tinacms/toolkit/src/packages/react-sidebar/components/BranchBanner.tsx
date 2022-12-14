@@ -34,7 +34,7 @@ interface SubmitModalProps {
 }
 
 const BranchModal = ({ close }: SubmitModalProps) => {
-  const { listBranches } = useCMS().api.tina
+  const tinaApi = useCMS().api.tina
   const { setCurrentBranch } = useBranchData()
 
   return (
@@ -43,7 +43,7 @@ const BranchModal = ({ close }: SubmitModalProps) => {
         <ModalHeader close={close}>Choose Workspace</ModalHeader>
         <ModalBody padded={true}>
           <BranchSwitcher
-            listBranches={listBranches}
+            listBranches={tinaApi.listBranches.bind(tinaApi)}
             createBranch={() => {
               return Promise.resolve('')
             }}
