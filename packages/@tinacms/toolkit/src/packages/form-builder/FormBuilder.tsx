@@ -26,6 +26,7 @@ import { PublishForm } from './PublishForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { useBranchData } from '../../plugins/branch-switcher'
 
 export interface FormBuilderProps {
   form: Form
@@ -92,10 +93,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [tinaForm])
 
   const cms = useCMS()
+  const { currentBranch } = useBranchData()
   //todo - should probably pull this from the api to grab true default branch
-  const isDefaultBranch =
-    cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
+  const isDefaultBranch = currentBranch === 'main' || currentBranch === 'master'
+  // cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
 
+  // console.log({isDefaultBranch }, cms.api.tina.branch)
+  console.log({ currentBranch, isDefaultBranch })
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -141,6 +145,29 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [finalForm])
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
+
+  // const mockCreatePullRequest = async ({
+  //   title,
+  //   branch,
+  //   baseBranch,
+  // } : {
+  //   title: string,
+  //   branch: string,
+  //   baseBranch: string,
+  // }) => {
+  //   await new Promise((p) => setTimeout(p, 500))
+  //   return Promise.resolve({
+  //     pullNumber: 42,
+  //   })
+  // }
+  //
+  // const mockVercelStatus = async () => {
+  //   await new Promise((p) => setTimeout(p, 500))
+  //   return Promise.resolve({
+  //     status: 'ready',
+  //     previewUrl: 'https://vercel.com'
+  //   })
+  // }
 
   return (
     <FinalForm
@@ -197,6 +224,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         (invalid && !dirtySinceLastSubmit)
                       }
                       busy={submitting}
+                      createPullRequest={cms.api.tina.createPullRequest}
+                      vercelStatus={cms.api.tina.vercelStatus}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
