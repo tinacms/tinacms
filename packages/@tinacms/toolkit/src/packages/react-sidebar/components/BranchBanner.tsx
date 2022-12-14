@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { BranchSwitcher } from '../../../plugins/branch-switcher'
+import { BranchSwitcher, useBranchData } from '../../../plugins/branch-switcher'
 import { useCMS } from '../../../react-tinacms'
 import { Modal, ModalBody, ModalHeader, ModalPopup } from '../../react-modals'
 
 export const BranchBanner = () => {
-  const { branch } = useCMS().api.tina
+  const { branch } = useCMS().api.tina || 'main'
   const [open, setOpen] = React.useState(false)
   return (
     <>
@@ -35,6 +35,7 @@ interface SubmitModalProps {
 
 const BranchModal = ({ close }: SubmitModalProps) => {
   const { listBranches } = useCMS().api.tina
+  const { setCurrentBranch } = useBranchData()
 
   return (
     <Modal>
@@ -46,6 +47,7 @@ const BranchModal = ({ close }: SubmitModalProps) => {
             createBranch={() => {
               return Promise.resolve('')
             }}
+            chooseBranch={setCurrentBranch}
           />
         </ModalBody>
       </ModalPopup>

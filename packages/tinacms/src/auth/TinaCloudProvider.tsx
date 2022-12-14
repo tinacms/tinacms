@@ -23,6 +23,7 @@ import {
   useLocalStorage,
   DummyMediaStore,
   TinaMediaStore,
+  useBranchData,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../internalClient'
@@ -246,6 +247,7 @@ export const TinaCloudProvider = (
       branchSwitcher = new BranchSwitcherPlugin({
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
+        chooseBranch: setCurrentBranch,
       })
       cms.plugins.add(branchSwitcher)
     }
