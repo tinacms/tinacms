@@ -1,16 +1,10 @@
 import * as React from 'react'
+import { BranchSwitcher } from '../../../plugins/branch-switcher'
 import { useCMS } from '../../../react-tinacms'
-import {
-  Modal,
-  ModalActions,
-  ModalBody,
-  ModalHeader,
-  ModalPopup,
-} from '../../react-modals'
-import { Button } from '../../styles'
+import { Modal, ModalBody, ModalHeader, ModalPopup } from '../../react-modals'
 
 export const BranchBanner = () => {
-  const branch = useCMS().api.tina.branch || 'main'
+  const { branch } = useCMS().api.tina
   const [open, setOpen] = React.useState(false)
   return (
     <>
@@ -40,32 +34,20 @@ interface SubmitModalProps {
 }
 
 const BranchModal = ({ close }: SubmitModalProps) => {
-  const branch = useCMS().api.tina.branch || 'main'
+  const { listBranches } = useCMS().api.tina
 
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>Choose Workspace</ModalHeader>
         <ModalBody padded={true}>
-          <p>
-            You are currently editing on <strong>"{branch}</strong>
-          </p>
-          <select>
-            <option>Foo</option>
-            <option>Bar</option>
-            <option>Foobar</option>
-          </select>
-        </ModalBody>
-        <ModalActions>
-          <Button
-            style={{ flexGrow: 3 }}
-            onClick={async () => {
-              close()
+          <BranchSwitcher
+            listBranches={listBranches}
+            createBranch={() => {
+              return Promise.resolve('')
             }}
-          >
-            Switch Workspace
-          </Button>
-        </ModalActions>
+          />
+        </ModalBody>
       </ModalPopup>
     </Modal>
   )
