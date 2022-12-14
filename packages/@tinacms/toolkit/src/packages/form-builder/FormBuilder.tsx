@@ -225,6 +225,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       }
                       busy={submitting}
                       createPullRequest={cms.api.tina.createPullRequest}
+                      indexStatus={cms.api.tina.indexStatus}
                       vercelStatus={cms.api.tina.vercelStatus}
                     >
                       {submitting && <LoadingDots />}

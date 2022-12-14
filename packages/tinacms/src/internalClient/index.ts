@@ -538,17 +538,23 @@ mutation addPendingDocumentMutation(
       return null
     }
   }
-  async vercelStatus({
-    pullNumber,
-  }: {
-    pullNumber: number
-  }): Promise<{
+  async vercelStatus({ pullNumber }: { pullNumber: number }): Promise<{
     status: string
     previewUrl: string
     inspectUrl: string
     feedbackUrl: string
   }> {
     const url = `${this.contentApiBase}/github/${this.clientId}/vercel_status/${pullNumber}`
+    const res = await this.fetchWithToken(url, {
+      method: 'GET',
+    })
+    return res.json()
+  }
+
+  async indexStatus({ branch }: { branch: string }): Promise<{
+    status: string
+  }> {
+    const url = `${this.contentApiBase}/db/${this.clientId}/status/${branch}`
     const res = await this.fetchWithToken(url, {
       method: 'GET',
     })

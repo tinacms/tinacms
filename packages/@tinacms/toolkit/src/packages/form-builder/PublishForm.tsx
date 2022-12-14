@@ -44,6 +44,7 @@ interface PublishFormProps {
   createPullRequest: (
     props: CreatePullRequestProps
   ) => Promise<{ pullNumber: number }>
+  indexStatus: ({ branch: string }) => Promise<{ status: string }>
   vercelStatus: ({
     pullNumber,
   }: {
@@ -57,6 +58,7 @@ export const PublishForm: FC<PublishFormProps> = ({
   children,
   isDefaultBranch,
   createPullRequest,
+  indexStatus,
   vercelStatus,
   ...props
 }: PublishFormProps) => {
@@ -84,6 +86,7 @@ export const PublishForm: FC<PublishFormProps> = ({
             submit()
           }}
           createPullRequest={createPullRequest}
+          indexStatus={indexStatus}
           vercelStatus={vercelStatus}
         />
       )}
@@ -98,6 +101,7 @@ interface SubmitModalProps {
   createPullRequest: (
     props: CreatePullRequestProps
   ) => Promise<{ pullNumber: number }>
+  indexStatus: ({ branch: string }) => Promise<{ status: string }>
   vercelStatus: ({
     pullNumber,
   }: {
@@ -110,6 +114,7 @@ const SubmitModal = ({
   previewCommit,
   publishCommit,
   createPullRequest,
+  indexStatus,
   vercelStatus,
 }: SubmitModalProps) => {
   const [modalState, setModalState] = React.useState<
@@ -133,6 +138,16 @@ const SubmitModal = ({
     }).then(async ({ pullNumber }) => {
       // TODO will this work?
       setCurrentBranch(branchName)
+
+      // wait for index to be built
+      while (true) {
+        const { status } = await indexStatus({ branch: branchName })
+        if (status === 'complete') {
+          break
+        }
+        await new Promise((p) => setTimeout(p, 1000))
+      }
+
       publishCommit()
 
       setModalState('waitingForPreview')
