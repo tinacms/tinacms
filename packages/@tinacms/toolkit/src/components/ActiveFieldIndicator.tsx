@@ -342,6 +342,7 @@ const Indicator = ({
     <div
       onMouseOver={() => setDisplay(true)}
       onClick={() => {
+        console.log({ tinafield })
         cms.events.dispatch({ type: 'field:selected', value: tinafield })
       }}
       onMouseOut={() => setDisplay(false)}
