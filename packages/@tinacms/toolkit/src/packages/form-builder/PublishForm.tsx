@@ -79,7 +79,7 @@ const SubmitModal = ({
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader close={close}>Reset</ModalHeader>
+        <ModalHeader close={close}>Save Changes</ModalHeader>
         <ModalBody padded={true}>
           <p>Are you sure you want to save to production?</p>
         </ModalBody>
