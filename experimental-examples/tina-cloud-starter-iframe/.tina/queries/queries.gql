@@ -1,10 +1,16 @@
-query PageQuery {
+query pageQuery {
   ...LayoutQueryFragment
-  postsConnection(first: 3) {
+  postConnection {
     edges {
       node {
         id
-        ...PostsParts
+        _values
+        date
+        author {
+          ... on Author {
+            ...AuthorParts
+          }
+        }
         _sys {
           filename
         }
@@ -13,22 +19,22 @@ query PageQuery {
   }
 }
 
-query ContentQuery($relativePath: String!) {
+query contentQuery($relativePath: String!) {
   ...LayoutQueryFragment
-  pages(relativePath: $relativePath) {
-    ...PagesParts
+  page(relativePath: $relativePath) {
+    ...PageParts
   }
 }
 
-query BlogPostQuery($relativePath: String!) {
+query blogPostQuery($relativePath: String!) {
   ...LayoutQueryFragment
-  posts(relativePath: $relativePath) {
-      ...PostsParts
-      author {
-        ... on Authors {
-          name
-          avatar
-        }
+  post(relativePath: $relativePath) {
+    ...PostParts
+    author {
+      ... on Author {
+        name
+        avatar
       }
+    }
   }
 }
