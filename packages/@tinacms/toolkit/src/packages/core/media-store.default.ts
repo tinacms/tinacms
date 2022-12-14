@@ -134,6 +134,14 @@ export class TinaMediaStore implements MediaStore {
             throw new Error(`Upload error: '${matches[2]}'`)
           }
         }
+        newFiles.push({
+          directory: item.directory,
+          filename: item.file.name,
+          id: item.file.name,
+          type: 'file',
+          previewSrc: `https://assets.tina.io/${this.api.clientId}/${path}`,
+          src: `https://assets.tina.io/${this.api.clientId}/${path}`,
+        })
       }
     }
 
@@ -142,6 +150,25 @@ export class TinaMediaStore implements MediaStore {
 
   private async persist_local(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
+    const hasTinaMedia =
+      Object.keys(
+        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
+      ).includes('mediaRoot') &&
+      Object.keys(
+        this.cms.api.tina.schema.schema?.config?.media?.tina || {}
+      ).includes('publicFolder')
+
+    let folder: string = hasTinaMedia
+      ? this.cms.api.tina.schema.schema?.config?.media?.tina.mediaRoot
+      : '/'
+
+    if (!folder.startsWith('/')) {
+      // ensure folder always has a /
+      folder = '/' + folder
+    }
+    if (!folder.endsWith('/')) {
+      folder = folder + '/'
+    }
 
     for (const item of media) {
       const { file, directory } = item
@@ -150,8 +177,13 @@ export class TinaMediaStore implements MediaStore {
       formData.append('directory', directory)
       formData.append('filename', file.name)
 
-      const path = `${directory ? `${directory}/${file.name}` : file.name}`
-      const res = await this.fetchFunction(`${this.url}/upload/${path}`, {
+      const uploadPath = `${
+        directory ? `${directory}/${file.name}` : file.name
+      }`
+      const filePath = `${
+        directory ? `${directory}${folder}${file.name}` : folder + file.name
+      }`
+      const res = await this.fetchFunction(`${this.url}/upload/${uploadPath}`, {
         method: 'POST',
         body: formData,
       })
@@ -168,8 +200,8 @@ export class TinaMediaStore implements MediaStore {
           id: file.name,
           filename: file.name,
           directory,
-          previewSrc: path,
-          src: path,
+          previewSrc: filePath,
+          src: filePath,
         }
 
         newFiles.push(parsedRes)
