@@ -30,6 +30,7 @@ import {
 interface PublishFormProps {
   children: any
   pristine: boolean
+  isDefaultBranch: boolean
   submit(): void
   style?: React.CSSProperties
 }
@@ -38,6 +39,7 @@ export const PublishForm: FC<PublishFormProps> = ({
   pristine,
   submit,
   children,
+  isDefaultBranch,
   ...props
 }: PublishFormProps) => {
   const [open, setOpen] = React.useState(false)
@@ -45,7 +47,11 @@ export const PublishForm: FC<PublishFormProps> = ({
     <>
       <Button
         onClick={() => {
-          setOpen((p) => !p)
+          if (isDefaultBranch) {
+            setOpen((p) => !p)
+          } else {
+            submit()
+          }
         }}
         disabled={pristine}
         {...props}

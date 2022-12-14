@@ -91,6 +91,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
+  const cms = useCMS()
+  //todo - should probably pull this from the api to grab true default branch
+  const isDefaultBranch =
+    cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
+
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -181,6 +186,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     <PublishForm
                       pristine={pristine}
                       submit={handleSubmit}
+                      isDefaultBranch={isDefaultBranch}
                       //@ts-ignore
                       variant="primary"
                       style={{ flexBasis: '10rem' }}
@@ -233,6 +239,11 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
+  const cms = useCMS()
+  //todo - should probably pull this from the api to grab true default branch
+  const isDefaultBranch =
+    cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
+
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -283,6 +294,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                     <PublishForm
                       pristine={pristine}
                       submit={handleSubmit}
+                      isDefaultBranch={isDefaultBranch}
                       //@ts-ignore
                       variant="primary"
                       style={{ flexBasis: '10rem' }}
@@ -378,7 +390,6 @@ const useOnChangeEventDispatch = ({
     )
   }, [subscribe, setFormValues])
   const cms = useCMS()
-
   React.useEffect(() => {
     if (newUpdate?.name === 'reset') {
       cms.events.dispatch({
