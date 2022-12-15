@@ -101,22 +101,13 @@ interface SubmitModalProps {
   client: Client
 }
 
-const SubmitModal = ({
-  close,
-  previewCommit,
-  publishCommit,
-  client,
-}: SubmitModalProps) => {
+const SubmitModal = ({ close, publishCommit, client }: SubmitModalProps) => {
   const [modalState, setModalState] = React.useState<
-    | 'initial'
-    | 'setupPullRequest'
-    | 'creatingPullRequest'
-    | 'waitingForPreview'
-    | 'previewReady'
+    'initial' | 'setupPullRequest' | 'creatingPullRequest' | 'previewReady'
   >('initial')
   const [pullRequestTitle, setPullRequestTitle] = React.useState('')
   const branchName = pullRequestTitle.toLowerCase().replaceAll(' ', '-')
-  const [previewUrl, setPreviewUrl] = React.useState('')
+  const [previewUrl] = React.useState('')
   const { currentBranch, setCurrentBranch } = useBranchData()
 
   const handleCreatePullRequest = React.useCallback(async () => {
@@ -130,6 +121,10 @@ const SubmitModal = ({
       .then(async ({ pullNumber }) => {
         setCurrentBranch(branchName)
 
+        window.localStorage.setItem(
+          'tinacms-current-pull-number',
+          pullNumber.toString()
+        )
         // wait for index to be built
         while (true) {
           const { status } = await client.indexStatus({ branch: branchName })
@@ -141,18 +136,7 @@ const SubmitModal = ({
 
         publishCommit()
 
-        setModalState('waitingForPreview')
-        while (true) {
-          const res = await client.vercelStatus({ pullNumber })
-          if (res.status.toLowerCase() === 'ready') {
-            setPreviewUrl(res.previewUrl)
-            setModalState('previewReady')
-            break
-          } else if (res.status.toLowerCase() === 'building') {
-            setModalState('waitingForPreview')
-          } // TODO handle error
-          await new Promise((p) => setTimeout(p, 10000))
-        }
+        setModalState('previewReady')
       })
   }, [
     client,
@@ -190,7 +174,6 @@ const SubmitModal = ({
           {modalState === 'creatingPullRequest' && (
             <p>Creating Pull Request...</p>
           )}
-          {modalState === 'waitingForPreview' && <p>Waiting for Preview...</p>}
           {modalState === 'previewReady' && (
             <p>
               Preview Ready: <a href={previewUrl}>{previewUrl}</a>
@@ -220,15 +203,12 @@ const SubmitModal = ({
             </>
           )}
           {(modalState === 'setupPullRequest' ||
-            modalState === 'creatingPullRequest' ||
-            modalState === 'waitingForPreview') && (
+            modalState === 'creatingPullRequest') && (
             <Button
               style={{ flexGrow: 2 }}
               onClick={() => handleCreatePullRequest()}
               disabled={
-                branchName.length === 0 ||
-                modalState === 'creatingPullRequest' ||
-                modalState === 'waitingForPreview'
+                branchName.length === 0 || modalState === 'creatingPullRequest'
               }
             >
               Create Preview
