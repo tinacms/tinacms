@@ -558,15 +558,15 @@ mutation addPendingDocumentMutation(
   }
 
   // need to enable cors on /db status endpoint for this to be usable
-  // async indexStatus({ branch }: { branch: string }): Promise<{
-  //   status: string
-  // }> {
-  //   const url = `${this.contentApiBase}/db/${this.clientId}/status/${branch}`
-  //   const res = await this.fetchWithToken(url, {
-  //     method: 'GET',
-  //   })
-  //   return res.json()
-  // }
+  async indexStatus({ branch }: { branch: string }): Promise<{
+    status: string
+  }> {
+    const url = `${this.contentApiBase}/db/${this.clientId}/status/${branch}`
+    const res = await this.fetchWithToken(url, {
+      method: 'GET',
+    })
+    return res.json()
+  }
 }
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'

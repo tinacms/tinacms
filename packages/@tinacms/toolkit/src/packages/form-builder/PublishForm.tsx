@@ -128,18 +128,16 @@ const SubmitModal = ({
         baseBranch: currentBranch,
       })
       .then(async ({ pullNumber }) => {
-        // TODO will this work?
         setCurrentBranch(branchName)
 
         // wait for index to be built
-        await new Promise((p) => setTimeout(p, 10000)) // workaround for CORS block on indexStatus
-        // while (true) {
-        //     const { status } = await client.indexStatus({ branch: branchName })
-        //     if (status === 'complete') {
-        //       break
-        //     }
-        //   await new Promise((p) => setTimeout(p, 1000))
-        // }
+        while (true) {
+          const { status } = await client.indexStatus({ branch: branchName })
+          if (status === 'complete') {
+            break
+          }
+          await new Promise((p) => setTimeout(p, 1000))
+        }
 
         publishCommit()
 
