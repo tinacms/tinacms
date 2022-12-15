@@ -532,7 +532,7 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
-      return await res.json().then((r) => r.data.pull_number)
+      return await res.json().then((r) => r.pull_number)
     } catch (error) {
       console.error('There was an error creating a new pull request.', error)
       return null

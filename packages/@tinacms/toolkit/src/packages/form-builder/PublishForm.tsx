@@ -163,7 +163,7 @@ const SubmitModal = ({
         await new Promise((p) => setTimeout(p, 1000))
       }
     })
-  }, [])
+  }, [pullRequestTitle, branchName, currentBranch])
 
   return (
     <Modal>
