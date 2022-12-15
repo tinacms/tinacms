@@ -87,6 +87,7 @@ const PreviewInner = ({ preview, config }) => {
   const ref = React.useRef<HTMLIFrameElement>(null)
   const paramURL = `/${params['*']}`
 
+  // @ts-ignore
   const urlGlobal = new URL(document.location)
   const paramsGlobal = new URLSearchParams(urlGlobal.search)
 
