@@ -29,6 +29,14 @@ const config = defineStaticConfig({
     publicFolder: "public", // The public asset folder for your framework
     outputFolder: "admin", // within the public folder
   },
+  cmsCallback: (cms) => {
+    /**
+     * Enables experimental branch switcher
+     */
+    cms.flags.set("branch-switcher", true);
+
+    return cms;
+  },
   schema: {
     collections: [
       {

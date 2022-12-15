@@ -518,6 +518,12 @@ mutation addPendingDocumentMutation(
     branch: string
     title: string
   }) {
+    if (!branch) {
+      throw new Error('No branch provided')
+    }
+    if (!title) {
+      throw new Error('No title provided')
+    }
     const url = `${this.contentApiBase}/github/${this.clientId}/create_pull_request`
 
     try {
@@ -532,7 +538,7 @@ mutation addPendingDocumentMutation(
           'Content-Type': 'application/json',
         },
       })
-      return await res.json().then((r) => r.data.pull_number)
+      return await res.json().then((r) => ({ pullNumber: r.pull_number }))
     } catch (error) {
       console.error('There was an error creating a new pull request.', error)
       return null
@@ -551,15 +557,16 @@ mutation addPendingDocumentMutation(
     return res.json()
   }
 
-  async indexStatus({ branch }: { branch: string }): Promise<{
-    status: string
-  }> {
-    const url = `${this.contentApiBase}/db/${this.clientId}/status/${branch}`
-    const res = await this.fetchWithToken(url, {
-      method: 'GET',
-    })
-    return res.json()
-  }
+  // need to enable cors on /db status endpoint for this to be usable
+  // async indexStatus({ branch }: { branch: string }): Promise<{
+  //   status: string
+  // }> {
+  //   const url = `${this.contentApiBase}/db/${this.clientId}/status/${branch}`
+  //   const res = await this.fetchWithToken(url, {
+  //     method: 'GET',
+  //   })
+  //   return res.json()
+  // }
 }
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'

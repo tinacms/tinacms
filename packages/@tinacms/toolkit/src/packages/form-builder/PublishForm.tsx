@@ -35,12 +35,7 @@ interface CreatePullRequestProps {
   baseBranch: string
 }
 
-interface PublishFormProps {
-  children: any
-  pristine: boolean
-  isDefaultBranch: boolean
-  submit(): void
-  style?: React.CSSProperties
+interface Client {
   createPullRequest: (
     props: CreatePullRequestProps
   ) => Promise<{ pullNumber: number }>
@@ -52,14 +47,21 @@ interface PublishFormProps {
   }) => Promise<{ status: string; previewUrl?: string }>
 }
 
+interface PublishFormProps {
+  children: any
+  pristine: boolean
+  isDefaultBranch: boolean
+  submit(): void
+  style?: React.CSSProperties
+  client: Client
+}
+
 export const PublishForm: FC<PublishFormProps> = ({
   pristine,
   submit,
   children,
   isDefaultBranch,
-  createPullRequest,
-  indexStatus,
-  vercelStatus,
+  client,
   ...props
 }: PublishFormProps) => {
   const [open, setOpen] = React.useState(false)
@@ -85,9 +87,7 @@ export const PublishForm: FC<PublishFormProps> = ({
           publishCommit={() => {
             submit()
           }}
-          createPullRequest={createPullRequest}
-          indexStatus={indexStatus}
-          vercelStatus={vercelStatus}
+          client={client}
         />
       )}
     </>
@@ -98,24 +98,14 @@ interface SubmitModalProps {
   close(): void
   previewCommit(): void
   publishCommit(): void
-  createPullRequest: (
-    props: CreatePullRequestProps
-  ) => Promise<{ pullNumber: number }>
-  indexStatus: ({ branch: string }) => Promise<{ status: string }>
-  vercelStatus: ({
-    pullNumber,
-  }: {
-    pullNumber: number
-  }) => Promise<{ status: string; previewUrl?: string }>
+  client: Client
 }
 
 const SubmitModal = ({
   close,
   previewCommit,
   publishCommit,
-  createPullRequest,
-  indexStatus,
-  vercelStatus,
+  client,
 }: SubmitModalProps) => {
   const [modalState, setModalState] = React.useState<
     | 'initial'
@@ -131,39 +121,50 @@ const SubmitModal = ({
 
   const handleCreatePullRequest = React.useCallback(async () => {
     setModalState('creatingPullRequest')
-    await createPullRequest({
-      title: pullRequestTitle,
-      branch: branchName,
-      baseBranch: currentBranch,
-    }).then(async ({ pullNumber }) => {
-      // TODO will this work?
-      setCurrentBranch(branchName)
+    await client
+      .createPullRequest({
+        title: pullRequestTitle,
+        branch: branchName,
+        baseBranch: currentBranch,
+      })
+      .then(async ({ pullNumber }) => {
+        // TODO will this work?
+        setCurrentBranch(branchName)
 
-      // wait for index to be built
-      while (true) {
-        const { status } = await indexStatus({ branch: branchName })
-        if (status === 'complete') {
-          break
+        // wait for index to be built
+        await new Promise((p) => setTimeout(p, 10000)) // workaround for CORS block on indexStatus
+        // while (true) {
+        //     const { status } = await client.indexStatus({ branch: branchName })
+        //     if (status === 'complete') {
+        //       break
+        //     }
+        //   await new Promise((p) => setTimeout(p, 1000))
+        // }
+
+        publishCommit()
+
+        setModalState('waitingForPreview')
+        while (true) {
+          const res = await client.vercelStatus({ pullNumber })
+          if (res.status.toLowerCase() === 'ready') {
+            setPreviewUrl(res.previewUrl)
+            setModalState('previewReady')
+            break
+          } else if (res.status.toLowerCase() === 'building') {
+            setModalState('waitingForPreview')
+          } // TODO handle error
+          await new Promise((p) => setTimeout(p, 10000))
         }
-        await new Promise((p) => setTimeout(p, 1000))
-      }
-
-      publishCommit()
-
-      setModalState('waitingForPreview')
-      while (true) {
-        const res = await vercelStatus({ pullNumber })
-        if (res.status === 'ready') {
-          setPreviewUrl(res.previewUrl)
-          setModalState('previewReady')
-          break
-        } else if (res.status === 'building') {
-          setModalState('waitingForPreview')
-        } // TODO handle error
-        await new Promise((p) => setTimeout(p, 1000))
-      }
-    })
-  }, [])
+      })
+  }, [
+    client,
+    branchName,
+    pullRequestTitle,
+    currentBranch,
+    setCurrentBranch,
+    setModalState,
+    publishCommit,
+  ])
 
   return (
     <Modal>
