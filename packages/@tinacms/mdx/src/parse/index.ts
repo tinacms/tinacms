@@ -82,15 +82,10 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.start,
-          `<${template.name}>\``
-        )
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.end,
-          `\`</${template.name}>`
+        const regex = `/${template.match.start}\s*${template.name}(.+?)\s*${template.match.end}/g;`
+        preprocessedString.replace(
+          regex,
+          `<${template.name}$1>\n</${template.name}>`
         )
       }
     }
