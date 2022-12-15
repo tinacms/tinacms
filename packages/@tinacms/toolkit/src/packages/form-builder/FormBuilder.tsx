@@ -224,9 +224,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         (invalid && !dirtySinceLastSubmit)
                       }
                       busy={submitting}
-                      createPullRequest={cms.api.tina.createPullRequest}
-                      indexStatus={cms.api.tina.indexStatus}
-                      vercelStatus={cms.api.tina.vercelStatus}
+                      client={cms.api.tina}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
