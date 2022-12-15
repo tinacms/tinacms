@@ -169,6 +169,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   //   })
   // }
 
+  const tinaApi = cms.api.tina
+
   return (
     <FinalForm
       form={finalForm}
@@ -224,9 +226,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         (invalid && !dirtySinceLastSubmit)
                       }
                       busy={submitting}
-                      createPullRequest={cms.api.tina.createPullRequest}
-                      indexStatus={cms.api.tina.indexStatus}
-                      vercelStatus={cms.api.tina.vercelStatus}
+                      createPullRequest={tinaApi.createPullRequest.bind(
+                        tinaApi
+                      )}
+                      indexStatus={tinaApi.indexStatus.bind(tinaApi)}
+                      vercelStatus={tinaApi.vercelStatus.bind(tinaApi)}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
