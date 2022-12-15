@@ -19,7 +19,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { TinaCMS } from '@tinacms/toolkit'
+import { Form, TinaCMS, useCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -78,12 +78,32 @@ const SetPreviewFlag = ({
 }
 
 const PreviewInner = ({ preview, config }) => {
+  // Hash router params
   const params = useParams()
+  // Hash router navigate
   const navigate = useNavigate()
   const [url, setURL] = React.useState(`/${params['*']}`)
   const [reportedURL, setReportedURL] = useState<string | null>(null)
   const ref = React.useRef<HTMLIFrameElement>(null)
   const paramURL = `/${params['*']}`
+
+  const urlGlobal = new URL(document.location)
+  const paramsGlobal = new URLSearchParams(urlGlobal.search)
+
+  const activeField = paramsGlobal.get('activeField')
+  const cms = useCMS()
+  const forms = cms.plugins.getType<Form>('form').all()
+  const form = forms[0]
+  const id = typeof form !== 'undefined' ? form?.id : ''
+
+  React.useEffect(() => {
+    if (id && activeField) {
+      cms.events.dispatch({
+        type: 'field:selected',
+        value: `${form.id}#${activeField}`,
+      })
+    }
+  }, [activeField, id])
 
   React.useEffect(() => {
     if (reportedURL !== paramURL && paramURL) {
@@ -92,6 +112,12 @@ const PreviewInner = ({ preview, config }) => {
   }, [paramURL])
   React.useEffect(() => {
     if ((reportedURL !== url || reportedURL !== paramURL) && reportedURL) {
+      // Remove the activeField URL param before navigating
+      if (paramsGlobal.get('activeField')) {
+        paramsGlobal.delete('activeField')
+        urlGlobal.search = paramsGlobal.toString()
+        window.history.replaceState(null, null, urlGlobal.toString())
+      }
       navigate(`/~${reportedURL}`)
     }
   }, [reportedURL])

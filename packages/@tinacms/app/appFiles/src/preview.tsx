@@ -31,24 +31,6 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
-  const params = new URL(document.location).searchParams
-  const activeField = params.get('activeField')
-  console.log({ activeField })
-  const cms = useCMS()
-  const forms = cms.plugins.getType<Form>('form').all()
-  console.log({ forms })
-  const form = forms[0]
-  console.log({ id: form?.id })
-  useEffect(() => {
-    if (form) {
-      cms.events.dispatch({
-        type: 'field:selected',
-        value: `${form.id}#${activeField}`,
-        // value: 'content/pages/home.md#title',
-      })
-    }
-  }, [activeField, form?.id])
-
   const [activeQuery, setActiveQuery] = React.useState<PostMessage | null>(null)
 
   React.useEffect(() => {
