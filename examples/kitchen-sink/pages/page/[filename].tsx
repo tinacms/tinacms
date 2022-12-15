@@ -8,7 +8,22 @@ export default function Home(
 ) {
   const { data } = useTina(props)
 
-  return <Json src={data} />
+  return (
+    <>
+      <button
+        onClick={(e) => {
+          e.preventDefault()
+          window?.parent?.postMessage(
+            { type: 'setActiveField', field: 'title' },
+            window?.location?.origin
+          )
+        }}
+      >
+        Click me
+      </button>
+      <Json src={data} />
+    </>
+  )
 }
 
 export const getStaticProps = async ({ params }) => {

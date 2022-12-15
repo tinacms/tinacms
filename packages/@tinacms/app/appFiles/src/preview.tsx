@@ -31,6 +31,8 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
+  const cms = useCMS()
+
   const [activeQuery, setActiveQuery] = React.useState<PostMessage | null>(null)
 
   React.useEffect(() => {
@@ -38,6 +40,22 @@ export const Preview = (
       window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
         if (event.data.type === 'open') {
           setActiveQuery(event.data)
+        }
+        // @ts-ignore
+        if (event.data.type === 'setActiveField') {
+          const forms = cms.plugins.getType<Form>('form').all()
+          const form = forms[0]
+          const id = typeof form !== 'undefined' ? form?.id : ''
+          console.log(`got event with type setActiveField`)
+          if (id) {
+            cms.events.dispatch({
+              type: 'field:selected',
+              // @ts-ignore
+              value: `${id}#${event.data?.field}`,
+            })
+          } else {
+            console.log('unable to find a field')
+          }
         }
       })
     }
