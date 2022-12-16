@@ -103,6 +103,7 @@ const BranchSelector = ({ openModal }) => {
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading')
+    // @ts-ignore
     await cms.api.tina
       .listBranches()
       .then((data) => {
