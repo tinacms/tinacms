@@ -125,6 +125,10 @@ const BranchSelector = ({ openModal }) => {
       setCurrentBranch(event.target.value)
       cms.alerts.success('Switched to branch ' + event.target.value + '.')
       selectRef.current.blur()
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 750)
     }
   }
 
