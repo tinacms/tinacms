@@ -1,5 +1,6 @@
 import React from 'react'
 import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
+import { tinaField } from 'tinacms/dist/react'
 
 type RenderValue = (args: {
   value: unknown
@@ -95,18 +96,23 @@ const UnknownRenderer = ({
           {!expanded && `...]`}
         </button>
         {expanded && (
-          <div className="pl-4">
-            {value.map((item, index) => (
-              <UnknownRenderer
-                key={String(index)}
-                keyName={String(index)}
-                value={item}
-                parentKeyName={keyName}
-                parentValue={parentValue}
-                renderValue={renderValue}
-                renderRichText={renderRichText}
-              />
-            ))}
+          <div
+            className="border-l border-dotted"
+            data-tinafield={`${tinaField(parentValue, keyName)}`}
+          >
+            <div className="pl-4">
+              {value.map((item, index) => (
+                <UnknownRenderer
+                  key={String(index)}
+                  keyName={String(index)}
+                  value={item}
+                  parentKeyName={keyName}
+                  parentValue={parentValue}
+                  renderValue={renderValue}
+                  renderRichText={renderRichText}
+                />
+              ))}
+            </div>
           </div>
         )}
         {expanded && <div>{']'}</div>}
@@ -219,14 +225,16 @@ const ObjectRenderer = ({
         </div>
         {expanded && (
           <div className="pl-4">
-            <ObjectValueRenderer
-              value={v}
-              parentValue={parentValue}
-              parentKeyName={parentKeyName}
-              renderValue={renderValue}
-              renderRichText={renderRichText}
-              showMetaFields={showMetaFields}
-            />
+            <div data-tinafield={tinaField(v)}>
+              <ObjectValueRenderer
+                value={v}
+                parentValue={parentValue}
+                parentKeyName={parentKeyName}
+                renderValue={renderValue}
+                renderRichText={renderRichText}
+                showMetaFields={showMetaFields}
+              />
+            </div>
           </div>
         )}
         {expanded && <div>{'}'}</div>}

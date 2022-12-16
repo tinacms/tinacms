@@ -13,8 +13,9 @@ limitations under the License.
 import React from 'react'
 import { useMachine } from '@xstate/react'
 import { queryMachine, initialContext } from './lib/machines/query-machine'
-import { useCMS, defineConfig } from 'tinacms'
+import { useCMS, defineConfig, Form } from 'tinacms'
 import type { formifyCallback as FormifyCallback } from 'tinacms/dist/hooks/use-graphql-forms'
+import { useEffect } from 'react'
 
 type Config = Parameters<typeof defineConfig>[0]
 
@@ -30,6 +31,8 @@ export const Preview = (
     iframeRef: React.MutableRefObject<HTMLIFrameElement>
   }
 ) => {
+  const cms = useCMS()
+
   const [activeQuery, setActiveQuery] = React.useState<PostMessage | null>(null)
 
   React.useEffect(() => {
@@ -37,6 +40,48 @@ export const Preview = (
       window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
         if (event.data.type === 'open') {
           setActiveQuery(event.data)
+        }
+        // @ts-ignore
+        if (event.data.type === 'setActiveField') {
+          const forms = cms.plugins.getType<Form>('form').all()
+          const form = forms[0]
+          const id = typeof form !== 'undefined' ? form?.id : ''
+          console.log(`got event with type setActiveField`)
+          if (id) {
+            cms.events.dispatch({
+              type: 'field:selected',
+              // @ts-ignore
+              value: `${id}#${event.data?.field}`,
+            })
+          } else {
+            console.log('unable to find a field')
+          }
+        }
+        // @ts-ignore
+        if (event.data.type === 'updateData') {
+          const forms = cms.plugins.getType<Form>('form').all()
+          const form = forms[0]
+          const id = typeof form !== 'undefined' ? form?.id : ''
+          console.log(`got event with type update data`)
+          if (id) {
+            console.log('dispatch from updateData')
+            const formValue = event.data?.data
+            // @ts-ignore
+            const fieldName: string = event.data?.field
+            const field = form.finalForm.getFieldState(fieldName)
+
+            field?.change(formValue)
+            cms.events.dispatch({
+              type: `forms:fields:onChange`,
+              value: formValue,
+              previousValue: '',
+              mutationType: { type: 'change' },
+              formId: id,
+              field,
+            })
+          } else {
+            console.log('unable to find a field')
+          }
         }
       })
       window.addEventListener('message', (event: MessageEvent<PostMessage>) => {
@@ -82,7 +127,7 @@ const QueryMachine = (props: {
         ...initialContext,
         cms,
         // Enable registration of sub forms
-        // registerSubForms: true,
+        registerSubForms: true,
         // @ts-ignore FIXME: add formifyCallback args to Config type
         formifyCallback: props.formifyCallback,
       }),

@@ -42,13 +42,14 @@ export interface ReferenceProps {
   options?: (Option | string)[]
 }
 
-export const Reference: React.FC<ReferenceProps> = ({ input, field }) => {
+// @ts-ignore PR FOR DEMO ONLY
+export const Reference: React.FC<ReferenceProps> = ({ input, field, meta }) => {
   const cms = useCMS()
 
   return (
     <div>
       <div className="relative group">
-        <ReferenceSelect cms={cms} input={input} field={field} />
+        <ReferenceSelect cms={cms} input={input} field={field} meta={meta} />
       </div>
       <ReferenceLink cms={cms} input={input} />
     </div>

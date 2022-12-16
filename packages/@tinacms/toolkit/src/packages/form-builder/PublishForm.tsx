@@ -160,12 +160,14 @@ const SubmitModal = ({ close, publishCommit, client }: SubmitModalProps) => {
             <div>
               <div className="mb-4">
                 <BaseTextField
+                  meta={{}}
                   placeholder="Name"
                   value={pullRequestTitle}
                   onChange={(e) => setPullRequestTitle(e.target.value)}
                 />
               </div>
               <BaseTextField
+                meta={{}}
                 placeholder="Branch Name"
                 value={branchName}
                 readOnly

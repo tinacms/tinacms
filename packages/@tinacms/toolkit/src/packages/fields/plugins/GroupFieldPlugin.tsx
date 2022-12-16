@@ -50,8 +50,11 @@ export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
             cms.alerts.error('Cannot navigate away from an invalid form.')
             return
           }
-
-          setExpanded((p) => !p)
+          cms.events.dispatch({
+            type: 'field:selected',
+            value: `${tinaForm.id}#${field.name}`,
+          })
+          // setExpanded((p) => !p)
         }}
       >
         {field.label || field.name}

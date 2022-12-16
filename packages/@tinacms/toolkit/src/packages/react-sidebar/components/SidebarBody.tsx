@@ -45,6 +45,7 @@ export const FormsView = ({
       : true
   const formPlugins = cms.plugins.getType<Form>('form')
   const { setFormIsPristine } = React.useContext(SidebarContext)
+  // @ts-ignore PR FOR DEMO ONLY
   const { formsRegistering, setFormsRegistering } =
     React.useContext(EditContext)
 
@@ -136,6 +137,8 @@ export const FormsView = ({
             ))}
           <FormBuilder
             form={activeForm as any}
+            // @ts-ignore PR FOR DEMO ONLY
+            setActiveFormId={setActiveFormId}
             onPristineChange={setFormIsPristine}
           />
         </FormWrapper>

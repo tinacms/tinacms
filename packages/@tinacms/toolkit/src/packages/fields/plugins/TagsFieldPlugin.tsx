@@ -43,6 +43,7 @@ export const TagsField = wrapFieldsWithMeta<
   const items = input.value || []
   return (
     <>
+      {/* @ts-ignore PR FOR DEMO ONLY */}
       <BaseTextField
         value={value}
         onChange={(event) => setValue(event.target.value)}

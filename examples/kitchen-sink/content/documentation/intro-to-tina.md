@@ -1,5 +1,7 @@
 ---
 title: Intro to Tina
+tags:
+  - reference: content/tags/css.json
 ---
 
 ## Introduction

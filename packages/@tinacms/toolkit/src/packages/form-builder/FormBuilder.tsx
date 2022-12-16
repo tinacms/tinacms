@@ -26,6 +26,7 @@ import { PublishForm } from './PublishForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { IoMdClose } from 'react-icons/io'
 import { useBranchData } from '../../plugins/branch-switcher'
 
 export interface FormBuilderProps {
@@ -71,6 +72,8 @@ const NoFieldsPlaceholder = () => (
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
+  // @ts-ignore PR FOR DEMO ONLY
+  setActiveFormId,
   onPristineChange,
   ...rest
 }) => {
@@ -101,6 +104,49 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   // console.log({isDefaultBranch }, cms.api.tina.branch)
   console.log({ currentBranch, isDefaultBranch })
   const finalForm = tinaForm.finalForm
+  const [activeFields, setActiveFields] = React.useState(null)
+  const [selectedField, setSelectedField] = React.useState(null)
+  const [path, setPath] = React.useState(null)
+
+  React.useMemo(() => {
+    cms.events.subscribe('field:selected', (e) => {
+      setSelectedField(e.value)
+    })
+  }, [setSelectedField])
+
+  const handler = ({ selectedField, tinaForm }) => {
+    const [formId, fieldName] = selectedField?.split('#')
+    const result = getFieldGroup(
+      tinaForm,
+      fieldName,
+      tinaForm.finalForm.getState().values,
+      []
+    )
+    if (result) {
+      setPath(result.path)
+      setActiveFields(result.fieldGroup)
+    } else {
+      setPath([])
+      setActiveFields(tinaForm.fields)
+    }
+  }
+
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField.split('#')
+      if (formId !== tinaForm.id) {
+        setActiveFormId(formId)
+      } else {
+        handler({ selectedField, tinaForm })
+      }
+    }
+  }, [selectedField, tinaForm.id])
+
+  React.useEffect(() => {
+    if (selectedField) {
+      handler({ selectedField, tinaForm })
+    }
+  }, [tinaForm.id])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -146,6 +192,32 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
 
+  const fields = activeFields || tinaForm.fields
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField?.split('#')
+      const activeFieldFound = fields.find((f) => f.name === fieldName)
+      if (activeFieldFound) {
+        setTimeout(() => {
+          finalForm.focus(fieldName)
+          setSelectedField(null)
+        }, 400)
+      }
+    }
+  }, [selectedField])
+  React.useEffect(() => {
+    if (selectedField) {
+      const [formId, fieldName] = selectedField?.split('#')
+      const activeFieldFound = fields.find((f) => f.name === fieldName)
+      if (activeFieldFound) {
+        setTimeout(() => {
+          finalForm.focus(fieldName)
+          setSelectedField(null)
+        }, 400)
+      }
+    }
+  }, [JSON.stringify(fields)])
+
   return (
     <FinalForm
       form={finalForm}
@@ -164,9 +236,52 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormPortalProvider>
+                {path &&
+                  path.map((item, index) => {
+                    let shouldRender = false
+                    const isLastPanel = path.length === index + 1
+                    let isSecondToLast = false
+                    if (!isLastPanel) {
+                      isSecondToLast = path.length === index + 2
+                      if (isSecondToLast) {
+                        const lastPanel = path[path.length - 1]
+                        if (isNumber(lastPanel)) {
+                          shouldRender = true
+                        }
+                      }
+                    } else {
+                      if (!isNumber(item)) {
+                        shouldRender = true
+                      }
+                    }
+                    if (isNumber(item)) {
+                      return
+                    }
+
+                    if (!shouldRender) {
+                      return
+                    }
+                    return (
+                      <PanelHeader
+                        key={path.slice(0, index).join('.')}
+                        path={path}
+                        itemIndex={index}
+                        setSelectedField={setSelectedField}
+                        tinaFormId={tinaForm.id}
+                        onClick={() => {
+                          const selectedField = `${tinaForm.id}#${path
+                            .slice(0, index + 1)
+                            .join('.')}`
+                          setSelectedField(selectedField)
+                        }}
+                      >
+                        {item}
+                      </PanelHeader>
+                    )
+                  })}
                 <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                  {tinaForm && fields.length ? (
+                    <FieldsBuilder form={tinaForm} fields={fields} />
                   ) : (
                     <NoFieldsPlaceholder />
                   )}
@@ -477,3 +592,206 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+const getFieldGroup = (
+  form: Form,
+  fieldName: string,
+  values: object,
+  prefix: string[]
+) => {
+  const [name, ...rest] = fieldName.split('.')
+  const field = form.fields.find((field) => field.name === name)
+  const value = values[name]
+  if (field.type === 'object') {
+    if (field.templates) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        if (index) {
+          const value2 = value[index]
+          const template = field.templates[value2._template]
+          if (rest2.length) {
+            const result = getFieldGroup(template, rest2.join('.'), value2, [
+              ...prefix,
+              name,
+              index,
+            ])
+            if (result) {
+              return result
+            }
+          }
+          return {
+            path: [...prefix, name, index],
+            fieldGroup: template.fields.map((field) => {
+              return {
+                ...field,
+                name: `${[...prefix, name, index].join('.')}.${field.name}`,
+              }
+            }),
+          }
+        } else {
+          return
+        }
+      } else {
+      }
+    }
+    if (field.fields) {
+      if (field.list) {
+        const [index, ...rest2] = rest
+        if (index) {
+          const value2 = value[index]
+          if (rest2.length) {
+            // @ts-ignore PR FOR DEMO ONLY
+            const result = getFieldGroup(field, rest2.join('.'), value2, [
+              ...prefix,
+              name,
+              index,
+            ])
+            if (result) {
+              return result
+            }
+          }
+          return {
+            path: [...prefix, name, index],
+            fieldGroup: field.fields.map((field) => {
+              return {
+                ...field,
+                name: `${[...prefix, name, index].join('.')}.${field.name}`,
+              }
+            }),
+          }
+        } else {
+          return
+        }
+      } else {
+        if (rest.length) {
+          // @ts-ignore PR FOR DEMO ONLY
+          const result = getFieldGroup(field, rest.join('.'), value, [
+            ...prefix,
+            name,
+          ])
+          if (result) {
+            return result
+          }
+        }
+        return {
+          path: [...prefix, name],
+          fieldGroup: field.fields.map((field) => {
+            return {
+              ...field,
+              name: `${[...prefix, name].join('.')}.${field.name}`,
+            }
+          }),
+        }
+      }
+    }
+  }
+}
+
+const PanelHeader = ({
+  path,
+  itemIndex,
+  setSelectedField,
+  onClick,
+  tinaFormId,
+  children,
+}) => {
+  return (
+    <div
+      style={{ zIndex: 1000 }}
+      className={`flex relative w-full bg-white hover:bg-gray-50 border-t border-b shadow-sm border-gray-100 px-6`}
+    >
+      <BreadcrumbDropdown
+        setSelectedField={setSelectedField}
+        tinaFormId={tinaFormId}
+        path={path}
+        itemIndex={itemIndex}
+      />
+      <button
+        className={`relative z-40 group text-left w-full py-2 px-2 -mt-px`}
+        onClick={onClick}
+        tabIndex={-1}
+      >
+        <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+          {children}
+          <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+        </div>
+      </button>
+    </div>
+  )
+}
+
+const isNumber = (item: string) => {
+  return !isNaN(Number(item))
+}
+
+import { Fragment } from 'react'
+import { Menu, Transition } from '@headlessui/react'
+import { DotsVerticalIcon } from '@heroicons/react/solid'
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
+export function BreadcrumbDropdown({
+  path,
+  itemIndex,
+  tinaFormId,
+  setSelectedField,
+}) {
+  return (
+    <Menu as="div" className="relative inline-block text-left">
+      <div>
+        <Menu.Button className="flex items-center bg-gray-100 text-gray-400 hover:text-gray-600 focus:outline-none py-2">
+          <span className="sr-only">Open options</span>
+          <DotsVerticalIcon className="h-5 w-5" aria-hidden="true" />
+        </Menu.Button>
+      </div>
+
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Menu.Items
+          style={{ zIndex: 1001 }}
+          className="absolute left-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+        >
+          <div className="py-1">
+            {path.map((item, index) => {
+              if (itemIndex === index) {
+                return
+              }
+              if (isNumber(item)) {
+                return
+              }
+              return (
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={() => {
+                        const selectedField = `${tinaFormId}#${path
+                          .slice(0, index + 1)
+                          .join('.')}`
+                        setSelectedField(selectedField)
+                      }}
+                      className={classNames(
+                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                        'text-left block w-full px-4 py-2  text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase '
+                      )}
+                    >
+                      {item}
+                    </button>
+                  )}
+                </Menu.Item>
+              )
+            })}
+          </div>
+        </Menu.Items>
+      </Transition>
+    </Menu>
+  )
+}

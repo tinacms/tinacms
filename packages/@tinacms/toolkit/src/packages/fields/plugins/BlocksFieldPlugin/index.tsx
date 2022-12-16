@@ -214,11 +214,15 @@ const BlockListItem = ({
                   return
                 }
 
-                setExpanded(true)
-                setFocusedField({
-                  id: tinaForm.id,
-                  fieldName: `${field.name}.${index}`,
+                cms.events.dispatch({
+                  type: 'field:selected',
+                  value: `${tinaForm.id}#${field.name}.${index}`,
                 })
+                // setExpanded(true)
+                // setFocusedField({
+                //   id: tinaForm.id,
+                //   fieldName: `${field.name}.${index}`,
+                // })
               }}
               onMouseOver={() =>
                 setHoveredField({

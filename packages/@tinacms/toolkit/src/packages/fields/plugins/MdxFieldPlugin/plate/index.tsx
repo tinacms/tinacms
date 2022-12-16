@@ -63,6 +63,19 @@ export const RichEditor = (props: RichTextType) => {
   const tempId = [props.tinaForm.id, props.input.name].join('.')
   const id = React.useMemo(() => uuid() + tempId, [tempId])
 
+  // TODO: setup focus functionality
+  // const ref = React.useRef<HTMLDivElement>(null)
+  // React.useEffect(() => {
+  //   if (ref.current) {
+  //     setTimeout(() => {
+  //       const tb = ref.current.querySelector('[role="textbox"]')
+  //       if (tb) {
+  //         tb.focus()
+  //       }
+  //     }, 400)
+  //   }
+  // }, [ref.current])
+
   return (
     <div className={withToolbar ? 'with-toolbar' : ''}>
       <Plate
