@@ -11,6 +11,7 @@ enum PREVIEW_STATE {
   WAITING_FOR_PREVIEW,
   PREVIEW_READY,
 }
+
 const usePreviewStatus = () => {
   const cms = useCMS()
   const client = cms.api.tina
@@ -57,25 +58,19 @@ export const BranchBanner = () => {
           <BranchSelector openModal={openModal} />
         </span>
         <Button
-          className="group text-[12px] h-7 px-3 flex-shrink-0 gap-1"
+          className="group text-[12px] h-7 px-3 flex-shrink-0 gap-2"
           size="custom"
           variant="white"
-          onClick={() => {}}
+          as="a"
+          href={previewUrl || '#'}
           disabled={previewState !== PREVIEW_STATE.PREVIEW_READY}
         >
-          {previewState === PREVIEW_STATE.WAITING_FOR_PREVIEW && (
-            <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" />
+          {previewState === PREVIEW_STATE.WAITING_FOR_PREVIEW ? (
+            <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 animate-spin" />
+          ) : (
+            <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70" />
           )}
-          {previewState === PREVIEW_STATE.PREVIEW_READY && (
-            <a className="flex" href={previewUrl}>
-              <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
-              {/* <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" /> */}
-              Preview
-            </a>
-          )}
-          {previewState === PREVIEW_STATE.NOT_AVAILABLE && (
-            <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
-          )}
+          Preview
         </Button>
       </div>
       {open && (
@@ -97,7 +92,7 @@ const BranchSelector = ({ openModal }) => {
   const [listState, setListState] = React.useState('loading')
   const [branchList, setBranchList] = React.useState([])
   const { branch } = useCMS().api.tina || 'main'
-  const isDefaultBranch = branch === 'main' || branch === 'master'
+  // const isDefaultBranch = branch === 'main' || branch === 'master'
   const tinaApi = useCMS().api.tina
   const { setCurrentBranch } = useBranchData()
 
@@ -110,12 +105,12 @@ const BranchSelector = ({ openModal }) => {
         setListState('ready')
       })
       .catch(() => setListState('error'))
-  }, [])
+  }, [tinaApi])
 
-  // load branch list
   React.useEffect(() => {
+    if (!tinaApi) return
     refreshBranchList()
-  }, [])
+  }, [tinaApi])
 
   if (listState === 'loading') {
     return (
