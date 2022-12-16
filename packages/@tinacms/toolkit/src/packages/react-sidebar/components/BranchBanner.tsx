@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BiGitBranch, BiLinkExternal } from 'react-icons/bi'
 import { FaSpinner } from 'react-icons/fa'
-import { BranchSwitcher, useBranchData } from '../../../plugins/branch-switcher'
+import { BranchCreator, useBranchData } from '../../../plugins/branch-switcher'
 import { useCMS } from '../../../react-tinacms'
 import { Modal, ModalBody, ModalHeader, PopupModal } from '../../react-modals'
 import { Button } from '../../styles'
@@ -12,8 +12,7 @@ enum PREVIEW_STATE {
   PREVIEW_READY,
 }
 
-const usePreviewStatus = () => {
-  const cms = useCMS()
+const usePreviewStatus = ({ cms }) => {
   const client = cms.api.tina
 
   const [previewUrl, setPreviewUrl] = React.useState('')
@@ -44,10 +43,12 @@ const usePreviewStatus = () => {
 }
 
 export const BranchBanner = () => {
+  const cms = useCMS()
   const [open, setOpen] = React.useState(false)
+  const [rerender, setRerender] = React.useState(false)
   const openModal = () => setOpen(true)
 
-  const { previewUrl, previewState } = usePreviewStatus()
+  const { previewUrl, previewState } = usePreviewStatus({ cms })
 
   return (
     <>
@@ -55,7 +56,7 @@ export const BranchBanner = () => {
       <div className="flex-grow-0 flex justify-between w-full text-xs items-center py-2 px-4 text-gray-500 bg-gradient-to-r from-white to-gray-50 border-b border-gray-150 gap-2">
         <span className="flex items-center justify-start gap-1 flex-1">
           <BiGitBranch className="w-5 h-auto text-blue-500/70" /> Branch
-          <BranchSelector openModal={openModal} />
+          <BranchSelector rerender={rerender} openModal={openModal} />
         </span>
         <Button
           className="group text-[12px] h-7 px-3 flex-shrink-0 gap-2"
@@ -79,9 +80,14 @@ export const BranchBanner = () => {
         </Button>
       </div>
       {open && (
-        <BranchModal
+        <CreateBranchModal
           close={() => {
             setOpen(false)
+          }}
+          callback={(name) => {
+            setOpen(false)
+            setRerender(!rerender)
+            cms.alerts?.success(`Created branch ${name}.`)
           }}
         />
       )}
@@ -89,11 +95,7 @@ export const BranchBanner = () => {
   )
 }
 
-interface SubmitModalProps {
-  close(): void
-}
-
-const BranchSelector = ({ openModal }) => {
+const BranchSelector = ({ openModal, rerender = false }) => {
   const selectRef = React.useRef<HTMLSelectElement>(null)
   const [listState, setListState] = React.useState('loading')
   const [branchList, setBranchList] = React.useState([])
@@ -116,11 +118,13 @@ const BranchSelector = ({ openModal }) => {
   React.useEffect(() => {
     if (!cms) return
     refreshBranchList()
-  }, [cms])
+  }, [cms, rerender])
 
   const changeBranch = (event) => {
     if (event.target.value === 'create-new-branch') {
       openModal()
+      selectRef.current.value = branch
+      selectRef.current.blur()
     } else {
       setCurrentBranch(event.target.value)
       cms.alerts.success('Switched to branch ' + event.target.value + '.')
@@ -162,23 +166,22 @@ const BranchSelector = ({ openModal }) => {
   )
 }
 
-const BranchModal = ({ close }: SubmitModalProps) => {
-  const tinaApi = useCMS().api.tina
+const CreateBranchModal = ({ close, callback }) => {
   const { setCurrentBranch } = useBranchData()
 
   return (
     <Modal>
       <PopupModal>
-        <ModalHeader close={close}>Choose Workspace</ModalHeader>
-        <ModalBody padded={false}>
-          <BranchSwitcher
-            listBranches={tinaApi.listBranches.bind(tinaApi)}
+        <ModalHeader close={close}>Create Branch</ModalHeader>
+        <div className="p-5 m-0 overflow-hidden flex flex-col [&:last-child]:rounded-[0_0_5px_5px] ">
+          <BranchCreator
             createBranch={() => {
               return Promise.resolve('')
             }}
             chooseBranch={setCurrentBranch}
+            callback={callback}
           />
-        </ModalBody>
+        </div>
       </PopupModal>
     </Modal>
   )

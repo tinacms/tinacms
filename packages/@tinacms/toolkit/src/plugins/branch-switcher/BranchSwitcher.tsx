@@ -18,10 +18,57 @@ import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
 import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
-import { useCMS } from '../../packages/react-core'
 import { AiFillWarning } from 'react-icons/ai'
+import { FaSpinner } from 'react-icons/fa'
+import { useCMS } from '../../packages/react-core'
 
 type ListState = 'loading' | 'ready' | 'error'
+
+export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const [isCreating, setIsCreating] = React.useState(false)
+  const { currentBranch } = useBranchData()
+
+  const handleCreateBranch = React.useCallback((value) => {
+    setIsCreating(true)
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      chooseBranch(createdBranchName)
+      callback(createdBranchName)
+    })
+  }, [])
+
+  return (
+    <div className="w-full flex justify-between items-center w-full gap-3">
+      <BaseTextField
+        placeholder="Branch Name"
+        value={newBranchName}
+        disabled={isCreating}
+        onChange={(e) => setNewBranchName(e.target.value)}
+      />
+      <Button
+        className="flex-0 flex items-center gap-2 whitespace-nowrap"
+        size="medium"
+        variant="primary"
+        disabled={isCreating}
+        onClick={() => handleCreateBranch(newBranchName)}
+      >
+        {isCreating ? (
+          <>
+            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
+            New
+          </>
+        ) : (
+          <>
+            <BiPlus className="w-5 h-auto opacity-70" /> Create New
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
 
 export const BranchSwitcher = ({
   listBranches,
