@@ -72,8 +72,8 @@ export const Hero = ({ data, parentField }) => {
         </div>
         {data.image && (
           <div
-            data-tinafield={tinaField(data.image, "src")}
-            className="row-start-1 flex justify-center"
+            data-tinafield={`${parentField}.image`}
+            className="relative row-start-1 lg:col-span-2 flex justify-center"
           >
             <img
               className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"

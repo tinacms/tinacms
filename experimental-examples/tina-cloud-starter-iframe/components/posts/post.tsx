@@ -17,7 +17,7 @@ import { Section } from "../util/section";
 import { useTheme } from "../layout";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
-import { tinaField } from "tinacms/dist/react";
+import { Prism } from "tinacms/dist/rich-text/prism";
 import type { TinaMarkdownContent, Components } from "tinacms/dist/rich-text";
 
 const components: Components<{
@@ -153,21 +153,15 @@ export const Post = (props) => {
         >
           {props.author && (
             <>
-              <div
-                data-tinafield={tinaField(data.author, "avatar")}
-                className="flex-shrink-0 mr-4"
-              >
+              <div className="flex-shrink-0 mr-4">
                 <img
                   className="h-14 w-14 object-cover rounded-full shadow-sm"
                   src={props.author.avatar}
                   alt={props.author.name}
                 />
               </div>
-              <p
-                data-tinafield={tinaField(data.author, "name")}
-                className="text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white"
-              >
-                {data.author.name}
+              <p className="text-base font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
+                {props.author.name}
               </p>
               <span className="font-bold text-gray-200 dark:text-gray-500 mx-2">
                 —
@@ -182,12 +176,23 @@ export const Post = (props) => {
           </p>
         </div>
       </Container>
-      {data.heroImg && (
-        <div data-tinafield="heroImg" className="">
-          <img
-            src={data.heroImg}
-            className="mb-14 block h-auto max-w-4xl lg:max-w-6xl mx-auto"
-          />
+      {props.heroImg && (
+        <div className="px-4 w-full">
+          <div
+            data-tinafield="heroImg"
+            className="relative max-w-4xl lg:max-w-5xl mx-auto"
+          >
+            <img
+              src={props.heroImg}
+              className="absolute block rounded-lg w-full h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
+              aria-hidden="true"
+            />
+            <img
+              src={props.heroImg}
+              alt={props.title}
+              className="relative z-10 mb-14 block rounded-lg w-full h-auto opacity-100"
+            />
+          </div>
         </div>
       )}
       <Container className={`flex-1 pt-4`} width="small" size="large">
