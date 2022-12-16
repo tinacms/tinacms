@@ -11,7 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import path from 'path'
-import { logText, successText } from '../../utils/theme'
+import {
+  cmdText,
+  focusText,
+  indentedCmd,
+  linkText,
+  logText,
+  titleText,
+} from '../../utils/theme'
 import { logger } from '../../logger'
 import fs from 'fs-extra'
 import prompts from 'prompts'
@@ -192,7 +199,7 @@ const addDependencies = async (packageManager) => {
     npm: `npm install ${deps.join(' ')}`,
     yarn: `yarn add ${deps.join(' ')}`,
   }
-  logger.info(`  ${logText(packageManagers[packageManager])}`)
+  logger.info(indentedCmd(`${logText(packageManagers[packageManager])}`))
   await execShellCommand(packageManagers[packageManager])
 }
 
@@ -265,20 +272,26 @@ const logNextSteps = ({
   packageManager: string
   framework: Framework
 }) => {
-  logSteps[framework.name]({ packageManager })
+  logger.info(focusText(`\n${titleText(' TinaCMS ')} has been initialized!`))
+  logger.info(
+    'To get started run: ' +
+      cmdText(frameworkDevCmds[framework.name]({ packageManager }))
+  )
+  logger.info(
+    `\nOnce your site is running, access the CMS at ${linkText(
+      '<YourDevURL>/admin/index.html'
+    )}`
+  )
 }
-const logSteps = {
+const frameworkDevCmds = {
   other: ({ packageManager }: { packageManager: string }) => {
     const packageManagers = {
       pnpm: `pnpm`,
       npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
       yarn: `yarn`,
     }
-    logger.info(`
-  ${successText('TinaCMS has been initialized, to get started run:')}
-  
-      ${packageManagers[packageManager]} tinacms dev -c "<your dev command>"
-  `)
+    const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
+    return installText
   },
   next: ({ packageManager }: { packageManager: string }) => {
     const packageManagers = {
@@ -286,16 +299,8 @@ const logSteps = {
       npm: `npm run`, // npx is the way to run executables that aren't in your "scripts"
       yarn: `yarn`,
     }
-    logger.info(`
-  ${successText('TinaCMS has been initialized, to get started run:')}
-  
-     "${packageManagers[packageManager]} dev"
-  `)
-    logger.info(`
-  ${successText(
-    'TinaCMS user interface is available at: <YourDevURL>/admin/index.html'
-  )}
-  `)
+    const installText = `${packageManagers[packageManager]} dev`
+    return installText
   },
 }
 

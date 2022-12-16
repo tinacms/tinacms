@@ -519,12 +519,24 @@ export interface Schema {
   collections: Collection[]
 }
 
+export type TokenObject = {
+  id_token: string
+  access_token: string
+  refresh_token: string
+}
+
 export interface Config<
   CMSCallback = undefined,
   FormifyCallback = undefined,
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  admin?: {
+    auth?: {
+      onLogin?: (args: { token: TokenObject }) => Promise<void>
+      onLogout?: () => Promise<void>
+    }
+  }
   // schema: TinaCloudSchema<false>
   /**
    * The Schema is used to define the shape of the content.

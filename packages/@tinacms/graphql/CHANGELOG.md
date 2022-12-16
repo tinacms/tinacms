@@ -1,5 +1,24 @@
 # tina-graphql
 
+## 1.0.3
+
+### Patch Changes
+
+- de37c9eff: Content is now merged with existing content. This means if you have a field that is not defined in the schema it will not be overridden.
+- Updated dependencies [7495f032b]
+- Updated dependencies [de37c9eff]
+  - @tinacms/schema-tools@1.0.3
+  - @tinacms/mdx@1.0.3
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/schema-tools@1.0.2
+  - @tinacms/mdx@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

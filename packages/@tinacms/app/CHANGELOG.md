@@ -1,5 +1,48 @@
 # @tinacms/app
 
+## 1.0.3
+
+### Patch Changes
+
+- 66ed1452b: Updated so that `useEditState` does not require `useTina` to be called first.
+
+## 1.0.2
+
+### Patch Changes
+
+- f13878798: Fix a bug where meta data was added to the form values payload
+- c62d2bad4: Fix issue where tailwind styles from within the user config weren't being picked up
+
+## 1.0.1
+
+### Patch Changes
+
+- 38438bad6: use env vars when building
+- 78b9668b1: Fix issue with formify logic that returned undefined for falsy values like "" or 0
+- 0b2164645: Simplifies preview markup
+- 7c1425a82: - Add active field for iframe
+  - Introduce `tinaField` utility helper
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+- 9d4943a82: Fix issue resolving alias fields when passing through the `useTina` hook
+
 ## 1.0.0
 
 ### Major Changes

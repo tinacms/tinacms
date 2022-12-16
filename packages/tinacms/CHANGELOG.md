@@ -1,5 +1,54 @@
 # tinacms
 
+## 1.1.1
+
+### Patch Changes
+
+- 7495f032b: Added `onLogout` hook function and a logout redirect page in the admin
+- 64599e300: Enable custom component for lic in TinaMarkdown
+- de693ea17: remove network request for redundant collection fetch
+- Updated dependencies [7495f032b]
+- Updated dependencies [de37c9eff]
+- Updated dependencies [de693ea17]
+  - @tinacms/schema-tools@1.0.3
+  - @tinacms/toolkit@1.1.1
+
+## 1.1.0
+
+### Minor Changes
+
+- 11b32f712: Enable custom component for text in TinaMarkdown
+
+## 1.0.2
+
+### Patch Changes
+
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
+- Updated dependencies [5a1e6faaf]
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [7c1425a82]
+- Updated dependencies [c1ac4bf10]
+  - @tinacms/toolkit@1.1.0
+  - @tinacms/schema-tools@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

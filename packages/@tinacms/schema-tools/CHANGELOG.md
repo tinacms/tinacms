@@ -1,5 +1,36 @@
 # @tinacms/schema-tools
 
+## 1.0.3
+
+### Patch Changes
+
+- 7495f032b: Added `onLogout` hook function and a logout redirect page in the admin
+- de37c9eff: Content is now merged with existing content. This means if you have a field that is not defined in the schema it will not be overridden.
+
+## 1.0.2
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- c1ac4bf10: Added a `onLogin` Callback function that is called when the user logs in.
+
+  EX:
+
+  ```ts
+  import { defineConfig } from 'tinacms'
+
+  export default defineConfig({
+    admin: {
+      auth: {
+        onLogin: () => {
+          console.log('On Log in!')
+        },
+      },
+    },
+    /// ...
+  })
+  ```
+
 ## 1.0.1
 
 ### Patch Changes

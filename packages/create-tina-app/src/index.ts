@@ -25,6 +25,12 @@ import { exit } from 'process'
 import { EXAMPLES, downloadExample } from './examples'
 import { preRunChecks } from './util/preRunChecks'
 
+const successText = chalk.bold.green
+const linkText = chalk.bold.cyan
+const cmdText = chalk.inverse
+
+const logText = chalk.italic.gray
+
 const program = new Command(name)
 let projectName = ''
 program
@@ -138,55 +144,44 @@ export const run = async () => {
 
   await downloadExample(chosenExample, root)
 
-  console.log('Installing packages. This might take a couple of minutes.')
+  console.log(
+    logText('Installing packages. This might take a couple of minutes.')
+  )
   console.log()
 
   // Run install command
   await install(root, null, { useYarn, isOnline: true })
-  console.log(chalk.green('Finished installing all packages'))
-  console.log()
 
   if (tryGitInit(root)) {
-    console.log('Initialized a git repository.')
+    console.log(logText('Initializing git repository.'))
     console.log()
   }
 
-  console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
+  console.log(`${successText('Starter successfully created!')}`)
 
-  // We can add this back in if we want
-  // console.log('Inside that directory, you can run several commands:')
-  // console.log()
-  // console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}dev`))
-  // console.log('    Starts the development server.')
-  // console.log()
-  // console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`))
-  // console.log('    Builds the app for production.')
-  // console.log()
-  // console.log(chalk.cyan(`  ${displayedCommand} start`))
-  // console.log('    Runs the built app in production mode.')
-  // console.log()
-  // console.log('We suggest that you begin by typing:')
-  console.log(chalk.bold('\tTo launch your app, run:'))
-  console.log()
-  console.log(chalk.cyan('  cd'), appName)
+  console.log(chalk.bold('\nTo launch your app, run:\n'))
+  console.log('  ' + cmdText(`cd ${appName}`))
   console.log(
-    `  ${chalk.cyan(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
+    '  ' + `${cmdText(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
   )
   console.log()
-  console.log(chalk.bold('  Next steps:'))
+  console.log('Next steps:')
   console.log()
-  console.log('- Go to http://localhost:3000/admin to enter edit-mode')
   console.log(
-    '- Edit some content on http://localhost:3000 (See https://tina.io/docs/using-tina-editor )'
+    `• 📝 Edit some content on ${linkText(
+      'http://localhost:3000'
+    )} (See ${linkText('https://tina.io/docs/using-tina-editor')})`
   )
   console.log(
-    '- Check out our concept docs, to learn how Tina powers the starters under the hood. (See https://tina.io/docs/schema/)'
+    `• 📖 Learn the basics: ${linkText('https://tina.io/docs/schema/')}`
   )
   console.log(
-    '- Learn how Tina can be extended to create new field components. (See https://tina.io/docs/advanced/extending-tina/) '
+    `• 🖌️ Extend Tina with custom field components: ${linkText(
+      'https://tina.io/docs/advanced/extending-tina/'
+    )}`
   )
   console.log(
-    '- Make your site editable with Tina on production. (See https://tina.io/docs/tina-cloud/)'
+    `• 🚀 Deploy to Production: ${linkText('https://tina.io/docs/tina-cloud/')}`
   )
 }
 

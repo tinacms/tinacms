@@ -97,10 +97,10 @@ union MovieDirector = Director
 type Movie implements Node & Document {
   title: String
   releaseDate: String
-  rating: Float!
   archived: Boolean
-  genre: String
   director: MovieDirector
+  genre: String
+  rating: Float!
   body: String
   id: ID!
   _sys: SystemInfo!
@@ -122,6 +122,15 @@ input DatetimeFilter {
   in: [String]
 }
 
+input BooleanFilter {
+  eq: Boolean
+  exists: Boolean
+}
+
+input MovieDirectorFilter {
+  director: DirectorFilter
+}
+
 input NumberFilter {
   lt: Float
   lte: Float
@@ -132,22 +141,13 @@ input NumberFilter {
   in: [Float]
 }
 
-input BooleanFilter {
-  eq: Boolean
-  exists: Boolean
-}
-
-input MovieDirectorFilter {
-  director: DirectorFilter
-}
-
 input MovieFilter {
   title: StringFilter
   releaseDate: DatetimeFilter
-  rating: NumberFilter
   archived: BooleanFilter
-  genre: StringFilter
   director: MovieDirectorFilter
+  genre: StringFilter
+  rating: NumberFilter
   body: StringFilter
 }
 
@@ -326,10 +326,10 @@ input DocumentMutation {
 input MovieMutation {
   title: String
   releaseDate: String
-  rating: Float
   archived: Boolean
-  genre: String
   director: String
+  genre: String
+  rating: Float
   body: String
 }
 

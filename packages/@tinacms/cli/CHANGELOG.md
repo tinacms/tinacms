@@ -1,5 +1,41 @@
 # tinacms-cli
 
+## 1.0.4
+
+### Patch Changes
+
+- e0f71d4bd: Update the error message to include context from the server
+- Updated dependencies [66ed1452b]
+- Updated dependencies [7495f032b]
+- Updated dependencies [de37c9eff]
+  - @tinacms/app@1.0.3
+  - @tinacms/schema-tools@1.0.3
+  - @tinacms/graphql@1.0.3
+
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [f13878798]
+- Updated dependencies [c62d2bad4]
+  - @tinacms/app@1.0.2
+
+## 1.0.2
+
+### Patch Changes
+
+- c91bc0fc9: Tweak CLI styling for create-tina-app, tinacms dev, and tinacms init
+- Updated dependencies [38438bad6]
+- Updated dependencies [c91bc0fc9]
+- Updated dependencies [78b9668b1]
+- Updated dependencies [0b2164645]
+- Updated dependencies [7c1425a82]
+- Updated dependencies [c1ac4bf10]
+- Updated dependencies [9d4943a82]
+  - @tinacms/app@1.0.1
+  - @tinacms/schema-tools@1.0.2
+  - @tinacms/graphql@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes

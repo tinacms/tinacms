@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/starter-iframe",
-  "version": "0.1.10",
+  "version": "0.1.13",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",

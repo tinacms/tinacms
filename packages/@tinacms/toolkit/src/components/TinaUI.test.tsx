@@ -29,6 +29,11 @@ describe('TinaUI', () => {
         enabled: true,
         sidebar: true,
       })
+      cms.registerApi('admin', {
+        fetchCollections: () => {
+          return []
+        },
+      })
 
       it('renders children', () => {
         const app = render(
@@ -113,6 +118,12 @@ describe('TinaUI', () => {
           enabled: false,
           sidebar: true,
         })
+        cms.registerApi('admin', {
+          fetchCollections: () => {
+            return []
+          },
+        })
+
         const onMount = jest.fn()
         function Child() {
           useEffect(onMount, [])

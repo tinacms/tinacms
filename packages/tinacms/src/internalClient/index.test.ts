@@ -11,19 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Client } from './index'
+import { Client, LocalClient } from './index'
 
 describe('Tina Client', () => {
   describe('With localhost contentAPI URL', () => {
     let client: Client
 
     beforeEach(() => {
-      client = new Client({
-        clientId: '',
-        branch: 'main',
-        tokenStorage: 'LOCAL_STORAGE',
-        customContentApiUrl: 'http://localhost:4001',
-      })
+      client = new LocalClient()
     })
     it('sets isLocalMode', () => {
       expect(client.isLocalMode).toEqual(true)

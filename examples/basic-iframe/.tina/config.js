@@ -1,6 +1,18 @@
 import { defineConfig } from 'tinacms'
 
 export default defineConfig({
+  admin: {
+    auth: {
+      onLogin: () => {
+        console.log('Logged in!')
+        // hook function to be called when the user logs in
+      },
+      onLogout: () => {
+        console.log('Logged out!')
+        // hook function to be called when the user logs out
+      },
+    },
+  },
   branch: '',
   clientId: null,
   token: null,
