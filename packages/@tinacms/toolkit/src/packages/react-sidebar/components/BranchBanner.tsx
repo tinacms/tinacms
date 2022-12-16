@@ -66,11 +66,16 @@ export const BranchBanner = () => {
           disabled={previewState !== PREVIEW_STATE.PREVIEW_READY}
         >
           {previewState === PREVIEW_STATE.WAITING_FOR_PREVIEW ? (
-            <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 animate-spin" />
+            <>
+              <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 animate-spin" />{' '}
+              Building
+            </>
           ) : (
-            <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70" />
+            <>
+              <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70" />{' '}
+              Preview
+            </>
           )}
-          Preview
         </Button>
       </div>
       {open && (
@@ -91,6 +96,7 @@ interface SubmitModalProps {
 const BranchSelector = ({ openModal }) => {
   const [listState, setListState] = React.useState('loading')
   const [branchList, setBranchList] = React.useState([])
+  const cms = useCMS()
   const { branch } = useCMS().api.tina || 'main'
   // const isDefaultBranch = branch === 'main' || branch === 'master'
   const tinaApi = useCMS().api.tina
@@ -112,6 +118,15 @@ const BranchSelector = ({ openModal }) => {
     refreshBranchList()
   }, [tinaApi])
 
+  const changeBranch = (event) => {
+    if (event.target.value === 'create-new-branch') {
+      openModal()
+    } else {
+      setCurrentBranch(event.target.value)
+      cms.alerts.success('Switched to branch ' + event.target.value + '.')
+    }
+  }
+
   if (listState === 'loading') {
     return (
       <span className="flex items-center gap-1 form-select h-7 px-2 ml-1 border border-gray-200 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize">
@@ -124,14 +139,7 @@ const BranchSelector = ({ openModal }) => {
   return (
     <select
       className="inline-block form-select h-7 pl-1 pr-3 ml-1 border border-gray-200 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize"
-      onChange={(event) => {
-        console.log(event.target.value)
-        if (event.target.value === 'create-new-branch') {
-          openModal()
-        } else {
-          setCurrentBranch(event.target.value)
-        }
-      }}
+      onChange={changeBranch}
     >
       {branchList.length > 0 &&
         branchList.map((branchOption) => {
