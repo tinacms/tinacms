@@ -67,7 +67,7 @@ export const BranchBanner = () => {
             <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" />
           )}
           {previewState === PREVIEW_STATE.PREVIEW_READY && (
-            <a href={previewUrl}>
+            <a className="flex" href={previewUrl}>
               <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
               {/* <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" /> */}
               Preview
