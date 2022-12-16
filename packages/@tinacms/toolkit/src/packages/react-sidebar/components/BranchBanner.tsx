@@ -98,25 +98,23 @@ const BranchSelector = ({ openModal }) => {
   const [branchList, setBranchList] = React.useState([])
   const cms = useCMS()
   const { branch } = useCMS().api.tina || 'main'
-  // const isDefaultBranch = branch === 'main' || branch === 'master'
-  const tinaApi = useCMS().api.tina
   const { setCurrentBranch } = useBranchData()
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading')
-    await tinaApi
+    await cms.api.tina
       .listBranches()
       .then((data) => {
         setBranchList(data)
         setListState('ready')
       })
       .catch(() => setListState('error'))
-  }, [tinaApi])
+  }, [cms])
 
   React.useEffect(() => {
-    if (!tinaApi) return
+    if (!cms) return
     refreshBranchList()
-  }, [tinaApi])
+  }, [cms])
 
   const changeBranch = (event) => {
     if (event.target.value === 'create-new-branch') {
