@@ -94,6 +94,7 @@ interface SubmitModalProps {
 }
 
 const BranchSelector = ({ openModal }) => {
+  const selectRef = React.useRef<HTMLSelectElement>(null)
   const [listState, setListState] = React.useState('loading')
   const [branchList, setBranchList] = React.useState([])
   const cms = useCMS()
@@ -122,6 +123,7 @@ const BranchSelector = ({ openModal }) => {
     } else {
       setCurrentBranch(event.target.value)
       cms.alerts.success('Switched to branch ' + event.target.value + '.')
+      selectRef.current.blur()
     }
   }
 
@@ -138,6 +140,7 @@ const BranchSelector = ({ openModal }) => {
     <select
       className="inline-block form-select h-7 pl-1 pr-3 ml-1 border border-gray-200 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize"
       onChange={changeBranch}
+      ref={selectRef}
     >
       {branchList.length > 0 &&
         branchList.map((branchOption) => {
