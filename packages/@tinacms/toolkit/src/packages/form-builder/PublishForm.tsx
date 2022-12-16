@@ -158,11 +158,13 @@ const SubmitModal = ({ close, publishCommit, client }: SubmitModalProps) => {
           )}
           {modalState === 'setupPullRequest' && (
             <div>
+              {/* @ts-ignore PR FOR DEMO ONLY */}
               <BaseTextField
                 placeholder="Description"
                 value={pullRequestTitle}
                 onChange={(e) => setPullRequestTitle(e.target.value)}
               />
+              {/* @ts-ignore PR FOR DEMO ONLY */}
               <BaseTextField
                 placeholder="Branch Name"
                 value={branchName}
