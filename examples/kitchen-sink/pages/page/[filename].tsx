@@ -21,6 +21,17 @@ export default function Home(
       >
         Click me
       </button>
+      <button
+        onClick={(e) => {
+          e.preventDefault()
+          window?.parent?.postMessage(
+            { type: 'updateData', field: 'title', data: 'This is a test!' },
+            window.location.origin
+          )
+        }}
+      >
+        Click me to update title
+      </button>
       <Json src={data} />
     </>
   )

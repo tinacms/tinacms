@@ -57,6 +57,32 @@ export const Preview = (
             console.log('unable to find a field')
           }
         }
+        // @ts-ignore
+        if (event.data.type === 'updateData') {
+          const forms = cms.plugins.getType<Form>('form').all()
+          const form = forms[0]
+          const id = typeof form !== 'undefined' ? form?.id : ''
+          console.log(`got event with type update data`)
+          if (id) {
+            console.log('dispatch from updateData')
+            const formValue = event.data?.data
+            // @ts-ignore
+            const fieldName: string = event.data?.field
+            const field = form.finalForm.getFieldState(fieldName)
+
+            field?.change(formValue)
+            cms.events.dispatch({
+              type: `forms:fields:onChange`,
+              value: formValue,
+              previousValue: '',
+              mutationType: { type: 'change' },
+              formId: id,
+              field,
+            })
+          } else {
+            console.log('unable to find a field')
+          }
+        }
       })
     }
   }, [props.iframeRef.current])
