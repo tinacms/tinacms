@@ -26,10 +26,10 @@ const usePreviewStatus = () => {
       )
       const res = await client.vercelStatus({ pullNumber })
 
-      if (res.status.toLowerCase() === 'ready') {
+      if (res.status?.toLowerCase() === 'ready') {
         setPreviewUrl(res.previewUrl)
         setPreviewState(PREVIEW_STATE.PREVIEW_READY)
-      } else if (res.status.toLowerCase() === 'building') {
+      } else if (res.status?.toLowerCase() === 'building') {
         setPreviewState(PREVIEW_STATE.WAITING_FOR_PREVIEW)
       } // TODO handle error
     }, 2000)
@@ -37,7 +37,7 @@ const usePreviewStatus = () => {
   }, [client, previewState, previewUrl, setPreviewState, setPreviewUrl, cms])
 
   return {
-    previewUrl,
+    previewUrl: previewUrl + window.location.href.split('#/~')[1],
     previewState,
   }
 }
@@ -67,7 +67,7 @@ export const BranchBanner = () => {
             <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" />
           )}
           {previewState === PREVIEW_STATE.PREVIEW_READY && (
-            <a className="flex" href={previewUrl}>
+            <a className="flex" target="_blank" href={previewUrl}>
               <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
               {/* <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" /> */}
               Preview
