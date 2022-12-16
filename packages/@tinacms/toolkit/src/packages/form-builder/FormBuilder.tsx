@@ -146,29 +146,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
 
-  // const mockCreatePullRequest = async ({
-  //   title,
-  //   branch,
-  //   baseBranch,
-  // } : {
-  //   title: string,
-  //   branch: string,
-  //   baseBranch: string,
-  // }) => {
-  //   await new Promise((p) => setTimeout(p, 500))
-  //   return Promise.resolve({
-  //     pullNumber: 42,
-  //   })
-  // }
-  //
-  // const mockVercelStatus = async () => {
-  //   await new Promise((p) => setTimeout(p, 500))
-  //   return Promise.resolve({
-  //     status: 'ready',
-  //     previewUrl: 'https://vercel.com'
-  //   })
-  // }
-
   return (
     <FinalForm
       form={finalForm}
