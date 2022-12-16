@@ -1,10 +1,8 @@
-import { Actions } from "../actions";
-import { Section } from "../section";
-import { Container } from "../container";
-import { Icon } from "../icon";
-import type { TinaTemplate } from "tinacms";
-import { iconSchema } from "../icon";
-import { tinaField as tField } from "tinacms/dist/react";
+import { Actions } from "../util/actions";
+import { Section } from "../util/section";
+import { Container } from "../util/container";
+import { Icon } from "../util/icon";
+import { iconSchema } from "../util/icon";
 
 export const Feature = ({ featuresColor, data, tinaField }) => {
   return (
@@ -15,9 +13,9 @@ export const Feature = ({ featuresColor, data, tinaField }) => {
     >
       {data.icon && (
         <Icon
-          tinaField={tField(data, "icon")}
+          tinaField={`${tinaField}.icon`}
           parentColor={featuresColor}
-          data={data.icon}
+          data={{ size: "large", ...data.icon }}
         />
       )}
       {data.title && (
@@ -52,7 +50,7 @@ export const Features = ({ data, parentField }) => {
           data.items.map(function (block, i) {
             return (
               <Feature
-                tinaField={tField(block)}
+                tinaField={`${parentField}.items.${i}`}
                 featuresColor={data.color}
                 key={i}
                 data={block}
@@ -74,7 +72,7 @@ const defaultFeature = {
   },
 };
 
-export const featureBlockShema: TinaTemplate = {
+export const featureBlockSchema = {
   name: "features",
   label: "Features",
   ui: {
@@ -90,6 +88,11 @@ export const featureBlockShema: TinaTemplate = {
       name: "items",
       list: true,
       ui: {
+        itemProps: (item) => {
+          return {
+            label: item?.title,
+          };
+        },
         defaultItem: {
           ...defaultFeature,
         },

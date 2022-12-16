@@ -1,14 +1,13 @@
 import * as React from "react";
-import { Actions } from "../actions";
-import { Container } from "../container";
-import { Section } from "../section";
-import { ThemeContext } from "../theme";
+import { Actions } from "../util/actions";
+import { Container } from "../util/container";
+import { Section } from "../util/section";
+import { useTheme } from "../layout";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 import type { TinaTemplate } from "tinacms";
-import { tinaField } from "tinacms/dist/react";
 
 export const Hero = ({ data, parentField }) => {
-  const theme = React.useContext(ThemeContext);
+  const theme = useTheme();
   const headlineColorClasses = {
     blue: "from-blue-400 to-blue-600",
     teal: "from-teal-400 to-teal-600",
@@ -24,12 +23,12 @@ export const Hero = ({ data, parentField }) => {
     <Section color={data.color}>
       <Container
         size="large"
-        className="grid grid-cols-1 lg:grid-cols-3 gap-x-10 gap-y-8 items-center justify-center"
+        className="grid grid-cols-1 lg:grid-cols-5 gap-14 items-center justify-center"
       >
-        <div className="row-start-2 lg:row-start-1 lg:col-start-1 lg:col-end-3 text-center lg:text-left">
+        <div className="row-start-2 lg:row-start-1 lg:col-span-3 text-center lg:text-left">
           {data.tagline && (
             <h2
-              data-tinafield={tinaField(data, "tagline")}
+              data-tinafield={`${parentField}.tagline`}
               className="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20"
             >
               {data.tagline}
@@ -38,7 +37,7 @@ export const Hero = ({ data, parentField }) => {
           )}
           {data.headline && (
             <h3
-              data-tinafield={tinaField(data, "headline")}
+              data-tinafield={`${parentField}.headline`}
               className={`w-full relative	mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font`}
             >
               <span
@@ -54,7 +53,7 @@ export const Hero = ({ data, parentField }) => {
           )}
           {data.text && (
             <div
-              data-tinafield={tinaField(data, "text")}
+              data-tinafield={`${parentField}.text`}
               className={`prose prose-lg mx-auto lg:mx-0 mb-10 ${
                 data.color === "primary" ? `prose-primary` : `dark:prose-dark`
               }`}
@@ -77,7 +76,12 @@ export const Hero = ({ data, parentField }) => {
             className="row-start-1 flex justify-center"
           >
             <img
-              className="w-full max-w-xs lg:max-w-none h-auto"
+              className="absolute w-full rounded-lg max-w-xs lg:max-w-none h-auto blur-2xl brightness-150 contrast-[0.9] dark:brightness-150 saturate-200 opacity-50 dark:opacity-30 mix-blend-multiply dark:mix-blend-hard-light"
+              src={data.image.src}
+              aria-hidden="true"
+            />
+            <img
+              className="relative z-10 w-full max-w-xs rounded-lg lg:max-w-none h-auto"
               alt={data.image.alt}
               src={data.image.src}
             />
@@ -127,6 +131,7 @@ export const heroBlockSchema: TinaTemplate = {
           icon: true,
           link: "/",
         },
+        itemProps: (item) => ({ label: item.label }),
       },
       fields: [
         {

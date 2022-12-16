@@ -1,5 +1,5 @@
-import { Container } from "../components/container";
-import { Section } from "../components/section";
+import { Container } from "../components/util/container";
+import { Section } from "../components/util/section";
 import { Posts } from "../components/posts";
 import { client } from "../.tina/__generated__/client";
 import { Layout } from "../components/layout";
@@ -16,7 +16,7 @@ export default function HomePage(
   return (
     <Layout>
       <Section className="flex-1">
-        <Container size="large">
+        <Container size="large" width="small">
           <Posts data={posts} />
         </Container>
       </Section>
@@ -25,7 +25,7 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
-  const tinaProps = await client.queries.PageQuery();
+  const tinaProps = await client.queries.pageQuery();
   return {
     props: {
       ...tinaProps,

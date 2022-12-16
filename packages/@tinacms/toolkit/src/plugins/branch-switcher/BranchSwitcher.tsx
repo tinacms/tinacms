@@ -26,12 +26,13 @@ type ListState = 'loading' | 'ready' | 'error'
 export const BranchSwitcher = ({
   listBranches,
   createBranch,
+  chooseBranch,
 }: BranchSwitcherProps) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
-  const { currentBranch, setCurrentBranch } = useBranchData()
+  const { currentBranch } = useBranchData()
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -39,7 +40,7 @@ export const BranchSwitcher = ({
       branchName: value,
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      setCurrentBranch(createdBranchName)
+      chooseBranch(createdBranchName)
       await refreshBranchList()
     })
   }, [])
@@ -102,7 +103,7 @@ export const BranchSwitcher = ({
                   handleCreateBranch(newBranch)
                 }}
                 onChange={(branchName) => {
-                  setCurrentBranch(branchName)
+                  chooseBranch(branchName)
                 }}
               />
             ) : (

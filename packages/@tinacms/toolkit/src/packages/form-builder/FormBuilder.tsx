@@ -17,16 +17,17 @@ import { Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '../styles'
 import { ModalProvider } from '../react-modals'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
 import { ResetForm } from './ResetForm'
+import { PublishForm } from './PublishForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { IoMdClose } from 'react-icons/io'
+import { useBranchData } from '../../plugins/branch-switcher'
 
 export interface FormBuilderProps {
   form: Form
@@ -94,12 +95,18 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
+  const cms = useCMS()
+  const { currentBranch } = useBranchData()
+  //todo - should probably pull this from the api to grab true default branch
+  const isDefaultBranch = currentBranch === 'main' || currentBranch === 'master'
+  // cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
+
+  // console.log({isDefaultBranch }, cms.api.tina.branch)
+  console.log({ currentBranch, isDefaultBranch })
   const finalForm = tinaForm.finalForm
   const [activeFields, setActiveFields] = React.useState(null)
   const [selectedField, setSelectedField] = React.useState(null)
   const [path, setPath] = React.useState(null)
-
-  const cms = useCMS()
 
   React.useMemo(() => {
     cms.events.subscribe('field:selected', (e) => {
@@ -295,8 +302,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         {tinaForm.buttons.reset}
                       </ResetForm>
                     )}
-                    <Button
-                      onClick={() => handleSubmit()}
+                    <PublishForm
+                      pristine={pristine}
+                      submit={handleSubmit}
+                      isDefaultBranch={isDefaultBranch}
+                      //@ts-ignore
+                      variant="primary"
+                      style={{ flexBasis: '10rem' }}
                       disabled={
                         pristine ||
                         submitting ||
@@ -304,12 +316,11 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         (invalid && !dirtySinceLastSubmit)
                       }
                       busy={submitting}
-                      variant="primary"
-                      style={{ flexGrow: 3 }}
+                      client={cms.api.tina}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
-                    </Button>
+                    </PublishForm>
                     {tinaForm.actions.length > 0 && (
                       <FormActionMenu
                         form={tinaForm as any}
@@ -347,6 +358,11 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
   React.useEffect(() => {
     setI((i) => i + 1)
   }, [tinaForm])
+
+  const cms = useCMS()
+  //todo - should probably pull this from the api to grab true default branch
+  const isDefaultBranch =
+    cms.api.tina.branch == 'main' || cms.api.tina.branch == 'master'
 
   const finalForm = tinaForm.finalForm
 
@@ -394,16 +410,18 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                         {tinaForm.buttons.reset}
                       </ResetForm>
                     )}
-                    <Button
-                      onClick={() => handleSubmit()}
-                      disabled={pristine || submitting || invalid}
-                      busy={submitting}
+
+                    <PublishForm
+                      pristine={pristine}
+                      submit={handleSubmit}
+                      isDefaultBranch={isDefaultBranch}
+                      //@ts-ignore
                       variant="primary"
                       style={{ flexBasis: '10rem' }}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
-                    </Button>
+                    </PublishForm>
                     {tinaForm.actions.length > 0 && (
                       <FormActionMenu
                         form={tinaForm as any}
@@ -492,7 +510,6 @@ const useOnChangeEventDispatch = ({
     )
   }, [subscribe, setFormValues])
   const cms = useCMS()
-
   React.useEffect(() => {
     if (newUpdate?.name === 'reset') {
       cms.events.dispatch({
