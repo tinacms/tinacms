@@ -158,11 +158,13 @@ const SubmitModal = ({ close, publishCommit, client }: SubmitModalProps) => {
           )}
           {modalState === 'setupPullRequest' && (
             <div>
-              <BaseTextField
-                placeholder="Description"
-                value={pullRequestTitle}
-                onChange={(e) => setPullRequestTitle(e.target.value)}
-              />
+              <div className="mb-4">
+                <BaseTextField
+                  placeholder="Name"
+                  value={pullRequestTitle}
+                  onChange={(e) => setPullRequestTitle(e.target.value)}
+                />
+              </div>
               <BaseTextField
                 placeholder="Branch Name"
                 value={branchName}
@@ -207,11 +209,12 @@ const SubmitModal = ({ close, publishCommit, client }: SubmitModalProps) => {
             <Button
               style={{ flexGrow: 2 }}
               onClick={() => handleCreatePullRequest()}
+              variant="primary"
               disabled={
                 branchName.length === 0 || modalState === 'creatingPullRequest'
               }
             >
-              Create Preview
+              Create Branch
             </Button>
           )}
           {modalState === 'previewReady' && (

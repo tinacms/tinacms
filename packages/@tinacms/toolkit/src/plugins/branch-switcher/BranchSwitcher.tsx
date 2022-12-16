@@ -26,6 +26,7 @@ type ListState = 'loading' | 'ready' | 'error'
 
 export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
   const [newBranchName, setNewBranchName] = React.useState('')
+  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
   const [isCreating, setIsCreating] = React.useState(false)
   const { currentBranch } = useBranchData()
 
@@ -41,28 +42,34 @@ export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
   }, [])
 
   return (
-    <div className="w-full flex justify-between items-center w-full gap-3">
+    <div className="w-full flex flex-col items-stretch w-full gap-4">
       <BaseTextField
-        placeholder="Branch Name"
+        placeholder="Name"
         value={newBranchName}
         disabled={isCreating}
         onChange={(e) => setNewBranchName(e.target.value)}
       />
+      <BaseTextField
+        placeholder="Branch Name"
+        value={branchName}
+        disabled={true}
+        readOnly
+      />
       <Button
-        className="flex-0 flex items-center gap-2 whitespace-nowrap"
+        className="flex-grow flex items-center gap-2 whitespace-nowrap"
         size="medium"
         variant="primary"
         disabled={isCreating}
-        onClick={() => handleCreateBranch(newBranchName)}
+        onClick={() => handleCreateBranch(branchName)}
       >
         {isCreating ? (
           <>
             <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
-            New
+            Branch
           </>
         ) : (
           <>
-            <BiPlus className="w-5 h-auto opacity-70" /> Create New
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
           </>
         )}
       </Button>
