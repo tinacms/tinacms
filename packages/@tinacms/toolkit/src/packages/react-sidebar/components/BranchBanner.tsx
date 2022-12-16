@@ -6,9 +6,47 @@ import { useCMS } from '../../../react-tinacms'
 import { Modal, ModalBody, ModalHeader, PopupModal } from '../../react-modals'
 import { Button } from '../../styles'
 
+enum PREVIEW_STATE {
+  NOT_AVAILABLE,
+  WAITING_FOR_PREVIEW,
+  PREVIEW_READY,
+}
+const usePreviewStatus = () => {
+  const cms = useCMS()
+  const client = cms.api.tina
+
+  const [previewUrl, setPreviewUrl] = React.useState('')
+  const [previewState, setPreviewState] = React.useState<PREVIEW_STATE>(
+    PREVIEW_STATE.NOT_AVAILABLE
+  )
+  React.useEffect(() => {
+    const interval = setInterval(async () => {
+      const pullNumber = window.localStorage.getItem(
+        'tinacms-current-pull-number'
+      )
+      const res = await client.vercelStatus({ pullNumber })
+
+      if (res.status.toLowerCase() === 'ready') {
+        setPreviewUrl(res.previewUrl)
+        setPreviewState(PREVIEW_STATE.PREVIEW_READY)
+      } else if (res.status.toLowerCase() === 'building') {
+        setPreviewState(PREVIEW_STATE.WAITING_FOR_PREVIEW)
+      } // TODO handle error
+    }, 2000)
+    return () => clearInterval(interval)
+  }, [client, previewState, previewUrl, setPreviewState, setPreviewUrl, cms])
+
+  return {
+    previewUrl,
+    previewState,
+  }
+}
+
 export const BranchBanner = () => {
   const [open, setOpen] = React.useState(false)
   const openModal = () => setOpen(true)
+
+  const { previewUrl, previewState } = usePreviewStatus()
 
   return (
     <>
@@ -23,10 +61,21 @@ export const BranchBanner = () => {
           size="custom"
           variant="white"
           onClick={() => {}}
+          disabled={previewState !== PREVIEW_STATE.PREVIEW_READY}
         >
-          <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
-          {/* <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" /> */}
-          Preview
+          {previewState === PREVIEW_STATE.WAITING_FOR_PREVIEW && (
+            <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" />
+          )}
+          {previewState === PREVIEW_STATE.PREVIEW_READY && (
+            <a href={previewUrl}>
+              <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
+              {/* <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" /> */}
+              Preview
+            </a>
+          )}
+          {previewState === PREVIEW_STATE.NOT_AVAILABLE && (
+            <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70 mr-1" />
+          )}
         </Button>
       </div>
       {open && (
