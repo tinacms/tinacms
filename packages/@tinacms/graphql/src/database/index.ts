@@ -819,9 +819,16 @@ export class Database {
       const indexDefinitions = await this.getIndexDefinitions()
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
-
+    this.level.sublevel<string, Record<string, any>>(
+      ROOT_PREFIX,
+      SUBLEVEL_OPTIONS
+    )
     const itemKey = normalizePath(filepath)
-    const item = await this.level.get(itemKey)
+    const rootSublevel = this.level.sublevel<string, Record<string, any>>(
+      ROOT_PREFIX,
+      SUBLEVEL_OPTIONS
+    )
+    const item = await rootSublevel.get(itemKey)
     if (item) {
       await this.level.batch([
         ...makeIndexOpsForDocument<Record<string, any>>(
@@ -832,7 +839,11 @@ export class Database {
           'del',
           this.level
         ),
-        { type: 'del', key: itemKey },
+        {
+          type: 'del',
+          key: itemKey,
+          sublevel: rootSublevel,
+        },
       ])
     }
 
