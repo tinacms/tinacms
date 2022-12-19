@@ -37,8 +37,7 @@ interface NavProps {
   userName?: string
   showCollections: boolean
   collectionsInfo: {
-    collections: { label: string; name: string }[]
-    loading: boolean
+    collections: { label?: string; name: string }[]
   }
   contentCreators?: any
   screens?: ScreenPlugin[]
@@ -123,16 +122,19 @@ export const Nav = ({
                     <Menu.Item>
                       <button
                         className={`text-lg px-4 py-2 first:pt-3 last:pb-3 tracking-wide whitespace-nowrap flex items-center opacity-80 text-gray-600 hover:text-blue-400 hover:bg-gray-50 hover:opacity-100`}
-                        onClick={() => {
+                        onClick={async () => {
                           updateBodyDisplacement({
                             displayState: 'closed',
                             sidebarWidth: null,
                             resizingSidebar: false,
                           })
-                          setEdit(false)
-                          if (cms?.api?.tina?.onLogout) {
-                            cms.api.tina.onLogout()
+                          if (cms?.api?.tina?.logout) {
+                            await cms.api.tina.logout()
+                            if (cms?.api?.tina?.onLogout) {
+                              await cms?.api?.tina?.onLogout()
+                            }
                           }
+                          setEdit(false)
                         }}
                       >
                         <BiExit className="w-6 h-auto mr-2 text-blue-400" /> Log
@@ -220,19 +222,13 @@ export const Nav = ({
 
 const CollectionsList = ({
   collections,
-  loading,
   RenderNavCollection,
 }: {
-  collections: { label: string; name: string }[]
-  loading: boolean
+  collections: { label?: string; name: string }[]
   RenderNavCollection: React.ComponentType<{
-    collection: { label: string; name: string }
+    collection: { label?: string; name: string }
   }>
 }) => {
-  if (loading === true) {
-    return <LoadingDots color="var(--tina-color-primary)" />
-  }
-
   if (collections.length === 0) {
     return <div>No collections found</div>
   }

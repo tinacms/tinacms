@@ -11,52 +11,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import type { Collection } from '../types'
 import { TinaAdminApi } from '../api'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 export const useGetCollections = (cms: TinaCMS) => {
   const api = new TinaAdminApi(cms)
-  const [collections, setCollections] = useState<Collection[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<Error | undefined>(undefined)
-
-  useEffect(() => {
-    const fetchCollections = async () => {
-      if (await api.isAuthenticated()) {
-        try {
-          const collections = await api.fetchCollections()
-          setCollections(collections)
-        } catch (error) {
-          console.error(error)
-          setCollections([])
-          setError(error)
-          throw new Error(
-            `[${error.name}] GetCollections failed: ${error.message}`
-          )
-        }
-
-        setLoading(false)
-      }
-    }
-
-    setLoading(true)
-    fetchCollections()
-  }, [cms])
-
-  return { collections, loading, error }
+  return { collections: api.fetchCollections() }
 }
 
 const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
-  const { collections, loading, error } = useGetCollections(cms)
+  const { collections } = useGetCollections(cms)
 
-  if (loading || error) {
-    return null
-  }
-
-  return <>{children(collections, loading)}</>
+  return <>{children(collections)}</>
 }
 
 export default GetCollections

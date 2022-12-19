@@ -534,6 +534,7 @@ export interface Config<
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
+      onLogout?: () => Promise<void>
     }
   }
   // schema: TinaCloudSchema<false>

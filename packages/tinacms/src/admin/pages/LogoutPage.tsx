@@ -11,12 +11,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { BiLogOut } from 'react-icons/bi'
 import { MdOutlineArrowBack } from 'react-icons/md'
-import { setEditing } from '@tinacms/sharedctx'
+import { useEditState, setEditing } from '@tinacms/sharedctx'
 import AuthTemplate from '../components/AuthTemplate'
-import { Button } from '@tinacms/toolkit'
+import { Button, useCMS } from '@tinacms/toolkit'
+
+export const LogoutRedirect = () => {
+  const cms = useCMS()
+  const { setEdit } = useEditState()
+  const [searchParams] = useSearchParams()
+  const slug = searchParams.get('slug') || '/'
+  const logout = async () => {
+    if (cms?.api?.tina?.logout) {
+      await cms.api.tina.logout()
+      if (cms?.api?.tina?.onLogout) {
+        await cms?.api?.tina?.onLogout()
+      }
+    }
+    setEdit(false)
+  }
+  useEffect(() => {
+    logout().then(() => {
+      window.location.href = slug
+    })
+  }, [])
+
+  return <div>Redirecting to {slug} ...</div>
+}
 
 const logout = () => {
   setEditing(false)

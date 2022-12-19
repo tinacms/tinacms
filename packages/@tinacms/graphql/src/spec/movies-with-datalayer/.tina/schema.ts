@@ -31,21 +31,9 @@ const tinaSchema: TinaCloudSchema<false> = {
           type: 'datetime',
         },
         {
-          name: 'rating',
-          label: 'Rating',
-          required: true,
-          type: 'number',
-        },
-        {
           name: 'archived',
           label: 'Archived',
           type: 'boolean',
-        },
-        {
-          name: 'genre',
-          label: 'Genre',
-          type: 'string',
-          options: ['scifi', 'mystery', 'drama', 'comedy', 'action'],
         },
         {
           type: 'reference',
@@ -53,6 +41,20 @@ const tinaSchema: TinaCloudSchema<false> = {
           name: 'director',
           collections: ['director'],
         },
+        {
+          name: 'genre',
+          label: 'Genre',
+          type: 'string',
+          options: ['scifi', 'mystery', 'drama', 'comedy', 'action'],
+        },
+
+        {
+          name: 'rating',
+          label: 'Rating',
+          required: true,
+          type: 'number',
+        },
+
         // {
         //   type: 'reference',
         //   label: 'Actors',
