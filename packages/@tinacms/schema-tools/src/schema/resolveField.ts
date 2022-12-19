@@ -67,8 +67,6 @@ export const resolveField = (
       }
     case 'string':
       if (field.options) {
-        // TODO: correct the type
-        // @ts-ignore
         if (field.list) {
           return {
             component: 'checkbox-group',
@@ -99,8 +97,6 @@ export const resolveField = (
               : [{ label: `Choose an option`, value: '' }, ...field.options],
         }
       }
-      // TODO: correct the type
-      // @ts-ignore
       if (field.list) {
         return {
           // Allows component to be overridden for scalars
@@ -167,7 +163,6 @@ export const resolveField = (
           throw new Error(`Global templates not yet supported for rich-text`)
         } else {
           const extraFields = template.ui || {}
-          // console.log({ namespace: template.namespace })
 
           // template.namespace is undefined
           const templateName = lastItem(template.namespace)
