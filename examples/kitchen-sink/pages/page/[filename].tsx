@@ -7,7 +7,6 @@ export default function Home(
   props: InferGetStaticPropsType<typeof getStaticProps>
 ) {
   const { data } = useTina(props)
-  console.log({ data })
 
   return <Json src={data} />
 }
