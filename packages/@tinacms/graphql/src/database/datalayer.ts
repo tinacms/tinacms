@@ -1,5 +1,10 @@
 import { JSONPath } from 'jsonpath-plus'
-import { BatchOp, Level, SUBLEVEL_OPTIONS } from './level'
+import {
+  BatchOp,
+  INDEX_KEY_FIELD_SEPARATOR,
+  Level,
+  SUBLEVEL_OPTIONS,
+} from './level'
 
 export enum OP {
   EQ = 'eq',
@@ -49,7 +54,6 @@ type StringEscaper = <T extends string | string[]>(input: T) => T
 
 export const DEFAULT_COLLECTION_SORT_KEY = '__filepath__'
 export const DEFAULT_NUMERIC_LPAD = 4
-export const INDEX_KEY_FIELD_SEPARATOR = '#'
 
 const applyPadding = (input: any, pad?: PadDefinition) => {
   if (pad) {

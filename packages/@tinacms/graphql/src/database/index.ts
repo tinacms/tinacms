@@ -31,7 +31,6 @@ import {
   coerceFilterChainOperands,
   DEFAULT_COLLECTION_SORT_KEY,
   DEFAULT_NUMERIC_LPAD,
-  INDEX_KEY_FIELD_SEPARATOR,
   IndexDefinition,
   makeFilter,
   makeFilterSuffixes,
@@ -41,6 +40,7 @@ import {
 import {
   BatchOp,
   DelOp,
+  INDEX_KEY_FIELD_SEPARATOR,
   Level,
   PutOp,
   ROOT_PREFIX,

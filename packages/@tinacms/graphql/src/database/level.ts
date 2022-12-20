@@ -3,7 +3,6 @@ import {
   AbstractSublevel,
   AbstractSublevelOptions,
 } from 'abstract-level'
-import { INDEX_KEY_FIELD_SEPARATOR } from './datalayer'
 
 export type Level = AbstractLevel<
   Buffer | Uint8Array | string,
@@ -36,6 +35,7 @@ export type DelOp = {
 
 export type BatchOp = PutOp | DelOp
 
+export const INDEX_KEY_FIELD_SEPARATOR = '#'
 export const ROOT_PREFIX = '~'
 export const SUBLEVEL_OPTIONS: AbstractSublevelOptions<
   string,
