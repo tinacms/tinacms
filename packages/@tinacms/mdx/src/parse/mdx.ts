@@ -70,19 +70,6 @@ export function mdxJsxElement(
       }
     }
 
-    if (template.match) {
-      const props = node.attributes.reduce(
-        (acc: any, curr: any) => ((acc[curr.name] = curr.value), acc),
-        {}
-      )
-
-      return {
-        type: node.type,
-        name: node.name,
-        children: [{ type: 'text', text: '' }],
-        props,
-      }
-    }
     // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)
     const props = extractAttributes(
       node.attributes,

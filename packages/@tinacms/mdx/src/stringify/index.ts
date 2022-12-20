@@ -74,17 +74,12 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = replaceAll(
-        preprocessedString,
-        // replace all instances of the match string with the template. Looks like this: <Match>{any number of spaces}`
-        `<${template.name}>[\n\r\\s]*\``,
-        `${template.match.start} `
-      )
-      preprocessedString = replaceAll(
-        preprocessedString,
-        `\`[\n\r\\s]*</${template.name}>`,
-        ` ${template.match.end}`
-      )
+      const regex = `<(\s)*${template.name}(.+?)>(?:[\n\r\\s\S]*?)<\/\s*${template.name}\s*>`
+      const replace = `${template.match.start} ${template.name} $2 ${template.match.end}`
+      // console.log('regex ', JSON.stringify(regex))
+      // console.log('replacement ', JSON.stringify(replace))
+
+      preprocessedString = replaceAll(preprocessedString, regex, replace)
     }
   })
   return preprocessedString
