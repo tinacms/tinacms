@@ -150,6 +150,7 @@ export const viteBuild = async ({
       target: 'es2020',
     },
     server: {
+      host: true,
       port: 5173,
       fs: {
         strict: false,
