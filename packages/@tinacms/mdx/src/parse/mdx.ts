@@ -71,31 +71,16 @@ export function mdxJsxElement(
     }
 
     if (template.match) {
-      const firstChild = node?.children[0]
-      if (firstChild?.type === 'inlineCode') {
-        const value = firstChild.value
-        if (node.type === 'mdxJsxFlowElement') {
-          // NOTE: Since we cast the children to `inline code`
-          // I don't think this code will ever run.
-          // And I'm not sure care either way
-          return {
-            type: node.type,
-            name: node.name,
-            children: [{ type: 'text', text: '' }],
-            props: { text: value },
-          }
-        } else {
-          return {
-            type: node.type,
-            name: node.name,
-            children: [{ type: 'text', text: '' }],
-            props: { text: value },
-          }
-        }
-      } else {
-        throw new Error(
-          `Unable to parse value for template match pattern -  start: ${template.match.start}, end: ${template.match.end}`
-        )
+      const props = node.attributes.reduce(
+        (acc: any, curr: any) => ((acc[curr.name] = curr.value), acc),
+        {}
+      )
+
+      return {
+        type: node.type,
+        name: node.name,
+        children: [{ type: 'text', text: '' }],
+        props,
       }
     }
     // FIXME: these should be passed through to the field resolver in @tinacms/graphql (via dependency injection)

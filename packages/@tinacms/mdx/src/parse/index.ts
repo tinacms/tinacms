@@ -82,9 +82,9 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        const regex = `/${template.match.start}\s*${template.name}(.+?)\s*${template.match.end}/g;`
-        preprocessedString.replace(
-          regex,
+        preprocessedString = replaceAll(
+          preprocessedString,
+          `${template.match.start}\s*${template.name}(.+?)\s*${template.match.end}`,
           `<${template.name}$1>\n</${template.name}>`
         )
       }
@@ -104,6 +104,8 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     // })
     return tree
   } catch (e) {
+    console.error(e)
+
     // @ts-ignore VMessage is the error type but it's not accessible
     throw new RichTextParseError(e, e.position)
   }
