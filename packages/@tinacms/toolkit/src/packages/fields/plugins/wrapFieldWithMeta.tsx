@@ -51,7 +51,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   children: any
-  label?: string
+  label?: string | boolean
   description?: string
   error?: string
   margin?: boolean
@@ -81,10 +81,12 @@ export const FieldMeta = ({
       style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}
     >
-      <FieldLabel name={name}>
-        {label || name}
-        {description && <FieldDescription>{description}</FieldDescription>}
-      </FieldLabel>
+      {(label !== false || description) && (
+        <FieldLabel name={name}>
+          {label !== false && <>{label || name}</>}
+          {description && <FieldDescription>{description}</FieldDescription>}
+        </FieldLabel>
+      )}
       {children}
       {/*
       FIXME: when a object field has a sub-field with a validation (eg. required)

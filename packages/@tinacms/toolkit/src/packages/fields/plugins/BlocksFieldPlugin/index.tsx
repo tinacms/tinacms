@@ -102,7 +102,9 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
     <>
       <GroupListHeader>
         <GroupListMeta>
-          <GroupLabel>{field.label || field.name}</GroupLabel>
+          {field.label !== false && (
+            <GroupLabel>{field.label || field.name}</GroupLabel>
+          )}
           {field.description && (
             <FieldDescription>{field.description}</FieldDescription>
           )}
