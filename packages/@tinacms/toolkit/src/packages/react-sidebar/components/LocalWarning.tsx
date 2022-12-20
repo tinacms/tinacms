@@ -36,7 +36,7 @@ export const LocalWarning = () => {
 
 export const BillingWarning = () => {
   const cms = useCMS()
-  const api = cms.api.tina
+  const api = cms?.api?.tina
   const isLocalMode: boolean = api.isLocalMode
 
   const [billingState, setBillingState] = React.useState(
@@ -50,7 +50,7 @@ export const BillingWarning = () => {
   )
   React.useEffect(() => {
     const fetchBillingState = async () => {
-      const billingRes = await api.getBillingState()
+      const billingRes = (await api?.getBillingState()) || {}
       setBillingState(billingRes)
     }
     if (!isLocalMode) fetchBillingState()
