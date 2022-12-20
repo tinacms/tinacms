@@ -115,7 +115,7 @@ export class Database {
     | CollectionTemplatesWithNamespace<true>
     | undefined
   > => {
-    const tinaSchema = await this.getSchema()
+    const tinaSchema = await this.getSchema(this.level)
     return tinaSchema.getCollectionByFullPath(filepath)
   }
 
@@ -190,7 +190,7 @@ export class Database {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected get for config file ${filepath}`)
     } else {
-      const tinaSchema = await this.getSchema()
+      const tinaSchema = await this.getSchema(this.level)
       const extension = path.extname(filepath)
       const contentObject = await this.level
         .sublevel<string, Record<string, any>>(
@@ -250,7 +250,7 @@ export class Database {
     const collection = await this.collectionForPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
-      const indexDefinitions = await this.getIndexDefinitions()
+      const indexDefinitions = await this.getIndexDefinitions(this.level)
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
     const normalizedPath = normalizePath(filepath)
@@ -319,7 +319,7 @@ export class Database {
       } else {
         let collectionIndexDefinitions
         if (collection) {
-          const indexDefinitions = await this.getIndexDefinitions()
+          const indexDefinitions = await this.getIndexDefinitions(this.level)
           collectionIndexDefinitions = indexDefinitions?.[collection]
         }
 
@@ -396,7 +396,7 @@ export class Database {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
-      const tinaSchema = await this.getSchema()
+      const tinaSchema = await this.getSchema(this.level)
       const collection = tinaSchema.getCollectionByFullPath(filepath)
 
       const templateInfo = await tinaSchema.getTemplatesForCollectable(
@@ -504,12 +504,11 @@ export class Database {
     const _graphql = await this.bridge.get(graphqlPath)
     return JSON.parse(_graphql)
   }
-  public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
-    await this.initLevel()
+  public getTinaSchema = async (level: Level): Promise<TinaCloudSchemaBase> => {
     const schemaPath = normalizePath(
       path.join(GENERATED_FOLDER, `_schema.json`)
     )
-    return (await this.level
+    return (await level
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
@@ -517,22 +516,22 @@ export class Database {
       .get(schemaPath)) as unknown as TinaCloudSchemaBase
   }
 
-  public getSchema = async () => {
+  public getSchema = async (level: Level) => {
     if (this.tinaSchema) {
       return this.tinaSchema
     }
-    const schema = await this.getTinaSchema()
+    const schema = await this.getTinaSchema(level)
     this.tinaSchema = await createSchema({ schema })
     return this.tinaSchema
   }
 
-  public getIndexDefinitions = async (): Promise<
-    Record<string, Record<string, IndexDefinition>>
-  > => {
+  public getIndexDefinitions = async (
+    level: Level
+  ): Promise<Record<string, Record<string, IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
       await new Promise<void>(async (resolve, reject) => {
         try {
-          const schema = await this.getSchema()
+          const schema = await this.getSchema(level)
           const collections = schema.getCollections()
           for (const collection of collections) {
             const indexDefinitions = {
@@ -634,7 +633,7 @@ export class Database {
       query.lt = atob(before)
     }
 
-    const allIndexDefinitions = await this.getIndexDefinitions()
+    const allIndexDefinitions = await this.getIndexDefinitions(this.level)
     const indexDefinitions = allIndexDefinitions?.[queryOptions.collection]
     if (!indexDefinitions) {
       throw new Error(
@@ -907,7 +906,7 @@ export class Database {
     const collection = await this.collectionForPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
-      const indexDefinitions = await this.getIndexDefinitions()
+      const indexDefinitions = await this.getIndexDefinitions(this.level)
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
     this.level.sublevel<string, Record<string, any>>(
@@ -942,7 +941,7 @@ export class Database {
   }
 
   public _indexAllContent = async (level: Level) => {
-    const tinaSchema = await this.getSchema()
+    const tinaSchema = await this.getSchema(level)
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
       operations.push(...ops)
@@ -1047,7 +1046,7 @@ const _indexContent = async (
 ) => {
   let collectionIndexDefinitions
   if (collection) {
-    const indexDefinitions = await database.getIndexDefinitions()
+    const indexDefinitions = await database.getIndexDefinitions(level)
     collectionIndexDefinitions = indexDefinitions?.[collection.name]
     if (!collectionIndexDefinitions) {
       throw new Error(`No indexDefinitions for collection ${collection.name}`)
@@ -1101,7 +1100,7 @@ const _deleteIndexContent = async (
 ) => {
   let collectionIndexDefinitions
   if (collection) {
-    const indexDefinitions = await database.getIndexDefinitions()
+    const indexDefinitions = await database.getIndexDefinitions(database.level)
     collectionIndexDefinitions = indexDefinitions?.[collection.name]
     if (!collectionIndexDefinitions) {
       throw new Error(`No indexDefinitions for collection ${collection.name}`)
