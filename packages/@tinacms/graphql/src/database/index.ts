@@ -174,10 +174,10 @@ export class Database {
       return
     }
     if (!this.config.version) {
-      return this.rootLevel
+      this.level = this.rootLevel
     } else {
       const version = await this.getDatabaseVersion()
-      return this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+      this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
     }
   }
 
