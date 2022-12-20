@@ -150,13 +150,13 @@ export class Database {
     await metadataLevel.put('metadata', { version })
   }
 
-  private async getDatabaseVersion() {
+  private async getDatabaseVersion(): Promise<string | undefined> {
     const metadataLevel = await this.rootLevel.sublevel(
       '_metadata',
       SUBLEVEL_OPTIONS
     )
 
-    let version: string = '0'
+    let version: string | undefined
     try {
       const metadata = await metadataLevel.get('metadata')
       version = metadata.version || version
@@ -164,7 +164,9 @@ export class Database {
       if (e.code !== 'LEVEL_NOT_FOUND') {
         throw e
       }
-      await metadataLevel.put('metadata', { version })
+      if (version) {
+        await metadataLevel.put('metadata', { version })
+      }
     }
     return version
   }
@@ -177,7 +179,9 @@ export class Database {
       this.level = this.rootLevel
     } else {
       const version = await this.getDatabaseVersion()
-      this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+      if (version) {
+        this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+      }
     }
   }
 
@@ -806,7 +810,7 @@ export class Database {
         nextLevel = this.level
       } else {
         const version = await this.getDatabaseVersion()
-        nextVersion = `${parseInt(version) + 1}`
+        nextVersion = version ? `${parseInt(version) + 1}` : '0'
         nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS)
       }
 
@@ -830,7 +834,9 @@ export class Database {
 
       if (this.config.version) {
         await this.updateDatabaseVersion(nextVersion)
-        await this.level.clear()
+        if (this.level) {
+          await this.level.clear()
+        }
         this.level = nextLevel
       }
     })
