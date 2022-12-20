@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
+import { BillingWarning, Form, FormBuilder, FormStatus } from '@tinacms/toolkit'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import GetDocument from '../components/GetDocument'
@@ -152,7 +152,7 @@ const RenderForm = ({
   return (
     <PageWrapper>
       <>
-        {cms?.api?.tina?.isLocalMode && <LocalWarning />}
+        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
         <div
           className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
         >
