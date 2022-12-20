@@ -36,7 +36,7 @@ export type DelOp = {
 export type BatchOp = PutOp | DelOp
 
 export const INDEX_KEY_FIELD_SEPARATOR = '#'
-export const ROOT_PREFIX = '~'
+export const CONTENT_ROOT_PREFIX = '~'
 export const SUBLEVEL_OPTIONS: AbstractSublevelOptions<
   string,
   Record<string, any>

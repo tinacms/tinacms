@@ -43,7 +43,7 @@ import {
   INDEX_KEY_FIELD_SEPARATOR,
   Level,
   PutOp,
-  ROOT_PREFIX,
+  CONTENT_ROOT_PREFIX,
   SUBLEVEL_OPTIONS,
 } from './level'
 
@@ -57,6 +57,7 @@ type CreateDatabase = {
   bridge: Bridge
   level: Level
   indexStatusCallback?: IndexStatusCallback
+  version?: boolean
 }
 
 export const createDatabase = (config: CreateDatabase) => {
@@ -92,7 +93,8 @@ const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
 
 export class Database {
   public bridge: Bridge
-  public level: Level
+  public rootLevel: Level
+  public level: Level | undefined
   public indexStatusCallback: IndexStatusCallback | undefined
   private tinaSchema: TinaSchema | undefined
   private collectionIndexDefinitions:
@@ -101,7 +103,7 @@ export class Database {
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge
-    this.level = config.level
+    this.rootLevel = config.level
     this.indexStatusCallback =
       config.indexStatusCallback || defaultStatusCallback
   }
@@ -140,14 +142,57 @@ export class Database {
     return { pathsByCollection, nonCollectionPaths, collections }
   }
 
+  private async updateDatabaseVersion(version: string) {
+    const metadataLevel = await this.rootLevel.sublevel(
+      '_metadata',
+      SUBLEVEL_OPTIONS
+    )
+    await metadataLevel.put('metadata', { version })
+  }
+
+  private async getDatabaseVersion() {
+    const metadataLevel = await this.rootLevel.sublevel(
+      '_metadata',
+      SUBLEVEL_OPTIONS
+    )
+
+    let version: string = '0'
+    try {
+      const metadata = await metadataLevel.get('metadata')
+      version = metadata.version || version
+    } catch (e: any) {
+      if (e.code !== 'LEVEL_NOT_FOUND') {
+        throw e
+      }
+      await metadataLevel.put('metadata', { version })
+    }
+    return version
+  }
+
+  private async initLevel() {
+    if (this.level) {
+      return
+    }
+    if (!this.config.version) {
+      return this.rootLevel
+    } else {
+      const version = await this.getDatabaseVersion()
+      return this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+    }
+  }
+
   public get = async <T extends object>(filepath: string): Promise<T> => {
+    await this.initLevel()
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected get for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
       const contentObject = await this.level
-        .sublevel<string, Record<string, any>>(ROOT_PREFIX, SUBLEVEL_OPTIONS)
+        .sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        )
         .get(normalizePath(filepath))
       if (!contentObject) {
         throw new GraphQLError(`Unable to find record ${filepath}`)
@@ -193,6 +238,7 @@ export class Database {
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
+    await this.initLevel()
     const { stringifiedFile, payload } = await this.stringifyFile(
       filepath,
       data
@@ -218,7 +264,10 @@ export class Database {
     let existingItem
     try {
       existingItem = await this.level
-        .sublevel<string, Record<string, any>>(ROOT_PREFIX, SUBLEVEL_OPTIONS)
+        .sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        )
         .get(normalizedPath)
     } catch (e: any) {
       if (e.code !== 'LEVEL_NOT_FOUND') {
@@ -245,7 +294,7 @@ export class Database {
         key: normalizedPath,
         value: payload,
         sublevel: this.level.sublevel<string, Record<string, any>>(
-          ROOT_PREFIX,
+          CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
         ),
       },
@@ -259,6 +308,7 @@ export class Database {
     data: { [key: string]: unknown },
     collection?: string
   ) => {
+    await this.initLevel()
     try {
       if (SYSTEM_FILES.includes(filepath)) {
         throw new Error(`Unexpected put for config file ${filepath}`)
@@ -288,7 +338,7 @@ export class Database {
         try {
           existingItem = await this.level
             .sublevel<string, Record<string, any>>(
-              ROOT_PREFIX,
+              CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
             )
             .get(normalizedPath)
@@ -316,7 +366,7 @@ export class Database {
             key: normalizedPath,
             value: payload,
             sublevel: this.level.sublevel<string, Record<string, any>>(
-              ROOT_PREFIX,
+              CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
             ),
           },
@@ -414,12 +464,16 @@ export class Database {
   }
 
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
+    await this.initLevel()
     const lookupPath = normalizePath(
       path.join(GENERATED_FOLDER, `_lookup.json`)
     )
     if (!this._lookup) {
       const _lookup = await this.level
-        .sublevel<string, Record<string, any>>(ROOT_PREFIX, SUBLEVEL_OPTIONS)
+        .sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        )
         .get(lookupPath)
       // @ts-ignore
       this._lookup = _lookup
@@ -427,11 +481,15 @@ export class Database {
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
+    await this.initLevel()
     const graphqlPath = normalizePath(
       path.join(GENERATED_FOLDER, `_graphql.json`)
     )
     return (await this.level
-      .sublevel<string, Record<string, any>>(ROOT_PREFIX, SUBLEVEL_OPTIONS)
+      .sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
+        SUBLEVEL_OPTIONS
+      )
       .get(graphqlPath)) as unknown as DocumentNode
   }
   //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
@@ -443,11 +501,15 @@ export class Database {
     return JSON.parse(_graphql)
   }
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
+    await this.initLevel()
     const schemaPath = normalizePath(
       path.join(GENERATED_FOLDER, `_schema.json`)
     )
     return (await this.level
-      .sublevel<string, Record<string, any>>(ROOT_PREFIX, SUBLEVEL_OPTIONS)
+      .sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
+        SUBLEVEL_OPTIONS
+      )
       .get(schemaPath)) as unknown as TinaCloudSchemaBase
   }
 
@@ -537,6 +599,7 @@ export class Database {
   }
 
   public query = async (queryOptions: QueryOptions, hydrator) => {
+    await this.initLevel()
     const {
       first,
       after,
@@ -585,7 +648,7 @@ export class Database {
     const filterSuffixes =
       indexDefinition && makeFilterSuffixes(filterChain, indexDefinition)
     const rootLevel = this.level.sublevel<string, Record<string, any>>(
-      ROOT_PREFIX,
+      CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
     const sublevel = indexDefinition
@@ -728,34 +791,53 @@ export class Database {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
+    await this.initLevel()
     await this.indexStatusCallbackWrapper(async () => {
       const lookup = JSON.parse(
         await this.bridge.get(
           normalizePath(path.join(GENERATED_FOLDER, '_lookup.json'))
         )
       )
-      await this.level.clear()
-      const rootLevel = this.level.sublevel<string, Record<string, any>>(
-        ROOT_PREFIX,
+
+      let nextLevel: Level | undefined
+      let nextVersion: string | undefined
+      if (!this.config.version) {
+        await this.level.clear()
+        nextLevel = this.level
+      } else {
+        const version = await this.getDatabaseVersion()
+        nextVersion = `${parseInt(version) + 1}`
+        nextLevel = this.rootLevel.sublevel(nextVersion, SUBLEVEL_OPTIONS)
+      }
+
+      const contentRootLevel = nextLevel.sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
       )
-      await rootLevel.put(
+      await contentRootLevel.put(
         normalizePath(path.join(GENERATED_FOLDER, '_graphql.json')),
         graphQLSchema as any
       )
-      await rootLevel.put(
+      await contentRootLevel.put(
         normalizePath(path.join(GENERATED_FOLDER, '_schema.json')),
         tinaSchema.schema as any
       )
-      await rootLevel.put(
+      await contentRootLevel.put(
         normalizePath(path.join(GENERATED_FOLDER, '_lookup.json')),
         lookup
       )
-      await this._indexAllContent()
+      await this._indexAllContent(nextLevel)
+
+      if (this.config.version) {
+        await this.updateDatabaseVersion(nextVersion)
+        await this.level.clear()
+        this.level = nextLevel
+      }
     })
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
+    await this.initLevel()
     const operations: DelOp[] = []
     const enqueueOps = async (ops: DelOp[]): Promise<void> => {
       operations.push(...ops)
@@ -785,6 +867,7 @@ export class Database {
   }
 
   public indexContentByPaths = async (documentPaths: string[]) => {
+    await this.initLevel()
     const operations: BatchOp[] = []
     const enqueueOps = async (ops: BatchOp[]): Promise<void> => {
       operations.push(...ops)
@@ -800,12 +883,13 @@ export class Database {
       for (const collection of Object.keys(pathsByCollection)) {
         await _indexContent(
           this,
+          this.level,
           pathsByCollection[collection],
           enqueueOps,
           collections[collection]
         )
       }
-      await _indexContent(this, nonCollectionPaths, enqueueOps)
+      await _indexContent(this, this.level, nonCollectionPaths, enqueueOps)
     })
     while (operations.length) {
       await this.level.batch(operations.splice(0, 25))
@@ -813,6 +897,7 @@ export class Database {
   }
 
   public delete = async (filepath: string) => {
+    await this.initLevel()
     const collection = await this.collectionForPath(filepath)
     let collectionIndexDefinitions
     if (collection) {
@@ -820,12 +905,12 @@ export class Database {
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
     this.level.sublevel<string, Record<string, any>>(
-      ROOT_PREFIX,
+      CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
     const itemKey = normalizePath(filepath)
     const rootSublevel = this.level.sublevel<string, Record<string, any>>(
-      ROOT_PREFIX,
+      CONTENT_ROOT_PREFIX,
       SUBLEVEL_OPTIONS
     )
     const item = await rootSublevel.get(itemKey)
@@ -850,7 +935,7 @@ export class Database {
     await this.bridge.delete(normalizePath(filepath))
   }
 
-  public _indexAllContent = async () => {
+  public _indexAllContent = async (level: Level) => {
     const tinaSchema = await this.getSchema()
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
@@ -858,7 +943,7 @@ export class Database {
       while (operations.length >= 25) {
         // make this an option
         const batchOps = operations.splice(0, 25)
-        await this.level.batch(batchOps)
+        await level.batch(batchOps)
       }
     }
     await sequential(tinaSchema.getCollections(), async (collection) => {
@@ -866,10 +951,10 @@ export class Database {
         normalizePath(collection.path),
         collection.format || 'md'
       )
-      await _indexContent(this, documentPaths, enqueueOps, collection)
+      await _indexContent(this, level, documentPaths, enqueueOps, collection)
     })
     while (operations.length) {
-      await this.level.batch(operations.splice(0, 25))
+      await level.batch(operations.splice(0, 25))
     }
   }
 
@@ -947,6 +1032,7 @@ type UnionDataLookup = {
 
 const _indexContent = async (
   database: Database,
+  level: Level,
   documentPaths: string[],
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
   collection?:
@@ -976,14 +1062,14 @@ const _indexContent = async (
           collectionIndexDefinitions,
           data,
           'put',
-          database.level
+          level
         ),
         {
           type: 'put',
           key: normalizedPath,
           value: data as any,
-          sublevel: database.level.sublevel<string, Record<string, any>>(
-            ROOT_PREFIX,
+          sublevel: level.sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
             SUBLEVEL_OPTIONS
           ),
         },
@@ -1017,7 +1103,7 @@ const _deleteIndexContent = async (
   }
 
   const rootLevel = database.level.sublevel<string, Record<string, any>>(
-    ROOT_PREFIX,
+    CONTENT_ROOT_PREFIX,
     SUBLEVEL_OPTIONS
   )
   await sequential(documentPaths, async (filepath) => {
