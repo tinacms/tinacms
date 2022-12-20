@@ -219,7 +219,7 @@ type FieldGeneric<
     }
 
 export interface BaseField {
-  label?: string
+  label?: string | boolean
   required?: boolean
   name: string
   description?: string

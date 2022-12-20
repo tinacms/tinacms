@@ -60,12 +60,17 @@ export const Toggle: FC<ToggleProps> = ({
   }
 
   return (
-    <div className="flex items-center">
-      {labels && <span className="text-gray-700">{labels.false}</span>}
-      <div
-        className="relative w-12 h-7"
-        style={{ margin: labels !== null ? '0 10px' : '0' }}
-      >
+    <div className="flex gap-2 items-center">
+      {labels && (
+        <span
+          className={`text-sm ${
+            !checked ? 'text-blue-500 font-bold' : 'text-gray-300'
+          }`}
+        >
+          {labels.false}
+        </span>
+      )}
+      <div className="relative w-12 h-7">
         <ToggleInput id={name} type="checkbox" {...input} />
         <label
           className="bg-none p-0 outline-none w-12 h-7"
@@ -76,27 +81,29 @@ export const Toggle: FC<ToggleProps> = ({
           htmlFor={name}
           role="switch"
         >
-          <div className="relative w-12 h-7 rounded-3xl bg-white pointer-events-none -ml-0.5">
+          <div className="relative w-[48px] h-7 rounded-3xl bg-white shadow-inner border border-gray-200 pointer-events-none -ml-0.5">
             <span
-              className="absolute rounded-3xl left-0.5 top-1/2 w-[22px] h-[22px]"
+              className={`absolute rounded-3xl left-0.5 top-1/2 w-[22px] h-[22px] shadow border transition-all ease-out duration-150 ${
+                checked
+                  ? 'bg-blue-500 border-blue-600'
+                  : 'bg-gray-250 border-gray-300'
+              }`}
               style={{
-                background: checked
-                  ? 'var(--tina-color-primary)'
-                  : 'var(--tina-color-grey-4)',
-                border: `1px solid ${
-                  checked
-                    ? 'var(--tina-color-primary-dark)'
-                    : 'var(--tina-color-grey-5)'
-                }`,
                 transform: `translate3d(${checked ? '20px' : '0'}, -50%, 0)`,
-                transition: 'all 150ms ease-out',
-                boxShadow: 'var(--tina-shadow-big)',
               }}
             />
           </div>
         </label>
       </div>
-      {labels && <span className="text-gray-700">{labels.true}</span>}
+      {labels && (
+        <span
+          className={`text-sm ${
+            checked ? 'text-blue-500 font-bold' : 'text-gray-300'
+          }`}
+        >
+          {labels.true}
+        </span>
+      )}
     </div>
   )
 }

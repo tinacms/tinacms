@@ -16,22 +16,15 @@ limitations under the License.
 
 */
 
-export type AnyField = Field & { [key: string]: any }
+import * as React from 'react'
+import { parse } from './textFormat'
 
-export interface Field<F extends Field = AnyField> {
-  name: string
-  label?: string | boolean
-  description?: string
-  component: React.FC<any> | string | null
-  inlineComponent?: React.FC<any>
-  parse?: (value: any, name: string, field: F) => any
-  format?: (value: any, name: string, field: F) => any
-  validate?(
-    value: any,
-    allValues: any,
-    meta: any,
-    field: Field
-  ): string | object | undefined
-  defaultValue?: any
-  fields?: F[]
+export const HiddenField = () => {
+  return <></>
+}
+
+export const HiddenFieldPlugin = {
+  name: 'hidden',
+  Component: HiddenField,
+  parse,
 }

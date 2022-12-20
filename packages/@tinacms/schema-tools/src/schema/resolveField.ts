@@ -67,11 +67,21 @@ export const resolveField = (
       }
     case 'string':
       if (field.options) {
-        // TODO: correct the type
-        // @ts-ignore
         if (field.list) {
           return {
             component: 'checkbox-group',
+            ...field,
+            ...extraFields,
+            options: field.options,
+          }
+        }
+        if (
+          field.options[0] &&
+          typeof field.options[0] === 'object' &&
+          field.options[0].icon
+        ) {
+          return {
+            component: 'button-toggle',
             ...field,
             ...extraFields,
             options: field.options,
@@ -81,11 +91,12 @@ export const resolveField = (
           component: 'select',
           ...field,
           ...extraFields,
-          options: [{ label: `Choose an option`, value: '' }, ...field.options],
+          options:
+            field.ui && field.ui.component !== 'select'
+              ? field.options
+              : [{ label: `Choose an option`, value: '' }, ...field.options],
         }
       }
-      // TODO: correct the type
-      // @ts-ignore
       if (field.list) {
         return {
           // Allows component to be overridden for scalars
@@ -152,7 +163,6 @@ export const resolveField = (
           throw new Error(`Global templates not yet supported for rich-text`)
         } else {
           const extraFields = template.ui || {}
-          // console.log({ namespace: template.namespace })
 
           // template.namespace is undefined
           const templateName = lastItem(template.namespace)
