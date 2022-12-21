@@ -504,11 +504,14 @@ export class Database {
     const _graphql = await this.bridge.get(graphqlPath)
     return JSON.parse(_graphql)
   }
-  public getTinaSchema = async (level: Level): Promise<TinaCloudSchemaBase> => {
+  public getTinaSchema = async (
+    level?: Level
+  ): Promise<TinaCloudSchemaBase> => {
+    await this.initLevel()
     const schemaPath = normalizePath(
       path.join(GENERATED_FOLDER, `_schema.json`)
     )
-    return (await level
+    return (await (level || this.level)
       .sublevel<string, Record<string, any>>(
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
@@ -516,22 +519,24 @@ export class Database {
       .get(schemaPath)) as unknown as TinaCloudSchemaBase
   }
 
-  public getSchema = async (level: Level) => {
+  public getSchema = async (level?: Level) => {
+    await this.initLevel()
     if (this.tinaSchema) {
       return this.tinaSchema
     }
-    const schema = await this.getTinaSchema(level)
+    const schema = await this.getTinaSchema(level || this.level)
     this.tinaSchema = await createSchema({ schema })
     return this.tinaSchema
   }
 
   public getIndexDefinitions = async (
-    level: Level
+    level?: Level
   ): Promise<Record<string, Record<string, IndexDefinition>>> => {
     if (!this.collectionIndexDefinitions) {
       await new Promise<void>(async (resolve, reject) => {
+        await this.initLevel()
         try {
-          const schema = await this.getSchema(level)
+          const schema = await this.getSchema(level || this.level)
           const collections = schema.getCollections()
           for (const collection of collections) {
             const indexDefinitions = {
