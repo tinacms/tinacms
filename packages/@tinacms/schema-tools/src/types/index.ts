@@ -79,7 +79,8 @@ export interface UICollection {
 export type Option =
   | string
   | {
-      label: string
+      label?: string
+      icon?: React.FC
       value: string
     }
 
@@ -219,7 +220,7 @@ type FieldGeneric<
     }
 
 export type BaseField<WithNamespace extends boolean = false> = {
-  label?: string
+  label?: string | false
   required?: boolean
   name: string
   description?: string
@@ -505,6 +506,7 @@ export interface Config<
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
+      onLogout?: () => Promise<void>
     }
   }
   // schema: TinaCloudSchema<false>
