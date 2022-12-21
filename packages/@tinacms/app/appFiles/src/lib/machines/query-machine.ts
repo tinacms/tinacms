@@ -403,10 +403,7 @@ export const queryMachine = createMachine(
       },
       onChangeCallback: (context) => (callback, _onReceive) => {
         const schema = context.cms.api.tina.schema as TinaSchema
-        console.log(
-          'ctx',
-          context.documentMap['content/documentation/intro-to-tina.md']
-        )
+
         Object.values(context.documentMap).forEach((documentMachine) => {
           if (!context.registerSubForms) {
             if (documentMachine.skipFormRegister) {

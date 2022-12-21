@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { BiCheck } from 'react-icons/bi'
 
 type Option = {
   value: string
@@ -29,7 +30,6 @@ interface RadioGroupFieldProps {
   component: string
   options: (Option | string)[]
   direction?: 'horizontal' | 'vertical'
-  variant?: 'radio' | 'button'
 }
 
 interface RadioRefsInterface {
@@ -49,14 +49,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   field,
   options,
 }) => {
-  const [activeRadioRef, setActiveRadioRef] =
-    React.useState<HTMLDivElement | null>(null)
   const radioOptions = options || field.options
   const radioRefs: RadioRefsInterface = {}
-
-  React.useEffect(() => {
-    setActiveRadioRef(radioRefs[`radio_${input.value}`])
-  }, [input.value])
 
   const toProps = (option: Option | string): Option => {
     if (typeof option === 'object') return option
@@ -69,7 +63,6 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 
     return (
       <div
-        className={field.variant === 'button' ? 'flex-1' : ''}
         key={option.value}
         ref={(ref) => {
           radioRefs[`radio_${option.value}`] = ref
@@ -83,100 +76,66 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           value={option.value}
           // https://github.com/final-form/react-final-form/issues/392#issuecomment-543118944
           onChange={(event) => {
-            console.log(optionId, event)
-            console.log(event.target)
-            console.log(event.target.value)
             input.onChange(event.target.value)
           }}
           checked={checked}
         />
-        <RadioOption
-          htmlFor={optionId}
-          checked={checked}
-          variant={field.variant}
-        >
-          <Label variant={field.variant}>{option.label}</Label>
+        <RadioOption htmlFor={optionId} checked={checked}>
+          {option.label}
         </RadioOption>
       </div>
     )
   }
 
   return (
-    <RadioOptions
-      id={input.name}
-      direction={field.direction}
-      variant={field.variant}
-    >
-      {field.variant === 'button' && (
-        <ActiveRadioIndicator
-          width={activeRadioRef?.offsetWidth}
-          height={activeRadioRef?.offsetHeight}
-          left={activeRadioRef?.offsetLeft}
-          top={activeRadioRef?.offsetTop}
-          hasValue={!!input.value}
-        />
-      )}
+    <RadioOptions id={input.name} direction={field.direction}>
       {radioOptions ? radioOptions.map(toProps).map(toComponent) : input.value}
     </RadioOptions>
   )
 }
 
-const Label = ({ variant, ...props }) => (
-  <span className={variant === 'button' ? 'relative' : ''} {...props} />
-)
-const ActiveRadioIndicator = ({
-  hasValue,
-  left,
-  top,
-  width,
-  height,
-  style = {},
-  className = '',
-  ...props
-}) => (
+const RadioOptions = ({ direction, children, ...props }) => (
   <div
-    className={`absolute transition-all duration-100 ease-out bg-blue-500 shadow-[0_2px_3px_rgba(0,0,0,0.12)] rounded-3xl h-[34px] pointer-events-none ${className}`}
-    style={{
-      backfaceVisibility: 'hidden',
-      width,
-      height: height ? width : '',
-      left,
-      top,
-      transform: `scale(${hasValue ? `1` : `0`})`,
-      ...style,
-    }}
-    {...props}
-  />
-)
-
-const RadioOptions = ({ direction, variant, className = '', ...props }) => (
-  <div
-    className={`flex pt-1 ${
-      variant === 'button'
-        ? 'min-h-[42px] bg-white rounded-3xl text-blue-500 padding-[3px] shadow-[0_0_0_0_#e1ddec] transition-all duration-100 ease-out gap-[3px] [&:not(:active)]:[&:not(:focus-within)]:hover:shadow-[0_0_0_2px_#e1ddec] focus-within:shadow-[0_0_0_2px_#0084ff] active:shadow-[0_0_0_2px_#0084ff]'
-        : 'gap-3 flex-wrap'
-    } ${direction === 'vertical' ? 'flex-col' : ''} ${className}`}
-    {...props}
-  />
-)
-
-const RadioOption = ({ checked, variant, className = '', ...props }) => (
-  <label
-    className={`flex items-center text-[13px] ${
-      variant === 'button'
-        ? `flex-1 text-center rounded-3xl font-normal cursor-pointer h-[34px] px-3 transition-all duration-100 ease-out m-0 border-none justify-center ${
-            checked ? 'text-white' : 'text-blue-500'
-          } [&:not(:active)]:hover:bg-gray-50 active:bg-gray-100`
-        : `before:content-[""] before:block before:w-4 before:h-4 before:mr-1 before:rounded-3xl before:bg-blue-500 ${
-            checked
-              ? 'before:border before:border-solid before:border-blue-500'
-              : 'before:border-gray-100'
-          } before:shadow-[0_0_0_0_#e1ddec,_inset_0_0_0_8px_white] before:transition-all before:duration-100 before:ease-out ${
-            checked
-              ? 'before:shadow-[0_0_0_0_#0084ff,_inset_0_0_0_4px_white] [input:focus+&:before]:border [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_4px_white]'
-              : '[input:focus+&:before]:border [input:focus+&:before]:border-solid [input:focus+&:before]:border-gray-100 [input:focus+&:before]:shadow-[0_0_0_2px_#0084ff,_inset_0_0_0_8px_white] hover:before:shadow-[0_0_0_2px_#e1ddec,_inset_0_0_0_8px_white]'
-          } ${className}`
+    className={`flex w-full ${
+      direction === 'horizontal'
+        ? 'flex-wrap gap-y-1 gap-x-3'
+        : 'flex-col gap-1'
     }`}
     {...props}
-  />
+  >
+    {children}
+  </div>
+)
+
+const RadioOption = ({ checked, htmlFor, children, ...props }) => (
+  <label
+    className="cursor-pointer flex group items-center gap-2"
+    htmlFor={htmlFor}
+    {...props}
+  >
+    <span
+      className={`relative h-[19px] w-[19px] rounded-full border text-indigo-600 focus:ring-indigo-500 transition ease-out duration-150 ${
+        checked
+          ? 'border-blue-500 bg-blue-500 shadow-sm group-hover:bg-blue-400 group-hover:border-blue-400'
+          : 'border-gray-200 bg-white shadow-inner group-hover:bg-gray-100'
+      }`}
+    >
+      <BiCheck
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[17px] h-[17px] transition ease-out duration-150 ${
+          checked
+            ? 'opacity-100 text-white group-hover:opacity-80'
+            : 'text-blue-500 opacity-0 grou-hover:opacity-30'
+        }`}
+      />
+    </span>
+    <span
+      className={`relative transition ease-out duration-150 ${
+        checked
+          ? 'text-gray-800 opacity-100'
+          : 'text-gray-700 opacity-70 group-hover:opacity-100'
+      }`}
+    >
+      {children}
+    </span>
+  </label>
 )

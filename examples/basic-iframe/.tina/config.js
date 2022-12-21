@@ -4,7 +4,12 @@ export default defineConfig({
   admin: {
     auth: {
       onLogin: () => {
-        // Your Login Logic Goes Here
+        console.log('Logged in!')
+        // hook function to be called when the user logs in
+      },
+      onLogout: () => {
+        console.log('Logged out!')
+        // hook function to be called when the user logs out
       },
     },
   },

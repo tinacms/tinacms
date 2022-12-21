@@ -16,11 +16,12 @@ limitations under the License.
 
 */
 
-import { parseMDX } from './parse'
-import { stringifyMDX } from './stringify'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { ButtonToggle } from '../components'
 
-// MDX types
-export * from './parse/plate'
+export const ButtonToggleField = wrapFieldsWithMeta(ButtonToggle)
 
-export { parseMDX }
-export { stringifyMDX }
+export const ButtonToggleFieldPlugin = {
+  name: 'button-toggle',
+  Component: ButtonToggleField,
+}

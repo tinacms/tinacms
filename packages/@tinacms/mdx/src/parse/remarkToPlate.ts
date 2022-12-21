@@ -23,6 +23,8 @@ import type * as Plate from './plate'
 import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 
+export type { Position, PositionItem } from './plate'
+
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
     mdxJsxTextElement: MdxJsxTextElement
@@ -427,21 +429,9 @@ export const remarkToSlate = (
   }
 }
 
-export type PositionItem = {
-  line?: number | null
-  column?: number | null
-  offset?: number | null
-  _index?: number | null
-  _bufferIndex?: number | null
-}
-export type Position = {
-  start: PositionItem
-  end: PositionItem
-}
-
 export class RichTextParseError extends Error {
-  public position?: Position
-  constructor(message: string, position?: Position) {
+  public position?: Plate.Position
+  constructor(message: string, position?: Plate.Position) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
     super(message)
 

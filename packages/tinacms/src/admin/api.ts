@@ -29,16 +29,8 @@ export class TinaAdminApi {
     return await this.api.isAuthenticated()
   }
 
-  async fetchCollections() {
-    try {
-      // TODO: fix this type
-      // @ts-ignore
-      const collections: Collection[] = this.schema.getCollections()
-      return collections
-    } catch (e) {
-      console.error(`[TinaAdminAPI] Unable to fetchCollections(): ${e.message}`)
-      return []
-    }
+  fetchCollections() {
+    return this.schema.getCollections()
   }
   async deleteDocument({
     collection,

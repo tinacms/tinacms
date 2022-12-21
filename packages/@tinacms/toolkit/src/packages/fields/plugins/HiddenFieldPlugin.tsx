@@ -16,11 +16,15 @@ limitations under the License.
 
 */
 
-import { parseMDX } from './parse'
-import { stringifyMDX } from './stringify'
+import * as React from 'react'
+import { parse } from './textFormat'
 
-// MDX types
-export * from './parse/plate'
+export const HiddenField = () => {
+  return <></>
+}
 
-export { parseMDX }
-export { stringifyMDX }
+export const HiddenFieldPlugin = {
+  name: 'hidden',
+  Component: HiddenField,
+  parse,
+}

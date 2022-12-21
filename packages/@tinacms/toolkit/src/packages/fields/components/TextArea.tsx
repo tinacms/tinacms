@@ -30,7 +30,7 @@ export interface TextAreaProps extends a {
 export const TextArea = ({ ...props }) => {
   return (
     <textarea
-      className="shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border-gray-200 focus:text-gray-900 rounded-md"
+      className="shadow-inner text-base px-3 py-2 text-gray-600 resize-y focus:shadow-outline focus:border-blue-500 block w-full border border-gray-200 focus:text-gray-900 rounded-md"
       {...props}
       style={{ minHeight: '160px' }}
     />

@@ -44,20 +44,22 @@ async function request<DataType extends Record<string, any> = any>(args: {
     body: bodyString,
     redirect: 'follow',
   })
+  const json = await res.json()
   if (!res.ok) {
     let additionalInfo = ''
     if (res.status === 401) {
       additionalInfo =
         'Please check that your client ID, URL and read only token are configured properly.'
     }
-
+    if (json) {
+      additionalInfo += `\n\nMessage from server: ${json.message}`
+    }
     throw new Error(
       `Server responded with status code ${res.status}, ${res.statusText}. ${
         additionalInfo ? additionalInfo : ''
       } Please see our FAQ for more information: https://tina.io/docs/errors/faq/`
     )
   }
-  const json = await res.json()
   if (json.errors) {
     throw new Error(
       `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
@@ -118,6 +120,7 @@ export const checkClientInfo = async (
         2
       )}\n\n Please check you have the correct "clientId", "branch" and "token" configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/`
     )
+
     throw e
   }
 

@@ -106,33 +106,7 @@ interface SidebarProps {
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
 const useFetchCollections = (cms) => {
-  const [collections, setCollections] = useState<any[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-
-  useEffect(() => {
-    const fetchCollections = async () => {
-      if (await cms.api.admin.isAuthenticated()) {
-        try {
-          const collections = await cms.api.admin.fetchCollections()
-          setCollections(collections)
-        } catch (error) {
-          setCollections([])
-          throw new Error(
-            `[${error.name}] GetCollections failed: ${error.message}`
-          )
-        }
-
-        setLoading(false)
-      }
-    }
-
-    if (cms.api.admin) {
-      setLoading(true)
-      fetchCollections()
-    }
-  }, [cms.api.admin])
-
-  return { collections, loading }
+  return { collections: cms.api.admin.fetchCollections(), loading: false }
 }
 
 const Sidebar = ({

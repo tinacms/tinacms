@@ -1,5 +1,6 @@
 import { defineConfig } from 'tinacms'
 import React from 'react'
+import { BiBall, BiBasketball, BiBaseball, BiFootball } from 'react-icons/bi'
 
 const slugify = (values) => {
   return `${(values?.name || values?.title || `document-${Date.now()}`)
@@ -111,12 +112,18 @@ export default defineConfig({
               {
                 name: 'title',
                 type: 'string',
+                description:
+                  'This is a description that is even longer than the label that is above it.',
                 required: true,
                 isTitle: true,
               },
               {
                 name: 'blocks',
                 type: 'object',
+                label:
+                  'This Here Is A Really Long Label That Hopefully Does Not Break The Layout',
+                description:
+                  'This is a description that is even longer than the label that is above it, even though that label is very long.',
                 list: true,
                 templates: [
                   {
@@ -133,7 +140,11 @@ export default defineConfig({
                     },
                     fields: [
                       { type: 'string', name: 'headline' },
-                      { type: 'string', name: 'description' },
+                      {
+                        type: 'string',
+                        name: 'description',
+                        ui: { component: 'textarea' },
+                      },
                       {
                         type: 'object',
                         name: 'actions',
@@ -159,8 +170,266 @@ export default defineConfig({
                   {
                     label: 'Features',
                     name: 'features',
+                    ui: {
+                      defaultItem: {
+                        title: 'Default Title',
+                        hidden: 'Default hidden value',
+                      },
+                    },
                     fields: [
-                      { type: 'string', name: 'title' },
+                      {
+                        type: 'string',
+                        name: 'title',
+                        ui: { component: 'textarea' },
+                      },
+                      {
+                        type: 'string',
+                        name: 'hidden',
+                        ui: {
+                          component: 'hidden',
+                        },
+                      },
+                      {
+                        label: 'Boolean With Labels',
+                        name: 'booleanLabels',
+                        type: 'boolean',
+                        // @ts-ignore
+                        toggleLabels: ['Yes', 'No'],
+                      },
+                      {
+                        label: 'Boolean',
+                        name: 'boolean',
+                        type: 'boolean',
+                      },
+                      {
+                        label: 'Checkbox Group',
+                        name: 'checkbox',
+                        type: 'string',
+                        list: true,
+                        options: [
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'new',
+                            label: 'New Releases',
+                          },
+                          {
+                            value: 'music',
+                            label: 'Trending Music',
+                          },
+                          {
+                            value: 'art',
+                            label: 'Art',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Inline Checkbox Group',
+                        name: 'checkboxInline',
+                        type: 'string',
+                        list: true,
+                        ui: {
+                          component: 'checkbox-group',
+                          // @ts-ignore
+                          direction: 'horizontal',
+                        },
+                        options: [
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'new',
+                            label: 'New Releases',
+                          },
+                          {
+                            value: 'music',
+                            label: 'Trending Music',
+                          },
+                          {
+                            value: 'art',
+                            label: 'Art',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Tags',
+                        name: 'categoriesOther',
+                        type: 'string',
+                        list: true,
+                        ui: {
+                          component: 'tags',
+                        },
+                        options: [
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'new',
+                            label: 'New Releases',
+                          },
+                          {
+                            value: 'music',
+                            label: 'Trending Music',
+                          },
+                          {
+                            value: 'art',
+                            label: 'Art',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Radio Group',
+                        name: 'radioGroup',
+                        type: 'string',
+                        ui: {
+                          component: 'radio-group',
+                        },
+                        options: [
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'new',
+                            label: 'New Releases',
+                          },
+                          {
+                            value: 'music',
+                            label: 'Trending Music',
+                          },
+                          {
+                            value: 'art',
+                            label: 'Art',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Inline Radio Group',
+                        name: 'radioGroupInline',
+                        type: 'string',
+                        ui: {
+                          component: 'radio-group',
+                          // @ts-ignore
+                          direction: 'horizontal',
+                        },
+                        options: [
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'new',
+                            label: 'New Releases',
+                          },
+                          {
+                            value: 'music',
+                            label: 'Trending Music',
+                          },
+                          {
+                            value: 'art',
+                            label: 'Art',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Button Toggle',
+                        name: 'buttonToggle',
+                        type: 'string',
+                        ui: {
+                          component: 'button-toggle',
+                        },
+                        options: [
+                          {
+                            value: 'all',
+                            label: 'All',
+                          },
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'shows',
+                            label: 'Shows',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Icon Button Toggle',
+                        name: 'buttonToggleIcon',
+                        type: 'string',
+                        ui: {
+                          component: 'button-toggle',
+                        },
+                        options: [
+                          {
+                            value: 'football',
+                            // @ts-ignore
+                            icon: BiBall,
+                          },
+                          {
+                            value: 'basketball',
+                            // @ts-ignore
+                            icon: BiBasketball,
+                          },
+                          {
+                            value: 'baseball',
+                            // @ts-ignore
+                            icon: BiBaseball,
+                          },
+                          {
+                            value: 'soccer',
+                            // @ts-ignore
+                            icon: BiFootball,
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Vertical Button Toggle',
+                        name: 'buttonToggleVertical',
+                        type: 'string',
+                        ui: {
+                          component: 'button-toggle',
+                          // @ts-ignore
+                          direction: 'vertical',
+                        },
+                        options: [
+                          {
+                            value: 'all',
+                            label: 'All',
+                          },
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'shows',
+                            label: 'Shows',
+                          },
+                        ],
+                      },
+                      {
+                        label: 'Select',
+                        name: 'select',
+                        type: 'string',
+                        options: [
+                          {
+                            value: 'all',
+                            label: 'All',
+                          },
+                          {
+                            value: 'movies',
+                            label: 'Movies',
+                          },
+                          {
+                            value: 'shows',
+                            label: 'Shows',
+                          },
+                        ],
+                      },
                       { type: 'string', name: 'items', list: true },
                     ],
                   },
