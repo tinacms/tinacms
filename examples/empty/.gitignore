@@ -25,3 +25,5 @@ yarn-debug.log*
 yarn-error.log*
 
 .env.local
+
+node_modules
