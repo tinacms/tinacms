@@ -28,12 +28,14 @@ export const viteBuild = async ({
   publicFolder,
   local: l,
   apiUrl,
+  host,
 }: {
   local: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
   apiUrl: string
+  host: boolean | string
 }) => {
   const local = l
   const localBuild = l
@@ -150,7 +152,7 @@ export const viteBuild = async ({
       target: 'es2020',
     },
     server: {
-      host: true,
+      host,
       port: 5173,
       fs: {
         strict: false,

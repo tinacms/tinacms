@@ -17,6 +17,8 @@ export default defineConfig({
   clientId: null,
   token: null,
   build: {
+    // can set the host of the vite config here
+    // host: true,
     outputFolder: 'admin',
     publicFolder: 'public',
   },
