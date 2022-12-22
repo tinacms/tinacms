@@ -311,6 +311,7 @@ export const buildAdmin = async ({
         outputFolder: schema?.config?.build?.outputFolder as string,
         publicFolder: schema?.config?.build?.publicFolder as string,
         apiUrl,
+        host: schema?.config?.build?.host ?? false,
       })
     }
     // Local runs an asset server as a long-lived task, don't show spinning animation
