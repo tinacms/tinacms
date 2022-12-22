@@ -29,7 +29,7 @@ import { Button } from '../../styles'
 import { FormsView } from './SidebarBody'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
-import { LocalWarning } from './LocalWarning'
+import { BillingWarning, LocalWarning } from './LocalWarning'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
@@ -106,33 +106,7 @@ interface SidebarProps {
 type displayStates = 'closed' | 'open' | 'fullscreen'
 
 const useFetchCollections = (cms) => {
-  const [collections, setCollections] = useState<any[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-
-  useEffect(() => {
-    const fetchCollections = async () => {
-      if (await cms.api.admin.isAuthenticated()) {
-        try {
-          const collections = await cms.api.admin.fetchCollections()
-          setCollections(collections)
-        } catch (error) {
-          setCollections([])
-          throw new Error(
-            `[${error.name}] GetCollections failed: ${error.message}`
-          )
-        }
-
-        setLoading(false)
-      }
-    }
-
-    if (cms.api.admin) {
-      setLoading(true)
-      fetchCollections()
-    }
-  }, [cms.api.admin])
-
-  return { collections, loading }
+  return { collections: cms.api.admin.fetchCollections(), loading: false }
 }
 
 const Sidebar = ({
@@ -458,6 +432,8 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
+      {!isLocalMode && <BillingWarning />}
+
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button

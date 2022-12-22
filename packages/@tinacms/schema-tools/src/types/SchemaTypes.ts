@@ -223,7 +223,8 @@ type ScalarType<WithNamespace extends boolean> = WithNamespace extends true
 export type Option =
   | string
   | {
-      label: string
+      label?: string
+      icon?: FC
       value: string
     }
 type ScalarTypeInner = TinaField &

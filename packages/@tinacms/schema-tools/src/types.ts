@@ -219,7 +219,7 @@ type FieldGeneric<
     }
 
 export interface BaseField {
-  label?: string
+  label?: string | boolean
   required?: boolean
   name: string
   description?: string
@@ -534,6 +534,7 @@ export interface Config<
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
+      onLogout?: () => Promise<void>
     }
   }
   // schema: TinaCloudSchema<false>
@@ -582,6 +583,13 @@ export interface Config<
      * Note that for most framworks you can omit the `index.html` portion, for Next.js see the [rewrites section](https://nextjs.org/docs/api-reference/next.config.js/rewrites)
      */
     outputFolder: string
+    /**
+     *
+     *  the host option for the vite config. This is useful when trying to run tinacms dev in a docker container.
+     *
+     * See https://vitejs.dev/config/server-options.html#server-host for more details
+     */
+    host?: string | boolean
   }
   media?:
     | {
