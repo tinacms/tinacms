@@ -35,7 +35,7 @@ export const BlockSelectorBig = ({
     [key: string]: BlockTemplate
   }
   addItem: any
-  label: string
+  label: string | boolean
 }) => {
   const FormPortal = useFormPortal()
   const [pickerIsOpen, setPickerIsOpen] = React.useState(false)

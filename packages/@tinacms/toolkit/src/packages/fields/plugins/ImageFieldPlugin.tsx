@@ -114,21 +114,21 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
         }}
         onDrop={async ([file]: File[]) => {
           setIsImgUploading(true)
-          const directory = uploadDir(props.form.getState().values)
-          const [media] = await cms.media.persist([
-            {
-              directory,
-              file,
-            },
-          ])
-          if (media) {
-            try {
+          try {
+            const directory = uploadDir(props.form.getState().values)
+            const [media] = await cms.media.persist([
+              {
+                directory: directory,
+                file,
+              },
+            ])
+            if (media) {
               await onChange(media)
-            } catch (error) {
-              console.error('Error uploading media asset: ', error)
-            } finally {
-              setIsImgUploading(false)
             }
+          } catch (error) {
+            console.error('Error uploading media asset: ', error)
+          } finally {
+            setIsImgUploading(false)
           }
         }}
         onClear={onClear}

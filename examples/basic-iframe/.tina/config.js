@@ -4,7 +4,12 @@ export default defineConfig({
   admin: {
     auth: {
       onLogin: () => {
-        // Your Login Logic Goes Here
+        console.log('Logged in!')
+        // hook function to be called when the user logs in
+      },
+      onLogout: () => {
+        console.log('Logged out!')
+        // hook function to be called when the user logs out
       },
     },
   },
@@ -12,6 +17,8 @@ export default defineConfig({
   clientId: null,
   token: null,
   build: {
+    // can set the host of the vite config here
+    // host: true,
     outputFolder: 'admin',
     publicFolder: 'public',
   },

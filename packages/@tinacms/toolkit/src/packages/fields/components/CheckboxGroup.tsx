@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Circle, CircleCheck } from '../../icons'
+import { BiCheck } from 'react-icons/bi'
 
 type Option = {
   value: string
@@ -29,6 +29,7 @@ export interface CheckboxGroupFieldProps {
   label?: string
   component: string
   options: (Option | string)[]
+  direction?: 'horizontal' | 'vertical'
 }
 
 export interface CheckboxGroupProps {
@@ -37,6 +38,7 @@ export interface CheckboxGroupProps {
   field: CheckboxGroupFieldProps
   disabled?: boolean
   options?: (Option | string)[]
+  direction?: 'horizontal' | 'vertical'
 }
 
 export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
@@ -67,7 +69,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
     const checked = input.value ? input.value.includes(option.value) : false
     return (
-      <div className="flex-1" key={option.value}>
+      <div key={option.value}>
         <input
           className="absolute w-0 h-0 opacity-0 cursor-pointer"
           type="checkbox"
@@ -93,15 +95,33 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
           }}
         />
         <label
-          className="flex items-center text-[13px] flex-grow rounded-3xl text-blue-500 font-normal cursor-pointer h-[34px] px-3 transition-all duration-100 ease-out m-0 border-0"
+          className="cursor-pointer flex group items-center gap-2"
           htmlFor={optionId}
         >
-          {checked === true ? (
-            <CircleCheck className="w-5 h-auto text-black mr-[5px]" />
-          ) : (
-            <Circle className="w-5 h-auto text-black mr-[5px]" />
-          )}
-          <span className="relative">{option.label}</span>
+          <span
+            className={`relative h-[18px] w-[18px] rounded border text-indigo-600 focus:ring-indigo-500 transition ease-out duration-150 ${
+              checked
+                ? 'border-blue-500 bg-blue-500 shadow-sm group-hover:bg-blue-400 group-hover:border-blue-400'
+                : 'border-gray-200 bg-white shadow-inner group-hover:bg-gray-100'
+            }`}
+          >
+            <BiCheck
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[17px] h-[17px] transition ease-out duration-150 ${
+                checked
+                  ? 'opacity-100 text-white group-hover:opacity-80'
+                  : 'text-blue-500 opacity-0 grou-hover:opacity-30'
+              }`}
+            />
+          </span>
+          <span
+            className={`relative transition ease-out duration-150 ${
+              checked
+                ? 'text-gray-800 opacity-100'
+                : 'text-gray-700 opacity-70 group-hover:opacity-100'
+            }`}
+          >
+            {option.label}
+          </span>
         </label>
       </div>
     )
@@ -109,7 +129,11 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
 
   return (
     <div
-      className="flex flex-col min-h-[42px] bg-white rounded-3xl shadow-none  text-blue-500 p-[3px] transition-all duration-100 ease-out gap-[3px] [&:not(:active)]:[&:not(:focus-within)]:hover:shadow-[0_0_0_2px_#e1ddec] focus-within:shadow-[0_0_0_2px_#0084ff] active:shadow-[0_0_0_2px_#0084ff]"
+      className={`flex w-full ${
+        field.direction === 'horizontal'
+          ? 'flex-wrap gap-y-1 gap-x-3'
+          : 'flex-col gap-1'
+      }`}
       id={input.name}
     >
       {checkboxOptions?.map(toProps).map(toComponent)}

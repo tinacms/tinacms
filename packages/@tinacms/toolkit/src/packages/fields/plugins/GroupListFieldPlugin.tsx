@@ -87,7 +87,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
     <>
       <GroupListHeader>
         <GroupListMeta>
-          <GroupLabel>{field.label || field.name}</GroupLabel>
+          {field.label !== false && (
+            <GroupLabel>{field.label || field.name}</GroupLabel>
+          )}
           {field.description && (
             <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
               {field.description}
@@ -238,18 +240,14 @@ export const GroupLabel = ({
 
 export const GroupListHeader = ({ children }: { children?: any }) => {
   return (
-    <span className="relative flex w-full justify-between items-center mb-2">
+    <span className="relative flex gap-2 w-full justify-between items-center mb-2">
       {children}
     </span>
   )
 }
 
 export const GroupListMeta = ({ children }: { children?: any }) => {
-  return (
-    <div className="leading-none w-full flex-1 flex justify-between items-center gap-2">
-      {children}
-    </div>
-  )
+  return <div className="flex-1 truncate">{children}</div>
 }
 
 export const ListPanel = ({ children }) => {

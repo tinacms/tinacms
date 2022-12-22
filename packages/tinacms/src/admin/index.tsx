@@ -26,7 +26,7 @@ import Sidebar from './components/Sidebar'
 import GetCMS from './components/GetCMS'
 
 import LoginPage from './pages/LoginPage'
-import LogoutPage from './pages/LogoutPage'
+import LogoutPage, { LogoutRedirect } from './pages/LogoutPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
@@ -187,6 +187,14 @@ export const TinaAdmin = ({
                   element={
                     <DefaultWrapper cms={cms}>
                       <ScreenPage />
+                    </DefaultWrapper>
+                  }
+                />
+                <Route
+                  path="logout"
+                  element={
+                    <DefaultWrapper cms={cms}>
+                      <LogoutRedirect />
                     </DefaultWrapper>
                   }
                 />
