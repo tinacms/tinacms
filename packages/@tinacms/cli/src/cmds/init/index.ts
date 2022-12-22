@@ -230,7 +230,7 @@ const forestryMigrate = async ({
     name: 'selection',
     type: 'confirm',
     initial: true,
-    message: `Would you like to migrate your Forestry templates?\n${logText(
+    message: `Please note that this is a beta version and may contain some issues\nWould you like to migrate your Forestry templates?\n${logText(
       'Note: This migration will not be perfect, but it will get you started.'
     )}`,
   })
