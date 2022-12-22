@@ -1,5 +1,18 @@
 # tinacms-cli
 
+## 1.0.5
+
+### Patch Changes
+
+- 4ebc44068: Add a migration tool for forestry users
+- Updated dependencies [7554ea362]
+- Updated dependencies [1a75e8c13]
+- Updated dependencies [4ebc44068]
+  - @tinacms/schema-tools@1.1.0
+  - @tinacms/app@1.0.4
+  - @tinacms/metrics@1.0.1
+  - @tinacms/graphql@1.0.4
+
 ## 1.0.4
 
 ### Patch Changes
