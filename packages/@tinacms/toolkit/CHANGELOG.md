@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.2.0
+
+### Minor Changes
+
+- 7554ea362: Adds hidden and button toggle fields, Improves toggle, radio, checkbox, select, textarea, and list field styles, Fixes block field UI, adds ability to set label to false on any field.
+
+### Patch Changes
+
+- a8c2f674b: Updated drag and drop to work on tina cloud
+- cd82190fb: Adding warning for billing
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @tinacms/schema-tools
 
+## 1.1.0
+
+### Minor Changes
+
+- 7554ea362: Adds hidden and button toggle fields, Improves toggle, radio, checkbox, select, textarea, and list field styles, Fixes block field UI, adds ability to set label to false on any field.
+
+### Patch Changes
+
+- 4ebc44068: Add a migration tool for forestry users
+
 ## 1.0.3
 
 ### Patch Changes
