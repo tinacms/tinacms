@@ -1,5 +1,11 @@
 # @tinacms/metrics
 
+## 1.0.1
+
+### Patch Changes
+
+- 4ebc44068: Add a migration tool for forestry users
+
 ## 1.0.0
 
 ### Major Changes
