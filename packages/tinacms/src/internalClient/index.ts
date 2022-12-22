@@ -486,7 +486,7 @@ mutation addPendingDocumentMutation(
       return null
     }
 
-    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing-state`
+    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing/state`
 
     try {
       const res = await this.fetchWithToken(url, {
@@ -497,22 +497,18 @@ mutation addPendingDocumentMutation(
         console.error(val.error)
         return null
       }
-      return val as {
+      return {
+        clientId: val.clientId || this.clientId,
+        delinquencyDate: val.delinquencyDate,
+        billingState: val.billingState,
+      } as {
         clientId: string
-
         delinquencyDate: number
-
         billingState: 'current' | 'late' | 'delinquent'
       }
     } catch (e) {
       console.error(e)
-      // TODO return null
-      // THIS IS A MOCK RESPONSE (currently working on a cors issue) TO NOT MERGE THIS CODE INTO MAIN WITHOUT REMOVING THIS
-      return {
-        clientId: this.clientId,
-        delinquencyDate: 0,
-        billingState: 'late',
-      }
+      return null
     }
   }
 
