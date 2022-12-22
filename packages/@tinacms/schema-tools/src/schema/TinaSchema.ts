@@ -115,15 +115,57 @@ export class TinaSchema {
     return globalTemplate
   }
   public getCollectionByFullPath = (filepath: string) => {
-    const collection = this.getCollections().find((collection) => {
+    const possibleCollections = this.getCollections().filter((collection) => {
       return filepath
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
     })
-    if (!collection) {
+
+    // No matches
+    if (possibleCollections.length === 0) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
     }
-    return collection
+    // One match
+    if (possibleCollections.length === 1) {
+      return possibleCollections[0]
+    }
+    if (possibleCollections.length > 1) {
+      /**
+       * If there are multiple matches, we want to return the collection
+       * with the longest path.
+       *
+       * This is to handle the case where a collection is nested
+       * inside another collection.
+       *
+       * For example:
+       *
+       * Collection 1:
+       * ```
+       * {
+       *  name: 'Collection 1',
+       *  path : 'content'
+       * }
+       * ```
+       *
+       * Collection 2:
+       *
+       * {
+       *  name: 'Collection 2',
+       *  path : 'content/posts'
+       * }
+       *
+       * For example if we have a file at `content/posts/hello-world.md` it will match on collection 2.
+       * Even though it also matches collection 1.
+       *
+       */
+      const longestMatch = possibleCollections.reduce((acc, collection) => {
+        if (collection.path.length > acc.path.length) {
+          return collection
+        }
+        return acc
+      })
+      return longestMatch
+    }
   }
   public getCollectionAndTemplateByFullPath = (
     filepath: string,
