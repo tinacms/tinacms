@@ -481,6 +481,36 @@ mutation addPendingDocumentMutation(
       return null
     }
   }
+  async getBillingState() {
+    if (!this.clientId) {
+      return null
+    }
+
+    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing/state`
+
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'GET',
+      })
+      const val = await res.json()
+      if (!res.status.toString().startsWith('2')) {
+        console.error(val.error)
+        return null
+      }
+      return {
+        clientId: val.clientId || this.clientId,
+        delinquencyDate: val.delinquencyDate,
+        billingState: val.billingState,
+      } as {
+        clientId: string
+        delinquencyDate: number
+        billingState: 'current' | 'late' | 'delinquent'
+      }
+    } catch (e) {
+      console.error(e)
+      return null
+    }
+  }
 
   async listBranches() {
     const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`

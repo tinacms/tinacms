@@ -46,7 +46,12 @@ export type { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
 export * from './packages/icons'
 export * from './packages/react-dismissible'
-export { Nav, LocalWarning, SyncStatus } from './packages/react-sidebar'
+export {
+  Nav,
+  LocalWarning,
+  BillingWarning,
+  SyncStatus,
+} from './packages/react-sidebar'
 
 /**
  * Custom `tinacms` things
