@@ -43,14 +43,13 @@ export const BillingWarning = () => {
   const [billingState, setBillingState] = React.useState(
     null as {
       clientId: string
-
       delinquencyDate: number
-
       billingState: 'current' | 'late' | 'delinquent'
     } | null
   )
   React.useEffect(() => {
     const fetchBillingState = async () => {
+      if (typeof api?.getBillingState !== 'function') return
       const billingRes = (await api?.getBillingState()) || {}
       setBillingState(billingRes)
     }
