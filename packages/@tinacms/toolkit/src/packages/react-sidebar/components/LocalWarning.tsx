@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { AiFillWarning } from 'react-icons/ai'
 import { BiError, BiRightArrowAlt } from 'react-icons/bi'
-import { useCMS } from '../../../react-tinacms'
+import { useCMS } from '../../react-core'
 
 export const LocalWarning = () => {
   return (
@@ -38,7 +38,7 @@ export const LocalWarning = () => {
 export const BillingWarning = () => {
   const cms = useCMS()
   const api = cms?.api?.tina
-  const isLocalMode: boolean = api.isLocalMode
+  const isLocalMode: boolean = api?.isLocalMode || false
 
   const [billingState, setBillingState] = React.useState(
     null as {

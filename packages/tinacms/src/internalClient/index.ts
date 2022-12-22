@@ -486,7 +486,7 @@ mutation addPendingDocumentMutation(
       return null
     }
 
-    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing/state`
+    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/billing-state`
 
     try {
       const res = await this.fetchWithToken(url, {
