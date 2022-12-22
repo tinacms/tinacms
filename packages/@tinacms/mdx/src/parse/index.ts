@@ -82,15 +82,26 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        const replacement = !!template.fields.find((t) => t.name == 'text')
-          ? `<${template.name} text=$1>\n</${template.name}>`
+        const unkeyedAttributes = !!template.fields.find(
+          (t) => t.name == 'text'
+        )
+
+        const replacement = unkeyedAttributes
+          ? `<${template.name} text=\'$1\'>\n</${template.name}>`
           : `<${template.name} $1>\n</${template.name}>`
 
-        preprocessedString = replaceAll(
-          preprocessedString,
-          `${template.match.start}\\s*${template.name}[\\s]+(.*?)[\\s]*${template.match.end}`,
-          replacement
-        )
+        const regex = unkeyedAttributes
+          ? `${template.match.start}\\s*${template.name}[\\s]+[\'\"]?(.*?)[\'\"]?[\\s]*${template.match.end}`
+          : `${template.match.start}\\s*${template.name}[\\s]+(.*?)[\\s]*${template.match.end}`
+
+        console.log('replacement: ', replacement)
+        console.log('regex: ', regex)
+
+        preprocessedString = replaceAll(preprocessedString, regex, replacement)
+
+        console.log('result: ', preprocessedString)
+
+        console.log('------------------')
       }
     }
   })
@@ -108,7 +119,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     // })
     return tree
   } catch (e) {
-    console.error(e)
+    console.error('error parsing file: ', e)
 
     // @ts-ignore VMessage is the error type but it's not accessible
     throw new RichTextParseError(e, e.position)
