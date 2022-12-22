@@ -520,10 +520,10 @@ export class Database {
   }
 
   public getSchema = async (level?: Level) => {
-    await this.initLevel()
     if (this.tinaSchema) {
       return this.tinaSchema
     }
+    await this.initLevel()
     const schema = await this.getTinaSchema(level || this.level)
     this.tinaSchema = await createSchema({ schema })
     return this.tinaSchema
