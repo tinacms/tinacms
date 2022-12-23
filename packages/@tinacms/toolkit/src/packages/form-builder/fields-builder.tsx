@@ -36,12 +36,16 @@ import { Object } from '../fields/plugins/core/object'
 export interface FieldsBuilderProps {
   form: Form
   fields: Field[]
+  prefix: string
+  setActiveFields: (field: SchemaField[]) => void
   padding?: boolean
 }
 
 export function FieldsBuilder({
   form,
   fields,
+  prefix,
+  setActiveFields,
   padding = false,
 }: FieldsBuilderProps) {
   const cms = useCMS()
@@ -56,26 +60,38 @@ export function FieldsBuilder({
   useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
 
   return (
-    <FieldsGroup padding={padding}>
-      {fields.map((field: Field) => (
-        <InnerField
-          key={field.name}
-          field={field}
-          form={form}
-          fieldPlugins={fieldPlugins}
-        />
-      ))}
-    </FieldsGroup>
+    <div className="h-full bg-gray-50 pt-12 px-6 pb-2">
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-form">
+          <FieldsGroup padding={padding}>
+            {fields.map((field: Field) => (
+              <InnerField
+                setActiveFields={setActiveFields}
+                key={field.name}
+                prefix={prefix}
+                field={field}
+                form={form}
+                fieldPlugins={fieldPlugins}
+              />
+            ))}
+          </FieldsGroup>
+        </div>
+      </div>
+    </div>
   )
 }
 
 const InnerField = ({
   field,
   form,
+  prefix,
+  setActiveFields,
   fieldPlugins,
 }: {
   field: Field
   form: Form
+  prefix: string
+  setActivFields: (fields: SchemaField[]) => void
   fieldPlugins: FieldPlugin[]
 }) => {
   // TODO: deprecate global field plugins
@@ -111,7 +127,10 @@ const InnerField = ({
       fieldConfig['type'] = field.list ? 'checkbox' : 'radio'
     }
   }
-  const { input, meta } = useField(field.name, fieldConfig)
+  const { input, meta } = useField(
+    `${prefix ? `${prefix}.` : ''}${field.name}`,
+    fieldConfig
+  )
 
   const props: TinaFieldProps = {
     input,
@@ -119,9 +138,11 @@ const InnerField = ({
     field,
     tinaForm: form,
     form: form.finalForm,
+    prefix,
+    setActiveFields,
   }
 
-  return <TinaField {...props} />
+  return <TinaField {...props} setActiveFields={setActiveFields} />
 }
 
 export type TinaFieldProps = {
@@ -129,6 +150,7 @@ export type TinaFieldProps = {
   meta: FieldMetaState<unknown>
   field: SchemaField<true>
   tinaForm: Form
+  setActiveFields: (fields: SchemaField[]) => void
   form: typeof FinalForm
 }
 const TinaField = (props: TinaFieldProps) => {

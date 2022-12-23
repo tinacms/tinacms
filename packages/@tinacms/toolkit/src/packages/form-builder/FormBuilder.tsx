@@ -26,6 +26,9 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { SchemaField } from '@tinacms/schema-tools'
+import { Transition } from '@headlessui/react'
+import { IoMdClose } from 'react-icons/io'
 
 export interface FormBuilderProps {
   form: Form
@@ -69,6 +72,260 @@ const NoFieldsPlaceholder = () => (
 )
 
 export const FormBuilder: FC<FormBuilderProps> = ({
+  form: tinaForm,
+  onPristineChange,
+  ...rest
+}) => {
+  const hideFooter = !!rest.hideFooter
+  /**
+   * > Why is a `key` being set when this isn't an array?
+   *
+   * `FinalForm` does not update when given a new `form` prop.
+   *
+   * We can force `FinalForm` to update by setting the `key` to
+   * the name of the form. When the name changes React will
+   * treat it as a new instance of `FinalForm`, destroying the
+   * old `FinalForm` componentt and create a new one.
+   *
+   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
+   */
+  const [i, setI] = React.useState(0)
+  React.useEffect(() => {
+    setI((i) => i + 1)
+  }, [tinaForm])
+
+  const [prefix, setPrefix] = React.useState('')
+  const [nextPrefix, setNextPrefix] = React.useState('')
+
+  const finalForm = tinaForm.finalForm
+
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !finalForm) return
+      const name = result.type
+      finalForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
+    },
+    [tinaForm]
+  )
+
+  const [activeFields, setActiveFieldsInner] = React.useState<SchemaField[]>(
+    tinaForm.fields
+  )
+  const [nextFields, setNextFields] = React.useState<SchemaField[]>([])
+  const [depth, setDepth] = React.useState<{ name: string; index?: number }[]>(
+    []
+  )
+  const setActiveFields = (fieldName: string) => {
+    if (fieldName === '') {
+      setNextFields(tinaForm.fields)
+      setDepth([])
+      setNextPrefix('')
+      return
+    }
+    setNextPrefix(fieldName)
+    const nameArray = fieldName.split('.')
+    const getField = (
+      nameArray: string[],
+      fields: SchemaField[],
+      depth: { name: string; index?: number }[] = []
+    ) => {
+      const [name, ...rest] = nameArray
+      const field = fields.find((field) => field.name === name)
+      let nextFields: SchemaField[] = []
+      if (field.type === 'object') {
+        if (field.list) {
+          const [index, ...rest2] = rest
+          depth.push({ name, index: Number(index) })
+          if (field.templates) {
+            const parentValues =
+              tinaForm.finalForm.getState().values[field.name]
+            const fieldValue = parentValues[index]
+            const template = field.templates.find(
+              (template) => template.name === fieldValue._template
+            )
+            if (rest2.length > 0) {
+              return getField(rest2, template.fields, depth)
+            }
+            nextFields = template.fields
+          }
+          if (field.fields) {
+            if (rest2.length > 0) {
+              return getField(rest2, field.fields, depth)
+            }
+            nextFields = field.fields
+          }
+        } else {
+          depth.push({ name })
+        }
+      } else {
+        throw new Error(
+          `Received field group event for field with no sub-fields`
+        )
+      }
+      return { depth, fields: nextFields }
+    }
+    const { depth, fields } = getField(nameArray, tinaForm.fields)
+    setNextFields(fields)
+    setDepth(depth)
+  }
+
+  /**
+   * Prevent navigation away from the window when the form is dirty
+   */
+  React.useEffect(() => {
+    // const onBeforeUnload = (event) => {
+    //   event.preventDefault()
+    //   event.returnValue = ''
+    // }
+
+    const unsubscribe = finalForm.subscribe(
+      ({ pristine }) => {
+        if (onPristineChange) {
+          onPristineChange(pristine)
+        }
+
+        // if (!pristine) {
+        //   window.addEventListener('beforeunload', onBeforeUnload)
+        // } else {
+        //   window.removeEventListener('beforeunload', onBeforeUnload)
+        // }
+      },
+      { pristine: true }
+    )
+    return () => {
+      // window.removeEventListener('beforeunload', onBeforeUnload)
+      unsubscribe()
+    }
+  }, [finalForm])
+
+  useOnChangeEventDispatch({ finalForm, tinaForm })
+
+  return (
+    <FinalForm
+      form={finalForm}
+      key={`${i}: ${tinaForm.id}`}
+      onSubmit={tinaForm.onSubmit}
+    >
+      {({
+        handleSubmit,
+        pristine,
+        invalid,
+        submitting,
+        dirtySinceLastSubmit,
+        hasValidationErrors,
+      }) => {
+        return (
+          <>
+            <DragDropContext onDragEnd={moveArrayItem}>
+              <div
+                data-test={`form:${tinaForm.id?.replace(/\\/g, '/')}`}
+                className="relative h-full overflow-y-auto max-h-full"
+              >
+                {depth.length > 0 && (
+                  <button
+                    className={`absolute left-0 right-0 top-0 z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm border-gray-100 px-6 -mt-px`}
+                    onClick={() => {
+                      const excludeLast = depth.slice(0, -1)
+                      const fieldName = excludeLast
+                        .map((item) =>
+                          isNaN(item.index)
+                            ? item.name
+                            : `${item.name}.${item.index}`
+                        )
+                        .join('.')
+                      setActiveFields(fieldName)
+                    }}
+                    tabIndex={-1}
+                  >
+                    <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+                      {depth[depth.length - 1].name}
+                      <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+                    </div>
+                  </button>
+                )}
+                <FieldsBuilder
+                  setActiveFields={setActiveFields}
+                  prefix={prefix}
+                  form={tinaForm}
+                  fields={activeFields}
+                />
+                <Transition
+                  appear={true}
+                  show={nextFields.length > 0}
+                  enter="transition ease-in-out duration-300 transform"
+                  enterFrom="translate-x-full"
+                  enterTo="translate-x-0  absolute inset-0 w-full h-full z-20"
+                  leave="transition ease-in-out duration-300 transform"
+                  leaveFrom="translate-x-0 absolute inset-0 w-full h-full z-20"
+                  leaveTo="translate-x-full"
+                  afterEnter={() => {
+                    setActiveFieldsInner(nextFields)
+                    setNextFields([])
+                    setPrefix(nextPrefix)
+                    setNextPrefix('')
+                  }}
+                >
+                  {/* Your content goes here*/}
+                  <FieldsBuilder
+                    setActiveFields={setActiveFields}
+                    form={tinaForm}
+                    prefix={nextPrefix}
+                    fields={nextFields}
+                  />
+                </Transition>
+              </div>
+
+              {!hideFooter && (
+                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
+                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                        style={{ flexGrow: 1 }}
+                      >
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={() => handleSubmit()}
+                      disabled={
+                        pristine ||
+                        submitting ||
+                        hasValidationErrors ||
+                        (invalid && !dirtySinceLastSubmit)
+                      }
+                      busy={submitting}
+                      variant="primary"
+                      style={{ flexGrow: 3 }}
+                    >
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+            </DragDropContext>
+          </>
+        )
+      }}
+    </FinalForm>
+  )
+}
+export const FormBuilder2: FC<FormBuilderProps> = ({
   form: tinaForm,
   onPristineChange,
   ...rest

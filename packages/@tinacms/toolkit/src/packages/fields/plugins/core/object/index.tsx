@@ -62,6 +62,9 @@ const ObjectFieldList = (
   if (props.field.type !== 'object') {
     throw new Error(`Expected field to be of type 'object'`)
   }
+  if (!Array.isArray(props.input.value)) {
+    return null
+  }
   return (
     <Wrap
       {...props}
@@ -75,7 +78,7 @@ const ObjectFieldList = (
         <Droppable droppableId={props.field.name} type={props.field.name}>
           {(provider) => (
             <div ref={provider.innerRef}>
-              {props.input.value.map((item, index) => {
+              {props.input.value?.map((item, index) => {
                 return (
                   <Item
                     key={index}
@@ -113,6 +116,9 @@ const ObjectTemplateList = (
     throw new Error(`Expected field to be of type 'object'`)
   }
 
+  if (!Array.isArray(props.input.value)) {
+    return null
+  }
   return (
     <Wrap
       {...props}
@@ -124,7 +130,7 @@ const ObjectTemplateList = (
         <Droppable droppableId={props.field.name} type={props.field.name}>
           {(provider) => (
             <div ref={provider.innerRef}>
-              {props.input.value.map((item, index) => {
+              {props.input.value?.map((item, index) => {
                 const template = props.field.templates.find(
                   (template) => item._template === template.name
                 )
@@ -174,7 +180,17 @@ const Item = (
           {...provider.dragHandleProps}
         >
           <DragHandle isDragging={snapshot.isDragging} />
-          <div className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2">
+          <button
+            // onClick={() => props.setActiveFields(props.template.fields)}
+            onClick={() =>
+              props.setActiveFields(
+                `${props.prefix ? `${props.prefix}.` : ''}${props.field.name}.${
+                  props.index
+                }`
+              )
+            }
+            className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2"
+          >
             <span
               className={`m-0 text-xs font-semibold flex-1 text-ellipsis overflow-hidden transition-all ease-out duration-100 text-left ${
                 false
@@ -185,7 +201,7 @@ const Item = (
               {title}
             </span>
             <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
-          </div>
+          </button>
           <button
             className="w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500"
             onClick={() => {}}
