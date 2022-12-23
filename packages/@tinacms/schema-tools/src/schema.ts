@@ -395,6 +395,7 @@ export class TinaSchema {
       // Get the type of the parent namespace
       field.namespace.filter((_, i) => i < field.namespace.length - 1)
     )
+    return field
     const extraFields = field.ui || {}
     switch (field.type) {
       case 'number':

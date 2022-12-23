@@ -518,9 +518,15 @@ const resolveFieldValue = ({
         if (field.list) {
           if (Array.isArray(value)) {
             return value.map((item) => {
-              const template = field.templates[item._template]
+              // const template = field.templates[item._template]
+              const template = field.templates.find(
+                (template) => template.name === item._template
+              )
               if (typeof template === 'string') {
                 throw new Error('Global templates not supported')
+              }
+              if (!template) {
+                throw new Error(`Unable to find template ${item._template}`)
               }
               return {
                 __typename: NAMER.dataTypeName(template.namespace),

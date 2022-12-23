@@ -21,6 +21,7 @@ import { FieldProps } from './fieldProps'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { Form } from '../../forms'
+import { FieldRenderProps } from 'react-final-form'
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps
@@ -48,6 +49,26 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   }
 }
 
+type WrapProps = FieldRenderProps<unknown> & {
+  children: JSX.Element
+  tinaForm: Form
+}
+export const Wrap = (props: WrapProps) => {
+  return (
+    <FieldMeta
+      name={props.input.name}
+      label={props.field.label}
+      description={props.field.description}
+      error={props.meta.error}
+      index={props.index}
+      tinaForm={props.tinaForm}
+      actionSlot={props.actionSlot}
+    >
+      {props.children}
+    </FieldMeta>
+  )
+}
+
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   children: any
@@ -56,6 +77,7 @@ interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   error?: string
   margin?: boolean
   index?: number
+  actionSlot?: JSX.Element
   tinaForm: Form
 }
 
@@ -68,6 +90,7 @@ export const FieldMeta = ({
   children,
   index,
   tinaForm,
+  actionSlot,
   ...props
 }: FieldMetaProps) => {
   const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
@@ -81,12 +104,15 @@ export const FieldMeta = ({
       style={{ zIndex: index ? 1000 - index : undefined }}
       {...props}
     >
-      {(label !== false || description) && (
-        <FieldLabel name={name}>
-          {label !== false && <>{label || name}</>}
-          {description && <FieldDescription>{description}</FieldDescription>}
-        </FieldLabel>
-      )}
+      <div className="flex justify-between items-center">
+        {(label !== false || description) && (
+          <FieldLabel name={name}>
+            {label !== false && <>{label || name}</>}
+            {description && <FieldDescription>{description}</FieldDescription>}
+          </FieldLabel>
+        )}
+        {actionSlot && <div>{actionSlot}</div>}
+      </div>
       {children}
       {/*
       FIXME: when a object field has a sub-field with a validation (eg. required)

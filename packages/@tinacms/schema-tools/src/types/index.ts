@@ -113,6 +113,8 @@ type Component<Type, List> = (props: {
     value: List extends true ? Type[] : Type
   }
   meta: Meta
+  form: any // TODO: FinalForm
+  tinaForm: any // TODO: Tina Form
 }) => any
 
 export type UIField<Type, List extends boolean> = {
@@ -174,7 +176,7 @@ export type UIField<Type, List extends boolean> = {
    * if you don't have access to the component directly
    */
   format?: (
-    value: Type,
+    value: List extends true ? Type[] : Type,
     name: string,
     field: Field
   ) => List extends true ? Type[] : Type
@@ -354,26 +356,34 @@ type ObjectUiProps = {
   visualSelector?: boolean
 }
 
-export type ObjectField<WithNamespace extends boolean = false> =
+export type ObjectFieldWithFields<WithNamespace extends boolean = false> =
   | (
       | FieldGeneric<string, undefined, ObjectUiProps>
       | FieldGeneric<string, true, ObjectUiProps>
       | FieldGeneric<string, false, ObjectUiProps>
     ) &
-      BaseField<WithNamespace> &
-      (
-        | {
-            type: 'object'
-            fields: Field<WithNamespace>[]
-            templates?: undefined
-            ui?: Template['ui']
-          }
-        | {
-            type: 'object'
-            fields?: undefined
-            templates: Template<WithNamespace>[]
-          }
-      )
+      BaseField<WithNamespace> & {
+        type: 'object'
+        fields: Field<WithNamespace>[]
+        templates?: undefined
+        ui?: Template['ui']
+      }
+
+export type ObjectFieldWithTemplates<WithNamespace extends boolean = false> =
+  | (
+      | FieldGeneric<string, undefined, ObjectUiProps>
+      | FieldGeneric<string, true, ObjectUiProps>
+      | FieldGeneric<string, false, ObjectUiProps>
+    ) &
+      BaseField<WithNamespace> & {
+        type: 'object'
+        fields?: undefined
+        templates: Template<WithNamespace>[]
+      }
+
+export type ObjectField<WithNamespace extends boolean = false> =
+  | ObjectFieldWithFields<WithNamespace>
+  | ObjectFieldWithTemplates<WithNamespace>
 
 type Field<WithNamespace extends boolean = false> =
   | StringField<WithNamespace>
@@ -391,7 +401,7 @@ type SchemaField<WithNamespace extends boolean = false> = Field<WithNamespace>
 export type { SchemaField }
 
 export type Template<WithNamespace extends boolean = false> = {
-  label?: string
+  label?: string | false // TODO: cleanup `false` is needed for compatibility with object fields
   name: string
   ui?: {
     /**

@@ -19,8 +19,19 @@ limitations under the License.
 import * as React from 'react'
 import { Form, Field } from '../forms'
 import { useCMS, useEventSubscription } from '../react-core'
-import { Field as FinalField } from 'react-final-form'
+import {
+  Field as FinalField,
+  Form as FinalForm,
+  FieldInputProps,
+  FieldMetaState,
+  useField,
+  UseFieldConfig,
+} from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
+import { SchemaField } from '@tinacms/schema-tools/src/types'
+import { String } from '../fields/plugins/core/string'
+import { Wrap } from '../fields'
+import { Object } from '../fields/plugins/core/object'
 
 export interface FieldsBuilderProps {
   form: Form
@@ -46,33 +57,30 @@ export function FieldsBuilder({
 
   return (
     <FieldsGroup padding={padding}>
-      {fields.map((field: Field, index) => (
+      {fields.map((field: Field) => (
         <InnerField
           key={field.name}
           field={field}
           form={form}
           fieldPlugins={fieldPlugins}
-          index={index}
         />
       ))}
     </FieldsGroup>
   )
 }
 
-const InnerField = ({ field, form, fieldPlugins, index }) => {
-  /**
-   * We double-render form builders for some reason which reults in useMemo not working here
-   */
-  React.useEffect(() => {
-    form.mutators.setFieldData(field.name, {
-      tinaField: field,
-    })
-  }, [form, field])
-
-  if (field.component === null) return null
-
+const InnerField = ({
+  field,
+  form,
+  fieldPlugins,
+}: {
+  field: Field
+  form: Form
+  fieldPlugins: FieldPlugin[]
+}) => {
+  // TODO: deprecate global field plugins
   const plugin = fieldPlugins.find(
-    (plugin: FieldPlugin) => plugin.name === field.component
+    (plugin: FieldPlugin) => plugin.name === field.ui?.component
   )
 
   let type: string | undefined
@@ -80,66 +88,59 @@ const InnerField = ({ field, form, fieldPlugins, index }) => {
     type = plugin.type
   }
 
-  const parse = getProp('parse', field, plugin)
-  const validate = getProp('validate', field, plugin)
+  const fieldConfig: UseFieldConfig<unknown, unknown> = {}
 
-  let format = field.format
-
+  const parse = field.ui?.parse || plugin?.parse
+  if (parse) {
+    fieldConfig['parse'] = (value, name) => parse!(value, name, field)
+  }
+  const validate = field.ui?.validate || plugin?.validate
+  if (validate) {
+    fieldConfig['validate'] = (value, values, meta) =>
+      validate!(value, values, meta, field)
+  }
+  let format = field.ui?.format
   if (!format && plugin && plugin.format) {
     format = plugin.format
   }
+  if (format) {
+    fieldConfig['format'] = (value, name) => format(value, name, field)
+  }
+  if (field.type === 'string') {
+    if (field.options) {
+      fieldConfig['type'] = field.list ? 'checkbox' : 'radio'
+    }
+  }
+  const { input, meta } = useField(field.name, fieldConfig)
 
-  return (
-    <FinalField
-      name={field.name}
-      key={field.name}
-      type={type}
-      parse={
-        parse
-          ? (value: any, name: string) => parse!(value, name, field)
-          : undefined
-      }
-      format={
-        format
-          ? (value: any, name: string) => format!(value, name, field)
-          : undefined
-      }
-      // don't use the default value anymore
-      // defaultValue={defaultValue}
-      validate={(value, values, meta) => {
-        if (validate) {
-          return validate(value, values, meta, field)
-        }
-      }}
-    >
-      {(fieldProps) => {
-        if (typeof field.component !== 'string' && field.component !== null) {
-          return (
-            <field.component
-              {...fieldProps}
-              form={form.finalForm}
-              tinaForm={form}
-              field={field}
-            />
-          )
-        }
+  const props: TinaFieldProps = {
+    input,
+    meta,
+    field,
+    tinaForm: form,
+    form: form.finalForm,
+  }
 
-        if (plugin) {
-          return (
-            <plugin.Component
-              {...fieldProps}
-              form={form.finalForm}
-              tinaForm={form}
-              field={field}
-              index={index}
-            />
-          )
-        }
+  return <TinaField {...props} />
+}
 
-        return <p>Unrecognized field type</p>
-      }}
-    </FinalField>
-  )
+export type TinaFieldProps = {
+  input: FieldInputProps<unknown, HTMLElement>
+  meta: FieldMetaState<unknown>
+  field: SchemaField<true>
+  tinaForm: Form
+  form: typeof FinalForm
+}
+const TinaField = (props: TinaFieldProps) => {
+  switch (props.field.type) {
+    case 'string': {
+      return <String {...props} />
+    }
+    case 'object': {
+      return <Object {...props} />
+    }
+  }
+  return <p>Unrecognized field type</p>
 }
 
 export const FieldsGroup = ({
@@ -158,22 +159,4 @@ export const FieldsGroup = ({
       {children}
     </div>
   )
-}
-
-/**
- *
- * @param name
- * @param field
- * @param plugin
- */
-function getProp(
-  name: keyof FieldPlugin & keyof Field,
-  field: Field,
-  plugin?: FieldPlugin
-): any {
-  let prop = field[name]
-  if (!prop && plugin && plugin[name]) {
-    prop = plugin[name]
-  }
-  return prop
 }
