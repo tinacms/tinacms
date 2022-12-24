@@ -71,6 +71,13 @@ const NoFieldsPlaceholder = () => (
   </div>
 )
 
+type Depth = { name: string; index?: number }
+
+export type State = {
+  fields: SchemaField[]
+  depth: Depth[]
+}
+
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
   onPristineChange,
@@ -94,9 +101,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     setI((i) => i + 1)
   }, [tinaForm])
 
-  const [prefix, setPrefix] = React.useState('')
-  const [nextPrefix, setNextPrefix] = React.useState('')
-
   const finalForm = tinaForm.finalForm
 
   const moveArrayItem = React.useCallback(
@@ -112,21 +116,24 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     [tinaForm]
   )
 
-  const [activeFields, setActiveFieldsInner] = React.useState<SchemaField[]>(
-    tinaForm.fields
-  )
-  const [nextFields, setNextFields] = React.useState<SchemaField[]>([])
-  const [depth, setDepth] = React.useState<{ name: string; index?: number }[]>(
-    []
-  )
+  const [state, setState] = React.useState<{
+    direction: 'in' | 'out'
+    current: State
+    next?: State
+  }>({
+    direction: 'in',
+    current: {
+      fields: tinaForm.fields,
+      depth: [],
+    },
+    next: null,
+  })
+
+  React.useEffect(() => {
+    console.log(state)
+  }, [JSON.stringify(state)])
+
   const setActiveFields = (fieldName: string) => {
-    if (fieldName === '') {
-      setNextFields(tinaForm.fields)
-      setDepth([])
-      setNextPrefix('')
-      return
-    }
-    setNextPrefix(fieldName)
     const nameArray = fieldName.split('.')
     const getField = (
       nameArray: string[],
@@ -134,6 +141,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       depth: { name: string; index?: number }[] = []
     ) => {
       const [name, ...rest] = nameArray
+      if (name === '') {
+        return { depth: [], fields: tinaForm.fields }
+      }
       const field = fields.find((field) => field.name === name)
       let nextFields: SchemaField[] = []
       if (field.type === 'object') {
@@ -169,8 +179,24 @@ export const FormBuilder: FC<FormBuilderProps> = ({
       return { depth, fields: nextFields }
     }
     const { depth, fields } = getField(nameArray, tinaForm.fields)
-    setNextFields(fields)
-    setDepth(depth)
+    if (depth.length > state.current.depth.length) {
+      setState((state) => ({
+        ...state,
+        next: {
+          fields,
+          depth,
+        },
+      }))
+    } else {
+      setState((state) => ({
+        direction: 'out',
+        current: {
+          fields,
+          depth,
+        },
+        next: state.current,
+      }))
+    }
   }
 
   /**
@@ -225,58 +251,40 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                 data-test={`form:${tinaForm.id?.replace(/\\/g, '/')}`}
                 className="relative h-full overflow-y-auto max-h-full"
               >
-                {depth.length > 0 && (
-                  <button
-                    className={`absolute left-0 right-0 top-0 z-40 group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm border-gray-100 px-6 -mt-px`}
-                    onClick={() => {
-                      const excludeLast = depth.slice(0, -1)
-                      const fieldName = excludeLast
-                        .map((item) =>
-                          isNaN(item.index)
-                            ? item.name
-                            : `${item.name}.${item.index}`
-                        )
-                        .join('.')
-                      setActiveFields(fieldName)
-                    }}
-                    tabIndex={-1}
-                  >
-                    <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
-                      {depth[depth.length - 1].name}
-                      <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
-                    </div>
-                  </button>
-                )}
                 <FieldsBuilder
                   setActiveFields={setActiveFields}
-                  prefix={prefix}
+                  state={state.current}
                   form={tinaForm}
-                  fields={activeFields}
                 />
-                <Transition
-                  appear={true}
-                  show={nextFields.length > 0}
-                  enter="transition ease-in-out duration-300 transform"
-                  enterFrom="translate-x-full"
-                  enterTo="translate-x-0  absolute inset-0 w-full h-full z-20"
-                  leave="transition ease-in-out duration-300 transform"
-                  leaveFrom="translate-x-0 absolute inset-0 w-full h-full z-20"
-                  leaveTo="translate-x-full"
+                <Animate
+                  direction={state.direction}
+                  show={!!state.next}
                   afterEnter={() => {
-                    setActiveFieldsInner(nextFields)
-                    setNextFields([])
-                    setPrefix(nextPrefix)
-                    setNextPrefix('')
+                    if (state.direction === 'in') {
+                      setState((state) => {
+                        return {
+                          current: state.next,
+                          next: null,
+                          direction: 'in',
+                        }
+                      })
+                    } else {
+                      setState((state) => ({
+                        ...state,
+                        next: null,
+                        direction: 'in',
+                      }))
+                    }
                   }}
                 >
-                  {/* Your content goes here*/}
-                  <FieldsBuilder
-                    setActiveFields={setActiveFields}
-                    form={tinaForm}
-                    prefix={nextPrefix}
-                    fields={nextFields}
-                  />
-                </Transition>
+                  {state.next && (
+                    <FieldsBuilder
+                      setActiveFields={setActiveFields}
+                      state={state.next}
+                      form={tinaForm}
+                    />
+                  )}
+                </Animate>
               </div>
 
               {!hideFooter && (
@@ -325,145 +333,34 @@ export const FormBuilder: FC<FormBuilderProps> = ({
     </FinalForm>
   )
 }
-export const FormBuilder2: FC<FormBuilderProps> = ({
-  form: tinaForm,
-  onPristineChange,
-  ...rest
-}) => {
-  const hideFooter = !!rest.hideFooter
-  /**
-   * > Why is a `key` being set when this isn't an array?
-   *
-   * `FinalForm` does not update when given a new `form` prop.
-   *
-   * We can force `FinalForm` to update by setting the `key` to
-   * the name of the form. When the name changes React will
-   * treat it as a new instance of `FinalForm`, destroying the
-   * old `FinalForm` componentt and create a new one.
-   *
-   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
-   */
-  const [i, setI] = React.useState(0)
-  React.useEffect(() => {
-    setI((i) => i + 1)
-  }, [tinaForm])
-
-  const finalForm = tinaForm.finalForm
-
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !finalForm) return
-      const name = result.type
-      finalForm.mutators.move(
-        name,
-        result.source.index,
-        result.destination.index
-      )
-    },
-    [tinaForm]
-  )
-
-  /**
-   * Prevent navigation away from the window when the form is dirty
-   */
-  React.useEffect(() => {
-    // const onBeforeUnload = (event) => {
-    //   event.preventDefault()
-    //   event.returnValue = ''
-    // }
-
-    const unsubscribe = finalForm.subscribe(
-      ({ pristine }) => {
-        if (onPristineChange) {
-          onPristineChange(pristine)
-        }
-
-        // if (!pristine) {
-        //   window.addEventListener('beforeunload', onBeforeUnload)
-        // } else {
-        //   window.removeEventListener('beforeunload', onBeforeUnload)
-        // }
-      },
-      { pristine: true }
-    )
-    return () => {
-      // window.removeEventListener('beforeunload', onBeforeUnload)
-      unsubscribe()
-    }
-  }, [finalForm])
-
-  useOnChangeEventDispatch({ finalForm, tinaForm })
-
+const Animate = ({ direction, show, afterEnter, children }) => {
+  const duration = 'duration-300'
+  const animateIn = {
+    enter: `transition ease-in-out ${duration} transform`,
+    enterFrom: 'translate-x-full',
+    enterTo: 'translate-x-0  absolute inset-0 w-full h-full z-20',
+    leave: `transition ease-in-out ${duration} transform`,
+    leaveFrom: 'translate-x-0 absolute inset-0 w-full h-full z-20',
+    leaveTo: 'translate-x-full',
+  }
+  const animateOut = {
+    enter: `transition ease-in-out transform absolute inset-0 w-full h-full z-20`,
+    enterFrom: 'translate-x-0',
+    enterTo: 'translate-x-full',
+    leave: `transition ease-in-out ${duration} transform  absolute inset-0 w-full h-full z-20`,
+    leaveFrom: 'translate-x-full',
+    leaveTo: 'translate-x-0',
+  }
+  const animation = direction === 'in' ? animateIn : animateOut
   return (
-    <FinalForm
-      form={finalForm}
-      key={`${i}: ${tinaForm.id}`}
-      onSubmit={tinaForm.onSubmit}
+    <Transition
+      {...animation}
+      appear={true}
+      show={show}
+      afterEnter={() => afterEnter()}
     >
-      {({
-        handleSubmit,
-        pristine,
-        invalid,
-        submitting,
-        dirtySinceLastSubmit,
-        hasValidationErrors,
-      }) => {
-        return (
-          <>
-            <DragDropContext onDragEnd={moveArrayItem}>
-              <FormPortalProvider>
-                <FormWrapper id={tinaForm.id}>
-                  {tinaForm && tinaForm.fields.length ? (
-                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  )}
-                </FormWrapper>
-              </FormPortalProvider>
-              {!hideFooter && (
-                <div className="relative flex-none w-full h-16 px-6 bg-white border-t border-gray-100	flex items-center justify-center">
-                  <div className="flex-1 w-full flex justify-between gap-4 items-center max-w-form">
-                    {tinaForm.reset && (
-                      <ResetForm
-                        pristine={pristine}
-                        reset={async () => {
-                          finalForm.reset()
-                          await tinaForm.reset!()
-                        }}
-                        style={{ flexGrow: 1 }}
-                      >
-                        {tinaForm.buttons.reset}
-                      </ResetForm>
-                    )}
-                    <Button
-                      onClick={() => handleSubmit()}
-                      disabled={
-                        pristine ||
-                        submitting ||
-                        hasValidationErrors ||
-                        (invalid && !dirtySinceLastSubmit)
-                      }
-                      busy={submitting}
-                      variant="primary"
-                      style={{ flexGrow: 3 }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {tinaForm.actions.length > 0 && (
-                      <FormActionMenu
-                        form={tinaForm as any}
-                        actions={tinaForm.actions}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-            </DragDropContext>
-          </>
-        )
-      }}
-    </FinalForm>
+      {children}
+    </Transition>
   )
 }
 
@@ -715,3 +612,11 @@ const Emoji = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+export const getPath = (depth: Depth[]) => {
+  return depth
+    .map(({ name, index }) => {
+      return isNaN(index) ? name : `${name}.${index}`
+    })
+    .join('.')
+}

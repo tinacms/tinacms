@@ -28,26 +28,27 @@ import {
   UseFieldConfig,
 } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
-import { SchemaField } from '@tinacms/schema-tools/src/types'
+import { SchemaField } from '@tinacms/schema-tools'
 import { String } from '../fields/plugins/core/string'
-import { Wrap } from '../fields'
 import { Object } from '../fields/plugins/core/object'
+import { getPath, State } from './FormBuilder'
+import { IoMdClose } from 'react-icons/io'
 
 export interface FieldsBuilderProps {
   form: Form
-  fields: Field[]
-  prefix: string
-  setActiveFields: (field: SchemaField[]) => void
+  state: State
+  setActiveFields: (fieldName: string) => void
   padding?: boolean
 }
 
 export function FieldsBuilder({
   form,
-  fields,
-  prefix,
+  state,
   setActiveFields,
   padding = false,
 }: FieldsBuilderProps) {
+  const prefix = getPath(state.depth)
+  const fields = state.fields
   const cms = useCMS()
 
   // re-build fields when new field plugins are registered
@@ -60,8 +61,28 @@ export function FieldsBuilder({
   useEventSubscription('plugin:add:field', () => updateFieldPlugins(), [])
 
   return (
-    <div className="h-full bg-gray-50 pt-12 px-6 pb-2">
-      <div className="w-full flex justify-center">
+    <div className="min-h-full bg-gray-50">
+      {state.depth.length > 0 && (
+        <button
+          className={`group text-left w-full bg-white hover:bg-gray-50 py-2 border-t border-b shadow-sm border-gray-100 px-6 -mt-px`}
+          onClick={() => {
+            const excludeLast = state.depth.slice(0, -1)
+            const fieldName = excludeLast
+              .map((item) =>
+                isNaN(item.index) ? item.name : `${item.name}.${item.index}`
+              )
+              .join('.')
+            setActiveFields(fieldName)
+          }}
+          tabIndex={-1}
+        >
+          <div className="flex items-center justify-between gap-3 text-xs tracking-wide font-medium text-gray-700 group-hover:text-blue-400 uppercase max-w-form mx-auto">
+            {state.depth[state.depth.length - 1].name}
+            <IoMdClose className="h-auto w-5 inline-block opacity-70 -mt-0.5 -mx-0.5" />
+          </div>
+        </button>
+      )}
+      <div className="w-full flex justify-center pt-8 px-6 pb-2">
         <div className="w-full max-w-form">
           <FieldsGroup padding={padding}>
             {fields.map((field: Field) => (
