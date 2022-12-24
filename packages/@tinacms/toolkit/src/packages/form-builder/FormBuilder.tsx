@@ -28,7 +28,6 @@ import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
 import { SchemaField } from '@tinacms/schema-tools'
 import { Transition } from '@headlessui/react'
-import { IoMdClose } from 'react-icons/io'
 
 export interface FormBuilderProps {
   form: Form

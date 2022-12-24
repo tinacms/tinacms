@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Form, Field } from '../forms'
+import { Form, Field, FormApi } from '../forms'
 import { useCMS, useEventSubscription } from '../react-core'
 import {
   Field as FinalField,
@@ -112,7 +112,7 @@ const InnerField = ({
   field: Field
   form: Form
   prefix: string
-  setActivFields: (fields: SchemaField[]) => void
+  setActiveFields: (fields: string) => void
   fieldPlugins: FieldPlugin[]
 }) => {
   // TODO: deprecate global field plugins
@@ -159,7 +159,6 @@ const InnerField = ({
     field,
     tinaForm: form,
     form: form.finalForm,
-    prefix,
     setActiveFields,
   }
 
@@ -169,10 +168,10 @@ const InnerField = ({
 export type TinaFieldProps = {
   input: FieldInputProps<unknown, HTMLElement>
   meta: FieldMetaState<unknown>
-  field: SchemaField<true>
+  field: SchemaField
   tinaForm: Form
-  setActiveFields: (fields: SchemaField[]) => void
-  form: typeof FinalForm
+  setActiveFields: (fields: string) => void
+  form: FormApi
 }
 const TinaField = (props: TinaFieldProps) => {
   switch (props.field.type) {
