@@ -144,6 +144,9 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         return { depth: [], fields: tinaForm.fields }
       }
       const field = fields.find((field) => field.name === name)
+      if (!field) {
+        throw new Error(`Expected to find field with name ${name}`)
+      }
       let nextFields: SchemaField[] = []
       if (field.type === 'object') {
         if (field.list) {

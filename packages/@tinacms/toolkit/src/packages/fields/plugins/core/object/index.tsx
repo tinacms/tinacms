@@ -1,5 +1,5 @@
 import React from 'react'
-import { TinaFieldProps } from '../../../../form-builder'
+import { getPath, TinaFieldProps } from '../../../../form-builder'
 import { DragHandle, Wrap } from '../../..'
 import { AddIcon, TrashIcon } from '../../../../icons'
 import { IconButton } from '../../../../styles'
@@ -162,6 +162,8 @@ const Item = (
 ) => {
   let label
   const title = label || (props.template.label || props.field.name) + ' Item'
+  const path = getPath(props.state.depth)
+  const prefix = path ? `${path}.` : ''
   return (
     <Draggable
       type={props.field.name}
@@ -184,9 +186,7 @@ const Item = (
             // onClick={() => props.setActiveFields(props.template.fields)}
             onClick={() =>
               props.setActiveFields(
-                `${props.prefix ? `${props.prefix}.` : ''}${props.field.name}.${
-                  props.index
-                }`
+                `${prefix}${props.field.name}.${props.index}`
               )
             }
             className="group text-gray-400 hover:text-blue-600 flex-1 min-w-0 relative flex justify-between items-center p-2"

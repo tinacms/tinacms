@@ -91,6 +91,7 @@ export function FieldsBuilder({
                 key={field.name}
                 prefix={prefix}
                 field={field}
+                state={state}
                 form={form}
                 fieldPlugins={fieldPlugins}
               />
@@ -107,11 +108,13 @@ const InnerField = ({
   form,
   prefix,
   setActiveFields,
+  state,
   fieldPlugins,
 }: {
   field: Field
   form: Form
   prefix: string
+  state: State
   setActiveFields: (fields: string) => void
   fieldPlugins: FieldPlugin[]
 }) => {
@@ -159,6 +162,7 @@ const InnerField = ({
     field,
     tinaForm: form,
     form: form.finalForm,
+    state,
     setActiveFields,
   }
 
@@ -171,6 +175,7 @@ export type TinaFieldProps = {
   field: SchemaField
   tinaForm: Form
   setActiveFields: (fields: string) => void
+  state: State
   form: FormApi
 }
 const TinaField = (props: TinaFieldProps) => {
