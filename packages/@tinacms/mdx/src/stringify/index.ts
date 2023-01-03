@@ -75,12 +75,20 @@ export const stringifyMDX = (
     }
     if (template.match) {
       const regex = !!template.fields.find((t) => t.name == 'text')
-        ? `<[\\s]*${template.name}[\\s]*text=(.*?)>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
-        : `<[\\s]*${template.name}(.+?)?[\\s]*>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
+        ? `<[\\s]*${template.name}[\\s]*text=(.*?)>((?:.|\n)*)<\/\\s*${template.name}\\s*>`
+        : `<[\\s]*${template.name}(.+?)?[\\s]*>((?:.|\n)*)<\/\\s*${template.name}\\s*>`
 
-      const replace = `${template.match.start} ${
-        template.match.name || template.name
-      } $1 ${template.match.end}`
+      const replace = template.fields.find((t) => t.name == 'children')
+        ? `${template.match.start} ${template.match.name || template.name} $1 ${
+            template.match.end
+          }\n$2\n${template.match.start} /${
+            template.match.name || template.name
+          } ${template.match.end}`
+        : `${template.match.start} ${template.match.name || template.name} $1 ${
+            template.match.end
+          }`
+
+      // console.log('preprocessedString:: ', JSON.stringify(preprocessedString))
 
       // console.log('regex!! ', JSON.stringify(regex))
       // console.log('replacement!! ', JSON.stringify(replace))
