@@ -89,10 +89,13 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
         const replacement = unkeyedAttributes
           ? `<${template.name} text=\'$1\'>\n</${template.name}>`
           : `<${template.name} $1>\n</${template.name}>`
-
         const regex = unkeyedAttributes
-          ? `${template.match.start}\\s*${template.name}[\\s]+[\'\"]?(.*?)[\'\"]?[\\s]*${template.match.end}`
-          : `${template.match.start}\\s*${template.name}[\\s]+(.*?)[\\s]*${template.match.end}`
+          ? `${template.match.start}\\s*${
+              template.match.name || template.name
+            }[\\s]+[\'\"]?(.*?)[\'\"]?[\\s]*${template.match.end}`
+          : `${template.match.start}\\s*${
+              template.match.name || template.name
+            }[\\s]+(.*?)[\\s]*${template.match.end}`
 
         console.log('replacement: ', replacement)
         console.log('regex: ', regex)

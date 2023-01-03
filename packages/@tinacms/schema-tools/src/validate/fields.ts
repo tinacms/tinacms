@@ -129,6 +129,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldInner<false>> = z.lazy(() => {
         .object({
           start: z.string(),
           end: z.string(),
+          name: z.string().optional(),
         })
         .optional(),
     })

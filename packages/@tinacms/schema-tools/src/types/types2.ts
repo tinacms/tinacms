@@ -304,6 +304,7 @@ export type RichTextField = (
       match?: {
         start: string
         end: string
+        name?: string
       }
     })[]
   }

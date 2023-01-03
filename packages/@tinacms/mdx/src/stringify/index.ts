@@ -78,9 +78,12 @@ export const stringifyMDX = (
         ? `<[\\s]*${template.name}[\\s]*text=(.*?)>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
         : `<[\\s]*${template.name}(.+?)[\\s]*>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
 
-      const replace = `${template.match.start} ${template.name} $1 ${template.match.end}`
-      console.log('regex!! ', JSON.stringify(regex))
-      console.log('replacement!! ', JSON.stringify(replace))
+      const replace = `${template.match.start} ${
+        template.match.name || template.name
+      } $1 ${template.match.end}`
+
+      // console.log('regex!! ', JSON.stringify(regex))
+      // console.log('replacement!! ', JSON.stringify(replace))
 
       preprocessedString = replaceAll(preprocessedString, regex, replace)
     }
