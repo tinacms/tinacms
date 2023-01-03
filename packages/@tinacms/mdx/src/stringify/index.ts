@@ -76,7 +76,7 @@ export const stringifyMDX = (
     if (template.match) {
       const regex = !!template.fields.find((t) => t.name == 'text')
         ? `<[\\s]*${template.name}[\\s]*text=(.*?)>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
-        : `<[\\s]*${template.name}(.+?)[\\s]*>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
+        : `<[\\s]*${template.name}(.+?)?[\\s]*>(?:[\n\r\\s\S]*?)<\/\\s*${template.name}\\s*>`
 
       const replace = `${template.match.start} ${
         template.match.name || template.name
