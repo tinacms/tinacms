@@ -173,16 +173,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         dirtySinceLastSubmit,
         hasValidationErrors,
       }) => {
-        const cannotSubmit =
-          pristine ||
-          submitting ||
-          hasValidationErrors ||
-          (invalid && !dirtySinceLastSubmit)
+        const canSubmit =
+          !pristine &&
+          !submitting &&
+          !hasValidationErrors &&
+          !(invalid && !dirtySinceLastSubmit)
 
         const safeHandleSubmit = () => {
-          if (cannotSubmit) return
-
-          handleSubmit()
+          if (canSubmit) {
+            handleSubmit()
+          }
         }
 
         return (
@@ -216,7 +216,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     )}
                     <Button
                       onClick={safeHandleSubmit}
-                      disabled={cannotSubmit}
+                      disabled={!canSubmit}
                       busy={submitting}
                       variant="primary"
                       style={{ flexGrow: 3 }}
@@ -285,12 +285,12 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
         onSubmit={tinaForm.onSubmit}
       >
         {({ handleSubmit, pristine, invalid, submitting }) => {
-          const cannotSubmit = pristine || submitting || invalid
+          const canSubmit = !pristine && !submitting && !invalid
 
           const safeHandleSubmit = () => {
-            if (cannotSubmit) return
-
-            handleSubmit()
+            if (canSubmit) {
+              handleSubmit()
+            }
           }
 
           return (
@@ -320,7 +320,7 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                     )}
                     <Button
                       onClick={safeHandleSubmit}
-                      disabled={cannotSubmit}
+                      disabled={!canSubmit}
                       busy={submitting}
                       variant="primary"
                       style={{ flexBasis: '10rem' }}
