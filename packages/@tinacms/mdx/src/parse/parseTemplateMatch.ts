@@ -37,15 +37,9 @@ export function parseTemplateMatch(
     match.name || template.name
   }[\\s]*${match.end}`
 
-  const regex = unkeyedAttributes
-    ? `${match.start}\\s*${
-        match.name || template.name
-      }[\\s]+[\'\"]?(.*?)[\'\"]?[\\s]*${match.end}${
-        hasChildren ? endRegex : ''
-      }`
-    : `${match.start}\\s*${match.name || template.name}[\\s]+(.*?)[\\s]*${
-        match.end
-      }${hasChildren ? endRegex : ''}`
+  const regex = `${match.start}\\s*${match.name || template.name}[\\s]+${
+    unkeyedAttributes ? '[\'"]?(.*?)[\'"]?' : '(.*?)'
+  }[\\s]*${match.end}${hasChildren ? endRegex : ''}`
 
   return replaceAll(preprocessedString, regex, replacement)
 }

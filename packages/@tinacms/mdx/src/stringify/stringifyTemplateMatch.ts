@@ -24,14 +24,16 @@ export function stringifyTemplateMatch(
   template: Template<false> & { inline?: boolean }
 ) {
   const match = template.match!
-  const regex = !!template.fields.find((t) => t.name == 'text')
-    ? `<[\\s]*${template.name}[\\s]*(?:text=(.*?))?[\\s]*>((?:.|\n)*?)<\/[\\s]*${template.name}[\\s]*>`
-    : `<[\\s]*${template.name}[\\s]*(.+?)?[\\s]*>[\\s]*((?:.|\n)*?)[\\s]*<\/[\\s]*${template.name}[\\s]*>`
+  const unkeyedAttributes = !!template.fields.find((t) => t.name == 'text')
+  const regex = `<[\\s]*${template.name}[\\s]*${
+    unkeyedAttributes ? '(?:text=(.*?))?' : '(.+?)?'
+  }[\\s]*>[\\s]*((?:.|\n)*?)[\\s]*<\/[\\s]*${template.name}[\\s]*>`
 
-  const replace = template.fields.find((t) => t.name == 'children')
-    ? `${match.start} ${match.name || template.name} $1 ${match.end}\n$2\n${
-        match.start
-      } /${match.name || template.name} ${match.end}`
-    : `${match.start} ${match.name || template.name} $1 ${match.end}`
+  const closingRegex = `\n$2\n${match.start} /${match.name || template.name} ${
+    match.end
+  }`
+  const replace = `${match.start} ${match.name || template.name} $1 ${
+    match.end
+  }${template.fields.find((t) => t.name == 'children') ? closingRegex : ''}`
   return replaceAll(preprocessedString, regex, replace)
 }
