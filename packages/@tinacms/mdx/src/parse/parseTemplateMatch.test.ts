@@ -42,7 +42,7 @@ describe('parseTemplateMatch', () => {
 
   describe('with unkeyed attributes', () => {
     it('parses attributes', () => {
-      const result = parseTemplateMatch('{{< signature "bar123"  >}}', {
+      const result = parseTemplateMatch('{{< signature "bar123" >}}', {
         name: 'signature',
         label: 'Signature',
         match: {

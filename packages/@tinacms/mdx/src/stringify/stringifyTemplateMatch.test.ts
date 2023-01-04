@@ -22,7 +22,7 @@ describe('stringifyTemplateMatch', () => {
   describe('with keyed field', () => {
     it('parses attributes', () => {
       const result = stringifyTemplateMatch(
-        '<signature foo="bar123" ></signature>',
+        '<signature foo="bar123"></signature>',
         {
           name: 'signature',
           label: 'Signature',
@@ -39,14 +39,14 @@ describe('stringifyTemplateMatch', () => {
           ],
         }
       )
-      expect(result).toEqual('{{< signature  foo="bar123" >}}')
+      expect(result).toEqual('{{< signature foo="bar123" >}}')
     })
   })
 
   describe('with unkeyed attributes', () => {
     it('parses attributes', () => {
       const result = stringifyTemplateMatch(
-        '<signature text="bar123" ></signature>',
+        '<signature text="bar123"></signature>',
         {
           name: 'signature',
           label: 'Signature',
@@ -63,14 +63,14 @@ describe('stringifyTemplateMatch', () => {
           ],
         }
       )
-      expect(result).toEqual('{{< signature "bar123"  >}}')
+      expect(result).toEqual('{{< signature "bar123" >}}')
     })
   })
 
   describe('with children', () => {
     it('parses children field', () => {
       const result = stringifyTemplateMatch(
-        '<signature ># FOO\n##Bar</signature>',
+        '<signature># FOO\n##Bar</signature>',
         {
           name: 'signature',
           label: 'Signature',
@@ -88,7 +88,7 @@ describe('stringifyTemplateMatch', () => {
         }
       )
       expect(result).toEqual(
-        '{{< signature   >}}\n# FOO\n##Bar\n{{< /signature >}}'
+        '{{< signature  >}}\n# FOO\n##Bar\n{{< /signature >}}'
       )
     })
   })
