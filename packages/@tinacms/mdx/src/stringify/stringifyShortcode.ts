@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Template } from '../../../schema-tools/src'
+import { Template } from '@tinacms/schema-tools'
 import { replaceAll } from '../parse'
 
 export function stringifyShortcode(
