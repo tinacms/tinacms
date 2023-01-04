@@ -22,12 +22,12 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
-import { replaceAll } from '../parse'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
+import { stringifyTemplateMatch } from './stringifyTemplateMatch'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -74,20 +74,7 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      const regex = !!template.fields.find((t) => t.name == 'text')
-        ? `<[\\s]*${template.name}(?:[\\s]*text=(.*?))?>((?:.|\n)*?)<\/\\s*${template.name}\\s*>`
-        : `<[\\s]*${template.name}(.+?)?[\\s]*>((?:.|\n)*?)<\/\\s*${template.name}\\s*>`
-
-      const replace = template.fields.find((t) => t.name == 'children')
-        ? `${template.match.start} ${template.match.name || template.name} $1 ${
-            template.match.end
-          }\n$2\n${template.match.start} /${
-            template.match.name || template.name
-          } ${template.match.end}`
-        : `${template.match.start} ${template.match.name || template.name} $1 ${
-            template.match.end
-          }`
-      preprocessedString = replaceAll(preprocessedString, regex, replace)
+      preprocessedString = stringifyTemplateMatch(preprocessedString, template)
     }
   })
   return preprocessedString
