@@ -22,6 +22,7 @@ import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
+import { parseTemplateMatch } from './parseTemplateMatch'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -82,33 +83,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        const unkeyedAttributes = !!template.fields.find(
-          (t) => t.name == 'text'
-        )
-
-        const hasChildren = !!template.fields.find((t) => t.name == 'children')
-
-        const replacement = `<${template.name} ${
-          unkeyedAttributes ? "text='$1'" : '$1'
-        }>${hasChildren ? '$2' : '\n'}</${template.name}>`
-
-        const endRegex = `((?:.|\\n)*)${template.match.start}\\s\/\\s*${
-          template.match.name || template.name
-        }[\\s]*${template.match.end}`
-
-        const regex = unkeyedAttributes
-          ? `${template.match.start}\\s*${
-              template.match.name || template.name
-            }[\\s]+[\'\"]?(.*?)[\'\"]?[\\s]*${template.match.end}${
-              hasChildren ? endRegex : ''
-            }`
-          : `${template.match.start}\\s*${
-              template.match.name || template.name
-            }[\\s]+(.*?)[\\s]*${template.match.end}\n${
-              hasChildren ? endRegex : ''
-            }`
-
-        preprocessedString = replaceAll(preprocessedString, regex, replacement)
+        preprocessedString = parseTemplateMatch(preprocessedString, template)
       }
     }
   })
