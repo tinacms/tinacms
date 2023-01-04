@@ -1,8 +1,38 @@
 import { defineConfig } from 'tinacms'
 
 export default defineConfig({
+  // contentApiUrlOverride: 'http://asdf.com',
   admin: {
     auth: {
+      // This is called when they want to authenticate a user. For a lot of implementatons it just may be redirecting to the login page
+      // async authenticate() {
+      //   console.log('Authenticating...')
+      //   localStorage.setItem(
+      //     'logan',
+      //     JSON.stringify({ name: 'Logan', role: 'admin' })
+      //   )
+      //   return {}
+      // },
+      // async logOut() {
+      //   console.log('logOut...')
+      //   localStorage.removeItem('logan')
+      //   window.location.href = '/'
+      // },
+      // async getUser() {
+      //   console.log('getUser...')
+      //   const userStr = localStorage.getItem('logan')
+      //   if (!userStr) {
+      //     return undefined
+      //   } else {
+      //     try {
+      //       return JSON.parse(userStr)
+      //     } catch {
+      //       return null
+      //     }
+      //   }
+      // },
+
+      // Other methods
       onLogin: () => {
         console.log('Logged in!')
         // hook function to be called when the user logs in
