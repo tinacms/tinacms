@@ -75,7 +75,7 @@ export const stringifyMDX = (
     }
     if (template.match) {
       const regex = !!template.fields.find((t) => t.name == 'text')
-        ? `<[\\s]*${template.name}[\\s]*text=(.*?)>((?:.|\n)*?)<\/\\s*${template.name}\\s*>`
+        ? `<[\\s]*${template.name}(?:[\\s]*text=(.*?))?>((?:.|\n)*?)<\/\\s*${template.name}\\s*>`
         : `<[\\s]*${template.name}(.+?)?[\\s]*>((?:.|\n)*?)<\/\\s*${template.name}\\s*>`
 
       const replace = template.fields.find((t) => t.name == 'children')
@@ -87,12 +87,6 @@ export const stringifyMDX = (
         : `${template.match.start} ${template.match.name || template.name} $1 ${
             template.match.end
           }`
-
-      // console.log('preprocessedString:: ', JSON.stringify(preprocessedString))
-
-      // console.log('regex!! ', JSON.stringify(regex))
-      // console.log('replacement!! ', JSON.stringify(replace))
-
       preprocessedString = replaceAll(preprocessedString, regex, replace)
     }
   })

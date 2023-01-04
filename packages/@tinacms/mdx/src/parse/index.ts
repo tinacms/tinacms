@@ -108,14 +108,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
               hasChildren ? endRegex : ''
             }`
 
-        // console.log('replacement: ', replacement)
-        // console.log('regex: ', regex)
-
         preprocessedString = replaceAll(preprocessedString, regex, replacement)
-
-        // console.log('result: ', preprocessedString)
-
-        console.log('------------------')
       }
     }
   })
