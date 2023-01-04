@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 import { it, expect, describe } from 'vitest'
-import { stringifyTemplateMatch } from './stringifyTemplateMatch'
+import { stringifyShortcode } from './stringifyShortcode'
 
-describe('stringifyTemplateMatch', () => {
+describe('stringifyShortcode', () => {
   describe('with keyed field', () => {
     it('parses attributes', () => {
-      const result = stringifyTemplateMatch(
+      const result = stringifyShortcode(
         '<signature foo="bar123"></signature>',
         {
           name: 'signature',
@@ -45,7 +45,7 @@ describe('stringifyTemplateMatch', () => {
 
   describe('with unkeyed attributes', () => {
     it('parses attributes', () => {
-      const result = stringifyTemplateMatch(
+      const result = stringifyShortcode(
         '<signature text="bar123"></signature>',
         {
           name: 'signature',
@@ -69,24 +69,21 @@ describe('stringifyTemplateMatch', () => {
 
   describe('with children', () => {
     it('parses children field', () => {
-      const result = stringifyTemplateMatch(
-        '<signature># FOO\n##Bar</signature>',
-        {
-          name: 'signature',
-          label: 'Signature',
-          match: {
-            start: '{{<',
-            end: '>}}',
+      const result = stringifyShortcode('<signature># FOO\n##Bar</signature>', {
+        name: 'signature',
+        label: 'Signature',
+        match: {
+          start: '{{<',
+          end: '>}}',
+        },
+        fields: [
+          {
+            name: 'children',
+            label: 'children',
+            type: 'string',
           },
-          fields: [
-            {
-              name: 'children',
-              label: 'children',
-              type: 'string',
-            },
-          ],
-        }
-      )
+        ],
+      })
       expect(result).toEqual(
         '{{< signature  >}}\n# FOO\n##Bar\n{{< /signature >}}'
       )

@@ -22,7 +22,7 @@ import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
-import { parseTemplateMatch } from './parseTemplateMatch'
+import { parseShortcode } from './parseShortcode'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -83,7 +83,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        preprocessedString = parseTemplateMatch(preprocessedString, template)
+        preprocessedString = parseShortcode(preprocessedString, template)
       }
     }
   })

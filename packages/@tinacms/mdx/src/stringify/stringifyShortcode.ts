@@ -19,7 +19,7 @@ limitations under the License.
 import { Template } from '../../../schema-tools/src'
 import { replaceAll } from '../parse'
 
-export function stringifyTemplateMatch(
+export function stringifyShortcode(
   preprocessedString: string,
   template: Template<false> & { inline?: boolean }
 ) {

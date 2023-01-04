@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 import { Template } from '../../../schema-tools/src'
-import { replaceAll } from '../parse'
+import { replaceAll } from '.'
 
-export function parseTemplateMatch(
+export function parseShortcode(
   preprocessedString: string,
   template: Template<false> & { inline?: boolean }
 ) {

@@ -27,7 +27,7 @@ import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
-import { stringifyTemplateMatch } from './stringifyTemplateMatch'
+import { stringifyShortcode } from './stringifyShortcode'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -74,7 +74,7 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = stringifyTemplateMatch(preprocessedString, template)
+      preprocessedString = stringifyShortcode(preprocessedString, template)
     }
   })
   return preprocessedString

@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 import { it, expect, describe } from 'vitest'
-import { parseTemplateMatch } from './parseTemplateMatch'
+import { parseShortcode } from './parseShortcode'
 
-describe('parseTemplateMatch', () => {
+describe('parseShortcode', () => {
   describe('with keyed field', () => {
     it('parses attributes', () => {
-      const result = parseTemplateMatch('{{< signature foo="bar123">}}', {
+      const result = parseShortcode('{{< signature foo="bar123">}}', {
         name: 'signature',
         label: 'Signature',
         match: {
@@ -42,7 +42,7 @@ describe('parseTemplateMatch', () => {
 
   describe('with unkeyed attributes', () => {
     it('parses attributes', () => {
-      const result = parseTemplateMatch('{{< signature "bar123" >}}', {
+      const result = parseShortcode('{{< signature "bar123" >}}', {
         name: 'signature',
         label: 'Signature',
         match: {
@@ -63,7 +63,7 @@ describe('parseTemplateMatch', () => {
 
   describe('with children', () => {
     it('parses children field', () => {
-      const result = parseTemplateMatch(
+      const result = parseShortcode(
         '{{< signature >}}\n# FOO\n##Bar\n{{< /signature >}}',
         {
           name: 'signature',
