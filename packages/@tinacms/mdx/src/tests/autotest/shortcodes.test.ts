@@ -31,7 +31,7 @@ const out = output({
           text: '',
         },
       ],
-      props: { text: '' },
+      props: {},
     },
     {
       type: 'mdxJsxFlowElement',
@@ -55,7 +55,7 @@ const out = output({
           text: '',
         },
       ],
-      props: { text: '' },
+      props: { text: 'neat' },
     },
   ],
 })

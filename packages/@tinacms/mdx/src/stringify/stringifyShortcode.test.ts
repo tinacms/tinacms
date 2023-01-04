@@ -44,6 +44,26 @@ describe('stringifyShortcode', () => {
   })
 
   describe('with unkeyed attributes', () => {
+    describe('and no text value set', () => {
+      it('excludes quotes', () => {
+        const result = stringifyShortcode('<signature></signature>', {
+          name: 'signature',
+          label: 'Signature',
+          match: {
+            start: '{{<',
+            end: '>}}',
+          },
+          fields: [
+            {
+              name: 'text',
+              label: 'text',
+              type: 'string',
+            },
+          ],
+        })
+        expect(result).toEqual('{{< signature  >}}')
+      })
+    })
     it('parses attributes', () => {
       const result = stringifyShortcode(
         '<signature text="bar123"></signature>',
