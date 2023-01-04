@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -90,10 +90,12 @@
     "multer": "1.4.5-lts.1",
     "normalize-path": "^3.0.0",
     "url-pattern": "^1.0.3",
+    "prettier": "^2.2.1",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
     "yarn": "^1.22.17",
-    "yup": "^0.32.9"
+    "yup": "^0.32.9",
+    "zod": "^3.14.3"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

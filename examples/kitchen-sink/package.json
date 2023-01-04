@@ -1,6 +1,6 @@
 {
   "name": "e2e-next",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "private": true,
   "scripts": {
     "dev": "MONOREPO_DEV=true tinacms dev -c \"next dev\"",
@@ -23,6 +23,7 @@
     "next": "12.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
     "react-json-view": "^1.21.3",
     "tinacms": "workspace:*",
     "vite": "^3.1.3",

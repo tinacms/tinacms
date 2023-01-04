@@ -17,6 +17,8 @@ export default defineConfig({
   clientId: null,
   token: null,
   build: {
+    // can set the host of the vite config here
+    // host: true,
     outputFolder: 'admin',
     publicFolder: 'public',
   },
@@ -33,6 +35,11 @@ export default defineConfig({
         path: 'content/test',
         label: 'Test',
         templates: [
+          {
+            name: 'tem1',
+            label: 'Template 1',
+            fields: [{ type: 'string', name: 'foo' }],
+          },
           {
             name: 'tem2',
             label: 'Template 2',

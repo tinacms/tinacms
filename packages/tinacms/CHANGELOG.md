@@ -1,5 +1,17 @@
 # tinacms
 
+## 1.1.2
+
+### Patch Changes
+
+- cd82190fb: Adding warning for billing
+- Updated dependencies [7554ea362]
+- Updated dependencies [a8c2f674b]
+- Updated dependencies [cd82190fb]
+- Updated dependencies [4ebc44068]
+  - @tinacms/schema-tools@1.1.0
+  - @tinacms/toolkit@1.2.0
+
 ## 1.1.1
 
 ### Patch Changes

@@ -13,6 +13,7 @@ limitations under the License.
 
 import {
   BaseTextField,
+  BillingWarning,
   Form,
   FormBuilder,
   FormStatus,
@@ -264,7 +265,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
   return (
     <PageWrapper>
       <>
-        {cms?.api?.tina?.isLocalMode && <LocalWarning />}
+        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
         <div
           className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
         >

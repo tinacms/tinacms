@@ -30,6 +30,7 @@ export interface TinaCMSAuditInvoke extends EventsBase {
 export interface TinaCMSInitInvoke extends EventsBase {
   name: 'tinacms:cli:init:invoke'
   schemaFileType?: string
+  hasForestryConfig?: boolean
 }
 
 export interface TinaCMSServerStartInvoke extends EventsBase {
