@@ -51,9 +51,13 @@ export async function genClient(
     )
   }
 
-  const apiURL = options.local
+  let apiURL = options.local
     ? `http://localhost:${options.port || 4001}/graphql`
     : `${baseUrl}/content/${clientId}/github/${branch}`
+
+  if (tinaSchema.config?.contentApiUrlOverride) {
+    apiURL = tinaSchema.config.contentApiUrlOverride
+  }
 
   const clientPath = p.join(generatedPath, `client.${usingTs ? 'ts' : 'js'}`)
   fs.writeFileSync(

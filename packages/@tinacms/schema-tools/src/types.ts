@@ -531,10 +531,14 @@ export interface Config<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  contentApiUrlOverride?: string
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
       onLogout?: () => Promise<void>
+      logout?: () => Promise<void>
+      getUser?: () => Promise<any | null>
+      authenticate: () => Promise<any | null>
     }
   }
   // schema: TinaCloudSchema<false>

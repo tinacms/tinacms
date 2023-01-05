@@ -47,7 +47,6 @@ interface ServerOptions {
   branch: string
   customContentApiUrl?: string
   getTokenFn?: () => Promise<TokenObject>
-  onLogin?: OnLoginFunc
   tinaioConfig?: TinaIOConfig
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
@@ -80,6 +79,15 @@ export class Client {
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout
+    if (options.schema?.config?.admin?.auth?.logout) {
+      this.onLogout = options.schema?.config?.admin?.auth?.logout
+    }
+    if (options.schema?.config?.admin?.auth?.getUser) {
+      this.getUser = options.schema?.config?.admin?.auth?.getUser
+    }
+    if (options.schema?.config?.admin?.auth?.authenticate) {
+      this.authenticate = options.schema?.config?.admin?.auth?.authenticate
+    }
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -89,6 +97,11 @@ export class Client {
       this.schema = enrichedSchema
     }
     this.options = options
+
+    if (options.schema.config?.contentApiUrlOverride) {
+      this.options.customContentApiUrl =
+        options.schema.config.contentApiUrlOverride
+    }
     this.setBranch(options.branch)
     this.events.subscribe<BranchChangeEvent>(
       'branch:change',
@@ -574,15 +587,13 @@ export class LocalClient extends Client {
   }
 
   async authenticate() {
+    console.log('not working authenticate')
     localStorage.setItem(LOCAL_CLIENT_KEY, 'true')
     return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' }
   }
 
-  async isAuthorized(): Promise<boolean> {
-    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
-  }
-
-  async isAuthenticated(): Promise<boolean> {
+  async getUser(): Promise<boolean> {
+    console.log('not working getUser')
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
 }
