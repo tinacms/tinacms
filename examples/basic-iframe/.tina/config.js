@@ -52,6 +52,7 @@ export default defineConfig({
         path: 'content/page',
         label: 'Page',
         format: 'mdx',
+        markdownFrontmatterFormat: 'toml',
         fields: [
           {
             label: 'Title',

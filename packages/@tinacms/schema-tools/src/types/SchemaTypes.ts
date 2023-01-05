@@ -143,6 +143,7 @@ interface BaseCollection {
   defaultItem?: DefaultItem<Record<string, any>>
   indexes?: TinaIndex[]
   format?: FormatType
+  markdownFrontmatterFormat?: 'yaml' | 'toml'
   ui?: UICollection
   match?: string
 }

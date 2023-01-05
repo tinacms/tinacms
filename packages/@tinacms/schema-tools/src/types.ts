@@ -475,6 +475,10 @@ export interface FieldCollection {
   name: string
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx'
+  /**
+   * This format will be used to parse the markdown frontmatter
+   */
+  markdownFrontmatterFormat?: 'yaml' | 'toml'
   ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
   /**
    * @deprecated - use `ui.defaultItem` instead

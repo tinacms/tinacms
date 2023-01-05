@@ -646,6 +646,7 @@ importers:
   packages/@tinacms/graphql:
     specifiers:
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
+      '@iarna/toml': ^2.2.5
       '@tinacms/datalayer': workspace:*
       '@tinacms/mdx': workspace:*
       '@tinacms/schema-tools': workspace:*
@@ -713,6 +714,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
+      '@iarna/toml': 2.2.5
       '@tinacms/datalayer': link:../datalayer
       '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
@@ -6004,6 +6006,13 @@ packages:
         integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==,
       }
     dev: true
+
+  /@iarna/toml/2.2.5:
+    resolution:
+      {
+        integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==,
+      }
+    dev: false
 
   /@icons/material/0.2.4_react@17.0.2:
     resolution:

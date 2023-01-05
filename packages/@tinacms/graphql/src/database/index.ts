@@ -297,7 +297,8 @@ export class Database {
       const stringifiedFile = stringifyFile(
         payload,
         extension,
-        templateInfo.type === 'union'
+        templateInfo.type === 'union',
+        collection?.markdownFrontmatterFormat
       )
       return {
         stringifiedFile,
@@ -734,8 +735,11 @@ const _indexContent = async (
   await sequential(documentPaths, async (filepath) => {
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
-      const data = parseFile(dataString, path.extname(filepath), (yup) =>
-        yup.object({})
+      const data = parseFile(
+        dataString,
+        path.extname(filepath),
+        (yup) => yup.object({}),
+        collection.markdownFrontmatterFormat
       )
       if (database.store.supportsSeeding()) {
         await database.store.seed(normalizePath(filepath), data, seedOptions)

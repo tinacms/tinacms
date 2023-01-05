@@ -12,14 +12,23 @@ limitations under the License.
 */
 
 import * as yup from 'yup'
+import toml from '@iarna/toml'
 import matter from 'gray-matter'
 import { assertShape } from '../util'
+
+const matterEngines = {
+  toml: {
+    parse: (val) => toml.parse(val),
+    stringify: (val) => toml.stringify(val),
+  },
+}
 
 export const stringifyFile = (
   content: object,
   format: FormatType | string, // FIXME
   /** For non-polymorphic documents we don't need the template key */
-  keepTemplateKey: boolean
+  keepTemplateKey: boolean,
+  markdownLanguage?: 'toml' | 'yaml'
 ): string => {
   switch (format) {
     case '.markdown':
@@ -47,7 +56,11 @@ export const stringifyFile = (
       }
       const ok = matter.stringify(
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
-        { ...rest, ...extra }
+        { ...rest, ...extra },
+        {
+          language: markdownLanguage || 'yaml',
+          engines: matterEngines,
+        }
       )
       return ok
     case '.json':
@@ -60,13 +73,17 @@ export const stringifyFile = (
 export const parseFile = <T extends object>(
   content: string,
   format: FormatType | string, // FIXME
-  yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
+  yupSchema: (args: typeof yup) => yup.ObjectSchema<any>,
+  markdownLanguage?: 'toml' | 'yaml'
 ): T => {
   switch (format) {
     case '.markdown':
     case '.mdx':
     case '.md':
-      const contentJSON = matter(content || '')
+      const contentJSON = matter(content || '', {
+        language: markdownLanguage || 'yaml',
+        engines: matterEngines,
+      })
       const markdownData = {
         ...contentJSON.data,
         $_body: contentJSON.content,
