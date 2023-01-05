@@ -97,6 +97,11 @@ export class Client {
       this.schema = enrichedSchema
     }
     this.options = options
+
+    if (options.schema.config?.contentApiUrlOverride) {
+      this.options.customContentApiUrl =
+        options.schema.config.contentApiUrlOverride
+    }
     this.setBranch(options.branch)
     this.events.subscribe<BranchChangeEvent>(
       'branch:change',

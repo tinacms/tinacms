@@ -531,6 +531,7 @@ export interface Config<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  contentApiUrlOverride?: string
   admin?: {
     auth?: {
       onLogin?: (args: { token: TokenObject }) => Promise<void>
