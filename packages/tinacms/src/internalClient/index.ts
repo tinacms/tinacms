@@ -98,7 +98,7 @@ export class Client {
     }
     this.options = options
 
-    if (options.schema.config?.contentApiUrlOverride) {
+    if (options.schema?.config?.contentApiUrlOverride) {
       this.options.customContentApiUrl =
         options.schema.config.contentApiUrlOverride
     }
