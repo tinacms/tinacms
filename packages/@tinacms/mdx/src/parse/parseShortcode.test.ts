@@ -76,7 +76,7 @@ describe('parseShortcode', () => {
             {
               name: 'children',
               label: 'children',
-              type: 'string',
+              type: 'rich-text',
             },
           ],
         }
