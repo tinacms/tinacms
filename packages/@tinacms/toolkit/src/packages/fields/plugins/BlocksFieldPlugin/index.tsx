@@ -102,6 +102,13 @@ const Blocks = ({
 
   const items = input.value || []
 
+  // @ts-ignore
+  const isMax = items.length >= (field.max || Infinity)
+  // @ts-ignore
+  const isMin = items.length <= (field.min || Infinity)
+  // @ts-ignore
+  const fixedLength = field.min === field.max
+
   return (
     <ListFieldMeta
       name={input.name}
@@ -111,8 +118,9 @@ const Blocks = ({
       index={index}
       tinaForm={tinaForm}
       actions={
+        (!fixedLength || (fixedLength && !isMax)) &&
         // @ts-ignore
-        !field.visualSelector ? (
+        (!field.visualSelector ? (
           <BlockSelector templates={field.templates} addItem={addItem} />
         ) : (
           <BlockSelectorBig
@@ -120,7 +128,7 @@ const Blocks = ({
             templates={field.templates}
             addItem={addItem}
           />
-        )
+        ))
       }
     >
       <ListPanel>
@@ -156,6 +164,8 @@ const Blocks = ({
                     index={index}
                     field={field}
                     tinaForm={tinaForm}
+                    isMin={isMin}
+                    fixedLength={fixedLength}
                     {...itemProps(block)}
                   />
                 )
@@ -176,6 +186,8 @@ interface BlockListItemProps {
   block: any
   template: BlockTemplate
   label?: string
+  isMin?: boolean
+  fixedLength?: boolean
 }
 
 const BlockListItem = ({
@@ -185,6 +197,8 @@ const BlockListItem = ({
   index,
   template,
   block,
+  isMin,
+  fixedLength,
 }: BlockListItemProps) => {
   const cms = useCMS()
   const FormPortal = useFormPortal()
@@ -234,7 +248,9 @@ const BlockListItem = ({
               <GroupLabel>{label || template.label}</GroupLabel>
               <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
             </ItemClickTarget>
-            <ItemDeleteButton onClick={removeItem} />
+            {(!fixedLength || (fixedLength && !isMin)) && (
+              <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+            )}
           </ItemHeader>
           <FormPortal>
             {({ zIndexShift }) => (

@@ -84,6 +84,13 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
     [field.itemProps]
   )
 
+  // @ts-ignore
+  const isMax = items.length >= (field.max || Infinity)
+  // @ts-ignore
+  const isMin = items.length <= (field.min || Infinity)
+  // @ts-ignore
+  const fixedLength = field.min === field.max
+
   return (
     <ListFieldMeta
       name={input.name}
@@ -93,9 +100,16 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
       index={index}
       tinaForm={tinaForm}
       actions={
-        <IconButton onClick={addItem} variant="primary" size="small">
-          <AddIcon className="w-5/6 h-auto" />
-        </IconButton>
+        (!fixedLength || (fixedLength && !isMax)) && (
+          <IconButton
+            onClick={addItem}
+            disabled={isMax}
+            variant="primary"
+            size="small"
+          >
+            <AddIcon className="w-5/6 h-auto" />
+          </IconButton>
+        )
       }
     >
       <ListPanel>
@@ -112,6 +126,8 @@ const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
                     field={field}
                     item={item}
                     index={index}
+                    isMin={isMin}
+                    fixedLength={fixedLength}
                     {...itemProps(item)}
                   />
                 ))}
@@ -131,9 +147,20 @@ interface ItemProps {
   index: number
   item: any
   label?: string
+  isMin: boolean
+  fixedLength: boolean
 }
 
-const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+const Item = ({
+  tinaForm,
+  field,
+  index,
+  item,
+  label,
+  isMin,
+  fixedLength,
+  ...p
+}: ItemProps) => {
   const cms = useCMS()
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
@@ -184,7 +211,9 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
               <GroupLabel>{title}</GroupLabel>
               <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
             </ItemClickTarget>
-            <ItemDeleteButton onClick={removeItem} />
+            {(!fixedLength || (fixedLength && !isMin)) && (
+              <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+            )}
           </ItemHeader>
           <FormPortal>
             {({ zIndexShift }) => (
@@ -261,10 +290,12 @@ export const ItemHeader = ({
   )
 }
 
-export const ItemDeleteButton = ({ onClick }) => {
+export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
-      className="w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500"
+      className={`w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500 ${
+        disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
+      }`}
       onClick={onClick}
     >
       <TrashIcon className="fill-current transition-colors ease-out duration-100" />

@@ -89,6 +89,13 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
     [field.itemProps]
   )
 
+  // @ts-ignore
+  const isMax = items.length >= (field.max || Infinity)
+  // @ts-ignore
+  const isMin = items.length <= (field.min || Infinity)
+  // @ts-ignore
+  const fixedLength = field.min === field.max
+
   return (
     <ListFieldMeta
       name={input.name}
@@ -98,9 +105,11 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
       index={index}
       tinaForm={tinaForm}
       actions={
-        <IconButton onClick={addItem} variant="primary" size="small">
-          <AddIcon className="w-5/6 h-auto" />
-        </IconButton>
+        (!fixedLength || (fixedLength && !isMax)) && (
+          <IconButton onClick={addItem} variant="primary" size="small">
+            <AddIcon className="w-5/6 h-auto" />
+          </IconButton>
+        )
       }
     >
       <ListPanel>
@@ -117,6 +126,8 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
                     field={field}
                     item={item}
                     index={index}
+                    isMin={isMin}
+                    fixedLength={fixedLength}
                     {...itemProps(item)}
                   />
                 ))}
@@ -136,9 +147,20 @@ interface ItemProps {
   index: number
   item: any
   label?: string
+  isMin?: boolean
+  fixedLength?: boolean
 }
 
-const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+const Item = ({
+  tinaForm,
+  field,
+  index,
+  item,
+  label,
+  isMin,
+  fixedLength,
+  ...p
+}: ItemProps) => {
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
@@ -165,7 +187,9 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
           <ItemClickTarget>
             <FieldsBuilder padding={false} form={tinaForm} fields={fields} />
           </ItemClickTarget>
-          <ItemDeleteButton onClick={removeItem} />
+          {(!fixedLength || (fixedLength && !isMin)) && (
+            <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+          )}
         </ItemHeader>
       )}
     </Draggable>

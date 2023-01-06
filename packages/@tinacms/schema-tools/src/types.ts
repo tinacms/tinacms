@@ -115,6 +115,8 @@ type Component<Type, List> = (props: {
 }) => any
 
 type UIField<Type, List extends boolean> = {
+  max?: List extends true ? number : never
+  min?: List extends true ? number : never
   /**
    * Override the label from parent object
    */
