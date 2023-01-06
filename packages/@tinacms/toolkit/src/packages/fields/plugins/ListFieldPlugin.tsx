@@ -22,15 +22,13 @@ import { FieldsBuilder } from '../../form-builder'
 import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon } from '../../icons'
-import { FieldDescription } from './wrapFieldWithMeta'
 import {
   DragHandle,
-  GroupListHeader,
-  GroupListMeta,
   ItemClickTarget,
   ItemDeleteButton,
   ItemHeader,
 } from './GroupListFieldPlugin'
+import { EmptyList, ListFieldMeta, ListPanel } from './ListFieldMeta'
 
 type DefaultItem = string | number | (() => string | number)
 
@@ -68,9 +66,10 @@ interface ListProps {
   field: ListFieldDefinititon
   form: any
   tinaForm: Form
+  index?: number
 }
 
-const List = ({ tinaForm, form, field, input }: ListProps) => {
+const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
   const addItem = React.useCallback(() => {
     let newItem: DefaultItem = ''
     if (typeof field.defaultItem === 'function') {
@@ -91,26 +90,25 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
   )
 
   return (
-    <>
-      <GroupListHeader>
-        <GroupListMeta>
-          {field.label !== false && <Label>{field.label || field.name}</Label>}
-          {field.description && (
-            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
-              {field.description}
-            </FieldDescription>
-          )}
-        </GroupListMeta>
+    <ListFieldMeta
+      name={input.name}
+      label={field.label}
+      description={field.description}
+      error={meta.error}
+      index={index}
+      tinaForm={tinaForm}
+      actions={
         <IconButton onClick={addItem} variant="primary" size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
-      </GroupListHeader>
+      }
+    >
       <ListPanel>
         <div>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
               <div ref={provider.innerRef}>
-                {items.length === 0 && <EmptyState />}
+                {items.length === 0 && <EmptyList />}
                 {items.map((item: any, index: any) => (
                   <Item
                     // NOTE: Supressing warnings, but not helping with render perf
@@ -128,11 +126,9 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
           </Droppable>
         </div>
       </ListPanel>
-    </>
+    </ListFieldMeta>
   )
 }
-
-const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
@@ -175,32 +171,13 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     </Draggable>
   )
 }
-const Label = ({ error = false, className = '', ...props }) => (
-  <span
-    className={`truncate m-0 text-[13px] font-bold tracking-[0.01em] leading-[1.35] flex-grow flex-shrink flex-auto transition-all duration-100 ease-out text-left ${
-      error ? 'text-orange-500' : 'text-gray-700'
-    } ${className}`}
-    {...props}
-  />
-)
-
-const ListPanel = ({ className = '', ...props }) => (
-  <div
-    className={`max-h-[initial] relative h-auto mb-6 rounded-md shadow bg-gray-100 ${className}`}
-    {...props}
-  />
-)
-
-const EmptyList = ({ className = '', ...props }) => (
-  <div
-    className={`text-center rounded-[5px] bg-gray-100 text-gray-300 leading-[1.35] py-3 text-[15px] font-normal ${className}`}
-    {...props}
-  />
-)
 
 export const ListField = List
 
 export const ListFieldPlugin = {
   name: 'list',
   Component: ListField,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }

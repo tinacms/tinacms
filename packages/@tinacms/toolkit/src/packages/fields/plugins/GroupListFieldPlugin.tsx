@@ -23,11 +23,11 @@ import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { FieldDescription } from './wrapFieldWithMeta'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
+import { EmptyList, ListFieldMeta, ListPanel } from './ListFieldMeta'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -61,9 +61,10 @@ interface GroupProps {
   field: GroupFieldDefinititon
   form: any
   tinaForm: Form
+  index?: number
 }
 
-const Group = ({ tinaForm, form, field, input }: GroupProps) => {
+const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -84,28 +85,25 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
   )
 
   return (
-    <>
-      <GroupListHeader>
-        <GroupListMeta>
-          {field.label !== false && (
-            <GroupLabel>{field.label || field.name}</GroupLabel>
-          )}
-          {field.description && (
-            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
-              {field.description}
-            </FieldDescription>
-          )}
-        </GroupListMeta>
+    <ListFieldMeta
+      name={input.name}
+      label={field.label}
+      description={field.description}
+      error={meta.error}
+      index={index}
+      tinaForm={tinaForm}
+      actions={
         <IconButton onClick={addItem} variant="primary" size="small">
           <AddIcon className="w-5/6 h-auto" />
         </IconButton>
-      </GroupListHeader>
+      }
+    >
       <ListPanel>
         <div>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
               <div ref={provider.innerRef}>
-                {items.length === 0 && <EmptyState />}
+                {items.length === 0 && <EmptyList />}
                 {items.map((item: any, index: any) => (
                   <Item
                     // NOTE: Supressing warnings, but not helping with render perf
@@ -123,11 +121,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
           </Droppable>
         </div>
       </ListPanel>
-    </>
+    </ListFieldMeta>
   )
 }
-
-export const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
@@ -235,34 +231,6 @@ export const GroupLabel = ({
     >
       {children}
     </span>
-  )
-}
-
-export const GroupListHeader = ({ children }: { children?: any }) => {
-  return (
-    <span className="relative flex gap-2 w-full justify-between items-center mb-2">
-      {children}
-    </span>
-  )
-}
-
-export const GroupListMeta = ({ children }: { children?: any }) => {
-  return <div className="flex-1 truncate">{children}</div>
-}
-
-export const ListPanel = ({ children }) => {
-  return (
-    <div className="relative mb-6 rounded-md bg-gray-100 shadow">
-      {children}
-    </div>
-  )
-}
-
-export const EmptyList = ({ children }) => {
-  return (
-    <div className="text-center rounded bg-gray-100 text-gray-400 p-3 text-sm italic font-regular">
-      {children}
-    </div>
   )
 }
 

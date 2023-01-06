@@ -164,7 +164,7 @@ export const FieldError = ({
 }) => {
   return (
     <span
-      className={`block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0 ${className}`}
+      className={`block font-sans text-xs font-normal text-red-500 pt-3 animate-slide-in whitespace-normal m-0  ${className}`}
       {...props}
     >
       {children}

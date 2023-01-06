@@ -21,17 +21,12 @@ import { Field, Form } from '../../../forms'
 import { FieldsBuilder, useFormPortal } from '../../../form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { GroupPanel, PanelHeader, PanelBody } from '../GroupFieldPlugin'
-import { FieldDescription } from '../wrapFieldWithMeta'
 import {
-  GroupListHeader,
-  GroupListMeta,
   GroupLabel,
   ItemDeleteButton,
   ItemHeader,
-  ListPanel,
   DragHandle,
   ItemClickTarget,
-  EmptyState,
 } from '../GroupListFieldPlugin'
 import { useCMS } from '../../../react-core/use-cms'
 import { useEvent } from '../../../react-core'
@@ -39,6 +34,7 @@ import { FieldHoverEvent, FieldFocusEvent } from '../../field-events'
 import { BlockSelector } from './BlockSelector'
 import { BlockSelectorBig } from './BlockSelectorBig'
 import { BiPencil } from 'react-icons/bi'
+import { EmptyList, ListFieldMeta, ListPanel } from '../ListFieldMeta'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -79,9 +75,17 @@ interface BlockFieldProps {
   field: BlocksFieldDefinititon
   form: any
   tinaForm: Form
+  index?: number
 }
 
-const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
+const Blocks = ({
+  tinaForm,
+  form,
+  field,
+  input,
+  meta,
+  index,
+}: BlockFieldProps) => {
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -99,34 +103,31 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const items = input.value || []
 
   return (
-    <>
-      <GroupListHeader>
-        <GroupListMeta>
-          {field.label !== false && (
-            <GroupLabel>{field.label || field.name}</GroupLabel>
-          )}
-          {field.description && (
-            <FieldDescription>{field.description}</FieldDescription>
-          )}
-        </GroupListMeta>
-        {/* @ts-ignore */}
-        {!field.visualSelector && (
+    <ListFieldMeta
+      name={input.name}
+      label={field.label}
+      description={field.description}
+      error={meta.error}
+      index={index}
+      tinaForm={tinaForm}
+      actions={
+        // @ts-ignore
+        !field.visualSelector ? (
           <BlockSelector templates={field.templates} addItem={addItem} />
-        )}
-        {/* @ts-ignore */}
-        {field.visualSelector && (
+        ) : (
           <BlockSelectorBig
             label={field.label || field.name}
             templates={field.templates}
             addItem={addItem}
           />
-        )}
-      </GroupListHeader>
+        )
+      }
+    >
       <ListPanel>
         <Droppable droppableId={field.name} type={field.name}>
           {(provider) => (
             <div ref={provider.innerRef} className="edit-page--list-parent">
-              {items.length === 0 && <EmptyState />}
+              {items.length === 0 && <EmptyList />}
               {items.map((block: any, index: any) => {
                 const template = field.templates[block._template]
 
@@ -164,7 +165,7 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           )}
         </Droppable>
       </ListPanel>
-    </>
+    </ListFieldMeta>
   )
 }
 
