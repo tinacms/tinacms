@@ -16,7 +16,7 @@ import { name } from './properties'
 import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
-const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
+const FORMATS = ['json', 'md', 'markdown', 'mdx', 'toml', 'yaml'] as const
 
 const Template = z
   .object({

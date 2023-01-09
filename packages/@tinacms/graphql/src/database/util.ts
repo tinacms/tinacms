@@ -13,6 +13,7 @@ limitations under the License.
 
 import * as yup from 'yup'
 import toml from '@iarna/toml'
+import yaml from 'js-yaml'
 import matter from 'gray-matter'
 import { assertShape } from '../util'
 
@@ -69,6 +70,10 @@ export const stringifyFile = (
       return ok
     case '.json':
       return JSON.stringify(content, null, 2)
+    case '.yaml':
+      return yaml.safeDump(content)
+    case '.toml':
+      return toml.stringify(content as any)
     default:
       throw new Error(`Must specify a valid format, got ${format}`)
   }
@@ -103,6 +108,16 @@ export const parseFile = <T extends object>(
         return {} as T
       }
       return JSON.parse(content)
+    case '.toml':
+      if (!content) {
+        return {} as T
+      }
+      return toml.parse(content) as T
+    case '.yaml':
+      if (!content) {
+        return {} as T
+      }
+      return yaml.safeLoad(content) as T
     default:
       throw new Error(`Must specify a valid format, got ${format}`)
   }

@@ -45,7 +45,7 @@
     "graphql": "15.8.0",
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
-    "js-yaml": "^3.14.0",
+    "js-yaml": "^3.14.1",
     "leveldown": "^6.1.0",
     "lodash": "^4.17.20",
     "mdast": "^3.0.0",
