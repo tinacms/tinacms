@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-json",
-  "version": "0.44.0",
+  "version": "0.43.3",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -45,5 +45,5 @@
     "react": ">=16.8",
     "tinacms": ">=0.11"
   },
-  "gitHead": "f60fdb5a0749981b961bad0cfd88f1e01911982a"
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

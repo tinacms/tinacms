@@ -1,7 +1,7 @@
 {
   "name": "gatsby-plugin-tinacms",
   "main": "index.js",
-  "version": "0.44.0",
+  "version": "0.43.3",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -35,5 +35,5 @@
   "dependencies": {
     "tinacms": "^0.43.3"
   },
-  "gitHead": "f60fdb5a0749981b961bad0cfd88f1e01911982a"
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

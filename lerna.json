@@ -6,7 +6,7 @@
       "ignoreChanges": [
         "packages/demo-*",
         "packages/@testing/**",
-        "packages/gatsby*",
+        "packages/gatsby-*",
         "packages/react-tinacms-github",
         "packages/next-tinacms-github",
         "packages/react-tinacms-strapi"
