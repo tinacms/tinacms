@@ -92,7 +92,7 @@ const List = ({ tinaForm, form, field, input, meta, index }: ListProps) => {
   // @ts-ignore
   const isMax = items.length >= (field.max || Infinity)
   // @ts-ignore
-  const isMin = items.length <= (field.min || Infinity)
+  const isMin = items.length <= (field.min || 0)
   // @ts-ignore
   const fixedLength = field.min === field.max
 
