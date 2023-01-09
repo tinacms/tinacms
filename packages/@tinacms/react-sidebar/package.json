@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/react-sidebar",
+  "name": "tinacms-react-sidebar",
   "version": "0.44.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -55,5 +55,5 @@
     "react": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "cd429e134781c6841aef0075950292ef248a0f19"
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/git-client",
+  "name": "tinacms-git-client",
   "version": "0.43.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

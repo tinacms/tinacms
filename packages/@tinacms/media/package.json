@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/media",
+  "name": "tinacms-media",
   "version": "0.43.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

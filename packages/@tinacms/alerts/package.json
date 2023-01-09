@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/alerts",
+  "name": "tinacms-alerts",
   "version": "0.43.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

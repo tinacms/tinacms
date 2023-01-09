@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/browser-storage",
+  "name": "tinacms-browser-storage",
   "version": "0.43.0",
   "description": "A TinaCMS adapter for backing up form data in browser storage",
   "main": "dist/index.js",

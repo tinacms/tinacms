@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/react-modals",
+  "name": "tinacms-react-modals",
   "version": "0.43.0",
   "license": "Apache-2.0",
   "main": "build/index.js",
