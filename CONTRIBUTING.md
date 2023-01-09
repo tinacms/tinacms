@@ -18,14 +18,26 @@ _Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/abou
 To get started:
 
 ```bash
-git clone git@github.com:tinacms/tinacms.git
+git clone git@github.com:einstein/tinacms.git
 cd tinacms
-npm install
+## Easiest way is to use an existing docker image.
+docker run -e 'NODE_OPTIONS=--openssl-legacy-provider' -p 3000:3000 -w /app -v "${PWD}/:/app" -it --rm --name tina-dev node:17 /bin/bash
+npm ci --legacy-peer-deps
 npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
 npm run develop
+```
+
+To publish package to Einstein's npm
+
+```bash
+# navigate back to tinacms root directory
+export NPM_TOKEN={EINSTEIN_NPM_TOKEN}
+cd ../../
+npm run build
+npm publish
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**

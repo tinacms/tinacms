@@ -2,18 +2,13 @@
   "title": "Page Builder Example",
   "blocks": [
     {
-      "_template": "hero",
-      "text": "Hello World"
-    },
-    {
-      "_template": "cta",
-      "text": "Log In",
-      "url": "www.google.com"
-    },
-    {
       "_template": "image",
       "src": "/images/iceland-thumb.jpg",
       "alt": "image alt text"
+    },
+    {
+      "_template": "wysiwyg",
+      "content": "# Hello World"
     }
   ],
   "hero_image": "/images/davisco-5E5N49RWtbA-unsplash.jpg"

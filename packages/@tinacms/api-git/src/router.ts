@@ -89,7 +89,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   }
 
-  router.delete('/:relPath', async (req: any, res) => {
+  router.delete('/:relPath', async (req: any, res: any) => {
     try {
       const user = req.user || {}
       const fileRelativePath = decodeURIComponent(req.params.relPath)
@@ -111,7 +111,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.put('/:relPath', (req, res) => {
+  router.put('/:relPath', (req: any, res: any) => {
     try {
       const fileRelativePath = decodeURIComponent(req.params.relPath)
       repo.writeFile(fileRelativePath, req.body.content)
@@ -121,38 +121,42 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/upload', uploader.single('file'), async (req: any, res) => {
-    try {
-      const user = req.user || {}
-      const message = req.body.message || defaultCommitMessage
+  router.post(
+    '/upload',
+    uploader.single('file'),
+    async (req: any, res: any) => {
+      try {
+        const user = req.user || {}
+        const message = req.body.message || defaultCommitMessage
 
-      const fileName = req.file.originalname
-      const tmpPath = path.join(repo.tmpDir, fileName)
-      const relPath = path.join(req.body.directory, fileName)
-      const absPath = repo.fileAbsolutePath(relPath)
+        const fileName = req.file.originalname
+        const tmpPath = path.join(repo.tmpDir, fileName)
+        const relPath = path.join(req.body.directory, fileName)
+        const absPath = repo.fileAbsolutePath(relPath)
 
-      if (repo.fileIsInRepo(absPath)) {
-        fs.renameSync(tmpPath, absPath)
+        if (repo.fileIsInRepo(absPath)) {
+          fs.renameSync(tmpPath, absPath)
 
-        await repo.commit({
-          name: user.name || req.body.name || defaultCommitName,
-          email: user.email || req.body.email || defaultCommitEmail,
-          message,
-          files: [relPath],
-        })
+          await repo.commit({
+            name: user.name || req.body.name || defaultCommitName,
+            email: user.email || req.body.email || defaultCommitEmail,
+            message,
+            files: [relPath],
+          })
 
-        if (pushOnCommit) {
-          await repo.push()
+          if (pushOnCommit) {
+            await repo.push()
+          }
+
+          res.send(req.file)
         }
-
-        res.send(req.file)
+      } catch {
+        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
       }
-    } catch {
-      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
-  })
+  )
 
-  router.post('/commit', async (req: any, res) => {
+  router.post('/commit', async (req: any, res: any) => {
     try {
       const user = req.user || {}
       const message = req.body.message || defaultCommitMessage
@@ -175,7 +179,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/push', async (req, res) => {
+  router.post('/push', async (req: any, res: any) => {
     try {
       await repo.push()
       res.json({ status: 'success' })
@@ -185,7 +189,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/reset', async (req, res) => {
+  router.post('/reset', async (req: any, res: any) => {
     try {
       // TODO: I feel like this in wrong. Taking a list of files and then only resetting the first one?
       await repo.reset(req.body.files[0])
@@ -195,7 +199,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.get('/show/:fileRelativePath', async (req, res) => {
+  router.get('/show/:fileRelativePath', async (req: any, res: any) => {
     try {
       const content = await repo.getFileAtHead(req.params.fileRelativePath)
 
