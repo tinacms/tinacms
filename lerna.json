@@ -6,7 +6,11 @@
       "ignoreChanges": ["packages/demo-*", "packages/@testing/**"]
     },
     "run": {
-      "ignore": []
+      "ignore": [
+        "packages/gatsby*",
+        "packages/react-tinacms-github",
+        "packages/next-tinacms-github"
+      ]
     }
   }
 }
