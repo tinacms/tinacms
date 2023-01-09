@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-github",
-  "version": "0.43.3",
+  "version": "0.44.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",

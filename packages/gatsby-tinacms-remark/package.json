@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.43.3",
+  "version": "0.44.0",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",

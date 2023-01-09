@@ -2,6 +2,10 @@
   "title": "Page Builder Example",
   "blocks": [
     {
+      "_template": "hero",
+      "text": "Spiderman"
+    },
+    {
       "_template": "image",
       "src": "/images/iceland-thumb.jpg",
       "alt": "image alt text"
