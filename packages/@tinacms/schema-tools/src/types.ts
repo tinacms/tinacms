@@ -478,7 +478,11 @@ export interface FieldCollection {
   /**
    * This format will be used to parse the markdown frontmatter
    */
-  markdownFrontmatterFormat?: 'yaml' | 'toml'
+  frontmatterFormat?: 'yaml' | 'toml'
+  /**
+   * The delimiters used to parse the frontmatter.
+   */
+  frontmatterDelimiters?: [string, string] | string
   ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
   /**
    * @deprecated - use `ui.defaultItem` instead

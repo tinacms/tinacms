@@ -298,7 +298,10 @@ export class Database {
         payload,
         extension,
         templateInfo.type === 'union',
-        collection?.markdownFrontmatterFormat
+        {
+          frontmatterFormat: collection?.frontmatterFormat,
+          frontmatterDelimiters: collection?.frontmatterDelimiters,
+        }
       )
       return {
         stringifiedFile,
@@ -739,7 +742,10 @@ const _indexContent = async (
         dataString,
         path.extname(filepath),
         (yup) => yup.object({}),
-        collection.markdownFrontmatterFormat
+        {
+          frontmatterDelimiters: collection?.frontmatterDelimiters,
+          frontmatterFormat: collection?.frontmatterFormat,
+        }
       )
       if (database.store.supportsSeeding()) {
         await database.store.seed(normalizePath(filepath), data, seedOptions)

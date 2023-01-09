@@ -28,7 +28,10 @@ export const stringifyFile = (
   format: FormatType | string, // FIXME
   /** For non-polymorphic documents we don't need the template key */
   keepTemplateKey: boolean,
-  markdownLanguage?: 'toml' | 'yaml'
+  markdownParseConfig?: {
+    frontmatterFormat?: 'toml' | 'yaml'
+    frontmatterDelimiters?: [string, string] | string
+  }
 ): string => {
   switch (format) {
     case '.markdown':
@@ -58,8 +61,9 @@ export const stringifyFile = (
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
         { ...rest, ...extra },
         {
-          language: markdownLanguage || 'yaml',
+          language: markdownParseConfig?.frontmatterFormat || 'yaml',
           engines: matterEngines,
+          delimiters: markdownParseConfig?.frontmatterDelimiters || '---',
         }
       )
       return ok
@@ -74,14 +78,18 @@ export const parseFile = <T extends object>(
   content: string,
   format: FormatType | string, // FIXME
   yupSchema: (args: typeof yup) => yup.ObjectSchema<any>,
-  markdownLanguage?: 'toml' | 'yaml'
+  markdownParseConfig?: {
+    frontmatterFormat?: 'toml' | 'yaml'
+    frontmatterDelimiters?: [string, string] | string
+  }
 ): T => {
   switch (format) {
     case '.markdown':
     case '.mdx':
     case '.md':
       const contentJSON = matter(content || '', {
-        language: markdownLanguage || 'yaml',
+        language: markdownParseConfig?.frontmatterFormat || 'yaml',
+        delimiters: markdownParseConfig?.frontmatterDelimiters || '---',
         engines: matterEngines,
       })
       const markdownData = {
