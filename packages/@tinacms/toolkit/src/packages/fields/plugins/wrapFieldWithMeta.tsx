@@ -48,6 +48,28 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   }
 }
 
+// Same as above but excludes the label, useful for fields that have their own label
+export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
+  Field:
+    | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
+) {
+  return (props: InputFieldType<ExtraFieldProps, InputProps>) => {
+    return (
+      <FieldMeta
+        name={props.input.name}
+        label={false}
+        description={props.field.description}
+        error={props.meta.error}
+        index={props.index}
+        tinaForm={props.tinaForm}
+      >
+        <Field {...props} />
+      </FieldMeta>
+    )
+  }
+}
+
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   children: any
