@@ -40,7 +40,7 @@ npm run build
 npm run lerna -- publish from-package --yes
 ```
 
-**Don't forget to update the version of all packages using semantic versioning**
+**Don't forget to bump the version in lerna.json following semantic versioning**
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
 

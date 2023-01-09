@@ -1,5 +1,5 @@
 {
-  "name": "tinacms",
+  "name": "@einsteinindustries/tinacms",
   "version": "0.44.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -54,5 +54,5 @@
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "cd429e134781c6841aef0075950292ef248a0f19"
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

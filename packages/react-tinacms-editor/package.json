@@ -1,5 +1,5 @@
 {
-  "name": "react-tinacms-editor",
+  "name": "@einsteinindustries/react-tinacms-editor",
   "version": "0.44.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -79,5 +79,5 @@
     "styled-components": ">=4.1",
     "tinacms": ">=0.13"
   },
-  "gitHead": "cd429e134781c6841aef0075950292ef248a0f19"
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

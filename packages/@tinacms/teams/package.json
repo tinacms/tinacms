@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-teams",
+  "name": "@einsteinindustries/tinacms-teams",
   "version": "0.42.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -37,5 +37,6 @@
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.6.0",
     "node-fetch": "2.6.1"
-  }
+  },
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

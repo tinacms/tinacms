@@ -1,5 +1,5 @@
 {
-  "name": "tinacms-react-alerts",
+  "name": "@einsteinindustries/tinacms-react-alerts",
   "version": "0.43.0",
   "license": "Apache-2.0",
   "main": "build/index.js",
@@ -34,5 +34,5 @@
     "react": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }
