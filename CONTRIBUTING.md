@@ -34,10 +34,10 @@ To publish package to Einstein's npm
 
 ```bash
 # navigate back to tinacms root directory
-export NPM_TOKEN={EINSTEIN_NPM_TOKEN}
 cd ../../
+npm login # follow prompts
 npm run build
-npm publish
+npm run lerna -- publish from-package --yes
 ```
 
 **Don't forget to update the version of all packages using semantic versioning**
