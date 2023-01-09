@@ -3,14 +3,17 @@
   "version": "0.44.0",
   "command": {
     "publish": {
-      "ignoreChanges": ["packages/demo-*", "packages/@testing/**"]
-    },
-    "run": {
-      "ignore": [
+      "ignoreChanges": [
+        "packages/demo-*",
+        "packages/@testing/**",
         "packages/gatsby*",
         "packages/react-tinacms-github",
-        "packages/next-tinacms-github"
+        "packages/next-tinacms-github",
+        "packages/react-tinacms-strapi"
       ]
+    },
+    "run": {
+      "ignore": []
     }
   }
 }
