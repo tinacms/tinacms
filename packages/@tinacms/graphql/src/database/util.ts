@@ -51,10 +51,10 @@ export const stringifyFile = (
     $_body: string
   }
   const extra: { [key: string]: string } = {}
-  const strippedContent = { ...rest, ...extra }
   if (keepTemplateKey) {
     extra['_template'] = _template
   }
+  const strippedContent = { ...rest, ...extra }
   switch (format) {
     case '.markdown':
     case '.mdx':
