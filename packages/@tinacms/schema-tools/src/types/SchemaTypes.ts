@@ -146,7 +146,7 @@ interface BaseCollection {
   /**
    * This format will be used to parse the markdown frontmatter
    */
-  frontmatterFormat?: 'yaml' | 'toml'
+  frontmatterFormat?: 'yaml' | 'toml' | 'json'
   /**
    * The delimiters used to parse the frontmatter.
    */

@@ -29,7 +29,7 @@ export const stringifyFile = (
   /** For non-polymorphic documents we don't need the template key */
   keepTemplateKey: boolean,
   markdownParseConfig?: {
-    frontmatterFormat?: 'toml' | 'yaml'
+    frontmatterFormat?: 'toml' | 'yaml' | 'json'
     frontmatterDelimiters?: [string, string] | string
   }
 ): string => {
@@ -79,7 +79,7 @@ export const parseFile = <T extends object>(
   format: FormatType | string, // FIXME
   yupSchema: (args: typeof yup) => yup.ObjectSchema<any>,
   markdownParseConfig?: {
-    frontmatterFormat?: 'toml' | 'yaml'
+    frontmatterFormat?: 'toml' | 'yaml' | 'json'
     frontmatterDelimiters?: [string, string] | string
   }
 ): T => {
