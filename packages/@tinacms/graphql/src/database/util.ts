@@ -34,33 +34,34 @@ export const stringifyFile = (
     frontmatterDelimiters?: [string, string] | string
   }
 ): string => {
+  const {
+    _relativePath,
+    _keepTemplateKey,
+    _id,
+    _template,
+    _collection,
+    $_body,
+    ...rest
+  } = content as {
+    _relativePath: string
+    _keepTemplateKey: string
+    _id: string
+    _template: string
+    _collection: string
+    $_body: string
+  }
+  const extra: { [key: string]: string } = {}
+  const strippedContent = { ...rest, ...extra }
+  if (keepTemplateKey) {
+    extra['_template'] = _template
+  }
   switch (format) {
     case '.markdown':
     case '.mdx':
     case '.md':
-      const {
-        _relativePath,
-        _keepTemplateKey,
-        _id,
-        _template,
-        _collection,
-        $_body,
-        ...rest
-      } = content as {
-        _relativePath: string
-        _keepTemplateKey: string
-        _id: string
-        _template: string
-        _collection: string
-        $_body: string
-      }
-      const extra: { [key: string]: string } = {}
-      if (keepTemplateKey) {
-        extra['_template'] = _template
-      }
       const ok = matter.stringify(
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
-        { ...rest, ...extra },
+        strippedContent,
         {
           language: markdownParseConfig?.frontmatterFormat || 'yaml',
           engines: matterEngines,
@@ -69,11 +70,11 @@ export const stringifyFile = (
       )
       return ok
     case '.json':
-      return JSON.stringify(content, null, 2)
+      return JSON.stringify(strippedContent, null, 2)
     case '.yaml':
-      return yaml.safeDump(content)
+      return yaml.safeDump(strippedContent)
     case '.toml':
-      return toml.stringify(content as any)
+      return toml.stringify(strippedContent as any)
     default:
       throw new Error(`Must specify a valid format, got ${format}`)
   }
