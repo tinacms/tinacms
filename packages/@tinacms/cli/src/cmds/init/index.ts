@@ -226,6 +226,13 @@ const forestryMigrate = async ({
       '.forestry/settings.yml'
     )} file in your project.`
   )
+
+  logger.info(
+    `This migration will update some of your content to match tina.  Please ${focusText(
+      'save a backup of your content'
+    )} before doing this migration. (This can be done with git)`
+  )
+
   const option = await prompts({
     name: 'selection',
     type: 'confirm',

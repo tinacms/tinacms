@@ -465,7 +465,6 @@ importers:
       '@types/progress': ^2.0.3
       '@types/prompts': ^2.0.13
       '@types/yup': ^0.29.11
-      add: ^2.0.6
       ajv: ^6.12.3
       altair-express-middleware: 4.0.6
       auto-bind: ^4.0.0
@@ -500,7 +499,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 3.1.1_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 3.1.2_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -512,7 +511,6 @@ importers:
       '@tinacms/graphql': link:../graphql
       '@tinacms/metrics': link:../metrics
       '@tinacms/schema-tools': link:../schema-tools
-      add: 2.0.6
       ajv: 6.12.6
       altair-express-middleware: 4.0.6
       auto-bind: 4.0.0
@@ -5630,15 +5628,15 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/3.1.1_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/3.1.2_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-+V1WK4DUhejVSbkZrAsyv9gA4oQABVrtEUkT7vWq7gSf7Ln6OEM59lDUDsjp5wpLPTBIDJANbAe3qEd+iCB3Ow==,
+        integrity: sha512-emOQiHyIliVOIjKVKdsI5MXj312zmRDwmHpyUTZMjfpvxq/UVAHUJIVdVf+lnjjrI+LXBTgMlTWTgHQfmICxjg==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
+      '@graphql-tools/utils': 9.1.3_graphql@15.8.0
       change-case-all: 1.0.15
       common-tags: 1.8.2
       graphql: 15.8.0
@@ -5871,6 +5869,18 @@ packages:
     dependencies:
       graphql: 15.8.0
       tslib: 2.4.0
+
+  /@graphql-tools/utils/9.1.3_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-bbJyKhs6awp1/OmP+WKA1GOyu9UbgZGkhIj5srmiMGLHohEOKMjW784Sk0BZil1w2x95UPu0WHw6/d/HVCACCg==,
+      }
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+    dependencies:
+      graphql: 15.8.0
+      tslib: 2.4.0
+    dev: false
 
   /@headlessui/react/1.6.5_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -11161,13 +11171,6 @@ packages:
       }
     engines: { node: '>=0.4.0' }
     hasBin: true
-
-  /add/2.0.6:
-    resolution:
-      {
-        integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==,
-      }
-    dev: false
 
   /agent-base/4.3.0:
     resolution:

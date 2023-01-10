@@ -12,7 +12,10 @@ limitations under the License.
 */
 
 import fs from 'fs-extra'
+import path from 'path'
 import yaml from 'js-yaml'
+
+import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type {
   TinaCloudCollection,
   UICollection,
@@ -24,6 +27,33 @@ const stringifyLabel = (label: string) => {
   return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
 }
 
+export const generateAllCollections = async ({
+  rootPath,
+}: {
+  rootPath: string
+}) => {
+  const allTemplates = (
+    await fs.readdir(
+      path.join(rootPath, '.forestry', 'front_matter', 'templates')
+    )
+  ).map((tem) => path.basename(tem, '.yml'))
+  const templateMap = new Map<
+    string,
+    { fields: TinaFieldInner<false>[]; templateObj: any }
+  >()
+  const proms = allTemplates.map(async (tem) => {
+    const { fields, templateObj } = getFieldsFromTemplates({
+      tem,
+      collection: stringifyLabel(tem),
+      rootPath,
+    })
+
+    templateMap.set(tem, { fields, templateObj })
+  })
+  await Promise.all(proms)
+  return templateMap
+}
+
 export const generateCollections = async ({
   forestryPath,
   rootPath,
@@ -31,6 +61,8 @@ export const generateCollections = async ({
   forestryPath: string
   rootPath: string
 }) => {
+  const templateMap = await generateAllCollections({ rootPath })
+
   const forestryConfig = await fs.readFile(forestryPath)
   const forestryYaml = yaml.load(forestryConfig.toString())
 
@@ -62,12 +94,24 @@ export const generateCollections = async ({
           }[] = []
           section.templates.forEach((tem) => {
             try {
-              const fields = getFieldsFromTemplates({
-                tem,
-                collection: stringifyLabel(section.label),
-                rootPath,
-              })
+              const { fields: otherFields, templateObj } = templateMap.get(tem)
+              fields.push(...otherFields)
               templates.push({ fields, label: tem, name: stringifyLabel(tem) })
+
+              templateObj?.pages?.forEach((page) => {
+                // update the data in page to have _template: tem
+                const filePath = path.join(rootPath, page.path)
+                const extname = path.extname(filePath)
+                const fileContent = fs.readFileSync(filePath).toString()
+                const content = parseFile(fileContent, extname, (yup) =>
+                  yup.object({})
+                )
+                const newContent = { _template: tem, ...content }
+                fs.writeFileSync(
+                  filePath,
+                  stringifyFile(newContent, extname, true)
+                )
+              })
             } catch (e) {
               console.log('Error parsing template ', tem)
               console.error(e)
@@ -92,12 +136,13 @@ export const generateCollections = async ({
           // deal with fields
           section.templates?.forEach((tem) => {
             try {
-              const additionalFields = getFieldsFromTemplates({
-                tem,
-                rootPath,
-                collection: stringifyLabel(section.label),
-              })
-              fields.push(...(additionalFields as any))
+              // const additionalFields = getFieldsFromTemplates({
+              //   tem,
+              //   rootPath,
+              //   collection: stringifyLabel(section.label),
+              // })
+              const { fields: additionalFields } = templateMap.get(tem)
+              fields.push(...additionalFields)
             } catch (e) {
               console.log('Error parsing template ', tem)
               console.error(e)

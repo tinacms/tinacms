@@ -298,14 +298,14 @@ export const transformForestryFieldsToTinaFields = ({
   return tinaFields
 }
 
-export const getFieldsFromTemplates = ({
-  tem,
-  rootPath,
-  collection,
-}: {
+export const getFieldsFromTemplates: (_args: {
   tem: string
   collection: string
   rootPath: string
+}) => { fields: TinaFieldInner<false>[]; templateObj: any } = ({
+  tem,
+  rootPath,
+  collection,
 }) => {
   const templatePath = path.join(
     rootPath,
@@ -329,7 +329,7 @@ export const getFieldsFromTemplates = ({
     fields: template.fields,
     collection,
   })
-  return fields
+  return { fields, templateObj }
 }
 
 export const parseTemplates = ({ val }: { val: unknown }) => {
