@@ -9,7 +9,7 @@
     "xstate": "4.32.1",
     "@headlessui/react": "1.6.6",
     "final-form": "4.20.7",
-    "graphql": "15.8.0",
+    "graphql": "16.6.0",
     "@heroicons/react": "1.0.6",
     "webfontloader": "1.6.28",
     "react-is": "17.0.2",
