@@ -135,7 +135,10 @@ export const generateCollections = async ({
                   const content = parseFile(fileContent, extname, (yup) =>
                     yup.object({})
                   )
-                  const newContent = { _template: tem, ...content }
+                  const newContent = {
+                    _template: stringifyLabel(tem),
+                    ...content,
+                  }
                   fs.writeFileSync(
                     filePath,
                     stringifyFile(newContent, extname, true)
