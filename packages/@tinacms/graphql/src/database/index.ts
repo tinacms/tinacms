@@ -786,18 +786,18 @@ export class Database {
         normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
-      await this.onPut(
-        normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
-        JSON.stringify(graphQLSchema)
-      )
+      // await this.onPut(
+      //   normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
+      //   JSON.stringify(graphQLSchema)
+      // )
       await this.bridge.putConfig(
         normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
-      await this.onPut(
-        normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
-        JSON.stringify(tinaSchema.schema)
-      )
+      // await this.onPut(
+      //   normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
+      //   JSON.stringify(tinaSchema.schema)
+      // )
     }
   }
 
@@ -1005,7 +1005,7 @@ export class Database {
       normalizePath(lookupPath),
       JSON.stringify(updatedLookup)
     )
-    await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
+    //await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }
 
