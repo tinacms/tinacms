@@ -22,11 +22,11 @@ limitations under the License.
  */
 
 import {
+  oldVisit,
   PluginFunction,
   PluginValidateFn,
   Types,
 } from '@graphql-codegen/plugin-helpers'
-import { visit } from 'graphql'
 
 import {
   LoadedFragment,
@@ -61,7 +61,7 @@ export const plugin: PluginFunction<RawGenericSdkPluginConfig> = (
     ...(config.externalFragments || []),
   ]
   const visitor = new GenericSdkVisitor(schema, allFragments, config)
-  const visitorResult = visit(allAst, { leave: visitor as any })
+  const visitorResult = oldVisit(allAst, { leave: visitor as any })
 
   return {
     // We will take care of imports
