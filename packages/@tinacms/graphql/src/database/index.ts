@@ -52,10 +52,14 @@ type IndexStatusEvent = {
   error?: Error
 }
 type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
+type OnPutCallback = (key: string, value: any) => Promise<void>
+type OnDeleteCallback = (key: string) => Promise<void>
 
 type CreateDatabase = {
   bridge: Bridge
   level: Level
+  onPut?: (key: string, value: any) => Promise<void>
+  onDelete?: (key: string) => Promise<void>
   indexStatusCallback?: IndexStatusCallback
   version?: boolean
 }
@@ -90,12 +94,16 @@ export type QueryOptions = {
 }
 
 const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
+const defaultOnPut: OnPutCallback = () => Promise.resolve()
+const defaultOnDelete: OnDeleteCallback = () => Promise.resolve()
 
 export class Database {
   public bridge: Bridge
   public rootLevel: Level
   public level: Level | undefined
   public indexStatusCallback: IndexStatusCallback | undefined
+  private onPut: OnPutCallback
+  private onDelete: OnDeleteCallback
   private tinaSchema: TinaSchema | undefined
   private collectionIndexDefinitions:
     | Record<string, Record<string, IndexDefinition>>
@@ -106,6 +114,8 @@ export class Database {
     this.rootLevel = config.level
     this.indexStatusCallback =
       config.indexStatusCallback || defaultStatusCallback
+    this.onPut = config.onPut || defaultOnPut
+    this.onDelete = config.onDelete || defaultOnDelete
   }
 
   private collectionForPath = async (
@@ -255,6 +265,7 @@ export class Database {
     }
     const normalizedPath = normalizePath(filepath)
     await this.bridge.put(normalizedPath, stringifiedFile)
+    await this.onPut(normalizedPath, stringifiedFile)
 
     const putOps = makeIndexOpsForDocument(
       normalizedPath,
@@ -329,6 +340,7 @@ export class Database {
           data
         )
         await this.bridge.put(normalizedPath, stringifiedFile)
+        await this.onPut(normalizedPath, stringifiedFile)
         const putOps = makeIndexOpsForDocument(
           normalizedPath,
           collection,
@@ -774,7 +786,15 @@ export class Database {
         normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
+      await this.onPut(
+        normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
+        JSON.stringify(graphQLSchema)
+      )
       await this.bridge.putConfig(
+        normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
+        JSON.stringify(tinaSchema.schema)
+      )
+      await this.onPut(
         normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
@@ -943,6 +963,7 @@ export class Database {
     }
 
     await this.bridge.delete(normalizePath(filepath))
+    await this.onDelete(normalizePath(filepath))
   }
 
   public _indexAllContent = async (level: Level) => {
@@ -984,6 +1005,7 @@ export class Database {
       normalizePath(lookupPath),
       JSON.stringify(updatedLookup)
     )
+    await this.onPut(normalizePath(lookupPath), JSON.stringify(updatedLookup))
   }
 }
 
