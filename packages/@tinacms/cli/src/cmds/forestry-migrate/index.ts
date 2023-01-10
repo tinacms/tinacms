@@ -108,6 +108,8 @@ export const generateCollections = async ({
             }
           }
         }
+        console.log(section.label)
+        console.log({ forestryTemplates })
         if ((forestryTemplates?.length || 0) > 1) {
           // deal with templates
           const templates: {
