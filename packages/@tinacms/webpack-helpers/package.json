@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/webpack-helpers",
+  "name": "@einsteinindustries/tinacms-webpack-helpers",
   "version": "0.42.1",
   "license": "Apache-2.0",
   "main": "index.js",
@@ -16,5 +16,6 @@
   "keywords": [
     "tinacms",
     "webpack"
-  ]
+  ],
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

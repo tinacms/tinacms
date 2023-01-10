@@ -208,6 +208,8 @@ const PAGE_BUILDER_BLOCKS = {
   cta: {
     Component: CallToActionBlock,
     template: cta_template,
+    // to disable this from being added again, uncomment following line
+    // displayAsOption: false
   },
   hero: {
     Component: HeroBlock,

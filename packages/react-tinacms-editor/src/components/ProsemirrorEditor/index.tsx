@@ -77,7 +77,7 @@ export const ProsemirrorEditor = styled(
       <WysiwygWrapper className="wysiwyg-wrapper" data-testid="wysiwyg-editor">
         <link
           rel="stylesheet"
-          href="https://codemirror.net/lib/codemirror.css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.css"
         />
         <EditorStateProvider translator={translator} editorView={editorView}>
           <Menubar sticky={sticky} imageProps={imageProps} plugins={plugins} />

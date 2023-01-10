@@ -23,6 +23,7 @@ import { BlockTemplate } from 'tinacms'
 export interface Block {
   Component: React.FC<BlockComponentProps>
   template: BlockTemplate
+  displayAsOption?: boolean
 }
 
 export interface BlockComponentProps {

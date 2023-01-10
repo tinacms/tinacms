@@ -65,7 +65,7 @@ Below is an example of the conditional data fetching, from the local environment
 
 ```ts
 import {
-  getGithubPreviewProps,
+  getGithubPreviewProps
   parseMarkdown,
 } from 'next-tinacms-github'
 

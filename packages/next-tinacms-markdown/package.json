@@ -1,6 +1,6 @@
 {
-  "name": "next-tinacms-markdown",
-  "version": "0.43.3",
+  "name": "@einsteinindustries/next-tinacms-markdown",
+  "version": "0.44.0",
   "license": "Apache-2.0",
   "author": "Kendall Strautman",
   "main": "dist/index.js",
@@ -34,5 +34,5 @@
     "@tinacms/scripts": "^0.42.1",
     "tinacms": "^0.43.3"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "eb33842c897df805d0dd2d2ab2fa6026f21d4752"
 }

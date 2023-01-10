@@ -1,6 +1,6 @@
 {
-  "name": "@tinacms/react-forms",
-  "version": "0.43.3",
+  "name": "@einsteinindustries/tinacms-react-forms",
+  "version": "0.44.0",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -43,5 +43,5 @@
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "9c04cc8418ca4272d53e821d3a6713685ebc2c23"
 }
