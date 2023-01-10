@@ -22,7 +22,7 @@ import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
-import { wrapFieldsWithMeta, wrapFieldWithError } from './wrapFieldWithMeta'
+import { wrapFieldWithError } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
