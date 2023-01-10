@@ -14,7 +14,7 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
-
+import minimatch from 'minimatch'
 import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type {
   TinaCloudCollection,
@@ -69,22 +69,46 @@ export const generateCollections = async ({
   const forestrySchema = parseSections({ val: forestryYaml })
   const collections: TinaCloudCollection<false>[] = []
 
-  forestrySchema.sections?.forEach((section) => {
+  const sections = forestrySchema.sections
+
+  for (let index = 0; index < sections.length; index++) {
+    const section = sections[index]
     if (section.read_only) return
+
+    const fields: TinaFieldInner<false>[] = [
+      {
+        // This is the body field
+        type: 'rich-text' as const,
+        name: 'body',
+        label: 'Body of Document',
+        description: 'This is the markdown body',
+        isBody: true,
+      },
+    ]
 
     switch (section.type) {
       case 'directory':
-        const fields: TinaFieldInner<false>[] = [
-          {
-            // This is the body field
-            type: 'rich-text' as const,
-            name: 'body',
-            label: 'Body of Document',
-            description: 'This is the markdown body',
-            isBody: true,
-          },
-        ]
-        if ((section.templates?.length || 0) > 1) {
+        const forestryTemplates = section?.templates || []
+
+        if (forestryTemplates.length === 0 && section.create === 'all') {
+          // For all template
+          for (let templateKey of templateMap.keys()) {
+            // get the shape of the template
+            const { templateObj } = templateMap.get(templateKey)
+            const pages: undefined | string[] = templateObj.pages
+            // if has pages see if there is I page that matches the current section
+            if (pages) {
+              if (
+                pages.some((page) =>
+                  minimatch(page, section.path + '/' + section.match)
+                )
+              ) {
+                forestryTemplates.push(templateKey)
+              }
+            }
+          }
+        }
+        if ((forestryTemplates?.length || 0) > 1) {
           // deal with templates
           const templates: {
             label: string
@@ -92,25 +116,33 @@ export const generateCollections = async ({
             ui?: UICollection
             fields: TinaFieldInner<false>[]
           }[] = []
-          section.templates.forEach((tem) => {
+          forestryTemplates.forEach((tem) => {
             try {
               const { fields: otherFields, templateObj } = templateMap.get(tem)
               fields.push(...otherFields)
-              templates.push({ fields, label: tem, name: stringifyLabel(tem) })
+              templates.push({
+                fields,
+                label: tem,
+                name: stringifyLabel(tem),
+              })
 
               templateObj?.pages?.forEach((page) => {
                 // update the data in page to have _template: tem
-                const filePath = path.join(rootPath, page.path)
-                const extname = path.extname(filePath)
-                const fileContent = fs.readFileSync(filePath).toString()
-                const content = parseFile(fileContent, extname, (yup) =>
-                  yup.object({})
-                )
-                const newContent = { _template: tem, ...content }
-                fs.writeFileSync(
-                  filePath,
-                  stringifyFile(newContent, extname, true)
-                )
+                try {
+                  const filePath = path.join(rootPath, page)
+                  const extname = path.extname(filePath)
+                  const fileContent = fs.readFileSync(filePath).toString()
+                  const content = parseFile(fileContent, extname, (yup) =>
+                    yup.object({})
+                  )
+                  const newContent = { _template: tem, ...content }
+                  fs.writeFileSync(
+                    filePath,
+                    stringifyFile(newContent, extname, true)
+                  )
+                } catch (error) {
+                  console.log('Error updating file', page)
+                }
               })
             } catch (e) {
               console.log('Error parsing template ', tem)
@@ -134,7 +166,7 @@ export const generateCollections = async ({
           collections.push(c)
         } else {
           // deal with fields
-          section.templates?.forEach((tem) => {
+          forestryTemplates?.forEach((tem) => {
             try {
               // const additionalFields = getFieldsFromTemplates({
               //   tem,
@@ -165,7 +197,36 @@ export const generateCollections = async ({
           collections.push(c)
         }
         break
+      case 'document':
+        for (let currentTemplateName of templateMap.keys()) {
+          const { templateObj, fields: additionalFields } =
+            templateMap.get(currentTemplateName)
+          const pages: string[] = templateObj?.pages || []
+
+          // find the template that has pages that contains the current section.path
+          if (pages.includes(section.path)) {
+            fields.push(...additionalFields)
+            break
+          }
+        }
+
+        const dir = path.dirname(section.path)
+
+        const c: TinaCloudCollection<false> = {
+          label: section.label,
+          name: stringifyLabel(section.label),
+          path: dir,
+          ui: {
+            allowedActions: {
+              create: false,
+              delete: false,
+            },
+          },
+          fields,
+        }
+        collections.push(c)
+        break
     }
-  })
+  }
   return collections
 }

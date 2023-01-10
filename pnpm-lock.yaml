@@ -487,6 +487,7 @@ importers:
       lodash: ^4.17.19
       lodash.get: ^4.4.2
       log4js: ^6.4.0
+      minimatch: ^5.1.2
       multer: 1.4.5-lts.1
       normalize-path: ^3.0.0
       prettier: ^2.2.1
@@ -532,6 +533,7 @@ importers:
       lodash: 4.17.21
       lodash.get: 4.4.2
       log4js: 6.5.2
+      minimatch: 5.1.2
       multer: 1.4.5-lts.1
       normalize-path: 3.0.0
       prettier: 2.7.1
@@ -23107,6 +23109,16 @@ packages:
     resolution:
       {
         integrity: sha512-362NP+zlprccbEt/SkxKfRMHnNY85V74mVnpUpNyr3F35covl09Kec7/sEFLt3RA4oXmewtoaanoIf67SE5Y5g==,
+      }
+    engines: { node: '>=10' }
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: false
+
+  /minimatch/5.1.2:
+    resolution:
+      {
+        integrity: sha512-bNH9mmM9qsJ2X4r2Nat1B//1dJVcn3+iBLa3IgqJ7EbGaDNepL9QSHOxN4ng33s52VMMhhIfgCYDk3C4ZmlDAg==,
       }
     engines: { node: '>=10' }
     dependencies:
