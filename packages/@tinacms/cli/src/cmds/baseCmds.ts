@@ -43,6 +43,11 @@ const startServerPortOption = {
   name: '--port <port>',
   description: 'Specify a port to run the server on. (default 4001)',
 }
+const rootPathOption = {
+  name: '--rootPath <rootPath>',
+  description:
+    'Specify the root directory to run the CLI from (defaults to current working directory)',
+}
 const experimentalDatalayer = {
   name: '--experimentalData',
   description: 'Build the server with additional data querying capabilities',
@@ -161,6 +166,7 @@ export const baseCmds: Command[] = [
       noTelemetryOption,
       watchFileOption,
       verboseOption,
+      rootPathOption,
     ],
     action: (options) =>
       chain(
@@ -185,6 +191,7 @@ export const baseCmds: Command[] = [
       verboseOption,
       developmentOption,
       localOption,
+      rootPathOption,
     ],
     action: (options) =>
       chain(
@@ -202,6 +209,7 @@ export const baseCmds: Command[] = [
   {
     command: INIT,
     options: [
+      rootPathOption,
       experimentalDatalayer,
       isomorphicGitBridge,
       noTelemetryOption,
@@ -214,6 +222,7 @@ export const baseCmds: Command[] = [
   },
   {
     options: [
+      rootPathOption,
       cleanOption,
       useDefaultValuesOption,
       noTelemetryOption,

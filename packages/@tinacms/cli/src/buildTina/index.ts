@@ -41,6 +41,7 @@ interface ClientGenOptions {
   local?: boolean
   verbose?: boolean
   port?: number
+  rootPath?: string
 }
 
 interface BuildOptions {
@@ -271,19 +272,20 @@ export class ConfigBuilder {
     verbose,
     local,
     port,
+    rootPath,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
   }) {
     const astSchema = await getASTSchema(this.database)
 
-    await genTypes({ schema: astSchema, usingTs }, () => {}, {
+    await genTypes({ schema: astSchema, usingTs, rootPath }, () => {}, {
       noSDK,
       verbose,
     })
 
     return genClient(
-      { tinaSchema: compiledSchema, usingTs },
+      { tinaSchema: compiledSchema, usingTs, rootPath },
       {
         local,
         port,
