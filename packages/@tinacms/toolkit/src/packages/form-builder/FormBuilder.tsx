@@ -340,7 +340,7 @@ export const FormWrapper = ({ children, id }) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
-      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-6 px-6 pb-2"
+      className="h-full overflow-y-auto max-h-full bg-gray-50 py-5 px-6"
     >
       <div className="w-full flex justify-center">
         <div className="w-full max-w-form">{children}</div>
