@@ -25,10 +25,10 @@ import { updateBodyDisplacement } from './Sidebar'
 import { FormModal } from '../../react-forms'
 import { useEditState } from '@tinacms/sharedctx'
 import type { ScreenPlugin } from '../../react-screens'
-import { LoadingDots } from '../../form-builder'
 import { SyncStatus, SyncErrorWidget, SyncStatusModal } from './SyncStatus'
 import { useCMS } from '../../react-core'
 import { CloudConfigPlugin } from '../../react-cloud-config'
+import { AddCollection } from './AddCollection'
 
 interface NavProps {
   isLocalMode: boolean
@@ -175,6 +175,7 @@ export const Nav = ({
               RenderNavCollection={RenderNavCollection}
               {...collectionsInfo}
             />
+            {isLocalMode && <AddCollection />}
           </>
         )}
         {(screens.length > 0 || contentCreators.length) > 0 && (
