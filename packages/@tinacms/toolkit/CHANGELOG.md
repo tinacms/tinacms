@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.2.1
+
+### Patch Changes
+
+- c627ebe92: docs: Update broken media error links
+- ef7c4043a: Fix links to Tina Cloud
+- b2952a298: Adds meta wrapper for list-type fields that displays errors. Adds optional min/max for list-type fields that controls add/remove UI. Removes duplicate label from group field.
+  - @tinacms/sharedctx@1.0.0
+
 ## 1.2.0
 
 ### Minor Changes

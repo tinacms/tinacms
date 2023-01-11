@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 1.0.5
+
+### Patch Changes
+
+- 7d41435df: added ability to use toml in markdown frontmatter
+- Updated dependencies [7d41435df]
+- Updated dependencies [3165f397d]
+- Updated dependencies [a68f1ac27]
+- Updated dependencies [7ff63fdd9]
+- Updated dependencies [b2952a298]
+  - @tinacms/schema-tools@1.2.0
+  - @tinacms/mdx@1.1.0
+  - @tinacms/datalayer@1.0.0
+
 ## 1.0.4
 
 ### Patch Changes
