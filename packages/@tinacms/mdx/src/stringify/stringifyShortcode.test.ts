@@ -55,8 +55,8 @@ describe('stringifyShortcode', () => {
           },
           fields: [
             {
-              name: 'text',
-              label: 'text',
+              name: '_value',
+              label: 'Value',
               type: 'string',
             },
           ],
@@ -66,7 +66,7 @@ describe('stringifyShortcode', () => {
     })
     it('parses attributes', () => {
       const result = stringifyShortcode(
-        '<signature text="bar123"></signature>',
+        '<signature _value="bar123"></signature>',
         {
           name: 'signature',
           label: 'Signature',
@@ -76,8 +76,8 @@ describe('stringifyShortcode', () => {
           },
           fields: [
             {
-              name: 'text',
-              label: 'text',
+              name: '_value',
+              label: 'Value',
               type: 'string',
             },
           ],

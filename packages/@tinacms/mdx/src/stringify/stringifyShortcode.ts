@@ -24,9 +24,9 @@ export function stringifyShortcode(
   template: Template<false> & { inline?: boolean }
 ) {
   const match = template.match!
-  const unkeyedAttributes = !!template.fields.find((t) => t.name == 'text')
+  const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')
   const regex = `<[\\s]*${template.name}[\\s]*${
-    unkeyedAttributes ? '(?:text=(.*?))?' : '(.+?)?'
+    unkeyedAttributes ? '(?:_value=(.*?))?' : '(.+?)?'
   }[\\s]*>[\\s]*((?:.|\n)*?)[\\s]*<\/[\\s]*${template.name}[\\s]*>`
 
   const closingRegex = `\n$2\n${match.start} /${match.name || template.name} ${

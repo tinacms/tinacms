@@ -184,10 +184,10 @@ export const field: RichTypeInner = {
       },
       fields: [
         {
-          name: 'text',
+          name: '_value',
           required: true,
           isTitle: true,
-          label: 'Text',
+          label: 'Value',
           type: 'string',
         },
       ],
@@ -203,10 +203,40 @@ export const field: RichTypeInner = {
       },
       fields: [
         {
-          name: 'text',
+          name: '_value',
           required: true,
           isTitle: true,
-          label: 'Text',
+          label: 'Value',
+          type: 'string',
+        },
+      ],
+    },
+    {
+      name: 'signature',
+      label: 'Signature',
+      match: {
+        start: '{{<',
+        end: '>}}',
+      },
+      fields: [
+        {
+          name: 'foo',
+          label: 'foo label',
+          type: 'string',
+        },
+      ],
+    },
+    {
+      name: 'unkeyedSignature',
+      label: 'Unkeyed Signature',
+      match: {
+        start: '{{<',
+        end: '>}}',
+      },
+      fields: [
+        {
+          name: '_value',
+          label: 'Value',
           type: 'string',
         },
       ],

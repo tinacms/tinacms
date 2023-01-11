@@ -51,13 +51,13 @@ describe('parseShortcode', () => {
         },
         fields: [
           {
-            name: 'text',
-            label: 'text',
+            name: '_value',
+            label: 'Value',
             type: 'string',
           },
         ],
       })
-      expect(result).toEqual('<signature text="bar123">\n</signature>')
+      expect(result).toEqual('<signature _value="bar123">\n</signature>')
     })
   })
 

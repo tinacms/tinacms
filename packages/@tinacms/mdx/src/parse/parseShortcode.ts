@@ -25,12 +25,12 @@ export function parseShortcode(
 ) {
   const match = template.match!
 
-  const unkeyedAttributes = !!template.fields.find((t) => t.name == 'text')
+  const unkeyedAttributes = !!template.fields.find((t) => t.name === '_value')
 
   const hasChildren = !!template.fields.find((t) => t.name == 'children')
 
   const replacement = `<${template.name} ${
-    unkeyedAttributes ? 'text="$1"' : '$1'
+    unkeyedAttributes ? '_value="$1"' : '$1'
   }>${hasChildren ? '$2' : '\n'}</${template.name}>`
 
   const endRegex = `((?:.|\\n)*)${match.start}\\s\/\\s*${

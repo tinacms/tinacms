@@ -55,7 +55,7 @@ const out = output({
           text: '',
         },
       ],
-      props: { text: 'neat' },
+      props: { _value: 'neat' },
     },
   ],
 })
