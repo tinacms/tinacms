@@ -37,10 +37,10 @@
   "devDependencies": {
     "@einsteinindustries/tinacms-form-builder": "0.44.1",
     "@einsteinindustries/tinacms-icons": "0.44.1",
-    "@einsteinindustries/tinacms-react-core": "^0.43.0",
+    "@einsteinindustries/tinacms-react-core": "^0.44.1",
     "@einsteinindustries/tinacms-react-forms": "0.44.1",
-    "@einsteinindustries/tinacms-react-modals": "^0.43.0",
-    "@einsteinindustries/tinacms-react-screens": "^0.43.0",
+    "@einsteinindustries/tinacms-react-modals": "^0.44.1",
+    "@einsteinindustries/tinacms-react-screens": "^0.44.1",
     "@einsteinindustries/tinacms-scripts": "0.44.1",
     "@einsteinindustries/tinacms-styles": "0.44.1"
   },
