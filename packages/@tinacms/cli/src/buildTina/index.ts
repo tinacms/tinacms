@@ -255,6 +255,15 @@ export class ConfigBuilder {
       dev,
       rootPath,
     })
+    // FIXME: the bridge is initialized before we have access to the config,
+    // ideally this is available to us during Bridge init but as a workaround
+    // we add it here.
+    if (
+      this.database.bridge.addOutputPath &&
+      compiledSchema.config.remote?.rootPath
+    ) {
+      this.database.bridge.addOutputPath(compiledSchema.config.remote.rootPath)
+    }
 
     const { graphQLSchema, tinaSchema } = await buildSchema(
       rootPath,

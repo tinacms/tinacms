@@ -22,4 +22,10 @@ export interface Bridge {
    */
   supportsBuilding(): boolean
   putConfig(filepath: string, data: string): Promise<void>
+  /**
+   * Optionally, the bridge can perform
+   * operations in a separate path.
+   */
+  outputPath?: string
+  addOutputPath?(outputPath: string): void
 }
