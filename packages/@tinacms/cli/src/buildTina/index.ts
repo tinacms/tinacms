@@ -187,6 +187,7 @@ export const buildCmdBuild = async (
     noSDK: options.noSDK,
     verbose: options.verbose,
     usingTs: ctx.usingTs,
+    rootPath: ctx.rootPath,
     port: options.port,
   })
   ctx.apiUrl = apiUrl
