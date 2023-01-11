@@ -342,7 +342,20 @@ const config = (cwd = '') => {
         auto: 'auto',
       },
       extend: {
+        keyframes: {
+          slideIn: {
+            '0%': {
+              opacity: '0',
+              transform: 'translateY(-1rem)',
+            },
+            '100%': {
+              opacity: '1',
+              transform: 'translateY(0)',
+            },
+          },
+        },
         animation: {
+          'slide-in': 'slideIn 150ms ease-out 1 normal forwards',
           'spin-reverse': 'spin 1s linear infinite reverse',
         },
         scale: {
