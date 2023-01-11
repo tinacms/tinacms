@@ -1,5 +1,16 @@
 # @tinacms/schema-tools
 
+## 1.2.0
+
+### Minor Changes
+
+- 3165f397d: fix: Shortcodes need to be specified by name to match with match-start / match-end
+
+### Patch Changes
+
+- 7d41435df: added ability to use toml in markdown frontmatter
+- b2952a298: Adds meta wrapper for list-type fields that displays errors. Adds optional min/max for list-type fields that controls add/remove UI. Removes duplicate label from group field.
+
 ## 1.1.0
 
 ### Minor Changes
