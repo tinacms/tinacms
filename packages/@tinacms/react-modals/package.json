@@ -26,12 +26,12 @@
     "@einsteinindustries/tinacms-styles": "0.44.1"
   },
   "peerDependencies": {
-    "@einsteinindustries//tinacms-icons": ">=0.7",
-    "@einsteinindustries//tinacms-react-core": ">=0.2",
-    "@einsteinindustries//tinacms-styles": ">=0.3",
+    "@einsteinindustries/tinacms-icons": ">=0.7",
+    "@einsteinindustries/tinacms-react-core": ">=0.2",
+    "@einsteinindustries/tinacms-styles": ">=0.3",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

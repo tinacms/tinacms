@@ -21,13 +21,13 @@
     "docs": "npx typedoc"
   },
   "peerDependencies": {
+    "@einsteinindustries/tinacms": ">=0.11",
     "next": ">=9",
-    "react": ">=16",
-    "@einsteinindustries/tinacms": ">=0.11"
+    "react": ">=16"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "0.44.1",
-    "@einsteinindustries/tinacms": "0.44.1"
+    "@einsteinindustries/tinacms": "0.44.1",
+    "@einsteinindustries/tinacms-scripts": "0.44.1"
   },
-  "gitHead": "eb33842c897df805d0dd2d2ab2fa6026f21d4752"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }
