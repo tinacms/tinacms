@@ -7,19 +7,28 @@ import {
 } from '../../react-modals'
 import React, { useState } from 'react'
 import { Button } from '../../styles'
+import FileDropper from './FileDropper'
+import SchemaPreview from './SchemaPreview'
 
 enum MODAL_STATE {
   HIDDEN,
   DROPZONE,
+  SCHEMA_DETAILS,
 }
 export const AddCollection = () => {
   const [modalState, setModalState] = useState(MODAL_STATE.HIDDEN)
+  const [markdownFile, setMarkdownFile] = useState<string>('')
 
   const close = () => {
     setModalState(MODAL_STATE.HIDDEN)
   }
   const open = () => {
     setModalState(MODAL_STATE.DROPZONE)
+  }
+
+  const addMarkdown = (markdownFile: string) => {
+    setMarkdownFile(markdownFile)
+    setModalState(MODAL_STATE.SCHEMA_DETAILS)
   }
   return (
     <>
@@ -29,11 +38,21 @@ export const AddCollection = () => {
       >
         Add New
       </div>
-      {modalState === MODAL_STATE.DROPZONE && (
+      {modalState !== MODAL_STATE.HIDDEN && (
         <Modal>
           <ModalPopup>
             <ModalHeader close={close}>Add New Collection</ModalHeader>
-            <ModalBody padded={true}></ModalBody>
+            <ModalBody padded={true}>
+              {modalState === MODAL_STATE.DROPZONE && (
+                <FileDropper setMarkdown={addMarkdown} />
+              )}
+              {modalState === MODAL_STATE.SCHEMA_DETAILS && (
+                <>
+                  <p>Enter some details about your collection</p>
+                  <SchemaPreview markdownFile={markdownFile} />
+                </>
+              )}
+            </ModalBody>
 
             <ModalActions>
               <Button

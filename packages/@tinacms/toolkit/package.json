@@ -61,6 +61,7 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
+    "gray-matter": "4.0.3",
     "@floating-ui/dom": "^0.1.7",
     "@floating-ui/react-dom": "^0.3.3",
     "@headlessui/react": "^1.5.0",
