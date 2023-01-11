@@ -108,8 +108,6 @@ export const generateCollections = async ({
             }
           }
         }
-        console.log(section.label)
-        console.log({ forestryTemplates })
         if ((forestryTemplates?.length || 0) > 1) {
           // deal with templates
           const templates: {
@@ -225,36 +223,41 @@ export const generateCollections = async ({
         }
         break
       case 'document':
-        const fields: TinaFieldInner<false>[] = [BODY_FIELD]
-        // Go though all templates
-        for (let currentTemplateName of templateMap.keys()) {
-          const { templateObj, fields: additionalFields } =
-            templateMap.get(currentTemplateName)
-          const pages: string[] = templateObj?.pages || []
-
-          // find the template that has the current "path" in its pages
-          if (pages.includes(section.path)) {
-            fields.push(...additionalFields)
-            break
-          }
-        }
-
-        const dir = path.dirname(section.path)
-
-        const c: TinaCloudCollection<false> = {
-          label: section.label,
-          name: stringifyLabel(section.label),
-          path: dir,
-          ui: {
-            allowedActions: {
-              create: false,
-              delete: false,
-            },
-          },
-          fields,
-        }
-        collections.push(c)
+        console.log(
+          `Single Document are not supported in TinaCMS yet. Skipping section ${section.label} (${section.path})`
+        )
         break
+
+      // const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+      // // Go though all templates
+      // for (let currentTemplateName of templateMap.keys()) {
+      //   const { templateObj, fields: additionalFields } =
+      //     templateMap.get(currentTemplateName)
+      //   const pages: string[] = templateObj?.pages || []
+
+      //   // find the template that has the current "path" in its pages
+      //   if (pages.includes(section.path)) {
+      //     fields.push(...additionalFields)
+      //     break
+      //   }
+      // }
+
+      // const dir = path.dirname(section.path)
+
+      // const c: TinaCloudCollection<false> = {
+      //   label: section.label,
+      //   name: stringifyLabel(section.label),
+      //   path: dir,
+      //   ui: {
+      //     allowedActions: {
+      //       create: false,
+      //       delete: false,
+      //     },
+      //   },
+      //   fields,
+      // }
+      // collections.push(c)
+      // break
     }
   }
   return collections
