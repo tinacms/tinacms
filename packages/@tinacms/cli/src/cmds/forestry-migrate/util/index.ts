@@ -18,6 +18,22 @@ import z from 'zod'
 import type { TinaFieldInner } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 
+export const stringifyName = (name: string, template: string) => {
+  const testRegex = /^[a-zA-Z0-9_]*$/
+  const updateRegex = /[^a-zA-Z0-9]/g
+
+  if (testRegex.test(name)) {
+    return name
+  } else {
+    const newName = name.replace(updateRegex, '_')
+    console.log(
+      `Name, "${name}" used in Frontmatter template ${template} must be alphanumeric and can only contain underscores.\n ${name} will be updated to ${newName} in the CMS if you wish to edit attribute ${name} you will have to update your frontmatter and code to use ${newName} instead.`
+    )
+
+    // replace everything that is not alphanumeric or underscore with an underscore
+    return newName
+  }
+}
 // A zod schema for the information we need from the .forestry/settings.yml file
 const forestryConfigSchema = z.object({
   sections: z.array(
@@ -125,14 +141,14 @@ export const transformForestryFieldsToTinaFields = ({
       case 'text':
         field = {
           type: 'string',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
         }
         break
       case 'textarea':
         field = {
           type: 'string',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           ui: {
             component: 'textarea',
@@ -142,28 +158,28 @@ export const transformForestryFieldsToTinaFields = ({
       case 'datetime':
         field = {
           type: forestryField.type,
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
         }
         break
       case 'number':
         field = {
           type: 'number',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
         }
         break
       case 'boolean':
         field = {
           type: 'boolean',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
         }
         break
       case 'color':
         field = {
           type: 'string',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           ui: {
             component: 'color',
@@ -173,7 +189,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'file':
         field = {
           type: 'image',
-          name: forestryField.name || 'image',
+          name: stringifyName(forestryField.name || 'image', ''),
           label: forestryField.label,
         }
         break
@@ -181,7 +197,7 @@ export const transformForestryFieldsToTinaFields = ({
         if (forestryField.config?.options) {
           field = {
             type: 'string',
-            name: forestryField.name,
+            name: stringifyName(forestryField.name, ''),
             label: forestryField.label,
             options: forestryField.config?.options || [],
           }
@@ -208,7 +224,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'list':
         field = {
           type: 'string',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           list: true,
         }
@@ -219,7 +235,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'tag_list':
         field = {
           type: 'string',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           list: true,
           ui: {
@@ -253,7 +269,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group':
         field = {
           type: 'object',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
@@ -264,7 +280,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group_list':
         field = {
           type: 'object',
-          name: forestryField.name,
+          name: stringifyName(forestryField.name, ''),
           label: forestryField.label,
           list: true,
           fields: transformForestryFieldsToTinaFields({

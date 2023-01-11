@@ -90,7 +90,7 @@ const validationCollectionsPathAndMatch = (
     .map((x) => x.path)
 
   if (noMatchCollections.length !== new Set(noMatchCollections).size) {
-    throw new Error('path must be unique when no `match` is provided')
+    throw new Error('path must be unique')
   }
 
   // Make sure both path and match are not the same
