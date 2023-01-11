@@ -173,11 +173,35 @@ export const generateCollections = async ({
           collections.push(c)
         } else {
           const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+
           // This is a collection with fields
           forestryTemplates?.forEach((tem) => {
             try {
-              const { fields: additionalFields } = templateMap.get(tem)
+              const { fields: additionalFields, templateObj } =
+                templateMap.get(tem)
               fields.push(...additionalFields)
+              // Go through all the pages in the template and update  the content to contain _template: ${templateName}
+              templateObj?.pages?.forEach((page) => {
+                // update the data in page to have _template: tem
+                try {
+                  const filePath = path.join(rootPath, page)
+                  const extname = path.extname(filePath)
+                  const fileContent = fs.readFileSync(filePath).toString()
+                  const content = parseFile(fileContent, extname, (yup) =>
+                    yup.object({})
+                  )
+                  const newContent = {
+                    _template: stringifyLabel(tem),
+                    ...content,
+                  }
+                  fs.writeFileSync(
+                    filePath,
+                    stringifyFile(newContent, extname, true)
+                  )
+                } catch (error) {
+                  console.log('Error updating file', page)
+                }
+              })
             } catch (e) {
               console.log('Error parsing template ', tem)
               console.error(e)
