@@ -135,6 +135,12 @@ export const transformForestryFieldsToTinaFields = ({
   const tinaFields: TinaFieldInner<false>[] = []
 
   fields?.forEach((forestryField) => {
+    if (forestryField.name === 'menu') {
+      console.log(
+        `skipping menu field in ${collection} since TinaCMS does not support Hugo or Jekyll menu fields`
+      )
+      return
+    }
     let field: TinaFieldInner<false>
     switch (forestryField.type) {
       // Single filed types
