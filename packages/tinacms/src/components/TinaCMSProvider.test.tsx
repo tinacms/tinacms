@@ -20,7 +20,7 @@ import { render } from '@testing-library/react'
 import React from 'react'
 import { TinaCMSProvider, INVALID_CMS_ERROR } from './TinaCMSProvider'
 import { TinaCMS } from '../tina-cms'
-import { CMS } from '@tinacms/core'
+import { CMS } from '@einsteinindustries/tinacms-core'
 
 describe('TinaCMSProvider', () => {
   describe('when passed an instance of CMS', () => {

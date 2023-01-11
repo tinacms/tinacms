@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { MediaIcon } from '@tinacms/icons'
-import { createScreen } from '@tinacms/react-screens'
+import { MediaIcon } from '@einsteinindustries/tinacms-icons'
+import { createScreen } from '@einsteinindustries/tinacms-react-screens'
 import { MediaPicker } from '../../components/media'
 
 export const MediaManagerScreenPlugin = createScreen({

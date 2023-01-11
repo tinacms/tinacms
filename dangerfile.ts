@@ -231,7 +231,9 @@ function checkForMilestone() {
       )}`
     )
   } else {
-    warn(`@tinacms/dev please add to a Milestone before merging `)
+    warn(
+      `@einsteinindustries/tinacms-dev please add to a Milestone before merging `
+    )
   }
 }
 
@@ -273,7 +275,7 @@ function listTouchedWorkflows(allFiles: string[]) {
  *
  */
 function checkForNpmScripts({ packageJson }: TinaPackage) {
-  if (packageJson.name === '@tinacms/scripts') {
+  if (packageJson.name === '@einsteinindustries/tinacms-scripts') {
     return
   }
   const scripts = packageJson.scripts || {}
@@ -334,7 +336,7 @@ function isMissingHeader(content: string) {
  * ```
  * ### Modified Packages
  *
- * * `@tinacms/fields`
+ * * `@einsteinindustries/tinacms-fields`
  * * `react-tinacms-github`
  * ```
  */

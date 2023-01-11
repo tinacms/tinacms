@@ -23,11 +23,11 @@
   "peerDependencies": {
     "next": ">=9",
     "react": ">=16",
-    "tinacms": ">=0.11"
+    "@einsteinindustries/tinacms": ">=0.11"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
-    "tinacms": "^0.43.3"
+    "@einsteinindustries/tinacms-scripts": "^0.43.21",
+    "@einsteinindustries/tinacms": "^0.44.0"
   },
   "gitHead": "eb33842c897df805d0dd2d2ab2fa6026f21d4752"
 }

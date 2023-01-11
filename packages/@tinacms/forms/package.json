@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-forms",
-  "version": "0.43.0",
+  "version": "0.43.21",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,8 +28,8 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@einsteinindustries/tinacms-core": "^0.44.0",
+    "@einsteinindustries/tinacms-scripts": "^0.43.21"
   },
   "dependencies": {
     "final-form": "^4.20.2",

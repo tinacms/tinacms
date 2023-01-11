@@ -17,7 +17,7 @@
  */
 
 import { Alerts } from './alerts'
-import { EventBus } from '@tinacms/core'
+import { EventBus } from '@einsteinindustries/tinacms-core'
 
 jest.useFakeTimers()
 

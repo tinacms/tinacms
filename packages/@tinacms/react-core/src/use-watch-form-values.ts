@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 import { FormSubscriber } from 'final-form'
 import { useEffect } from 'react'
 

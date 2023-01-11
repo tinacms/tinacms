@@ -13,17 +13,17 @@ limitations under the License.
 
 import matter from 'gray-matter'
 import styled from 'styled-components'
-import { useMarkdownForm } from 'next-tinacms-markdown'
+import { useMarkdownForm } from '@einsteinindustries/next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
-import { useCMS, usePlugin } from 'tinacms'
+import { useCMS, usePlugin } from '@einsteinindustries/tinacms'
 import {
   InlineForm,
   InlineText,
   InlineImage,
   InlineGroup,
   InlineTextarea,
-} from 'react-tinacms-inline'
-import { InlineWysiwyg } from 'react-tinacms-editor'
+} from '@einsteinindustries/react-tinacms-inline'
+import { InlineWysiwyg } from '@einsteinindustries/react-tinacms-editor'
 import { DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'

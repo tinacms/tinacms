@@ -19,25 +19,25 @@
     "react-use": "^17.1.1"
   },
   "peerDependencies": {
-    "@tinacms/form-builder": ">=0.39",
+    "@einsteinindustries/tinacms-form-builder": ">=0.39",
     "react": ">=16.8",
     "react-dropzone": "10.2.1",
     "react-final-form": ">=6",
-    "react-tinacms-editor": ">=0.0",
+    "@einsteinindustries/react-tinacms-editor": ">=0.0",
     "styled-components": ">=4.1",
-    "tinacms": ">=0.39"
+    "@einsteinindustries/tinacms": ">=0.39"
   },
   "devDependencies": {
     "@testing-library/react": "^11.1.2",
-    "@tinacms/form-builder": "^0.43.3",
-    "@tinacms/icons": "^0.42.1",
-    "@tinacms/react-forms": "^0.43.3",
-    "@tinacms/scripts": "^0.42.1",
-    "@tinacms/styles": "^0.42.1",
+    "@einsteinindustries/tinacms-form-builder": "^0.44.0",
+    "@einsteinindustries/tinacms-icons": "^0.43.21",
+    "@einsteinindustries/tinacms-react-forms": "^0.44.0",
+    "@einsteinindustries/tinacms-scripts": "^0.43.21",
+    "@einsteinindustries/tinacms-styles": "^0.44.0",
     "jest": "^26.6.3",
     "react-dropzone": "10.1.8",
-    "react-tinacms-editor": "^0.4.0",
-    "tinacms": "^0.43.3"
+    "@einsteinindustries/react-tinacms-editor": "^0.4.0",
+    "@einsteinindustries/tinacms": "^0.44.0"
   },
   "gitHead": "eb33842c897df805d0dd2d2ab2fa6026f21d4752"
 }

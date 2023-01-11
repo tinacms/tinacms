@@ -18,11 +18,14 @@ limitations under the License.
 
 import React from 'react'
 import App from 'next/app'
-import { TinaProvider, TinaCMS, withTina } from 'tinacms'
-import { GitClient, GitMediaStore } from '@tinacms/git-client'
-import { GlobalStyles as TinaCustomStyles } from '@tinacms/styles'
+import { TinaProvider, TinaCMS, withTina } from '@einsteinindustries/tinacms'
+import {
+  GitClient,
+  GitMediaStore,
+} from '@einsteinindustries/tinacms-git-client'
+import { GlobalStyles as TinaCustomStyles } from '@einsteinindustries/tinacms-styles'
 import { NextGitMediaStore } from '../next-git-media-store'
-import { MarkdownFieldPlugin } from 'react-tinacms-editor'
+import { MarkdownFieldPlugin } from '@einsteinindustries/react-tinacms-editor'
 //import { CustomPaginatorPlugin } from '../plugins/CustomPaginator'
 
 function Empty() {

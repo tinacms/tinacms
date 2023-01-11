@@ -18,15 +18,18 @@
 
 import React from 'react'
 import styled, { css, keyframes } from 'styled-components'
-import { Alerts as AlertsCollection, AlertLevel } from '@tinacms/alerts'
+import {
+  Alerts as AlertsCollection,
+  AlertLevel,
+} from '@einsteinindustries/tinacms-alerts'
 import {
   AlertIcon,
   InfoIcon,
   WarningIcon,
   ErrorIcon,
   CloseIcon,
-} from '@tinacms/icons'
-import { useSubscribable } from '@tinacms/react-core'
+} from '@einsteinindustries/tinacms-icons'
+import { useSubscribable } from '@einsteinindustries/tinacms-react-core'
 
 export interface AlertsProps {
   alerts: AlertsCollection

@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useCMS, TinaCMS } from 'tinacms'
+import { useCMS, TinaCMS } from '@einsteinindustries/tinacms'
 import { FocusRing, FocusRingOptions } from '../styles'
 import { InlineField } from '..'
 

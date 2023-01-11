@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { MarkdownFile } from './use-markdown-form'
-import { Field } from 'tinacms'
+import { Field } from '@einsteinindustries/tinacms'
 
 export function generateFields(markdownFile: MarkdownFile): Field[] {
   const frontmatterFields = Object.keys(markdownFile.frontmatter).map(key => ({

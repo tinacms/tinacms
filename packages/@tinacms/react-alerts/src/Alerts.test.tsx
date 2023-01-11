@@ -19,7 +19,7 @@
 import { render } from '@testing-library/react'
 import React from 'react'
 import { Alerts } from './Alerts'
-import { Alert } from '@tinacms/alerts'
+import { Alert } from '@einsteinindustries/tinacms-alerts'
 
 describe('Alerts', () => {
   it('subscribes to the `alerts`', () => {

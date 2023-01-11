@@ -18,8 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Form } from '@tinacms/forms'
-import { RightArrowIcon } from '@tinacms/icons'
+import { Form } from '@einsteinindustries/tinacms-forms'
+import { RightArrowIcon } from '@einsteinindustries/tinacms-icons'
 
 export interface FormsListProps {
   forms: Form[]

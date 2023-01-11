@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { MediaPaginatorPlugin } from 'tinacms'
+import { MediaPaginatorPlugin } from '@einsteinindustries/tinacms'
 
 const CustomPaginatorComponent = ({ list, setOffset }) => {
   const numPerPage = list.limit

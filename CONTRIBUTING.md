@@ -40,7 +40,11 @@ npm run build
 npm run lerna -- publish from-package --yes
 ```
 
-**Don't forget to bump the version in lerna.json following semantic versioning**
+### Please note
+
+1. Before publishing, Don't forget to bump the version in lerna.json following semantic versioning\*\*
+2. You may also need to manually go into each package and update intra dependencies' versions\*\*
+3. Most lerna commands such as bootstrap, etc, will require you to pass `--legacy-peer-deps`
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
 

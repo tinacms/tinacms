@@ -18,18 +18,21 @@ limitations under the License.
 import * as React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPage } from 'next'
-import { MarkdownFile, useMarkdownForm } from 'next-tinacms-markdown'
+import {
+  MarkdownFile,
+  useMarkdownForm,
+} from '@einsteinindustries/next-tinacms-markdown'
 import {
   InlineForm,
   InlineText,
   InlineField,
   useInlineForm,
-} from 'react-tinacms-inline'
+} from '@einsteinindustries/react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { useCMS, usePlugin } from 'tinacms'
-import { InlineWysiwyg } from 'react-tinacms-editor'
+import { useCMS, usePlugin } from '@einsteinindustries/tinacms'
+import { InlineWysiwyg } from '@einsteinindustries/react-tinacms-editor'
 import Link from 'next/link'
-import { ContentCreatorPlugin } from '@tinacms/forms'
+import { ContentCreatorPlugin } from '@einsteinindustries/tinacms-forms'
 
 const addBlogPlugin: ContentCreatorPlugin<any> = {
   __type: 'content-creator',

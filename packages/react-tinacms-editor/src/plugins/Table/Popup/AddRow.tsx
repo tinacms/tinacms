@@ -26,8 +26,8 @@ import {
   getCellsInRow,
 } from 'prosemirror-utils'
 import styled from 'styled-components'
-import { AddIcon } from '@tinacms/icons'
-import { IconButton } from '@tinacms/styles'
+import { AddIcon } from '@einsteinindustries/tinacms-icons'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
 
 const borderWidth = 1
 const controlSize = 12
@@ -54,6 +54,7 @@ export default ({ index, marker, tableWidth, view }: AddRowProps) => {
       const cells = cellInNextRow?.map(cell =>
         table_cell.createAndFill({ ...cell.node.attrs })
       )
+      // @ts-ignore
       dispatch(state.tr.insert(position, table_row.create(null, cells)))
     }
     view.focus()

@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export { usePlugins, usePlugin } from '@tinacms/react-core'
+export { usePlugins, usePlugin } from '@einsteinindustries/tinacms-react-core'

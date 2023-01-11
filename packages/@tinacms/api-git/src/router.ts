@@ -54,7 +54,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
      * Incase js users forget to pass in `repo`.
      */
     throw new Error(
-      '@tinacms/api-git#router(repo, config): Parameter `repo` is missing.'
+      '@einsteinindustries/tinacms-api-git#router(repo, config): Parameter `repo` is missing.'
     )
   } else if (!(repo instanceof Repo)) {
     /**

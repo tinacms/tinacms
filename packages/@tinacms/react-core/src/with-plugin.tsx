@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Plugin } from '@tinacms/core'
+import { Plugin } from '@einsteinindustries/tinacms-core'
 import { usePlugin } from './use-plugin'
 import * as React from 'react'
 

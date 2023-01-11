@@ -18,8 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useJsonForm } from 'next-tinacms-json'
-import { ModalProvider, BlockTemplate } from 'tinacms'
+import { useJsonForm } from '@einsteinindustries/next-tinacms-json'
+import { ModalProvider, BlockTemplate } from '@einsteinindustries/tinacms'
 import {
   InlineForm,
   InlineImage,
@@ -28,8 +28,8 @@ import {
   BlocksControls,
   useInlineForm,
   InlineTextarea,
-} from 'react-tinacms-inline'
-import { InlineWysiwyg } from 'react-tinacms-editor'
+} from '@einsteinindustries/react-tinacms-inline'
+import { InlineWysiwyg } from '@einsteinindustries/react-tinacms-editor'
 
 import Layout from '../components/Layout'
 

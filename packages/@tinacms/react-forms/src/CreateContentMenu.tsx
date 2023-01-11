@@ -18,14 +18,14 @@ import {
   ModalHeader,
   ModalBody,
   ModalPopup,
-} from '@tinacms/react-modals'
-import { FormBuilder } from '@tinacms/form-builder'
+} from '@einsteinindustries/tinacms-react-modals'
+import { FormBuilder } from '@einsteinindustries/tinacms-form-builder'
 import { useMemo } from 'react'
-import { Form } from '@tinacms/forms'
-import { AddIcon } from '@tinacms/icons'
-import { IconButton, Button } from '@tinacms/styles'
+import { Form } from '@einsteinindustries/tinacms-forms'
+import { AddIcon } from '@einsteinindustries/tinacms-icons'
+import { IconButton, Button } from '@einsteinindustries/tinacms-styles'
 import { Dismissible } from 'react-dismissible'
-import { useCMS, useSubscribable } from '@tinacms/react-core'
+import { useCMS, useSubscribable } from '@einsteinindustries/tinacms-react-core'
 
 export interface CreateContentMenuProps {
   sidebar: boolean

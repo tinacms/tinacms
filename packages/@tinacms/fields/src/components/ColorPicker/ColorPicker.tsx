@@ -22,7 +22,7 @@ import { Dismissible } from 'react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
 import styled, { css, keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
-import { useFormPortal } from '@tinacms/form-builder'
+import { useFormPortal } from '@einsteinindustries/tinacms-form-builder'
 
 type DivProps = any
 type WrappedFieldProps = any

@@ -19,7 +19,7 @@ limitations under the License.
 /**
  * Export @tinacms internal packages
  */
-export * from '@tinacms/react-modals'
+export * from '@einsteinindustries/tinacms-react-modals'
 export {
   Media,
   MediaUploadOptions,
@@ -28,12 +28,15 @@ export {
   MediaList,
   MediaManager,
   MediaListError,
-} from '@tinacms/core'
-export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
-export * from '@tinacms/fields'
-export * from '@tinacms/form-builder'
-export { ContentCreatorPlugin as AddContentPlugin } from '@tinacms/forms'
-export { ContentCreatorPlugin } from '@tinacms/forms'
+} from '@einsteinindustries/tinacms-core'
+export {
+  ScreenPlugin,
+  useScreenPlugin,
+} from '@einsteinindustries/tinacms-react-screens'
+export * from '@einsteinindustries/tinacms-fields'
+export * from '@einsteinindustries/tinacms-form-builder'
+export { ContentCreatorPlugin as AddContentPlugin } from '@einsteinindustries/tinacms-forms'
+export { ContentCreatorPlugin } from '@einsteinindustries/tinacms-forms'
 
 /**
  * Custom `tinacms` things

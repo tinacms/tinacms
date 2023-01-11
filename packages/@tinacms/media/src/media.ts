@@ -26,4 +26,4 @@ export {
   MediaListOptions,
   MediaList,
   MediaManager,
-} from '@tinacms/core'
+} from '@einsteinindustries/tinacms-core'

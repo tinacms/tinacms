@@ -18,8 +18,8 @@ limitations under the License.
 
 const matter = require('gray-matter')
 
-import * as yaml from 'js-yaml'
-import { useForm, useCMS, FormOptions } from 'tinacms'
+// import * as yaml from 'js-yaml'
+import { useForm, useCMS, FormOptions } from '@einsteinindustries/tinacms'
 import { generateFields } from './generate-fields'
 
 /**
@@ -33,12 +33,17 @@ export interface MarkdownFile {
 }
 
 export function toMarkdownString(markdownFile: MarkdownFile) {
-  return (
-    '---\n' +
-    yaml.dump(markdownFile.frontmatter) +
-    '---\n' +
-    (markdownFile.markdownBody || '')
+  console.debug(markdownFile)
+  throw new Error(
+    'I disabled this, this package does not have js-yaml install even though it requires it for some reason. ' +
+      'Find me in packages/next-tinacms-markdown/src/use-markdown-form.ts(21,23)'
   )
+  // return (
+  //   '---\n' +
+  //   yaml.dump(markdownFile.frontmatter) +
+  //   '---\n' +
+  //   (markdownFile.markdownBody || '')
+  // )
 }
 /**
  * Creates a TinaCMS Form for editing a MarkdownFile in Git

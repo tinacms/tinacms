@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { useForm, usePlugin, ActionButton } from 'tinacms'
+import { useForm, usePlugin, ActionButton } from '@einsteinindustries/tinacms'
 import {
   InlineForm,
   InlineGroup,
@@ -23,8 +23,8 @@ import {
   InlineTextarea,
   InlineBlocks,
   BlocksControls,
-} from 'react-tinacms-inline'
-import { TinaIcon } from '@tinacms/icons'
+} from '@einsteinindustries/react-tinacms-inline'
+import { TinaIcon } from '@einsteinindustries/tinacms-icons'
 import styled from 'styled-components'
 
 import Layout from '../components/Layout'

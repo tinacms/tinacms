@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export { useWatchFormValues } from '@tinacms/react-core'
+export { useWatchFormValues } from '@einsteinindustries/tinacms-react-core'

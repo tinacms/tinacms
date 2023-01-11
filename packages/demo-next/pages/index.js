@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { useJsonForm } from 'next-tinacms-json'
-import { useScreenPlugin, usePlugin } from 'tinacms'
+import { useJsonForm } from '@einsteinindustries/next-tinacms-json'
+import { useScreenPlugin, usePlugin } from '@einsteinindustries/tinacms'
 
 import Layout from '../components/Layout'
 import BlogList from '../components/BlogList'

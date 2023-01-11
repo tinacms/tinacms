@@ -17,10 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { SettingsIcon } from '@tinacms/icons'
-import { Form } from '@tinacms/forms'
-import { ScreenPlugin } from '@tinacms/react-screens'
-import { FormBuilder } from '@tinacms/form-builder'
+import { SettingsIcon } from '@einsteinindustries/tinacms-icons'
+import { Form } from '@einsteinindustries/tinacms-forms'
+import { ScreenPlugin } from '@einsteinindustries/tinacms-react-screens'
+import { FormBuilder } from '@einsteinindustries/tinacms-form-builder'
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen'

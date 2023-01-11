@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { GitMediaStore } from '@tinacms/git-client'
+import { GitMediaStore } from '@einsteinindustries/tinacms-git-client'
 
 export class NextGitMediaStore extends GitMediaStore {
   previewSrc(src) {

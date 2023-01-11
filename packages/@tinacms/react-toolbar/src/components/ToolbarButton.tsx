@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import styled from 'styled-components'
-import { Button } from '@tinacms/styles'
+import { Button } from '@einsteinindustries/tinacms-styles'
 
 export const ToolbarButton = styled(Button)`
   display: flex;

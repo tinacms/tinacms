@@ -61,7 +61,7 @@ export function buildEditorState(
 
   return EditorState.create({
     schema,
-    doc: translator.nodeFromString(value),
+    doc: translator.nodeFromString(value) ?? undefined,
     plugins,
   })
 }

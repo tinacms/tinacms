@@ -41,6 +41,7 @@ class MarkdownParseState {
   constructor(schema: Schema, tokenHandlers: TokenHandlers) {
     this.schema = schema
     this.stack = [{ type: schema.topNodeType, content: [] }]
+    // @ts-ignore
     this.marks = Mark.none
     this.tokenHandlers = tokenHandlers
   }
@@ -72,12 +73,14 @@ class MarkdownParseState {
   // : (Mark)
   // Adds the given mark to the set of active marks.
   openMark(mark: Mark) {
+    // @ts-ignore
     this.marks = mark.addToSet(this.marks)
   }
 
   // : (Mark)
   // Removes the given mark from the set of active marks.
   closeMark(mark: MarkType) {
+    // @ts-ignore
     this.marks = mark.removeFromSet(this.marks)
   }
 
@@ -111,6 +114,7 @@ class MarkdownParseState {
   // : () → ?Node
   // Close and return the node that is currently on top of the stack.
   closeNode() {
+    // @ts-ignore
     if (this.marks.length) this.marks = Mark.none
     const info = this.stack.pop()
     if (!info) return //devWarn("Attempted to close a non-existent node.")
