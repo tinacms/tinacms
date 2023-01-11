@@ -132,7 +132,7 @@ export class TinaCMS extends CMS {
             name: 'Project Config',
             link: {
               text: 'Project Config',
-              href: `https://app.tina.io/projects/${clientId}/0`,
+              href: `https://app.tina.io/projects/${clientId}/overview`,
             },
           })
         )
@@ -141,7 +141,7 @@ export class TinaCMS extends CMS {
             name: 'User Management',
             link: {
               text: 'User Management',
-              href: `https://app.tina.io/projects/${clientId}/3`,
+              href: `https://app.tina.io/projects/${clientId}/collaborators`,
             },
           })
         )
