@@ -23,6 +23,15 @@ import type {
 } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 
+const BODY_FIELD = {
+  // This is the body field
+  type: 'rich-text' as const,
+  name: 'body',
+  label: 'Body of Document',
+  description: 'This is the markdown body',
+  isBody: true,
+}
+
 const stringifyLabel = (label: string) => {
   return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
 }
@@ -73,23 +82,14 @@ export const generateCollections = async ({
 
   for (let index = 0; index < sections.length; index++) {
     const section = sections[index]
+    // TODO: What should we do with read only sections?
     if (section.read_only) return
-
-    const fields: TinaFieldInner<false>[] = [
-      {
-        // This is the body field
-        type: 'rich-text' as const,
-        name: 'body',
-        label: 'Body of Document',
-        description: 'This is the markdown body',
-        isBody: true,
-      },
-    ]
 
     switch (section.type) {
       case 'directory':
         const forestryTemplates = section?.templates || []
 
+        // If the section has no templates and has `create: all`
         if (forestryTemplates.length === 0 && section.create === 'all') {
           // For all template
           for (let templateKey of templateMap.keys()) {
@@ -120,14 +120,15 @@ export const generateCollections = async ({
           }[] = []
           forestryTemplates.forEach((tem) => {
             try {
-              const { fields: otherFields, templateObj } = templateMap.get(tem)
-              fields.push(...otherFields)
+              // Add the template to the collection with its fields and the body field
+              const { fields, templateObj } = templateMap.get(tem)
               templates.push({
-                fields,
+                fields: [BODY_FIELD, ...fields],
                 label: tem,
                 name: stringifyLabel(tem),
               })
 
+              // Go through all the pages in the template and update  the content to contain _template: ${templateName}
               templateObj?.pages?.forEach((page) => {
                 // update the data in page to have _template: tem
                 try {
@@ -154,6 +155,7 @@ export const generateCollections = async ({
               console.error(e)
             }
           })
+          // Add the collection to the list of collections with its templates
           const c: TinaCloudCollection<false> = {
             label: section.label,
             name: stringifyLabel(section.label),
@@ -170,14 +172,10 @@ export const generateCollections = async ({
           }
           collections.push(c)
         } else {
-          // deal with fields
+          const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+          // This is a collection with fields
           forestryTemplates?.forEach((tem) => {
             try {
-              // const additionalFields = getFieldsFromTemplates({
-              //   tem,
-              //   rootPath,
-              //   collection: stringifyLabel(section.label),
-              // })
               const { fields: additionalFields } = templateMap.get(tem)
               fields.push(...additionalFields)
             } catch (e) {
@@ -203,12 +201,14 @@ export const generateCollections = async ({
         }
         break
       case 'document':
+        const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+        // Go though all templates
         for (let currentTemplateName of templateMap.keys()) {
           const { templateObj, fields: additionalFields } =
             templateMap.get(currentTemplateName)
           const pages: string[] = templateObj?.pages || []
 
-          // find the template that has pages that contains the current section.path
+          // find the template that has the current "path" in its pages
           if (pages.includes(section.path)) {
             fields.push(...additionalFields)
             break
