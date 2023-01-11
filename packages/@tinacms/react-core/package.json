@@ -20,14 +20,14 @@
     "build": "tinacms-scripts build"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-core": "^0.44.0",
-    "@einsteinindustries/tinacms-forms": "^0.43.21"
+    "@einsteinindustries/tinacms-core": "0.44.1",
+    "@einsteinindustries/tinacms-forms": "0.44.1"
   },
   "peerDependencies": {
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.21"
+    "@einsteinindustries/tinacms-scripts": "0.44.1"
   },
   "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

@@ -33,10 +33,10 @@
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "^0.44.0",
-    "@einsteinindustries/tinacms-react-core": "^0.43.21",
-    "@einsteinindustries/tinacms-react-modals": "^0.44.0",
-    "@einsteinindustries/tinacms-scripts": "^0.43.21"
+    "@einsteinindustries/tinacms-core": "0.44.1",
+    "@einsteinindustries/tinacms-react-core": "0.44.1",
+    "@einsteinindustries/tinacms-react-modals": "0.44.1",
+    "@einsteinindustries/tinacms-scripts": "0.44.1"
   },
   "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

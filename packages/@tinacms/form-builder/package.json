@@ -29,14 +29,14 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.21"
+    "@einsteinindustries/tinacms-scripts": "0.44.1"
   },
   "dependencies": {
-    "@einsteinindustries/tinacms-forms": "^0.43.21",
-    "@einsteinindustries/tinacms-icons": "^0.43.21",
-    "@einsteinindustries/tinacms-react-core": "^0.43.21",
-    "@einsteinindustries/tinacms-react-modals": "^0.44.0",
-    "@einsteinindustries/tinacms-styles": "^0.44.0",
+    "@einsteinindustries/tinacms-forms": "0.44.1",
+    "@einsteinindustries/tinacms-icons": "0.44.1",
+    "@einsteinindustries/tinacms-react-core": "0.44.1",
+    "@einsteinindustries/tinacms-react-modals": "0.44.1",
+    "@einsteinindustries/tinacms-styles": "0.44.1",
     "react-final-form": "^6.3.0"
   },
   "peerDependencies": {

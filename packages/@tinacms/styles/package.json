@@ -28,7 +28,7 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.21",
+    "@einsteinindustries/tinacms-scripts": "0.44.1",
     "@types/webfontloader": "^1.6.29",
     "styled-components": ">=4.1"
   },

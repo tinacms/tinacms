@@ -40,7 +40,7 @@
     "simple-git": "1.126.0"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.21",
+    "@einsteinindustries/tinacms-scripts": "0.44.1",
     "@types/atob": "2.1.2",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.0",

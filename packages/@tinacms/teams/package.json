@@ -28,7 +28,7 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "^0.43.21",
+    "@einsteinindustries/tinacms-scripts": "0.44.1",
     "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "8.3.5"
   },
