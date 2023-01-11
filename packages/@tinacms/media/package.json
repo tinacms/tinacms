@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-media",
-  "version": "0.43.21",
+  "version": "0.44.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",

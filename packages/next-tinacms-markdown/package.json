@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/next-tinacms-markdown",
-  "version": "0.44.0",
+  "version": "0.44.1",
   "license": "Apache-2.0",
   "author": "Kendall Strautman",
   "main": "dist/index.js",
