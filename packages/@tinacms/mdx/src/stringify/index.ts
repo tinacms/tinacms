@@ -22,12 +22,12 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
-import { replaceAll } from '../parse'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
+import { stringifyShortcode } from './stringifyShortcode'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -74,17 +74,7 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = replaceAll(
-        preprocessedString,
-        // replace all instances of the match string with the template. Looks like this: <Match>{any number of spaces}`
-        `<${template.name}>[\n\r\\s]*\``,
-        `${template.match.start} `
-      )
-      preprocessedString = replaceAll(
-        preprocessedString,
-        `\`[\n\r\\s]*</${template.name}>`,
-        ` ${template.match.end}`
-      )
+      preprocessedString = stringifyShortcode(preprocessedString, template)
     }
   })
   return preprocessedString

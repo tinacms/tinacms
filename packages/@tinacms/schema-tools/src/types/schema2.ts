@@ -144,6 +144,7 @@ type Template = {
   match?: {
     start: string
     end: string
+    name?: string
   }
 }
 

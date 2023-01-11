@@ -22,6 +22,7 @@ import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
+import { parseShortcode } from './parseShortcode'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -82,16 +83,7 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     }
     if (template.match) {
       if (preprocessedString) {
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.start,
-          `<${template.name}>\``
-        )
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.end,
-          `\`</${template.name}>`
-        )
+        preprocessedString = parseShortcode(preprocessedString, template)
       }
     }
   })
@@ -109,6 +101,8 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
     // })
     return tree
   } catch (e) {
+    console.error('error parsing file: ', e)
+
     // @ts-ignore VMessage is the error type but it's not accessible
     throw new RichTextParseError(e, e.position)
   }

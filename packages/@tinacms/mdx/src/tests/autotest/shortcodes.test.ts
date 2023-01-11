@@ -23,39 +23,39 @@ const out = output({
   type: 'root',
   children: [
     {
-      type: 'p',
+      type: 'mdxJsxFlowElement',
+      name: 'featurePanel',
       children: [
         {
-          type: 'mdxJsxTextElement',
-          name: 'Shortcode2',
-          children: [{ type: 'text', text: '' }],
-          props: { text: 'feature-panels' },
+          type: 'text',
+          text: '',
         },
       ],
+      props: {},
     },
     {
-      type: 'p',
+      type: 'mdxJsxFlowElement',
+      name: 'rimg',
       children: [
         {
-          type: 'mdxJsxTextElement',
-          name: 'Shortcode1',
-          children: [{ type: 'text', text: '' }],
-          props: {
-            text: 'rimg src="https://res.cloudinary.com/indysigner/image/upload/v1609336455/the-relevance-gap_kzwi6q.png" href="https://infrequently.org/2020/06/platform-adjacency-theory/" sizes="100vw" caption="Image credit: <a href=\'https://infrequently.org/2020/06/platform-adjacency-theory/\'>Alex Russell</a>" alt="The Relevance Gap"',
-          },
+          type: 'text',
+          text: '',
         },
       ],
+      props: {
+        src: 'https://res.cloudinary.com/indysigner/image/upload/v1609336455/the-relevance-gap_kzwi6q.png',
+      },
     },
     {
-      type: 'p',
+      type: 'mdxJsxFlowElement',
+      name: 'adPanel',
       children: [
         {
-          type: 'mdxJsxTextElement',
-          name: 'Shortcode2',
-          children: [{ type: 'text', text: '' }],
-          props: { text: 'ad-panel-leaderboard' },
+          type: 'text',
+          text: '',
         },
       ],
+      props: { _value: 'neat' },
     },
   ],
 })

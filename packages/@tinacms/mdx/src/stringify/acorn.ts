@@ -233,15 +233,27 @@ export function stringifyProps(
         throw new Error(`Stringify props: ${field.type} not yet supported`)
     }
   })
-
   if (template.match) {
-    if (attributes[0] && typeof attributes[0].value === 'string') {
-      return {
-        attributes: [],
-        children: [{ type: 'inlineCode', value: attributes[0].value }],
-      }
+    // consistent mdx element rendering regardless of children makes it easier to parse
+    return {
+      attributes,
+      children:
+        children && children.length
+          ? (children as any)
+          : [
+              {
+                type: 'paragraph',
+                children: [
+                  {
+                    type: 'text',
+                    value: '',
+                  },
+                ],
+              },
+            ],
     }
   }
+
   return { attributes, children } as any
 }
 
