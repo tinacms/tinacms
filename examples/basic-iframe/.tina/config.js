@@ -52,6 +52,8 @@ export default defineConfig({
         path: 'content/page',
         label: 'Page',
         format: 'mdx',
+        frontmatterFormat: 'toml',
+        frontmatterDelimiters: ['+++', '+++'],
         fields: [
           {
             label: 'Title',

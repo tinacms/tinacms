@@ -143,6 +143,14 @@ interface BaseCollection {
   defaultItem?: DefaultItem<Record<string, any>>
   indexes?: TinaIndex[]
   format?: FormatType
+  /**
+   * This format will be used to parse the markdown frontmatter
+   */
+  frontmatterFormat?: 'yaml' | 'toml' | 'json'
+  /**
+   * The delimiters used to parse the frontmatter.
+   */
+  frontmatterDelimiters?: [string, string] | string
   ui?: UICollection
   match?: string
 }
