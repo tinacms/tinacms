@@ -29,6 +29,7 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
+import { spin } from '../../utils/spinner'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -244,6 +245,13 @@ const forestryMigrate = async ({
   if (!option['selection']) {
     return null
   }
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  await spin({
+    waitFor: async () => {
+      await delay(2000)
+    },
+    text: '',
+  })
   const collections = await generateCollections({
     forestryPath,
     rootPath,
