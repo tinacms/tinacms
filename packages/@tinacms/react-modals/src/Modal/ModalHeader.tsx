@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { CloseIcon } from '@tinacms/icons'
+import { CloseIcon } from '@einsteinindustries/tinacms-icons'
 
 export interface ModalHeaderProps {
   children: React.ReactChild | React.ReactChild[]

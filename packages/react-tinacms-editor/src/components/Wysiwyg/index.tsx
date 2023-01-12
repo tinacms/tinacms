@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { TinaCMS, useCMS, Form } from 'tinacms'
+import { TinaCMS, useCMS, Form } from '@einsteinindustries/tinacms'
 import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
 import {

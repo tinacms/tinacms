@@ -18,14 +18,14 @@ limitations under the License.
 
 import * as React from 'react'
 
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 import { useState } from 'react'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { Button } from '@tinacms/styles'
+import { Button } from '@einsteinindustries/tinacms-styles'
 import { FormList } from './FormList'
-import { useCMS, useSubscribable } from '@tinacms/react-core'
-import { LeftArrowIcon } from '@tinacms/icons'
-import { FormBuilder } from '@tinacms/form-builder'
+import { useCMS, useSubscribable } from '@einsteinindustries/tinacms-react-core'
+import { LeftArrowIcon } from '@einsteinindustries/tinacms-icons'
+import { FormBuilder } from '@einsteinindustries/tinacms-form-builder'
 
 export const FormsView = ({
   children,

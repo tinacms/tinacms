@@ -43,8 +43,10 @@ export const tablePlugin = new Plugin({
           const selectionNotChanged = selection === oldState.selection
           const tableNotChanged =
             (tableNode && tableNode.node.nodeSize) ===
+              //@ts-ignore
               (prev.selectedTable && prev.selectedTable.node.nodeSize) &&
             (tableNode && tableNode.start) ===
+              //@ts-ignore
               (prev.selectedTable && prev.selectedTable.start)
 
           if (selectionNotChanged && tableNotChanged) return prev

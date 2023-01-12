@@ -17,8 +17,11 @@ limitations under the License.
 */
 
 import { useCallback, useEffect } from 'react'
-import { Form } from '@tinacms/forms'
-import { useCMS, useWatchFormValues } from '@tinacms/react-core'
+import { Form } from '@einsteinindustries/tinacms-forms'
+import {
+  useCMS,
+  useWatchFormValues,
+} from '@einsteinindustries/tinacms-react-core'
 
 import { getFlattenedFormValues } from './get-flattened-form-values'
 

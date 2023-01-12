@@ -28,7 +28,7 @@ export function insertImage(
 ) {
   const nodeType = state.schema.nodes['image']
   const image = nodeType.createAndFill({ src, alt: '', title: '' })
-  if (dispatch) {
+  if (dispatch && image) {
     dispatch(state.tr.replaceSelectionWith(image).scrollIntoView())
   }
   return true
@@ -44,7 +44,9 @@ export function insertImageList(
     const { tr } = state
     imageSrc.forEach(src => {
       const image = nodeType.createAndFill({ src, alt: '', title: '' })
-      tr.replaceSelectionWith(image)
+      if (image) {
+        tr.replaceSelectionWith(image)
+      }
     })
     dispatch(tr.scrollIntoView())
   }

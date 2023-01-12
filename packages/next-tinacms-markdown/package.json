@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/next-tinacms-markdown",
-  "version": "0.44.0",
+  "version": "0.44.301",
   "license": "Apache-2.0",
   "author": "Kendall Strautman",
   "main": "dist/index.js",
@@ -22,17 +22,18 @@
     "docs": "npx typedoc"
   },
   "peerDependencies": {
+    "@einsteinindustries/tinacms": ">=0.11",
     "next": ">=9",
-    "react": ">=16",
-    "tinacms": ">=0.11"
+    "react": ">=16"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
-    "js-yaml": "^3.13.1"
+    "js-yaml": "^3.14.1"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
-    "tinacms": "^0.43.3"
+    "@einsteinindustries/tinacms": "0.44.301",
+    "@einsteinindustries/tinacms-scripts": "0.44.301",
+    "@types/js-yaml": "^4.0.5"
   },
-  "gitHead": "eb33842c897df805d0dd2d2ab2fa6026f21d4752"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

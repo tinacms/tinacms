@@ -46,7 +46,7 @@ interface TinaTeamsUser {
   }
 }
 
-const NO_COOKIES_ERROR = `@tinacms/teams \`authenticate\` middleware could not find cookies on the request.
+const NO_COOKIES_ERROR = `@einsteinindustries/tinacms-teams \`authenticate\` middleware could not find cookies on the request.
 
 Try adding the \`cookie-parser\` middleware to your express app.
 

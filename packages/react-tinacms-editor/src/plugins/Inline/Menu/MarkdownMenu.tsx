@@ -17,7 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
+import {
+  BoldIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+} from '@einsteinindustries/tinacms-icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 

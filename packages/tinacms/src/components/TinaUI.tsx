@@ -17,12 +17,15 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ModalProvider } from '@tinacms/react-modals'
-import { Theme } from '@tinacms/styles'
-import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
-import { Toolbar } from '@tinacms/react-toolbar'
+import { ModalProvider } from '@einsteinindustries/tinacms-react-modals'
+import { Theme } from '@einsteinindustries/tinacms-styles'
+import {
+  SidebarProvider,
+  SidebarPosition,
+} from '@einsteinindustries/tinacms-react-sidebar'
+import { Toolbar } from '@einsteinindustries/tinacms-react-toolbar'
 import { useCMS } from '../react-tinacms'
-import { Alerts } from '@tinacms/react-alerts'
+import { Alerts } from '@einsteinindustries/tinacms-react-alerts'
 import { MediaManager } from './media'
 
 export interface TinaUIProps {

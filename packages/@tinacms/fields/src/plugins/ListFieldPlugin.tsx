@@ -17,12 +17,19 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '@tinacms/forms'
+import { Field, Form } from '@einsteinindustries/tinacms-forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder, FieldsGroup } from '@tinacms/form-builder'
-import { IconButton } from '@tinacms/styles'
+import {
+  FieldsBuilder,
+  FieldsGroup,
+} from '@einsteinindustries/tinacms-form-builder'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { AddIcon, ReorderIcon, TrashIcon } from '@tinacms/icons'
+import {
+  AddIcon,
+  ReorderIcon,
+  TrashIcon,
+} from '@einsteinindustries/tinacms-icons'
 import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
 
 type DefaultItem = string | number | (() => string | number)

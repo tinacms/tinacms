@@ -25,7 +25,7 @@ import {
   FORM_ERROR,
   Mutator,
 } from 'final-form'
-import { Plugin } from '@tinacms/core'
+import { Plugin } from '@einsteinindustries/tinacms-core'
 import { Field, AnyField } from './field'
 
 export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {

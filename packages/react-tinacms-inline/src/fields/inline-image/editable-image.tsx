@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { usePreviewSrc, Form, useCMS } from 'tinacms'
+import { usePreviewSrc, Form, useCMS } from '@einsteinindustries/tinacms'
 import { FocusRing } from '../../styles'
 import { InlineImageProps } from './inline-image-field'
 import { InlineImageUpload } from './inline-image-upload'

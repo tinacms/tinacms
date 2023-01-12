@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 
-import { MarkdownIcon } from '@tinacms/icons'
+import { MarkdownIcon } from '@einsteinindustries/tinacms-icons'
 import { MenuButton } from '../MenuHelpers/MenuButton'
 import { useEditorModeContext } from '../../context/editorMode'
 

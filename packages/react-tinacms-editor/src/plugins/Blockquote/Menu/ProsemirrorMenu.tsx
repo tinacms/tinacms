@@ -19,7 +19,7 @@ limitations under the License.
 import { wrapIn } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import { QuoteIcon } from '@tinacms/icons'
+import { QuoteIcon } from '@einsteinindustries/tinacms-icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
 

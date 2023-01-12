@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { usePlugins } from '@tinacms/react-core'
+import { usePlugins } from '@einsteinindustries/tinacms-react-core'
 import { useMemo, DependencyList } from 'react'
 import { createScreen, ScreenOptions } from './screen-plugin'
 

@@ -17,7 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
+import {
+  UnorderedListIcon,
+  OrderedListIcon,
+} from '@einsteinindustries/tinacms-icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
 import { formatKeymap } from '../../../utils'

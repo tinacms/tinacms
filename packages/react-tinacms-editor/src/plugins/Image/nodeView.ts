@@ -25,6 +25,7 @@ const Identity = (str: string) => str
 export class ImageView implements NodeView {
   node: Node
   view: EditorView
+  // @ts-ignore
   dom?: HTMLElement
   img?: HTMLImageElement
 

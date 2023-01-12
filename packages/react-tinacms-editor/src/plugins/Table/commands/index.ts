@@ -52,6 +52,7 @@ export const insertTable = (
   }
   const rows = []
   for (let i = 0; i < rowsCount; i += 1) {
+    // @ts-ignore
     rows.push(tableRow.createChecked(null, i === 0 ? headerCells : cells))
   }
 

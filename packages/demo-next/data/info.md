@@ -13,6 +13,7 @@ lunch:
   - tacos
   - falafel
   - sliders
+pagewidth: xs
 ---
 ## This blog was created using [TinaCMS](https://tinacms.org) & [NextJS](https://nextjs.org/)
 

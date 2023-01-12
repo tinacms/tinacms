@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import React from 'react'
-import { FieldMeta } from '@tinacms/fields'
+import { FieldMeta } from '@einsteinindustries/tinacms-fields'
 import styled from 'styled-components'
 
 export const MarkdownFieldPlaceholder = {

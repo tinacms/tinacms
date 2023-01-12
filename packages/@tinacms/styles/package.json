@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-styles",
-  "version": "0.44.0",
+  "version": "0.44.301",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
+    "@einsteinindustries/tinacms-scripts": "0.44.301",
     "@types/webfontloader": "^1.6.29",
     "styled-components": ">=4.1"
   },
@@ -38,5 +38,5 @@
   "dependencies": {
     "webfontloader": "^1.6.28"
   },
-  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

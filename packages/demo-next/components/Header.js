@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import Link from 'next/link'
-import { useCMS } from 'tinacms'
+import { useCMS } from '@einsteinindustries/tinacms'
 
 export default function Header(props) {
   const cms = useCMS()

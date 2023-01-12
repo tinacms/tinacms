@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { undo, redo, undoDepth, redoDepth } from 'prosemirror-history'
 
-import { RedoIcon, UndoIcon } from '@tinacms/icons'
+import { RedoIcon, UndoIcon } from '@einsteinindustries/tinacms-icons'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton } from '../../../components/MenuHelpers'

@@ -26,8 +26,13 @@ import {
   forEachCellInColumn,
   setCellAttrs,
 } from 'prosemirror-utils'
-import { IconButton } from '@tinacms/styles'
-import { AlignCenter, AlignLeft, AlignRight, TrashIcon } from '@tinacms/icons'
+import { IconButton } from '@einsteinindustries/tinacms-styles'
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  TrashIcon,
+} from '@einsteinindustries/tinacms-icons'
 
 import { useEditorStateContext } from '../../../context/editorState'
 

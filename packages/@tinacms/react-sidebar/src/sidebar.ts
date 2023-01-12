@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { EventBus, Callback } from '@tinacms/core'
+import { EventBus, Callback } from '@einsteinindustries/tinacms-core'
 import { NoFormsPlaceholder } from './components/NoFormsPlaceHolder'
 import * as React from 'react'
 

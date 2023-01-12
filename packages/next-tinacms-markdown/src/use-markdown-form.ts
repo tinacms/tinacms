@@ -19,7 +19,7 @@ limitations under the License.
 const matter = require('gray-matter')
 
 import * as yaml from 'js-yaml'
-import { useForm, useCMS, FormOptions } from 'tinacms'
+import { useForm, useCMS, FormOptions } from '@einsteinindustries/tinacms'
 import { generateFields } from './generate-fields'
 
 /**

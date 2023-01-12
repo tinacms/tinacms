@@ -25,11 +25,14 @@ import {
   LeftArrowIcon,
   EditIcon,
   TinaIcon,
-} from '@tinacms/icons'
-import { tina_reset_styles } from '@tinacms/styles'
-import { CreateContentMenu } from '@tinacms/react-forms'
-import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
-import { useSubscribable, useCMS } from '@tinacms/react-core'
+} from '@einsteinindustries/tinacms-icons'
+import { tina_reset_styles } from '@einsteinindustries/tinacms-styles'
+import { CreateContentMenu } from '@einsteinindustries/tinacms-react-forms'
+import {
+  ScreenPlugin,
+  ScreenPluginModal,
+} from '@einsteinindustries/tinacms-react-screens'
+import { useSubscribable, useCMS } from '@einsteinindustries/tinacms-react-core'
 import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
 

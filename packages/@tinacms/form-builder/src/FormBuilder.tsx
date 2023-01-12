@@ -14,12 +14,12 @@ limitations under the License.
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
-import { Form } from '@tinacms/forms'
+import { Form } from '@einsteinindustries/tinacms-forms'
 import { Form as FinalForm } from 'react-final-form'
 
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '@tinacms/styles'
-import { ModalProvider } from '@tinacms/react-modals'
+import { Button } from '@einsteinindustries/tinacms-styles'
+import { ModalProvider } from '@einsteinindustries/tinacms-react-modals'
 import { LoadingDots } from './LoadingDots'
 import { FormPortalProvider } from './FormPortal'
 import { FieldsBuilder } from './fields-builder'
@@ -57,7 +57,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
    */
   const [i, setI] = React.useState(0)
   React.useEffect(() => {
-    setI((i) => i + 1)
+    setI(i => i + 1)
   }, [tinaForm])
 
   const finalForm = tinaForm.finalForm

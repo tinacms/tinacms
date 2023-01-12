@@ -16,10 +16,13 @@ limitations under the License.
 
 */
 
-import { useCMS as useBaseCMS } from '@tinacms/react-core'
+import { useCMS as useBaseCMS } from '@einsteinindustries/tinacms-react-core'
 import { TinaCMS } from '../tina-cms'
 
-export { ERROR_MISSING_CMS, CMSContext } from '@tinacms/react-core'
+export {
+  ERROR_MISSING_CMS,
+  CMSContext,
+} from '@einsteinindustries/tinacms-react-core'
 
 export function useCMS(): TinaCMS {
   return useBaseCMS() as TinaCMS

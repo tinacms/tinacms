@@ -17,10 +17,10 @@ limitations under the License.
 */
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { Media } from '@tinacms/core'
-import { Folder, File } from '@tinacms/icons'
-import { Button, IconButton } from '@tinacms/styles'
-import { TrashIcon } from '@tinacms/icons'
+import { Media } from '@einsteinindustries/tinacms-core'
+import { Folder, File } from '@einsteinindustries/tinacms-icons'
+import { Button, IconButton } from '@einsteinindustries/tinacms-styles'
+import { TrashIcon } from '@einsteinindustries/tinacms-icons'
 
 interface MediaItemProps {
   item: Media

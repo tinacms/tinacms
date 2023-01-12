@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const { createJestConfig } = require('@tinacms/scripts')
+const { createJestConfig } = require('@einsteinindustries/tinacms-scripts')
 const pack = require('./package')
 
 module.exports = createJestConfig(pack)

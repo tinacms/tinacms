@@ -16,7 +16,7 @@
 
  */
 
-import { EventBus, Callback, CMSEvent } from '@tinacms/core'
+import { EventBus, Callback, CMSEvent } from '@einsteinindustries/tinacms-core'
 
 export interface EventsToAlerts {
   [key: string]: ToAlert | AlertArgs

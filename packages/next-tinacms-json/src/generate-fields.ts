@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { JsonFile } from './use-json-form'
-import { Field } from 'tinacms'
+import { Field } from '@einsteinindustries/tinacms'
 
 export function generateFields(jsonFile: JsonFile): Field[] {
   return Object.keys(jsonFile.data).map(key => {

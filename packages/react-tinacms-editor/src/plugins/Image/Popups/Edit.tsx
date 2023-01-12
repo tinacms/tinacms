@@ -22,7 +22,7 @@ import styled from 'styled-components'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@einsteinindustries/tinacms-styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import { useEditorStateContext } from '../../../context/editorState'

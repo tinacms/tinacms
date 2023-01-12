@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { CMS } from '@tinacms/core'
+import { CMS } from '@einsteinindustries/tinacms-core'
 import { GitClient } from './git-client'
 
 export class GitFile {

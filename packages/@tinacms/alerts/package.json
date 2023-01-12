@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-alerts",
-  "version": "0.43.0",
+  "version": "0.44.301",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,11 +27,11 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@einsteinindustries/tinacms-core": "0.44.301",
+    "@einsteinindustries/tinacms-scripts": "0.44.301"
   },
   "peerDependencies": {
-    "@tinacms/core": ">=0.7"
+    "@einsteinindustries/tinacms-core": ">=0.7"
   },
-  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

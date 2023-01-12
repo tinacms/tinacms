@@ -18,8 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useJsonForm } from 'next-tinacms-json'
-import { ModalProvider, BlockTemplate } from 'tinacms'
+import { useJsonForm } from '@einsteinindustries/next-tinacms-json'
+import { ModalProvider, BlockTemplate } from '@einsteinindustries/tinacms'
 import {
   InlineForm,
   InlineImage,
@@ -28,8 +28,8 @@ import {
   BlocksControls,
   useInlineForm,
   InlineTextarea,
-} from 'react-tinacms-inline'
-import { InlineWysiwyg } from 'react-tinacms-editor'
+} from '@einsteinindustries/react-tinacms-inline'
+import { InlineWysiwyg } from '@einsteinindustries/react-tinacms-editor'
 
 import Layout from '../components/Layout'
 
@@ -63,7 +63,7 @@ export default function BlocksExample({ jsonFile }) {
                 style: { backgroundColor: 'red' },
               }}
               min={2}
-              max={4}
+              max={5}
             />
           </Wrap>
         </InlineForm>
@@ -97,6 +97,8 @@ const cta_template: BlockTemplate = {
     { name: 'text', label: 'Text', component: 'text' },
     { name: 'url', label: 'URL', component: 'text' },
   ],
+  // comment next line out to not display this as a dropdown option but still allow for the block to exist
+  // displayAsOption: false
 }
 
 function CallToActionBlock({ index, data }) {
@@ -208,8 +210,6 @@ const PAGE_BUILDER_BLOCKS = {
   cta: {
     Component: CallToActionBlock,
     template: cta_template,
-    // to disable this from being added again, uncomment following line
-    // displayAsOption: false
   },
   hero: {
     Component: HeroBlock,

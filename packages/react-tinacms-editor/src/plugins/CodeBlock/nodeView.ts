@@ -38,6 +38,7 @@ if (!ssr) {
 
 export class CodeBlockView implements NodeView {
   cm: CodeMirrorEditor
+  // @ts-ignore
   dom?: HTMLElement
   updating: boolean = false
 
@@ -96,6 +97,7 @@ export class CodeBlockView implements NodeView {
       const tr = this.view.state.tr.replaceWith(
         codeBlockStart + change.from,
         codeBlockStart + change.to,
+        // @ts-ignore
         change.text ? schema.text(change.text) : null
       )
       this.view.dispatch(tr as any) // Damn typings :(
