@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-core",
-  "version": "0.44.2",
+  "version": "0.44.301",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,7 +27,7 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "0.44.2"
+    "@einsteinindustries/tinacms-scripts": "0.44.301"
   },
   "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }
