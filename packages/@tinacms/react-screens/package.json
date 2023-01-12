@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-screens",
-  "version": "0.44.1",
+  "version": "0.44.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -33,10 +33,10 @@
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-core": "0.44.1",
-    "@einsteinindustries/tinacms-react-core": "0.44.1",
-    "@einsteinindustries/tinacms-react-modals": "0.44.1",
-    "@einsteinindustries/tinacms-scripts": "0.44.1"
+    "@einsteinindustries/tinacms-core": "0.44.2",
+    "@einsteinindustries/tinacms-react-core": "0.44.2",
+    "@einsteinindustries/tinacms-react-modals": "0.44.2",
+    "@einsteinindustries/tinacms-scripts": "0.44.2"
   },
   "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

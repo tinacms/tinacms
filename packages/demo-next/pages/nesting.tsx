@@ -54,6 +54,11 @@ const AnotherAction = () => {
 }
 
 export default function Nesting() {
+  const SIDE_BAR_TEMPLATES = {}
+  for (const sidebarTemplate of [POSTS.post, ROW, COL, HEADING, PARAGRAPH]) {
+    SIDE_BAR_TEMPLATES[sidebarTemplate.template.label] =
+      sidebarTemplate.template
+  }
   const [values, form] = useForm({
     id: 'nesting-example',
     initialValues: {
@@ -70,6 +75,18 @@ export default function Nesting() {
       posts: [
         { _template: 'post', title: 'Post #1' },
         { _template: 'post', title: 'Post #2' },
+      ],
+      side_bar: [
+        {
+          _template: 'Heading',
+          key: 1,
+          fields: {},
+        },
+        {
+          _template: 'Paragraph',
+          key: 2,
+          fields: { name: 'red' },
+        },
       ],
       builder: [
         {
@@ -106,6 +123,12 @@ export default function Nesting() {
         component: 'toggle',
         toggleLabels: true,
       },
+      {
+        name: 'side_bar',
+        label: 'Side Bar',
+        component: 'blocks',
+        templates: SIDE_BAR_TEMPLATES,
+      },
     ],
     actions: [TestAction, AnotherAction],
     onSubmit() {},
@@ -114,7 +137,7 @@ export default function Nesting() {
   /**
    * To test data in the browser
    */
-  console.log('NESTING', values)
+  // console.log('NESTING', values)
   usePlugin(form)
 
   return (
@@ -400,6 +423,7 @@ const PARAGRAPH = {
       text: 'New Paragraph',
     },
     fields: [],
+    displayAsOption: false,
   },
   Component({ index, data }) {
     return (

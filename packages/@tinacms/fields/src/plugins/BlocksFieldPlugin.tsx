@@ -74,6 +74,7 @@ export interface BlockTemplate {
      */
     label?: string
   }
+  displayAsOption?: boolean
 }
 
 interface BlockFieldProps {
@@ -131,17 +132,21 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             disabled={!visible}
           >
             <BlockMenuList>
-              {Object.entries(field.templates).map(([name, template]) => (
-                <BlockOption
-                  key={name}
-                  onClick={() => {
-                    addItem(name, template)
-                    setVisible(false)
-                  }}
-                >
-                  {template.label}
-                </BlockOption>
-              ))}
+              {Object.entries(field.templates)
+                .filter(([_, template]) => {
+                  return template.displayAsOption ?? true
+                })
+                .map(([name, template]) => (
+                  <BlockOption
+                    key={name}
+                    onClick={() => {
+                      addItem(name, template)
+                      setVisible(false)
+                    }}
+                  >
+                    {template.label}
+                  </BlockOption>
+                ))}
             </BlockMenuList>
           </Dismissible>
         </BlockMenu>

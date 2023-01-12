@@ -2,6 +2,11 @@
   "title": "Page Builder Example",
   "blocks": [
     {
+      "_template": "cta",
+      "url": "",
+      "text": "Signup!"
+    },
+    {
       "_template": "hero",
       "text": "Spiderman"
     },
