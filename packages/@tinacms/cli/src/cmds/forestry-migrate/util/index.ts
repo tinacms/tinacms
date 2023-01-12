@@ -83,6 +83,9 @@ const forestryFieldWithoutField = z.object({
   default: z.any().optional(),
   config: z
     .object({
+      // min and max are used for lists
+      min: z.number().optional().nullable(),
+      max: z.number().optional().nullable(),
       required: z.boolean().optional().nullable(),
       use_select: z.boolean().optional().nullable(),
       date_format: z.string().optional().nullable(),
