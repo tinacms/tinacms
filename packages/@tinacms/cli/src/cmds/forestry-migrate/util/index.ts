@@ -89,7 +89,7 @@ const forestryFieldWithoutField = z.object({
       required: z.boolean().optional().nullable(),
       use_select: z.boolean().optional().nullable(),
       date_format: z.string().optional().nullable(),
-      time_format: z.string().optional(),
+      time_format: z.string().optional().nullable(),
       options: z.array(z.string()).optional(),
       source: z
         .object({
