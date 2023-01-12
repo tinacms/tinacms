@@ -46,15 +46,15 @@ const forestryConfigSchema = z.object({
         z.literal('jekyll-posts'),
       ]),
       label: z.string(),
-      path: z.string().optional(),
-      match: z.string().optional(),
-      exclude: z.string().optional(),
+      path: z.string().optional().nullable(),
+      match: z.string().optional().nullable(),
+      exclude: z.string().optional().nullable(),
       create: z
         .union([z.literal('all'), z.literal('documents'), z.literal('none')])
         .optional(),
-      templates: z.array(z.string()).optional(),
-      new_doc_ext: z.string().optional(),
-      read_only: z.boolean().optional(),
+      templates: z.array(z.string()).optional().nullable(),
+      new_doc_ext: z.string().optional().nullable(),
+      read_only: z.boolean().optional().nullable(),
     })
   ),
 })
@@ -90,7 +90,7 @@ const forestryFieldWithoutField = z.object({
       use_select: z.boolean().optional().nullable(),
       date_format: z.string().optional().nullable(),
       time_format: z.string().optional().nullable(),
-      options: z.array(z.string()).optional(),
+      options: z.array(z.string()).optional().nullable(),
       source: z
         .object({
           type: z
@@ -102,8 +102,9 @@ const forestryFieldWithoutField = z.object({
               // TODO: I want to ignore this key if its invalid
               z.string(),
             ])
-            .optional(),
-          section: z.string().optional(),
+            .optional()
+            .nullable(),
+          section: z.string().optional().nullable(),
         })
         .optional(),
     })
