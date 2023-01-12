@@ -51,13 +51,18 @@ export const generateAllCollections = async ({
     { fields: TinaFieldInner<false>[]; templateObj: any }
   >()
   const proms = allTemplates.map(async (tem) => {
-    const { fields, templateObj } = getFieldsFromTemplates({
-      tem,
-      collection: stringifyLabel(tem),
-      rootPath,
-    })
-
-    templateMap.set(tem, { fields, templateObj })
+    try {
+      const { fields, templateObj } = getFieldsFromTemplates({
+        tem,
+        collection: stringifyLabel(tem),
+        rootPath,
+      })
+      templateMap.set(tem, { fields, templateObj })
+    } catch (e) {
+      console.log('Error parsing template frontmatter template', tem + '.yml')
+      console.error(e)
+      templateMap.set(tem, { fields: [], templateObj: {} })
+    }
   })
   await Promise.all(proms)
   return templateMap
@@ -95,7 +100,7 @@ export const generateCollections = async ({
           for (let templateKey of templateMap.keys()) {
             // get the shape of the template
             const { templateObj } = templateMap.get(templateKey)
-            const pages: undefined | string[] = templateObj.pages
+            const pages: undefined | string[] = templateObj?.pages
             // if has pages see if there is I page that matches the current section
             if (pages) {
               if (
