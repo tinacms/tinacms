@@ -15,7 +15,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
-import type { TinaFieldInner } from '@tinacms/schema-tools'
+import type { TinaFieldInner, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 
 export const stringifyName = (name: string, template: string) => {
@@ -78,6 +78,7 @@ const forestryFieldWithoutField = z.object({
     z.literal('blocks'),
     z.literal('color'),
   ]),
+  template_types: z.array(z.string()).optional().nullable(),
   name: z.string(),
   label: z.string(),
   default: z.any().optional(),
@@ -132,9 +133,13 @@ const FrontmatterTemplateSchema = z.object({
 export const transformForestryFieldsToTinaFields = ({
   fields,
   collection,
+  rootPath,
+  skipBlocks = false,
 }: {
   fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
   collection: string
+  rootPath: string
+  skipBlocks?: boolean
 }) => {
   const tinaFields: TinaFieldInner<false>[] = []
 
@@ -254,27 +259,6 @@ export const transformForestryFieldsToTinaFields = ({
         }
         break
 
-      //   case 'list':
-      // TODO: make list work
-
-      // TODO habnde options
-      // EX:
-      // - type: list
-      //   name: categories
-      //   label: Categories
-      //   config:
-      //     use_select: true
-      //     source:
-      //       type: simple
-      //     options:
-      //     - CMS
-      //     - Jekyll
-      //     - Hugo
-      //     - Static Sites
-      //     - Static Site Generators
-      //     - Company
-      // break
-
       // Object (Group) types
       case 'field_group':
         field = {
@@ -284,6 +268,8 @@ export const transformForestryFieldsToTinaFields = ({
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
             collection,
+            rootPath,
+            skipBlocks,
           }),
         }
         break
@@ -296,7 +282,37 @@ export const transformForestryFieldsToTinaFields = ({
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
             collection,
+            rootPath,
+            skipBlocks,
           }),
+        }
+        break
+
+      case 'blocks':
+        if (skipBlocks) break
+
+        const templates: TinaTemplate[] = []
+        forestryField?.template_types.forEach((tem) => {
+          const { fields, template } = getFieldsFromTemplates({
+            tem,
+            collection: '',
+            skipBlocks: true,
+            rootPath: process.cwd(),
+          })
+          const t: TinaTemplate = {
+            fields,
+            label: template.label,
+            name: stringifyName(tem, ''),
+          }
+          templates.push(t)
+        })
+
+        field = {
+          type: 'object',
+          list: true,
+          label: forestryField.label,
+          name: stringifyName(forestryField.name, ''),
+          templates,
         }
         break
 
@@ -328,11 +344,16 @@ export const getFieldsFromTemplates: (_args: {
   tem: string
   collection: string
   rootPath: string
-}) => { fields: TinaFieldInner<false>[]; templateObj: any } = ({
-  tem,
-  rootPath,
-  collection,
+  skipBlocks?: boolean
 }) => {
+  fields: TinaFieldInner<false>[]
+  templateObj: any
+  template: {
+    label?: string
+    hide_body?: boolean
+    fields?: ForestryFieldType[]
+  }
+} = ({ tem, rootPath, collection, skipBlocks = false }) => {
   const templatePath = path.join(
     rootPath,
     '.forestry',
@@ -354,8 +375,10 @@ export const getFieldsFromTemplates: (_args: {
   const fields = transformForestryFieldsToTinaFields({
     fields: template.fields,
     collection,
+    rootPath,
+    skipBlocks,
   })
-  return { fields, templateObj }
+  return { fields, templateObj, template }
 }
 
 export const parseTemplates = ({ val }: { val: unknown }) => {
