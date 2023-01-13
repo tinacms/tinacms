@@ -1,0 +1,70 @@
+name: Publish
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      max-parallel: 1
+      matrix:
+        channel:
+          - latest
+          - dev
+
+    runs-on: ubuntu-latest
+    env:
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.4.0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Build Types
+        run: pnpm types
+      - name: Set NPMRC
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > .npmrc
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Release to @dev channel
+        if: matrix.channel == 'dev'
+        run: |
+          pnpm version:snapshot
+          pnpm run publish:beta
+      - name: Publish
+        if: matrix.channel == 'latest'
+        run: |
+          pnpm run publish
+      - name: Push tags
+        if: matrix.channel == 'latest'
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          pnpm push-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Create release pull request
+        uses: changesets/action@v1
+        if: matrix.channel == 'latest'
+        with:
+          version: pnpm run version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
