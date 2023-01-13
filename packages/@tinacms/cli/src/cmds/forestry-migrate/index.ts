@@ -22,6 +22,8 @@ import type {
   TinaFieldInner,
 } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
+import { logger } from '../../logger'
+import { warnText } from '../../utils/theme'
 
 const BODY_FIELD = {
   // This is the body field
@@ -54,12 +56,11 @@ export const generateAllCollections = async ({
     try {
       const { fields, templateObj } = getFieldsFromTemplates({
         tem,
-        collection: stringifyLabel(tem),
         rootPath,
       })
       templateMap.set(tem, { fields, templateObj })
     } catch (e) {
-      console.log('Error parsing template frontmatter template', tem + '.yml')
+      logger.log(`Error parsing template frontmatter template', tem + '.yml'`)
       console.error(e)
       templateMap.set(tem, { fields: [], templateObj: {} })
     }
@@ -202,11 +203,11 @@ export const generateCollections = async ({
                     stringifyFile(newContent, extname, true)
                   )
                 } catch (error) {
-                  console.log('Error updating file', page)
+                  logger.log('Error updating file', page)
                 }
               })
             } catch (e) {
-              console.log('Error parsing template ', tem)
+              logger.log('Error parsing template ', tem)
               console.error(e)
             }
           })
@@ -229,7 +230,9 @@ export const generateCollections = async ({
         break
       case 'document':
         console.log(
-          `Single Document are not supported in TinaCMS yet. Skipping section ${section.label} (${section.path})`
+          warnText(
+            `Single Document are not supported in TinaCMS yet. Skipping section ${section.label} (${section.path})`
+          )
         )
         break
 

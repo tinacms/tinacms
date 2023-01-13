@@ -17,6 +17,7 @@ import yaml from 'js-yaml'
 import z from 'zod'
 import type { TinaFieldInner, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
+import { dangerText, linkText, warnText } from '../../../utils/theme'
 
 export const stringifyName = (name: string, template: string) => {
   const testRegex = /^[a-zA-Z0-9_]*$/
@@ -26,8 +27,12 @@ export const stringifyName = (name: string, template: string) => {
     return name
   } else {
     const newName = name.replace(updateRegex, '_')
-    console.log(
-      `Name, "${name}" used in Frontmatter template ${template} must be alphanumeric and can only contain underscores.\n ${name} will be updated to ${newName} in the CMS if you wish to edit attribute ${name} you will have to update your frontmatter and code to use ${newName} instead.`
+    logger.error(
+      `${dangerText(
+        `Name, "${name}" used in Frontmatter template "${template}.yaml" must be alphanumeric and can only contain underscores.`
+      )}\n "${name}" will be updated to ${newName} in  TinaCMS if you wish to edit attribute ${name} you will have to update your content and code to use ${newName} instead. See ${linkText(
+        'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
+      )} for more information.`
     )
 
     // replace everything that is not alphanumeric or underscore with an underscore
@@ -132,21 +137,23 @@ const FrontmatterTemplateSchema = z.object({
 // Takes a field from forestry and converts it to a Tina field
 export const transformForestryFieldsToTinaFields = ({
   fields,
-  collection,
   rootPath,
+  template,
   skipBlocks = false,
 }: {
   fields: z.infer<typeof FrontmatterTemplateSchema>['fields']
-  collection: string
   rootPath: string
+  template: string
   skipBlocks?: boolean
 }) => {
   const tinaFields: TinaFieldInner<false>[] = []
 
   fields?.forEach((forestryField) => {
     if (forestryField.name === 'menu') {
-      console.log(
-        `skipping menu field in ${collection} since TinaCMS does not support Hugo or Jekyll menu fields`
+      logger.info(
+        warnText(
+          `skipping menu field template ${template}.yaml since TinaCMS does not support Hugo or Jekyll menu fields`
+        )
       )
       return
     }
@@ -156,14 +163,14 @@ export const transformForestryFieldsToTinaFields = ({
       case 'text':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
         }
         break
       case 'textarea':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           ui: {
             component: 'textarea',
@@ -173,28 +180,28 @@ export const transformForestryFieldsToTinaFields = ({
       case 'datetime':
         field = {
           type: forestryField.type,
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
         }
         break
       case 'number':
         field = {
           type: 'number',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
         }
         break
       case 'boolean':
         field = {
           type: 'boolean',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
         }
         break
       case 'color':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           ui: {
             component: 'color',
@@ -204,7 +211,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'file':
         field = {
           type: 'image',
-          name: stringifyName(forestryField.name || 'image', ''),
+          name: stringifyName(forestryField.name || 'image', template),
           label: forestryField.label,
         }
         break
@@ -212,13 +219,15 @@ export const transformForestryFieldsToTinaFields = ({
         if (forestryField.config?.options) {
           field = {
             type: 'string',
-            name: stringifyName(forestryField.name, ''),
+            name: stringifyName(forestryField.name, template),
             label: forestryField.label,
             options: forestryField.config?.options || [],
           }
         } else {
           logger.info(
-            `Warning in collection ${collection}. "select" field migration has only been implemented for simple select. Other versions of select have not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
+            warnText(
+              `Warning in template ${template}.yaml . "select" field migration has only been implemented for simple select. Other versions of select have not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
+            )
           )
         }
 
@@ -239,7 +248,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'list':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           list: true,
         }
@@ -250,7 +259,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'tag_list':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           list: true,
           ui: {
@@ -263,12 +272,12 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group':
         field = {
           type: 'object',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
-            collection,
             rootPath,
+            template,
             skipBlocks,
           }),
         }
@@ -276,12 +285,12 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group_list':
         field = {
           type: 'object',
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           label: forestryField.label,
           list: true,
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
-            collection,
+            template,
             rootPath,
             skipBlocks,
           }),
@@ -295,14 +304,13 @@ export const transformForestryFieldsToTinaFields = ({
         forestryField?.template_types.forEach((tem) => {
           const { fields, template } = getFieldsFromTemplates({
             tem,
-            collection: '',
             skipBlocks: true,
             rootPath: process.cwd(),
           })
           const t: TinaTemplate = {
             fields,
             label: template.label,
-            name: stringifyName(tem, ''),
+            name: stringifyName(tem, tem),
           }
           templates.push(t)
         })
@@ -311,7 +319,7 @@ export const transformForestryFieldsToTinaFields = ({
           type: 'object',
           list: true,
           label: forestryField.label,
-          name: stringifyName(forestryField.name, ''),
+          name: stringifyName(forestryField.name, template),
           templates,
         }
         break
@@ -319,13 +327,17 @@ export const transformForestryFieldsToTinaFields = ({
       // Unsupported types
       case 'image_gallery':
       case 'include':
-        console.log(
-          `Unsupported field type: ${forestryField.type}, in collection ${collection}. This will not be added to the schema.`
+        logger.info(
+          warnText(
+            `Unsupported field type: ${forestryField.type}, in forestry ${template}. This will not be added to the schema.`
+          )
         )
         break
       default:
         logger.info(
-          `Warning in collection ${collection}. "${forestryField.type}" migration has not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
+          warnText(
+            `Warning in template ${template}. "${forestryField.type}" migration has not been implemented yet. To make your \`${forestryField.name}\` field work, you will need to manually add it to your schema.`
+          )
         )
     }
     if (field) {
@@ -342,7 +354,6 @@ export const transformForestryFieldsToTinaFields = ({
 
 export const getFieldsFromTemplates: (_args: {
   tem: string
-  collection: string
   rootPath: string
   skipBlocks?: boolean
 }) => {
@@ -353,7 +364,7 @@ export const getFieldsFromTemplates: (_args: {
     hide_body?: boolean
     fields?: ForestryFieldType[]
   }
-} = ({ tem, rootPath, collection, skipBlocks = false }) => {
+} = ({ tem, rootPath, skipBlocks = false }) => {
   const templatePath = path.join(
     rootPath,
     '.forestry',
@@ -374,8 +385,8 @@ export const getFieldsFromTemplates: (_args: {
   const template = parseTemplates({ val: templateObj })
   const fields = transformForestryFieldsToTinaFields({
     fields: template.fields,
-    collection,
     rootPath,
+    template: tem,
     skipBlocks,
   })
   return { fields, templateObj, template }
