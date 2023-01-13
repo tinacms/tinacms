@@ -30,7 +30,6 @@ export type { QueryOptions } from './database'
 import type { Database } from './database'
 export type { Database } from './database'
 
-export type { Bridge } from './database/bridge'
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
 export { createSchema } from './schema/createSchema'

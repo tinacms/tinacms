@@ -12,7 +12,8 @@ limitations under the License.
 */
 
 import Progress from 'progress'
-import type { Bridge, Database } from '@tinacms/graphql'
+import type { Bridge } from '@tinacms/datalayer'
+import type { Database } from '@tinacms/graphql'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
 

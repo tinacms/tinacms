@@ -24,7 +24,7 @@ import type {
   TinaFieldInner,
   TinaSchema,
 } from '@tinacms/schema-tools'
-import type { Bridge } from './bridge'
+import type { Bridge } from '@tinacms/datalayer'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
   BinaryFilter,
