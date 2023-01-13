@@ -24,9 +24,17 @@ import { ProsemirrorMenu as HistoryMenu } from '../../../plugins/History'
 import { ProsemirrorMenu as InlineMenu } from '../../../plugins/Inline'
 import { ProsemirrorMenu as ListMenu } from '../../../plugins/List'
 import { ProsemirrorMenu as QuoteMenu } from '../../../plugins/Blockquote'
+import { ProsemirrorMenu as HorizontalRule } from '../../../plugins/horizontalRule'
 import { ProsemirrorMenu as TableMenu } from '../../../plugins/Table'
 import { ProsemirrorMenu as ImageMenu } from '../../../plugins/Image'
 import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
+import { ProsemirrorMenu as AnchorMenu } from '../../../plugins/Anchor'
+import {
+  AlignJustify,
+  AlignRight,
+  AlignLeft,
+  AlignCenter,
+} from '../../../plugins/TextAlignment'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
 import {
@@ -34,6 +42,7 @@ import {
   Loader as ImageLoader,
 } from '../../../plugins/Image'
 import { LinkForm as LinkFormPopup } from '../../../plugins/Link'
+import { AnchorForm as AnchorFormPopup } from '../../../plugins/Anchor'
 
 import { ImageProps, Plugin } from '../../../types'
 import { useEditorStateContext } from '../../../context/editorState'
@@ -57,17 +66,24 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
         <BlockMenu key="BlockMenu" />,
         <InlineMenu key="InlineMenu" />,
         <LinkMenu key="LinkMenu" />,
+        <AnchorMenu key="AnchorMenu" />,
         <ImageMenu key="ImageMenu" imageProps={imageProps} />,
         <TableMenu key="TableMenu" />,
         <QuoteMenu key="QuoteMenu" />,
         <CodeBlockMenu key="CodeBlockMenu" />,
+        <HorizontalRule key="HorizontalRule" />,
         <ListMenu key="ListMenu" />,
+        <AlignLeft key="AlignLeft" />,
+        <AlignCenter key="AlignCenter" />,
+        <AlignRight key="AlignRight" />,
+        <AlignJustify key="AlignJustify" />,
         <HistoryMenu key="HistoryMenu" />,
       ]}
       popups={[
         <TablePopups key="TablePopups" />,
         <ImageEditPopup key="ImageEditPopup" />,
         <LinkFormPopup key="LinkFormPopup" />,
+        <AnchorFormPopup key="AnchorFormPopup" />,
         <ImageLoader key="ImageLoader" />,
       ]}
       plugins={plugins}

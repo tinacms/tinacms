@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.10](https://github.com/einstein/tinacms/compare/v0.43.9...v0.43.10) (2022-01-06)
+
+**Note:** Version bump only for package @einsteinindustries/tinacms
+
+
+
+
+
+## [0.43.9](https://github.com/einstein/tinacms/compare/v0.43.8...v0.43.9) (2022-01-06)
+
+**Note:** Version bump only for package @einsteinindustries/tinacms
+
+
+
+
+
+## [0.43.8](https://github.com/einstein/tinacms/compare/v0.43.7...v0.43.8) (2022-01-06)
+
+**Note:** Version bump only for package @einsteinindustries/tinacms
+
+
+
+
+
+## [0.43.7](https://github.com/einstein/tinacms/compare/v0.43.6...v0.43.7) (2022-01-06)
+
+**Note:** Version bump only for package @einsteinindustries/tinacms
+
+
+
+
+
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Features
+
+* **@tinacms/fields:** Adds date field to default plugins ([8ac27d1](https://github.com/einstein/tinacms/commit/8ac27d12bcc488a73f75b214b718da111e185d28))
+* **tinacms:** configure media mgr page size via mediaOptions.pageSize ([5d7890f](https://github.com/einstein/tinacms/commit/5d7890f5312e5efa08a07cd7fc4e3967d71eccf3))
+* **tinacms:** customize list error message by throwing a MediaListError ([5aff1da](https://github.com/einstein/tinacms/commit/5aff1da8e725ad4046bf1888fa83599c3ef0a4c5))
+* **tinacms:** remove pluggable pagination ([846b516](https://github.com/einstein/tinacms/commit/846b51621aa85520724817192f8d8ade19c1b02a))
+* **tinacms:** use cursor-based pagination in media manager ([7a94b97](https://github.com/einstein/tinacms/commit/7a94b97e228ffd490a68159d458130e089dd6c87))
+
+
+
+
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 **Note:** Version bump only for package tinacms

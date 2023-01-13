@@ -21,7 +21,7 @@ import { createScreen } from '@einsteinindustries/tinacms-react-screens'
 import { MediaPicker } from '../../components/media'
 
 export const MediaManagerScreenPlugin = createScreen({
-  name: 'Media Manager',
+  name: 'Assets Manager',
   Component: MediaPicker,
   Icon: MediaIcon,
   layout: 'fullscreen',

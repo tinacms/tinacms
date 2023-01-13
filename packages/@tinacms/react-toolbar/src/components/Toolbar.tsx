@@ -37,6 +37,7 @@ import {
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@einsteinindustries/tinacms-form-builder'
 import { FormActionMenu } from './FormActions'
+import Link from 'next/link'
 
 const useFormState = (form: Form | null, subscription: any): any => {
   const [state, setState] = React.useState<any>()
@@ -70,7 +71,7 @@ export const Toolbar = () => {
     invalid: true,
   })
 
-  // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
+  // this is used to refresh the discard button to fix it not updating when pressed after the page loads
   const [, setState] = React.useState(0)
 
   // Global plugin hamburger menu
@@ -128,7 +129,7 @@ export const Toolbar = () => {
     <>
       <ToolbarPlaceholder />
       <StyledToolbar menuIsOpen={menuIsOpen}>
-        <AlignLeft>
+        <BottomLeft>
           {showMenu && (
             <MenuToggle
               onClick={() => setMenuIsOpen(!menuIsOpen)}
@@ -138,6 +139,11 @@ export const Toolbar = () => {
             </MenuToggle>
           )}
           <CreateContentMenu sidebar={false} />
+        </BottomLeft>
+        <AlignLeft>
+          <Link href="/sites">
+            <a>Lucid</a>
+          </Link>
         </AlignLeft>
 
         <AlignRight>
@@ -210,6 +216,11 @@ export const Toolbar = () => {
         <ScreenPluginModal
           screen={activeScreen}
           close={() => setActiveView(null)}
+          // @ts-ignore
+          back={() => {
+            setActiveView(null)
+            setMenuIsOpen(true)
+          }}
         />
       )}
     </>
@@ -237,7 +248,7 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
 }
 
 const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
-  ${tina_reset_styles}
+  ${tina_reset_styles};
 
   font-family: 'Inter', sans-serif;
   position: fixed;
@@ -305,6 +316,20 @@ const AlignLeft = styled.div`
   justify-self: start;
   display: flex;
   align-items: center;
+
+  > a:first-child {
+    margin-left: 52px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #0574e4;
+  }
+`
+
+const BottomLeft = styled.div`
+  position: fixed;
+  bottom: 90px;
+  margin-bottom: 1rem;
 `
 
 const AlignRight = styled.div`
@@ -507,7 +532,7 @@ const MenuWrapper = styled.div`
 
 const MenuPanel = styled.div<{ visible: boolean }>`
   all: unset;
-  ${tina_reset_styles}
+  ${tina_reset_styles};
   box-sizing: border-box;
   background: var(--tina-color-grey-8);
   position: fixed;

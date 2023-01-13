@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Features
+
+* **@tinacms/git-client:** Migrate GitMediaStore to cursor-based pagination ([8d2146c](https://github.com/einstein/tinacms/commit/8d2146ccb36516b42bbe8b01bb5e31eb955b0635))
+
+
+
+
+
 # [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
 
 **Note:** Version bump only for package @tinacms/git-client

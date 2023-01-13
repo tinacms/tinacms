@@ -1,18 +1,16 @@
 {
   "name": "@einsteinindustries/react-tinacms-date",
-  "version": "0.44.301",
+  "version": "0.44.310",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
-  "keywords": [
-    "react"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/react-tinacms-date"
   },
   "files": [
@@ -24,15 +22,16 @@
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "test": "jest --passWithNoTests",
-    "docs": "npx typedoc"
+    "docs": "npx typedoc",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "dependencies": {
     "moment": ">=2 <=3",
     "react-datetime": "^2.16.3"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-fields": "0.44.301",
-    "@einsteinindustries/tinacms-scripts": "0.44.301"
+    "@einsteinindustries/tinacms-fields": "^0.44.310",
+    "@einsteinindustries/tinacms-scripts": "^0.44.310"
   },
   "peerDependencies": {
     "styled-components": ">=4.1"

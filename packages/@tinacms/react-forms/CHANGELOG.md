@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+
+### Bug Fixes
+
+* **bug:** disables form save button if field fails validation ([e829ffa](https://github.com/einstein/tinacms/commit/e829ffa6756a22b58c9de9403895d76696d224fe))
+
+
+### Features
+
+* Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/einstein/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+* **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/einstein/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+
+
+
+
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 **Note:** Version bump only for package @tinacms/react-forms

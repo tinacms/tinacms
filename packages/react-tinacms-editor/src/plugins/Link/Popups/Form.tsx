@@ -26,6 +26,7 @@ import {
   findElementOffsetTop,
   findElementOffsetLeft,
   getMarkPresent,
+  getAllMarkOccurrences,
 } from '../../../utils'
 import {
   removeLinkBeingEdited,
@@ -94,6 +95,7 @@ export const LinkForm = () => {
     // title = linkMark.attrs.title
   }
 
+  const anchors = getAllMarkOccurrences(state.doc.content, 'anchor')
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>
       {position && (
@@ -109,7 +111,7 @@ export const LinkForm = () => {
               removeLink={() => removeLinkBeingEdited(state, dispatch)}
               onChange={onChange}
               href={href}
-              // title={title}
+              allAnchors={anchors}
               cancel={onCancel}
             />
           </LinkFormWrapper>

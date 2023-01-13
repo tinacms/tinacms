@@ -123,6 +123,11 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             <ScreenPluginModal
               screen={activeScreen}
               close={() => setActiveView(null)}
+              // @ts-ignore
+              back={() => {
+                setActiveView(null)
+                setMenuIsOpen(true)
+              }}
             />
           )}
           <ResizeHandle />
@@ -360,7 +365,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   pointer-events: all;
   bottom: 44px;
   left: var(--tina-sidebar-width);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 24px 24px 0;
   width: 50px;
   height: 44px;
@@ -425,7 +430,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
-  ${tina_reset_styles}
+  ${tina_reset_styles};
 
   position: fixed !important;
   top: 0 !important;

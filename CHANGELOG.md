@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.10](https://github.com/einstein/tinacms/compare/v0.43.9...v0.43.10) (2022-01-06)
+
+**Note:** Version bump only for package root
+
+## [0.43.9](https://github.com/einstein/tinacms/compare/v0.43.8...v0.43.9) (2022-01-06)
+
+**Note:** Version bump only for package root
+
+## [0.43.8](https://github.com/einstein/tinacms/compare/v0.43.7...v0.43.8) (2022-01-06)
+
+**Note:** Version bump only for package root
+
+## [0.43.7](https://github.com/einstein/tinacms/compare/v0.43.6...v0.43.7) (2022-01-06)
+
+**Note:** Version bump only for package root
+
+## [0.43.4](https://github.com/einstein/tinacms/compare/v0.40.1...v0.43.4) (2022-01-04)
+
+### Bug Fixes
+
+- **@tinacms/fields:** Better handling for default formats ([af3496d](https://github.com/einstein/tinacms/commit/af3496d47b865e2d2e08693cff5b7270aea8eebd))
+- **@tinacms/form-builder:** Removes onKeyPress from FormBuilder ([f0e456b](https://github.com/einstein/tinacms/commit/f0e456b2f9d1f2cc8a0a3ede38eee47da46e710c))
+- **bug:** disables form save button if field fails validation ([e829ffa](https://github.com/einstein/tinacms/commit/e829ffa6756a22b58c9de9403895d76696d224fe))
+- **react-tinacms-editor:** fixing FocusRingOptions import path ([7096add](https://github.com/einstein/tinacms/commit/7096add5f5915ac69f90682d00d73dc1e739ffd5))
+- **react-tinacms-editor,react-tinacms-inline:** Fixes deps ([d60eb84](https://github.com/einstein/tinacms/commit/d60eb8400595de3f0286f0236bba52b02b01cb51))
+- **react-tinacms-github:** Makes form-builder a peerDependency ([0e2174c](https://github.com/einstein/tinacms/commit/0e2174ceef97ecd507e0a13d1f6a23cc7e843064))
+- **react-tinacmseditor:** fixing FocusRingOptions import path ([6c231e3](https://github.com/einstein/tinacms/commit/6c231e3b7b6f7221e691ca8aae3ee2d96634bff6))
+
+### Features
+
+- **tinacms:** customize list error message by throwing a MediaListError ([5aff1da](https://github.com/einstein/tinacms/commit/5aff1da8e725ad4046bf1888fa83599c3ef0a4c5))
+- Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/einstein/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+- **@tinacms/fields:** Adds date field to default plugins ([8ac27d1](https://github.com/einstein/tinacms/commit/8ac27d12bcc488a73f75b214b718da111e185d28))
+- **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/einstein/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+- **@tinacms/git-client:** Migrate GitMediaStore to cursor-based pagination ([8d2146c](https://github.com/einstein/tinacms/commit/8d2146ccb36516b42bbe8b01bb5e31eb955b0635))
+- **react-tinacms-github:** Migrate GithubMediaStore to cursor-based pagination ([5163fad](https://github.com/einstein/tinacms/commit/5163fad6023ac133668736262c5c9732dfdd2c6d))
+- **react-tinacms-inline:** InlineBlocks children ([00d5804](https://github.com/einstein/tinacms/commit/00d580492370714096c051761b90cea013dc7644))
+- **react-tinacms-strapi:** Migrate StrapiMediaStore to cursor-based pagination ([646151f](https://github.com/einstein/tinacms/commit/646151f73d65a8b862827a1e2eb241ff8df856a6))
+- **tinacms:** configure media mgr page size via mediaOptions.pageSize ([5d7890f](https://github.com/einstein/tinacms/commit/5d7890f5312e5efa08a07cd7fc4e3967d71eccf3))
+- **tinacms:** remove pluggable pagination ([846b516](https://github.com/einstein/tinacms/commit/846b51621aa85520724817192f8d8ade19c1b02a))
+- **tinacms:** use cursor-based pagination in media manager ([7a94b97](https://github.com/einstein/tinacms/commit/7a94b97e228ffd490a68159d458130e089dd6c87))
+- Updates default format to be more standards compliant ([3617ea6](https://github.com/einstein/tinacms/commit/3617ea67c07be2d155a8bd5ba2b2a21ed9923006))
+
 ## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
 
 ### Bug Fixes

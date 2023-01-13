@@ -21,6 +21,8 @@ import {
   BoldIcon,
   ItalicIcon,
   StrikethroughIcon,
+  SuperscriptIcon,
+  SubscriptIcon,
 } from '@einsteinindustries/tinacms-icons'
 
 import { markControl } from '../../../components/MenuHelpers'
@@ -30,6 +32,8 @@ export const ProsemirrorMenu = () => (
   <>
     <BoldControl />
     <ItalicControl />
+    <Superscript />
+    <Subscript />
     <StrikeControl />
   </>
 )
@@ -50,4 +54,16 @@ const StrikeControl = markControl({
   mark: 'strike',
   Icon: StrikethroughIcon,
   tooltip: 'Strike',
+})
+
+const Subscript = markControl({
+  mark: 'subscript',
+  Icon: SubscriptIcon,
+  tooltip: 'Subscript',
+})
+
+const Superscript = markControl({
+  mark: 'superscript',
+  Icon: SuperscriptIcon,
+  tooltip: 'Superscript',
 })

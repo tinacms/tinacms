@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-alerts",
-  "version": "0.44.301",
+  "version": "0.44.310",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/react-alerts"
   },
   "scripts": {
@@ -17,14 +17,15 @@
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
     "docs": "npx typedoc",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-alerts": "0.44.301",
-    "@einsteinindustries/tinacms-icons": "0.44.301",
-    "@einsteinindustries/tinacms-react-core": "0.44.301",
-    "@einsteinindustries/tinacms-scripts": "0.44.301",
-    "@einsteinindustries/tinacms-styles": "0.44.301"
+    "@einsteinindustries/tinacms-alerts": "^0.44.310",
+    "@einsteinindustries/tinacms-icons": "^0.44.310",
+    "@einsteinindustries/tinacms-react-core": "^0.44.310",
+    "@einsteinindustries/tinacms-scripts": "^0.44.310",
+    "@einsteinindustries/tinacms-styles": "^0.44.310"
   },
   "peerDependencies": {
     "@einsteinindustries/tinacms-alerts": ">=0.1",

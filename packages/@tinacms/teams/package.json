@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-teams",
-  "version": "0.44.301",
+  "version": "0.44.310",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -8,16 +8,13 @@
     "build",
     "public"
   ],
-  "keywords": [
-    "tinacms",
-    "cms"
-  ],
+  "keywords": [],
   "bugs": {
-    "url": "https://github.com/tinacms/tinacms/issues"
+    "url": "https://github.com/einstein/tinacms/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/teams"
   },
   "scripts": {
@@ -25,10 +22,11 @@
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "test": "jest --passWithNoTests",
-    "docs": "npx typedoc"
+    "docs": "npx typedoc",
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-scripts": "0.44.301",
+    "@einsteinindustries/tinacms-scripts": "^0.44.310",
     "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "8.3.5"
   },

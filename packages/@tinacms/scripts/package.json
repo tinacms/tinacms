@@ -1,21 +1,19 @@
 {
   "name": "@einsteinindustries/tinacms-scripts",
-  "version": "0.44.301",
+  "version": "0.44.310",
   "license": "Apache-2.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tinacms/tinacms.git",
+    "url": "https://github.com/einstein/tinacms.git",
     "directory": "packages/@tinacms/scripts"
   },
   "bin": {
     "tinacms-scripts": "./bin/scripts.js"
   },
-  "keywords": [
-    "tinacms",
-    "rollup",
-    "typescript",
-    "build"
-  ],
+  "scripts": {
+    "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
+  },
+  "keywords": [],
   "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

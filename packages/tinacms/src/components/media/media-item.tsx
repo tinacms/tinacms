@@ -16,11 +16,9 @@ limitations under the License.
 
 */
 import React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { Media } from '@einsteinindustries/tinacms-core'
 import { Folder, File } from '@einsteinindustries/tinacms-icons'
-import { Button, IconButton } from '@einsteinindustries/tinacms-styles'
-import { TrashIcon } from '@einsteinindustries/tinacms-icons'
 
 interface MediaItemProps {
   item: Media
@@ -33,10 +31,15 @@ export function MediaItem({
   item,
   onClick,
   onSelect,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onDelete,
 }: MediaItemProps) {
   return (
-    <ListItem onClick={() => onClick(item)} type={item.type}>
+    <ListItem
+      onClick={() => (onSelect ? onSelect(item) : onClick(item))}
+      type={item.type}
+      data-content={item.filename}
+    >
       <ItemPreview>
         {item.previewSrc ? (
           <img src={item.previewSrc} alt={item.filename} />
@@ -44,19 +47,6 @@ export function MediaItem({
           <FileIcon type={item.type} />
         )}
       </ItemPreview>
-      <Filename>{item.filename}</Filename>
-      <ActionButtons>
-        {onSelect && item.type === 'file' && (
-          <Button small onClick={() => onSelect(item)}>
-            Insert
-          </Button>
-        )}
-        {onDelete && item.type === 'file' && (
-          <IconButton small onClick={() => onDelete(item)}>
-            <TrashIcon />
-          </IconButton>
-        )}
-      </ActionButtons>
     </ListItem>
   )
 }
@@ -70,7 +60,9 @@ interface ListItemProps {
 }
 
 const ListItem = styled.li<ListItemProps>`
+  width: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 1rem;
   background-color: white;
@@ -80,18 +72,56 @@ const ListItem = styled.li<ListItemProps>`
   margin-bottom: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
   min-height: 90px;
+  position: relative;
 
-  > :first-child {
-    margin-right: var(--tina-padding-small);
+  &:after {
+    content: 'Here is some text..';
+    color: #fff;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    transition: all 1s;
+    -webkit-transition: all 1s;
   }
 
-  &:hover {
-    filter: drop-shadow(var(--tina-shadow-small));
-    ${p =>
-      p.type === 'dir' &&
-      css`
-        cursor: pointer;
-      `}
+  &:after {
+    content: '\\A';
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    opacity: 0;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+  }
+
+  &:before {
+    position: absolute;
+    opacity: 0;
+    transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    content: attr(data-content);
+    width: 100%;
+    color: #fff;
+    z-index: 1;
+    bottom: 0;
+    padding: 4px 10px;
+    text-align: center;
+    background: var(--tina-color-primary-light);
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+  }
+
+  &:hover:after,
+  &:hover:before {
+    opacity: 0.9;
+    cursor: pointer;
   }
 
   @media screen and (min-width: 720px) {
@@ -104,13 +134,14 @@ const ListItem = styled.li<ListItemProps>`
 `
 
 const ItemPreview = styled.div`
-  width: 56px;
-  height: 56px;
+  width: 90%;
+  height: auto;
   border-radius: var(--tina-radius-small);
   overflow: hidden;
   display: flex;
   justify-content: center;
   flex-shrink: 0;
+  vertical-align: top;
 
   > img {
     object-fit: cover;
@@ -123,22 +154,5 @@ const ItemPreview = styled.div`
     width: 47%;
     height: 100%;
     fill: var(--tina-color-grey-4);
-  }
-`
-
-const Filename = styled.span`
-  flex-grow: 1;
-  font-size: var(--tina-font-size-2);
-  overflow: hidden;
-  width: 100%;
-  overflow-wrap: break-word;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-`
-
-const ActionButtons = styled.span`
-  display: flex;
-  > * {
-    margin-left: var(--tina-padding-small);
   }
 `
