@@ -2,6 +2,7 @@
   "name": "@tinacms/datalayer",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "typings": "dist/index.d.ts",
   "files": [
     "package.json",
