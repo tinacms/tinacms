@@ -24,12 +24,17 @@ import { ProsemirrorMenu as HistoryMenu } from '../../../plugins/History'
 import { ProsemirrorMenu as InlineMenu } from '../../../plugins/Inline'
 import { ProsemirrorMenu as ListMenu } from '../../../plugins/List'
 import { ProsemirrorMenu as QuoteMenu } from '../../../plugins/Blockquote'
-import { ProsemirrorMenu as HorizontalRule } from '../../../plugins/HorizontalRule'
+import { ProsemirrorMenu as HorizontalRule } from '../../../plugins/horizontalRule'
 import { ProsemirrorMenu as TableMenu } from '../../../plugins/Table'
 import { ProsemirrorMenu as ImageMenu } from '../../../plugins/Image'
 import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
 import { ProsemirrorMenu as AnchorMenu } from '../../../plugins/Anchor'
-import { AlignJustify, AlignRight, AlignLeft, AlignCenter } from '../../../plugins/TextAlignment'
+import {
+  AlignJustify,
+  AlignRight,
+  AlignLeft,
+  AlignCenter,
+} from '../../../plugins/TextAlignment'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
 import {
@@ -66,7 +71,7 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
         <TableMenu key="TableMenu" />,
         <QuoteMenu key="QuoteMenu" />,
         <CodeBlockMenu key="CodeBlockMenu" />,
-        <HorizontalRule key="HorizontalRule"/>,
+        <HorizontalRule key="HorizontalRule" />,
         <ListMenu key="ListMenu" />,
         <AlignLeft key="AlignLeft" />,
         <AlignCenter key="AlignCenter" />,

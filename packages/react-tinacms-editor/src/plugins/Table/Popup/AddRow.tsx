@@ -54,6 +54,7 @@ export default ({ index, marker, tableWidth, view }: AddRowProps) => {
       const cells = cellInNextRow?.map(cell =>
         table_cell.createAndFill({ ...cell.node.attrs })
       )
+      // @ts-ignore
       dispatch(state.tr.insert(position, table_row.create(null, cells)))
     }
     view.focus()

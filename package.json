@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
-    "build": "lerna run build --reject-cycles",
+    "build": "lerna run build --reject-cycles -- --legacy-peer-deps",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local -- --legacy-peer-deps",
     "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",

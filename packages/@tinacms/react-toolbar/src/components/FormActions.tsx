@@ -49,7 +49,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
           }}
         >
           {form?.actions &&
-            form.actions.map((Action, i) => (
+            form.actions.map((Action: any, i: number) => (
               // TODO: `i` will suppress warnings but this indicates that maybe
               //        Actions should just be components
               <Action form={form} key={i} />

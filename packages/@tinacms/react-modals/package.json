@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-react-modals",
-  "version": "0.43.21",
+  "version": "0.44.301",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -21,10 +21,10 @@
     "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-icons": "^0.43.21",
-    "@einsteinindustries/tinacms-react-core": "^0.43.21",
-    "@einsteinindustries/tinacms-scripts": "^0.43.21",
-    "@einsteinindustries/tinacms-styles": "^0.43.21"
+    "@einsteinindustries/tinacms-icons": "0.44.301",
+    "@einsteinindustries/tinacms-react-core": "0.44.301",
+    "@einsteinindustries/tinacms-scripts": "0.44.301",
+    "@einsteinindustries/tinacms-styles": "0.44.301"
   },
   "peerDependencies": {
     "@einsteinindustries/tinacms-icons": ">=0.7",
@@ -34,5 +34,5 @@
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

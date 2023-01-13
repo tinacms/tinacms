@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/tinacms-webpack-helpers",
-  "version": "0.43.21",
+  "version": "0.44.301",
   "license": "Apache-2.0",
   "main": "index.js",
   "repository": {
@@ -14,5 +14,6 @@
     "dev": "echo 'dev'",
     "generate-lock-file": "npm i --package-lock-only --legacy-peer-deps"
   },
-  "keywords": []
+  "keywords": [],
+  "gitHead": "7ca2737411a85354f4160ae75cf2916135bf2027"
 }

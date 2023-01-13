@@ -17,7 +17,14 @@ limitations under the License.
 */
 
 import arrayMutators from 'final-form-arrays'
-import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
+import {
+  FormApi,
+  createForm,
+  Config,
+  FormState,
+  FORM_ERROR,
+  Mutator,
+} from 'final-form'
 import { Plugin } from '@einsteinindustries/tinacms-core'
 import { Field, AnyField } from './field'
 
@@ -77,7 +84,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       mutators: {
         ...arrayMutators,
         ...options.mutators,
-      },
+      } as { [key: string]: Mutator<S, any> },
     })
 
     this._reset = reset

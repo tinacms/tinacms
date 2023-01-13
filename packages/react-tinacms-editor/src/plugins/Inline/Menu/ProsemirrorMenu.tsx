@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-// @ts-ignore
 import {
   BoldIcon,
   ItalicIcon,

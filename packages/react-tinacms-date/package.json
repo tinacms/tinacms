@@ -1,6 +1,6 @@
 {
   "name": "@einsteinindustries/react-tinacms-date",
-  "version": "0.43.21",
+  "version": "0.44.301",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -30,11 +30,11 @@
     "react-datetime": "^2.16.3"
   },
   "devDependencies": {
-    "@einsteinindustries/tinacms-fields": "^0.43.21",
-    "@einsteinindustries/tinacms-scripts": "^0.43.21"
+    "@einsteinindustries/tinacms-fields": "0.44.301",
+    "@einsteinindustries/tinacms-scripts": "0.44.301"
   },
   "peerDependencies": {
     "styled-components": ">=4.1"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "1de7b2eaf2ffcaef9921abb529302fb102e1ad46"
 }

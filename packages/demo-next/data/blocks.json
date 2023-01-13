@@ -1,0 +1,24 @@
+{
+  "title": "Page Builder Example",
+  "blocks": [
+    {
+      "_template": "cta",
+      "url": "",
+      "text": "Signup!"
+    },
+    {
+      "_template": "hero",
+      "text": "Spiderman"
+    },
+    {
+      "_template": "image",
+      "src": "/images/iceland-thumb.jpg",
+      "alt": "image alt text"
+    },
+    {
+      "_template": "wysiwyg",
+      "content": "# Hello World"
+    }
+  ],
+  "hero_image": "/images/davisco-5E5N49RWtbA-unsplash.jpg"
+}

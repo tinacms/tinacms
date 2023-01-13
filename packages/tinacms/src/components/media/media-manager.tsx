@@ -34,7 +34,7 @@ import {
   MediaListOffset,
   MediaListError,
 } from '@einsteinindustries/tinacms-core'
-// import path from 'path'
+
 import { Button } from '@einsteinindustries/tinacms-styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
@@ -211,10 +211,6 @@ export function MediaPicker({
   }, [offset, directory, cms.media.isConfigured, currentTab])
 
   const onClickMediaItem = (item: Media) => {
-    /*if (item.type === 'dir') {
-      setDirectory(path.join(item.directory, item.filename))
-      resetOffset()
-    }*/
     setItemModal(item)
   }
 

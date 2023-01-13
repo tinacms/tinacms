@@ -93,6 +93,13 @@ export function AddBlockMenu({
     return () => document.removeEventListener('mousedown', inactivateBlockMenu)
   }, [addBlockButtonRef])
 
+  const optionBlocks = Object.keys(blocks).filter(key => {
+    const { displayAsOption = true, label } = blocks[key].template
+    return (
+      displayAsOption && label.toLowerCase().includes(filterValue.toLowerCase())
+    )
+  })
+
   return (
     <AddBlockWrapper
       index={index}
@@ -124,40 +131,31 @@ export function AddBlockMenu({
           </DropdownHeader>
         )}
         <BlocksMenuOptions>
-          {Object.keys(blocks).filter(key => {
-            const label = blocks[key].template.label
-            return label.toLowerCase().includes(filterValue.toLowerCase())
-          }).length > 0 ? (
-            Object.keys(blocks)
-              .filter(key => {
-                const label = blocks[key].template.label
-                return label.toLowerCase().includes(filterValue.toLowerCase())
-              })
-              .map((key: string) => {
-                const template = blocks[key].template
+          {optionBlocks.length > 0 ? (
+            optionBlocks.map((key: string) => {
+              const template = blocks[key].template
+              if (!template) {
+                console.error(`No template for ${key} block exists`)
 
-                if (!template) {
-                  console.error(`No template for ${key} block exists`)
-
-                  return null
-                } else {
-                  return (
-                    <BlockOption
-                      key={template?.label}
-                      onClick={event => {
-                        event.stopPropagation()
-                        event.preventDefault()
-                        addBlock({
-                          _template: key,
-                          ...getDefaultProps(template?.defaultItem),
-                        })
-                      }}
-                    >
-                      {template?.label}
-                    </BlockOption>
-                  )
-                }
-              })
+                return null
+              } else {
+                return (
+                  <BlockOption
+                    key={template?.label}
+                    onClick={event => {
+                      event.stopPropagation()
+                      event.preventDefault()
+                      addBlock({
+                        _template: key,
+                        ...getDefaultProps(template?.defaultItem),
+                      })
+                    }}
+                  >
+                    {template?.label}
+                  </BlockOption>
+                )
+              }
+            })
           ) : (
             <BlockOption disabled>No blocks to display</BlockOption>
           )}

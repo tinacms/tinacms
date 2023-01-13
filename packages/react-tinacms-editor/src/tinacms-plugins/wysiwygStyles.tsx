@@ -31,7 +31,7 @@ export function wysiwygStyles(component: FC<any>) {
     position: relative;
 
     > [contenteditable] {
-      ${InputCss}
+      ${InputCss};
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       min-height: 200px;

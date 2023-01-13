@@ -46,7 +46,7 @@ import { DummyMediaStore } from './media-store.default'
  * #### Creating a CMS
  *
  * ```ts
- * import { CMS } from "@tinacms/core"
+ * import { CMS } from "@einsteinindustries/tinacms-core"
  *
  * const cms = new CMS()
  * ```
@@ -57,7 +57,7 @@ import { DummyMediaStore } from './media-store.default'
  * Creating a subclass is great way to facilitate these interactions:
  *
  * ```ts
- * import { CMS } from "@tinacms/core"
+ * import { CMS } from "@einsteinindustries/tinacms-core"
  *
  * class MyCMS extends CMS {
  *   get colors() {
@@ -108,7 +108,7 @@ export class CMS {
    * #### Example: Fetching Data Through an API
    *
    * ```ts
-   * import { CMS } from "@tinacms/core"
+   * import { CMS } from "@einsteinindustries/tinacms-core"
    * import { CoolApi } from "cool-api"
    *
    * const cms = new CMS()

@@ -18,14 +18,33 @@ _Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/abou
 To get started:
 
 ```bash
-git clone git@github.com:tinacms/tinacms.git
+git clone git@github.com:einstein/tinacms.git
 cd tinacms
-npm install
+## Easiest way is to use an existing docker image.
+docker run -e 'NODE_OPTIONS=--openssl-legacy-provider' -p 3000:3000 -w /app -v "${PWD}/:/app" -it --rm --name tina-dev node:17 /bin/bash
+npm ci --legacy-peer-deps
 npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
 npm run develop
+```
+
+### To publish package to Einstein's npm
+
+#### Before Publishing
+
+1. Don't forget to bump the version in lerna.json, and the packages you wish to publish following semantic versioning
+2. You will also need to manually go into each package and update intra dependencies' versions
+   - I've found that it's way easier to just keep a fixed version on all packages, so even if you update only one package, upping the version on every package and every intra dependency is much easier
+3. You have to commit your changes
+
+```bash
+# navigate back to tinacms root directory
+cd ../../
+npm login # follow prompts
+npm run build
+npm run lerna -- publish from-package --yes
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**

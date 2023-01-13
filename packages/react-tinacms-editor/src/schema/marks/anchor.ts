@@ -37,7 +37,8 @@ export const anchor = {
     },
   ],
   toDOM(node: Node) {
-    const {attrs} = node
+    const { attrs } = node
+    // @ts-ignore
     attrs.style = `color: red;`
     return ['a', attrs]
   },
