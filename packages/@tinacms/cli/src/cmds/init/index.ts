@@ -30,6 +30,7 @@ import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
 import { spin } from '../../utils/spinner'
+import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -256,6 +257,10 @@ const forestryMigrate = async ({
     forestryPath,
     rootPath,
   })
+
+  // print errors
+  ErrorSingleton.getInstance().printErrorNames()
+
   return JSON.stringify(collections, null, 2)
 }
 

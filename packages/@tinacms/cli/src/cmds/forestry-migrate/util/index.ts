@@ -17,7 +17,10 @@ import yaml from 'js-yaml'
 import z from 'zod'
 import type { TinaFieldInner, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
-import { dangerText, linkText, warnText } from '../../../utils/theme'
+import { warnText } from '../../../utils/theme'
+import { ErrorSingleton } from './errorSingleton'
+
+const errorSingletonInstance = ErrorSingleton.getInstance()
 
 export const stringifyName = (name: string, template: string) => {
   const testRegex = /^[a-zA-Z0-9_]*$/
@@ -27,13 +30,14 @@ export const stringifyName = (name: string, template: string) => {
     return name
   } else {
     const newName = name.replace(updateRegex, '_')
-    logger.error(
-      `${dangerText(
-        `Name, "${name}" used in Frontmatter template "${template}.yaml" must be alphanumeric and can only contain underscores.`
-      )}\n "${name}" will be updated to ${newName} in  TinaCMS if you wish to edit attribute ${name} you will have to update your content and code to use ${newName} instead. See ${linkText(
-        'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
-      )} for more information.`
-    )
+    errorSingletonInstance.addErrorName({ name, newName, template })
+    // logger.error(
+    //   `${dangerText(
+    //     `Name, "${name}" used in Frontmatter template "${template}.yaml" must be alphanumeric and can only contain underscores.`
+    //   )}\n "${name}" will be updated to ${newName} in  TinaCMS if you wish to edit attribute ${name} you will have to update your content and code to use ${newName} instead. See ${linkText(
+    //     'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
+    //   )} for more information.`
+    // )
 
     // replace everything that is not alphanumeric or underscore with an underscore
     return newName
