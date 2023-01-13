@@ -27,7 +27,7 @@
     "jest-file-snapshot": "^0.5.0",
     "js-base64": "^3.7.4",
     "mongodb": "^4.12.1",
-    "mongodb-level": "workspace:*",
+    "mongodb-level": "0.0.1",
     "next": "12.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
