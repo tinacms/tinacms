@@ -407,6 +407,7 @@ export class Resolver {
     isDeletion,
     isAddPendingDocument,
     isCollectionSpecific,
+    isUpdateName,
   }: {
     args: unknown
     collection?: string
@@ -415,6 +416,7 @@ export class Resolver {
     isDeletion?: boolean
     isAddPendingDocument?: boolean
     isCollectionSpecific?: boolean
+    isUpdateName?: boolean
   }) => {
     /**
      * `collectionName` is passed in:
@@ -469,15 +471,31 @@ export class Resolver {
           isAddPendingDocument,
         })
       }
-      if (isDeletion) {
+      // if we are deleting a document or updating its name we should check if it exists
+      if (isDeletion || isUpdateName) {
         if (!alreadyExists) {
           throw new Error(
             `Unable to delete document, ${realPath} does not exist`
           )
         }
+      }
+      if (isDeletion) {
         const doc = await this.getDocument(realPath)
         await this.deleteDocument(realPath)
         return doc
+      }
+      if (isUpdateName) {
+        assertShape<{ newRelativePath: string }>(args, (yup) =>
+          yup.object({ newRelativePath: yup.string().required() })
+        )
+        // Get the real document
+        const doc = await this.getDocument(realPath)
+        const newRealPath = path.join(collection?.path, args.newRelativePath)
+        // Update the document
+        await this.database.put(newRealPath, doc._rawData, collection.name)
+        // Delete the old document
+        await this.deleteDocument(realPath)
+        return this.getDocument(newRealPath)
       }
       /**
        * updateDocument, update<Collection>Document
