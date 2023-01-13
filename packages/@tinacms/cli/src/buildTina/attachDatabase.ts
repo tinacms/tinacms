@@ -45,7 +45,8 @@ export const attachDatabase = async (
     filename: 'database',
     allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
   })
-  if (inputFile && !_options.useLocalDatabase) {
+  // if (inputFile && !_options.useLocalDatabase) {
+  if (inputFile) {
     try {
       await transpile(
         inputFile,

@@ -16,7 +16,14 @@ limitations under the License.
 
 */
 
-import { parseMDX, stringifyMDX } from '@tinacms/mdx'
+// import { parseMDX, stringifyMDX } from '@tinacms/mdx'
 
-export { parseMDX }
-export { stringifyMDX }
+// export { parseMDX }
+// export { stringifyMDX }
+// MDX is bundled in a way that Nextjs doesn't like, fake it out for now
+export const parseMDX = () => {
+  return { type: 'root', children: [] }
+}
+export const stringifyMDX = () => {
+  return `### Hello World!`
+}
