@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FC } from 'react'
+import { FC, useEffect } from 'react'
 import { Form } from '../forms'
 import { Form as FinalForm } from 'react-final-form'
 
@@ -32,6 +32,10 @@ export interface FormBuilderProps {
   hideFooter?: boolean
   label?: string
   onPristineChange?: (_pristine: boolean) => unknown
+}
+
+interface FormKeyBindingsProps {
+  onSubmit: () => void
 }
 
 const NoFieldsPlaceholder = () => (
@@ -67,6 +71,24 @@ const NoFieldsPlaceholder = () => (
     </p>
   </div>
 )
+
+const FormKeyBindings: FC<FormKeyBindingsProps> = ({ onSubmit }) => {
+  // Submit when cmd/ctrl + s is pressed
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault()
+        onSubmit()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [onSubmit])
+
+  return null
+}
 
 export const FormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
@@ -151,9 +173,23 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         dirtySinceLastSubmit,
         hasValidationErrors,
       }) => {
+        const canSubmit =
+          !pristine &&
+          !submitting &&
+          !hasValidationErrors &&
+          !(invalid && !dirtySinceLastSubmit)
+
+        const safeHandleSubmit = () => {
+          if (canSubmit) {
+            handleSubmit()
+          }
+        }
+
         return (
           <>
             <DragDropContext onDragEnd={moveArrayItem}>
+              <FormKeyBindings onSubmit={safeHandleSubmit} />
+
               <FormPortalProvider>
                 <FormWrapper id={tinaForm.id}>
                   {tinaForm && tinaForm.fields.length ? (
@@ -179,13 +215,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       </ResetForm>
                     )}
                     <Button
-                      onClick={() => handleSubmit()}
-                      disabled={
-                        pristine ||
-                        submitting ||
-                        hasValidationErrors ||
-                        (invalid && !dirtySinceLastSubmit)
-                      }
+                      onClick={safeHandleSubmit}
+                      disabled={!canSubmit}
                       busy={submitting}
                       variant="primary"
                       style={{ flexGrow: 3 }}
@@ -254,8 +285,18 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
         onSubmit={tinaForm.onSubmit}
       >
         {({ handleSubmit, pristine, invalid, submitting }) => {
+          const canSubmit = !pristine && !submitting && !invalid
+
+          const safeHandleSubmit = () => {
+            if (canSubmit) {
+              handleSubmit()
+            }
+          }
+
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
+              <FormKeyBindings onSubmit={safeHandleSubmit} />
+
               <div className="w-full h-screen flex flex-col items-center">
                 <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
                   {label && (
@@ -278,8 +319,8 @@ export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
                       </ResetForm>
                     )}
                     <Button
-                      onClick={() => handleSubmit()}
-                      disabled={pristine || submitting || invalid}
+                      onClick={safeHandleSubmit}
+                      disabled={!canSubmit}
                       busy={submitting}
                       variant="primary"
                       style={{ flexBasis: '10rem' }}
@@ -340,7 +381,7 @@ export const FormWrapper = ({ children, id }) => {
   return (
     <div
       data-test={`form:${id?.replace(/\\/g, '/')}`}
-      className="h-full overflow-y-auto max-h-full bg-gray-50 py-5 px-6"
+      className="h-full overflow-y-auto max-h-full bg-gray-50 pt-6 px-6 pb-2"
     >
       <div className="w-full flex justify-center">
         <div className="w-full max-w-form">{children}</div>
