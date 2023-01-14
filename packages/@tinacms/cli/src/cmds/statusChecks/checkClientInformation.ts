@@ -89,7 +89,7 @@ export const checkClientInfo = async (
   _options: { verbose?: boolean }
 ) => {
   if (ctx.isSelfHostedDatabase) {
-    next()
+    return next()
   }
 
   const config = ctx.schema?.config

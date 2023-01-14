@@ -527,7 +527,7 @@ export const buildIt = async (entryPoint, packageJSON) => {
         bundle: true,
         format: 'esm',
         outfile: appMDXPath,
-        external,
+        external: Object.keys({ ...peerDeps }),
       })
     } else {
       await esbuild({

@@ -48,9 +48,12 @@ export const waitForDB = async (
   options: { verbose?: boolean }
 ) => {
   const token = ctx.schema.config.token
+  if (ctx.isSelfHostedDatabase) {
+    return next()
+  }
   const { clientId, branch, isLocalClient, host } = parseURL(ctx.apiUrl)
 
-  if (isLocalClient || ctx.isSelfHostedDatabase) {
+  if (isLocalClient) {
     return next()
   }
   const bar = new Progress(
