@@ -473,9 +473,17 @@ export const buildIt = async (entryPoint, packageJSON) => {
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
         ),
       })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        external,
+      })
     } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
       const peerDeps = packageJSON.peerDependencies
-      const external = Object.keys({ ...peerDeps })
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
@@ -486,6 +494,15 @@ export const buildIt = async (entryPoint, packageJSON) => {
         target: 'node12',
         format: 'cjs',
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
+        external: Object.keys({ ...peerDeps }),
+      })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
         external,
       })
       /**
