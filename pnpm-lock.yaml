@@ -204,7 +204,6 @@ importers:
       '@types/react': ^17.0.35
       autoprefixer: ^10.4.0
       date-fns: ^2.23.0
-      memory-level: ^1.0.0
       next: 12.2.4
       next-tinacms-cloudinary: workspace:*
       postcss: ^8.3.11
@@ -225,7 +224,6 @@ importers:
       '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
       '@tinacms/graphql': link:../../packages/@tinacms/graphql
       date-fns: 2.28.0
-      memory-level: 1.0.0
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       next-tinacms-cloudinary: link:../../packages/next-tinacms-cloudinary
       react: 17.0.2
