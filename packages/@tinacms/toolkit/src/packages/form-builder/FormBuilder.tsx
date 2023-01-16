@@ -136,57 +136,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   }, [finalForm])
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
-  const cms = useCMS()
-  const id: string = tinaForm.id
-  const schema = cms.api.tina.schema
-  const collection = schema.getCollectionByFullPath(id)
 
-  const renameDocument = async () => {
-    // Dummy new name until we have UI
-    const newName = 'foobar.mdx'
-
-    const mutationString = `#graphql
-              mutation RenameDocument($collection: String!, $relativePath: String! $newRelativePath: String!) {
-                 updateDocumentName(collection: $collection, relativePath: $relativePath, newRelativePath: $newRelativePath){
-    __typename
-  }
-              }
-            `
-    try {
-      // Rename the document
-      await cms.api.tina.request(mutationString, {
-        variables: {
-          collection: collection.name,
-          // Not sure if this is the best way to get the relative path
-          relativePath: id.replace(collection.path, ''),
-          // Dummy new name
-          newRelativePath: newName,
-        },
-      })
-      cms.alerts.success('Document saved!')
-    } catch (e) {
-      cms.alerts.error('There was a problem saving your document')
-      console.error(e)
-    }
-  }
-
-  const deleteDocument = async () => {
-    const mutationString = `#graphql
-              mutation DeleteDocument($collection: String!, $relativePath: String!) {
-                deleteDocument(collection: $collection, relativePath: $relativePath) {
-                  __typename
-                }
-              }
-            `
-
-    await cms.api.tina.request(mutationString, {
-      variables: {
-        collection: collection.name,
-        // Not sure if this is the best way to get the relative path
-        relativePath: id.replace(collection.path, ''),
-      },
-    })
-  }
+  // This will be needed when we add rename and delete functionality to this page
+  // const cms = useCMS()
+  // const id: string = tinaForm.id
+  // const schema = cms.api.tina.schema
+  // const collection = schema.getCollectionByFullPath(id)
 
   return (
     <FinalForm
@@ -243,39 +198,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
-                    </Button>
-                    {/* TODO: add UI */}
-                    <Button
-                      onClick={async () => {
-                        await deleteDocument()
-                      }}
-                      disabled={
-                        submitting ||
-                        hasValidationErrors ||
-                        (invalid && !dirtySinceLastSubmit)
-                      }
-                      busy={submitting}
-                      variant="danger"
-                      style={{ flexGrow: 3 }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && 'Delete'}
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        await renameDocument()
-                      }}
-                      disabled={
-                        submitting ||
-                        hasValidationErrors ||
-                        (invalid && !dirtySinceLastSubmit)
-                      }
-                      busy={submitting}
-                      variant="danger"
-                      style={{ flexGrow: 3 }}
-                    >
-                      {submitting && <LoadingDots />}
-                      {!submitting && 'Rename Document'}
                     </Button>
                     {tinaForm.actions.length > 0 && (
                       <FormActionMenu

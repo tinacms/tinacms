@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiTrash } from 'react-icons/bi'
+import { BiEdit, BiPlus, BiTrash, BiRename } from 'react-icons/bi'
 import {
   useParams,
   Link,
@@ -31,6 +31,7 @@ import {
   TinaCMS,
   OverflowMenu,
   Select,
+  BaseTextField,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -139,10 +140,12 @@ const handleNavigate = (
 const CollectionListPage = () => {
   const navigate = useNavigate()
   const { collectionName } = useParams()
-  const [open, setOpen] = React.useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false)
+  const [renameModalOpen, setRenameModalOpen] = React.useState(false)
   const [vars, setVars] = React.useState({
     collection: collectionName,
     relativePath: '',
+    newRelativePath: '',
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -209,7 +212,7 @@ const CollectionListPage = () => {
               return (
                 <PageWrapper>
                   <>
-                    {open && (
+                    {deleteModalOpen && (
                       <DeleteModal
                         filename={vars.relativePath}
                         deleteFunc={async () => {
@@ -225,7 +228,39 @@ const CollectionListPage = () => {
                             throw error
                           }
                         }}
-                        close={() => setOpen(false)}
+                        close={() => setDeleteModalOpen(false)}
+                      />
+                    )}
+
+                    {renameModalOpen && (
+                      <RenameModal
+                        filename={vars.relativePath}
+                        newRelativePath={vars.newRelativePath}
+                        setNewRelativePath={(newRelativePath) => {
+                          setVars((vars) => {
+                            return { ...vars, newRelativePath }
+                          })
+                        }}
+                        renameFunc={async () => {
+                          // add the file extension
+                          const newRelativePath = `${vars.newRelativePath}.${collection.format}`
+                          try {
+                            await admin.renameDocument({
+                              collection: vars.collection,
+                              relativePath: vars.relativePath,
+                              newRelativePath,
+                            })
+                            cms.alerts.info('Document was successfully renamed')
+                            reFetchCollection()
+                          } catch (error) {
+                            cms.alerts.warn(
+                              'Document was not renamed, ask a developer for help or check the console for an error message'
+                            )
+                            console.error(error)
+                            throw error
+                          }
+                        }}
+                        close={() => setRenameModalOpen(false)}
                       />
                     )}
 
@@ -429,8 +464,31 @@ const CollectionListPage = () => {
                                                     '/'
                                                   ) +
                                                   document.node._sys.extension,
+                                                newRelativePath: '',
                                               })
-                                              setOpen(true)
+                                              setDeleteModalOpen(true)
+                                            },
+                                          },
+                                          allowDelete && {
+                                            name: 'rename',
+                                            label: 'Rename',
+                                            Icon: (
+                                              <BiRename
+                                                size="1.3rem"
+                                                className="text-red-500"
+                                              />
+                                            ),
+                                            onMouseDown: () => {
+                                              setVars({
+                                                collection: collectionName,
+                                                relativePath:
+                                                  document.node._sys.breadcrumbs.join(
+                                                    '/'
+                                                  ) +
+                                                  document.node._sys.extension,
+                                                newRelativePath: '',
+                                              })
+                                              setRenameModalOpen(true)
                                             },
                                           },
                                         ].filter(Boolean)}
@@ -505,6 +563,55 @@ const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
             }}
           >
             Delete
+          </Button>
+        </ModalActions>
+      </PopupModal>
+    </Modal>
+  )
+}
+
+interface RenameModalProps {
+  close(): void
+  renameFunc(): void
+  filename: string
+  setNewRelativePath(newRelativePath: string): void
+  newRelativePath: string
+}
+
+const RenameModal = ({
+  close,
+  renameFunc,
+  filename,
+  newRelativePath,
+  setNewRelativePath,
+}: RenameModalProps) => {
+  return (
+    <Modal>
+      <PopupModal>
+        <ModalHeader close={close}>Rename {filename}</ModalHeader>
+        <ModalBody padded={true}>
+          <>
+            <p>{`Are you sure you want to rename ${filename}? TinaCMS uses the filename as the ID. Renaming this file could result in unresolved references`}</p>
+            <BaseTextField
+              placeholder="Enter a new name for the document's file"
+              value={newRelativePath}
+              onChange={(event) => setNewRelativePath(event.target.value)}
+            ></BaseTextField>
+          </>
+        </ModalBody>
+        <ModalActions>
+          <Button style={{ flexGrow: 2 }} onClick={close}>
+            Cancel
+          </Button>
+          <Button
+            style={{ flexGrow: 3 }}
+            variant="primary"
+            onClick={async () => {
+              await renameFunc()
+              close()
+            }}
+          >
+            Rename
           </Button>
         </ModalActions>
       </PopupModal>
