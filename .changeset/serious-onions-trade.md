@@ -1,5 +1,6 @@
 ---
 '@tinacms/cli': minor
+'@tinacms/schema-tools': minor
 '@tinacms/datalayer': minor
 '@tinacms/graphql': minor
 '@tinacms/mdx': minor
