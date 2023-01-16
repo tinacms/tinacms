@@ -23,7 +23,7 @@ import styles from './styles.css'
 import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { useTina } from './edit-state'
-import { parseURL } from './utils/parseUrl'
+import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
 
 const errorButtonStyles = {

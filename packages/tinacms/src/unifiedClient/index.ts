@@ -85,48 +85,13 @@ export class TinaClient<GenQueries> {
     if (json.errors) {
       throw new Error(
         `Unable to fetch, please see our FAQ for more information: https://tina.io/docs/errors/faq/
-  
+
         Errors: \n\t${json.errors.map((error) => error.message).join('\n')}`
       )
     }
     return {
       data: json?.data as DataType,
       query: args.query,
-    }
-  }
-
-  public parseURL = (overrideUrl: string): TinaClientURLParts => {
-    const url = overrideUrl || this.apiUrl
-    if (url.includes('localhost')) {
-      return {
-        host: 'localhost',
-        branch: null,
-        isLocalClient: true,
-        clientId: null,
-      }
-    }
-
-    const params = new URL(url)
-    const pattern = new UrlPattern('/content/:clientId/github/*', {
-      escapeChar: ' ',
-    })
-    const result = pattern.match(params.pathname)
-    const branch = result?._
-    const clientId = result?.clientId
-
-    if (!branch || !clientId) {
-      throw new Error(
-        `Invalid URL format provided. Expected: https://${TINA_HOST}/content/<ClientID>/github/<Branch> but but received ${url}`
-      )
-    }
-
-    // TODO if !result || !result.clientId || !result.branch, throw an error
-
-    return {
-      host: params.host,
-      clientId,
-      branch,
-      isLocalClient: false,
     }
   }
 }

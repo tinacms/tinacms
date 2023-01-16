@@ -14,12 +14,35 @@ limitations under the License.
 import UrlPattern from 'url-pattern'
 export const TINA_HOST = 'content.tinajs.io'
 
-export const parseURL = (url: string): { branch; isLocalClient; clientId } => {
+export const parseURL = (
+  url: string
+): {
+  branch: string | null
+  isLocalClient: boolean
+  clientId: string | null
+  host: string | null
+} => {
   if (url.includes('localhost')) {
-    return { branch: null, isLocalClient: true, clientId: null }
+    return {
+      branch: null,
+      isLocalClient: true,
+      clientId: null,
+      host: 'localhost',
+    }
   }
 
   const params = new URL(url)
+
+  // This is a self-hosted URL
+  if (!['tinajs.dev', 'tina.io'].find((item) => params.host.includes(item))) {
+    return {
+      branch: null,
+      isLocalClient: true,
+      clientId: null,
+      host: params.host,
+    }
+  }
+
   const pattern = new UrlPattern('/content/:clientId/github/*', {
     escapeChar: ' ',
   })
@@ -36,6 +59,7 @@ export const parseURL = (url: string): { branch; isLocalClient; clientId } => {
   // TODO if !result || !result.clientId || !result.branch, throw an error
 
   return {
+    host: params.host,
     branch,
     clientId,
     isLocalClient: false,

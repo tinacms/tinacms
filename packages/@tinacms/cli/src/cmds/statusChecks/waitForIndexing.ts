@@ -12,8 +12,7 @@ limitations under the License.
 */
 
 import Progress from 'progress'
-import UrlPattern from 'url-pattern'
-import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { parseURL, TinaCloudSchema } from '@tinacms/schema-tools'
 
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
@@ -128,47 +127,4 @@ export const waitForDB = async (
     text: 'Checking indexing process in Tina Cloud...',
     waitFor: pollForStatus,
   })
-}
-
-// this was copied from packages/tinacms/src/utils/parseURL.ts
-// TODO: maybe we should move this to its own "util" package
-export const parseURL = (
-  url: string
-): {
-  branch: string
-  isLocalClient: boolean
-  clientId: string
-  host: string
-} => {
-  if (url.includes('localhost')) {
-    return {
-      host: 'localhost',
-      branch: null,
-      isLocalClient: true,
-      clientId: null,
-    }
-  }
-
-  const params = new URL(url)
-  const pattern = new UrlPattern('/content/:clientId/github/*', {
-    escapeChar: ' ',
-  })
-  const result = pattern.match(params.pathname)
-  const branch = result?._
-  const clientId = result?.clientId
-
-  if (!branch || !clientId) {
-    throw new Error(
-      `Invalid URL format provided. Expected: https://content.tinajs.io/content/<ClientID>/github/<Branch> but but received ${url}`
-    )
-  }
-
-  // TODO if !result || !result.clientId || !result.branch, throw an error
-
-  return {
-    host: params.host,
-    clientId,
-    branch,
-    isLocalClient: false,
-  }
 }
