@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import fetchPonyfill from 'fetch-ponyfill'
-import UrlPattern from 'url-pattern'
 
 const { fetch, Headers } = fetchPonyfill()
 
