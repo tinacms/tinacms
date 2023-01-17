@@ -18,8 +18,8 @@ export const AUTH_TOKEN_KEY = 'tinacms-auth'
 
 export type TokenObject = {
   id_token: string
-  access_token: string
-  refresh_token: string
+  access_token?: string
+  refresh_token?: string
 }
 export const authenticate = (
   clientId: string,

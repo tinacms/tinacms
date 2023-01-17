@@ -154,6 +154,10 @@ export class Client {
         this.getToken = options.getTokenFn
         break
     }
+    // if the user provides a getToken function in the config we can use that
+    if (options.schema?.config?.admin?.auth?.getToken) {
+      this.getToken = options.schema?.config?.admin?.auth?.getToken
+    }
   }
 
   public get isLocalMode() {

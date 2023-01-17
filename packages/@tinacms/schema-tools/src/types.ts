@@ -521,8 +521,8 @@ export interface Schema {
 
 export type TokenObject = {
   id_token: string
-  access_token: string
-  refresh_token: string
+  access_token?: string
+  refresh_token?: string
 }
 
 export interface Config<
@@ -534,6 +534,7 @@ export interface Config<
   contentApiUrlOverride?: string
   admin?: {
     auth?: {
+      getToken: () => Promise<TokenObject | null>
       onLogin?: (args: { token: TokenObject }) => Promise<void>
       onLogout?: () => Promise<void>
       logout?: () => Promise<void>

@@ -2,9 +2,15 @@ import { defineConfig } from 'tinacms'
 
 export default defineConfig({
   // Example of how you can override the frontend url
-  contentApiUrlOverride: 'http://localhost:3000/api/gql',
+  // contentApiUrlOverride: 'http://localhost:3000/api/gql',
   admin: {
     auth: {
+      // Get token function examples (can be removed)
+      getToken: async () => {
+        return {
+          id_token: 'Foo',
+        }
+      },
       // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
       async authenticate() {
         console.log('Authenticating...')
