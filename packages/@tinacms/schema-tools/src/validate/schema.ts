@@ -39,7 +39,14 @@ const Template = z
 
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
-  name: name,
+  name: name.superRefine((val, ctx) => {
+    if (val === 'relativePath') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `name cannot be 'relativePath'. 'relativePath' is a reserved field name.`,
+      })
+    }
+  }),
   format: z.enum(FORMATS).optional(),
 })
 

@@ -485,12 +485,19 @@ export class Resolver {
         return doc
       }
       if (isUpdateName) {
-        assertShape<{ newRelativePath: string }>(args, (yup) =>
-          yup.object({ newRelativePath: yup.string().required() })
+        // Must provide a new relative path in the params
+        assertShape<{ params: string }>(args, (yup) =>
+          yup.object({ params: yup.object().required() })
+        )
+        assertShape<{ relativePath: string }>(args?.params, (yup) =>
+          yup.object({ relativePath: yup.string().required() })
         )
         // Get the real document
         const doc = await this.getDocument(realPath)
-        const newRealPath = path.join(collection?.path, args.newRelativePath)
+        const newRealPath = path.join(
+          collection?.path,
+          args.params.relativePath
+        )
         // Update the document
         await this.database.put(newRealPath, doc._rawData, collection.name)
         // Delete the old document

@@ -241,7 +241,6 @@ export const resolve = async ({
                   'createDocument',
                   'updateDocument',
                   'deleteDocument',
-                  'updateDocumentName',
                 ].includes(info.fieldName)
               ) {
                 /**
@@ -254,7 +253,7 @@ export const resolve = async ({
                   isCreation,
                   // Right now this is the only case for deletion
                   isDeletion: info.fieldName === 'deleteDocument',
-                  isUpdateName: info.fieldName === 'updateDocumentName',
+                  isUpdateName: Boolean(args?.params?.relativePath),
                   isAddPendingDocument: false,
                   isCollectionSpecific: false,
                 })

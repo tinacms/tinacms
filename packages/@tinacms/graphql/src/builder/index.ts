@@ -418,46 +418,6 @@ export class Builder {
       type: astBuilder.TYPES.MultiCollectionDocument,
     })
   }
-
-  /**
-   * ```graphql
-   * # ex.
-   * {
-   *   deleteDocument(relativePath: $relativePath, params: $params) {
-   *     id
-   *     data {...}
-   *   }
-   * }
-   * ```
-   *
-   * @param collections
-   */
-  public buildUpdateNameCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
-    return astBuilder.FieldDefinition({
-      name: 'updateDocumentName',
-      args: [
-        astBuilder.InputValueDefinition({
-          name: 'collection',
-          required: false,
-          type: astBuilder.TYPES.String,
-        }),
-        astBuilder.InputValueDefinition({
-          name: 'relativePath',
-          required: true,
-          type: astBuilder.TYPES.String,
-        }),
-        astBuilder.InputValueDefinition({
-          name: 'newRelativePath',
-          required: true,
-          type: astBuilder.TYPES.String,
-        }),
-      ],
-      required: true,
-      type: astBuilder.TYPES.MultiCollectionDocument,
-    })
-  }
   /**
    * ```graphql
    * # ex.
@@ -1215,17 +1175,24 @@ export class Builder {
     namespace: string[]
     collections: string[]
   }) => {
+    const fields = await sequential(
+      this.tinaSchema.getCollectionsByName(field.collections),
+      async (collection) => {
+        return astBuilder.InputValueDefinition({
+          name: collection.name,
+          type: NAMER.dataMutationTypeName([collection.name]),
+        })
+      }
+    )
+    fields.push(
+      astBuilder.InputValueDefinition({
+        name: 'relativePath',
+        type: astBuilder.TYPES.String,
+      })
+    )
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(field.namespace),
-      fields: await sequential(
-        this.tinaSchema.getCollectionsByName(field.collections),
-        async (collection) => {
-          return astBuilder.InputValueDefinition({
-            name: collection.name,
-            type: NAMER.dataMutationTypeName([collection.name]),
-          })
-        }
-      ),
+      fields,
     })
   }
 

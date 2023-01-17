@@ -36,7 +36,7 @@ export class TinaAdminApi {
     await this.api.request(
       `#graphql
               mutation RenameDocument($collection: String!, $relativePath: String! $newRelativePath: String!) {
-                 updateDocumentName(collection: $collection, relativePath: $relativePath, newRelativePath: $newRelativePath){
+                updateDocument(collection: $collection, relativePath: $relativePath, params: {relativePath: $newRelativePath}){
     __typename
   }
               }

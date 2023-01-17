@@ -224,9 +224,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   mutationTypeDefinitionFields.push(
     await builder.buildCreateCollectionDocumentMutation(collections)
   )
-  mutationTypeDefinitionFields.push(
-    await builder.buildUpdateNameCollectionDocumentMutation(collections)
-  )
 
   /**
    * Collection queries/mutations/fragments
