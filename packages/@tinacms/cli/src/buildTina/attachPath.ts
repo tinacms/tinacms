@@ -15,9 +15,7 @@ import { pathExists } from 'fs-extra'
 import path from 'path'
 
 export const attachPath = async (ctx: any, next: () => void, options: any) => {
-  ctx.rootPath = options.rootPath
-    ? path.join(process.cwd(), options.rootPath)
-    : process.cwd()
+  ctx.rootPath = options.rootPath || process.cwd()
 
   ctx.usingTs = await isProjectTs(ctx.rootPath)
   next()

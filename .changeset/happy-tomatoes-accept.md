@@ -15,7 +15,7 @@ Tina now supports serving content from a separate Git repo.
 To enable this during local development, point
 this config at the root of the content repo.
 
-> NOTE: Relative paths are fine to use here, but you should use an environment variable for this, as each developer on your team may have a different location to the path.
+> NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
 
 ```ts
 localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
