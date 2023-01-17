@@ -261,9 +261,9 @@ export class ConfigBuilder {
     // we add it here.
     if (
       this.database.bridge.addOutputPath &&
-      compiledSchema.config?.remote?.rootPath
+      compiledSchema.config?.localContentPath
     ) {
-      this.database.bridge.addOutputPath(compiledSchema.config.remote.rootPath)
+      this.database.bridge.addOutputPath(compiledSchema.config.localContentPath)
     }
 
     const { graphQLSchema, tinaSchema } = await buildSchema(

@@ -575,14 +575,10 @@ export interface Config<
    * location to the path.
    *
    * ```ts
-   * remote: {
-   *   rootPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
-   * }
+   * localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
    * ```
    */
-  remote?: {
-    rootPath?: string
-  }
+  localContentPath?: string
   /**
    * Tina is compiled as a single-page app and placed in the public directory
    * of your application.
