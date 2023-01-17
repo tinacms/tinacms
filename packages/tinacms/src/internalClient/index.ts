@@ -587,13 +587,11 @@ export class LocalClient extends Client {
   }
 
   async authenticate() {
-    console.log('not working authenticate')
     localStorage.setItem(LOCAL_CLIENT_KEY, 'true')
     return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' }
   }
 
   async getUser(): Promise<boolean> {
-    console.log('not working getUser')
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
 }
