@@ -259,7 +259,7 @@ const forestryMigrate = async ({
   })
 
   // print errors
-  ErrorSingleton.getInstance().printErrorNames()
+  ErrorSingleton.getInstance().printNameErrors()
 
   return JSON.stringify(collections, null, 2)
 }

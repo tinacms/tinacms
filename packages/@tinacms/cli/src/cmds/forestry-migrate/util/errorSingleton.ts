@@ -53,7 +53,7 @@ export class ErrorSingleton {
   public addErrorName(error: NameError) {
     this.allErrorNames.push(error)
   }
-  public printErrorNames() {
+  public printNameErrors() {
     logger.error(
       dangerText('ERROR: TinaCMS only supports alphanumeric field names')
     )
