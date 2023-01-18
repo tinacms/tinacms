@@ -28,7 +28,7 @@ import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'
 import type { TinaCMSProviderDefaultProps } from './types/cms'
 export type { TinaCMSProviderDefaultProps }
 export default TinaCMSProvider2
-import { TinaCMS } from '@tinacms/toolkit'
+import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { validateSchema } from '@tinacms/schema-tools'
@@ -97,7 +97,8 @@ export const defineStaticConfig = (
   config: Config<
     (cms: TinaCMS) => TinaCMS,
     formifyCallback,
-    DocumentCreatorCallback
+    DocumentCreatorCallback,
+    MediaStore
   >
 ) => {
   if (!config.schema) {
