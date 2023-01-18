@@ -41,16 +41,30 @@ interface Options {
   command?: string
   watchFolders?: string[]
   noWatch?: boolean
-  noSDK: boolean
-  noTelemetry: boolean
+  noSDK?: boolean
+  noTelemetry?: boolean
   verbose?: boolean
   dev?: boolean
-  local: boolean
+  // local: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 
-export async function startServer(
+export async function startServer(args: {
+  context: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+    schema?: TinaCloudSchema<false>
+  }
+  options: Options
+}) {
+  await startServerInner(args.context, () => {}, args.options)
+  return args.context
+}
+export async function startServerInner(
   ctx: {
     builder: ConfigBuilder
     rootPath: string

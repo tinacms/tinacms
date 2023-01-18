@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { createDatabase } from '@tinacms/graphql'
+import { createDatabase, Database } from '@tinacms/graphql'
 
 import {
   AuditFileSystemBridge,
@@ -28,16 +28,24 @@ import { neutralText } from '../../utils/theme'
 
 const rootPath = process.cwd()
 
-export const audit = async (ctx: any, next: () => void, options) => {
-  const telemetry = new Telemetry({ disabled: options.noTelemetry })
+export const audit = async (args: {
+  context: { database: Database }
+  options: {
+    noTelemetry?: boolean
+    clean?: boolean
+    useDefaultValues?: boolean
+    verbose?: boolean
+  }
+}) => {
+  const telemetry = new Telemetry({ disabled: args.options.noTelemetry })
   await telemetry.submitRecord({
     event: {
       name: 'tinacms:cli:audit:invoke',
-      clean: Boolean(options.clean),
-      useDefaults: Boolean(options.useDefaultValues),
+      clean: Boolean(args.options.clean),
+      useDefaults: Boolean(args.options.useDefaultValues),
     },
   })
-  if (options.clean) {
+  if (args.options.clean) {
     logger.info(
       `You are using the \`--clean\` option. This will modify your content as if a user is submitting a form. Before running this you should have a ${chalk.bold(
         'clean git tree'
@@ -53,7 +61,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
       process.exit(0)
     }
   }
-  if (options.useDefaultValues && !options.clean) {
+  if (args.options.useDefaultValues && !args.options.clean) {
     logger.warn(
       chalk.yellowBright(
         'WARNING: using the `--useDefaultValues` without the `--clean` flag has no effect. Please re-run audit and add the `--clean` flag'
@@ -61,7 +69,7 @@ export const audit = async (ctx: any, next: () => void, options) => {
     )
   }
 
-  const database = ctx.database
+  const database = args.context.database
   const schema = await database.getSchema()
   const collections = schema.getCollections()
   let error = false
@@ -81,30 +89,30 @@ export const audit = async (ctx: any, next: () => void, options) => {
       collection,
       database,
       rootPath,
-      useDefaultValues: options.useDefaultValues,
+      useDefaultValues: args.options.useDefaultValues,
       documents: docs.edges,
-      verbose: ctx.verbose,
+      verbose: args.options.verbose,
     })
     error = error || returnError
   }
-  ctx.error = error
-
-  next()
+  return {
+    ...args.context,
+    error,
+  }
 }
 
-export const printFinalMessage = async (
-  ctx: any,
-  next: () => void,
-  _options
-) => {
-  if (ctx.error) {
+export const printFinalMessage = async (args: {
+  context: { error?: boolean; warning?: boolean }
+  options: {}
+}) => {
+  if (args.context.error) {
     logger.error(
       chalk.redBright(`‼️ Audit ${chalk.bold('failed')} with errors`)
     )
-  } else if (ctx.warning) {
+  } else if (args.context.warning) {
     logger.warn(chalk.yellowBright('⚠️ Audit passed with warnings'))
   } else {
     logger.info(chalk.greenBright('✅ Audit passed'))
   }
-  next()
+  return args.context
 }

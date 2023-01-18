@@ -15,11 +15,11 @@ import { logger } from '../../logger'
 import childProcess from 'child_process'
 import { dangerText } from '../../utils/theme'
 
-interface Options {
-  command?: string
-}
-
-export const startSubprocess = async (_ctx, next, { command }: Options) => {
+export const startSubprocess = async (args: {
+  context: object
+  options: { command?: string }
+}) => {
+  const command = args.options?.command
   if (typeof command === 'string') {
     const commands = command.split(' ')
     const firstCommand = commands[0]

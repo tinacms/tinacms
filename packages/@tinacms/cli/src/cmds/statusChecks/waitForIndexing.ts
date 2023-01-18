@@ -40,8 +40,8 @@ class IndexFailedError extends Error {
   }
 }
 
-export const waitForDB = async (
-  ctx: {
+export const waitForDB = async (args: {
+  context: {
     builder: ConfigBuilder
     rootPath: string
     database: Database
@@ -49,15 +49,16 @@ export const waitForDB = async (
     usingTs: boolean
     schema?: TinaCloudSchema<true>
     apiUrl: string
-  },
-  next,
+  }
   options: { verbose?: boolean }
-) => {
-  const token = ctx.schema.config.token
-  const { clientId, branch, isLocalClient, host } = parseURL(ctx.apiUrl)
+}) => {
+  const token = args.context.schema.config.token
+  const { clientId, branch, isLocalClient, host } = parseURL(
+    args.context.apiUrl
+  )
 
   if (isLocalClient) {
-    return next()
+    return args.context
   }
   const bar = new Progress(
     'Checking indexing process in Tina Cloud... :prog',
@@ -66,7 +67,7 @@ export const waitForDB = async (
 
   const pollForStatus = async () => {
     try {
-      if (options.verbose) {
+      if (args.options.verbose) {
         logger.info(logText('Polling for status...'))
       }
       const headers = new Headers()
@@ -92,11 +93,11 @@ export const waitForDB = async (
         bar.tick({
           prog: '✅',
         })
-        return next()
+        return args.context
 
         // Index Inprogress
       } else if (status === STATUS_INPROGRESS) {
-        if (options.verbose) {
+        if (args.options.verbose) {
           logger.info(logText(`${statusMessage}, trying again in 5 seconds`))
         }
         setTimeout(pollForStatus, POLLING_INTERVAL)

@@ -14,11 +14,16 @@
 import { pathExists } from 'fs-extra'
 import path from 'path'
 
-export const attachPath = async (ctx: any, next: () => void, options: any) => {
-  ctx.rootPath = options.rootPath || process.cwd()
-
-  ctx.usingTs = await isProjectTs(ctx.rootPath)
-  next()
+export const attachPath = async <C extends object>(args: {
+  context: C
+  options: { rootPath?: string }
+}): Promise<C & { rootPath: string; usingTs: boolean }> => {
+  const rootPath = args.options.rootPath || process.cwd()
+  return {
+    ...args.context,
+    rootPath,
+    usingTs: await isProjectTs(rootPath),
+  }
 }
 
 export const isProjectTs = async (rootPath: string) => {

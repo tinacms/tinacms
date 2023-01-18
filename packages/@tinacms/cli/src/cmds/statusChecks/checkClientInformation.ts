@@ -73,22 +73,21 @@ async function request<DataType extends Record<string, any> = any>(args: {
   }
 }
 
-export const checkClientInfo = async (
-  ctx: {
+export const checkClientInfo = async (args: {
+  context: {
     builder: ConfigBuilder
     rootPath: string
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema<false>
+    schema?: TinaCloudSchema<true>
     apiUrl: string
-  },
-  next,
-  _options: { verbose?: boolean }
-) => {
-  const config = ctx.schema?.config
+  }
+  options: { verbose?: boolean }
+}) => {
+  const config = args.context.schema?.config
   const token = config.token
-  const url = ctx.apiUrl
+  const url = args.context.apiUrl
 
   const bar = new Progress('Checking clientId, token and branch. :prog', 1)
 
@@ -123,6 +122,5 @@ export const checkClientInfo = async (
 
     throw e
   }
-
-  next()
+  return args.context
 }

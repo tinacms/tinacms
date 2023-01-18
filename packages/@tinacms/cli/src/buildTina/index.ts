@@ -14,6 +14,7 @@
 import fs from 'fs-extra'
 
 import {
+  Bridge,
   buildSchema,
   createDatabase,
   Database,
@@ -45,7 +46,7 @@ interface ClientGenOptions {
 }
 
 interface BuildOptions {
-  local: boolean
+  local?: boolean
   dev?: boolean
   verbose?: boolean
   rootPath?: string
@@ -56,50 +57,59 @@ interface BuildSetupOptions {
   experimentalData?: boolean
 }
 
-export const buildSetupCmdBuild = async (
-  ctx: any,
-  next: () => void,
-  opts: BuildSetupOptions
-) => {
-  const rootPath = ctx.rootPath as string
+export const buildSetupCmdBuild = async <C extends { rootPath: string }>(args: {
+  context: C
+  options: BuildSetupOptions
+}) => {
+  const rootPath = args.context.rootPath
   const { bridge, database } = await buildSetup({
-    ...opts,
+    ...args.options,
     rootPath,
     useMemoryStore: true,
   })
   // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  const builder = new ConfigBuilder(database)
 
-  next()
+  return {
+    ...args.context,
+    bridge,
+    database,
+    builder,
+  }
 }
 
-export const buildSetupCmdServerStart = async (
-  ctx: any,
-  next: () => void,
-  opts: BuildSetupOptions
-) => {
-  const rootPath = ctx.rootPath as string
+export const buildSetupCmdServerStart = async <
+  C extends { rootPath: string }
+>(args: {
+  context: C
+  options: BuildSetupOptions
+}): Promise<
+  C & {
+    bridge: Bridge
+    database: Database
+    builder: ConfigBuilder
+  }
+> => {
+  const rootPath = args.context.rootPath as string
   const { bridge, database } = await buildSetup({
-    ...opts,
+    ...args.options,
     rootPath,
     useMemoryStore: false,
   })
-  // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
-
-  next()
+  const builder = new ConfigBuilder(database)
+  return {
+    ...args.context,
+    bridge,
+    database,
+    builder,
+  }
 }
-export const buildSetupCmdAudit = async (
-  ctx: any,
-  next: () => void,
-  options: { clean: boolean }
-) => {
-  const rootPath = ctx.rootPath as string
-  const bridge = options.clean
+export const buildSetupCmdAudit = async (args: {
+  context: { rootPath: string }
+  options: { clean?: boolean }
+}) => {
+  const rootPath = args.context.rootPath as string
+  const bridge = args.options.clean
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
 
@@ -108,12 +118,14 @@ export const buildSetupCmdAudit = async (
 
   const database = await createDatabase({ store, bridge })
 
-  // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  const builder = new ConfigBuilder(database)
 
-  next()
+  return {
+    ...args.context,
+    bridge,
+    database,
+    builder,
+  }
 }
 
 const buildSetup = async ({
@@ -161,67 +173,68 @@ const buildSetup = async ({
   return { database, bridge, store }
 }
 
-export const buildCmdBuild = async (
-  ctx: {
+export const buildCmdBuild = async <C extends object>(args: {
+  context: C & {
     builder: ConfigBuilder
     rootPath: string
     usingTs: boolean
-    schema: unknown
-    apiUrl: string
-  },
-  next: () => void,
+  }
   options: Omit<
     BuildOptions & BuildSetupOptions & ClientGenOptions,
     'bridge' | 'database' | 'store'
   >
-) => {
+}) => {
   // always skip indexing in the "build" command
-  const { schema } = await ctx.builder.build({
-    rootPath: ctx.rootPath,
-    ...options,
+  const { schema } = await args.context.builder.build({
+    rootPath: args.context.rootPath,
+    ...args.options,
   })
-  ctx.schema = schema
-  const apiUrl = await ctx.builder.genTypedClient({
+  // .schema = schema
+  const apiUrl = await args.context.builder.genTypedClient({
     compiledSchema: schema,
-    local: options.local,
-    noSDK: options.noSDK,
-    verbose: options.verbose,
-    usingTs: ctx.usingTs,
-    rootPath: ctx.rootPath,
-    port: options.port,
+    local: args.options.local,
+    noSDK: args.options.noSDK,
+    verbose: args.options.verbose,
+    usingTs: args.context.usingTs,
+    rootPath: args.context.rootPath,
+    port: args.options.port,
   })
-  ctx.apiUrl = apiUrl
   await buildAdmin({
-    local: options.local,
-    rootPath: ctx.rootPath,
+    local: args.options.local,
+    rootPath: args.context.rootPath,
     schema,
     apiUrl,
   })
-  next()
+  return {
+    ...args.context,
+    schema,
+    apiUrl,
+  }
 }
 
-export const auditCmdBuild = async (
-  ctx: { builder: ConfigBuilder; rootPath: string; database: Database },
-  next: () => void,
+export const auditCmdBuild = async (args: {
+  context: { builder: ConfigBuilder; rootPath: string; database: Database }
   options: Omit<
     BuildOptions & BuildSetupOptions,
     'bridge' | 'database' | 'store'
   >
-) => {
-  const { graphQLSchema, tinaSchema } = await ctx.builder.build({
-    rootPath: ctx.rootPath,
-    ...options,
+}) => {
+  const { graphQLSchema, tinaSchema } = await args.context.builder.build({
+    rootPath: args.context.rootPath,
+    ...args.options,
     verbose: true,
   })
 
   await spin({
     waitFor: async () => {
-      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+      await args.context.database.indexContent({ graphQLSchema, tinaSchema })
     },
     text: 'Indexing local files',
   })
 
-  next()
+  return {
+    ...args.context,
+  }
 }
 
 export class ConfigBuilder {
