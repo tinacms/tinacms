@@ -18,6 +18,7 @@ const tinaConfigKey = z
   .object({
     publicFolder: z.string(),
     mediaRoot: z.string(),
+    mediaPrefix: z.string().optional(),
   })
   .strict()
   .optional()

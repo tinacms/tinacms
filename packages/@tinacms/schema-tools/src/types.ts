@@ -632,6 +632,14 @@ export interface Config<
            * would store content in `"<my-public-folder>/uploads"`
            */
           mediaRoot: string
+
+          /**
+           * An optional override to control the prefix of an image once its uploaded.
+           * Can be useful for outputting relative images on a site instead of using
+           * Tina's media server.
+           * Default: 'https://assets.tina.io/'
+           */
+          mediaPrefix?: string
         }
         loadCustomStore?: never
       }
