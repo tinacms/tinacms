@@ -472,10 +472,15 @@ export class Resolver {
         })
       }
       // if we are deleting a document or updating its name we should check if it exists
-      if (isDeletion || isUpdateName) {
-        if (!alreadyExists) {
+      if (!alreadyExists) {
+        if (isDeletion) {
           throw new Error(
             `Unable to delete document, ${realPath} does not exist`
+          )
+        }
+        if (isUpdateName) {
+          throw new Error(
+            `Unable to update document, ${realPath} does not exist`
           )
         }
       }
