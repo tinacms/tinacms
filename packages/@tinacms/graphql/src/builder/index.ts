@@ -374,7 +374,7 @@ export class Builder {
         astBuilder.InputValueDefinition({
           name: 'params',
           required: true,
-          type: await this._buildReferenceMutation({
+          type: await this._buildUpdateDocumentMutationParams({
             namespace: ['document'],
             collections: collections.map((collection) => collection.name),
           }),
@@ -1175,6 +1175,24 @@ export class Builder {
     namespace: string[]
     collections: string[]
   }) => {
+    return astBuilder.InputObjectTypeDefinition({
+      name: NAMER.dataMutationTypeName(field.namespace),
+      fields: await sequential(
+        this.tinaSchema.getCollectionsByName(field.collections),
+        async (collection) => {
+          return astBuilder.InputValueDefinition({
+            name: collection.name,
+            type: NAMER.dataMutationTypeName([collection.name]),
+          })
+        }
+      ),
+    })
+  }
+
+  private _buildUpdateDocumentMutationParams = async (field: {
+    namespace: string[]
+    collections: string[]
+  }) => {
     const fields = await sequential(
       this.tinaSchema.getCollectionsByName(field.collections),
       async (collection) => {
@@ -1191,7 +1209,7 @@ export class Builder {
       })
     )
     return astBuilder.InputObjectTypeDefinition({
-      name: NAMER.dataMutationTypeName(field.namespace),
+      name: NAMER.dataMutationUpdateTypeName(field.namespace),
       fields,
     })
   }
