@@ -131,13 +131,14 @@ export class TinaMediaStore implements MediaStore {
             throw new Error(`Upload error: '${matches[2]}'`)
           }
         }
-        const { mediaPrefix } =
+        const { mediaPrefix: configuredMediaPrefix } =
           this.cms.api.tina.schema.schema?.config?.media?.tina || {}
-        const src = `${
-          typeof mediaPrefix != 'undefined'
-            ? mediaPrefix
-            : 'https://assets.tina.io/'
-        }${this.api.clientId}/${path}`
+        const mediaPrefix =
+          typeof configuredMediaPrefix != 'undefined'
+            ? configuredMediaPrefix
+            : 'https://assets.tina.io/' + this.api.clientId
+
+        const src = `${mediaPrefix}${path}`
         newFiles.push({
           directory: item.directory,
           filename: item.file.name,
