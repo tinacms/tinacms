@@ -104,7 +104,7 @@ export const auditDocuments = async (args: AuditArgs) => {
         topLevelDefaults
       )
 
-      const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!!) {
+      const mutation = `mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
