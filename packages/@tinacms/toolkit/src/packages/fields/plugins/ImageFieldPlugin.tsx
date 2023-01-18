@@ -26,59 +26,15 @@ import { useState, useEffect } from 'react'
 
 interface ImageProps {
   path: string
-  previewSrc?: MediaStore['previewSrc']
   uploadDir?(formValues: any): string
   clearable?: boolean
-}
-
-export function usePreviewSrc(
-  value: string,
-  fieldName: string,
-  formValues: any,
-  getPreviewSrc?: MediaStore['previewSrc']
-): [string, boolean] {
-  const cms = useCMS()
-  const getSrc = getPreviewSrc || cms.media.previewSrc
-  const [{ src, loading }, setState] = useState({
-    src: '',
-    loading: true,
-  })
-
-  useEffect(() => {
-    let componentUnmounted = false
-    let tmpSrc = ''
-    ;(async () => {
-      try {
-        tmpSrc = await getSrc(value, fieldName, formValues)
-      } catch {}
-
-      if (componentUnmounted) return
-
-      setState({
-        src: tmpSrc,
-        loading: false,
-      })
-    })()
-
-    return () => {
-      componentUnmounted = true
-    }
-  }, [value])
-
-  return [src, loading]
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
   (props) => {
     const cms = useCMS()
-    const { form, field } = props
-    const { name, value } = props.input
-    const [src, srcIsLoading] = usePreviewSrc(
-      value,
-      name,
-      form.getState().values,
-      field.previewSrc
-    )
+    const { value } = props.input
+    const src = value
     const [isImgUploading, setIsImgUploading] = useState(false)
     let onClear: any
     if (props.field.clearable) {
@@ -102,8 +58,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
     return (
       <ImageUpload
         value={value}
-        previewSrc={src}
-        loading={isImgUploading || srcIsLoading}
+        src={src}
+        loading={isImgUploading}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values)
           cms.media.open({

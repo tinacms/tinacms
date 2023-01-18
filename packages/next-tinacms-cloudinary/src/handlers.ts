@@ -196,10 +196,7 @@ function getCloudinaryToTinaFunc(opts: CloudinaryOptions) {
       filename,
       directory,
       src: file[sel],
-      previewSrc: transformCloudinaryImage(
-        file[sel],
-        'w_75,h_75,c_fill,q_auto'
-      ),
+      thumbnail: transformCloudinaryImage(file[sel], 'w_75,h_75,c_fill,q_auto'),
       type: 'file',
     }
   }
