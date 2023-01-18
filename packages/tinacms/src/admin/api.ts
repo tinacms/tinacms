@@ -229,7 +229,7 @@ export class TinaAdminApi {
   ) {
     const response = await this.api.request(
       `#graphql
-      mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+      mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
