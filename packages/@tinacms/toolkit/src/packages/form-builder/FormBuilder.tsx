@@ -26,6 +26,7 @@ import { ResetForm } from './ResetForm'
 import { FormActionMenu } from './FormActions'
 import { getIn, FormApi } from 'final-form'
 import { useCMS } from '../react-core'
+import { PublishForm } from './PublishForm'
 
 export interface FormBuilderProps {
   form: Form
@@ -112,6 +113,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   React.useEffect(() => {
     setI((i) => i + 1)
   }, [tinaForm])
+
+  const cms = useCMS()
 
   const finalForm = tinaForm.finalForm
 
@@ -214,16 +217,23 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         {tinaForm.buttons.reset}
                       </ResetForm>
                     )}
-                    <Button
-                      onClick={safeHandleSubmit}
-                      disabled={!canSubmit}
-                      busy={submitting}
+                    <PublishForm
+                      pristine={pristine}
+                      submit={handleSubmit}
+                      //@ts-ignore
                       variant="primary"
-                      style={{ flexGrow: 3 }}
+                      style={{ flexBasis: '10rem' }}
+                      disabled={
+                        pristine ||
+                        submitting ||
+                        hasValidationErrors ||
+                        (invalid && !dirtySinceLastSubmit)
+                      }
+                      busy={submitting}
                     >
                       {submitting && <LoadingDots />}
                       {!submitting && tinaForm.buttons.save}
-                    </Button>
+                    </PublishForm>
                     {tinaForm.actions.length > 0 && (
                       <FormActionMenu
                         form={tinaForm as any}

@@ -20,18 +20,75 @@ import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { useCMS } from '../../packages/react-core'
 import { AiFillWarning } from 'react-icons/ai'
+import { FaSpinner } from 'react-icons/fa'
 
 type ListState = 'loading' | 'ready' | 'error'
+
+export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
+  const [isCreating, setIsCreating] = React.useState(false)
+  const { currentBranch } = useBranchData()
+
+  const handleCreateBranch = React.useCallback((value) => {
+    setIsCreating(true)
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      chooseBranch(createdBranchName)
+      callback(createdBranchName)
+    })
+  }, [])
+
+  return (
+    <div className="w-full flex flex-col items-stretch w-full gap-4">
+      {/* @ts-ignore THIS IS JUST FOR THE PR deploy */}
+      <BaseTextField
+        placeholder="Name"
+        value={newBranchName}
+        disabled={isCreating}
+        onChange={(e) => setNewBranchName(e.target.value)}
+      />
+      {/* @ts-ignore THIS IS JUST FOR THE PR deploy */}
+      <BaseTextField
+        placeholder="Branch Name"
+        value={branchName}
+        disabled={true}
+        readOnly
+      />
+      <Button
+        className="flex-grow flex items-center gap-2 whitespace-nowrap"
+        size="medium"
+        variant="primary"
+        disabled={isCreating}
+        onClick={() => handleCreateBranch(branchName)}
+      >
+        {isCreating ? (
+          <>
+            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
+            Branch
+          </>
+        ) : (
+          <>
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
 
 export const BranchSwitcher = ({
   listBranches,
   createBranch,
+  chooseBranch,
 }: BranchSwitcherProps) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
-  const { currentBranch, setCurrentBranch } = useBranchData()
+  const { currentBranch } = useBranchData()
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -39,7 +96,7 @@ export const BranchSwitcher = ({
       branchName: value,
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      setCurrentBranch(createdBranchName)
+      chooseBranch(createdBranchName)
       await refreshBranchList()
     })
   }, [])
