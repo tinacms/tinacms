@@ -591,7 +591,11 @@ const RenameModal = ({
         <ModalHeader close={close}>Rename {filename}</ModalHeader>
         <ModalBody padded={true}>
           <>
-            <p>{`Are you sure you want to rename ${filename}? TinaCMS uses the filename as the ID. Renaming this file could result in unresolved references`}</p>
+            <p className="mb-4">
+              Are you sure you want to rename <strong>{filename}</strong>?
+              TinaCMS uses the filename as the ID; renaming this file could
+              result in unresolved references.
+            </p>
             <BaseTextField
               placeholder="Enter a new name for the document's file"
               value={newRelativePath}
