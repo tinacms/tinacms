@@ -56,7 +56,7 @@ type OnPutCallback = (key: string, value: any) => Promise<void>
 type OnDeleteCallback = (key: string) => Promise<void>
 
 type CreateDatabase = {
-  bridge: Bridge
+  bridge?: Bridge
   level: Level
   onPut?: (key: string, value: any) => Promise<void>
   onDelete?: (key: string) => Promise<void>
@@ -98,7 +98,7 @@ const defaultOnPut: OnPutCallback = () => Promise.resolve()
 const defaultOnDelete: OnDeleteCallback = () => Promise.resolve()
 
 export class Database {
-  public bridge: Bridge
+  public bridge?: Bridge
   public rootLevel: Level
   public level: Level | undefined
   public indexStatusCallback: IndexStatusCallback | undefined
@@ -264,7 +264,9 @@ export class Database {
       collectionIndexDefinitions = indexDefinitions?.[collection.name]
     }
     const normalizedPath = normalizePath(filepath)
-    await this.bridge.put(normalizedPath, stringifiedFile)
+    if (this.bridge) {
+      await this.bridge.put(normalizedPath, stringifiedFile)
+    }
     await this.onPut(normalizedPath, stringifiedFile)
 
     const putOps = makeIndexOpsForDocument(
@@ -339,7 +341,9 @@ export class Database {
           filepath,
           data
         )
-        await this.bridge.put(normalizedPath, stringifiedFile)
+        if (this.bridge) {
+          await this.bridge.put(normalizedPath, stringifiedFile)
+        }
         await this.onPut(normalizedPath, stringifiedFile)
         const putOps = makeIndexOpsForDocument(
           normalizedPath,
@@ -510,6 +514,10 @@ export class Database {
   }
   //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
+    if (!this.bridge) {
+      throw new Error(`No bridge configured`)
+    }
+
     const graphqlPath = normalizePath(
       path.join(GENERATED_FOLDER, `_graphql.json`)
     )
@@ -781,23 +789,15 @@ export class Database {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
-    if (this.bridge.supportsBuilding()) {
+    if (this.bridge && this.bridge.supportsBuilding()) {
       await this.bridge.putConfig(
         normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
-      // await this.onPut(
-      //   normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
-      //   JSON.stringify(graphQLSchema)
-      // )
       await this.bridge.putConfig(
         normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
-      // await this.onPut(
-      //   normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
-      //   JSON.stringify(tinaSchema.schema)
-      // )
     }
   }
 
@@ -819,6 +819,9 @@ export class Database {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
+    if (!this.bridge) {
+      throw new Error('No bridge configured')
+    }
     await this.initLevel()
     await this.indexStatusCallbackWrapper(async () => {
       const lookup = JSON.parse(
@@ -962,7 +965,9 @@ export class Database {
       ])
     }
 
-    await this.bridge.delete(normalizePath(filepath))
+    if (this.bridge) {
+      await this.bridge.delete(normalizePath(filepath))
+    }
     await this.onDelete(normalizePath(filepath))
   }
 
@@ -990,6 +995,9 @@ export class Database {
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
+    if (!this.bridge) {
+      throw new Error('No bridge configured')
+    }
     const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     let lookupMap
     try {
