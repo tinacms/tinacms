@@ -24,10 +24,12 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
 
   listBranches: BranchSwitcherProps['listBranches']
   createBranch: BranchSwitcherProps['createBranch']
+  chooseBranch: BranchSwitcherProps['chooseBranch']
 
   constructor(options: BranchSwitcherProps) {
     this.listBranches = options.listBranches
     this.createBranch = options.createBranch
+    this.chooseBranch = options.chooseBranch
   }
 
   Component = () => {
@@ -35,6 +37,7 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
       <BranchSwitcher
         listBranches={this.listBranches}
         createBranch={this.createBranch}
+        chooseBranch={this.chooseBranch}
       />
     )
   }

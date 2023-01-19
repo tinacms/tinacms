@@ -88,7 +88,7 @@ export const BranchSwitcher = ({
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
-  const { currentBranch } = useBranchData()
+  const { currentBranch, setCurrentBranch } = useBranchData()
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
