@@ -65,6 +65,10 @@ const noWatchOption = {
   name: '--noWatch',
   description: "Don't regenerate config on file changes",
 }
+const noServerOption = {
+  name: '--noServer',
+  description: "Don't run the API server",
+}
 const noSDKCodegenOption = {
   name: '--noSDK',
   description: "Don't generate the generated client SDK",
@@ -160,6 +164,7 @@ export const baseCmds: Command[] = [
       subCommand,
       isomorphicGitBridge,
       noWatchOption,
+      noServerOption,
       noSDKCodegenOption,
       noTelemetryOption,
       watchFileOption,
@@ -175,7 +180,7 @@ export const baseCmds: Command[] = [
           startServer,
           startSubprocess,
         ],
-        { ...options, useLocalDatabase: true }
+        options
       ),
   },
   {

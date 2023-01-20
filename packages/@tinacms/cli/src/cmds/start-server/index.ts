@@ -42,6 +42,7 @@ interface Options {
   command?: string
   watchFolders?: string[]
   noWatch?: boolean
+  noServer?: boolean
   noSDK: boolean
   noTelemetry: boolean
   verbose?: boolean
@@ -69,6 +70,7 @@ export async function startServer(
     watchFolders,
     verbose,
     dev,
+    noServer,
   }: Options
 ) {
   buildLock.disable()
@@ -220,6 +222,12 @@ export async function startServer(
     } finally {
       await afterBuild()
     }
+  }
+  if (noServer) {
+    logger.info('Building database index, no API server will be run')
+    await build()
+    await database.config.level.close()
+    return
   }
 
   const foldersToWatch = (watchFolders || []).map((x) => path.join(rootPath, x))
