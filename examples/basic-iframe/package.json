@@ -19,7 +19,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-is": "^17.0.2",
-    "tinacms": "workspace:*"
+    "tinacms": "workspace:*",
+    "many-level": "^2.0.0",
+    "readable-stream": "^4.3.0"
   },
   "devDependencies": {
     "@tinacms/cli": "workspace:*",
