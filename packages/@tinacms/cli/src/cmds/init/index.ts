@@ -29,6 +29,8 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
+import { spin } from '../../utils/spinner'
+import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -226,6 +228,13 @@ const forestryMigrate = async ({
       '.forestry/settings.yml'
     )} file in your project.`
   )
+
+  logger.info(
+    `This migration will update some of your content to match tina.  Please ${focusText(
+      'save a backup of your content'
+    )} before doing this migration. (This can be done with git)`
+  )
+
   const option = await prompts({
     name: 'selection',
     type: 'confirm',
@@ -237,10 +246,21 @@ const forestryMigrate = async ({
   if (!option['selection']) {
     return null
   }
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  await spin({
+    waitFor: async () => {
+      await delay(2000)
+    },
+    text: '',
+  })
   const collections = await generateCollections({
     forestryPath,
     rootPath,
   })
+
+  // print errors
+  ErrorSingleton.getInstance().printNameErrors()
+
   return JSON.stringify(collections, null, 2)
 }
 
