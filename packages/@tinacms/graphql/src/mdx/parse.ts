@@ -117,9 +117,9 @@ export const parseMDXInner = (
       if (isNull(node.name)) {
         // this is a fragment <> </>, ignore it
       } else {
-        throw new Error(
-          `Found unregistered JSX or HTML: <${node.name}>. Please ensure all structured elements have been registered with your schema. https://tina.io/docs/editing/mdx/`
-        )
+        // throw new Error(
+        //   `Found unregistered JSX or HTML: <${node.name}>. Please ensure all structured elements have been registered with your schema. https://tina.io/docs/editing/mdx/`
+        // )
       }
     }
 
