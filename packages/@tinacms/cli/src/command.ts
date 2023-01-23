@@ -31,8 +31,6 @@ export const command = <O extends Option>(args: {
       ? string
       : Extract<O, { key: key }>['defaultValue'] extends boolean
       ? boolean
-      : Extract<O, { key: key }>['defaultValue'] extends number
-      ? number
       : Extract<O, { key: key }>['defaultValue'] extends string[]
       ? string[]
       : string
@@ -40,53 +38,10 @@ export const command = <O extends Option>(args: {
 }): Command => {
   return args
 }
-export const commandx = <O extends Option>(args: {
-  command: string
-  description: string
-  options: O[]
-  action: (options: {
-    [key in O['key']]: Extract<O, { key: key }>['defaultValue'] extends string
-      ? string
-      : boolean
-  }) => void
-}): Command => {
-  return args
-}
-export const command2 = <O extends Option[], T extends O[number]>(args: {
-  command: string
-  description: string
-  options: O
-  action: (options: {
-    [key in T['key']]: T['defaultValue']
-  }) => void
-}): Command => {
-  return args
-}
-export const commandBackup = <O extends { [key: string]: Option }>(args: {
-  command: string
-  description: string
-  options: Option[]
-  option2: O[]
-  action: (options: { [K in keyof O]: O[K] }) => void
-}): Command => {
-  return args
-}
-
-export type Command2<O extends Option[]> = {
-  command: string
-  description: string
-  action: (options: { [key in Option['key']]?: string }) => void
-  options: O[]
-}
 
 interface Option {
   name: string
   description: string
   key: string
-  defaultValue?: number | boolean | string | string[]
-}
-
-export type Action<ContextModification extends object = {}> = {
-  options: Option[]
-  action: (...args: any[]) => void
+  defaultValue?: boolean | string | string[]
 }
