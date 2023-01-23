@@ -1,6 +1,6 @@
 import { createDatabase } from '@tinacms/graphql'
 import { FilesystemBridge } from '@tinacms/datalayer'
-import { TinaLocalLevel } from '@tinacms/cli'
+import { TinaLevelClient } from '@tinacms/cli'
 import { Octokit } from '@octokit/rest'
 import fs from 'fs'
 import path from 'path'
@@ -15,7 +15,7 @@ const octokit = new Octokit({
   auth: token,
 })
 
-const localLevelStore = new TinaLocalLevel()
+const localLevelStore = new TinaLevelClient()
 
 export default createDatabase({
   bridge: new FilesystemBridge(process.cwd()),

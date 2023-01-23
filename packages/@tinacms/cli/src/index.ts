@@ -18,7 +18,7 @@ import { Command } from './command'
 import { baseCmds as baseCommands } from './cmds/baseCmds'
 import { logText } from './utils/theme'
 export { defineSchema } from './cmds/compile'
-export { TinaLocalLevel } from './tinaLocalLevel'
+export { TinaLevelClient } from './tinaLocalLevel'
 import { logger } from './logger'
 export type {
   TinaCloudSchema,
