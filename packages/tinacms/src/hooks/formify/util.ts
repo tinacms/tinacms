@@ -195,7 +195,7 @@ export const buildForm = (
         })
         const variables = { params }
         const mutationString = `#graphql
-          mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+          mutation UpdateDocument($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
             updateDocument(collection: $collection, relativePath: $relativePath, params: $params) {
               __typename
             }

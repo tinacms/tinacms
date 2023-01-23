@@ -159,6 +159,12 @@ export const FormBuilder: FC<FormBuilderProps> = ({
 
   useOnChangeEventDispatch({ finalForm, tinaForm })
 
+  // This will be needed when we add rename and delete functionality to this page
+  // const cms = useCMS()
+  // const id: string = tinaForm.id
+  // const schema = cms.api.tina.schema
+  // const collection = schema.getCollectionByFullPath(id)
+
   return (
     <FinalForm
       form={finalForm}

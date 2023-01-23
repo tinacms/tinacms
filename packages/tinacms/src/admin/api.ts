@@ -32,6 +32,19 @@ export class TinaAdminApi {
   fetchCollections() {
     return this.schema.getCollections()
   }
+  async renameDocument({ collection, relativePath, newRelativePath }) {
+    await this.api.request(
+      `#graphql
+              mutation RenameDocument($collection: String!, $relativePath: String! $newRelativePath: String!) {
+                updateDocument(collection: $collection, relativePath: $relativePath, params: {relativePath: $newRelativePath}){
+    __typename
+  }
+              }
+            `,
+      { variables: { collection, relativePath, newRelativePath } }
+    )
+  }
+
   async deleteDocument({
     collection,
     relativePath,
@@ -216,7 +229,7 @@ export class TinaAdminApi {
   ) {
     const response = await this.api.request(
       `#graphql
-      mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
+      mutation($collection: String!, $relativePath: String!, $params: DocumentUpdateMutation!) {
         updateDocument(
           collection: $collection,
           relativePath: $relativePath,
