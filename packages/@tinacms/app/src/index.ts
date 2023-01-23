@@ -160,7 +160,7 @@ export const viteBuild = async ({
     },
     resolve: {
       alias,
-      dedupe: ['graphql'],
+      dedupe: ['graphql', 'tinacms', '@tinacms/toolkit'],
     },
     build: {
       sourcemap: true,

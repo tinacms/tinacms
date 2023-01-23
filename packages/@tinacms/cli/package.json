@@ -48,6 +48,7 @@
     "test": "jest --passWithNoTests",
     "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
+    "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "dependencies": {

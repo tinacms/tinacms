@@ -329,6 +329,7 @@ importers:
       '@tailwindcss/typography': ^0.5.4
       '@tinacms/mdx': workspace:*
       '@tinacms/scripts': workspace:*
+      '@tinacms/toolkit': workspace:*
       '@types/fs-extra': ^9.0.1
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
@@ -382,6 +383,7 @@ importers:
     devDependencies:
       '@tinacms/mdx': link:../mdx
       '@tinacms/scripts': link:../scripts
+      '@tinacms/toolkit': link:../toolkit
       '@types/fs-extra': 9.0.13
       '@types/react': 17.0.2
       '@types/react-dom': 17.0.2
