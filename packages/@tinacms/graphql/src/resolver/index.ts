@@ -705,6 +705,7 @@ export class Resolver {
     Object.entries(fieldParams).forEach(([fieldName, fieldValue]) => {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
+          accum[fieldName] = []
           return
         }
       }
