@@ -37,7 +37,7 @@ import { spin } from '../../utils/spinner'
 const buildLock = new AsyncLock()
 const reBuildLock = new AsyncLock()
 interface Options {
-  port?: number
+  port?: string
   command?: string
   watchFolders?: string[]
   noWatch?: boolean
@@ -74,15 +74,7 @@ export async function startServerInner(
     schema?: TinaCloudSchema<false>
   },
   next,
-  {
-    port = 4001,
-    noWatch,
-    noSDK,
-    noTelemetry,
-    watchFolders,
-    verbose,
-    dev,
-  }: Options
+  { port = '4001', noWatch, noSDK, noTelemetry, watchFolders, verbose }: Options
 ) {
   buildLock.disable()
   reBuildLock.disable()

@@ -41,7 +41,7 @@ interface ClientGenOptions {
   noSDK?: boolean
   local?: boolean
   verbose?: boolean
-  port?: number
+  port?: string
   rootPath?: string
 }
 

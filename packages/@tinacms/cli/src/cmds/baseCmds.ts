@@ -41,7 +41,7 @@ export const CMD_BUILD = 'build'
 const startServerPortOption = {
   name: '--port <port>',
   key: 'port',
-  defaultValue: 4001,
+  defaultValue: '4001',
   description: 'Specify a port to run the server on. (default 4001)',
 } as const
 const rootPathOption = {
