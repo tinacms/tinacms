@@ -1,10 +1,8 @@
 import { createDatabase } from '@tinacms/graphql'
 import { FilesystemBridge } from '@tinacms/datalayer'
+import { TinaLocalLevel } from '@tinacms/cli'
 import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'
-const { ManyLevelGuest } = require('many-level')
-const { pipeline } = require('readable-stream')
-const { connect } = require('net')
 
 const owner = ''
 const repo = ''
@@ -15,17 +13,11 @@ const octokit = new Octokit({
   auth: token,
 })
 
-const level = new ManyLevelGuest()
-const socket = connect(9000)
-
-// Pipe socket into guest stream and vice versa
-pipeline(socket, level.createRpcStream(), socket, () => {
-  // Disconnected
-})
+const localLevelStore = new TinaLocalLevel()
 
 export default createDatabase({
   bridge: new FilesystemBridge(process.cwd()),
-  level,
+  level: localLevelStore,
   onPut: async (key, value) => {
     let sha
     try {
