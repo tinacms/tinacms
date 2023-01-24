@@ -81,7 +81,7 @@ importers:
       js-base64: ^3.7.4
       many-level: ^2.0.0
       mongodb: ^4.13.0
-      mongodb-level: ^0.0.1
+      mongodb-level: ^0.0.2
       next: 12.2.4
       react: 17.0.2
       react-dom: 17.0.2
@@ -96,7 +96,7 @@ importers:
       js-base64: 3.7.4
       many-level: 2.0.0
       mongodb: 4.13.0
-      mongodb-level: 0.0.1
+      mongodb-level: 0.0.2
       next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -24504,6 +24504,19 @@ packages:
     resolution:
       {
         integrity: sha512-Zy6yjKXsExbT9yJsRQZc7uu2tDOIGncD8wWjPGvl86P+AlhyE0uYG9sS8zXEhp0IWnHdC6RpeLSIOqUVtIVvKw==,
+      }
+    dependencies:
+      abstract-level: 1.0.3
+      module-error: 1.0.2
+      mongodb: 4.13.0
+    transitivePeerDependencies:
+      - aws-crt
+    dev: false
+
+  /mongodb-level/0.0.2:
+    resolution:
+      {
+        integrity: sha512-GxsHqSY4M2gHEijJuv4wH1S3bXNOhm6mG8DDp7O7G/JhMNVgRA5h/5iRLxsJxcQt1RE1CDeLc19Ey4bbXuWagg==,
       }
     dependencies:
       abstract-level: 1.0.3

@@ -1,6 +1,7 @@
 import { createDatabase } from '@tinacms/graphql'
 import { FilesystemBridge } from '@tinacms/datalayer'
 import { TinaLevelClient } from '@tinacms/cli'
+import { MongodbLevel } from 'mongodb-level'
 import { Octokit } from '@octokit/rest'
 import fs from 'fs'
 import path from 'path'
@@ -18,6 +19,12 @@ const octokit = new Octokit({
 })
 
 const localLevelStore = new TinaLevelClient()
+const mongodbLevelStore = new MongodbLevel({
+  collectionName: 'tinacms',
+  dbName: 'tinacms',
+  mongoUri: process.env.MONGODB_URI,
+})
+localLevelStore.openConnection()
 
 const githubOnPut = async (key, value) => {
   let sha
@@ -82,8 +89,7 @@ const localOnDelete = async (key) => {
 
 export default createDatabase({
   bridge: new FilesystemBridge(process.cwd()),
-  // undefined could be replaced with a MongoLevelStore in production
-  level: isLocal ? localLevelStore : undefined,
+  level: isLocal ? localLevelStore : mongodbLevelStore,
   onPut: isLocal ? localOnPut : githubOnPut,
   onDelete: isLocal ? localOnDelete : githubOnDelete,
 })
