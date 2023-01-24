@@ -34,7 +34,14 @@ export const parseURL = (
   const params = new URL(url)
 
   // This is a self-hosted URL
-  if (!['tinajs.dev', 'tina.io'].find((item) => params.host.includes(item))) {
+  console.log(params.host)
+  const isTinaCloud =
+    params.host.includes('tinajs.dev') ||
+    params.host.includes('tina.io') ||
+    params.host.includes('tinajs.io')
+  console.log({ isTinaCloud })
+
+  if (!isTinaCloud) {
     return {
       branch: null,
       isLocalClient: true,
