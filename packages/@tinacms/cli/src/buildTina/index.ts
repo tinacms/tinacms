@@ -236,15 +236,20 @@ export const auditCmdBuild = async (args: {
     'bridge' | 'database' | 'store'
   >
 }) => {
-  const { graphQLSchema, tinaSchema } = await args.context.builder.build({
-    rootPath: args.context.rootPath,
-    ...args.options,
-    verbose: true,
-  })
+  const { graphQLSchema, tinaSchema, lookup } =
+    await args.context.builder.build({
+      rootPath: args.context.rootPath,
+      ...args.options,
+      verbose: true,
+    })
 
   await spin({
     waitFor: async () => {
-      await args.context.database.indexContent({ graphQLSchema, tinaSchema })
+      await args.context.database.indexContent({
+        graphQLSchema,
+        tinaSchema,
+        lookup,
+      })
     },
     text: 'Indexing local files',
   })
@@ -267,8 +272,9 @@ export class ConfigBuilder {
     schema: any
     graphQLSchema: DocumentNode
     tinaSchema: any
+    lookup: object
   }> {
-    const usingTs = await isProjectTs(rootPath)
+    const usingTs = await isProjectTs(rootPath, tinaDirectory)
 
     if (!rootPath) {
       throw new Error('Root path has not been attached')
@@ -363,31 +369,38 @@ export class ConfigBuilder {
       path.join(rootPath, tinaDirectory, '__generated__', 'queries.gql'),
       queriesString
     )
-    const schemaJSON = await fs
-      .readFileSync(
-        path.join(rootPath, tinaDirectory, '__generated__', '_schema.json')
+    if (tinaDirectory === 'tina') {
+      const schemaJSON = await fs
+        .readFileSync(
+          path.join(rootPath, tinaDirectory, '__generated__', '_schema.json')
+        )
+        .toString()
+      const lookupJSON = await fs
+        .readFileSync(
+          path.join(rootPath, tinaDirectory, '__generated__', '_lookup.json')
+        )
+        .toString()
+      const graphqlJSON = await fs
+        .readFileSync(
+          path.join(rootPath, tinaDirectory, '__generated__', '_graphql.json')
+        )
+        .toString()
+      await fs.outputFileSync(
+        path.join(rootPath, tinaDirectory, 'tina-lock.json'),
+        JSON.stringify({
+          schemaJSON: JSON.parse(schemaJSON),
+          lookupJSON: JSON.parse(lookupJSON),
+          graphqlJSON: JSON.parse(graphqlJSON),
+        })
       )
-      .toString()
-    const lookupJSON = await fs
-      .readFileSync(
-        path.join(rootPath, tinaDirectory, '__generated__', '_lookup.json')
-      )
-      .toString()
-    const graphqlJSON = await fs
-      .readFileSync(
-        path.join(rootPath, tinaDirectory, '__generated__', '_graphql.json')
-      )
-      .toString()
-    await fs.outputFileSync(
-      path.join(rootPath, tinaDirectory, 'tina-lock.json'),
-      JSON.stringify({
-        schemaJSON: JSON.parse(schemaJSON),
-        lookupJSON: JSON.parse(lookupJSON),
-        graphqlJSON: JSON.parse(graphqlJSON),
-      })
-    )
+    }
 
-    return { schema: compiledSchema, graphQLSchema, tinaSchema }
+    return {
+      schema: compiledSchema,
+      graphQLSchema,
+      tinaSchema,
+      lookup: JSON.parse(lookupJSON),
+    }
   }
 
   async genTypedClient({

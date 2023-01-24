@@ -181,12 +181,13 @@ export async function startServerInner(
 
     try {
       await beforeBuild()
-      const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
-        rootPath: ctx.rootPath,
-        tinaDirectory: ctx.tinaDirectory,
-        verbose,
-        local: true,
-      })
+      const { schema, graphQLSchema, tinaSchema, lookup } =
+        await ctx.builder.build({
+          rootPath: ctx.rootPath,
+          tinaDirectory: ctx.tinaDirectory,
+          verbose,
+          local: true,
+        })
       ctx.schema = schema
 
       const missingFormat = tinaSchema?.schema?.collections
@@ -214,7 +215,7 @@ export async function startServerInner(
 
       await spin({
         waitFor: async () => {
-          await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+          await ctx.database.indexContent({ graphQLSchema, tinaSchema, lookup })
         },
         text: logText('Indexing local files'),
       })

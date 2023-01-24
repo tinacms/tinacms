@@ -543,16 +543,20 @@ export class Database {
   public indexContent = async ({
     graphQLSchema,
     tinaSchema,
+    lookup: lookupFromLockFile,
   }: {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
+    lookup?: object
   }) => {
     await this.indexStatusCallbackWrapper(async () => {
-      const lookup = JSON.parse(
-        await this.bridge.get(
-          normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json'))
+      const lookup =
+        lookupFromLockFile ||
+        JSON.parse(
+          await this.bridge.get(
+            normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json'))
+          )
         )
-      )
       if (this.store.supportsSeeding()) {
         await this.store.clear()
         await this.store.seed(
