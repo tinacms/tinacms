@@ -363,6 +363,29 @@ export class ConfigBuilder {
       path.join(rootPath, tinaDirectory, '__generated__', 'queries.gql'),
       queriesString
     )
+    const schemaJSON = await fs
+      .readFileSync(
+        path.join(rootPath, tinaDirectory, '__generated__', '_schema.json')
+      )
+      .toString()
+    const lookupJSON = await fs
+      .readFileSync(
+        path.join(rootPath, tinaDirectory, '__generated__', '_lookup.json')
+      )
+      .toString()
+    const graphqlJSON = await fs
+      .readFileSync(
+        path.join(rootPath, tinaDirectory, '__generated__', '_graphql.json')
+      )
+      .toString()
+    await fs.outputFileSync(
+      path.join(rootPath, tinaDirectory, 'tina-lock.json'),
+      JSON.stringify({
+        schemaJSON: JSON.parse(schemaJSON),
+        lookupJSON: JSON.parse(lookupJSON),
+        graphqlJSON: JSON.parse(graphqlJSON),
+      })
+    )
 
     return { schema: compiledSchema, graphQLSchema, tinaSchema }
   }

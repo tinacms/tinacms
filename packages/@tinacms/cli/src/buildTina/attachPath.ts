@@ -32,8 +32,8 @@ export const attachPath = async <C extends object>(args: {
       )
     } else {
       console.log('Detected legacy directory for tina, move to "tina"')
+      tinaDirectory = '.tina'
     }
-    tinaDirectory = '.tina'
   }
   return {
     ...args.context,
