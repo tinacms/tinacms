@@ -24,6 +24,7 @@ let hasCopiedFiles = false
 
 export const viteBuild = async ({
   rootPath,
+  tinaDirectory,
   outputFolder,
   publicFolder,
   local: l,
@@ -32,6 +33,7 @@ export const viteBuild = async ({
 }: {
   local: boolean
   rootPath: string
+  tinaDirectory: string
   publicFolder: string
   outputFolder: string
   apiUrl: string
@@ -40,7 +42,7 @@ export const viteBuild = async ({
   const local = l
   const localBuild = l
   const node_env = JSON.stringify(process.env.NODE_ENV)
-  const generatedPath = path.join(rootPath, '.tina', '__generated__')
+  const generatedPath = path.join(rootPath, tinaDirectory, '__generated__')
   /**
    * The final location of the SPA assets
    * @example public/admin
@@ -53,7 +55,7 @@ export const viteBuild = async ({
   const appCopyPath = path.join(__dirname, '..', 'appFiles')
   /**
    * The location to copy source files
-   * @example .tina/__generated__/app
+   * @example {tinaDirectory}/__generated__/app
    */
   // const appRootPath = path.join(__dirname, '..', 'appFiles')
   const appRootPath = path.join(generatedPath, 'app')
@@ -71,7 +73,7 @@ export const viteBuild = async ({
   /**
    * The location of the user-defined config
    */
-  const configPath = path.join(rootPath, '.tina', 'config')
+  const configPath = path.join(rootPath, tinaDirectory, 'config')
   /**
    * The location where the user-defined config is "prebuilt" to.
    */

@@ -43,6 +43,7 @@ interface ClientGenOptions {
   verbose?: boolean
   port?: string
   rootPath?: string
+  tinaDirectory: string
 }
 
 interface BuildOptions {
@@ -50,6 +51,7 @@ interface BuildOptions {
   dev?: boolean
   verbose?: boolean
   rootPath?: string
+  tinaDirectory?: string
 }
 
 interface BuildSetupOptions {
@@ -57,7 +59,9 @@ interface BuildSetupOptions {
   experimentalData?: boolean
 }
 
-export const buildSetupCmdBuild = async <C extends { rootPath: string }>(args: {
+export const buildSetupCmdBuild = async <
+  C extends { rootPath: string; tinaDirectory: string }
+>(args: {
   context: C
   options: BuildSetupOptions
 }) => {
@@ -65,6 +69,7 @@ export const buildSetupCmdBuild = async <C extends { rootPath: string }>(args: {
   const { bridge, database } = await buildSetup({
     ...args.options,
     rootPath,
+    tinaDirectory: args.context.tinaDirectory,
     useMemoryStore: true,
   })
   // attach to context
@@ -79,7 +84,7 @@ export const buildSetupCmdBuild = async <C extends { rootPath: string }>(args: {
 }
 
 export const buildSetupCmdServerStart = async <
-  C extends { rootPath: string }
+  C extends { rootPath: string; tinaDirectory: string }
 >(args: {
   context: C
   options: BuildSetupOptions
@@ -94,6 +99,7 @@ export const buildSetupCmdServerStart = async <
   const { bridge, database } = await buildSetup({
     ...args.options,
     rootPath,
+    tinaDirectory: args.context.tinaDirectory,
     useMemoryStore: false,
   })
   const builder = new ConfigBuilder(database)
@@ -105,7 +111,7 @@ export const buildSetupCmdServerStart = async <
   }
 }
 export const buildSetupCmdAudit = async (args: {
-  context: { rootPath: string }
+  context: { rootPath: string; tinaDirectory: string }
   options: { clean?: boolean }
 }) => {
   const rootPath = args.context.rootPath as string
@@ -113,10 +119,16 @@ export const buildSetupCmdAudit = async (args: {
     ? new FilesystemBridge(rootPath)
     : new AuditFileSystemBridge(rootPath)
 
-  await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
+  await fs.ensureDirSync(
+    path.join(rootPath, args.context.tinaDirectory, '__generated__')
+  )
   const store = new LevelStore(rootPath, false)
 
-  const database = await createDatabase({ store, bridge })
+  const database = await createDatabase({
+    store,
+    bridge,
+    tinaDirectory: args.context.tinaDirectory,
+  })
 
   const builder = new ConfigBuilder(database)
 
@@ -131,9 +143,11 @@ export const buildSetupCmdAudit = async (args: {
 const buildSetup = async ({
   isomorphicGitBridge,
   rootPath,
+  tinaDirectory,
   useMemoryStore,
 }: BuildSetupOptions & {
   rootPath: string
+  tinaDirectory: string
   useMemoryStore: boolean
 }) => {
   const fsBridge = new FilesystemBridge(rootPath)
@@ -164,11 +178,11 @@ const buildSetup = async ({
   //   ? new LevelStore(rootPath, useMemoryStore)
   //   : new FilesystemStore({ rootPath })
 
-  await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
+  await fs.ensureDirSync(path.join(rootPath, tinaDirectory, '__generated__'))
 
-  const store = new LevelStore(rootPath, useMemoryStore)
+  const store = new LevelStore(rootPath, useMemoryStore, tinaDirectory)
 
-  const database = await createDatabase({ store, bridge })
+  const database = await createDatabase({ store, bridge, tinaDirectory })
 
   return { database, bridge, store }
 }
@@ -177,6 +191,7 @@ export const buildCmdBuild = async <C extends object>(args: {
   context: C & {
     builder: ConfigBuilder
     rootPath: string
+    tinaDirectory: string
     usingTs: boolean
   }
   options: Omit<
@@ -197,11 +212,13 @@ export const buildCmdBuild = async <C extends object>(args: {
     verbose: args.options.verbose,
     usingTs: args.context.usingTs,
     rootPath: args.context.rootPath,
+    tinaDirectory: args.context.tinaDirectory,
     port: args.options.port,
   })
   await buildAdmin({
     local: args.options.local,
     rootPath: args.context.rootPath,
+    tinaDirectory: args.context.tinaDirectory,
     schema,
     apiUrl,
   })
@@ -240,7 +257,13 @@ export const auditCmdBuild = async (args: {
 export class ConfigBuilder {
   constructor(private database: Database) {}
 
-  async build({ dev, verbose, rootPath, local }: BuildOptions): Promise<{
+  async build({
+    dev,
+    verbose,
+    rootPath,
+    tinaDirectory,
+    local,
+  }: BuildOptions): Promise<{
     schema: any
     graphQLSchema: DocumentNode
     tinaSchema: any
@@ -250,7 +273,11 @@ export class ConfigBuilder {
     if (!rootPath) {
       throw new Error('Root path has not been attached')
     }
-    const tinaGeneratedPath = path.join(rootPath!, '.tina', '__generated__')
+    const tinaGeneratedPath = path.join(
+      rootPath!,
+      tinaDirectory,
+      '__generated__'
+    )
 
     // Clear the cache of the DB passed to the GQL server
     this.database.clearCache()
@@ -268,6 +295,7 @@ export class ConfigBuilder {
       verbose,
       dev,
       rootPath,
+      tinaDirectory,
     })
     // FIXME: the bridge is initialized before we have access to the config,
     // ideally this is available to us during Bridge init but as a workaround
@@ -283,7 +311,7 @@ export class ConfigBuilder {
       }
       let localContentPath = compiledSchema.config.localContentPath
       if (!localContentPath.startsWith('/')) {
-        localContentPath = path.join(process.cwd(), '.tina', localContentPath)
+        localContentPath = path.join(rootPath, tinaDirectory, localContentPath)
       }
       if (await fs.pathExists(localContentPath)) {
         logger.info(logText(`Using separate content path ${localContentPath}`))
@@ -299,10 +327,41 @@ export class ConfigBuilder {
       this.database.bridge.addOutputPath(localContentPath)
     }
 
-    const { graphQLSchema, tinaSchema } = await buildSchema(
+    const { graphQLSchema, tinaSchema, fragString, queriesString } =
+      await buildSchema(rootPath, tinaDirectory, this.database, [
+        'experimentalData',
+        'isomorphicGitBridge',
+      ])
+
+    const fragPath = path.join(
       rootPath,
-      this.database,
-      ['experimentalData', 'isomorphicGitBridge']
+      tinaDirectory,
+      '__generated__',
+      'frags.gql'
+    )
+    await fs.outputFileSync(fragPath, fragString)
+    if (
+      (await (await fs.stat(fragPath)).size) >
+      // convert to 100 kb to bytes
+      100 * 1024
+    ) {
+      console.warn(
+        'Warning: frags.gql is very large (>100kb). Consider setting the reference depth to 1 or 0. See code snippet below.'
+      )
+      console.log(
+        `const schema = defineSchema({
+          config: {
+              client: {
+                  referenceDepth: 1,
+              },
+          }
+          // ...
+      })`
+      )
+    }
+    await fs.outputFileSync(
+      path.join(rootPath, tinaDirectory, '__generated__', 'queries.gql'),
+      queriesString
     )
 
     return { schema: compiledSchema, graphQLSchema, tinaSchema }
@@ -316,19 +375,24 @@ export class ConfigBuilder {
     local,
     port,
     rootPath,
+    tinaDirectory,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
   }) {
     const astSchema = await getASTSchema(this.database)
 
-    await genTypes({ schema: astSchema, usingTs, rootPath }, () => {}, {
-      noSDK,
-      verbose,
-    })
+    await genTypes(
+      { schema: astSchema, usingTs, rootPath, tinaDirectory },
+      () => {},
+      {
+        noSDK,
+        verbose,
+      }
+    )
 
     return genClient(
-      { tinaSchema: compiledSchema, usingTs, rootPath },
+      { tinaSchema: compiledSchema, usingTs, rootPath, tinaDirectory },
       {
         local,
         port,
@@ -341,11 +405,13 @@ export const buildAdmin = async ({
   schema,
   local,
   rootPath,
+  tinaDirectory,
   apiUrl,
 }: {
   schema: any
   local: boolean
   rootPath: string
+  tinaDirectory: string
   apiUrl: string
 }) => {
   if (schema?.config?.build) {
@@ -353,6 +419,7 @@ export const buildAdmin = async ({
       await viteBuild({
         local,
         rootPath,
+        tinaDirectory,
         outputFolder: schema?.config?.build?.outputFolder as string,
         publicFolder: schema?.config?.build?.publicFolder as string,
         apiUrl,

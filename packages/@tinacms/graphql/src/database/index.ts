@@ -52,6 +52,7 @@ type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
 type CreateDatabase = {
   bridge: Bridge
   store: Store
+  tinaDirectory?: string
   indexStatusCallback?: IndexStatusCallback
 }
 
@@ -63,7 +64,6 @@ export const createDatabase = async (config: CreateDatabase) => {
   })
 }
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
-const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
@@ -89,6 +89,7 @@ const defaultStatusCallback: IndexStatusCallback = () => Promise.resolve()
 export class Database {
   public bridge: Bridge
   public store: Store
+  public tinaDirectory: string
   public indexStatusCallback: IndexStatusCallback | undefined
   private tinaSchema: TinaSchema | undefined
   private collectionIndexDefinitions:
@@ -96,6 +97,7 @@ export class Database {
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   constructor(public config: CreateDatabase) {
+    this.tinaDirectory = config.tinaDirectory || '.tina'
     this.bridge = config.bridge
     this.store = config.store
     this.indexStatusCallback =
@@ -113,6 +115,9 @@ export class Database {
     const collection = tinaSchema.getCollectionByFullPath(filepath)
     return collection
   }
+
+  private getGeneratedFolder = () =>
+    path.join(this.tinaDirectory, '__generated__')
 
   private async partitionPathsByCollection(documentPaths: string[]) {
     const pathsByCollection: Record<string, string[]> = {}
@@ -322,7 +327,7 @@ export class Database {
   }
 
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
-    const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
+    const lookupPath = path.join(this.getGeneratedFolder(), `_lookup.json`)
     if (!this._lookup) {
       const _lookup = await this.store.get(normalizePath(lookupPath))
       // @ts-ignore
@@ -331,17 +336,17 @@ export class Database {
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
-    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
+    const graphqlPath = path.join(this.getGeneratedFolder(), `_graphql.json`)
     return this.store.get(normalizePath(graphqlPath))
   }
   //TODO - is there a reason why the database fetches some config with "bridge.get", and some with "store.get"?
   public getGraphQLSchemaFromBridge = async (): Promise<DocumentNode> => {
-    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
+    const graphqlPath = path.join(this.getGeneratedFolder(), `_graphql.json`)
     const _graphql = await this.bridge.get(normalizePath(graphqlPath))
     return JSON.parse(_graphql)
   }
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
-    const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
+    const schemaPath = path.join(this.getGeneratedFolder(), `_schema.json`)
     return this.store.get(normalizePath(schemaPath))
   }
 
@@ -514,11 +519,11 @@ export class Database {
   }) => {
     if (this.bridge.supportsBuilding()) {
       await this.bridge.putConfig(
-        normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
+        normalizePath(path.join(this.getGeneratedFolder(), `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
       await this.bridge.putConfig(
-        normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
+        normalizePath(path.join(this.getGeneratedFolder(), `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
     }
@@ -545,21 +550,21 @@ export class Database {
     await this.indexStatusCallbackWrapper(async () => {
       const lookup = JSON.parse(
         await this.bridge.get(
-          normalizePath(path.join(GENERATED_FOLDER, '_lookup.json'))
+          normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json'))
         )
       )
       if (this.store.supportsSeeding()) {
         await this.store.clear()
         await this.store.seed(
-          normalizePath(path.join(GENERATED_FOLDER, '_graphql.json')),
+          normalizePath(path.join(this.getGeneratedFolder(), '_graphql.json')),
           graphQLSchema
         )
         await this.store.seed(
-          normalizePath(path.join(GENERATED_FOLDER, '_schema.json')),
+          normalizePath(path.join(this.getGeneratedFolder(), '_schema.json')),
           tinaSchema.schema
         )
         await this.store.seed(
-          normalizePath(path.join(GENERATED_FOLDER, '_lookup.json')),
+          normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
           lookup
         )
         await this._indexAllContent()
@@ -631,7 +636,7 @@ export class Database {
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
-    const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
+    const lookupPath = path.join(this.getGeneratedFolder(), `_lookup.json`)
     let lookupMap
     try {
       lookupMap = JSON.parse(await this.bridge.get(normalizePath(lookupPath)))

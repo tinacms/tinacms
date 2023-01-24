@@ -115,6 +115,7 @@ export const compileFile = async (
     verbose?: boolean
     dev?: boolean
     rootPath: string
+    tinaDirectory: string
   },
   fileName: string
 ) => {
@@ -122,7 +123,7 @@ export const compileFile = async (
   if (!root) {
     throw new Error('ctx.rootPath has not been attached')
   }
-  const tinaPath = path.join(root, '.tina')
+  const tinaPath = path.join(root, options.tinaDirectory)
   const tsConfigPath = path.join(root, 'tsconfig.json')
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaTempPath = path.join(tinaGeneratedPath, `temp_${fileName}`)
@@ -213,9 +214,10 @@ export const compileSchema = async (options: {
   verbose?: boolean
   dev?: boolean
   rootPath: string
+  tinaDirectory: string
 }) => {
   const root = options.rootPath
-  const tinaPath = path.join(root, '.tina')
+  const tinaPath = path.join(root, options.tinaDirectory)
   const tinaGeneratedPath = path.join(tinaPath, '__generated__')
   const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
 

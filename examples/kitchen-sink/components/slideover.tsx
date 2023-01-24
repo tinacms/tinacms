@@ -14,9 +14,9 @@ limitations under the License.
 import { Fragment, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { client } from '../.tina/__generated__/client'
+import { client } from '../tina/__generated__/client'
 import Navigation from './navigation'
-import type { MenuQueryQuery } from '../.tina/__generated__/types'
+import type { MenuQueryQuery } from '../tina/__generated__/types'
 
 type Item = {
   name: string

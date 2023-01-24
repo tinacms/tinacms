@@ -26,8 +26,8 @@ import { plugin as typescriptSdkPlugin } from './sdkPlugin'
 
 export const generateTypes = async (
   schema: GraphQLSchema,
-  queryPathGlob = process.cwd(),
-  fragDocPath = process.cwd(),
+  queryPathGlob,
+  fragDocPath,
   options: { noSDK: boolean; verbose?: boolean } = {
     noSDK: false,
     verbose: false,

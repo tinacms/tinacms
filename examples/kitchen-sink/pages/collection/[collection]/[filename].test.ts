@@ -2,7 +2,7 @@ import { test, expect } from 'vitest'
 import { getServerSideProps } from './[filename]'
 import { printState, printBlueprints } from '@tinacms/app/dist/test-utils'
 import schema from '../../../.tina/__generated__/_graphql.json'
-import client from '../../../.tina/__generated__/client'
+import client from '../../../tina/__generated__/client'
 import { DocumentNode, print } from 'graphql'
 import { toMatchFile } from 'jest-file-snapshot'
 expect.extend({ toMatchFile })

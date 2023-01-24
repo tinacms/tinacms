@@ -27,14 +27,16 @@ export async function genClient(
     tinaSchema,
     usingTs,
     rootPath,
+    tinaDirectory,
   }: {
     tinaSchema: TinaCloudSchema<false>
     usingTs?: boolean
     rootPath: string
+    tinaDirectory: string
   },
   options
 ) {
-  const generatedPath = p.join(rootPath, '.tina', '__generated__')
+  const generatedPath = p.join(rootPath, tinaDirectory, '__generated__')
   const branch = tinaSchema?.config?.branch
   const clientId = tinaSchema?.config?.clientId
   const token = tinaSchema.config?.token
@@ -76,15 +78,25 @@ export async function genTypes(
     schema,
     usingTs,
     rootPath,
-  }: { schema: GraphQLSchema; usingTs?: boolean; rootPath: string },
+    tinaDirectory,
+  }: {
+    schema: GraphQLSchema
+    usingTs?: boolean
+    rootPath: string
+    tinaDirectory: string
+  },
   next: () => void,
   options
 ) {
-  const typesPath = rootPath + '/.tina/__generated__/types.ts'
-  const typesJSPath = rootPath + '/.tina/__generated__/types.js'
-  const typesDPath = rootPath + '/.tina/__generated__/types.d.ts'
-  const fragPath = rootPath + '/.tina/__generated__/*.{graphql,gql}'
-  const queryPathGlob = rootPath + '/.tina/queries/**/*.{graphql,gql}'
+  const typesPath = p.join(rootPath, tinaDirectory) + '/__generated__/types.ts'
+  const typesJSPath =
+    p.join(rootPath, tinaDirectory) + '/__generated__/types.js'
+  const typesDPath =
+    p.join(rootPath, tinaDirectory) + '/__generated__/types.d.ts'
+  const fragPath =
+    p.join(rootPath, tinaDirectory) + '/__generated__/*.{graphql,gql}'
+  const queryPathGlob =
+    p.join(rootPath, tinaDirectory) + '/queries/**/*.{graphql,gql}'
 
   const typescriptTypes = await generateTypes(
     schema,
@@ -112,7 +124,8 @@ export async function genTypes(
   }
 
   const schemaString = await printSchema(schema)
-  const schemaPath = rootPath + '/.tina/__generated__/schema.gql'
+  const schemaPath =
+    p.join(rootPath, tinaDirectory) + '/__generated__/schema.gql'
 
   await fs.outputFile(
     schemaPath,

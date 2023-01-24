@@ -228,7 +228,10 @@ export const baseCmds: Command[] = [
       attachPath({ context: {}, options }).then((context) =>
         checkOptions({ context, options }).then((context) =>
           buildSetupCmdBuild({ context, options }).then((context) =>
-            buildCmdBuild({ context, options }).then((context) =>
+            buildCmdBuild({
+              context,
+              options: { ...options, tinaDirectory: context.tinaDirectory },
+            }).then((context) =>
               checkClientInfo({ context, options }).then((context) =>
                 waitForDB({ context, options })
               )

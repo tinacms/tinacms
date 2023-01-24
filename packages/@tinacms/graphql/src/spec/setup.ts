@@ -50,10 +50,11 @@ export const setup = async (
     bridge: setupBridge,
     store,
   })
-  const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
-    database: setupDatabase,
-    config: schema,
-  })
+  const { graphQLSchema, tinaSchema, fragString, queriesString } =
+    await buildDotTinaFiles({
+      database: setupDatabase,
+      config: schema,
+    })
   await setupDatabase.indexContent({ graphQLSchema, tinaSchema })
 
   const bridge = new MockFilesystemBridge(rootPath)
@@ -68,6 +69,31 @@ export const setup = async (
   await fs.outputFileSync(
     path.join(rootPath, '.tina', '__generated__', 'schema.gql'),
     graphQLSchemaString
+  )
+  const fragPath = path.join(rootPath, '.tina', '__generated__', 'frags.gql')
+  await fs.outputFileSync(fragPath, fragString)
+  if (
+    (await (await fs.stat(fragPath)).size) >
+    // convert to 100 kb to bytes
+    100 * 1024
+  ) {
+    console.warn(
+      'Warning: frags.gql is very large (>100kb). Consider setting the reference depth to 1 or 0. See code snippet below.'
+    )
+    console.log(
+      `const schema = defineSchema({
+        config: {
+            client: {
+                referenceDepth: 1,
+            },
+        }
+        // ...
+    })`
+    )
+  }
+  await fs.outputFileSync(
+    path.join(rootPath, '.tina', '__generated__', 'queries.gql'),
+    fragString
   )
 
   return {

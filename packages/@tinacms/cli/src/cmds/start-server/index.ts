@@ -54,6 +54,7 @@ export async function startServer(args: {
   context: {
     builder: ConfigBuilder
     rootPath: string
+    tinaDirectory: string
     database: Database
     bridge: Bridge
     usingTs: boolean
@@ -68,6 +69,7 @@ export async function startServerInner(
   ctx: {
     builder: ConfigBuilder
     rootPath: string
+    tinaDirectory: string
     database: Database
     bridge: Bridge
     usingTs: boolean
@@ -181,6 +183,7 @@ export async function startServerInner(
       await beforeBuild()
       const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
         rootPath: ctx.rootPath,
+        tinaDirectory: ctx.tinaDirectory,
         verbose,
         local: true,
       })
@@ -206,6 +209,7 @@ export async function startServerInner(
         usingTs: ctx.usingTs,
         port,
         rootPath: ctx.rootPath,
+        tinaDirectory: ctx.tinaDirectory,
       })
 
       await spin({
@@ -218,6 +222,7 @@ export async function startServerInner(
       await buildAdmin({
         local: true,
         rootPath: ctx.rootPath,
+        tinaDirectory: ctx.tinaDirectory,
         schema,
         apiUrl,
       })
@@ -234,14 +239,18 @@ export async function startServerInner(
       .watch(
         [
           ...foldersToWatch,
-          `${rootPath}/.tina/**/*.{ts,gql,graphql,js,tsx,jsx}`,
+          path.join(
+            rootPath,
+            ctx.tinaDirectory,
+            '/**/*.{ts,gql,graphql,js,tsx,jsx}'
+          ),
           gqlPackageFile,
         ],
         {
           ignored: [
             '**/node_modules/**/*',
             '**/.next/**/*',
-            `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
+            path.join(rootPath, ctx.tinaDirectory, '__generated__/**/*'),
           ],
         }
       )

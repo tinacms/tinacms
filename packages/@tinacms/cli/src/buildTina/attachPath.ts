@@ -13,21 +13,41 @@
 
 import { pathExists } from 'fs-extra'
 import path from 'path'
+import fs from 'fs-extra'
 
 export const attachPath = async <C extends object>(args: {
   context: C
   options: { rootPath?: string }
-}): Promise<C & { rootPath: string; usingTs: boolean }> => {
+}): Promise<
+  C & { rootPath: string; tinaDirectory: string; usingTs: boolean }
+> => {
   const rootPath = args.options.rootPath || process.cwd()
+
+  // const tinaDirectory = '.tina'
+  let tinaDirectory = 'tina'
+  if (fs.existsSync(path.join(rootPath, '.tina'))) {
+    if (fs.existsSync(path.join(rootPath, 'tina'))) {
+      console.log(
+        'Detected "tina" and ".tina" folders, it\'s safe to remove the ".tina" folder'
+      )
+    } else {
+      console.log('Detected legacy directory for tina, move to "tina"')
+    }
+    tinaDirectory = '.tina'
+  }
   return {
     ...args.context,
+    tinaDirectory,
     rootPath,
-    usingTs: await isProjectTs(rootPath),
+    usingTs: await isProjectTs(rootPath, tinaDirectory),
   }
 }
 
-export const isProjectTs = async (rootPath: string) => {
-  const tinaPath = path.join(rootPath, '.tina')
+export const isProjectTs = async (
+  rootPath: string,
+  tinaDirectory: string = '.tina'
+) => {
+  const tinaPath = path.join(rootPath, tinaDirectory)
 
   return (
     (await pathExists(path.join(tinaPath, 'schema.ts'))) ||

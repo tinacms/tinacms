@@ -36,7 +36,7 @@ export interface Framework {
 }
 
 export async function initStaticTina(args: {
-  context: { rootPath: string }
+  context: { rootPath: string; tinaDirectory: string }
   options: { noTelemetry?: boolean }
 }) {
   const baseDir = args.context.rootPath
@@ -112,6 +112,7 @@ export async function initStaticTina(args: {
   await addConfigFile({
     publicFolder,
     baseDir,
+    tinaDirectory: args.context.tinaDirectory,
     usingTypescript,
     framework,
     collections,
@@ -319,6 +320,7 @@ const addDependencies = async (packageManager) => {
 export interface AddConfigArgs {
   publicFolder: string
   baseDir: string
+  tinaDirectory: string
   usingTypescript: boolean
   framework: Framework
   collections?: string
@@ -326,9 +328,9 @@ export interface AddConfigArgs {
   clientId?: string
 }
 const addConfigFile = async (args: AddConfigArgs) => {
-  const { baseDir, usingTypescript } = args
+  const { baseDir, usingTypescript, tinaDirectory } = args
   const configPath = path.join(
-    '.tina',
+    tinaDirectory,
     `config.${usingTypescript ? 'ts' : 'js'}`
   )
   const fullConfigPath = path.join(baseDir, configPath)

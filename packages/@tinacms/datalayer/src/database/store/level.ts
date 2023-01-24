@@ -46,13 +46,17 @@ export class LevelStore implements Store {
   public rootPath
   public db: LevelDB
   public useMemory: boolean
-  constructor(rootPath: string, useMemory: boolean = false) {
+  constructor(
+    rootPath: string,
+    useMemory: boolean = false,
+    tinaDirectory = '.tina'
+  ) {
     this.rootPath = rootPath || ''
     this.useMemory = useMemory
     if (useMemory) {
       this.db = levelup(encode(memdown(), { valueEncoding: 'json' }))
     } else {
-      this.db = level(path.join(rootPath, '.tina/__generated__/db'), {
+      this.db = level(path.join(rootPath, tinaDirectory, '__generated__/db'), {
         valueEncoding: 'json',
       })
     }
