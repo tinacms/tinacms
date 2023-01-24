@@ -16,11 +16,14 @@ import { pipeline } from 'readable-stream'
 import { connect } from 'net'
 
 export class TinaLevelClient extends ManyLevelGuest {
-  constructor() {
-    super()
+  private _connected = false
+  public openConnection() {
+    if (this._connected) return
     const socket = connect(9000)
     pipeline(socket, this.createRpcStream(), socket, () => {
       // Disconnected
+      this._connected = false
     })
+    this._connected = true
   }
 }
