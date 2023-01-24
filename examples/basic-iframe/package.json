@@ -2,7 +2,7 @@
   "name": "starter-basic-iframe",
   "private": true,
   "scripts": {
-    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
+    "dev": "TINA_IS_LOCAL='true' tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms build && next build",
     "start": "next start",
     "lint": "next lint"
