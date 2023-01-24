@@ -50,7 +50,7 @@ export const BillingWarning = () => {
   React.useEffect(() => {
     const fetchBillingState = async () => {
       if (typeof api?.getBillingState !== 'function') return
-      const billingRes = (await api?.getBillingState()) || {}
+      const billingRes = await api?.getBillingState()
       setBillingState(billingRes)
     }
     if (!isLocalMode) fetchBillingState()
