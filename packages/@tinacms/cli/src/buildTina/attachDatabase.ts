@@ -20,9 +20,9 @@ import { createDatabase, TinaLevelClient } from '@tinacms/graphql'
 import fs from 'fs-extra'
 import { makeIsomorphicOptions } from './git'
 import { MemoryLevel } from 'memory-level'
-const { ManyLevelGuest, ManyLevelHost } = require('many-level')
-const { pipeline } = require('readable-stream')
-const { connect, createServer } = require('net')
+import { ManyLevelHost } from 'many-level'
+import { pipeline } from 'readable-stream'
+import { createServer } from 'net'
 
 export const attachDatabase = async (
   ctx: any,
@@ -49,6 +49,8 @@ export const attachDatabase = async (
   })
   const fsBridge = new FilesystemBridge(ctx.rootPath)
 
+  console.log('init level host')
+
   const levelHost = new ManyLevelHost(
     new MemoryLevel<string, Record<string, any>>({
       valueEncoding: 'json',
@@ -61,6 +63,7 @@ export const attachDatabase = async (
       // Disconnected
     })
   })
+  console.log('done init level host')
 
   server.listen(9000)
   ctx.dbServer = server
@@ -127,7 +130,7 @@ export const attachDatabase = async (
       : fsBridge
 
     const level = new TinaLevelClient()
-    level.connect()
+    level.openConnection()
 
     ctx.database = await createDatabase({ level, bridge })
     ctx.bridge = bridge
