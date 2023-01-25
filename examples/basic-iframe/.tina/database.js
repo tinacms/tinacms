@@ -1,10 +1,7 @@
 import { createDatabase } from '@tinacms/graphql'
-import { FilesystemBridge } from '@tinacms/datalayer'
 import { TinaLevelClient } from '@tinacms/cli'
 import { MongodbLevel } from 'mongodb-level'
 import { Octokit } from '@octokit/rest'
-import fs from 'fs'
-import path from 'path'
 import { Base64 } from 'js-base64'
 
 const isLocal = process.env.TINA_IS_LOCAL === 'true'
@@ -50,10 +47,7 @@ const githubOnPut = async (key, value) => {
     sha,
   })
 }
-const localOnPut = async (key, value) => {
-  const filePath = path.join(process.cwd(), key)
-  fs.writeFileSync(filePath, value)
-}
+
 const githubOnDelete = async (key) => {
   console.log('deleting', key)
   let sha
@@ -82,14 +76,9 @@ const githubOnDelete = async (key) => {
     console.log('data', data)
   }
 }
-const localOnDelete = async (key) => {
-  const filePath = path.join(process.cwd(), key)
-  fs.rmSync(filePath)
-}
 
 export default createDatabase({
-  bridge: new FilesystemBridge(process.cwd()),
   level: isLocal ? localLevelStore : mongodbLevelStore,
-  onPut: isLocal ? localOnPut : githubOnPut,
-  onDelete: isLocal ? localOnDelete : githubOnDelete,
+  onPut: isLocal ? undefined : githubOnPut,
+  onDelete: isLocal ? undefined : githubOnDelete,
 })
