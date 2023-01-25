@@ -14,14 +14,44 @@
 import { pathExists } from 'fs-extra'
 import path from 'path'
 import fs from 'fs-extra'
+import prompts from 'prompts'
+import { logger } from '../logger'
+import { focusText } from '../utils/theme'
 
 export const attachPath = async <C extends object>(args: {
   context: C
-  options: { rootPath?: string }
+  options: { rootPath?: string; moveConfig?: boolean }
 }): Promise<
   C & { rootPath: string; tinaDirectory: string; usingTs: boolean }
 > => {
   const rootPath = args.options.rootPath || process.cwd()
+  if (args.options.moveConfig) {
+    await prompts({
+      name: 'move',
+      type: 'confirm',
+      initial: true,
+      message: `Preparing to move Tina config, ensure you've committed your
+  latest changes to source control before continuing. Proceed?`,
+    })
+    const oldTinaConfigPath = path.join(rootPath, '.tina')
+    const newTinaConfigPath = path.join(rootPath, 'tina')
+    if (fs.existsSync(newTinaConfigPath)) {
+      console.log(
+        'New tina config already exists, ignoring --moveConfig option'
+      )
+    } else {
+      if (!fs.existsSync(oldTinaConfigPath)) {
+        throw new Error(`Unable to find .tina folder, exiting`)
+      }
+      logger.info(
+        `Copying config files from ${focusText('.tina')} to ${focusText(
+          'tina'
+        )}`
+      )
+      await fs.copy(path.join(rootPath, '.tina'), path.join(rootPath, 'tina'))
+      await fs.removeSync(path.join(rootPath, '.tina'))
+    }
+  }
 
   // const tinaDirectory = '.tina'
   let tinaDirectory = 'tina'

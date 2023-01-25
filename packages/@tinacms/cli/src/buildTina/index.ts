@@ -369,15 +369,15 @@ export class ConfigBuilder {
       path.join(rootPath, tinaDirectory, '__generated__', 'queries.gql'),
       queriesString
     )
+    const lookupJSON = await fs
+      .readFileSync(
+        path.join(rootPath, tinaDirectory, '__generated__', '_lookup.json')
+      )
+      .toString()
     if (tinaDirectory === 'tina') {
       const schemaJSON = await fs
         .readFileSync(
           path.join(rootPath, tinaDirectory, '__generated__', '_schema.json')
-        )
-        .toString()
-      const lookupJSON = await fs
-        .readFileSync(
-          path.join(rootPath, tinaDirectory, '__generated__', '_lookup.json')
         )
         .toString()
       const graphqlJSON = await fs

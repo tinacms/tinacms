@@ -3,6 +3,12 @@
 # https://github.com/graphql/vscode-graphql/issues/242#issue-721757152
 
 projects:
+  kitchenSink:
+    schema: examples/kitchen-sink/tina/__generated__/schema.gql
+    documents:
+      - examples/kitchen-sink/**/*.tsx
+      - examples/kitchen-sink/**/*.ts
+      - examples/kitchen-sink/**/*.gql
   forestry:
     schema: packages/@tinacms/graphql/src/spec/forestry-sample/.tina/__generated__/schema.gql
     documents:

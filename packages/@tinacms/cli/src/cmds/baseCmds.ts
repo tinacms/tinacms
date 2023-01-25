@@ -129,6 +129,12 @@ const localOption = {
   description: 'Uses the local file system graphql server',
   defaultValue: false,
 } as const
+const moveConfig = {
+  name: '--moveConfig',
+  key: 'moveConfig',
+  description: 'Move config files from .tina to tina. More info [here]()',
+  defaultValue: false,
+} as const
 
 const checkOptions = async <C extends object>({
   context,
@@ -186,6 +192,7 @@ export const baseCmds: Command[] = [
     command: CMD_DEV,
     description: 'Builds tina and starts the dev server.',
     options: [
+      moveConfig,
       startServerPortOption,
       subCommand,
       isomorphicGitBridge,
