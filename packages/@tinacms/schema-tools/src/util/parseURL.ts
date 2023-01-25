@@ -34,7 +34,6 @@ export const parseURL = (
   const params = new URL(url)
 
   // This is a self-hosted URL
-  console.log(params.host)
   const isTinaCloud =
     params.host.includes('tinajs.dev') ||
     params.host.includes('tina.io') ||
