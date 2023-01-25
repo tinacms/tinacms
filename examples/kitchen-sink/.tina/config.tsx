@@ -12,7 +12,6 @@ const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
 export default defineConfig({
-  contentApiUrlOverride: 'http://localhost:3000/api/gql',
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',

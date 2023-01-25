@@ -135,19 +135,12 @@ importers:
       '@tailwindcss/typography': ^0.5.7
       '@tinacms/app': workspace:*
       '@tinacms/cli': workspace:*
-      '@tinacms/datalayer': workspace:*
-      '@tinacms/graphql': workspace:*
       autoprefixer: ^10.4.0
-      classic-level: ^1.2.0
       cypress: ^10.10.0
-      dotenv: ^16.0.3
       eslint: 8.24.0
       eslint-config-next: 12.0.3
       graphql: ^15.1.0
       jest-file-snapshot: ^0.5.0
-      mongodb: ^4.13.0
-      mongodb-level: ^0.0.1
-      multileveldown: ^5.0.1
       next: 12.2.4
       postcss: ^8.4.18
       puppeteer: ^18.0.5
@@ -165,15 +158,8 @@ importers:
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
       '@heroicons/react': 2.0.12_react@18.2.0
       '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
-      '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
-      '@tinacms/graphql': link:../../packages/@tinacms/graphql
-      classic-level: 1.2.0
-      dotenv: 16.0.3
       graphql: 15.8.0
       jest-file-snapshot: 0.5.0
-      mongodb: 4.13.0
-      mongodb-level: 0.0.1
-      multileveldown: 5.0.1
       next: 12.2.4_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -15499,17 +15485,6 @@ packages:
     engines: { node: '>=10' }
     dev: false
 
-  /deferred-leveldown/7.0.0:
-    resolution:
-      {
-        integrity: sha512-QKN8NtuS3BC6m0B8vAnBls44tX1WXAFATUsJlruyAYbZpysWV3siH6o/i3g9DCHauzodksO60bdj5NazNbjCmg==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      abstract-leveldown: 7.2.0
-      inherits: 2.0.4
-    dev: false
-
   /define-properties/1.1.4:
     resolution:
       {
@@ -22802,17 +22777,6 @@ packages:
       invert-kv: 1.0.0
     dev: false
 
-  /length-prefixed-stream/2.0.0:
-    resolution:
-      {
-        integrity: sha512-dvjTuWTKWe0oEznQcG6a9osfiYknCs7DEFJMP88n9Y581IFhYh1sZIgAFcuDOojKB0G7ftPreKhh4D0kh/VPjQ==,
-      }
-    dependencies:
-      inherits: 2.0.4
-      readable-stream: 3.6.0
-      varint: 5.0.2
-    dev: false
-
   /level-codec/10.0.0:
     resolution:
       {
@@ -22841,17 +22805,6 @@ packages:
     engines: { node: '>=10' }
     dev: false
 
-  /level-iterator-stream/5.0.0:
-    resolution:
-      {
-        integrity: sha512-wnb1+o+CVFUDdiSMR/ZymE2prPs3cjVLlXuDeSq9Zb8o032XrabGEXcTCsBxprAtseO3qvFeGzh6406z9sOTRA==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      inherits: 2.0.4
-      readable-stream: 3.6.0
-    dev: false
-
   /level-supports/2.1.0:
     resolution:
       {
@@ -22876,21 +22829,6 @@ packages:
     dependencies:
       buffer: 6.0.3
       module-error: 1.0.2
-
-  /levelup/5.1.1:
-    resolution:
-      {
-        integrity: sha512-0mFCcHcEebOwsQuk00WJwjLI6oCjbBuEYdh/RaRqhjnyVlzqf41T1NnDtCedumZ56qyIh8euLFDqV1KfzTAVhg==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      catering: 2.1.1
-      deferred-leveldown: 7.0.0
-      level-errors: 3.0.1
-      level-iterator-stream: 5.0.0
-      level-supports: 2.1.0
-      queue-microtask: 1.2.3
-    dev: false
 
   /leven/2.1.0:
     resolution:
@@ -24498,19 +24436,6 @@ packages:
       whatwg-url: 11.0.0
     dev: false
 
-  /mongodb-level/0.0.1:
-    resolution:
-      {
-        integrity: sha512-Zy6yjKXsExbT9yJsRQZc7uu2tDOIGncD8wWjPGvl86P+AlhyE0uYG9sS8zXEhp0IWnHdC6RpeLSIOqUVtIVvKw==,
-      }
-    dependencies:
-      abstract-level: 1.0.3
-      module-error: 1.0.2
-      mongodb: 4.13.0
-    transitivePeerDependencies:
-      - aws-crt
-    dev: false
-
   /mongodb/4.13.0:
     resolution:
       {
@@ -24612,24 +24537,6 @@ packages:
       object-assign: 4.1.1
       type-is: 1.6.18
       xtend: 4.0.2
-    dev: false
-
-  /multileveldown/5.0.1:
-    resolution:
-      {
-        integrity: sha512-iBZxEPLGE3zZOgGTbVSs4sDrR3b4u3ZpyV66mIAIsd3ECGZWEkdLgJl6pwm7YsqNDVQFOJxgq5G60aFlP7cP4w==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      abstract-leveldown: 7.2.0
-      duplexify: 4.1.2
-      encoding-down: 7.1.0
-      end-of-stream: 1.4.4
-      length-prefixed-stream: 2.0.0
-      levelup: 5.1.1
-      numeric-id-map: 1.1.0
-      protocol-buffers-encodings: 1.2.0
-      reachdown: 1.1.0
     dev: false
 
   /multimatch/2.1.0:
@@ -25153,13 +25060,6 @@ packages:
         integrity: sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==,
       }
     engines: { node: '>=0.10.0' }
-    dev: false
-
-  /numeric-id-map/1.1.0:
-    resolution:
-      {
-        integrity: sha512-Uykta6eiJdSdRNFhA+vHYQITEugUzijF/zuaCvggDuymPtmCkdO7pVnNv5E9zsGRhj2V/2beGWGzOdP+d9OX8Q==,
-      }
     dev: false
 
   /nwsapi/2.2.1:
@@ -26788,14 +26688,6 @@ packages:
     dependencies:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-    dev: false
-
-  /reachdown/1.1.0:
-    resolution:
-      {
-        integrity: sha512-6LsdRe4cZyOjw4NnvbhUd/rGG7WQ9HMopPr+kyL018Uci4kijtxcGR5kVb5Ln13k4PEE+fEFQbjfOvNw7cnXmA==,
-      }
-    engines: { node: '>=6' }
     dev: false
 
   /react-base16-styling/0.6.0:
