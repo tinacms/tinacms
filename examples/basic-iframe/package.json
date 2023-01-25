@@ -2,7 +2,7 @@
   "name": "starter-basic-iframe",
   "private": true,
   "scripts": {
-    "dev": "TINA_IS_LOCAL='true' tinacms dev --noTelemetry -c \"next dev\"",
+    "dev": "tinacms dev --noTelemetry -c \"next dev\"",
     "build": "tinacms build && next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,14 +14,11 @@
     "dotenv": "^16.0.3",
     "js-base64": "^3.7.4",
     "mongodb": "^4.13.0",
-    "mongodb-level": "^0.0.2",
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-is": "^17.0.2",
-    "tinacms": "workspace:*",
-    "many-level": "^2.0.0",
-    "readable-stream": "^4.3.0"
+    "tinacms": "workspace:*"
   },
   "devDependencies": {
     "@tinacms/cli": "workspace:*",
