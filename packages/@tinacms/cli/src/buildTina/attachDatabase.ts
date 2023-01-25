@@ -16,7 +16,7 @@ import * as path from 'path'
 import { transpile } from '../cmds/compile'
 import { BuildSchemaError } from '../cmds/start-server/errors'
 import { FilesystemBridge, IsomorphicBridge } from '@tinacms/datalayer'
-import { createDatabase } from '@tinacms/graphql'
+import { createDatabase, TinaLevelClient } from '@tinacms/graphql'
 import fs from 'fs-extra'
 import { makeIsomorphicOptions } from './git'
 import { MemoryLevel } from 'memory-level'
@@ -126,13 +126,8 @@ export const attachDatabase = async (
         )
       : fsBridge
 
-    const level = new ManyLevelGuest()
-    const socket = connect(9000)
-
-    // Pipe socket into guest stream and vice versa
-    pipeline(socket, level.createRpcStream(), socket, () => {
-      // Disconnected
-    })
+    const level = new TinaLevelClient()
+    level.connect()
 
     ctx.database = await createDatabase({ level, bridge })
     ctx.bridge = bridge

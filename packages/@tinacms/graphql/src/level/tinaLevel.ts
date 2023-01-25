@@ -15,7 +15,10 @@ import { ManyLevelGuest } from 'many-level'
 import { pipeline } from 'readable-stream'
 import { connect } from 'net'
 
-export class TinaLevelClient extends ManyLevelGuest {
+export class TinaLevelClient extends ManyLevelGuest<
+  string,
+  Record<string, any>
+> {
   private _connected = false
   public openConnection() {
     if (this._connected) return
