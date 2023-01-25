@@ -67,10 +67,10 @@ export const setup = async (
   // @ts-ignore
   const graphQLSchemaString = printSchema(buildASTSchema(schemaString))
   await fs.outputFileSync(
-    path.join(rootPath, '.tina', '__generated__', 'schema.gql'),
+    path.join(rootPath, 'tina', '__generated__', 'schema.gql'),
     graphQLSchemaString
   )
-  const fragPath = path.join(rootPath, '.tina', '__generated__', 'frags.gql')
+  const fragPath = path.join(rootPath, 'tina', '__generated__', 'frags.gql')
   await fs.outputFileSync(fragPath, fragString)
   if (
     (await (await fs.stat(fragPath)).size) >
@@ -92,7 +92,7 @@ export const setup = async (
     )
   }
   await fs.outputFileSync(
-    path.join(rootPath, '.tina', '__generated__', 'queries.gql'),
+    path.join(rootPath, 'tina', '__generated__', 'queries.gql'),
     fragString
   )
 

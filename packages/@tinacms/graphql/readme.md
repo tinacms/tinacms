@@ -36,7 +36,7 @@ The most valuable test right now is the `builder.spec.ts`, it's sort of an integ
 
 ### Builder
 
-The builder service is responsible for building out the entire GraphQL schema for a given `.tina` config. This service can run at any time (but needs to be re-run on each schema change) and it's output is a GraphQL schema which can be stored in the schema definition language (SDL) as a string in a database record or as a `.graphql` file. At the top of the schema is a `document` query, this query returns the document, which can be one of any number of templates defined in the `.tina` config. From there, each field in the given template is used to build out the rest of the schema, so each template field is built by the `type` in it's definition
+The builder service is responsible for building out the entire GraphQL schema for a given `tina` config. This service can run at any time (but needs to be re-run on each schema change) and it's output is a GraphQL schema which can be stored in the schema definition language (SDL) as a string in a database record or as a `.graphql` file. At the top of the schema is a `document` query, this query returns the document, which can be one of any number of templates defined in the `.tina` config. From there, each field in the given template is used to build out the rest of the schema, so each template field is built by the `type` in it's definition
 
 #### Field-level builders
 

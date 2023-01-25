@@ -487,7 +487,8 @@ export class Database {
         } catch (error) {
           if (
             error instanceof Error &&
-            !edge.path.includes('.tina/__generated__/_graphql.json')
+            (!edge.path.includes('.tina/__generated__/_graphql.json') ||
+              !edge.path.includes('tina/__generated__/_graphql.json'))
           ) {
             throw new TinaQueryError({
               originalError: error,

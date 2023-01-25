@@ -108,7 +108,6 @@ export async function initStaticTina(args: {
 
   await addDependencies(packageManager)
 
-  // add .tina/config.{js,ts}]
   await addConfigFile({
     publicFolder,
     baseDir,
@@ -349,7 +348,7 @@ const addConfigFile = async (args: AddConfigArgs) => {
   } else {
     logger.info(
       logText(
-        `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
+        `Adding config file at tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
     await fs.outputFileSync(fullConfigPath, config(args))

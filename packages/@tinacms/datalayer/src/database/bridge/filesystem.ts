@@ -82,6 +82,11 @@ export class AuditFileSystemBridge extends FilesystemBridge {
         '.tina/__generated__/_lookup.json',
         '.tina/__generated__/_schema.json',
         '.tina/__generated__/_graphql.json',
+      ].includes(filepath) ||
+      [
+        'tina/__generated__/_lookup.json',
+        'tina/__generated__/_schema.json',
+        'tina/__generated__/_graphql.json',
       ].includes(filepath)
     ) {
       return super.put(filepath, data)

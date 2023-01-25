@@ -229,10 +229,10 @@ describe('isomorphic bridge', () => {
     })
 
     test('putConfig', async () => {
-      const filepath = '.tina/__generated__/_schema.json'
+      const filepath = 'tina/__generated__/_schema.json'
       const content = '{}'
       await bridge.putConfig(filepath, content)
-      const result = await bridge.glob('.tina', '.json')
+      const result = await bridge.glob('tina', '.json')
       expect(result).toEqual([filepath])
       expect(content).toEqual(await bridge.get(filepath))
     })
