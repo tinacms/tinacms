@@ -33,14 +33,6 @@ The `queries` folder is optional and is used by the [experimental generated clie
 
 This is where all the files that are generated during the build process are stored. Generally speaking, these files should be in your `.gitignore`.
 
-### `_lookup.json`
-
-This is a lookup file that is used to resolve document names. Must be pushed to GitHub.
-
-### `_schema.json`
-
-The Graphql Schema AST (represented in JSON). Must be pushed to GitHub.
-
 ### `types.{js,ts}`
 
 This file is where all the types of the schema are generated. This file is for the user to use in there site if they want to use the types. It is generated on every build, and does not need to be pushed to GitHub.
@@ -59,4 +51,14 @@ This file contains the raw graphql queries that are generated and used by the [e
 
 ### `schema.gql`
 
-This file contains the raw graphql schema. Does not need to be checked into source control.
+This file contains the raw graphql schema. If you're using `vscode-graphql` you can point it to this file
+for intellisense. Eg:
+
+```yml
+# graphql.config.yml
+schema: tina/__generated__/schema.gql
+documents:
+  - ./**/*.tsx
+  - ./**/*.ts
+  - ./**/*.gql
+```
