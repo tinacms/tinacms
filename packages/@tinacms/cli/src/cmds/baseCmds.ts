@@ -31,12 +31,14 @@ import { initStaticTina } from './init'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
+import { moveTinaFolder } from '../buildTina/moveTinaFolder'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
 export const INIT = 'init'
 export const AUDIT = 'audit'
 export const CMD_BUILD = 'build'
+export const MOVE_TINA = 'move-tina-config'
 
 const startServerPortOption = {
   name: '--port <port>',
@@ -129,12 +131,6 @@ const localOption = {
   description: 'Uses the local file system graphql server',
   defaultValue: false,
 } as const
-const moveConfig = {
-  name: '--moveConfig',
-  key: 'moveConfig',
-  description: 'Move config files from .tina to tina. More info [here]()',
-  defaultValue: false,
-} as const
 
 const checkOptions = async <C extends object>({
   context,
@@ -192,7 +188,6 @@ export const baseCmds: Command[] = [
     command: CMD_DEV,
     description: 'Builds tina and starts the dev server.',
     options: [
-      moveConfig,
       startServerPortOption,
       subCommand,
       isomorphicGitBridge,
@@ -290,6 +285,15 @@ export const baseCmds: Command[] = [
           })
         )
       )
+    },
+  }),
+  command({
+    command: MOVE_TINA,
+    description:
+      "The default location for Tina config is tina. This command moves things from '.tina'",
+    options: [],
+    action: async (options) => {
+      await moveTinaFolder({ context: {}, options })
     },
   }),
 ]
