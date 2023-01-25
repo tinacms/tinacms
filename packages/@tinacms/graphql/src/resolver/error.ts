@@ -13,7 +13,7 @@ limitations under the License.
 
 import { ASTNode, GraphQLError, Source, SourceLocation } from 'graphql'
 
-export class TinaGraphQLError extends Error implements GraphQLError {
+export class TinaGraphQLError extends GraphQLError {
   public extensions: Record<string, any>
   // FIXME: not sure what this does
   // override readonly name!: string;

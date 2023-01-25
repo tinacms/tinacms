@@ -127,7 +127,7 @@ importers:
       cypress: ^10.10.0
       eslint: 8.24.0
       eslint-config-next: 12.0.3
-      graphql: ^15.1.0
+      graphql: 16.6.0
       jest-file-snapshot: ^0.5.0
       next: 12.2.4
       postcss: ^8.4.18
@@ -146,7 +146,7 @@ importers:
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
       '@heroicons/react': 2.0.12_react@18.2.0
       '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
-      graphql: 15.8.0
+      graphql: 16.6.0
       jest-file-snapshot: 0.5.0
       next: 12.2.4_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
@@ -586,7 +586,7 @@ importers:
       fast-glob: ^3.2.5
       fs-extra: ^9.0.1
       glob-parent: ^6.0.2
-      graphql: 15.8.0
+      graphql: 16.6.0
       gray-matter: ^4.0.2
       isomorphic-git: ^1.10.3
       jest: 27.0.6
@@ -612,7 +612,7 @@ importers:
       fast-glob: 3.2.11
       fs-extra: 9.1.0
       glob-parent: 6.0.2
-      graphql: 15.8.0
+      graphql: 16.6.0
       gray-matter: 4.0.3
       isomorphic-git: 1.18.3
       js-yaml: 3.14.1
@@ -676,7 +676,7 @@ importers:
       fast-glob: ^3.2.5
       flat: ^5.0.2
       fs-extra: ^9.0.1
-      graphql: 15.8.0
+      graphql: 16.6.0
       graphql-type-json: ^0.3.2
       gray-matter: ^4.0.2
       jest: 27.0.6
@@ -712,7 +712,7 @@ importers:
       ws: ^7.3.1
       yup: ^0.32.9
     dependencies:
-      '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
+      '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@16.6.0
       '@tinacms/datalayer': link:../datalayer
       '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
@@ -727,8 +727,8 @@ importers:
       fast-glob: 3.2.11
       flat: 5.0.2
       fs-extra: 9.1.0
-      graphql: 15.8.0
-      graphql-type-json: 0.3.2_graphql@15.8.0
+      graphql: 16.6.0
+      graphql-type-json: 0.3.2_graphql@16.6.0
       gray-matter: 4.0.3
       js-yaml: 3.14.1
       leveldown: 6.1.1
@@ -1243,7 +1243,7 @@ importers:
       encoding: 0.1.13
       fetch-ponyfill: ^7.1.0
       final-form: 4.20.1
-      graphql: 15.8.0
+      graphql: 16.6.0
       graphql-tag: ^2.11.0
       identity-obj-proxy: ^3.0.0
       isomorphic-fetch: ^3.0.0
@@ -1261,7 +1261,7 @@ importers:
       url-pattern: ^1.0.3
       yup: ^0.32.0
     dependencies:
-      '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
+      '@graphql-tools/relay-operation-optimizer': 6.5.0_rjjjs2nwgns3bcvnnqb5eu5nry
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
       '@react-hook/window-size': 3.0.7_react@17.0.2
@@ -1272,8 +1272,8 @@ importers:
       encoding: 0.1.13
       fetch-ponyfill: 7.1.0_encoding@0.1.13
       final-form: 4.20.1
-      graphql: 15.8.0
-      graphql-tag: 2.12.6_graphql@15.8.0
+      graphql: 16.6.0
+      graphql-tag: 2.12.6_graphql@16.6.0
       lodash.set: 4.3.2
       prism-react-renderer: 1.3.5_react@17.0.2
       react-icons: 4.4.0_react@17.0.2
@@ -1281,7 +1281,7 @@ importers:
       url-pattern: 1.0.3
       yup: 0.32.11
     devDependencies:
-      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
+      '@graphql-tools/utils': 8.8.0_graphql@16.6.0
       '@testing-library/jest-dom': 5.16.4
       '@testing-library/react': 12.1.5_sfoxds7t5ydpegc3knd667wn6m
       '@testing-library/react-hooks': 7.0.2_sfoxds7t5ydpegc3knd667wn6m
@@ -1322,38 +1322,6 @@ packages:
       grapheme-splitter: 1.0.4
     dev: false
 
-  /@ardatan/relay-compiler/12.0.0_graphql@15.8.0:
-    resolution:
-      {
-        integrity: sha512-9anThAaj1dQr6IGmzBMcfzOQKTa5artjuPmw8NYK/fiGEMjADbSguBY2FMDykt+QhilR3wc9VA/3yVju7JHg7Q==,
-      }
-    hasBin: true
-    peerDependencies:
-      graphql: '*'
-    dependencies:
-      '@babel/core': 7.18.6
-      '@babel/generator': 7.18.6
-      '@babel/parser': 7.18.6
-      '@babel/runtime': 7.18.6
-      '@babel/traverse': 7.18.6
-      '@babel/types': 7.18.6
-      babel-preset-fbjs: 3.4.0_@babel+core@7.18.6
-      chalk: 4.1.2
-      fb-watchman: 2.0.1
-      fbjs: 3.0.4
-      glob: 7.2.3
-      graphql: 15.8.0
-      immutable: 3.7.6
-      invariant: 2.2.4
-      nullthrows: 1.1.1
-      relay-runtime: 12.0.0
-      signedsource: 1.0.0
-      yargs: 15.4.1
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    dev: false
-
   /@ardatan/relay-compiler/12.0.0_graphql@16.6.0:
     resolution:
       {
@@ -1386,7 +1354,7 @@ packages:
       - supports-color
     dev: false
 
-  /@ardatan/relay-compiler/12.0.0_qyboaezk4cm6zsf5jfobzggyaa:
+  /@ardatan/relay-compiler/12.0.0_rjjjs2nwgns3bcvnnqb5eu5nry:
     resolution:
       {
         integrity: sha512-9anThAaj1dQr6IGmzBMcfzOQKTa5artjuPmw8NYK/fiGEMjADbSguBY2FMDykt+QhilR3wc9VA/3yVju7JHg7Q==,
@@ -1406,7 +1374,7 @@ packages:
       fb-watchman: 2.0.1
       fbjs: 3.0.4_encoding@0.1.13
       glob: 7.2.3
-      graphql: 15.8.0
+      graphql: 16.6.0
       immutable: 3.7.6
       invariant: 2.2.4
       nullthrows: 1.1.1
@@ -5844,23 +5812,6 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-tools/relay-operation-optimizer/6.5.0_graphql@15.8.0:
-    resolution:
-      {
-        integrity: sha512-snqmdPiM2eBex6pijRFx4H9MPumVd8ZWM3y+aaRwzc73VUNnjHE4NyVZEEIdlbmJ2HoQ9Zrm9aFlHVMK7B59zg==,
-      }
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-    dependencies:
-      '@ardatan/relay-compiler': 12.0.0_graphql@15.8.0
-      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
-      graphql: 15.8.0
-      tslib: 2.4.0
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-    dev: false
-
   /@graphql-tools/relay-operation-optimizer/6.5.0_graphql@16.6.0:
     resolution:
       {
@@ -5878,7 +5829,7 @@ packages:
       - supports-color
     dev: false
 
-  /@graphql-tools/relay-operation-optimizer/6.5.0_qyboaezk4cm6zsf5jfobzggyaa:
+  /@graphql-tools/relay-operation-optimizer/6.5.0_rjjjs2nwgns3bcvnnqb5eu5nry:
     resolution:
       {
         integrity: sha512-snqmdPiM2eBex6pijRFx4H9MPumVd8ZWM3y+aaRwzc73VUNnjHE4NyVZEEIdlbmJ2HoQ9Zrm9aFlHVMK7B59zg==,
@@ -5886,9 +5837,9 @@ packages:
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      '@ardatan/relay-compiler': 12.0.0_qyboaezk4cm6zsf5jfobzggyaa
-      '@graphql-tools/utils': 8.8.0_graphql@15.8.0
-      graphql: 15.8.0
+      '@ardatan/relay-compiler': 12.0.0_rjjjs2nwgns3bcvnnqb5eu5nry
+      '@graphql-tools/utils': 8.8.0_graphql@16.6.0
+      graphql: 16.6.0
       tslib: 2.4.0
     transitivePeerDependencies:
       - encoding
@@ -5910,17 +5861,6 @@ packages:
       value-or-promise: 1.0.11
     dev: false
 
-  /@graphql-tools/utils/8.8.0_graphql@15.8.0:
-    resolution:
-      {
-        integrity: sha512-KJrtx05uSM/cPYFdTnGAS1doL5bftJLAiFCDMZ8Vkifztz3BFn3gpFiy/o4wDtM8s39G46mxmt2Km/RmeltfGw==,
-      }
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-    dependencies:
-      graphql: 15.8.0
-      tslib: 2.4.0
-
   /@graphql-tools/utils/8.8.0_graphql@16.6.0:
     resolution:
       {
@@ -5931,7 +5871,6 @@ packages:
     dependencies:
       graphql: 16.6.0
       tslib: 2.4.0
-    dev: false
 
   /@graphql-tools/utils/9.1.3_graphql@16.6.0:
     resolution:
@@ -18323,19 +18262,6 @@ packages:
         integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==,
       }
 
-  /graphql-tag/2.12.6_graphql@15.8.0:
-    resolution:
-      {
-        integrity: sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==,
-      }
-    engines: { node: '>=10' }
-    peerDependencies:
-      graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      graphql: 15.8.0
-      tslib: 2.4.0
-    dev: false
-
   /graphql-tag/2.12.6_graphql@16.6.0:
     resolution:
       {
@@ -18349,7 +18275,7 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /graphql-type-json/0.3.2_graphql@15.8.0:
+  /graphql-type-json/0.3.2_graphql@16.6.0:
     resolution:
       {
         integrity: sha512-J+vjof74oMlCWXSvt0DOf2APEdZOCdubEvGDUAlqH//VBYcOYsGgRW7Xzorr44LvkjiuvecWc8fChxuZZbChtg==,
@@ -18357,15 +18283,8 @@ packages:
     peerDependencies:
       graphql: '>=0.8.0'
     dependencies:
-      graphql: 15.8.0
+      graphql: 16.6.0
     dev: false
-
-  /graphql/15.8.0:
-    resolution:
-      {
-        integrity: sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==,
-      }
-    engines: { node: '>= 10.x' }
 
   /graphql/16.6.0:
     resolution:

@@ -32,79 +32,82 @@ import {
   OperationDefinitionNode,
   VariableDefinitionNode,
   ArgumentNode,
+  Kind,
+  ConstDirectiveNode,
+  OperationTypeNode,
 } from 'graphql'
 import _ from 'lodash'
 import { lastItem } from '../util'
 
-const SysFieldDefinition = {
-  kind: 'Field' as const,
+const SysFieldDefinition: FieldNode = {
+  kind: Kind.FIELD,
   name: {
-    kind: 'Name' as const,
+    kind: Kind.NAME,
     value: '_sys',
   },
   arguments: [],
   directives: [],
   selectionSet: {
-    kind: 'SelectionSet' as const,
+    kind: Kind.SELECTION_SET,
     selections: [
       // {
-      //   kind: 'Field' as const,
+      //   kind: Kind.FIELD,
       //   name: {
-      //     kind: 'Name' as const,
+      //     kind: Kind.NAME,
       //     value: 'title',
       //   },
       //   arguments: [],
       //   directives: [],
       // },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'filename',
         },
         arguments: [],
         directives: [],
       },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'basename',
         },
         arguments: [],
         directives: [],
       },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'breadcrumbs',
         },
         arguments: [],
         directives: [],
       },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'path',
         },
         arguments: [],
         directives: [],
       },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'relativePath',
         },
         arguments: [],
         directives: [],
       },
       {
-        kind: 'Field' as const,
+        kind: Kind.FIELD,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: 'extension',
         },
         arguments: [],
@@ -167,13 +170,13 @@ export const astBuilder = {
     description?: string
   }): ScalarTypeDefinitionNode => {
     return {
-      kind: 'ScalarTypeDefinition',
+      kind: Kind.SCALAR_TYPE_DEFINITION,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: name,
       },
       description: {
-        kind: 'StringValue',
+        kind: Kind.STRING,
         value: description || '',
       },
       directives: [],
@@ -192,16 +195,16 @@ export const astBuilder = {
   }) => {
     let res = {}
     const namedType = {
-      kind: 'NamedType' as const,
+      kind: Kind.NAMED_TYPE,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: type,
       },
     }
     const def = {
-      kind: 'InputValueDefinition' as const,
+      kind: Kind.INPUT_VALUE_DEFINITION,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: name,
       },
     }
@@ -210,9 +213,9 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'ListType' as const,
+            kind: Kind.LIST_TYPE,
             type: {
-              kind: 'NonNullType',
+              kind: Kind.NON_NULL_TYPE,
               type: namedType,
             },
           },
@@ -221,7 +224,7 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'ListType' as const,
+            kind: Kind.LIST_TYPE,
             type: namedType,
           },
         }
@@ -231,7 +234,7 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'NonNullType',
+            kind: Kind.NON_NULL_TYPE,
             type: namedType,
           },
         }
@@ -251,16 +254,16 @@ export const astBuilder = {
     values: string[]
   }): EnumTypeDefinitionNode => {
     return {
-      kind: 'EnumTypeDefinition',
+      kind: Kind.ENUM_TYPE_DEFINITION,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: props.name,
       },
       values: props.values.map((val) => {
         return {
-          kind: 'EnumValueDefinition',
+          kind: Kind.ENUM_VALUE_DEFINITION,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: val,
           },
         }
@@ -281,8 +284,8 @@ export const astBuilder = {
     args?: InputValueDefinitionNode[]
   }) =>
     ({
-      name: { kind: 'Name' as const, value: name },
-      kind: 'Field' as const,
+      name: { kind: Kind.NAME, value: name },
+      kind: Kind.FIELD,
     } as FieldNode),
   FieldDefinition: ({
     name,
@@ -300,16 +303,16 @@ export const astBuilder = {
     // Default to true
     let res = {}
     const namedType = {
-      kind: 'NamedType' as const,
+      kind: Kind.NAMED_TYPE,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: type,
       },
     }
     const def = {
-      kind: 'FieldDefinition' as const,
+      kind: Kind.FIELD_DEFINITION,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: name,
       },
       arguments: args,
@@ -322,11 +325,11 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'NonNullType' as const,
+            kind: Kind.NON_NULL_TYPE,
             type: {
-              kind: 'ListType' as const,
+              kind: Kind.LIST_TYPE,
               type: {
-                kind: 'NonNullType',
+                kind: Kind.NON_NULL_TYPE,
                 type: namedType,
               },
             },
@@ -337,7 +340,7 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'ListType' as const,
+            kind: Kind.LIST_TYPE,
             type: namedType,
           },
         }
@@ -349,7 +352,7 @@ export const astBuilder = {
         res = {
           ...def,
           type: {
-            kind: 'NonNullType' as const,
+            kind: Kind.NON_NULL_TYPE,
             type: namedType,
           },
         }
@@ -374,10 +377,10 @@ export const astBuilder = {
     fields: FieldDefinitionNode[]
   }): InterfaceTypeDefinitionNode => {
     return {
-      kind: 'InterfaceTypeDefinition',
-      description: { kind: 'StringValue', value: description },
+      kind: Kind.INTERFACE_TYPE_DEFINITION,
+      description: { kind: Kind.STRING, value: description },
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: name,
       },
       interfaces: [],
@@ -392,9 +395,9 @@ export const astBuilder = {
     name: string
     fields: InputValueDefinitionNode[] | ObjectTypeDefinitionNode[]
   }): InputObjectTypeDefinitionNode => ({
-    kind: 'InputObjectTypeDefinition' as const,
+    kind: Kind.INPUT_OBJECT_TYPE_DEFINITION,
     name: {
-      kind: 'Name' as const,
+      kind: Kind.NAME,
       value: name,
     },
     // @ts-ignore FIXME; this is being handled properly but we're lying to
@@ -408,27 +411,27 @@ export const astBuilder = {
     name: string
     types: (string | TypeDefinitionNode)[]
   }): UnionTypeDefinitionNode => ({
-    kind: 'UnionTypeDefinition' as const,
+    kind: Kind.UNION_TYPE_DEFINITION,
     name: {
-      kind: 'Name' as const,
+      kind: Kind.NAME,
       value: name,
     },
     directives: [],
     // @ts-ignore FIXME; this is being handled properly but we're lying to
     // ts and then fixing it in the `extractInlineTypes` function
     types: types.map((name) => ({
-      kind: 'NamedType' as const,
+      kind: Kind.NAMED_TYPE,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: name,
       },
     })),
   }),
   NamedType: ({ name }: { name: string }): NamedTypeNode => {
     return {
-      kind: 'NamedType',
+      kind: Kind.NAMED_TYPE,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: name,
       },
     }
@@ -443,14 +446,14 @@ export const astBuilder = {
     name: string
     fields: FieldDefinitionNode[]
     interfaces?: NamedTypeNode[]
-    directives?: DirectiveNode[]
+    directives?: ConstDirectiveNode[]
     args?: NamedTypeNode[]
   }): ObjectTypeDefinitionNode => ({
-    kind: 'ObjectTypeDefinition' as const,
+    kind: Kind.OBJECT_TYPE_DEFINITION,
     interfaces,
     directives,
     name: {
-      kind: 'Name' as const,
+      kind: Kind.NAME,
       value: name,
     },
     fields,
@@ -463,13 +466,13 @@ export const astBuilder = {
     selections: SelectionNode[]
   }) => {
     return {
-      name: { kind: 'Name' as const, value: name },
-      kind: 'Field' as const,
+      name: { kind: Kind.NAME, value: name },
+      kind: Kind.FIELD,
       selectionSet: {
-        kind: 'SelectionSet' as const,
+        kind: Kind.SELECTION_SET,
         selections,
       },
-    }
+    } as const
   },
   InlineFragmentDefinition: ({
     name,
@@ -479,15 +482,15 @@ export const astBuilder = {
     selections: SelectionNode[]
   }): InlineFragmentNode => {
     return {
-      kind: 'InlineFragment' as const,
+      kind: Kind.INLINE_FRAGMENT,
       selectionSet: {
-        kind: 'SelectionSet' as const,
+        kind: Kind.SELECTION_SET,
         selections,
       },
       typeCondition: {
-        kind: 'NamedType' as const,
+        kind: Kind.NAMED_TYPE,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: name,
         },
       },
@@ -503,21 +506,21 @@ export const astBuilder = {
     selections: SelectionNode[]
   }): FragmentDefinitionNode => {
     return {
-      kind: 'FragmentDefinition' as const,
+      kind: Kind.FRAGMENT_DEFINITION,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: fragmentName,
       },
       typeCondition: {
-        kind: 'NamedType' as const,
+        kind: Kind.NAMED_TYPE,
         name: {
-          kind: 'Name' as const,
+          kind: Kind.NAME,
           value: name,
         },
       },
       directives: [],
       selectionSet: {
-        kind: 'SelectionSet' as const,
+        kind: Kind.SELECTION_SET,
         selections,
       },
     }
@@ -558,48 +561,48 @@ export const astBuilder = {
     fragName: string
   }): OperationDefinitionNode => {
     return {
-      kind: 'OperationDefinition' as const,
-      operation: 'query' as const,
+      kind: Kind.OPERATION_DEFINITION,
+      operation: OperationTypeNode.QUERY,
       name: {
-        kind: 'Name' as const,
+        kind: Kind.NAME,
         value: queryName,
       },
       variableDefinitions: [
         {
-          kind: 'VariableDefinition' as const,
+          kind: Kind.VARIABLE_DEFINITION,
           type: {
-            kind: 'NonNullType',
+            kind: Kind.NON_NULL_TYPE,
             type: {
-              kind: 'NamedType',
-              name: { kind: 'Name' as const, value: 'String' },
+              kind: Kind.NAMED_TYPE,
+              name: { kind: Kind.NAME, value: 'String' },
             },
           },
           variable: {
-            kind: 'Variable' as const,
-            name: { kind: 'Name' as const, value: 'relativePath' },
+            kind: Kind.VARIABLE,
+            name: { kind: Kind.NAME, value: 'relativePath' },
           },
         },
       ],
       selectionSet: {
-        kind: 'SelectionSet' as const,
+        kind: Kind.SELECTION_SET,
         selections: [
           {
-            kind: 'Field',
+            kind: Kind.FIELD,
             name: {
-              kind: 'Name',
+              kind: Kind.NAME,
               value: queryName,
             },
             arguments: [
               {
-                kind: 'Argument',
+                kind: Kind.ARGUMENT,
                 name: {
-                  kind: 'Name',
+                  kind: Kind.NAME,
                   value: 'relativePath',
                 },
                 value: {
-                  kind: 'Variable',
+                  kind: Kind.VARIABLE,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: 'relativePath',
                   },
                 },
@@ -607,26 +610,26 @@ export const astBuilder = {
             ],
             directives: [],
             selectionSet: {
-              kind: 'SelectionSet',
+              kind: Kind.SELECTION_SET,
               selections: [
                 {
-                  kind: 'InlineFragment' as const,
+                  kind: Kind.INLINE_FRAGMENT,
                   typeCondition: {
-                    kind: 'NamedType' as const,
+                    kind: Kind.NAMED_TYPE,
                     name: {
-                      kind: 'Name' as const,
+                      kind: Kind.NAME,
                       value: 'Document',
                     },
                   },
                   directives: [],
                   selectionSet: {
-                    kind: 'SelectionSet' as const,
+                    kind: Kind.SELECTION_SET,
                     selections: [
                       SysFieldDefinition,
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'id',
                         },
                         arguments: [],
@@ -636,9 +639,9 @@ export const astBuilder = {
                   },
                 },
                 {
-                  kind: 'FragmentSpread',
+                  kind: Kind.FRAGMENT_SPREAD,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: fragName,
                   },
                   directives: [],
@@ -664,90 +667,90 @@ export const astBuilder = {
   }): OperationDefinitionNode => {
     const variableDefinitions: VariableDefinitionNode[] = [
       {
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'before',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'String',
           },
         },
         directives: [],
       },
       {
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'after',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'String',
           },
         },
         directives: [],
       },
       {
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'first',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'Float',
           },
         },
         directives: [],
       },
       {
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'last',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'Float',
           },
         },
         directives: [],
       },
       {
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'sort',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'String',
           },
         },
@@ -756,71 +759,71 @@ export const astBuilder = {
     ]
     const queryArguments: ArgumentNode[] = [
       {
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'before',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'before',
           },
         },
       },
       {
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'after',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'after',
           },
         },
       },
       {
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'first',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'first',
           },
         },
       },
       {
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'last',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'last',
           },
         },
       },
       {
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'sort',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'sort',
           },
         },
@@ -829,33 +832,33 @@ export const astBuilder = {
 
     if (dataLayer) {
       queryArguments.push({
-        kind: 'Argument',
+        kind: Kind.ARGUMENT,
         name: {
-          kind: 'Name',
+          kind: Kind.NAME,
           value: 'filter',
         },
         value: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'filter',
           },
         },
       })
 
       variableDefinitions.push({
-        kind: 'VariableDefinition',
+        kind: Kind.VARIABLE_DEFINITION,
         variable: {
-          kind: 'Variable',
+          kind: Kind.VARIABLE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: 'filter',
           },
         },
         type: {
-          kind: 'NamedType',
+          kind: Kind.NAMED_TYPE,
           name: {
-            kind: 'Name',
+            kind: Kind.NAME,
             value: filterType,
           },
         },
@@ -864,70 +867,70 @@ export const astBuilder = {
     }
 
     return {
-      kind: 'OperationDefinition',
-      operation: 'query',
+      kind: Kind.OPERATION_DEFINITION,
+      operation: OperationTypeNode.QUERY,
       name: {
-        kind: 'Name',
+        kind: Kind.NAME,
         value: queryName,
       },
       variableDefinitions,
       directives: [],
       selectionSet: {
-        kind: 'SelectionSet',
+        kind: Kind.SELECTION_SET,
         selections: [
           {
-            kind: 'Field',
+            kind: Kind.FIELD,
             name: {
-              kind: 'Name',
+              kind: Kind.NAME,
               value: queryName,
             },
             arguments: queryArguments,
             directives: [],
             selectionSet: {
-              kind: 'SelectionSet',
+              kind: Kind.SELECTION_SET,
               selections: [
                 {
-                  kind: 'Field',
+                  kind: Kind.FIELD,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: 'pageInfo',
                   },
                   arguments: [],
                   directives: [],
                   selectionSet: {
-                    kind: 'SelectionSet',
+                    kind: Kind.SELECTION_SET,
                     selections: [
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'hasPreviousPage',
                         },
                         arguments: [],
                         directives: [],
                       },
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'hasNextPage',
                         },
                         arguments: [],
                         directives: [],
                       },
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'startCursor',
                         },
                         arguments: [],
                         directives: [],
                       },
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'endCursor',
                         },
                         arguments: [],
@@ -937,63 +940,63 @@ export const astBuilder = {
                   },
                 },
                 {
-                  kind: 'Field',
+                  kind: Kind.FIELD,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: 'totalCount',
                   },
                   arguments: [],
                   directives: [],
                 },
                 {
-                  kind: 'Field',
+                  kind: Kind.FIELD,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: 'edges',
                   },
                   arguments: [],
                   directives: [],
                   selectionSet: {
-                    kind: 'SelectionSet',
+                    kind: Kind.SELECTION_SET,
                     selections: [
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'cursor',
                         },
                         arguments: [],
                         directives: [],
                       },
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'node',
                         },
                         arguments: [],
                         directives: [],
                         selectionSet: {
-                          kind: 'SelectionSet',
+                          kind: Kind.SELECTION_SET,
                           selections: [
                             {
-                              kind: 'InlineFragment' as const,
+                              kind: Kind.INLINE_FRAGMENT,
                               typeCondition: {
-                                kind: 'NamedType' as const,
+                                kind: Kind.NAMED_TYPE,
                                 name: {
-                                  kind: 'Name' as const,
+                                  kind: Kind.NAME,
                                   value: 'Document',
                                 },
                               },
                               directives: [],
                               selectionSet: {
-                                kind: 'SelectionSet' as const,
+                                kind: Kind.SELECTION_SET,
                                 selections: [
                                   SysFieldDefinition,
                                   {
-                                    kind: 'Field',
+                                    kind: Kind.FIELD,
                                     name: {
-                                      kind: 'Name',
+                                      kind: Kind.NAME,
                                       value: 'id',
                                     },
                                     arguments: [],
@@ -1003,9 +1006,9 @@ export const astBuilder = {
                               },
                             },
                             {
-                              kind: 'FragmentSpread',
+                              kind: Kind.FRAGMENT_SPREAD,
                               name: {
-                                kind: 'Name',
+                                kind: Kind.NAME,
                                 value: fragName,
                               },
                               directives: [],
@@ -1038,7 +1041,7 @@ export const astBuilder = {
     )
 
     return {
-      kind: 'Document',
+      kind: Kind.DOCUMENT,
       definitions,
     }
   },

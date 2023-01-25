@@ -16,7 +16,7 @@ import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
-import type {
+import {
   UnionTypeDefinitionNode,
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
@@ -26,6 +26,7 @@ import type {
   InlineFragmentNode,
   FieldDefinitionNode,
   NamedTypeNode,
+  Kind,
 } from 'graphql'
 
 import type {
@@ -503,7 +504,7 @@ export class Builder {
     depth: number
   ) => {
     const selections = []
-    if (typeof collection.fields === 'object') {
+    if (collection.fields && typeof collection.fields === 'object') {
       await sequential(collection.fields, async (x) => {
         const field = await this._buildFieldNodeForFragments(x, depth)
         selections.push(field)
@@ -542,7 +543,10 @@ export class Builder {
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
             selections: [
-              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              {
+                kind: Kind.FIELD,
+                name: { kind: Kind.NAME, value: '__typename' },
+              },
               ...filterSelections(selections),
             ],
           })
@@ -557,7 +561,10 @@ export class Builder {
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
             selections: [
-              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              {
+                kind: Kind.FIELD,
+                name: { kind: Kind.NAME, value: '__typename' },
+              },
               ...filterSelections(selections),
             ],
           })
@@ -575,17 +582,17 @@ export class Builder {
           const collection = this.tinaSchema.getCollection(col)
 
           selections.push({
-            kind: 'InlineFragment',
+            kind: Kind.INLINE_FRAGMENT,
             typeCondition: {
-              kind: 'NamedType',
+              kind: Kind.NAMED_TYPE,
               name: {
-                kind: 'Name',
+                kind: Kind.NAME,
                 value: NAMER.documentTypeName(collection.namespace),
               },
             },
             directives: [],
             selectionSet: {
-              kind: 'SelectionSet',
+              kind: Kind.SELECTION_SET,
               selections: filterSelections(
                 await this._getCollectionFragmentSelections(
                   collection,
@@ -602,22 +609,22 @@ export class Builder {
             ...selections,
             // This is ... on Document { id }
             {
-              kind: 'InlineFragment',
+              kind: Kind.INLINE_FRAGMENT,
               typeCondition: {
-                kind: 'NamedType',
+                kind: Kind.NAMED_TYPE,
                 name: {
-                  kind: 'Name',
+                  kind: Kind.NAME,
                   value: 'Document',
                 },
               },
               directives: [],
               selectionSet: {
-                kind: 'SelectionSet',
+                kind: Kind.SELECTION_SET,
                 selections: [
                   {
-                    kind: 'Field',
+                    kind: Kind.FIELD,
                     name: {
-                      kind: 'Name',
+                      kind: Kind.NAME,
                       value: 'id',
                     },
                     arguments: [],

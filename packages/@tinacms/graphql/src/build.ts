@@ -13,7 +13,7 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import { print, OperationDefinitionNode, DocumentNode } from 'graphql'
+import { print, OperationDefinitionNode, DocumentNode, Kind } from 'graphql'
 import { TinaSchema } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -80,8 +80,8 @@ const _buildFragments = async (
     fragmentDefinitionsFields.push(frag)
   })
 
-  const fragDoc = {
-    kind: 'Document' as const,
+  const fragDoc: DocumentNode = {
+    kind: Kind.DOCUMENT,
     definitions: _.uniqBy(
       // @ts-ignore
       extractInlineTypes(fragmentDefinitionsFields),
@@ -153,8 +153,8 @@ const _buildQueries = async (
     )
   })
 
-  const queryDoc = {
-    kind: 'Document' as const,
+  const queryDoc: DocumentNode = {
+    kind: Kind.DOCUMENT,
     definitions: _.uniqBy(
       // @ts-ignore
       extractInlineTypes(operationsDefinitions),
@@ -255,8 +255,8 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     })
   )
 
-  const doc = {
-    kind: 'Document' as const,
+  const doc: DocumentNode = {
+    kind: Kind.DOCUMENT,
     definitions: _.uniqBy(
       // @ts-ignore
       extractInlineTypes(definitions),

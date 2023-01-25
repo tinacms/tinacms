@@ -30,7 +30,7 @@
     "fast-glob": "^3.2.5",
     "fs-extra": "^9.0.1",
     "glob-parent": "^6.0.2",
-    "graphql": "15.8.0",
+    "graphql": "16.6.0",
     "gray-matter": "^4.0.2",
     "isomorphic-git": "^1.10.3",
     "js-yaml": "^3.14.0",

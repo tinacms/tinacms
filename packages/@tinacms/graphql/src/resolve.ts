@@ -42,7 +42,7 @@ export const resolve = async ({
 }: {
   config?: GraphQLConfig
   query: string
-  variables: object
+  variables: Record<string, unknown>
   database: Database
   silenceErrors?: boolean
   verbose?: boolean
