@@ -29,6 +29,7 @@ import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
 import { hasForestryConfig } from '../forestry-migrate/util'
 import { generateCollections } from '../forestry-migrate'
+import { readme } from './setup-files/readme'
 
 export interface Framework {
   name: 'next' | 'hugo' | 'jekyll' | 'other'
@@ -92,20 +93,7 @@ export async function initStaticTina(args: {
     await createPackageJSON()
   }
 
-  // Check if .gitignore exists
-  const hasGitignore = await fs.pathExistsSync('.gitignore')
-  // if no .gitignore, create one
-  if (!hasGitignore) {
-    await createGitignore({ baseDir })
-  } else {
-    const hasNodeModulesIgnored = await checkGitignoreForNodeModules({
-      baseDir,
-    })
-    if (!hasNodeModulesIgnored) {
-      await addNodeModulesToGitignore({ baseDir })
-    }
-  }
-
+  await createOrAppendToGitignore(baseDir, ['node_modules'])
   await addDependencies(packageManager)
 
   await addConfigFile({
@@ -118,6 +106,16 @@ export async function initStaticTina(args: {
     token,
     clientId,
   })
+
+  await addReadMeFile({
+    baseDir,
+    tinaDirectory: args.context.tinaDirectory,
+  })
+
+  await createOrAppendToGitignore(
+    path.join(args.context.rootPath, args.context.tinaDirectory),
+    ['__generated__']
+  )
 
   if (!forestryPath.exists) {
     // add /content/posts/hello-world.md
@@ -276,32 +274,37 @@ const createPackageJSON = async () => {
   logger.info(logText('No package.json found, creating one'))
   await execShellCommand(`npm init --yes`)
 }
-const createGitignore = async ({ baseDir }: { baseDir: string }) => {
-  logger.info(logText('No .gitignore found, creating one'))
-  await fs.outputFileSync(path.join(baseDir, '.gitignore'), 'node_modules')
+
+const createOrAppendToGitignore = async (
+  baseDir: string,
+  gitignoredLines: string[]
+) => {
+  const hasGitignore = await fs.pathExistsSync(path.join(baseDir, '.gitignore'))
+  if (hasGitignore) {
+    const gitignoreContent = await fs
+      .readFileSync(path.join(baseDir, '.gitignore'))
+      .toString()
+    const existingGitignoredLines = gitignoreContent.split('\n')
+    const filteredGitignoredLines = gitignoredLines.filter(
+      (line) => !existingGitignoredLines.includes(line)
+    )
+    const newGitignoreContent = [
+      ...existingGitignoredLines,
+      ...filteredGitignoredLines,
+    ].join('\n')
+    await fs.writeFileSync(
+      path.join(baseDir, '.gitignore'),
+      newGitignoreContent
+    )
+  } else {
+    logger.info(logText('No .gitignore found, creating one'))
+    await fs.outputFileSync(
+      path.join(baseDir, '.gitignore'),
+      gitignoredLines.join('\n')
+    )
+  }
 }
 
-const checkGitignoreForNodeModules = async ({
-  baseDir,
-}: {
-  baseDir: string
-}) => {
-  const gitignoreContent = await fs
-    .readFileSync(path.join(baseDir, '.gitignore'))
-    .toString()
-  return gitignoreContent.split('\n').some((item) => item === 'node_modules')
-}
-const addNodeModulesToGitignore = async ({ baseDir }: { baseDir: string }) => {
-  logger.info(logText('Adding node_modules to .gitignore'))
-  const gitignoreContent = await fs
-    .readFileSync(path.join(baseDir, '.gitignore'))
-    .toString()
-  const newGitignoreContent = [
-    ...gitignoreContent.split('\n'),
-    'node_modules',
-  ].join('\n')
-  await fs.writeFileSync(path.join(baseDir, '.gitignore'), newGitignoreContent)
-}
 const addDependencies = async (packageManager) => {
   logger.info(logText('Adding dependencies, this might take a moment...'))
   const deps = ['tinacms', '@tinacms/cli']
@@ -353,6 +356,14 @@ const addConfigFile = async (args: AddConfigArgs) => {
     )
     await fs.outputFileSync(fullConfigPath, config(args))
   }
+}
+const addReadMeFile = async (args: {
+  baseDir: string
+  tinaDirectory: string
+}) => {
+  const { baseDir, tinaDirectory } = args
+  const fullConfigPath = path.join(baseDir, tinaDirectory, 'README.md')
+  await fs.outputFileSync(fullConfigPath, readme)
 }
 
 const addContentFile = async ({ baseDir }: { baseDir: string }) => {
@@ -430,11 +441,26 @@ const content = `---
 title: Hello, World!
 ---
 
-## Hello World!
+Welcome to Tina, here is some dummy text:
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut non lorem diam. Quisque vulputate nibh sodales eros pretium tincidunt. Aenean porttitor efficitur convallis. Nulla sagittis finibus convallis. Phasellus in fermentum quam, eu egestas tortor. Maecenas ac mollis leo. Integer maximus eu nisl vel sagittis.
+I like it, but can the snow look a little warmer can you use a high definition screenshot,
+so i'll know it when i see it, and that's great, but can you make it work for ie 2 please,
+and just do what you think. I trust you theres all this spanish text on my site, yet can
+you turn it around in photoshop so we can see more of the front. Labrador can you make the
+logo bigger yes bigger bigger still the logo is too big, nor I like it, but can the snow
+look a little warmer it needs to be the same, but totally different , yet I really like
+the colour but can you change it, and this is just a 5 minutes job.
 
-Suspendisse facilisis, mi ac scelerisque interdum, ligula ex imperdiet felis, a posuere eros justo nec sem. Nullam laoreet accumsan metus, sit amet tincidunt orci egestas nec. Pellentesque ut aliquet ante, at tristique nunc. Donec non massa nibh. Ut posuere lacus non aliquam laoreet. Fusce pharetra ligula a felis porttitor, at mollis ipsum maximus. Donec quam tortor, vehicula a magna sit amet, tincidunt dictum enim. In hac habitasse platea dictumst. Mauris sit amet ornare ligula, blandit consequat risus. Duis malesuada pellentesque lectus, non feugiat turpis eleifend a. Nullam tempus ante et diam pretium, ac faucibus ligula interdum.
+Can we have another option will royalties in the company do instead of cash can you remove
+my double chin on my business card photo? i don't like the way it looks I need a website
+How much will it cost. I love it, but can you invert all colors? make it pop, yet can you
+pimp this powerpoint, need more geometry patterns, for try a more powerful colour, but I want
+you to take it to the next level. There are more projects lined up charge extra the next time
+we need to make the new version clean and sexy, yet can't you just take a picture from the internet?
+that's going to be a chunk of change, nor that sandwich needs to be more playful. Low resolution?
+
+> Lost and looking for a place to start? [Check out this guide](https://tina.io/guides/tina-cloud/getting-started/overview/)
+> to see how to add TinaCMS to an existing Next.js site
 `
 const addReactiveFile = {
   next: ({
