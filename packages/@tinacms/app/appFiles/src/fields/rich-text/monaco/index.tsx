@@ -197,7 +197,7 @@ export const RawEditor = (props: RichTextType) => {
             fontSize: 14,
             lineHeight: 2,
             formatOnPaste: true,
-            lineNumbers: 'off',
+            lineNumbers: 'on',
             formatOnType: true,
             fixedOverflowWidgets: true,
             // Takes too much horizontal space for iframe
