@@ -22,6 +22,15 @@ export const parseURL = (
   clientId: string | null
   host: string | null
 } => {
+  // This is a local URL
+  if (url.startsWith('/')) {
+    return {
+      branch: null,
+      isLocalClient: true,
+      clientId: null,
+      host: null,
+    }
+  }
   if (url.includes('localhost')) {
     return {
       branch: null,
