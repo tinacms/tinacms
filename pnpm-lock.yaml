@@ -525,14 +525,12 @@ importers:
       lodash: ^4.17.19
       lodash.get: ^4.4.2
       log4js: ^6.4.0
-      many-level: ^2.0.0
       memory-level: ^1.0.0
       multer: 1.4.5-lts.1
       normalize-path: ^3.0.0
       prettier: ^2.2.1
       progress: ^2.0.3
       prompts: ^2.4.1
-      readable-stream: ^4.3.0
       typescript: 4.3.5
       yarn: ^1.22.17
       yup: ^0.32.9
@@ -574,14 +572,12 @@ importers:
       lodash: 4.17.21
       lodash.get: 4.4.2
       log4js: 6.5.2
-      many-level: 2.0.0
       memory-level: 1.0.0
       multer: 1.4.5-lts.1
       normalize-path: 3.0.0
       prettier: 2.7.1
       progress: 2.0.3
       prompts: 2.4.2
-      readable-stream: 4.3.0
       yarn: 1.22.19
       yup: 0.32.11
       zod: 3.17.3
@@ -719,6 +715,7 @@ importers:
       js-yaml: ^3.14.0
       jsonpath-plus: ^6.0.1
       lodash: ^4.17.20
+      many-level: ^2.0.0
       mdast: ^3.0.0
       mdast-util-from-markdown: ^1.0.0
       mdast-util-mdx: ^1.1.0
@@ -729,6 +726,7 @@ importers:
       nodemon: 2.0.19
       normalize-path: ^3.0.0
       prettier: ^2.2.1
+      readable-stream: ^4.3.0
       rehype-format: ^3.1.0
       rehype-stringify: ^8.0.0
       remark: ^13.0.0
@@ -768,6 +766,7 @@ importers:
       js-yaml: 3.14.1
       jsonpath-plus: 6.0.1
       lodash: 4.17.21
+      many-level: 2.0.0
       mdast: 3.0.0
       mdast-util-from-markdown: 1.2.0
       mdast-util-mdx: 1.1.0
@@ -776,6 +775,7 @@ importers:
       micromark-extension-mdxjs: 1.0.0
       normalize-path: 3.0.0
       prettier: 2.7.1
+      readable-stream: 4.3.0
       rehype-format: 3.1.0
       rehype-stringify: 8.0.0
       remark: 13.0.0

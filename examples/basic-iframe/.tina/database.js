@@ -21,8 +21,9 @@ const mongodbLevelStore = new MongodbLevel({
   dbName: 'tinacms',
   mongoUri: process.env.MONGODB_URI,
 })
-localLevelStore.openConnection()
-
+if (isLocal) {
+  localLevelStore.openConnection()
+}
 const githubOnPut = async (key, value) => {
   let sha
   try {
