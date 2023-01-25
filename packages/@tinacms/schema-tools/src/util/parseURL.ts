@@ -47,7 +47,6 @@ export const parseURL = (
     params.host.includes('tinajs.dev') ||
     params.host.includes('tina.io') ||
     params.host.includes('tinajs.io')
-  console.log({ isTinaCloud })
 
   if (!isTinaCloud) {
     return {
