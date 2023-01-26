@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 overrides:
+  '@types/react': 17.0.47
   vm2@<3.9.11: '>=3.9.11'
 
 importers:
@@ -191,7 +192,7 @@ importers:
       '@tinacms/graphql': workspace:*
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
-      '@types/react': ^17.0.35
+      '@types/react': 17.0.47
       '@types/styled-components': ^5.1.15
       '@typescript-eslint/eslint-plugin': ^5.20.0
       '@typescript-eslint/parser': ^5.20.0
@@ -204,10 +205,10 @@ importers:
       postcss: ^8.3.11
       postcss-import: ^14.0.2
       postcss-nesting: ^10.1.0
-      react: ^17.0.2
-      react-dom: ^17.0.2
-      react-icons: ^4.2.0
-      react-is: ^17.0.2
+      react: 17.0.2
+      react-dom: 17.0.2
+      react-icons: ^4.3.1
+      react-is: 17.0.2
       styled-components: ^5.1.3
       styled-jsx: ^3.2.5
       tailwindcss: 3.2.4
@@ -278,7 +279,7 @@ importers:
       '@tinacms/graphql': workspace:*
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
-      '@types/react': ^17.0.35
+      '@types/react': 17.0.47
       autoprefixer: ^10.4.0
       date-fns: ^2.23.0
       next: 12.2.4
@@ -331,7 +332,7 @@ importers:
       '@tinacms/cli': workspace:*
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
-      '@types/react': ^17.0.35
+      '@types/react': 17.0.47
       '@types/styled-components': ^5.1.15
       autoprefixer: ^10.4.0
       date-fns: ^2.23.0
@@ -411,7 +412,7 @@ importers:
       '@tinacms/mdx': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/fs-extra': ^9.0.1
-      '@types/react': 17.0.2
+      '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
       '@vitejs/plugin-react': ^2.1.0
       '@xstate/react': 3.0.0
@@ -442,7 +443,7 @@ importers:
       '@tailwindcss/line-clamp': 0.3.1_tailwindcss@3.1.8
       '@tailwindcss/typography': 0.5.4_tailwindcss@3.1.8
       '@vitejs/plugin-react': 2.1.0_vite@3.1.8
-      '@xstate/react': 3.0.0_cgmtdnh7hbcv55nluxt3gdbquy
+      '@xstate/react': 3.0.0_qoz6orvt26se6gmwe4ax5kvcum
       autoprefixer: 10.4.7_postcss@8.4.14
       final-form: 4.20.7
       fs-extra: 9.1.0
@@ -464,7 +465,7 @@ importers:
       '@tinacms/mdx': link:../mdx
       '@tinacms/scripts': link:../scripts
       '@types/fs-extra': 9.0.13
-      '@types/react': 17.0.2
+      '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
       jest: 27.5.1
       tinacms: link:../../tinacms
@@ -1087,7 +1088,7 @@ importers:
       '@types/lodash.debounce': ^4.0.6
       '@types/lodash.get': ^4.4.5
       '@types/prop-types': ^15.7.4
-      '@types/react': ^17.0.14
+      '@types/react': 17.0.47
       '@types/react-beautiful-dnd': ^11.0.3
       '@types/react-color': ^3.0.1
       '@types/react-dom': ^17.0.9
@@ -1284,7 +1285,7 @@ importers:
       '@types/crypto-js': ^3.1.47
       '@types/js-cookie': ^2.2.6
       '@types/node': ^13.13.1
-      '@types/react': ^16.9.43
+      '@types/react': 17.0.47
       multer: 1.4.5-lts.1
       next: 12.2.4
       tinacms: workspace:*
@@ -1299,7 +1300,7 @@ importers:
       '@types/crypto-js': 3.1.47
       '@types/js-cookie': 2.2.7
       '@types/node': 13.13.52
-      '@types/react': 16.14.28
+      '@types/react': 17.0.47
       next: 12.2.4
       tinacms: link:../tinacms
       typescript: 4.3.5
@@ -1322,7 +1323,7 @@ importers:
       '@types/jest': ^27.0.1
       '@types/lodash': ^4.14.169
       '@types/node': ^14.0.13
-      '@types/react': ^16.9.38
+      '@types/react': 17.0.47
       '@types/yup': ^0.29.10
       crypto-js: ^4.0.0
       encoding: 0.1.13
@@ -1373,7 +1374,7 @@ importers:
       '@types/jest': 27.5.2
       '@types/lodash': 4.14.182
       '@types/node': 14.18.21
-      '@types/react': 16.14.28
+      '@types/react': 17.0.47
       '@types/yup': 0.29.14
       identity-obj-proxy: 3.0.0
       isomorphic-fetch: 3.0.0_encoding@0.1.13
@@ -1417,7 +1418,7 @@ packages:
       '@babel/core': 7.18.13
       '@babel/generator': 7.18.13
       '@babel/parser': 7.18.13
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
       '@babel/traverse': 7.18.13
       '@babel/types': 7.18.13
       babel-preset-fbjs: 3.4.0_@babel+core@7.18.13
@@ -1449,7 +1450,7 @@ packages:
       '@babel/core': 7.18.13
       '@babel/generator': 7.18.13
       '@babel/parser': 7.18.13
-      '@babel/runtime': 7.18.6
+      '@babel/runtime': 7.19.0
       '@babel/traverse': 7.18.13
       '@babel/types': 7.18.13
       babel-preset-fbjs: 3.4.0_@babel+core@7.18.13
@@ -9213,7 +9214,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.18.6
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       '@types/react-dom': 18.0.5
       '@types/react-test-renderer': 18.0.0
       react: 17.0.2
@@ -9647,7 +9648,7 @@ packages:
         integrity: sha512-iMIqiko6ooLrTh1joXodJK5X9xeEALT1kM5G3ZLhD3hszxBdIEd5C75U834D9mLcINgD4OyZf5uQXjkuYydWvA==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       hoist-non-react-statics: 3.3.2
 
   /@types/http-cache-semantics/4.0.1:
@@ -10104,7 +10105,7 @@ packages:
         integrity: sha512-AUAtXLqJO8A0gp+XyRq0M++UdBKfVesuJkPnafHEfMEqWQJpaJDIsgxqcd2tRE28XkBmGIdsAeMLr8NLyyDy3A==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
 
   /@types/react-color/3.0.6:
@@ -10113,7 +10114,7 @@ packages:
         integrity: sha512-OzPIO5AyRmLA7PlOyISlgabpYUa3En74LP8mTMa0veCA719SvYQov4WLMsHvCgXP+L+KI9yGhYnqZafVGG0P4w==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       '@types/reactcss': 1.2.6
     dev: true
 
@@ -10132,7 +10133,7 @@ packages:
         integrity: sha512-Icd9KEgdnFfJs39KyRyr0jQ7EKhq8U6CcHRMGAS45fp5qgUvxL3ujUCfWFttUK2UErqZNj97t9gsVPNAqcwoCg==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
 
   /@types/react-dom/18.0.5:
@@ -10141,7 +10142,7 @@ packages:
         integrity: sha512-OWPWTUrY/NIrjsAPkAk1wW9LZeIjSvkXRhclsFO8CZcZGCOg2G0YZy4ft+rOyYxy8B7ui5iZzi9OkDebZ7/QSA==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
 
   /@types/react-redux/7.1.24:
@@ -10151,7 +10152,7 @@ packages:
       }
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       hoist-non-react-statics: 3.3.2
       redux: 4.2.0
     dev: false
@@ -10162,7 +10163,7 @@ packages:
         integrity: sha512-5GGBO3npQ0G/poQmEn+kI3Vn3DoJ9WjRXCeGcpwLxd5rYmjYPH235lbYPX5aclXE2RqEXyFxd96oh0wYwPXYpg==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       '@types/react-dom': 17.0.17
       '@types/react-transition-group': 4.4.5
     dev: true
@@ -10173,7 +10174,7 @@ packages:
         integrity: sha512-C7/5FBJ3g3sqUahguGi03O79b8afNeSD6T8/GU50oQrJCU0bVCCGQHaGKUbg2Ce8VQEEqTw8/HiS6lXHHdgkdQ==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
 
   /@types/react-transition-group/4.4.5:
@@ -10182,43 +10183,13 @@ packages:
         integrity: sha512-juKD/eiSM3/xZYzjuzH6ZwpP+/lejltmiS3QEzV/vmb/Q8+HfDmxu+Baga8UEMGBqV88Nbg4l2hY/K2DkyaLLA==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
-
-  /@types/react/16.14.28:
-    resolution:
-      {
-        integrity: sha512-83zBE6+XUVXsdL3iFzOyUewdauaU+KviKCHEGOgSW52coAuqW7tEKQM0E9+ZC0Zk6TELQ2/JgogPvp7FavzFwg==,
-      }
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.0
-    dev: true
-
-  /@types/react/17.0.2:
-    resolution:
-      {
-        integrity: sha512-Xt40xQsrkdvjn1EyWe1Bc0dJLcil/9x2vAuW7ya+PuQip4UYUaXyhzWmAbwRsdMgwOFHpfp7/FFZebDU6Y8VHA==,
-      }
-    dependencies:
-      '@types/prop-types': 15.7.5
-      csstype: 3.1.0
 
   /@types/react/17.0.47:
     resolution:
       {
         integrity: sha512-mk0BL8zBinf2ozNr3qPnlu1oyVTYq+4V7WA76RgxUAtf0Em/Wbid38KN6n4abEkvO4xMTBWmnP1FtQzgkEiJoA==,
-      }
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.1.0
-
-  /@types/react/18.0.15:
-    resolution:
-      {
-        integrity: sha512-iz3BtLuIYH1uWdsv6wXYdhozhqj20oD4/Hk2DNXIn1kFsmp9x8d9QB6FnPhfkbhd2PgEONt9Q1x/ebkwjfFLow==,
       }
     dependencies:
       '@types/prop-types': 15.7.5
@@ -10231,7 +10202,7 @@ packages:
         integrity: sha512-qaIzpCuXNWomGR1Xq8SCFTtF4v8V27Y6f+b9+bzHiv087MylI/nTCqqdChNeWS7tslgROmYB7yeiruWX7WnqNg==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
     dev: true
 
   /@types/responselike/1.0.0:
@@ -10298,7 +10269,7 @@ packages:
         integrity: sha512-U/+J5qccRdKFryvHkk1a0IeZaSIZLCmTwAQhTSDGeC3SPNIYPus+EtunBqP49r870l8czbfxtjeC3IL9P66ngQ==,
       }
     dependencies:
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       '@types/webpack-env': 1.17.0
     dev: true
 
@@ -10309,7 +10280,7 @@ packages:
       }
     dependencies:
       '@types/hoist-non-react-statics': 3.3.1
-      '@types/react': 18.0.15
+      '@types/react': 17.0.47
       csstype: 3.1.0
     dev: true
 
@@ -12115,7 +12086,7 @@ packages:
       varint: 5.0.2
     dev: false
 
-  /@xstate/react/3.0.0_cgmtdnh7hbcv55nluxt3gdbquy:
+  /@xstate/react/3.0.0_qoz6orvt26se6gmwe4ax5kvcum:
     resolution:
       {
         integrity: sha512-KHSCfwtb8gZ7QH2luihvmKYI+0lcdHQOmGNRUxUEs4zVgaJCyd8csCEmwPsudpliLdUmyxX2pzUBojFkINpotw==,
@@ -12131,7 +12102,7 @@ packages:
         optional: true
     dependencies:
       react: 17.0.2
-      use-isomorphic-layout-effect: 1.1.2_7u6mpky5dbb5b3hgdescs5ficq
+      use-isomorphic-layout-effect: 1.1.2_sudpmbbyhqtxq6t4xf6jlicdem
       use-sync-external-store: 1.2.0_react@17.0.2
       xstate: 4.32.1
     transitivePeerDependencies:
@@ -14708,7 +14679,10 @@ packages:
     dev: false
 
   /concat-map/0.0.1:
-    resolution: { integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s= }
+    resolution:
+      {
+        integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==,
+      }
 
   /concat-md/0.5.0:
     resolution:
@@ -31332,22 +31306,6 @@ packages:
       react: '>=16.8.0'
     dependencies:
       dequal: 1.0.0
-      react: 17.0.2
-    dev: false
-
-  /use-isomorphic-layout-effect/1.1.2_7u6mpky5dbb5b3hgdescs5ficq:
-    resolution:
-      {
-        integrity: sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA==,
-      }
-    peerDependencies:
-      '@types/react': '*'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@types/react': 17.0.2
       react: 17.0.2
     dev: false
 

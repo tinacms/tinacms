@@ -52,6 +52,7 @@ export const attachDatabase = async (
   console.log('init level host')
 
   const levelHost = new ManyLevelHost(
+    // @ts-ignore
     new MemoryLevel<string, Record<string, any>>({
       valueEncoding: 'json',
     })
