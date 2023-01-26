@@ -13,8 +13,6 @@
     "@tinacms/graphql": "workspace:*",
     "dotenv": "^16.0.3",
     "js-base64": "^3.7.4",
-    "mongodb": "^4.13.0",
-    "mongodb-level": "^0.0.1",
     "next": "12.2.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",

@@ -15,7 +15,7 @@ import * as _ from 'lodash'
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
 import fs from 'fs-extra'
 import path from 'path'
-import { build } from 'esbuild'
+import { build, Platform } from 'esbuild'
 import type { Loader } from 'esbuild'
 import type { TinaCloudSchema } from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
@@ -271,7 +271,8 @@ export const transpile = async (
   tempDir,
   verbose,
   define,
-  packageJSONFilePath: string
+  packageJSONFilePath: string,
+  platform: Platform = 'neutral'
 ) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
@@ -296,7 +297,7 @@ export const transpile = async (
   const prebuiltInputPath = path.join(tempDir, 'temp-output.jsx')
   await build({
     bundle: true,
-    platform: 'neutral',
+    platform,
     target: ['es2020'],
     entryPoints: [inputFile],
     treeShaking: true,
@@ -319,7 +320,7 @@ export const transpile = async (
   const outputPath = path.join(tempDir, outputFile)
   await build({
     bundle: true,
-    platform: 'neutral',
+    platform,
     target: ['node10.4'],
     entryPoints: [prebuiltInputPath],
     // Since this code is run via CLI, convert it to cjs

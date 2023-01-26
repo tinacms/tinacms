@@ -175,7 +175,7 @@ export const baseCmds: Command[] = [
           startServer,
           startSubprocess,
         ],
-        { ...options, useLocalDatabase: true }
+        options
       ),
   },
   {

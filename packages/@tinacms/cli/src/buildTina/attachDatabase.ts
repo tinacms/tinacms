@@ -16,17 +16,19 @@ import * as path from 'path'
 import { transpile } from '../cmds/compile'
 import { BuildSchemaError } from '../cmds/start-server/errors'
 import { FilesystemBridge, IsomorphicBridge } from '@tinacms/datalayer'
-import { createDatabase } from '@tinacms/graphql'
+import { createDatabase, TinaLevelClient } from '@tinacms/graphql'
 import fs from 'fs-extra'
 import { makeIsomorphicOptions } from './git'
 import { MemoryLevel } from 'memory-level'
+import { ManyLevelHost } from 'many-level'
+import { pipeline } from 'readable-stream'
+import { createServer } from 'net'
 
 export const attachDatabase = async (
   ctx: any,
   next: () => void,
   _options: {
     isomorphicGitBridge: boolean
-    useLocalDatabase: boolean
     dev: boolean
     verbose: boolean
   }
@@ -45,7 +47,29 @@ export const attachDatabase = async (
     filename: 'database',
     allowedTypes: ['js', 'jsx', 'tsx', 'ts'],
   })
-  if (inputFile && !_options.useLocalDatabase) {
+  const fsBridge = new FilesystemBridge(ctx.rootPath)
+
+  console.log('init level host')
+
+  const levelHost = new ManyLevelHost(
+    // @ts-ignore
+    new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    })
+  )
+
+  const server = createServer(function (socket) {
+    // Pipe socket into host stream and vice versa
+    pipeline(socket, levelHost.createRpcStream(), socket, () => {
+      // Disconnected
+    })
+  })
+  console.log('done init level host')
+
+  server.listen(9000)
+  ctx.dbServer = server
+
+  if (inputFile) {
     try {
       await transpile(
         inputFile,
@@ -53,7 +77,8 @@ export const attachDatabase = async (
         tinaTempPath,
         _options.verbose,
         define,
-        path.join(ctx.rootPath, 'package.json')
+        path.join(ctx.rootPath, 'package.json'),
+        'node'
       )
     } catch (e) {
       await fs.remove(tinaTempPath)
@@ -70,6 +95,7 @@ export const attachDatabase = async (
     try {
       const databaseFunc = require(path.join(tinaTempPath, `database.cjs`))
       ctx.database = databaseFunc.default
+      ctx.database.bridge = fsBridge
       ctx.bridge = ctx.database.bridge
       ctx.isSelfHostedDatabase = true
       await fs.remove(tinaTempPath)
@@ -96,7 +122,6 @@ export const attachDatabase = async (
     // const bridge = new GithubBridge(ghConfig)
     // const store = new GithubStore(ghConfig)
 
-    const fsBridge = new FilesystemBridge(ctx.rootPath)
     const bridge = _options.isomorphicGitBridge
       ? new IsomorphicBridge(
           ctx.rootPath,
@@ -105,9 +130,8 @@ export const attachDatabase = async (
         )
       : fsBridge
 
-    const level = new MemoryLevel<string, Record<string, any>>({
-      valueEncoding: 'json',
-    })
+    const level = new TinaLevelClient()
+    level.openConnection()
 
     ctx.database = await createDatabase({ level, bridge })
     ctx.bridge = bridge

@@ -22,6 +22,15 @@ export const parseURL = (
   clientId: string | null
   host: string | null
 } => {
+  // This is a local URL
+  if (url.startsWith('/')) {
+    return {
+      branch: null,
+      isLocalClient: true,
+      clientId: null,
+      host: null,
+    }
+  }
   if (url.includes('localhost')) {
     return {
       branch: null,
@@ -34,7 +43,12 @@ export const parseURL = (
   const params = new URL(url)
 
   // This is a self-hosted URL
-  if (!['tinajs.dev', 'tina.io'].find((item) => params.host.includes(item))) {
+  const isTinaCloud =
+    params.host.includes('tinajs.dev') ||
+    params.host.includes('tina.io') ||
+    params.host.includes('tinajs.io')
+
+  if (!isTinaCloud) {
     return {
       branch: null,
       isLocalClient: true,
