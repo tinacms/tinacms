@@ -44,10 +44,13 @@ export function ErrorMessage({ error }) {
         </h3>
         <div className="mt-2 max-w-xl text-sm text-red-800 space-y-4">
           <p>{message}</p>
-          <p>
-            To fix these errors, edit your content locally and then restart the
-            Tina server.
-          </p>
+          <p>To fix these errors, edit the content in raw-mode.</p>
+          <button
+            onClick={() => setRawMode(true)}
+            className="rounded-l-md border-r-0 shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-gray-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+          >
+            Switch to raw-mode
+          </button>
         </div>
         {/* <div className="mt-5">
           <button
