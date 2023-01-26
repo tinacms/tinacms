@@ -15,8 +15,8 @@ import Progress from 'progress'
 import type { Bridge } from '@tinacms/datalayer'
 import type { Database } from '@tinacms/graphql'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { parseURL } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
-import { parseURL } from './waitForIndexing'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
 // TODO: maybe move this to a shared util package?
