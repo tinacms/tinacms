@@ -101,7 +101,7 @@ export function ErrorMessage({ error }: { error: InvalidMarkdownElement }) {
           >
             <Popover.Panel className="absolute top-8 w-[300px] -right-3 z-10 mt-3 px-4 sm:px-0">
               <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="rounded-md bg-red-50 p-4">
+                <div className="rounded-md bg-red-50 p-4 overflow-scroll">
                   <div className="flex">
                     <div className="flex-shrink-0">
                       <XCircleIcon
