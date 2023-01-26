@@ -33,7 +33,11 @@ export async function genClient(
     tinaSchema?.config?.tinaioConfig?.contentApiUrlOverride ||
     `https://${TINA_HOST}`
 
-  if ((!branch || !clientId || !token) && !options?.local) {
+  if (
+    (!branch || !clientId || !token) &&
+    !options?.local &&
+    !tinaSchema?.config?.contentApiUrlOverride
+  ) {
     const missing = []
     if (!branch) missing.push('branch')
     if (!clientId) missing.push('clientId')
