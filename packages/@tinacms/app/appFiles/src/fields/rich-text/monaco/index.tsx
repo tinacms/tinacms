@@ -91,15 +91,16 @@ export const RawEditor = (props: RichTextType) => {
   React.useEffect(() => {
     // @ts-ignore no access to the rich-text type from this package
     const parsedValue = parseMDX(value, field, (value) => value)
-    if (parsedValue.children[0]) {
-      if (parsedValue.children[0].type === 'invalid_markdown') {
-        const invalidMarkdown = parsedValue.children[0]
-        setError(invalidMarkdown)
-        return
-      }
+    if (
+      parsedValue.children[0] &&
+      parsedValue.children[0].type === 'invalid_markdown'
+    ) {
+      const invalidMarkdown = parsedValue.children[0]
+      setError(invalidMarkdown)
+    } else {
+      setError(null)
     }
     props.input.onChange(parsedValue)
-    setError(null)
   }, [JSON.stringify(debouncedValue)])
 
   React.useEffect(() => {
