@@ -21,16 +21,20 @@ import { logText, warnText } from '../../utils/theme'
 import { logger } from '../../logger'
 import { transform } from 'esbuild'
 export const TINA_HOST = 'content.tinajs.io'
-const root = process.cwd()
-const generatedPath = p.join(root, '.tina', '__generated__')
 
 export async function genClient(
   {
     tinaSchema,
     usingTs,
-  }: { tinaSchema: TinaCloudSchema<false>; usingTs?: boolean },
+    rootPath,
+  }: {
+    tinaSchema: TinaCloudSchema<false>
+    usingTs?: boolean
+    rootPath: string
+  },
   options
 ) {
+  const generatedPath = p.join(rootPath, '.tina', '__generated__')
   const branch = tinaSchema?.config?.branch
   const clientId = tinaSchema?.config?.clientId
   const token = tinaSchema.config?.token
@@ -72,15 +76,19 @@ export default client;
 }
 
 export async function genTypes(
-  { schema, usingTs }: { schema: GraphQLSchema; usingTs?: boolean },
+  {
+    schema,
+    usingTs,
+    rootPath,
+  }: { schema: GraphQLSchema; usingTs?: boolean; rootPath: string },
   next: () => void,
   options
 ) {
-  const typesPath = process.cwd() + '/.tina/__generated__/types.ts'
-  const typesJSPath = process.cwd() + '/.tina/__generated__/types.js'
-  const typesDPath = process.cwd() + '/.tina/__generated__/types.d.ts'
-  const fragPath = process.cwd() + '/.tina/__generated__/*.{graphql,gql}'
-  const queryPathGlob = process.cwd() + '/.tina/queries/**/*.{graphql,gql}'
+  const typesPath = rootPath + '/.tina/__generated__/types.ts'
+  const typesJSPath = rootPath + '/.tina/__generated__/types.js'
+  const typesDPath = rootPath + '/.tina/__generated__/types.d.ts'
+  const fragPath = rootPath + '/.tina/__generated__/*.{graphql,gql}'
+  const queryPathGlob = rootPath + '/.tina/queries/**/*.{graphql,gql}'
 
   const typescriptTypes = await generateTypes(
     schema,
@@ -108,7 +116,7 @@ export async function genTypes(
   }
 
   const schemaString = await printSchema(schema)
-  const schemaPath = process.cwd() + '/.tina/__generated__/schema.gql'
+  const schemaPath = rootPath + '/.tina/__generated__/schema.gql'
 
   await fs.outputFile(
     schemaPath,

@@ -200,6 +200,7 @@ export async function startServer(
         verbose,
         usingTs: ctx.usingTs,
         port,
+        rootPath: ctx.rootPath,
       })
 
       await spin({

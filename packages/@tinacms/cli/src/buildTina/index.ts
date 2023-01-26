@@ -29,13 +29,14 @@ import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
 import { logger } from '../logger'
-import { logText } from '../utils/theme'
+import { logText, warnText } from '../utils/theme'
 
 interface ClientGenOptions {
   noSDK?: boolean
   local?: boolean
   verbose?: boolean
   port?: number
+  rootPath?: string
 }
 
 interface BuildOptions {
@@ -143,6 +144,7 @@ export const buildCmdBuild = async (
     noSDK: options.noSDK,
     verbose: options.verbose,
     usingTs: ctx.usingTs,
+    rootPath: ctx.rootPath,
     port: options.port,
   })
   ctx.apiUrl = apiUrl
@@ -241,6 +243,35 @@ export class ConfigBuilder {
       dev,
       rootPath,
     })
+    // FIXME: the bridge is initialized before we have access to the config,
+    // ideally this is available to us during Bridge init but as a workaround
+    // we add it here.
+    if (
+      this.database.bridge.addOutputPath &&
+      compiledSchema.config?.localContentPath
+    ) {
+      if (compiledSchema?.config?.media?.tina) {
+        throw new Error(
+          `"media.tina" is not supported when the "localContentPath" property is present.`
+        )
+      }
+      let localContentPath = compiledSchema.config.localContentPath
+      if (!localContentPath.startsWith('/')) {
+        localContentPath = path.join(process.cwd(), '.tina', localContentPath)
+      }
+      if (await fs.pathExists(localContentPath)) {
+        logger.info(logText(`Using separate content path ${localContentPath}`))
+      } else {
+        logger.warn(
+          warnText(
+            `Using separate content path ${localContentPath}
+  but no directory was found at that location, creating one...`
+          )
+        )
+        await fs.mkdir(localContentPath)
+      }
+      this.database.bridge.addOutputPath(localContentPath)
+    }
 
     const { graphQLSchema, tinaSchema } = await buildSchema(
       rootPath,
@@ -258,19 +289,20 @@ export class ConfigBuilder {
     verbose,
     local,
     port,
+    rootPath,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
   }) {
     const astSchema = await getASTSchema(this.database)
 
-    await genTypes({ schema: astSchema, usingTs }, () => {}, {
+    await genTypes({ schema: astSchema, usingTs, rootPath }, () => {}, {
       noSDK,
       verbose,
     })
 
     return genClient(
-      { tinaSchema: compiledSchema, usingTs },
+      { tinaSchema: compiledSchema, usingTs, rootPath },
       {
         local,
         port,

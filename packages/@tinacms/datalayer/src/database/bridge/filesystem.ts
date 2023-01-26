@@ -24,18 +24,23 @@ import type { Bridge } from './index'
  */
 export class FilesystemBridge implements Bridge {
   public rootPath: string
+  public outputPath?: string
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
+    this.outputPath = rootPath || ''
+  }
+  public addOutputPath(outputPath: string) {
+    this.outputPath = outputPath
   }
   public async glob(pattern: string, extension: string) {
-    const basePath = path.join(this.rootPath, ...pattern.split('/'))
+    const basePath = path.join(this.outputPath, ...pattern.split('/'))
     const items = await fg(
       path.join(basePath, '**', `/*${extension}`).replace(/\\/g, '/'),
       {
         dot: true,
       }
     )
-    const posixRootPath = normalize(this.rootPath)
+    const posixRootPath = normalize(this.outputPath)
     return items.map((item) => {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
@@ -44,16 +49,26 @@ export class FilesystemBridge implements Bridge {
     return true
   }
   public async delete(filepath: string) {
-    await fs.remove(path.join(this.rootPath, filepath))
+    await fs.remove(path.join(this.outputPath, filepath))
   }
   public async get(filepath: string) {
-    return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
+    return fs.readFileSync(path.join(this.outputPath, filepath)).toString()
   }
   public async putConfig(filepath: string, data: string) {
-    await this.put(filepath, data)
+    /**
+     * If the root path and output path are different (for separate content repos)
+     * push config file changes to both.
+     */
+    if (this.rootPath !== this.outputPath) {
+      await this.put(filepath, data)
+      await this.put(filepath, data, this.rootPath)
+    } else {
+      await this.put(filepath, data)
+    }
   }
-  public async put(filepath: string, data: string) {
-    await fs.outputFileSync(path.join(this.rootPath, filepath), data)
+  public async put(filepath: string, data: string, basePathOverride?: string) {
+    const basePath = basePathOverride || this.outputPath
+    await fs.outputFileSync(path.join(basePath, filepath), data)
   }
 }
 

@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [c627ebe92]
+- Updated dependencies [7d41435df]
+- Updated dependencies [3165f397d]
+- Updated dependencies [ef7c4043a]
+- Updated dependencies [b2952a298]
+  - @tinacms/toolkit@1.2.1
+  - @tinacms/schema-tools@1.2.0
+  - @tinacms/sharedctx@1.0.0
+
 ## 1.1.2
 
 ### Patch Changes

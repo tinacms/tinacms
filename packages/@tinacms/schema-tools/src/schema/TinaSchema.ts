@@ -315,7 +315,15 @@ export class TinaSchema {
           return { [_template]: this.transformCollectablePayload(rest, field) }
         }
       } else {
-        return value
+        if (field.list) {
+          assertShape<object[]>(value, (yup) => yup.array(yup.object()))
+          return value.map((item) => {
+            return this.transformCollectablePayload(item, field)
+          })
+        } else {
+          assertShape<object>(value, (yup) => yup.object())
+          return this.transformCollectablePayload(value, field)
+        }
       }
     else {
       return value

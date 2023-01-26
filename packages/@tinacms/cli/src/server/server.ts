@@ -75,6 +75,7 @@ export const gqlServer = async (database, verbose: boolean) => {
   app.use(
     '/media',
     createMediaRouter({
+      rootPath: db.bridge.rootPath,
       publicFolder: parseMediaFolder(mediaPaths?.publicFolder || ''),
       mediaRoot: parseMediaFolder(mediaPaths?.mediaRoot || ''),
     })

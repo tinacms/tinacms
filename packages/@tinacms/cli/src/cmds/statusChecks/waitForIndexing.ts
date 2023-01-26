@@ -77,6 +77,7 @@ export const waitForDB = async (
         {
           method: 'GET',
           headers,
+          cache: 'no-cache',
         }
       )
       const { status, error } = (await response.json()) as IndexStatusResponse

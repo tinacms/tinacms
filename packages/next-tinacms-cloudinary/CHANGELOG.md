@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 4.1.1
+
+### Patch Changes
+
+- c627ebe92: docs: Update broken media error links
+
 ## 4.1.0
 
 ### Minor Changes

@@ -409,6 +409,7 @@ importers:
       '@tailwindcss/typography': ^0.5.4
       '@tinacms/mdx': workspace:*
       '@tinacms/scripts': workspace:*
+      '@tinacms/toolkit': workspace:*
       '@types/fs-extra': ^9.0.1
       '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
@@ -462,6 +463,7 @@ importers:
     devDependencies:
       '@tinacms/mdx': link:../mdx
       '@tinacms/scripts': link:../scripts
+      '@tinacms/toolkit': link:../toolkit
       '@types/fs-extra': 9.0.13
       '@types/react': 17.0.47
       '@types/react-dom': 17.0.2
@@ -545,7 +547,6 @@ importers:
       '@types/progress': ^2.0.3
       '@types/prompts': ^2.0.13
       '@types/yup': ^0.29.11
-      add: ^2.0.6
       ajv: ^6.12.3
       altair-express-middleware: 4.0.6
       auto-bind: ^4.0.0
@@ -570,6 +571,7 @@ importers:
       log4js: ^6.4.0
       many-level: ^2.0.0
       memory-level: ^1.0.0
+      minimatch: ^5.1.2
       multer: 1.4.5-lts.1
       normalize-path: ^3.0.0
       prettier: ^2.2.1
@@ -577,6 +579,7 @@ importers:
       prompts: ^2.4.1
       readable-stream: ^4.3.0
       typescript: 4.3.5
+      url-pattern: ^1.0.3
       yarn: ^1.22.17
       yup: ^0.32.9
       zod: ^3.14.3
@@ -594,7 +597,6 @@ importers:
       '@tinacms/graphql': link:../graphql
       '@tinacms/metrics': link:../metrics
       '@tinacms/schema-tools': link:../schema-tools
-      add: 2.0.6
       ajv: 6.12.6
       altair-express-middleware: 4.0.6
       auto-bind: 4.0.0
@@ -618,12 +620,14 @@ importers:
       log4js: 6.5.2
       many-level: 2.0.0
       memory-level: 1.0.0
+      minimatch: 5.1.2
       multer: 1.4.5-lts.1
       normalize-path: 3.0.0
       prettier: 2.7.1
       progress: 2.0.3
       prompts: 2.4.2
       readable-stream: 4.3.0
+      url-pattern: 1.0.3
       yarn: 1.22.19
       yup: 0.32.11
       zod: 3.17.3
@@ -720,6 +724,7 @@ importers:
   packages/@tinacms/graphql:
     specifiers:
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
+      '@iarna/toml': ^2.2.5
       '@tinacms/datalayer': workspace:*
       '@tinacms/mdx': workspace:*
       '@tinacms/schema-tools': workspace:*
@@ -758,8 +763,9 @@ importers:
       jest-diff: 27.0.6
       jest-file-snapshot: ^0.5.0
       jest-matcher-utils: 27.0.6
-      js-yaml: ^3.14.0
+      js-yaml: ^3.14.1
       jsonpath-plus: ^6.0.1
+      leveldown: ^6.1.0
       lodash: ^4.17.20
       many-level: ^2.0.0
       mdast: ^3.0.0
@@ -791,6 +797,7 @@ importers:
       yup: ^0.32.9
     dependencies:
       '@graphql-tools/relay-operation-optimizer': 6.5.0_graphql@15.8.0
+      '@iarna/toml': 2.2.5
       '@tinacms/datalayer': link:../datalayer
       '@tinacms/mdx': link:../mdx
       '@tinacms/schema-tools': link:../schema-tools
@@ -811,6 +818,7 @@ importers:
       gray-matter: 4.0.3
       js-yaml: 3.14.1
       jsonpath-plus: 6.0.1
+      leveldown: 6.1.1
       lodash: 4.17.21
       many-level: 2.0.0
       mdast: 3.0.0
@@ -6698,6 +6706,13 @@ packages:
       }
     dev: true
 
+  /@iarna/toml/2.2.5:
+    resolution:
+      {
+        integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==,
+      }
+    dev: false
+
   /@icons/material/0.2.4_react@17.0.2:
     resolution:
       {
@@ -12399,13 +12414,6 @@ packages:
       }
     engines: { node: '>=0.4.0' }
     hasBin: true
-
-  /add/2.0.6:
-    resolution:
-      {
-        integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==,
-      }
-    dev: false
 
   /agent-base/4.3.0:
     resolution:
@@ -22919,6 +22927,19 @@ packages:
       buffer: 6.0.3
       module-error: 1.0.2
 
+  /leveldown/6.1.1:
+    resolution:
+      {
+        integrity: sha512-88c+E+Eizn4CkQOBHwqlCJaTNEjGpaEIikn1S+cINc5E9HEvJ77bqY4JY/HxT5u0caWqsc3P3DcFIKBI1vHt+A==,
+      }
+    engines: { node: '>=10.12.0' }
+    requiresBuild: true
+    dependencies:
+      abstract-leveldown: 7.2.0
+      napi-macros: 2.0.0
+      node-gyp-build: 4.6.0
+    dev: false
+
   /leven/2.1.0:
     resolution:
       {
@@ -24377,6 +24398,16 @@ packages:
       brace-expansion: 2.0.1
     dev: false
 
+  /minimatch/5.1.2:
+    resolution:
+      {
+        integrity: sha512-bNH9mmM9qsJ2X4r2Nat1B//1dJVcn3+iBLa3IgqJ7EbGaDNepL9QSHOxN4ng33s52VMMhhIfgCYDk3C4ZmlDAg==,
+      }
+    engines: { node: '>=10' }
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: false
+
   /minimist-options/4.1.0:
     resolution:
       {
@@ -24722,6 +24753,13 @@ packages:
       - supports-color
     dev: false
 
+  /napi-macros/2.0.0:
+    resolution:
+      {
+        integrity: sha512-A0xLykHtARfueITVDernsAWdtIMbOJgKgcluwENp3AlsKN/PloyO10HtmoqnFAQAcxPkgZN7wdfPfEd0zNGxbg==,
+      }
+    dev: false
+
   /natural-compare-lite/1.4.0:
     resolution:
       {
@@ -25006,6 +25044,14 @@ packages:
     dependencies:
       encoding: 0.1.13
       whatwg-url: 5.0.0
+
+  /node-gyp-build/4.6.0:
+    resolution:
+      {
+        integrity: sha512-NTZVKn9IylLwUzaKjkas1e4u2DLNcV4rdYagA4PWdPwW87Bi7z+BznyKSRwS/761tV/lzCGXplWsiaMjLqP2zQ==,
+      }
+    hasBin: true
+    dev: false
 
   /node-int64/0.4.0:
     resolution:

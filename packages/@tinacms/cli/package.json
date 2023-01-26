@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -48,6 +48,7 @@
     "test": "jest --passWithNoTests",
     "types": "pnpm tsc",
     "test-watch": "jest  --passWithNoTests --watch",
+    "tinacms": "MONOREPO_DEV=true node ./bin/tinacms",
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "dependencies": {
@@ -64,7 +65,6 @@
     "@tinacms/graphql": "workspace:*",
     "@tinacms/metrics": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
-    "add": "^2.0.6",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",
     "auto-bind": "^4.0.0",
@@ -88,12 +88,14 @@
     "log4js": "^6.4.0",
     "memory-level": "^1.0.0",
     "many-level": "^2.0.0",
+    "minimatch": "^5.1.2",
     "multer": "1.4.5-lts.1",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
     "readable-stream": "^4.3.0",
+    "url-pattern": "^1.0.3",
     "yarn": "^1.22.17",
     "yup": "^0.32.9",
     "zod": "^3.14.3"

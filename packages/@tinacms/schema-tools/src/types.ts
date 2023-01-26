@@ -115,6 +115,8 @@ type Component<Type, List> = (props: {
 }) => any
 
 type UIField<Type, List extends boolean> = {
+  max?: List extends true ? number : never
+  min?: List extends true ? number : never
   /**
    * Override the label from parent object
    */
@@ -336,6 +338,7 @@ export type RichTextField = (
       match?: {
         start: string
         end: string
+        name?: string
       }
     })[]
   }
@@ -474,7 +477,15 @@ export interface FieldCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
+  /**
+   * This format will be used to parse the markdown frontmatter
+   */
+  frontmatterFormat?: 'yaml' | 'toml' | 'json'
+  /**
+   * The delimiters used to parse the frontmatter.
+   */
+  frontmatterDelimiters?: [string, string] | string
   ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
   /**
    * @deprecated - use `ui.defaultItem` instead
@@ -493,7 +504,7 @@ export interface TemplateCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
   ui?: UICollection
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead
@@ -571,6 +582,19 @@ export interface Config<
      */
     referenceDepth?: number
   }
+  /**
+   *
+   * Tina supports serving content from a separate Git repo. To enable this during local development, point
+   * this config at the root of the content repo.
+   *
+   * NOTE: Relative paths are fine to use here, but you should use an environment variable for this, as each developer on your team may have a different
+   * location to the path.
+   *
+   * ```ts
+   * localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+   * ```
+   */
+  localContentPath?: string
   /**
    * Tina is compiled as a single-page app and placed in the public directory
    * of your application.

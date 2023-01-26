@@ -16,7 +16,7 @@ import { name } from './properties'
 import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
-const FORMATS = ['json', 'md', 'markdown', 'mdx'] as const
+const FORMATS = ['json', 'md', 'markdown', 'mdx', 'toml', 'yaml'] as const
 
 const Template = z
   .object({
@@ -39,7 +39,14 @@ const Template = z
 
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
-  name: name,
+  name: name.superRefine((val, ctx) => {
+    if (val === 'relativePath') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `name cannot be 'relativePath'. 'relativePath' is a reserved field name.`,
+      })
+    }
+  }),
   format: z.enum(FORMATS).optional(),
 })
 
