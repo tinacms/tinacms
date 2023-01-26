@@ -40,8 +40,6 @@ export const attachDatabase = async (
   })
   const fsBridge = new FilesystemBridge(ctx.rootPath)
 
-  console.log('init level host')
-
   const levelHost = new ManyLevelHost(
     // @ts-ignore
     new MemoryLevel<string, Record<string, any>>({
@@ -55,7 +53,6 @@ export const attachDatabase = async (
       // Disconnected
     })
   })
-  console.log('done init level host')
 
   server.listen(9000)
   ctx.dbServer = server
