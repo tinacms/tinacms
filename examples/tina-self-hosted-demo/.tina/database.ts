@@ -18,7 +18,7 @@ const octokit = new Octokit({
 })
 
 const localLevelStore = new TinaLevelClient()
-const mongodbLevelStore = new MongodbLevel({
+const mongodbLevelStore = new MongodbLevel<string, Record<string, any>>({
   collectionName: 'tinacms',
   dbName: 'tinacms',
   mongoUri: process.env.MONGODB_URI as string,
@@ -31,6 +31,7 @@ const githubOnPut = async (key, value) => {
   let sha
   try {
     const {
+      // @ts-ignore
       data: { sha: existingSha },
     } = await octokit.repos.getContent({
       owner,
@@ -56,6 +57,7 @@ const githubOnDelete = async (key) => {
   let sha
   try {
     const {
+      // @ts-ignore
       data: { sha: existingSha },
     } = await octokit.repos.getContent({
       owner,

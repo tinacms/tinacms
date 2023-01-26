@@ -1,8 +1,8 @@
 import { Container } from '../components/util/container'
 import { Section } from '../components/util/section'
 import { Posts } from '../components/posts'
-import { client } from '../.tina/__generated__/client'
 import { Layout } from '../components/layout'
+import { dbConnection } from '../lib/databaseConnection'
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>['props']
@@ -21,7 +21,7 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
-  const tinaProps = await client.queries.pageQuery()
+  const tinaProps = await dbConnection.queries.pageQuery()
   return {
     props: {
       ...tinaProps,

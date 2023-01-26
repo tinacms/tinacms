@@ -89,9 +89,9 @@ export const Header = ({ data }) => {
             {data.nav &&
               data.nav.map((item, i) => {
                 const activeItem =
-                  item.href === ''
-                    ? router.asPath === '/'
-                    : router.asPath.includes(item.href)
+                  item?.href === ''
+                    ? router?.asPath === '/'
+                    : router?.asPath.includes(item.href)
                 return (
                   <li
                     key={`${item.label}-${i}`}
