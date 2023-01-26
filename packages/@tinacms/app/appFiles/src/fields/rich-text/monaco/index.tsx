@@ -205,8 +205,8 @@ export const RawEditor = (props: RichTextType) => {
             folding: false,
             renderLineHighlight: 'none',
             scrollbar: {
-              verticalScrollbarSize: 1,
-              horizontalScrollbarSize: 1,
+              verticalScrollbarSize: 4,
+              horizontalScrollbarSize: 4,
               // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
               alwaysConsumeMouseWheel: false,
             },
