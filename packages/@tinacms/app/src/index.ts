@@ -153,7 +153,7 @@ export const viteBuild = async ({
       alias,
       dedupe: process.env.MONOREPO_DEV
         ? ['graphql', 'tinacms', '@tinacms/toolkit']
-        : [],
+        : ['graphql'],
     },
     build: {
       sourcemap: true,

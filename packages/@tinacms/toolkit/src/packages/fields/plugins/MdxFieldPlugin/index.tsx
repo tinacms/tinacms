@@ -65,6 +65,13 @@ export const MdxFieldPlugin = {
 
 export const MdxFieldPluginExtendible = {
   name: 'rich-text',
+  validate(value: any) {
+    if (value.children[0] && value.children[0].type === 'invalid_markdown') {
+      return 'Unable to parse rich-text'
+    } else {
+      return undefined
+    }
+  },
   Component: wrapFieldsWithMeta<InputProps, { templates: MdxTemplate[] }>(
     (props) => {
       const [key, setKey] = React.useState(0)
