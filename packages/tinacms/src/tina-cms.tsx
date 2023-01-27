@@ -199,6 +199,8 @@ export const TinaCMSProvider2 = ({
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
 
+  const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
+
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -211,7 +213,10 @@ export const TinaCMSProvider2 = ({
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||
     // If in not in localMode check if clientId and branch are defined
-    (!isLocalClient && (!branch || !clientId))
+    (!isLocalClient &&
+      (!branch || !clientId) &&
+      // if they pass a custom apiURL, we don't need to throw an error
+      !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
       'Invalid setup. See https://tina.io/docs/tina-cloud/connecting-site/ for more information.'
@@ -231,7 +236,7 @@ export const TinaCMSProvider2 = ({
         branch={branch}
         clientId={clientId}
         tinaioConfig={props.tinaioConfig}
-        isLocalClient={isLocalClient}
+        isLocalClient={isLocalOverride || isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
