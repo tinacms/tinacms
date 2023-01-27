@@ -17,7 +17,7 @@ export const parseURL = (
   if (url.startsWith('/')) {
     return {
       branch: null,
-      isLocalClient: true,
+      isLocalClient: false,
       clientId: null,
       host: null,
     }
