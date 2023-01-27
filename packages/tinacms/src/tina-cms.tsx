@@ -234,7 +234,7 @@ export const TinaCMSProvider2 = ({
     <>
       <TinaCloudProvider
         branch={branch}
-        clientId={clientId}
+        clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
         isLocalClient={isLocalOverride || isLocalClient}
         cmsCallback={props.cmsCallback}
