@@ -13,7 +13,7 @@ limitations under the License.
 
 import { Spinner } from 'cli-spinner'
 
-export async function spin<T>({
+async function localSpin<T>({
   waitFor,
   text,
 }: {
@@ -38,4 +38,22 @@ export async function spin<T>({
   spinner.stop()
   console.log('')
   return res
+}
+
+export function spin<T>({
+  waitFor,
+  text,
+}: {
+  waitFor: () => Promise<T>
+  text: string
+}): Promise<any> {
+  if (process.env.CI) {
+    console.log(text)
+    return waitFor()
+  } else {
+    return localSpin({
+      text,
+      waitFor,
+    })
+  }
 }
