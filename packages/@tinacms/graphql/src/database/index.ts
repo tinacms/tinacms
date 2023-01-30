@@ -51,6 +51,7 @@ type CreateDatabase = {
   level: Level
   onPut?: (key: string, value: any) => Promise<void>
   onDelete?: (key: string) => Promise<void>
+  tinaDirectory?: string
   indexStatusCallback?: IndexStatusCallback
   version?: boolean
 }
@@ -63,7 +64,6 @@ export const createDatabase = (config: CreateDatabase) => {
   })
 }
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
-const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 /** Options for {@link Database.query} **/
 export type QueryOptions = {
@@ -92,6 +92,7 @@ export class Database {
   public bridge?: Bridge
   public rootLevel: Level
   public level: Level | undefined
+  public tinaDirectory: string
   public indexStatusCallback: IndexStatusCallback | undefined
   private onPut: OnPutCallback
   private onDelete: OnDeleteCallback
@@ -101,6 +102,7 @@ export class Database {
     | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   constructor(public config: CreateDatabase) {
+    this.tinaDirectory = config.tinaDirectory || '.tina'
     this.bridge = config.bridge
     this.rootLevel = config.level
     this.indexStatusCallback =
@@ -119,6 +121,9 @@ export class Database {
     const tinaSchema = await this.getSchema(this.level)
     return tinaSchema.getCollectionByFullPath(filepath)
   }
+
+  private getGeneratedFolder = () =>
+    path.join(this.tinaDirectory, '__generated__')
 
   private async partitionPathsByCollection(documentPaths: string[]) {
     const pathsByCollection: Record<string, string[]> = {}
@@ -481,7 +486,7 @@ export class Database {
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
     await this.initLevel()
     const lookupPath = normalizePath(
-      path.join(GENERATED_FOLDER, `_lookup.json`)
+      path.join(this.getGeneratedFolder(), `_lookup.json`)
     )
     if (!this._lookup) {
       const _lookup = await this.level
@@ -498,7 +503,7 @@ export class Database {
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     await this.initLevel()
     const graphqlPath = normalizePath(
-      path.join(GENERATED_FOLDER, `_graphql.json`)
+      path.join(this.getGeneratedFolder(), `_graphql.json`)
     )
     return (await this.level
       .sublevel<string, Record<string, any>>(
@@ -514,7 +519,7 @@ export class Database {
     }
 
     const graphqlPath = normalizePath(
-      path.join(GENERATED_FOLDER, `_graphql.json`)
+      path.join(this.getGeneratedFolder(), `_graphql.json`)
     )
     const _graphql = await this.bridge.get(graphqlPath)
     return JSON.parse(_graphql)
@@ -524,7 +529,7 @@ export class Database {
   ): Promise<TinaCloudSchemaBase> => {
     await this.initLevel()
     const schemaPath = normalizePath(
-      path.join(GENERATED_FOLDER, `_schema.json`)
+      path.join(this.getGeneratedFolder(), `_schema.json`)
     )
     return (await (level || this.level)
       .sublevel<string, Record<string, any>>(
@@ -754,7 +759,8 @@ export class Database {
         } catch (error) {
           if (
             error instanceof Error &&
-            !edge.path.includes('.tina/__generated__/_graphql.json')
+            (!edge.path.includes('.tina/__generated__/_graphql.json') ||
+              !edge.path.includes('tina/__generated__/_graphql.json'))
           ) {
             throw new TinaQueryError({
               originalError: error,
@@ -786,11 +792,11 @@ export class Database {
   }) => {
     if (this.bridge && this.bridge.supportsBuilding()) {
       await this.bridge.putConfig(
-        normalizePath(path.join(GENERATED_FOLDER, `_graphql.json`)),
+        normalizePath(path.join(this.getGeneratedFolder(), `_graphql.json`)),
         JSON.stringify(graphQLSchema)
       )
       await this.bridge.putConfig(
-        normalizePath(path.join(GENERATED_FOLDER, `_schema.json`)),
+        normalizePath(path.join(this.getGeneratedFolder(), `_schema.json`)),
         JSON.stringify(tinaSchema.schema)
       )
     }
@@ -810,20 +816,24 @@ export class Database {
   public indexContent = async ({
     graphQLSchema,
     tinaSchema,
+    lookup: lookupFromLockFile,
   }: {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
+    lookup?: object
   }) => {
     if (!this.bridge) {
       throw new Error('No bridge configured')
     }
     await this.initLevel()
     await this.indexStatusCallbackWrapper(async () => {
-      const lookup = JSON.parse(
-        await this.bridge.get(
-          normalizePath(path.join(GENERATED_FOLDER, '_lookup.json'))
+      const lookup =
+        lookupFromLockFile ||
+        JSON.parse(
+          await this.bridge.get(
+            normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json'))
+          )
         )
-      )
 
       let nextLevel: Level | undefined
       let nextVersion: string | undefined
@@ -841,15 +851,15 @@ export class Database {
         SUBLEVEL_OPTIONS
       )
       await contentRootLevel.put(
-        normalizePath(path.join(GENERATED_FOLDER, '_graphql.json')),
+        normalizePath(path.join(this.getGeneratedFolder(), '_graphql.json')),
         graphQLSchema as any
       )
       await contentRootLevel.put(
-        normalizePath(path.join(GENERATED_FOLDER, '_schema.json')),
+        normalizePath(path.join(this.getGeneratedFolder(), '_schema.json')),
         tinaSchema.schema as any
       )
       await contentRootLevel.put(
-        normalizePath(path.join(GENERATED_FOLDER, '_lookup.json')),
+        normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
         lookup
       )
       await this._indexAllContent(nextLevel)
@@ -993,7 +1003,7 @@ export class Database {
     if (!this.bridge) {
       throw new Error('No bridge configured')
     }
-    const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
+    const lookupPath = path.join(this.getGeneratedFolder(), `_lookup.json`)
     let lookupMap
     try {
       lookupMap = JSON.parse(await this.bridge.get(normalizePath(lookupPath)))

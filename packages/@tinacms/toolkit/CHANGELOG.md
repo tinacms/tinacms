@@ -1,5 +1,16 @@
 # Change Log
 
+## 1.3.0
+
+### Minor Changes
+
+- e8776aa59: Add new GraphQL endpoint for updating a documents name
+- e019a200a: Adds CMD/CTRL+S functionality for saving forms. It works in both the fullscreen and sidebar forms, making the editing experience a little more seamless.
+
+### Patch Changes
+
+- b4facb6ca: Fix billing warning to not show if not logged in
+
 ## 1.2.1
 
 ### Patch Changes

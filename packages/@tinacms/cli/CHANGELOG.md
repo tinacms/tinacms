@@ -1,5 +1,46 @@
 # tinacms-cli
 
+## 1.0.7
+
+### Patch Changes
+
+- 849dc0bb7: Adds more features to the forestry migration tool
+- 23942cfcb: Add support for --rootPath argument in CLI commands
+- e7c404bcf: Support remote path configuration for separate content repos
+
+  Tina now supports serving content from a separate Git repo.
+
+  ### Local development workflow
+
+  To enable this during local development, point
+  this config at the root of the content repo.
+
+  > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
+
+  ```ts
+  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  ```
+
+  ### Production workflow
+
+  For production, your config should use the `clientId`, `branch`, and `token` values that are associated with your _content repo_.
+
+- 82b22d6f7: fix: don't try and show spinners in CI logs
+- d6301e7fb: Use the db status endpoint to validate credentials so that slow indexing does not cause builds to fail during indexing
+- Updated dependencies [84fe97ca7]
+- Updated dependencies [c5a603c75]
+- Updated dependencies [23942cfcb]
+- Updated dependencies [e7c404bcf]
+- Updated dependencies [e8776aa59]
+- Updated dependencies [e938b9d91]
+- Updated dependencies [b7b05d03f]
+- Updated dependencies [4533d5d66]
+- Updated dependencies [31dacc176]
+  - @tinacms/schema-tools@1.2.1
+  - @tinacms/app@1.0.5
+  - @tinacms/datalayer@1.0.1
+  - @tinacms/graphql@1.1.0
+
 ## 1.0.6
 
 ### Patch Changes
