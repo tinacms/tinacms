@@ -192,9 +192,13 @@ const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
   const option = await prompts({
     name: 'selection',
     type: 'text',
-    message: `Where are public assets stored? (default: "${suggestion}")\n${logText(
-      'Not sure what value to use? Refer to our "Frameworks" doc: https://tina.io/docs/integration/frameworks/'
-    )}`,
+    message:
+      `Where are public assets stored? (default: "${suggestion}")\n` +
+      logText(
+        `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
+          'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
+        )}`
+      ),
   })
   return option['selection'] || suggestion
 }
