@@ -1,7 +1,6 @@
 import database from '../.tina/database'
 import { queries } from '../.tina/__generated__/types'
 import { resolve } from '@tinacms/graphql'
-import type { Database } from '@tinacms/graphql'
 import type { TinaClient } from 'tinacms/dist/client'
 
 export async function databaseRequest({ query, variables }) {
@@ -21,10 +20,8 @@ export async function databaseRequest({ query, variables }) {
 }
 
 export function getDatabaseConnection<GenQueries = Record<string, unknown>>({
-  database,
   queries,
 }: {
-  database: Database
   queries: (client: {
     request: TinaClient<GenQueries>['request']
   }) => GenQueries
@@ -39,4 +36,4 @@ export function getDatabaseConnection<GenQueries = Record<string, unknown>>({
   return { queries: q, request }
 }
 
-export const dbConnection = getDatabaseConnection({ database, queries })
+export const dbConnection = getDatabaseConnection({ queries })
