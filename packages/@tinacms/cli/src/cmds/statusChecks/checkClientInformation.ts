@@ -16,6 +16,7 @@ import type { Bridge, Database } from '@tinacms/graphql'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
 import { parseURL } from './waitForIndexing'
+import crypto from 'crypto'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
 // TODO: maybe move this to a shared util package?
@@ -23,10 +24,14 @@ import { parseURL } from './waitForIndexing'
 async function request(args: {
   url: string
   token: string
+  schemaId: string
 }): Promise<{ status: string; timestamp: number }> {
   const headers = new Headers()
   if (args.token) {
     headers.append('X-API-KEY', args.token)
+  }
+  if (args.schemaId) {
+    headers.append('X-SCHEMA-ID', args.schemaId)
   }
   headers.append('Content-Type', 'application/json')
 
@@ -84,11 +89,16 @@ export const checkClientInfo = async (
   const { clientId, branch, host } = parseURL(ctx.apiUrl)
   const url = `https://${host}/db/${clientId}/status/${branch}`
   const bar = new Progress('Checking clientId, token and branch. :prog', 1)
+  const schemaId = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(ctx.schema))
+    .digest('hex')
 
   try {
     await request({
       token,
       url,
+      schemaId,
     })
     bar.tick({
       prog: '✅',
