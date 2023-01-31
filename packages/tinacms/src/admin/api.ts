@@ -67,21 +67,43 @@ export class TinaAdminApi {
     includeDocuments: boolean,
     after?: string,
     sortKey?: string,
-    order?: 'asc' | 'desc'
+    order?: 'asc' | 'desc',
+    filterArgs?: {
+      filterField: string
+      startsWith?: string
+    }
   ) {
+    let filter = null
+    const filterField = filterArgs?.filterField
+    if (filterField) {
+      // if we have a filterField, we'll create an empty filter object
+      filter = {
+        [collectionName]: {
+          [filterField]: {},
+        },
+      }
+    }
+    // If we have a filterField and a startsWith value, we'll add a filter
+    if (filterField && filterArgs?.startsWith) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        startsWith: filterArgs.startsWith,
+      }
+    }
+
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
       const response: { collection: Collection } =
         order === 'asc'
           ? await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, after: $after, first: $limit) @include(if: $includeDocuments) {
+          documents(sort: $sort, after: $after, first: $limit, filter: $filter) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -115,18 +137,19 @@ export class TinaAdminApi {
                   sort,
                   limit: 50,
                   after,
+                  filter,
                 },
               }
             )
           : await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, before: $after, last: $limit) @include(if: $includeDocuments) {
+          documents(sort: $sort, before: $after, last: $limit, filter: $filter) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -160,6 +183,7 @@ export class TinaAdminApi {
                   sort,
                   limit: 50,
                   after,
+                  filter,
                 },
               }
             )

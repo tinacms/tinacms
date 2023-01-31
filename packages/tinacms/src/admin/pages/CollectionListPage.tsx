@@ -32,6 +32,7 @@ import {
   OverflowMenu,
   Select,
   BaseTextField,
+  Input,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -146,6 +147,9 @@ const CollectionListPage = () => {
     collection: collectionName,
     relativePath: '',
     newRelativePath: '',
+    filterField: '',
+    startsWith: '',
+    endsWith: '',
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -185,6 +189,7 @@ const CollectionListPage = () => {
             includeDocuments
             startCursor={endCursor}
             sortKey={sortKey}
+            filterArgs={vars}
           >
             {(
               collection: Collection,
@@ -200,6 +205,10 @@ const CollectionListPage = () => {
                 // only allow sortable fields
                 ['string', 'number', 'datetime', 'boolean'].includes(x.type)
               )
+
+              const sortField = fields?.find((x) => x.name === vars.filterField)
+              const showStartsWith = sortField?.type === 'string'
+
               const collectionDefinition = cms.api.tina.schema.getCollection(
                 collection.name
               )
@@ -274,62 +283,134 @@ const CollectionListPage = () => {
                           </h3>
 
                           {fields?.length > 0 && (
-                            <div className="flex gap-2 items-center">
-                              <label
-                                htmlFor="sort"
-                                className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                              >
-                                Sort by
-                              </label>
-                              <Select
-                                name="sort"
-                                options={[
-                                  {
-                                    label: 'Default',
-                                    value: JSON.stringify({
-                                      order: 'asc',
-                                      name: '',
-                                    }),
-                                  },
-                                  ...fields
-                                    .map((x) => [
-                                      {
-                                        label:
-                                          (x.label || x.name) + ' (Ascending)',
-                                        value: JSON.stringify({
-                                          name: x.name,
-                                          order: 'asc',
-                                        }),
-                                      },
-                                      {
-                                        label:
-                                          (x.label || x.name) + ' (Descending)',
-                                        value: JSON.stringify({
-                                          name: x.name,
-                                          order: 'desc',
-                                        }),
-                                      },
-                                    ])
-                                    .flat(),
-                                ]}
-                                input={{
-                                  id: 'sort',
-                                  name: 'sort',
-                                  value: sortKey,
-                                  onChange: (e) => {
-                                    const val = JSON.parse(e.target.value)
-                                    setEndCursor('')
-                                    setPrevCursors([])
-                                    window?.localStorage.setItem(
-                                      `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                      e.target.value
-                                    )
-                                    setSortKey(e.target.value)
-                                    setSortOrder(val.order)
-                                  },
-                                }}
-                              />
-                            </div>
+                            <>
+                              <div className="flex gap-2 items-center">
+                                <label
+                                  htmlFor="sort"
+                                  className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                >
+                                  Sort by
+                                </label>
+                                <Select
+                                  name="sort"
+                                  options={[
+                                    {
+                                      label: 'Default',
+                                      value: JSON.stringify({
+                                        order: 'asc',
+                                        name: '',
+                                      }),
+                                    },
+                                    ...fields
+                                      .map((x) => [
+                                        {
+                                          label:
+                                            (x.label || x.name) +
+                                            ' (Ascending)',
+                                          value: JSON.stringify({
+                                            name: x.name,
+                                            order: 'asc',
+                                          }),
+                                        },
+                                        {
+                                          label:
+                                            (x.label || x.name) +
+                                            ' (Descending)',
+                                          value: JSON.stringify({
+                                            name: x.name,
+                                            order: 'desc',
+                                          }),
+                                        },
+                                      ])
+                                      .flat(),
+                                  ]}
+                                  input={{
+                                    id: 'sort',
+                                    name: 'sort',
+                                    value: sortKey,
+                                    onChange: (e) => {
+                                      const val = JSON.parse(e.target.value)
+                                      setEndCursor('')
+                                      setPrevCursors([])
+                                      window?.localStorage.setItem(
+                                        `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                        e.target.value
+                                      )
+                                      setSortKey(e.target.value)
+                                      setSortOrder(val.order)
+                                    },
+                                  }}
+                                />
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <label
+                                  htmlFor="filter"
+                                  className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                >
+                                  Filter by
+                                </label>
+                                <Select
+                                  name="filter"
+                                  options={[
+                                    {
+                                      label: 'None',
+                                      value: '',
+                                    },
+                                    ...fields.map((x) => ({
+                                      label: x.label || x.name,
+                                      value: x.name,
+                                    })),
+                                  ]}
+                                  input={{
+                                    id: 'filter',
+                                    name: 'filter',
+                                    value: vars.filterField,
+                                    onChange: (e) => {
+                                      const val = e.target.value
+                                      setEndCursor('')
+                                      setPrevCursors([])
+                                      setVars((old) => ({
+                                        ...old,
+                                        filterField: val,
+                                      }))
+                                    },
+                                  }}
+                                />
+                              </div>
+                              {showStartsWith && (
+                                <>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      htmlFor="startsWith"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      Starts with
+                                    </label>
+                                    <Input
+                                      name="startsWith"
+                                      id="startsWith"
+                                      value={vars.startsWith}
+                                      onChange={(e) => {
+                                        const val = e.target.value
+                                        setVars((old) => ({
+                                          ...old,
+                                          startsWith: val,
+                                        }))
+                                        setEndCursor('')
+                                        setPrevCursors([])
+                                      }}
+                                    />
+                                    <button
+                                      onClick={() => {
+                                        reFetchCollection()
+                                      }}
+                                    >
+                                      Search
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </>
                           )}
                         </div>
                         {!collection.templates && allowCreate && (
@@ -457,7 +538,8 @@ const CollectionListPage = () => {
                                               />
                                             ),
                                             onMouseDown: () => {
-                                              setVars({
+                                              setVars((old) => ({
+                                                ...old,
                                                 collection: collectionName,
                                                 relativePath:
                                                   document.node._sys.breadcrumbs.join(
@@ -465,7 +547,7 @@ const CollectionListPage = () => {
                                                   ) +
                                                   document.node._sys.extension,
                                                 newRelativePath: '',
-                                              })
+                                              }))
                                               setDeleteModalOpen(true)
                                             },
                                           },
@@ -479,7 +561,8 @@ const CollectionListPage = () => {
                                               />
                                             ),
                                             onMouseDown: () => {
-                                              setVars({
+                                              setVars((old) => ({
+                                                ...old,
                                                 collection: collectionName,
                                                 relativePath:
                                                   document.node._sys.breadcrumbs.join(
@@ -487,7 +570,7 @@ const CollectionListPage = () => {
                                                   ) +
                                                   document.node._sys.extension,
                                                 newRelativePath: '',
-                                              })
+                                              }))
                                               setRenameModalOpen(true)
                                             },
                                           },
