@@ -272,16 +272,38 @@ export const resolve = async ({
                     return { node: document }
                   }),
                 }
-                // TODO when jeffs back: Look at this to make sure its OK to do this. (I am pretty sure it is -- Logan)
-                // Fixes https://github.com/tinacms/tinacms/issues/2886
               } else if (
                 info.fieldName === 'documents' &&
                 value?.collection &&
                 value?.hasDocuments
               ) {
-                // use the collecion and hasDocuments to resolve the documents
+                let filter = args.filter
+
+                // When querying for documents, filter has shape filter { [collectionName]: { ... }} but we need to pass the filter directly to the resolver
+                if (
+                  // 1. Make sure that the filter exists
+                  typeof args?.filter !== 'undefined' &&
+                  args?.filter !== null &&
+                  // 2. Make sure that the collection name exists
+                  // @ts-ignore
+                  typeof value?.collection?.name === 'string' &&
+                  // 3. Make sure that the collection name is in the filter and is not undefined
+                  // @ts-ignore
+                  Object.keys(args.filter).includes(value?.collection?.name) &&
+                  // @ts-ignore
+                  typeof args.filter[value?.collection?.name] !== 'undefined'
+                ) {
+                  // Since 1. 2. and 3. are true, we can safely assume that the filter exists and is not undefined
+
+                  // @ts-ignore
+                  filter = args.filter[value.collection.name]
+                }
+                // use the collection and hasDocuments to resolve the documents
                 return resolver.resolveCollectionConnection({
-                  args,
+                  args: {
+                    ...args,
+                    filter,
+                  },
                   // @ts-ignore
                   collection: value.collection,
                 })
