@@ -78,7 +78,12 @@ export const MdxFieldPlugin = {
 export const MdxFieldPluginExtendible = {
   name: 'rich-text',
   validate(value: any) {
-    if (value.children[0] && value.children[0].type === 'invalid_markdown') {
+    if (
+      typeof value !== 'undefined' &&
+      value !== null &&
+      value.children[0] &&
+      value.children[0].type === 'invalid_markdown'
+    ) {
       return 'Unable to parse rich-text'
     } else {
       return undefined
