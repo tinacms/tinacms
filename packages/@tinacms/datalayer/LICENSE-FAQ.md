@@ -1,11 +1,11 @@
 ## Is TinaCMS Open-Source?
-TinaCMS comprises several different packages. Most TinaCMS packages are open-source under the Apache 2.0 license. However, the [Tina Data Layer](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/datalayer) package is licensed under a [source available](https://en.wikipedia.org/wiki/Source-available_software) license based on the [Fair Source License (version 0.9)](https://docs.google.com/document/d/1sEOCR4gvDY0tRVqhXkJMnCKaTuztHSerJnWWh6bWquM/edit#).   All TinaCMS packages can be found in the [TinaCMS monorepo](https://github.com/tinacms/tinacms/tree/main/packages). 
+TinaCMS comprises several different packages. Most TinaCMS packages are open-source under the [Apache 2.0 license](https://github.com/tinacms/tinacms/blob/main/LICENSE). However, the [Tina Data Layer](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/datalayer) package is licensed under a [source available](https://en.wikipedia.org/wiki/Source-available_software) license based on the [Fair Source License (version 0.9)](https://docs.google.com/document/d/1sEOCR4gvDY0tRVqhXkJMnCKaTuztHSerJnWWh6bWquM/edit#).   All TinaCMS packages can be found in the [TinaCMS monorepo](https://github.com/tinacms/tinacms/tree/main/packages). 
 
-## Why did TinaCMS choose to adopt the Apache 2.0 license for most of its packages? 
+## Why did TinaCMS adopt the Apache 2.0 license for most of its packages? 
 
 We chose the Apache 2.0 license for some of the TinaCMS packages because we want to offer them under a permissive, well-known, open-source license that includes language that protects the TinaCMS trademarks. 
 
-## Why did TinaCMS choose to adopt a license based on the Fair Source License for the Tina Data Layer ? 
+## Why did TinaCMS adopt a license based on the Fair Source License for the Tina Data Layer ? 
 
 We chose to adopt this license because we want the source code of this package to be publicly available, extensible, and modifiable while limiting some commercial activity. This allows us to provide a free-of-charge, self-hosted solution for smaller sites that are within the Use Limitations defined in the license such as those of startups, small and medium businesses, or other simple use-cases. 
 
