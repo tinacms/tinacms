@@ -34,6 +34,7 @@ import {
   BaseTextField,
   Input,
   ReactDateTimeWithStyles,
+  Toggle,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -153,6 +154,7 @@ const CollectionListPage = () => {
     endsWith: '',
     before: '',
     after: '',
+    booleanEquals: false,
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -213,6 +215,9 @@ const CollectionListPage = () => {
               const showStartsWith =
                 sortField?.type === 'string' && !sortField.list
               const showDateFilter = sortField?.type === 'datetime'
+
+              const showBooleanToggle =
+                sortField?.type === 'boolean' && !sortField.list
 
               // TODO: add other fields
               // const showNumberFilter = sortField?.type === 'number' && !sortField.list
@@ -446,6 +451,33 @@ const CollectionListPage = () => {
                                         }}
                                       />
                                     </label>
+                                  </div>
+                                </>
+                              )}
+                              {showBooleanToggle && (
+                                <>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      htmlFor="toggle"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      {sortField.label || sortField.name}
+                                    </label>
+                                    <Toggle
+                                      // @ts-ignore
+                                      field={sortField}
+                                      input={{
+                                        name: 'toggle',
+                                        value: vars.booleanEquals,
+                                        onChange: () => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            booleanEquals: !old.booleanEquals,
+                                          }))
+                                        },
+                                      }}
+                                      name="toggle"
+                                    />
                                   </div>
                                 </>
                               )}

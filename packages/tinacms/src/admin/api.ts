@@ -73,6 +73,7 @@ export class TinaAdminApi {
       startsWith?: string
       before?: string
       after?: string
+      booleanEquals?: boolean
     }
   ) {
     let filter = null
@@ -102,6 +103,12 @@ export class TinaAdminApi {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         after: filterArgs.after,
+      }
+    }
+    if (filterField && filterArgs?.booleanEquals) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        eq: filterArgs.booleanEquals,
       }
     }
 
