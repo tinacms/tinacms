@@ -191,6 +191,22 @@ const CollectionListPage = () => {
     setPrevCursors([])
   }, [loc])
 
+  useEffect(() => {
+    // reset filter when the route is changed
+    setVars((old) => ({
+      ...old,
+      collection: collectionName,
+      relativePath: '',
+      newRelativePath: '',
+      filterField: '',
+      startsWith: '',
+      endsWith: '',
+      before: '',
+      after: '',
+      booleanEquals: null,
+    }))
+  }, [collectionName])
+
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -201,7 +217,23 @@ const CollectionListPage = () => {
             includeDocuments
             startCursor={endCursor}
             sortKey={sortKey}
-            filterArgs={vars}
+            filterArgs={
+              // only pass filter args if the collection is the same as the current route
+              // We need this hear because this runs before the useEffect above
+              collectionName === vars.collection
+                ? vars
+                : {
+                    collection: collectionName,
+                    relativePath: '',
+                    newRelativePath: '',
+                    filterField: '',
+                    startsWith: '',
+                    endsWith: '',
+                    before: '',
+                    after: '',
+                    booleanEquals: null,
+                  }
+            }
           >
             {(
               collection: Collection,
@@ -487,7 +519,7 @@ const CollectionListPage = () => {
                                         field={sortField}
                                         input={{
                                           name: 'toggle',
-                                          value: vars.booleanEquals,
+                                          value: vars.booleanEquals ?? false,
                                           onChange: () => {
                                             setVars((old) => ({
                                               ...old,
