@@ -71,6 +71,8 @@ export class TinaAdminApi {
     filterArgs?: {
       filterField: string
       startsWith?: string
+      before?: string
+      after?: string
     }
   ) {
     let filter = null
@@ -88,6 +90,18 @@ export class TinaAdminApi {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         startsWith: filterArgs.startsWith,
+      }
+    }
+    if (filterField && filterArgs?.before) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        before: filterArgs.before,
+      }
+    }
+    if (filterField && filterArgs?.after) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        after: filterArgs.after,
       }
     }
 

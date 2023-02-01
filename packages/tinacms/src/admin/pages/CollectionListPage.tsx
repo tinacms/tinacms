@@ -33,6 +33,7 @@ import {
   Select,
   BaseTextField,
   Input,
+  ReactDateTimeWithStyles,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -150,6 +151,8 @@ const CollectionListPage = () => {
     filterField: '',
     startsWith: '',
     endsWith: '',
+    before: '',
+    after: '',
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -207,7 +210,12 @@ const CollectionListPage = () => {
               )
 
               const sortField = fields?.find((x) => x.name === vars.filterField)
-              const showStartsWith = sortField?.type === 'string'
+              const showStartsWith =
+                sortField?.type === 'string' && !sortField.list
+              const showDateFilter = sortField?.type === 'datetime'
+
+              // TODO: add other fields
+              // const showNumberFilter = sortField?.type === 'number' && !sortField.list
 
               const collectionDefinition = cms.api.tina.schema.getCollection(
                 collection.name
@@ -396,20 +404,60 @@ const CollectionListPage = () => {
                                           ...old,
                                           startsWith: val,
                                         }))
-                                        setEndCursor('')
-                                        setPrevCursors([])
                                       }}
                                     />
-                                    <button
-                                      onClick={() => {
-                                        reFetchCollection()
-                                      }}
-                                    >
-                                      Search
-                                    </button>
                                   </div>
                                 </>
                               )}
+                              {showDateFilter && (
+                                <>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      htmlFor="dateAfter"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      After
+                                      <ReactDateTimeWithStyles
+                                        value={vars.after}
+                                        onChange={(e) => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            // @ts-ignore
+                                            after: e.format(),
+                                          }))
+                                        }}
+                                      />
+                                    </label>
+                                  </div>
+                                  <div className="flex gap-2 items-center">
+                                    <label
+                                      htmlFor="dateBefore"
+                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                    >
+                                      Before
+                                      <ReactDateTimeWithStyles
+                                        value={vars.before}
+                                        onChange={(e) => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            // @ts-ignore
+                                            before: e.format(),
+                                          }))
+                                        }}
+                                      />
+                                    </label>
+                                  </div>
+                                </>
+                              )}
+                              <button
+                                onClick={() => {
+                                  setEndCursor('')
+                                  setPrevCursors([])
+                                  reFetchCollection()
+                                }}
+                              >
+                                Search
+                              </button>
                             </>
                           )}
                         </div>
