@@ -16,6 +16,14 @@ import type { TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
 import type { Collection, DocumentForm } from './types'
 
+export interface FilterArgs {
+  filterField: string
+  startsWith?: string
+  before?: string
+  after?: string
+  booleanEquals?: boolean
+}
+
 export class TinaAdminApi {
   api: Client
   useDataLayer: boolean
@@ -68,13 +76,7 @@ export class TinaAdminApi {
     after?: string,
     sortKey?: string,
     order?: 'asc' | 'desc',
-    filterArgs?: {
-      filterField: string
-      startsWith?: string
-      before?: string
-      after?: string
-      booleanEquals?: boolean
-    }
+    filterArgs?: FilterArgs
   ) {
     let filter = null
     const filterField = filterArgs?.filterField
@@ -105,7 +107,11 @@ export class TinaAdminApi {
         after: filterArgs.after,
       }
     }
-    if (filterField && filterArgs?.booleanEquals) {
+    if (
+      filterField &&
+      filterArgs?.booleanEquals !== null &&
+      filterArgs?.booleanEquals !== undefined
+    ) {
       filter[collectionName][filterField] = {
         ...(filter[collectionName][filterField] || {}),
         eq: filterArgs.booleanEquals,

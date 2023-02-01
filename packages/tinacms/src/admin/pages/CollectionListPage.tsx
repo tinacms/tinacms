@@ -154,7 +154,7 @@ const CollectionListPage = () => {
     endsWith: '',
     before: '',
     after: '',
-    booleanEquals: false,
+    booleanEquals: null,
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -408,6 +408,9 @@ const CollectionListPage = () => {
                                         setVars((old) => ({
                                           ...old,
                                           startsWith: val,
+                                          after: '',
+                                          before: '',
+                                          booleanEquals: null,
                                         }))
                                       }}
                                     />
@@ -429,6 +432,8 @@ const CollectionListPage = () => {
                                             ...old,
                                             // @ts-ignore
                                             after: e.format(),
+                                            booleanEquals: null,
+                                            startsWith: '',
                                           }))
                                         }}
                                       />
@@ -447,6 +452,8 @@ const CollectionListPage = () => {
                                             ...old,
                                             // @ts-ignore
                                             before: e.format(),
+                                            booleanEquals: null,
+                                            startsWith: '',
                                           }))
                                         }}
                                       />
@@ -473,6 +480,9 @@ const CollectionListPage = () => {
                                           setVars((old) => ({
                                             ...old,
                                             booleanEquals: !old.booleanEquals,
+                                            after: '',
+                                            before: '',
+                                            startsWith: '',
                                           }))
                                         },
                                       }}

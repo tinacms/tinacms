@@ -14,7 +14,7 @@ limitations under the License.
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaSchema } from '@tinacms/schema-tools'
-import { TinaAdminApi } from '../api'
+import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { Collection } from '../types'
 
@@ -24,10 +24,7 @@ export const useGetCollection = (
   includeDocuments: boolean = true,
   after: string = '',
   sortKey?: string,
-  filterArgs?: {
-    filterField: string
-    startsWith?: string
-  }
+  filterArgs?: FilterArgs
 ) => {
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
@@ -96,10 +93,7 @@ const GetCollection = ({
   startCursor?: string
   sortKey?: string
   children: any
-  filterArgs?: {
-    filterField: string
-    startsWith?: string
-  }
+  filterArgs?: FilterArgs
 }) => {
   const { collection, loading, error, reFetchCollection, collectionExtra } =
     useGetCollection(

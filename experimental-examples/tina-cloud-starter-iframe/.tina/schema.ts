@@ -71,6 +71,11 @@ const schema = defineSchema({
       },
       fields: [
         {
+          name: "published",
+          label: "Publish",
+          type: "boolean",
+        },
+        {
           label: "3 layer nesting",
           name: "pageBlocks3",
           type: "object",
