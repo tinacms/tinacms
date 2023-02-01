@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 1.0.8
+
+### Patch Changes
+
+- 55f7953eb: Small cli styling change on public assets in init
+  - @tinacms/app@1.0.5
+
 ## 1.0.7
 
 ### Patch Changes
