@@ -12,7 +12,14 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiTrash, BiRename } from 'react-icons/bi'
+import {
+  BiEdit,
+  BiPlus,
+  BiTrash,
+  BiRename,
+  BiSearch,
+  BiX,
+} from 'react-icons/bi'
 import {
   useParams,
   Link,
@@ -287,7 +294,7 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
-                      <>
+                      <div className="w-full grid grid-flow-col items-end gap-4">
                         <div className="flex flex-col gap-4">
                           <h3 className="font-sans text-2xl text-gray-700">
                             {collection.label
@@ -296,8 +303,8 @@ const CollectionListPage = () => {
                           </h3>
 
                           {fields?.length > 0 && (
-                            <>
-                              <div className="flex gap-2 items-center">
+                            <div className="flex gap-4 items-end flex-wrap">
+                              <div className="flex flex-col gap-2 items-start">
                                 <label
                                   htmlFor="sort"
                                   className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
@@ -319,7 +326,9 @@ const CollectionListPage = () => {
                                         {
                                           label:
                                             (x.label || x.name) +
-                                            ' (Ascending)',
+                                            (x.type === 'datetime'
+                                              ? ' (Oldest First)'
+                                              : ' (Ascending)'),
                                           value: JSON.stringify({
                                             name: x.name,
                                             order: 'asc',
@@ -328,7 +337,9 @@ const CollectionListPage = () => {
                                         {
                                           label:
                                             (x.label || x.name) +
-                                            ' (Descending)',
+                                            (x.type === 'datetime'
+                                              ? ' (Newest First)'
+                                              : ' (Descending)'),
                                           value: JSON.stringify({
                                             name: x.name,
                                             order: 'desc',
@@ -355,76 +366,78 @@ const CollectionListPage = () => {
                                   }}
                                 />
                               </div>
-                              <div className="flex gap-2 items-center">
-                                <label
-                                  htmlFor="filter"
-                                  className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                >
-                                  Filter by
-                                </label>
-                                <Select
-                                  name="filter"
-                                  options={[
-                                    {
-                                      label: 'None',
-                                      value: '',
-                                    },
-                                    ...fields.map((x) => ({
-                                      label: x.label || x.name,
-                                      value: x.name,
-                                    })),
-                                  ]}
-                                  input={{
-                                    id: 'filter',
-                                    name: 'filter',
-                                    value: vars.filterField,
-                                    onChange: (e) => {
-                                      const val = e.target.value
-                                      setEndCursor('')
-                                      setPrevCursors([])
-                                      setVars((old) => ({
-                                        ...old,
-                                        filterField: val,
-                                      }))
-                                    },
-                                  }}
-                                />
-                              </div>
-                              {showStartsWith && (
-                                <>
-                                  <div className="flex gap-2 items-center">
-                                    <label
-                                      htmlFor="startsWith"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                    >
-                                      Starts with
-                                    </label>
-                                    <Input
-                                      name="startsWith"
-                                      id="startsWith"
-                                      value={vars.startsWith}
-                                      onChange={(e) => {
+                              <div className="flex flex-wrap gap-4 items-end">
+                                <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                  <label
+                                    htmlFor="filter"
+                                    className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                  >
+                                    Filter by
+                                  </label>
+                                  <Select
+                                    name="filter"
+                                    options={[
+                                      {
+                                        label: 'None',
+                                        value: '',
+                                      },
+                                      ...fields.map((x) => ({
+                                        label: x.label || x.name,
+                                        value: x.name,
+                                      })),
+                                    ]}
+                                    input={{
+                                      id: 'filter',
+                                      name: 'filter',
+                                      value: vars.filterField,
+                                      onChange: (e) => {
                                         const val = e.target.value
+                                        setEndCursor('')
+                                        setPrevCursors([])
                                         setVars((old) => ({
                                           ...old,
-                                          startsWith: val,
-                                          after: '',
-                                          before: '',
-                                          booleanEquals: null,
+                                          filterField: val,
                                         }))
-                                      }}
-                                    />
-                                  </div>
-                                </>
-                              )}
-                              {showDateFilter && (
-                                <>
-                                  <div className="flex gap-2 items-center">
-                                    <label
-                                      htmlFor="dateAfter"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                    >
-                                      After
+                                      },
+                                    }}
+                                  />
+                                </div>
+                                {showStartsWith && (
+                                  <>
+                                    <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="startsWith"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        Starts with
+                                      </label>
+                                      <Input
+                                        name="startsWith"
+                                        id="startsWith"
+                                        value={vars.startsWith}
+                                        onChange={(e) => {
+                                          const val = e.target.value
+                                          setVars((old) => ({
+                                            ...old,
+                                            startsWith: val,
+                                            after: '',
+                                            before: '',
+                                            booleanEquals: null,
+                                          }))
+                                        }}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                                {showDateFilter && (
+                                  <div className="flex gap-4">
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="dateAfter"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        After
+                                      </label>
                                       <ReactDateTimeWithStyles
                                         value={vars.after}
                                         onChange={(e) => {
@@ -437,14 +450,14 @@ const CollectionListPage = () => {
                                           }))
                                         }}
                                       />
-                                    </label>
-                                  </div>
-                                  <div className="flex gap-2 items-center">
-                                    <label
-                                      htmlFor="dateBefore"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                                    >
-                                      Before
+                                    </div>
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="dateBefore"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        Before
+                                      </label>
                                       <ReactDateTimeWithStyles
                                         value={vars.before}
                                         onChange={(e) => {
@@ -457,65 +470,98 @@ const CollectionListPage = () => {
                                           }))
                                         }}
                                       />
-                                    </label>
+                                    </div>
                                   </div>
-                                </>
-                              )}
-                              {showBooleanToggle && (
-                                <>
-                                  <div className="flex gap-2 items-center">
-                                    <label
-                                      htmlFor="toggle"
-                                      className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                )}
+                                {showBooleanToggle && (
+                                  <>
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="toggle"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        {sortField.label || sortField.name}
+                                      </label>
+                                      <Toggle
+                                        // @ts-ignore
+                                        field={sortField}
+                                        input={{
+                                          name: 'toggle',
+                                          value: vars.booleanEquals,
+                                          onChange: () => {
+                                            setVars((old) => ({
+                                              ...old,
+                                              booleanEquals: !old.booleanEquals,
+                                              after: '',
+                                              before: '',
+                                              startsWith: '',
+                                            }))
+                                          },
+                                        }}
+                                        name="toggle"
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                                {(showStartsWith ||
+                                  showDateFilter ||
+                                  showBooleanToggle) && (
+                                  <div className="flex gap-3">
+                                    <Button
+                                      onClick={() => {
+                                        setEndCursor('')
+                                        setPrevCursors([])
+                                        reFetchCollection()
+                                      }}
+                                      variant="primary"
                                     >
-                                      {sortField.label || sortField.name}
-                                    </label>
-                                    <Toggle
-                                      // @ts-ignore
-                                      field={sortField}
-                                      input={{
-                                        name: 'toggle',
-                                        value: vars.booleanEquals,
-                                        onChange: () => {
+                                      Search{' '}
+                                      <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+                                    </Button>
+                                    {(vars.startsWith ||
+                                      vars.after ||
+                                      vars.before ||
+                                      vars.booleanEquals) && (
+                                      <Button
+                                        onClick={() => {
                                           setVars((old) => ({
                                             ...old,
-                                            booleanEquals: !old.booleanEquals,
+                                            startsWith: '',
                                             after: '',
                                             before: '',
-                                            startsWith: '',
+                                            booleanEquals: null,
                                           }))
-                                        },
-                                      }}
-                                      name="toggle"
-                                    />
+                                          setEndCursor('')
+                                          setPrevCursors([])
+                                          reFetchCollection()
+                                        }}
+                                        variant="white"
+                                      >
+                                        Clear{' '}
+                                        <BiX className="w-5 h-full ml-1 opacity-70" />
+                                      </Button>
+                                    )}
                                   </div>
-                                </>
-                              )}
-                              <button
-                                onClick={() => {
-                                  setEndCursor('')
-                                  setPrevCursors([])
-                                  reFetchCollection()
-                                }}
-                              >
-                                Search
-                              </button>
-                            </>
+                                )}
+                              </div>
+                            </div>
                           )}
                         </div>
-                        {!collection.templates && allowCreate && (
-                          <Link
-                            to={`new`}
-                            className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
-                          >
-                            Create New{' '}
-                            <BiPlus className="w-5 h-full ml-1 opacity-70" />
-                          </Link>
-                        )}
-                        {collection.templates && allowCreate && (
-                          <TemplateMenu templates={collection.templates} />
-                        )}
-                      </>
+                        <div className="flex self-end	justify-self-end">
+                          {!collection.templates && allowCreate && (
+                            <Link
+                              to={`new`}
+                              className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
+                            >
+                              Create New{' '}
+                              <BiPlus className="w-5 h-full ml-1 opacity-70" />
+                            </Link>
+                          )}
+                          {collection.templates && allowCreate && (
+                            <TemplateMenu templates={collection.templates} />
+                          )}
+                        </div>
+                      </div>
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
@@ -673,7 +719,7 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        <div className="pt-3">
+                        <div className="pt-4">
                           <CursorPaginator
                             variant="white"
                             hasNext={
