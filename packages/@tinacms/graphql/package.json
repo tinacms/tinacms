@@ -33,7 +33,6 @@
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@iarna/toml": "^2.2.5",
-    "@tinacms/datalayer": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "abstract-level": "^1.0.3",
     "@tinacms/schema-tools": "workspace:*",
@@ -89,7 +88,6 @@
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
-    "@tinacms/datalayer": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",

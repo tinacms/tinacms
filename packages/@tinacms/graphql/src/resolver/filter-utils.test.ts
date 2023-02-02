@@ -1,10 +1,6 @@
-/**
-
-*/
-
 import { collectConditionsForField, resolveReferences } from './filter-utils'
-import { ReferenceTypeInner, TinaFieldInner } from '../types'
-import { FilterCondition } from '@tinacms/datalayer'
+import { ReferenceTypeInner, TinaFieldInner } from '@tinacms/schema-tools'
+import { FilterCondition } from '../database/datalayer'
 
 describe('resolveReferences', () => {
   it('resolves reference to single item', async () => {

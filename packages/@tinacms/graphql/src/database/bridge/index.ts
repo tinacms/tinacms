@@ -1,7 +1,3 @@
-/**
-
-*/
-
 export interface Bridge {
   rootPath: string
   glob(pattern: string, extension: string): Promise<string[]>

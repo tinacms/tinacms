@@ -1,10 +1,17 @@
-/**
-
-*/
-
+// Export from @tinacms/graphql to maintain backwards compatibility
+export type {
+  Bridge,
+  // User facing
+  CreateDatabase,
+  OnPutCallback,
+  OnDeleteCallback,
+} from '@tinacms/graphql'
 export {
   FilesystemBridge,
   AuditFileSystemBridge,
-} from './database/bridge/filesystem'
-export { IsomorphicBridge } from './database/bridge/isomorphic'
-export type { Bridge } from './database/bridge'
+  IsomorphicBridge,
+  // Users facing
+  createDatabase,
+  Database,
+  TinaLevelClient,
+} from '@tinacms/graphql'
