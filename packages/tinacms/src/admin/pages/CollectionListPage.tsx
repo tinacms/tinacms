@@ -42,6 +42,7 @@ import {
   Input,
   ReactDateTimeWithStyles,
   Toggle,
+  textFieldClasses,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -462,7 +463,7 @@ const CollectionListPage = () => {
                                   </>
                                 )}
                                 {showDateFilter && (
-                                  <div className="flex gap-4">
+                                  <div className="flex flex-shrink-0 gap-4">
                                     <div className="flex flex-col gap-2 items-start">
                                       <label
                                         htmlFor="dateAfter"
@@ -471,6 +472,9 @@ const CollectionListPage = () => {
                                         After
                                       </label>
                                       <ReactDateTimeWithStyles
+                                        inputProps={{
+                                          className: textFieldClasses,
+                                        }}
                                         value={vars.after}
                                         onChange={(e) => {
                                           setVars((old) => ({
@@ -491,6 +495,9 @@ const CollectionListPage = () => {
                                         Before
                                       </label>
                                       <ReactDateTimeWithStyles
+                                        inputProps={{
+                                          className: textFieldClasses,
+                                        }}
                                         value={vars.before}
                                         onChange={(e) => {
                                           setVars((old) => ({
