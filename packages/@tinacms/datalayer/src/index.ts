@@ -14,4 +14,5 @@ export {
   createDatabase,
   Database,
   TinaLevelClient,
+  resolve,
 } from '@tinacms/graphql'
