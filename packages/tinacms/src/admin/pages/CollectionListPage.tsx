@@ -251,13 +251,22 @@ const CollectionListPage = () => {
                 ['string', 'number', 'datetime', 'boolean'].includes(x.type)
               )
 
-              const sortField = fields?.find((x) => x.name === vars.filterField)
+              const filterFields = collectionExtra.fields?.filter((x) => {
+                // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
+                return (
+                  ['string', 'datetime', 'boolean'].includes(x.type) && !x.list
+                )
+              })
+
+              const filterField = filterFields?.find(
+                (x) => x.name === vars.filterField
+              )
               const showStartsWith =
-                sortField?.type === 'string' && !sortField.list
-              const showDateFilter = sortField?.type === 'datetime'
+                filterField?.type === 'string' && !filterField.list
+              const showDateFilter = filterField?.type === 'datetime'
 
               const showBooleanToggle =
-                sortField?.type === 'boolean' && !sortField.list
+                filterField?.type === 'boolean' && !filterField.list
 
               // TODO: add other fields
               // const showNumberFilter = sortField?.type === 'number' && !sortField.list
@@ -414,7 +423,7 @@ const CollectionListPage = () => {
                                         label: 'None',
                                         value: '',
                                       },
-                                      ...fields.map((x) => ({
+                                      ...filterFields.map((x) => ({
                                         label: x.label || x.name,
                                         value: x.name,
                                       })),
@@ -519,11 +528,11 @@ const CollectionListPage = () => {
                                         htmlFor="toggle"
                                         className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
                                       >
-                                        {sortField.label || sortField.name}
+                                        {filterField.label || filterField.name}
                                       </label>
                                       <Toggle
                                         // @ts-ignore
-                                        field={sortField}
+                                        field={filterField}
                                         input={{
                                           name: 'toggle',
                                           value: vars.booleanEquals ?? false,
