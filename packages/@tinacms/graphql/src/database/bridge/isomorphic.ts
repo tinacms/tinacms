@@ -1,7 +1,3 @@
-/**
-
- */
-
 import git, {
   CallbackFsClient,
   PromiseFsClient,

@@ -18,9 +18,14 @@ export { resolve } from './resolve'
 export * from './resolver/error'
 export { createDatabase } from './database'
 export { TinaLevelClient } from './level/tinaLevel'
-export type { QueryOptions } from './database'
+export type {
+  QueryOptions,
+  Database,
+  OnDeleteCallback,
+  OnPutCallback,
+  CreateDatabase,
+} from './database'
 import type { Database } from './database'
-export type { Database } from './database'
 
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
@@ -63,3 +68,11 @@ export type TinaCloudCollection = TinaCloudCollectionBase<false>
 export type TinaCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
 export type { TinaTemplate }
+
+// Bridge exports
+export {
+  FilesystemBridge,
+  AuditFileSystemBridge,
+} from './database/bridge/filesystem'
+export { IsomorphicBridge } from './database/bridge/isomorphic'
+export type { Bridge } from './database/bridge'

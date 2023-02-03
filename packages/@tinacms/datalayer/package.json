@@ -28,21 +28,7 @@
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
-    "@octokit/auth-app": "^2.6.0",
-    "@octokit/graphql": "^4.5.6",
-    "@octokit/rest": "18.0.6",
-    "encoding-down": "^7.1.0",
-    "fast-glob": "^3.2.5",
-    "fs-extra": "^9.0.1",
-    "glob-parent": "^6.0.2",
-    "graphql": "15.8.0",
-    "gray-matter": "^4.0.2",
-    "isomorphic-git": "^1.10.3",
-    "js-yaml": "^3.14.0",
-    "lodash": "^4.17.20",
-    "normalize-path": "^3.0.0",
-    "prettier": "^2.2.1",
-    "yup": "^0.32.9"
+    "@tinacms/graphql": "workspace:*"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

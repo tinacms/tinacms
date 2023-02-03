@@ -7,7 +7,7 @@ import fs from 'fs-extra'
 import { toMatchFile } from 'jest-file-snapshot'
 import { buildASTSchema, printSchema } from 'graphql'
 
-import { FilesystemBridge } from '@tinacms/datalayer'
+import { FilesystemBridge } from '../database/bridge/filesystem'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
 
 import { resolve } from '../resolve'

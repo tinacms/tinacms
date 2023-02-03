@@ -1,7 +1,3 @@
-/**
-
- */
-
 import fs from 'fs'
 import git from 'isomorphic-git'
 import { IsomorphicBridge } from './isomorphic'

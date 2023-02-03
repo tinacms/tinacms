@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import fs from 'fs-extra'
 import fg from 'fast-glob'
 import path from 'path'

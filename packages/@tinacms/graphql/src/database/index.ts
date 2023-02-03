@@ -15,7 +15,7 @@ import type {
   TinaFieldInner,
   TinaSchema,
 } from '@tinacms/schema-tools'
-import type { Bridge } from '@tinacms/datalayer'
+import type { Bridge } from '../database/bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
 import {
   BinaryFilter,
@@ -43,10 +43,10 @@ type IndexStatusEvent = {
   error?: Error
 }
 type IndexStatusCallback = (event: IndexStatusEvent) => Promise<void>
-type OnPutCallback = (key: string, value: any) => Promise<void>
-type OnDeleteCallback = (key: string) => Promise<void>
+export type OnPutCallback = (key: string, value: any) => Promise<void>
+export type OnDeleteCallback = (key: string) => Promise<void>
 
-type CreateDatabase = {
+export type CreateDatabase = {
   bridge?: Bridge
   level: Level
   onPut?: (key: string, value: any) => Promise<void>
