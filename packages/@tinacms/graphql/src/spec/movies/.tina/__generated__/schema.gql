@@ -48,11 +48,17 @@ type Query {
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
   movie(relativePath: String): Movie!
-  movieConnection(before: String, after: String, first: Float, last: Float, sort: String): MovieConnection!
+  movieConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: MovieFilter): MovieConnection!
   director(relativePath: String): Director!
-  directorConnection(before: String, after: String, first: Float, last: Float, sort: String): DirectorConnection!
+  directorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: DirectorFilter): DirectorConnection!
   actor(relativePath: String): Actor!
-  actorConnection(before: String, after: String, first: Float, last: Float, sort: String): ActorConnection!
+  actorConnection(before: String, after: String, first: Float, last: Float, sort: String, filter: ActorFilter): ActorConnection!
+}
+
+input DocumentFilter {
+  movie: MovieFilter
+  director: DirectorFilter
+  actor: ActorFilter
 }
 
 type DocumentConnectionEdges {
@@ -75,7 +81,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
+  documents(before: String, after: String, first: Float, last: Float, sort: String, filter: DocumentFilter): DocumentConnection!
 }
 
 union DocumentNode = Movie | Director | Actor
@@ -93,6 +99,135 @@ type Movie implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input StringFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input DatetimeFilter {
+  after: String
+  before: String
+  eq: String
+  exists: Boolean
+  in: [String]
+}
+
+input NumberFilter {
+  lt: Float
+  lte: Float
+  gte: Float
+  gt: Float
+  eq: Float
+  exists: Boolean
+  in: [Float]
+}
+
+input BooleanFilter {
+  eq: Boolean
+  exists: Boolean
+}
+
+input MovieDirectorFilter {
+  director: DirectorFilter
+}
+
+input MovieBodyHeroSubTitleCtaActionsPopupFilter {
+  title: StringFilter
+  body: StringFilter
+}
+
+input MovieBodyHeroSubTitleCtaActionsExternalLinkFilter {
+  url: StringFilter
+}
+
+input MovieBodyCtaActionsFilter {
+  popup: MovieBodyHeroSubTitleCtaActionsPopupFilter
+  externalLink: MovieBodyHeroSubTitleCtaActionsExternalLinkFilter
+}
+
+input MovieBodyCtaFilter {
+  title: StringFilter
+  actions: MovieBodyCtaActionsFilter
+}
+
+input RichTextFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input MovieBodyBlockQuoteFilter {
+  author: StringFilter
+  categories: StringFilter
+  children: RichTextFilter
+}
+
+input MovieBodyHeroChildrenCtaActionsPopupFilter {
+  title: StringFilter
+  body: StringFilter
+}
+
+input MovieBodyHeroChildrenCtaActionsExternalLinkFilter {
+  url: StringFilter
+}
+
+input MovieBodyHeroSubTitleCtaActionsFilter {
+  popup: MovieBodyHeroChildrenCtaActionsPopupFilter
+  externalLink: MovieBodyHeroChildrenCtaActionsExternalLinkFilter
+}
+
+input MovieBodyHeroSubTitleCtaFilter {
+  title: StringFilter
+  actions: MovieBodyHeroSubTitleCtaActionsFilter
+}
+
+input MovieBodyHeroSubTitleFilter {
+  Cta: MovieBodyHeroSubTitleCtaFilter
+}
+
+input MovieBodyHeroConfigFilter {
+  variant: StringFilter
+}
+
+input MovieBodyHeroChildrenCtaActionsFilter {
+  popup: MovieBodyHeroChildrenCtaActionsPopupFilter
+  externalLink: MovieBodyHeroChildrenCtaActionsExternalLinkFilter
+}
+
+input MovieBodyHeroChildrenCtaFilter {
+  title: StringFilter
+  actions: MovieBodyHeroChildrenCtaActionsFilter
+}
+
+input MovieBodyHeroChildrenFilter {
+  Cta: MovieBodyHeroChildrenCtaFilter
+}
+
+input MovieBodyHeroFilter {
+  author: StringFilter
+  subTitle: MovieBodyHeroSubTitleFilter
+  config: MovieBodyHeroConfigFilter
+  children: MovieBodyHeroChildrenFilter
+}
+
+input MovieBodyFilter {
+  Cta: MovieBodyCtaFilter
+  BlockQuote: MovieBodyBlockQuoteFilter
+  Hero: MovieBodyHeroFilter
+}
+
+input MovieFilter {
+  title: StringFilter
+  releaseDate: DatetimeFilter
+  rating: NumberFilter
+  archived: BooleanFilter
+  genre: StringFilter
+  director: MovieDirectorFilter
+  body: MovieBodyFilter
 }
 
 type MovieConnectionEdges {
@@ -113,6 +248,10 @@ type Director implements Node & Document {
   _values: JSON!
 }
 
+input DirectorFilter {
+  name: StringFilter
+}
+
 type DirectorConnectionEdges {
   cursor: String!
   node: Director
@@ -130,6 +269,11 @@ type Actor implements Node & Document {
   id: ID!
   _sys: SystemInfo!
   _values: JSON!
+}
+
+input ActorFilter {
+  name: StringFilter
+  body: StringFilter
 }
 
 type ActorConnectionEdges {

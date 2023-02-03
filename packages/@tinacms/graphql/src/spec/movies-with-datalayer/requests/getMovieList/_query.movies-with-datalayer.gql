@@ -115,7 +115,7 @@ query {
         endCursor
     }
   },
-  paginatedAscPage2: movieConnection(sort: "releaseDate", first: 1, after: "bW92aWUjcmVsZWFzZURhdGUjMjMzMzkxNjAwMDAwI2NvbnRlbnQvbW92aWVzL3N0YXItd2Fycy5tZA==") {
+  paginatedAscPage2: movieConnection(sort: "releaseDate", first: 1, after: "MjMzMzkxNjAwMDAwHWNvbnRlbnQvbW92aWVzL3N0YXItd2Fycy5tZA==") {
     edges {
       node {
         id
@@ -137,7 +137,7 @@ query {
         endCursor
     }
   },
-  paginatedDescPage2: movieConnection(sort: "releaseDate", last: 1, before: "bW92aWUjcmVsZWFzZURhdGUjODM0MTMwODAwMDAwI2NvbnRlbnQvbW92aWVzL3RoZS1yb2NrLm1k") {
+  paginatedDescPage2: movieConnection(sort: "releaseDate", last: 1, before: "ODM0MTMwODAwMDAwHWNvbnRlbnQvbW92aWVzL3RoZS1yb2NrLm1k") {
     edges {
       node {
         id
