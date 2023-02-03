@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.1
+
+### Patch Changes
+
+- 09e716538: Fix error where children being undefined would cause an error
+
 ## 1.3.0
 
 ### Minor Changes
