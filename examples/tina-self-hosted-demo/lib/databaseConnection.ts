@@ -1,6 +1,6 @@
 import database from '../.tina/database'
 import { queries } from '../.tina/__generated__/types'
-import { resolve } from '@tinacms/graphql'
+import { resolve } from '@tinacms/datalayer'
 import type { TinaClient } from 'tinacms/dist/client'
 
 export async function databaseRequest({ query, variables }) {

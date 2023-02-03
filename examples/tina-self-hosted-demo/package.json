@@ -28,7 +28,7 @@
     "@headlessui/react": "1.7.5",
     "@octokit/rest": "^19.0.7",
     "@tailwindcss/typography": "^0.5.8",
-    "@tinacms/graphql": "workspace:*",
+    "@tinacms/datalayer": "workspace:*",
     "date-fns": "^2.23.0",
     "js-base64": "^3.7.4",
     "mongodb-level": "^0.0.2",

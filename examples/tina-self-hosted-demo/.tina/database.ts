@@ -1,4 +1,4 @@
-import { createDatabase, TinaLevelClient } from '@tinacms/graphql'
+import { createDatabase, TinaLevelClient } from '@tinacms/datalayer'
 import { MongodbLevel } from 'mongodb-level'
 import { Octokit } from '@octokit/rest'
 import { Base64 } from 'js-base64'

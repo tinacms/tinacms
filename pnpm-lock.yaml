@@ -187,7 +187,7 @@ importers:
       '@svgr/webpack': ^6.3.1
       '@tailwindcss/typography': ^0.5.8
       '@tinacms/cli': workspace:*
-      '@tinacms/graphql': workspace:*
+      '@tinacms/datalayer': workspace:*
       '@types/js-cookie': ^3.0.0
       '@types/node': ^16.11.7
       '@types/react': 17.0.47
@@ -216,7 +216,7 @@ importers:
       '@headlessui/react': 1.7.5_sfoxds7t5ydpegc3knd667wn6m
       '@octokit/rest': 19.0.7
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
-      '@tinacms/graphql': link:../../packages/@tinacms/graphql
+      '@tinacms/datalayer': link:../../packages/@tinacms/datalayer
       date-fns: 2.28.0
       js-base64: 3.7.4
       mongodb-level: 0.0.2
@@ -585,7 +585,7 @@ importers:
       zod: ^3.14.3
     dependencies:
       '@graphql-codegen/core': 2.5.1_graphql@15.8.0
-      '@graphql-codegen/plugin-helpers': 3.1.2_graphql@15.8.0
+      '@graphql-codegen/plugin-helpers': 4.0.0_graphql@15.8.0
       '@graphql-codegen/typescript': 2.5.1_graphql@15.8.0
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
@@ -6278,10 +6278,10 @@ packages:
       tslib: 2.4.0
     dev: false
 
-  /@graphql-codegen/plugin-helpers/3.1.2_graphql@15.8.0:
+  /@graphql-codegen/plugin-helpers/4.0.0_graphql@15.8.0:
     resolution:
       {
-        integrity: sha512-emOQiHyIliVOIjKVKdsI5MXj312zmRDwmHpyUTZMjfpvxq/UVAHUJIVdVf+lnjjrI+LXBTgMlTWTgHQfmICxjg==,
+        integrity: sha512-vgNGTanT36hC4RAC/LAThMEjDvnu3WCyx6MtKZcPUtfCWFxbUAr88+OarGl1LAEiOef0agIREC7tIBXCqjKkJA==,
       }
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
