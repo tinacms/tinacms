@@ -16,8 +16,15 @@ limitations under the License.
 
 */
 
-import { remark } from 'remark'
-import remarkMdx from 'remark-mdx'
+import { frontmatter } from 'micromark-extension-frontmatter'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import { directive } from 'micromark-extension-directive'
+import { directiveFromMarkdown } from 'mdast-util-directive'
+import { mdx } from 'micromark-extension-mdx'
+import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
@@ -89,7 +96,11 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   })
   try {
     // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    const tree = fromMarkdown(preprocessedString, {
+      extensions: [mdx(), directive()],
+      mdastExtensions: [mdxFromMarkdown(), directiveFromMarkdown],
+    })
     if (!tree) {
       throw new Error('Error parsing markdown')
     }

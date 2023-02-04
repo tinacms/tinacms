@@ -1,0 +1,296 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background: #eee;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, '.SFNSText-Regular',
+    sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  padding: 0 5%;
+}
+
+.editor-container {
+  background: #fff;
+  margin: 20px auto 20px auto;
+  border-radius: 2px;
+  max-width: 600px;
+  color: #000;
+  position: relative;
+  line-height: 20px;
+  font-weight: 400;
+  text-align: left;
+  border-radius: 10px;
+}
+
+.editor-input {
+  min-height: 150px;
+  resize: none;
+  font-size: 15px;
+  caret-color: rgb(5, 5, 5);
+  position: relative;
+  tab-size: 1;
+  outline: 0;
+  padding: 10px 10px 5px;
+  caret-color: #444;
+}
+
+.editor-placeholder {
+  color: #999;
+  overflow: hidden;
+  position: absolute;
+  text-overflow: ellipsis;
+  top: 10px;
+  left: 10px;
+  font-size: 15px;
+  user-select: none;
+  display: inline-block;
+  pointer-events: none;
+}
+
+.editor-paragraph {
+  margin: 0 0 15px 0;
+  position: relative;
+}
+
+.dropdown .item .icon {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  user-select: none;
+  margin-right: 12px;
+  line-height: 16px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.mentions-menu {
+  width: 250px;
+}
+
+.mention:focus {
+  box-shadow: rgb(180 213 255) 0px 0px 0px 2px;
+  outline: none;
+}
+
+.typeahead-popover {
+  background: #fff;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  width: auto;
+}
+
+.typeahead-popover ul {
+  padding: 0;
+  list-style: none;
+  margin: 0;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.typeahead-popover ul::-webkit-scrollbar {
+  display: none;
+}
+
+.typeahead-popover ul {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.typeahead-popover ul li {
+  margin: 0;
+  min-width: 180px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.typeahead-popover ul li.selected {
+  background: #eee;
+}
+
+.typeahead-popover li {
+  margin: 0 8px 0 8px;
+  padding: 8px;
+  color: #050505;
+  cursor: pointer;
+  line-height: 16px;
+  font-size: 15px;
+  display: flex;
+  align-content: center;
+  flex-direction: row;
+  flex-shrink: 0;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 0;
+}
+
+.typeahead-popover li.active {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  background-size: contain;
+}
+
+.typeahead-popover li:first-child {
+  border-radius: 8px 8px 0px 0px;
+}
+
+.typeahead-popover li:last-child {
+  border-radius: 0px 0px 8px 8px;
+}
+
+.typeahead-popover li:hover {
+  background-color: #eee;
+}
+
+.typeahead-popover li .text {
+  display: flex;
+  line-height: 20px;
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+/* Code editor */
+/**
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ *
+ */
+.PlaygroundEditorTheme__ltr {
+  text-align: left;
+}
+.PlaygroundEditorTheme__rtl {
+  text-align: right;
+}
+.PlaygroundEditorTheme__paragraph {
+  margin: 0;
+  position: relative;
+}
+.PlaygroundEditorTheme__quote {
+  margin: 0;
+  margin-left: 20px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: rgb(101, 103, 107);
+  border-left-color: rgb(206, 208, 212);
+  border-left-width: 4px;
+  border-left-style: solid;
+  padding-left: 16px;
+}
+.PlaygroundEditorTheme__h1 {
+  font-size: 24px;
+  color: rgb(5, 5, 5);
+  font-weight: 400;
+  margin: 0;
+}
+.PlaygroundEditorTheme__h2 {
+  font-size: 15px;
+  color: rgb(101, 103, 107);
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+.PlaygroundEditorTheme__h3 {
+  font-size: 12px;
+  margin: 0;
+  text-transform: uppercase;
+}
+.PlaygroundEditorTheme__textBold {
+  font-weight: bold;
+}
+.PlaygroundEditorTheme__textItalic {
+  font-style: italic;
+}
+.PlaygroundEditorTheme__textUnderline {
+  text-decoration: underline;
+}
+.PlaygroundEditorTheme__textStrikethrough {
+  text-decoration: line-through;
+}
+.PlaygroundEditorTheme__textUnderlineStrikethrough {
+  text-decoration: underline line-through;
+}
+.PlaygroundEditorTheme__textSubscript {
+  font-size: 0.8em;
+  vertical-align: sub !important;
+}
+.PlaygroundEditorTheme__textSuperscript {
+  font-size: 0.8em;
+  vertical-align: super;
+}
+.PlaygroundEditorTheme__textCode {
+  background-color: rgb(240, 242, 245);
+  padding: 1px 0.25rem;
+  font-family: Menlo, Consolas, Monaco, monospace;
+  font-size: 94%;
+}
+.PlaygroundEditorTheme__hashtag {
+  background-color: rgba(88, 144, 255, 0.15);
+  border-bottom: 1px solid rgba(88, 144, 255, 0.3);
+}
+.PlaygroundEditorTheme__link {
+  color: rgb(33, 111, 219);
+  text-decoration: none;
+}
+.PlaygroundEditorTheme__link:hover {
+  text-decoration: underline;
+}
+
+.prose
+  :where(blockquote p:first-of-type):not(:where([class~='not-prose']
+      *))::before {
+  content: '';
+}
+.prose
+  :where(blockquote p:last-of-type):not(:where([class~='not-prose'] *))::after {
+  content: '';
+}
+.prose :where(blockquote):not(:where([class~='not-prose'] *)) {
+  font-weight: normal;
+}
+
+/* When nesting lists, this is jarring */
+.prose :where(ul):not(:where([class~='not-prose'] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1.625em;
+}
+/*
+Not supported in Firefox
+Hides the extra disc when nesting lists
+ */
+.prose :where(ul > li):not(:where([class~='not-prose'] *)):has(ul)::marker {
+  content: '';
+}
+
+.prose :where(p):not(:where([class~='not-prose'] *)) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose :where(blockquote):not(:where([class~='not-prose'] *)) {
+  font-weight: normal;
+  font-style: normal;
+  color: var(--tw-prose-quotes);
+  border-left-width: 0.25rem;
+  border-left-color: var(--tw-prose-quote-borders);
+  quotes: '';
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1em;
+}

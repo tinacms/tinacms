@@ -64,7 +64,15 @@ export const stringifyMDX = (
   const res = toMarkdown(rootElement(value, field, imageCallback), {
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
+    setext: false,
   })
+    // Replace empty strings at beginning and end of lines
+    // Probably should be done via mdast extension
+    .split('\n')
+    .map((item) => {
+      return item.replace('&#x20;', '')
+    })
+    .join('\n')
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )

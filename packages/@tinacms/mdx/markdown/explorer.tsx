@@ -1,5 +1,4 @@
 import React from 'react'
-import type { TinaMarkdownContent } from 'tinacms/dist/rich-text'
 
 type RenderValue = (args: {
   value: unknown
@@ -7,15 +6,13 @@ type RenderValue = (args: {
   parentValue: object | object[]
   parentKeyName: string
 }) => JSX.Element
-type RenderRichText = (args: { value: TinaMarkdownContent }) => JSX.Element
 
 export const Explorer2 = (props: {
   value: object
   renderValue: RenderValue
-  renderRichText: RenderRichText
 }) => {
   return (
-    <div className="font-mono">
+    <div className="font-mono text-xs">
       {/* @ts-ignore */}
       <ObjectValueRenderer {...props} />
     </div>
@@ -26,7 +23,6 @@ const ObjectValueRenderer = (props: {
   parentValue: object | object[]
   parentKeyName: string
   renderValue: RenderValue
-  renderRichText: RenderRichText
   showMetaFields?: boolean
 }) => {
   const subEntries = Object.entries(props.value).map(([keyName, subValue]) => {
@@ -38,7 +34,6 @@ const ObjectValueRenderer = (props: {
           parentValue={props.value}
           parentKeyName={props.parentKeyName}
           renderValue={props.renderValue}
-          renderRichText={props.renderRichText}
           showMetaFields={props.showMetaFields}
         />
       </div>
@@ -53,7 +48,6 @@ const UnknownRenderer = ({
   parentValue,
   parentKeyName,
   renderValue,
-  renderRichText,
   showMetaFields,
 }: {
   keyName: string
@@ -61,7 +55,6 @@ const UnknownRenderer = ({
   parentValue: object | object[]
   parentKeyName: string
   renderValue: RenderValue
-  renderRichText: RenderRichText
   showMetaFields?: boolean
 }) => {
   const typeOfValue = typeof value
@@ -79,6 +72,7 @@ const UnknownRenderer = ({
         '__meta__',
         '_internalValues',
         '_internalSys',
+        'position',
       ].includes(keyName)
     ) {
       return
@@ -104,7 +98,6 @@ const UnknownRenderer = ({
                 parentKeyName={keyName}
                 parentValue={parentValue}
                 renderValue={renderValue}
-                renderRichText={renderRichText}
               />
             ))}
           </div>
@@ -115,7 +108,7 @@ const UnknownRenderer = ({
   }
   if (typeOfValue === 'object') {
     /* @ts-ignore */
-    if (value?.type === 'root' && renderRichText) {
+    if (value?.type === 'root') {
       return (
         <div className="flex gap-2">
           <button
@@ -136,7 +129,6 @@ const UnknownRenderer = ({
         parentValue={parentValue}
         parentKeyName={parentKeyName}
         renderValue={renderValue}
-        renderRichText={renderRichText}
       />
     )
   }
@@ -179,7 +171,6 @@ const ObjectRenderer = ({
   parentValue,
   parentKeyName,
   renderValue,
-  renderRichText,
 }) => {
   const [showMetaFields, setShowMetaFields] = React.useState(false)
   const [expanded, setExpanded] = React.useState(true)
@@ -211,7 +202,7 @@ const ObjectRenderer = ({
               onClick={() => {
                 setShowMetaFields((show) => !show)
               }}
-              className="min-w-[48px] text-sm text-gray-400"
+              className="min-w-[48px] text-xs text-gray-400"
             >
               {showMetaFields ? 'Hide meta fields' : 'Show meta fields'}
             </button>
@@ -224,7 +215,6 @@ const ObjectRenderer = ({
               parentValue={parentValue}
               parentKeyName={parentKeyName}
               renderValue={renderValue}
-              renderRichText={renderRichText}
               showMetaFields={showMetaFields}
             />
           </div>

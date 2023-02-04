@@ -81,6 +81,7 @@ const normalize = (node: any) => {
     return {
       ...node,
       children: [{ type: 'text', text: '' }],
+      id: Date.now(),
     }
   }
   if (node.children) {
@@ -88,12 +89,14 @@ const normalize = (node: any) => {
       return {
         ...node,
         children: node.children.map(normalize),
+        id: Date.now(),
       }
     } else {
       // Always supply an empty text leaf
       return {
         ...node,
         children: [{ text: '' }],
+        id: Date.now(),
       }
     }
   }
