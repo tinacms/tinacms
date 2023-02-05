@@ -110,14 +110,16 @@ export const remarkToSlate = (
   }
 
   const html = (content: Md.HTML): Plate.HTMLElement => {
+    // return { type: 'text', value: content.value }
     return {
-      type: 'html',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
+      type: 'p',
+      // value: content.value,
+      children: [{ type: 'text', text: content.value }],
     }
   }
 
   const html_inline = (content: Md.HTML): Plate.HTMLInlineElement => {
+    return { type: 'text', text: content.value }
     return {
       type: 'html_inline',
       value: content.value,

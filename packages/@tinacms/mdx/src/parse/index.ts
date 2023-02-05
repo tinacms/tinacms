@@ -79,7 +79,11 @@ import { parseShortcode } from './parseShortcode'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (value: string, field: RichTypeInner) => {
+export const markdownToAst = (
+  value: string,
+  field: RichTypeInner,
+  useMdx: boolean = true
+) => {
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -97,9 +101,15 @@ export const markdownToAst = (value: string, field: RichTypeInner) => {
   try {
     // Remark Root is not the same as mdast for some reason
     // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
+    const extensions = [directive()]
+    const mdastExtensions = [directiveFromMarkdown]
+    if (useMdx) {
+      extensions.push(mdx())
+      mdastExtensions.push(mdxFromMarkdown())
+    }
     const tree = fromMarkdown(preprocessedString, {
-      extensions: [mdx(), directive()],
-      mdastExtensions: [mdxFromMarkdown(), directiveFromMarkdown],
+      extensions,
+      mdastExtensions,
     })
     if (!tree) {
       throw new Error('Error parsing markdown')
@@ -138,10 +148,19 @@ export const parseMDX = (
       return { type: 'root', children: [] }
     }
   } catch (e: any) {
-    if (e instanceof RichTextParseError) {
-      return invalidMarkdown(e, value)
+    try {
+      tree = markdownToAst(value, field, false)
+      if (tree) {
+        return remarkToSlate(tree, field, imageCallback)
+      } else {
+        return { type: 'root', children: [] }
+      }
+    } catch (e: any) {
+      if (e instanceof RichTextParseError) {
+        return invalidMarkdown(e, value)
+      }
+      return invalidMarkdown(new RichTextParseError(e.message), value)
     }
-    return invalidMarkdown(new RichTextParseError(e.message), value)
   }
 }
 

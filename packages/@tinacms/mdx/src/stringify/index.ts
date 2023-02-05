@@ -22,6 +22,8 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
+import { gfm } from 'micromark-extension-gfm'
+import { gfmToMarkdown } from 'mdast-util-gfm'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
@@ -61,18 +63,41 @@ export const stringifyMDX = (
       return value.children[0].value
     }
   }
-  const res = toMarkdown(rootElement(value, field, imageCallback), {
+  const tree = rootElement(value, field, imageCallback)
+  const res = toMarkdown(tree, {
     extensions: [mdxJsxToMarkdown()],
     listItemIndent: 'one',
-    setext: false,
+    bullet: '-',
+    fences: true, // setting to false results in 4-space tabbed code
+    handlers: {
+      /**
+       * Probably a lot more configuration we can expose here for customization
+       *                             https://github.com/syntax-tree/mdast-util-to-markdown/tree/5fa790ee4cdead2a6c11b6a6f73c59eb0f9ca295/lib/util
+       *
+       * Some context on configuring https://github.com/syntax-tree/mdast-util-to-markdown/issues/31
+       *                             https://github.com/remarkjs/remark/issues/720
+       *
+       * This code is pretty simple to follow
+       *                             https://github.com/syntax-tree/mdast-util-to-markdown/blob/5fa790ee4cdead2a6c11b6a6f73c59eb0f9ca295/lib/index.js
+       *
+       * This was a more thorough example of a workaround
+       *                             https://github.com/syntax-tree/mdast-util-to-markdown/issues/31#issuecomment-1346524273
+       *
+       * This use case is pretty close to ours, our rich-text editor
+       * may be responsible for reading in/writing out markdown files
+       * but otherwise not involved in the pipeline (eg. Hugo or other
+       * static site generators). Theese guys can be stubborn in their
+       * openness to needs like this
+       *                             https://github.com/syntax-tree/mdast-util-to-markdown/issues/31#issuecomment-853072585
+       *
+       */
+      text(node) {
+        // Originally:
+        // return safe(context, node.value, safeOptions)
+        return node.value
+      },
+    },
   })
-    // Replace empty strings at beginning and end of lines
-    // Probably should be done via mdast extension
-    .split('\n')
-    .map((item) => {
-      return item.replace('&#x20;', '')
-    })
-    .join('\n')
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
