@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { flatten } from 'lodash-es'
-import { mdxJsxElement } from './mdx'
+import { containerDirectiveElement, mdxJsxElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
@@ -44,7 +44,8 @@ declare module 'mdast' {
 export const remarkToSlate = (
   root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement,
   field: RichTypeInner,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  raw: string
 ): Plate.RootElement => {
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
@@ -100,6 +101,9 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+      case 'containerDirective': {
+        return containerDirectiveElement(content, field, imageCallback, raw)
+      }
       default:
         throw new RichTextParseError(
           `Content: ${content.type} is not yet supported`,

@@ -26806,6 +26806,30 @@ var directiveFromMarkdown = {
     directiveTextName: exitName,
   },
 }
+var directiveToMarkdown = {
+  unsafe: [
+    {
+      character: '\r',
+      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    },
+    {
+      character: '\n',
+      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    },
+    {
+      before: '[^:]',
+      character: ':',
+      after: '[A-Za-z]',
+      inConstruct: ['phrasing'],
+    },
+    { atBreak: true, character: ':', after: ':' },
+  ],
+  handlers: {
+    containerDirective: handleDirective,
+    leafDirective: handleDirective,
+    textDirective: handleDirective,
+  },
+}
 function enterContainer(token) {
   enter.call(this, 'containerDirective', token)
 }
@@ -27302,9 +27326,9 @@ function nodelike(value) {
 function location(file) {
   var value = String(file)
   var indices = []
-  var search2 = /\r?\n|\r/g
-  while (search2.test(value)) {
-    indices.push(search2.lastIndex)
+  var search3 = /\r?\n|\r/g
+  while (search3.test(value)) {
+    indices.push(search3.lastIndex)
   }
   indices.push(value.length + 1)
   return { toPoint, toOffset }
@@ -27372,10 +27396,10 @@ function eventsToAcorn(events, options) {
       setPoint(token.end)
     }
   }
-  const source = chunks.join('')
-  const value = prefix + source + suffix
-  const isEmptyExpression = options.expression && empty(source)
-  const place = location(source)
+  const source2 = chunks.join('')
+  const value = prefix + source2 + suffix
+  const isEmptyExpression = options.expression && empty(source2)
+  const place = location(source2)
   if (isEmptyExpression && !options.allowEmpty) {
     throw new VFileMessage(
       'Unexpected empty expression',
@@ -27399,7 +27423,7 @@ function eventsToAcorn(events, options) {
     }
     exception = error
     swallow =
-      error.raisedAt >= prefix.length + source.length ||
+      error.raisedAt >= prefix.length + source2.length ||
       error.message === 'Unterminated comment'
   }
   if (estree && options.expression && !isEmptyExpression) {
@@ -27407,13 +27431,13 @@ function eventsToAcorn(events, options) {
       estree = {
         type: 'Program',
         start: 0,
-        end: prefix.length + source.length,
+        end: prefix.length + source2.length,
         body: [
           {
             type: 'ExpressionStatement',
             expression: estree,
             start: 0,
-            end: prefix.length + source.length,
+            end: prefix.length + source2.length,
           },
         ],
         sourceType: 'module',
@@ -27495,8 +27519,8 @@ function eventsToAcorn(events, options) {
     let sourceOffset = acornOffset - prefix.length
     if (sourceOffset < 0) {
       sourceOffset = 0
-    } else if (sourceOffset > source.length) {
-      sourceOffset = source.length
+    } else if (sourceOffset > source2.length) {
+      sourceOffset = source2.length
     }
     const pointInSource = place.toPoint(sourceOffset)
     const line = startLine + (pointInSource.line - 1)
@@ -28588,15 +28612,15 @@ function exitMdxExpressionData(token) {
 
 // ../../../node_modules/.pnpm/ccount@2.0.1/node_modules/ccount/index.js
 function ccount(value, character) {
-  const source = String(value)
+  const source2 = String(value)
   if (typeof character !== 'string') {
     throw new TypeError('Expected character')
   }
   let count = 0
-  let index2 = source.indexOf(character)
+  let index2 = source2.indexOf(character)
   while (index2 !== -1) {
     count++
-    index2 = source.indexOf(character, index2 + character.length)
+    index2 = source2.indexOf(character, index2 + character.length)
   }
   return count
 }
@@ -34392,8 +34416,8 @@ function hardBreak(_, _1, context, safe2) {
 
 // ../../../node_modules/.pnpm/longest-streak@3.0.1/node_modules/longest-streak/index.js
 function longestStreak(value, character) {
-  const source = String(value)
-  let index2 = source.indexOf(character)
+  const source2 = String(value)
+  let index2 = source2.indexOf(character)
   let expected = index2
   let count = 0
   let max = 0
@@ -34409,7 +34433,7 @@ function longestStreak(value, character) {
       count = 1
     }
     expected = index2 + 1
-    index2 = source.indexOf(character, expected)
+    index2 = source2.indexOf(character, expected)
   }
   return max
 }
@@ -35657,510 +35681,6 @@ function joinDefinition(left, right) {
   }
 }
 
-// ../mdx/src/parse/mdx.ts
-function mdxJsxElement(node, field, imageCallback) {
-  try {
-    const template = field.templates?.find((template2) => {
-      const templateName =
-        typeof template2 === 'string' ? template2 : template2.name
-      return templateName === node.name
-    })
-    if (typeof template === 'string') {
-      throw new Error('Global templates not yet supported')
-    }
-    if (!template) {
-      const string3 = toMarkdown(
-        { type: 'root', children: [node] },
-        {
-          extensions: [mdxJsxToMarkdown()],
-          listItemIndent: 'one',
-        }
-      )
-      return {
-        type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
-        value: string3.trim(),
-        children: [{ type: 'text', text: '' }],
-      }
-    }
-    const props = extractAttributes(
-      node.attributes,
-      template.fields,
-      imageCallback
-    )
-    const childField = template.fields.find(
-      (field2) => field2.name === 'children'
-    )
-    if (childField) {
-      if (childField.type === 'rich-text') {
-        props.children = remarkToSlate(node, childField, imageCallback)
-      }
-    }
-    return {
-      type: node.type,
-      name: node.name,
-      children: [{ type: 'text', text: '' }],
-      props,
-    }
-  } catch (e) {
-    if (e instanceof Error) {
-      throw new RichTextParseError(e.message, node.position)
-    }
-    throw e
-  }
-}
-
-// ../mdx/src/parse/remarkToPlate.ts
-var remarkToSlate = (root3, field, imageCallback) => {
-  const content3 = (content4) => {
-    switch (content4.type) {
-      case 'blockquote':
-        const children = []
-        content4.children.map((child) => {
-          const inlineElements = unwrapBlockContent(child)
-          inlineElements.forEach((child2) => {
-            children.push(child2)
-          })
-        })
-        return {
-          type: 'blockquote',
-          children,
-        }
-      case 'heading':
-        return heading2(content4)
-      case 'code':
-        return code2(content4)
-      case 'paragraph':
-        return paragraph2(content4)
-      case 'mdxJsxFlowElement':
-        return mdxJsxElement(content4, field, imageCallback)
-      case 'thematicBreak':
-        return {
-          type: 'hr',
-          children: [{ type: 'text', text: '' }],
-        }
-      case 'listItem':
-        return {
-          type: 'li',
-          children: [
-            {
-              type: 'lic',
-              children: flatten_default(
-                content4.children.map((child) => unwrapBlockContent(child))
-              ),
-            },
-          ],
-        }
-      case 'list':
-        return list3(content4)
-      case 'html':
-        return html2(content4)
-      case 'mdxFlowExpression':
-      case 'mdxjsEsm':
-        throw new RichTextParseError(
-          `Unexpected expression ${content4.value}.`,
-          content4.position
-        )
-      default:
-        throw new RichTextParseError(
-          `Content: ${content4.type} is not yet supported`,
-          content4.position
-        )
-    }
-  }
-  const html2 = (content4) => {
-    return {
-      type: 'p',
-      children: [{ type: 'text', text: content4.value }],
-    }
-  }
-  const html_inline = (content4) => {
-    return { type: 'text', text: content4.value }
-    return {
-      type: 'html_inline',
-      value: content4.value,
-      children: [{ type: 'text', text: '' }],
-    }
-  }
-  const list3 = (content4) => {
-    return {
-      type: content4.ordered ? 'ol' : 'ul',
-      children: content4.children.map((child) => listItem2(child)),
-    }
-  }
-  const listItem2 = (content4) => {
-    return {
-      type: 'li',
-      children: content4.children.map((child) => {
-        switch (child.type) {
-          case 'list':
-            return list3(child)
-          case 'heading':
-          case 'paragraph':
-            return {
-              type: 'lic',
-              children: flatten_default(
-                child.children.map((child2) => phrasingContent(child2))
-              ),
-            }
-          case 'blockquote': {
-            return {
-              ...blockquote2(child),
-              type: 'lic',
-            }
-          }
-          case 'mdxJsxFlowElement':
-            return {
-              type: 'lic',
-              children: [
-                mdxJsxElement(
-                  { ...child, type: 'mdxJsxTextElement' },
-                  field,
-                  imageCallback
-                ),
-              ],
-            }
-          case 'code':
-          case 'thematicBreak':
-          case 'table':
-          case 'html':
-            throw new RichTextParseError(
-              `${child.type} inside list item is not supported`,
-              child.position
-            )
-          default:
-            throw new RichTextParseError(
-              `Unknown list item of type ${child.type}`,
-              child.position
-            )
-        }
-      }),
-    }
-  }
-  const unwrapBlockContent = (content4) => {
-    const flattenPhrasingContent = (children) => {
-      const children2 = children.map((child) => phrasingContent(child))
-      return flatten_default(Array.isArray(children2) ? children2 : [children2])
-    }
-    switch (content4.type) {
-      case 'heading':
-      case 'paragraph':
-        return flattenPhrasingContent(content4.children)
-      default:
-        throw new Error(
-          `UnwrapBlock: Unknown block content of type ${content4.type}`
-        )
-    }
-  }
-  const code2 = (content4) => {
-    const extra = {}
-    if (content4.lang) extra['lang'] = content4.lang
-    return {
-      type: 'code_block',
-      ...extra,
-      value: content4.value,
-      children: [{ type: 'text', text: '' }],
-    }
-  }
-  const link2 = (content4) => {
-    return {
-      type: 'a',
-      url: content4.url,
-      title: content4.title,
-      children: flatten_default(
-        content4.children.map((child) => staticPhrasingContent(child))
-      ),
-    }
-  }
-  const heading2 = (content4) => {
-    return {
-      type: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'][content4.depth - 1],
-      children: flatten_default(content4.children.map(phrasingContent)),
-    }
-  }
-  const staticPhrasingContent = (content4) => {
-    switch (content4.type) {
-      case 'mdxJsxTextElement':
-        return mdxJsxElement(content4, field, imageCallback)
-      case 'text':
-        return text5(content4)
-      case 'inlineCode':
-      case 'emphasis':
-      case 'image':
-      case 'strong':
-        return phrashingMark(content4)
-      default:
-        throw new Error(
-          `StaticPhrasingContent: ${content4.type} is not yet supported`
-        )
-    }
-  }
-  const phrasingContent = (content4) => {
-    switch (content4.type) {
-      case 'text':
-        return text5(content4)
-      case 'link':
-        return link2(content4)
-      case 'image':
-        return image2(content4)
-      case 'mdxJsxTextElement':
-        return mdxJsxElement(content4, field, imageCallback)
-      case 'emphasis':
-        return phrashingMark(content4)
-      case 'strong':
-        return phrashingMark(content4)
-      case 'break':
-        return breakContent()
-      case 'inlineCode':
-        return phrashingMark(content4)
-      case 'html':
-        return html_inline(content4)
-      case 'mdxTextExpression':
-        throw new RichTextParseError(
-          `Unexpected expression ${content4.value}.`,
-          content4.position
-        )
-      default:
-        throw new Error(
-          `PhrasingContent: ${content4.type} is not yet supported`
-        )
-    }
-  }
-  const breakContent = () => {
-    return {
-      type: 'break',
-      children: [
-        {
-          type: 'text',
-          text: '',
-        },
-      ],
-    }
-  }
-  const phrashingMark = (node, marks = []) => {
-    const accum = []
-    switch (node.type) {
-      case 'emphasis': {
-        const children = flatten_default(
-          node.children.map((child) =>
-            phrashingMark(child, [...marks, 'italic'])
-          )
-        )
-        children.forEach((child) => {
-          accum.push(child)
-        })
-        break
-      }
-      case 'inlineCode': {
-        const markProps2 = {}
-        marks.forEach((mark) => (markProps2[mark] = true))
-        accum.push({
-          type: 'text',
-          text: node.value,
-          code: true,
-          ...markProps2,
-        })
-        break
-      }
-      case 'strong': {
-        const children = flatten_default(
-          node.children.map((child) => phrashingMark(child, [...marks, 'bold']))
-        )
-        children.forEach((child) => {
-          accum.push(child)
-        })
-        break
-      }
-      case 'image': {
-        accum.push(image2(node))
-        break
-      }
-      case 'link': {
-        const children = flatten_default(
-          node.children.map((child) => phrashingMark(child, marks))
-        )
-        accum.push({ type: 'a', url: node.url, title: node.title, children })
-        break
-      }
-      case 'text':
-        const markProps = {}
-        marks.forEach((mark) => (markProps[mark] = true))
-        accum.push({ type: 'text', text: node.value, ...markProps })
-        break
-      default:
-        throw new Error(`Unexpected inline element of type ${node.type}`)
-    }
-    return accum
-  }
-  const image2 = (content4) => {
-    return {
-      type: 'img',
-      url: imageCallback(content4.url),
-      alt: content4.alt,
-      caption: content4.title,
-      children: [{ type: 'text', text: '' }],
-    }
-  }
-  const text5 = (content4) => {
-    return {
-      type: 'text',
-      text: content4.value,
-    }
-  }
-  const blockquote2 = (content4) => {
-    const children = []
-    content4.children.map((child) => {
-      const inlineElements = unwrapBlockContent(child)
-      inlineElements.forEach((child2) => {
-        children.push(child2)
-      })
-    })
-    return {
-      type: 'blockquote',
-      children,
-    }
-  }
-  const paragraph2 = (content4) => {
-    const children = flatten_default(content4.children.map(phrasingContent))
-    if (children.length === 1) {
-      if (children[0]) {
-        if (children[0].type === 'html_inline') {
-          return {
-            ...children[0],
-            type: 'html',
-          }
-        }
-      }
-    }
-    return {
-      type: 'p',
-      children,
-    }
-  }
-  return {
-    type: 'root',
-    children: root3.children.map((child) => {
-      return content3(child)
-    }),
-  }
-}
-var RichTextParseError = class extends Error {
-  position
-  constructor(message, position2) {
-    super(message)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RichTextParseError)
-    }
-    this.name = 'RichTextParseError'
-    this.position = position2
-  }
-}
-
-// ../mdx/src/parse/parseShortcode.ts
-function parseShortcode(preprocessedString, template) {
-  const match = template.match
-  const unkeyedAttributes = !!template.fields.find((t) => t.name === '_value')
-  const hasChildren = !!template.fields.find((t) => t.name == 'children')
-  const replacement = `<${template.name} ${
-    unkeyedAttributes ? '_value="$1"' : '$1'
-  }>${hasChildren ? '$2' : '\n'}</${template.name}>`
-  const endRegex = `((?:.|\\n)*)${match.start}\\s/\\s*${
-    match.name || template.name
-  }[\\s]*${match.end}`
-  const regex = `${match.start}\\s*${match.name || template.name}[\\s]+${
-    unkeyedAttributes ? `['"]?(.*?)['"]?` : '(.*?)'
-  }[\\s]*${match.end}${hasChildren ? endRegex : ''}`
-  return replaceAll(preprocessedString, regex, replacement)
-}
-
-// ../mdx/src/parse/index.ts
-var markdownToAst = (value, field, useMdx = true) => {
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
-  let preprocessedString = value
-  templatesWithMatchers?.forEach((template) => {
-    if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
-    }
-    if (template.match) {
-      if (preprocessedString) {
-        preprocessedString = parseShortcode(preprocessedString, template)
-      }
-    }
-  })
-  if (!useMdx) {
-    console.log('encountered MDX error, falling back to non-MDX parser')
-  }
-  try {
-    const extensions = [directive()]
-    const mdastExtensions = [directiveFromMarkdown]
-    if (useMdx) {
-      extensions.push(mdx())
-      mdastExtensions.push(mdxFromMarkdown())
-    }
-    const tree = fromMarkdown(preprocessedString, {
-      extensions,
-      mdastExtensions,
-    })
-    if (!tree) {
-      throw new Error('Error parsing markdown')
-    }
-    return tree
-  } catch (e) {
-    console.error('error parsing file: ', e)
-    throw new RichTextParseError(e, e.position)
-  }
-}
-var MDX_PARSE_ERROR_MSG =
-  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
-var parseMDX = (value, field, imageCallback) => {
-  let tree
-  try {
-    tree = markdownToAst(value, field)
-    if (tree) {
-      return remarkToSlate(tree, field, imageCallback)
-    } else {
-      return { type: 'root', children: [] }
-    }
-  } catch (e) {
-    try {
-      tree = markdownToAst(value, field, false)
-      if (tree) {
-        return remarkToSlate(tree, field, imageCallback)
-      } else {
-        return { type: 'root', children: [] }
-      }
-    } catch (e2) {
-      if (e2 instanceof RichTextParseError) {
-        return invalidMarkdown(e2, value)
-      }
-      return invalidMarkdown(new RichTextParseError(e2.message), value)
-    }
-  }
-}
-var invalidMarkdown = (e, value) => {
-  const extra = {}
-  if (e.position && Object.keys(e.position).length) {
-    extra['position'] = e.position
-  }
-  return {
-    type: 'root',
-    children: [
-      {
-        type: 'invalid_markdown',
-        value,
-        message: e.message || `Error parsing markdown ${MDX_PARSE_ERROR_MSG}`,
-        children: [{ type: 'text', text: '' }],
-        ...extra,
-      },
-    ],
-  }
-}
-var replaceAll = (string3, target, value) => {
-  const regex = new RegExp(target, 'g')
-  return string3.valueOf().replace(regex, value)
-}
-
 // ../mdx/src/stringify/acorn.ts
 var import_prettier = __toModule(require_standalone())
 var stringifyPropsInline = (element2, field, imageCallback) => {
@@ -36635,17 +36155,7 @@ var stringifyMDX = (value, field, imageCallback) => {
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  const res = toMarkdown(tree, {
-    extensions: [mdxJsxToMarkdown()],
-    listItemIndent: 'one',
-    bullet: '-',
-    fences: true,
-    handlers: {
-      text(node) {
-        return node.value
-      },
-    },
-  })
+  const res = toTinaMarkdown(tree)
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -36659,6 +36169,19 @@ var stringifyMDX = (value, field, imageCallback) => {
     }
   })
   return preprocessedString
+}
+var toTinaMarkdown = (tree) => {
+  return toMarkdown(tree, {
+    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
+    listItemIndent: 'one',
+    bullet: '-',
+    fences: true,
+    handlers: {
+      text(node) {
+        return node.value
+      },
+    },
+  })
 }
 var rootElement = (content3, field, imageCallback) => {
   const children = []
@@ -36817,6 +36340,539 @@ var getMarks = (content3) => {
     marks.push('inlineCode')
   }
   return marks
+}
+
+// ../../../node_modules/.pnpm/unist-util-source@4.0.2/node_modules/unist-util-source/lib/index.js
+var search2 = /\r?\n|\r/g
+function source(value, file) {
+  const doc = String(file)
+  const loc = location(file)
+  const position2 =
+    value && typeof value === 'object'
+      ? 'type' in value
+        ? value.position
+        : value
+      : void 0
+  if (!position2 || !position2.start || !position2.end) {
+    return null
+  }
+  const endOffset = loc.toOffset(position2.end)
+  let startOffset = loc.toOffset(position2.start)
+  if (endOffset === -1 || startOffset === -1) {
+    return null
+  }
+  const results = []
+  while (startOffset < endOffset) {
+    search2.lastIndex = startOffset
+    const match = search2.exec(doc)
+    const end = match && match.index < endOffset ? match.index : endOffset
+    results.push(doc.slice(startOffset, end))
+    startOffset = end
+    if (match && match.index < endOffset) {
+      startOffset += match[0].length
+      results.push(match[0])
+    }
+  }
+  return results.join('')
+}
+
+// ../mdx/src/parse/mdx.ts
+function mdxJsxElement(node, field, imageCallback) {
+  try {
+    const template = field.templates?.find((template2) => {
+      const templateName =
+        typeof template2 === 'string' ? template2 : template2.name
+      return templateName === node.name
+    })
+    if (typeof template === 'string') {
+      throw new Error('Global templates not yet supported')
+    }
+    if (!template) {
+      console.log('no template')
+      const string3 = toTinaMarkdown({ type: 'root', children: [node] })
+      return {
+        type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
+        value: string3.trim(),
+        children: [{ type: 'text', text: '' }],
+      }
+    }
+    const props = extractAttributes(
+      node.attributes,
+      template.fields,
+      imageCallback
+    )
+    const childField = template.fields.find(
+      (field2) => field2.name === 'children'
+    )
+    if (childField) {
+      if (childField.type === 'rich-text') {
+        props.children = remarkToSlate(node, childField, imageCallback)
+      }
+    }
+    return {
+      type: node.type,
+      name: node.name,
+      children: [{ type: 'text', text: '' }],
+      props,
+    }
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new RichTextParseError(e.message, node.position)
+    }
+    throw e
+  }
+}
+var containerDirectiveElement = (node, field, imageCallback, raw) => {
+  let template
+  template = field.templates?.find((template2) => {
+    const templateName =
+      typeof template2 === 'string' ? template2 : template2.name
+    return templateName === node.name
+  })
+  if (typeof template === 'string') {
+    throw new Error('Global templates not yet supported')
+  }
+  if (!template) {
+    template = field.templates?.find((template2) => {
+      const templateName = template2?.match?.name
+      return templateName === node.name
+    })
+  }
+  if (!template) {
+    return {
+      type: 'p',
+      children: [{ type: 'text', text: source(node, raw) }],
+    }
+  }
+  return {
+    type: 'mdxJsxFlowElement',
+    name: node.name,
+    props: node.attributes,
+    children: node.children,
+  }
+}
+
+// ../mdx/src/parse/remarkToPlate.ts
+var remarkToSlate = (root3, field, imageCallback, raw) => {
+  const content3 = (content4) => {
+    switch (content4.type) {
+      case 'blockquote':
+        const children = []
+        content4.children.map((child) => {
+          const inlineElements = unwrapBlockContent(child)
+          inlineElements.forEach((child2) => {
+            children.push(child2)
+          })
+        })
+        return {
+          type: 'blockquote',
+          children,
+        }
+      case 'heading':
+        return heading2(content4)
+      case 'code':
+        return code2(content4)
+      case 'paragraph':
+        return paragraph2(content4)
+      case 'mdxJsxFlowElement':
+        return mdxJsxElement(content4, field, imageCallback)
+      case 'thematicBreak':
+        return {
+          type: 'hr',
+          children: [{ type: 'text', text: '' }],
+        }
+      case 'listItem':
+        return {
+          type: 'li',
+          children: [
+            {
+              type: 'lic',
+              children: flatten_default(
+                content4.children.map((child) => unwrapBlockContent(child))
+              ),
+            },
+          ],
+        }
+      case 'list':
+        return list3(content4)
+      case 'html':
+        return html2(content4)
+      case 'mdxFlowExpression':
+      case 'mdxjsEsm':
+        throw new RichTextParseError(
+          `Unexpected expression ${content4.value}.`,
+          content4.position
+        )
+      case 'containerDirective': {
+        return containerDirectiveElement(content4, field, imageCallback, raw)
+      }
+      default:
+        throw new RichTextParseError(
+          `Content: ${content4.type} is not yet supported`,
+          content4.position
+        )
+    }
+  }
+  const html2 = (content4) => {
+    return {
+      type: 'p',
+      children: [{ type: 'text', text: content4.value }],
+    }
+  }
+  const html_inline = (content4) => {
+    return { type: 'text', text: content4.value }
+    return {
+      type: 'html_inline',
+      value: content4.value,
+      children: [{ type: 'text', text: '' }],
+    }
+  }
+  const list3 = (content4) => {
+    return {
+      type: content4.ordered ? 'ol' : 'ul',
+      children: content4.children.map((child) => listItem2(child)),
+    }
+  }
+  const listItem2 = (content4) => {
+    return {
+      type: 'li',
+      children: content4.children.map((child) => {
+        switch (child.type) {
+          case 'list':
+            return list3(child)
+          case 'heading':
+          case 'paragraph':
+            return {
+              type: 'lic',
+              children: flatten_default(
+                child.children.map((child2) => phrasingContent(child2))
+              ),
+            }
+          case 'blockquote': {
+            return {
+              ...blockquote2(child),
+              type: 'lic',
+            }
+          }
+          case 'mdxJsxFlowElement':
+            return {
+              type: 'lic',
+              children: [
+                mdxJsxElement(
+                  { ...child, type: 'mdxJsxTextElement' },
+                  field,
+                  imageCallback
+                ),
+              ],
+            }
+          case 'code':
+          case 'thematicBreak':
+          case 'table':
+          case 'html':
+            throw new RichTextParseError(
+              `${child.type} inside list item is not supported`,
+              child.position
+            )
+          default:
+            throw new RichTextParseError(
+              `Unknown list item of type ${child.type}`,
+              child.position
+            )
+        }
+      }),
+    }
+  }
+  const unwrapBlockContent = (content4) => {
+    const flattenPhrasingContent = (children) => {
+      const children2 = children.map((child) => phrasingContent(child))
+      return flatten_default(Array.isArray(children2) ? children2 : [children2])
+    }
+    switch (content4.type) {
+      case 'heading':
+      case 'paragraph':
+        return flattenPhrasingContent(content4.children)
+      default:
+        throw new Error(
+          `UnwrapBlock: Unknown block content of type ${content4.type}`
+        )
+    }
+  }
+  const code2 = (content4) => {
+    const extra = {}
+    if (content4.lang) extra['lang'] = content4.lang
+    return {
+      type: 'code_block',
+      ...extra,
+      value: content4.value,
+      children: [{ type: 'text', text: '' }],
+    }
+  }
+  const link2 = (content4) => {
+    return {
+      type: 'a',
+      url: content4.url,
+      title: content4.title,
+      children: flatten_default(
+        content4.children.map((child) => staticPhrasingContent(child))
+      ),
+    }
+  }
+  const heading2 = (content4) => {
+    return {
+      type: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'][content4.depth - 1],
+      children: flatten_default(content4.children.map(phrasingContent)),
+    }
+  }
+  const staticPhrasingContent = (content4) => {
+    switch (content4.type) {
+      case 'mdxJsxTextElement':
+        return mdxJsxElement(content4, field, imageCallback)
+      case 'text':
+        return text5(content4)
+      case 'inlineCode':
+      case 'emphasis':
+      case 'image':
+      case 'strong':
+        return phrashingMark(content4)
+      default:
+        throw new Error(
+          `StaticPhrasingContent: ${content4.type} is not yet supported`
+        )
+    }
+  }
+  const phrasingContent = (content4) => {
+    switch (content4.type) {
+      case 'text':
+        return text5(content4)
+      case 'link':
+        return link2(content4)
+      case 'image':
+        return image2(content4)
+      case 'mdxJsxTextElement':
+        return mdxJsxElement(content4, field, imageCallback)
+      case 'emphasis':
+        return phrashingMark(content4)
+      case 'strong':
+        return phrashingMark(content4)
+      case 'break':
+        return breakContent()
+      case 'inlineCode':
+        return phrashingMark(content4)
+      case 'html':
+        return html_inline(content4)
+      case 'mdxTextExpression':
+        throw new RichTextParseError(
+          `Unexpected expression ${content4.value}.`,
+          content4.position
+        )
+      default:
+        throw new Error(
+          `PhrasingContent: ${content4.type} is not yet supported`
+        )
+    }
+  }
+  const breakContent = () => {
+    return {
+      type: 'break',
+      children: [
+        {
+          type: 'text',
+          text: '',
+        },
+      ],
+    }
+  }
+  const phrashingMark = (node, marks = []) => {
+    const accum = []
+    switch (node.type) {
+      case 'emphasis': {
+        const children = flatten_default(
+          node.children.map((child) =>
+            phrashingMark(child, [...marks, 'italic'])
+          )
+        )
+        children.forEach((child) => {
+          accum.push(child)
+        })
+        break
+      }
+      case 'inlineCode': {
+        const markProps2 = {}
+        marks.forEach((mark) => (markProps2[mark] = true))
+        accum.push({
+          type: 'text',
+          text: node.value,
+          code: true,
+          ...markProps2,
+        })
+        break
+      }
+      case 'strong': {
+        const children = flatten_default(
+          node.children.map((child) => phrashingMark(child, [...marks, 'bold']))
+        )
+        children.forEach((child) => {
+          accum.push(child)
+        })
+        break
+      }
+      case 'image': {
+        accum.push(image2(node))
+        break
+      }
+      case 'link': {
+        const children = flatten_default(
+          node.children.map((child) => phrashingMark(child, marks))
+        )
+        accum.push({ type: 'a', url: node.url, title: node.title, children })
+        break
+      }
+      case 'text':
+        const markProps = {}
+        marks.forEach((mark) => (markProps[mark] = true))
+        accum.push({ type: 'text', text: node.value, ...markProps })
+        break
+      default:
+        throw new Error(`Unexpected inline element of type ${node.type}`)
+    }
+    return accum
+  }
+  const image2 = (content4) => {
+    return {
+      type: 'img',
+      url: imageCallback(content4.url),
+      alt: content4.alt,
+      caption: content4.title,
+      children: [{ type: 'text', text: '' }],
+    }
+  }
+  const text5 = (content4) => {
+    return {
+      type: 'text',
+      text: content4.value,
+    }
+  }
+  const blockquote2 = (content4) => {
+    const children = []
+    content4.children.map((child) => {
+      const inlineElements = unwrapBlockContent(child)
+      inlineElements.forEach((child2) => {
+        children.push(child2)
+      })
+    })
+    return {
+      type: 'blockquote',
+      children,
+    }
+  }
+  const paragraph2 = (content4) => {
+    const children = flatten_default(content4.children.map(phrasingContent))
+    if (children.length === 1) {
+      if (children[0]) {
+        if (children[0].type === 'html_inline') {
+          return {
+            ...children[0],
+            type: 'html',
+          }
+        }
+      }
+    }
+    return {
+      type: 'p',
+      children,
+    }
+  }
+  return {
+    type: 'root',
+    children: root3.children.map((child) => {
+      return content3(child)
+    }),
+  }
+}
+var RichTextParseError = class extends Error {
+  position
+  constructor(message, position2) {
+    super(message)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, RichTextParseError)
+    }
+    this.name = 'RichTextParseError'
+    this.position = position2
+  }
+}
+
+// ../mdx/src/parse/index.ts
+var markdownToAst = (value, field, useMdx = true) => {
+  let preprocessedString = value
+  try {
+    const extensions = [directive()]
+    const mdastExtensions = [directiveFromMarkdown]
+    if (useMdx) {
+      extensions.push(mdx())
+      mdastExtensions.push(mdxFromMarkdown())
+    }
+    const tree = fromMarkdown(preprocessedString, {
+      extensions,
+      mdastExtensions,
+    })
+    if (!tree) {
+      throw new Error('Error parsing markdown')
+    }
+    return tree
+  } catch (e) {
+    console.error('error parsing file: ', e)
+    throw new RichTextParseError(e, e.position)
+  }
+}
+var MDX_PARSE_ERROR_MSG =
+  'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
+var parseMDX = (value, field, imageCallback) => {
+  let tree
+  try {
+    tree = markdownToAst(value, field)
+    if (tree) {
+      return remarkToSlate(tree, field, imageCallback, value)
+    } else {
+      return { type: 'root', children: [] }
+    }
+  } catch (e) {
+    try {
+      tree = markdownToAst(value, field, false)
+      if (tree) {
+        return remarkToSlate(tree, field, imageCallback, value)
+      } else {
+        return { type: 'root', children: [] }
+      }
+    } catch (e2) {
+      console.log(e2)
+      if (e2 instanceof RichTextParseError) {
+        return invalidMarkdown(e2, value)
+      }
+      return invalidMarkdown(new RichTextParseError(e2.message), value)
+    }
+  }
+}
+var invalidMarkdown = (e, value) => {
+  const extra = {}
+  if (e.position && Object.keys(e.position).length) {
+    extra['position'] = e.position
+  }
+  return {
+    type: 'root',
+    children: [
+      {
+        type: 'invalid_markdown',
+        value,
+        message: e.message || `Error parsing markdown ${MDX_PARSE_ERROR_MSG}`,
+        children: [{ type: 'text', text: '' }],
+        ...extra,
+      },
+    ],
+  }
+}
+var replaceAll = (string3, target, value) => {
+  const regex = new RegExp(target, 'g')
+  return string3.valueOf().replace(regex, value)
 }
 export { parseMDX, stringifyMDX }
 /**

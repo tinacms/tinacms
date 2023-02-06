@@ -1,0 +1,598 @@
+/* ../toolkit/src/packages/form-builder/LoadingDots.css */
+@keyframes loading-dots-scale-up-and-down {
+  0% {
+    transform: scale(0.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  90% {
+    transform: scale(0.1);
+  }
+  100% {
+    transform: scale(0.1);
+  }
+}
+
+/* ../toolkit/src/packages/fields/components/ColorPicker/index.css */
+@keyframes color-popup-keyframes {
+  0% {
+    transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
+  }
+}
+@keyframes color-popup-open-top-keyframes {
+  0% {
+    transform: translate3d(-50%, -100%, 0) scale3d(0.5, 0.5, 1);
+  }
+  100% {
+    transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
+  }
+}
+.color-picker-clip-path::before,
+.color-picker-clip-path::after {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.color-picker-on-top-clip-path::before,
+.color-picker-on-top-clip-path::after {
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+}
+
+/* ../toolkit/src/packages/fields/plugins/DateFieldPlugin.css */
+.tina-date-field .rdt {
+  position: relative;
+}
+.tina-date-field .rdtPicker {
+  display: none;
+  position: absolute;
+  width: 100%;
+  max-width: 350px;
+  padding: 4px;
+  margin-top: 4px;
+  z-index: 99999 !important;
+  background: var(--tina-color-grey-0);
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-big);
+  border: 1px solid var(--tina-color-grey-2);
+}
+.tina-date-field .rdtOpen .rdtPicker {
+  display: block;
+}
+.tina-date-field .rdtStatic .rdtPicker {
+  box-shadow: none;
+  position: static;
+}
+.tina-date-field .rdtPicker .rdtTimeToggle {
+  text-align: center;
+}
+.tina-date-field .rdtPicker table {
+  width: 100%;
+  margin: 0;
+}
+.tina-date-field .rdtPicker td,
+.rdtPicker th {
+  text-align: center;
+  height: 28px;
+}
+.tina-date-field .rdtPicker td {
+  cursor: pointer;
+}
+.tina-date-field .rdtPicker td.rdtDay:hover,
+.tina-date-field .rdtPicker td.rdtHour:hover,
+.tina-date-field .rdtPicker td.rdtMinute:hover,
+.tina-date-field .rdtPicker td.rdtSecond:hover,
+.tina-date-field .rdtPicker .rdtTimeToggle:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+  cursor: pointer;
+}
+.tina-date-field .rdtPicker td.rdtDay:hover:active,
+.tina-date-field .rdtPicker td.rdtHour:hover:active,
+.tina-date-field .rdtPicker td.rdtMinute:hover:active,
+.tina-date-field .rdtPicker td.rdtSecond:hover:active,
+.tina-date-field .rdtPicker .rdtTimeToggle:hover:active {
+  background: var(--tina-color-primary);
+  color: var(--tina-color-grey-0);
+  border-radius: var(--tina-radius-small);
+}
+.tina-date-field .rdtPicker td.rdtOld,
+.rdtPicker td.rdtNew {
+  color: var(--tina-color-grey-6);
+}
+.tina-date-field .rdtPicker td.rdtToday {
+  position: relative;
+}
+.tina-date-field .rdtPicker td.rdtToday:before {
+  content: '';
+  display: inline-block;
+  border-left: 7px solid transparent;
+  border-bottom: 7px solid var(--tina-color-primary);
+  border-radius: 20px;
+  border-top-color: rgba(0, 0, 0, 0.2);
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+}
+.tina-date-field .rdtPicker td.rdtActive,
+.rdtPicker td.rdtActive:hover {
+  background-color: var(--tina-color-primary);
+  color: var(--tina-color-grey-0);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.tina-date-field .rdtPicker td.rdtActive.rdtToday:before {
+  border-bottom-color: var(--tina-color-grey-0);
+}
+.tina-date-field .rdtPicker td.rdtDisabled,
+.rdtPicker td.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+.tina-date-field .rdtPicker td span.rdtOld {
+  color: var(--tina-color-grey-6);
+}
+.tina-date-field .rdtPicker td span.rdtDisabled,
+.rdtPicker td span.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+.tina-date-field .rdtPicker th {
+  border-bottom: 1px solid var(--tina-color-grey-1);
+}
+.tina-date-field .rdtPicker .dow {
+  width: 14.2857%;
+  border-bottom: none;
+  cursor: default;
+}
+.tina-date-field .rdtPicker th.rdtSwitch {
+  width: 100px;
+}
+.tina-date-field .rdtPicker th.rdtNext,
+.rdtPicker th.rdtPrev {
+  font-size: 21px;
+  vertical-align: top;
+}
+.tina-date-field .rdtPrev span,
+.rdtNext span {
+  display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.tina-date-field .rdtPicker th.rdtDisabled,
+.rdtPicker th.rdtDisabled:hover {
+  background: none;
+  color: var(--tina-color-grey-6);
+  cursor: not-allowed;
+}
+.tina-date-field .rdtPicker thead tr:first-child th {
+  cursor: pointer;
+}
+.tina-date-field .rdtPicker thead tr:first-child th:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+.tina-date-field .rdtPicker tfoot {
+  border-top: 1px solid var(--tina-color-grey-1);
+}
+.tina-date-field .rdtPicker button {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.tina-date-field .rdtPicker button:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+.tina-date-field .rdtPicker thead button {
+  width: 100%;
+  height: 100%;
+}
+.tina-date-field td.rdtMonth,
+td.rdtYear {
+  height: 50px;
+  width: 25%;
+  cursor: pointer;
+}
+.tina-date-field td.rdtMonth:hover,
+td.rdtYear:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+.tina-date-field .rdtCounters {
+  display: inline-block;
+}
+.tina-date-field .rdtCounters > div {
+  float: left;
+}
+.tina-date-field .rdtCounter {
+  height: 100px;
+}
+.tina-date-field .rdtCounter {
+  width: 40px;
+}
+.tina-date-field .rdtCounterSeparator {
+  line-height: 100px;
+}
+.tina-date-field .rdtCounter .rdtBtn {
+  height: 40%;
+  line-height: 40px;
+  cursor: pointer;
+  display: block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.tina-date-field .rdtCounter .rdtBtn:hover {
+  background: var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+}
+.tina-date-field .rdtCounter .rdtCount {
+  height: 20%;
+  font-size: 1.2em;
+}
+.tina-date-field .rdtMilli {
+  vertical-align: middle;
+  padding-left: 8px;
+  width: 48px;
+}
+.tina-date-field .rdtMilli input {
+  width: 100%;
+  font-size: 1.2em;
+  margin-top: 37px;
+}
+.tina-date-field .rdtTime td {
+  cursor: default;
+}
+
+/* ../toolkit/src/global.css */
+:root {
+  --tina-color-primary-light: #2296fe;
+  --tina-color-primary: #0084ff;
+  --tina-color-primary-dark: #0574e4;
+  --tina-color-error-light: #eb6337;
+  --tina-color-error: #ec4815;
+  --tina-color-error-dark: #dc4419;
+  --tina-color-warning-light: #f5e06e;
+  --tina-color-warning: #e9d050;
+  --tina-color-warning-dark: #d3ba38;
+  --tina-color-success-light: #57c355;
+  --tina-color-success: #3cad3a;
+  --tina-color-success-dark: #249a21;
+  --tina-color-grey-0: #ffffff;
+  --tina-color-grey-1: #f6f6f9;
+  --tina-color-grey-2: #edecf3;
+  --tina-color-grey-3: #e1ddec;
+  --tina-color-grey-4: #b2adbe;
+  --tina-color-grey-5: #918c9e;
+  --tina-color-grey-6: #716c7f;
+  --tina-color-grey-7: #565165;
+  --tina-color-grey-8: #433e52;
+  --tina-color-grey-9: #363145;
+  --tina-color-grey-10: #252336;
+  --tina-color-indicator: var(--tina-color-primary);
+  --tina-radius-small: 5px;
+  --tina-radius-big: 24px;
+  --tina-padding-small: 12px;
+  --tina-padding-big: 20px;
+  --tina-font-size-0: 12px;
+  --tina-font-size-1: 13px;
+  --tina-font-size-2: 15px;
+  --tina-font-size-3: 16px;
+  --tina-font-size-4: 18px;
+  --tina-font-size-5: 20px;
+  --tina-font-size-6: 22px;
+  --tina-font-size-7: 26px;
+  --tina-font-size-8: 32px;
+  --tina-font-family: 'Inter', sans-serif;
+  --tina-font-weight-regular: 400;
+  --tina-font-weight-bold: 600;
+  --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  --tina-shadow-small: 0px 2px 3px rgba(0, 0, 0, 0.12);
+  --tina-timing-short: 85ms;
+  --tina-timing-medium: 150ms;
+  --tina-timing-long: 250ms;
+  --tina-z-index-0: 0;
+  --tina-z-index-1: 10;
+  --tina-z-index-2: 20;
+  --tina-z-index-3: 30;
+  --tina-z-index-4: 40;
+  --tina-z-index-5: 50;
+  --tina-sidebar-width: 340px;
+  --tina-sidebar-header-height: 60px;
+  --tina-toolbar-height: 62px;
+}
+@keyframes fly-in-left {
+  0% {
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fly-in-up {
+  0% {
+    transform: translate3d(0, 100%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes popup-right {
+  0% {
+    transform: translate3d(-2rem, 0, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+@keyframes popup-down {
+  0% {
+    transform: translate3d(0, -2rem, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+/* ../toolkit/src/preflight.css */
+.tina-tailwind {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+  *,
+  ::before,
+  ::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: transparent;
+  }
+  ::before,
+  ::after {
+    --tw-content: '';
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr: where([title]) {
+    text-decoration: underline dotted;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+  b,
+  strong {
+    font-weight: bolder;
+  }
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: theme(
+      'fontFamily.mono',
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      'Liberation Mono',
+      'Courier New',
+      monospace
+    );
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub,
+  sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: inherit;
+    font-size: 100%;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+  }
+  button,
+  select {
+    text-transform: none;
+  }
+  button,
+  [type='button'],
+  [type='reset'],
+  [type='submit'] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none;
+  }
+  :-moz-focusring {
+    outline: auto;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  ::-webkit-inner-spin-button,
+  ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [type='search'] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit;
+  }
+  summary {
+    display: list-item;
+  }
+  blockquote,
+  dl,
+  dd,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  hr,
+  figure,
+  p,
+  pre {
+    margin: 0;
+  }
+  fieldset {
+    margin: 0;
+    padding: 0;
+  }
+  legend {
+    padding: 0;
+  }
+  ol,
+  ul,
+  menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li: before {
+    display: none;
+  }
+  textarea {
+    resize: vertical;
+  }
+  input: :placeholder, textarea::placeholder {
+    opacity: 1;
+    color: theme('colors.gray.400', #9ca3af);
+  }
+  button,
+  [role='button'] {
+    cursor: pointer;
+  }
+  :disabled {
+    cursor: default;
+  }
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+    vertical-align: middle;
+  }
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+  [hidden] {
+    display: none;
+  }
+}
+
+/* ../toolkit/src/styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+  .icon-parent {
+    svg {
+      fill: currentColor;
+    }
+  }
+}
+.tina-tailwind {
+  @apply font-sans text-gray-600 text-base;
+}
+.tina-prose [data-slate-editor='true'] {
+  padding-bottom: 0.5em;
+}
+.tina-prose [data-slate-editor='true'] .slate-code::before {
+  content: '';
+}
+.tina-prose [data-slate-editor='true'] .slate-code::after {
+  content: '';
+}
+.tina-prose [data-slate-editor='true'] .slate-code_block {
+  margin: 0;
+}
+.tina-prose [data-slate-editor='true'] .slate-code_block .slate-code {
+  background: none;
+}
+.tina-prose [data-slate-editor='true'] p:first-of-type {
+  font-size: 1em;
+}
+.with-toolbar [data-slate-editor='true'] {
+  min-height: 72px;
+}

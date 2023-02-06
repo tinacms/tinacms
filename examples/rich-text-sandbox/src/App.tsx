@@ -30,7 +30,7 @@ function App() {
           <Editor value={text} onChange={setText} />
           <ResizeHandle />
           {/* @ts-ignore */}
-          <Editor value={stringifyMDX(parsedText, field, (v) => v) || ''} />
+          {/* <Editor value={stringifyMDX(parsedText, field, (v) => v) || ''} /> */}
         </PanelGroup>
       </Panel>
       <ResizeHandle direction="horizontal" />

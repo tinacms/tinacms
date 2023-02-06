@@ -891,6 +891,7 @@ importers:
       typedoc: ^0.23.21
       typedoc-plugin-markdown: ^3.13.6
       typescript: ^4.7.4
+      unist-util-source: ^4.0.2
       unist-util-visit: ^4.1.0
       unist-util-visit-parents: ^5.1.3
       uvu: ^0.5.6
@@ -938,6 +939,7 @@ importers:
       stringify-entities: 4.0.3
       typedoc: 0.23.21_typescript@4.7.4
       typedoc-plugin-markdown: 3.13.6_typedoc@0.23.21
+      unist-util-source: 4.0.2
       unist-util-visit: 4.1.0
       unist-util-visit-parents: 5.1.3
       uvu: 0.5.6
@@ -30715,6 +30717,17 @@ packages:
     dependencies:
       '@types/unist': 2.0.6
       unist-util-visit: 4.1.0
+    dev: false
+
+  /unist-util-source/4.0.2:
+    resolution:
+      {
+        integrity: sha512-J7jAaCer3fTQCH6sW2oIs6fcgiuglp1GnbnFKGc1DVA5fjfkXmh/K5mRw1636lTZ4P3wvLVBTcF3aTWtB7AFEQ==,
+      }
+    dependencies:
+      '@types/unist': 2.0.6
+      vfile: 5.3.4
+      vfile-location: 4.0.1
     dev: false
 
   /unist-util-stringify-position/1.1.2:

@@ -16,13 +16,10 @@ limitations under the License.
 
 */
 
-import { frontmatter } from 'micromark-extension-frontmatter'
-import { gfm } from 'micromark-extension-gfm'
-import { gfmFromMarkdown } from 'mdast-util-gfm'
 import { directive } from 'micromark-extension-directive'
 import { directiveFromMarkdown } from 'mdast-util-directive'
 import { mdx } from 'micromark-extension-mdx'
-import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
+import { mdxFromMarkdown } from 'mdast-util-mdx'
 
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -30,6 +27,8 @@ import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import { parseShortcode } from './parseShortcode'
+import { Config } from 'mdast-util-from-markdown/lib'
+import { Extension } from 'micromark-util-types'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -84,23 +83,23 @@ export const markdownToAst = (
   field: RichTypeInner,
   useMdx: boolean = true
 ) => {
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
+  // const templatesWithMatchers = field.templates?.filter(
+  //   (template) => template.match
+  // )
   let preprocessedString = value
-  templatesWithMatchers?.forEach((template) => {
-    if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
-    }
-    if (template.match) {
-      if (preprocessedString) {
-        preprocessedString = parseShortcode(preprocessedString, template)
-      }
-    }
-  })
-  if (!useMdx) {
-    console.log('encountered MDX error, falling back to non-MDX parser')
-  }
+  // templatesWithMatchers?.forEach((template) => {
+  //   if (typeof template === 'string') {
+  //     throw new Error('Global templates are not supported')
+  //   }
+  //   if (template.match) {
+  //     if (preprocessedString) {
+  //       preprocessedString = parseShortcode(preprocessedString, template)
+  //     }
+  //   }
+  // })
+  // if (!useMdx) {
+  //   console.log('encountered MDX error, falling back to non-MDX parser')
+  // }
   try {
     // Remark Root is not the same as mdast for some reason
     // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
@@ -146,7 +145,7 @@ export const parseMDX = (
   try {
     tree = markdownToAst(value, field)
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback)
+      return remarkToSlate(tree, field, imageCallback, value)
     } else {
       return { type: 'root', children: [] }
     }
@@ -154,11 +153,12 @@ export const parseMDX = (
     try {
       tree = markdownToAst(value, field, false)
       if (tree) {
-        return remarkToSlate(tree, field, imageCallback)
+        return remarkToSlate(tree, field, imageCallback, value)
       } else {
         return { type: 'root', children: [] }
       }
     } catch (e: any) {
+      console.log(e)
       if (e instanceof RichTextParseError) {
         return invalidMarkdown(e, value)
       }

@@ -30,6 +30,7 @@ import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { stringifyShortcode } from './stringifyShortcode'
+import { directiveToMarkdown } from 'mdast-util-directive'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -64,8 +65,25 @@ export const stringifyMDX = (
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  const res = toMarkdown(tree, {
-    extensions: [mdxJsxToMarkdown()],
+  const res = toTinaMarkdown(tree)
+  const templatesWithMatchers = field.templates?.filter(
+    (template) => template.match
+  )
+  let preprocessedString = res
+  templatesWithMatchers?.forEach((template) => {
+    if (typeof template === 'string') {
+      throw new Error('Global templates are not supported')
+    }
+    if (template.match) {
+      preprocessedString = stringifyShortcode(preprocessedString, template)
+    }
+  })
+  return preprocessedString
+}
+
+export const toTinaMarkdown = (tree: Md.Root) => {
+  return toMarkdown(tree, {
+    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true, // setting to false results in 4-space tabbed code
@@ -98,19 +116,6 @@ export const stringifyMDX = (
       },
     },
   })
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
-  let preprocessedString = res
-  templatesWithMatchers?.forEach((template) => {
-    if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
-    }
-    if (template.match) {
-      preprocessedString = stringifyShortcode(preprocessedString, template)
-    }
-  })
-  return preprocessedString
 }
 
 export const rootElement = (

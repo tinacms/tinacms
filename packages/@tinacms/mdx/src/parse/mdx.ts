@@ -22,6 +22,9 @@ import { extractAttributes } from './acorn'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
+import { ContainerDirective } from 'mdast-util-directive'
+import { toTinaMarkdown } from '../stringify'
+import { source } from 'unist-util-source'
 
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -56,13 +59,8 @@ export function mdxJsxElement(
       throw new Error('Global templates not yet supported')
     }
     if (!template) {
-      const string = toMarkdown(
-        { type: 'root', children: [node] },
-        {
-          extensions: [mdxJsxToMarkdown()],
-          listItemIndent: 'one',
-        }
-      )
+      console.log('no template')
+      const string = toTinaMarkdown({ type: 'root', children: [node] })
       return {
         type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
         value: string.trim(),
@@ -95,5 +93,47 @@ export function mdxJsxElement(
       throw new RichTextParseError(e.message, node.position)
     }
     throw e
+  }
+}
+
+const rawString = `:::hhello
+
+someth
+
+
+:::
+`
+
+export const containerDirectiveElement = (
+  node: ContainerDirective,
+  field: RichTypeInner,
+  imageCallback: (url: string) => string,
+  raw: string
+): Plate.MdxBlockElement => {
+  let template
+  template = field.templates?.find((template) => {
+    const templateName = typeof template === 'string' ? template : template.name
+    return templateName === node.name
+  })
+  if (typeof template === 'string') {
+    throw new Error('Global templates not yet supported')
+  }
+  if (!template) {
+    template = field.templates?.find((template) => {
+      const templateName = template?.match?.name
+      return templateName === node.name
+    })
+  }
+  if (!template) {
+    return {
+      type: 'p',
+      children: [{ type: 'text', text: source(node, raw) }],
+    }
+  }
+  return {
+    type: 'mdxJsxFlowElement',
+    name: node.name,
+    props: node.attributes,
+    children: node.children,
   }
 }
