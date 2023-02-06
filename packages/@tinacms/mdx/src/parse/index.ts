@@ -142,7 +142,6 @@ export const parseMDX = (
   field: RichTypeInner,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
-  console.log('hi')
   let tree
   try {
     tree = markdownToAst(value, field)

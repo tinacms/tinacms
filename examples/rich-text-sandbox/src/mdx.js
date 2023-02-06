@@ -34089,7 +34089,7 @@ function flatten(array) {
 }
 var flatten_default = flatten
 
-// src/parse/acorn.ts
+// ../mdx/src/parse/acorn.ts
 var extractAttributes = (attributes5, fields, imageCallback) => {
   const properties = {}
   attributes5.forEach((attribute) => {
@@ -35657,7 +35657,7 @@ function joinDefinition(left, right) {
   }
 }
 
-// src/parse/mdx.ts
+// ../mdx/src/parse/mdx.ts
 function mdxJsxElement(node, field, imageCallback) {
   try {
     const template = field.templates?.find((template2) => {
@@ -35709,7 +35709,7 @@ function mdxJsxElement(node, field, imageCallback) {
   }
 }
 
-// src/parse/remarkToPlate.ts
+// ../mdx/src/parse/remarkToPlate.ts
 var remarkToSlate = (root3, field, imageCallback) => {
   const content3 = (content4) => {
     switch (content4.type) {
@@ -36055,7 +36055,7 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// src/parse/parseShortcode.ts
+// ../mdx/src/parse/parseShortcode.ts
 function parseShortcode(preprocessedString, template) {
   const match = template.match
   const unkeyedAttributes = !!template.fields.find((t) => t.name === '_value')
@@ -36072,7 +36072,7 @@ function parseShortcode(preprocessedString, template) {
   return replaceAll(preprocessedString, regex, replacement)
 }
 
-// src/parse/index.ts
+// ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
@@ -36114,7 +36114,6 @@ var markdownToAst = (value, field, useMdx = true) => {
 var MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 var parseMDX = (value, field, imageCallback) => {
-  console.log('hi')
   let tree
   try {
     tree = markdownToAst(value, field)
@@ -36162,7 +36161,7 @@ var replaceAll = (string3, target, value) => {
   return string3.valueOf().replace(regex, value)
 }
 
-// src/stringify/acorn.ts
+// ../mdx/src/stringify/acorn.ts
 var import_prettier = __toModule(require_standalone())
 var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
@@ -36401,7 +36400,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// src/stringify/marks.ts
+// ../mdx/src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -36481,7 +36480,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
 var text4 = (content3) => {
   return {
     type: 'text',
-    value: content3.text.replace('&#x20;', ''),
+    value: content3.text,
   }
 }
 var eat = (c, field, imageCallback) => {
@@ -36605,7 +36604,7 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// src/stringify/stringifyShortcode.ts
+// ../mdx/src/stringify/stringifyShortcode.ts
 function stringifyShortcode(preprocessedString, template) {
   const match = template.match
   const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')
@@ -36622,7 +36621,7 @@ ${match.start} /${match.name || template.name} ${match.end}`
   return replaceAll(preprocessedString, regex, replace)
 }
 
-// src/stringify/index.ts
+// ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return

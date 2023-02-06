@@ -149,7 +149,7 @@ const inlineElementExceptLink = (
 const text = (content: { text: string }) => {
   return {
     type: 'text' as const,
-    value: content.text.replace('&#x20;', ''),
+    value: content.text,
   }
 }
 

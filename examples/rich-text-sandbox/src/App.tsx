@@ -36,7 +36,10 @@ function App() {
       <ResizeHandle direction="horizontal" />
       <Panel>
         <PanelGroup autoSaveId="example" direction="vertical">
-          <Editor value={JSON.stringify(parsedText, null, 2)} />
+          <Editor
+            onChange={(value) => setParsedText(JSON.parse(value))}
+            value={JSON.stringify(parsedText, null, 2)}
+          />
         </PanelGroup>
       </Panel>
     </PanelGroup>
