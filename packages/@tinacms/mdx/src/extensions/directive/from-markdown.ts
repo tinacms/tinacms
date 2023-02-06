@@ -91,7 +91,12 @@ const exitAttributeName: FromMarkdownHandle = function (token) {
   // Attribute names in CommonMark are significantly limited, so character
   // references can’t exist.
   if (list) {
-    list.push([this.sliceSerialize(token), ''])
+    const name = this.sliceSerialize(token)
+    if (!name) {
+      list.push(['_value', ''])
+    } else {
+      list.push([this.sliceSerialize(token), ''])
+    }
   }
 }
 

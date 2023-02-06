@@ -16,8 +16,6 @@ limitations under the License.
 
 */
 
-import { directive } from 'micromark-extension-directive'
-import { directiveFromMarkdown } from 'mdast-util-directive'
 import { mdx } from 'micromark-extension-mdx'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 
@@ -29,6 +27,11 @@ import type * as Plate from './plate'
 import { parseShortcode } from './parseShortcode'
 import { Config } from 'mdast-util-from-markdown/lib'
 import { Extension } from 'micromark-util-types'
+import { directive } from 'micromark-extension-directive'
+// import { directiveFromMarkdown } from 'mdast-util-directive'
+import { directiveFromMarkdown } from '../extensions/directive/from-markdown'
+import { tinaDirective } from '../extensions/tina-shortcodes/extension'
+import { tinaDirectiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -103,8 +106,17 @@ export const markdownToAst = (
   try {
     // Remark Root is not the same as mdast for some reason
     // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-    const extensions = [directive()]
-    const mdastExtensions = [directiveFromMarkdown]
+    const patterns = []
+    field.templates?.forEach((template) => {
+      if (typeof template === 'string') {
+        return
+      }
+      if (template && template.match) {
+        patterns.push(template.match)
+      }
+    })
+    const extensions = [directive(), tinaDirective(patterns)]
+    const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())

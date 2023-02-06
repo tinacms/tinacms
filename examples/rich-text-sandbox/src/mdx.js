@@ -25197,1845 +25197,6 @@ var require_standalone = __commonJS({
   },
 })
 
-// ../../../node_modules/.pnpm/micromark-util-character@1.1.0/node_modules/micromark-util-character/lib/unicode-punctuation-regex.js
-var unicodePunctuationRegex =
-  /[!-/:-@[-`{-~\u00A1\u00A7\u00AB\u00B6\u00B7\u00BB\u00BF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]/
-
-// ../../../node_modules/.pnpm/micromark-util-character@1.1.0/node_modules/micromark-util-character/index.js
-var asciiAlpha = regexCheck(/[A-Za-z]/)
-var asciiDigit = regexCheck(/\d/)
-var asciiHexDigit = regexCheck(/[\dA-Fa-f]/)
-var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/)
-var asciiPunctuation = regexCheck(/[!-/:-@[-`{-~]/)
-var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/)
-function asciiControl(code2) {
-  return code2 !== null && (code2 < 32 || code2 === 127)
-}
-function markdownLineEndingOrSpace(code2) {
-  return code2 !== null && (code2 < 0 || code2 === 32)
-}
-function markdownLineEnding(code2) {
-  return code2 !== null && code2 < -2
-}
-function markdownSpace(code2) {
-  return code2 === -2 || code2 === -1 || code2 === 32
-}
-var unicodeWhitespace = regexCheck(/\s/)
-var unicodePunctuation = regexCheck(unicodePunctuationRegex)
-function regexCheck(regex) {
-  return check
-  function check(code2) {
-    return code2 !== null && regex.test(String.fromCharCode(code2))
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-factory-space@1.0.0/node_modules/micromark-factory-space/index.js
-function factorySpace(effects, ok2, type, max) {
-  const limit = max ? max - 1 : Number.POSITIVE_INFINITY
-  let size = 0
-  return start3
-  function start3(code2) {
-    if (markdownSpace(code2)) {
-      effects.enter(type)
-      return prefix(code2)
-    }
-    return ok2(code2)
-  }
-  function prefix(code2) {
-    if (markdownSpace(code2) && size++ < limit) {
-      effects.consume(code2)
-      return prefix
-    }
-    effects.exit(type)
-    return ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-factory-whitespace@1.0.0/node_modules/micromark-factory-whitespace/index.js
-function factoryWhitespace(effects, ok2) {
-  let seen
-  return start3
-  function start3(code2) {
-    if (markdownLineEnding(code2)) {
-      effects.enter('lineEnding')
-      effects.consume(code2)
-      effects.exit('lineEnding')
-      seen = true
-      return start3
-    }
-    if (markdownSpace(code2)) {
-      return factorySpace(
-        effects,
-        start3,
-        seen ? 'linePrefix' : 'lineSuffix'
-      )(code2)
-    }
-    return ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-attributes.js
-function factoryAttributes(
-  effects,
-  ok2,
-  nok,
-  attributesType,
-  attributesMarkerType,
-  attributeType,
-  attributeIdType,
-  attributeClassType,
-  attributeNameType,
-  attributeInitializerType,
-  attributeValueLiteralType,
-  attributeValueType,
-  attributeValueMarker,
-  attributeValueData,
-  disallowEol
-) {
-  let type
-  let marker
-  return start3
-  function start3(code2) {
-    effects.enter(attributesType)
-    effects.enter(attributesMarkerType)
-    effects.consume(code2)
-    effects.exit(attributesMarkerType)
-    return between2
-  }
-  function between2(code2) {
-    if (code2 === 35) {
-      type = attributeIdType
-      return shortcutStart(code2)
-    }
-    if (code2 === 46) {
-      type = attributeClassType
-      return shortcutStart(code2)
-    }
-    if (code2 === 58 || code2 === 95 || asciiAlpha(code2)) {
-      effects.enter(attributeType)
-      effects.enter(attributeNameType)
-      effects.consume(code2)
-      return name
-    }
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, between2, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, between2)(code2)
-    }
-    return end(code2)
-  }
-  function shortcutStart(code2) {
-    effects.enter(attributeType)
-    effects.enter(type)
-    effects.enter(type + 'Marker')
-    effects.consume(code2)
-    effects.exit(type + 'Marker')
-    return shortcutStartAfter
-  }
-  function shortcutStartAfter(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 35 ||
-      code2 === 39 ||
-      code2 === 46 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96 ||
-      code2 === 125 ||
-      markdownLineEndingOrSpace(code2)
-    ) {
-      return nok(code2)
-    }
-    effects.enter(type + 'Value')
-    effects.consume(code2)
-    return shortcut2
-  }
-  function shortcut2(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 39 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96
-    ) {
-      return nok(code2)
-    }
-    if (
-      code2 === 35 ||
-      code2 === 46 ||
-      code2 === 125 ||
-      markdownLineEndingOrSpace(code2)
-    ) {
-      effects.exit(type + 'Value')
-      effects.exit(type)
-      effects.exit(attributeType)
-      return between2(code2)
-    }
-    effects.consume(code2)
-    return shortcut2
-  }
-  function name(code2) {
-    if (
-      code2 === 45 ||
-      code2 === 46 ||
-      code2 === 58 ||
-      code2 === 95 ||
-      asciiAlphanumeric(code2)
-    ) {
-      effects.consume(code2)
-      return name
-    }
-    effects.exit(attributeNameType)
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, nameAfter, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, nameAfter)(code2)
-    }
-    return nameAfter(code2)
-  }
-  function nameAfter(code2) {
-    if (code2 === 61) {
-      effects.enter(attributeInitializerType)
-      effects.consume(code2)
-      effects.exit(attributeInitializerType)
-      return valueBefore
-    }
-    effects.exit(attributeType)
-    return between2(code2)
-  }
-  function valueBefore(code2) {
-    if (
-      code2 === null ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96 ||
-      code2 === 125 ||
-      (disallowEol && markdownLineEnding(code2))
-    ) {
-      return nok(code2)
-    }
-    if (code2 === 34 || code2 === 39) {
-      effects.enter(attributeValueLiteralType)
-      effects.enter(attributeValueMarker)
-      effects.consume(code2)
-      effects.exit(attributeValueMarker)
-      marker = code2
-      return valueQuotedStart
-    }
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, valueBefore, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, valueBefore)(code2)
-    }
-    effects.enter(attributeValueType)
-    effects.enter(attributeValueData)
-    effects.consume(code2)
-    marker = void 0
-    return valueUnquoted
-  }
-  function valueUnquoted(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 39 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96
-    ) {
-      return nok(code2)
-    }
-    if (code2 === 125 || markdownLineEndingOrSpace(code2)) {
-      effects.exit(attributeValueData)
-      effects.exit(attributeValueType)
-      effects.exit(attributeType)
-      return between2(code2)
-    }
-    effects.consume(code2)
-    return valueUnquoted
-  }
-  function valueQuotedStart(code2) {
-    if (code2 === marker) {
-      effects.enter(attributeValueMarker)
-      effects.consume(code2)
-      effects.exit(attributeValueMarker)
-      effects.exit(attributeValueLiteralType)
-      effects.exit(attributeType)
-      return valueQuotedAfter
-    }
-    effects.enter(attributeValueType)
-    return valueQuotedBetween(code2)
-  }
-  function valueQuotedBetween(code2) {
-    if (code2 === marker) {
-      effects.exit(attributeValueType)
-      return valueQuotedStart(code2)
-    }
-    if (code2 === null) {
-      return nok(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      return disallowEol
-        ? nok(code2)
-        : factoryWhitespace(effects, valueQuotedBetween)(code2)
-    }
-    effects.enter(attributeValueData)
-    effects.consume(code2)
-    return valueQuoted
-  }
-  function valueQuoted(code2) {
-    if (code2 === marker || code2 === null || markdownLineEnding(code2)) {
-      effects.exit(attributeValueData)
-      return valueQuotedBetween(code2)
-    }
-    effects.consume(code2)
-    return valueQuoted
-  }
-  function valueQuotedAfter(code2) {
-    return code2 === 125 || markdownLineEndingOrSpace(code2)
-      ? between2(code2)
-      : end(code2)
-  }
-  function end(code2) {
-    if (code2 === 125) {
-      effects.enter(attributesMarkerType)
-      effects.consume(code2)
-      effects.exit(attributesMarkerType)
-      effects.exit(attributesType)
-      return ok2
-    }
-    return nok(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-label.js
-function factoryLabel(
-  effects,
-  ok2,
-  nok,
-  type,
-  markerType,
-  stringType,
-  disallowEol
-) {
-  let size = 0
-  let balance = 0
-  let previous3
-  return start3
-  function start3(code2) {
-    effects.enter(type)
-    effects.enter(markerType)
-    effects.consume(code2)
-    effects.exit(markerType)
-    return afterStart
-  }
-  function afterStart(code2) {
-    if (code2 === 93) {
-      effects.enter(markerType)
-      effects.consume(code2)
-      effects.exit(markerType)
-      effects.exit(type)
-      return ok2
-    }
-    effects.enter(stringType)
-    return lineStart(code2)
-  }
-  function lineStart(code2) {
-    if (code2 === 93 && !balance) {
-      return atClosingBrace(code2)
-    }
-    const token = effects.enter('chunkText', {
-      contentType: 'text',
-      previous: previous3,
-    })
-    if (previous3) previous3.next = token
-    previous3 = token
-    return data(code2)
-  }
-  function data(code2) {
-    if (code2 === null || size > 999) {
-      return nok(code2)
-    }
-    if (code2 === 91 && ++balance > 32) {
-      return nok(code2)
-    }
-    if (code2 === 93 && !balance--) {
-      effects.exit('chunkText')
-      return atClosingBrace(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      if (disallowEol) {
-        return nok(code2)
-      }
-      effects.consume(code2)
-      effects.exit('chunkText')
-      return lineStart
-    }
-    effects.consume(code2)
-    return code2 === 92 ? dataEscape : data
-  }
-  function dataEscape(code2) {
-    if (code2 === 91 || code2 === 92 || code2 === 93) {
-      effects.consume(code2)
-      size++
-      return data
-    }
-    return data(code2)
-  }
-  function atClosingBrace(code2) {
-    effects.exit(stringType)
-    effects.enter(markerType)
-    effects.consume(code2)
-    effects.exit(markerType)
-    effects.exit(type)
-    return ok2
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-name.js
-function factoryName(effects, ok2, nok, type) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    if (asciiAlpha(code2)) {
-      effects.enter(type)
-      effects.consume(code2)
-      return name
-    }
-    return nok(code2)
-  }
-  function name(code2) {
-    if (code2 === 45 || code2 === 95 || asciiAlphanumeric(code2)) {
-      effects.consume(code2)
-      return name
-    }
-    effects.exit(type)
-    return self2.previous === 45 || self2.previous === 95
-      ? nok(code2)
-      : ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-container.js
-var directiveContainer = {
-  tokenize: tokenizeDirectiveContainer,
-  concrete: true,
-}
-var label = {
-  tokenize: tokenizeLabel,
-  partial: true,
-}
-var attributes = {
-  tokenize: tokenizeAttributes,
-  partial: true,
-}
-var nonLazyLine = {
-  tokenize: tokenizeNonLazyLine,
-  partial: true,
-}
-function tokenizeDirectiveContainer(effects, ok2, nok) {
-  const self2 = this
-  const tail = self2.events[self2.events.length - 1]
-  const initialSize =
-    tail && tail[1].type === 'linePrefix'
-      ? tail[2].sliceSerialize(tail[1], true).length
-      : 0
-  let sizeOpen = 0
-  let previous3
-  return start3
-  function start3(code2) {
-    effects.enter('directiveContainer')
-    effects.enter('directiveContainerFence')
-    effects.enter('directiveContainerSequence')
-    return sequenceOpen(code2)
-  }
-  function sequenceOpen(code2) {
-    if (code2 === 58) {
-      effects.consume(code2)
-      sizeOpen++
-      return sequenceOpen
-    }
-    if (sizeOpen < 3) {
-      return nok(code2)
-    }
-    effects.exit('directiveContainerSequence')
-    return factoryName.call(
-      self2,
-      effects,
-      afterName,
-      nok,
-      'directiveContainerName'
-    )(code2)
-  }
-  function afterName(code2) {
-    return code2 === 91
-      ? effects.attempt(label, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    return factorySpace(effects, openAfter, 'whitespace')(code2)
-  }
-  function openAfter(code2) {
-    effects.exit('directiveContainerFence')
-    if (code2 === null) {
-      return afterOpening(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      if (self2.interrupt) {
-        return ok2(code2)
-      }
-      return effects.attempt(nonLazyLine, contentStart, afterOpening)(code2)
-    }
-    return nok(code2)
-  }
-  function afterOpening(code2) {
-    effects.exit('directiveContainer')
-    return ok2(code2)
-  }
-  function contentStart(code2) {
-    if (code2 === null) {
-      effects.exit('directiveContainer')
-      return ok2(code2)
-    }
-    effects.enter('directiveContainerContent')
-    return lineStart(code2)
-  }
-  function lineStart(code2) {
-    if (code2 === null) {
-      return after(code2)
-    }
-    return effects.attempt(
-      {
-        tokenize: tokenizeClosingFence,
-        partial: true,
-      },
-      after,
-      initialSize
-        ? factorySpace(effects, chunkStart, 'linePrefix', initialSize + 1)
-        : chunkStart
-    )(code2)
-  }
-  function chunkStart(code2) {
-    if (code2 === null) {
-      return after(code2)
-    }
-    const token = effects.enter('chunkDocument', {
-      contentType: 'document',
-      previous: previous3,
-    })
-    if (previous3) previous3.next = token
-    previous3 = token
-    return contentContinue(code2)
-  }
-  function contentContinue(code2) {
-    if (code2 === null) {
-      const t = effects.exit('chunkDocument')
-      self2.parser.lazy[t.start.line] = false
-      return after(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      return effects.check(nonLazyLine, nonLazyLineAfter, lineAfter)(code2)
-    }
-    effects.consume(code2)
-    return contentContinue
-  }
-  function nonLazyLineAfter(code2) {
-    effects.consume(code2)
-    const t = effects.exit('chunkDocument')
-    self2.parser.lazy[t.start.line] = false
-    return lineStart
-  }
-  function lineAfter(code2) {
-    const t = effects.exit('chunkDocument')
-    self2.parser.lazy[t.start.line] = false
-    return after(code2)
-  }
-  function after(code2) {
-    effects.exit('directiveContainerContent')
-    effects.exit('directiveContainer')
-    return ok2(code2)
-  }
-  function tokenizeClosingFence(effects2, ok3, nok2) {
-    let size = 0
-    return factorySpace(effects2, closingPrefixAfter, 'linePrefix', 4)
-    function closingPrefixAfter(code2) {
-      effects2.enter('directiveContainerFence')
-      effects2.enter('directiveContainerSequence')
-      return closingSequence(code2)
-    }
-    function closingSequence(code2) {
-      if (code2 === 58) {
-        effects2.consume(code2)
-        size++
-        return closingSequence
-      }
-      if (size < sizeOpen) return nok2(code2)
-      effects2.exit('directiveContainerSequence')
-      return factorySpace(effects2, closingSequenceEnd, 'whitespace')(code2)
-    }
-    function closingSequenceEnd(code2) {
-      if (code2 === null || markdownLineEnding(code2)) {
-        effects2.exit('directiveContainerFence')
-        return ok3(code2)
-      }
-      return nok2(code2)
-    }
-  }
-}
-function tokenizeLabel(effects, ok2, nok) {
-  return factoryLabel(
-    effects,
-    ok2,
-    nok,
-    'directiveContainerLabel',
-    'directiveContainerLabelMarker',
-    'directiveContainerLabelString',
-    true
-  )
-}
-function tokenizeAttributes(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveContainerAttributes',
-    'directiveContainerAttributesMarker',
-    'directiveContainerAttribute',
-    'directiveContainerAttributeId',
-    'directiveContainerAttributeClass',
-    'directiveContainerAttributeName',
-    'directiveContainerAttributeInitializerMarker',
-    'directiveContainerAttributeValueLiteral',
-    'directiveContainerAttributeValue',
-    'directiveContainerAttributeValueMarker',
-    'directiveContainerAttributeValueData',
-    true
-  )
-}
-function tokenizeNonLazyLine(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('lineEnding')
-    effects.consume(code2)
-    effects.exit('lineEnding')
-    return lineStart
-  }
-  function lineStart(code2) {
-    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-leaf.js
-var directiveLeaf = {
-  tokenize: tokenizeDirectiveLeaf,
-}
-var label2 = {
-  tokenize: tokenizeLabel2,
-  partial: true,
-}
-var attributes2 = {
-  tokenize: tokenizeAttributes2,
-  partial: true,
-}
-function tokenizeDirectiveLeaf(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('directiveLeaf')
-    effects.enter('directiveLeafSequence')
-    effects.consume(code2)
-    return inStart
-  }
-  function inStart(code2) {
-    if (code2 === 58) {
-      effects.consume(code2)
-      effects.exit('directiveLeafSequence')
-      return factoryName.call(
-        self2,
-        effects,
-        afterName,
-        nok,
-        'directiveLeafName'
-      )
-    }
-    return nok(code2)
-  }
-  function afterName(code2) {
-    return code2 === 91
-      ? effects.attempt(label2, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes2, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    return factorySpace(effects, end, 'whitespace')(code2)
-  }
-  function end(code2) {
-    if (code2 === null || markdownLineEnding(code2)) {
-      effects.exit('directiveLeaf')
-      return ok2(code2)
-    }
-    return nok(code2)
-  }
-}
-function tokenizeLabel2(effects, ok2, nok) {
-  return factoryLabel(
-    effects,
-    ok2,
-    nok,
-    'directiveLeafLabel',
-    'directiveLeafLabelMarker',
-    'directiveLeafLabelString',
-    true
-  )
-}
-function tokenizeAttributes2(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveLeafAttributes',
-    'directiveLeafAttributesMarker',
-    'directiveLeafAttribute',
-    'directiveLeafAttributeId',
-    'directiveLeafAttributeClass',
-    'directiveLeafAttributeName',
-    'directiveLeafAttributeInitializerMarker',
-    'directiveLeafAttributeValueLiteral',
-    'directiveLeafAttributeValue',
-    'directiveLeafAttributeValueMarker',
-    'directiveLeafAttributeValueData',
-    true
-  )
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-text.js
-var directiveText = {
-  tokenize: tokenizeDirectiveText,
-  previous,
-}
-var label3 = {
-  tokenize: tokenizeLabel3,
-  partial: true,
-}
-var attributes3 = {
-  tokenize: tokenizeAttributes3,
-  partial: true,
-}
-function previous(code2) {
-  return (
-    code2 !== 58 ||
-    this.events[this.events.length - 1][1].type === 'characterEscape'
-  )
-}
-function tokenizeDirectiveText(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('directiveText')
-    effects.enter('directiveTextMarker')
-    effects.consume(code2)
-    effects.exit('directiveTextMarker')
-    return factoryName.call(self2, effects, afterName, nok, 'directiveTextName')
-  }
-  function afterName(code2) {
-    return code2 === 58
-      ? nok(code2)
-      : code2 === 91
-      ? effects.attempt(label3, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes3, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    effects.exit('directiveText')
-    return ok2(code2)
-  }
-}
-function tokenizeLabel3(effects, ok2, nok) {
-  return factoryLabel(
-    effects,
-    ok2,
-    nok,
-    'directiveTextLabel',
-    'directiveTextLabelMarker',
-    'directiveTextLabelString'
-  )
-}
-function tokenizeAttributes3(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveTextAttributes',
-    'directiveTextAttributesMarker',
-    'directiveTextAttribute',
-    'directiveTextAttributeId',
-    'directiveTextAttributeClass',
-    'directiveTextAttributeName',
-    'directiveTextAttributeInitializerMarker',
-    'directiveTextAttributeValueLiteral',
-    'directiveTextAttributeValue',
-    'directiveTextAttributeValueMarker',
-    'directiveTextAttributeValueData'
-  )
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/syntax.js
-function directive() {
-  return {
-    text: {
-      [58]: directiveText,
-    },
-    flow: {
-      [58]: [directiveContainer, directiveLeaf],
-    },
-  }
-}
-
-// ../../../node_modules/.pnpm/character-entities-legacy@3.0.0/node_modules/character-entities-legacy/index.js
-var characterEntitiesLegacy = [
-  'AElig',
-  'AMP',
-  'Aacute',
-  'Acirc',
-  'Agrave',
-  'Aring',
-  'Atilde',
-  'Auml',
-  'COPY',
-  'Ccedil',
-  'ETH',
-  'Eacute',
-  'Ecirc',
-  'Egrave',
-  'Euml',
-  'GT',
-  'Iacute',
-  'Icirc',
-  'Igrave',
-  'Iuml',
-  'LT',
-  'Ntilde',
-  'Oacute',
-  'Ocirc',
-  'Ograve',
-  'Oslash',
-  'Otilde',
-  'Ouml',
-  'QUOT',
-  'REG',
-  'THORN',
-  'Uacute',
-  'Ucirc',
-  'Ugrave',
-  'Uuml',
-  'Yacute',
-  'aacute',
-  'acirc',
-  'acute',
-  'aelig',
-  'agrave',
-  'amp',
-  'aring',
-  'atilde',
-  'auml',
-  'brvbar',
-  'ccedil',
-  'cedil',
-  'cent',
-  'copy',
-  'curren',
-  'deg',
-  'divide',
-  'eacute',
-  'ecirc',
-  'egrave',
-  'eth',
-  'euml',
-  'frac12',
-  'frac14',
-  'frac34',
-  'gt',
-  'iacute',
-  'icirc',
-  'iexcl',
-  'igrave',
-  'iquest',
-  'iuml',
-  'laquo',
-  'lt',
-  'macr',
-  'micro',
-  'middot',
-  'nbsp',
-  'not',
-  'ntilde',
-  'oacute',
-  'ocirc',
-  'ograve',
-  'ordf',
-  'ordm',
-  'oslash',
-  'otilde',
-  'ouml',
-  'para',
-  'plusmn',
-  'pound',
-  'quot',
-  'raquo',
-  'reg',
-  'sect',
-  'shy',
-  'sup1',
-  'sup2',
-  'sup3',
-  'szlig',
-  'thorn',
-  'times',
-  'uacute',
-  'ucirc',
-  'ugrave',
-  'uml',
-  'uuml',
-  'yacute',
-  'yen',
-  'yuml',
-]
-
-// ../../../node_modules/.pnpm/character-reference-invalid@2.0.1/node_modules/character-reference-invalid/index.js
-var characterReferenceInvalid = {
-  0: '\uFFFD',
-  128: '\u20AC',
-  130: '\u201A',
-  131: '\u0192',
-  132: '\u201E',
-  133: '\u2026',
-  134: '\u2020',
-  135: '\u2021',
-  136: '\u02C6',
-  137: '\u2030',
-  138: '\u0160',
-  139: '\u2039',
-  140: '\u0152',
-  142: '\u017D',
-  145: '\u2018',
-  146: '\u2019',
-  147: '\u201C',
-  148: '\u201D',
-  149: '\u2022',
-  150: '\u2013',
-  151: '\u2014',
-  152: '\u02DC',
-  153: '\u2122',
-  154: '\u0161',
-  155: '\u203A',
-  156: '\u0153',
-  158: '\u017E',
-  159: '\u0178',
-}
-
-// ../../../node_modules/.pnpm/is-decimal@2.0.1/node_modules/is-decimal/index.js
-function isDecimal(character) {
-  const code2 =
-    typeof character === 'string' ? character.charCodeAt(0) : character
-  return code2 >= 48 && code2 <= 57
-}
-
-// ../../../node_modules/.pnpm/is-hexadecimal@2.0.1/node_modules/is-hexadecimal/index.js
-function isHexadecimal(character) {
-  const code2 =
-    typeof character === 'string' ? character.charCodeAt(0) : character
-  return (
-    (code2 >= 97 && code2 <= 102) ||
-    (code2 >= 65 && code2 <= 70) ||
-    (code2 >= 48 && code2 <= 57)
-  )
-}
-
-// ../../../node_modules/.pnpm/is-alphabetical@2.0.1/node_modules/is-alphabetical/index.js
-function isAlphabetical(character) {
-  const code2 =
-    typeof character === 'string' ? character.charCodeAt(0) : character
-  return (code2 >= 97 && code2 <= 122) || (code2 >= 65 && code2 <= 90)
-}
-
-// ../../../node_modules/.pnpm/is-alphanumerical@2.0.1/node_modules/is-alphanumerical/index.js
-function isAlphanumerical(character) {
-  return isAlphabetical(character) || isDecimal(character)
-}
-
-// ../../../node_modules/.pnpm/decode-named-character-reference@1.0.2/node_modules/decode-named-character-reference/index.dom.js
-var element = document.createElement('i')
-function decodeNamedCharacterReference(value) {
-  const characterReference2 = '&' + value + ';'
-  element.innerHTML = characterReference2
-  const char = element.textContent
-  if (char.charCodeAt(char.length - 1) === 59 && value !== 'semi') {
-    return false
-  }
-  return char === characterReference2 ? false : char
-}
-
-// ../../../node_modules/.pnpm/parse-entities@4.0.0/node_modules/parse-entities/lib/index.js
-var fromCharCode = String.fromCharCode
-var messages = [
-  '',
-  'Named character references must be terminated by a semicolon',
-  'Numeric character references must be terminated by a semicolon',
-  'Named character references cannot be empty',
-  'Numeric character references cannot be empty',
-  'Named character references must be known',
-  'Numeric character references cannot be disallowed',
-  'Numeric character references cannot be outside the permissible Unicode range',
-]
-function parseEntities(value, options = {}) {
-  const additional =
-    typeof options.additional === 'string'
-      ? options.additional.charCodeAt(0)
-      : options.additional
-  const result = []
-  let index2 = 0
-  let lines = -1
-  let queue = ''
-  let point3
-  let indent
-  if (options.position) {
-    if ('start' in options.position || 'indent' in options.position) {
-      indent = options.position.indent
-      point3 = options.position.start
-    } else {
-      point3 = options.position
-    }
-  }
-  let line = (point3 ? point3.line : 0) || 1
-  let column = (point3 ? point3.column : 0) || 1
-  let previous3 = now()
-  let character
-  index2--
-  while (++index2 <= value.length) {
-    if (character === 10) {
-      column = (indent ? indent[lines] : 0) || 1
-    }
-    character = value.charCodeAt(index2)
-    if (character === 38) {
-      const following = value.charCodeAt(index2 + 1)
-      if (
-        following === 9 ||
-        following === 10 ||
-        following === 12 ||
-        following === 32 ||
-        following === 38 ||
-        following === 60 ||
-        Number.isNaN(following) ||
-        (additional && following === additional)
-      ) {
-        queue += fromCharCode(character)
-        column++
-        continue
-      }
-      const start3 = index2 + 1
-      let begin = start3
-      let end = start3
-      let type
-      if (following === 35) {
-        end = ++begin
-        const following2 = value.charCodeAt(end)
-        if (following2 === 88 || following2 === 120) {
-          type = 'hexadecimal'
-          end = ++begin
-        } else {
-          type = 'decimal'
-        }
-      } else {
-        type = 'named'
-      }
-      let characterReferenceCharacters = ''
-      let characterReference2 = ''
-      let characters = ''
-      const test =
-        type === 'named'
-          ? isAlphanumerical
-          : type === 'decimal'
-          ? isDecimal
-          : isHexadecimal
-      end--
-      while (++end <= value.length) {
-        const following2 = value.charCodeAt(end)
-        if (!test(following2)) {
-          break
-        }
-        characters += fromCharCode(following2)
-        if (type === 'named' && characterEntitiesLegacy.includes(characters)) {
-          characterReferenceCharacters = characters
-          characterReference2 = decodeNamedCharacterReference(characters)
-        }
-      }
-      let terminated = value.charCodeAt(end) === 59
-      if (terminated) {
-        end++
-        const namedReference =
-          type === 'named' ? decodeNamedCharacterReference(characters) : false
-        if (namedReference) {
-          characterReferenceCharacters = characters
-          characterReference2 = namedReference
-        }
-      }
-      let diff = 1 + end - start3
-      let reference = ''
-      if (!terminated && options.nonTerminated === false) {
-      } else if (!characters) {
-        if (type !== 'named') {
-          warning(4, diff)
-        }
-      } else if (type === 'named') {
-        if (terminated && !characterReference2) {
-          warning(5, 1)
-        } else {
-          if (characterReferenceCharacters !== characters) {
-            end = begin + characterReferenceCharacters.length
-            diff = 1 + end - begin
-            terminated = false
-          }
-          if (!terminated) {
-            const reason = characterReferenceCharacters ? 1 : 3
-            if (options.attribute) {
-              const following2 = value.charCodeAt(end)
-              if (following2 === 61) {
-                warning(reason, diff)
-                characterReference2 = ''
-              } else if (isAlphanumerical(following2)) {
-                characterReference2 = ''
-              } else {
-                warning(reason, diff)
-              }
-            } else {
-              warning(reason, diff)
-            }
-          }
-        }
-        reference = characterReference2
-      } else {
-        if (!terminated) {
-          warning(2, diff)
-        }
-        let referenceCode = Number.parseInt(
-          characters,
-          type === 'hexadecimal' ? 16 : 10
-        )
-        if (prohibited(referenceCode)) {
-          warning(7, diff)
-          reference = fromCharCode(65533)
-        } else if (referenceCode in characterReferenceInvalid) {
-          warning(6, diff)
-          reference = characterReferenceInvalid[referenceCode]
-        } else {
-          let output = ''
-          if (disallowed(referenceCode)) {
-            warning(6, diff)
-          }
-          if (referenceCode > 65535) {
-            referenceCode -= 65536
-            output += fromCharCode((referenceCode >>> (10 & 1023)) | 55296)
-            referenceCode = 56320 | (referenceCode & 1023)
-          }
-          reference = output + fromCharCode(referenceCode)
-        }
-      }
-      if (reference) {
-        flush()
-        previous3 = now()
-        index2 = end - 1
-        column += end - start3 + 1
-        result.push(reference)
-        const next = now()
-        next.offset++
-        if (options.reference) {
-          options.reference.call(
-            options.referenceContext,
-            reference,
-            { start: previous3, end: next },
-            value.slice(start3 - 1, end)
-          )
-        }
-        previous3 = next
-      } else {
-        characters = value.slice(start3 - 1, end)
-        queue += characters
-        column += characters.length
-        index2 = end - 1
-      }
-    } else {
-      if (character === 10) {
-        line++
-        lines++
-        column = 0
-      }
-      if (Number.isNaN(character)) {
-        flush()
-      } else {
-        queue += fromCharCode(character)
-        column++
-      }
-    }
-  }
-  return result.join('')
-  function now() {
-    return {
-      line,
-      column,
-      offset: index2 + ((point3 ? point3.offset : 0) || 0),
-    }
-  }
-  function warning(code2, offset) {
-    let position2
-    if (options.warning) {
-      position2 = now()
-      position2.column += offset
-      position2.offset += offset
-      options.warning.call(
-        options.warningContext,
-        messages[code2],
-        position2,
-        code2
-      )
-    }
-  }
-  function flush() {
-    if (queue) {
-      result.push(queue)
-      if (options.text) {
-        options.text.call(options.textContext, queue, {
-          start: previous3,
-          end: now(),
-        })
-      }
-      queue = ''
-    }
-  }
-}
-function prohibited(code2) {
-  return (code2 >= 55296 && code2 <= 57343) || code2 > 1114111
-}
-function disallowed(code2) {
-  return (
-    (code2 >= 1 && code2 <= 8) ||
-    code2 === 11 ||
-    (code2 >= 13 && code2 <= 31) ||
-    (code2 >= 127 && code2 <= 159) ||
-    (code2 >= 64976 && code2 <= 65007) ||
-    (code2 & 65535) === 65535 ||
-    (code2 & 65535) === 65534
-  )
-}
-
-// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/core.js
-function core(value, options) {
-  value = value.replace(
-    options.subset ? charactersToExpression(options.subset) : /["&'<>`]/g,
-    basic
-  )
-  if (options.subset || options.escapeOnly) {
-    return value
-  }
-  return value
-    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, surrogate)
-    .replace(
-      /[\x01-\t\v\f\x0E-\x1F\x7F\x81\x8D\x8F\x90\x9D\xA0-\uFFFF]/g,
-      basic
-    )
-  function surrogate(pair, index2, all2) {
-    return options.format(
-      (pair.charCodeAt(0) - 55296) * 1024 + pair.charCodeAt(1) - 56320 + 65536,
-      all2.charCodeAt(index2 + 2),
-      options
-    )
-  }
-  function basic(character, index2, all2) {
-    return options.format(
-      character.charCodeAt(0),
-      all2.charCodeAt(index2 + 1),
-      options
-    )
-  }
-}
-function charactersToExpression(subset) {
-  const groups = []
-  let index2 = -1
-  while (++index2 < subset.length) {
-    groups.push(subset[index2].replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'))
-  }
-  return new RegExp('(?:' + groups.join('|') + ')', 'g')
-}
-
-// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/util/format-basic.js
-function formatBasic(code2) {
-  return '&#x' + code2.toString(16).toUpperCase() + ';'
-}
-
-// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/index.js
-function stringifyEntitiesLight(value, options) {
-  return core(value, Object.assign({ format: formatBasic }, options))
-}
-
-// ../../../node_modules/.pnpm/unist-util-is@5.1.1/node_modules/unist-util-is/index.js
-var convert = function (test) {
-  if (test === void 0 || test === null) {
-    return ok
-  }
-  if (typeof test === 'string') {
-    return typeFactory(test)
-  }
-  if (typeof test === 'object') {
-    return Array.isArray(test) ? anyFactory(test) : propsFactory(test)
-  }
-  if (typeof test === 'function') {
-    return castFactory(test)
-  }
-  throw new Error('Expected function, string, or object as test')
-}
-function anyFactory(tests) {
-  const checks = []
-  let index2 = -1
-  while (++index2 < tests.length) {
-    checks[index2] = convert(tests[index2])
-  }
-  return castFactory(any)
-  function any(...parameters) {
-    let index3 = -1
-    while (++index3 < checks.length) {
-      if (checks[index3].call(this, ...parameters)) return true
-    }
-    return false
-  }
-}
-function propsFactory(check) {
-  return castFactory(all2)
-  function all2(node) {
-    let key
-    for (key in check) {
-      if (node[key] !== check[key]) return false
-    }
-    return true
-  }
-}
-function typeFactory(check) {
-  return castFactory(type)
-  function type(node) {
-    return node && node.type === check
-  }
-}
-function castFactory(check) {
-  return assertion
-  function assertion(...parameters) {
-    return Boolean(check.call(this, ...parameters))
-  }
-}
-function ok() {
-  return true
-}
-
-// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/color.browser.js
-function color(d) {
-  return d
-}
-
-// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/index.js
-var CONTINUE = true
-var EXIT = false
-var SKIP = 'skip'
-var visitParents = function (tree, test, visitor, reverse) {
-  if (typeof test === 'function' && typeof visitor !== 'function') {
-    reverse = visitor
-    visitor = test
-    test = null
-  }
-  const is = convert(test)
-  const step = reverse ? -1 : 1
-  factory(tree, void 0, [])()
-  function factory(node, index2, parents) {
-    const value = node && typeof node === 'object' ? node : {}
-    if (typeof value.type === 'string') {
-      const name =
-        typeof value.tagName === 'string'
-          ? value.tagName
-          : typeof value.name === 'string'
-          ? value.name
-          : void 0
-      Object.defineProperty(visit3, 'name', {
-        value:
-          'node (' + color(node.type + (name ? '<' + name + '>' : '')) + ')',
-      })
-    }
-    return visit3
-    function visit3() {
-      let result = []
-      let subresult
-      let offset
-      let grandparents
-      if (!test || is(node, index2, parents[parents.length - 1] || null)) {
-        result = toResult(visitor(node, parents))
-        if (result[0] === EXIT) {
-          return result
-        }
-      }
-      if (node.children && result[0] !== SKIP) {
-        offset = (reverse ? node.children.length : -1) + step
-        grandparents = parents.concat(node)
-        while (offset > -1 && offset < node.children.length) {
-          subresult = factory(node.children[offset], offset, grandparents)()
-          if (subresult[0] === EXIT) {
-            return subresult
-          }
-          offset =
-            typeof subresult[1] === 'number' ? subresult[1] : offset + step
-        }
-      }
-      return result
-    }
-  }
-}
-function toResult(value) {
-  if (Array.isArray(value)) {
-    return value
-  }
-  if (typeof value === 'number') {
-    return [CONTINUE, value]
-  }
-  return [value]
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-flow.js
-function containerFlow(parent, state, info) {
-  const indexStack = state.indexStack
-  const children = parent.children || []
-  const tracker = state.createTracker(info)
-  const results = []
-  let index2 = -1
-  indexStack.push(-1)
-  while (++index2 < children.length) {
-    const child = children[index2]
-    indexStack[indexStack.length - 1] = index2
-    results.push(
-      tracker.move(
-        state.handle(child, parent, state, {
-          before: '\n',
-          after: '\n',
-          ...tracker.current(),
-        })
-      )
-    )
-    if (child.type !== 'list') {
-      state.bulletLastUsed = void 0
-    }
-    if (index2 < children.length - 1) {
-      results.push(
-        tracker.move(between(child, children[index2 + 1], parent, state))
-      )
-    }
-  }
-  indexStack.pop()
-  return results.join('')
-}
-function between(left, right, parent, state) {
-  let index2 = state.join.length
-  while (index2--) {
-    const result = state.join[index2](left, right, parent, state)
-    if (result === true || result === 1) {
-      break
-    }
-    if (typeof result === 'number') {
-      return '\n'.repeat(1 + result)
-    }
-    if (result === false) {
-      return '\n\n<!---->\n\n'
-    }
-  }
-  return '\n\n'
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js
-function containerPhrasing(parent, state, info) {
-  const indexStack = state.indexStack
-  const children = parent.children || []
-  const results = []
-  let index2 = -1
-  let before = info.before
-  indexStack.push(-1)
-  let tracker = state.createTracker(info)
-  while (++index2 < children.length) {
-    const child = children[index2]
-    let after
-    indexStack[indexStack.length - 1] = index2
-    if (index2 + 1 < children.length) {
-      let handle2 = state.handle.handlers[children[index2 + 1].type]
-      if (handle2 && handle2.peek) handle2 = handle2.peek
-      after = handle2
-        ? handle2(children[index2 + 1], parent, state, {
-            before: '',
-            after: '',
-            ...tracker.current(),
-          }).charAt(0)
-        : ''
-    } else {
-      after = info.after
-    }
-    if (
-      results.length > 0 &&
-      (before === '\r' || before === '\n') &&
-      child.type === 'html'
-    ) {
-      results[results.length - 1] = results[results.length - 1].replace(
-        /(\r?\n|\r)$/,
-        ' '
-      )
-      before = ' '
-      tracker = state.createTracker(info)
-      tracker.move(results.join(''))
-    }
-    results.push(
-      tracker.move(
-        state.handle(child, parent, state, {
-          ...tracker.current(),
-          before,
-          after,
-        })
-      )
-    )
-    before = results[results.length - 1].slice(-1)
-  }
-  indexStack.pop()
-  return results.join('')
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
-function checkQuote(state) {
-  const marker = state.options.quote || '"'
-  if (marker !== '"' && marker !== "'") {
-    throw new Error(
-      'Cannot serialize title with `' +
-        marker +
-        '` for `options.quote`, expected `"`, or `\'`'
-    )
-  }
-  return marker
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/track.js
-function track(config) {
-  const options = config || {}
-  const now = options.now || {}
-  let lineShift = options.lineShift || 0
-  let line = now.line || 1
-  let column = now.column || 1
-  return { move, current, shift }
-  function current() {
-    return { now: { line, column }, lineShift }
-  }
-  function shift(value) {
-    lineShift += value
-  }
-  function move(input) {
-    const value = input || ''
-    const chunks = value.split(/\r?\n|\r/g)
-    const tail = chunks[chunks.length - 1]
-    line += chunks.length - 1
-    column =
-      chunks.length === 1 ? column + tail.length : 1 + tail.length + lineShift
-    return value
-  }
-}
-
-// ../../../node_modules/.pnpm/mdast-util-directive@2.2.3/node_modules/mdast-util-directive/lib/index.js
-var own = {}.hasOwnProperty
-var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
-handleDirective.peek = peekDirective
-var directiveFromMarkdown = {
-  canContainEols: ['textDirective'],
-  enter: {
-    directiveContainer: enterContainer,
-    directiveContainerAttributes: enterAttributes,
-    directiveContainerLabel: enterContainerLabel,
-    directiveLeaf: enterLeaf,
-    directiveLeafAttributes: enterAttributes,
-    directiveText: enterText,
-    directiveTextAttributes: enterAttributes,
-  },
-  exit: {
-    directiveContainer: exit,
-    directiveContainerAttributeClassValue: exitAttributeClassValue,
-    directiveContainerAttributeIdValue: exitAttributeIdValue,
-    directiveContainerAttributeName: exitAttributeName,
-    directiveContainerAttributeValue: exitAttributeValue,
-    directiveContainerAttributes: exitAttributes,
-    directiveContainerLabel: exitContainerLabel,
-    directiveContainerName: exitName,
-    directiveLeaf: exit,
-    directiveLeafAttributeClassValue: exitAttributeClassValue,
-    directiveLeafAttributeIdValue: exitAttributeIdValue,
-    directiveLeafAttributeName: exitAttributeName,
-    directiveLeafAttributeValue: exitAttributeValue,
-    directiveLeafAttributes: exitAttributes,
-    directiveLeafName: exitName,
-    directiveText: exit,
-    directiveTextAttributeClassValue: exitAttributeClassValue,
-    directiveTextAttributeIdValue: exitAttributeIdValue,
-    directiveTextAttributeName: exitAttributeName,
-    directiveTextAttributeValue: exitAttributeValue,
-    directiveTextAttributes: exitAttributes,
-    directiveTextName: exitName,
-  },
-}
-var directiveToMarkdown = {
-  unsafe: [
-    {
-      character: '\r',
-      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
-    },
-    {
-      character: '\n',
-      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
-    },
-    {
-      before: '[^:]',
-      character: ':',
-      after: '[A-Za-z]',
-      inConstruct: ['phrasing'],
-    },
-    { atBreak: true, character: ':', after: ':' },
-  ],
-  handlers: {
-    containerDirective: handleDirective,
-    leafDirective: handleDirective,
-    textDirective: handleDirective,
-  },
-}
-function enterContainer(token) {
-  enter.call(this, 'containerDirective', token)
-}
-function enterLeaf(token) {
-  enter.call(this, 'leafDirective', token)
-}
-function enterText(token) {
-  enter.call(this, 'textDirective', token)
-}
-function enter(type, token) {
-  this.enter({ type, name: '', attributes: {}, children: [] }, token)
-}
-function exitName(token) {
-  const node = this.stack[this.stack.length - 1]
-  node.name = this.sliceSerialize(token)
-}
-function enterContainerLabel(token) {
-  this.enter(
-    { type: 'paragraph', data: { directiveLabel: true }, children: [] },
-    token
-  )
-}
-function exitContainerLabel(token) {
-  this.exit(token)
-}
-function enterAttributes() {
-  this.setData('directiveAttributes', [])
-  this.buffer()
-}
-function exitAttributeIdValue(token) {
-  const list3 = this.getData('directiveAttributes')
-  list3.push([
-    'id',
-    parseEntities(this.sliceSerialize(token), {
-      attribute: true,
-    }),
-  ])
-}
-function exitAttributeClassValue(token) {
-  const list3 = this.getData('directiveAttributes')
-  list3.push([
-    'class',
-    parseEntities(this.sliceSerialize(token), {
-      attribute: true,
-    }),
-  ])
-}
-function exitAttributeValue(token) {
-  const list3 = this.getData('directiveAttributes')
-  list3[list3.length - 1][1] = parseEntities(this.sliceSerialize(token), {
-    attribute: true,
-  })
-}
-function exitAttributeName(token) {
-  const list3 = this.getData('directiveAttributes')
-  list3.push([this.sliceSerialize(token), ''])
-}
-function exitAttributes() {
-  const list3 = this.getData('directiveAttributes')
-  const cleaned = {}
-  let index2 = -1
-  while (++index2 < list3.length) {
-    const attribute = list3[index2]
-    if (attribute[0] === 'class' && cleaned.class) {
-      cleaned.class += ' ' + attribute[1]
-    } else {
-      cleaned[attribute[0]] = attribute[1]
-    }
-  }
-  this.setData('directiveAttributes')
-  this.resume()
-  const node = this.stack[this.stack.length - 1]
-  node.attributes = cleaned
-}
-function exit(token) {
-  this.exit(token)
-}
-function handleDirective(node, _, state, safeOptions) {
-  const tracker = track(safeOptions)
-  const sequence = fence(node)
-  const exit3 = state.enter(node.type)
-  let value = tracker.move(sequence + (node.name || ''))
-  let label4
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    label4 = inlineDirectiveLabel(head) ? head : void 0
-  } else {
-    label4 = node
-  }
-  if (label4 && label4.children && label4.children.length > 0) {
-    const exit4 = state.enter('label')
-    const labelType = `${node.type}Label`
-    const subexit = state.enter(labelType)
-    value += tracker.move('[')
-    value += tracker.move(
-      containerPhrasing(label4, state, {
-        ...tracker.current(),
-        before: value,
-        after: ']',
-      })
-    )
-    value += tracker.move(']')
-    subexit()
-    exit4()
-  }
-  value += tracker.move(attributes4(node, state))
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    let shallow = node
-    if (inlineDirectiveLabel(head)) {
-      shallow = Object.assign({}, node, { children: node.children.slice(1) })
-    }
-    if (shallow && shallow.children && shallow.children.length > 0) {
-      value += tracker.move('\n')
-      value += tracker.move(containerFlow(shallow, state, tracker.current()))
-    }
-    value += tracker.move('\n' + sequence)
-  }
-  exit3()
-  return value
-}
-function peekDirective() {
-  return ':'
-}
-function attributes4(node, state) {
-  const quote = checkQuote(state)
-  const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs = node.attributes || {}
-  const values = []
-  let classesFull
-  let classes
-  let id
-  let key
-  for (key in attrs) {
-    if (own.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
-      const value = String(attrs[key])
-      if (key === 'id') {
-        id = shortcut.test(value) ? '#' + value : quoted('id', value)
-      } else if (key === 'class') {
-        const list3 = value.split(/[\t\n\r ]+/g)
-        const classesFullList = []
-        const classesList = []
-        let index2 = -1
-        while (++index2 < list3.length) {
-          ;(shortcut.test(list3[index2]) ? classesList : classesFullList).push(
-            list3[index2]
-          )
-        }
-        classesFull =
-          classesFullList.length > 0
-            ? quoted('class', classesFullList.join(' '))
-            : ''
-        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
-      } else {
-        values.push(quoted(key, value))
-      }
-    }
-  }
-  if (classesFull) {
-    values.unshift(classesFull)
-  }
-  if (classes) {
-    values.unshift(classes)
-  }
-  if (id) {
-    values.unshift(id)
-  }
-  return values.length > 0 ? '{' + values.join(' ') + '}' : ''
-  function quoted(key2, value) {
-    return (
-      key2 +
-      (value
-        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
-        : '')
-    )
-  }
-}
-function inlineDirectiveLabel(node) {
-  return Boolean(
-    node && node.type === 'paragraph' && node.data && node.data.directiveLabel
-  )
-}
-function fence(node) {
-  let size = 0
-  if (node.type === 'containerDirective') {
-    visitParents(node, function (node2, parents) {
-      if (node2.type === 'containerDirective') {
-        let index2 = parents.length
-        let nesting = 0
-        while (index2--) {
-          if (parents[index2].type === 'containerDirective') {
-            nesting++
-          }
-        }
-        if (nesting > size) size = nesting
-      }
-    })
-    size += 3
-  } else if (node.type === 'leafDirective') {
-    size = 2
-  } else {
-    size = 1
-  }
-  return ':'.repeat(size)
-}
-
 // ../../../node_modules/.pnpm/micromark-util-chunked@1.0.0/node_modules/micromark-util-chunked/index.js
 function splice(list3, start3, remove, items) {
   const end = list3.length
@@ -27104,6 +25265,60 @@ function constructs(existing, list3) {
     ;(list3[index2].add === 'after' ? existing : before).push(list3[index2])
   }
   splice(existing, 0, 0, before)
+}
+
+// ../../../node_modules/.pnpm/micromark-util-character@1.1.0/node_modules/micromark-util-character/lib/unicode-punctuation-regex.js
+var unicodePunctuationRegex =
+  /[!-/:-@[-`{-~\u00A1\u00A7\u00AB\u00B6\u00B7\u00BB\u00BF\u037E\u0387\u055A-\u055F\u0589\u058A\u05BE\u05C0\u05C3\u05C6\u05F3\u05F4\u0609\u060A\u060C\u060D\u061B\u061E\u061F\u066A-\u066D\u06D4\u0700-\u070D\u07F7-\u07F9\u0830-\u083E\u085E\u0964\u0965\u0970\u09FD\u0A76\u0AF0\u0C77\u0C84\u0DF4\u0E4F\u0E5A\u0E5B\u0F04-\u0F12\u0F14\u0F3A-\u0F3D\u0F85\u0FD0-\u0FD4\u0FD9\u0FDA\u104A-\u104F\u10FB\u1360-\u1368\u1400\u166E\u169B\u169C\u16EB-\u16ED\u1735\u1736\u17D4-\u17D6\u17D8-\u17DA\u1800-\u180A\u1944\u1945\u1A1E\u1A1F\u1AA0-\u1AA6\u1AA8-\u1AAD\u1B5A-\u1B60\u1BFC-\u1BFF\u1C3B-\u1C3F\u1C7E\u1C7F\u1CC0-\u1CC7\u1CD3\u2010-\u2027\u2030-\u2043\u2045-\u2051\u2053-\u205E\u207D\u207E\u208D\u208E\u2308-\u230B\u2329\u232A\u2768-\u2775\u27C5\u27C6\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC\u29FD\u2CF9-\u2CFC\u2CFE\u2CFF\u2D70\u2E00-\u2E2E\u2E30-\u2E4F\u2E52\u3001-\u3003\u3008-\u3011\u3014-\u301F\u3030\u303D\u30A0\u30FB\uA4FE\uA4FF\uA60D-\uA60F\uA673\uA67E\uA6F2-\uA6F7\uA874-\uA877\uA8CE\uA8CF\uA8F8-\uA8FA\uA8FC\uA92E\uA92F\uA95F\uA9C1-\uA9CD\uA9DE\uA9DF\uAA5C-\uAA5F\uAADE\uAADF\uAAF0\uAAF1\uABEB\uFD3E\uFD3F\uFE10-\uFE19\uFE30-\uFE52\uFE54-\uFE61\uFE63\uFE68\uFE6A\uFE6B\uFF01-\uFF03\uFF05-\uFF0A\uFF0C-\uFF0F\uFF1A\uFF1B\uFF1F\uFF20\uFF3B-\uFF3D\uFF3F\uFF5B\uFF5D\uFF5F-\uFF65]/
+
+// ../../../node_modules/.pnpm/micromark-util-character@1.1.0/node_modules/micromark-util-character/index.js
+var asciiAlpha = regexCheck(/[A-Za-z]/)
+var asciiDigit = regexCheck(/\d/)
+var asciiHexDigit = regexCheck(/[\dA-Fa-f]/)
+var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/)
+var asciiPunctuation = regexCheck(/[!-/:-@[-`{-~]/)
+var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/)
+function asciiControl(code2) {
+  return code2 !== null && (code2 < 32 || code2 === 127)
+}
+function markdownLineEndingOrSpace(code2) {
+  return code2 !== null && (code2 < 0 || code2 === 32)
+}
+function markdownLineEnding(code2) {
+  return code2 !== null && code2 < -2
+}
+function markdownSpace(code2) {
+  return code2 === -2 || code2 === -1 || code2 === 32
+}
+var unicodeWhitespace = regexCheck(/\s/)
+var unicodePunctuation = regexCheck(unicodePunctuationRegex)
+function regexCheck(regex) {
+  return check
+  function check(code2) {
+    return code2 !== null && regex.test(String.fromCharCode(code2))
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-factory-space@1.0.0/node_modules/micromark-factory-space/index.js
+function factorySpace(effects, ok2, type, max) {
+  const limit = max ? max - 1 : Number.POSITIVE_INFINITY
+  let size = 0
+  return start3
+  function start3(code2) {
+    if (markdownSpace(code2)) {
+      effects.enter(type)
+      return prefix(code2)
+    }
+    return ok2(code2)
+  }
+  function prefix(code2) {
+    if (markdownSpace(code2) && size++ < limit) {
+      effects.consume(code2)
+      return prefix
+    }
+    effects.exit(type)
+    return ok2(code2)
+  }
 }
 
 // ../../../node_modules/.pnpm/unist-util-position-from-estree@1.1.1/node_modules/unist-util-position-from-estree/index.js
@@ -27234,45 +25449,45 @@ VFileMessage.prototype.ruleId = null
 VFileMessage.prototype.position = null
 
 // ../../../node_modules/.pnpm/estree-util-visit@1.1.0/node_modules/estree-util-visit/color.browser.js
-function color2(d) {
+function color(d) {
   return d
 }
 
 // ../../../node_modules/.pnpm/estree-util-visit@1.1.0/node_modules/estree-util-visit/index.js
-var own2 = {}.hasOwnProperty
-var CONTINUE2 = Symbol('continue')
-var SKIP2 = Symbol('skip')
-var EXIT2 = Symbol('exit')
+var own = {}.hasOwnProperty
+var CONTINUE = Symbol('continue')
+var SKIP = Symbol('skip')
+var EXIT = Symbol('exit')
 function visit(tree, visitor) {
-  var enter2
+  var enter3
   var leave
   if (typeof visitor === 'function') {
-    enter2 = visitor
+    enter3 = visitor
   } else if (visitor && typeof visitor === 'object') {
-    enter2 = visitor.enter
+    enter3 = visitor.enter
     leave = visitor.leave
   }
   build(tree, null, null, [])()
   function build(node, key, index2, parents) {
     if (nodelike(node)) {
-      visit3.displayName = 'node (' + color2(node.type) + ')'
+      visit3.displayName = 'node (' + color(node.type) + ')'
     }
     return visit3
     function visit3() {
-      var result = enter2 ? toResult2(enter2(node, key, index2, parents)) : []
+      var result = enter3 ? toResult(enter3(node, key, index2, parents)) : []
       var cKey
       var cIndex
       var grandparents
       var subresult
       var value
       var subvalue
-      if (result[0] === EXIT2) {
+      if (result[0] === EXIT) {
         return result
       }
-      if (result[0] !== SKIP2) {
+      if (result[0] !== SKIP) {
         for (cKey in node) {
           if (
-            own2.call(node, cKey) &&
+            own.call(node, cKey) &&
             node[cKey] &&
             typeof node[cKey] === 'object' &&
             cKey !== 'data' &&
@@ -27286,7 +25501,7 @@ function visit(tree, visitor) {
                 subvalue = value[cIndex]
                 if (nodelike(subvalue)) {
                   subresult = build(subvalue, cKey, cIndex, grandparents)()
-                  if (subresult[0] === EXIT2) return subresult
+                  if (subresult[0] === EXIT) return subresult
                   cIndex =
                     typeof subresult[1] === 'number' ? subresult[1] : cIndex + 1
                 } else {
@@ -27295,21 +25510,21 @@ function visit(tree, visitor) {
               }
             } else if (nodelike(value)) {
               subresult = build(value, cKey, null, grandparents)()
-              if (subresult[0] === EXIT2) return subresult
+              if (subresult[0] === EXIT) return subresult
             }
           }
         }
       }
-      return leave ? toResult2(leave(node, key, index2, parents)) : result
+      return leave ? toResult(leave(node, key, index2, parents)) : result
     }
   }
 }
-function toResult2(value) {
+function toResult(value) {
   if (Array.isArray(value)) {
     return value
   }
   if (typeof value === 'number') {
-    return [CONTINUE2, value]
+    return [CONTINUE, value]
   }
   return [value]
 }
@@ -28625,8 +26840,493 @@ function ccount(value, character) {
   return count
 }
 
+// ../../../node_modules/.pnpm/character-entities-legacy@3.0.0/node_modules/character-entities-legacy/index.js
+var characterEntitiesLegacy = [
+  'AElig',
+  'AMP',
+  'Aacute',
+  'Acirc',
+  'Agrave',
+  'Aring',
+  'Atilde',
+  'Auml',
+  'COPY',
+  'Ccedil',
+  'ETH',
+  'Eacute',
+  'Ecirc',
+  'Egrave',
+  'Euml',
+  'GT',
+  'Iacute',
+  'Icirc',
+  'Igrave',
+  'Iuml',
+  'LT',
+  'Ntilde',
+  'Oacute',
+  'Ocirc',
+  'Ograve',
+  'Oslash',
+  'Otilde',
+  'Ouml',
+  'QUOT',
+  'REG',
+  'THORN',
+  'Uacute',
+  'Ucirc',
+  'Ugrave',
+  'Uuml',
+  'Yacute',
+  'aacute',
+  'acirc',
+  'acute',
+  'aelig',
+  'agrave',
+  'amp',
+  'aring',
+  'atilde',
+  'auml',
+  'brvbar',
+  'ccedil',
+  'cedil',
+  'cent',
+  'copy',
+  'curren',
+  'deg',
+  'divide',
+  'eacute',
+  'ecirc',
+  'egrave',
+  'eth',
+  'euml',
+  'frac12',
+  'frac14',
+  'frac34',
+  'gt',
+  'iacute',
+  'icirc',
+  'iexcl',
+  'igrave',
+  'iquest',
+  'iuml',
+  'laquo',
+  'lt',
+  'macr',
+  'micro',
+  'middot',
+  'nbsp',
+  'not',
+  'ntilde',
+  'oacute',
+  'ocirc',
+  'ograve',
+  'ordf',
+  'ordm',
+  'oslash',
+  'otilde',
+  'ouml',
+  'para',
+  'plusmn',
+  'pound',
+  'quot',
+  'raquo',
+  'reg',
+  'sect',
+  'shy',
+  'sup1',
+  'sup2',
+  'sup3',
+  'szlig',
+  'thorn',
+  'times',
+  'uacute',
+  'ucirc',
+  'ugrave',
+  'uml',
+  'uuml',
+  'yacute',
+  'yen',
+  'yuml',
+]
+
+// ../../../node_modules/.pnpm/character-reference-invalid@2.0.1/node_modules/character-reference-invalid/index.js
+var characterReferenceInvalid = {
+  0: '\uFFFD',
+  128: '\u20AC',
+  130: '\u201A',
+  131: '\u0192',
+  132: '\u201E',
+  133: '\u2026',
+  134: '\u2020',
+  135: '\u2021',
+  136: '\u02C6',
+  137: '\u2030',
+  138: '\u0160',
+  139: '\u2039',
+  140: '\u0152',
+  142: '\u017D',
+  145: '\u2018',
+  146: '\u2019',
+  147: '\u201C',
+  148: '\u201D',
+  149: '\u2022',
+  150: '\u2013',
+  151: '\u2014',
+  152: '\u02DC',
+  153: '\u2122',
+  154: '\u0161',
+  155: '\u203A',
+  156: '\u0153',
+  158: '\u017E',
+  159: '\u0178',
+}
+
+// ../../../node_modules/.pnpm/is-decimal@2.0.1/node_modules/is-decimal/index.js
+function isDecimal(character) {
+  const code2 =
+    typeof character === 'string' ? character.charCodeAt(0) : character
+  return code2 >= 48 && code2 <= 57
+}
+
+// ../../../node_modules/.pnpm/is-hexadecimal@2.0.1/node_modules/is-hexadecimal/index.js
+function isHexadecimal(character) {
+  const code2 =
+    typeof character === 'string' ? character.charCodeAt(0) : character
+  return (
+    (code2 >= 97 && code2 <= 102) ||
+    (code2 >= 65 && code2 <= 70) ||
+    (code2 >= 48 && code2 <= 57)
+  )
+}
+
+// ../../../node_modules/.pnpm/is-alphabetical@2.0.1/node_modules/is-alphabetical/index.js
+function isAlphabetical(character) {
+  const code2 =
+    typeof character === 'string' ? character.charCodeAt(0) : character
+  return (code2 >= 97 && code2 <= 122) || (code2 >= 65 && code2 <= 90)
+}
+
+// ../../../node_modules/.pnpm/is-alphanumerical@2.0.1/node_modules/is-alphanumerical/index.js
+function isAlphanumerical(character) {
+  return isAlphabetical(character) || isDecimal(character)
+}
+
+// ../../../node_modules/.pnpm/decode-named-character-reference@1.0.2/node_modules/decode-named-character-reference/index.dom.js
+var element = document.createElement('i')
+function decodeNamedCharacterReference(value) {
+  const characterReference2 = '&' + value + ';'
+  element.innerHTML = characterReference2
+  const char = element.textContent
+  if (char.charCodeAt(char.length - 1) === 59 && value !== 'semi') {
+    return false
+  }
+  return char === characterReference2 ? false : char
+}
+
+// ../../../node_modules/.pnpm/parse-entities@4.0.0/node_modules/parse-entities/lib/index.js
+var fromCharCode = String.fromCharCode
+var messages = [
+  '',
+  'Named character references must be terminated by a semicolon',
+  'Numeric character references must be terminated by a semicolon',
+  'Named character references cannot be empty',
+  'Numeric character references cannot be empty',
+  'Named character references must be known',
+  'Numeric character references cannot be disallowed',
+  'Numeric character references cannot be outside the permissible Unicode range',
+]
+function parseEntities(value, options = {}) {
+  const additional =
+    typeof options.additional === 'string'
+      ? options.additional.charCodeAt(0)
+      : options.additional
+  const result = []
+  let index2 = 0
+  let lines = -1
+  let queue = ''
+  let point3
+  let indent
+  if (options.position) {
+    if ('start' in options.position || 'indent' in options.position) {
+      indent = options.position.indent
+      point3 = options.position.start
+    } else {
+      point3 = options.position
+    }
+  }
+  let line = (point3 ? point3.line : 0) || 1
+  let column = (point3 ? point3.column : 0) || 1
+  let previous3 = now()
+  let character
+  index2--
+  while (++index2 <= value.length) {
+    if (character === 10) {
+      column = (indent ? indent[lines] : 0) || 1
+    }
+    character = value.charCodeAt(index2)
+    if (character === 38) {
+      const following = value.charCodeAt(index2 + 1)
+      if (
+        following === 9 ||
+        following === 10 ||
+        following === 12 ||
+        following === 32 ||
+        following === 38 ||
+        following === 60 ||
+        Number.isNaN(following) ||
+        (additional && following === additional)
+      ) {
+        queue += fromCharCode(character)
+        column++
+        continue
+      }
+      const start3 = index2 + 1
+      let begin = start3
+      let end = start3
+      let type
+      if (following === 35) {
+        end = ++begin
+        const following2 = value.charCodeAt(end)
+        if (following2 === 88 || following2 === 120) {
+          type = 'hexadecimal'
+          end = ++begin
+        } else {
+          type = 'decimal'
+        }
+      } else {
+        type = 'named'
+      }
+      let characterReferenceCharacters = ''
+      let characterReference2 = ''
+      let characters = ''
+      const test =
+        type === 'named'
+          ? isAlphanumerical
+          : type === 'decimal'
+          ? isDecimal
+          : isHexadecimal
+      end--
+      while (++end <= value.length) {
+        const following2 = value.charCodeAt(end)
+        if (!test(following2)) {
+          break
+        }
+        characters += fromCharCode(following2)
+        if (type === 'named' && characterEntitiesLegacy.includes(characters)) {
+          characterReferenceCharacters = characters
+          characterReference2 = decodeNamedCharacterReference(characters)
+        }
+      }
+      let terminated = value.charCodeAt(end) === 59
+      if (terminated) {
+        end++
+        const namedReference =
+          type === 'named' ? decodeNamedCharacterReference(characters) : false
+        if (namedReference) {
+          characterReferenceCharacters = characters
+          characterReference2 = namedReference
+        }
+      }
+      let diff = 1 + end - start3
+      let reference = ''
+      if (!terminated && options.nonTerminated === false) {
+      } else if (!characters) {
+        if (type !== 'named') {
+          warning(4, diff)
+        }
+      } else if (type === 'named') {
+        if (terminated && !characterReference2) {
+          warning(5, 1)
+        } else {
+          if (characterReferenceCharacters !== characters) {
+            end = begin + characterReferenceCharacters.length
+            diff = 1 + end - begin
+            terminated = false
+          }
+          if (!terminated) {
+            const reason = characterReferenceCharacters ? 1 : 3
+            if (options.attribute) {
+              const following2 = value.charCodeAt(end)
+              if (following2 === 61) {
+                warning(reason, diff)
+                characterReference2 = ''
+              } else if (isAlphanumerical(following2)) {
+                characterReference2 = ''
+              } else {
+                warning(reason, diff)
+              }
+            } else {
+              warning(reason, diff)
+            }
+          }
+        }
+        reference = characterReference2
+      } else {
+        if (!terminated) {
+          warning(2, diff)
+        }
+        let referenceCode = Number.parseInt(
+          characters,
+          type === 'hexadecimal' ? 16 : 10
+        )
+        if (prohibited(referenceCode)) {
+          warning(7, diff)
+          reference = fromCharCode(65533)
+        } else if (referenceCode in characterReferenceInvalid) {
+          warning(6, diff)
+          reference = characterReferenceInvalid[referenceCode]
+        } else {
+          let output = ''
+          if (disallowed(referenceCode)) {
+            warning(6, diff)
+          }
+          if (referenceCode > 65535) {
+            referenceCode -= 65536
+            output += fromCharCode((referenceCode >>> (10 & 1023)) | 55296)
+            referenceCode = 56320 | (referenceCode & 1023)
+          }
+          reference = output + fromCharCode(referenceCode)
+        }
+      }
+      if (reference) {
+        flush()
+        previous3 = now()
+        index2 = end - 1
+        column += end - start3 + 1
+        result.push(reference)
+        const next = now()
+        next.offset++
+        if (options.reference) {
+          options.reference.call(
+            options.referenceContext,
+            reference,
+            { start: previous3, end: next },
+            value.slice(start3 - 1, end)
+          )
+        }
+        previous3 = next
+      } else {
+        characters = value.slice(start3 - 1, end)
+        queue += characters
+        column += characters.length
+        index2 = end - 1
+      }
+    } else {
+      if (character === 10) {
+        line++
+        lines++
+        column = 0
+      }
+      if (Number.isNaN(character)) {
+        flush()
+      } else {
+        queue += fromCharCode(character)
+        column++
+      }
+    }
+  }
+  return result.join('')
+  function now() {
+    return {
+      line,
+      column,
+      offset: index2 + ((point3 ? point3.offset : 0) || 0),
+    }
+  }
+  function warning(code2, offset) {
+    let position2
+    if (options.warning) {
+      position2 = now()
+      position2.column += offset
+      position2.offset += offset
+      options.warning.call(
+        options.warningContext,
+        messages[code2],
+        position2,
+        code2
+      )
+    }
+  }
+  function flush() {
+    if (queue) {
+      result.push(queue)
+      if (options.text) {
+        options.text.call(options.textContext, queue, {
+          start: previous3,
+          end: now(),
+        })
+      }
+      queue = ''
+    }
+  }
+}
+function prohibited(code2) {
+  return (code2 >= 55296 && code2 <= 57343) || code2 > 1114111
+}
+function disallowed(code2) {
+  return (
+    (code2 >= 1 && code2 <= 8) ||
+    code2 === 11 ||
+    (code2 >= 13 && code2 <= 31) ||
+    (code2 >= 127 && code2 <= 159) ||
+    (code2 >= 64976 && code2 <= 65007) ||
+    (code2 & 65535) === 65535 ||
+    (code2 & 65535) === 65534
+  )
+}
+
+// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/core.js
+function core(value, options) {
+  value = value.replace(
+    options.subset ? charactersToExpression(options.subset) : /["&'<>`]/g,
+    basic
+  )
+  if (options.subset || options.escapeOnly) {
+    return value
+  }
+  return value
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, surrogate)
+    .replace(
+      /[\x01-\t\v\f\x0E-\x1F\x7F\x81\x8D\x8F\x90\x9D\xA0-\uFFFF]/g,
+      basic
+    )
+  function surrogate(pair, index2, all2) {
+    return options.format(
+      (pair.charCodeAt(0) - 55296) * 1024 + pair.charCodeAt(1) - 56320 + 65536,
+      all2.charCodeAt(index2 + 2),
+      options
+    )
+  }
+  function basic(character, index2, all2) {
+    return options.format(
+      character.charCodeAt(0),
+      all2.charCodeAt(index2 + 1),
+      options
+    )
+  }
+}
+function charactersToExpression(subset) {
+  const groups = []
+  let index2 = -1
+  while (++index2 < subset.length) {
+    groups.push(subset[index2].replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'))
+  }
+  return new RegExp('(?:' + groups.join('|') + ')', 'g')
+}
+
+// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/util/format-basic.js
+function formatBasic(code2) {
+  return '&#x' + code2.toString(16).toUpperCase() + ';'
+}
+
+// ../../../node_modules/.pnpm/stringify-entities@4.0.3/node_modules/stringify-entities/lib/index.js
+function stringifyEntitiesLight(value, options) {
+  return core(value, Object.assign({ format: formatBasic }, options))
+}
+
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/track.js
-function track2(options_) {
+function track(options_) {
   const options = options_ || {}
   const now = options.now || {}
   let lineShift = options.lineShift || 0
@@ -28650,10 +27350,10 @@ function track2(options_) {
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/container-flow.js
-function containerFlow2(parent, context, safeOptions) {
+function containerFlow(parent, context, safeOptions) {
   const indexStack = context.indexStack
   const children = parent.children || []
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   const results = []
   let index2 = -1
   indexStack.push(-1)
@@ -28697,14 +27397,14 @@ function containerFlow2(parent, context, safeOptions) {
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js
-function containerPhrasing2(parent, context, safeOptions) {
+function containerPhrasing(parent, context, safeOptions) {
   const indexStack = context.indexStack
   const children = parent.children || []
   const results = []
   let index2 = -1
   let before = safeOptions.before
   indexStack.push(-1)
-  let tracker = track2(safeOptions)
+  let tracker = track(safeOptions)
   while (++index2 < children.length) {
     const child = children[index2]
     let after
@@ -28732,7 +27432,7 @@ function containerPhrasing2(parent, context, safeOptions) {
         ' '
       )
       before = ' '
-      tracker = track2(safeOptions)
+      tracker = track(safeOptions)
       tracker.move(results.join(''))
     }
     results.push(
@@ -29050,10 +27750,10 @@ function mdxJsxToMarkdown(options = {}) {
     resourceLink: true,
   }
   function mdxElement(node, _, context, safeOptions) {
-    const tracker = track2(safeOptions)
+    const tracker = track(safeOptions)
     const selfClosing =
       node.name && (!node.children || node.children.length === 0)
-    const exit3 = context.enter(node.type)
+    const exit4 = context.enter(node.type)
     let index2 = -1
     const serializedAttributes = []
     let value = tracker.move('<' + (node.name || ''))
@@ -29124,12 +27824,12 @@ function mdxJsxToMarkdown(options = {}) {
         tracker.shift(2)
         value += tracker.move('\n')
         value += tracker.move(
-          indentLines(containerFlow2(node, context, tracker.current()), map3)
+          indentLines(containerFlow(node, context, tracker.current()), map3)
         )
         value += tracker.move('\n')
       } else {
         value += tracker.move(
-          containerPhrasing2(node, context, {
+          containerPhrasing(node, context, {
             ...tracker.current(),
             before: '<',
             after: '>',
@@ -29140,7 +27840,7 @@ function mdxJsxToMarkdown(options = {}) {
     if (!selfClosing) {
       value += tracker.move('</' + (node.name || '') + '>')
     }
-    exit3()
+    exit4()
     return value
   }
   function map3(line, _, blank) {
@@ -29195,11 +27895,11 @@ function one(node, includeImageAlt) {
     ''
   )
 }
-function all(values, includeImageAlt) {
+function all(values2, includeImageAlt) {
   var result = []
   var index2 = -1
-  while (++index2 < values.length) {
-    result[index2] = one(values[index2], includeImageAlt)
+  while (++index2 < values2.length) {
+    result[index2] = one(values2[index2], includeImageAlt)
   }
   return result.join('')
 }
@@ -29781,7 +28481,7 @@ var blockQuote = {
   continuation: {
     tokenize: tokenizeBlockQuoteContinuation,
   },
-  exit: exit2,
+  exit,
 }
 function tokenizeBlockQuoteStart(effects, ok2, nok) {
   const self2 = this
@@ -29823,7 +28523,7 @@ function tokenizeBlockQuoteContinuation(effects, ok2, nok) {
     this.parser.constructs.disable.null.includes('codeIndented') ? void 0 : 4
   )
 }
-function exit2(effects) {
+function exit(effects) {
   effects.exit('blockQuote')
 }
 
@@ -30170,13 +28870,13 @@ var codeText = {
   name: 'codeText',
   tokenize: tokenizeCodeText,
   resolve: resolveCodeText,
-  previous: previous2,
+  previous,
 }
 function resolveCodeText(events) {
   let tailExitIndex = events.length - 4
   let headEnterIndex = 3
   let index2
-  let enter2
+  let enter3
   if (
     (events[headEnterIndex][1].type === 'lineEnding' ||
       events[headEnterIndex][1].type === 'space') &&
@@ -30197,27 +28897,27 @@ function resolveCodeText(events) {
   index2 = headEnterIndex - 1
   tailExitIndex++
   while (++index2 <= tailExitIndex) {
-    if (enter2 === void 0) {
+    if (enter3 === void 0) {
       if (index2 !== tailExitIndex && events[index2][1].type !== 'lineEnding') {
-        enter2 = index2
+        enter3 = index2
       }
     } else if (
       index2 === tailExitIndex ||
       events[index2][1].type === 'lineEnding'
     ) {
-      events[enter2][1].type = 'codeTextData'
-      if (index2 !== enter2 + 2) {
-        events[enter2][1].end = events[index2 - 1][1].end
-        events.splice(enter2 + 2, index2 - enter2 - 2)
-        tailExitIndex -= index2 - enter2 - 2
-        index2 = enter2 + 2
+      events[enter3][1].type = 'codeTextData'
+      if (index2 !== enter3 + 2) {
+        events[enter3][1].end = events[index2 - 1][1].end
+        events.splice(enter3 + 2, index2 - enter3 - 2)
+        tailExitIndex -= index2 - enter3 - 2
+        index2 = enter3 + 2
       }
-      enter2 = void 0
+      enter3 = void 0
     }
   }
   return events
 }
-function previous2(code2) {
+function previous(code2) {
   return (
     code2 !== 96 ||
     this.events[this.events.length - 1][1].type === 'characterEscape'
@@ -30640,7 +29340,7 @@ function factoryDestination(
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-label@1.0.2/node_modules/micromark-factory-label/index.js
-function factoryLabel2(effects, ok2, nok, type, markerType, stringType) {
+function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
   const self2 = this
   let size = 0
   let data
@@ -30768,6 +29468,29 @@ function factoryTitle(effects, ok2, nok, type, markerType, stringType) {
   }
 }
 
+// ../../../node_modules/.pnpm/micromark-factory-whitespace@1.0.0/node_modules/micromark-factory-whitespace/index.js
+function factoryWhitespace(effects, ok2) {
+  let seen
+  return start3
+  function start3(code2) {
+    if (markdownLineEnding(code2)) {
+      effects.enter('lineEnding')
+      effects.consume(code2)
+      effects.exit('lineEnding')
+      seen = true
+      return start3
+    }
+    if (markdownSpace(code2)) {
+      return factorySpace(
+        effects,
+        start3,
+        seen ? 'linePrefix' : 'lineSuffix'
+      )(code2)
+    }
+    return ok2(code2)
+  }
+}
+
 // ../../../node_modules/.pnpm/micromark-util-normalize-identifier@1.0.0/node_modules/micromark-util-normalize-identifier/index.js
 function normalizeIdentifier(value) {
   return value
@@ -30792,7 +29515,7 @@ function tokenizeDefinition(effects, ok2, nok) {
   return start3
   function start3(code2) {
     effects.enter('definition')
-    return factoryLabel2.call(
+    return factoryLabel.call(
       self2,
       effects,
       labelAfter,
@@ -32033,7 +30756,7 @@ function tokenizeFullReference(effects, ok2, nok) {
   const self2 = this
   return start3
   function start3(code2) {
-    return factoryLabel2.call(
+    return factoryLabel.call(
       self2,
       effects,
       afterLabel,
@@ -32570,20 +31293,20 @@ function createResolver(extraResolver) {
   return resolveAllText
   function resolveAllText(events, context) {
     let index2 = -1
-    let enter2
+    let enter3
     while (++index2 <= events.length) {
-      if (enter2 === void 0) {
+      if (enter3 === void 0) {
         if (events[index2] && events[index2][1].type === 'data') {
-          enter2 = index2
+          enter3 = index2
           index2++
         }
       } else if (!events[index2] || events[index2][1].type !== 'data') {
-        if (index2 !== enter2 + 2) {
-          events[enter2][1].end = events[index2 - 1][1].end
-          events.splice(enter2 + 2, index2 - enter2 - 2)
-          index2 = enter2 + 2
+        if (index2 !== enter3 + 2) {
+          events[enter3][1].end = events[index2 - 1][1].end
+          events.splice(enter3 + 2, index2 - enter3 - 2)
+          index2 = enter3 + 2
         }
-        enter2 = void 0
+        enter3 = void 0
       }
     }
     return extraResolver ? extraResolver(events, context) : events
@@ -32680,8 +31403,8 @@ function createTokenizer(parser, initialize, from) {
   let consumed = true
   const effects = {
     consume,
-    enter: enter2,
-    exit: exit3,
+    enter: enter3,
+    exit: exit4,
     attempt: constructFactory(onsuccessfulconstruct),
     check: constructFactory(onsuccessfulcheck),
     interrupt: constructFactory(onsuccessfulcheck, {
@@ -32776,7 +31499,7 @@ function createTokenizer(parser, initialize, from) {
     context.previous = code2
     consumed = true
   }
-  function enter2(type, fields) {
+  function enter3(type, fields) {
     const token = fields || {}
     token.type = type
     token.start = now()
@@ -32784,7 +31507,7 @@ function createTokenizer(parser, initialize, from) {
     stack.push(token)
     return token
   }
-  function exit3(type) {
+  function exit4(type) {
     const token = stack.pop()
     token.end = now()
     context.events.push(['exit', token, context])
@@ -33191,7 +31914,7 @@ function decode($0, $1, $2) {
 }
 
 // ../../../node_modules/.pnpm/mdast-util-from-markdown@1.3.0/node_modules/mdast-util-from-markdown/lib/index.js
-var own3 = {}.hasOwnProperty
+var own2 = {}.hasOwnProperty
 var fromMarkdown = function (value, encoding, options) {
   if (typeof encoding !== 'string') {
     options = encoding
@@ -33313,8 +32036,8 @@ function compiler(options) {
       stack: [tree],
       tokenStack: [],
       config,
-      enter: enter2,
-      exit: exit3,
+      enter: enter3,
+      exit: exit4,
       buffer,
       resume,
       setData,
@@ -33338,7 +32061,7 @@ function compiler(options) {
     index2 = -1
     while (++index2 < events.length) {
       const handler = config[events[index2][0]]
-      if (own3.call(handler, events[index2][1].type)) {
+      if (own2.call(handler, events[index2][1].type)) {
         handler[events[index2][1].type].call(
           Object.assign(
             {
@@ -33500,7 +32223,7 @@ function compiler(options) {
   function opener(create, and) {
     return open
     function open(token) {
-      enter2.call(this, create(token), token)
+      enter3.call(this, create(token), token)
       if (and) and.call(this, token)
     }
   }
@@ -33510,7 +32233,7 @@ function compiler(options) {
       children: [],
     })
   }
-  function enter2(node, token, errorHandler) {
+  function enter3(node, token, errorHandler) {
     const parent = this.stack[this.stack.length - 1]
     parent.children.push(node)
     this.stack.push(node)
@@ -33524,10 +32247,10 @@ function compiler(options) {
     return close
     function close(token) {
       if (and) and.call(this, token)
-      exit3.call(this, token)
+      exit4.call(this, token)
     }
   }
-  function exit3(token, onExitError) {
+  function exit4(token, onExitError) {
     const node = this.stack.pop()
     const open = this.tokenStack.pop()
     if (!open) {
@@ -33910,7 +32633,7 @@ function configure(combined, extensions) {
 function extension(combined, extension2) {
   let key
   for (key in extension2) {
-    if (own3.call(extension2, key)) {
+    if (own2.call(extension2, key)) {
       if (key === 'canContainEols') {
         const right = extension2[key]
         if (right) {
@@ -34060,12 +32783,12 @@ var isArguments = baseIsArguments_default(
 var isArguments_default = isArguments
 
 // ../../../node_modules/.pnpm/lodash-es@4.17.21/node_modules/lodash-es/_arrayPush.js
-function arrayPush(array, values) {
+function arrayPush(array, values2) {
   var index2 = -1,
-    length = values.length,
+    length = values2.length,
     offset = array.length
   while (++index2 < length) {
-    array[offset + index2] = values[index2]
+    array[offset + index2] = values2[index2]
   }
   return array
 }
@@ -34155,8 +32878,8 @@ var extractAttribute = (attribute, field, imageCallback) => {
       }
     case 'image':
       if (field.list) {
-        const values = extractScalar(extractExpression(attribute), field)
-        return values.split(',').map((value) => imageCallback(value))
+        const values2 = extractScalar(extractExpression(attribute), field)
+        return values2.split(',').map((value) => imageCallback(value))
       } else {
         const value = extractString(attribute, field)
         return imageCallback(value)
@@ -34319,14 +33042,14 @@ var trimFragments = (string3) => {
 }
 
 // ../../../node_modules/.pnpm/zwitch@2.0.2/node_modules/zwitch/index.js
-var own4 = {}.hasOwnProperty
+var own3 = {}.hasOwnProperty
 function zwitch(key, options) {
   var settings = options || {}
   function one2(value) {
     var fn = one2.invalid
     var handlers = one2.handlers
-    if (value && own4.call(value, key)) {
-      fn = own4.call(handlers, value[key]) ? handlers[value[key]] : one2.unknown
+    if (value && own3.call(value, key)) {
+      fn = own3.call(handlers, value[key]) ? handlers[value[key]] : one2.unknown
     }
     if (fn) {
       return fn.apply(this, arguments)
@@ -34362,15 +33085,15 @@ function configure2(base, extension2) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
 function blockquote(node, _, context, safeOptions) {
-  const exit3 = context.enter('blockquote')
-  const tracker = track2(safeOptions)
+  const exit4 = context.enter('blockquote')
+  const tracker = track(safeOptions)
   tracker.move('> ')
   tracker.shift(2)
   const value = indentLines(
-    containerFlow2(node, context, tracker.current()),
+    containerFlow(node, context, tracker.current()),
     map
   )
-  exit3()
+  exit4()
   return value
 }
 function map(line, _, blank) {
@@ -34582,14 +33305,14 @@ function code(node, _, context, safeOptions) {
   const raw = node.value || ''
   const suffix = marker === '`' ? 'GraveAccent' : 'Tilde'
   if (formatCodeAsIndented(node, context)) {
-    const exit4 = context.enter('codeIndented')
+    const exit5 = context.enter('codeIndented')
     const value2 = indentLines(raw, map2)
-    exit4()
+    exit5()
     return value2
   }
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3))
-  const exit3 = context.enter('codeFenced')
+  const exit4 = context.enter('codeFenced')
   let value = tracker.move(sequence)
   if (node.lang) {
     const subexit = context.enter('codeFencedLang' + suffix)
@@ -34621,7 +33344,7 @@ function code(node, _, context, safeOptions) {
     value += tracker.move(raw + '\n')
   }
   value += tracker.move(sequence)
-  exit3()
+  exit4()
   return value
 }
 function map2(line, _, blank) {
@@ -34637,7 +33360,7 @@ function association(node) {
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
-function checkQuote2(context) {
+function checkQuote(context) {
   const marker = context.options.quote || '"'
   if (marker !== '"' && marker !== "'") {
     throw new Error(
@@ -34651,11 +33374,11 @@ function checkQuote2(context) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/definition.js
 function definition2(node, _, context, safeOptions) {
-  const quote = checkQuote2(context)
+  const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
-  const exit3 = context.enter('definition')
+  const exit4 = context.enter('definition')
   let subexit = context.enter('label')
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   let value = tracker.move('[')
   value += tracker.move(
     safe(context, association(node), {
@@ -34701,7 +33424,7 @@ function definition2(node, _, context, safeOptions) {
     value += tracker.move(quote)
     subexit()
   }
-  exit3()
+  exit4()
   return value
 }
 
@@ -34722,34 +33445,91 @@ function checkEmphasis(context) {
 emphasis.peek = emphasisPeek
 function emphasis(node, _, context, safeOptions) {
   const marker = checkEmphasis(context)
-  const exit3 = context.enter('emphasis')
-  const tracker = track2(safeOptions)
+  const exit4 = context.enter('emphasis')
+  const tracker = track(safeOptions)
   let value = tracker.move(marker)
   value += tracker.move(
-    containerPhrasing2(node, context, {
+    containerPhrasing(node, context, {
       before: value,
       after: marker,
       ...tracker.current(),
     })
   )
   value += tracker.move(marker)
-  exit3()
+  exit4()
   return value
 }
 function emphasisPeek(_, _1, context) {
   return context.options.emphasis || '*'
 }
 
+// ../../../node_modules/.pnpm/unist-util-is@5.1.1/node_modules/unist-util-is/index.js
+var convert = function (test) {
+  if (test === void 0 || test === null) {
+    return ok
+  }
+  if (typeof test === 'string') {
+    return typeFactory(test)
+  }
+  if (typeof test === 'object') {
+    return Array.isArray(test) ? anyFactory(test) : propsFactory(test)
+  }
+  if (typeof test === 'function') {
+    return castFactory(test)
+  }
+  throw new Error('Expected function, string, or object as test')
+}
+function anyFactory(tests) {
+  const checks = []
+  let index2 = -1
+  while (++index2 < tests.length) {
+    checks[index2] = convert(tests[index2])
+  }
+  return castFactory(any)
+  function any(...parameters) {
+    let index3 = -1
+    while (++index3 < checks.length) {
+      if (checks[index3].call(this, ...parameters)) return true
+    }
+    return false
+  }
+}
+function propsFactory(check) {
+  return castFactory(all2)
+  function all2(node) {
+    let key
+    for (key in check) {
+      if (node[key] !== check[key]) return false
+    }
+    return true
+  }
+}
+function typeFactory(check) {
+  return castFactory(type)
+  function type(node) {
+    return node && node.type === check
+  }
+}
+function castFactory(check) {
+  return assertion
+  function assertion(...parameters) {
+    return Boolean(check.call(this, ...parameters))
+  }
+}
+function ok() {
+  return true
+}
+
 // ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.0/node_modules/unist-util-visit-parents/color.browser.js
-function color3(d) {
+function color2(d) {
   return d
 }
 
 // ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.0/node_modules/unist-util-visit-parents/index.js
-var CONTINUE3 = true
-var SKIP3 = 'skip'
-var EXIT3 = false
-var visitParents2 = function (tree, test, visitor, reverse) {
+var CONTINUE2 = true
+var SKIP2 = 'skip'
+var EXIT2 = false
+var visitParents = function (tree, test, visitor, reverse) {
   if (typeof test === 'function' && typeof visitor !== 'function') {
     reverse = visitor
     visitor = test
@@ -34770,7 +33550,7 @@ var visitParents2 = function (tree, test, visitor, reverse) {
           : void 0
       Object.defineProperty(visit3, 'name', {
         value:
-          'node (' + color3(value.type + (name ? '<' + name + '>' : '')) + ')',
+          'node (' + color2(value.type + (name ? '<' + name + '>' : '')) + ')',
       })
     }
     return visit3
@@ -34780,17 +33560,17 @@ var visitParents2 = function (tree, test, visitor, reverse) {
       let offset
       let grandparents
       if (!test || is(node, index2, parents[parents.length - 1] || null)) {
-        result = toResult3(visitor(node, parents))
-        if (result[0] === EXIT3) {
+        result = toResult2(visitor(node, parents))
+        if (result[0] === EXIT2) {
           return result
         }
       }
-      if (node.children && result[0] !== SKIP3) {
+      if (node.children && result[0] !== SKIP2) {
         offset = (reverse ? node.children.length : -1) + step
         grandparents = parents.concat(node)
         while (offset > -1 && offset < node.children.length) {
           subresult = factory(node.children[offset], offset, grandparents)()
-          if (subresult[0] === EXIT3) {
+          if (subresult[0] === EXIT2) {
             return subresult
           }
           offset =
@@ -34801,12 +33581,12 @@ var visitParents2 = function (tree, test, visitor, reverse) {
     }
   }
 }
-function toResult3(value) {
+function toResult2(value) {
   if (Array.isArray(value)) {
     return value
   }
   if (typeof value === 'number') {
-    return [CONTINUE3, value]
+    return [CONTINUE2, value]
   }
   return [value]
 }
@@ -34818,7 +33598,7 @@ var visit2 = function (tree, test, visitor, reverse) {
     visitor = test
     test = null
   }
-  visitParents2(tree, test, overload, reverse)
+  visitParents(tree, test, overload, reverse)
   function overload(node, parents) {
     const parent = parents[parents.length - 1]
     return visitor(node, parent ? parent.children.indexOf(node) : null, parent)
@@ -34834,7 +33614,7 @@ function formatHeadingAsSetext(node, context) {
       node2.type === 'break'
     ) {
       literalWithBreak = true
-      return EXIT3
+      return EXIT2
     }
   })
   return Boolean(
@@ -34847,17 +33627,17 @@ function formatHeadingAsSetext(node, context) {
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/heading.js
 function heading(node, _, context, safeOptions) {
   const rank = Math.max(Math.min(6, node.depth || 1), 1)
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   if (formatHeadingAsSetext(node, context)) {
-    const exit4 = context.enter('headingSetext')
+    const exit5 = context.enter('headingSetext')
     const subexit2 = context.enter('phrasing')
-    const value2 = containerPhrasing2(node, context, {
+    const value2 = containerPhrasing(node, context, {
       ...tracker.current(),
       before: '\n',
       after: '\n',
     })
     subexit2()
-    exit4()
+    exit5()
     return (
       value2 +
       '\n' +
@@ -34868,10 +33648,10 @@ function heading(node, _, context, safeOptions) {
     )
   }
   const sequence = '#'.repeat(rank)
-  const exit3 = context.enter('headingAtx')
+  const exit4 = context.enter('headingAtx')
   const subexit = context.enter('phrasing')
   tracker.move(sequence + ' ')
-  let value = containerPhrasing2(node, context, {
+  let value = containerPhrasing(node, context, {
     before: '# ',
     after: '\n',
     ...tracker.current(),
@@ -34888,7 +33668,7 @@ function heading(node, _, context, safeOptions) {
     value += ' ' + sequence
   }
   subexit()
-  exit3()
+  exit4()
   return value
 }
 
@@ -34904,11 +33684,11 @@ function htmlPeek() {
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/image.js
 image.peek = imagePeek
 function image(node, _, context, safeOptions) {
-  const quote = checkQuote2(context)
+  const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
-  const exit3 = context.enter('image')
+  const exit4 = context.enter('image')
   let subexit = context.enter('label')
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   let value = tracker.move('![')
   value += tracker.move(
     safe(context, node.alt, { before: value, after: ']', ...tracker.current() })
@@ -34951,7 +33731,7 @@ function image(node, _, context, safeOptions) {
     subexit()
   }
   value += tracker.move(')')
-  exit3()
+  exit4()
   return value
 }
 function imagePeek() {
@@ -34962,9 +33742,9 @@ function imagePeek() {
 imageReference.peek = imageReferencePeek
 function imageReference(node, _, context, safeOptions) {
   const type = node.referenceType
-  const exit3 = context.enter('imageReference')
+  const exit4 = context.enter('imageReference')
   let subexit = context.enter('label')
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   let value = tracker.move('![')
   const alt = safe(context, node.alt, {
     before: value,
@@ -34983,7 +33763,7 @@ function imageReference(node, _, context, safeOptions) {
   })
   subexit()
   context.stack = stack
-  exit3()
+  exit4()
   if (type === 'full' || !alt || alt !== reference) {
     value += tracker.move(reference + ']')
   } else if (type === 'shortcut') {
@@ -35053,33 +33833,33 @@ function formatLinkAsAutolink(node, context) {
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/link.js
 link.peek = linkPeek
 function link(node, _, context, safeOptions) {
-  const quote = checkQuote2(context)
+  const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
-  const tracker = track2(safeOptions)
-  let exit3
+  const tracker = track(safeOptions)
+  let exit4
   let subexit
   if (formatLinkAsAutolink(node, context)) {
     const stack = context.stack
     context.stack = []
-    exit3 = context.enter('autolink')
+    exit4 = context.enter('autolink')
     let value2 = tracker.move('<')
     value2 += tracker.move(
-      containerPhrasing2(node, context, {
+      containerPhrasing(node, context, {
         before: value2,
         after: '>',
         ...tracker.current(),
       })
     )
     value2 += tracker.move('>')
-    exit3()
+    exit4()
     context.stack = stack
     return value2
   }
-  exit3 = context.enter('link')
+  exit4 = context.enter('link')
   subexit = context.enter('label')
   let value = tracker.move('[')
   value += tracker.move(
-    containerPhrasing2(node, context, {
+    containerPhrasing(node, context, {
       before: value,
       after: '](',
       ...tracker.current(),
@@ -35123,7 +33903,7 @@ function link(node, _, context, safeOptions) {
     subexit()
   }
   value += tracker.move(')')
-  exit3()
+  exit4()
   return value
 }
 function linkPeek(node, _, context) {
@@ -35134,11 +33914,11 @@ function linkPeek(node, _, context) {
 linkReference.peek = linkReferencePeek
 function linkReference(node, _, context, safeOptions) {
   const type = node.referenceType
-  const exit3 = context.enter('linkReference')
+  const exit4 = context.enter('linkReference')
   let subexit = context.enter('label')
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   let value = tracker.move('[')
-  const text5 = containerPhrasing2(node, context, {
+  const text5 = containerPhrasing(node, context, {
     before: value,
     after: ']',
     ...tracker.current(),
@@ -35155,7 +33935,7 @@ function linkReference(node, _, context, safeOptions) {
   })
   subexit()
   context.stack = stack
-  exit3()
+  exit4()
   if (type === 'full' || !text5 || text5 !== reference) {
     value += tracker.move(reference + ']')
   } else if (type === 'shortcut') {
@@ -35262,7 +34042,7 @@ function checkRule(context) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/list.js
 function list2(node, parent, context, safeOptions) {
-  const exit3 = context.enter('list')
+  const exit4 = context.enter('list')
   const bulletCurrent = context.bulletCurrent
   let bullet = node.ordered ? checkBulletOrdered(context) : checkBullet(context)
   const bulletOther = node.ordered
@@ -35317,10 +34097,10 @@ function list2(node, parent, context, safeOptions) {
     bullet = bulletOther
   }
   context.bulletCurrent = bullet
-  const value = containerFlow2(node, context, safeOptions)
+  const value = containerFlow(node, context, safeOptions)
   context.bulletLastUsed = bullet
   context.bulletCurrent = bulletCurrent
-  exit3()
+  exit4()
   return value
 }
 
@@ -35362,15 +34142,15 @@ function listItem(node, parent, context, safeOptions) {
   ) {
     size = Math.ceil(size / 4) * 4
   }
-  const tracker = track2(safeOptions)
+  const tracker = track(safeOptions)
   tracker.move(bullet + ' '.repeat(size - bullet.length))
   tracker.shift(size)
-  const exit3 = context.enter('listItem')
+  const exit4 = context.enter('listItem')
   const value = indentLines(
-    containerFlow2(node, context, tracker.current()),
+    containerFlow(node, context, tracker.current()),
     map3
   )
-  exit3()
+  exit4()
   return value
   function map3(line, index2, blank) {
     if (index2) {
@@ -35382,17 +34162,17 @@ function listItem(node, parent, context, safeOptions) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
 function paragraph(node, _, context, safeOptions) {
-  const exit3 = context.enter('paragraph')
+  const exit4 = context.enter('paragraph')
   const subexit = context.enter('phrasing')
-  const value = containerPhrasing2(node, context, safeOptions)
+  const value = containerPhrasing(node, context, safeOptions)
   subexit()
-  exit3()
+  exit4()
   return value
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/root.js
 function root2(node, _, context, safeOptions) {
-  return containerFlow2(node, context, safeOptions)
+  return containerFlow(node, context, safeOptions)
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/check-strong.js
@@ -35412,18 +34192,18 @@ function checkStrong(context) {
 strong.peek = strongPeek
 function strong(node, _, context, safeOptions) {
   const marker = checkStrong(context)
-  const exit3 = context.enter('strong')
-  const tracker = track2(safeOptions)
+  const exit4 = context.enter('strong')
+  const tracker = track(safeOptions)
   let value = tracker.move(marker + marker)
   value += tracker.move(
-    containerPhrasing2(node, context, {
+    containerPhrasing(node, context, {
       before: value,
       after: marker,
       ...tracker.current(),
     })
   )
   value += tracker.move(marker + marker)
-  exit3()
+  exit4()
   return value
 }
 function strongPeek(_, _1, context) {
@@ -35629,7 +34409,7 @@ var unsafe = [
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/index.js
 function toMarkdown(tree, options = {}) {
   const context = {
-    enter: enter2,
+    enter: enter3,
     stack: [],
     unsafe: [],
     join: [],
@@ -35661,10 +34441,10 @@ function toMarkdown(tree, options = {}) {
     result += '\n'
   }
   return result
-  function enter2(name) {
+  function enter3(name) {
     context.stack.push(name)
-    return exit3
-    function exit3() {
+    return exit4
+    function exit4() {
       context.stack.pop()
     }
   }
@@ -35689,22 +34469,31 @@ var stringifyPropsInline = (element2, field, imageCallback) => {
 function stringifyProps(element2, parentField, flatten2, imageCallback) {
   const attributes5 = []
   const children = []
-  const template = parentField.templates?.find((template2) => {
+  let template
+  let useDirective = false
+  template = parentField.templates?.find((template2) => {
     if (typeof template2 === 'string') {
       throw new Error('Global templates not supported')
     }
     return template2.name === element2.name
   })
+  if (!template) {
+    template = parentField.templates?.find((template2) => {
+      const templateName = template2?.match?.name
+      return templateName === element2.name
+    })
+  }
   if (!template || typeof template === 'string') {
     throw new Error(`Unable to find template for JSX element ${element2.name}`)
   }
+  useDirective = !!template.match
   Object.entries(element2.props).forEach(([name, value]) => {
     const field = template.fields.find((field2) => field2.name === name)
     if (!field) {
       if (name === 'children') {
         return
       }
-      throw new Error(`No field definition found for property ${name}`)
+      return
     }
     switch (field.type) {
       case 'reference':
@@ -35874,6 +34663,7 @@ ${val}
   })
   if (template.match) {
     return {
+      useDirective,
       attributes: attributes5,
       children:
         children && children.length
@@ -35891,7 +34681,7 @@ ${val}
             ],
     }
   }
-  return { attributes: attributes5, children }
+  return { attributes: attributes5, children, useDirective }
 }
 function stringifyObj(obj, flatten2) {
   if (typeof obj === 'object' && obj !== null) {
@@ -35908,7 +34698,6 @@ function stringifyObj(obj, flatten2) {
       .replace(dummyFunc, '')
     return flatten2 ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
   } else {
-    console.log(obj)
     throw new Error(
       `stringifyObj must be passed an object or an array of objects, received ${typeof obj}`
     )
@@ -36141,6 +34930,374 @@ ${match.start} /${match.name || template.name} ${match.end}`
   return replaceAll(preprocessedString, regex, replace)
 }
 
+// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/color.browser.js
+function color3(d) {
+  return d
+}
+
+// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/index.js
+var CONTINUE3 = true
+var EXIT3 = false
+var SKIP3 = 'skip'
+var visitParents2 = function (tree, test, visitor, reverse) {
+  if (typeof test === 'function' && typeof visitor !== 'function') {
+    reverse = visitor
+    visitor = test
+    test = null
+  }
+  const is = convert(test)
+  const step = reverse ? -1 : 1
+  factory(tree, void 0, [])()
+  function factory(node, index2, parents) {
+    const value = node && typeof node === 'object' ? node : {}
+    if (typeof value.type === 'string') {
+      const name =
+        typeof value.tagName === 'string'
+          ? value.tagName
+          : typeof value.name === 'string'
+          ? value.name
+          : void 0
+      Object.defineProperty(visit3, 'name', {
+        value:
+          'node (' + color3(node.type + (name ? '<' + name + '>' : '')) + ')',
+      })
+    }
+    return visit3
+    function visit3() {
+      let result = []
+      let subresult
+      let offset
+      let grandparents
+      if (!test || is(node, index2, parents[parents.length - 1] || null)) {
+        result = toResult3(visitor(node, parents))
+        if (result[0] === EXIT3) {
+          return result
+        }
+      }
+      if (node.children && result[0] !== SKIP3) {
+        offset = (reverse ? node.children.length : -1) + step
+        grandparents = parents.concat(node)
+        while (offset > -1 && offset < node.children.length) {
+          subresult = factory(node.children[offset], offset, grandparents)()
+          if (subresult[0] === EXIT3) {
+            return subresult
+          }
+          offset =
+            typeof subresult[1] === 'number' ? subresult[1] : offset + step
+        }
+      }
+      return result
+    }
+  }
+}
+function toResult3(value) {
+  if (Array.isArray(value)) {
+    return value
+  }
+  if (typeof value === 'number') {
+    return [CONTINUE3, value]
+  }
+  return [value]
+}
+
+// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-flow.js
+function containerFlow2(parent, state, info) {
+  const indexStack = state.indexStack
+  const children = parent.children || []
+  const tracker = state.createTracker(info)
+  const results = []
+  let index2 = -1
+  indexStack.push(-1)
+  while (++index2 < children.length) {
+    const child = children[index2]
+    indexStack[indexStack.length - 1] = index2
+    results.push(
+      tracker.move(
+        state.handle(child, parent, state, {
+          before: '\n',
+          after: '\n',
+          ...tracker.current(),
+        })
+      )
+    )
+    if (child.type !== 'list') {
+      state.bulletLastUsed = void 0
+    }
+    if (index2 < children.length - 1) {
+      results.push(
+        tracker.move(between(child, children[index2 + 1], parent, state))
+      )
+    }
+  }
+  indexStack.pop()
+  return results.join('')
+}
+function between(left, right, parent, state) {
+  let index2 = state.join.length
+  while (index2--) {
+    const result = state.join[index2](left, right, parent, state)
+    if (result === true || result === 1) {
+      break
+    }
+    if (typeof result === 'number') {
+      return '\n'.repeat(1 + result)
+    }
+    if (result === false) {
+      return '\n\n<!---->\n\n'
+    }
+  }
+  return '\n\n'
+}
+
+// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js
+function containerPhrasing2(parent, state, info) {
+  const indexStack = state.indexStack
+  const children = parent.children || []
+  const results = []
+  let index2 = -1
+  let before = info.before
+  indexStack.push(-1)
+  let tracker = state.createTracker(info)
+  while (++index2 < children.length) {
+    const child = children[index2]
+    let after
+    indexStack[indexStack.length - 1] = index2
+    if (index2 + 1 < children.length) {
+      let handle2 = state.handle.handlers[children[index2 + 1].type]
+      if (handle2 && handle2.peek) handle2 = handle2.peek
+      after = handle2
+        ? handle2(children[index2 + 1], parent, state, {
+            before: '',
+            after: '',
+            ...tracker.current(),
+          }).charAt(0)
+        : ''
+    } else {
+      after = info.after
+    }
+    if (
+      results.length > 0 &&
+      (before === '\r' || before === '\n') &&
+      child.type === 'html'
+    ) {
+      results[results.length - 1] = results[results.length - 1].replace(
+        /(\r?\n|\r)$/,
+        ' '
+      )
+      before = ' '
+      tracker = state.createTracker(info)
+      tracker.move(results.join(''))
+    }
+    results.push(
+      tracker.move(
+        state.handle(child, parent, state, {
+          ...tracker.current(),
+          before,
+          after,
+        })
+      )
+    )
+    before = results[results.length - 1].slice(-1)
+  }
+  indexStack.pop()
+  return results.join('')
+}
+
+// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
+function checkQuote2(state) {
+  const marker = state.options.quote || '"'
+  if (marker !== '"' && marker !== "'") {
+    throw new Error(
+      'Cannot serialize title with `' +
+        marker +
+        '` for `options.quote`, expected `"`, or `\'`'
+    )
+  }
+  return marker
+}
+
+// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/track.js
+function track2(config) {
+  const options = config || {}
+  const now = options.now || {}
+  let lineShift = options.lineShift || 0
+  let line = now.line || 1
+  let column = now.column || 1
+  return { move, current, shift }
+  function current() {
+    return { now: { line, column }, lineShift }
+  }
+  function shift(value) {
+    lineShift += value
+  }
+  function move(input) {
+    const value = input || ''
+    const chunks = value.split(/\r?\n|\r/g)
+    const tail = chunks[chunks.length - 1]
+    line += chunks.length - 1
+    column =
+      chunks.length === 1 ? column + tail.length : 1 + tail.length + lineShift
+    return value
+  }
+}
+
+// ../../../node_modules/.pnpm/mdast-util-directive@2.2.3/node_modules/mdast-util-directive/lib/index.js
+var own4 = {}.hasOwnProperty
+var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
+handleDirective.peek = peekDirective
+var directiveToMarkdown = {
+  unsafe: [
+    {
+      character: '\r',
+      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    },
+    {
+      character: '\n',
+      inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    },
+    {
+      before: '[^:]',
+      character: ':',
+      after: '[A-Za-z]',
+      inConstruct: ['phrasing'],
+    },
+    { atBreak: true, character: ':', after: ':' },
+  ],
+  handlers: {
+    containerDirective: handleDirective,
+    leafDirective: handleDirective,
+    textDirective: handleDirective,
+  },
+}
+function handleDirective(node, _, state, safeOptions) {
+  const tracker = track2(safeOptions)
+  const sequence = fence(node)
+  const exit4 = state.enter(node.type)
+  let value = tracker.move(sequence + (node.name || ''))
+  let label4
+  if (node.type === 'containerDirective') {
+    const head = (node.children || [])[0]
+    label4 = inlineDirectiveLabel(head) ? head : void 0
+  } else {
+    label4 = node
+  }
+  if (label4 && label4.children && label4.children.length > 0) {
+    const exit5 = state.enter('label')
+    const labelType = `${node.type}Label`
+    const subexit = state.enter(labelType)
+    value += tracker.move('[')
+    value += tracker.move(
+      containerPhrasing2(label4, state, {
+        ...tracker.current(),
+        before: value,
+        after: ']',
+      })
+    )
+    value += tracker.move(']')
+    subexit()
+    exit5()
+  }
+  value += tracker.move(attributes(node, state))
+  if (node.type === 'containerDirective') {
+    const head = (node.children || [])[0]
+    let shallow = node
+    if (inlineDirectiveLabel(head)) {
+      shallow = Object.assign({}, node, { children: node.children.slice(1) })
+    }
+    if (shallow && shallow.children && shallow.children.length > 0) {
+      value += tracker.move('\n')
+      value += tracker.move(containerFlow2(shallow, state, tracker.current()))
+    }
+    value += tracker.move('\n' + sequence)
+  }
+  exit4()
+  return value
+}
+function peekDirective() {
+  return ':'
+}
+function attributes(node, state) {
+  const quote = checkQuote2(state)
+  const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
+  const attrs = node.attributes || {}
+  const values2 = []
+  let classesFull
+  let classes
+  let id
+  let key
+  for (key in attrs) {
+    if (own4.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
+      const value = String(attrs[key])
+      if (key === 'id') {
+        id = shortcut.test(value) ? '#' + value : quoted('id', value)
+      } else if (key === 'class') {
+        const list3 = value.split(/[\t\n\r ]+/g)
+        const classesFullList = []
+        const classesList = []
+        let index2 = -1
+        while (++index2 < list3.length) {
+          ;(shortcut.test(list3[index2]) ? classesList : classesFullList).push(
+            list3[index2]
+          )
+        }
+        classesFull =
+          classesFullList.length > 0
+            ? quoted('class', classesFullList.join(' '))
+            : ''
+        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
+      } else {
+        values2.push(quoted(key, value))
+      }
+    }
+  }
+  if (classesFull) {
+    values2.unshift(classesFull)
+  }
+  if (classes) {
+    values2.unshift(classes)
+  }
+  if (id) {
+    values2.unshift(id)
+  }
+  return values2.length > 0 ? '{' + values2.join(' ') + '}' : ''
+  function quoted(key2, value) {
+    return (
+      key2 +
+      (value
+        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
+        : '')
+    )
+  }
+}
+function inlineDirectiveLabel(node) {
+  return Boolean(
+    node && node.type === 'paragraph' && node.data && node.data.directiveLabel
+  )
+}
+function fence(node) {
+  let size = 0
+  if (node.type === 'containerDirective') {
+    visitParents2(node, function (node2, parents) {
+      if (node2.type === 'containerDirective') {
+        let index2 = parents.length
+        let nesting = 0
+        while (index2--) {
+          if (parents[index2].type === 'containerDirective') {
+            nesting++
+          }
+        }
+        if (nesting > size) size = nesting
+      }
+    })
+    size += 3
+  } else if (node.type === 'leafDirective') {
+    size = 2
+  } else {
+    size = 1
+  }
+  return ':'.repeat(size)
+}
+
 // ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
@@ -36156,6 +35313,7 @@ var stringifyMDX = (value, field, imageCallback) => {
   }
   const tree = rootElement(value, field, imageCallback)
   const res = toTinaMarkdown(tree)
+  return res
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -36227,12 +35385,19 @@ var blockElement = (content3, field, imageCallback) => {
         value: content3.value,
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes: attributes5 } = stringifyProps(
-        content3,
-        field,
-        false,
-        imageCallback
-      )
+      const {
+        children,
+        attributes: attributes5,
+        useDirective,
+      } = stringifyProps(content3, field, false, imageCallback)
+      if (useDirective) {
+        return {
+          type: 'leafDirective',
+          name: content3.name,
+          attributes: content3.props,
+          children: content3.children,
+        }
+      }
       return {
         type: 'mdxJsxFlowElement',
         name: content3.name,
@@ -36503,6 +35668,9 @@ var remarkToSlate = (root3, field, imageCallback, raw) => {
           `Unexpected expression ${content4.value}.`,
           content4.position
         )
+      case 'leafDirective': {
+        return containerDirectiveElement(content4, field, imageCallback, raw)
+      }
       case 'containerDirective': {
         return containerDirectiveElement(content4, field, imageCallback, raw)
       }
@@ -36801,12 +35969,1613 @@ var RichTextParseError = class extends Error {
   }
 }
 
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-attributes.js
+function factoryAttributes(
+  effects,
+  ok2,
+  nok,
+  attributesType,
+  attributesMarkerType,
+  attributeType,
+  attributeIdType,
+  attributeClassType,
+  attributeNameType,
+  attributeInitializerType,
+  attributeValueLiteralType,
+  attributeValueType,
+  attributeValueMarker,
+  attributeValueData,
+  disallowEol
+) {
+  let type
+  let marker
+  return start3
+  function start3(code2) {
+    effects.enter(attributesType)
+    effects.enter(attributesMarkerType)
+    effects.consume(code2)
+    effects.exit(attributesMarkerType)
+    return between2
+  }
+  function between2(code2) {
+    if (code2 === 35) {
+      type = attributeIdType
+      return shortcutStart(code2)
+    }
+    if (code2 === 46) {
+      type = attributeClassType
+      return shortcutStart(code2)
+    }
+    if (code2 === 58 || code2 === 95 || asciiAlpha(code2)) {
+      effects.enter(attributeType)
+      effects.enter(attributeNameType)
+      effects.consume(code2)
+      return name
+    }
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, between2, 'whitespace')(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, between2)(code2)
+    }
+    return end(code2)
+  }
+  function shortcutStart(code2) {
+    effects.enter(attributeType)
+    effects.enter(type)
+    effects.enter(type + 'Marker')
+    effects.consume(code2)
+    effects.exit(type + 'Marker')
+    return shortcutStartAfter
+  }
+  function shortcutStartAfter(code2) {
+    if (
+      code2 === null ||
+      code2 === 34 ||
+      code2 === 35 ||
+      code2 === 39 ||
+      code2 === 46 ||
+      code2 === 60 ||
+      code2 === 61 ||
+      code2 === 62 ||
+      code2 === 96 ||
+      code2 === 125 ||
+      markdownLineEndingOrSpace(code2)
+    ) {
+      return nok(code2)
+    }
+    effects.enter(type + 'Value')
+    effects.consume(code2)
+    return shortcut2
+  }
+  function shortcut2(code2) {
+    if (
+      code2 === null ||
+      code2 === 34 ||
+      code2 === 39 ||
+      code2 === 60 ||
+      code2 === 61 ||
+      code2 === 62 ||
+      code2 === 96
+    ) {
+      return nok(code2)
+    }
+    if (
+      code2 === 35 ||
+      code2 === 46 ||
+      code2 === 125 ||
+      markdownLineEndingOrSpace(code2)
+    ) {
+      effects.exit(type + 'Value')
+      effects.exit(type)
+      effects.exit(attributeType)
+      return between2(code2)
+    }
+    effects.consume(code2)
+    return shortcut2
+  }
+  function name(code2) {
+    if (
+      code2 === 45 ||
+      code2 === 46 ||
+      code2 === 58 ||
+      code2 === 95 ||
+      asciiAlphanumeric(code2)
+    ) {
+      effects.consume(code2)
+      return name
+    }
+    effects.exit(attributeNameType)
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, nameAfter, 'whitespace')(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, nameAfter)(code2)
+    }
+    return nameAfter(code2)
+  }
+  function nameAfter(code2) {
+    if (code2 === 61) {
+      effects.enter(attributeInitializerType)
+      effects.consume(code2)
+      effects.exit(attributeInitializerType)
+      return valueBefore
+    }
+    effects.exit(attributeType)
+    return between2(code2)
+  }
+  function valueBefore(code2) {
+    if (
+      code2 === null ||
+      code2 === 60 ||
+      code2 === 61 ||
+      code2 === 62 ||
+      code2 === 96 ||
+      code2 === 125 ||
+      (disallowEol && markdownLineEnding(code2))
+    ) {
+      return nok(code2)
+    }
+    if (code2 === 34 || code2 === 39) {
+      effects.enter(attributeValueLiteralType)
+      effects.enter(attributeValueMarker)
+      effects.consume(code2)
+      effects.exit(attributeValueMarker)
+      marker = code2
+      return valueQuotedStart
+    }
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, valueBefore, 'whitespace')(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, valueBefore)(code2)
+    }
+    effects.enter(attributeValueType)
+    effects.enter(attributeValueData)
+    effects.consume(code2)
+    marker = void 0
+    return valueUnquoted
+  }
+  function valueUnquoted(code2) {
+    if (
+      code2 === null ||
+      code2 === 34 ||
+      code2 === 39 ||
+      code2 === 60 ||
+      code2 === 61 ||
+      code2 === 62 ||
+      code2 === 96
+    ) {
+      return nok(code2)
+    }
+    if (code2 === 125 || markdownLineEndingOrSpace(code2)) {
+      effects.exit(attributeValueData)
+      effects.exit(attributeValueType)
+      effects.exit(attributeType)
+      return between2(code2)
+    }
+    effects.consume(code2)
+    return valueUnquoted
+  }
+  function valueQuotedStart(code2) {
+    if (code2 === marker) {
+      effects.enter(attributeValueMarker)
+      effects.consume(code2)
+      effects.exit(attributeValueMarker)
+      effects.exit(attributeValueLiteralType)
+      effects.exit(attributeType)
+      return valueQuotedAfter
+    }
+    effects.enter(attributeValueType)
+    return valueQuotedBetween(code2)
+  }
+  function valueQuotedBetween(code2) {
+    if (code2 === marker) {
+      effects.exit(attributeValueType)
+      return valueQuotedStart(code2)
+    }
+    if (code2 === null) {
+      return nok(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      return disallowEol
+        ? nok(code2)
+        : factoryWhitespace(effects, valueQuotedBetween)(code2)
+    }
+    effects.enter(attributeValueData)
+    effects.consume(code2)
+    return valueQuoted
+  }
+  function valueQuoted(code2) {
+    if (code2 === marker || code2 === null || markdownLineEnding(code2)) {
+      effects.exit(attributeValueData)
+      return valueQuotedBetween(code2)
+    }
+    effects.consume(code2)
+    return valueQuoted
+  }
+  function valueQuotedAfter(code2) {
+    return code2 === 125 || markdownLineEndingOrSpace(code2)
+      ? between2(code2)
+      : end(code2)
+  }
+  function end(code2) {
+    if (code2 === 125) {
+      effects.enter(attributesMarkerType)
+      effects.consume(code2)
+      effects.exit(attributesMarkerType)
+      effects.exit(attributesType)
+      return ok2
+    }
+    return nok(code2)
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-label.js
+function factoryLabel2(
+  effects,
+  ok2,
+  nok,
+  type,
+  markerType,
+  stringType,
+  disallowEol
+) {
+  let size = 0
+  let balance = 0
+  let previous3
+  return start3
+  function start3(code2) {
+    effects.enter(type)
+    effects.enter(markerType)
+    effects.consume(code2)
+    effects.exit(markerType)
+    return afterStart
+  }
+  function afterStart(code2) {
+    if (code2 === 93) {
+      effects.enter(markerType)
+      effects.consume(code2)
+      effects.exit(markerType)
+      effects.exit(type)
+      return ok2
+    }
+    effects.enter(stringType)
+    return lineStart(code2)
+  }
+  function lineStart(code2) {
+    if (code2 === 93 && !balance) {
+      return atClosingBrace(code2)
+    }
+    const token = effects.enter('chunkText', {
+      contentType: 'text',
+      previous: previous3,
+    })
+    if (previous3) previous3.next = token
+    previous3 = token
+    return data(code2)
+  }
+  function data(code2) {
+    if (code2 === null || size > 999) {
+      return nok(code2)
+    }
+    if (code2 === 91 && ++balance > 32) {
+      return nok(code2)
+    }
+    if (code2 === 93 && !balance--) {
+      effects.exit('chunkText')
+      return atClosingBrace(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      if (disallowEol) {
+        return nok(code2)
+      }
+      effects.consume(code2)
+      effects.exit('chunkText')
+      return lineStart
+    }
+    effects.consume(code2)
+    return code2 === 92 ? dataEscape : data
+  }
+  function dataEscape(code2) {
+    if (code2 === 91 || code2 === 92 || code2 === 93) {
+      effects.consume(code2)
+      size++
+      return data
+    }
+    return data(code2)
+  }
+  function atClosingBrace(code2) {
+    effects.exit(stringType)
+    effects.enter(markerType)
+    effects.consume(code2)
+    effects.exit(markerType)
+    effects.exit(type)
+    return ok2
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-name.js
+function factoryName(effects, ok2, nok, type) {
+  const self2 = this
+  return start3
+  function start3(code2) {
+    if (asciiAlpha(code2)) {
+      effects.enter(type)
+      effects.consume(code2)
+      return name
+    }
+    return nok(code2)
+  }
+  function name(code2) {
+    if (code2 === 45 || code2 === 95 || asciiAlphanumeric(code2)) {
+      effects.consume(code2)
+      return name
+    }
+    effects.exit(type)
+    return self2.previous === 45 || self2.previous === 95
+      ? nok(code2)
+      : ok2(code2)
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-container.js
+var directiveContainer = {
+  tokenize: tokenizeDirectiveContainer,
+  concrete: true,
+}
+var label = {
+  tokenize: tokenizeLabel,
+  partial: true,
+}
+var attributes2 = {
+  tokenize: tokenizeAttributes,
+  partial: true,
+}
+var nonLazyLine = {
+  tokenize: tokenizeNonLazyLine,
+  partial: true,
+}
+function tokenizeDirectiveContainer(effects, ok2, nok) {
+  const self2 = this
+  const tail = self2.events[self2.events.length - 1]
+  const initialSize =
+    tail && tail[1].type === 'linePrefix'
+      ? tail[2].sliceSerialize(tail[1], true).length
+      : 0
+  let sizeOpen = 0
+  let previous3
+  return start3
+  function start3(code2) {
+    effects.enter('directiveContainer')
+    effects.enter('directiveContainerFence')
+    effects.enter('directiveContainerSequence')
+    return sequenceOpen(code2)
+  }
+  function sequenceOpen(code2) {
+    if (code2 === 58) {
+      effects.consume(code2)
+      sizeOpen++
+      return sequenceOpen
+    }
+    if (sizeOpen < 3) {
+      return nok(code2)
+    }
+    effects.exit('directiveContainerSequence')
+    return factoryName.call(
+      self2,
+      effects,
+      afterName,
+      nok,
+      'directiveContainerName'
+    )(code2)
+  }
+  function afterName(code2) {
+    return code2 === 91
+      ? effects.attempt(label, afterLabel, afterLabel)(code2)
+      : afterLabel(code2)
+  }
+  function afterLabel(code2) {
+    return code2 === 123
+      ? effects.attempt(attributes2, afterAttributes, afterAttributes)(code2)
+      : afterAttributes(code2)
+  }
+  function afterAttributes(code2) {
+    return factorySpace(effects, openAfter, 'whitespace')(code2)
+  }
+  function openAfter(code2) {
+    effects.exit('directiveContainerFence')
+    if (code2 === null) {
+      return afterOpening(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      if (self2.interrupt) {
+        return ok2(code2)
+      }
+      return effects.attempt(nonLazyLine, contentStart, afterOpening)(code2)
+    }
+    return nok(code2)
+  }
+  function afterOpening(code2) {
+    effects.exit('directiveContainer')
+    return ok2(code2)
+  }
+  function contentStart(code2) {
+    if (code2 === null) {
+      effects.exit('directiveContainer')
+      return ok2(code2)
+    }
+    effects.enter('directiveContainerContent')
+    return lineStart(code2)
+  }
+  function lineStart(code2) {
+    if (code2 === null) {
+      return after(code2)
+    }
+    return effects.attempt(
+      {
+        tokenize: tokenizeClosingFence,
+        partial: true,
+      },
+      after,
+      initialSize
+        ? factorySpace(effects, chunkStart, 'linePrefix', initialSize + 1)
+        : chunkStart
+    )(code2)
+  }
+  function chunkStart(code2) {
+    if (code2 === null) {
+      return after(code2)
+    }
+    const token = effects.enter('chunkDocument', {
+      contentType: 'document',
+      previous: previous3,
+    })
+    if (previous3) previous3.next = token
+    previous3 = token
+    return contentContinue(code2)
+  }
+  function contentContinue(code2) {
+    if (code2 === null) {
+      const t = effects.exit('chunkDocument')
+      self2.parser.lazy[t.start.line] = false
+      return after(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      return effects.check(nonLazyLine, nonLazyLineAfter, lineAfter)(code2)
+    }
+    effects.consume(code2)
+    return contentContinue
+  }
+  function nonLazyLineAfter(code2) {
+    effects.consume(code2)
+    const t = effects.exit('chunkDocument')
+    self2.parser.lazy[t.start.line] = false
+    return lineStart
+  }
+  function lineAfter(code2) {
+    const t = effects.exit('chunkDocument')
+    self2.parser.lazy[t.start.line] = false
+    return after(code2)
+  }
+  function after(code2) {
+    effects.exit('directiveContainerContent')
+    effects.exit('directiveContainer')
+    return ok2(code2)
+  }
+  function tokenizeClosingFence(effects2, ok3, nok2) {
+    let size = 0
+    return factorySpace(effects2, closingPrefixAfter, 'linePrefix', 4)
+    function closingPrefixAfter(code2) {
+      effects2.enter('directiveContainerFence')
+      effects2.enter('directiveContainerSequence')
+      return closingSequence(code2)
+    }
+    function closingSequence(code2) {
+      if (code2 === 58) {
+        effects2.consume(code2)
+        size++
+        return closingSequence
+      }
+      if (size < sizeOpen) return nok2(code2)
+      effects2.exit('directiveContainerSequence')
+      return factorySpace(effects2, closingSequenceEnd, 'whitespace')(code2)
+    }
+    function closingSequenceEnd(code2) {
+      if (code2 === null || markdownLineEnding(code2)) {
+        effects2.exit('directiveContainerFence')
+        return ok3(code2)
+      }
+      return nok2(code2)
+    }
+  }
+}
+function tokenizeLabel(effects, ok2, nok) {
+  return factoryLabel2(
+    effects,
+    ok2,
+    nok,
+    'directiveContainerLabel',
+    'directiveContainerLabelMarker',
+    'directiveContainerLabelString',
+    true
+  )
+}
+function tokenizeAttributes(effects, ok2, nok) {
+  return factoryAttributes(
+    effects,
+    ok2,
+    nok,
+    'directiveContainerAttributes',
+    'directiveContainerAttributesMarker',
+    'directiveContainerAttribute',
+    'directiveContainerAttributeId',
+    'directiveContainerAttributeClass',
+    'directiveContainerAttributeName',
+    'directiveContainerAttributeInitializerMarker',
+    'directiveContainerAttributeValueLiteral',
+    'directiveContainerAttributeValue',
+    'directiveContainerAttributeValueMarker',
+    'directiveContainerAttributeValueData',
+    true
+  )
+}
+function tokenizeNonLazyLine(effects, ok2, nok) {
+  const self2 = this
+  return start3
+  function start3(code2) {
+    effects.enter('lineEnding')
+    effects.consume(code2)
+    effects.exit('lineEnding')
+    return lineStart
+  }
+  function lineStart(code2) {
+    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok2(code2)
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-leaf.js
+var directiveLeaf = {
+  tokenize: tokenizeDirectiveLeaf,
+}
+var label2 = {
+  tokenize: tokenizeLabel2,
+  partial: true,
+}
+var attributes3 = {
+  tokenize: tokenizeAttributes2,
+  partial: true,
+}
+function tokenizeDirectiveLeaf(effects, ok2, nok) {
+  const self2 = this
+  return start3
+  function start3(code2) {
+    effects.enter('directiveLeaf')
+    effects.enter('directiveLeafSequence')
+    effects.consume(code2)
+    return inStart
+  }
+  function inStart(code2) {
+    if (code2 === 58) {
+      effects.consume(code2)
+      effects.exit('directiveLeafSequence')
+      return factoryName.call(
+        self2,
+        effects,
+        afterName,
+        nok,
+        'directiveLeafName'
+      )
+    }
+    return nok(code2)
+  }
+  function afterName(code2) {
+    return code2 === 91
+      ? effects.attempt(label2, afterLabel, afterLabel)(code2)
+      : afterLabel(code2)
+  }
+  function afterLabel(code2) {
+    return code2 === 123
+      ? effects.attempt(attributes3, afterAttributes, afterAttributes)(code2)
+      : afterAttributes(code2)
+  }
+  function afterAttributes(code2) {
+    return factorySpace(effects, end, 'whitespace')(code2)
+  }
+  function end(code2) {
+    if (code2 === null || markdownLineEnding(code2)) {
+      effects.exit('directiveLeaf')
+      return ok2(code2)
+    }
+    return nok(code2)
+  }
+}
+function tokenizeLabel2(effects, ok2, nok) {
+  return factoryLabel2(
+    effects,
+    ok2,
+    nok,
+    'directiveLeafLabel',
+    'directiveLeafLabelMarker',
+    'directiveLeafLabelString',
+    true
+  )
+}
+function tokenizeAttributes2(effects, ok2, nok) {
+  return factoryAttributes(
+    effects,
+    ok2,
+    nok,
+    'directiveLeafAttributes',
+    'directiveLeafAttributesMarker',
+    'directiveLeafAttribute',
+    'directiveLeafAttributeId',
+    'directiveLeafAttributeClass',
+    'directiveLeafAttributeName',
+    'directiveLeafAttributeInitializerMarker',
+    'directiveLeafAttributeValueLiteral',
+    'directiveLeafAttributeValue',
+    'directiveLeafAttributeValueMarker',
+    'directiveLeafAttributeValueData',
+    true
+  )
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-text.js
+var directiveText = {
+  tokenize: tokenizeDirectiveText,
+  previous: previous2,
+}
+var label3 = {
+  tokenize: tokenizeLabel3,
+  partial: true,
+}
+var attributes4 = {
+  tokenize: tokenizeAttributes3,
+  partial: true,
+}
+function previous2(code2) {
+  return (
+    code2 !== 58 ||
+    this.events[this.events.length - 1][1].type === 'characterEscape'
+  )
+}
+function tokenizeDirectiveText(effects, ok2, nok) {
+  const self2 = this
+  return start3
+  function start3(code2) {
+    effects.enter('directiveText')
+    effects.enter('directiveTextMarker')
+    effects.consume(code2)
+    effects.exit('directiveTextMarker')
+    return factoryName.call(self2, effects, afterName, nok, 'directiveTextName')
+  }
+  function afterName(code2) {
+    return code2 === 58
+      ? nok(code2)
+      : code2 === 91
+      ? effects.attempt(label3, afterLabel, afterLabel)(code2)
+      : afterLabel(code2)
+  }
+  function afterLabel(code2) {
+    return code2 === 123
+      ? effects.attempt(attributes4, afterAttributes, afterAttributes)(code2)
+      : afterAttributes(code2)
+  }
+  function afterAttributes(code2) {
+    effects.exit('directiveText')
+    return ok2(code2)
+  }
+}
+function tokenizeLabel3(effects, ok2, nok) {
+  return factoryLabel2(
+    effects,
+    ok2,
+    nok,
+    'directiveTextLabel',
+    'directiveTextLabelMarker',
+    'directiveTextLabelString'
+  )
+}
+function tokenizeAttributes3(effects, ok2, nok) {
+  return factoryAttributes(
+    effects,
+    ok2,
+    nok,
+    'directiveTextAttributes',
+    'directiveTextAttributesMarker',
+    'directiveTextAttribute',
+    'directiveTextAttributeId',
+    'directiveTextAttributeClass',
+    'directiveTextAttributeName',
+    'directiveTextAttributeInitializerMarker',
+    'directiveTextAttributeValueLiteral',
+    'directiveTextAttributeValue',
+    'directiveTextAttributeValueMarker',
+    'directiveTextAttributeValueData'
+  )
+}
+
+// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/syntax.js
+function directive() {
+  return {
+    text: {
+      [58]: directiveText,
+    },
+    flow: {
+      [58]: [directiveContainer, directiveLeaf],
+    },
+  }
+}
+
+// ../mdx/src/extensions/directive/from-markdown.ts
+var own5 = {}.hasOwnProperty
+var enterContainer = function (token) {
+  enter.call(this, 'containerDirective', token)
+}
+var enterLeaf = function (token) {
+  enter.call(this, 'leafDirective', token)
+}
+var enterText = function (token) {
+  enter.call(this, 'textDirective', token)
+}
+var enter = function (type, token) {
+  this.enter({ type, name: '', attributes: {}, children: [] }, token)
+}
+function exitName(token) {
+  const node = this.stack[this.stack.length - 1]
+  node.name = this.sliceSerialize(token)
+}
+var enterContainerLabel = function (token) {
+  this.enter(
+    { type: 'paragraph', data: { directiveLabel: true }, children: [] },
+    token
+  )
+}
+var exitContainerLabel = function (token) {
+  this.exit(token)
+}
+var enterAttributes = function () {
+  this.setData('directiveAttributes', [])
+  this.buffer()
+}
+var exitAttributeIdValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3.push([
+      'id',
+      parseEntities(this.sliceSerialize(token), {
+        attribute: true,
+      }),
+    ])
+  }
+}
+var exitAttributeClassValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3.push([
+      'class',
+      parseEntities(this.sliceSerialize(token), {
+        attribute: true,
+      }),
+    ])
+  }
+}
+var exitAttributeValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3[list3.length - 1][1] = parseEntities(this.sliceSerialize(token), {
+      attribute: true,
+    })
+  }
+}
+var exitAttributeName = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    const name = this.sliceSerialize(token)
+    if (!name) {
+      list3.push(['_value', ''])
+    } else {
+      list3.push([this.sliceSerialize(token), ''])
+    }
+  }
+}
+function exitAttributes() {
+  const list3 = this.getData('directiveAttributes')
+  const cleaned = {}
+  let index2 = -1
+  if (list3) {
+    while (++index2 < list3.length) {
+      const attribute = list3[index2]
+      if (attribute[0] === 'class' && cleaned.class) {
+        cleaned.class += ' ' + attribute[1]
+      } else {
+        cleaned[attribute[0]] = attribute[1]
+      }
+    }
+  }
+  this.setData('directiveAttributes')
+  this.resume()
+  const node = this.stack[this.stack.length - 1]
+  node.attributes = cleaned
+}
+function exit2(token) {
+  this.exit(token)
+}
+var directiveFromMarkdown2 = {
+  canContainEols: ['textDirective'],
+  enter: {
+    directiveContainer: enterContainer,
+    directiveContainerAttributes: enterAttributes,
+    directiveContainerLabel: enterContainerLabel,
+    directiveLeaf: enterLeaf,
+    directiveLeafAttributes: enterAttributes,
+    directiveText: enterText,
+    directiveTextAttributes: enterAttributes,
+  },
+  exit: {
+    directiveContainer: exit2,
+    directiveContainerAttributeClassValue: exitAttributeClassValue,
+    directiveContainerAttributeIdValue: exitAttributeIdValue,
+    directiveContainerAttributeName: exitAttributeName,
+    directiveContainerAttributeValue: exitAttributeValue,
+    directiveContainerAttributes: exitAttributes,
+    directiveContainerLabel: exitContainerLabel,
+    directiveContainerName: exitName,
+    directiveLeaf: exit2,
+    directiveLeafAttributeClassValue: exitAttributeClassValue,
+    directiveLeafAttributeIdValue: exitAttributeIdValue,
+    directiveLeafAttributeName: exitAttributeName,
+    directiveLeafAttributeValue: exitAttributeValue,
+    directiveLeafAttributes: exitAttributes,
+    directiveLeafName: exitName,
+    directiveText: exit2,
+    directiveTextAttributeClassValue: exitAttributeClassValue,
+    directiveTextAttributeIdValue: exitAttributeIdValue,
+    directiveTextAttributeName: exitAttributeName,
+    directiveTextAttributeValue: exitAttributeValue,
+    directiveTextAttributes: exitAttributes,
+    directiveTextName: exitName,
+  },
+}
+
+// ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/codes.js
+var codes = {
+  carriageReturn: -5,
+  lineFeed: -4,
+  carriageReturnLineFeed: -3,
+  horizontalTab: -2,
+  virtualSpace: -1,
+  eof: null,
+  nul: 0,
+  soh: 1,
+  stx: 2,
+  etx: 3,
+  eot: 4,
+  enq: 5,
+  ack: 6,
+  bel: 7,
+  bs: 8,
+  ht: 9,
+  lf: 10,
+  vt: 11,
+  ff: 12,
+  cr: 13,
+  so: 14,
+  si: 15,
+  dle: 16,
+  dc1: 17,
+  dc2: 18,
+  dc3: 19,
+  dc4: 20,
+  nak: 21,
+  syn: 22,
+  etb: 23,
+  can: 24,
+  em: 25,
+  sub: 26,
+  esc: 27,
+  fs: 28,
+  gs: 29,
+  rs: 30,
+  us: 31,
+  space: 32,
+  exclamationMark: 33,
+  quotationMark: 34,
+  numberSign: 35,
+  dollarSign: 36,
+  percentSign: 37,
+  ampersand: 38,
+  apostrophe: 39,
+  leftParenthesis: 40,
+  rightParenthesis: 41,
+  asterisk: 42,
+  plusSign: 43,
+  comma: 44,
+  dash: 45,
+  dot: 46,
+  slash: 47,
+  digit0: 48,
+  digit1: 49,
+  digit2: 50,
+  digit3: 51,
+  digit4: 52,
+  digit5: 53,
+  digit6: 54,
+  digit7: 55,
+  digit8: 56,
+  digit9: 57,
+  colon: 58,
+  semicolon: 59,
+  lessThan: 60,
+  equalsTo: 61,
+  greaterThan: 62,
+  questionMark: 63,
+  atSign: 64,
+  uppercaseA: 65,
+  uppercaseB: 66,
+  uppercaseC: 67,
+  uppercaseD: 68,
+  uppercaseE: 69,
+  uppercaseF: 70,
+  uppercaseG: 71,
+  uppercaseH: 72,
+  uppercaseI: 73,
+  uppercaseJ: 74,
+  uppercaseK: 75,
+  uppercaseL: 76,
+  uppercaseM: 77,
+  uppercaseN: 78,
+  uppercaseO: 79,
+  uppercaseP: 80,
+  uppercaseQ: 81,
+  uppercaseR: 82,
+  uppercaseS: 83,
+  uppercaseT: 84,
+  uppercaseU: 85,
+  uppercaseV: 86,
+  uppercaseW: 87,
+  uppercaseX: 88,
+  uppercaseY: 89,
+  uppercaseZ: 90,
+  leftSquareBracket: 91,
+  backslash: 92,
+  rightSquareBracket: 93,
+  caret: 94,
+  underscore: 95,
+  graveAccent: 96,
+  lowercaseA: 97,
+  lowercaseB: 98,
+  lowercaseC: 99,
+  lowercaseD: 100,
+  lowercaseE: 101,
+  lowercaseF: 102,
+  lowercaseG: 103,
+  lowercaseH: 104,
+  lowercaseI: 105,
+  lowercaseJ: 106,
+  lowercaseK: 107,
+  lowercaseL: 108,
+  lowercaseM: 109,
+  lowercaseN: 110,
+  lowercaseO: 111,
+  lowercaseP: 112,
+  lowercaseQ: 113,
+  lowercaseR: 114,
+  lowercaseS: 115,
+  lowercaseT: 116,
+  lowercaseU: 117,
+  lowercaseV: 118,
+  lowercaseW: 119,
+  lowercaseX: 120,
+  lowercaseY: 121,
+  lowercaseZ: 122,
+  leftCurlyBrace: 123,
+  verticalBar: 124,
+  rightCurlyBrace: 125,
+  tilde: 126,
+  del: 127,
+  byteOrderMarker: 65279,
+  replacementCharacter: 65533,
+}
+
+// ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/types.js
+var types = {
+  data: 'data',
+  whitespace: 'whitespace',
+  lineEnding: 'lineEnding',
+  lineEndingBlank: 'lineEndingBlank',
+  linePrefix: 'linePrefix',
+  lineSuffix: 'lineSuffix',
+  atxHeading: 'atxHeading',
+  atxHeadingSequence: 'atxHeadingSequence',
+  atxHeadingText: 'atxHeadingText',
+  autolink: 'autolink',
+  autolinkEmail: 'autolinkEmail',
+  autolinkMarker: 'autolinkMarker',
+  autolinkProtocol: 'autolinkProtocol',
+  characterEscape: 'characterEscape',
+  characterEscapeValue: 'characterEscapeValue',
+  characterReference: 'characterReference',
+  characterReferenceMarker: 'characterReferenceMarker',
+  characterReferenceMarkerNumeric: 'characterReferenceMarkerNumeric',
+  characterReferenceMarkerHexadecimal: 'characterReferenceMarkerHexadecimal',
+  characterReferenceValue: 'characterReferenceValue',
+  codeFenced: 'codeFenced',
+  codeFencedFence: 'codeFencedFence',
+  codeFencedFenceSequence: 'codeFencedFenceSequence',
+  codeFencedFenceInfo: 'codeFencedFenceInfo',
+  codeFencedFenceMeta: 'codeFencedFenceMeta',
+  codeFlowValue: 'codeFlowValue',
+  codeIndented: 'codeIndented',
+  codeText: 'codeText',
+  codeTextData: 'codeTextData',
+  codeTextPadding: 'codeTextPadding',
+  codeTextSequence: 'codeTextSequence',
+  content: 'content',
+  definition: 'definition',
+  definitionDestination: 'definitionDestination',
+  definitionDestinationLiteral: 'definitionDestinationLiteral',
+  definitionDestinationLiteralMarker: 'definitionDestinationLiteralMarker',
+  definitionDestinationRaw: 'definitionDestinationRaw',
+  definitionDestinationString: 'definitionDestinationString',
+  definitionLabel: 'definitionLabel',
+  definitionLabelMarker: 'definitionLabelMarker',
+  definitionLabelString: 'definitionLabelString',
+  definitionMarker: 'definitionMarker',
+  definitionTitle: 'definitionTitle',
+  definitionTitleMarker: 'definitionTitleMarker',
+  definitionTitleString: 'definitionTitleString',
+  emphasis: 'emphasis',
+  emphasisSequence: 'emphasisSequence',
+  emphasisText: 'emphasisText',
+  escapeMarker: 'escapeMarker',
+  hardBreakEscape: 'hardBreakEscape',
+  hardBreakTrailing: 'hardBreakTrailing',
+  htmlFlow: 'htmlFlow',
+  htmlFlowData: 'htmlFlowData',
+  htmlText: 'htmlText',
+  htmlTextData: 'htmlTextData',
+  image: 'image',
+  label: 'label',
+  labelText: 'labelText',
+  labelLink: 'labelLink',
+  labelImage: 'labelImage',
+  labelMarker: 'labelMarker',
+  labelImageMarker: 'labelImageMarker',
+  labelEnd: 'labelEnd',
+  link: 'link',
+  paragraph: 'paragraph',
+  reference: 'reference',
+  referenceMarker: 'referenceMarker',
+  referenceString: 'referenceString',
+  resource: 'resource',
+  resourceDestination: 'resourceDestination',
+  resourceDestinationLiteral: 'resourceDestinationLiteral',
+  resourceDestinationLiteralMarker: 'resourceDestinationLiteralMarker',
+  resourceDestinationRaw: 'resourceDestinationRaw',
+  resourceDestinationString: 'resourceDestinationString',
+  resourceMarker: 'resourceMarker',
+  resourceTitle: 'resourceTitle',
+  resourceTitleMarker: 'resourceTitleMarker',
+  resourceTitleString: 'resourceTitleString',
+  setextHeading: 'setextHeading',
+  setextHeadingText: 'setextHeadingText',
+  setextHeadingLine: 'setextHeadingLine',
+  setextHeadingLineSequence: 'setextHeadingLineSequence',
+  strong: 'strong',
+  strongSequence: 'strongSequence',
+  strongText: 'strongText',
+  thematicBreak: 'thematicBreak',
+  thematicBreakSequence: 'thematicBreakSequence',
+  blockQuote: 'blockQuote',
+  blockQuotePrefix: 'blockQuotePrefix',
+  blockQuoteMarker: 'blockQuoteMarker',
+  blockQuotePrefixWhitespace: 'blockQuotePrefixWhitespace',
+  listOrdered: 'listOrdered',
+  listUnordered: 'listUnordered',
+  listItemIndent: 'listItemIndent',
+  listItemMarker: 'listItemMarker',
+  listItemPrefix: 'listItemPrefix',
+  listItemPrefixWhitespace: 'listItemPrefixWhitespace',
+  listItemValue: 'listItemValue',
+  chunkDocument: 'chunkDocument',
+  chunkContent: 'chunkContent',
+  chunkFlow: 'chunkFlow',
+  chunkText: 'chunkText',
+  chunkString: 'chunkString',
+}
+
+// ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/values.js
+var values = {
+  ht: '	',
+  lf: '\n',
+  cr: '\r',
+  space: ' ',
+  exclamationMark: '!',
+  quotationMark: '"',
+  numberSign: '#',
+  dollarSign: '$',
+  percentSign: '%',
+  ampersand: '&',
+  apostrophe: "'",
+  leftParenthesis: '(',
+  rightParenthesis: ')',
+  asterisk: '*',
+  plusSign: '+',
+  comma: ',',
+  dash: '-',
+  dot: '.',
+  slash: '/',
+  digit0: '0',
+  digit1: '1',
+  digit2: '2',
+  digit3: '3',
+  digit4: '4',
+  digit5: '5',
+  digit6: '6',
+  digit7: '7',
+  digit8: '8',
+  digit9: '9',
+  colon: ':',
+  semicolon: ';',
+  lessThan: '<',
+  equalsTo: '=',
+  greaterThan: '>',
+  questionMark: '?',
+  atSign: '@',
+  uppercaseA: 'A',
+  uppercaseB: 'B',
+  uppercaseC: 'C',
+  uppercaseD: 'D',
+  uppercaseE: 'E',
+  uppercaseF: 'F',
+  uppercaseG: 'G',
+  uppercaseH: 'H',
+  uppercaseI: 'I',
+  uppercaseJ: 'J',
+  uppercaseK: 'K',
+  uppercaseL: 'L',
+  uppercaseM: 'M',
+  uppercaseN: 'N',
+  uppercaseO: 'O',
+  uppercaseP: 'P',
+  uppercaseQ: 'Q',
+  uppercaseR: 'R',
+  uppercaseS: 'S',
+  uppercaseT: 'T',
+  uppercaseU: 'U',
+  uppercaseV: 'V',
+  uppercaseW: 'W',
+  uppercaseX: 'X',
+  uppercaseY: 'Y',
+  uppercaseZ: 'Z',
+  leftSquareBracket: '[',
+  backslash: '\\',
+  rightSquareBracket: ']',
+  caret: '^',
+  underscore: '_',
+  graveAccent: '`',
+  lowercaseA: 'a',
+  lowercaseB: 'b',
+  lowercaseC: 'c',
+  lowercaseD: 'd',
+  lowercaseE: 'e',
+  lowercaseF: 'f',
+  lowercaseG: 'g',
+  lowercaseH: 'h',
+  lowercaseI: 'i',
+  lowercaseJ: 'j',
+  lowercaseK: 'k',
+  lowercaseL: 'l',
+  lowercaseM: 'm',
+  lowercaseN: 'n',
+  lowercaseO: 'o',
+  lowercaseP: 'p',
+  lowercaseQ: 'q',
+  lowercaseR: 'r',
+  lowercaseS: 's',
+  lowercaseT: 't',
+  lowercaseU: 'u',
+  lowercaseV: 'v',
+  lowercaseW: 'w',
+  lowercaseX: 'x',
+  lowercaseY: 'y',
+  lowercaseZ: 'z',
+  leftCurlyBrace: '{',
+  verticalBar: '|',
+  rightCurlyBrace: '}',
+  tilde: '~',
+  replacementCharacter: '\uFFFD',
+}
+
+// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
+var findValue = (string3) => {
+  let lookupValue = null
+  Object.entries(values).forEach(([key, value]) => {
+    if (value === string3) {
+      lookupValue = key
+    }
+  })
+  return lookupValue
+}
+var findCode = (string3) => {
+  const lookup = findValue(string3)
+  let lookupValue = null
+  if (lookup) {
+    Object.entries(codes).forEach(([key, value]) => {
+      if (key === lookup) {
+        lookupValue = value
+      }
+    })
+  }
+  return lookupValue
+}
+var tokenizeLeaf = function (pattern) {
+  const startPattern = pattern.start
+  const endPattern = pattern.end
+  const tokenizeDirectiveLeaf2 = function (effects, ok2, nok) {
+    const self2 = this
+    const logSelf = () => {
+      self2.events.forEach((e) => {
+        console.log(`${e[0]} - ${e[1].type}`)
+      })
+    }
+    let startIndex = 0
+    let endIndex = 0
+    const start3 = function (code2) {
+      effects.enter('shortcode')
+      effects.enter('shortcodeOpen')
+      effects.consume(code2)
+      if (startPattern.length - 1 === startIndex) {
+        effects.exit('shortcodeOpen')
+        return startName
+      } else {
+        startIndex = startIndex + 1
+        return startSequence
+      }
+    }
+    const startSequence = function (code2) {
+      const nextItem = startPattern[startIndex]
+      if (code2 === findCode(nextItem)) {
+        effects.consume(code2)
+        if (startPattern.length - 1 === startIndex) {
+          effects.exit('shortcodeOpen')
+          return startName
+        } else {
+          startIndex = startIndex + 1
+          return startSequence
+        }
+      }
+      return nok(code2)
+    }
+    const startName = function (code2) {
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, startName, types.whitespace)(code2)
+      }
+      if (asciiAlpha(code2)) {
+        effects.enter('shortcodeName')
+        effects.consume(code2)
+        return nameName
+      }
+      return nok(code2)
+    }
+    const nameName = function (code2) {
+      if (
+        code2 === codes.dash ||
+        code2 === codes.underscore ||
+        asciiAlphanumeric(code2)
+      ) {
+        effects.consume(code2)
+        return nameName
+      }
+      effects.exit('shortcodeName')
+      return self2.previous === codes.dash ||
+        self2.previous === codes.underscore
+        ? nok(code2)
+        : attributes5(code2)
+    }
+    const attributes5 = function (code2) {
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, attributes5, types.whitespace)(code2)
+      }
+      if (
+        code2 === codes.dash ||
+        code2 === codes.underscore ||
+        code2 === codes.quotationMark ||
+        asciiAlphanumeric(code2)
+      ) {
+        return between2(code2)
+      }
+      if (code2 === findCode(endPattern[endIndex])) {
+        effects.enter('shortcodeClose')
+        effects.consume(code2)
+        if (endPattern.length - 1 === endIndex) {
+          effects.exit('shortcodeClose')
+          return end
+        } else {
+          endIndex = endIndex + 1
+          return endSequence
+        }
+      }
+      return nok(code2)
+    }
+    const endSequence = function (code2) {
+      const nextItem = endPattern[endIndex]
+      if (code2 === findCode(nextItem)) {
+        effects.consume(code2)
+        if (endPattern.length - 1 === endIndex) {
+          effects.exit('shortcodeClose')
+          return end
+        } else {
+          endIndex = endIndex + 1
+          return endSequence
+        }
+      }
+      return nok(code2)
+    }
+    const end = function (code2) {
+      if (code2 === codes.eof || markdownLineEnding(code2)) {
+        effects.exit('shortcode')
+        return ok2(code2)
+      }
+      return nok(code2)
+    }
+    const okInside = end
+    const between2 = function (code2) {
+      const disallowEol = true
+      let marker
+      const end2 = function (code3) {
+        const nextItem = endPattern[endIndex]
+        if (code3 === findCode(nextItem)) {
+          if (endPattern.length - 1 === endIndex) {
+            effects.enter('directiveLeafAttributesMarker')
+            effects.consume(code3)
+            effects.exit('directiveLeafAttributesMarker')
+            effects.exit('directiveLeafAttributes')
+            effects.exit('shortcodeClose')
+            return okInside
+          } else {
+            effects.exit('directiveLeafAttributes')
+            effects.enter('shortcodeClose')
+            effects.consume(code3)
+            endIndex = endIndex + 1
+            return endSequence
+          }
+        }
+        return nok(code3)
+      }
+      const valueQuotedAfter = function (code3) {
+        return code3 === codes.rightCurlyBrace ||
+          markdownLineEndingOrSpace(code3)
+          ? between3(code3)
+          : end2(code3)
+      }
+      const valueQuoted = function (code3) {
+        if (
+          code3 === marker ||
+          code3 === codes.eof ||
+          markdownLineEnding(code3)
+        ) {
+          effects.exit('directiveLeafAttributeValueData')
+          return valueQuotedBetween(code3)
+        }
+        effects.consume(code3)
+        return valueQuoted
+      }
+      const valueQuotedBetween = function (code3) {
+        if (code3 === marker) {
+          effects.exit('directiveLeafAttributeValue')
+          return valueQuotedStart(code3)
+        }
+        if (code3 === codes.eof) {
+          return nok(code3)
+        }
+        if (markdownLineEnding(code3)) {
+          return disallowEol
+            ? nok(code3)
+            : factoryWhitespace(effects, valueQuotedBetween)(code3)
+        }
+        effects.enter('directiveLeafAttributeValueData')
+        effects.consume(code3)
+        return valueQuoted
+      }
+      const valueQuotedStart = function (code3) {
+        if (code3 === marker) {
+          effects.enter('directiveLeafAttributeValueMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeValueMarker')
+          effects.exit('directiveLeafAttributeValueLiteral')
+          effects.exit('directiveLeafAttribute')
+          return valueQuotedAfter
+        }
+        effects.enter('directiveLeafAttributeValue')
+        return valueQuotedBetween(code3)
+      }
+      const valueUnquoted = function (code3) {
+        if (
+          code3 === codes.eof ||
+          code3 === codes.quotationMark ||
+          code3 === codes.apostrophe ||
+          code3 === codes.lessThan ||
+          code3 === codes.equalsTo ||
+          code3 === codes.greaterThan ||
+          code3 === codes.graveAccent
+        ) {
+          return nok(code3)
+        }
+        if (
+          code3 === codes.rightCurlyBrace ||
+          markdownLineEndingOrSpace(code3)
+        ) {
+          effects.exit('directiveLeafAttributeValueData')
+          effects.exit('directiveLeafAttributeValue')
+          effects.exit('directiveLeafAttribute')
+          return between3(code3)
+        }
+        effects.consume(code3)
+        return valueUnquoted
+      }
+      const valueBefore = function (code3) {
+        if (
+          code3 === codes.eof ||
+          code3 === codes.lessThan ||
+          code3 === codes.equalsTo ||
+          code3 === codes.greaterThan ||
+          code3 === codes.graveAccent ||
+          code3 === codes.rightCurlyBrace ||
+          (disallowEol && markdownLineEnding(code3))
+        ) {
+          return nok(code3)
+        }
+        if (code3 === codes.quotationMark || code3 === codes.apostrophe) {
+          effects.enter('directiveLeafAttributeValueLiteral')
+          effects.enter('directiveLeafAttributeValueMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeValueMarker')
+          marker = code3
+          return valueQuotedStart
+        }
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, valueBefore, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, valueBefore)(code3)
+        }
+        effects.enter('directiveLeafAttributeValue')
+        effects.enter('directiveLeafAttributeValueData')
+        effects.consume(code3)
+        marker = void 0
+        return valueUnquoted
+      }
+      const nameAfter = function (code3) {
+        if (code3 === codes.equalsTo) {
+          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeInitializerMarker')
+          return valueBefore
+        }
+        effects.exit('directiveLeafAttribute')
+        return between3(code3)
+      }
+      const name = function (code3) {
+        if (
+          code3 === codes.dash ||
+          code3 === codes.dot ||
+          code3 === codes.colon ||
+          code3 === codes.underscore ||
+          asciiAlphanumeric(code3)
+        ) {
+          effects.consume(code3)
+          return name
+        }
+        effects.exit('directiveLeafAttributeName')
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, nameAfter, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, nameAfter)(code3)
+        }
+        return nameAfter(code3)
+      }
+      const between3 = function (code3) {
+        if (
+          code3 === codes.colon ||
+          code3 === codes.underscore ||
+          asciiAlpha(code3)
+        ) {
+          effects.enter('directiveLeafAttribute')
+          effects.enter('directiveLeafAttributeName')
+          effects.consume(code3)
+          return name
+        }
+        if (code3 === codes.quotationMark) {
+          effects.enter('directiveLeafAttribute')
+          effects.enter('directiveLeafAttributeName')
+          effects.exit('directiveLeafAttributeName')
+          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.exit('directiveLeafAttributeInitializerMarker')
+          return valueBefore(code3)
+        }
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, between3, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, between3)(code3)
+        }
+        return end2(code3)
+      }
+      const start4 = function (code3) {
+        effects.enter('directiveLeafAttributes')
+        return between3(code3)
+      }
+      return start4(code2)
+    }
+    return start3
+  }
+  return tokenizeDirectiveLeaf2
+}
+var directiveLeaf2 = function (pattern) {
+  return { tokenize: tokenizeLeaf(pattern) }
+}
+
+// ../mdx/src/extensions/tina-shortcodes/extension.ts
+var tinaDirective = function (patterns) {
+  let rules = {}
+  patterns.forEach((pattern) => {
+    const firstKey = pattern.start[0]
+    const code2 = findCode(firstKey)
+    const directive2 = directiveLeaf2(pattern)
+    if (rules[code2]) {
+      rules[code2].push(directive2)
+    } else {
+      rules[code2] = [directive2]
+    }
+  })
+  return {
+    flow: rules,
+  }
+}
+
+// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
+var enter2 = function (type, token) {
+  this.enter({ type, name: '', attributes: {}, children: [] }, token)
+}
+var enterShortcode = function (token) {
+  enter2.call(this, 'leafDirective', token)
+}
+function exitName2(token) {
+  const node = this.stack[this.stack.length - 1]
+  node.name = this.sliceSerialize(token)
+}
+function exit3(token) {
+  this.exit(token)
+}
+var tinaDirectiveFromMarkdown = {
+  enter: {
+    shortcode: enterShortcode,
+  },
+  exit: {
+    shortcode: exit3,
+    shortcodeName: exitName2,
+  },
+}
+
 // ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   let preprocessedString = value
   try {
-    const extensions = [directive()]
-    const mdastExtensions = [directiveFromMarkdown]
+    const patterns = []
+    field.templates?.forEach((template) => {
+      if (typeof template === 'string') {
+        return
+      }
+      if (template && template.match) {
+        patterns.push(template.match)
+      }
+    })
+    const extensions = [directive(), tinaDirective(patterns)]
+    const mdastExtensions = [directiveFromMarkdown2, tinaDirectiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())

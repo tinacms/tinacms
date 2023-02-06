@@ -11,6 +11,7 @@ const slugify = (values) => {
 const router = ({ document, collection }) => {
   return `/${collection.name}/${document._sys.filename}`
 }
+const meh = process.env.OK
 export default defineConfig({
   build: {
     outputFolder: 'admin',

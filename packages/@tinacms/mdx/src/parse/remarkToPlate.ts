@@ -101,6 +101,9 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+      case 'leafDirective': {
+        return containerDirectiveElement(content, field, imageCallback, raw)
+      }
       case 'containerDirective': {
         return containerDirectiveElement(content, field, imageCallback, raw)
       }

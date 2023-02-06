@@ -66,6 +66,7 @@ export const stringifyMDX = (
   }
   const tree = rootElement(value, field, imageCallback)
   const res = toTinaMarkdown(tree)
+  return res
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -173,12 +174,20 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes } = stringifyProps(
+      const { children, attributes, useDirective } = stringifyProps(
         content,
         field,
         false,
         imageCallback
       )
+      if (useDirective) {
+        return {
+          type: 'leafDirective',
+          name: content.name,
+          attributes: content.props,
+          children: content.children,
+        }
+      }
       return {
         type: 'mdxJsxFlowElement',
         name: content.name,

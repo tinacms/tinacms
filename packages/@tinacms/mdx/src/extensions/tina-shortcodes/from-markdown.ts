@@ -11,7 +11,7 @@ const enter = function (this: CompileContext, type: any, token: Token) {
 }
 
 const enterShortcode: FromMarkdownHandle = function (token) {
-  enter.call(this, 'shortcode', token)
+  enter.call(this, 'leafDirective', token)
 }
 
 function exitName(this: CompileContext, token: Token) {
