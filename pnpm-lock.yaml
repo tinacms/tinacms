@@ -171,6 +171,7 @@ importers:
 
   examples/rich-text-sandbox:
     specifiers:
+      '@tinacms/mdx': workspace:*
       '@types/react': ^18.0.27
       '@types/react-dom': ^18.0.10
       '@vitejs/plugin-react-swc': ^3.0.0
@@ -178,13 +179,16 @@ importers:
       postcss: ^8.4.21
       react: ^18.2.0
       react-dom: ^18.2.0
+      react-monaco-editor: ^0.51.0
       react-resizable-panels: ^0.0.36
       tailwindcss: ^3.2.4
       typescript: ^4.9.3
       vite: ^4.1.0
     dependencies:
+      '@tinacms/mdx': link:../../packages/@tinacms/mdx
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+      react-monaco-editor: 0.51.0_3stiutgnnbnfnf3uowm5cip22i
       react-resizable-panels: 0.0.36_biqbaboplfbrettd7655fr4n2y
     devDependencies:
       '@types/react': 18.0.27
@@ -8588,7 +8592,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
-      tailwindcss: 2.2.19_ugi4xkrfysqkt4c4y6hkyfj344
+      tailwindcss: 2.2.19_3vnygek3yzhyjlvmmgk3sqgzme
     dev: false
 
   /@tailwindcss/typography/0.5.2_tailwindcss@3.1.4:
@@ -12311,7 +12315,6 @@ packages:
       picocolors: 1.0.0
       postcss: 8.4.16
       postcss-value-parser: 4.2.0
-    dev: true
 
   /autoprefixer/10.4.7_postcss@8.4.18:
     resolution:
@@ -25854,7 +25857,6 @@ packages:
       lilconfig: 2.0.6
       postcss: 8.4.16
       yaml: 1.10.2
-    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.18:
     resolution:
@@ -25918,7 +25920,6 @@ packages:
     dependencies:
       postcss: 8.4.16
       postcss-selector-parser: 6.0.10
-    dev: true
 
   /postcss-nested/5.0.6_postcss@8.4.18:
     resolution:
@@ -26016,7 +26017,6 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
-    dev: true
 
   /postcss/8.4.18:
     resolution:
@@ -26810,7 +26810,6 @@ packages:
       '@types/react': 18.0.27
       prop-types: 15.8.1
       react: 18.2.0
-    dev: true
 
   /react-onclickoutside/6.12.2_sfoxds7t5ydpegc3knd667wn6m:
     resolution:
@@ -29285,7 +29284,6 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
-    dev: true
 
   /tailwindcss/2.2.19_ugi4xkrfysqkt4c4y6hkyfj344:
     resolution:
@@ -29334,6 +29332,7 @@ packages:
       tmp: 0.2.1
     transitivePeerDependencies:
       - ts-node
+    dev: true
 
   /tailwindcss/3.1.4_postcss@8.4.14:
     resolution:

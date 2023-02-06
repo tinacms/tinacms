@@ -98,6 +98,9 @@ export const markdownToAst = (
       }
     }
   })
+  if (!useMdx) {
+    console.log('encountered MDX error, falling back to non-MDX parser')
+  }
   try {
     // Remark Root is not the same as mdast for some reason
     // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
@@ -139,6 +142,7 @@ export const parseMDX = (
   field: RichTypeInner,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
+  console.log('hi')
   let tree
   try {
     tree = markdownToAst(value, field)

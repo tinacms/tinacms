@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tinacms/mdx": "workspace:*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-monaco-editor": "^0.51.0",
     "react-resizable-panels": "^0.0.36"
   },
   "devDependencies": {
