@@ -110,6 +110,19 @@ export const viteBuild = async ({
     TINA_IMPORT: configPrebuildPath,
   }
 
+  // TODO: make this configurable
+  const publicEnv: Record<string, string> = {}
+  Object.keys(process.env).forEach((key) => {
+    if (
+      key.startsWith('TINA_PUBLIC_') ||
+      key.startsWith('NEXT_PUBLIC_') ||
+      key === 'NODE_ENV' ||
+      key === 'HEAD'
+    ) {
+      publicEnv[key] = JSON.stringify(process.env[key])
+    }
+  })
+
   const config: InlineConfig = {
     root: appRootPath,
     base: `/${outputFolder}/`,
@@ -134,7 +147,7 @@ export const viteBuild = async ({
        * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
        * but node does. This was a surprise, but using `new Object()` seems to do the trick.
        */
-      'process.env': `new Object(${JSON.stringify(process.env)})`,
+      'process.env': `new Object(${JSON.stringify(publicEnv)})`,
       __API_URL__: `"${apiUrl}"`,
     },
     // NextJS forces es5 on tsconfig, specifying it here ignores that
