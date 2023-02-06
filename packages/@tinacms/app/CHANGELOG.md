@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 1.0.6
+
+### Patch Changes
+
+- 61f8c0e50: Fix issue where all env vars where send to the admin
+
 ## 1.0.5
 
 ### Patch Changes
