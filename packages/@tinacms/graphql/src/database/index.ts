@@ -1159,19 +1159,25 @@ const _deleteIndexContent = async (
   )
   await sequential(documentPaths, async (filepath) => {
     const itemKey = normalizePath(filepath)
-    const item = await rootLevel.get(itemKey)
-    if (item) {
-      await enequeueOps([
-        ...makeIndexOpsForDocument(
-          itemKey,
-          collection.name,
-          collectionIndexDefinitions,
-          item,
-          'del',
-          database.level
-        ),
-        { type: 'del', key: itemKey, sublevel: rootLevel },
-      ])
+    try {
+      const item = await rootLevel.get(itemKey)
+      if (item) {
+        await enequeueOps([
+          ...makeIndexOpsForDocument(
+            itemKey,
+            collection.name,
+            collectionIndexDefinitions,
+            item,
+            'del',
+            database.level
+          ),
+          { type: 'del', key: itemKey, sublevel: rootLevel },
+        ])
+      }
+    } catch (e: any) {
+      if (e.code !== 'LEVEL_NOT_FOUND') {
+        throw e
+      }
     }
   })
 }
