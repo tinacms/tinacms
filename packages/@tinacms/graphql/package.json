@@ -12,7 +12,7 @@
     "import": "./dist/index.es.js",
     "require": "./dist/index.js"
   },
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "buildConfig": {
     "entryPoints": [
       {
