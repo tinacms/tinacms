@@ -47,12 +47,12 @@ const printCode = (num: number) => {
   console.log(lookupValue)
 }
 
-const tokenizeLeaf = function (pattern: Pattern) {
+const tokenizeContainer = function (pattern: Pattern) {
   // This should be passed in as an arg
   const startPattern = pattern.start
   const endPattern = pattern.end
   const patternName = pattern.name || pattern.templateName
-  const tokenizeDirectiveLeaf: Tokenizer = function (effects, ok, nok) {
+  const tokenizeDirectiveContainer: Tokenizer = function (effects, ok, nok) {
     // Assigning global this to self
     // eslint-disable-next-line
     const self = this
@@ -61,7 +61,7 @@ const tokenizeLeaf = function (pattern: Pattern) {
         console.log(`${e[0]} - ${e[1].type}`)
       })
     }
-    if (pattern.type === 'block') {
+    if (pattern.type === 'leaf') {
       return nok
     }
 
@@ -403,11 +403,11 @@ const tokenizeLeaf = function (pattern: Pattern) {
 
     return start
   }
-  return tokenizeDirectiveLeaf
+  return tokenizeDirectiveContainer
 }
 
-export const directiveLeaf: (pattern: Pattern) => Construct = function (
+export const directiveContainer: (pattern: Pattern) => Construct = function (
   pattern
 ) {
-  return { tokenize: tokenizeLeaf(pattern) }
+  return { tokenize: tokenizeContainer(pattern) }
 }

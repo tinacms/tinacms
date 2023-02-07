@@ -37369,15 +37369,369 @@ var directiveLeaf2 = function (pattern) {
   return { tokenize: tokenizeLeaf(pattern) }
 }
 
+// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
+var findValue2 = (string3) => {
+  let lookupValue = null
+  Object.entries(values).forEach(([key, value]) => {
+    if (value === string3) {
+      lookupValue = key
+    }
+  })
+  return lookupValue
+}
+var findCode2 = (string3) => {
+  if (!string3) {
+    return null
+  }
+  const lookup = findValue2(string3)
+  let lookupValue = null
+  if (lookup) {
+    Object.entries(codes).forEach(([key, value]) => {
+      if (key === lookup) {
+        lookupValue = value
+      }
+    })
+  }
+  return lookupValue
+}
+var tokenizeContainer2 = function (pattern) {
+  const startPattern = pattern.start
+  const endPattern = pattern.end
+  const patternName = pattern.name || pattern.templateName
+  const tokenizeDirectiveContainer2 = function (effects, ok2, nok) {
+    const self2 = this
+    const logSelf = () => {
+      self2.events.forEach((e) => {
+        console.log(`${e[0]} - ${e[1].type}`)
+      })
+    }
+    if (pattern.type === 'leaf') {
+      return nok
+    }
+    let startIndex = 0
+    let endIndex = 0
+    let nameIndex = 0
+    const start3 = function (code2) {
+      effects.enter('shortcode', { pattern })
+      effects.enter('shortcodeOpen')
+      effects.consume(code2)
+      if (startPattern.length - 1 === startIndex) {
+        effects.exit('shortcodeOpen')
+        return startName
+      } else {
+        startIndex = startIndex + 1
+        return startSequence
+      }
+    }
+    const startSequence = function (code2) {
+      const nextItem = startPattern[startIndex]
+      if (code2 === findCode2(nextItem)) {
+        effects.consume(code2)
+        if (startPattern.length - 1 === startIndex) {
+          effects.exit('shortcodeOpen')
+          return startName
+        } else {
+          startIndex = startIndex + 1
+          return startSequence
+        }
+      }
+      return nok(code2)
+    }
+    const startName = function (code2) {
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, startName, types.whitespace)(code2)
+      }
+      const firstCharacter = patternName[nameIndex]
+      if (code2 === findCode2(firstCharacter)) {
+        if (asciiAlpha(code2)) {
+          nameIndex = nameIndex + 1
+          effects.enter('shortcodeName')
+          effects.consume(code2)
+          return nameName
+        }
+      }
+      return nok(code2)
+    }
+    const nameName = function (code2) {
+      if (
+        code2 === codes.dash ||
+        code2 === codes.underscore ||
+        asciiAlphanumeric(code2)
+      ) {
+        const nextCharacter = patternName[nameIndex]
+        if (code2 === findCode2(nextCharacter)) {
+          nameIndex = nameIndex + 1
+          effects.consume(code2)
+          return nameName
+        }
+      }
+      effects.exit('shortcodeName')
+      return self2.previous === codes.dash ||
+        self2.previous === codes.underscore
+        ? nok(code2)
+        : attributes4(code2)
+    }
+    const attributes4 = function (code2) {
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, attributes4, types.whitespace)(code2)
+      }
+      if (
+        code2 === codes.dash ||
+        code2 === codes.underscore ||
+        code2 === codes.quotationMark ||
+        asciiAlphanumeric(code2)
+      ) {
+        return between(code2)
+      }
+      if (code2 === findCode2(endPattern[endIndex])) {
+        effects.enter('shortcodeClose')
+        effects.consume(code2)
+        if (endPattern.length - 1 === endIndex) {
+          effects.exit('shortcodeClose')
+          return end
+        } else {
+          endIndex = endIndex + 1
+          return endSequence
+        }
+      }
+      return nok(code2)
+    }
+    const endSequence = function (code2) {
+      const nextItem = endPattern[endIndex]
+      if (code2 === findCode2(nextItem)) {
+        effects.consume(code2)
+        if (endPattern.length - 1 === endIndex) {
+          effects.exit('shortcodeClose')
+          return end
+        } else {
+          endIndex = endIndex + 1
+          return endSequence
+        }
+      }
+      return nok(code2)
+    }
+    const end = function (code2) {
+      if (code2 === codes.eof || markdownLineEnding(code2)) {
+        effects.exit('shortcode')
+        return ok2(code2)
+      }
+      return nok(code2)
+    }
+    const okInside = end
+    const between = function (code2) {
+      const disallowEol = true
+      let marker
+      const end2 = function (code3) {
+        const nextItem = endPattern[endIndex]
+        if (code3 === findCode2(nextItem)) {
+          if (endPattern.length - 1 === endIndex) {
+            effects.enter('directiveLeafAttributesMarker')
+            effects.consume(code3)
+            effects.exit('directiveLeafAttributesMarker')
+            effects.exit('directiveLeafAttributes')
+            effects.exit('shortcodeClose')
+            return okInside
+          } else {
+            effects.exit('directiveLeafAttributes')
+            effects.enter('shortcodeClose')
+            effects.consume(code3)
+            endIndex = endIndex + 1
+            return endSequence
+          }
+        }
+        return nok(code3)
+      }
+      const valueQuotedAfter = function (code3) {
+        return code3 === codes.rightCurlyBrace ||
+          markdownLineEndingOrSpace(code3)
+          ? between2(code3)
+          : end2(code3)
+      }
+      const valueQuoted = function (code3) {
+        if (
+          code3 === marker ||
+          code3 === codes.eof ||
+          markdownLineEnding(code3)
+        ) {
+          effects.exit('directiveLeafAttributeValueData')
+          return valueQuotedBetween(code3)
+        }
+        effects.consume(code3)
+        return valueQuoted
+      }
+      const valueQuotedBetween = function (code3) {
+        if (code3 === marker) {
+          effects.exit('directiveLeafAttributeValue')
+          return valueQuotedStart(code3)
+        }
+        if (code3 === codes.eof) {
+          return nok(code3)
+        }
+        if (markdownLineEnding(code3)) {
+          return disallowEol
+            ? nok(code3)
+            : factoryWhitespace(effects, valueQuotedBetween)(code3)
+        }
+        effects.enter('directiveLeafAttributeValueData')
+        effects.consume(code3)
+        return valueQuoted
+      }
+      const valueQuotedStart = function (code3) {
+        if (code3 === marker) {
+          effects.enter('directiveLeafAttributeValueMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeValueMarker')
+          effects.exit('directiveLeafAttributeValueLiteral')
+          effects.exit('directiveLeafAttribute')
+          return valueQuotedAfter
+        }
+        effects.enter('directiveLeafAttributeValue')
+        return valueQuotedBetween(code3)
+      }
+      const valueUnquoted = function (code3) {
+        if (
+          code3 === codes.eof ||
+          code3 === codes.quotationMark ||
+          code3 === codes.apostrophe ||
+          code3 === codes.lessThan ||
+          code3 === codes.equalsTo ||
+          code3 === codes.greaterThan ||
+          code3 === codes.graveAccent
+        ) {
+          return nok(code3)
+        }
+        if (
+          code3 === codes.rightCurlyBrace ||
+          markdownLineEndingOrSpace(code3)
+        ) {
+          effects.exit('directiveLeafAttributeValueData')
+          effects.exit('directiveLeafAttributeValue')
+          effects.exit('directiveLeafAttribute')
+          return between2(code3)
+        }
+        effects.consume(code3)
+        return valueUnquoted
+      }
+      const valueBefore = function (code3) {
+        if (
+          code3 === codes.eof ||
+          code3 === codes.lessThan ||
+          code3 === codes.equalsTo ||
+          code3 === codes.greaterThan ||
+          code3 === codes.graveAccent ||
+          code3 === codes.rightCurlyBrace ||
+          (disallowEol && markdownLineEnding(code3))
+        ) {
+          return nok(code3)
+        }
+        if (code3 === codes.quotationMark || code3 === codes.apostrophe) {
+          effects.enter('directiveLeafAttributeValueLiteral')
+          effects.enter('directiveLeafAttributeValueMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeValueMarker')
+          marker = code3
+          return valueQuotedStart
+        }
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, valueBefore, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, valueBefore)(code3)
+        }
+        effects.enter('directiveLeafAttributeValue')
+        effects.enter('directiveLeafAttributeValueData')
+        effects.consume(code3)
+        marker = void 0
+        return valueUnquoted
+      }
+      const nameAfter = function (code3) {
+        if (code3 === codes.equalsTo) {
+          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.consume(code3)
+          effects.exit('directiveLeafAttributeInitializerMarker')
+          return valueBefore
+        }
+        effects.exit('directiveLeafAttribute')
+        return between2(code3)
+      }
+      const name = function (code3) {
+        if (
+          code3 === codes.dash ||
+          code3 === codes.dot ||
+          code3 === codes.colon ||
+          code3 === codes.underscore ||
+          asciiAlphanumeric(code3)
+        ) {
+          effects.consume(code3)
+          return name
+        }
+        effects.exit('directiveLeafAttributeName')
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, nameAfter, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, nameAfter)(code3)
+        }
+        return nameAfter(code3)
+      }
+      const between2 = function (code3) {
+        if (
+          code3 === codes.colon ||
+          code3 === codes.underscore ||
+          asciiAlpha(code3)
+        ) {
+          effects.enter('directiveLeafAttribute')
+          effects.enter('directiveLeafAttributeName')
+          effects.consume(code3)
+          return name
+        }
+        if (code3 === codes.quotationMark) {
+          effects.enter('directiveLeafAttribute')
+          effects.enter('directiveLeafAttributeName')
+          effects.exit('directiveLeafAttributeName')
+          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.exit('directiveLeafAttributeInitializerMarker')
+          return valueBefore(code3)
+        }
+        if (disallowEol && markdownSpace(code3)) {
+          return factorySpace(effects, between2, types.whitespace)(code3)
+        }
+        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
+          return factoryWhitespace(effects, between2)(code3)
+        }
+        return end2(code3)
+      }
+      const start4 = function (code3) {
+        effects.enter('directiveLeafAttributes')
+        return between2(code3)
+      }
+      return start4(code2)
+    }
+    return start3
+  }
+  return tokenizeDirectiveContainer2
+}
+var directiveContainer2 = function (pattern) {
+  return { tokenize: tokenizeContainer2(pattern) }
+}
+
 // ../mdx/src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
     const firstKey = pattern.start[0]
     if (firstKey) {
-      if (pattern.type === 'leaf') {
-        const code2 = findCode(firstKey)
-        if (code2) {
+      const code2 = findCode(firstKey)
+      if (code2) {
+        if (pattern.type === 'block') {
+          const directive2 = directiveContainer2(pattern)
+          if (rules[code2]) {
+            rules[code2] = [...(rules[code2] || []), directive2]
+          } else {
+            rules[code2] = [directive2]
+          }
+        }
+        if (pattern.type === 'leaf') {
           const directive2 = directiveLeaf2(pattern)
           if (rules[code2]) {
             rules[code2] = [...(rules[code2] || []), directive2]
