@@ -1,5 +1,19 @@
 # tina-graphql
 
+## 1.1.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+- Updated dependencies [50f86caed]
+  - @tinacms/graphql@1.2.0
+
 ## 1.0.1
 
 ### Patch Changes
