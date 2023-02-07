@@ -22,15 +22,13 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
-import { gfm } from 'micromark-extension-gfm'
-import { gfmToMarkdown } from 'mdast-util-gfm'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { stringifyShortcode } from './stringifyShortcode'
-import { directiveToMarkdown } from 'mdast-util-directive'
+import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -65,26 +63,23 @@ export const stringifyMDX = (
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  const res = toTinaMarkdown(tree)
-  return res
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
-  let preprocessedString = res
-  templatesWithMatchers?.forEach((template) => {
-    if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
-    }
-    if (template.match) {
-      preprocessedString = stringifyShortcode(preprocessedString, template)
-    }
-  })
-  return preprocessedString
+  return toTinaMarkdown(tree, field)
 }
 
-export const toTinaMarkdown = (tree: Md.Root) => {
+export const toTinaMarkdown = (tree: Md.Root, field) => {
+  const patterns = []
+  field.templates?.forEach((template) => {
+    if (typeof template === 'string') {
+      return
+    }
+    if (template && template.match) {
+      const pattern = template.match
+      pattern.templateName = template.name
+      patterns.push(pattern)
+    }
+  })
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
+    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true, // setting to false results in 4-space tabbed code

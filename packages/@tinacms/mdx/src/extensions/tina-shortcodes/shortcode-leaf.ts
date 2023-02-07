@@ -60,7 +60,7 @@ const tokenizeLeaf = function (pattern: Pattern) {
     let endIndex = 0
 
     const start: State = function (code) {
-      effects.enter('shortcode')
+      effects.enter('shortcode', { pattern })
       effects.enter('shortcodeOpen')
       effects.consume(code)
       if (startPattern.length - 1 === startIndex) {

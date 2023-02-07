@@ -508,6 +508,24 @@ export default defineConfig({
             isBody: true,
             templates: [
               {
+                name: 'featurePanel',
+                label: 'Feature Panel',
+                match: {
+                  start: '{{<',
+                  end: '>}}',
+                  name: 'feature-panel',
+                },
+                fields: [
+                  {
+                    name: '_value',
+                    required: true,
+                    isTitle: true,
+                    label: 'Value',
+                    type: 'string',
+                  },
+                ],
+              },
+              {
                 name: 'Hero',
                 fields: [
                   {

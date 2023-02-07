@@ -27373,12 +27373,12 @@ function containerFlow(parent, context, safeOptions) {
       context.bulletLastUsed = void 0
     }
     if (index2 < children.length - 1) {
-      results.push(tracker.move(between2(child, children[index2 + 1])))
+      results.push(tracker.move(between(child, children[index2 + 1])))
     }
   }
   indexStack.pop()
   return results.join('')
-  function between2(left, right) {
+  function between(left, right) {
     let index3 = context.join.length
     while (index3--) {
       const result = context.join[index3](left, right, parent, context)
@@ -27410,10 +27410,10 @@ function containerPhrasing(parent, context, safeOptions) {
     let after
     indexStack[indexStack.length - 1] = index2
     if (index2 + 1 < children.length) {
-      let handle2 = context.handle.handlers[children[index2 + 1].type]
-      if (handle2 && handle2.peek) handle2 = handle2.peek
-      after = handle2
-        ? handle2(children[index2 + 1], parent, context, {
+      let handle3 = context.handle.handlers[children[index2 + 1].type]
+      if (handle3 && handle3.peek) handle3 = handle3.peek
+      after = handle3
+        ? handle3(children[index2 + 1], parent, context, {
             before: '',
             after: '',
             ...tracker.current(),
@@ -30725,10 +30725,10 @@ function tokenizeResource(effects, ok2, nok) {
   }
   function destinationAfter(code2) {
     return markdownLineEndingOrSpace(code2)
-      ? factoryWhitespace(effects, between2)(code2)
+      ? factoryWhitespace(effects, between)(code2)
       : end(code2)
   }
-  function between2(code2) {
+  function between(code2) {
     if (code2 === 34 || code2 === 39 || code2 === 40) {
       return factoryTitle(
         effects,
@@ -32837,9 +32837,9 @@ function flatten(array) {
 var flatten_default = flatten
 
 // ../mdx/src/parse/acorn.ts
-var extractAttributes = (attributes5, fields, imageCallback) => {
+var extractAttributes = (attributes4, fields, imageCallback) => {
   const properties = {}
-  attributes5.forEach((attribute) => {
+  attributes4.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field2) => field2.name === attribute.name)
     if (!field) {
@@ -34467,7 +34467,7 @@ var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
 }
 function stringifyProps(element2, parentField, flatten2, imageCallback) {
-  const attributes5 = []
+  const attributes4 = []
   const children = []
   let template
   let useDirective = false
@@ -34499,7 +34499,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'reference':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34510,7 +34510,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34522,7 +34522,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'string':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34533,7 +34533,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34548,7 +34548,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'image':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34560,7 +34560,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes5.push({
+          attributes4.push({
             type: 'mdxJsxAttribute',
             name,
             value: imageCallback(String(value)),
@@ -34571,7 +34571,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'boolean':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34581,7 +34581,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes5.push({
+          attributes4.push({
             type: 'mdxJsxAttribute',
             name,
             value: {
@@ -34592,7 +34592,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
         }
         break
       case 'object':
-        attributes5.push({
+        attributes4.push({
           type: 'mdxJsxAttribute',
           name,
           value: {
@@ -34635,7 +34635,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             }
           }
           if (flatten2) {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34644,7 +34644,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
               },
             })
           } else {
-            attributes5.push({
+            attributes4.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34664,7 +34664,7 @@ ${val}
   if (template.match) {
     return {
       useDirective,
-      attributes: attributes5,
+      attributes: attributes4,
       children:
         children && children.length
           ? children
@@ -34681,7 +34681,7 @@ ${val}
             ],
     }
   }
-  return { attributes: attributes5, children, useDirective }
+  return { attributes: attributes4, children, useDirective }
 }
 function stringifyObj(obj, flatten2) {
   if (typeof obj === 'object' && obj !== null) {
@@ -34761,7 +34761,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
         type: 'break',
       }
     case 'mdxJsxTextElement': {
-      const { attributes: attributes5, children } = stringifyPropsInline(
+      const { attributes: attributes4, children } = stringifyPropsInline(
         content3,
         field,
         imageCallback
@@ -34769,7 +34769,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxTextElement',
         name: content3.name,
-        attributes: attributes5,
+        attributes: attributes4,
         children,
       }
     }
@@ -34913,23 +34913,6 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// ../mdx/src/stringify/stringifyShortcode.ts
-function stringifyShortcode(preprocessedString, template) {
-  const match = template.match
-  const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')
-  const regex = `<[\\s]*${template.name}[\\s]*${
-    unkeyedAttributes ? '(?:_value=(.*?))?' : '(.+?)?'
-  }[\\s]*>[\\s]*((?:.|
-)*?)[\\s]*</[\\s]*${template.name}[\\s]*>`
-  const closingRegex = `
-$2
-${match.start} /${match.name || template.name} ${match.end}`
-  const replace = `${match.start} ${match.name || template.name} $1 ${
-    match.end
-  }${template.fields.find((t) => t.name == 'children') ? closingRegex : ''}`
-  return replaceAll(preprocessedString, regex, replace)
-}
-
 // ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/color.browser.js
 function color3(d) {
   return d
@@ -35000,152 +34983,10 @@ function toResult3(value) {
   return [value]
 }
 
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-flow.js
-function containerFlow2(parent, state, info) {
-  const indexStack = state.indexStack
-  const children = parent.children || []
-  const tracker = state.createTracker(info)
-  const results = []
-  let index2 = -1
-  indexStack.push(-1)
-  while (++index2 < children.length) {
-    const child = children[index2]
-    indexStack[indexStack.length - 1] = index2
-    results.push(
-      tracker.move(
-        state.handle(child, parent, state, {
-          before: '\n',
-          after: '\n',
-          ...tracker.current(),
-        })
-      )
-    )
-    if (child.type !== 'list') {
-      state.bulletLastUsed = void 0
-    }
-    if (index2 < children.length - 1) {
-      results.push(
-        tracker.move(between(child, children[index2 + 1], parent, state))
-      )
-    }
-  }
-  indexStack.pop()
-  return results.join('')
-}
-function between(left, right, parent, state) {
-  let index2 = state.join.length
-  while (index2--) {
-    const result = state.join[index2](left, right, parent, state)
-    if (result === true || result === 1) {
-      break
-    }
-    if (typeof result === 'number') {
-      return '\n'.repeat(1 + result)
-    }
-    if (result === false) {
-      return '\n\n<!---->\n\n'
-    }
-  }
-  return '\n\n'
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/container-phrasing.js
-function containerPhrasing2(parent, state, info) {
-  const indexStack = state.indexStack
-  const children = parent.children || []
-  const results = []
-  let index2 = -1
-  let before = info.before
-  indexStack.push(-1)
-  let tracker = state.createTracker(info)
-  while (++index2 < children.length) {
-    const child = children[index2]
-    let after
-    indexStack[indexStack.length - 1] = index2
-    if (index2 + 1 < children.length) {
-      let handle2 = state.handle.handlers[children[index2 + 1].type]
-      if (handle2 && handle2.peek) handle2 = handle2.peek
-      after = handle2
-        ? handle2(children[index2 + 1], parent, state, {
-            before: '',
-            after: '',
-            ...tracker.current(),
-          }).charAt(0)
-        : ''
-    } else {
-      after = info.after
-    }
-    if (
-      results.length > 0 &&
-      (before === '\r' || before === '\n') &&
-      child.type === 'html'
-    ) {
-      results[results.length - 1] = results[results.length - 1].replace(
-        /(\r?\n|\r)$/,
-        ' '
-      )
-      before = ' '
-      tracker = state.createTracker(info)
-      tracker.move(results.join(''))
-    }
-    results.push(
-      tracker.move(
-        state.handle(child, parent, state, {
-          ...tracker.current(),
-          before,
-          after,
-        })
-      )
-    )
-    before = results[results.length - 1].slice(-1)
-  }
-  indexStack.pop()
-  return results.join('')
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/check-quote.js
-function checkQuote2(state) {
-  const marker = state.options.quote || '"'
-  if (marker !== '"' && marker !== "'") {
-    throw new Error(
-      'Cannot serialize title with `' +
-        marker +
-        '` for `options.quote`, expected `"`, or `\'`'
-    )
-  }
-  return marker
-}
-
-// ../../../node_modules/.pnpm/mdast-util-to-markdown@1.5.0/node_modules/mdast-util-to-markdown/lib/util/track.js
-function track2(config) {
-  const options = config || {}
-  const now = options.now || {}
-  let lineShift = options.lineShift || 0
-  let line = now.line || 1
-  let column = now.column || 1
-  return { move, current, shift }
-  function current() {
-    return { now: { line, column }, lineShift }
-  }
-  function shift(value) {
-    lineShift += value
-  }
-  function move(input) {
-    const value = input || ''
-    const chunks = value.split(/\r?\n|\r/g)
-    const tail = chunks[chunks.length - 1]
-    line += chunks.length - 1
-    column =
-      chunks.length === 1 ? column + tail.length : 1 + tail.length + lineShift
-    return value
-  }
-}
-
-// ../../../node_modules/.pnpm/mdast-util-directive@2.2.3/node_modules/mdast-util-directive/lib/index.js
+// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
-handleDirective.peek = peekDirective
-var directiveToMarkdown = {
+var directiveToMarkdown = (patterns) => ({
   unsafe: [
     {
       character: '\r',
@@ -35164,138 +35005,132 @@ var directiveToMarkdown = {
     { atBreak: true, character: ':', after: ':' },
   ],
   handlers: {
-    containerDirective: handleDirective,
-    leafDirective: handleDirective,
-    textDirective: handleDirective,
+    containerDirective: handle2(patterns),
+    leafDirective: handle2(patterns),
+    textDirective: handle2(patterns),
   },
-}
-function handleDirective(node, _, state, safeOptions) {
-  const tracker = track2(safeOptions)
-  const sequence = fence(node)
-  const exit4 = state.enter(node.type)
-  let value = tracker.move(sequence + (node.name || ''))
-  let label4
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    label4 = inlineDirectiveLabel(head) ? head : void 0
-  } else {
-    label4 = node
-  }
-  if (label4 && label4.children && label4.children.length > 0) {
-    const exit5 = state.enter('label')
-    const labelType = `${node.type}Label`
-    const subexit = state.enter(labelType)
-    value += tracker.move('[')
-    value += tracker.move(
-      containerPhrasing2(label4, state, {
-        ...tracker.current(),
-        before: value,
-        after: ']',
-      })
+})
+var handle2 = function (patterns) {
+  function handleDirective(node, _, state, safeOptions) {
+    const pattern = patterns.find(
+      (p) => p.name === node.name || p.templateName === node.name
     )
-    value += tracker.move(']')
-    subexit()
-    exit5()
-  }
-  value += tracker.move(attributes(node, state))
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    let shallow = node
-    if (inlineDirectiveLabel(head)) {
-      shallow = Object.assign({}, node, { children: node.children.slice(1) })
-    }
-    if (shallow && shallow.children && shallow.children.length > 0) {
-      value += tracker.move('\n')
-      value += tracker.move(containerFlow2(shallow, state, tracker.current()))
-    }
-    value += tracker.move('\n' + sequence)
-  }
-  exit4()
-  return value
-}
-function peekDirective() {
-  return ':'
-}
-function attributes(node, state) {
-  const quote = checkQuote2(state)
-  const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs = node.attributes || {}
-  const values2 = []
-  let classesFull
-  let classes
-  let id
-  let key
-  for (key in attrs) {
-    if (own4.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
-      const value = String(attrs[key])
-      if (key === 'id') {
-        id = shortcut.test(value) ? '#' + value : quoted('id', value)
-      } else if (key === 'class') {
-        const list3 = value.split(/[\t\n\r ]+/g)
-        const classesFullList = []
-        const classesList = []
-        let index2 = -1
-        while (++index2 < list3.length) {
-          ;(shortcut.test(list3[index2]) ? classesList : classesFullList).push(
-            list3[index2]
-          )
-        }
-        classesFull =
-          classesFullList.length > 0
-            ? quoted('class', classesFullList.join(' '))
-            : ''
-        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
-      } else {
-        values2.push(quoted(key, value))
+    const startPattern = pattern.start
+    const endPattern = pattern.end
+    const tracker = track(safeOptions)
+    const sequence = startPattern + ' '
+    const exit4 = state.enter(node.type)
+    let value = tracker.move(sequence + (node.name || ''))
+    value += tracker.move(attributes4(node, state))
+    value += endPattern
+    if (node.type === 'containerDirective') {
+      const head = (node.children || [])[0]
+      let shallow = node
+      if (inlineDirectiveLabel(head)) {
+        shallow = Object.assign({}, node, { children: node.children.slice(1) })
       }
+      if (shallow && shallow.children && shallow.children.length > 0) {
+        value += tracker.move('\n')
+        value += tracker.move(containerFlow(shallow, state, tracker.current()))
+      }
+      value += tracker.move('\n' + sequence)
     }
+    exit4()
+    return value
   }
-  if (classesFull) {
-    values2.unshift(classesFull)
+  function peekDirective() {
+    return ':'
   }
-  if (classes) {
-    values2.unshift(classes)
-  }
-  if (id) {
-    values2.unshift(id)
-  }
-  return values2.length > 0 ? '{' + values2.join(' ') + '}' : ''
-  function quoted(key2, value) {
-    return (
-      key2 +
-      (value
-        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
-        : '')
-    )
-  }
-}
-function inlineDirectiveLabel(node) {
-  return Boolean(
-    node && node.type === 'paragraph' && node.data && node.data.directiveLabel
-  )
-}
-function fence(node) {
-  let size = 0
-  if (node.type === 'containerDirective') {
-    visitParents2(node, function (node2, parents) {
-      if (node2.type === 'containerDirective') {
-        let index2 = parents.length
-        let nesting = 0
-        while (index2--) {
-          if (parents[index2].type === 'containerDirective') {
-            nesting++
+  function attributes4(node, state) {
+    const quote = checkQuote(state)
+    const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
+    const attrs = node.attributes || {}
+    const values2 = []
+    let classesFull
+    let classes
+    let id
+    let key
+    for (key in attrs) {
+      if (
+        own4.call(attrs, key) &&
+        attrs[key] !== void 0 &&
+        attrs[key] !== null
+      ) {
+        const value = String(attrs[key])
+        if (key === 'id') {
+          id = shortcut.test(value) ? '#' + value : quoted('id', value)
+        } else if (key === '_value') {
+          values2.push(`"${value}"`)
+        } else if (key === 'class') {
+          const list3 = value.split(/[\t\n\r ]+/g)
+          const classesFullList = []
+          const classesList = []
+          let index2 = -1
+          while (++index2 < list3.length) {
+            ;(shortcut.test(list3[index2])
+              ? classesList
+              : classesFullList
+            ).push(list3[index2])
           }
+          classesFull =
+            classesFullList.length > 0
+              ? quoted('class', classesFullList.join(' '))
+              : ''
+          classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
+        } else {
+          values2.push(quoted(key, value))
         }
-        if (nesting > size) size = nesting
       }
-    })
-    size += 3
-  } else if (node.type === 'leafDirective') {
-    size = 2
-  } else {
-    size = 1
+    }
+    if (classesFull) {
+      values2.unshift(classesFull)
+    }
+    if (classes) {
+      values2.unshift(classes)
+    }
+    if (id) {
+      values2.unshift(id)
+    }
+    return values2.length > 0 ? ' ' + values2.join(' ') + ' ' : ''
+    function quoted(key2, value) {
+      return (
+        key2 +
+        (value
+          ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
+          : '')
+      )
+    }
   }
-  return ':'.repeat(size)
+  function inlineDirectiveLabel(node) {
+    return Boolean(
+      node && node.type === 'paragraph' && node.data && node.data.directiveLabel
+    )
+  }
+  function fence(node) {
+    let size = 0
+    if (node.type === 'containerDirective') {
+      visitParents2(node, function (node2, parents) {
+        if (node2.type === 'containerDirective') {
+          let index2 = parents.length
+          let nesting = 0
+          while (index2--) {
+            if (parents[index2].type === 'containerDirective') {
+              nesting++
+            }
+          }
+          if (nesting > size) size = nesting
+        }
+      })
+      size += 3
+    } else if (node.type === 'leafDirective') {
+      size = 2
+    } else {
+      size = 1
+    }
+    return ':'.repeat(size)
+  }
+  handleDirective.peek = peekDirective
+  return handleDirective
 }
 
 // ../mdx/src/stringify/index.ts
@@ -35312,25 +35147,22 @@ var stringifyMDX = (value, field, imageCallback) => {
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  const res = toTinaMarkdown(tree)
-  return res
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
-  let preprocessedString = res
-  templatesWithMatchers?.forEach((template) => {
+  return toTinaMarkdown(tree, field)
+}
+var toTinaMarkdown = (tree, field) => {
+  const patterns = []
+  field.templates?.forEach((template) => {
     if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
+      return
     }
-    if (template.match) {
-      preprocessedString = stringifyShortcode(preprocessedString, template)
+    if (template && template.match) {
+      const pattern = template.match
+      pattern.templateName = template.name
+      patterns.push(pattern)
     }
   })
-  return preprocessedString
-}
-var toTinaMarkdown = (tree) => {
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
+    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true,
@@ -35387,7 +35219,7 @@ var blockElement = (content3, field, imageCallback) => {
     case 'mdxJsxFlowElement':
       const {
         children,
-        attributes: attributes5,
+        attributes: attributes4,
         useDirective,
       } = stringifyProps(content3, field, false, imageCallback)
       if (useDirective) {
@@ -35401,7 +35233,7 @@ var blockElement = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxFlowElement',
         name: content3.name,
-        attributes: attributes5,
+        attributes: attributes4,
         children,
       }
     case 'blockquote':
@@ -35995,9 +35827,9 @@ function factoryAttributes(
     effects.enter(attributesMarkerType)
     effects.consume(code2)
     effects.exit(attributesMarkerType)
-    return between2
+    return between
   }
-  function between2(code2) {
+  function between(code2) {
     if (code2 === 35) {
       type = attributeIdType
       return shortcutStart(code2)
@@ -36013,10 +35845,10 @@ function factoryAttributes(
       return name
     }
     if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, between2, 'whitespace')(code2)
+      return factorySpace(effects, between, 'whitespace')(code2)
     }
     if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, between2)(code2)
+      return factoryWhitespace(effects, between)(code2)
     }
     return end(code2)
   }
@@ -36069,7 +35901,7 @@ function factoryAttributes(
       effects.exit(type + 'Value')
       effects.exit(type)
       effects.exit(attributeType)
-      return between2(code2)
+      return between(code2)
     }
     effects.consume(code2)
     return shortcut2
@@ -36102,7 +35934,7 @@ function factoryAttributes(
       return valueBefore
     }
     effects.exit(attributeType)
-    return between2(code2)
+    return between(code2)
   }
   function valueBefore(code2) {
     if (
@@ -36152,7 +35984,7 @@ function factoryAttributes(
       effects.exit(attributeValueData)
       effects.exit(attributeValueType)
       effects.exit(attributeType)
-      return between2(code2)
+      return between(code2)
     }
     effects.consume(code2)
     return valueUnquoted
@@ -36196,7 +36028,7 @@ function factoryAttributes(
   }
   function valueQuotedAfter(code2) {
     return code2 === 125 || markdownLineEndingOrSpace(code2)
-      ? between2(code2)
+      ? between(code2)
       : end(code2)
   }
   function end(code2) {
@@ -36328,7 +36160,7 @@ var label = {
   tokenize: tokenizeLabel,
   partial: true,
 }
-var attributes2 = {
+var attributes = {
   tokenize: tokenizeAttributes,
   partial: true,
 }
@@ -36377,7 +36209,7 @@ function tokenizeDirectiveContainer(effects, ok2, nok) {
   }
   function afterLabel(code2) {
     return code2 === 123
-      ? effects.attempt(attributes2, afterAttributes, afterAttributes)(code2)
+      ? effects.attempt(attributes, afterAttributes, afterAttributes)(code2)
       : afterAttributes(code2)
   }
   function afterAttributes(code2) {
@@ -36542,7 +36374,7 @@ var label2 = {
   tokenize: tokenizeLabel2,
   partial: true,
 }
-var attributes3 = {
+var attributes2 = {
   tokenize: tokenizeAttributes2,
   partial: true,
 }
@@ -36576,7 +36408,7 @@ function tokenizeDirectiveLeaf(effects, ok2, nok) {
   }
   function afterLabel(code2) {
     return code2 === 123
-      ? effects.attempt(attributes3, afterAttributes, afterAttributes)(code2)
+      ? effects.attempt(attributes2, afterAttributes, afterAttributes)(code2)
       : afterAttributes(code2)
   }
   function afterAttributes(code2) {
@@ -36630,7 +36462,7 @@ var label3 = {
   tokenize: tokenizeLabel3,
   partial: true,
 }
-var attributes4 = {
+var attributes3 = {
   tokenize: tokenizeAttributes3,
   partial: true,
 }
@@ -36659,7 +36491,7 @@ function tokenizeDirectiveText(effects, ok2, nok) {
   }
   function afterLabel(code2) {
     return code2 === 123
-      ? effects.attempt(attributes4, afterAttributes, afterAttributes)(code2)
+      ? effects.attempt(attributes3, afterAttributes, afterAttributes)(code2)
       : afterAttributes(code2)
   }
   function afterAttributes(code2) {
@@ -36802,7 +36634,7 @@ function exitAttributes() {
 function exit2(token) {
   this.exit(token)
 }
-var directiveFromMarkdown2 = {
+var directiveFromMarkdown = {
   canContainEols: ['textDirective'],
   enter: {
     directiveContainer: enterContainer,
@@ -37224,7 +37056,7 @@ var tokenizeLeaf = function (pattern) {
     let startIndex = 0
     let endIndex = 0
     const start3 = function (code2) {
-      effects.enter('shortcode')
+      effects.enter('shortcode', { pattern })
       effects.enter('shortcodeOpen')
       effects.consume(code2)
       if (startPattern.length - 1 === startIndex) {
@@ -37273,11 +37105,11 @@ var tokenizeLeaf = function (pattern) {
       return self2.previous === codes.dash ||
         self2.previous === codes.underscore
         ? nok(code2)
-        : attributes5(code2)
+        : attributes4(code2)
     }
-    const attributes5 = function (code2) {
+    const attributes4 = function (code2) {
       if (markdownSpace(code2)) {
-        return factorySpace(effects, attributes5, types.whitespace)(code2)
+        return factorySpace(effects, attributes4, types.whitespace)(code2)
       }
       if (
         code2 === codes.dash ||
@@ -37285,7 +37117,7 @@ var tokenizeLeaf = function (pattern) {
         code2 === codes.quotationMark ||
         asciiAlphanumeric(code2)
       ) {
-        return between2(code2)
+        return between(code2)
       }
       if (code2 === findCode(endPattern[endIndex])) {
         effects.enter('shortcodeClose')
@@ -37322,7 +37154,7 @@ var tokenizeLeaf = function (pattern) {
       return nok(code2)
     }
     const okInside = end
-    const between2 = function (code2) {
+    const between = function (code2) {
       const disallowEol = true
       let marker
       const end2 = function (code3) {
@@ -37348,7 +37180,7 @@ var tokenizeLeaf = function (pattern) {
       const valueQuotedAfter = function (code3) {
         return code3 === codes.rightCurlyBrace ||
           markdownLineEndingOrSpace(code3)
-          ? between3(code3)
+          ? between2(code3)
           : end2(code3)
       }
       const valueQuoted = function (code3) {
@@ -37411,7 +37243,7 @@ var tokenizeLeaf = function (pattern) {
           effects.exit('directiveLeafAttributeValueData')
           effects.exit('directiveLeafAttributeValue')
           effects.exit('directiveLeafAttribute')
-          return between3(code3)
+          return between2(code3)
         }
         effects.consume(code3)
         return valueUnquoted
@@ -37456,7 +37288,7 @@ var tokenizeLeaf = function (pattern) {
           return valueBefore
         }
         effects.exit('directiveLeafAttribute')
-        return between3(code3)
+        return between2(code3)
       }
       const name = function (code3) {
         if (
@@ -37478,7 +37310,7 @@ var tokenizeLeaf = function (pattern) {
         }
         return nameAfter(code3)
       }
-      const between3 = function (code3) {
+      const between2 = function (code3) {
         if (
           code3 === codes.colon ||
           code3 === codes.underscore ||
@@ -37498,16 +37330,16 @@ var tokenizeLeaf = function (pattern) {
           return valueBefore(code3)
         }
         if (disallowEol && markdownSpace(code3)) {
-          return factorySpace(effects, between3, types.whitespace)(code3)
+          return factorySpace(effects, between2, types.whitespace)(code3)
         }
         if (!disallowEol && markdownLineEndingOrSpace(code3)) {
-          return factoryWhitespace(effects, between3)(code3)
+          return factoryWhitespace(effects, between2)(code3)
         }
         return end2(code3)
       }
       const start4 = function (code3) {
         effects.enter('directiveLeafAttributes')
-        return between3(code3)
+        return between2(code3)
       }
       return start4(code2)
     }
@@ -37575,7 +37407,7 @@ var markdownToAst = (value, field, useMdx = true) => {
       }
     })
     const extensions = [directive(), tinaDirective(patterns)]
-    const mdastExtensions = [directiveFromMarkdown2, tinaDirectiveFromMarkdown]
+    const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
@@ -37638,10 +37470,6 @@ var invalidMarkdown = (e, value) => {
       },
     ],
   }
-}
-var replaceAll = (string3, target, value) => {
-  const regex = new RegExp(target, 'g')
-  return string3.valueOf().replace(regex, value)
 }
 export { parseMDX, stringifyMDX }
 /**
