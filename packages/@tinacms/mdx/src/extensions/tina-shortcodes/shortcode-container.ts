@@ -47,12 +47,12 @@ const printCode = (num: number) => {
   console.log(lookupValue)
 }
 
-const tokenizeContainer = function (pattern: Pattern) {
+const tokenizeDirective = function (pattern: Pattern) {
   // This should be passed in as an arg
   const startPattern = pattern.start
   const endPattern = pattern.end
   const patternName = pattern.name || pattern.templateName
-  const tokenizeDirectiveContainer: Tokenizer = function (effects, ok, nok) {
+  const tokenizedirectiveContainer: Tokenizer = function (effects, ok, nok) {
     // Assigning global this to self
     // eslint-disable-next-line
     const self = this
@@ -197,14 +197,14 @@ const tokenizeContainer = function (pattern: Pattern) {
         const nextItem = endPattern[endIndex]
         if (code === findCode(nextItem)) {
           if (endPattern.length - 1 === endIndex) {
-            effects.enter('directiveLeafAttributesMarker')
+            effects.enter('directiveContainerAttributesMarker')
             effects.consume(code)
-            effects.exit('directiveLeafAttributesMarker')
-            effects.exit('directiveLeafAttributes')
+            effects.exit('directiveContainerAttributesMarker')
+            effects.exit('directiveContainerAttributes')
             effects.exit('shortcodeClose')
             return okInside
           } else {
-            effects.exit('directiveLeafAttributes')
+            effects.exit('directiveContainerAttributes')
             effects.enter('shortcodeClose')
             effects.consume(code)
             endIndex = endIndex + 1
@@ -222,7 +222,7 @@ const tokenizeContainer = function (pattern: Pattern) {
       }
       const valueQuoted: State = function (code) {
         if (code === marker || code === codes.eof || markdownLineEnding(code)) {
-          effects.exit('directiveLeafAttributeValueData')
+          effects.exit('directiveContainerAttributeValueData')
           return valueQuotedBetween(code)
         }
 
@@ -231,7 +231,7 @@ const tokenizeContainer = function (pattern: Pattern) {
       }
       const valueQuotedBetween: State = function (code) {
         if (code === marker) {
-          effects.exit('directiveLeafAttributeValue')
+          effects.exit('directiveContainerAttributeValue')
           return valueQuotedStart(code)
         }
 
@@ -246,22 +246,22 @@ const tokenizeContainer = function (pattern: Pattern) {
             : factoryWhitespace(effects, valueQuotedBetween)(code)
         }
 
-        effects.enter('directiveLeafAttributeValueData')
+        effects.enter('directiveContainerAttributeValueData')
         effects.consume(code)
         return valueQuoted
       }
 
       const valueQuotedStart: State = function (code) {
         if (code === marker) {
-          effects.enter('directiveLeafAttributeValueMarker')
+          effects.enter('directiveContainerAttributeValueMarker')
           effects.consume(code)
-          effects.exit('directiveLeafAttributeValueMarker')
-          effects.exit('directiveLeafAttributeValueLiteral')
-          effects.exit('directiveLeafAttribute')
+          effects.exit('directiveContainerAttributeValueMarker')
+          effects.exit('directiveContainerAttributeValueLiteral')
+          effects.exit('directiveContainerAttribute')
           return valueQuotedAfter
         }
 
-        effects.enter('directiveLeafAttributeValue')
+        effects.enter('directiveContainerAttributeValue')
         return valueQuotedBetween(code)
       }
 
@@ -279,9 +279,9 @@ const tokenizeContainer = function (pattern: Pattern) {
         }
 
         if (code === codes.rightCurlyBrace || markdownLineEndingOrSpace(code)) {
-          effects.exit('directiveLeafAttributeValueData')
-          effects.exit('directiveLeafAttributeValue')
-          effects.exit('directiveLeafAttribute')
+          effects.exit('directiveContainerAttributeValueData')
+          effects.exit('directiveContainerAttributeValue')
+          effects.exit('directiveContainerAttribute')
           return between(code)
         }
 
@@ -303,10 +303,10 @@ const tokenizeContainer = function (pattern: Pattern) {
         }
 
         if (code === codes.quotationMark || code === codes.apostrophe) {
-          effects.enter('directiveLeafAttributeValueLiteral')
-          effects.enter('directiveLeafAttributeValueMarker')
+          effects.enter('directiveContainerAttributeValueLiteral')
+          effects.enter('directiveContainerAttributeValueMarker')
           effects.consume(code)
-          effects.exit('directiveLeafAttributeValueMarker')
+          effects.exit('directiveContainerAttributeValueMarker')
           marker = code
           return valueQuotedStart
         }
@@ -319,8 +319,8 @@ const tokenizeContainer = function (pattern: Pattern) {
           return factoryWhitespace(effects, valueBefore)(code)
         }
 
-        effects.enter('directiveLeafAttributeValue')
-        effects.enter('directiveLeafAttributeValueData')
+        effects.enter('directiveContainerAttributeValue')
+        effects.enter('directiveContainerAttributeValueData')
         effects.consume(code)
         marker = undefined
         return valueUnquoted
@@ -328,14 +328,14 @@ const tokenizeContainer = function (pattern: Pattern) {
 
       const nameAfter: State = function (code) {
         if (code === codes.equalsTo) {
-          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.enter('directiveContainerAttributeInitializerMarker')
           effects.consume(code)
-          effects.exit('directiveLeafAttributeInitializerMarker')
+          effects.exit('directiveContainerAttributeInitializerMarker')
           return valueBefore
         }
 
         // Attribute w/o value.
-        effects.exit('directiveLeafAttribute')
+        effects.exit('directiveContainerAttribute')
         return between(code)
       }
       const name: State = function (code) {
@@ -350,7 +350,7 @@ const tokenizeContainer = function (pattern: Pattern) {
           return name
         }
 
-        effects.exit('directiveLeafAttributeName')
+        effects.exit('directiveContainerAttributeName')
 
         if (disallowEol && markdownSpace(code)) {
           return factorySpace(effects, nameAfter, types.whitespace)(code)
@@ -369,17 +369,17 @@ const tokenizeContainer = function (pattern: Pattern) {
           code === codes.underscore ||
           asciiAlpha(code)
         ) {
-          effects.enter('directiveLeafAttribute')
-          effects.enter('directiveLeafAttributeName')
+          effects.enter('directiveContainerAttribute')
+          effects.enter('directiveContainerAttributeName')
           effects.consume(code)
           return name
         }
         if (code === codes.quotationMark) {
-          effects.enter('directiveLeafAttribute')
-          effects.enter('directiveLeafAttributeName')
-          effects.exit('directiveLeafAttributeName')
-          effects.enter('directiveLeafAttributeInitializerMarker')
-          effects.exit('directiveLeafAttributeInitializerMarker')
+          effects.enter('directiveContainerAttribute')
+          effects.enter('directiveContainerAttributeName')
+          effects.exit('directiveContainerAttributeName')
+          effects.enter('directiveContainerAttributeInitializerMarker')
+          effects.exit('directiveContainerAttributeInitializerMarker')
           return valueBefore(code)
         }
 
@@ -395,7 +395,7 @@ const tokenizeContainer = function (pattern: Pattern) {
       }
 
       const start: State = function (code) {
-        effects.enter('directiveLeafAttributes')
+        effects.enter('directiveContainerAttributes')
         return between(code)
       }
       return start(code)
@@ -403,11 +403,11 @@ const tokenizeContainer = function (pattern: Pattern) {
 
     return start
   }
-  return tokenizeDirectiveContainer
+  return tokenizedirectiveContainer
 }
 
 export const directiveContainer: (pattern: Pattern) => Construct = function (
   pattern
 ) {
-  return { tokenize: tokenizeContainer(pattern) }
+  return { tokenize: tokenizeDirective(pattern) }
 }

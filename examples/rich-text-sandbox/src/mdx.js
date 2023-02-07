@@ -27057,7 +27057,7 @@ function parseEntities(value, options = {}) {
   }
   let line = (point3 ? point3.line : 0) || 1
   let column = (point3 ? point3.column : 0) || 1
-  let previous3 = now()
+  let previous2 = now()
   let character
   index2--
   while (++index2 <= value.length) {
@@ -27191,7 +27191,7 @@ function parseEntities(value, options = {}) {
       }
       if (reference) {
         flush()
-        previous3 = now()
+        previous2 = now()
         index2 = end - 1
         column += end - start3 + 1
         result.push(reference)
@@ -27201,11 +27201,11 @@ function parseEntities(value, options = {}) {
           options.reference.call(
             options.referenceContext,
             reference,
-            { start: previous3, end: next },
+            { start: previous2, end: next },
             value.slice(start3 - 1, end)
           )
         }
-        previous3 = next
+        previous2 = next
       } else {
         characters = value.slice(start3 - 1, end)
         queue += characters
@@ -27253,7 +27253,7 @@ function parseEntities(value, options = {}) {
       result.push(queue)
       if (options.text) {
         options.text.call(options.textContext, queue, {
-          start: previous3,
+          start: previous2,
           end: now(),
         })
       }
@@ -27914,7 +27914,7 @@ function initializeContent(effects) {
     afterContentStartConstruct,
     paragraphInitial
   )
-  let previous3
+  let previous2
   return contentStart
   function afterContentStartConstruct(code2) {
     if (code2 === null) {
@@ -27933,12 +27933,12 @@ function initializeContent(effects) {
   function lineStart(code2) {
     const token = effects.enter('chunkText', {
       contentType: 'text',
-      previous: previous3,
+      previous: previous2,
     })
-    if (previous3) {
-      previous3.next = token
+    if (previous2) {
+      previous2.next = token
     }
-    previous3 = token
+    previous2 = token
     return data(code2)
   }
   function data(code2) {
@@ -28327,8 +28327,8 @@ function resolveAllAttention(events, context) {
 }
 function tokenizeAttention(effects, ok2) {
   const attentionMarkers2 = this.parser.constructs.attentionMarkers.null
-  const previous3 = this.previous
-  const before = classifyCharacter(previous3)
+  const previous2 = this.previous
+  const before = classifyCharacter(previous2)
   let marker
   return start3
   function start3(code2) {
@@ -28348,7 +28348,7 @@ function tokenizeAttention(effects, ok2) {
     const close =
       !before ||
       (before === 2 && after) ||
-      attentionMarkers2.includes(previous3)
+      attentionMarkers2.includes(previous2)
     token._open = Boolean(marker === 42 ? open : open && (before || !close))
     token._close = Boolean(marker === 42 ? close : close && (after || !open))
     return ok2(code2)
@@ -28634,8 +28634,8 @@ function tokenizeCodeFenced(effects, ok2, nok) {
     tokenize: tokenizeClosingFence,
     partial: true,
   }
-  const nonLazyLine2 = {
-    tokenize: tokenizeNonLazyLine2,
+  const nonLazyLine = {
+    tokenize: tokenizeNonLazyLine,
     partial: true,
   }
   const tail = this.events[this.events.length - 1]
@@ -28714,7 +28714,7 @@ function tokenizeCodeFenced(effects, ok2, nok) {
     }
     if (markdownLineEnding(code2)) {
       return effects.attempt(
-        nonLazyLine2,
+        nonLazyLine,
         effects.attempt(
           closingFenceConstruct,
           after,
@@ -28745,7 +28745,7 @@ function tokenizeCodeFenced(effects, ok2, nok) {
     effects.exit('codeFenced')
     return ok2(code2)
   }
-  function tokenizeNonLazyLine2(effects2, ok3, nok2) {
+  function tokenizeNonLazyLine(effects2, ok3, nok2) {
     const self3 = this
     return start4
     function start4(code2) {
@@ -29087,7 +29087,7 @@ function subcontent(events, eventIndex) {
   const jumps = []
   const gaps = {}
   let stream
-  let previous3
+  let previous2
   let index2 = -1
   let current = token
   let adjust = 0
@@ -29101,7 +29101,7 @@ function subcontent(events, eventIndex) {
       if (!current.next) {
         stream.push(null)
       }
-      if (previous3) {
+      if (previous2) {
         tokenizer.defineSkip(current.start)
       }
       if (current._isInFirstContentOfListItem) {
@@ -29112,7 +29112,7 @@ function subcontent(events, eventIndex) {
         tokenizer._gfmTasklistFirstContentOfListItem = void 0
       }
     }
-    previous3 = current
+    previous2 = current
     current = current.next
   }
   current = token
@@ -29166,11 +29166,11 @@ function resolveContent(events) {
   return events
 }
 function tokenizeContent(effects, ok2) {
-  let previous3
+  let previous2
   return start3
   function start3(code2) {
     effects.enter('content')
-    previous3 = effects.enter('chunkContent', {
+    previous2 = effects.enter('chunkContent', {
       contentType: 'content',
     })
     return data(code2)
@@ -29197,11 +29197,11 @@ function tokenizeContent(effects, ok2) {
   function contentContinue(code2) {
     effects.consume(code2)
     effects.exit('chunkContent')
-    previous3.next = effects.enter('chunkContent', {
+    previous2.next = effects.enter('chunkContent', {
       contentType: 'content',
-      previous: previous3,
+      previous: previous2,
     })
-    previous3 = previous3.next
+    previous2 = previous2.next
     return data
   }
 }
@@ -29382,9 +29382,9 @@ function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
     effects.enter('chunkString', {
       contentType: 'string',
     })
-    return label4(code2)
+    return label(code2)
   }
-  function label4(code2) {
+  function label(code2) {
     if (
       code2 === null ||
       code2 === 91 ||
@@ -29397,15 +29397,15 @@ function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
     }
     effects.consume(code2)
     data = data || !markdownSpace(code2)
-    return code2 === 92 ? labelEscape : label4
+    return code2 === 92 ? labelEscape : label
   }
   function labelEscape(code2) {
     if (code2 === 91 || code2 === 92 || code2 === 93) {
       effects.consume(code2)
       size++
-      return label4
+      return label
     }
-    return label4(code2)
+    return label(code2)
   }
 }
 
@@ -30603,7 +30603,7 @@ function resolveToLabelEnd(events, context) {
     start: Object.assign({}, events[open][1].start),
     end: Object.assign({}, events[events.length - 1][1].end),
   }
-  const label4 = {
+  const label = {
     type: 'label',
     start: Object.assign({}, events[open][1].start),
     end: Object.assign({}, events[close][1].end),
@@ -30615,7 +30615,7 @@ function resolveToLabelEnd(events, context) {
   }
   media = [
     ['enter', group, context],
-    ['enter', label4, context],
+    ['enter', label, context],
   ]
   media = push(media, events.slice(open + 1, open + offset + 3))
   media = push(media, [['enter', text5, context]])
@@ -30631,7 +30631,7 @@ function resolveToLabelEnd(events, context) {
     ['exit', text5, context],
     events[close - 2],
     events[close - 1],
-    ['exit', label4, context],
+    ['exit', label, context],
   ])
   media = push(media, events.slice(close + 1))
   media = push(media, [['exit', group, context]])
@@ -32315,9 +32315,9 @@ function compiler(options) {
     node.value = data2.replace(/(\r?\n|\r)$/g, '')
   }
   function onexitdefinitionlabelstring(token) {
-    const label4 = this.resume()
+    const label = this.resume()
     const node = this.stack[this.stack.length - 1]
-    node.label = label4
+    node.label = label
     node.identifier = normalizeIdentifier(
       this.sliceSerialize(token)
     ).toLowerCase()
@@ -32463,9 +32463,9 @@ function compiler(options) {
     setData('referenceType', 'collapsed')
   }
   function onexitreferencestring(token) {
-    const label4 = this.resume()
+    const label = this.resume()
     const node = this.stack[this.stack.length - 1]
-    node.label = label4
+    node.label = label
     node.identifier = normalizeIdentifier(
       this.sliceSerialize(token)
     ).toLowerCase()
@@ -32837,9 +32837,9 @@ function flatten(array) {
 var flatten_default = flatten
 
 // ../mdx/src/parse/acorn.ts
-var extractAttributes = (attributes4, fields, imageCallback) => {
+var extractAttributes = (attributes, fields, imageCallback) => {
   const properties = {}
-  attributes4.forEach((attribute) => {
+  attributes.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field2) => field2.name === attribute.name)
     if (!field) {
@@ -34467,7 +34467,7 @@ var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
 }
 function stringifyProps(element2, parentField, flatten2, imageCallback) {
-  const attributes4 = []
+  const attributes = []
   const children = []
   let template
   let useDirective = false
@@ -34499,7 +34499,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'reference':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34510,7 +34510,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34522,7 +34522,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'string':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34533,7 +34533,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34548,7 +34548,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'image':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34560,7 +34560,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes4.push({
+          attributes.push({
             type: 'mdxJsxAttribute',
             name,
             value: imageCallback(String(value)),
@@ -34571,7 +34571,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'boolean':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34581,7 +34581,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes4.push({
+          attributes.push({
             type: 'mdxJsxAttribute',
             name,
             value: {
@@ -34592,7 +34592,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
         }
         break
       case 'object':
-        attributes4.push({
+        attributes.push({
           type: 'mdxJsxAttribute',
           name,
           value: {
@@ -34635,7 +34635,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             }
           }
           if (flatten2) {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34644,7 +34644,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
               },
             })
           } else {
-            attributes4.push({
+            attributes.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34664,7 +34664,7 @@ ${val}
   if (template.match) {
     return {
       useDirective,
-      attributes: attributes4,
+      attributes,
       children:
         children && children.length
           ? children
@@ -34681,7 +34681,7 @@ ${val}
             ],
     }
   }
-  return { attributes: attributes4, children, useDirective }
+  return { attributes, children, useDirective }
 }
 function stringifyObj(obj, flatten2) {
   if (typeof obj === 'object' && obj !== null) {
@@ -34761,7 +34761,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
         type: 'break',
       }
     case 'mdxJsxTextElement': {
-      const { attributes: attributes4, children } = stringifyPropsInline(
+      const { attributes, children } = stringifyPropsInline(
         content3,
         field,
         imageCallback
@@ -34769,7 +34769,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxTextElement',
         name: content3.name,
-        attributes: attributes4,
+        attributes,
         children,
       }
     }
@@ -35023,7 +35023,7 @@ var handle2 = function (patterns) {
     const sequence = startPattern + ' '
     const exit4 = state.enter(node.type)
     let value = tracker.move(sequence + (node.name || ''))
-    value += tracker.move(attributes4(node, state))
+    value += tracker.move(attributes(node, state))
     value += endPattern
     if (node.type === 'containerDirective') {
       const head = (node.children || [])[0]
@@ -35043,7 +35043,7 @@ var handle2 = function (patterns) {
   function peekDirective() {
     return ':'
   }
-  function attributes4(node, state) {
+  function attributes(node, state) {
     const quote = checkQuote(state)
     const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
     const attrs = node.attributes || {}
@@ -35219,11 +35219,12 @@ var blockElement = (content3, field, imageCallback) => {
         value: content3.value,
       }
     case 'mdxJsxFlowElement':
-      const {
-        children,
-        attributes: attributes4,
-        useDirective,
-      } = stringifyProps(content3, field, false, imageCallback)
+      const { children, attributes, useDirective } = stringifyProps(
+        content3,
+        field,
+        false,
+        imageCallback
+      )
       if (useDirective) {
         return {
           type: 'leafDirective',
@@ -35235,7 +35236,7 @@ var blockElement = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxFlowElement',
         name: content3.name,
-        attributes: attributes4,
+        attributes,
         children,
       }
     case 'blockquote':
@@ -35803,745 +35804,6 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-attributes.js
-function factoryAttributes(
-  effects,
-  ok2,
-  nok,
-  attributesType,
-  attributesMarkerType,
-  attributeType,
-  attributeIdType,
-  attributeClassType,
-  attributeNameType,
-  attributeInitializerType,
-  attributeValueLiteralType,
-  attributeValueType,
-  attributeValueMarker,
-  attributeValueData,
-  disallowEol
-) {
-  let type
-  let marker
-  return start3
-  function start3(code2) {
-    effects.enter(attributesType)
-    effects.enter(attributesMarkerType)
-    effects.consume(code2)
-    effects.exit(attributesMarkerType)
-    return between
-  }
-  function between(code2) {
-    if (code2 === 35) {
-      type = attributeIdType
-      return shortcutStart(code2)
-    }
-    if (code2 === 46) {
-      type = attributeClassType
-      return shortcutStart(code2)
-    }
-    if (code2 === 58 || code2 === 95 || asciiAlpha(code2)) {
-      effects.enter(attributeType)
-      effects.enter(attributeNameType)
-      effects.consume(code2)
-      return name
-    }
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, between, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, between)(code2)
-    }
-    return end(code2)
-  }
-  function shortcutStart(code2) {
-    effects.enter(attributeType)
-    effects.enter(type)
-    effects.enter(type + 'Marker')
-    effects.consume(code2)
-    effects.exit(type + 'Marker')
-    return shortcutStartAfter
-  }
-  function shortcutStartAfter(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 35 ||
-      code2 === 39 ||
-      code2 === 46 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96 ||
-      code2 === 125 ||
-      markdownLineEndingOrSpace(code2)
-    ) {
-      return nok(code2)
-    }
-    effects.enter(type + 'Value')
-    effects.consume(code2)
-    return shortcut2
-  }
-  function shortcut2(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 39 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96
-    ) {
-      return nok(code2)
-    }
-    if (
-      code2 === 35 ||
-      code2 === 46 ||
-      code2 === 125 ||
-      markdownLineEndingOrSpace(code2)
-    ) {
-      effects.exit(type + 'Value')
-      effects.exit(type)
-      effects.exit(attributeType)
-      return between(code2)
-    }
-    effects.consume(code2)
-    return shortcut2
-  }
-  function name(code2) {
-    if (
-      code2 === 45 ||
-      code2 === 46 ||
-      code2 === 58 ||
-      code2 === 95 ||
-      asciiAlphanumeric(code2)
-    ) {
-      effects.consume(code2)
-      return name
-    }
-    effects.exit(attributeNameType)
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, nameAfter, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, nameAfter)(code2)
-    }
-    return nameAfter(code2)
-  }
-  function nameAfter(code2) {
-    if (code2 === 61) {
-      effects.enter(attributeInitializerType)
-      effects.consume(code2)
-      effects.exit(attributeInitializerType)
-      return valueBefore
-    }
-    effects.exit(attributeType)
-    return between(code2)
-  }
-  function valueBefore(code2) {
-    if (
-      code2 === null ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96 ||
-      code2 === 125 ||
-      (disallowEol && markdownLineEnding(code2))
-    ) {
-      return nok(code2)
-    }
-    if (code2 === 34 || code2 === 39) {
-      effects.enter(attributeValueLiteralType)
-      effects.enter(attributeValueMarker)
-      effects.consume(code2)
-      effects.exit(attributeValueMarker)
-      marker = code2
-      return valueQuotedStart
-    }
-    if (disallowEol && markdownSpace(code2)) {
-      return factorySpace(effects, valueBefore, 'whitespace')(code2)
-    }
-    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
-      return factoryWhitespace(effects, valueBefore)(code2)
-    }
-    effects.enter(attributeValueType)
-    effects.enter(attributeValueData)
-    effects.consume(code2)
-    marker = void 0
-    return valueUnquoted
-  }
-  function valueUnquoted(code2) {
-    if (
-      code2 === null ||
-      code2 === 34 ||
-      code2 === 39 ||
-      code2 === 60 ||
-      code2 === 61 ||
-      code2 === 62 ||
-      code2 === 96
-    ) {
-      return nok(code2)
-    }
-    if (code2 === 125 || markdownLineEndingOrSpace(code2)) {
-      effects.exit(attributeValueData)
-      effects.exit(attributeValueType)
-      effects.exit(attributeType)
-      return between(code2)
-    }
-    effects.consume(code2)
-    return valueUnquoted
-  }
-  function valueQuotedStart(code2) {
-    if (code2 === marker) {
-      effects.enter(attributeValueMarker)
-      effects.consume(code2)
-      effects.exit(attributeValueMarker)
-      effects.exit(attributeValueLiteralType)
-      effects.exit(attributeType)
-      return valueQuotedAfter
-    }
-    effects.enter(attributeValueType)
-    return valueQuotedBetween(code2)
-  }
-  function valueQuotedBetween(code2) {
-    if (code2 === marker) {
-      effects.exit(attributeValueType)
-      return valueQuotedStart(code2)
-    }
-    if (code2 === null) {
-      return nok(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      return disallowEol
-        ? nok(code2)
-        : factoryWhitespace(effects, valueQuotedBetween)(code2)
-    }
-    effects.enter(attributeValueData)
-    effects.consume(code2)
-    return valueQuoted
-  }
-  function valueQuoted(code2) {
-    if (code2 === marker || code2 === null || markdownLineEnding(code2)) {
-      effects.exit(attributeValueData)
-      return valueQuotedBetween(code2)
-    }
-    effects.consume(code2)
-    return valueQuoted
-  }
-  function valueQuotedAfter(code2) {
-    return code2 === 125 || markdownLineEndingOrSpace(code2)
-      ? between(code2)
-      : end(code2)
-  }
-  function end(code2) {
-    if (code2 === 125) {
-      effects.enter(attributesMarkerType)
-      effects.consume(code2)
-      effects.exit(attributesMarkerType)
-      effects.exit(attributesType)
-      return ok2
-    }
-    return nok(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-label.js
-function factoryLabel2(
-  effects,
-  ok2,
-  nok,
-  type,
-  markerType,
-  stringType,
-  disallowEol
-) {
-  let size = 0
-  let balance = 0
-  let previous3
-  return start3
-  function start3(code2) {
-    effects.enter(type)
-    effects.enter(markerType)
-    effects.consume(code2)
-    effects.exit(markerType)
-    return afterStart
-  }
-  function afterStart(code2) {
-    if (code2 === 93) {
-      effects.enter(markerType)
-      effects.consume(code2)
-      effects.exit(markerType)
-      effects.exit(type)
-      return ok2
-    }
-    effects.enter(stringType)
-    return lineStart(code2)
-  }
-  function lineStart(code2) {
-    if (code2 === 93 && !balance) {
-      return atClosingBrace(code2)
-    }
-    const token = effects.enter('chunkText', {
-      contentType: 'text',
-      previous: previous3,
-    })
-    if (previous3) previous3.next = token
-    previous3 = token
-    return data(code2)
-  }
-  function data(code2) {
-    if (code2 === null || size > 999) {
-      return nok(code2)
-    }
-    if (code2 === 91 && ++balance > 32) {
-      return nok(code2)
-    }
-    if (code2 === 93 && !balance--) {
-      effects.exit('chunkText')
-      return atClosingBrace(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      if (disallowEol) {
-        return nok(code2)
-      }
-      effects.consume(code2)
-      effects.exit('chunkText')
-      return lineStart
-    }
-    effects.consume(code2)
-    return code2 === 92 ? dataEscape : data
-  }
-  function dataEscape(code2) {
-    if (code2 === 91 || code2 === 92 || code2 === 93) {
-      effects.consume(code2)
-      size++
-      return data
-    }
-    return data(code2)
-  }
-  function atClosingBrace(code2) {
-    effects.exit(stringType)
-    effects.enter(markerType)
-    effects.consume(code2)
-    effects.exit(markerType)
-    effects.exit(type)
-    return ok2
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/factory-name.js
-function factoryName(effects, ok2, nok, type) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    if (asciiAlpha(code2)) {
-      effects.enter(type)
-      effects.consume(code2)
-      return name
-    }
-    return nok(code2)
-  }
-  function name(code2) {
-    if (code2 === 45 || code2 === 95 || asciiAlphanumeric(code2)) {
-      effects.consume(code2)
-      return name
-    }
-    effects.exit(type)
-    return self2.previous === 45 || self2.previous === 95
-      ? nok(code2)
-      : ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-container.js
-var directiveContainer = {
-  tokenize: tokenizeDirectiveContainer,
-  concrete: true,
-}
-var label = {
-  tokenize: tokenizeLabel,
-  partial: true,
-}
-var attributes = {
-  tokenize: tokenizeAttributes,
-  partial: true,
-}
-var nonLazyLine = {
-  tokenize: tokenizeNonLazyLine,
-  partial: true,
-}
-function tokenizeDirectiveContainer(effects, ok2, nok) {
-  const self2 = this
-  const tail = self2.events[self2.events.length - 1]
-  const initialSize =
-    tail && tail[1].type === 'linePrefix'
-      ? tail[2].sliceSerialize(tail[1], true).length
-      : 0
-  let sizeOpen = 0
-  let previous3
-  return start3
-  function start3(code2) {
-    effects.enter('directiveContainer')
-    effects.enter('directiveContainerFence')
-    effects.enter('directiveContainerSequence')
-    return sequenceOpen(code2)
-  }
-  function sequenceOpen(code2) {
-    if (code2 === 58) {
-      effects.consume(code2)
-      sizeOpen++
-      return sequenceOpen
-    }
-    if (sizeOpen < 3) {
-      return nok(code2)
-    }
-    effects.exit('directiveContainerSequence')
-    return factoryName.call(
-      self2,
-      effects,
-      afterName,
-      nok,
-      'directiveContainerName'
-    )(code2)
-  }
-  function afterName(code2) {
-    return code2 === 91
-      ? effects.attempt(label, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    return factorySpace(effects, openAfter, 'whitespace')(code2)
-  }
-  function openAfter(code2) {
-    effects.exit('directiveContainerFence')
-    if (code2 === null) {
-      return afterOpening(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      if (self2.interrupt) {
-        return ok2(code2)
-      }
-      return effects.attempt(nonLazyLine, contentStart, afterOpening)(code2)
-    }
-    return nok(code2)
-  }
-  function afterOpening(code2) {
-    effects.exit('directiveContainer')
-    return ok2(code2)
-  }
-  function contentStart(code2) {
-    if (code2 === null) {
-      effects.exit('directiveContainer')
-      return ok2(code2)
-    }
-    effects.enter('directiveContainerContent')
-    return lineStart(code2)
-  }
-  function lineStart(code2) {
-    if (code2 === null) {
-      return after(code2)
-    }
-    return effects.attempt(
-      {
-        tokenize: tokenizeClosingFence,
-        partial: true,
-      },
-      after,
-      initialSize
-        ? factorySpace(effects, chunkStart, 'linePrefix', initialSize + 1)
-        : chunkStart
-    )(code2)
-  }
-  function chunkStart(code2) {
-    if (code2 === null) {
-      return after(code2)
-    }
-    const token = effects.enter('chunkDocument', {
-      contentType: 'document',
-      previous: previous3,
-    })
-    if (previous3) previous3.next = token
-    previous3 = token
-    return contentContinue(code2)
-  }
-  function contentContinue(code2) {
-    if (code2 === null) {
-      const t = effects.exit('chunkDocument')
-      self2.parser.lazy[t.start.line] = false
-      return after(code2)
-    }
-    if (markdownLineEnding(code2)) {
-      return effects.check(nonLazyLine, nonLazyLineAfter, lineAfter)(code2)
-    }
-    effects.consume(code2)
-    return contentContinue
-  }
-  function nonLazyLineAfter(code2) {
-    effects.consume(code2)
-    const t = effects.exit('chunkDocument')
-    self2.parser.lazy[t.start.line] = false
-    return lineStart
-  }
-  function lineAfter(code2) {
-    const t = effects.exit('chunkDocument')
-    self2.parser.lazy[t.start.line] = false
-    return after(code2)
-  }
-  function after(code2) {
-    effects.exit('directiveContainerContent')
-    effects.exit('directiveContainer')
-    return ok2(code2)
-  }
-  function tokenizeClosingFence(effects2, ok3, nok2) {
-    let size = 0
-    return factorySpace(effects2, closingPrefixAfter, 'linePrefix', 4)
-    function closingPrefixAfter(code2) {
-      effects2.enter('directiveContainerFence')
-      effects2.enter('directiveContainerSequence')
-      return closingSequence(code2)
-    }
-    function closingSequence(code2) {
-      if (code2 === 58) {
-        effects2.consume(code2)
-        size++
-        return closingSequence
-      }
-      if (size < sizeOpen) return nok2(code2)
-      effects2.exit('directiveContainerSequence')
-      return factorySpace(effects2, closingSequenceEnd, 'whitespace')(code2)
-    }
-    function closingSequenceEnd(code2) {
-      if (code2 === null || markdownLineEnding(code2)) {
-        effects2.exit('directiveContainerFence')
-        return ok3(code2)
-      }
-      return nok2(code2)
-    }
-  }
-}
-function tokenizeLabel(effects, ok2, nok) {
-  return factoryLabel2(
-    effects,
-    ok2,
-    nok,
-    'directiveContainerLabel',
-    'directiveContainerLabelMarker',
-    'directiveContainerLabelString',
-    true
-  )
-}
-function tokenizeAttributes(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveContainerAttributes',
-    'directiveContainerAttributesMarker',
-    'directiveContainerAttribute',
-    'directiveContainerAttributeId',
-    'directiveContainerAttributeClass',
-    'directiveContainerAttributeName',
-    'directiveContainerAttributeInitializerMarker',
-    'directiveContainerAttributeValueLiteral',
-    'directiveContainerAttributeValue',
-    'directiveContainerAttributeValueMarker',
-    'directiveContainerAttributeValueData',
-    true
-  )
-}
-function tokenizeNonLazyLine(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('lineEnding')
-    effects.consume(code2)
-    effects.exit('lineEnding')
-    return lineStart
-  }
-  function lineStart(code2) {
-    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok2(code2)
-  }
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-leaf.js
-var directiveLeaf = {
-  tokenize: tokenizeDirectiveLeaf,
-}
-var label2 = {
-  tokenize: tokenizeLabel2,
-  partial: true,
-}
-var attributes2 = {
-  tokenize: tokenizeAttributes2,
-  partial: true,
-}
-function tokenizeDirectiveLeaf(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('directiveLeaf')
-    effects.enter('directiveLeafSequence')
-    effects.consume(code2)
-    return inStart
-  }
-  function inStart(code2) {
-    if (code2 === 58) {
-      effects.consume(code2)
-      effects.exit('directiveLeafSequence')
-      return factoryName.call(
-        self2,
-        effects,
-        afterName,
-        nok,
-        'directiveLeafName'
-      )
-    }
-    return nok(code2)
-  }
-  function afterName(code2) {
-    return code2 === 91
-      ? effects.attempt(label2, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes2, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    return factorySpace(effects, end, 'whitespace')(code2)
-  }
-  function end(code2) {
-    if (code2 === null || markdownLineEnding(code2)) {
-      effects.exit('directiveLeaf')
-      return ok2(code2)
-    }
-    return nok(code2)
-  }
-}
-function tokenizeLabel2(effects, ok2, nok) {
-  return factoryLabel2(
-    effects,
-    ok2,
-    nok,
-    'directiveLeafLabel',
-    'directiveLeafLabelMarker',
-    'directiveLeafLabelString',
-    true
-  )
-}
-function tokenizeAttributes2(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveLeafAttributes',
-    'directiveLeafAttributesMarker',
-    'directiveLeafAttribute',
-    'directiveLeafAttributeId',
-    'directiveLeafAttributeClass',
-    'directiveLeafAttributeName',
-    'directiveLeafAttributeInitializerMarker',
-    'directiveLeafAttributeValueLiteral',
-    'directiveLeafAttributeValue',
-    'directiveLeafAttributeValueMarker',
-    'directiveLeafAttributeValueData',
-    true
-  )
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/directive-text.js
-var directiveText = {
-  tokenize: tokenizeDirectiveText,
-  previous: previous2,
-}
-var label3 = {
-  tokenize: tokenizeLabel3,
-  partial: true,
-}
-var attributes3 = {
-  tokenize: tokenizeAttributes3,
-  partial: true,
-}
-function previous2(code2) {
-  return (
-    code2 !== 58 ||
-    this.events[this.events.length - 1][1].type === 'characterEscape'
-  )
-}
-function tokenizeDirectiveText(effects, ok2, nok) {
-  const self2 = this
-  return start3
-  function start3(code2) {
-    effects.enter('directiveText')
-    effects.enter('directiveTextMarker')
-    effects.consume(code2)
-    effects.exit('directiveTextMarker')
-    return factoryName.call(self2, effects, afterName, nok, 'directiveTextName')
-  }
-  function afterName(code2) {
-    return code2 === 58
-      ? nok(code2)
-      : code2 === 91
-      ? effects.attempt(label3, afterLabel, afterLabel)(code2)
-      : afterLabel(code2)
-  }
-  function afterLabel(code2) {
-    return code2 === 123
-      ? effects.attempt(attributes3, afterAttributes, afterAttributes)(code2)
-      : afterAttributes(code2)
-  }
-  function afterAttributes(code2) {
-    effects.exit('directiveText')
-    return ok2(code2)
-  }
-}
-function tokenizeLabel3(effects, ok2, nok) {
-  return factoryLabel2(
-    effects,
-    ok2,
-    nok,
-    'directiveTextLabel',
-    'directiveTextLabelMarker',
-    'directiveTextLabelString'
-  )
-}
-function tokenizeAttributes3(effects, ok2, nok) {
-  return factoryAttributes(
-    effects,
-    ok2,
-    nok,
-    'directiveTextAttributes',
-    'directiveTextAttributesMarker',
-    'directiveTextAttribute',
-    'directiveTextAttributeId',
-    'directiveTextAttributeClass',
-    'directiveTextAttributeName',
-    'directiveTextAttributeInitializerMarker',
-    'directiveTextAttributeValueLiteral',
-    'directiveTextAttributeValue',
-    'directiveTextAttributeValueMarker',
-    'directiveTextAttributeValueData'
-  )
-}
-
-// ../../../node_modules/.pnpm/micromark-extension-directive@2.1.2/node_modules/micromark-extension-directive/lib/syntax.js
-function directive() {
-  return {
-    text: {
-      [58]: directiveText,
-    },
-    flow: {
-      [58]: [directiveContainer, directiveLeaf],
-    },
-  }
-}
-
 // ../mdx/src/extensions/directive/from-markdown.ts
 var own5 = {}.hasOwnProperty
 var enterContainer = function (token) {
@@ -37052,7 +36314,7 @@ var tokenizeLeaf = function (pattern) {
   const startPattern = pattern.start
   const endPattern = pattern.end
   const patternName = pattern.name || pattern.templateName
-  const tokenizeDirectiveLeaf2 = function (effects, ok2, nok) {
+  const tokenizeDirectiveLeaf = function (effects, ok2, nok) {
     const self2 = this
     const logSelf = () => {
       self2.events.forEach((e) => {
@@ -37123,11 +36385,11 @@ var tokenizeLeaf = function (pattern) {
       return self2.previous === codes.dash ||
         self2.previous === codes.underscore
         ? nok(code2)
-        : attributes4(code2)
+        : attributes(code2)
     }
-    const attributes4 = function (code2) {
+    const attributes = function (code2) {
       if (markdownSpace(code2)) {
-        return factorySpace(effects, attributes4, types.whitespace)(code2)
+        return factorySpace(effects, attributes, types.whitespace)(code2)
       }
       if (
         code2 === codes.dash ||
@@ -37363,9 +36625,9 @@ var tokenizeLeaf = function (pattern) {
     }
     return start3
   }
-  return tokenizeDirectiveLeaf2
+  return tokenizeDirectiveLeaf
 }
-var directiveLeaf2 = function (pattern) {
+var directiveLeaf = function (pattern) {
   return { tokenize: tokenizeLeaf(pattern) }
 }
 
@@ -37394,11 +36656,11 @@ var findCode2 = (string3) => {
   }
   return lookupValue
 }
-var tokenizeContainer2 = function (pattern) {
+var tokenizeDirective = function (pattern) {
   const startPattern = pattern.start
   const endPattern = pattern.end
   const patternName = pattern.name || pattern.templateName
-  const tokenizeDirectiveContainer2 = function (effects, ok2, nok) {
+  const tokenizedirectiveContainer = function (effects, ok2, nok) {
     const self2 = this
     const logSelf = () => {
       self2.events.forEach((e) => {
@@ -37469,11 +36731,11 @@ var tokenizeContainer2 = function (pattern) {
       return self2.previous === codes.dash ||
         self2.previous === codes.underscore
         ? nok(code2)
-        : attributes4(code2)
+        : attributes(code2)
     }
-    const attributes4 = function (code2) {
+    const attributes = function (code2) {
       if (markdownSpace(code2)) {
-        return factorySpace(effects, attributes4, types.whitespace)(code2)
+        return factorySpace(effects, attributes, types.whitespace)(code2)
       }
       if (
         code2 === codes.dash ||
@@ -37525,14 +36787,14 @@ var tokenizeContainer2 = function (pattern) {
         const nextItem = endPattern[endIndex]
         if (code3 === findCode2(nextItem)) {
           if (endPattern.length - 1 === endIndex) {
-            effects.enter('directiveLeafAttributesMarker')
+            effects.enter('directiveContainerAttributesMarker')
             effects.consume(code3)
-            effects.exit('directiveLeafAttributesMarker')
-            effects.exit('directiveLeafAttributes')
+            effects.exit('directiveContainerAttributesMarker')
+            effects.exit('directiveContainerAttributes')
             effects.exit('shortcodeClose')
             return okInside
           } else {
-            effects.exit('directiveLeafAttributes')
+            effects.exit('directiveContainerAttributes')
             effects.enter('shortcodeClose')
             effects.consume(code3)
             endIndex = endIndex + 1
@@ -37553,7 +36815,7 @@ var tokenizeContainer2 = function (pattern) {
           code3 === codes.eof ||
           markdownLineEnding(code3)
         ) {
-          effects.exit('directiveLeafAttributeValueData')
+          effects.exit('directiveContainerAttributeValueData')
           return valueQuotedBetween(code3)
         }
         effects.consume(code3)
@@ -37561,7 +36823,7 @@ var tokenizeContainer2 = function (pattern) {
       }
       const valueQuotedBetween = function (code3) {
         if (code3 === marker) {
-          effects.exit('directiveLeafAttributeValue')
+          effects.exit('directiveContainerAttributeValue')
           return valueQuotedStart(code3)
         }
         if (code3 === codes.eof) {
@@ -37572,20 +36834,20 @@ var tokenizeContainer2 = function (pattern) {
             ? nok(code3)
             : factoryWhitespace(effects, valueQuotedBetween)(code3)
         }
-        effects.enter('directiveLeafAttributeValueData')
+        effects.enter('directiveContainerAttributeValueData')
         effects.consume(code3)
         return valueQuoted
       }
       const valueQuotedStart = function (code3) {
         if (code3 === marker) {
-          effects.enter('directiveLeafAttributeValueMarker')
+          effects.enter('directiveContainerAttributeValueMarker')
           effects.consume(code3)
-          effects.exit('directiveLeafAttributeValueMarker')
-          effects.exit('directiveLeafAttributeValueLiteral')
-          effects.exit('directiveLeafAttribute')
+          effects.exit('directiveContainerAttributeValueMarker')
+          effects.exit('directiveContainerAttributeValueLiteral')
+          effects.exit('directiveContainerAttribute')
           return valueQuotedAfter
         }
-        effects.enter('directiveLeafAttributeValue')
+        effects.enter('directiveContainerAttributeValue')
         return valueQuotedBetween(code3)
       }
       const valueUnquoted = function (code3) {
@@ -37604,9 +36866,9 @@ var tokenizeContainer2 = function (pattern) {
           code3 === codes.rightCurlyBrace ||
           markdownLineEndingOrSpace(code3)
         ) {
-          effects.exit('directiveLeafAttributeValueData')
-          effects.exit('directiveLeafAttributeValue')
-          effects.exit('directiveLeafAttribute')
+          effects.exit('directiveContainerAttributeValueData')
+          effects.exit('directiveContainerAttributeValue')
+          effects.exit('directiveContainerAttribute')
           return between2(code3)
         }
         effects.consume(code3)
@@ -37625,10 +36887,10 @@ var tokenizeContainer2 = function (pattern) {
           return nok(code3)
         }
         if (code3 === codes.quotationMark || code3 === codes.apostrophe) {
-          effects.enter('directiveLeafAttributeValueLiteral')
-          effects.enter('directiveLeafAttributeValueMarker')
+          effects.enter('directiveContainerAttributeValueLiteral')
+          effects.enter('directiveContainerAttributeValueMarker')
           effects.consume(code3)
-          effects.exit('directiveLeafAttributeValueMarker')
+          effects.exit('directiveContainerAttributeValueMarker')
           marker = code3
           return valueQuotedStart
         }
@@ -37638,20 +36900,20 @@ var tokenizeContainer2 = function (pattern) {
         if (!disallowEol && markdownLineEndingOrSpace(code3)) {
           return factoryWhitespace(effects, valueBefore)(code3)
         }
-        effects.enter('directiveLeafAttributeValue')
-        effects.enter('directiveLeafAttributeValueData')
+        effects.enter('directiveContainerAttributeValue')
+        effects.enter('directiveContainerAttributeValueData')
         effects.consume(code3)
         marker = void 0
         return valueUnquoted
       }
       const nameAfter = function (code3) {
         if (code3 === codes.equalsTo) {
-          effects.enter('directiveLeafAttributeInitializerMarker')
+          effects.enter('directiveContainerAttributeInitializerMarker')
           effects.consume(code3)
-          effects.exit('directiveLeafAttributeInitializerMarker')
+          effects.exit('directiveContainerAttributeInitializerMarker')
           return valueBefore
         }
-        effects.exit('directiveLeafAttribute')
+        effects.exit('directiveContainerAttribute')
         return between2(code3)
       }
       const name = function (code3) {
@@ -37665,7 +36927,7 @@ var tokenizeContainer2 = function (pattern) {
           effects.consume(code3)
           return name
         }
-        effects.exit('directiveLeafAttributeName')
+        effects.exit('directiveContainerAttributeName')
         if (disallowEol && markdownSpace(code3)) {
           return factorySpace(effects, nameAfter, types.whitespace)(code3)
         }
@@ -37680,17 +36942,17 @@ var tokenizeContainer2 = function (pattern) {
           code3 === codes.underscore ||
           asciiAlpha(code3)
         ) {
-          effects.enter('directiveLeafAttribute')
-          effects.enter('directiveLeafAttributeName')
+          effects.enter('directiveContainerAttribute')
+          effects.enter('directiveContainerAttributeName')
           effects.consume(code3)
           return name
         }
         if (code3 === codes.quotationMark) {
-          effects.enter('directiveLeafAttribute')
-          effects.enter('directiveLeafAttributeName')
-          effects.exit('directiveLeafAttributeName')
-          effects.enter('directiveLeafAttributeInitializerMarker')
-          effects.exit('directiveLeafAttributeInitializerMarker')
+          effects.enter('directiveContainerAttribute')
+          effects.enter('directiveContainerAttributeName')
+          effects.exit('directiveContainerAttributeName')
+          effects.enter('directiveContainerAttributeInitializerMarker')
+          effects.exit('directiveContainerAttributeInitializerMarker')
           return valueBefore(code3)
         }
         if (disallowEol && markdownSpace(code3)) {
@@ -37702,17 +36964,17 @@ var tokenizeContainer2 = function (pattern) {
         return end2(code3)
       }
       const start4 = function (code3) {
-        effects.enter('directiveLeafAttributes')
+        effects.enter('directiveContainerAttributes')
         return between2(code3)
       }
       return start4(code2)
     }
     return start3
   }
-  return tokenizeDirectiveContainer2
+  return tokenizedirectiveContainer
 }
-var directiveContainer2 = function (pattern) {
-  return { tokenize: tokenizeContainer2(pattern) }
+var directiveContainer = function (pattern) {
+  return { tokenize: tokenizeDirective(pattern) }
 }
 
 // ../mdx/src/extensions/tina-shortcodes/extension.ts
@@ -37724,19 +36986,19 @@ var tinaDirective = function (patterns) {
       const code2 = findCode(firstKey)
       if (code2) {
         if (pattern.type === 'block') {
-          const directive2 = directiveContainer2(pattern)
+          const directive = directiveContainer(pattern)
           if (rules[code2]) {
-            rules[code2] = [...(rules[code2] || []), directive2]
+            rules[code2] = [...(rules[code2] || []), directive]
           } else {
-            rules[code2] = [directive2]
+            rules[code2] = [directive]
           }
         }
         if (pattern.type === 'leaf') {
-          const directive2 = directiveLeaf2(pattern)
+          const directive = directiveLeaf(pattern)
           if (rules[code2]) {
-            rules[code2] = [...(rules[code2] || []), directive2]
+            rules[code2] = [...(rules[code2] || []), directive]
           } else {
-            rules[code2] = [directive2]
+            rules[code2] = [directive]
           }
         }
       }
@@ -37790,7 +37052,7 @@ var markdownToAst = (value, field, useMdx = true) => {
         })
       }
     })
-    const extensions = [directive(), tinaDirective(patterns)]
+    const extensions = [tinaDirective(patterns)]
     const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())

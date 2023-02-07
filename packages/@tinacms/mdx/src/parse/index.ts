@@ -104,7 +104,8 @@ export const markdownToAst = (
         })
       }
     })
-    const extensions = [directive(), tinaDirective(patterns)]
+    // const extensions = [directive(), tinaDirective(patterns)]
+    const extensions = [tinaDirective(patterns)]
     const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
     // const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
@@ -115,6 +116,7 @@ export const markdownToAst = (
       extensions,
       mdastExtensions,
     })
+    // console.log(tree)
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
