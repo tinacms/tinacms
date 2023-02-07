@@ -1,21 +1,13 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import Progress from 'progress'
-import type { Bridge, Database } from '@tinacms/graphql'
+import type { Bridge } from '@tinacms/datalayer'
+import type { Database } from '@tinacms/graphql'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { parseURL } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
-import { parseURL } from './waitForIndexing'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
 // TODO: maybe move this to a shared util package?
@@ -75,10 +67,15 @@ export const checkClientInfo = async (
     usingTs: boolean
     schema?: TinaCloudSchema<false>
     apiUrl: string
+    isSelfHostedDatabase: boolean
   },
   next,
   _options: { verbose?: boolean }
 ) => {
+  if (ctx.isSelfHostedDatabase) {
+    return next()
+  }
+
   const config = ctx.schema?.config
   const token = config.token
   const { clientId, branch, host } = parseURL(ctx.apiUrl)
