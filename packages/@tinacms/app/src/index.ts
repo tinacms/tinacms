@@ -119,7 +119,21 @@ export const viteBuild = async ({
       key === 'NODE_ENV' ||
       key === 'HEAD'
     ) {
-      publicEnv[key] = JSON.stringify(process.env[key])
+      try {
+        // if the value is a string, we can just use it
+        if (typeof process.env[key] === 'string') {
+          publicEnv[key] = process.env[key] as string
+        } else {
+          // otherwise, we need to stringify it
+          publicEnv[key] = JSON.stringify(process.env[key])
+        }
+      } catch (error) {
+        // if we can't stringify it, we'll just warn the user
+        console.warn(
+          `Could not stringify public env process.env.${key} env variable`
+        )
+        console.warn(error)
+      }
     }
   })
 
