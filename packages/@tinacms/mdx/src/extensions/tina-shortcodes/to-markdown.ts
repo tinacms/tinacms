@@ -5,6 +5,8 @@ import { visitParents } from 'unist-util-visit-parents'
 import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow'
 import { checkQuote } from 'mdast-util-to-markdown/lib/util/check-quote'
 import { track } from 'mdast-util-to-markdown/lib/util/track'
+import { Pattern } from '../../stringify'
+import { ToMarkdownHandle } from 'mdast-util-mdx-jsx/lib'
 
 const own = {}.hasOwnProperty
 
@@ -15,7 +17,9 @@ const shortcut = /^[^\t\n\r "#'.<=>`}]+$/
  *
  * @type {ToMarkdownExtension}
  */
-export const directiveToMarkdown: () => ToMarkdownExtension = (patterns) => ({
+export const directiveToMarkdown: (
+  patterns: Pattern[]
+) => ToMarkdownExtension = (patterns) => ({
   unsafe: [
     {
       character: '\r',
@@ -40,15 +44,23 @@ export const directiveToMarkdown: () => ToMarkdownExtension = (patterns) => ({
   },
 })
 
-const handle = function (patterns) {
+const handle = function (patterns: Pattern[]) {
   /**
    * @type {ToMarkdownHandle}
    * @param {Directive} node
    */
-  function handleDirective(node, _, state, safeOptions) {
+  const handleDirective: ToMarkdownHandle = function (
+    node,
+    _,
+    state,
+    safeOptions
+  ) {
     const pattern = patterns.find(
       (p) => p.name === node.name || p.templateName === node.name
     )
+    if (!pattern) {
+      throw new Error(`Expected directive to match a pattern for ${node.name}`)
+    }
     const startPattern = pattern.start
     const endPattern = pattern.end
     const tracker = track(safeOptions)

@@ -35011,10 +35011,13 @@ var directiveToMarkdown = (patterns) => ({
   },
 })
 var handle2 = function (patterns) {
-  function handleDirective(node, _, state, safeOptions) {
+  const handleDirective = function (node, _, state, safeOptions) {
     const pattern = patterns.find(
       (p) => p.name === node.name || p.templateName === node.name
     )
+    if (!pattern) {
+      throw new Error(`Expected directive to match a pattern for ${node.name}`)
+    }
     const startPattern = pattern.start
     const endPattern = pattern.end
     const tracker = track(safeOptions)
@@ -35438,7 +35441,7 @@ var containerDirectiveElement = (node, field, imageCallback, raw) => {
   if (!template) {
     return {
       type: 'p',
-      children: [{ type: 'text', text: source(node, raw) }],
+      children: [{ type: 'text', text: source(node, raw) || '' }],
     }
   }
   return {
@@ -37032,6 +37035,9 @@ var findValue = (string3) => {
   return lookupValue
 }
 var findCode = (string3) => {
+  if (!string3) {
+    return null
+  }
   const lookup = findValue(string3)
   let lookupValue = null
   if (lookup) {
@@ -37353,15 +37359,19 @@ var directiveLeaf2 = function (pattern) {
 
 // ../mdx/src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
-  let rules = {}
+  const rules = {}
   patterns.forEach((pattern) => {
     const firstKey = pattern.start[0]
-    const code2 = findCode(firstKey)
-    const directive2 = directiveLeaf2(pattern)
-    if (rules[code2]) {
-      rules[code2].push(directive2)
-    } else {
-      rules[code2] = [directive2]
+    if (firstKey) {
+      const code2 = findCode(firstKey)
+      if (code2) {
+        const directive2 = directiveLeaf2(pattern)
+        if (rules[code2]) {
+          rules[code2] = [...(rules[code2] || []), directive2]
+        } else {
+          rules[code2] = [directive2]
+        }
+      }
     }
   })
   return {

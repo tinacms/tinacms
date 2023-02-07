@@ -22,7 +22,10 @@ const findValue = (string: string): string | null => {
   })
   return lookupValue
 }
-export const findCode = (string: string): number | null => {
+export const findCode = (string: string | undefined | null): number | null => {
+  if (!string) {
+    return null
+  }
   const lookup = findValue(string)
   let lookupValue: number | null = null
   if (lookup) {
@@ -49,6 +52,7 @@ const tokenizeLeaf = function (pattern: Pattern) {
   const startPattern = pattern.start
   const endPattern = pattern.end
   const tokenizeDirectiveLeaf: Tokenizer = function (effects, ok, nok) {
+    // @ts-ignore
     const self = this
     const logSelf = () => {
       self.events.forEach((e) => {

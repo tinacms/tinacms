@@ -96,20 +96,12 @@ export function mdxJsxElement(
   }
 }
 
-const rawString = `:::hhello
-
-someth
-
-
-:::
-`
-
 export const containerDirectiveElement = (
   node: ContainerDirective,
   field: RichTypeInner,
   imageCallback: (url: string) => string,
   raw: string
-): Plate.MdxBlockElement => {
+): Plate.BlockElement | Plate.ParagraphElement => {
   let template
   template = field.templates?.find((template) => {
     const templateName = typeof template === 'string' ? template : template.name
@@ -127,7 +119,7 @@ export const containerDirectiveElement = (
   if (!template) {
     return {
       type: 'p',
-      children: [{ type: 'text', text: source(node, raw) }],
+      children: [{ type: 'text', text: source(node, raw) || '' }],
     }
   }
   return {

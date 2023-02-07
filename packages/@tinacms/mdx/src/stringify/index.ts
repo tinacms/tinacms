@@ -66,14 +66,21 @@ export const stringifyMDX = (
   return toTinaMarkdown(tree, field)
 }
 
-export const toTinaMarkdown = (tree: Md.Root, field) => {
-  const patterns = []
+export type Pattern = {
+  start: string
+  end: string
+  name: string
+  templateName: string
+}
+
+export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
+  const patterns: Pattern[] = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
       return
     }
     if (template && template.match) {
-      const pattern = template.match
+      const pattern = template.match as Pattern
       pattern.templateName = template.name
       patterns.push(pattern)
     }
