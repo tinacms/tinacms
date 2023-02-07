@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { TinaSchema } from '@tinacms/schema-tools'
-import { TinaAdminApi } from '../api'
+import { FilterArgs, TinaAdminApi } from '../api'
 import LoadingPage from '../components/LoadingPage'
 import type { Collection } from '../types'
 
@@ -14,7 +14,8 @@ export const useGetCollection = (
   collectionName: string,
   includeDocuments: boolean = true,
   after: string = '',
-  sortKey?: string
+  sortKey?: string,
+  filterArgs?: FilterArgs
 ) => {
   const api = new TinaAdminApi(cms)
   const schema = cms.api.tina.schema as TinaSchema
@@ -41,7 +42,8 @@ export const useGetCollection = (
             includeDocuments,
             after,
             validSortKey,
-            order
+            order,
+            filterArgs
           )
           setCollection(collection)
         } catch (error) {
@@ -59,6 +61,7 @@ export const useGetCollection = (
 
     setLoading(true)
     fetchCollection()
+    // TODO: useDebounce
   }, [cms, collectionName, resetState, after, sortKey])
 
   const reFetchCollection = () => setResetSate((x) => x + 1)
@@ -73,6 +76,7 @@ const GetCollection = ({
   startCursor,
   sortKey,
   children,
+  filterArgs,
 }: {
   cms: TinaCMS
   collectionName: string
@@ -80,6 +84,7 @@ const GetCollection = ({
   startCursor?: string
   sortKey?: string
   children: any
+  filterArgs?: FilterArgs
 }) => {
   const { collection, loading, error, reFetchCollection, collectionExtra } =
     useGetCollection(
@@ -87,7 +92,8 @@ const GetCollection = ({
       collectionName,
       includeDocuments,
       startCursor || '',
-      sortKey
+      sortKey,
+      filterArgs
     ) || {}
 
   if (error) {

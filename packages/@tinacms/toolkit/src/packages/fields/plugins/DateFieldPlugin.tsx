@@ -18,45 +18,52 @@ import DateFieldPluginCSS from './DateFieldPlugin.css'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const area = useRef<HTMLDivElement>(null!)
-
-    useEffect(() => {
-      const handleClick = (event: MouseEvent) => {
-        if (!area.current) return
-        if (!event.target) return
-
-        if (!area.current.contains(event.target as HTMLElement)) {
-          setIsOpen(false)
-        } else {
-          setIsOpen(true)
-        }
-      }
-      document.addEventListener('mouseup', handleClick, false)
-      return () => {
-        document.removeEventListener('mouseup', handleClick, false)
-      }
-    }, [document])
-
     return (
       <>
-        <style>{DateFieldPluginCSS}</style>
-        <div className="tina-date-field" ref={area}>
-          <ReactDatetime
-            value={input.value}
-            onFocus={input.onFocus}
-            onChange={input.onChange}
-            open={isOpen}
-            dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
-            timeFormat={timeFormat || false}
-            inputProps={{ className: textFieldClasses }}
-            {...rest}
-          />
-        </div>
+        <ReactDateTimeWithStyles
+          value={input.value}
+          onFocus={input.onFocus}
+          onChange={input.onChange}
+          dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
+          timeFormat={timeFormat || false}
+          inputProps={{ className: textFieldClasses }}
+          {...rest}
+        />
       </>
     )
   }
 )
+
+export const ReactDateTimeWithStyles = (props: DatetimepickerProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const area = useRef<HTMLDivElement>(null!)
+
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      if (!area.current) return
+      if (!event.target) return
+
+      if (!area.current.contains(event.target as HTMLElement)) {
+        setIsOpen(false)
+      } else {
+        setIsOpen(true)
+      }
+    }
+    document.addEventListener('mouseup', handleClick, false)
+    return () => {
+      document.removeEventListener('mouseup', handleClick, false)
+    }
+  }, [document])
+
+  return (
+    <>
+      <style>{DateFieldPluginCSS}</style>
+      <div className="tina-date-field" ref={area}>
+        <ReactDatetime {...props} isOpen={isOpen} />
+      </div>
+    </>
+  )
+}
 
 export const DateFieldPlugin = {
   __type: 'field',

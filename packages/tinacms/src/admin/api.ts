@@ -7,6 +7,14 @@ import type { TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
 import type { Collection, DocumentForm } from './types'
 
+export interface FilterArgs {
+  filterField: string
+  startsWith?: string
+  before?: string
+  after?: string
+  booleanEquals?: boolean
+}
+
 export class TinaAdminApi {
   api: Client
   useDataLayer: boolean
@@ -58,21 +66,62 @@ export class TinaAdminApi {
     includeDocuments: boolean,
     after?: string,
     sortKey?: string,
-    order?: 'asc' | 'desc'
+    order?: 'asc' | 'desc',
+    filterArgs?: FilterArgs
   ) {
+    let filter = null
+    const filterField = filterArgs?.filterField
+    if (filterField) {
+      // if we have a filterField, we'll create an empty filter object
+      filter = {
+        [collectionName]: {
+          [filterField]: {},
+        },
+      }
+    }
+    // If we have a filterField and a startsWith value, we'll add a filter
+    if (filterField && filterArgs?.startsWith) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        startsWith: filterArgs.startsWith,
+      }
+    }
+    if (filterField && filterArgs?.before) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        before: filterArgs.before,
+      }
+    }
+    if (filterField && filterArgs?.after) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        after: filterArgs.after,
+      }
+    }
+    if (
+      filterField &&
+      filterArgs?.booleanEquals !== null &&
+      filterArgs?.booleanEquals !== undefined
+    ) {
+      filter[collectionName][filterField] = {
+        ...(filter[collectionName][filterField] || {}),
+        eq: filterArgs.booleanEquals,
+      }
+    }
+
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
       const response: { collection: Collection } =
         order === 'asc'
           ? await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, after: $after, first: $limit) @include(if: $includeDocuments) {
+          documents(sort: $sort, after: $after, first: $limit, filter: $filter) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -106,18 +155,19 @@ export class TinaAdminApi {
                   sort,
                   limit: 50,
                   after,
+                  filter,
                 },
               }
             )
           : await this.api.request(
               `#graphql
-      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String){
+      query($collection: String!, $includeDocuments: Boolean!, $sort: String,  $limit: Float, $after: String, $filter: DocumentFilter){
         collection(collection: $collection){
           name
           label
           format
           templates
-          documents(sort: $sort, before: $after, last: $limit) @include(if: $includeDocuments) {
+          documents(sort: $sort, before: $after, last: $limit, filter: $filter) @include(if: $includeDocuments) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -151,6 +201,7 @@ export class TinaAdminApi {
                   sort,
                   limit: 50,
                   after,
+                  filter,
                 },
               }
             )
