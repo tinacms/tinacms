@@ -1,5 +1,18 @@
 # @tinacms/mdx
 
+## 1.2.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+  - @tinacms/schema-tools@1.3.0
+
 ## 1.1.1
 
 ### Patch Changes
