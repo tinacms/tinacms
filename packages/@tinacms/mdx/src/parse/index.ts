@@ -32,6 +32,7 @@ import { directive } from 'micromark-extension-directive'
 import { directiveFromMarkdown } from '../extensions/directive/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
 import { tinaDirectiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
+import { Pattern } from '../stringify'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -86,54 +87,37 @@ export const markdownToAst = (
   field: RichTypeInner,
   useMdx: boolean = true
 ) => {
-  // const templatesWithMatchers = field.templates?.filter(
-  //   (template) => template.match
-  // )
-  let preprocessedString = value
-  // templatesWithMatchers?.forEach((template) => {
-  //   if (typeof template === 'string') {
-  //     throw new Error('Global templates are not supported')
-  //   }
-  //   if (template.match) {
-  //     if (preprocessedString) {
-  //       preprocessedString = parseShortcode(preprocessedString, template)
-  //     }
-  //   }
-  // })
-  // if (!useMdx) {
-  //   console.log('encountered MDX error, falling back to non-MDX parser')
-  // }
   try {
-    // Remark Root is not the same as mdast for some reason
-    // const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-    const patterns = []
+    const patterns: Pattern[] = []
     field.templates?.forEach((template) => {
       if (typeof template === 'string') {
         return
       }
       if (template && template.match) {
-        patterns.push(template.match)
+        patterns.push({
+          ...template.match,
+          name: template.match?.name || template.name,
+          templateName: template.name,
+          type: template.fields.find((f) => f.name === 'children')
+            ? 'block'
+            : 'leaf',
+        })
       }
     })
     const extensions = [directive(), tinaDirective(patterns)]
     const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
+    // const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
     }
-    const tree = fromMarkdown(preprocessedString, {
+    const tree = fromMarkdown(value, {
       extensions,
       mdastExtensions,
     })
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
-    // NOTE: if we want to provide error highlighing in the raw editor
-    // we could keep this info around in edit mode
-    // Delete useless position info
-    // visit(tree, (node) => {
-    //   delete node.position
-    // })
     return tree
   } catch (e) {
     console.error('error parsing file: ', e)

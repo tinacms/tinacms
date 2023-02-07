@@ -137,7 +137,6 @@ export const field = {
     {
       name: 'rimg',
       label: 'rimg',
-      inline: true,
       match: {
         start: '{{<',
         end: '>}}',
@@ -155,7 +154,6 @@ export const field = {
     {
       name: 'adPanel',
       label: 'Ad Panel',
-      inline: true,
       match: {
         start: '{{%',
         end: '%}}',
@@ -174,7 +172,6 @@ export const field = {
     {
       name: 'featurePanel',
       label: 'Feature Panel',
-      inline: true,
       match: {
         start: '{{%',
         end: '%}}',
@@ -190,21 +187,27 @@ export const field = {
         },
       ],
     },
-    // {
-    //   name: 'signature',
-    //   label: 'Signature',
-    //   match: {
-    //     start: '{{<',
-    //     end: '>}}',
-    //   },
-    //   fields: [
-    //     {
-    //       name: 'foo',
-    //       label: 'foo label',
-    //       type: 'string',
-    //     },
-    //   ],
-    // },
+    {
+      name: 'pullQuote',
+      label: 'Pull Quote',
+      match: {
+        start: '{{%',
+        name: 'pull-quote',
+        end: '%}}',
+      },
+      fields: [
+        {
+          name: 'foo',
+          label: 'foo label',
+          type: 'string',
+        },
+        {
+          name: 'children',
+          label: 'Children',
+          type: 'rich-text',
+        },
+      ],
+    },
     {
       name: 'unkeyedSignature',
       label: 'Unkeyed Signature',

@@ -11,7 +11,7 @@ import { factorySpace } from 'micromark-factory-space'
 import { types } from 'micromark-util-symbol/types'
 import { values } from 'micromark-util-symbol/values'
 import { factoryWhitespace } from 'micromark-factory-whitespace'
-import { Pattern } from './extension'
+import type { Pattern } from '../../stringify'
 
 const findValue = (string: string): string | null => {
   let lookupValue: string | null = null
@@ -51,17 +51,26 @@ const tokenizeLeaf = function (pattern: Pattern) {
   // This should be passed in as an arg
   const startPattern = pattern.start
   const endPattern = pattern.end
+  const patternName = pattern.name || pattern.templateName
+  // if (pattern.name === 'pull-quote') {
+  // }
+  // console.log(pattern)
   const tokenizeDirectiveLeaf: Tokenizer = function (effects, ok, nok) {
-    // @ts-ignore
+    // Assigning global this to self
+    // eslint-disable-next-line
     const self = this
     const logSelf = () => {
       self.events.forEach((e) => {
         console.log(`${e[0]} - ${e[1].type}`)
       })
     }
+    if (pattern.type === 'block') {
+      return nok
+    }
 
     let startIndex = 0
     let endIndex = 0
+    let nameIndex = 0
 
     const start: State = function (code) {
       effects.enter('shortcode', { pattern })
@@ -96,10 +105,14 @@ const tokenizeLeaf = function (pattern: Pattern) {
       if (markdownSpace(code)) {
         return factorySpace(effects, startName, types.whitespace)(code)
       }
-      if (asciiAlpha(code)) {
-        effects.enter('shortcodeName')
-        effects.consume(code)
-        return nameName
+      const firstCharacter = patternName[nameIndex]
+      if (code === findCode(firstCharacter)) {
+        if (asciiAlpha(code)) {
+          nameIndex = nameIndex + 1
+          effects.enter('shortcodeName')
+          effects.consume(code)
+          return nameName
+        }
       }
 
       return nok(code)
@@ -111,8 +124,12 @@ const tokenizeLeaf = function (pattern: Pattern) {
         code === codes.underscore ||
         asciiAlphanumeric(code)
       ) {
-        effects.consume(code)
-        return nameName
+        const nextCharacter = patternName[nameIndex]
+        if (code === findCode(nextCharacter)) {
+          nameIndex = nameIndex + 1
+          effects.consume(code)
+          return nameName
+        }
       }
 
       effects.exit('shortcodeName')

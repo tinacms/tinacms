@@ -71,6 +71,7 @@ export type Pattern = {
   end: string
   name: string
   templateName: string
+  type: 'block' | 'leaf'
 }
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {

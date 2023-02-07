@@ -1,7 +1,7 @@
 import type { Construct, Extension } from 'micromark-util-types'
 import { directiveLeaf, findCode } from './shortcode-leaf'
+import type { Pattern } from '../../stringify'
 
-export type Pattern = { start: string; end: string; name?: string }
 export const tinaDirective: (patterns: Pattern[]) => Extension = function (
   patterns
 ) {
@@ -9,13 +9,15 @@ export const tinaDirective: (patterns: Pattern[]) => Extension = function (
   patterns.forEach((pattern) => {
     const firstKey = pattern.start[0]
     if (firstKey) {
-      const code = findCode(firstKey)
-      if (code) {
-        const directive = directiveLeaf(pattern)
-        if (rules[code]) {
-          rules[code] = [...(rules[code] || []), directive]
-        } else {
-          rules[code] = [directive]
+      if (pattern.type === 'leaf') {
+        const code = findCode(firstKey)
+        if (code) {
+          const directive = directiveLeaf(pattern)
+          if (rules[code]) {
+            rules[code] = [...(rules[code] || []), directive]
+          } else {
+            rules[code] = [directive]
+          }
         }
       }
     }

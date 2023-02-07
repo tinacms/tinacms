@@ -40,7 +40,7 @@ export const directiveToMarkdown: (
   handlers: {
     containerDirective: handle(patterns),
     leafDirective: handle(patterns),
-    textDirective: handle(patterns),
+    // textDirective: handle(patterns),
   },
 })
 

@@ -35007,7 +35007,6 @@ var directiveToMarkdown = (patterns) => ({
   handlers: {
     containerDirective: handle2(patterns),
     leafDirective: handle2(patterns),
-    textDirective: handle2(patterns),
   },
 })
 var handle2 = function (patterns) {
@@ -37052,6 +37051,7 @@ var findCode = (string3) => {
 var tokenizeLeaf = function (pattern) {
   const startPattern = pattern.start
   const endPattern = pattern.end
+  const patternName = pattern.name || pattern.templateName
   const tokenizeDirectiveLeaf2 = function (effects, ok2, nok) {
     const self2 = this
     const logSelf = () => {
@@ -37059,8 +37059,12 @@ var tokenizeLeaf = function (pattern) {
         console.log(`${e[0]} - ${e[1].type}`)
       })
     }
+    if (pattern.type === 'block') {
+      return nok
+    }
     let startIndex = 0
     let endIndex = 0
+    let nameIndex = 0
     const start3 = function (code2) {
       effects.enter('shortcode', { pattern })
       effects.enter('shortcodeOpen')
@@ -37091,10 +37095,14 @@ var tokenizeLeaf = function (pattern) {
       if (markdownSpace(code2)) {
         return factorySpace(effects, startName, types.whitespace)(code2)
       }
-      if (asciiAlpha(code2)) {
-        effects.enter('shortcodeName')
-        effects.consume(code2)
-        return nameName
+      const firstCharacter = patternName[nameIndex]
+      if (code2 === findCode(firstCharacter)) {
+        if (asciiAlpha(code2)) {
+          nameIndex = nameIndex + 1
+          effects.enter('shortcodeName')
+          effects.consume(code2)
+          return nameName
+        }
       }
       return nok(code2)
     }
@@ -37104,8 +37112,12 @@ var tokenizeLeaf = function (pattern) {
         code2 === codes.underscore ||
         asciiAlphanumeric(code2)
       ) {
-        effects.consume(code2)
-        return nameName
+        const nextCharacter = patternName[nameIndex]
+        if (code2 === findCode(nextCharacter)) {
+          nameIndex = nameIndex + 1
+          effects.consume(code2)
+          return nameName
+        }
       }
       effects.exit('shortcodeName')
       return self2.previous === codes.dash ||
@@ -37363,13 +37375,15 @@ var tinaDirective = function (patterns) {
   patterns.forEach((pattern) => {
     const firstKey = pattern.start[0]
     if (firstKey) {
-      const code2 = findCode(firstKey)
-      if (code2) {
-        const directive2 = directiveLeaf2(pattern)
-        if (rules[code2]) {
-          rules[code2] = [...(rules[code2] || []), directive2]
-        } else {
-          rules[code2] = [directive2]
+      if (pattern.type === 'leaf') {
+        const code2 = findCode(firstKey)
+        if (code2) {
+          const directive2 = directiveLeaf2(pattern)
+          if (rules[code2]) {
+            rules[code2] = [...(rules[code2] || []), directive2]
+          } else {
+            rules[code2] = [directive2]
+          }
         }
       }
     }
@@ -37405,7 +37419,6 @@ var tinaDirectiveFromMarkdown = {
 
 // ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
-  let preprocessedString = value
   try {
     const patterns = []
     field.templates?.forEach((template) => {
@@ -37413,7 +37426,14 @@ var markdownToAst = (value, field, useMdx = true) => {
         return
       }
       if (template && template.match) {
-        patterns.push(template.match)
+        patterns.push({
+          ...template.match,
+          name: template.match?.name || template.name,
+          templateName: template.name,
+          type: template.fields.find((f) => f.name === 'children')
+            ? 'block'
+            : 'leaf',
+        })
       }
     })
     const extensions = [directive(), tinaDirective(patterns)]
@@ -37422,7 +37442,7 @@ var markdownToAst = (value, field, useMdx = true) => {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
     }
-    const tree = fromMarkdown(preprocessedString, {
+    const tree = fromMarkdown(value, {
       extensions,
       mdastExtensions,
     })
