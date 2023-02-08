@@ -108,7 +108,9 @@ async function uploadMedia(
   const filename = path.basename(filePath)
   const params: PutObjectCommandInput = {
     Bucket: bucket,
-    Key: path.join(mediaRoot, prefix + filename),
+    Key: mediaRoot
+      ? path.join(mediaRoot, prefix + filename)
+      : prefix + filename,
     Body: blob,
     ACL: 'public-read',
   }
@@ -121,8 +123,16 @@ async function uploadMedia(
       id: prefix + filename,
       filename,
       directory: prefix,
-      previewSrc: cdnUrl + path.join(mediaRoot, prefix + filename),
-      src: cdnUrl + path.join(prefix + filename),
+      previewSrc:
+        cdnUrl +
+        (mediaRoot
+          ? path.join(mediaRoot, prefix + filename)
+          : prefix + filename),
+      src:
+        cdnUrl +
+        (mediaRoot
+          ? path.join(mediaRoot, prefix + filename)
+          : prefix + filename),
     })
   } catch (e) {
     res.status(500).send(findErrorMessage(e))
@@ -167,7 +177,7 @@ async function listMedia(
     const params: ListObjectsCommandInput = {
       Bucket: bucket,
       Delimiter: '/',
-      Prefix: path.join(mediaRoot, prefix),
+      Prefix: mediaRoot ? path.join(mediaRoot, prefix) : prefix,
       Marker: offset?.toString(),
       MaxKeys: directory && !offset ? +limit + 1 : +limit,
     }
