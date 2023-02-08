@@ -34937,76 +34937,6 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/color.browser.js
-function color3(d) {
-  return d
-}
-
-// ../../../node_modules/.pnpm/unist-util-visit-parents@5.1.3/node_modules/unist-util-visit-parents/lib/index.js
-var CONTINUE3 = true
-var EXIT3 = false
-var SKIP3 = 'skip'
-var visitParents2 = function (tree, test, visitor, reverse) {
-  if (typeof test === 'function' && typeof visitor !== 'function') {
-    reverse = visitor
-    visitor = test
-    test = null
-  }
-  const is2 = convert(test)
-  const step = reverse ? -1 : 1
-  factory(tree, void 0, [])()
-  function factory(node, index2, parents) {
-    const value = node && typeof node === 'object' ? node : {}
-    if (typeof value.type === 'string') {
-      const name =
-        typeof value.tagName === 'string'
-          ? value.tagName
-          : typeof value.name === 'string'
-          ? value.name
-          : void 0
-      Object.defineProperty(visit3, 'name', {
-        value:
-          'node (' + color3(node.type + (name ? '<' + name + '>' : '')) + ')',
-      })
-    }
-    return visit3
-    function visit3() {
-      let result = []
-      let subresult
-      let offset
-      let grandparents
-      if (!test || is2(node, index2, parents[parents.length - 1] || null)) {
-        result = toResult3(visitor(node, parents))
-        if (result[0] === EXIT3) {
-          return result
-        }
-      }
-      if (node.children && result[0] !== SKIP3) {
-        offset = (reverse ? node.children.length : -1) + step
-        grandparents = parents.concat(node)
-        while (offset > -1 && offset < node.children.length) {
-          subresult = factory(node.children[offset], offset, grandparents)()
-          if (subresult[0] === EXIT3) {
-            return subresult
-          }
-          offset =
-            typeof subresult[1] === 'number' ? subresult[1] : offset + step
-        }
-      }
-      return result
-    }
-  }
-}
-function toResult3(value) {
-  if (Array.isArray(value)) {
-    return value
-  }
-  if (typeof value === 'number') {
-    return [CONTINUE3, value]
-  }
-  return [value]
-}
-
 // ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
@@ -35029,54 +34959,67 @@ var directiveToMarkdown = (patterns) => ({
     { atBreak: true, character: ':', after: ':' },
   ],
   handlers: {
-    containerDirective: handleDirective,
-    leafDirective: handleDirective,
-    textDirective: handleDirective,
+    containerDirective: handleDirective(patterns),
+    leafDirective: handleDirective(patterns),
+    textDirective: handleDirective(patterns),
   },
 })
-var handleDirective = function (node, _, state, safeOptions) {
-  const tracker = track(safeOptions)
-  const sequence = fence(node)
-  const exit3 = state.enter(node.type)
-  let value = tracker.move(sequence + (node.name || ''))
-  let label
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    label = inlineDirectiveLabel(head) ? head : void 0
-  } else {
-    label = node
-  }
-  if (label && label.children && label.children.length > 0) {
-    const exit4 = state.enter('label')
-    const labelType = `${node.type}Label`
-    const subexit = state.enter(labelType)
-    value += tracker.move('[')
-    value += tracker.move(
-      containerPhrasing(label, state, {
-        ...tracker.current(),
-        before: value,
-        after: ']',
-      })
+var handleDirective = function (patterns) {
+  const handleDirective2 = function (node, _, state, safeOptions) {
+    const tracker = track(safeOptions)
+    const exit3 = state.enter(node.type)
+    const pattern = patterns.find(
+      (p) => p.name === node.name || p.templateName === node.name
     )
-    value += tracker.move(']')
-    subexit()
-    exit4()
-  }
-  value += tracker.move(attributes(node, state))
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    let shallow = node
-    if (inlineDirectiveLabel(head)) {
-      shallow = Object.assign({}, node, { children: node.children.slice(1) })
+    if (!pattern) {
+      exit3()
+      return
     }
-    if (shallow && shallow.children && shallow.children.length > 0) {
-      value += tracker.move('\n')
-      value += tracker.move(containerFlow(shallow, state, tracker.current()))
+    const sequence = pattern.start
+    let value = tracker.move(sequence + ' ' + (node.name || ''))
+    let label
+    if (node.type === 'containerDirective') {
+      const head = (node.children || [])[0]
+      label = inlineDirectiveLabel(head) ? head : void 0
+    } else {
+      label = node
     }
-    value += tracker.move('\n' + sequence)
+    if (label && label.children && label.children.length > 0) {
+      const exit4 = state.enter('label')
+      const labelType = `${node.type}Label`
+      const subexit = state.enter(labelType)
+      value += tracker.move('[')
+      value += tracker.move(
+        containerPhrasing(label, state, {
+          ...tracker.current(),
+          before: value,
+          after: ']',
+        })
+      )
+      value += tracker.move(']')
+      subexit()
+      exit4()
+    }
+    value += tracker.move(' ')
+    value += tracker.move(attributes(node, state))
+    value += tracker.move(pattern.end)
+    if (node.type === 'containerDirective') {
+      const head = (node.children || [])[0]
+      let shallow = node
+      if (inlineDirectiveLabel(head)) {
+        shallow = Object.assign({}, node, { children: node.children.slice(1) })
+      }
+      if (shallow && shallow.children && shallow.children.length > 0) {
+        value += tracker.move('\n')
+        value += tracker.move(containerFlow(shallow, state, tracker.current()))
+      }
+      value += tracker.move('\n' + sequence)
+      value += tracker.move(' \\' + node.name + ' ' + pattern.end)
+    }
+    exit3()
+    return value
   }
-  exit3()
-  return value
+  return handleDirective2
 }
 function peekDirective() {
   return ':'
@@ -35124,7 +35067,7 @@ function attributes(node, state) {
   if (id) {
     values2.unshift(id)
   }
-  return values2.length > 0 ? '{' + values2.join(' ') + '}' : ''
+  return values2.length > 0 ? values2.join(' ') + ' ' : ''
   function quoted(key2, value) {
     return (
       key2 +
@@ -35138,29 +35081,6 @@ function inlineDirectiveLabel(node) {
   return Boolean(
     node && node.type === 'paragraph' && node.data && node.data.directiveLabel
   )
-}
-function fence(node) {
-  let size = 0
-  if (node.type === 'containerDirective') {
-    visitParents2(node, function (node2, parents) {
-      if (node2.type === 'containerDirective') {
-        let index2 = parents.length
-        let nesting = 0
-        while (index2--) {
-          if (parents[index2].type === 'containerDirective') {
-            nesting++
-          }
-        }
-        if (nesting > size) size = nesting
-      }
-    })
-    size += 3
-  } else if (node.type === 'leafDirective') {
-    size = 2
-  } else {
-    size = 1
-  }
-  return ':'.repeat(size)
 }
 handleDirective.peek = peekDirective
 

@@ -38,68 +38,84 @@ export const directiveToMarkdown: (
     { atBreak: true, character: ':', after: ':' },
   ],
   handlers: {
-    containerDirective: handleDirective,
-    leafDirective: handleDirective,
-    textDirective: handleDirective,
+    containerDirective: handleDirective(patterns),
+    leafDirective: handleDirective(patterns),
+    textDirective: handleDirective(patterns),
   },
 })
 
-const handleDirective: ToMarkdownHandle = function (
-  node,
-  _,
-  state,
-  safeOptions
+const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
+  patterns
 ) {
-  const tracker = track(safeOptions)
-  const sequence = fence(node)
-  const exit = state.enter(node.type)
-  let value = tracker.move(sequence + (node.name || ''))
-  let label: Paragraph | LeafDirective | TextDirective | undefined
-
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    label = inlineDirectiveLabel(head) ? head : undefined
-  } else {
-    label = node
-  }
-
-  if (label && label.children && label.children.length > 0) {
-    const exit = state.enter('label')
-    const labelType = `${node.type}Label` as ConstructName
-    const subexit = state.enter(labelType)
-    value += tracker.move('[')
-    value += tracker.move(
-      containerPhrasing(label, state, {
-        ...tracker.current(),
-        before: value,
-        after: ']',
-      })
+  const handleDirective: ToMarkdownHandle = function (
+    node,
+    _,
+    state,
+    safeOptions
+  ) {
+    const tracker = track(safeOptions)
+    const exit = state.enter(node.type)
+    const pattern = patterns.find(
+      (p) => p.name === node.name || p.templateName === node.name
     )
-    value += tracker.move(']')
-    subexit()
+    if (!pattern) {
+      exit()
+      return
+    }
+
+    const sequence = pattern.start
+    let value = tracker.move(sequence + ' ' + (node.name || ''))
+    let label: Paragraph | LeafDirective | TextDirective | undefined
+
+    if (node.type === 'containerDirective') {
+      const head = (node.children || [])[0]
+      label = inlineDirectiveLabel(head) ? head : undefined
+    } else {
+      label = node
+    }
+
+    if (label && label.children && label.children.length > 0) {
+      const exit = state.enter('label')
+      const labelType = `${node.type}Label` as ConstructName
+      const subexit = state.enter(labelType)
+      value += tracker.move('[')
+      value += tracker.move(
+        containerPhrasing(label, state, {
+          ...tracker.current(),
+          before: value,
+          after: ']',
+        })
+      )
+      value += tracker.move(']')
+      subexit()
+      exit()
+    }
+
+    value += tracker.move(' ')
+    value += tracker.move(attributes(node, state))
+    value += tracker.move(pattern.end)
+
+    if (node.type === 'containerDirective') {
+      const head = (node.children || [])[0]
+      let shallow = node
+
+      if (inlineDirectiveLabel(head)) {
+        shallow = Object.assign({}, node, { children: node.children.slice(1) })
+      }
+
+      if (shallow && shallow.children && shallow.children.length > 0) {
+        value += tracker.move('\n')
+        value += tracker.move(containerFlow(shallow, state, tracker.current()))
+      }
+
+      value += tracker.move('\n' + sequence)
+      value += tracker.move(' \\' + node.name + ' ' + pattern.end)
+    }
+
     exit()
+    return value
   }
-
-  value += tracker.move(attributes(node, state))
-
-  if (node.type === 'containerDirective') {
-    const head = (node.children || [])[0]
-    let shallow = node
-
-    if (inlineDirectiveLabel(head)) {
-      shallow = Object.assign({}, node, { children: node.children.slice(1) })
-    }
-
-    if (shallow && shallow.children && shallow.children.length > 0) {
-      value += tracker.move('\n')
-      value += tracker.move(containerFlow(shallow, state, tracker.current()))
-    }
-
-    value += tracker.move('\n' + sequence)
-  }
-
-  exit()
-  return value
+  return handleDirective
 }
 
 /** @type {ToMarkdownHandle} */
@@ -172,7 +188,7 @@ function attributes(node: Directive, state: State): string {
     values.unshift(id)
   }
 
-  return values.length > 0 ? '{' + values.join(' ') + '}' : ''
+  return values.length > 0 ? values.join(' ') + ' ' : ''
 
   /**
    * @param {string} key
