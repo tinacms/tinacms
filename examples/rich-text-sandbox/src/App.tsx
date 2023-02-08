@@ -14,8 +14,8 @@ function App() {
     children: [],
   })
 
+  // Annoying because it runs twice, harder to debug
   React.useEffect(() => {
-    // @ts-ignore
     setParsedText(parseMDX(text, field, (v) => v))
   }, [text])
 
@@ -27,7 +27,13 @@ function App() {
       <ResizeHandle direction="horizontal" />
       <Panel>
         <PanelGroup autoSaveId="example" direction="vertical">
-          <Editor value={text} onChange={setText} />
+          <Editor
+            value={text}
+            onChange={(value) => {
+              setText(value)
+              // setParsedText(parseMDX(value, field, (v) => v))
+            }}
+          />
           <ResizeHandle />
           {/* @ts-ignore */}
           <Editor value={stringifyMDX(parsedText, field, (v) => v) || ''} />
@@ -72,6 +78,7 @@ const Editor = ({
         width={editorBox.width}
         language="markdown"
         value={value}
+        theme="vs-dark"
         options={{
           minimap: {
             enabled: false,

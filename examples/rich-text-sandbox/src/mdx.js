@@ -417,21 +417,21 @@ var require_standalone = __commonJS({
         var Bl = Ye(),
           Nl = Et(),
           ss = Ft(),
-          is = Gr(),
+          is2 = Gr(),
           wl = cr(),
           _l = Wu(),
           Pl = St(),
           kl = Bl.TypeError,
           Il = Pl('toPrimitive')
         as.exports = function (e, n) {
-          if (!ss(e) || is(e)) return e
+          if (!ss(e) || is2(e)) return e
           var t = wl(e, Il),
             s
           if (t) {
             if (
               (n === void 0 && (n = 'default'),
               (s = Nl(t, e, n)),
-              !ss(s) || is(s))
+              !ss(s) || is2(s))
             )
               return s
             throw kl("Can't convert object to primitive value")
@@ -2423,15 +2423,15 @@ var require_standalone = __commonJS({
                                 break
                               } else
                                 for (
-                                  let $ = 1;
-                                  $ < x.expandedStates.length + 1;
-                                  $++
+                                  let $2 = 1;
+                                  $2 < x.expandedStates.length + 1;
+                                  $2++
                                 )
-                                  if ($ >= x.expandedStates.length) {
+                                  if ($2 >= x.expandedStates.length) {
                                     D.push([y, m, j])
                                     break
                                   } else {
-                                    let V = x.expandedStates[$],
+                                    let V = x.expandedStates[$2],
                                       q = [y, d, V]
                                     if (A(q, D, L, I, M)) {
                                       D.push(q)
@@ -2449,26 +2449,26 @@ var require_standalone = __commonJS({
                           { parts: L } = x
                         if (L.length === 0) break
                         let [M, j] = L,
-                          $ = [y, d, M],
+                          $2 = [y, d, M],
                           V = [y, m, M],
-                          q = A($, [], b, I, l.length > 0, true)
+                          q = A($2, [], b, I, l.length > 0, true)
                         if (L.length === 1) {
-                          q ? D.push($) : D.push(V)
+                          q ? D.push($2) : D.push(V)
                           break
                         }
                         let Y = [y, d, j],
                           H = [y, m, j]
                         if (L.length === 2) {
-                          q ? D.push(Y, $) : D.push(H, V)
+                          q ? D.push(Y, $2) : D.push(H, V)
                           break
                         }
                         L.splice(0, 2)
                         let R = [y, N, r(L)],
                           Q = L[0]
                         A([y, d, [M, j, Q]], [], b, I, l.length > 0, true)
-                          ? D.push(R, Y, $)
+                          ? D.push(R, Y, $2)
                           : q
-                          ? D.push(R, H, $)
+                          ? D.push(R, H, $2)
                           : D.push(R, H, V)
                         break
                       }
@@ -4092,7 +4092,7 @@ var require_standalone = __commonJS({
               function j(H, R) {
                 ;(R.leading = false), (R.trailing = true), b(H, R)
               }
-              function $(H, R) {
+              function $2(H, R) {
                 let { languages: Q } = a({ plugins: R.plugins }),
                   ee =
                     Q.find((te) => {
@@ -4136,7 +4136,7 @@ var require_standalone = __commonJS({
                 )
               }
               n.exports = {
-                inferParserByLanguage: $,
+                inferParserByLanguage: $2,
                 getStringWidth: u,
                 getMaxContinuousCount: N,
                 getMinNotPresentContinuousCount: x,
@@ -6308,9 +6308,9 @@ var require_standalone = __commonJS({
                 T = new WeakMap()
               function A(L, M, j) {
                 if (!L) return
-                let { printer: $, locStart: V, locEnd: q } = M
+                let { printer: $2, locStart: V, locEnd: q } = M
                 if (j) {
-                  if ($.canAttachComment && $.canAttachComment(L)) {
+                  if ($2.canAttachComment && $2.canAttachComment(L)) {
                     let H
                     for (
                       H = j.length - 1;
@@ -6322,7 +6322,7 @@ var require_standalone = __commonJS({
                   }
                 } else if (T.has(L)) return T.get(L)
                 let Y =
-                  ($.getCommentChildNodes && $.getCommentChildNodes(L, M)) ||
+                  ($2.getCommentChildNodes && $2.getCommentChildNodes(L, M)) ||
                   (typeof L == 'object' &&
                     Object.entries(L)
                       .filter((H) => {
@@ -6346,7 +6346,7 @@ var require_standalone = __commonJS({
                   return j
                 }
               }
-              function S(L, M, j, $) {
+              function S(L, M, j, $2) {
                 let { locStart: V, locEnd: q } = j,
                   Y = V(M),
                   H = q(M),
@@ -6373,23 +6373,27 @@ var require_standalone = __commonJS({
                     'Comment location overlaps with node location'
                   )
                 }
-                if ($ && $.type === 'TemplateLiteral') {
-                  let { quasis: W } = $,
+                if ($2 && $2.type === 'TemplateLiteral') {
+                  let { quasis: W } = $2,
                     X = F(W, M, j)
                   Q && F(W, Q, j) !== X && (Q = null),
                     ee && F(W, ee, j) !== X && (ee = null)
                 }
-                return { enclosingNode: $, precedingNode: Q, followingNode: ee }
+                return {
+                  enclosingNode: $2,
+                  precedingNode: Q,
+                  followingNode: ee,
+                }
               }
               var B = () => false
-              function I(L, M, j, $) {
+              function I(L, M, j, $2) {
                 if (!Array.isArray(L)) return
                 let V = [],
                   {
                     locStart: q,
                     locEnd: Y,
                     printer: { handleComments: H = {} },
-                  } = $,
+                  } = $2,
                   {
                     avoidAstMutation: R,
                     ownLine: Q = B,
@@ -6398,12 +6402,12 @@ var require_standalone = __commonJS({
                   } = H,
                   oe = L.map((W, X) =>
                     Object.assign(
-                      Object.assign({}, S(M, W, $)),
+                      Object.assign({}, S(M, W, $2)),
                       {},
                       {
                         comment: W,
                         text: j,
-                        options: $,
+                        options: $2,
                         ast: M,
                         isLastComment: L.length - 1 === X,
                       }
@@ -6460,31 +6464,31 @@ var require_standalone = __commonJS({
                         V.push(X)
                     } else De ? w(De, ue) : G ? f(G, ue) : h(ie || le, ue)
                 }
-                if ((D(V, j, $), !R))
+                if ((D(V, j, $2), !R))
                   for (let W of L)
                     delete W.precedingNode,
                       delete W.enclosingNode,
                       delete W.followingNode
               }
               var k = (L) => !/[\S\n\u2028\u2029]/.test(L)
-              function P(L, M, j, $) {
-                let { comment: V, precedingNode: q } = j[$],
+              function P(L, M, j, $2) {
+                let { comment: V, precedingNode: q } = j[$2],
                   { locStart: Y, locEnd: H } = M,
                   R = Y(V)
                 if (q)
-                  for (let Q = $ - 1; Q >= 0; Q--) {
+                  for (let Q = $2 - 1; Q >= 0; Q--) {
                     let { comment: ee, precedingNode: te } = j[Q]
                     if (te !== q || !k(L.slice(H(ee), R))) break
                     R = Y(ee)
                   }
                 return v(L, R, { backwards: true })
               }
-              function C(L, M, j, $) {
-                let { comment: V, followingNode: q } = j[$],
+              function C(L, M, j, $2) {
+                let { comment: V, followingNode: q } = j[$2],
                   { locStart: Y, locEnd: H } = M,
                   R = H(V)
                 if (q)
-                  for (let Q = $ + 1; Q < j.length; Q++) {
+                  for (let Q = $2 + 1; Q < j.length; Q++) {
                     let { comment: ee, followingNode: te } = j[Q]
                     if (te !== q || !k(L.slice(R, Y(ee)))) break
                     R = H(ee)
@@ -6492,8 +6496,8 @@ var require_standalone = __commonJS({
                 return v(L, R)
               }
               function D(L, M, j) {
-                let $ = L.length
-                if ($ === 0) return
+                let $2 = L.length
+                if ($2 === 0) return
                 let {
                     precedingNode: V,
                     followingNode: q,
@@ -6504,7 +6508,7 @@ var require_standalone = __commonJS({
                     /^[\s(]*$/,
                   R = j.locStart(q),
                   Q
-                for (Q = $; Q > 0; --Q) {
+                for (Q = $2; Q > 0; --Q) {
                   let {
                     comment: ee,
                     precedingNode: te,
@@ -6530,14 +6534,14 @@ var require_standalone = __commonJS({
                 return (j.printed = true), M.printer.printComment(L, M)
               }
               function F(L, M, j) {
-                let $ = j.locStart(M) - 1
+                let $2 = j.locStart(M) - 1
                 for (let V = 1; V < L.length; ++V)
-                  if ($ < j.locStart(L[V])) return V - 1
+                  if ($2 < j.locStart(L[V])) return V - 1
                 return 0
               }
               function l(L, M) {
                 let j = L.getValue(),
-                  $ = [g(L, M)],
+                  $2 = [g(L, M)],
                   { printer: V, originalText: q, locStart: Y, locEnd: H } = M
                 if (V.isBlockComment && V.isBlockComment(j)) {
                   let ee = v(q, H(j))
@@ -6545,31 +6549,34 @@ var require_standalone = __commonJS({
                       ? a
                       : s
                     : ' '
-                  $.push(ee)
-                } else $.push(a)
+                  $2.push(ee)
+                } else $2.push(a)
                 let Q = m(q, d(q, H(j)))
-                return Q !== false && v(q, Q) && $.push(a), $
+                return Q !== false && v(q, Q) && $2.push(a), $2
               }
               function E(L, M) {
                 let j = L.getValue(),
-                  $ = g(L, M),
+                  $2 = g(L, M),
                   { printer: V, originalText: q, locStart: Y } = M,
                   H = V.isBlockComment && V.isBlockComment(j)
                 if (v(q, Y(j), { backwards: true })) {
                   let Q = p(q, j, Y)
-                  return i([a, Q ? a : '', $])
+                  return i([a, Q ? a : '', $2])
                 }
-                let R = [' ', $]
+                let R = [' ', $2]
                 return H || (R = [i(R), r]), R
               }
-              function y(L, M, j, $) {
+              function y(L, M, j, $2) {
                 let V = [],
                   q = L.getValue()
                 return !q ||
                   !q.comments ||
                   (L.each(() => {
                     let Y = L.getValue()
-                    !Y.leading && !Y.trailing && (!$ || $(Y)) && V.push(g(L, M))
+                    !Y.leading &&
+                      !Y.trailing &&
+                      (!$2 || $2(Y)) &&
+                      V.push(g(L, M))
                   }, 'comments'),
                   V.length === 0)
                   ? ''
@@ -6578,11 +6585,11 @@ var require_standalone = __commonJS({
                   : u([a, o(a, V)])
               }
               function N(L, M, j) {
-                let $ = L.getValue()
-                if (!$) return {}
-                let V = $.comments || []
+                let $2 = L.getValue()
+                if (!$2) return {}
+                let V = $2.comments || []
                 j && (V = V.filter((R) => !j.has(R)))
-                let q = $ === M.cursorNode
+                let q = $2 === M.cursorNode
                 if (V.length === 0) {
                   let R = q ? c : ''
                   return { leading: R, trailing: R }
@@ -6600,8 +6607,8 @@ var require_standalone = __commonJS({
                   { leading: Y, trailing: H }
                 )
               }
-              function x(L, M, j, $) {
-                let { leading: V, trailing: q } = N(L, j, $)
+              function x(L, M, j, $2) {
+                let { leading: V, trailing: q } = N(L, j, $2)
                 return !V && !q ? M : [V, M, q]
               }
               function b(L) {
@@ -7108,31 +7115,31 @@ var require_standalone = __commonJS({
                     (b.formatted = L + i(F.endOfLine))
                 }
                 if (F.cursorOffset >= 0) {
-                  let L, M, j, $, V
+                  let L, M, j, $2, V
                   if (
                     (F.cursorNode && b.cursorNodeText
                       ? ((L = F.locStart(F.cursorNode)),
                         (M = y.slice(L, F.locEnd(F.cursorNode))),
                         (j = F.cursorOffset - L),
-                        ($ = b.cursorNodeStart),
+                        ($2 = b.cursorNodeStart),
                         (V = b.cursorNodeText))
                       : ((L = 0),
                         (M = y),
                         (j = F.cursorOffset),
-                        ($ = 0),
+                        ($2 = 0),
                         (V = b.formatted)),
                     M === V)
                   )
                     return {
                       formatted: b.formatted,
-                      cursorOffset: $ + j,
+                      cursorOffset: $2 + j,
                       comments: N,
                     }
                   let q = [...M]
                   q.splice(j, 0, T)
                   let Y = [...V],
                     H = t(q, Y),
-                    R = $
+                    R = $2
                   for (let Q of H)
                     if (Q.removed) {
                       if (Q.value.includes(T)) break
@@ -7176,12 +7183,12 @@ var require_standalone = __commonJS({
                     ),
                     M
                   ),
-                  $ = j.formatted.trimEnd(),
+                  $2 = j.formatted.trimEnd(),
                   { cursorOffset: V } = F
                 V > N
-                  ? (V += $.length - x.length)
+                  ? (V += $2.length - x.length)
                   : j.cursorOffset >= 0 && (V = j.cursorOffset + y)
-                let q = E.slice(0, y) + $ + E.slice(N)
+                let q = E.slice(0, y) + $2 + E.slice(N)
                 if (F.endOfLine !== 'lf') {
                   let Y = i(F.endOfLine)
                   V >= 0 &&
@@ -7971,11 +7978,11 @@ var require_standalone = __commonJS({
                 let $e = fe.getParentNode()
                 return $e.type === 'Program' && $e.body.length === 1
               }
-              function $(O) {
+              function $2(O) {
                 return O.kind === 'get' || O.kind === 'set'
               }
               function V(O) {
-                return $(O) || m(O, O.value)
+                return $2(O) || m(O, O.value)
               }
               function q(O) {
                 return (
@@ -8533,7 +8540,7 @@ var require_standalone = __commonJS({
                 isFunctionCompositionArgs: pe,
                 isFunctionNotation: V,
                 isFunctionOrArrowExpression: x,
-                isGetterOrSetter: $,
+                isGetterOrSetter: $2,
                 isJestEachTemplateLiteral: Ae,
                 isJsxNode: M,
                 isLiteral: F,
@@ -8625,9 +8632,9 @@ var require_standalone = __commonJS({
                   g.each((M) => {
                     let j = M.getName()
                     if ((x.push(F()), j < b.length)) {
-                      let { tabWidth: $ } = l,
+                      let { tabWidth: $2 } = l,
                         V = M.getValue(),
-                        q = a(V.value.raw, $),
+                        q = a(V.value.raw, $2),
                         Y = b[j]
                       if (!L) {
                         let R = E[N][j]
@@ -8644,7 +8651,7 @@ var require_standalone = __commonJS({
                         V.value.raw.endsWith(`
 `)
                           ? v(Number.NEGATIVE_INFINITY, Y)
-                          : d(Y, q, $)
+                          : d(Y, q, $2)
                       x.push(o(['${', H, m, '}']))
                     }
                   }, 'quasis'),
@@ -8688,8 +8695,8 @@ var require_standalone = __commonJS({
                   }
                   let M = Math.max(y.length, ...L.map((V) => V.cells.length)),
                     j = Array.from({ length: M }).fill(0),
-                    $ = [{ cells: y }, ...L.filter((V) => V.cells.length > 0)]
-                  for (let { cells: V } of $.filter((q) => !q.hasLineBreak))
+                    $2 = [{ cells: y }, ...L.filter((V) => V.cells.length > 0)]
+                  for (let { cells: V } of $2.filter((q) => !q.hasLineBreak))
                     for (let [q, Y] of V.entries()) j[q] = Math.max(j[q], s(Y))
                   return (
                     x.push(
@@ -8699,7 +8706,7 @@ var require_standalone = __commonJS({
                         u,
                         r(
                           u,
-                          $.map((V) =>
+                          $2.map((V) =>
                             r(
                               ' | ',
                               V.cells.map((q, Y) =>
@@ -9656,7 +9663,7 @@ var require_standalone = __commonJS({
                   De,
                   q,
                   j,
-                  $,
+                  $2,
                   V,
                   Q,
                   Ae,
@@ -9676,7 +9683,7 @@ var require_standalone = __commonJS({
                   Y,
                   Ne,
                   j,
-                  $,
+                  $2,
                   V,
                   Q,
                   ie,
@@ -9689,7 +9696,7 @@ var require_standalone = __commonJS({
                 ].some((_) => _(me))
               }
               function x(me) {
-                return [ve, j, $, H, ue, te, ge, X, W, K, G, ae].some((_) =>
+                return [ve, j, $2, H, ue, te, ge, X, W, K, G, ae].some((_) =>
                   _(me)
                 )
               }
@@ -9737,7 +9744,7 @@ var require_standalone = __commonJS({
                   ? (i(Ee, _), true)
                   : false
               }
-              function $(me) {
+              function $2(me) {
                 let {
                   comment: _,
                   precedingNode: J,
@@ -11023,15 +11030,15 @@ var require_standalone = __commonJS({
                       b.type === 'SwitchStatement' ||
                       b.type === 'DoWhileStatement'),
                   j = C(y) && x.operator === '|>',
-                  $ = F(E, N, y, false, M)
-                if (M) return $
-                if (j) return i($)
+                  $2 = F(E, N, y, false, M)
+                if (M) return $2
+                if (j) return i($2)
                 if (
                   (I(b) && b.callee === x) ||
                   b.type === 'UnaryExpression' ||
                   (k(b) && !b.computed)
                 )
-                  return i([o([u, ...$]), u])
+                  return i([o([u, ...$2]), u])
                 let V =
                     b.type === 'ReturnStatement' ||
                     b.type === 'ThrowStatement' ||
@@ -11059,21 +11066,21 @@ var require_standalone = __commonJS({
                     b.type === 'ClassPrivateProperty' ||
                     P(b),
                   Y = w(x.left) && A(x.operator, x.left.operator)
-                if (V || (l(x) && !Y) || (!l(x) && q)) return i($)
-                if ($.length === 0) return ''
+                if (V || (l(x) && !Y) || (!l(x) && q)) return i($2)
+                if ($2.length === 0) return ''
                 let H = T(x.right),
-                  R = $.findIndex(
+                  R = $2.findIndex(
                     (X) =>
                       typeof X != 'string' &&
                       !Array.isArray(X) &&
                       X.type === 'group'
                   ),
-                  Q = $.slice(0, R === -1 ? 1 : R + 1),
-                  ee = $.slice(Q.length, H ? -1 : void 0),
+                  Q = $2.slice(0, R === -1 ? 1 : R + 1),
+                  ee = $2.slice(Q.length, H ? -1 : void 0),
                   te = Symbol('logicalChain-' + ++D),
                   oe = i([...Q, o(ee)], { id: te })
                 if (!H) return oe
-                let W = s($)
+                let W = s($2)
                 return i([oe, m(W, { groupId: te })])
               }
               function F(E, y, N, x, b) {
@@ -11084,7 +11091,7 @@ var require_standalone = __commonJS({
                   ? (M = E.call((ee) => F(ee, y, N, true, b), 'left'))
                   : M.push(i(y('left')))
                 let j = l(L),
-                  $ =
+                  $2 =
                     (L.operator === '|>' ||
                       L.type === 'NGPipeExpression' ||
                       (L.operator === '|' &&
@@ -11111,7 +11118,7 @@ var require_standalone = __commonJS({
                     C(N) && V === '|>'
                       ? E.call((oe) => F(oe, y, N, true, b), 'right')
                       : y('right')
-                  Y = [$ ? r : '', V, $ ? ' ' : r, te, q]
+                  Y = [$2 ? r : '', V, $2 ? ' ' : r, te, q]
                 }
                 let H = E.getParentNode(),
                   R = S(L.left, B.Trailing | B.Line),
@@ -11122,7 +11129,7 @@ var require_standalone = __commonJS({
                       L.left.type !== L.type &&
                       L.right.type !== L.type)
                 if (
-                  (M.push($ ? '' : ' ', Q ? i(Y, { shouldBreak: R }) : Y),
+                  (M.push($2 ? '' : ' ', Q ? i(Y, { shouldBreak: R }) : Y),
                   x && S(L))
                 ) {
                   let ee = d(t(E, M, N))
@@ -11574,7 +11581,7 @@ var require_standalone = __commonJS({
                   { shouldBreak: Ne }
                 )
               }
-              function $(ie, G, z) {
+              function $2(ie, G, z) {
                 let U = ie.getValue(),
                   le = []
                 le.push('</')
@@ -11649,7 +11656,7 @@ var require_standalone = __commonJS({
                     case 'JSXOpeningElement':
                       return j(ie, G, z)
                     case 'JSXClosingElement':
-                      return $(ie, G, z)
+                      return $2(ie, G, z)
                     case 'JSXOpeningFragment':
                     case 'JSXClosingFragment':
                       return V(ie, G)
@@ -11848,12 +11855,12 @@ var require_standalone = __commonJS({
                           R === 'ArrayExpression' ? 'elements' : 'properties'
                         return q[ee] && q[ee].length > 1
                       }),
-                    $ = k(l, g),
+                    $2 = k(l, g),
                     V = b
                       ? L
                         ? ','
                         : d(g)
-                        ? $
+                        ? $2
                           ? o(',', '', { groupId: M })
                           : o(',')
                         : ''
@@ -11864,7 +11871,7 @@ var require_standalone = __commonJS({
                         y,
                         i([
                           a,
-                          $ ? C(D, g, F, V) : [P(D, g, 'elements', F), V],
+                          $2 ? C(D, g, F, V) : [P(D, g, 'elements', F), V],
                           t(D, g, true),
                         ]),
                         a,
@@ -11964,11 +11971,11 @@ var require_standalone = __commonJS({
                 } = Oe(),
                 { ArgExpansionBailout: F } = zt(),
                 { isConciselyPrintedArray: l } = Kt()
-              function E(j, $, V) {
+              function E(j, $2, V) {
                 let q = j.getValue(),
                   Y = q.type === 'ImportExpression',
                   H = d(q)
-                if (H.length === 0) return ['(', t(j, $, true), ')']
+                if (H.length === 0) return ['(', t(j, $2, true), ')']
                 if (b(H))
                   return [
                     '(',
@@ -11985,14 +11992,14 @@ var require_standalone = __commonJS({
                   let z = ie.getNode(),
                     U = [V()]
                   G === ee ||
-                    (f(z, $)
+                    (f(z, $2)
                       ? (G === 0 && (Q = true), (R = true), U.push(',', S, S))
                       : U.push(',', A)),
                     te.push(U)
                 })
                 let oe =
                   !(Y || (q.callee && q.callee.type === 'Import')) &&
-                  m($, 'all')
+                  m($2, 'all')
                     ? ','
                     : ''
                 function W() {
@@ -12003,7 +12010,7 @@ var require_standalone = __commonJS({
                 if (R || (j.getParentNode().type !== 'Decorator' && o(H)))
                   return W()
                 let X = x(H),
-                  ue = N(H, $)
+                  ue = N(H, $2)
                 if (X || ue) {
                   if (X ? te.slice(1).some(g) : te.slice(0, -1).some(g))
                     return W()
@@ -12059,7 +12066,7 @@ var require_standalone = __commonJS({
                 return v(j) ? De : I(De, { shouldBreak: te.some(g) || R })
               }
               function y(j) {
-                let $ =
+                let $2 =
                   arguments.length > 1 && arguments[1] !== void 0
                     ? arguments[1]
                     : false
@@ -12081,7 +12088,7 @@ var require_standalone = __commonJS({
                         y(j.body, true)) ||
                       j.body.type === 'ObjectExpression' ||
                       j.body.type === 'ArrayExpression' ||
-                      (!$ &&
+                      (!$2 &&
                         (h(j.body) ||
                           j.body.type === 'ConditionalExpression')) ||
                       c(j.body))) ||
@@ -12089,7 +12096,7 @@ var require_standalone = __commonJS({
                   j.type === 'ModuleExpression'
                 )
               }
-              function N(j, $) {
+              function N(j, $2) {
                 let V = s(j),
                   q = a(j)
                 return (
@@ -12100,18 +12107,18 @@ var require_standalone = __commonJS({
                   (j.length !== 2 ||
                     q.type !== 'ArrowFunctionExpression' ||
                     V.type !== 'ArrayExpression') &&
-                  !(j.length > 1 && V.type === 'ArrayExpression' && l(V, $))
+                  !(j.length > 1 && V.type === 'ArrayExpression' && l(V, $2))
                 )
               }
               function x(j) {
                 if (j.length !== 2) return false
-                let [$, V] = j
-                return $.type === 'ModuleExpression' && M(V)
+                let [$2, V] = j
+                return $2.type === 'ModuleExpression' && M(V)
                   ? true
-                  : !u($) &&
-                      ($.type === 'FunctionExpression' ||
-                        ($.type === 'ArrowFunctionExpression' &&
-                          $.body.type === 'BlockStatement')) &&
+                  : !u($2) &&
+                      ($2.type === 'FunctionExpression' ||
+                        ($2.type === 'ArrowFunctionExpression' &&
+                          $2.body.type === 'BlockStatement')) &&
                       V.type !== 'FunctionExpression' &&
                       V.type !== 'ArrowFunctionExpression' &&
                       V.type !== 'ConditionalExpression' &&
@@ -12124,13 +12131,13 @@ var require_standalone = __commonJS({
                   r(j[0]).length === 0 &&
                   j[0].body.type === 'BlockStatement' &&
                   j[1].type === 'ArrayExpression' &&
-                  !j.some(($) => u($))
+                  !j.some(($2) => u($2))
                 )
               }
               function L(j) {
                 return (
                   j.type === 'BlockStatement' &&
-                  (j.body.some(($) => $.type !== 'EmptyStatement') ||
+                  (j.body.some(($2) => $2.type !== 'EmptyStatement') ||
                     u(j, i.Dangling))
                 )
               }
@@ -12251,7 +12258,7 @@ var require_standalone = __commonJS({
               function N(x, b, L) {
                 let M = x.getParentNode(),
                   j = !M || M.type === 'ExpressionStatement',
-                  $ = []
+                  $2 = []
                 function V(de) {
                   let { originalText: ae } = b,
                     ve = r(ae, de, T)
@@ -12262,7 +12269,7 @@ var require_standalone = __commonJS({
                 function q(de) {
                   let ae = de.getValue()
                   i(ae) && (m(ae.callee) || i(ae.callee))
-                    ? ($.unshift({
+                    ? ($2.unshift({
                         node: ae,
                         printed: [
                           t(de, [l(de), E(de, b, L), g(de, b, L)], b),
@@ -12271,55 +12278,58 @@ var require_standalone = __commonJS({
                       }),
                       de.call((ve) => q(ve), 'callee'))
                     : m(ae)
-                    ? ($.unshift({
+                    ? ($2.unshift({
                         node: ae,
                         needsParens: u(de, b),
                         printed: t(de, o(ae) ? F(de, b, L) : y(de, b, L), b),
                       }),
                       de.call((ve) => q(ve), 'object'))
                     : ae.type === 'TSNonNullExpression'
-                    ? ($.unshift({ node: ae, printed: t(de, '!', b) }),
+                    ? ($2.unshift({ node: ae, printed: t(de, '!', b) }),
                       de.call((ve) => q(ve), 'expression'))
-                    : $.unshift({ node: ae, printed: L() })
+                    : $2.unshift({ node: ae, printed: L() })
                 }
                 let Y = x.getValue()
-                $.unshift({ node: Y, printed: [l(x), E(x, b, L), g(x, b, L)] }),
+                $2.unshift({
+                  node: Y,
+                  printed: [l(x), E(x, b, L), g(x, b, L)],
+                }),
                   Y.callee && x.call((de) => q(de), 'callee')
                 let H = [],
-                  R = [$[0]],
+                  R = [$2[0]],
                   Q = 1
                 for (
                   ;
-                  Q < $.length &&
-                  ($[Q].node.type === 'TSNonNullExpression' ||
-                    i($[Q].node) ||
-                    (o($[Q].node) &&
-                      $[Q].node.computed &&
-                      d($[Q].node.property)));
+                  Q < $2.length &&
+                  ($2[Q].node.type === 'TSNonNullExpression' ||
+                    i($2[Q].node) ||
+                    (o($2[Q].node) &&
+                      $2[Q].node.computed &&
+                      d($2[Q].node.property)));
                   ++Q
                 )
-                  R.push($[Q])
-                if (!i($[0].node))
+                  R.push($2[Q])
+                if (!i($2[0].node))
                   for (
                     ;
-                    Q + 1 < $.length && m($[Q].node) && m($[Q + 1].node);
+                    Q + 1 < $2.length && m($2[Q].node) && m($2[Q + 1].node);
                     ++Q
                   )
-                    R.push($[Q])
+                    R.push($2[Q])
                 H.push(R), (R = [])
                 let ee = false
-                for (; Q < $.length; ++Q) {
-                  if (ee && m($[Q].node)) {
-                    if ($[Q].node.computed && d($[Q].node.property)) {
-                      R.push($[Q])
+                for (; Q < $2.length; ++Q) {
+                  if (ee && m($2[Q].node)) {
+                    if ($2[Q].node.computed && d($2[Q].node.property)) {
+                      R.push($2[Q])
                       continue
                     }
                     H.push(R), (R = []), (ee = false)
                   }
-                  ;(i($[Q].node) || $[Q].node.type === 'ImportExpression') &&
+                  ;(i($2[Q].node) || $2[Q].node.type === 'ImportExpression') &&
                     (ee = true),
-                    R.push($[Q]),
-                    f($[Q].node, h.Trailing) &&
+                    R.push($2[Q]),
+                    f($2[Q].node, h.Trailing) &&
                       (H.push(R), (R = []), (ee = false))
                 }
                 R.length > 0 && H.push(R)
@@ -12373,10 +12383,12 @@ var require_standalone = __commonJS({
                     Ae ? S : '',
                     De(H.slice(X ? 2 : 1)),
                   ],
-                  ke = $.map((de) => {
-                    let { node: ae } = de
-                    return ae
-                  }).filter(i)
+                  ke = $2
+                    .map((de) => {
+                      let { node: ae } = de
+                      return ae
+                    })
+                    .filter(i)
                 function ce() {
                   let de = s(s(H)).node,
                     ae = s(ie)
@@ -12593,7 +12605,7 @@ var require_standalone = __commonJS({
                   X.parser === 'json'
                 )
                   return 'never-break-after-operator'
-                if (N(G) || L(G) || $(G) || (V(G) && m(De))) return 'break-lhs'
+                if (N(G) || L(G) || $2(G) || (V(G) && m(De))) return 'break-lhs'
                 let Ae = ee(G, De, X)
                 return W.call(() => y(W, X, ue, Ae), ie)
                   ? 'break-after-operator'
@@ -12673,7 +12685,7 @@ var require_standalone = __commonJS({
                   W.type === 'TSTypeAliasDeclaration' || W.type === 'TypeAlias'
                 )
               }
-              function $(W) {
+              function $2(W) {
                 if (W.type !== 'VariableDeclarator') return false
                 let { typeAnnotation: X } = W.id
                 if (!X || !X.typeAnnotation) return false
@@ -12826,10 +12838,10 @@ var require_standalone = __commonJS({
               function g(y, N, x, b, L) {
                 let M = y.getValue(),
                   j = d(M),
-                  $ = L ? D(y, x, N) : ''
+                  $2 = L ? D(y, x, N) : ''
                 if (j.length === 0)
                   return [
-                    $,
+                    $2,
                     '(',
                     s(y, x, true, (ee) => t(x.originalText, ee, P) === ')'),
                     ')',
@@ -12853,14 +12865,14 @@ var require_standalone = __commonJS({
                   }),
                   b)
                 ) {
-                  if (m($) || m(H)) throw new C()
-                  return i([v($), '(', v(H), ')'])
+                  if (m($2) || m(H)) throw new C()
+                  return i([v($2), '(', v(H), ')'])
                 }
                 let R = j.every((ee) => !ee.decorators)
                 return Y && R
-                  ? [$, '(', ...H, ')']
+                  ? [$2, '(', ...H, ')']
                   : q
-                  ? [$, '(', ...H, ')']
+                  ? [$2, '(', ...H, ')']
                   : (A(V) ||
                       w(V) ||
                       V.type === 'TypeAlias' ||
@@ -12880,7 +12892,7 @@ var require_standalone = __commonJS({
                     ? ['(', ...H, ')']
                     : H
                   : [
-                      $,
+                      $2,
                       '(',
                       o([u, ...H]),
                       c(!S(M) && B(x, 'all') ? ',' : ''),
@@ -13002,47 +13014,47 @@ var require_standalone = __commonJS({
               function C(x, b, L) {
                 let M = b.semi ? ';' : '',
                   j = x.getValue(),
-                  $ = []
+                  $2 = []
                 return (
-                  $.push('opaque type ', L('id'), L('typeParameters')),
-                  j.supertype && $.push(': ', L('supertype')),
-                  j.impltype && $.push(' = ', L('impltype')),
-                  $.push(M),
-                  $
+                  $2.push('opaque type ', L('id'), L('typeParameters')),
+                  j.supertype && $2.push(': ', L('supertype')),
+                  j.impltype && $2.push(' = ', L('impltype')),
+                  $2.push(M),
+                  $2
                 )
               }
               function D(x, b, L) {
                 let M = b.semi ? ';' : '',
                   j = x.getValue(),
-                  $ = []
-                j.declare && $.push('declare '),
-                  $.push('type ', L('id'), L('typeParameters'))
+                  $2 = []
+                j.declare && $2.push('declare '),
+                  $2.push('type ', L('id'), L('typeParameters'))
                 let V =
                   j.type === 'TSTypeAliasDeclaration'
                     ? 'typeAnnotation'
                     : 'right'
-                return [S(x, b, L, $, ' =', V), M]
+                return [S(x, b, L, $2, ' =', V), M]
               }
               function g(x, b, L) {
                 let M = x.getValue(),
                   j = x.map(L, 'types'),
-                  $ = [],
+                  $2 = [],
                   V = false
                 for (let q = 0; q < j.length; ++q)
                   q === 0
-                    ? $.push(j[q])
+                    ? $2.push(j[q])
                     : h(M.types[q - 1]) && h(M.types[q])
-                    ? $.push([' & ', V ? c(j[q]) : j[q]])
+                    ? $2.push([' & ', V ? c(j[q]) : j[q]])
                     : !h(M.types[q - 1]) && !h(M.types[q])
-                    ? $.push(c([' &', i, j[q]]))
+                    ? $2.push(c([' &', i, j[q]]))
                     : (q > 1 && (V = true),
-                      $.push(' & ', q > 1 ? c(j[q]) : j[q]))
-                return r($)
+                      $2.push(' & ', q > 1 ? c(j[q]) : j[q]))
+                return r($2)
               }
               function F(x, b, L) {
                 let M = x.getValue(),
                   j = x.getParentNode(),
-                  $ =
+                  $2 =
                     j.type !== 'TypeParameterInstantiation' &&
                     j.type !== 'TSTypeParameterInstantiation' &&
                     j.type !== 'GenericTypeAnnotation' &&
@@ -13067,43 +13079,43 @@ var require_standalone = __commonJS({
                     return V || (Q = v(2, Q)), t(R, Q, b)
                   }, 'types')
                 if (V) return u(' | ', q)
-                let Y = $ && !w(b.originalText, M),
+                let Y = $2 && !w(b.originalText, M),
                   H = [m([Y ? i : '', '| ']), u([i, '| '], q)]
                 return d(x, b)
                   ? r([c(H), o])
                   : (j.type === 'TupleTypeAnnotation' && j.types.length > 1) ||
                     (j.type === 'TSTupleType' && j.elementTypes.length > 1)
                   ? r([c([m(['(', o]), H]), o, m(')')])
-                  : r($ ? c(H) : H)
+                  : r($2 ? c(H) : H)
               }
               function l(x, b, L) {
                 let M = x.getValue(),
                   j = [],
-                  $ = x.getParentNode(0),
+                  $2 = x.getParentNode(0),
                   V = x.getParentNode(1),
                   q = x.getParentNode(2),
                   Y =
                     M.type === 'TSFunctionType' ||
                     !(
-                      (($.type === 'ObjectTypeProperty' ||
-                        $.type === 'ObjectTypeInternalSlot') &&
-                        !$.variance &&
-                        !$.optional &&
-                        p($) === p(M)) ||
-                      $.type === 'ObjectTypeCallProperty' ||
+                      (($2.type === 'ObjectTypeProperty' ||
+                        $2.type === 'ObjectTypeInternalSlot') &&
+                        !$2.variance &&
+                        !$2.optional &&
+                        p($2) === p(M)) ||
+                      $2.type === 'ObjectTypeCallProperty' ||
                       (q && q.type === 'DeclareFunction')
                     ),
                   H =
                     Y &&
-                    ($.type === 'TypeAnnotation' ||
-                      $.type === 'TSTypeAnnotation'),
+                    ($2.type === 'TypeAnnotation' ||
+                      $2.type === 'TSTypeAnnotation'),
                   R =
                     H &&
                     Y &&
-                    ($.type === 'TypeAnnotation' ||
-                      $.type === 'TSTypeAnnotation') &&
+                    ($2.type === 'TypeAnnotation' ||
+                      $2.type === 'TSTypeAnnotation') &&
                     V.type === 'ArrowFunctionExpression'
-                T($) && ((Y = true), (H = true)), R && j.push('(')
+                T($2) && ((Y = true), (H = true)), R && j.push('(')
                 let Q = B(x, L, b, false, true),
                   ee =
                     M.returnType || M.predicate || M.typeAnnotation
@@ -13125,8 +13137,8 @@ var require_standalone = __commonJS({
               function E(x, b, L) {
                 let M = x.getValue(),
                   j = M.type === 'TSTupleType' ? 'elementTypes' : 'types',
-                  $ = M[j],
-                  V = a($),
+                  $2 = M[j],
+                  V = a($2),
                   q = V ? o : ''
                 return r([
                   '[',
@@ -13380,7 +13392,7 @@ var require_standalone = __commonJS({
                 { locEnd: M } = st(),
                 {
                   printFunctionParameters: j,
-                  shouldGroupFunctionParameters: $,
+                  shouldGroupFunctionParameters: $2,
                 } = Pr(),
                 { printPropertyKey: V } = Qt(),
                 { printFunctionTypeParameters: q } = ct()
@@ -13405,7 +13417,7 @@ var require_standalone = __commonJS({
                   Ae.id && ke.push(U('id'))
                 let ce = j(z, U, le, Ne),
                   pe = X(z, U, le),
-                  de = $(Ae, pe)
+                  de = $2(Ae, pe)
                 return (
                   ke.push(
                     q(z, le, U),
@@ -13446,7 +13458,7 @@ var require_standalone = __commonJS({
                 let ge = z.getNode(),
                   Ae = j(z, le, U),
                   Ne = X(z, le, U),
-                  ke = $(ge, Ne),
+                  ke = $2(ge, Ne),
                   ce = [q(z, U, le), c([ke ? c(Ae) : Ae, Ne])]
                 return (
                   ge.body
@@ -13739,7 +13751,7 @@ var require_standalone = __commonJS({
                 M.declare && j.push('declare '),
                   M.abstract && j.push('abstract '),
                   j.push('class')
-                let $ =
+                let $2 =
                     (M.id && p(M.id, f.Trailing)) ||
                     (M.typeParameters && p(M.typeParameters, f.Trailing)) ||
                     (M.superClass && p(M.superClass)) ||
@@ -13755,10 +13767,10 @@ var require_standalone = __commonJS({
                 ) {
                   let Y = [E(x, b, L), L('superTypeParameters')],
                     H = x.call((R) => ['extends ', a(R, Y, b)], 'superClass')
-                  $ ? q.push(i, v(H)) : q.push(' ', H)
+                  $2 ? q.push(i, v(H)) : q.push(' ', H)
                 } else q.push(l(x, b, L, 'extends'))
                 if (
-                  (q.push(l(x, b, L, 'mixins'), l(x, b, L, 'implements')), $)
+                  (q.push(l(x, b, L, 'mixins'), l(x, b, L, 'implements')), $2)
                 ) {
                   let Y
                   F(M) ? (Y = [...V, m(q)]) : (Y = m([...V, q])),
@@ -13787,14 +13799,14 @@ var require_standalone = __commonJS({
               function l(x, b, L, M) {
                 let j = x.getValue()
                 if (!t(j[M])) return ''
-                let $ = r(x, b, true, (V) => {
+                let $2 = r(x, b, true, (V) => {
                   let { marker: q } = V
                   return q === M
                 })
                 return [
                   F(j) ? d(' ', i, { groupId: h(j.typeParameters) }) : i,
-                  $,
-                  $ && o,
+                  $2,
+                  $2 && o,
                   M,
                   v(m([i, u([',', i], x.map(L, M))])),
                 ]
@@ -13824,7 +13836,7 @@ var require_standalone = __commonJS({
               function N(x, b, L) {
                 let M = x.getValue(),
                   j = [],
-                  $ = b.semi ? ';' : ''
+                  $2 = b.semi ? ';' : ''
                 return (
                   t(M.decorators) && j.push(k(x, b, L)),
                   M.accessibility && j.push(M.accessibility + ' '),
@@ -13837,7 +13849,7 @@ var require_standalone = __commonJS({
                   M.variance && j.push(L('variance')),
                   M.type === 'ClassAccessorProperty' && j.push('accessor '),
                   j.push(B(x, b, L), T(x), S(x), A(x, b, L)),
-                  [I(x, b, L, j, ' =', 'value'), $]
+                  [I(x, b, L, j, ' =', 'value'), $2]
                 )
               }
               n.exports = {
@@ -13933,10 +13945,10 @@ var require_standalone = __commonJS({
                 let L = N.getValue(),
                   M = x.semi ? ';' : '',
                   j = [],
-                  { importKind: $ } = L
+                  { importKind: $2 } = L
                 return (
                   j.push('import'),
-                  $ && $ !== 'value' && j.push(' ', $),
+                  $2 && $2 !== 'value' && j.push(' ', $2),
                   j.push(g(N, x, b), D(N, x, b), l(N, x, b), M),
                   j
                 )
@@ -13945,7 +13957,7 @@ var require_standalone = __commonJS({
                 let L = N.getValue(),
                   M = []
                 S(L) && M.push(B(N, x, b))
-                let { type: j, exportKind: $, declaration: V } = L
+                let { type: j, exportKind: $2, declaration: V } = L
                 return (
                   M.push('export'),
                   (L.default || j === 'ExportDefaultDeclaration') &&
@@ -13955,7 +13967,7 @@ var require_standalone = __commonJS({
                   V
                     ? M.push(' ', b('declaration'))
                     : M.push(
-                        $ === 'type' ? ' type' : '',
+                        $2 === 'type' ? ' type' : '',
                         g(N, x, b),
                         D(N, x, b),
                         l(N, x, b)
@@ -13968,10 +13980,10 @@ var require_standalone = __commonJS({
                 let L = N.getValue(),
                   M = x.semi ? ';' : '',
                   j = [],
-                  { exportKind: $, exported: V } = L
+                  { exportKind: $2, exported: V } = L
                 return (
                   j.push('export'),
-                  $ === 'type' && j.push(' type'),
+                  $2 === 'type' && j.push(' type'),
                   j.push(' *'),
                   V && j.push(' as ', b('exported')),
                   j.push(D(N, x, b), l(N, x, b), M),
@@ -14007,7 +14019,7 @@ var require_standalone = __commonJS({
                 let M = [' ']
                 if (t(L.specifiers)) {
                   let j = [],
-                    $ = []
+                    $2 = []
                   N.each(() => {
                     let V = N.getValue().type
                     if (
@@ -14018,22 +14030,22 @@ var require_standalone = __commonJS({
                     )
                       j.push(b())
                     else if (V === 'ExportSpecifier' || V === 'ImportSpecifier')
-                      $.push(b())
+                      $2.push(b())
                     else
                       throw new Error(
                         'Unknown specifier type '.concat(JSON.stringify(V))
                       )
                   }, 'specifiers'),
                     M.push(u(', ', j)),
-                    $.length > 0 &&
+                    $2.length > 0 &&
                       (j.length > 0 && M.push(', '),
-                      $.length > 1 ||
+                      $2.length > 1 ||
                       j.length > 0 ||
                       L.specifiers.some((q) => m(q))
                         ? M.push(
                             a([
                               '{',
-                              r([x.bracketSpacing ? i : s, u([',', i], $)]),
+                              r([x.bracketSpacing ? i : s, u([',', i], $2)]),
                               o(p(x) ? ',' : ''),
                               x.bracketSpacing ? i : s,
                               '}',
@@ -14042,7 +14054,7 @@ var require_standalone = __commonJS({
                         : M.push([
                             '{',
                             x.bracketSpacing ? ' ' : '',
-                            ...$,
+                            ...$2,
                             x.bracketSpacing ? ' ' : '',
                             '}',
                           ]))
@@ -14071,8 +14083,8 @@ var require_standalone = __commonJS({
                 let L = N.getNode(),
                   { type: M } = L,
                   j = [],
-                  $ = M === 'ImportSpecifier' ? L.importKind : L.exportKind
-                $ && $ !== 'value' && j.push($, ' ')
+                  $2 = M === 'ImportSpecifier' ? L.importKind : L.exportKind
+                $2 && $2 !== 'value' && j.push($2, ' ')
                 let V = M.startsWith('Import'),
                   q = V ? 'imported' : 'local',
                   Y = V ? 'local' : 'exported',
@@ -14171,7 +14183,7 @@ var require_standalone = __commonJS({
                       M.type === 'DeclareInterface' ||
                       M.type === 'DeclareClass') &&
                     g.getName() === 'body',
-                  $ =
+                  $2 =
                     y.type === 'TSInterfaceBody' ||
                     j ||
                     (y.type === 'ObjectPattern' &&
@@ -14281,7 +14293,7 @@ var require_standalone = __commonJS({
                         X === 'rest') &&
                       ue === 0
                   ) ||
-                  (!$ &&
+                  (!$2 &&
                     g.match(
                       (W) => W.type === 'ObjectPattern',
                       (W) =>
@@ -14289,7 +14301,7 @@ var require_standalone = __commonJS({
                         W.type === 'VariableDeclarator'
                     ))
                   ? oe
-                  : r(oe, { shouldBreak: $ })
+                  : r(oe, { shouldBreak: $2 })
               }
               n.exports = { printObject: D }
             },
@@ -14340,9 +14352,9 @@ var require_standalone = __commonJS({
                   Q = []
                 switch (H.type) {
                   case 'DeclareClass':
-                    return $(V, T(V, q, Y))
+                    return $2(V, T(V, q, Y))
                   case 'DeclareFunction':
-                    return $(V, [
+                    return $2(V, [
                       'function ',
                       Y('id'),
                       H.predicate ? ' ' : '',
@@ -14350,26 +14362,26 @@ var require_standalone = __commonJS({
                       R,
                     ])
                   case 'DeclareModule':
-                    return $(V, ['module ', Y('id'), ' ', Y('body')])
+                    return $2(V, ['module ', Y('id'), ' ', Y('body')])
                   case 'DeclareModuleExports':
-                    return $(V, [
+                    return $2(V, [
                       'module.exports',
                       ': ',
                       Y('typeAnnotation'),
                       R,
                     ])
                   case 'DeclareVariable':
-                    return $(V, ['var ', Y('id'), R])
+                    return $2(V, ['var ', Y('id'), R])
                   case 'DeclareOpaqueType':
-                    return $(V, A(V, q, Y))
+                    return $2(V, A(V, q, Y))
                   case 'DeclareInterface':
-                    return $(V, D(V, q, Y))
+                    return $2(V, D(V, q, Y))
                   case 'DeclareTypeAlias':
-                    return $(V, S(V, q, Y))
+                    return $2(V, S(V, q, Y))
                   case 'DeclareExportDeclaration':
-                    return $(V, l(V, q, Y))
+                    return $2(V, l(V, q, Y))
                   case 'DeclareExportAllDeclaration':
-                    return $(V, E(V, q, Y))
+                    return $2(V, E(V, q, Y))
                   case 'OpaqueType':
                     return A(V, q, Y)
                   case 'TypeAlias':
@@ -14600,7 +14612,7 @@ var require_standalone = __commonJS({
                     )
                 }
               }
-              function $(V, q) {
+              function $2(V, q) {
                 let Y = v(V)
                 return Y
                   ? (t.strictEqual(Y.type, 'DeclareExportDeclaration'), q)
@@ -14709,7 +14721,7 @@ var require_standalone = __commonJS({
                   L = false,
                   M = P.getParentNode(),
                   j = M.type === g.type && y.some((ue) => M[ue] === g),
-                  $ = M.type === g.type && !j,
+                  $2 = M.type === g.type && !j,
                   V,
                   q,
                   Y = 0
@@ -14718,7 +14730,7 @@ var require_standalone = __commonJS({
                 let H = V || M,
                   R = q
                 if (F && (s(g[y[0]]) || s(N) || s(x) || A(R))) {
-                  ;(L = true), ($ = true)
+                  ;(L = true), ($2 = true)
                   let ue = (ie) => [h('('), p([m, ie]), m, h(')')],
                     De = (ie) =>
                       ie.type === 'NullLiteral' ||
@@ -14759,7 +14771,7 @@ var require_standalone = __commonJS({
                     (u(M) || (M.type === 'NGPipeExpression' && M.left === g)) &&
                     !M.computed,
                   W = I(P),
-                  X = te([S(P, C, D), $ ? b : p(b), F && oe && !W ? m : ''])
+                  X = te([S(P, C, D), $2 ? b : p(b), F && oe && !W ? m : ''])
                 return j || W ? d([p([m, X]), m]) : X
               }
               n.exports = { printTernary: k }
@@ -15027,7 +15039,7 @@ var require_standalone = __commonJS({
                 { printInterface: M } = lo(),
                 { printBlock: j } = Do(),
                 {
-                  printTypeAlias: $,
+                  printTypeAlias: $2,
                   printIntersectionType: V,
                   printUnionType: q,
                   printFunctionType: Y,
@@ -15069,7 +15081,7 @@ var require_standalone = __commonJS({
                   case 'TSTypeLiteral':
                     return F(te, oe, W)
                   case 'TSTypeAliasDeclaration':
-                    return $(te, oe, W)
+                    return $2(te, oe, W)
                   case 'TSQualifiedName':
                     return a('.', [W('left'), W('right')])
                   case 'TSAbstractMethodDefinition':
@@ -15510,7 +15522,7 @@ var require_standalone = __commonJS({
                 { printHtmlBinding: x, isVueEventBindingExpression: b } = $m(),
                 { printAngular: L } = Hm(),
                 { printJsx: M, hasJsxIgnoreComment: j } = Gm(),
-                { printFlow: $ } = Um(),
+                { printFlow: $2 } = Um(),
                 { printTypescript: V } = Xm(),
                 {
                   printOptionalToken: q,
@@ -15597,7 +15609,7 @@ var require_standalone = __commonJS({
                   Xe = Pe.semi ? ';' : ''
                 if (!xe) return ''
                 if (typeof xe == 'string') return xe
-                for (let je of [me, x, L, M, $, V]) {
+                for (let je of [me, x, L, M, $2, V]) {
                   let Re = je(Be, Pe, Se)
                   if (typeof Re < 'u') return Re
                 }
@@ -17130,7 +17142,7 @@ var require_standalone = __commonJS({
                     : U.type) === 'value-colon'
                 )
               }
-              function $(G) {
+              function $2(G) {
                 var z
                 return (
                   G.type === 'value-paren_group' &&
@@ -17143,14 +17155,14 @@ var require_standalone = __commonJS({
                 let U = G.getValue()
                 if (U.groups.length === 0) return false
                 let le = G.getParentNode(1)
-                if (!$(U) && !(le && $(le))) return false
+                if (!$2(U) && !(le && $2(le))) return false
                 let ge = a(G, 'css-decl')
                 return !!(
                   (ge != null &&
                     (z = ge.prop) !== null &&
                     z !== void 0 &&
                     z.startsWith('$')) ||
-                  $(le) ||
+                  $2(le) ||
                   le.type === 'value-func'
                 )
               }
@@ -17265,7 +17277,7 @@ var require_standalone = __commonJS({
                 isTemplatePropNode: N,
                 isPostcssSimpleVarNode: x,
                 isKeyValuePairNode: j,
-                isKeyValuePairInParenGroupNode: $,
+                isKeyValuePairInParenGroupNode: $2,
                 isKeyInValuePairNode: te,
                 isSCSSMapItemNode: V,
                 isInlineValueCommentNode: q,
@@ -17610,7 +17622,7 @@ var require_standalone = __commonJS({
                   isSCSSControlDirectiveNode: L,
                   isDetachedRulesetDeclarationNode: M,
                   isRelationalOperatorNode: j,
-                  isEqualityOperatorNode: $,
+                  isEqualityOperatorNode: $2,
                   isMultiplicationNode: V,
                   isDivisionNode: q,
                   isAdditionNode: Y,
@@ -18120,7 +18132,7 @@ var require_standalone = __commonJS({
                         }
                         if (
                           pt &&
-                          ($(Ge) || j(Ge) || oe(Ge) || Q(Ve) || ee(Ve))
+                          ($2(Ge) || j(Ge) || oe(Ge) || Q(Ve) || ee(Ve))
                         ) {
                           Te.push(' ')
                           continue
@@ -18916,7 +18928,7 @@ var require_standalone = __commonJS({
                   ye = K.openStrip.open ? '~' : ''
                 return [he, ye, '#']
               }
-              function $(K) {
+              function $2(K) {
                 let he = M(K)
                 return [K.openStrip.close ? '~' : '', he]
               }
@@ -18941,7 +18953,7 @@ var require_standalone = __commonJS({
               function R(K, he) {
                 let ye = K.getValue(),
                   Ce = j(ye),
-                  Ie = $(ye),
+                  Ie = $2(ye),
                   Fe = [de(K, he)],
                   me = ae(K, he)
                 if ((me && Fe.push(c, me), f(ye.program.blockParams))) {
@@ -20234,7 +20246,7 @@ var require_standalone = __commonJS({
                   isAutolink: M,
                 } = Kn(),
                 j = new Set(['importExport']),
-                $ = ['heading', 'tableCell', 'link', 'wikiLink'],
+                $2 = ['heading', 'tableCell', 'link', 'wikiLink'],
                 V = new Set(['listItem', 'definition', 'footnoteDefinition'])
               function q(ce, pe, de) {
                 let ae = ce.getValue()
@@ -20617,7 +20629,7 @@ var require_standalone = __commonJS({
 `
                 )
                   return d
-                let ae = de.proseWrap === 'always' && !te(ce, $)
+                let ae = de.proseWrap === 'always' && !te(ce, $2)
                 return pe !== '' ? (ae ? c : ' ') : ae ? p : ''
               }
               function W(ce, pe, de) {
@@ -21247,7 +21259,7 @@ var require_standalone = __commonJS({
               }
               function j(_) {
                 return (
-                  $(_) ||
+                  $2(_) ||
                   (_.type === 'element' &&
                     _.children.length > 0 &&
                     (['body', 'script', 'style'].includes(_.name) ||
@@ -21259,7 +21271,7 @@ var require_standalone = __commonJS({
                     (!_.lastChild.isTrailingSpaceSensitive || R(_.lastChild)))
                 )
               }
-              function $(_) {
+              function $2(_) {
                 return (
                   _.type === 'element' &&
                   _.children.length > 0 &&
@@ -21527,7 +21539,7 @@ var require_standalone = __commonJS({
                 countChars: de,
                 countParents: ge,
                 dedentString: pe,
-                forceBreakChildren: $,
+                forceBreakChildren: $2,
                 forceBreakContent: j,
                 forceNextEmptyLine: M,
                 getLastDescendant: ee,
@@ -21973,7 +21985,7 @@ var require_standalone = __commonJS({
                     htmlAst: L,
                     styles: M,
                     styleUrls: j,
-                    externalStylesheets: $,
+                    externalStylesheets: $2,
                     animations: V,
                     ngContentSelectors: q,
                     interpolation: Y,
@@ -21987,7 +21999,7 @@ var require_standalone = __commonJS({
                     (this.htmlAst = L),
                     (this.styles = k(M)),
                     (this.styleUrls = k(j)),
-                    (this.externalStylesheets = k($)),
+                    (this.externalStylesheets = k($2)),
                     (this.animations = V ? C(V) : []),
                     (this.ngContentSelectors = q || []),
                     Y && Y.length != 2)
@@ -22018,7 +22030,7 @@ var require_standalone = __commonJS({
                       selector: L,
                       exportAs: M,
                       changeDetection: j,
-                      inputs: $,
+                      inputs: $2,
                       outputs: V,
                       host: q,
                       providers: Y,
@@ -22046,8 +22058,8 @@ var require_standalone = __commonJS({
                         : Ae[2] != null && (De[Ae[2]] = ge)
                     })
                   let z = {}
-                  $ != null &&
-                    $.forEach((le) => {
+                  $2 != null &&
+                    $2.forEach((le) => {
                       let ge = t.splitAtColon(le, [le, le])
                       z[ge[0]] = ge[1]
                     })
@@ -22091,7 +22103,7 @@ var require_standalone = __commonJS({
                     selector: L,
                     exportAs: M,
                     changeDetection: j,
-                    inputs: $,
+                    inputs: $2,
                     outputs: V,
                     hostListeners: q,
                     hostProperties: Y,
@@ -22113,7 +22125,7 @@ var require_standalone = __commonJS({
                     (this.selector = L),
                     (this.exportAs = M),
                     (this.changeDetection = j),
-                    (this.inputs = $),
+                    (this.inputs = $2),
                     (this.outputs = V),
                     (this.hostListeners = q),
                     (this.hostProperties = Y),
@@ -22182,7 +22194,7 @@ var require_standalone = __commonJS({
                     exportedDirectives: L,
                     declaredPipes: M,
                     exportedPipes: j,
-                    entryComponents: $,
+                    entryComponents: $2,
                     bootstrapComponents: V,
                     importedModules: q,
                     exportedModules: Y,
@@ -22196,7 +22208,7 @@ var require_standalone = __commonJS({
                     (this.declaredPipes = k(M)),
                     (this.exportedPipes = k(j)),
                     (this.providers = k(x)),
-                    (this.entryComponents = k($)),
+                    (this.entryComponents = k($2)),
                     (this.bootstrapComponents = k(V)),
                     (this.importedModules = k(q)),
                     (this.exportedModules = k(Y)),
@@ -22278,7 +22290,7 @@ var require_standalone = __commonJS({
                     useExisting: L,
                     useFactory: M,
                     deps: j,
-                    multi: $,
+                    multi: $2,
                   } = N
                   ;(this.token = y),
                     (this.useClass = x || null),
@@ -22286,7 +22298,7 @@ var require_standalone = __commonJS({
                     (this.useExisting = L),
                     (this.useFactory = M || null),
                     (this.dependencies = j || null),
-                    (this.multi = !!$)
+                    (this.multi = !!$2)
                 }
               }
               e.ProviderMeta = P
@@ -22648,28 +22660,28 @@ var require_standalone = __commonJS({
                         L = null,
                         M = x.value.split(y)
                       for (let j = 0; j < M.length; j++, b = L) {
-                        let $ = M[j]
+                        let $2 = M[j]
                         if (j % 2 === 0) {
-                          ;(L = b.moveBy($.length)),
-                            $.length > 0 &&
+                          ;(L = b.moveBy($2.length)),
+                            $2.length > 0 &&
                               N.insertChildBefore(x, {
                                 type: 'text',
-                                value: $,
+                                value: $2,
                                 sourceSpan: new t(b, L),
                               })
                           continue
                         }
-                        ;(L = b.moveBy($.length + 4)),
+                        ;(L = b.moveBy($2.length + 4)),
                           N.insertChildBefore(x, {
                             type: 'interpolation',
                             sourceSpan: new t(b, L),
                             children:
-                              $.length === 0
+                              $2.length === 0
                                 ? []
                                 : [
                                     {
                                       type: 'text',
-                                      value: $,
+                                      value: $2,
                                       sourceSpan: new t(
                                         b.moveBy(2),
                                         L.moveBy(-2)
@@ -22706,7 +22718,7 @@ var require_standalone = __commonJS({
                           text: M,
                           trailingWhitespace: j,
                         } = a(b.value),
-                        $ = b.prev,
+                        $2 = b.prev,
                         V = b.next
                       M
                         ? ((b.value = M),
@@ -22715,7 +22727,7 @@ var require_standalone = __commonJS({
                             b.sourceSpan.end.moveBy(-j.length)
                           )),
                           L &&
-                            ($ && ($.hasTrailingSpaces = true),
+                            ($2 && ($2.hasTrailingSpaces = true),
                             (b.hasLeadingSpaces = true)),
                           j &&
                             ((b.hasTrailingSpaces = true),
@@ -22723,7 +22735,7 @@ var require_standalone = __commonJS({
                         : (E.removeChild(b),
                           x--,
                           (L || j) &&
-                            ($ && ($.hasTrailingSpaces = true),
+                            ($2 && ($2.hasTrailingSpaces = true),
                             V && (V.hasLeadingSpaces = true)))
                     }
                   ;(E.isWhitespaceSensitive = y), (E.isIndentationSensitive = N)
@@ -22862,7 +22874,7 @@ var require_standalone = __commonJS({
                 return F(q) ? C(q.lastChild, Y) : ''
               }
               function k(q, Y) {
-                return l(q) ? P(q.parent, Y) : E(q) ? $(q.next) : ''
+                return l(q) ? P(q.parent, Y) : E(q) ? $2(q.next) : ''
               }
               function P(q, Y) {
                 if ((t(!q.isSelfClosing), D(q, Y))) return ''
@@ -22994,12 +23006,12 @@ var require_standalone = __commonJS({
                 return [M(R, Y), x(q, Y, H), R.isSelfClosing ? '' : b(R)]
               }
               function M(q, Y) {
-                return q.prev && E(q.prev) ? '' : [j(q, Y), $(q)]
+                return q.prev && E(q.prev) ? '' : [j(q, Y), $2(q)]
               }
               function j(q, Y) {
                 return N(q) ? V(q.parent) : g(q) ? C(q.prev, Y) : ''
               }
-              function $(q) {
+              function $2(q) {
                 switch (q.type) {
                   case 'ieConditionalComment':
                   case 'ieConditionalStartComment':
@@ -23042,7 +23054,7 @@ var require_standalone = __commonJS({
                 printOpeningTag: L,
                 printOpeningTagStart: M,
                 printOpeningTagPrefix: j,
-                printOpeningTagStartMarker: $,
+                printOpeningTagStartMarker: $2,
                 printOpeningTagEndMarker: V,
                 needsToBorrowNextOpeningTagStartMarker: E,
                 needsToBorrowParentOpeningTagEndMarker: N,
@@ -23381,7 +23393,7 @@ var require_standalone = __commonJS({
                 } = qt(),
                 N = ho()
               function x(L, M, j) {
-                let $ = (te) => new RegExp(te.join('|')).test(L.fullName),
+                let $2 = (te) => new RegExp(te.join('|')).test(L.fullName),
                   V = () => F(L.value),
                   q = false,
                   Y = (te, oe) => {
@@ -23443,7 +23455,7 @@ var require_standalone = __commonJS({
                   let te = ['^@', '^v-on:'],
                     oe = ['^:', '^v-bind:'],
                     W = ['^v-']
-                  if ($(te)) {
+                  if ($2(te)) {
                     let X = V(),
                       ue = I(X)
                         ? '__js_expression'
@@ -23452,8 +23464,8 @@ var require_standalone = __commonJS({
                         : '__vue_event_binding'
                     return Q(ee(X, { parser: ue }))
                   }
-                  if ($(oe)) return Q(ee(V(), { parser: '__vue_expression' }))
-                  if ($(W)) return Q(ee(V(), { parser: '__js_expression' }))
+                  if ($2(oe)) return Q(ee(V(), { parser: '__vue_expression' }))
+                  if ($2(W)) return Q(ee(V(), { parser: '__js_expression' }))
                 }
                 if (j.parser === 'angular') {
                   let te = (G, z) =>
@@ -23473,13 +23485,13 @@ var require_standalone = __commonJS({
                       '^ng-(if|show|hide|class|style)$',
                     ],
                     ue = ['^i18n(-.+)?$']
-                  if ($(W)) return Q(te(V(), { parser: '__ng_action' }))
-                  if ($(X)) return Q(te(V(), { parser: '__ng_binding' }))
-                  if ($(ue)) {
+                  if ($2(W)) return Q(te(V(), { parser: '__ng_action' }))
+                  if ($2(X)) return Q(te(V(), { parser: '__ng_binding' }))
+                  if ($2(ue)) {
                     let G = V().trim()
                     return R(i(y(L, G)), !G.includes('@@'))
                   }
-                  if ($(oe)) return Q(te(V(), { parser: '__ng_directive' }))
+                  if ($2(oe)) return Q(te(V(), { parser: '__ng_directive' }))
                   let De = /{{(.+?)}}/s,
                     ie = V()
                   if (De.test(ie)) {
@@ -23510,15 +23522,15 @@ var require_standalone = __commonJS({
                 }
                 return null
               }
-              function b(L, M, j, $) {
+              function b(L, M, j, $2) {
                 let V = L.getValue()
                 switch (V.type) {
                   case 'element': {
                     if (k(V) || V.type === 'interpolation') return
-                    if (!V.isSelfClosing && P(V, $)) {
-                      let q = C(V, $)
+                    if (!V.isSelfClosing && P(V, $2)) {
+                      let q = C(V, $2)
                       if (!q) return
-                      let Y = N(V, $),
+                      let Y = N(V, $2),
                         H = /^\s*$/.test(Y),
                         R = ''
                       return (
@@ -23530,13 +23542,13 @@ var require_standalone = __commonJS({
                           )),
                           (H = R === '')),
                         [
-                          h(V, $),
-                          s(w(L, $, M)),
+                          h(V, $2),
+                          s(w(L, $2, M)),
                           H ? '' : a,
                           R,
                           H ? '' : a,
-                          d(V, $),
-                          p(V, $),
+                          d(V, $2),
+                          p(V, $2),
                         ]
                       )
                     }
@@ -23544,14 +23556,14 @@ var require_standalone = __commonJS({
                   }
                   case 'text': {
                     if (k(V.parent)) {
-                      let q = C(V.parent, $)
+                      let q = C(V.parent, $2)
                       if (q) {
                         let Y =
                             q === 'markdown'
                               ? g(V.value.replace(/^[^\S\n]*\n/, ''))
                               : V.value,
                           H = { parser: q, __embeddedInHtml: true }
-                        if ($.parser === 'html' && q === 'babel') {
+                        if ($2.parser === 'html' && q === 'babel') {
                           let R = 'script',
                             { attrMap: Q } = V.parent
                           Q &&
@@ -23563,9 +23575,9 @@ var require_standalone = __commonJS({
                         }
                         return [
                           t,
-                          h(V, $),
+                          h(V, $2),
                           j(Y, H, { stripTrailingHardline: true }),
-                          p(V, $),
+                          p(V, $2),
                         ]
                       }
                     } else if (V.parent.type === 'interpolation') {
@@ -23574,11 +23586,11 @@ var require_standalone = __commonJS({
                         __embeddedInHtml: true,
                       }
                       return (
-                        $.parser === 'angular'
+                        $2.parser === 'angular'
                           ? ((q.parser = '__ng_interpolation'),
                             (q.trailingComma = 'none'))
-                          : $.parser === 'vue'
-                          ? (q.parser = $.__should_parse_vue_template_with_ts
+                          : $2.parser === 'vue'
+                          ? (q.parser = $2.__should_parse_vue_template_with_ts
                               ? '__vue_ts_expression'
                               : '__vue_expression')
                           : (q.parser = '__js_expression'),
@@ -23597,7 +23609,7 @@ var require_standalone = __commonJS({
                     if (!V.value) break
                     if (
                       /^PRETTIER_HTML_PLACEHOLDER_\d+_\d+_IN_JS$/.test(
-                        $.originalText.slice(
+                        $2.originalText.slice(
                           V.valueSpan.start.offset,
                           V.valueSpan.end.offset
                         )
@@ -23605,9 +23617,9 @@ var require_standalone = __commonJS({
                     )
                       return [V.rawName, '=', V.value]
                     if (
-                      $.parser === 'lwc' &&
+                      $2.parser === 'lwc' &&
                       /^{.*}$/s.test(
-                        $.originalText.slice(
+                        $2.originalText.slice(
                           V.valueSpan.start.offset,
                           V.valueSpan.end.offset
                         )
@@ -23628,7 +23640,7 @@ var require_standalone = __commonJS({
                           ),
                           { stripTrailingHardline: true }
                         ),
-                      $
+                      $2
                     )
                     if (q)
                       return [
@@ -23752,7 +23764,7 @@ var require_standalone = __commonJS({
                   let L = [],
                     M = [],
                     j = [],
-                    $ = [],
+                    $2 = [],
                     V = b.prev ? C(b.prev, b) : '',
                     q = b.next ? C(b, b.next) : ''
                   return (
@@ -23766,11 +23778,15 @@ var require_standalone = __commonJS({
                         : M.push(a('', u, { groupId: y[x - 1] }))),
                     q &&
                       (d(b)
-                        ? p(b.next) && $.push(i, i)
+                        ? p(b.next) && $2.push(i, i)
                         : q === i
-                        ? p(b.next) && $.push(i)
+                        ? p(b.next) && $2.push(i)
                         : j.push(q)),
-                    [...L, s([...M, s([P(N, F, l), ...j], { id: y[x] })]), ...$]
+                    [
+                      ...L,
+                      s([...M, s([P(N, F, l), ...j], { id: y[x] })]),
+                      ...$2,
+                    ]
                   )
                 }, 'children')
               }
@@ -24589,7 +24605,7 @@ var require_standalone = __commonJS({
                     a,
                     u(
                       '',
-                      k.map(P, 'value', 'leadingComments').map(($) => [$, a])
+                      k.map(P, 'value', 'leadingComments').map(($2) => [$2, a])
                     ),
                     ': ',
                     h(2, N),
@@ -24896,7 +24912,7 @@ var require_standalone = __commonJS({
                               oe(['head', 'trailingComment']),
                             ])
                           : X.push('---')),
-                      $(R) && X.push(oe('body')),
+                      $2(R) && X.push(oe('body')),
                       u(r, X)
                     )
                   }
@@ -25006,7 +25022,7 @@ var require_standalone = __commonJS({
                     throw new Error('Unexpected node type '.concat(R.type))
                 }
               }
-              function $(R) {
+              function $2(R) {
                 return R.body.children.length > 0 || k(R.body)
               }
               function V(R, Q) {
@@ -25300,7 +25316,7 @@ function regexCheck(regex) {
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-space@1.0.0/node_modules/micromark-factory-space/index.js
-function factorySpace(effects, ok2, type, max) {
+function factorySpace(effects, ok3, type, max) {
   const limit = max ? max - 1 : Number.POSITIVE_INFINITY
   let size = 0
   return start3
@@ -25309,7 +25325,7 @@ function factorySpace(effects, ok2, type, max) {
       effects.enter(type)
       return prefix(code2)
     }
-    return ok2(code2)
+    return ok3(code2)
   }
   function prefix(code2) {
     if (markdownSpace(code2) && size++ < limit) {
@@ -25317,7 +25333,7 @@ function factorySpace(effects, ok2, type, max) {
       return prefix
     }
     effects.exit(type)
-    return ok2(code2)
+    return ok3(code2)
   }
 }
 
@@ -25459,12 +25475,12 @@ var CONTINUE = Symbol('continue')
 var SKIP = Symbol('skip')
 var EXIT = Symbol('exit')
 function visit(tree, visitor) {
-  var enter3
+  var enter2
   var leave
   if (typeof visitor === 'function') {
-    enter3 = visitor
+    enter2 = visitor
   } else if (visitor && typeof visitor === 'object') {
-    enter3 = visitor.enter
+    enter2 = visitor.enter
     leave = visitor.leave
   }
   build(tree, null, null, [])()
@@ -25474,7 +25490,7 @@ function visit(tree, visitor) {
     }
     return visit3
     function visit3() {
-      var result = enter3 ? toResult(enter3(node, key, index2, parents)) : []
+      var result = enter2 ? toResult(enter2(node, key, index2, parents)) : []
       var cKey
       var cIndex
       var grandparents
@@ -25563,17 +25579,17 @@ function location(file) {
     return { line: void 0, column: void 0, offset: void 0 }
   }
   function toOffset(point3) {
-    var line = point3 && point3.line
+    var line2 = point3 && point3.line
     var column = point3 && point3.column
     var offset
     if (
-      typeof line === 'number' &&
+      typeof line2 === 'number' &&
       typeof column === 'number' &&
-      !Number.isNaN(line) &&
+      !Number.isNaN(line2) &&
       !Number.isNaN(column) &&
-      line - 1 in indices
+      line2 - 1 in indices
     ) {
-      offset = (indices[line - 2] || 0) + column - 1 || 0
+      offset = (indices[line2 - 2] || 0) + column - 1 || 0
     }
     return offset > -1 && offset < indices[indices.length - 1] ? offset : -1
   }
@@ -25593,7 +25609,7 @@ function eventsToAcorn(events, options) {
     preserveParens: true,
   })
   const chunks = []
-  const lines = {}
+  const lines2 = {}
   let index2 = -1
   let swallow = false
   let estree
@@ -25601,7 +25617,7 @@ function eventsToAcorn(events, options) {
   let startLine
   if (options.start) {
     startLine = options.start.line
-    lines[startLine] = options.start
+    lines2[startLine] = options.start
   }
   while (++index2 < events.length) {
     const [kind, token, context] = events[index2]
@@ -25738,11 +25754,11 @@ function eventsToAcorn(events, options) {
       sourceOffset = source2.length
     }
     const pointInSource = place.toPoint(sourceOffset)
-    const line = startLine + (pointInSource.line - 1)
-    const column = lines[line].column + (pointInSource.column - 1)
-    const offset = lines[line].offset + (pointInSource.column - 1)
+    const line2 = startLine + (pointInSource.line - 1)
+    const column = lines2[line2].column + (pointInSource.column - 1)
+    const offset = lines2[line2].offset + (pointInSource.column - 1)
     return {
-      line,
+      line: line2,
       column,
       offset,
     }
@@ -25751,8 +25767,11 @@ function eventsToAcorn(events, options) {
     if (!startLine || point3.line < startLine) {
       startLine = point3.line
     }
-    if (!(point3.line in lines) || lines[point3.line].offset > point3.offset) {
-      lines[point3.line] = point3
+    if (
+      !(point3.line in lines2) ||
+      lines2[point3.line].offset > point3.offset
+    ) {
+      lines2[point3.line] = point3
     }
   }
 }
@@ -25767,7 +25786,7 @@ function empty(value) {
 // ../../../node_modules/.pnpm/micromark-factory-mdx-expression@1.0.6/node_modules/micromark-factory-mdx-expression/index.js
 function factoryMdxExpression(
   effects,
-  ok2,
+  ok3,
   type,
   markerType,
   chunkType,
@@ -25865,7 +25884,7 @@ function factoryMdxExpression(
       effects.consume(code2)
       effects.exit(markerType)
       effects.exit(type)
-      return ok2
+      return ok3
     }
     const result = eventsToAcorn(self2.events.slice(eventStart), {
       acorn,
@@ -25937,7 +25956,7 @@ function factoryMdxExpression(
           }
         : void 0
     )
-    return ok2
+    return ok3
   }
 }
 
@@ -25980,7 +25999,7 @@ function mdxExpression(options = {}) {
       },
     },
   }
-  function tokenizeFlowExpression(effects, ok2, nok) {
+  function tokenizeFlowExpression(effects, ok3, nok) {
     const self2 = this
     return start3
     function start3(code2) {
@@ -26000,18 +26019,18 @@ function mdxExpression(options = {}) {
     }
     function after(code2) {
       return code2 === null || markdownLineEnding(code2)
-        ? ok2(code2)
+        ? ok3(code2)
         : nok(code2)
     }
   }
-  function tokenizeTextExpression(effects, ok2) {
+  function tokenizeTextExpression(effects, ok3) {
     const self2 = this
     return start3
     function start3(code2) {
       return factoryMdxExpression.call(
         self2,
         effects,
-        ok2,
+        ok3,
         'mdxTextExpression',
         'mdxTextExpressionMarker',
         'mdxTextExpressionChunk',
@@ -26048,7 +26067,7 @@ var lazyLineEnd = {
 }
 function factoryTag(
   effects,
-  ok2,
+  ok3,
   nok,
   acorn,
   acornOptions,
@@ -26570,7 +26589,7 @@ function factoryTag(
     effects.consume(code2)
     effects.exit(tagMarkerType)
     effects.exit(tagType)
-    return ok2
+    return ok3
   }
   function optionalEsWhitespace(code2) {
     if (markdownLineEnding(code2)) {
@@ -26630,7 +26649,7 @@ function factoryTag(
     )
   }
 }
-function tokenizeLazyLineEnd(effects, ok2, nok) {
+function tokenizeLazyLineEnd(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -26640,7 +26659,7 @@ function tokenizeLazyLineEnd(effects, ok2, nok) {
     return lineStart
   }
   function lineStart(code2) {
-    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok2(code2)
+    return self2.parser.lazy[self2.now().line] ? nok(code2) : ok3(code2)
   }
 }
 function serializeCharCode(code2) {
@@ -26652,11 +26671,11 @@ function jsxText(acorn, acornOptions, addResult) {
   return {
     tokenize: tokenizeJsxText,
   }
-  function tokenizeJsxText(effects, ok2, nok) {
+  function tokenizeJsxText(effects, ok3, nok) {
     return factoryTag.call(
       this,
       effects,
-      ok2,
+      ok3,
       nok,
       acorn,
       acornOptions,
@@ -26697,7 +26716,7 @@ function jsxFlow(acorn, acornOptions, addResult) {
     tokenize: tokenizeJsxFlow,
     concrete: true,
   }
-  function tokenizeJsxFlow(effects, ok2, nok) {
+  function tokenizeJsxFlow(effects, ok3, nok) {
     const self2 = this
     return start3
     function start3(code2) {
@@ -26741,7 +26760,7 @@ function jsxFlow(acorn, acornOptions, addResult) {
       return code2 === 60
         ? start3(code2)
         : code2 === null || markdownLineEnding(code2)
-        ? ok2(code2)
+        ? ok3(code2)
         : nok(code2)
     }
   }
@@ -27043,7 +27062,7 @@ function parseEntities(value, options = {}) {
       : options.additional
   const result = []
   let index2 = 0
-  let lines = -1
+  let lines2 = -1
   let queue = ''
   let point3
   let indent
@@ -27055,14 +27074,14 @@ function parseEntities(value, options = {}) {
       point3 = options.position
     }
   }
-  let line = (point3 ? point3.line : 0) || 1
+  let line2 = (point3 ? point3.line : 0) || 1
   let column = (point3 ? point3.column : 0) || 1
   let previous2 = now()
   let character
   index2--
   while (++index2 <= value.length) {
     if (character === 10) {
-      column = (indent ? indent[lines] : 0) || 1
+      column = (indent ? indent[lines2] : 0) || 1
     }
     character = value.charCodeAt(index2)
     if (character === 38) {
@@ -27128,12 +27147,12 @@ function parseEntities(value, options = {}) {
           characterReference2 = namedReference
         }
       }
-      let diff = 1 + end - start3
+      let diff3 = 1 + end - start3
       let reference = ''
       if (!terminated && options.nonTerminated === false) {
       } else if (!characters) {
         if (type !== 'named') {
-          warning(4, diff)
+          warning(4, diff3)
         }
       } else if (type === 'named') {
         if (terminated && !characterReference2) {
@@ -27141,7 +27160,7 @@ function parseEntities(value, options = {}) {
         } else {
           if (characterReferenceCharacters !== characters) {
             end = begin + characterReferenceCharacters.length
-            diff = 1 + end - begin
+            diff3 = 1 + end - begin
             terminated = false
           }
           if (!terminated) {
@@ -27149,37 +27168,37 @@ function parseEntities(value, options = {}) {
             if (options.attribute) {
               const following2 = value.charCodeAt(end)
               if (following2 === 61) {
-                warning(reason, diff)
+                warning(reason, diff3)
                 characterReference2 = ''
               } else if (isAlphanumerical(following2)) {
                 characterReference2 = ''
               } else {
-                warning(reason, diff)
+                warning(reason, diff3)
               }
             } else {
-              warning(reason, diff)
+              warning(reason, diff3)
             }
           }
         }
         reference = characterReference2
       } else {
         if (!terminated) {
-          warning(2, diff)
+          warning(2, diff3)
         }
         let referenceCode = Number.parseInt(
           characters,
           type === 'hexadecimal' ? 16 : 10
         )
         if (prohibited(referenceCode)) {
-          warning(7, diff)
+          warning(7, diff3)
           reference = fromCharCode(65533)
         } else if (referenceCode in characterReferenceInvalid) {
-          warning(6, diff)
+          warning(6, diff3)
           reference = characterReferenceInvalid[referenceCode]
         } else {
           let output = ''
           if (disallowed(referenceCode)) {
-            warning(6, diff)
+            warning(6, diff3)
           }
           if (referenceCode > 65535) {
             referenceCode -= 65536
@@ -27214,8 +27233,8 @@ function parseEntities(value, options = {}) {
       }
     } else {
       if (character === 10) {
-        line++
-        lines++
+        line2++
+        lines2++
         column = 0
       }
       if (Number.isNaN(character)) {
@@ -27229,7 +27248,7 @@ function parseEntities(value, options = {}) {
   return result.join('')
   function now() {
     return {
-      line,
+      line: line2,
       column,
       offset: index2 + ((point3 ? point3.offset : 0) || 0),
     }
@@ -27330,11 +27349,11 @@ function track(options_) {
   const options = options_ || {}
   const now = options.now || {}
   let lineShift = options.lineShift || 0
-  let line = now.line || 1
+  let line2 = now.line || 1
   let column = now.column || 1
   return { move, current, shift }
   function current() {
-    return { now: { line, column }, lineShift }
+    return { now: { line: line2, column }, lineShift }
   }
   function shift(value) {
     lineShift += value
@@ -27342,7 +27361,7 @@ function track(options_) {
   function move(value = '') {
     const chunks = value.split(/\r?\n|\r/g)
     const tail = chunks[chunks.length - 1]
-    line += chunks.length - 1
+    line2 += chunks.length - 1
     column =
       chunks.length === 1 ? column + tail.length : 1 + tail.length + lineShift
     return value
@@ -27455,18 +27474,18 @@ var eol = /\r?\n|\r/g
 function indentLines(value, map3) {
   const result = []
   let start3 = 0
-  let line = 0
+  let line2 = 0
   let match
   while ((match = eol.exec(value))) {
     one2(value.slice(start3, match.index))
     result.push(match[0])
     start3 = match.index + match[0].length
-    line++
+    line2++
   }
   one2(value.slice(start3))
   return result.join('')
   function one2(value2) {
-    result.push(map3(value2, line, !value2))
+    result.push(map3(value2, line2, !value2))
   }
 }
 
@@ -27753,7 +27772,7 @@ function mdxJsxToMarkdown(options = {}) {
     const tracker = track(safeOptions)
     const selfClosing =
       node.name && (!node.children || node.children.length === 0)
-    const exit4 = context.enter(node.type)
+    const exit3 = context.enter(node.type)
     let index2 = -1
     const serializedAttributes = []
     let value = tracker.move('<' + (node.name || ''))
@@ -27840,11 +27859,11 @@ function mdxJsxToMarkdown(options = {}) {
     if (!selfClosing) {
       value += tracker.move('</' + (node.name || '') + '>')
     }
-    exit4()
+    exit3()
     return value
   }
-  function map3(line, _, blank) {
-    return (blank ? '' : '  ') + line
+  function map3(line2, _, blank) {
+    return (blank ? '' : '  ') + line2
   }
   function peekElement() {
     return '<'
@@ -28161,10 +28180,10 @@ function initializeDocument(effects) {
     self2.containerState._closeFlow = void 0
   }
 }
-function tokenizeContainer(effects, ok2, nok) {
+function tokenizeContainer(effects, ok3, nok) {
   return factorySpace(
     effects,
-    effects.attempt(this.parser.constructs.document, ok2, nok),
+    effects.attempt(this.parser.constructs.document, ok3, nok),
     'linePrefix',
     this.parser.constructs.disable.null.includes('codeIndented') ? void 0 : 4
   )
@@ -28325,7 +28344,7 @@ function resolveAllAttention(events, context) {
   }
   return events
 }
-function tokenizeAttention(effects, ok2) {
+function tokenizeAttention(effects, ok3) {
   const attentionMarkers2 = this.parser.constructs.attentionMarkers.null
   const previous2 = this.previous
   const before = classifyCharacter(previous2)
@@ -28351,7 +28370,7 @@ function tokenizeAttention(effects, ok2) {
       attentionMarkers2.includes(previous2)
     token._open = Boolean(marker === 42 ? open : open && (before || !close))
     token._close = Boolean(marker === 42 ? close : close && (after || !open))
-    return ok2(code2)
+    return ok3(code2)
   }
 }
 function movePoint(point3, offset) {
@@ -28365,7 +28384,7 @@ var autolink = {
   name: 'autolink',
   tokenize: tokenizeAutolink,
 }
-function tokenizeAutolink(effects, ok2, nok) {
+function tokenizeAutolink(effects, ok3, nok) {
   let size = 1
   return start3
   function start3(code2) {
@@ -28458,7 +28477,7 @@ function tokenizeAutolink(effects, ok2, nok) {
     effects.consume(code2)
     effects.exit('autolinkMarker')
     effects.exit('autolink')
-    return ok2
+    return ok3
   }
 }
 
@@ -28467,10 +28486,10 @@ var blankLine = {
   tokenize: tokenizeBlankLine,
   partial: true,
 }
-function tokenizeBlankLine(effects, ok2, nok) {
+function tokenizeBlankLine(effects, ok3, nok) {
   return factorySpace(effects, afterWhitespace, 'linePrefix')
   function afterWhitespace(code2) {
-    return code2 === null || markdownLineEnding(code2) ? ok2(code2) : nok(code2)
+    return code2 === null || markdownLineEnding(code2) ? ok3(code2) : nok(code2)
   }
 }
 
@@ -28483,7 +28502,7 @@ var blockQuote = {
   },
   exit,
 }
-function tokenizeBlockQuoteStart(effects, ok2, nok) {
+function tokenizeBlockQuoteStart(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -28509,16 +28528,16 @@ function tokenizeBlockQuoteStart(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('blockQuotePrefixWhitespace')
       effects.exit('blockQuotePrefix')
-      return ok2
+      return ok3
     }
     effects.exit('blockQuotePrefix')
-    return ok2(code2)
+    return ok3(code2)
   }
 }
-function tokenizeBlockQuoteContinuation(effects, ok2, nok) {
+function tokenizeBlockQuoteContinuation(effects, ok3, nok) {
   return factorySpace(
     effects,
-    effects.attempt(blockQuote, ok2, nok),
+    effects.attempt(blockQuote, ok3, nok),
     'linePrefix',
     this.parser.constructs.disable.null.includes('codeIndented') ? void 0 : 4
   )
@@ -28532,7 +28551,7 @@ var characterEscape = {
   name: 'characterEscape',
   tokenize: tokenizeCharacterEscape,
 }
-function tokenizeCharacterEscape(effects, ok2, nok) {
+function tokenizeCharacterEscape(effects, ok3, nok) {
   return start3
   function start3(code2) {
     effects.enter('characterEscape')
@@ -28547,7 +28566,7 @@ function tokenizeCharacterEscape(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('characterEscapeValue')
       effects.exit('characterEscape')
-      return ok2
+      return ok3
     }
     return nok(code2)
   }
@@ -28558,7 +28577,7 @@ var characterReference = {
   name: 'characterReference',
   tokenize: tokenizeCharacterReference,
 }
-function tokenizeCharacterReference(effects, ok2, nok) {
+function tokenizeCharacterReference(effects, ok3, nok) {
   const self2 = this
   let size = 0
   let max
@@ -28612,7 +28631,7 @@ function tokenizeCharacterReference(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('characterReferenceMarker')
       effects.exit('characterReference')
-      return ok2
+      return ok3
     }
     if (test(code2) && size++ < max) {
       effects.consume(code2)
@@ -28628,7 +28647,7 @@ var codeFenced = {
   tokenize: tokenizeCodeFenced,
   concrete: true,
 }
-function tokenizeCodeFenced(effects, ok2, nok) {
+function tokenizeCodeFenced(effects, ok3, nok) {
   const self2 = this
   const closingFenceConstruct = {
     tokenize: tokenizeClosingFence,
@@ -28706,7 +28725,7 @@ function tokenizeCodeFenced(effects, ok2, nok) {
   }
   function openAfter(code2) {
     effects.exit('codeFencedFence')
-    return self2.interrupt ? ok2(code2) : contentStart(code2)
+    return self2.interrupt ? ok3(code2) : contentStart(code2)
   }
   function contentStart(code2) {
     if (code2 === null) {
@@ -28743,9 +28762,9 @@ function tokenizeCodeFenced(effects, ok2, nok) {
   }
   function after(code2) {
     effects.exit('codeFenced')
-    return ok2(code2)
+    return ok3(code2)
   }
-  function tokenizeNonLazyLine(effects2, ok3, nok2) {
+  function tokenizeNonLazyLine(effects2, ok4, nok2) {
     const self3 = this
     return start4
     function start4(code2) {
@@ -28755,10 +28774,10 @@ function tokenizeCodeFenced(effects, ok2, nok) {
       return lineStart
     }
     function lineStart(code2) {
-      return self3.parser.lazy[self3.now().line] ? nok2(code2) : ok3(code2)
+      return self3.parser.lazy[self3.now().line] ? nok2(code2) : ok4(code2)
     }
   }
-  function tokenizeClosingFence(effects2, ok3, nok2) {
+  function tokenizeClosingFence(effects2, ok4, nok2) {
     let size = 0
     return factorySpace(
       effects2,
@@ -28784,7 +28803,7 @@ function tokenizeCodeFenced(effects, ok2, nok) {
     function closingSequenceEnd(code2) {
       if (code2 === null || markdownLineEnding(code2)) {
         effects2.exit('codeFencedFence')
-        return ok3(code2)
+        return ok4(code2)
       }
       return nok2(code2)
     }
@@ -28800,7 +28819,7 @@ var indentedContent = {
   tokenize: tokenizeIndentedContent,
   partial: true,
 }
-function tokenizeCodeIndented(effects, ok2, nok) {
+function tokenizeCodeIndented(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -28835,10 +28854,10 @@ function tokenizeCodeIndented(effects, ok2, nok) {
   }
   function after(code2) {
     effects.exit('codeIndented')
-    return ok2(code2)
+    return ok3(code2)
   }
 }
-function tokenizeIndentedContent(effects, ok2, nok) {
+function tokenizeIndentedContent(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -28858,7 +28877,7 @@ function tokenizeIndentedContent(effects, ok2, nok) {
     return tail &&
       tail[1].type === 'linePrefix' &&
       tail[2].sliceSerialize(tail[1], true).length >= 4
-      ? ok2(code2)
+      ? ok3(code2)
       : markdownLineEnding(code2)
       ? start3(code2)
       : nok(code2)
@@ -28876,7 +28895,7 @@ function resolveCodeText(events) {
   let tailExitIndex = events.length - 4
   let headEnterIndex = 3
   let index2
-  let enter3
+  let enter2
   if (
     (events[headEnterIndex][1].type === 'lineEnding' ||
       events[headEnterIndex][1].type === 'space') &&
@@ -28897,22 +28916,22 @@ function resolveCodeText(events) {
   index2 = headEnterIndex - 1
   tailExitIndex++
   while (++index2 <= tailExitIndex) {
-    if (enter3 === void 0) {
+    if (enter2 === void 0) {
       if (index2 !== tailExitIndex && events[index2][1].type !== 'lineEnding') {
-        enter3 = index2
+        enter2 = index2
       }
     } else if (
       index2 === tailExitIndex ||
       events[index2][1].type === 'lineEnding'
     ) {
-      events[enter3][1].type = 'codeTextData'
-      if (index2 !== enter3 + 2) {
-        events[enter3][1].end = events[index2 - 1][1].end
-        events.splice(enter3 + 2, index2 - enter3 - 2)
-        tailExitIndex -= index2 - enter3 - 2
-        index2 = enter3 + 2
+      events[enter2][1].type = 'codeTextData'
+      if (index2 !== enter2 + 2) {
+        events[enter2][1].end = events[index2 - 1][1].end
+        events.splice(enter2 + 2, index2 - enter2 - 2)
+        tailExitIndex -= index2 - enter2 - 2
+        index2 = enter2 + 2
       }
-      enter3 = void 0
+      enter2 = void 0
     }
   }
   return events
@@ -28923,7 +28942,7 @@ function previous(code2) {
     this.events[this.events.length - 1][1].type === 'characterEscape'
   )
 }
-function tokenizeCodeText(effects, ok2, nok) {
+function tokenizeCodeText(effects, ok3, nok) {
   const self2 = this
   let sizeOpen = 0
   let size
@@ -28989,7 +29008,7 @@ function tokenizeCodeText(effects, ok2, nok) {
     if (size === sizeOpen) {
       effects.exit('codeTextSequence')
       effects.exit('codeText')
-      return ok2(code2)
+      return ok3(code2)
     }
     token.type = 'codeTextData'
     return data(code2)
@@ -29165,7 +29184,7 @@ function resolveContent(events) {
   subtokenize(events)
   return events
 }
-function tokenizeContent(effects, ok2) {
+function tokenizeContent(effects, ok3) {
   let previous2
   return start3
   function start3(code2) {
@@ -29192,7 +29211,7 @@ function tokenizeContent(effects, ok2) {
   function contentEnd(code2) {
     effects.exit('chunkContent')
     effects.exit('content')
-    return ok2(code2)
+    return ok3(code2)
   }
   function contentContinue(code2) {
     effects.consume(code2)
@@ -29205,7 +29224,7 @@ function tokenizeContent(effects, ok2) {
     return data
   }
 }
-function tokenizeContinuation(effects, ok2, nok) {
+function tokenizeContinuation(effects, ok3, nok) {
   const self2 = this
   return startLookahead
   function startLookahead(code2) {
@@ -29226,16 +29245,16 @@ function tokenizeContinuation(effects, ok2, nok) {
       tail[1].type === 'linePrefix' &&
       tail[2].sliceSerialize(tail[1], true).length >= 4
     ) {
-      return ok2(code2)
+      return ok3(code2)
     }
-    return effects.interrupt(self2.parser.constructs.flow, nok, ok2)(code2)
+    return effects.interrupt(self2.parser.constructs.flow, nok, ok3)(code2)
   }
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-destination@1.0.0/node_modules/micromark-factory-destination/index.js
 function factoryDestination(
   effects,
-  ok2,
+  ok3,
   nok,
   type,
   literalType,
@@ -29274,7 +29293,7 @@ function factoryDestination(
       effects.exit(literalMarkerType)
       effects.exit(literalType)
       effects.exit(type)
-      return ok2
+      return ok3
     }
     effects.enter(stringType)
     effects.enter('chunkString', {
@@ -29313,7 +29332,7 @@ function factoryDestination(
         effects.exit(stringType)
         effects.exit(rawType)
         effects.exit(type)
-        return ok2(code2)
+        return ok3(code2)
       }
       effects.consume(code2)
       return destinationRaw
@@ -29324,7 +29343,7 @@ function factoryDestination(
       effects.exit(stringType)
       effects.exit(rawType)
       effects.exit(type)
-      return ok2(code2)
+      return ok3(code2)
     }
     if (asciiControl(code2)) return nok(code2)
     effects.consume(code2)
@@ -29340,7 +29359,7 @@ function factoryDestination(
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-label@1.0.2/node_modules/micromark-factory-label/index.js
-function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
+function factoryLabel(effects, ok3, nok, type, markerType, stringType) {
   const self2 = this
   let size = 0
   let data
@@ -29371,7 +29390,7 @@ function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
       effects.consume(code2)
       effects.exit(markerType)
       effects.exit(type)
-      return ok2
+      return ok3
     }
     if (markdownLineEnding(code2)) {
       effects.enter('lineEnding')
@@ -29410,7 +29429,7 @@ function factoryLabel(effects, ok2, nok, type, markerType, stringType) {
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-title@1.0.2/node_modules/micromark-factory-title/index.js
-function factoryTitle(effects, ok2, nok, type, markerType, stringType) {
+function factoryTitle(effects, ok3, nok, type, markerType, stringType) {
   let marker
   return start3
   function start3(code2) {
@@ -29427,7 +29446,7 @@ function factoryTitle(effects, ok2, nok, type, markerType, stringType) {
       effects.consume(code2)
       effects.exit(markerType)
       effects.exit(type)
-      return ok2
+      return ok3
     }
     effects.enter(stringType)
     return atTitleBreak(code2)
@@ -29469,7 +29488,7 @@ function factoryTitle(effects, ok2, nok, type, markerType, stringType) {
 }
 
 // ../../../node_modules/.pnpm/micromark-factory-whitespace@1.0.0/node_modules/micromark-factory-whitespace/index.js
-function factoryWhitespace(effects, ok2) {
+function factoryWhitespace(effects, ok3) {
   let seen
   return start3
   function start3(code2) {
@@ -29487,7 +29506,7 @@ function factoryWhitespace(effects, ok2) {
         seen ? 'linePrefix' : 'lineSuffix'
       )(code2)
     }
-    return ok2(code2)
+    return ok3(code2)
   }
 }
 
@@ -29509,7 +29528,7 @@ var titleConstruct = {
   tokenize: tokenizeTitle,
   partial: true,
 }
-function tokenizeDefinition(effects, ok2, nok) {
+function tokenizeDefinition(effects, ok3, nok) {
   const self2 = this
   let identifier
   return start3
@@ -29561,12 +29580,12 @@ function tokenizeDefinition(effects, ok2, nok) {
       if (!self2.parser.defined.includes(identifier)) {
         self2.parser.defined.push(identifier)
       }
-      return ok2(code2)
+      return ok3(code2)
     }
     return nok(code2)
   }
 }
-function tokenizeTitle(effects, ok2, nok) {
+function tokenizeTitle(effects, ok3, nok) {
   return start3
   function start3(code2) {
     return markdownLineEndingOrSpace(code2)
@@ -29587,7 +29606,7 @@ function tokenizeTitle(effects, ok2, nok) {
     return nok(code2)
   }
   function after(code2) {
-    return code2 === null || markdownLineEnding(code2) ? ok2(code2) : nok(code2)
+    return code2 === null || markdownLineEnding(code2) ? ok3(code2) : nok(code2)
   }
 }
 
@@ -29596,7 +29615,7 @@ var hardBreakEscape = {
   name: 'hardBreakEscape',
   tokenize: tokenizeHardBreakEscape,
 }
-function tokenizeHardBreakEscape(effects, ok2, nok) {
+function tokenizeHardBreakEscape(effects, ok3, nok) {
   return start3
   function start3(code2) {
     effects.enter('hardBreakEscape')
@@ -29608,7 +29627,7 @@ function tokenizeHardBreakEscape(effects, ok2, nok) {
     if (markdownLineEnding(code2)) {
       effects.exit('escapeMarker')
       effects.exit('hardBreakEscape')
-      return ok2(code2)
+      return ok3(code2)
     }
     return nok(code2)
   }
@@ -29663,7 +29682,7 @@ function resolveHeadingAtx(events, context) {
   }
   return events
 }
-function tokenizeHeadingAtx(effects, ok2, nok) {
+function tokenizeHeadingAtx(effects, ok3, nok) {
   const self2 = this
   let size = 0
   return start3
@@ -29679,7 +29698,7 @@ function tokenizeHeadingAtx(effects, ok2, nok) {
     }
     if (code2 === null || markdownLineEndingOrSpace(code2)) {
       effects.exit('atxHeadingSequence')
-      return self2.interrupt ? ok2(code2) : headingBreak(code2)
+      return self2.interrupt ? ok3(code2) : headingBreak(code2)
     }
     return nok(code2)
   }
@@ -29690,7 +29709,7 @@ function tokenizeHeadingAtx(effects, ok2, nok) {
     }
     if (code2 === null || markdownLineEnding(code2)) {
       effects.exit('atxHeading')
-      return ok2(code2)
+      return ok3(code2)
     }
     if (markdownSpace(code2)) {
       return factorySpace(effects, headingBreak, 'whitespace')(code2)
@@ -29810,7 +29829,7 @@ function resolveToHtmlFlow(events) {
   }
   return events
 }
-function tokenizeHtmlFlow(effects, ok2, nok) {
+function tokenizeHtmlFlow(effects, ok3, nok) {
   const self2 = this
   let kind
   let startTag
@@ -29836,7 +29855,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
     if (code2 === 63) {
       effects.consume(code2)
       kind = 3
-      return self2.interrupt ? ok2 : continuationDeclarationInside
+      return self2.interrupt ? ok3 : continuationDeclarationInside
     }
     if (asciiAlpha(code2)) {
       effects.consume(code2)
@@ -29862,14 +29881,14 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
     if (asciiAlpha(code2)) {
       effects.consume(code2)
       kind = 4
-      return self2.interrupt ? ok2 : continuationDeclarationInside
+      return self2.interrupt ? ok3 : continuationDeclarationInside
     }
     return nok(code2)
   }
   function commentOpenInside(code2) {
     if (code2 === 45) {
       effects.consume(code2)
-      return self2.interrupt ? ok2 : continuationDeclarationInside
+      return self2.interrupt ? ok3 : continuationDeclarationInside
     }
     return nok(code2)
   }
@@ -29878,7 +29897,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
       effects.consume(code2)
       return index2 === buffer.length
         ? self2.interrupt
-          ? ok2
+          ? ok3
           : continuation
         : cdataOpenInside
     }
@@ -29905,7 +29924,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
         htmlRawNames.includes(buffer.toLowerCase())
       ) {
         kind = 1
-        return self2.interrupt ? ok2(code2) : continuation(code2)
+        return self2.interrupt ? ok3(code2) : continuation(code2)
       }
       if (htmlBlockNames.includes(buffer.toLowerCase())) {
         kind = 6
@@ -29913,7 +29932,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
           effects.consume(code2)
           return basicSelfClosing
         }
-        return self2.interrupt ? ok2(code2) : continuation(code2)
+        return self2.interrupt ? ok3(code2) : continuation(code2)
       }
       kind = 7
       return self2.interrupt && !self2.parser.lazy[self2.now().line]
@@ -29932,7 +29951,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
   function basicSelfClosing(code2) {
     if (code2 === 62) {
       effects.consume(code2)
-      return self2.interrupt ? ok2 : continuation
+      return self2.interrupt ? ok3 : continuation
     }
     return nok(code2)
   }
@@ -30108,7 +30127,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
     effects.enter('htmlFlowData')
     return continuation(code2)
   }
-  function htmlLineEnd(effects2, ok3, nok2) {
+  function htmlLineEnd(effects2, ok4, nok2) {
     return start4
     function start4(code2) {
       effects2.enter('lineEnding')
@@ -30117,7 +30136,7 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
       return lineStart
     }
     function lineStart(code2) {
-      return self2.parser.lazy[self2.now().line] ? nok2(code2) : ok3(code2)
+      return self2.parser.lazy[self2.now().line] ? nok2(code2) : ok4(code2)
     }
   }
   function continuationCommentInside(code2) {
@@ -30175,17 +30194,17 @@ function tokenizeHtmlFlow(effects, ok2, nok) {
   }
   function done(code2) {
     effects.exit('htmlFlow')
-    return ok2(code2)
+    return ok3(code2)
   }
 }
-function tokenizeNextBlank(effects, ok2, nok) {
+function tokenizeNextBlank(effects, ok3, nok) {
   return start3
   function start3(code2) {
     effects.exit('htmlFlowData')
     effects.enter('lineEndingBlank')
     effects.consume(code2)
     effects.exit('lineEndingBlank')
-    return effects.attempt(blankLine, ok2, nok)
+    return effects.attempt(blankLine, ok3, nok)
   }
 }
 
@@ -30194,7 +30213,7 @@ var htmlText = {
   name: 'htmlText',
   tokenize: tokenizeHtmlText,
 }
-function tokenizeHtmlText(effects, ok2, nok) {
+function tokenizeHtmlText(effects, ok3, nok) {
   const self2 = this
   let marker
   let buffer
@@ -30524,7 +30543,7 @@ function tokenizeHtmlText(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('htmlTextData')
       effects.exit('htmlText')
-      return ok2
+      return ok3
     }
     return nok(code2)
   }
@@ -30638,7 +30657,7 @@ function resolveToLabelEnd(events, context) {
   splice(events, open, events.length, media)
   return events
 }
-function tokenizeLabelEnd(effects, ok2, nok) {
+function tokenizeLabelEnd(effects, ok3, nok) {
   const self2 = this
   let index2 = self2.events.length
   let labelStart
@@ -30678,27 +30697,27 @@ function tokenizeLabelEnd(effects, ok2, nok) {
     if (code2 === 40) {
       return effects.attempt(
         resourceConstruct,
-        ok2,
-        defined ? ok2 : balanced
+        ok3,
+        defined ? ok3 : balanced
       )(code2)
     }
     if (code2 === 91) {
       return effects.attempt(
         fullReferenceConstruct,
-        ok2,
+        ok3,
         defined
-          ? effects.attempt(collapsedReferenceConstruct, ok2, balanced)
+          ? effects.attempt(collapsedReferenceConstruct, ok3, balanced)
           : balanced
       )(code2)
     }
-    return defined ? ok2(code2) : balanced(code2)
+    return defined ? ok3(code2) : balanced(code2)
   }
   function balanced(code2) {
     labelStart._balanced = true
     return nok(code2)
   }
 }
-function tokenizeResource(effects, ok2, nok) {
+function tokenizeResource(effects, ok3, nok) {
   return start3
   function start3(code2) {
     effects.enter('resource')
@@ -30747,12 +30766,12 @@ function tokenizeResource(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('resourceMarker')
       effects.exit('resource')
-      return ok2
+      return ok3
     }
     return nok(code2)
   }
 }
-function tokenizeFullReference(effects, ok2, nok) {
+function tokenizeFullReference(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -30774,11 +30793,11 @@ function tokenizeFullReference(effects, ok2, nok) {
           .slice(1, -1)
       )
     )
-      ? ok2(code2)
+      ? ok3(code2)
       : nok(code2)
   }
 }
-function tokenizeCollapsedReference(effects, ok2, nok) {
+function tokenizeCollapsedReference(effects, ok3, nok) {
   return start3
   function start3(code2) {
     effects.enter('reference')
@@ -30793,7 +30812,7 @@ function tokenizeCollapsedReference(effects, ok2, nok) {
       effects.consume(code2)
       effects.exit('referenceMarker')
       effects.exit('reference')
-      return ok2
+      return ok3
     }
     return nok(code2)
   }
@@ -30805,7 +30824,7 @@ var labelStartImage = {
   tokenize: tokenizeLabelStartImage,
   resolveAll: labelEnd.resolveAll,
 }
-function tokenizeLabelStartImage(effects, ok2, nok) {
+function tokenizeLabelStartImage(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -30828,7 +30847,7 @@ function tokenizeLabelStartImage(effects, ok2, nok) {
   function after(code2) {
     return code2 === 94 && '_hiddenFootnoteSupport' in self2.parser.constructs
       ? nok(code2)
-      : ok2(code2)
+      : ok3(code2)
   }
 }
 
@@ -30838,7 +30857,7 @@ var labelStartLink = {
   tokenize: tokenizeLabelStartLink,
   resolveAll: labelEnd.resolveAll,
 }
-function tokenizeLabelStartLink(effects, ok2, nok) {
+function tokenizeLabelStartLink(effects, ok3, nok) {
   const self2 = this
   return start3
   function start3(code2) {
@@ -30852,7 +30871,7 @@ function tokenizeLabelStartLink(effects, ok2, nok) {
   function after(code2) {
     return code2 === 94 && '_hiddenFootnoteSupport' in self2.parser.constructs
       ? nok(code2)
-      : ok2(code2)
+      : ok3(code2)
   }
 }
 
@@ -30861,13 +30880,13 @@ var lineEnding = {
   name: 'lineEnding',
   tokenize: tokenizeLineEnding,
 }
-function tokenizeLineEnding(effects, ok2) {
+function tokenizeLineEnding(effects, ok3) {
   return start3
   function start3(code2) {
     effects.enter('lineEnding')
     effects.consume(code2)
     effects.exit('lineEnding')
-    return factorySpace(effects, ok2, 'linePrefix')
+    return factorySpace(effects, ok3, 'linePrefix')
   }
 }
 
@@ -30876,7 +30895,7 @@ var thematicBreak = {
   name: 'thematicBreak',
   tokenize: tokenizeThematicBreak,
 }
-function tokenizeThematicBreak(effects, ok2, nok) {
+function tokenizeThematicBreak(effects, ok3, nok) {
   let size = 0
   let marker
   return start3
@@ -30897,7 +30916,7 @@ function tokenizeThematicBreak(effects, ok2, nok) {
       return nok(code2)
     }
     effects.exit('thematicBreak')
-    return ok2(code2)
+    return ok3(code2)
   }
   function sequence(code2) {
     if (code2 === marker) {
@@ -30927,7 +30946,7 @@ var indentConstruct = {
   tokenize: tokenizeIndent,
   partial: true,
 }
-function tokenizeListStart(effects, ok2, nok) {
+function tokenizeListStart(effects, ok3, nok) {
   const self2 = this
   const tail = self2.events[self2.events.length - 1]
   let initialSize =
@@ -31016,10 +31035,10 @@ function tokenizeListStart(effects, ok2, nok) {
     self2.containerState.size =
       initialSize +
       self2.sliceSerialize(effects.exit('listItemPrefix'), true).length
-    return ok2(code2)
+    return ok3(code2)
   }
 }
-function tokenizeListContinuation(effects, ok2, nok) {
+function tokenizeListContinuation(effects, ok3, nok) {
   const self2 = this
   self2.containerState._closeFlow = void 0
   return effects.check(blankLine, onBlank, notBlank)
@@ -31029,7 +31048,7 @@ function tokenizeListContinuation(effects, ok2, nok) {
       self2.containerState.initialBlankLine
     return factorySpace(
       effects,
-      ok2,
+      ok3,
       'listItemIndent',
       self2.containerState.size + 1
     )(code2)
@@ -31042,20 +31061,20 @@ function tokenizeListContinuation(effects, ok2, nok) {
     }
     self2.containerState.furtherBlankLines = void 0
     self2.containerState.initialBlankLine = void 0
-    return effects.attempt(indentConstruct, ok2, notInCurrentItem)(code2)
+    return effects.attempt(indentConstruct, ok3, notInCurrentItem)(code2)
   }
   function notInCurrentItem(code2) {
     self2.containerState._closeFlow = true
     self2.interrupt = void 0
     return factorySpace(
       effects,
-      effects.attempt(list, ok2, nok),
+      effects.attempt(list, ok3, nok),
       'linePrefix',
       self2.parser.constructs.disable.null.includes('codeIndented') ? void 0 : 4
     )(code2)
   }
 }
-function tokenizeIndent(effects, ok2, nok) {
+function tokenizeIndent(effects, ok3, nok) {
   const self2 = this
   return factorySpace(
     effects,
@@ -31068,14 +31087,14 @@ function tokenizeIndent(effects, ok2, nok) {
     return tail &&
       tail[1].type === 'listItemIndent' &&
       tail[2].sliceSerialize(tail[1], true).length === self2.containerState.size
-      ? ok2(code2)
+      ? ok3(code2)
       : nok(code2)
   }
 }
 function tokenizeListEnd(effects) {
   effects.exit(this.containerState.type)
 }
-function tokenizeListItemPrefixWhitespace(effects, ok2, nok) {
+function tokenizeListItemPrefixWhitespace(effects, ok3, nok) {
   const self2 = this
   return factorySpace(
     effects,
@@ -31090,7 +31109,7 @@ function tokenizeListItemPrefixWhitespace(effects, ok2, nok) {
     return !markdownSpace(code2) &&
       tail &&
       tail[1].type === 'listItemPrefixWhitespace'
-      ? ok2(code2)
+      ? ok3(code2)
       : nok(code2)
   }
 }
@@ -31140,7 +31159,7 @@ function resolveToSetextUnderline(events, context) {
   events.push(['exit', heading2, context])
   return events
 }
-function tokenizeSetextUnderline(effects, ok2, nok) {
+function tokenizeSetextUnderline(effects, ok3, nok) {
   const self2 = this
   let index2 = self2.events.length
   let marker
@@ -31179,7 +31198,7 @@ function tokenizeSetextUnderline(effects, ok2, nok) {
   function closingSequenceEnd(code2) {
     if (code2 === null || markdownLineEnding(code2)) {
       effects.exit('setextHeadingLine')
-      return ok2(code2)
+      return ok3(code2)
     }
     return nok(code2)
   }
@@ -31293,20 +31312,20 @@ function createResolver(extraResolver) {
   return resolveAllText
   function resolveAllText(events, context) {
     let index2 = -1
-    let enter3
+    let enter2
     while (++index2 <= events.length) {
-      if (enter3 === void 0) {
+      if (enter2 === void 0) {
         if (events[index2] && events[index2][1].type === 'data') {
-          enter3 = index2
+          enter2 = index2
           index2++
         }
       } else if (!events[index2] || events[index2][1].type !== 'data') {
-        if (index2 !== enter3 + 2) {
-          events[enter3][1].end = events[index2 - 1][1].end
-          events.splice(enter3 + 2, index2 - enter3 - 2)
-          index2 = enter3 + 2
+        if (index2 !== enter2 + 2) {
+          events[enter2][1].end = events[index2 - 1][1].end
+          events.splice(enter2 + 2, index2 - enter2 - 2)
+          index2 = enter2 + 2
         }
-        enter3 = void 0
+        enter2 = void 0
       }
     }
     return extraResolver ? extraResolver(events, context) : events
@@ -31403,8 +31422,8 @@ function createTokenizer(parser, initialize, from) {
   let consumed = true
   const effects = {
     consume,
-    enter: enter3,
-    exit: exit4,
+    enter: enter2,
+    exit: exit3,
     attempt: constructFactory(onsuccessfulconstruct),
     check: constructFactory(onsuccessfulcheck),
     interrupt: constructFactory(onsuccessfulcheck, {
@@ -31499,7 +31518,7 @@ function createTokenizer(parser, initialize, from) {
     context.previous = code2
     consumed = true
   }
-  function enter3(type, fields) {
+  function enter2(type, fields) {
     const token = fields || {}
     token.type = type
     token.start = now()
@@ -31507,7 +31526,7 @@ function createTokenizer(parser, initialize, from) {
     stack.push(token)
     return token
   }
-  function exit4(type) {
+  function exit3(type) {
     const token = stack.pop()
     token.end = now()
     context.events.push(['exit', token, context])
@@ -31568,12 +31587,12 @@ function createTokenizer(parser, initialize, from) {
           return construct.tokenize.call(
             fields ? Object.assign(Object.create(context), fields) : context,
             effects,
-            ok2,
+            ok3,
             nok
           )(code2)
         }
       }
-      function ok2(code2) {
+      function ok3(code2) {
         consumed = true
         onreturn(currentConstruct, info)
         return returnState
@@ -32036,8 +32055,8 @@ function compiler(options) {
       stack: [tree],
       tokenStack: [],
       config,
-      enter: enter3,
-      exit: exit4,
+      enter: enter2,
+      exit: exit3,
       buffer,
       resume,
       setData,
@@ -32223,7 +32242,7 @@ function compiler(options) {
   function opener(create, and) {
     return open
     function open(token) {
-      enter3.call(this, create(token), token)
+      enter2.call(this, create(token), token)
       if (and) and.call(this, token)
     }
   }
@@ -32233,7 +32252,7 @@ function compiler(options) {
       children: [],
     })
   }
-  function enter3(node, token, errorHandler) {
+  function enter2(node, token, errorHandler) {
     const parent = this.stack[this.stack.length - 1]
     parent.children.push(node)
     this.stack.push(node)
@@ -32247,10 +32266,10 @@ function compiler(options) {
     return close
     function close(token) {
       if (and) and.call(this, token)
-      exit4.call(this, token)
+      exit3.call(this, token)
     }
   }
-  function exit4(token, onExitError) {
+  function exit3(token, onExitError) {
     const node = this.stack.pop()
     const open = this.tokenStack.pop()
     if (!open) {
@@ -32836,7 +32855,7 @@ function flatten(array) {
 }
 var flatten_default = flatten
 
-// ../mdx/src/parse/acorn.ts
+// src/parse/acorn.ts
 var extractAttributes = (attributes, fields, imageCallback) => {
   const properties = {}
   attributes.forEach((attribute) => {
@@ -33085,7 +33104,7 @@ function configure2(base, extension2) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/blockquote.js
 function blockquote(node, _, context, safeOptions) {
-  const exit4 = context.enter('blockquote')
+  const exit3 = context.enter('blockquote')
   const tracker = track(safeOptions)
   tracker.move('> ')
   tracker.shift(2)
@@ -33093,11 +33112,11 @@ function blockquote(node, _, context, safeOptions) {
     containerFlow(node, context, tracker.current()),
     map
   )
-  exit4()
+  exit3()
   return value
 }
-function map(line, _, blank) {
-  return '>' + (blank ? '' : ' ') + line
+function map(line2, _, blank) {
+  return '>' + (blank ? '' : ' ') + line2
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/pattern-in-scope.js
@@ -33305,14 +33324,14 @@ function code(node, _, context, safeOptions) {
   const raw = node.value || ''
   const suffix = marker === '`' ? 'GraveAccent' : 'Tilde'
   if (formatCodeAsIndented(node, context)) {
-    const exit5 = context.enter('codeIndented')
+    const exit4 = context.enter('codeIndented')
     const value2 = indentLines(raw, map2)
-    exit5()
+    exit4()
     return value2
   }
   const tracker = track(safeOptions)
   const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3))
-  const exit4 = context.enter('codeFenced')
+  const exit3 = context.enter('codeFenced')
   let value = tracker.move(sequence)
   if (node.lang) {
     const subexit = context.enter('codeFencedLang' + suffix)
@@ -33344,11 +33363,11 @@ function code(node, _, context, safeOptions) {
     value += tracker.move(raw + '\n')
   }
   value += tracker.move(sequence)
-  exit4()
+  exit3()
   return value
 }
-function map2(line, _, blank) {
-  return (blank ? '' : '    ') + line
+function map2(line2, _, blank) {
+  return (blank ? '' : '    ') + line2
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/util/association.js
@@ -33376,7 +33395,7 @@ function checkQuote(context) {
 function definition2(node, _, context, safeOptions) {
   const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
-  const exit4 = context.enter('definition')
+  const exit3 = context.enter('definition')
   let subexit = context.enter('label')
   const tracker = track(safeOptions)
   let value = tracker.move('[')
@@ -33424,7 +33443,7 @@ function definition2(node, _, context, safeOptions) {
     value += tracker.move(quote)
     subexit()
   }
-  exit4()
+  exit3()
   return value
 }
 
@@ -33445,7 +33464,7 @@ function checkEmphasis(context) {
 emphasis.peek = emphasisPeek
 function emphasis(node, _, context, safeOptions) {
   const marker = checkEmphasis(context)
-  const exit4 = context.enter('emphasis')
+  const exit3 = context.enter('emphasis')
   const tracker = track(safeOptions)
   let value = tracker.move(marker)
   value += tracker.move(
@@ -33456,7 +33475,7 @@ function emphasis(node, _, context, safeOptions) {
     })
   )
   value += tracker.move(marker)
-  exit4()
+  exit3()
   return value
 }
 function emphasisPeek(_, _1, context) {
@@ -33535,7 +33554,7 @@ var visitParents = function (tree, test, visitor, reverse) {
     visitor = test
     test = null
   }
-  const is = convert(test)
+  const is2 = convert(test)
   const step = reverse ? -1 : 1
   factory(tree, null, [])()
   function factory(node, index2, parents) {
@@ -33559,7 +33578,7 @@ var visitParents = function (tree, test, visitor, reverse) {
       let subresult
       let offset
       let grandparents
-      if (!test || is(node, index2, parents[parents.length - 1] || null)) {
+      if (!test || is2(node, index2, parents[parents.length - 1] || null)) {
         result = toResult2(visitor(node, parents))
         if (result[0] === EXIT2) {
           return result
@@ -33629,7 +33648,7 @@ function heading(node, _, context, safeOptions) {
   const rank = Math.max(Math.min(6, node.depth || 1), 1)
   const tracker = track(safeOptions)
   if (formatHeadingAsSetext(node, context)) {
-    const exit5 = context.enter('headingSetext')
+    const exit4 = context.enter('headingSetext')
     const subexit2 = context.enter('phrasing')
     const value2 = containerPhrasing(node, context, {
       ...tracker.current(),
@@ -33637,7 +33656,7 @@ function heading(node, _, context, safeOptions) {
       after: '\n',
     })
     subexit2()
-    exit5()
+    exit4()
     return (
       value2 +
       '\n' +
@@ -33648,7 +33667,7 @@ function heading(node, _, context, safeOptions) {
     )
   }
   const sequence = '#'.repeat(rank)
-  const exit4 = context.enter('headingAtx')
+  const exit3 = context.enter('headingAtx')
   const subexit = context.enter('phrasing')
   tracker.move(sequence + ' ')
   let value = containerPhrasing(node, context, {
@@ -33668,7 +33687,7 @@ function heading(node, _, context, safeOptions) {
     value += ' ' + sequence
   }
   subexit()
-  exit4()
+  exit3()
   return value
 }
 
@@ -33686,7 +33705,7 @@ image.peek = imagePeek
 function image(node, _, context, safeOptions) {
   const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
-  const exit4 = context.enter('image')
+  const exit3 = context.enter('image')
   let subexit = context.enter('label')
   const tracker = track(safeOptions)
   let value = tracker.move('![')
@@ -33731,7 +33750,7 @@ function image(node, _, context, safeOptions) {
     subexit()
   }
   value += tracker.move(')')
-  exit4()
+  exit3()
   return value
 }
 function imagePeek() {
@@ -33742,7 +33761,7 @@ function imagePeek() {
 imageReference.peek = imageReferencePeek
 function imageReference(node, _, context, safeOptions) {
   const type = node.referenceType
-  const exit4 = context.enter('imageReference')
+  const exit3 = context.enter('imageReference')
   let subexit = context.enter('label')
   const tracker = track(safeOptions)
   let value = tracker.move('![')
@@ -33763,7 +33782,7 @@ function imageReference(node, _, context, safeOptions) {
   })
   subexit()
   context.stack = stack
-  exit4()
+  exit3()
   if (type === 'full' || !alt || alt !== reference) {
     value += tracker.move(reference + ']')
   } else if (type === 'shortcut') {
@@ -33836,12 +33855,12 @@ function link(node, _, context, safeOptions) {
   const quote = checkQuote(context)
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe'
   const tracker = track(safeOptions)
-  let exit4
+  let exit3
   let subexit
   if (formatLinkAsAutolink(node, context)) {
     const stack = context.stack
     context.stack = []
-    exit4 = context.enter('autolink')
+    exit3 = context.enter('autolink')
     let value2 = tracker.move('<')
     value2 += tracker.move(
       containerPhrasing(node, context, {
@@ -33851,11 +33870,11 @@ function link(node, _, context, safeOptions) {
       })
     )
     value2 += tracker.move('>')
-    exit4()
+    exit3()
     context.stack = stack
     return value2
   }
-  exit4 = context.enter('link')
+  exit3 = context.enter('link')
   subexit = context.enter('label')
   let value = tracker.move('[')
   value += tracker.move(
@@ -33903,7 +33922,7 @@ function link(node, _, context, safeOptions) {
     subexit()
   }
   value += tracker.move(')')
-  exit4()
+  exit3()
   return value
 }
 function linkPeek(node, _, context) {
@@ -33914,7 +33933,7 @@ function linkPeek(node, _, context) {
 linkReference.peek = linkReferencePeek
 function linkReference(node, _, context, safeOptions) {
   const type = node.referenceType
-  const exit4 = context.enter('linkReference')
+  const exit3 = context.enter('linkReference')
   let subexit = context.enter('label')
   const tracker = track(safeOptions)
   let value = tracker.move('[')
@@ -33935,7 +33954,7 @@ function linkReference(node, _, context, safeOptions) {
   })
   subexit()
   context.stack = stack
-  exit4()
+  exit3()
   if (type === 'full' || !text5 || text5 !== reference) {
     value += tracker.move(reference + ']')
   } else if (type === 'shortcut') {
@@ -34042,7 +34061,7 @@ function checkRule(context) {
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/list.js
 function list2(node, parent, context, safeOptions) {
-  const exit4 = context.enter('list')
+  const exit3 = context.enter('list')
   const bulletCurrent = context.bulletCurrent
   let bullet = node.ordered ? checkBulletOrdered(context) : checkBullet(context)
   const bulletOther = node.ordered
@@ -34100,7 +34119,7 @@ function list2(node, parent, context, safeOptions) {
   const value = containerFlow(node, context, safeOptions)
   context.bulletLastUsed = bullet
   context.bulletCurrent = bulletCurrent
-  exit4()
+  exit3()
   return value
 }
 
@@ -34145,28 +34164,28 @@ function listItem(node, parent, context, safeOptions) {
   const tracker = track(safeOptions)
   tracker.move(bullet + ' '.repeat(size - bullet.length))
   tracker.shift(size)
-  const exit4 = context.enter('listItem')
+  const exit3 = context.enter('listItem')
   const value = indentLines(
     containerFlow(node, context, tracker.current()),
     map3
   )
-  exit4()
+  exit3()
   return value
-  function map3(line, index2, blank) {
+  function map3(line2, index2, blank) {
     if (index2) {
-      return (blank ? '' : ' '.repeat(size)) + line
+      return (blank ? '' : ' '.repeat(size)) + line2
     }
-    return (blank ? bullet : bullet + ' '.repeat(size - bullet.length)) + line
+    return (blank ? bullet : bullet + ' '.repeat(size - bullet.length)) + line2
   }
 }
 
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/handle/paragraph.js
 function paragraph(node, _, context, safeOptions) {
-  const exit4 = context.enter('paragraph')
+  const exit3 = context.enter('paragraph')
   const subexit = context.enter('phrasing')
   const value = containerPhrasing(node, context, safeOptions)
   subexit()
-  exit4()
+  exit3()
   return value
 }
 
@@ -34192,7 +34211,7 @@ function checkStrong(context) {
 strong.peek = strongPeek
 function strong(node, _, context, safeOptions) {
   const marker = checkStrong(context)
-  const exit4 = context.enter('strong')
+  const exit3 = context.enter('strong')
   const tracker = track(safeOptions)
   let value = tracker.move(marker + marker)
   value += tracker.move(
@@ -34203,7 +34222,7 @@ function strong(node, _, context, safeOptions) {
     })
   )
   value += tracker.move(marker + marker)
-  exit4()
+  exit3()
   return value
 }
 function strongPeek(_, _1, context) {
@@ -34409,7 +34428,7 @@ var unsafe = [
 // ../../../node_modules/.pnpm/mdast-util-to-markdown@1.3.0/node_modules/mdast-util-to-markdown/lib/index.js
 function toMarkdown(tree, options = {}) {
   const context = {
-    enter: enter3,
+    enter: enter2,
     stack: [],
     unsafe: [],
     join: [],
@@ -34441,10 +34460,10 @@ function toMarkdown(tree, options = {}) {
     result += '\n'
   }
   return result
-  function enter3(name) {
+  function enter2(name) {
     context.stack.push(name)
-    return exit4
-    function exit4() {
+    return exit3
+    function exit3() {
       context.stack.pop()
     }
   }
@@ -34461,7 +34480,7 @@ function joinDefinition(left, right) {
   }
 }
 
-// ../mdx/src/stringify/acorn.ts
+// src/stringify/acorn.ts
 var import_prettier = __toModule(require_standalone())
 var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
@@ -34709,7 +34728,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// ../mdx/src/stringify/marks.ts
+// src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -34928,7 +34947,7 @@ var visitParents2 = function (tree, test, visitor, reverse) {
     visitor = test
     test = null
   }
-  const is = convert(test)
+  const is2 = convert(test)
   const step = reverse ? -1 : 1
   factory(tree, void 0, [])()
   function factory(node, index2, parents) {
@@ -34951,7 +34970,7 @@ var visitParents2 = function (tree, test, visitor, reverse) {
       let subresult
       let offset
       let grandparents
-      if (!test || is(node, index2, parents[parents.length - 1] || null)) {
+      if (!test || is2(node, index2, parents[parents.length - 1] || null)) {
         result = toResult3(visitor(node, parents))
         if (result[0] === EXIT3) {
           return result
@@ -34983,7 +35002,7 @@ function toResult3(value) {
   return [value]
 }
 
-// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
+// src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
 var directiveToMarkdown = (patterns) => ({
@@ -35021,7 +35040,7 @@ var handle2 = function (patterns) {
     const endPattern = pattern.end
     const tracker = track(safeOptions)
     const sequence = startPattern + ' '
-    const exit4 = state.enter(node.type)
+    const exit3 = state.enter(node.type)
     let value = tracker.move(sequence + (node.name || ''))
     value += tracker.move(attributes(node, state))
     value += endPattern
@@ -35037,7 +35056,7 @@ var handle2 = function (patterns) {
       }
       value += tracker.move('\n' + sequence)
     }
-    exit4()
+    exit3()
     return value
   }
   function peekDirective() {
@@ -35135,7 +35154,7 @@ var handle2 = function (patterns) {
   return handleDirective
 }
 
-// ../mdx/src/stringify/index.ts
+// src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return
@@ -35376,7 +35395,7 @@ function source(value, file) {
   return results.join('')
 }
 
-// ../mdx/src/parse/mdx.ts
+// src/parse/mdx.ts
 function mdxJsxElement(node, field, imageCallback) {
   try {
     const template = field.templates?.find((template2) => {
@@ -35452,7 +35471,7 @@ var containerDirectiveElement = (node, field, imageCallback, raw) => {
   }
 }
 
-// ../mdx/src/parse/remarkToPlate.ts
+// src/parse/remarkToPlate.ts
 var remarkToSlate = (root3, field, imageCallback, raw) => {
   const content3 = (content4) => {
     switch (content4.type) {
@@ -35802,137 +35821,6 @@ var RichTextParseError = class extends Error {
     this.name = 'RichTextParseError'
     this.position = position2
   }
-}
-
-// ../mdx/src/extensions/directive/from-markdown.ts
-var own5 = {}.hasOwnProperty
-var enterContainer = function (token) {
-  enter.call(this, 'containerDirective', token)
-}
-var enterLeaf = function (token) {
-  enter.call(this, 'leafDirective', token)
-}
-var enterText = function (token) {
-  enter.call(this, 'textDirective', token)
-}
-var enter = function (type, token) {
-  this.enter({ type, name: '', attributes: {}, children: [] }, token)
-}
-function exitName(token) {
-  const node = this.stack[this.stack.length - 1]
-  node.name = this.sliceSerialize(token)
-}
-var enterContainerLabel = function (token) {
-  this.enter(
-    { type: 'paragraph', data: { directiveLabel: true }, children: [] },
-    token
-  )
-}
-var exitContainerLabel = function (token) {
-  this.exit(token)
-}
-var enterAttributes = function () {
-  this.setData('directiveAttributes', [])
-  this.buffer()
-}
-var exitAttributeIdValue = function (token) {
-  const list3 = this.getData('directiveAttributes')
-  if (list3) {
-    list3.push([
-      'id',
-      parseEntities(this.sliceSerialize(token), {
-        attribute: true,
-      }),
-    ])
-  }
-}
-var exitAttributeClassValue = function (token) {
-  const list3 = this.getData('directiveAttributes')
-  if (list3) {
-    list3.push([
-      'class',
-      parseEntities(this.sliceSerialize(token), {
-        attribute: true,
-      }),
-    ])
-  }
-}
-var exitAttributeValue = function (token) {
-  const list3 = this.getData('directiveAttributes')
-  if (list3) {
-    list3[list3.length - 1][1] = parseEntities(this.sliceSerialize(token), {
-      attribute: true,
-    })
-  }
-}
-var exitAttributeName = function (token) {
-  const list3 = this.getData('directiveAttributes')
-  if (list3) {
-    const name = this.sliceSerialize(token)
-    if (!name) {
-      list3.push(['_value', ''])
-    } else {
-      list3.push([this.sliceSerialize(token), ''])
-    }
-  }
-}
-function exitAttributes() {
-  const list3 = this.getData('directiveAttributes')
-  const cleaned = {}
-  let index2 = -1
-  if (list3) {
-    while (++index2 < list3.length) {
-      const attribute = list3[index2]
-      if (attribute[0] === 'class' && cleaned.class) {
-        cleaned.class += ' ' + attribute[1]
-      } else {
-        cleaned[attribute[0]] = attribute[1]
-      }
-    }
-  }
-  this.setData('directiveAttributes')
-  this.resume()
-  const node = this.stack[this.stack.length - 1]
-  node.attributes = cleaned
-}
-function exit2(token) {
-  this.exit(token)
-}
-var directiveFromMarkdown = {
-  canContainEols: ['textDirective'],
-  enter: {
-    directiveContainer: enterContainer,
-    directiveContainerAttributes: enterAttributes,
-    directiveContainerLabel: enterContainerLabel,
-    directiveLeaf: enterLeaf,
-    directiveLeafAttributes: enterAttributes,
-    directiveText: enterText,
-    directiveTextAttributes: enterAttributes,
-  },
-  exit: {
-    directiveContainer: exit2,
-    directiveContainerAttributeClassValue: exitAttributeClassValue,
-    directiveContainerAttributeIdValue: exitAttributeIdValue,
-    directiveContainerAttributeName: exitAttributeName,
-    directiveContainerAttributeValue: exitAttributeValue,
-    directiveContainerAttributes: exitAttributes,
-    directiveContainerLabel: exitContainerLabel,
-    directiveContainerName: exitName,
-    directiveLeaf: exit2,
-    directiveLeafAttributeClassValue: exitAttributeClassValue,
-    directiveLeafAttributeIdValue: exitAttributeIdValue,
-    directiveLeafAttributeName: exitAttributeName,
-    directiveLeafAttributeValue: exitAttributeValue,
-    directiveLeafAttributes: exitAttributes,
-    directiveLeafName: exitName,
-    directiveText: exit2,
-    directiveTextAttributeClassValue: exitAttributeClassValue,
-    directiveTextAttributeIdValue: exitAttributeIdValue,
-    directiveTextAttributeName: exitAttributeName,
-    directiveTextAttributeValue: exitAttributeValue,
-    directiveTextAttributes: exitAttributes,
-    directiveTextName: exitName,
-  },
 }
 
 // ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/codes.js
@@ -36285,7 +36173,7 @@ var values = {
   replacementCharacter: '\uFFFD',
 }
 
-// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
+// src/extensions/tina-shortcodes/shortcode-leaf.ts
 var findValue = (string3) => {
   let lookupValue = null
   Object.entries(values).forEach(([key, value]) => {
@@ -36314,7 +36202,7 @@ var tokenizeLeaf = function (pattern) {
   const startPattern = pattern.start
   const endPattern = pattern.end
   const patternName = pattern.name || pattern.templateName
-  const tokenizeDirectiveLeaf = function (effects, ok2, nok) {
+  const tokenizeDirectiveLeaf = function (effects, ok3, nok) {
     const self2 = this
     const logSelf = () => {
       self2.events.forEach((e) => {
@@ -36429,7 +36317,7 @@ var tokenizeLeaf = function (pattern) {
     const end = function (code2) {
       if (code2 === codes.eof || markdownLineEnding(code2)) {
         effects.exit('shortcode')
-        return ok2(code2)
+        return ok3(code2)
       }
       return nok(code2)
     }
@@ -36631,353 +36519,1716 @@ var directiveLeaf = function (pattern) {
   return { tokenize: tokenizeLeaf(pattern) }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
-var findValue2 = (string3) => {
-  let lookupValue = null
-  Object.entries(values).forEach(([key, value]) => {
-    if (value === string3) {
-      lookupValue = key
-    }
-  })
-  return lookupValue
-}
-var findCode2 = (string3) => {
-  if (!string3) {
-    return null
+// ../../../node_modules/.pnpm/dequal@2.0.2/node_modules/dequal/dist/index.mjs
+var has = Object.prototype.hasOwnProperty
+function find(iter, tar, key) {
+  for (key of iter.keys()) {
+    if (dequal(key, tar)) return key
   }
-  const lookup = findValue2(string3)
-  let lookupValue = null
-  if (lookup) {
-    Object.entries(codes).forEach(([key, value]) => {
-      if (key === lookup) {
-        lookupValue = value
+}
+function dequal(foo, bar) {
+  var ctor, len, tmp
+  if (foo === bar) return true
+  if (foo && bar && (ctor = foo.constructor) === bar.constructor) {
+    if (ctor === Date) return foo.getTime() === bar.getTime()
+    if (ctor === RegExp) return foo.toString() === bar.toString()
+    if (ctor === Array) {
+      if ((len = foo.length) === bar.length) {
+        while (len-- && dequal(foo[len], bar[len]));
       }
-    })
+      return len === -1
+    }
+    if (ctor === Set) {
+      if (foo.size !== bar.size) {
+        return false
+      }
+      for (len of foo) {
+        tmp = len
+        if (tmp && typeof tmp === 'object') {
+          tmp = find(bar, tmp)
+          if (!tmp) return false
+        }
+        if (!bar.has(tmp)) return false
+      }
+      return true
+    }
+    if (ctor === Map) {
+      if (foo.size !== bar.size) {
+        return false
+      }
+      for (len of foo) {
+        tmp = len[0]
+        if (tmp && typeof tmp === 'object') {
+          tmp = find(bar, tmp)
+          if (!tmp) return false
+        }
+        if (!dequal(len[1], bar.get(tmp))) {
+          return false
+        }
+      }
+      return true
+    }
+    if (ctor === ArrayBuffer) {
+      foo = new Uint8Array(foo)
+      bar = new Uint8Array(bar)
+    } else if (ctor === DataView) {
+      if ((len = foo.byteLength) === bar.byteLength) {
+        while (len-- && foo.getInt8(len) === bar.getInt8(len));
+      }
+      return len === -1
+    }
+    if (ArrayBuffer.isView(foo)) {
+      if ((len = foo.byteLength) === bar.byteLength) {
+        while (len-- && foo[len] === bar[len]);
+      }
+      return len === -1
+    }
+    if (!ctor || typeof foo === 'object') {
+      len = 0
+      for (ctor in foo) {
+        if (has.call(foo, ctor) && ++len && !has.call(bar, ctor)) return false
+        if (!(ctor in bar) || !dequal(foo[ctor], bar[ctor])) return false
+      }
+      return Object.keys(bar).length === len
+    }
   }
-  return lookupValue
+  return foo !== foo && bar !== bar
 }
-var tokenizeDirective = function (pattern) {
-  const startPattern = pattern.start
-  const endPattern = pattern.end
-  const patternName = pattern.name || pattern.templateName
-  const tokenizedirectiveContainer = function (effects, ok2, nok) {
+
+// ../../../node_modules/.pnpm/kleur@4.1.5/node_modules/kleur/index.mjs
+;('use strict')
+var FORCE_COLOR
+var NODE_DISABLE_COLORS
+var NO_COLOR
+var TERM
+var isTTY = true
+if (typeof process !== 'undefined') {
+  ;({ FORCE_COLOR, NODE_DISABLE_COLORS, NO_COLOR, TERM } = process.env || {})
+  isTTY = process.stdout && process.stdout.isTTY
+}
+var $ = {
+  enabled:
+    !NODE_DISABLE_COLORS &&
+    NO_COLOR == null &&
+    TERM !== 'dumb' &&
+    ((FORCE_COLOR != null && FORCE_COLOR !== '0') || isTTY),
+  reset: init(0, 0),
+  bold: init(1, 22),
+  dim: init(2, 22),
+  italic: init(3, 23),
+  underline: init(4, 24),
+  inverse: init(7, 27),
+  hidden: init(8, 28),
+  strikethrough: init(9, 29),
+  black: init(30, 39),
+  red: init(31, 39),
+  green: init(32, 39),
+  yellow: init(33, 39),
+  blue: init(34, 39),
+  magenta: init(35, 39),
+  cyan: init(36, 39),
+  white: init(37, 39),
+  gray: init(90, 39),
+  grey: init(90, 39),
+  bgBlack: init(40, 49),
+  bgRed: init(41, 49),
+  bgGreen: init(42, 49),
+  bgYellow: init(43, 49),
+  bgBlue: init(44, 49),
+  bgMagenta: init(45, 49),
+  bgCyan: init(46, 49),
+  bgWhite: init(47, 49),
+}
+function run(arr, str) {
+  let i = 0,
+    tmp,
+    beg = '',
+    end = ''
+  for (; i < arr.length; i++) {
+    tmp = arr[i]
+    beg += tmp.open
+    end += tmp.close
+    if (!!~str.indexOf(tmp.close)) {
+      str = str.replace(tmp.rgx, tmp.close + tmp.open)
+    }
+  }
+  return beg + str + end
+}
+function chain(has2, keys) {
+  let ctx = { has: has2, keys }
+  ctx.reset = $.reset.bind(ctx)
+  ctx.bold = $.bold.bind(ctx)
+  ctx.dim = $.dim.bind(ctx)
+  ctx.italic = $.italic.bind(ctx)
+  ctx.underline = $.underline.bind(ctx)
+  ctx.inverse = $.inverse.bind(ctx)
+  ctx.hidden = $.hidden.bind(ctx)
+  ctx.strikethrough = $.strikethrough.bind(ctx)
+  ctx.black = $.black.bind(ctx)
+  ctx.red = $.red.bind(ctx)
+  ctx.green = $.green.bind(ctx)
+  ctx.yellow = $.yellow.bind(ctx)
+  ctx.blue = $.blue.bind(ctx)
+  ctx.magenta = $.magenta.bind(ctx)
+  ctx.cyan = $.cyan.bind(ctx)
+  ctx.white = $.white.bind(ctx)
+  ctx.gray = $.gray.bind(ctx)
+  ctx.grey = $.grey.bind(ctx)
+  ctx.bgBlack = $.bgBlack.bind(ctx)
+  ctx.bgRed = $.bgRed.bind(ctx)
+  ctx.bgGreen = $.bgGreen.bind(ctx)
+  ctx.bgYellow = $.bgYellow.bind(ctx)
+  ctx.bgBlue = $.bgBlue.bind(ctx)
+  ctx.bgMagenta = $.bgMagenta.bind(ctx)
+  ctx.bgCyan = $.bgCyan.bind(ctx)
+  ctx.bgWhite = $.bgWhite.bind(ctx)
+  return ctx
+}
+function init(open, close) {
+  let blk = {
+    open: `[${open}m`,
+    close: `[${close}m`,
+    rgx: new RegExp(`\\x1b\\[${close}m`, 'g'),
+  }
+  return function (txt) {
+    if (this !== void 0 && this.has !== void 0) {
+      !!~this.has.indexOf(open) || (this.has.push(open), this.keys.push(blk))
+      return txt === void 0
+        ? this
+        : $.enabled
+        ? run(this.keys, txt + '')
+        : txt + ''
+    }
+    return txt === void 0
+      ? chain([open], [blk])
+      : $.enabled
+      ? run([blk], txt + '')
+      : txt + ''
+  }
+}
+var kleur_default = $
+
+// ../../../node_modules/.pnpm/diff@5.1.0/node_modules/diff/lib/index.mjs
+function Diff() {}
+Diff.prototype = {
+  diff: function diff(oldString, newString) {
+    var options =
+      arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {}
+    var callback = options.callback
+    if (typeof options === 'function') {
+      callback = options
+      options = {}
+    }
+    this.options = options
+    var self2 = this
+    function done(value) {
+      if (callback) {
+        setTimeout(function () {
+          callback(void 0, value)
+        }, 0)
+        return true
+      } else {
+        return value
+      }
+    }
+    oldString = this.castInput(oldString)
+    newString = this.castInput(newString)
+    oldString = this.removeEmpty(this.tokenize(oldString))
+    newString = this.removeEmpty(this.tokenize(newString))
+    var newLen = newString.length,
+      oldLen = oldString.length
+    var editLength = 1
+    var maxEditLength = newLen + oldLen
+    if (options.maxEditLength) {
+      maxEditLength = Math.min(maxEditLength, options.maxEditLength)
+    }
+    var bestPath = [
+      {
+        newPos: -1,
+        components: [],
+      },
+    ]
+    var oldPos = this.extractCommon(bestPath[0], newString, oldString, 0)
+    if (bestPath[0].newPos + 1 >= newLen && oldPos + 1 >= oldLen) {
+      return done([
+        {
+          value: this.join(newString),
+          count: newString.length,
+        },
+      ])
+    }
+    function execEditLength() {
+      for (
+        var diagonalPath = -1 * editLength;
+        diagonalPath <= editLength;
+        diagonalPath += 2
+      ) {
+        var basePath = void 0
+        var addPath = bestPath[diagonalPath - 1],
+          removePath = bestPath[diagonalPath + 1],
+          _oldPos = (removePath ? removePath.newPos : 0) - diagonalPath
+        if (addPath) {
+          bestPath[diagonalPath - 1] = void 0
+        }
+        var canAdd = addPath && addPath.newPos + 1 < newLen,
+          canRemove = removePath && 0 <= _oldPos && _oldPos < oldLen
+        if (!canAdd && !canRemove) {
+          bestPath[diagonalPath] = void 0
+          continue
+        }
+        if (!canAdd || (canRemove && addPath.newPos < removePath.newPos)) {
+          basePath = clonePath(removePath)
+          self2.pushComponent(basePath.components, void 0, true)
+        } else {
+          basePath = addPath
+          basePath.newPos++
+          self2.pushComponent(basePath.components, true, void 0)
+        }
+        _oldPos = self2.extractCommon(
+          basePath,
+          newString,
+          oldString,
+          diagonalPath
+        )
+        if (basePath.newPos + 1 >= newLen && _oldPos + 1 >= oldLen) {
+          return done(
+            buildValues(
+              self2,
+              basePath.components,
+              newString,
+              oldString,
+              self2.useLongestToken
+            )
+          )
+        } else {
+          bestPath[diagonalPath] = basePath
+        }
+      }
+      editLength++
+    }
+    if (callback) {
+      ;(function exec() {
+        setTimeout(function () {
+          if (editLength > maxEditLength) {
+            return callback()
+          }
+          if (!execEditLength()) {
+            exec()
+          }
+        }, 0)
+      })()
+    } else {
+      while (editLength <= maxEditLength) {
+        var ret = execEditLength()
+        if (ret) {
+          return ret
+        }
+      }
+    }
+  },
+  pushComponent: function pushComponent(components, added, removed) {
+    var last = components[components.length - 1]
+    if (last && last.added === added && last.removed === removed) {
+      components[components.length - 1] = {
+        count: last.count + 1,
+        added,
+        removed,
+      }
+    } else {
+      components.push({
+        count: 1,
+        added,
+        removed,
+      })
+    }
+  },
+  extractCommon: function extractCommon(
+    basePath,
+    newString,
+    oldString,
+    diagonalPath
+  ) {
+    var newLen = newString.length,
+      oldLen = oldString.length,
+      newPos = basePath.newPos,
+      oldPos = newPos - diagonalPath,
+      commonCount = 0
+    while (
+      newPos + 1 < newLen &&
+      oldPos + 1 < oldLen &&
+      this.equals(newString[newPos + 1], oldString[oldPos + 1])
+    ) {
+      newPos++
+      oldPos++
+      commonCount++
+    }
+    if (commonCount) {
+      basePath.components.push({
+        count: commonCount,
+      })
+    }
+    basePath.newPos = newPos
+    return oldPos
+  },
+  equals: function equals(left, right) {
+    if (this.options.comparator) {
+      return this.options.comparator(left, right)
+    } else {
+      return (
+        left === right ||
+        (this.options.ignoreCase && left.toLowerCase() === right.toLowerCase())
+      )
+    }
+  },
+  removeEmpty: function removeEmpty(array) {
+    var ret = []
+    for (var i = 0; i < array.length; i++) {
+      if (array[i]) {
+        ret.push(array[i])
+      }
+    }
+    return ret
+  },
+  castInput: function castInput(value) {
+    return value
+  },
+  tokenize: function tokenize(value) {
+    return value.split('')
+  },
+  join: function join2(chars2) {
+    return chars2.join('')
+  },
+}
+function buildValues(diff3, components, newString, oldString, useLongestToken) {
+  var componentPos = 0,
+    componentLen = components.length,
+    newPos = 0,
+    oldPos = 0
+  for (; componentPos < componentLen; componentPos++) {
+    var component = components[componentPos]
+    if (!component.removed) {
+      if (!component.added && useLongestToken) {
+        var value = newString.slice(newPos, newPos + component.count)
+        value = value.map(function (value2, i) {
+          var oldValue = oldString[oldPos + i]
+          return oldValue.length > value2.length ? oldValue : value2
+        })
+        component.value = diff3.join(value)
+      } else {
+        component.value = diff3.join(
+          newString.slice(newPos, newPos + component.count)
+        )
+      }
+      newPos += component.count
+      if (!component.added) {
+        oldPos += component.count
+      }
+    } else {
+      component.value = diff3.join(
+        oldString.slice(oldPos, oldPos + component.count)
+      )
+      oldPos += component.count
+      if (componentPos && components[componentPos - 1].added) {
+        var tmp = components[componentPos - 1]
+        components[componentPos - 1] = components[componentPos]
+        components[componentPos] = tmp
+      }
+    }
+  }
+  var lastComponent = components[componentLen - 1]
+  if (
+    componentLen > 1 &&
+    typeof lastComponent.value === 'string' &&
+    (lastComponent.added || lastComponent.removed) &&
+    diff3.equals('', lastComponent.value)
+  ) {
+    components[componentLen - 2].value += lastComponent.value
+    components.pop()
+  }
+  return components
+}
+function clonePath(path) {
+  return {
+    newPos: path.newPos,
+    components: path.components.slice(0),
+  }
+}
+var characterDiff = new Diff()
+function diffChars(oldStr, newStr, options) {
+  return characterDiff.diff(oldStr, newStr, options)
+}
+var extendedWordChars =
+  /^[A-Za-z\xC0-\u02C6\u02C8-\u02D7\u02DE-\u02FF\u1E00-\u1EFF]+$/
+var reWhitespace = /\S/
+var wordDiff = new Diff()
+wordDiff.equals = function (left, right) {
+  if (this.options.ignoreCase) {
+    left = left.toLowerCase()
+    right = right.toLowerCase()
+  }
+  return (
+    left === right ||
+    (this.options.ignoreWhitespace &&
+      !reWhitespace.test(left) &&
+      !reWhitespace.test(right))
+  )
+}
+wordDiff.tokenize = function (value) {
+  var tokens = value.split(/([^\S\r\n]+|[()[\]{}'"\r\n]|\b)/)
+  for (var i = 0; i < tokens.length - 1; i++) {
+    if (
+      !tokens[i + 1] &&
+      tokens[i + 2] &&
+      extendedWordChars.test(tokens[i]) &&
+      extendedWordChars.test(tokens[i + 2])
+    ) {
+      tokens[i] += tokens[i + 2]
+      tokens.splice(i + 1, 2)
+      i--
+    }
+  }
+  return tokens
+}
+var lineDiff = new Diff()
+lineDiff.tokenize = function (value) {
+  var retLines = [],
+    linesAndNewlines = value.split(/(\n|\r\n)/)
+  if (!linesAndNewlines[linesAndNewlines.length - 1]) {
+    linesAndNewlines.pop()
+  }
+  for (var i = 0; i < linesAndNewlines.length; i++) {
+    var line2 = linesAndNewlines[i]
+    if (i % 2 && !this.options.newlineIsToken) {
+      retLines[retLines.length - 1] += line2
+    } else {
+      if (this.options.ignoreWhitespace) {
+        line2 = line2.trim()
+      }
+      retLines.push(line2)
+    }
+  }
+  return retLines
+}
+function diffLines(oldStr, newStr, callback) {
+  return lineDiff.diff(oldStr, newStr, callback)
+}
+var sentenceDiff = new Diff()
+sentenceDiff.tokenize = function (value) {
+  return value.split(/(\S.+?[.!?])(?=\s+|$)/)
+}
+var cssDiff = new Diff()
+cssDiff.tokenize = function (value) {
+  return value.split(/([{}:;,]|\s+)/)
+}
+function _typeof(obj) {
+  '@babel/helpers - typeof'
+  if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+    _typeof = function (obj2) {
+      return typeof obj2
+    }
+  } else {
+    _typeof = function (obj2) {
+      return obj2 &&
+        typeof Symbol === 'function' &&
+        obj2.constructor === Symbol &&
+        obj2 !== Symbol.prototype
+        ? 'symbol'
+        : typeof obj2
+    }
+  }
+  return _typeof(obj)
+}
+var objectPrototypeToString = Object.prototype.toString
+var jsonDiff = new Diff()
+jsonDiff.useLongestToken = true
+jsonDiff.tokenize = lineDiff.tokenize
+jsonDiff.castInput = function (value) {
+  var _this$options = this.options,
+    undefinedReplacement = _this$options.undefinedReplacement,
+    _this$options$stringi = _this$options.stringifyReplacer,
+    stringifyReplacer =
+      _this$options$stringi === void 0
+        ? function (k, v) {
+            return typeof v === 'undefined' ? undefinedReplacement : v
+          }
+        : _this$options$stringi
+  return typeof value === 'string'
+    ? value
+    : JSON.stringify(
+        canonicalize(value, null, null, stringifyReplacer),
+        stringifyReplacer,
+        '  '
+      )
+}
+jsonDiff.equals = function (left, right) {
+  return Diff.prototype.equals.call(
+    jsonDiff,
+    left.replace(/,([\r\n])/g, '$1'),
+    right.replace(/,([\r\n])/g, '$1')
+  )
+}
+function canonicalize(obj, stack, replacementStack, replacer, key) {
+  stack = stack || []
+  replacementStack = replacementStack || []
+  if (replacer) {
+    obj = replacer(key, obj)
+  }
+  var i
+  for (i = 0; i < stack.length; i += 1) {
+    if (stack[i] === obj) {
+      return replacementStack[i]
+    }
+  }
+  var canonicalizedObj
+  if (objectPrototypeToString.call(obj) === '[object Array]') {
+    stack.push(obj)
+    canonicalizedObj = new Array(obj.length)
+    replacementStack.push(canonicalizedObj)
+    for (i = 0; i < obj.length; i += 1) {
+      canonicalizedObj[i] = canonicalize(
+        obj[i],
+        stack,
+        replacementStack,
+        replacer,
+        key
+      )
+    }
+    stack.pop()
+    replacementStack.pop()
+    return canonicalizedObj
+  }
+  if (obj && obj.toJSON) {
+    obj = obj.toJSON()
+  }
+  if (_typeof(obj) === 'object' && obj !== null) {
+    stack.push(obj)
+    canonicalizedObj = {}
+    replacementStack.push(canonicalizedObj)
+    var sortedKeys = [],
+      _key
+    for (_key in obj) {
+      if (obj.hasOwnProperty(_key)) {
+        sortedKeys.push(_key)
+      }
+    }
+    sortedKeys.sort()
+    for (i = 0; i < sortedKeys.length; i += 1) {
+      _key = sortedKeys[i]
+      canonicalizedObj[_key] = canonicalize(
+        obj[_key],
+        stack,
+        replacementStack,
+        replacer,
+        _key
+      )
+    }
+    stack.pop()
+    replacementStack.pop()
+  } else {
+    canonicalizedObj = obj
+  }
+  return canonicalizedObj
+}
+var arrayDiff = new Diff()
+arrayDiff.tokenize = function (value) {
+  return value.slice()
+}
+arrayDiff.join = arrayDiff.removeEmpty = function (value) {
+  return value
+}
+function diffArrays(oldArr, newArr, callback) {
+  return arrayDiff.diff(oldArr, newArr, callback)
+}
+
+// ../../../node_modules/.pnpm/uvu@0.5.6/node_modules/uvu/diff/index.mjs
+var colors = {
+  '--': kleur_default.red,
+  '\xB7\xB7': kleur_default.grey,
+  '++': kleur_default.green,
+}
+var TITLE = kleur_default.dim().italic
+var TAB = kleur_default.dim('\u2192')
+var SPACE = kleur_default.dim('\xB7')
+var NL = kleur_default.dim('\u21B5')
+var LOG = (sym, str) => colors[sym](sym + PRETTY(str)) + '\n'
+var LINE = (num, x) =>
+  kleur_default.dim('L' + String(num).padStart(x, '0') + ' ')
+var PRETTY = (str) =>
+  str
+    .replace(/[ ]/g, SPACE)
+    .replace(/\t/g, TAB)
+    .replace(/(\r?\n)/g, NL)
+function line(obj, prev, pad) {
+  let char = obj.removed ? '--' : obj.added ? '++' : '\xB7\xB7'
+  let arr = obj.value.replace(/\r?\n$/, '').split('\n')
+  let i = 0,
+    tmp,
+    out = ''
+  if (obj.added) out += colors[char]().underline(TITLE('Expected:')) + '\n'
+  else if (obj.removed) out += colors[char]().underline(TITLE('Actual:')) + '\n'
+  for (; i < arr.length; i++) {
+    tmp = arr[i]
+    if (tmp != null) {
+      if (prev) out += LINE(prev + i, pad)
+      out += LOG(char, tmp || '\n')
+    }
+  }
+  return out
+}
+function arrays(input, expect) {
+  let arr = diffArrays(input, expect)
+  let i = 0,
+    j = 0,
+    k = 0,
+    tmp,
+    val,
+    char,
+    isObj,
+    str
+  let out = LOG('\xB7\xB7', '[')
+  for (; i < arr.length; i++) {
+    char = (tmp = arr[i]).removed ? '--' : tmp.added ? '++' : '\xB7\xB7'
+    if (tmp.added) {
+      out += colors[char]().underline(TITLE('Expected:')) + '\n'
+    } else if (tmp.removed) {
+      out += colors[char]().underline(TITLE('Actual:')) + '\n'
+    }
+    for (j = 0; j < tmp.value.length; j++) {
+      isObj = tmp.value[j] && typeof tmp.value[j] === 'object'
+      val = stringify(tmp.value[j]).split(/\r?\n/g)
+      for (k = 0; k < val.length; ) {
+        str = '  ' + val[k++] + (isObj ? '' : ',')
+        if (isObj && k === val.length && j + 1 < tmp.value.length) str += ','
+        out += LOG(char, str)
+      }
+    }
+  }
+  return out + LOG('\xB7\xB7', ']')
+}
+function lines(input, expect, linenum = 0) {
+  let i = 0,
+    tmp,
+    output = ''
+  let arr = diffLines(input, expect)
+  let pad = String(expect.split(/\r?\n/g).length - linenum).length
+  for (; i < arr.length; i++) {
+    output += line((tmp = arr[i]), linenum, pad)
+    if (linenum && !tmp.removed) linenum += tmp.count
+  }
+  return output
+}
+function chars(input, expect) {
+  let arr = diffChars(input, expect)
+  let i = 0,
+    output = '',
+    tmp
+  let l1 = input.length
+  let l2 = expect.length
+  let p1 = PRETTY(input)
+  let p2 = PRETTY(expect)
+  tmp = arr[i]
+  if (l1 === l2) {
+  } else if (tmp.removed && arr[i + 1]) {
+    let del = tmp.count - arr[i + 1].count
+    if (del == 0) {
+    } else if (del > 0) {
+      expect = ' '.repeat(del) + expect
+      p2 = ' '.repeat(del) + p2
+      l2 += del
+    } else if (del < 0) {
+      input = ' '.repeat(-del) + input
+      p1 = ' '.repeat(-del) + p1
+      l1 += -del
+    }
+  }
+  output += direct(p1, p2, l1, l2)
+  if (l1 === l2) {
+    for (tmp = '  '; i < l1; i++) {
+      tmp += input[i] === expect[i] ? ' ' : '^'
+    }
+  } else {
+    for (tmp = '  '; i < arr.length; i++) {
+      tmp += (arr[i].added || arr[i].removed ? '^' : ' ').repeat(
+        Math.max(arr[i].count, 0)
+      )
+      if (
+        i + 1 < arr.length &&
+        ((arr[i].added && arr[i + 1].removed) ||
+          (arr[i].removed && arr[i + 1].added))
+      ) {
+        arr[i + 1].count -= arr[i].count
+      }
+    }
+  }
+  return output + kleur_default.red(tmp)
+}
+function direct(
+  input,
+  expect,
+  lenA = String(input).length,
+  lenB = String(expect).length
+) {
+  let gutter = 4
+  let lenC = Math.max(lenA, lenB)
+  let typeA = typeof input,
+    typeB = typeof expect
+  if (typeA !== typeB) {
+    gutter = 2
+    let delA = gutter + lenC - lenA
+    let delB = gutter + lenC - lenB
+    input += ' '.repeat(delA) + kleur_default.dim(`[${typeA}]`)
+    expect += ' '.repeat(delB) + kleur_default.dim(`[${typeB}]`)
+    lenA += delA + typeA.length + 2
+    lenB += delB + typeB.length + 2
+    lenC = Math.max(lenA, lenB)
+  }
+  let output =
+    colors['++'](
+      '++' + expect + ' '.repeat(gutter + lenC - lenB) + TITLE('(Expected)')
+    ) + '\n'
+  return (
+    output +
+    colors['--'](
+      '--' + input + ' '.repeat(gutter + lenC - lenA) + TITLE('(Actual)')
+    ) +
+    '\n'
+  )
+}
+function sort(input, expect) {
+  var k,
+    i = 0,
+    tmp,
+    isArr = Array.isArray(input)
+  var keys = [],
+    out = isArr ? Array(input.length) : {}
+  if (isArr) {
+    for (i = 0; i < out.length; i++) {
+      tmp = input[i]
+      if (!tmp || typeof tmp !== 'object') out[i] = tmp
+      else out[i] = sort(tmp, expect[i])
+    }
+  } else {
+    for (k in expect) keys.push(k)
+    for (; i < keys.length; i++) {
+      if (Object.prototype.hasOwnProperty.call(input, (k = keys[i]))) {
+        if (!(tmp = input[k]) || typeof tmp !== 'object') out[k] = tmp
+        else out[k] = sort(tmp, expect[k])
+      }
+    }
+    for (k in input) {
+      if (!out.hasOwnProperty(k)) {
+        out[k] = input[k]
+      }
+    }
+  }
+  return out
+}
+function circular() {
+  var cache = new Set()
+  return function print(key, val) {
+    if (val === void 0) return '[__VOID__]'
+    if (typeof val === 'number' && val !== val) return '[__NAN__]'
+    if (typeof val === 'bigint') return val.toString()
+    if (!val || typeof val !== 'object') return val
+    if (cache.has(val)) return '[Circular]'
+    cache.add(val)
+    return val
+  }
+}
+function stringify(input) {
+  return JSON.stringify(input, circular(), 2)
+    .replace(/"\[__NAN__\]"/g, 'NaN')
+    .replace(/"\[__VOID__\]"/g, 'undefined')
+}
+function compare(input, expect) {
+  if (Array.isArray(expect) && Array.isArray(input))
+    return arrays(input, expect)
+  if (expect instanceof RegExp) return chars('' + input, '' + expect)
+  let isA = input && typeof input == 'object'
+  let isB = expect && typeof expect == 'object'
+  if (isA && isB) input = sort(input, expect)
+  if (isB) expect = stringify(expect)
+  if (isA) input = stringify(input)
+  if (expect && typeof expect == 'object') {
+    input = stringify(sort(input, expect))
+    expect = stringify(expect)
+  }
+  isA = typeof input == 'string'
+  isB = typeof expect == 'string'
+  if (isA && /\r?\n/.test(input)) return lines(input, '' + expect)
+  if (isB && /\r?\n/.test(expect)) return lines('' + input, expect)
+  if (isA && isB) return chars(input, expect)
+  return direct(input, expect)
+}
+
+// ../../../node_modules/.pnpm/uvu@0.5.6/node_modules/uvu/assert/index.mjs
+function dedent(str) {
+  str = str.replace(/\r?\n/g, '\n')
+  let arr = str.match(/^[ \t]*(?=\S)/gm)
+  let i = 0,
+    min = 1 / 0,
+    len = (arr || []).length
+  for (; i < len; i++) min = Math.min(min, arr[i].length)
+  return len && min ? str.replace(new RegExp(`^[ \\t]{${min}}`, 'gm'), '') : str
+}
+var Assertion = class extends Error {
+  constructor(opts = {}) {
+    super(opts.message)
+    this.name = 'Assertion'
+    this.code = 'ERR_ASSERTION'
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor)
+    }
+    this.details = opts.details || false
+    this.generated = !!opts.generated
+    this.operator = opts.operator
+    this.expects = opts.expects
+    this.actual = opts.actual
+  }
+}
+function assert(bool, actual, expects, operator, detailer, backup, msg) {
+  if (bool) return
+  let message = msg || backup
+  if (msg instanceof Error) throw msg
+  let details = detailer && detailer(actual, expects)
+  throw new Assertion({
+    actual,
+    expects,
+    operator,
+    message,
+    details,
+    generated: !msg,
+  })
+}
+function ok2(val, msg) {
+  assert(!!val, false, true, 'ok', false, 'Expected value to be truthy', msg)
+}
+function is(val, exp, msg) {
+  assert(
+    val === exp,
+    val,
+    exp,
+    'is',
+    compare,
+    'Expected values to be strictly equal:',
+    msg
+  )
+}
+function not(val, msg) {
+  assert(!val, true, false, 'not', false, 'Expected value to be falsey', msg)
+}
+not.ok = not
+is.not = function (val, exp, msg) {
+  assert(
+    val !== exp,
+    val,
+    exp,
+    'is.not',
+    false,
+    'Expected values not to be strictly equal',
+    msg
+  )
+}
+not.equal = function (val, exp, msg) {
+  assert(
+    !dequal(val, exp),
+    val,
+    exp,
+    'not.equal',
+    false,
+    'Expected values not to be deeply equal',
+    msg
+  )
+}
+not.type = function (val, exp, msg) {
+  let tmp = typeof val
+  assert(
+    tmp !== exp,
+    tmp,
+    exp,
+    'not.type',
+    false,
+    `Expected "${tmp}" not to be "${exp}"`,
+    msg
+  )
+}
+not.instance = function (val, exp, msg) {
+  let name = '`' + (exp.name || exp.constructor.name) + '`'
+  assert(
+    !(val instanceof exp),
+    val,
+    exp,
+    'not.instance',
+    false,
+    `Expected value not to be an instance of ${name}`,
+    msg
+  )
+}
+not.snapshot = function (val, exp, msg) {
+  val = dedent(val)
+  exp = dedent(exp)
+  assert(
+    val !== exp,
+    val,
+    exp,
+    'not.snapshot',
+    false,
+    'Expected value not to match snapshot',
+    msg
+  )
+}
+not.fixture = function (val, exp, msg) {
+  val = dedent(val)
+  exp = dedent(exp)
+  assert(
+    val !== exp,
+    val,
+    exp,
+    'not.fixture',
+    false,
+    'Expected value not to match fixture',
+    msg
+  )
+}
+not.match = function (val, exp, msg) {
+  if (typeof exp === 'string') {
+    assert(
+      !val.includes(exp),
+      val,
+      exp,
+      'not.match',
+      false,
+      `Expected value not to include "${exp}" substring`,
+      msg
+    )
+  } else {
+    assert(
+      !exp.test(val),
+      val,
+      exp,
+      'not.match',
+      false,
+      `Expected value not to match \`${String(exp)}\` pattern`,
+      msg
+    )
+  }
+}
+not.throws = function (blk, exp, msg) {
+  if (!msg && typeof exp === 'string') {
+    msg = exp
+    exp = null
+  }
+  try {
+    blk()
+  } catch (err) {
+    if (typeof exp === 'function') {
+      assert(
+        !exp(err),
+        true,
+        false,
+        'not.throws',
+        false,
+        'Expected function not to throw matching exception',
+        msg
+      )
+    } else if (exp instanceof RegExp) {
+      assert(
+        !exp.test(err.message),
+        true,
+        false,
+        'not.throws',
+        false,
+        `Expected function not to throw exception matching \`${String(
+          exp
+        )}\` pattern`,
+        msg
+      )
+    } else if (!exp) {
+      assert(
+        false,
+        true,
+        false,
+        'not.throws',
+        false,
+        'Expected function not to throw',
+        msg
+      )
+    }
+  }
+}
+
+// ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/constants.js
+var constants = {
+  attentionSideBefore: 1,
+  attentionSideAfter: 2,
+  atxHeadingOpeningFenceSizeMax: 6,
+  autolinkDomainSizeMax: 63,
+  autolinkSchemeSizeMax: 32,
+  cdataOpeningString: 'CDATA[',
+  characterGroupWhitespace: 1,
+  characterGroupPunctuation: 2,
+  characterReferenceDecimalSizeMax: 7,
+  characterReferenceHexadecimalSizeMax: 6,
+  characterReferenceNamedSizeMax: 31,
+  codeFencedSequenceSizeMin: 3,
+  contentTypeDocument: 'document',
+  contentTypeFlow: 'flow',
+  contentTypeContent: 'content',
+  contentTypeString: 'string',
+  contentTypeText: 'text',
+  hardBreakPrefixSizeMin: 2,
+  htmlRaw: 1,
+  htmlComment: 2,
+  htmlInstruction: 3,
+  htmlDeclaration: 4,
+  htmlCdata: 5,
+  htmlBasic: 6,
+  htmlComplete: 7,
+  htmlRawSizeMax: 8,
+  linkResourceDestinationBalanceMax: 32,
+  linkReferenceSizeMax: 999,
+  listItemValueSizeMax: 10,
+  numericBaseDecimal: 10,
+  numericBaseHexadecimal: 16,
+  tabSize: 4,
+  thematicBreakMarkerCountMin: 3,
+  v8MaxSafeChunkSize: 1e4,
+}
+
+// src/extensions/tina-shortcodes/factory-attributes.ts
+function factoryAttributes(
+  effects,
+  ok3,
+  nok,
+  attributesType,
+  attributesMarkerType,
+  attributeType,
+  attributeIdType,
+  attributeClassType,
+  attributeNameType,
+  attributeInitializerType,
+  attributeValueLiteralType,
+  attributeValueType,
+  attributeValueMarker,
+  attributeValueData,
+  disallowEol
+) {
+  let type
+  let marker
+  const start3 = function (code2) {
+    effects.enter(attributesType)
+    return between(code2)
+  }
+  const between = function (code2) {
+    if (code2 === codes.numberSign) {
+      type = attributeIdType
+      return shortcutStart(code2)
+    }
+    if (code2 === codes.dot) {
+      type = attributeClassType
+      return shortcutStart(code2)
+    }
+    if (
+      code2 === codes.colon ||
+      code2 === codes.underscore ||
+      asciiAlpha(code2)
+    ) {
+      effects.enter(attributeType)
+      effects.enter(attributeNameType)
+      effects.consume(code2)
+      return name
+    }
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, between, types.whitespace)(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, between)(code2)
+    }
+    return end(code2)
+  }
+  const shortcutStart = function (code2) {
+    effects.enter(attributeType)
+    effects.enter(type)
+    effects.enter(type + 'Marker')
+    effects.consume(code2)
+    effects.exit(type + 'Marker')
+    return shortcutStartAfter
+  }
+  const shortcutStartAfter = function (code2) {
+    if (
+      code2 === codes.eof ||
+      code2 === codes.quotationMark ||
+      code2 === codes.numberSign ||
+      code2 === codes.apostrophe ||
+      code2 === codes.dot ||
+      code2 === codes.lessThan ||
+      code2 === codes.equalsTo ||
+      code2 === codes.greaterThan ||
+      code2 === codes.graveAccent ||
+      code2 === codes.rightCurlyBrace ||
+      markdownLineEndingOrSpace(code2)
+    ) {
+      return nok(code2)
+    }
+    effects.enter(type + 'Value')
+    effects.consume(code2)
+    return shortcut2
+  }
+  const shortcut2 = function (code2) {
+    if (
+      code2 === codes.eof ||
+      code2 === codes.quotationMark ||
+      code2 === codes.apostrophe ||
+      code2 === codes.lessThan ||
+      code2 === codes.equalsTo ||
+      code2 === codes.greaterThan ||
+      code2 === codes.graveAccent
+    ) {
+      return nok(code2)
+    }
+    if (
+      code2 === codes.numberSign ||
+      code2 === codes.dot ||
+      code2 === codes.rightCurlyBrace ||
+      markdownLineEndingOrSpace(code2)
+    ) {
+      effects.exit(type + 'Value')
+      effects.exit(type)
+      effects.exit(attributeType)
+      return between(code2)
+    }
+    effects.consume(code2)
+    return shortcut2
+  }
+  const name = function (code2) {
+    if (
+      code2 === codes.dash ||
+      code2 === codes.dot ||
+      code2 === codes.colon ||
+      code2 === codes.underscore ||
+      asciiAlphanumeric(code2)
+    ) {
+      effects.consume(code2)
+      return name
+    }
+    effects.exit(attributeNameType)
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, nameAfter, types.whitespace)(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, nameAfter)(code2)
+    }
+    return nameAfter(code2)
+  }
+  const nameAfter = function (code2) {
+    if (code2 === codes.equalsTo) {
+      effects.enter(attributeInitializerType)
+      effects.consume(code2)
+      effects.exit(attributeInitializerType)
+      return valueBefore
+    }
+    effects.exit(attributeType)
+    return between(code2)
+  }
+  const valueBefore = function (code2) {
+    if (
+      code2 === codes.eof ||
+      code2 === codes.lessThan ||
+      code2 === codes.equalsTo ||
+      code2 === codes.greaterThan ||
+      code2 === codes.graveAccent ||
+      code2 === codes.rightCurlyBrace ||
+      (disallowEol && markdownLineEnding(code2))
+    ) {
+      return nok(code2)
+    }
+    if (code2 === codes.quotationMark || code2 === codes.apostrophe) {
+      effects.enter(attributeValueLiteralType)
+      effects.enter(attributeValueMarker)
+      effects.consume(code2)
+      effects.exit(attributeValueMarker)
+      marker = code2
+      return valueQuotedStart
+    }
+    if (disallowEol && markdownSpace(code2)) {
+      return factorySpace(effects, valueBefore, types.whitespace)(code2)
+    }
+    if (!disallowEol && markdownLineEndingOrSpace(code2)) {
+      return factoryWhitespace(effects, valueBefore)(code2)
+    }
+    effects.enter(attributeValueType)
+    effects.enter(attributeValueData)
+    effects.consume(code2)
+    marker = void 0
+    return valueUnquoted
+  }
+  const valueUnquoted = function (code2) {
+    if (
+      code2 === codes.eof ||
+      code2 === codes.quotationMark ||
+      code2 === codes.apostrophe ||
+      code2 === codes.lessThan ||
+      code2 === codes.equalsTo ||
+      code2 === codes.greaterThan ||
+      code2 === codes.graveAccent
+    ) {
+      return nok(code2)
+    }
+    if (code2 === codes.rightCurlyBrace || markdownLineEndingOrSpace(code2)) {
+      effects.exit(attributeValueData)
+      effects.exit(attributeValueType)
+      effects.exit(attributeType)
+      return between(code2)
+    }
+    effects.consume(code2)
+    return valueUnquoted
+  }
+  const valueQuotedStart = function (code2) {
+    if (code2 === marker) {
+      effects.enter(attributeValueMarker)
+      effects.consume(code2)
+      effects.exit(attributeValueMarker)
+      effects.exit(attributeValueLiteralType)
+      effects.exit(attributeType)
+      return valueQuotedAfter
+    }
+    effects.enter(attributeValueType)
+    return valueQuotedBetween(code2)
+  }
+  const valueQuotedBetween = function (code2) {
+    if (code2 === marker) {
+      effects.exit(attributeValueType)
+      return valueQuotedStart(code2)
+    }
+    if (code2 === codes.eof) {
+      return nok(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      return disallowEol
+        ? nok(code2)
+        : factoryWhitespace(effects, valueQuotedBetween)(code2)
+    }
+    effects.enter(attributeValueData)
+    effects.consume(code2)
+    return valueQuoted
+  }
+  const valueQuoted = function (code2) {
+    if (code2 === marker || code2 === codes.eof || markdownLineEnding(code2)) {
+      effects.exit(attributeValueData)
+      return valueQuotedBetween(code2)
+    }
+    effects.consume(code2)
+    return valueQuoted
+  }
+  const valueQuotedAfter = function (code2) {
+    return code2 === codes.rightCurlyBrace || markdownLineEndingOrSpace(code2)
+      ? between(code2)
+      : end(code2)
+  }
+  const end = function (code2) {
+    if (code2 === codes.rightCurlyBrace) {
+      effects.enter(attributesMarkerType)
+      effects.consume(code2)
+      effects.exit(attributesMarkerType)
+      effects.exit(attributesType)
+      return ok3
+    }
+    return nok(code2)
+  }
+  return start3
+}
+
+// src/extensions/directive/extension/lib/factory-label.ts
+function factoryLabel2(
+  effects,
+  ok3,
+  nok,
+  type,
+  markerType,
+  stringType,
+  disallowEol
+) {
+  let size = 0
+  let balance = 0
+  let previous2
+  const start3 = function (code2) {
+    ok2(code2 === codes.leftSquareBracket, 'expected `[`')
+    effects.enter(type)
+    effects.enter(markerType)
+    effects.consume(code2)
+    effects.exit(markerType)
+    return afterStart
+  }
+  const afterStart = function (code2) {
+    if (code2 === codes.rightSquareBracket) {
+      effects.enter(markerType)
+      effects.consume(code2)
+      effects.exit(markerType)
+      effects.exit(type)
+      return ok3
+    }
+    effects.enter(stringType)
+    return lineStart(code2)
+  }
+  const lineStart = function (code2) {
+    if (code2 === codes.rightSquareBracket && !balance) {
+      return atClosingBrace(code2)
+    }
+    const token = effects.enter(types.chunkText, {
+      contentType: constants.contentTypeText,
+      previous: previous2,
+    })
+    if (previous2) previous2.next = token
+    previous2 = token
+    return data(code2)
+  }
+  const data = function (code2) {
+    if (code2 === codes.eof || size > constants.linkReferenceSizeMax) {
+      return nok(code2)
+    }
+    if (
+      code2 === codes.leftSquareBracket &&
+      ++balance > constants.linkResourceDestinationBalanceMax
+    ) {
+      return nok(code2)
+    }
+    if (code2 === codes.rightSquareBracket && !balance--) {
+      effects.exit(types.chunkText)
+      return atClosingBrace(code2)
+    }
+    if (markdownLineEnding(code2)) {
+      if (disallowEol) {
+        return nok(code2)
+      }
+      effects.consume(code2)
+      effects.exit(types.chunkText)
+      return lineStart
+    }
+    effects.consume(code2)
+    return code2 === codes.backslash ? dataEscape : data
+  }
+  const dataEscape = function (code2) {
+    if (
+      code2 === codes.leftSquareBracket ||
+      code2 === codes.backslash ||
+      code2 === codes.rightSquareBracket
+    ) {
+      effects.consume(code2)
+      size++
+      return data
+    }
+    return data(code2)
+  }
+  const atClosingBrace = function (code2) {
+    effects.exit(stringType)
+    effects.enter(markerType)
+    effects.consume(code2)
+    effects.exit(markerType)
+    effects.exit(type)
+    return ok3
+  }
+  return start3
+}
+
+// src/extensions/directive/extension/lib/factory-name.ts
+function factoryName(effects, ok3, nok, type) {
+  const self2 = this
+  const start3 = function (code2) {
+    if (asciiAlpha(code2)) {
+      effects.enter(type)
+      effects.consume(code2)
+      return name
+    }
+    return nok(code2)
+  }
+  const name = function (code2) {
+    if (
+      code2 === codes.dash ||
+      code2 === codes.underscore ||
+      asciiAlphanumeric(code2)
+    ) {
+      effects.consume(code2)
+      return name
+    }
+    effects.exit(type)
+    return self2.previous === codes.dash || self2.previous === codes.underscore
+      ? nok(code2)
+      : ok3(code2)
+  }
+  return start3
+}
+
+// src/extensions/tina-shortcodes/shortcode-container.ts
+var directiveContainer = (pattern) => {
+  const tokenizeDirectiveContainer = function (effects, ok3, nnok) {
     const self2 = this
     const logSelf = () => {
       self2.events.forEach((e) => {
         console.log(`${e[0]} - ${e[1].type}`)
       })
+      console.log('==============================')
     }
-    if (pattern.type === 'leaf') {
-      return nok
+    const tail = self2.events[self2.events.length - 1]
+    const initialSize =
+      tail && tail[1].type === types.linePrefix
+        ? tail[2].sliceSerialize(tail[1], true).length
+        : 0
+    let sizeOpen = 0
+    let previous2
+    let startSequenceIndex = 1
+    let endSequenceIndex = 0
+    let endNameIndex = 0
+    const nok = function (code2) {
+      return nnok
     }
-    let startIndex = 0
-    let endIndex = 0
-    let nameIndex = 0
     const start3 = function (code2) {
-      effects.enter('shortcode', { pattern })
-      effects.enter('shortcodeOpen')
+      const firstCharacter = pattern.start[0]
+      if (findCode(firstCharacter) === code2) {
+        effects.enter('directiveContainer')
+        effects.enter('directiveContainerFence')
+        effects.enter('directiveContainerSequence')
+        effects.consume(code2)
+        return sequenceOpen(code2)
+      }
+      return nok(code2)
+    }
+    const sequenceOpen = function (code2) {
+      const nextCharacter = pattern.start[startSequenceIndex]
+      if (findCode(nextCharacter) === code2) {
+        effects.consume(code2)
+        startSequenceIndex++
+        return sequenceOpen
+      }
+      if (startSequenceIndex < pattern.start.length) {
+        return nok(code2)
+      }
+      effects.exit('directiveContainerSequence')
+      return factorName(code2)
+    }
+    const factorName = (code2) => {
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, factorName, types.whitespace)(code2)
+      }
+      return factoryName.call(
+        self2,
+        effects,
+        afterName,
+        nok,
+        'directiveContainerName'
+      )(code2)
+    }
+    const afterName = function (code2) {
+      return code2 === codes.leftSquareBracket
+        ? effects.attempt(label, afterLabel, afterLabel)(code2)
+        : afterLabel(code2)
+    }
+    const afterLabel = function (code2) {
+      return code2 === codes.leftCurlyBrace
+        ? effects.attempt(attributes, afterAttributes, afterAttributes)(code2)
+        : afterAttributes(code2)
+    }
+    const afterAttributes = function (code2) {
+      return factorySpace(effects, openAfter, types.whitespace)(code2)
+    }
+    const openAfter = function (code2) {
+      effects.exit('directiveContainerFence')
+      if (code2 === codes.eof) {
+        return afterOpening(code2)
+      }
+      if (markdownLineEnding(code2)) {
+        if (self2.interrupt) {
+          return ok3(code2)
+        }
+        return effects.attempt(nonLazyLine, contentStart, afterOpening)(code2)
+      }
+      return nok(code2)
+    }
+    const afterOpening = function (code2) {
+      effects.exit('directiveContainer')
+      return ok3(code2)
+    }
+    const contentStart = function (code2) {
+      if (code2 === codes.eof) {
+        effects.exit('directiveContainer')
+        return ok3(code2)
+      }
+      effects.enter('directiveContainerContent')
+      return lineStart(code2)
+    }
+    const lineStart = function (code2) {
+      if (code2 === codes.eof) {
+        return after(code2)
+      }
+      return effects.attempt(
+        { tokenize: tokenizeClosingFence, partial: true },
+        after,
+        initialSize
+          ? factorySpace(effects, chunkStart, types.linePrefix, initialSize + 1)
+          : chunkStart
+      )(code2)
+    }
+    const chunkStart = function (code2) {
+      if (code2 === codes.eof) {
+        return after(code2)
+      }
+      const token = effects.enter(types.chunkDocument, {
+        contentType: constants.contentTypeDocument,
+        previous: previous2,
+      })
+      if (previous2) previous2.next = token
+      previous2 = token
+      return contentContinue(code2)
+    }
+    const contentContinue = function (code2) {
+      if (code2 === codes.eof) {
+        const t = effects.exit(types.chunkDocument)
+        self2.parser.lazy[t.start.line] = false
+        return after(code2)
+      }
+      if (markdownLineEnding(code2)) {
+        return effects.check(nonLazyLine, nonLazyLineAfter, lineAfter)(code2)
+      }
       effects.consume(code2)
-      if (startPattern.length - 1 === startIndex) {
-        effects.exit('shortcodeOpen')
-        return startName
-      } else {
-        startIndex = startIndex + 1
-        return startSequence
-      }
+      return contentContinue
     }
-    const startSequence = function (code2) {
-      const nextItem = startPattern[startIndex]
-      if (code2 === findCode2(nextItem)) {
-        effects.consume(code2)
-        if (startPattern.length - 1 === startIndex) {
-          effects.exit('shortcodeOpen')
-          return startName
-        } else {
-          startIndex = startIndex + 1
-          return startSequence
-        }
-      }
-      return nok(code2)
+    const nonLazyLineAfter = function (code2) {
+      effects.consume(code2)
+      const t = effects.exit(types.chunkDocument)
+      self2.parser.lazy[t.start.line] = false
+      return lineStart
     }
-    const startName = function (code2) {
-      if (markdownSpace(code2)) {
-        return factorySpace(effects, startName, types.whitespace)(code2)
-      }
-      const firstCharacter = patternName[nameIndex]
-      if (code2 === findCode2(firstCharacter)) {
-        if (asciiAlpha(code2)) {
-          nameIndex = nameIndex + 1
-          effects.enter('shortcodeName')
-          effects.consume(code2)
-          return nameName
-        }
-      }
-      return nok(code2)
+    const lineAfter = function (code2) {
+      const t = effects.exit(types.chunkDocument)
+      self2.parser.lazy[t.start.line] = false
+      return after(code2)
     }
-    const nameName = function (code2) {
-      if (
-        code2 === codes.dash ||
-        code2 === codes.underscore ||
-        asciiAlphanumeric(code2)
-      ) {
-        const nextCharacter = patternName[nameIndex]
-        if (code2 === findCode2(nextCharacter)) {
-          nameIndex = nameIndex + 1
-          effects.consume(code2)
-          return nameName
-        }
-      }
-      effects.exit('shortcodeName')
-      return self2.previous === codes.dash ||
-        self2.previous === codes.underscore
-        ? nok(code2)
-        : attributes(code2)
+    const after = function (code2) {
+      effects.exit('directiveContainerContent')
+      effects.exit('directiveContainer')
+      return ok3(code2)
     }
-    const attributes = function (code2) {
-      if (markdownSpace(code2)) {
-        return factorySpace(effects, attributes, types.whitespace)(code2)
+    const tokenizeClosingFence = function (effects2, ok4, nok2) {
+      let size = 0
+      const closingPrefixAfter = function (code2) {
+        effects2.enter('directiveContainerFence')
+        effects2.enter('directiveContainerSequence')
+        return closingSequence(code2)
       }
-      if (
-        code2 === codes.dash ||
-        code2 === codes.underscore ||
-        code2 === codes.quotationMark ||
-        asciiAlphanumeric(code2)
-      ) {
-        return between(code2)
+      const closingSequence = function (code2) {
+        const nextCharacter = pattern.start[endSequenceIndex]
+        if (findCode(nextCharacter) === code2) {
+          effects2.consume(code2)
+          endSequenceIndex++
+          return closingSequence
+        }
+        if (endSequenceIndex < pattern.end.length - 1) {
+          endSequenceIndex = 0
+          return nok2(code2)
+        }
+        effects2.exit('directiveContainerSequence')
+        return factorySpace(
+          effects2,
+          closingSequenceNameStart,
+          types.whitespace
+        )(code2)
       }
-      if (code2 === findCode2(endPattern[endIndex])) {
-        effects.enter('shortcodeClose')
-        effects.consume(code2)
-        if (endPattern.length - 1 === endIndex) {
-          effects.exit('shortcodeClose')
-          return end
-        } else {
-          endIndex = endIndex + 1
-          return endSequence
+      const closingSequenceName = function (code2) {
+        const patternName = pattern.name || pattern.templateName
+        const nextCharacter = patternName[endNameIndex]
+        if (findCode(nextCharacter) === code2) {
+          effects2.consume(code2)
+          endNameIndex++
+          return closingSequenceName
         }
+        if (patternName.length - 1 === endNameIndex) {
+          return closingSequenceEnd
+        }
+        return nok2
       }
-      return nok(code2)
-    }
-    const endSequence = function (code2) {
-      const nextItem = endPattern[endIndex]
-      if (code2 === findCode2(nextItem)) {
-        effects.consume(code2)
-        if (endPattern.length - 1 === endIndex) {
-          effects.exit('shortcodeClose')
-          return end
-        } else {
-          endIndex = endIndex + 1
-          return endSequence
+      const closingSequenceNameStart = function (code2) {
+        if (markdownSpace(code2)) {
+          return factorySpace(
+            effects2,
+            closingSequenceNameStart,
+            types.whitespace
+          )
         }
+        if (code2 === codes.backslash) {
+          effects2.consume(code2)
+          return closingSequenceName
+        }
+        return nok2(code2)
       }
-      return nok(code2)
-    }
-    const end = function (code2) {
-      if (code2 === codes.eof || markdownLineEnding(code2)) {
-        effects.exit('shortcode')
-        return ok2(code2)
+      const closingSequenceEnd = function (code2) {
+        if (code2 === codes.eof || markdownLineEnding(code2)) {
+          effects2.exit('directiveContainerFence')
+          return ok4(code2)
+        }
+        return nok2(code2)
       }
-      return nok(code2)
-    }
-    const okInside = end
-    const between = function (code2) {
-      const disallowEol = true
-      let marker
-      const end2 = function (code3) {
-        const nextItem = endPattern[endIndex]
-        if (code3 === findCode2(nextItem)) {
-          if (endPattern.length - 1 === endIndex) {
-            effects.enter('directiveContainerAttributesMarker')
-            effects.consume(code3)
-            effects.exit('directiveContainerAttributesMarker')
-            effects.exit('directiveContainerAttributes')
-            effects.exit('shortcodeClose')
-            return okInside
-          } else {
-            effects.exit('directiveContainerAttributes')
-            effects.enter('shortcodeClose')
-            effects.consume(code3)
-            endIndex = endIndex + 1
-            return endSequence
-          }
-        }
-        return nok(code3)
-      }
-      const valueQuotedAfter = function (code3) {
-        return code3 === codes.rightCurlyBrace ||
-          markdownLineEndingOrSpace(code3)
-          ? between2(code3)
-          : end2(code3)
-      }
-      const valueQuoted = function (code3) {
-        if (
-          code3 === marker ||
-          code3 === codes.eof ||
-          markdownLineEnding(code3)
-        ) {
-          effects.exit('directiveContainerAttributeValueData')
-          return valueQuotedBetween(code3)
-        }
-        effects.consume(code3)
-        return valueQuoted
-      }
-      const valueQuotedBetween = function (code3) {
-        if (code3 === marker) {
-          effects.exit('directiveContainerAttributeValue')
-          return valueQuotedStart(code3)
-        }
-        if (code3 === codes.eof) {
-          return nok(code3)
-        }
-        if (markdownLineEnding(code3)) {
-          return disallowEol
-            ? nok(code3)
-            : factoryWhitespace(effects, valueQuotedBetween)(code3)
-        }
-        effects.enter('directiveContainerAttributeValueData')
-        effects.consume(code3)
-        return valueQuoted
-      }
-      const valueQuotedStart = function (code3) {
-        if (code3 === marker) {
-          effects.enter('directiveContainerAttributeValueMarker')
-          effects.consume(code3)
-          effects.exit('directiveContainerAttributeValueMarker')
-          effects.exit('directiveContainerAttributeValueLiteral')
-          effects.exit('directiveContainerAttribute')
-          return valueQuotedAfter
-        }
-        effects.enter('directiveContainerAttributeValue')
-        return valueQuotedBetween(code3)
-      }
-      const valueUnquoted = function (code3) {
-        if (
-          code3 === codes.eof ||
-          code3 === codes.quotationMark ||
-          code3 === codes.apostrophe ||
-          code3 === codes.lessThan ||
-          code3 === codes.equalsTo ||
-          code3 === codes.greaterThan ||
-          code3 === codes.graveAccent
-        ) {
-          return nok(code3)
-        }
-        if (
-          code3 === codes.rightCurlyBrace ||
-          markdownLineEndingOrSpace(code3)
-        ) {
-          effects.exit('directiveContainerAttributeValueData')
-          effects.exit('directiveContainerAttributeValue')
-          effects.exit('directiveContainerAttribute')
-          return between2(code3)
-        }
-        effects.consume(code3)
-        return valueUnquoted
-      }
-      const valueBefore = function (code3) {
-        if (
-          code3 === codes.eof ||
-          code3 === codes.lessThan ||
-          code3 === codes.equalsTo ||
-          code3 === codes.greaterThan ||
-          code3 === codes.graveAccent ||
-          code3 === codes.rightCurlyBrace ||
-          (disallowEol && markdownLineEnding(code3))
-        ) {
-          return nok(code3)
-        }
-        if (code3 === codes.quotationMark || code3 === codes.apostrophe) {
-          effects.enter('directiveContainerAttributeValueLiteral')
-          effects.enter('directiveContainerAttributeValueMarker')
-          effects.consume(code3)
-          effects.exit('directiveContainerAttributeValueMarker')
-          marker = code3
-          return valueQuotedStart
-        }
-        if (disallowEol && markdownSpace(code3)) {
-          return factorySpace(effects, valueBefore, types.whitespace)(code3)
-        }
-        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
-          return factoryWhitespace(effects, valueBefore)(code3)
-        }
-        effects.enter('directiveContainerAttributeValue')
-        effects.enter('directiveContainerAttributeValueData')
-        effects.consume(code3)
-        marker = void 0
-        return valueUnquoted
-      }
-      const nameAfter = function (code3) {
-        if (code3 === codes.equalsTo) {
-          effects.enter('directiveContainerAttributeInitializerMarker')
-          effects.consume(code3)
-          effects.exit('directiveContainerAttributeInitializerMarker')
-          return valueBefore
-        }
-        effects.exit('directiveContainerAttribute')
-        return between2(code3)
-      }
-      const name = function (code3) {
-        if (
-          code3 === codes.dash ||
-          code3 === codes.dot ||
-          code3 === codes.colon ||
-          code3 === codes.underscore ||
-          asciiAlphanumeric(code3)
-        ) {
-          effects.consume(code3)
-          return name
-        }
-        effects.exit('directiveContainerAttributeName')
-        if (disallowEol && markdownSpace(code3)) {
-          return factorySpace(effects, nameAfter, types.whitespace)(code3)
-        }
-        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
-          return factoryWhitespace(effects, nameAfter)(code3)
-        }
-        return nameAfter(code3)
-      }
-      const between2 = function (code3) {
-        if (
-          code3 === codes.colon ||
-          code3 === codes.underscore ||
-          asciiAlpha(code3)
-        ) {
-          effects.enter('directiveContainerAttribute')
-          effects.enter('directiveContainerAttributeName')
-          effects.consume(code3)
-          return name
-        }
-        if (code3 === codes.quotationMark) {
-          effects.enter('directiveContainerAttribute')
-          effects.enter('directiveContainerAttributeName')
-          effects.exit('directiveContainerAttributeName')
-          effects.enter('directiveContainerAttributeInitializerMarker')
-          effects.exit('directiveContainerAttributeInitializerMarker')
-          return valueBefore(code3)
-        }
-        if (disallowEol && markdownSpace(code3)) {
-          return factorySpace(effects, between2, types.whitespace)(code3)
-        }
-        if (!disallowEol && markdownLineEndingOrSpace(code3)) {
-          return factoryWhitespace(effects, between2)(code3)
-        }
-        return end2(code3)
-      }
-      const start4 = function (code3) {
-        effects.enter('directiveContainerAttributes')
-        return between2(code3)
-      }
-      return start4(code2)
+      return factorySpace(
+        effects2,
+        closingPrefixAfter,
+        types.linePrefix,
+        constants.tabSize
+      )
     }
     return start3
   }
-  return tokenizedirectiveContainer
-}
-var directiveContainer = function (pattern) {
-  return { tokenize: tokenizeDirective(pattern) }
+  const tokenizeLabel = function (effects, ok3, nok) {
+    return factoryLabel2(
+      effects,
+      ok3,
+      nok,
+      'directiveContainerLabel',
+      'directiveContainerLabelMarker',
+      'directiveContainerLabelString',
+      true
+    )
+  }
+  const tokenizeAttributes = function (effects, ok3, nok) {
+    return factoryAttributes(
+      effects,
+      ok3,
+      nok,
+      'directiveContainerAttributes',
+      'directiveContainerAttributesMarker',
+      'directiveContainerAttribute',
+      'directiveContainerAttributeId',
+      'directiveContainerAttributeClass',
+      'directiveContainerAttributeName',
+      'directiveContainerAttributeInitializerMarker',
+      'directiveContainerAttributeValueLiteral',
+      'directiveContainerAttributeValue',
+      'directiveContainerAttributeValueMarker',
+      'directiveContainerAttributeValueData',
+      true
+    )
+  }
+  const tokenizeNonLazyLine = function (effects, ok3, nok) {
+    const self2 = this
+    const lineStart = function (code2) {
+      return self2.parser.lazy[self2.now().line] ? nok(code2) : ok3(code2)
+    }
+    const start3 = function (code2) {
+      ok2(markdownLineEnding(code2), 'expected eol')
+      effects.enter(types.lineEnding)
+      effects.consume(code2)
+      effects.exit(types.lineEnding)
+      return lineStart
+    }
+    return start3
+  }
+  const label = { tokenize: tokenizeLabel, partial: true }
+  const attributes = { tokenize: tokenizeAttributes, partial: true }
+  const nonLazyLine = { tokenize: tokenizeNonLazyLine, partial: true }
+  return {
+    tokenize: tokenizeDirectiveContainer,
+    concrete: true,
+  }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/extension.ts
+// src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
@@ -37009,18 +38260,15 @@ var tinaDirective = function (patterns) {
   }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
-var enter2 = function (type, token) {
+// src/extensions/tina-shortcodes/from-markdown.ts
+var enter = function (type, token) {
   this.enter({ type, name: '', attributes: {}, children: [] }, token)
 }
 var enterShortcode = function (token) {
-  enter2.call(this, 'leafDirective', token)
+  enter.call(this, 'leafDirective', token)
 }
-function exitName2(token) {
-  const node = this.stack[this.stack.length - 1]
-  node.name = this.sliceSerialize(token)
-}
-function exit3(token) {
+function exit2(token) {
+  console.log('exit called', token)
   this.exit(token)
 }
 var tinaDirectiveFromMarkdown = {
@@ -37028,12 +38276,11 @@ var tinaDirectiveFromMarkdown = {
     shortcode: enterShortcode,
   },
   exit: {
-    shortcode: exit3,
-    shortcodeName: exitName2,
+    shortcode: exit2,
   },
 }
 
-// ../mdx/src/parse/index.ts
+// src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   try {
     const patterns = []
@@ -37053,15 +38300,21 @@ var markdownToAst = (value, field, useMdx = true) => {
       }
     })
     const extensions = [tinaDirective(patterns)]
-    const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
+    const mdastExtensions = [tinaDirectiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
     }
-    const tree = fromMarkdown(value, {
-      extensions,
-      mdastExtensions,
-    })
+    let tree
+    try {
+      tree = fromMarkdown(value, {
+        extensions,
+        mdastExtensions,
+      })
+    } catch (e) {
+      console.log(e)
+      throw 'SHORTCODE ERROR'
+    }
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
@@ -37076,7 +38329,7 @@ var MDX_PARSE_ERROR_MSG =
 var parseMDX = (value, field, imageCallback) => {
   let tree
   try {
-    tree = markdownToAst(value, field)
+    tree = markdownToAst(value, field, false)
     if (tree) {
       return remarkToSlate(tree, field, imageCallback, value)
     } else {
@@ -37084,6 +38337,7 @@ var parseMDX = (value, field, imageCallback) => {
     }
   } catch (e) {
     try {
+      throw 'NO'
       tree = markdownToAst(value, field, false)
       if (tree) {
         return remarkToSlate(tree, field, imageCallback, value)

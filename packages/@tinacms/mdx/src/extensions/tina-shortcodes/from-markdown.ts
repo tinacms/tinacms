@@ -13,6 +13,9 @@ const enter = function (this: CompileContext, type: any, token: Token) {
 const enterShortcode: FromMarkdownHandle = function (token) {
   enter.call(this, 'leafDirective', token)
 }
+const enterShortcodeContainer: FromMarkdownHandle = function (token) {
+  // enter.call(this, 'containerDirective', token)
+}
 
 function exitName(this: CompileContext, token: Token) {
   const node = this.stack[this.stack.length - 1]
@@ -20,6 +23,7 @@ function exitName(this: CompileContext, token: Token) {
 }
 
 function exit(this: CompileContext, token: Token) {
+  console.log('exit called', token)
   this.exit(token)
 }
 
@@ -27,9 +31,12 @@ export const tinaDirectiveFromMarkdown: FromMarkdownExtension = {
   // canContainEols: ["textDirective"],
   enter: {
     shortcode: enterShortcode,
+    // shortcodeContainer: enterShortcodeContainer,
   },
   exit: {
     shortcode: exit,
-    shortcodeName: exitName,
+    // shortcodeContainer: exit,
+    // containerDirective: exit,
+    // shortcodeName: exitName,
   },
 }

@@ -106,17 +106,23 @@ export const markdownToAst = (
     })
     // const extensions = [directive(), tinaDirective(patterns)]
     const extensions = [tinaDirective(patterns)]
-    const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
+    // const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
+    const mdastExtensions = [tinaDirectiveFromMarkdown]
     // const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
     }
-    const tree = fromMarkdown(value, {
-      extensions,
-      mdastExtensions,
-    })
-    // console.log(tree)
+    let tree
+    try {
+      tree = fromMarkdown(value, {
+        extensions,
+        mdastExtensions,
+      })
+    } catch (e) {
+      console.log(e)
+      throw 'SHORTCODE ERROR'
+    }
     if (!tree) {
       throw new Error('Error parsing markdown')
     }
@@ -128,7 +134,6 @@ export const markdownToAst = (
     throw new RichTextParseError(e, e.position)
   }
 }
-
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 export const MDX_PARSE_ERROR_MSG_HTML =
@@ -141,7 +146,7 @@ export const parseMDX = (
 ): Plate.RootElement => {
   let tree
   try {
-    tree = markdownToAst(value, field)
+    tree = markdownToAst(value, field, false)
     if (tree) {
       return remarkToSlate(tree, field, imageCallback, value)
     } else {
@@ -149,6 +154,7 @@ export const parseMDX = (
     }
   } catch (e: any) {
     try {
+      throw 'NO'
       tree = markdownToAst(value, field, false)
       if (tree) {
         return remarkToSlate(tree, field, imageCallback, value)

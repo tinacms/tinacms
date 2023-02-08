@@ -37,7 +37,7 @@ export const findCode = (string: string | undefined | null): number | null => {
   }
   return lookupValue
 }
-const printCode = (num: number) => {
+export const printCode = (num: number) => {
   let lookupValue: string | null = null
   Object.entries(codes).forEach(([key, value]) => {
     if (value === num) {
