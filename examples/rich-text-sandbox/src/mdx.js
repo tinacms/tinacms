@@ -35314,7 +35314,6 @@ function mdxJsxElement(node, field, imageCallback) {
       throw new Error('Global templates not yet supported')
     }
     if (!template) {
-      console.log('no template')
       const string3 = toTinaMarkdown({ type: 'root', children: [node] })
       return {
         type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
@@ -38174,52 +38173,40 @@ var tinaDirective = function (patterns) {
 
 // ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
-  try {
-    const patterns = []
-    field.templates?.forEach((template) => {
-      if (typeof template === 'string') {
-        return
-      }
-      if (template && template.match) {
-        patterns.push({
-          ...template.match,
-          name: template.match?.name || template.name,
-          templateName: template.name,
-          type: template.fields.find((f) => f.name === 'children')
-            ? 'block'
-            : 'leaf',
-        })
-      }
-    })
-    const extensions = [tinaDirective(patterns)]
-    const mdastExtensions = [directiveFromMarkdown]
-    if (useMdx) {
-      extensions.push(mdx())
-      mdastExtensions.push(mdxFromMarkdown())
+  const patterns = []
+  field.templates?.forEach((template) => {
+    if (typeof template === 'string') {
+      return
     }
-    let tree
-    try {
-      tree = fromMarkdown(value, {
-        extensions,
-        mdastExtensions,
+    if (template && template.match) {
+      patterns.push({
+        ...template.match,
+        name: template.match?.name || template.name,
+        templateName: template.name,
+        type: template.fields.find((f) => f.name === 'children')
+          ? 'block'
+          : 'leaf',
       })
-    } catch (e) {
-      console.log(e)
-      throw 'SHORTCODE ERROR'
     }
-    if (!tree) {
-      throw new Error('Error parsing markdown')
-    }
-    return tree
-  } catch (e) {
-    console.error('error parsing file: ', e)
-    throw new RichTextParseError(e, e.position)
+  })
+  const extensions = [tinaDirective(patterns)]
+  const mdastExtensions = [directiveFromMarkdown]
+  if (useMdx) {
+    extensions.push(mdx())
+    mdastExtensions.push(mdxFromMarkdown())
   }
+  return fromMarkdown(value, {
+    extensions,
+    mdastExtensions,
+  })
 }
 var MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 var parseMDX = (value, field, imageCallback) => {
   let tree
+  if (!value) {
+    return { type: 'root', children: [] }
+  }
   try {
     tree = markdownToAst(value, field)
     if (tree) {
@@ -38236,7 +38223,6 @@ var parseMDX = (value, field, imageCallback) => {
         return { type: 'root', children: [] }
       }
     } catch (e2) {
-      console.log(e2)
       if (e2 instanceof RichTextParseError) {
         return invalidMarkdown(e2, value)
       }

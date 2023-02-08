@@ -87,49 +87,32 @@ export const markdownToAst = (
   field: RichTypeInner,
   useMdx: boolean = true
 ) => {
-  try {
-    const patterns: Pattern[] = []
-    field.templates?.forEach((template) => {
-      if (typeof template === 'string') {
-        return
-      }
-      if (template && template.match) {
-        patterns.push({
-          ...template.match,
-          name: template.match?.name || template.name,
-          templateName: template.name,
-          type: template.fields.find((f) => f.name === 'children')
-            ? 'block'
-            : 'leaf',
-        })
-      }
-    })
-    const extensions = [tinaDirective(patterns)]
-    const mdastExtensions = [directiveFromMarkdown]
-    if (useMdx) {
-      extensions.push(mdx())
-      mdastExtensions.push(mdxFromMarkdown())
+  const patterns: Pattern[] = []
+  field.templates?.forEach((template) => {
+    if (typeof template === 'string') {
+      return
     }
-    let tree
-    try {
-      tree = fromMarkdown(value, {
-        extensions,
-        mdastExtensions,
+    if (template && template.match) {
+      patterns.push({
+        ...template.match,
+        name: template.match?.name || template.name,
+        templateName: template.name,
+        type: template.fields.find((f) => f.name === 'children')
+          ? 'block'
+          : 'leaf',
       })
-    } catch (e) {
-      console.log(e)
-      throw 'SHORTCODE ERROR'
     }
-    if (!tree) {
-      throw new Error('Error parsing markdown')
-    }
-    return tree
-  } catch (e) {
-    console.error('error parsing file: ', e)
-
-    // @ts-ignore VMessage is the error type but it's not accessible
-    throw new RichTextParseError(e, e.position)
+  })
+  const extensions = [tinaDirective(patterns)]
+  const mdastExtensions = [directiveFromMarkdown]
+  if (useMdx) {
+    extensions.push(mdx())
+    mdastExtensions.push(mdxFromMarkdown())
   }
+  return fromMarkdown(value, {
+    extensions,
+    mdastExtensions,
+  })
 }
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
@@ -142,6 +125,9 @@ export const parseMDX = (
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   let tree
+  if (!value) {
+    return { type: 'root', children: [] }
+  }
   try {
     tree = markdownToAst(value, field)
     if (tree) {
@@ -158,7 +144,6 @@ export const parseMDX = (
         return { type: 'root', children: [] }
       }
     } catch (e: any) {
-      console.log(e)
       if (e instanceof RichTextParseError) {
         return invalidMarkdown(e, value)
       }

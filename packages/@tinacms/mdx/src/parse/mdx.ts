@@ -59,7 +59,6 @@ export function mdxJsxElement(
       throw new Error('Global templates not yet supported')
     }
     if (!template) {
-      console.log('no template')
       const string = toTinaMarkdown({ type: 'root', children: [node] })
       return {
         type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
