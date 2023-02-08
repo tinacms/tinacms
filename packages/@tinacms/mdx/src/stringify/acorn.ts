@@ -54,6 +54,7 @@ export function stringifyProps(
   const children: Md.Content[] = []
   let template
   let useDirective = false
+  let directiveType = 'leaf'
   template = parentField.templates?.find((template) => {
     if (typeof template === 'string') {
       throw new Error('Global templates not supported')
@@ -68,6 +69,9 @@ export function stringifyProps(
   }
   if (!template || typeof template === 'string') {
     throw new Error(`Unable to find template for JSX element ${element.name}`)
+  }
+  if (template.fields.find((f) => f.name === 'children')) {
+    directiveType = 'block'
   }
   useDirective = !!template.match
   Object.entries(element.props).forEach(([name, value]) => {
@@ -247,6 +251,7 @@ export function stringifyProps(
     // consistent mdx element rendering regardless of children makes it easier to parse
     return {
       useDirective,
+      directiveType,
       attributes,
       children:
         children && children.length
@@ -265,7 +270,7 @@ export function stringifyProps(
     }
   }
 
-  return { attributes, children, useDirective } as any
+  return { attributes, children, useDirective, directiveType } as any
 }
 
 /**

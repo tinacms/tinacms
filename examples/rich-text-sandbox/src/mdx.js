@@ -34490,6 +34490,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
   const children = []
   let template
   let useDirective = false
+  let directiveType = 'leaf'
   template = parentField.templates?.find((template2) => {
     if (typeof template2 === 'string') {
       throw new Error('Global templates not supported')
@@ -34504,6 +34505,9 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
   }
   if (!template || typeof template === 'string') {
     throw new Error(`Unable to find template for JSX element ${element2.name}`)
+  }
+  if (template.fields.find((f) => f.name === 'children')) {
+    directiveType = 'block'
   }
   useDirective = !!template.match
   Object.entries(element2.props).forEach(([name, value]) => {
@@ -34683,6 +34687,7 @@ ${val}
   if (template.match) {
     return {
       useDirective,
+      directiveType,
       attributes: attributes2,
       children:
         children && children.length
@@ -34700,7 +34705,7 @@ ${val}
             ],
     }
   }
-  return { attributes: attributes2, children, useDirective }
+  return { attributes: attributes2, children, useDirective, directiveType }
 }
 function stringifyObj(obj, flatten2) {
   if (typeof obj === 'object' && obj !== null) {
@@ -35247,10 +35252,12 @@ var blockElement = (content3, field, imageCallback) => {
         children,
         attributes: attributes2,
         useDirective,
+        directiveType,
       } = stringifyProps(content3, field, false, imageCallback)
       if (useDirective) {
         return {
-          type: 'containerDirective',
+          type:
+            directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
           name: content3.name,
           attributes: content3.props,
           children: content3.children,

@@ -179,16 +179,12 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes, useDirective } = stringifyProps(
-        content,
-        field,
-        false,
-        imageCallback
-      )
+      const { children, attributes, useDirective, directiveType } =
+        stringifyProps(content, field, false, imageCallback)
       if (useDirective) {
         return {
-          // type: 'leafDirective',
-          type: 'containerDirective',
+          type:
+            directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
           name: content.name,
           attributes: content.props,
           children: content.children,
