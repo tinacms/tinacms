@@ -431,6 +431,10 @@ const CollectionListPage = () => {
                                           ...old,
                                           filterField: val,
                                         }))
+                                        // if we clear the filter, we need to re-fetch the collection
+                                        if (!val) {
+                                          reFetchCollection()
+                                        }
                                       },
                                     }}
                                   />
