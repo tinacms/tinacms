@@ -25,6 +25,7 @@ import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 import { ContainerDirective } from 'mdast-util-directive'
 import { toTinaMarkdown } from '../stringify'
 import { source } from 'unist-util-source'
+import { LeafDirective } from 'mdast-util-directive/lib'
 
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -95,11 +96,11 @@ export function mdxJsxElement(
   }
 }
 
-export const containerDirectiveElement = (
-  node: ContainerDirective,
+export const directiveElement = (
+  node: ContainerDirective | LeafDirective,
   field: RichTypeInner,
   imageCallback: (url: string) => string,
-  raw: string
+  raw?: string
 ): Plate.BlockElement | Plate.ParagraphElement => {
   let template
   template = field.templates?.find((template) => {
@@ -118,22 +119,25 @@ export const containerDirectiveElement = (
   if (!template) {
     return {
       type: 'p',
-      children: [{ type: 'text', text: source(node, raw) || '' }],
+      children: [{ type: 'text', text: source(node, raw || '') || '' }],
     }
   }
   if (typeof template === 'string') {
     throw new Error(`Global templates not supported`)
   }
-  const props = node.attributes
+  const props = (node.attributes || {}) as typeof node.attributes & {
+    children: Plate.RootElement | undefined
+  }
   const childField = template.fields.find((field) => field.name === 'children')
   if (childField) {
     if (childField.type === 'rich-text') {
-      props.children = remarkToSlate(node, childField, imageCallback)
+      if (node.type === 'containerDirective') {
+        props.children = remarkToSlate(node, childField, imageCallback, raw)
+      }
     }
   }
   return {
     type: 'mdxJsxFlowElement',
-    // name: template.match?.name || node.name,
     name: template.name,
     props: props,
     children: [{ type: 'text', text: '' }],

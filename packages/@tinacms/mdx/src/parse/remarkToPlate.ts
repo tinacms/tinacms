@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 import { flatten } from 'lodash-es'
-import { containerDirectiveElement, mdxJsxElement } from './mdx'
+import { directiveElement, mdxJsxElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import { ContainerDirective } from 'mdast-util-directive'
 
 export type { Position, PositionItem } from './plate'
 
@@ -42,10 +43,10 @@ declare module 'mdast' {
 }
 
 export const remarkToSlate = (
-  root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement,
+  root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
   field: RichTypeInner,
   imageCallback: (url: string) => string,
-  raw: string
+  raw?: string
 ): Plate.RootElement => {
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
@@ -102,10 +103,10 @@ export const remarkToSlate = (
           content.position
         )
       case 'leafDirective': {
-        return containerDirectiveElement(content, field, imageCallback, raw)
+        return directiveElement(content, field, imageCallback, raw)
       }
       case 'containerDirective': {
-        return containerDirectiveElement(content, field, imageCallback, raw)
+        return directiveElement(content, field, imageCallback, raw)
       }
       default:
         throw new RichTextParseError(
@@ -116,22 +117,19 @@ export const remarkToSlate = (
     }
   }
 
-  const html = (content: Md.HTML): Plate.HTMLElement => {
-    // return { type: 'text', value: content.value }
+  // Treating HTML as paragraphs so they remain editable
+  // This is only really used for non-MDX contexts
+  const html = (content: Md.HTML): Plate.ParagraphElement => {
     return {
       type: 'p',
-      // value: content.value,
       children: [{ type: 'text', text: content.value }],
     }
   }
 
-  const html_inline = (content: Md.HTML): Plate.HTMLInlineElement => {
+  // Treating HTML as text nodes so they remain editable
+  // This is only really used for non-MDX contexts
+  const html_inline = (content: Md.HTML): Plate.TextElement => {
     return { type: 'text', text: content.value }
-    return {
-      type: 'html_inline',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
-    }
   }
 
   const list = (content: Md.List): Plate.List => {
@@ -196,7 +194,6 @@ export const remarkToSlate = (
             )
           default:
             throw new RichTextParseError(
-              // @ts-expect-error child.type should be 'never'
               `Unknown list item of type ${child.type}`,
               // @ts-expect-error child.type should be 'never'
               child.position
@@ -207,7 +204,7 @@ export const remarkToSlate = (
   }
 
   const unwrapBlockContent = (
-    content: Md.BlockContent
+    content: Md.BlockContent | Md.DefinitionContent
   ): Plate.InlineElement[] => {
     const flattenPhrasingContent = (
       children: Md.PhrasingContent[]
@@ -382,7 +379,7 @@ export const remarkToSlate = (
     return {
       type: 'img',
       url: imageCallback(content.url),
-      alt: content.alt,
+      alt: content.alt || undefined, // alt cannot be `null`
       caption: content.title,
       children: [{ type: 'text', text: '' }],
     }
