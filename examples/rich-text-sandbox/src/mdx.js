@@ -35007,10 +35007,10 @@ function toResult3(value) {
   return [value]
 }
 
-// ../mdx/src/extensions/directive/to-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
-var directiveToMarkdown = {
+var directiveToMarkdown = (patterns) => ({
   unsafe: [
     {
       character: '\r',
@@ -35033,8 +35033,8 @@ var directiveToMarkdown = {
     leafDirective: handleDirective,
     textDirective: handleDirective,
   },
-}
-function handleDirective(node, _, state, safeOptions) {
+})
+var handleDirective = function (node, _, state, safeOptions) {
   const tracker = track(safeOptions)
   const sequence = fence(node)
   const exit3 = state.enter(node.type)
@@ -35193,7 +35193,7 @@ var toTinaMarkdown = (tree, field) => {
     }
   })
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
+    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true,
