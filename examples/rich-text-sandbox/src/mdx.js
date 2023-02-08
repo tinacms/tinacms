@@ -35314,7 +35314,7 @@ function mdxJsxElement(node, field, imageCallback) {
       throw new Error('Global templates not yet supported')
     }
     if (!template) {
-      const string3 = toTinaMarkdown({ type: 'root', children: [node] })
+      const string3 = toTinaMarkdown({ type: 'root', children: [node] }, field)
       return {
         type: node.type === 'mdxJsxFlowElement' ? 'html' : 'html_inline',
         value: string3.trim(),
