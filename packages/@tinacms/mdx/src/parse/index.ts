@@ -109,8 +109,6 @@ export const markdownToAst = (
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
-    } else {
-      console.log('falling back to non-MDX parser')
     }
     let tree
     try {

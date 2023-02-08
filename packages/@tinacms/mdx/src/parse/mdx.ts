@@ -122,11 +122,21 @@ export const containerDirectiveElement = (
       children: [{ type: 'text', text: source(node, raw) || '' }],
     }
   }
+  if (typeof template === 'string') {
+    throw new Error(`Global templates not supported`)
+  }
+  const props = node.attributes
+  const childField = template.fields.find((field) => field.name === 'children')
+  if (childField) {
+    if (childField.type === 'rich-text') {
+      props.children = remarkToSlate(node, childField, imageCallback)
+    }
+  }
   return {
     type: 'mdxJsxFlowElement',
     // name: template.match?.name || node.name,
     name: template.name,
-    props: node.attributes,
-    children: node.children,
+    props: props,
+    children: [{ type: 'text', text: '' }],
   }
 }

@@ -149,6 +149,36 @@ export const field = {
           required: true,
           isTitle: true,
         },
+        {
+          name: 'href',
+          label: 'Href',
+          type: 'string',
+        },
+        {
+          name: 'breakout',
+          label: 'Breakout',
+          type: 'string',
+        },
+        {
+          name: 'width',
+          label: 'Width',
+          type: 'string',
+        },
+        {
+          name: 'height',
+          label: 'Height',
+          type: 'string',
+        },
+        {
+          name: 'caption',
+          label: 'Caption',
+          type: 'string',
+        },
+        {
+          name: 'alt',
+          label: 'Alt',
+          type: 'string',
+        },
       ],
     },
     {

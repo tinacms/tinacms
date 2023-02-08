@@ -508,11 +508,76 @@ export default defineConfig({
             isBody: true,
             templates: [
               {
-                name: 'featurePanel',
-                label: 'Feature Panel',
+                name: 'rimg',
+                label: 'rimg',
                 match: {
                   start: '{{<',
                   end: '>}}',
+                },
+                fields: [
+                  {
+                    name: 'src',
+                    label: 'Src',
+                    type: 'string',
+                    required: true,
+                    isTitle: true,
+                  },
+                  {
+                    name: 'href',
+                    label: 'Href',
+                    type: 'string',
+                  },
+                  {
+                    name: 'breakout',
+                    label: 'Breakout',
+                    type: 'string',
+                  },
+                  {
+                    name: 'width',
+                    label: 'Width',
+                    type: 'string',
+                  },
+                  {
+                    name: 'height',
+                    label: 'Height',
+                    type: 'string',
+                  },
+                  {
+                    name: 'caption',
+                    label: 'Caption',
+                    type: 'string',
+                  },
+                  {
+                    name: 'alt',
+                    label: 'Alt',
+                    type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'adPanel',
+                label: 'Ad Panel',
+                match: {
+                  start: '{{%',
+                  end: '%}}',
+                  name: 'ad-panel-leaderboard',
+                },
+                fields: [
+                  {
+                    name: '_value',
+                    required: true,
+                    isTitle: true,
+                    label: 'Value',
+                    type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'featurePanel',
+                label: 'Feature Panel',
+                match: {
+                  start: '{{%',
+                  end: '%}}',
                   name: 'feature-panel',
                 },
                 fields: [
@@ -522,6 +587,27 @@ export default defineConfig({
                     isTitle: true,
                     label: 'Value',
                     type: 'string',
+                  },
+                ],
+              },
+              {
+                name: 'pullQuote',
+                label: 'Pull Quote',
+                match: {
+                  start: '{{%',
+                  name: 'pull-quote',
+                  end: '%}}',
+                },
+                fields: [
+                  {
+                    name: 'foo',
+                    label: 'foo label',
+                    type: 'string',
+                  },
+                  {
+                    name: 'children',
+                    label: 'Children',
+                    type: 'rich-text',
                   },
                 ],
               },

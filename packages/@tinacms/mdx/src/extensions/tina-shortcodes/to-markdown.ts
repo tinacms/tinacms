@@ -1,4 +1,8 @@
-import type { Directive, LeafDirective, TextDirective, State } from './types'
+import type {
+  Directive,
+  LeafDirective,
+  TextDirective,
+} from '../directive/types'
 import type { BlockContent, DefinitionContent, Paragraph } from 'mdast'
 import type {
   Handle as ToMarkdownHandle,
@@ -12,6 +16,9 @@ import { checkQuote } from 'mdast-util-to-markdown/lib/util/check-quote'
 import { track } from 'mdast-util-to-markdown/lib/util/track'
 import { Pattern } from '../../stringify'
 import { ConstructName } from 'mdast-util-directive/lib'
+import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
+import { MdxJsxExpressionAttribute } from 'mdast-util-mdx'
+import { State } from 'micromark-util-types'
 
 const own = {}.hasOwnProperty
 
@@ -133,7 +140,14 @@ function peekDirective() {
 function attributes(node: Directive, state: State): string {
   const quote = checkQuote(state)
   const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs = node.attributes || {}
+  const attrs: Record<string, string> = {}
+  // These are actually "mdxJsxAttribute" until we support directives properly
+  node.attributes.forEach((att: MdxJsxAttribute) => {
+    if (att.value && typeof att.value === 'string') {
+      attrs[att.name] = att.value
+    }
+  })
+  // const attrs = node.attributes || {}
   /** @type {Array<string>} */
   const values = []
   /** @type {string | undefined} */
@@ -153,41 +167,8 @@ function attributes(node: Directive, state: State): string {
     ) {
       const value = String(attrs[key])
 
-      if (key === 'id') {
-        id = shortcut.test(value) ? '#' + value : quoted('id', value)
-      } else if (key === 'class') {
-        const list = value.split(/[\t\n\r ]+/g)
-        const classesFullList: string[] = []
-        const classesList: string[] = []
-        let index = -1
-
-        while (++index < list.length) {
-          ;(shortcut.test(list[index]) ? classesList : classesFullList).push(
-            list[index]
-          )
-        }
-
-        classesFull =
-          classesFullList.length > 0
-            ? quoted('class', classesFullList.join(' '))
-            : ''
-        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
-      } else {
-        values.push(quoted(key, value))
-      }
+      values.push(quoted(key, value))
     }
-  }
-
-  if (classesFull) {
-    values.unshift(classesFull)
-  }
-
-  if (classes) {
-    values.unshift(classes)
-  }
-
-  if (id) {
-    values.unshift(id)
   }
 
   return values.length > 0 ? values.join(' ') + ' ' : ''

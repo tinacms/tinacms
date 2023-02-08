@@ -164,7 +164,12 @@ export const blockElement = (
       // Ignore empty blocks
       if (content.children.length === 1) {
         const onlyChild = content.children[0]
-        if (onlyChild && onlyChild.type === 'text' && onlyChild.text === '') {
+        if (
+          onlyChild &&
+          // Slate text nodes don't get a `type` property for text nodes
+          (onlyChild.type === 'text' || !onlyChild.type) &&
+          onlyChild.text === ''
+        ) {
           return null
         }
       }
@@ -186,8 +191,9 @@ export const blockElement = (
           type:
             directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
           name: content.name,
-          attributes: content.props,
-          children: content.children,
+          attributes,
+          children: children,
+          // children: c.children,
         }
       }
       return {

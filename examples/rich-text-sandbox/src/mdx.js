@@ -34939,7 +34939,6 @@ var cleanNode = (node, mark) => {
 
 // ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
-var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
 var directiveToMarkdown = (patterns) => ({
   unsafe: [
     {
@@ -35023,7 +35022,12 @@ function peekDirective() {
 function attributes(node, state) {
   const quote = checkQuote(state)
   const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs = node.attributes || {}
+  const attrs = {}
+  node.attributes.forEach((att) => {
+    if (att.value && typeof att.value === 'string') {
+      attrs[att.name] = att.value
+    }
+  })
   const values2 = []
   let classesFull
   let classes
@@ -35032,36 +35036,8 @@ function attributes(node, state) {
   for (key in attrs) {
     if (own4.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
       const value = String(attrs[key])
-      if (key === 'id') {
-        id = shortcut.test(value) ? '#' + value : quoted('id', value)
-      } else if (key === 'class') {
-        const list3 = value.split(/[\t\n\r ]+/g)
-        const classesFullList = []
-        const classesList = []
-        let index2 = -1
-        while (++index2 < list3.length) {
-          ;(shortcut.test(list3[index2]) ? classesList : classesFullList).push(
-            list3[index2]
-          )
-        }
-        classesFull =
-          classesFullList.length > 0
-            ? quoted('class', classesFullList.join(' '))
-            : ''
-        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
-      } else {
-        values2.push(quoted(key, value))
-      }
+      values2.push(quoted(key, value))
     }
-  }
-  if (classesFull) {
-    values2.unshift(classesFull)
-  }
-  if (classes) {
-    values2.unshift(classes)
-  }
-  if (id) {
-    values2.unshift(id)
   }
   return values2.length > 0 ? values2.join(' ') + ' ' : ''
   function quoted(key2, value) {
@@ -35149,7 +35125,11 @@ var blockElement = (content3, field, imageCallback) => {
     case 'p':
       if (content3.children.length === 1) {
         const onlyChild = content3.children[0]
-        if (onlyChild && onlyChild.type === 'text' && onlyChild.text === '') {
+        if (
+          onlyChild &&
+          (onlyChild.type === 'text' || !onlyChild.type) &&
+          onlyChild.text === ''
+        ) {
           return null
         }
       }
@@ -35175,8 +35155,8 @@ var blockElement = (content3, field, imageCallback) => {
           type:
             directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
           name: content3.name,
-          attributes: content3.props,
-          children: content3.children,
+          attributes: attributes2,
+          children,
         }
       }
       return {
@@ -35390,11 +35370,23 @@ var containerDirectiveElement = (node, field, imageCallback, raw) => {
       children: [{ type: 'text', text: source(node, raw) || '' }],
     }
   }
+  if (typeof template === 'string') {
+    throw new Error(`Global templates not supported`)
+  }
+  const props = node.attributes
+  const childField = template.fields.find(
+    (field2) => field2.name === 'children'
+  )
+  if (childField) {
+    if (childField.type === 'rich-text') {
+      props.children = remarkToSlate(node, childField, imageCallback)
+    }
+  }
   return {
     type: 'mdxJsxFlowElement',
     name: template.name,
-    props: node.attributes,
-    children: node.children,
+    props,
+    children: [{ type: 'text', text: '' }],
   }
 }
 
@@ -36313,9 +36305,9 @@ function factoryAttributes(
     }
     effects.enter(type + 'Value')
     effects.consume(code2)
-    return shortcut2
+    return shortcut
   }
-  const shortcut2 = function (code2) {
+  const shortcut = function (code2) {
     if (
       code2 === codes.eof ||
       code2 === codes.quotationMark ||
@@ -36339,7 +36331,7 @@ function factoryAttributes(
       return between(code2)
     }
     effects.consume(code2)
-    return shortcut2
+    return shortcut
   }
   const name = function (code2) {
     if (
@@ -38204,8 +38196,6 @@ var markdownToAst = (value, field, useMdx = true) => {
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
-    } else {
-      console.log('falling back to non-MDX parser')
     }
     let tree
     try {
