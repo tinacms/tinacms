@@ -41,8 +41,13 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
   const client = new S3Client(config.config)
   const bucket = config.bucket
   let mediaRoot = config.mediaRoot || ''
-  if (mediaRoot && !mediaRoot.endsWith('/')) {
-    mediaRoot = mediaRoot + '/'
+  if (mediaRoot) {
+    if (!mediaRoot.endsWith('/')) {
+      mediaRoot = mediaRoot + '/'
+    }
+    if (mediaRoot.startsWith('/')) {
+      mediaRoot = mediaRoot.substr(1)
+    }
   }
   let cdnUrl =
     options?.cdnUrl ||
@@ -64,7 +69,7 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
       case 'POST':
         return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl)
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket, mediaRoot)
+        return deleteAsset(req, res, client, bucket)
       default:
         res.end(404)
     }
@@ -200,7 +205,10 @@ async function listMedia(
 
     items.push(
       ...(response.Contents || [])
-        .filter((file) => file.Key !== prefix)
+        .filter((file) => {
+          const strippedKey = stripMediaRoot(mediaRoot, file.Key)
+          return strippedKey !== prefix
+        })
         .map(getDOSToTinaFunc(cdnUrl, mediaRoot))
     )
 
@@ -232,8 +240,7 @@ async function deleteAsset(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string,
-  mediaRoot: string
+  bucket: string
 ) {
   const { media } = req.query
   const [, objectKey] = media as string[]
