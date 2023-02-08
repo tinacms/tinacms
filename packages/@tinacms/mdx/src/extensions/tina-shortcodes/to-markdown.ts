@@ -1,8 +1,4 @@
-import type {
-  Directive,
-  LeafDirective,
-  TextDirective,
-} from '../directive/types'
+import type { Directive, LeafDirective, TextDirective } from './types'
 import type { BlockContent, DefinitionContent, Paragraph } from 'mdast'
 import type {
   Handle as ToMarkdownHandle,

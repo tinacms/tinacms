@@ -7,9 +7,8 @@ import { codes } from 'micromark-util-symbol/codes'
 import { constants } from 'micromark-util-symbol/constants'
 import { types } from 'micromark-util-symbol/types'
 import { factoryAttributes } from './factory-attributes'
-import { factoryLabel } from '../directive/extension/lib/factory-label'
-import { factoryName } from '../directive/extension/lib/factory-name'
-import { findCode, printCode } from './shortcode-leaf'
+import { factoryName } from './factory-name'
+import { findCode } from './shortcode-leaf'
 
 export const directiveContainer: (pattern: Pattern) => Construct = (
   pattern
@@ -17,12 +16,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
   const tokenizeDirectiveContainer: Tokenizer = function (effects, ook, nnok) {
     // eslint-disable-next-line
     const self = this
-    const logSelf = () => {
-      self.events.forEach((e) => {
-        console.log(`${e[0]} - ${e[1].type}`)
-      })
-      console.log('==============================')
-    }
     const tail = self.events[self.events.length - 1]
     const initialSize =
       tail && tail[1].type === types.linePrefix
@@ -310,19 +303,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     return start
   }
 
-  const tokenizeLabel: Tokenizer = function (effects, ok, nok) {
-    // Always a `[`
-    return factoryLabel(
-      effects,
-      ok,
-      nok,
-      'directiveContainerLabel',
-      'directiveContainerLabelMarker',
-      'directiveContainerLabelString',
-      true
-    )
-  }
-
   const tokenizeAttributes: Tokenizer = function (effects, ok, nok) {
     // Always a `{`
     return factoryAttributes(
@@ -363,7 +343,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     return start
   }
 
-  const label = { tokenize: tokenizeLabel, partial: true }
   const attributes = { tokenize: tokenizeAttributes, partial: true }
   const nonLazyLine = { tokenize: tokenizeNonLazyLine, partial: true }
   return {

@@ -1,15 +1,12 @@
 import type { Pattern } from '../../stringify'
-import type { Construct, Tokenizer, State, Token } from 'micromark-util-types'
-import { ok as assert } from 'uvu/assert'
+import type { Construct, Tokenizer, State } from 'micromark-util-types'
 import { factorySpace } from 'micromark-factory-space'
 import { markdownLineEnding, markdownSpace } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes'
 import { values } from 'micromark-util-symbol/values'
-import { constants } from 'micromark-util-symbol/constants'
 import { types } from 'micromark-util-symbol/types'
 import { factoryAttributes } from './factory-attributes'
-import { factoryLabel } from '../directive/extension/lib/factory-label'
-import { factoryName } from '../directive/extension/lib/factory-name'
+import { factoryName } from './factory-name'
 
 const findValue = (string: string): string | null => {
   let lookupValue: string | null = null
@@ -49,12 +46,6 @@ export const directiveLeaf: (pattern: Pattern) => Construct = (pattern) => {
   const tokenizeDirectiveLeaf: Tokenizer = function (effects, ook, nnok) {
     // eslint-disable-next-line
     const self = this
-    const logSelf = () => {
-      self.events.forEach((e) => {
-        console.log(`${e[0]} - ${e[1].type}`)
-      })
-      console.log('==============================')
-    }
     let startSequenceIndex = 1
     let endSequenceIndex = 0
 
@@ -171,6 +162,5 @@ export const directiveLeaf: (pattern: Pattern) => Construct = (pattern) => {
   const attributes = { tokenize: tokenizeAttributes, partial: true }
   return {
     tokenize: tokenizeDirectiveLeaf,
-    // concrete: true,
   }
 }
