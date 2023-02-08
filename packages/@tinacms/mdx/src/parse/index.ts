@@ -107,8 +107,8 @@ export const markdownToAst = (
     // const extensions = [directive(), tinaDirective(patterns)]
     const extensions = [tinaDirective(patterns)]
     // const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
-    const mdastExtensions = [tinaDirectiveFromMarkdown]
-    // const mdastExtensions = [directiveFromMarkdown]
+    // const mdastExtensions = [tinaDirectiveFromMarkdown]
+    const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())

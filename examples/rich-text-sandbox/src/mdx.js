@@ -32855,7 +32855,7 @@ function flatten(array) {
 }
 var flatten_default = flatten
 
-// src/parse/acorn.ts
+// ../mdx/src/parse/acorn.ts
 var extractAttributes = (attributes, fields, imageCallback) => {
   const properties = {}
   attributes.forEach((attribute) => {
@@ -34480,7 +34480,7 @@ function joinDefinition(left, right) {
   }
 }
 
-// src/stringify/acorn.ts
+// ../mdx/src/stringify/acorn.ts
 var import_prettier = __toModule(require_standalone())
 var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
@@ -34728,7 +34728,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// src/stringify/marks.ts
+// ../mdx/src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -35002,7 +35002,7 @@ function toResult3(value) {
   return [value]
 }
 
-// src/extensions/tina-shortcodes/to-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
 var directiveToMarkdown = (patterns) => ({
@@ -35154,7 +35154,7 @@ var handle2 = function (patterns) {
   return handleDirective
 }
 
-// src/stringify/index.ts
+// ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return
@@ -35395,7 +35395,7 @@ function source(value, file) {
   return results.join('')
 }
 
-// src/parse/mdx.ts
+// ../mdx/src/parse/mdx.ts
 function mdxJsxElement(node, field, imageCallback) {
   try {
     const template = field.templates?.find((template2) => {
@@ -35471,7 +35471,7 @@ var containerDirectiveElement = (node, field, imageCallback, raw) => {
   }
 }
 
-// src/parse/remarkToPlate.ts
+// ../mdx/src/parse/remarkToPlate.ts
 var remarkToSlate = (root3, field, imageCallback, raw) => {
   const content3 = (content4) => {
     switch (content4.type) {
@@ -35821,6 +35821,137 @@ var RichTextParseError = class extends Error {
     this.name = 'RichTextParseError'
     this.position = position2
   }
+}
+
+// ../mdx/src/extensions/directive/from-markdown.ts
+var own5 = {}.hasOwnProperty
+var enterContainer = function (token) {
+  enter.call(this, 'containerDirective', token)
+}
+var enterLeaf = function (token) {
+  enter.call(this, 'leafDirective', token)
+}
+var enterText = function (token) {
+  enter.call(this, 'textDirective', token)
+}
+var enter = function (type, token) {
+  this.enter({ type, name: '', attributes: {}, children: [] }, token)
+}
+function exitName(token) {
+  const node = this.stack[this.stack.length - 1]
+  node.name = this.sliceSerialize(token)
+}
+var enterContainerLabel = function (token) {
+  this.enter(
+    { type: 'paragraph', data: { directiveLabel: true }, children: [] },
+    token
+  )
+}
+var exitContainerLabel = function (token) {
+  this.exit(token)
+}
+var enterAttributes = function () {
+  this.setData('directiveAttributes', [])
+  this.buffer()
+}
+var exitAttributeIdValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3.push([
+      'id',
+      parseEntities(this.sliceSerialize(token), {
+        attribute: true,
+      }),
+    ])
+  }
+}
+var exitAttributeClassValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3.push([
+      'class',
+      parseEntities(this.sliceSerialize(token), {
+        attribute: true,
+      }),
+    ])
+  }
+}
+var exitAttributeValue = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    list3[list3.length - 1][1] = parseEntities(this.sliceSerialize(token), {
+      attribute: true,
+    })
+  }
+}
+var exitAttributeName = function (token) {
+  const list3 = this.getData('directiveAttributes')
+  if (list3) {
+    const name = this.sliceSerialize(token)
+    if (!name) {
+      list3.push(['_value', ''])
+    } else {
+      list3.push([this.sliceSerialize(token), ''])
+    }
+  }
+}
+function exitAttributes() {
+  const list3 = this.getData('directiveAttributes')
+  const cleaned = {}
+  let index2 = -1
+  if (list3) {
+    while (++index2 < list3.length) {
+      const attribute = list3[index2]
+      if (attribute[0] === 'class' && cleaned.class) {
+        cleaned.class += ' ' + attribute[1]
+      } else {
+        cleaned[attribute[0]] = attribute[1]
+      }
+    }
+  }
+  this.setData('directiveAttributes')
+  this.resume()
+  const node = this.stack[this.stack.length - 1]
+  node.attributes = cleaned
+}
+function exit2(token) {
+  this.exit(token)
+}
+var directiveFromMarkdown = {
+  canContainEols: ['textDirective'],
+  enter: {
+    directiveContainer: enterContainer,
+    directiveContainerAttributes: enterAttributes,
+    directiveContainerLabel: enterContainerLabel,
+    directiveLeaf: enterLeaf,
+    directiveLeafAttributes: enterAttributes,
+    directiveText: enterText,
+    directiveTextAttributes: enterAttributes,
+  },
+  exit: {
+    directiveContainer: exit2,
+    directiveContainerAttributeClassValue: exitAttributeClassValue,
+    directiveContainerAttributeIdValue: exitAttributeIdValue,
+    directiveContainerAttributeName: exitAttributeName,
+    directiveContainerAttributeValue: exitAttributeValue,
+    directiveContainerAttributes: exitAttributes,
+    directiveContainerLabel: exitContainerLabel,
+    directiveContainerName: exitName,
+    directiveLeaf: exit2,
+    directiveLeafAttributeClassValue: exitAttributeClassValue,
+    directiveLeafAttributeIdValue: exitAttributeIdValue,
+    directiveLeafAttributeName: exitAttributeName,
+    directiveLeafAttributeValue: exitAttributeValue,
+    directiveLeafAttributes: exitAttributes,
+    directiveLeafName: exitName,
+    directiveText: exit2,
+    directiveTextAttributeClassValue: exitAttributeClassValue,
+    directiveTextAttributeIdValue: exitAttributeIdValue,
+    directiveTextAttributeName: exitAttributeName,
+    directiveTextAttributeValue: exitAttributeValue,
+    directiveTextAttributes: exitAttributes,
+    directiveTextName: exitName,
+  },
 }
 
 // ../../../node_modules/.pnpm/micromark-util-symbol@1.0.1/node_modules/micromark-util-symbol/codes.js
@@ -36173,7 +36304,7 @@ var values = {
   replacementCharacter: '\uFFFD',
 }
 
-// src/extensions/tina-shortcodes/shortcode-leaf.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
 var findValue = (string3) => {
   let lookupValue = null
   Object.entries(values).forEach(([key, value]) => {
@@ -36197,6 +36328,15 @@ var findCode = (string3) => {
     })
   }
   return lookupValue
+}
+var printCode = (num) => {
+  let lookupValue = null
+  Object.entries(codes).forEach(([key, value]) => {
+    if (value === num) {
+      lookupValue = key
+    }
+  })
+  console.log(lookupValue)
 }
 var tokenizeLeaf = function (pattern) {
   const startPattern = pattern.start
@@ -37595,11 +37735,11 @@ var constants = {
   v8MaxSafeChunkSize: 1e4,
 }
 
-// src/extensions/tina-shortcodes/factory-attributes.ts
+// ../mdx/src/extensions/tina-shortcodes/factory-attributes.ts
 function factoryAttributes(
   effects,
   ok3,
-  nok,
+  nnok,
   attributesType,
   attributesMarkerType,
   attributeType,
@@ -37615,6 +37755,11 @@ function factoryAttributes(
 ) {
   let type
   let marker
+  const nok = function (code2) {
+    console.log('factoryattbritues not ok')
+    printCode(code2)
+    return nnok(code2)
+  }
   const start3 = function (code2) {
     effects.enter(attributesType)
     return between(code2)
@@ -37826,19 +37971,18 @@ function factoryAttributes(
       : end(code2)
   }
   const end = function (code2) {
-    if (code2 === codes.rightCurlyBrace) {
+    if (!asciiAlpha(code2)) {
       effects.enter(attributesMarkerType)
-      effects.consume(code2)
       effects.exit(attributesMarkerType)
       effects.exit(attributesType)
-      return ok3
+      return ok3(code2)
     }
     return nok(code2)
   }
   return start3
 }
 
-// src/extensions/directive/extension/lib/factory-label.ts
+// ../mdx/src/extensions/directive/extension/lib/factory-label.ts
 function factoryLabel2(
   effects,
   ok3,
@@ -37930,7 +38074,7 @@ function factoryLabel2(
   return start3
 }
 
-// src/extensions/directive/extension/lib/factory-name.ts
+// ../mdx/src/extensions/directive/extension/lib/factory-name.ts
 function factoryName(effects, ok3, nok, type) {
   const self2 = this
   const start3 = function (code2) {
@@ -37958,9 +38102,9 @@ function factoryName(effects, ok3, nok, type) {
   return start3
 }
 
-// src/extensions/tina-shortcodes/shortcode-container.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
 var directiveContainer = (pattern) => {
-  const tokenizeDirectiveContainer = function (effects, ok3, nnok) {
+  const tokenizeDirectiveContainer = function (effects, ook, nnok) {
     const self2 = this
     const logSelf = () => {
       self2.events.forEach((e) => {
@@ -37976,10 +38120,15 @@ var directiveContainer = (pattern) => {
     let sizeOpen = 0
     let previous2
     let startSequenceIndex = 1
-    let endSequenceIndex = 0
+    let closeStartSequenceIndex = 0
     let endNameIndex = 0
+    let endSequenceIndex = 0
+    let closeEndSequenceIndex = 0
+    const ok3 = function (code2) {
+      return ook(code2)
+    }
     const nok = function (code2) {
-      return nnok
+      return nnok(code2)
     }
     const start3 = function (code2) {
       const firstCharacter = pattern.start[0]
@@ -38018,17 +38167,36 @@ var directiveContainer = (pattern) => {
       )(code2)
     }
     const afterName = function (code2) {
-      return code2 === codes.leftSquareBracket
-        ? effects.attempt(label, afterLabel, afterLabel)(code2)
-        : afterLabel(code2)
+      if (markdownSpace(code2)) {
+        return factorySpace(effects, afterName, types.whitespace)(code2)
+      }
+      if (markdownLineEnding(code2)) {
+        return nok
+      }
+      return startAttributes
     }
-    const afterLabel = function (code2) {
-      return code2 === codes.leftCurlyBrace
-        ? effects.attempt(attributes, afterAttributes, afterAttributes)(code2)
-        : afterAttributes(code2)
+    const startAttributes = function (code2) {
+      const nextCharacter = pattern.end[endSequenceIndex]
+      if (findCode(nextCharacter) === code2) {
+        return afterAttributes(code2)
+      }
+      return effects.attempt(
+        attributes,
+        afterAttributes,
+        afterAttributes
+      )(code2)
     }
     const afterAttributes = function (code2) {
-      return factorySpace(effects, openAfter, types.whitespace)(code2)
+      const nextCharacter = pattern.end[endSequenceIndex]
+      if (findCode(nextCharacter) === code2) {
+        effects.consume(code2)
+        endSequenceIndex++
+        return afterAttributes
+      }
+      if (pattern.end.length === endSequenceIndex) {
+        return factorySpace(effects, openAfter, types.whitespace)(code2)
+      }
+      return nok
     }
     const openAfter = function (code2) {
       effects.exit('directiveContainerFence')
@@ -38115,14 +38283,14 @@ var directiveContainer = (pattern) => {
         return closingSequence(code2)
       }
       const closingSequence = function (code2) {
-        const nextCharacter = pattern.start[endSequenceIndex]
+        const nextCharacter = pattern.start[closeStartSequenceIndex]
         if (findCode(nextCharacter) === code2) {
           effects2.consume(code2)
-          endSequenceIndex++
+          closeStartSequenceIndex++
           return closingSequence
         }
-        if (endSequenceIndex < pattern.end.length - 1) {
-          endSequenceIndex = 0
+        if (closeStartSequenceIndex < pattern.end.length - 1) {
+          closeStartSequenceIndex = 0
           return nok2(code2)
         }
         effects2.exit('directiveContainerSequence')
@@ -38135,12 +38303,18 @@ var directiveContainer = (pattern) => {
       const closingSequenceName = function (code2) {
         const patternName = pattern.name || pattern.templateName
         const nextCharacter = patternName[endNameIndex]
+        if (code2 === codes.eof) {
+          return nok2
+        }
+        if (markdownLineEnding(code2)) {
+          return nok2
+        }
         if (findCode(nextCharacter) === code2) {
           effects2.consume(code2)
           endNameIndex++
           return closingSequenceName
         }
-        if (patternName.length - 1 === endNameIndex) {
+        if (patternName.length === endNameIndex) {
           return closingSequenceEnd
         }
         return nok2
@@ -38160,9 +38334,21 @@ var directiveContainer = (pattern) => {
         return nok2(code2)
       }
       const closingSequenceEnd = function (code2) {
-        if (code2 === codes.eof || markdownLineEnding(code2)) {
+        if (markdownSpace(code2)) {
+          return factorySpace(effects2, closingSequenceEnd, types.whitespace)
+        }
+        if (code2 === codes.eof) {
+          return nok2
+        }
+        if (pattern.end.length - 1 === closeEndSequenceIndex) {
           effects2.exit('directiveContainerFence')
           return ok4(code2)
+        }
+        const nextCharacter = pattern.end[closeEndSequenceIndex]
+        if (findCode(nextCharacter) === code2) {
+          effects2.consume(code2)
+          closeEndSequenceIndex++
+          return closingSequenceEnd
         }
         return nok2(code2)
       }
@@ -38228,7 +38414,7 @@ var directiveContainer = (pattern) => {
   }
 }
 
-// src/extensions/tina-shortcodes/extension.ts
+// ../mdx/src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
@@ -38260,27 +38446,7 @@ var tinaDirective = function (patterns) {
   }
 }
 
-// src/extensions/tina-shortcodes/from-markdown.ts
-var enter = function (type, token) {
-  this.enter({ type, name: '', attributes: {}, children: [] }, token)
-}
-var enterShortcode = function (token) {
-  enter.call(this, 'leafDirective', token)
-}
-function exit2(token) {
-  console.log('exit called', token)
-  this.exit(token)
-}
-var tinaDirectiveFromMarkdown = {
-  enter: {
-    shortcode: enterShortcode,
-  },
-  exit: {
-    shortcode: exit2,
-  },
-}
-
-// src/parse/index.ts
+// ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   try {
     const patterns = []
@@ -38300,7 +38466,7 @@ var markdownToAst = (value, field, useMdx = true) => {
       }
     })
     const extensions = [tinaDirective(patterns)]
-    const mdastExtensions = [tinaDirectiveFromMarkdown]
+    const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())

@@ -17,6 +17,7 @@ import {
 } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes'
 import { types } from 'micromark-util-symbol/types'
+import { findCode, printCode } from './shortcode-leaf'
 
 /**
  * @param {Effects} effects
@@ -39,7 +40,7 @@ import { types } from 'micromark-util-symbol/types'
 export function factoryAttributes(
   effects: Effects,
   ok: State,
-  nok: State,
+  nnok: State,
   attributesType: string,
   attributesMarkerType: string,
   attributeType: string,
@@ -55,6 +56,13 @@ export function factoryAttributes(
 ) {
   let type: string
   let marker: Code | undefined
+
+  const nok: State = function (code) {
+    console.log('factoryattbritues not ok')
+    // console.trace()
+    printCode(code)
+    return nnok(code)
+  }
 
   const start: State = function (code) {
     effects.enter(attributesType)
@@ -302,12 +310,11 @@ export function factoryAttributes(
   }
 
   const end: State = function (code) {
-    if (code === codes.rightCurlyBrace) {
+    if (!asciiAlpha(code)) {
       effects.enter(attributesMarkerType)
-      effects.consume(code)
       effects.exit(attributesMarkerType)
       effects.exit(attributesType)
-      return ok
+      return ok(code)
     }
 
     return nok(code)

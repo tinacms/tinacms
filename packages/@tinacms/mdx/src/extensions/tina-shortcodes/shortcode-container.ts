@@ -14,7 +14,8 @@ import { findCode, printCode } from './shortcode-leaf'
 export const directiveContainer: (pattern: Pattern) => Construct = (
   pattern
 ) => {
-  const tokenizeDirectiveContainer: Tokenizer = function (effects, ok, nnok) {
+  const tokenizeDirectiveContainer: Tokenizer = function (effects, ook, nnok) {
+    // eslint-disable-next-line
     const self = this
     const logSelf = () => {
       self.events.forEach((e) => {
@@ -30,14 +31,21 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     let sizeOpen = 0
     let previous: Token
     let startSequenceIndex = 1
-    let endSequenceIndex = 0
+    let closeStartSequenceIndex = 0
     let endNameIndex = 0
+    let endSequenceIndex = 0
+    let closeEndSequenceIndex = 0
 
+    const ok: State = function (code) {
+      // logSelf()
+      // printCode(code)
+      return ook(code)
+    }
     const nok: State = function (code) {
       // console.log('nok')
       // console.trace()
       // printCode(code)
-      return nnok
+      return nnok(code)
     }
 
     const start: State = function (code) {
@@ -81,19 +89,34 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     }
 
     const afterName: State = function (code) {
-      return code === codes.leftSquareBracket
-        ? effects.attempt(label, afterLabel, afterLabel)(code)
-        : afterLabel(code)
+      if (markdownSpace(code)) {
+        return factorySpace(effects, afterName, types.whitespace)(code)
+      }
+      if (markdownLineEnding(code)) {
+        return nok
+      }
+      return startAttributes
     }
 
-    const afterLabel: State = function (code) {
-      return code === codes.leftCurlyBrace
-        ? effects.attempt(attributes, afterAttributes, afterAttributes)(code)
-        : afterAttributes(code)
+    const startAttributes: State = function (code) {
+      const nextCharacter = pattern.end[endSequenceIndex]
+      if (findCode(nextCharacter) === code) {
+        return afterAttributes(code)
+      }
+      return effects.attempt(attributes, afterAttributes, afterAttributes)(code)
     }
 
     const afterAttributes: State = function (code) {
-      return factorySpace(effects, openAfter, types.whitespace)(code)
+      const nextCharacter = pattern.end[endSequenceIndex]
+      if (findCode(nextCharacter) === code) {
+        effects.consume(code)
+        endSequenceIndex++
+        return afterAttributes
+      }
+      if (pattern.end.length === endSequenceIndex) {
+        return factorySpace(effects, openAfter, types.whitespace)(code)
+      }
+      return nok
     }
 
     const openAfter: State = function (code) {
@@ -201,15 +224,15 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       }
 
       const closingSequence: State = function (code) {
-        const nextCharacter = pattern.start[endSequenceIndex]
+        const nextCharacter = pattern.start[closeStartSequenceIndex]
         if (findCode(nextCharacter) === code) {
           effects.consume(code)
-          endSequenceIndex++
+          closeStartSequenceIndex++
           return closingSequence
         }
 
-        if (endSequenceIndex < pattern.end.length - 1) {
-          endSequenceIndex = 0
+        if (closeStartSequenceIndex < pattern.end.length - 1) {
+          closeStartSequenceIndex = 0
           return nok(code)
         }
         effects.exit('directiveContainerSequence')
@@ -223,12 +246,19 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       const closingSequenceName: State = function (code) {
         const patternName = pattern.name || pattern.templateName
         const nextCharacter = patternName[endNameIndex]
+        if (code === codes.eof) {
+          return nok
+        }
+        if (markdownLineEnding(code)) {
+          return nok
+        }
+
         if (findCode(nextCharacter) === code) {
           effects.consume(code)
           endNameIndex++
           return closingSequenceName
         }
-        if (patternName.length - 1 === endNameIndex) {
+        if (patternName.length === endNameIndex) {
           return closingSequenceEnd
         }
         return nok
@@ -250,9 +280,21 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       }
 
       const closingSequenceEnd: State = function (code) {
-        if (code === codes.eof || markdownLineEnding(code)) {
+        if (markdownSpace(code)) {
+          return factorySpace(effects, closingSequenceEnd, types.whitespace)
+        }
+        if (code === codes.eof) {
+          return nok
+        }
+        if (pattern.end.length - 1 === closeEndSequenceIndex) {
           effects.exit('directiveContainerFence')
           return ok(code)
+        }
+        const nextCharacter = pattern.end[closeEndSequenceIndex]
+        if (findCode(nextCharacter) === code) {
+          effects.consume(code)
+          closeEndSequenceIndex++
+          return closingSequenceEnd
         }
 
         return nok(code)
@@ -304,6 +346,7 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
   }
 
   const tokenizeNonLazyLine: Tokenizer = function (effects, ok, nok) {
+    // eslint-disable-next-line
     const self = this
 
     const lineStart: State = function (code) {
