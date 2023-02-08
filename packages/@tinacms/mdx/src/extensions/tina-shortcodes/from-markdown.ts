@@ -19,7 +19,11 @@ const enterText: FromMarkdownHandle = function (token) {
   enter.call(this, 'textDirective', token)
 }
 
-const enter = function (this: CompileContext, type: Directive, token: Token) {
+const enter = function (
+  this: CompileContext,
+  type: 'containerDirective' | 'leafDirective' | 'textDirective',
+  token: Token
+) {
   this.enter({ type, name: '', attributes: {}, children: [] }, token)
 }
 
