@@ -23,6 +23,7 @@ import { promisify } from 'util'
 export interface DOSConfig {
   config: S3ClientConfig
   bucket: string
+  mediaRoot?: string
   authorized: (_req: NextApiRequest, _res: NextApiResponse) => Promise<boolean>
 }
 
@@ -39,6 +40,7 @@ export const mediaHandlerConfig = {
 export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
   const client = new S3Client(config.config)
   const bucket = config.bucket
+  const mediaRoot = config.mediaRoot || ''
   let cdnUrl =
     options?.cdnUrl ||
     config.config.endpoint
@@ -55,11 +57,11 @@ export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
     }
     switch (req.method) {
       case 'GET':
-        return listMedia(req, res, client, bucket, cdnUrl)
+        return listMedia(req, res, client, bucket, mediaRoot, cdnUrl)
       case 'POST':
-        return uploadMedia(req, res, client, bucket, cdnUrl)
+        return uploadMedia(req, res, client, bucket, mediaRoot, cdnUrl)
       case 'DELETE':
-        return deleteAsset(req, res, client, bucket)
+        return deleteAsset(req, res, client, bucket, mediaRoot)
       default:
         res.end(404)
     }
@@ -71,6 +73,7 @@ async function uploadMedia(
   res: NextApiResponse,
   client: S3Client,
   bucket: string,
+  mediaRoot: string,
   cdnUrl: string
 ) {
   const upload = promisify(
@@ -102,7 +105,7 @@ async function uploadMedia(
   const filename = path.basename(filePath)
   const params: PutObjectCommandInput = {
     Bucket: bucket,
-    Key: prefix + filename,
+    Key: path.join(mediaRoot, prefix + filename),
     Body: blob,
     ACL: 'public-read',
   }
@@ -115,12 +118,30 @@ async function uploadMedia(
       id: prefix + filename,
       filename,
       directory: prefix,
-      previewSrc: cdnUrl + prefix + filename,
-      src: cdnUrl + prefix + filename,
+      previewSrc: cdnUrl + path.join(mediaRoot, prefix + filename),
+      src: cdnUrl + path.join(prefix + filename),
     })
   } catch (e) {
     res.status(500).send(findErrorMessage(e))
   }
+}
+
+function stripMediaRoot(mediaRoot: string, key: string) {
+  if (!mediaRoot) {
+    return key
+  }
+  const mediaRootParts = mediaRoot.split('/')
+  if (mediaRootParts.length === 0 || !mediaRootParts[0]) {
+    return key
+  }
+  const keyParts = key.split('/')
+  // remove each part of the key that matches the mediaRoot parts
+  for (let i = 0; i < mediaRootParts.length; i++) {
+    if (keyParts[i] === mediaRootParts[i]) {
+      keyParts.shift()
+    }
+  }
+  return keyParts.join('/')
 }
 
 async function listMedia(
@@ -128,6 +149,7 @@ async function listMedia(
   res: NextApiResponse,
   client: S3Client,
   bucket: string,
+  mediaRoot: string,
   cdnUrl: string
 ) {
   try {
@@ -143,7 +165,7 @@ async function listMedia(
     const params: ListObjectsCommandInput = {
       Bucket: bucket,
       Delimiter: '/',
-      Prefix: prefix,
+      Prefix: path.join(mediaRoot, prefix),
       Marker: offset?.toString(),
       MaxKeys: directory && !offset ? +limit + 1 : +limit,
     }
@@ -154,19 +176,20 @@ async function listMedia(
 
     const items = []
 
-    response.CommonPrefixes?.forEach(({ Prefix }) =>
+    response.CommonPrefixes?.forEach(({ Prefix }) => {
+      const strippedPrefix = stripMediaRoot(mediaRoot, Prefix)
       items.push({
         id: Prefix,
         type: 'dir',
-        filename: path.basename(Prefix),
-        directory: path.dirname(Prefix),
+        filename: path.basename(strippedPrefix),
+        directory: path.dirname(strippedPrefix),
       })
-    )
+    })
 
     items.push(
       ...(response.Contents || [])
         .filter((file) => file.Key !== prefix)
-        .map(getDOSToTinaFunc(cdnUrl))
+        .map(getDOSToTinaFunc(cdnUrl, mediaRoot))
     )
 
     res.json({
@@ -197,14 +220,15 @@ async function deleteAsset(
   req: NextApiRequest,
   res: NextApiResponse,
   client: S3Client,
-  bucket: string
+  bucket: string,
+  mediaRoot: string
 ) {
   const { media } = req.query
   const [, objectKey] = media as string[]
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
-    Key: objectKey,
+    Key: path.join(mediaRoot, objectKey),
   }
   const command = new DeleteObjectCommand(params)
   try {
@@ -217,10 +241,11 @@ async function deleteAsset(
   }
 }
 
-function getDOSToTinaFunc(cdnUrl) {
+function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
   return function dosToTina(file: _Object): Media {
-    const filename = path.basename(file.Key)
-    const directory = path.dirname(file.Key) + '/'
+    const strippedKey = stripMediaRoot(mediaRoot, file.Key)
+    const filename = path.basename(strippedKey)
+    const directory = path.dirname(strippedKey) + '/'
 
     return {
       id: file.Key,

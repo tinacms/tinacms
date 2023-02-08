@@ -6,12 +6,12 @@ Manage **Digital Ocean Space media assets** in TinaCMS.
 
 ### With Yarn
 ```bash
-yarn add next-tinacms-dos
+yarn add next-tinacms-dos @tinacms/auth
 ```
 
 ### With NPM
 ```bash
-npm install next-tinacms-dos
+npm install next-tinacms-dos @tinacms/auth
 ```
 
 ## Connect with Digital Ocean Space
