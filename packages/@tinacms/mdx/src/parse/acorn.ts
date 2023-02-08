@@ -20,7 +20,6 @@ import type {
   MdxJsxAttributeValueExpression,
   MdxJsxExpressionAttribute,
 } from 'mdast-util-mdx-jsx'
-import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
@@ -286,14 +285,6 @@ function assertHasType(
     }
   }
   throw new Error(`Expect value to be an object with property "type"`)
-}
-
-const throwError = (field: TinaFieldBase) => {
-  throw new Error(
-    `Unexpected expression for field "${field.name}"${
-      field.list ? ' with "list": true' : ''
-    }`
-  )
 }
 
 export const trimFragments = (string: string) => {

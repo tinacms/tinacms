@@ -1,11 +1,4 @@
-/**
- * @typedef {import('micromark-util-types').Effects} Effects
- * @typedef {import('micromark-util-types').State} State
- * @typedef {import('micromark-util-types').Code} Code
- */
-
 import type { Effects, State, Code } from 'micromark-util-types'
-import { ok as assert } from 'uvu/assert'
 import { factorySpace } from 'micromark-factory-space'
 import { factoryWhitespace } from 'micromark-factory-whitespace'
 import {
@@ -17,26 +10,7 @@ import {
 } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes'
 import { types } from 'micromark-util-symbol/types'
-import { findCode, printCode } from './shortcode-leaf'
 
-/**
- * @param {Effects} effects
- * @param {State} ok
- * @param {State} nok
- * @param {string} attributesType
- * @param {string} attributesMarkerType
- * @param {string} attributeType
- * @param {string} attributeIdType
- * @param {string} attributeClassType
- * @param {string} attributeNameType
- * @param {string} attributeInitializerType
- * @param {string} attributeValueLiteralType
- * @param {string} attributeValueType
- * @param {string} attributeValueMarker
- * @param {string} attributeValueData
- * @param {boolean} [disallowEol=false]
- */
-/* eslint-disable-next-line max-params */
 export function factoryAttributes(
   effects: Effects,
   ok: State,
@@ -58,9 +32,6 @@ export function factoryAttributes(
   let marker: Code | undefined
 
   const nok: State = function (code) {
-    console.log('factoryattbritues not ok')
-    // console.trace()
-    printCode(code)
     return nnok(code)
   }
 

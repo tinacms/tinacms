@@ -1,21 +1,8 @@
-/**
- * @typedef {import('micromark-util-types').TokenizeContext} TokenizeContext
- * @typedef {import('micromark-util-types').Effects} Effects
- * @typedef {import('micromark-util-types').State} State
- */
-
 import type { TokenizeContext, Effects, State } from 'micromark-util-types'
 import { asciiAlpha, asciiAlphanumeric } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes'
-import { findCode, printCode } from '../../../tina-shortcodes/shortcode-leaf'
+import { findCode } from './shortcode-leaf'
 
-/**
- * @this {TokenizeContext}
- * @param {Effects} effects
- * @param {State} ok
- * @param {State} nok
- * @param {string} type
- */
 export function factoryName(
   this: TokenizeContext,
   effects: Effects,
@@ -24,6 +11,7 @@ export function factoryName(
   type: string,
   patternName: string
 ) {
+  // eslint-disable-next-line
   const self = this
   let nameIndex = 0
 
