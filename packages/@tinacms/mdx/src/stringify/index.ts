@@ -28,7 +28,8 @@ import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { stringifyShortcode } from './stringifyShortcode'
-import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
+import { directiveToMarkdown } from '../extensions/directive/to-markdown'
+// import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -87,7 +88,8 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
     }
   })
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
+    // extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
+    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true, // setting to false results in 4-space tabbed code
@@ -185,7 +187,8 @@ export const blockElement = (
       )
       if (useDirective) {
         return {
-          type: 'leafDirective',
+          // type: 'leafDirective',
+          type: 'containerDirective',
           name: content.name,
           attributes: content.props,
           children: content.children,

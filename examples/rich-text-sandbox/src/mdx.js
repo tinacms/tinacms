@@ -27429,10 +27429,10 @@ function containerPhrasing(parent, context, safeOptions) {
     let after
     indexStack[indexStack.length - 1] = index2
     if (index2 + 1 < children.length) {
-      let handle3 = context.handle.handlers[children[index2 + 1].type]
-      if (handle3 && handle3.peek) handle3 = handle3.peek
-      after = handle3
-        ? handle3(children[index2 + 1], parent, context, {
+      let handle2 = context.handle.handlers[children[index2 + 1].type]
+      if (handle2 && handle2.peek) handle2 = handle2.peek
+      after = handle2
+        ? handle2(children[index2 + 1], parent, context, {
             before: '',
             after: '',
             ...tracker.current(),
@@ -32856,9 +32856,9 @@ function flatten(array) {
 var flatten_default = flatten
 
 // ../mdx/src/parse/acorn.ts
-var extractAttributes = (attributes, fields, imageCallback) => {
+var extractAttributes = (attributes2, fields, imageCallback) => {
   const properties = {}
-  attributes.forEach((attribute) => {
+  attributes2.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field2) => field2.name === attribute.name)
     if (!field) {
@@ -34486,7 +34486,7 @@ var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
 }
 function stringifyProps(element2, parentField, flatten2, imageCallback) {
-  const attributes = []
+  const attributes2 = []
   const children = []
   let template
   let useDirective = false
@@ -34518,7 +34518,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'reference':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34529,7 +34529,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34541,7 +34541,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'string':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34552,7 +34552,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
           }
         } else {
           if (typeof value === 'string') {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value,
@@ -34567,7 +34567,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'image':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34579,7 +34579,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes.push({
+          attributes2.push({
             type: 'mdxJsxAttribute',
             name,
             value: imageCallback(String(value)),
@@ -34590,7 +34590,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
       case 'boolean':
         if (field.list) {
           if (Array.isArray(value)) {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34600,7 +34600,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             })
           }
         } else {
-          attributes.push({
+          attributes2.push({
             type: 'mdxJsxAttribute',
             name,
             value: {
@@ -34611,7 +34611,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
         }
         break
       case 'object':
-        attributes.push({
+        attributes2.push({
           type: 'mdxJsxAttribute',
           name,
           value: {
@@ -34654,7 +34654,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
             }
           }
           if (flatten2) {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34663,7 +34663,7 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
               },
             })
           } else {
-            attributes.push({
+            attributes2.push({
               type: 'mdxJsxAttribute',
               name,
               value: {
@@ -34683,7 +34683,7 @@ ${val}
   if (template.match) {
     return {
       useDirective,
-      attributes,
+      attributes: attributes2,
       children:
         children && children.length
           ? children
@@ -34700,7 +34700,7 @@ ${val}
             ],
     }
   }
-  return { attributes, children, useDirective }
+  return { attributes: attributes2, children, useDirective }
 }
 function stringifyObj(obj, flatten2) {
   if (typeof obj === 'object' && obj !== null) {
@@ -34780,7 +34780,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
         type: 'break',
       }
     case 'mdxJsxTextElement': {
-      const { attributes, children } = stringifyPropsInline(
+      const { attributes: attributes2, children } = stringifyPropsInline(
         content3,
         field,
         imageCallback
@@ -34788,7 +34788,7 @@ var inlineElementExceptLink = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxTextElement',
         name: content3.name,
-        attributes,
+        attributes: attributes2,
         children,
       }
     }
@@ -35002,10 +35002,10 @@ function toResult3(value) {
   return [value]
 }
 
-// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
+// ../mdx/src/extensions/directive/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var shortcut = /^[^\t\n\r "#'.<=>`}]+$/
-var directiveToMarkdown = (patterns) => ({
+var directiveToMarkdown = {
   unsafe: [
     {
       character: '\r',
@@ -35024,135 +35024,140 @@ var directiveToMarkdown = (patterns) => ({
     { atBreak: true, character: ':', after: ':' },
   ],
   handlers: {
-    containerDirective: handle2(patterns),
-    leafDirective: handle2(patterns),
+    containerDirective: handleDirective,
+    leafDirective: handleDirective,
+    textDirective: handleDirective,
   },
-})
-var handle2 = function (patterns) {
-  const handleDirective = function (node, _, state, safeOptions) {
-    const pattern = patterns.find(
-      (p) => p.name === node.name || p.templateName === node.name
-    )
-    if (!pattern) {
-      throw new Error(`Expected directive to match a pattern for ${node.name}`)
-    }
-    const startPattern = pattern.start
-    const endPattern = pattern.end
-    const tracker = track(safeOptions)
-    const sequence = startPattern + ' '
-    const exit3 = state.enter(node.type)
-    let value = tracker.move(sequence + (node.name || ''))
-    value += tracker.move(attributes(node, state))
-    value += endPattern
-    if (node.type === 'containerDirective') {
-      const head = (node.children || [])[0]
-      let shallow = node
-      if (inlineDirectiveLabel(head)) {
-        shallow = Object.assign({}, node, { children: node.children.slice(1) })
-      }
-      if (shallow && shallow.children && shallow.children.length > 0) {
-        value += tracker.move('\n')
-        value += tracker.move(containerFlow(shallow, state, tracker.current()))
-      }
-      value += tracker.move('\n' + sequence)
-    }
-    exit3()
-    return value
-  }
-  function peekDirective() {
-    return ':'
-  }
-  function attributes(node, state) {
-    const quote = checkQuote(state)
-    const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-    const attrs = node.attributes || {}
-    const values2 = []
-    let classesFull
-    let classes
-    let id
-    let key
-    for (key in attrs) {
-      if (
-        own4.call(attrs, key) &&
-        attrs[key] !== void 0 &&
-        attrs[key] !== null
-      ) {
-        const value = String(attrs[key])
-        if (key === 'id') {
-          id = shortcut.test(value) ? '#' + value : quoted('id', value)
-        } else if (key === '_value') {
-          values2.push(`"${value}"`)
-        } else if (key === 'class') {
-          const list3 = value.split(/[\t\n\r ]+/g)
-          const classesFullList = []
-          const classesList = []
-          let index2 = -1
-          while (++index2 < list3.length) {
-            ;(shortcut.test(list3[index2])
-              ? classesList
-              : classesFullList
-            ).push(list3[index2])
-          }
-          classesFull =
-            classesFullList.length > 0
-              ? quoted('class', classesFullList.join(' '))
-              : ''
-          classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
-        } else {
-          values2.push(quoted(key, value))
-        }
-      }
-    }
-    if (classesFull) {
-      values2.unshift(classesFull)
-    }
-    if (classes) {
-      values2.unshift(classes)
-    }
-    if (id) {
-      values2.unshift(id)
-    }
-    return values2.length > 0 ? ' ' + values2.join(' ') + ' ' : ''
-    function quoted(key2, value) {
-      return (
-        key2 +
-        (value
-          ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
-          : '')
-      )
-    }
-  }
-  function inlineDirectiveLabel(node) {
-    return Boolean(
-      node && node.type === 'paragraph' && node.data && node.data.directiveLabel
-    )
-  }
-  function fence(node) {
-    let size = 0
-    if (node.type === 'containerDirective') {
-      visitParents2(node, function (node2, parents) {
-        if (node2.type === 'containerDirective') {
-          let index2 = parents.length
-          let nesting = 0
-          while (index2--) {
-            if (parents[index2].type === 'containerDirective') {
-              nesting++
-            }
-          }
-          if (nesting > size) size = nesting
-        }
-      })
-      size += 3
-    } else if (node.type === 'leafDirective') {
-      size = 2
-    } else {
-      size = 1
-    }
-    return ':'.repeat(size)
-  }
-  handleDirective.peek = peekDirective
-  return handleDirective
 }
+function handleDirective(node, _, state, safeOptions) {
+  const tracker = track(safeOptions)
+  const sequence = fence(node)
+  const exit3 = state.enter(node.type)
+  let value = tracker.move(sequence + (node.name || ''))
+  let label
+  if (node.type === 'containerDirective') {
+    const head = (node.children || [])[0]
+    label = inlineDirectiveLabel(head) ? head : void 0
+  } else {
+    label = node
+  }
+  if (label && label.children && label.children.length > 0) {
+    const exit4 = state.enter('label')
+    const labelType = `${node.type}Label`
+    const subexit = state.enter(labelType)
+    value += tracker.move('[')
+    value += tracker.move(
+      containerPhrasing(label, state, {
+        ...tracker.current(),
+        before: value,
+        after: ']',
+      })
+    )
+    value += tracker.move(']')
+    subexit()
+    exit4()
+  }
+  value += tracker.move(attributes(node, state))
+  if (node.type === 'containerDirective') {
+    const head = (node.children || [])[0]
+    let shallow = node
+    if (inlineDirectiveLabel(head)) {
+      shallow = Object.assign({}, node, { children: node.children.slice(1) })
+    }
+    if (shallow && shallow.children && shallow.children.length > 0) {
+      value += tracker.move('\n')
+      value += tracker.move(containerFlow(shallow, state, tracker.current()))
+    }
+    value += tracker.move('\n' + sequence)
+  }
+  exit3()
+  return value
+}
+function peekDirective() {
+  return ':'
+}
+function attributes(node, state) {
+  const quote = checkQuote(state)
+  const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
+  const attrs = node.attributes || {}
+  const values2 = []
+  let classesFull
+  let classes
+  let id
+  let key
+  for (key in attrs) {
+    if (own4.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
+      const value = String(attrs[key])
+      if (key === 'id') {
+        id = shortcut.test(value) ? '#' + value : quoted('id', value)
+      } else if (key === 'class') {
+        const list3 = value.split(/[\t\n\r ]+/g)
+        const classesFullList = []
+        const classesList = []
+        let index2 = -1
+        while (++index2 < list3.length) {
+          ;(shortcut.test(list3[index2]) ? classesList : classesFullList).push(
+            list3[index2]
+          )
+        }
+        classesFull =
+          classesFullList.length > 0
+            ? quoted('class', classesFullList.join(' '))
+            : ''
+        classes = classesList.length > 0 ? '.' + classesList.join('.') : ''
+      } else {
+        values2.push(quoted(key, value))
+      }
+    }
+  }
+  if (classesFull) {
+    values2.unshift(classesFull)
+  }
+  if (classes) {
+    values2.unshift(classes)
+  }
+  if (id) {
+    values2.unshift(id)
+  }
+  return values2.length > 0 ? '{' + values2.join(' ') + '}' : ''
+  function quoted(key2, value) {
+    return (
+      key2 +
+      (value
+        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
+        : '')
+    )
+  }
+}
+function inlineDirectiveLabel(node) {
+  return Boolean(
+    node && node.type === 'paragraph' && node.data && node.data.directiveLabel
+  )
+}
+function fence(node) {
+  let size = 0
+  if (node.type === 'containerDirective') {
+    visitParents2(node, function (node2, parents) {
+      if (node2.type === 'containerDirective') {
+        let index2 = parents.length
+        let nesting = 0
+        while (index2--) {
+          if (parents[index2].type === 'containerDirective') {
+            nesting++
+          }
+        }
+        if (nesting > size) size = nesting
+      }
+    })
+    size += 3
+  } else if (node.type === 'leafDirective') {
+    size = 2
+  } else {
+    size = 1
+  }
+  return ':'.repeat(size)
+}
+handleDirective.peek = peekDirective
 
 // ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
@@ -35183,7 +35188,7 @@ var toTinaMarkdown = (tree, field) => {
     }
   })
   return toMarkdown(tree, {
-    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
+    extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
     listItemIndent: 'one',
     bullet: '-',
     fences: true,
@@ -35238,15 +35243,14 @@ var blockElement = (content3, field, imageCallback) => {
         value: content3.value,
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes, useDirective } = stringifyProps(
-        content3,
-        field,
-        false,
-        imageCallback
-      )
+      const {
+        children,
+        attributes: attributes2,
+        useDirective,
+      } = stringifyProps(content3, field, false, imageCallback)
       if (useDirective) {
         return {
-          type: 'leafDirective',
+          type: 'containerDirective',
           name: content3.name,
           attributes: content3.props,
           children: content3.children,
@@ -35255,7 +35259,7 @@ var blockElement = (content3, field, imageCallback) => {
       return {
         type: 'mdxJsxFlowElement',
         name: content3.name,
-        attributes,
+        attributes: attributes2,
         children,
       }
     case 'blockquote':
@@ -36413,11 +36417,11 @@ var tokenizeLeaf = function (pattern) {
       return self2.previous === codes.dash ||
         self2.previous === codes.underscore
         ? nok(code2)
-        : attributes(code2)
+        : attributes2(code2)
     }
-    const attributes = function (code2) {
+    const attributes2 = function (code2) {
       if (markdownSpace(code2)) {
-        return factorySpace(effects, attributes, types.whitespace)(code2)
+        return factorySpace(effects, attributes2, types.whitespace)(code2)
       }
       if (
         code2 === codes.dash ||
@@ -38181,7 +38185,7 @@ var directiveContainer = (pattern) => {
         return afterAttributes(code2)
       }
       return effects.attempt(
-        attributes,
+        attributes2,
         afterAttributes,
         afterAttributes
       )(code2)
@@ -38406,7 +38410,7 @@ var directiveContainer = (pattern) => {
     return start3
   }
   const label = { tokenize: tokenizeLabel, partial: true }
-  const attributes = { tokenize: tokenizeAttributes, partial: true }
+  const attributes2 = { tokenize: tokenizeAttributes, partial: true }
   const nonLazyLine = { tokenize: tokenizeNonLazyLine, partial: true }
   return {
     tokenize: tokenizeDirectiveContainer,
