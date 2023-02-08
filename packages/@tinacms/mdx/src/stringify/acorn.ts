@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTypeInner, Template } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -34,13 +34,23 @@ export function stringifyProps(
   parentField: RichTypeInner,
   flatten: boolean,
   imageCallback: (url: string) => string
-): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] }
+): {
+  attributes: MdxJsxAttribute[]
+  children: Md.PhrasingContent[]
+  useDirective: boolean
+  directiveType: string
+}
 export function stringifyProps(
   element: Plate.MdxBlockElement,
   parentField: RichTypeInner,
   flatten: boolean,
   imageCallback: (url: string) => string
-): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] }
+): {
+  attributes: MdxJsxAttribute[]
+  children: Md.BlockContent[]
+  useDirective: boolean
+  directiveType: string
+}
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
   parentField: RichTypeInner,
@@ -49,10 +59,12 @@ export function stringifyProps(
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[] | Md.PhrasingContent[]
+  useDirective: boolean
+  directiveType: string
 } {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.Content[] = []
-  let template
+  let template: Template<false> | undefined | string
   let useDirective = false
   let directiveType = 'leaf'
   template = parentField.templates?.find((template) => {
@@ -75,7 +87,10 @@ export function stringifyProps(
   }
   useDirective = !!template.match
   Object.entries(element.props).forEach(([name, value]) => {
-    const field = template.fields.find((field) => field.name === name)
+    if (typeof template === 'string') {
+      throw new Error(`Unable to find template for JSX element ${name}`)
+    }
+    const field = template?.fields?.find((field) => field.name === name)
     if (!field) {
       if (name === 'children') {
         return

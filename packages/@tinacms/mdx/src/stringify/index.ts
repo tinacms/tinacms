@@ -27,8 +27,6 @@ import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
-import { stringifyShortcode } from './stringifyShortcode'
-// import { directiveToMarkdown } from '../extensions/directive/to-markdown'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 
 declare module 'mdast' {
@@ -187,13 +185,32 @@ export const blockElement = (
       const { children, attributes, useDirective, directiveType } =
         stringifyProps(content, field, false, imageCallback)
       if (useDirective) {
-        return {
-          type:
-            directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
-          name: content.name,
-          attributes,
-          children: children,
-          // children: c.children,
+        const name = content.name
+        if (!name) {
+          throw new Error(
+            `Expective shortcode to have a name but it was not defined`
+          )
+        }
+        const directiveAttributes: Record<string, string> = {}
+        attributes.forEach((att) => {
+          if (att.value && typeof att.value === 'string') {
+            directiveAttributes[att.name] = att.value
+          }
+        })
+        if (directiveType === 'leaf') {
+          return {
+            type: 'leafDirective',
+            name,
+            attributes: directiveAttributes,
+            children: [],
+          }
+        } else {
+          return {
+            type: 'containerDirective',
+            name,
+            attributes: directiveAttributes,
+            children: children,
+          }
         }
       }
       return {

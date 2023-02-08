@@ -22,16 +22,9 @@ import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
-import type * as Md from 'mdast'
 import type * as Plate from './plate'
-import { parseShortcode } from './parseShortcode'
-import { Config } from 'mdast-util-from-markdown/lib'
-import { Extension } from 'micromark-util-types'
-import { directive } from 'micromark-extension-directive'
-// import { directiveFromMarkdown } from 'mdast-util-directive'
-import { directiveFromMarkdown } from '../extensions/directive/from-markdown'
+import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
-import { tinaDirectiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { Pattern } from '../stringify'
 /**
  * ### Convert the MDXAST into an API-friendly format
@@ -107,7 +100,9 @@ export const markdownToAst = (
   const mdastExtensions = [directiveFromMarkdown]
   if (useMdx) {
     extensions.push(mdx())
-    mdastExtensions.push(mdxFromMarkdown())
+    mdxFromMarkdown().forEach((mdastExt) => {
+      mdastExtensions.push(mdastExt)
+    })
   }
   return fromMarkdown(value, {
     extensions,

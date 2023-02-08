@@ -34511,7 +34511,10 @@ function stringifyProps(element2, parentField, flatten2, imageCallback) {
   }
   useDirective = !!template.match
   Object.entries(element2.props).forEach(([name, value]) => {
-    const field = template.fields.find((field2) => field2.name === name)
+    if (typeof template === 'string') {
+      throw new Error(`Unable to find template for JSX element ${name}`)
+    }
+    const field = template?.fields?.find((field2) => field2.name === name)
     if (!field) {
       if (name === 'children') {
         return
@@ -34973,7 +34976,7 @@ var handleDirective = function (patterns) {
     if (!pattern) {
       console.log('no pattern found for directive', node.name)
       exit3()
-      return
+      return ''
     }
     const patternName = pattern.name || pattern.templateName
     const sequence = pattern.start
@@ -35014,6 +35017,7 @@ var handleDirective = function (patterns) {
     exit3()
     return value
   }
+  handleDirective2.peek = peekDirective
   return handleDirective2
 }
 function peekDirective() {
@@ -35022,16 +35026,8 @@ function peekDirective() {
 function attributes(node, state) {
   const quote = checkQuote(state)
   const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs = {}
-  node.attributes.forEach((att) => {
-    if (att.value && typeof att.value === 'string') {
-      attrs[att.name] = att.value
-    }
-  })
+  const attrs = node.attributes || {}
   const values2 = []
-  let classesFull
-  let classes
-  let id
   let key
   for (key in attrs) {
     if (own4.call(attrs, key) && attrs[key] !== void 0 && attrs[key] !== null) {
@@ -35054,7 +35050,6 @@ function inlineDirectiveLabel(node) {
     node && node.type === 'paragraph' && node.data && node.data.directiveLabel
   )
 }
-handleDirective.peek = peekDirective
 
 // ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
@@ -35151,12 +35146,32 @@ var blockElement = (content3, field, imageCallback) => {
         directiveType,
       } = stringifyProps(content3, field, false, imageCallback)
       if (useDirective) {
-        return {
-          type:
-            directiveType === 'leaf' ? 'leafDirective' : 'containerDirective',
-          name: content3.name,
-          attributes: attributes2,
-          children,
+        const name = content3.name
+        if (!name) {
+          throw new Error(
+            `Expective shortcode to have a name but it was not defined`
+          )
+        }
+        const directiveAttributes = {}
+        attributes2.forEach((att) => {
+          if (att.value && typeof att.value === 'string') {
+            directiveAttributes[att.name] = att.value
+          }
+        })
+        if (directiveType === 'leaf') {
+          return {
+            type: 'leafDirective',
+            name,
+            attributes: directiveAttributes,
+            children: [],
+          }
+        } else {
+          return {
+            type: 'containerDirective',
+            name,
+            attributes: directiveAttributes,
+            children,
+          }
         }
       }
       return {
@@ -35741,8 +35756,7 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// ../mdx/src/extensions/directive/from-markdown.ts
-var own5 = {}.hasOwnProperty
+// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
 var enterContainer = function (token) {
   enter.call(this, 'containerDirective', token)
 }
@@ -35797,9 +35811,12 @@ var exitAttributeClassValue = function (token) {
 var exitAttributeValue = function (token) {
   const list3 = this.getData('directiveAttributes')
   if (list3) {
-    list3[list3.length - 1][1] = parseEntities(this.sliceSerialize(token), {
-      attribute: true,
-    })
+    const item = list3[list3.length - 1]
+    if (item) {
+      item[1] = parseEntities(this.sliceSerialize(token), {
+        attribute: true,
+      })
+    }
   }
 }
 var exitAttributeName = function (token) {
@@ -35820,10 +35837,12 @@ function exitAttributes() {
   if (list3) {
     while (++index2 < list3.length) {
       const attribute = list3[index2]
-      if (attribute[0] === 'class' && cleaned.class) {
-        cleaned.class += ' ' + attribute[1]
-      } else {
-        cleaned[attribute[0]] = attribute[1]
+      if (attribute) {
+        if (attribute[0] === 'class' && cleaned.class) {
+          cleaned.class += ' ' + attribute[1]
+        } else {
+          cleaned[attribute[0]] = attribute[1]
+        }
       }
     }
   }
@@ -38193,7 +38212,9 @@ var markdownToAst = (value, field, useMdx = true) => {
   const mdastExtensions = [directiveFromMarkdown]
   if (useMdx) {
     extensions.push(mdx())
-    mdastExtensions.push(mdxFromMarkdown())
+    mdxFromMarkdown().forEach((mdastExt) => {
+      mdastExtensions.push(mdastExt)
+    })
   }
   return fromMarkdown(value, {
     extensions,

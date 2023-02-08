@@ -9,20 +9,15 @@ import type {
   Options as ToMarkdownExtension,
 } from 'mdast-util-to-markdown'
 import { stringifyEntitiesLight } from 'stringify-entities'
-import { visitParents } from 'unist-util-visit-parents'
 import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow'
 import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing'
 import { checkQuote } from 'mdast-util-to-markdown/lib/util/check-quote'
 import { track } from 'mdast-util-to-markdown/lib/util/track'
 import { Pattern } from '../../stringify'
 import { ConstructName } from 'mdast-util-directive/lib'
-import { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import { MdxJsxExpressionAttribute } from 'mdast-util-mdx'
-import { State } from 'micromark-util-types'
+import { Context as State } from 'mdast-util-to-markdown'
 
 const own = {}.hasOwnProperty
-
-const shortcut = /^[^\t\n\r "#'.<=>`}]+$/
 
 export const directiveToMarkdown: (
   patterns: Pattern[]
@@ -68,7 +63,7 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
     if (!pattern) {
       console.log('no pattern found for directive', node.name)
       exit()
-      return
+      return ''
     }
     const patternName = pattern.name || pattern.templateName
 
@@ -124,6 +119,10 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
     exit()
     return value
   }
+
+  // @ts-ignore Property does not exist on type Handle
+  // Not sure what this does!
+  handleDirective.peek = peekDirective
   return handleDirective
 }
 
@@ -140,24 +139,9 @@ function peekDirective() {
 function attributes(node: Directive, state: State): string {
   const quote = checkQuote(state)
   const subset = node.type === 'textDirective' ? [quote] : [quote, '\n', '\r']
-  const attrs: Record<string, string> = {}
-  // These are actually "mdxJsxAttribute" until we support directives properly
-  node.attributes.forEach((att: MdxJsxAttribute) => {
-    if (att.value && typeof att.value === 'string') {
-      attrs[att.name] = att.value
-    }
-  })
-  // const attrs = node.attributes || {}
-  /** @type {Array<string>} */
-  const values = []
-  /** @type {string | undefined} */
-  let classesFull
-  /** @type {string | undefined} */
-  let classes
-  /** @type {string | undefined} */
-  let id
-  /** @type {string} */
-  let key
+  const attrs = node.attributes || {}
+  const values: string[] = []
+  let key: string
 
   for (key in attrs) {
     if (
@@ -197,5 +181,3 @@ function inlineDirectiveLabel(node: BlockContent | DefinitionContent) {
     node && node.type === 'paragraph' && node.data && node.data.directiveLabel
   )
 }
-
-handleDirective.peek = peekDirective
