@@ -131,7 +131,7 @@ function stripMediaRoot(mediaRoot: string, key: string) {
     return key
   }
   const mediaRootParts = mediaRoot.split('/')
-  if (mediaRootParts.length === 0 || !mediaRootParts[0]) {
+  if (!mediaRootParts || !mediaRootParts[0]) {
     return key
   }
   const keyParts = key.split('/')
@@ -158,7 +158,7 @@ async function listMedia(
       limit = 500,
       offset,
     } = req.query as MediaListOptions
-
+    console.log(mediaRoot)
     let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
     if (prefix) prefix = prefix + '/'
 
@@ -169,15 +169,15 @@ async function listMedia(
       Marker: offset?.toString(),
       MaxKeys: directory && !offset ? +limit + 1 : +limit,
     }
+    console.log({ params })
 
-    const command = new ListObjectsCommand(params)
-
-    const response = await client.send(command)
+    const response = await client.send(new ListObjectsCommand(params))
 
     const items = []
 
     response.CommonPrefixes?.forEach(({ Prefix }) => {
       const strippedPrefix = stripMediaRoot(mediaRoot, Prefix)
+      console.log({ Prefix, strippedPrefix })
       items.push({
         id: Prefix,
         type: 'dir',
@@ -186,11 +186,19 @@ async function listMedia(
       })
     })
 
+    if (response.CommonPrefixes) {
+      console.log({ responseCommonPrefixes: response.CommonPrefixes })
+    }
+    if (response.Contents) {
+      console.log({ responseContents: response.Contents })
+    }
+
     items.push(
       ...(response.Contents || [])
         .filter((file) => file.Key !== prefix)
         .map(getDOSToTinaFunc(cdnUrl, mediaRoot))
     )
+    console.log({ items })
 
     res.json({
       items,
@@ -244,6 +252,7 @@ async function deleteAsset(
 function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
   return function dosToTina(file: _Object): Media {
     const strippedKey = stripMediaRoot(mediaRoot, file.Key)
+    console.log({ Key: file.Key, strippedKey })
     const filename = path.basename(strippedKey)
     const directory = path.dirname(strippedKey) + '/'
 
