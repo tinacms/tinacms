@@ -116,6 +116,7 @@ export default createMediaHandler({
     region: 'us-east-1',
   },
   bucket: process.env.NEXT_PUBLIC_SPACE_NAME || '',
+  mediaRoot: 'images',
   authorized: async (req, _res) => {
     if (process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT === "1") {
       return true;
