@@ -40,7 +40,10 @@ export const mediaHandlerConfig = {
 export const createMediaHandler = (config: DOSConfig, options?: DOSOptions) => {
   const client = new S3Client(config.config)
   const bucket = config.bucket
-  const mediaRoot = config.mediaRoot || ''
+  let mediaRoot = config.mediaRoot || ''
+  if (mediaRoot && !mediaRoot.endsWith('/')) {
+    mediaRoot = mediaRoot + '/'
+  }
   let cdnUrl =
     options?.cdnUrl ||
     config.config.endpoint
@@ -158,7 +161,6 @@ async function listMedia(
       limit = 500,
       offset,
     } = req.query as MediaListOptions
-    console.log(mediaRoot)
     let prefix = directory.replace(/^\//, '').replace(/\/$/, '')
     if (prefix) prefix = prefix + '/'
 
@@ -169,15 +171,15 @@ async function listMedia(
       Marker: offset?.toString(),
       MaxKeys: directory && !offset ? +limit + 1 : +limit,
     }
-    console.log({ params })
 
     const response = await client.send(new ListObjectsCommand(params))
-
     const items = []
 
     response.CommonPrefixes?.forEach(({ Prefix }) => {
       const strippedPrefix = stripMediaRoot(mediaRoot, Prefix)
-      console.log({ Prefix, strippedPrefix })
+      if (!strippedPrefix) {
+        return
+      }
       items.push({
         id: Prefix,
         type: 'dir',
@@ -186,19 +188,11 @@ async function listMedia(
       })
     })
 
-    if (response.CommonPrefixes) {
-      console.log({ responseCommonPrefixes: response.CommonPrefixes })
-    }
-    if (response.Contents) {
-      console.log({ responseContents: response.Contents })
-    }
-
     items.push(
       ...(response.Contents || [])
         .filter((file) => file.Key !== prefix)
         .map(getDOSToTinaFunc(cdnUrl, mediaRoot))
     )
-    console.log({ items })
 
     res.json({
       items,
@@ -236,11 +230,10 @@ async function deleteAsset(
 
   const params: DeleteObjectCommandInput = {
     Bucket: bucket,
-    Key: path.join(mediaRoot, objectKey),
+    Key: objectKey,
   }
-  const command = new DeleteObjectCommand(params)
   try {
-    const data = await client.send(command)
+    const data = await client.send(new DeleteObjectCommand(params))
     res.json(data)
   } catch (err) {
     res.status(500).json({
@@ -252,7 +245,6 @@ async function deleteAsset(
 function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
   return function dosToTina(file: _Object): Media {
     const strippedKey = stripMediaRoot(mediaRoot, file.Key)
-    console.log({ Key: file.Key, strippedKey })
     const filename = path.basename(strippedKey)
     const directory = path.dirname(strippedKey) + '/'
 
