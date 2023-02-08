@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BiGitBranch, BiLinkExternal } from 'react-icons/bi'
+import { BiChevronDown, BiGitBranch, BiLinkExternal } from 'react-icons/bi'
 import { FaSpinner } from 'react-icons/fa'
 import { BranchSwitcher, useBranchData } from '../../../plugins/branch-switcher'
 import { useCMS } from '../../../react-tinacms'
@@ -53,11 +53,11 @@ export const BranchBanner = () => {
     <>
       {' '}
       <div className="flex-grow-0 flex justify-between w-full text-xs items-center py-2 px-4 text-gray-500 bg-gradient-to-r from-white to-gray-50 border-b border-gray-150 gap-2">
-        <span className="flex items-center justify-start gap-1 flex-1">
+        <span className="flex items-center justify-start gap-2 flex-1">
           <BiGitBranch className="w-5 h-auto text-blue-500/70" /> Branch
-          <BranchSelector openModal={openModal} />
+          <BranchButton openModal={openModal} />
         </span>
-        <Button
+        {/* <Button
           className="group text-[12px] h-7 px-3 flex-shrink-0 gap-2"
           size="custom"
           variant="white"
@@ -76,7 +76,7 @@ export const BranchBanner = () => {
               Preview
             </>
           )}
-        </Button>
+        </Button> */}
       </div>
       {open && (
         <BranchModal
@@ -93,72 +93,18 @@ interface SubmitModalProps {
   close(): void
 }
 
-const BranchSelector = ({ openModal }) => {
-  const selectRef = React.useRef<HTMLSelectElement>(null)
-  const [listState, setListState] = React.useState('loading')
-  const [branchList, setBranchList] = React.useState([])
-  const cms = useCMS()
-  const { branch } = useCMS().api.tina || 'main'
-  const { setCurrentBranch } = useBranchData()
-
-  const refreshBranchList = React.useCallback(async () => {
-    setListState('loading')
-    // @ts-ignore
-    await cms.api.tina
-      .listBranches()
-      .then((data) => {
-        setBranchList(data)
-        setListState('ready')
-      })
-      .catch(() => setListState('error'))
-  }, [cms])
-
-  React.useEffect(() => {
-    if (!cms) return
-    refreshBranchList()
-  }, [cms])
-
-  const changeBranch = (event) => {
-    if (event.target.value === 'create-new-branch') {
-      openModal()
-    } else {
-      setCurrentBranch(event.target.value)
-      cms.alerts.success('Switched to branch ' + event.target.value + '.')
-      selectRef.current.blur()
-    }
-  }
-
-  if (listState === 'loading') {
-    return (
-      <span className="flex items-center gap-1 form-select h-7 px-2 ml-1 border border-gray-200 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize">
-        <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 mr-1 animate-spin" />{' '}
-        Loading...
-      </span>
-    )
-  }
-
+const BranchButton = ({ openModal }) => {
   return (
-    <select
-      className="inline-block form-select h-7 pl-1 pr-3 ml-1 border border-gray-200 bg-white text-gray-700 rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize"
-      onChange={changeBranch}
-      ref={selectRef}
+    <button
+      className="flex gap-1.5 items-center form-select h-7 px-2.5 border border-gray-200 bg-white text-gray-700 hover:text-blue-500 transition-color duration-150 ease-out rounded-md shadow-sm focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out text-[12px] leading-tight capitalize"
+      onClick={openModal}
     >
-      {branchList.length > 0 &&
-        branchList.map((branchOption) => {
-          return (
-            <option
-              key={branchOption.name}
-              value={branchOption.name}
-              selected={branchOption.name === branch}
-            >
-              {branchOption.name}
-            </option>
-          )
-        })}
-      <option key={'create-new-branch'} value="create-new-branch">
-        Create New Branch
-      </option>
-    </select>
+      main
+      <BiChevronDown
+        className="-mr-1 -ml-1 h-4 w-4 opacity-70"
+        aria-hidden="true"
+      />
+    </button>
   )
 }
 
@@ -169,7 +115,7 @@ const BranchModal = ({ close }: SubmitModalProps) => {
   return (
     <Modal>
       <PopupModal>
-        <ModalHeader close={close}>Choose Workspace</ModalHeader>
+        <ModalHeader close={close}>Select Branch</ModalHeader>
         <ModalBody padded={false}>
           <BranchSwitcher
             listBranches={tinaApi.listBranches.bind(tinaApi)}

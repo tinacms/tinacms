@@ -24,6 +24,7 @@ import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
 import { CloudConfigPlugin } from '../../react-cloud-config'
+import { BranchBanner } from './BranchBanner'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -421,6 +422,7 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
       {!isLocalMode && <BillingWarning />}
+      <BranchBanner />
 
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
