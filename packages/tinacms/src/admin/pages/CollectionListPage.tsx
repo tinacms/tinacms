@@ -608,7 +608,7 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
-                        {totalCount > 0 && (
+                        {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
@@ -761,6 +761,8 @@ const CollectionListPage = () => {
                               })}
                             </tbody>
                           </table>
+                        ) : (
+                          <NoDocumentsPlaceholder />
                         )}
                         <div className="pt-4">
                           <CursorPaginator
@@ -802,6 +804,16 @@ interface ResetModalProps {
   close(): void
   deleteFunc(): void
   filename: string
+}
+
+const NoDocumentsPlaceholder = () => {
+  return (
+    <div className="text-center px-5 py-3 flex flex-col items-center justify-center shadow border border-gray-100 bg-gray-50 border-b border-gray-200 w-full max-w-full rounded-lg">
+      <p className="text-base italic font-medium text-gray-300">
+        No documents found.
+      </p>
+    </div>
+  )
 }
 
 const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {
