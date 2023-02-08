@@ -34972,18 +34972,14 @@ var handleDirective = function (patterns) {
       (p) => p.name === node.name || p.templateName === node.name
     )
     if (!pattern) {
+      console.log('no pattern found for directive', node.name)
       exit3()
       return
     }
+    const patternName = pattern.name || pattern.templateName
     const sequence = pattern.start
-    let value = tracker.move(sequence + ' ' + (node.name || ''))
+    let value = tracker.move(sequence + ' ' + patternName)
     let label
-    if (node.type === 'containerDirective') {
-      const head = (node.children || [])[0]
-      label = inlineDirectiveLabel(head) ? head : void 0
-    } else {
-      label = node
-    }
     if (label && label.children && label.children.length > 0) {
       const exit4 = state.enter('label')
       const labelType = `${node.type}Label`
@@ -35014,7 +35010,7 @@ var handleDirective = function (patterns) {
         value += tracker.move(containerFlow(shallow, state, tracker.current()))
       }
       value += tracker.move('\n' + sequence)
-      value += tracker.move(' \\' + node.name + ' ' + pattern.end)
+      value += tracker.move(' \\' + patternName + ' ' + pattern.end)
     }
     exit3()
     return value
@@ -35396,7 +35392,7 @@ var containerDirectiveElement = (node, field, imageCallback, raw) => {
   }
   return {
     type: 'mdxJsxFlowElement',
-    name: node.name,
+    name: template.name,
     props: node.attributes,
     children: node.children,
   }
@@ -38208,6 +38204,8 @@ var markdownToAst = (value, field, useMdx = true) => {
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
+    } else {
+      console.log('falling back to non-MDX parser')
     }
     let tree
     try {
@@ -38233,7 +38231,7 @@ var MDX_PARSE_ERROR_MSG =
 var parseMDX = (value, field, imageCallback) => {
   let tree
   try {
-    tree = markdownToAst(value, field, false)
+    tree = markdownToAst(value, field)
     if (tree) {
       return remarkToSlate(tree, field, imageCallback, value)
     } else {
@@ -38241,7 +38239,6 @@ var parseMDX = (value, field, imageCallback) => {
     }
   } catch (e) {
     try {
-      throw 'NO'
       tree = markdownToAst(value, field, false)
       if (tree) {
         return remarkToSlate(tree, field, imageCallback, value)

@@ -104,14 +104,13 @@ export const markdownToAst = (
         })
       }
     })
-    // const extensions = [directive(), tinaDirective(patterns)]
     const extensions = [tinaDirective(patterns)]
-    // const mdastExtensions = [directiveFromMarkdown, tinaDirectiveFromMarkdown]
-    // const mdastExtensions = [tinaDirectiveFromMarkdown]
     const mdastExtensions = [directiveFromMarkdown]
     if (useMdx) {
       extensions.push(mdx())
       mdastExtensions.push(mdxFromMarkdown())
+    } else {
+      console.log('falling back to non-MDX parser')
     }
     let tree
     try {
@@ -146,7 +145,7 @@ export const parseMDX = (
 ): Plate.RootElement => {
   let tree
   try {
-    tree = markdownToAst(value, field, false)
+    tree = markdownToAst(value, field)
     if (tree) {
       return remarkToSlate(tree, field, imageCallback, value)
     } else {
@@ -154,7 +153,6 @@ export const parseMDX = (
     }
   } catch (e: any) {
     try {
-      throw 'NO'
       tree = markdownToAst(value, field, false)
       if (tree) {
         return remarkToSlate(tree, field, imageCallback, value)

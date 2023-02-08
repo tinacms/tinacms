@@ -59,20 +59,22 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
       (p) => p.name === node.name || p.templateName === node.name
     )
     if (!pattern) {
+      console.log('no pattern found for directive', node.name)
       exit()
       return
     }
+    const patternName = pattern.name || pattern.templateName
 
     const sequence = pattern.start
-    let value = tracker.move(sequence + ' ' + (node.name || ''))
+    let value = tracker.move(sequence + ' ' + patternName)
     let label: Paragraph | LeafDirective | TextDirective | undefined
 
-    if (node.type === 'containerDirective') {
-      const head = (node.children || [])[0]
-      label = inlineDirectiveLabel(head) ? head : undefined
-    } else {
-      label = node
-    }
+    // if (node.type === 'containerDirective') {
+    //   const head = (node.children || [])[0]
+    //   label = inlineDirectiveLabel(head) ? head : undefined
+    // } else {
+    //   label = node
+    // }
 
     if (label && label.children && label.children.length > 0) {
       const exit = state.enter('label')
@@ -109,7 +111,7 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
       }
 
       value += tracker.move('\n' + sequence)
-      value += tracker.move(' \\' + node.name + ' ' + pattern.end)
+      value += tracker.move(' \\' + patternName + ' ' + pattern.end)
     }
 
     exit()
@@ -213,38 +215,6 @@ function inlineDirectiveLabel(node: BlockContent | DefinitionContent) {
   return Boolean(
     node && node.type === 'paragraph' && node.data && node.data.directiveLabel
   )
-}
-
-/**
- * @param {Directive} node
- * @returns {string}
- */
-function fence(node: Directive): string {
-  let size = 0
-
-  if (node.type === 'containerDirective') {
-    visitParents(node, function (node, parents) {
-      if (node.type === 'containerDirective') {
-        let index = parents.length
-        let nesting = 0
-
-        while (index--) {
-          if (parents[index].type === 'containerDirective') {
-            nesting++
-          }
-        }
-
-        if (nesting > size) size = nesting
-      }
-    })
-    size += 3
-  } else if (node.type === 'leafDirective') {
-    size = 2
-  } else {
-    size = 1
-  }
-
-  return ':'.repeat(size)
 }
 
 handleDirective.peek = peekDirective

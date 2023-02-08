@@ -124,7 +124,8 @@ export const containerDirectiveElement = (
   }
   return {
     type: 'mdxJsxFlowElement',
-    name: node.name,
+    // name: template.match?.name || node.name,
+    name: template.name,
     props: node.attributes,
     children: node.children,
   }
