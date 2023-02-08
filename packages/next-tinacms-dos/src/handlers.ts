@@ -130,14 +130,14 @@ function stripMediaRoot(mediaRoot: string, key: string) {
   if (!mediaRoot) {
     return key
   }
-  const mediaRootParts = mediaRoot.split('/')
+  const mediaRootParts = mediaRoot.split('/').filter((part) => part)
   if (!mediaRootParts || !mediaRootParts[0]) {
     return key
   }
-  const keyParts = key.split('/')
+  const keyParts = key.split('/').filter((part) => part)
   // remove each part of the key that matches the mediaRoot parts
   for (let i = 0; i < mediaRootParts.length; i++) {
-    if (keyParts[i] === mediaRootParts[i]) {
+    if (keyParts[0] === mediaRootParts[i]) {
       keyParts.shift()
     }
   }
