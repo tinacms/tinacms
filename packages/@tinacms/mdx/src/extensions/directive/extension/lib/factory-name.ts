@@ -7,6 +7,7 @@
 import type { TokenizeContext, Effects, State } from 'micromark-util-types'
 import { asciiAlpha, asciiAlphanumeric } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes'
+import { findCode, printCode } from '../../../tina-shortcodes/shortcode-leaf'
 
 /**
  * @this {TokenizeContext}
@@ -20,12 +21,16 @@ export function factoryName(
   effects: Effects,
   ok: State,
   nok: State,
-  type: string
+  type: string,
+  patternName: string
 ) {
   const self = this
+  let nameIndex = 0
 
   const start: State = function (code) {
-    if (asciiAlpha(code)) {
+    const character = patternName[nameIndex]
+    if (asciiAlpha(code) && findCode(character) === code) {
+      nameIndex++
       effects.enter(type)
       effects.consume(code)
       return name
@@ -35,13 +40,18 @@ export function factoryName(
   }
 
   const name: State = function (code) {
+    const character = patternName[nameIndex]
     if (
       code === codes.dash ||
       code === codes.underscore ||
       asciiAlphanumeric(code)
     ) {
-      effects.consume(code)
-      return name
+      if (findCode(character) === code) {
+        effects.consume(code)
+        nameIndex++
+        return name
+      }
+      return nok(code)
     }
 
     effects.exit(type)

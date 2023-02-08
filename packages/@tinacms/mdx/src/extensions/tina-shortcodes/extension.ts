@@ -12,16 +12,16 @@ export const tinaDirective: (patterns: Pattern[]) => Extension = function (
     if (firstKey) {
       const code = findCode(firstKey)
       if (code) {
-        if (pattern.type === 'block') {
-          const directive = directiveContainer(pattern)
+        if (pattern.type === 'leaf') {
+          const directive = directiveLeaf(pattern)
           if (rules[code]) {
             rules[code] = [...(rules[code] || []), directive]
           } else {
             rules[code] = [directive]
           }
         }
-        if (pattern.type === 'leaf') {
-          const directive = directiveLeaf(pattern)
+        if (pattern.type === 'block') {
+          const directive = directiveContainer(pattern)
           if (rules[code]) {
             rules[code] = [...(rules[code] || []), directive]
           } else {

@@ -28,7 +28,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       tail && tail[1].type === types.linePrefix
         ? tail[2].sliceSerialize(tail[1], true).length
         : 0
-    let sizeOpen = 0
     let previous: Token
     let startSequenceIndex = 1
     let closeStartSequenceIndex = 0
@@ -37,14 +36,10 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     let closeEndSequenceIndex = 0
 
     const ok: State = function (code) {
-      // logSelf()
-      // printCode(code)
       return ook(code)
     }
     const nok: State = function (code) {
-      // console.log('nok')
       // console.trace()
-      // printCode(code)
       return nnok(code)
     }
 
@@ -84,7 +79,8 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
         effects,
         afterName,
         nok,
-        'directiveContainerName'
+        'directiveContainerName',
+        pattern.name || pattern.templateName
       )(code)
     }
 
@@ -108,6 +104,9 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
 
     const afterAttributes: State = function (code) {
       const nextCharacter = pattern.end[endSequenceIndex]
+      if (code === codes.eof) {
+        return nok
+      }
       if (findCode(nextCharacter) === code) {
         effects.consume(code)
         endSequenceIndex++
@@ -128,7 +127,8 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
 
       if (markdownLineEnding(code)) {
         if (self.interrupt) {
-          return ok(code)
+          // return ok(code)
+          return nok(code)
         }
 
         return effects.attempt(nonLazyLine, contentStart, afterOpening)(code)
@@ -138,14 +138,13 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     }
 
     const afterOpening: State = function (code) {
-      effects.exit('directiveContainer')
-      return ok(code)
+      // effects.exit('directiveContainer')
+      return nok(code)
     }
 
     const contentStart: State = function (code) {
       if (code === codes.eof) {
-        effects.exit('directiveContainer')
-        return ok(code)
+        return nok(code)
       }
 
       effects.enter('directiveContainerContent')
@@ -153,8 +152,10 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     }
 
     const lineStart: State = function (code) {
+      // If we arrive at the end of the file without finding a
+      // closing sequence, don't make it a shortcode
       if (code === codes.eof) {
-        return after(code)
+        return nok(code)
       }
 
       return effects.attempt(
@@ -168,7 +169,7 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
 
     const chunkStart: State = function (code) {
       if (code === codes.eof) {
-        return after(code)
+        return nok(code)
       }
 
       const token = effects.enter(types.chunkDocument, {
@@ -184,7 +185,8 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       if (code === codes.eof) {
         const t = effects.exit(types.chunkDocument)
         self.parser.lazy[t.start.line] = false
-        return after(code)
+        // return after(code)
+        return nok(code)
       }
 
       if (markdownLineEnding(code)) {
@@ -215,8 +217,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
     }
 
     const tokenizeClosingFence: Tokenizer = function (effects, ok, nok) {
-      let size = 0
-
       const closingPrefixAfter: State = function (code) {
         effects.enter('directiveContainerFence')
         effects.enter('directiveContainerSequence')
@@ -232,7 +232,6 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
         }
 
         if (closeStartSequenceIndex < pattern.end.length - 1) {
-          closeStartSequenceIndex = 0
           return nok(code)
         }
         effects.exit('directiveContainerSequence')
