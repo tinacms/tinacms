@@ -9,6 +9,7 @@ export interface Branch {
 
 export interface BranchSwitcherProps {
   listBranches: () => Promise<Branch[]>
+  chooseBranch: (_branch: string) => void
   createBranch: ({
     baseBranch,
     branchName,

@@ -1,28 +1,89 @@
-/**
-
-*/
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
 import { BaseTextField } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
-import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
+import { BiGitBranch, BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
-import { useCMS } from '../../packages/react-core'
 import { AiFillWarning } from 'react-icons/ai'
+import { FaSpinner } from 'react-icons/fa'
+import { useCMS } from '../../packages/react-core'
 
 type ListState = 'loading' | 'ready' | 'error'
+
+export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
+  const [isCreating, setIsCreating] = React.useState(false)
+  const { currentBranch } = useBranchData()
+
+  const handleCreateBranch = React.useCallback((value) => {
+    setIsCreating(true)
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      chooseBranch(createdBranchName)
+      callback(createdBranchName)
+    })
+  }, [])
+
+  return (
+    <div className="w-full flex flex-col items-stretch w-full gap-4">
+      <BaseTextField
+        placeholder="Name"
+        value={newBranchName}
+        disabled={isCreating}
+        onChange={(e) => setNewBranchName(e.target.value)}
+      />
+      <BaseTextField
+        placeholder="Branch Name"
+        value={branchName}
+        disabled={true}
+        readOnly
+      />
+      <Button
+        className="flex-grow flex items-center gap-2 whitespace-nowrap"
+        size="medium"
+        variant="primary"
+        disabled={isCreating}
+        onClick={() => handleCreateBranch(branchName)}
+      >
+        {isCreating ? (
+          <>
+            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
+            Branch
+          </>
+        ) : (
+          <>
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
 
 export const BranchSwitcher = ({
   listBranches,
   createBranch,
+  chooseBranch,
 }: BranchSwitcherProps) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
-  const { currentBranch, setCurrentBranch } = useBranchData()
+  const { currentBranch } = useBranchData()
+  const initialBranch = React.useMemo(() => currentBranch, [])
+  // when modal closes, refresh page is currentBranch has changed
+  React.useEffect(() => {
+    return () => {
+      if (initialBranch != currentBranch) {
+        window.location.reload()
+      }
+    }
+  }, [currentBranch])
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -30,7 +91,7 @@ export const BranchSwitcher = ({
       branchName: value,
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      setCurrentBranch(createdBranchName)
+      chooseBranch(createdBranchName)
       await refreshBranchList()
     })
   }, [])
@@ -93,7 +154,7 @@ export const BranchSwitcher = ({
                   handleCreateBranch(newBranch)
                 }}
                 onChange={(branchName) => {
-                  setCurrentBranch(branchName)
+                  chooseBranch(branchName)
                 }}
               />
             ) : (
@@ -122,8 +183,17 @@ const BranchSelector = ({
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
   const filteredBranchList = branchList.filter(
-    (branch) => !filter || branch.name.includes(filter)
+    (branch) =>
+      !filter || branch.name.includes(filter) || branch.name === currentBranch
   )
+  const currentBranchItem = branchList.find(
+    (branch) => branch.name === currentBranch
+  )
+  const currentIndex = filteredBranchList.findIndex(
+    (branch) => branch.name === currentBranch
+  )
+  filteredBranchList.splice(currentIndex, 1)
+  filteredBranchList.unshift(currentBranchItem)
 
   return (
     <div className="flex flex-col gap-3">
@@ -157,7 +227,7 @@ const BranchSelector = ({
             const isCurrentBranch = branch.name === currentBranch
             return (
               <div
-                className={`cursor-pointer relative text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
+                className={`cursor-pointer relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
                   isCurrentBranch
                     ? 'bg-blue-50 text-blue-800 pointer-events-none'
                     : ''
@@ -165,6 +235,9 @@ const BranchSelector = ({
                 key={branch}
                 onClick={() => onChange(branch.name)}
               >
+                {isCurrentBranch && (
+                  <BiGitBranch className="w-5 h-auto text-blue-500/70" />
+                )}
                 {branch.name}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>
