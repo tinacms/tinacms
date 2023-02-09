@@ -174,8 +174,17 @@ const BranchSelector = ({
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
   const filteredBranchList = branchList.filter(
-    (branch) => !filter || branch.name.includes(filter)
+    (branch) =>
+      !filter || branch.name.includes(filter) || branch.name === currentBranch
   )
+  const currentBranchItem = branchList.find(
+    (branch) => branch.name === currentBranch
+  )
+  const currentIndex = filteredBranchList.findIndex(
+    (branch) => branch.name === currentBranch
+  )
+  filteredBranchList.splice(currentIndex, 1)
+  filteredBranchList.unshift(currentBranchItem)
 
   return (
     <div className="flex flex-col gap-3">
