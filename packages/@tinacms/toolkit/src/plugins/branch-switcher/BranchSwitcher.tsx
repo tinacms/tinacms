@@ -4,7 +4,7 @@ import { useBranchData } from './BranchData'
 import { BaseTextField } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
-import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
+import { BiGitBranch, BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
@@ -218,7 +218,7 @@ const BranchSelector = ({
             const isCurrentBranch = branch.name === currentBranch
             return (
               <div
-                className={`cursor-pointer relative text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
+                className={`cursor-pointer relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
                   isCurrentBranch
                     ? 'bg-blue-50 text-blue-800 pointer-events-none'
                     : ''
@@ -226,6 +226,9 @@ const BranchSelector = ({
                 key={branch}
                 onClick={() => onChange(branch.name)}
               >
+                {isCurrentBranch && (
+                  <BiGitBranch className="w-5 h-auto text-blue-500/70" />
+                )}
                 {branch.name}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>

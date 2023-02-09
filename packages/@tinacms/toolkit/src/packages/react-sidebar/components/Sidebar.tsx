@@ -110,6 +110,17 @@ const Sidebar = ({
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
 
+  const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
+    cms.flags.get('branch-switcher')
+  )
+  React.useEffect(() => {
+    cms.events.subscribe('flag:set', ({ key, value }) => {
+      if (key === 'branch-switcher') {
+        setBranchingEnabled(value)
+      }
+    })
+  }, [cms.events])
+
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config')
 
@@ -286,6 +297,7 @@ const Sidebar = ({
               displayNav={displayNav}
               renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
+              branchingEnabled={branchingEnabled}
             />
             <FormsView>
               <sidebar.placeholder />
@@ -412,7 +424,12 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
+const SidebarHeader = ({
+  branchingEnabled,
+  renderNav,
+  displayNav,
+  isLocalMode,
+}) => {
   const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
     React.useContext(SidebarContext)
 
@@ -421,12 +438,8 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
-      {!isLocalMode && (
-        <>
-          <BillingWarning />
-          <BranchBanner />
-        </>
-      )}
+      {!isLocalMode && <BillingWarning />}
+      {branchingEnabled && !isLocalMode && <BranchBanner />}
 
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
