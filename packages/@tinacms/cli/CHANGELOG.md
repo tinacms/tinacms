@@ -1,5 +1,37 @@
 # tinacms-cli
 
+## 1.1.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+- Updated dependencies [50f86caed]
+  - @tinacms/app@1.0.7
+  - @tinacms/datalayer@1.1.0
+  - @tinacms/graphql@1.2.0
+  - @tinacms/metrics@1.0.2
+  - @tinacms/schema-tools@1.3.0
+
+## 1.0.9
+
+### Patch Changes
+
+- Updated dependencies [61f8c0e50]
+  - @tinacms/app@1.0.6
+
+## 1.0.8
+
+### Patch Changes
+
+- 55f7953eb: Small cli styling change on public assets in init
+  - @tinacms/app@1.0.5
+
 ## 1.0.7
 
 ### Patch Changes

@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 import path from 'path'
 import { format } from 'prettier'
@@ -192,8 +183,13 @@ const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
   const option = await prompts({
     name: 'selection',
     type: 'text',
-    message: `Where are public assets stored? (default: "${suggestion}")
-Not sure what value to use? Refer to our "Frameworks" doc: https://tina.io/docs/integration/frameworks/`,
+    message:
+      `Where are public assets stored? (default: "${suggestion}")\n` +
+      logText(
+        `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
+          'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
+        )}`
+      ),
   })
   return option['selection'] || suggestion
 }

@@ -1,18 +1,16 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit, BiPlus, BiTrash, BiRename } from 'react-icons/bi'
+import {
+  BiEdit,
+  BiPlus,
+  BiTrash,
+  BiRename,
+  BiSearch,
+  BiX,
+} from 'react-icons/bi'
 import {
   useParams,
   Link,
@@ -32,6 +30,10 @@ import {
   OverflowMenu,
   Select,
   BaseTextField,
+  Input,
+  ReactDateTimeWithStyles,
+  Toggle,
+  textFieldClasses,
 } from '@tinacms/toolkit'
 import type { Collection, Template, DocumentSys } from '../types'
 import GetCMS from '../components/GetCMS'
@@ -146,6 +148,12 @@ const CollectionListPage = () => {
     collection: collectionName,
     relativePath: '',
     newRelativePath: '',
+    filterField: '',
+    startsWith: '',
+    endsWith: '',
+    before: '',
+    after: '',
+    booleanEquals: null,
   })
   const [endCursor, setEndCursor] = useState('')
   const [prevCursors, setPrevCursors] = useState([])
@@ -175,6 +183,22 @@ const CollectionListPage = () => {
     setPrevCursors([])
   }, [loc])
 
+  useEffect(() => {
+    // reset filter when the route is changed
+    setVars((old) => ({
+      ...old,
+      collection: collectionName,
+      relativePath: '',
+      newRelativePath: '',
+      filterField: '',
+      startsWith: '',
+      endsWith: '',
+      before: '',
+      after: '',
+      booleanEquals: null,
+    }))
+  }, [collectionName])
+
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
@@ -185,6 +209,23 @@ const CollectionListPage = () => {
             includeDocuments
             startCursor={endCursor}
             sortKey={sortKey}
+            filterArgs={
+              // only pass filter args if the collection is the same as the current route
+              // We need this hear because this runs before the useEffect above
+              collectionName === vars.collection
+                ? vars
+                : {
+                    collection: collectionName,
+                    relativePath: '',
+                    newRelativePath: '',
+                    filterField: '',
+                    startsWith: '',
+                    endsWith: '',
+                    before: '',
+                    after: '',
+                    booleanEquals: null,
+                  }
+            }
           >
             {(
               collection: Collection,
@@ -200,6 +241,27 @@ const CollectionListPage = () => {
                 // only allow sortable fields
                 ['string', 'number', 'datetime', 'boolean'].includes(x.type)
               )
+
+              const filterFields = collectionExtra.fields?.filter((x) => {
+                // only allow fileable fields. Currently only string, datetime, and boolean of non-list type
+                return (
+                  ['string', 'datetime', 'boolean'].includes(x.type) && !x.list
+                )
+              })
+
+              const filterField = filterFields?.find(
+                (x) => x.name === vars.filterField
+              )
+              const showStartsWith =
+                filterField?.type === 'string' && !filterField.list
+              const showDateFilter = filterField?.type === 'datetime'
+
+              const showBooleanToggle =
+                filterField?.type === 'boolean' && !filterField.list
+
+              // TODO: add other fields
+              // const showNumberFilter = sortField?.type === 'number' && !sortField.list
+
               const collectionDefinition = cms.api.tina.schema.getCollection(
                 collection.name
               )
@@ -265,7 +327,7 @@ const CollectionListPage = () => {
                     )}
 
                     <PageHeader isLocalMode={cms?.api?.tina?.isLocalMode}>
-                      <>
+                      <div className="w-full grid grid-flow-col items-end gap-4">
                         <div className="flex flex-col gap-4">
                           <h3 className="font-sans text-2xl text-gray-700">
                             {collection.label
@@ -274,77 +336,271 @@ const CollectionListPage = () => {
                           </h3>
 
                           {fields?.length > 0 && (
-                            <div className="flex gap-2 items-center">
-                              <label
-                                htmlFor="sort"
-                                className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
-                              >
-                                Sort by
-                              </label>
-                              <Select
-                                name="sort"
-                                options={[
-                                  {
-                                    label: 'Default',
-                                    value: JSON.stringify({
-                                      order: 'asc',
-                                      name: '',
-                                    }),
-                                  },
-                                  ...fields
-                                    .map((x) => [
+                            <div className="flex gap-4 items-end flex-wrap">
+                              <div className="flex flex-col gap-2 items-start">
+                                <label
+                                  htmlFor="sort"
+                                  className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                >
+                                  Sort by
+                                </label>
+                                <Select
+                                  name="sort"
+                                  options={[
+                                    {
+                                      label: 'Default',
+                                      value: JSON.stringify({
+                                        order: 'asc',
+                                        name: '',
+                                      }),
+                                    },
+                                    ...fields
+                                      .map((x) => [
+                                        {
+                                          label:
+                                            (x.label || x.name) +
+                                            (x.type === 'datetime'
+                                              ? ' (Oldest First)'
+                                              : ' (Ascending)'),
+                                          value: JSON.stringify({
+                                            name: x.name,
+                                            order: 'asc',
+                                          }),
+                                        },
+                                        {
+                                          label:
+                                            (x.label || x.name) +
+                                            (x.type === 'datetime'
+                                              ? ' (Newest First)'
+                                              : ' (Descending)'),
+                                          value: JSON.stringify({
+                                            name: x.name,
+                                            order: 'desc',
+                                          }),
+                                        },
+                                      ])
+                                      .flat(),
+                                  ]}
+                                  input={{
+                                    id: 'sort',
+                                    name: 'sort',
+                                    value: sortKey,
+                                    onChange: (e) => {
+                                      const val = JSON.parse(e.target.value)
+                                      setEndCursor('')
+                                      setPrevCursors([])
+                                      window?.localStorage.setItem(
+                                        `${LOCAL_STORAGE_KEY}.${collectionName}`,
+                                        e.target.value
+                                      )
+                                      setSortKey(e.target.value)
+                                      setSortOrder(val.order)
+                                    },
+                                  }}
+                                />
+                              </div>
+                              <div className="flex flex-wrap gap-4 items-end">
+                                <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                  <label
+                                    htmlFor="filter"
+                                    className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                  >
+                                    Filter by
+                                  </label>
+                                  <Select
+                                    name="filter"
+                                    options={[
                                       {
-                                        label:
-                                          (x.label || x.name) + ' (Ascending)',
-                                        value: JSON.stringify({
-                                          name: x.name,
-                                          order: 'asc',
-                                        }),
+                                        label: 'None',
+                                        value: '',
                                       },
-                                      {
-                                        label:
-                                          (x.label || x.name) + ' (Descending)',
-                                        value: JSON.stringify({
-                                          name: x.name,
-                                          order: 'desc',
-                                        }),
+                                      ...filterFields.map((x) => ({
+                                        label: x.label || x.name,
+                                        value: x.name,
+                                      })),
+                                    ]}
+                                    input={{
+                                      id: 'filter',
+                                      name: 'filter',
+                                      value: vars.filterField,
+                                      onChange: (e) => {
+                                        const val = e.target.value
+                                        setEndCursor('')
+                                        setPrevCursors([])
+                                        setVars((old) => ({
+                                          ...old,
+                                          filterField: val,
+                                        }))
                                       },
-                                    ])
-                                    .flat(),
-                                ]}
-                                input={{
-                                  id: 'sort',
-                                  name: 'sort',
-                                  value: sortKey,
-                                  onChange: (e) => {
-                                    const val = JSON.parse(e.target.value)
-                                    setEndCursor('')
-                                    setPrevCursors([])
-                                    window?.localStorage.setItem(
-                                      `${LOCAL_STORAGE_KEY}.${collectionName}`,
-                                      e.target.value
-                                    )
-                                    setSortKey(e.target.value)
-                                    setSortOrder(val.order)
-                                  },
-                                }}
-                              />
+                                    }}
+                                  />
+                                </div>
+                                {showStartsWith && (
+                                  <>
+                                    <div className="flex flex-shrink-0 flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="startsWith"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        Starts with
+                                      </label>
+                                      <Input
+                                        name="startsWith"
+                                        id="startsWith"
+                                        value={vars.startsWith}
+                                        onChange={(e) => {
+                                          const val = e.target.value
+                                          setVars((old) => ({
+                                            ...old,
+                                            startsWith: val,
+                                            after: '',
+                                            before: '',
+                                            booleanEquals: null,
+                                          }))
+                                        }}
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                                {showDateFilter && (
+                                  <div className="flex flex-shrink-0 gap-4">
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="dateAfter"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        After
+                                      </label>
+                                      <ReactDateTimeWithStyles
+                                        inputProps={{
+                                          className: textFieldClasses,
+                                        }}
+                                        value={vars.after}
+                                        onChange={(e) => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            // @ts-ignore
+                                            after: e.format(),
+                                            booleanEquals: null,
+                                            startsWith: '',
+                                          }))
+                                        }}
+                                      />
+                                    </div>
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="dateBefore"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        Before
+                                      </label>
+                                      <ReactDateTimeWithStyles
+                                        inputProps={{
+                                          className: textFieldClasses,
+                                        }}
+                                        value={vars.before}
+                                        onChange={(e) => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            // @ts-ignore
+                                            before: e.format(),
+                                            booleanEquals: null,
+                                            startsWith: '',
+                                          }))
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                                {showBooleanToggle && (
+                                  <>
+                                    <div className="flex flex-col gap-2 items-start">
+                                      <label
+                                        htmlFor="toggle"
+                                        className="block font-sans text-xs font-semibold text-gray-500 whitespace-normal"
+                                      >
+                                        {filterField.label || filterField.name}
+                                      </label>
+                                      <Toggle
+                                        // @ts-ignore
+                                        field={filterField}
+                                        input={{
+                                          name: 'toggle',
+                                          value: vars.booleanEquals ?? false,
+                                          onChange: () => {
+                                            setVars((old) => ({
+                                              ...old,
+                                              booleanEquals: !old.booleanEquals,
+                                              after: '',
+                                              before: '',
+                                              startsWith: '',
+                                            }))
+                                          },
+                                        }}
+                                        name="toggle"
+                                      />
+                                    </div>
+                                  </>
+                                )}
+                                {(showStartsWith ||
+                                  showDateFilter ||
+                                  showBooleanToggle) && (
+                                  <div className="flex gap-3">
+                                    <Button
+                                      onClick={() => {
+                                        setEndCursor('')
+                                        setPrevCursors([])
+                                        reFetchCollection()
+                                      }}
+                                      variant="primary"
+                                    >
+                                      Search{' '}
+                                      <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
+                                    </Button>
+                                    {(vars.startsWith ||
+                                      vars.after ||
+                                      vars.before ||
+                                      vars.booleanEquals) && (
+                                      <Button
+                                        onClick={() => {
+                                          setVars((old) => ({
+                                            ...old,
+                                            startsWith: '',
+                                            after: '',
+                                            before: '',
+                                            booleanEquals: null,
+                                          }))
+                                          setEndCursor('')
+                                          setPrevCursors([])
+                                          reFetchCollection()
+                                        }}
+                                        variant="white"
+                                      >
+                                        Clear{' '}
+                                        <BiX className="w-5 h-full ml-1 opacity-70" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>
-                        {!collection.templates && allowCreate && (
-                          <Link
-                            to={`new`}
-                            className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out  shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
-                          >
-                            Create New{' '}
-                            <BiPlus className="w-5 h-full ml-1 opacity-70" />
-                          </Link>
-                        )}
-                        {collection.templates && allowCreate && (
-                          <TemplateMenu templates={collection.templates} />
-                        )}
-                      </>
+                        <div className="flex self-end	justify-self-end">
+                          {!collection.templates && allowCreate && (
+                            <Link
+                              to={`new`}
+                              className="icon-parent inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:shadow-outline text-center rounded-full justify-center transition-all duration-150 ease-out whitespace-nowrap shadow text-white bg-blue-500 hover:bg-blue-600 focus:ring-blue-500 text-sm h-10 px-6"
+                            >
+                              Create New{' '}
+                              <BiPlus className="w-5 h-full ml-1 opacity-70" />
+                            </Link>
+                          )}
+                          {collection.templates && allowCreate && (
+                            <TemplateMenu templates={collection.templates} />
+                          )}
+                        </div>
+                      </div>
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
@@ -457,7 +713,8 @@ const CollectionListPage = () => {
                                               />
                                             ),
                                             onMouseDown: () => {
-                                              setVars({
+                                              setVars((old) => ({
+                                                ...old,
                                                 collection: collectionName,
                                                 relativePath:
                                                   document.node._sys.breadcrumbs.join(
@@ -465,7 +722,7 @@ const CollectionListPage = () => {
                                                   ) +
                                                   document.node._sys.extension,
                                                 newRelativePath: '',
-                                              })
+                                              }))
                                               setDeleteModalOpen(true)
                                             },
                                           },
@@ -479,7 +736,8 @@ const CollectionListPage = () => {
                                               />
                                             ),
                                             onMouseDown: () => {
-                                              setVars({
+                                              setVars((old) => ({
+                                                ...old,
                                                 collection: collectionName,
                                                 relativePath:
                                                   document.node._sys.breadcrumbs.join(
@@ -487,7 +745,7 @@ const CollectionListPage = () => {
                                                   ) +
                                                   document.node._sys.extension,
                                                 newRelativePath: '',
-                                              })
+                                              }))
                                               setRenameModalOpen(true)
                                             },
                                           },
@@ -500,7 +758,7 @@ const CollectionListPage = () => {
                             </tbody>
                           </table>
                         )}
-                        <div className="pt-3">
+                        <div className="pt-4">
                           <CursorPaginator
                             variant="white"
                             hasNext={

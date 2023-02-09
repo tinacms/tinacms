@@ -1,5 +1,20 @@
 # Change Log
 
+## 1.3.2
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- 50f86caed: Adds filtering to the admin IU
+- Updated dependencies [efd56e769]
+  - @tinacms/sharedctx@1.0.1
+
+## 1.3.1
+
+### Patch Changes
+
+- 09e716538: Fix error where children being undefined would cause an error
+
 ## 1.3.0
 
 ### Minor Changes

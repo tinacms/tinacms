@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 type Doc = {
@@ -532,8 +523,8 @@ export interface Schema {
 
 export type TokenObject = {
   id_token: string
-  access_token: string
-  refresh_token: string
+  access_token?: string
+  refresh_token?: string
 }
 
 export interface Config<
@@ -542,8 +533,44 @@ export interface Config<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  contentApiUrlOverride?: string
   admin?: {
     auth?: {
+      /**
+       * If you wish to use the local auth provider, set this to true
+       *
+       * This will take precedence over the customAuth option (if set to true)
+       *
+       **/
+      useLocalAuth?: boolean
+      /**
+       * If you are using a custom auth provider, set this to true
+       **/
+      customAuth?: boolean
+      /**
+       *  Used for getting the token from the custom auth provider
+       *
+       * @returns {Promise<TokenObject | null>}
+       **/
+      getToken?: () => Promise<TokenObject | null>
+      /**
+       *  Used to logout from the custom auth provider
+       *
+       **/
+      logout?: () => Promise<void>
+      /**
+       *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+       *
+       *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
+       *
+       **/
+      getUser?: () => Promise<any | null>
+      /**
+       * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
+       *
+       **/
+      authenticate?: () => Promise<any | null>
+
       onLogin?: (args: { token: TokenObject }) => Promise<void>
       onLogout?: () => Promise<void>
     }

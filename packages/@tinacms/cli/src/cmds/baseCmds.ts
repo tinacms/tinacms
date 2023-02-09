@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { audit, printFinalMessage } from './audit'
@@ -27,8 +18,10 @@ import {
   buildSetupCmdBuild,
   auditCmdBuild,
   buildSetupCmdAudit,
+  indexIntoSelfHostedDatabase,
 } from '../buildTina'
 import { initStaticTina } from './init'
+import { attachDatabase } from '../buildTina/attachDatabase'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
 import { checkClientInfo } from './statusChecks/checkClientInformation'
@@ -138,6 +131,7 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           async (ctx, next, _) => {
             logger.warn(
               warnText(
@@ -172,6 +166,7 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           checkOptions,
           buildSetupCmdServerStart,
           startServer,
@@ -197,11 +192,13 @@ export const baseCmds: Command[] = [
       chain(
         [
           attachPath,
+          attachDatabase,
           checkOptions,
           buildSetupCmdBuild,
           buildCmdBuild,
           checkClientInfo,
           waitForDB,
+          indexIntoSelfHostedDatabase,
         ],
         options
       ),

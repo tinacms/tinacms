@@ -1,5 +1,15 @@
 # @tinacms/schema-tools
 
+## 1.3.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
 ## 1.2.1
 
 ### Patch Changes

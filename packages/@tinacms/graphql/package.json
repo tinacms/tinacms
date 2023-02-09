@@ -1,13 +1,18 @@
 {
   "name": "@tinacms/graphql",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "typings": "dist/index.d.ts",
   "files": [
     "package.json",
     "dist"
   ],
-  "license": "Apache-2.0",
+  "exports": {
+    "import": "./dist/index.es.js",
+    "require": "./dist/index.js"
+  },
+  "license": "SEE LICENSE IN LICENSE",
   "buildConfig": {
     "entryPoints": [
       {
@@ -28,9 +33,9 @@
   "dependencies": {
     "@graphql-tools/relay-operation-optimizer": "^6.4.1",
     "@iarna/toml": "^2.2.5",
-    "@tinacms/datalayer": "workspace:*",
     "@tinacms/mdx": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
+    "abstract-level": "^1.0.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dataloader": "^2.0.0",
@@ -42,12 +47,16 @@
     "fast-glob": "^3.2.5",
     "flat": "^5.0.2",
     "fs-extra": "^9.0.1",
+    "glob-parent": "^6.0.2",
     "graphql": "15.8.0",
     "graphql-type-json": "^0.3.2",
     "gray-matter": "^4.0.2",
+    "isomorphic-git": "^1.21.0",
     "js-yaml": "^3.14.1",
+    "jsonpath-plus": "^6.0.1",
     "leveldown": "^6.1.0",
     "lodash": "^4.17.20",
+    "many-level": "^2.0.0",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",
     "mdast-util-mdx": "^1.1.0",
@@ -56,6 +65,7 @@
     "micromark-extension-mdxjs": "^1.0.0",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
+    "readable-stream": "^4.3.0",
     "rehype-format": "^3.1.0",
     "rehype-stringify": "^8.0.0",
     "remark": "^13.0.0",
@@ -80,7 +90,6 @@
     "directory": "packages/tina-graphql"
   },
   "devDependencies": {
-    "@tinacms/datalayer": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
@@ -102,6 +111,7 @@
     "jest-diff": "27.0.6",
     "jest-file-snapshot": "^0.5.0",
     "jest-matcher-utils": "27.0.6",
+    "memory-level": "^1.0.0",
     "nodemon": "2.0.19",
     "typescript": "4.3.5"
   }

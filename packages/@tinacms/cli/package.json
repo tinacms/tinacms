@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/cli",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -86,12 +86,15 @@
     "lodash": "^4.17.19",
     "lodash.get": "^4.4.2",
     "log4js": "^6.4.0",
+    "memory-level": "^1.0.0",
+    "many-level": "^2.0.0",
     "minimatch": "^5.1.2",
     "multer": "1.4.5-lts.1",
     "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
+    "readable-stream": "^4.3.0",
     "url-pattern": "^1.0.3",
     "yarn": "^1.22.17",
     "yup": "^0.32.9",
