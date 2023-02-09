@@ -64,17 +64,15 @@ export const audit = async (ctx: any, next: () => void, options) => {
       } Documents`
     )
 
-    if (collection.name !== 'author') {
-      const returnError = await auditDocuments({
-        collection,
-        database,
-        rootPath,
-        useDefaultValues: options.useDefaultValues,
-        documents: docs.edges,
-        verbose: ctx.verbose,
-      })
-      error = error || returnError
-    }
+    const returnError = await auditDocuments({
+      collection,
+      database,
+      rootPath,
+      useDefaultValues: options.useDefaultValues,
+      documents: docs.edges,
+      verbose: ctx.verbose,
+    })
+    error = error || returnError
   }
   ctx.error = error
 
