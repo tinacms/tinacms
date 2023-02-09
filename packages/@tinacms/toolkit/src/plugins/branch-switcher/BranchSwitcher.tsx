@@ -75,6 +75,15 @@ export const BranchSwitcher = ({
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
   const { currentBranch } = useBranchData()
+  const initialBranch = React.useMemo(() => currentBranch, [])
+  // when modal closes, refresh page is currentBranch has changed
+  React.useEffect(() => {
+    return () => {
+      if (initialBranch != currentBranch) {
+        window.location.reload()
+      }
+    }
+  }, [currentBranch])
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -255,4 +264,7 @@ const BranchSelector = ({
       </div>
     </div>
   )
+}
+function useEffect(arg0: () => void, arg1: undefined[]) {
+  throw new Error('Function not implemented.')
 }
