@@ -203,12 +203,19 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema(this.level)
       const extension = path.extname(filepath)
-      const contentObject = await this.level
-        .sublevel<string, Record<string, any>>(
-          CONTENT_ROOT_PREFIX,
-          SUBLEVEL_OPTIONS
-        )
-        .get(normalizePath(filepath))
+      let contentObject
+      try {
+        contentObject = await this.level
+          .sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
+            SUBLEVEL_OPTIONS
+          )
+          .get(normalizePath(filepath))
+      } catch (e: any) {
+        if (e.code !== 'LEVEL_NOT_FOUND') {
+          throw e
+        }
+      }
       if (!contentObject) {
         throw new GraphQLError(`Unable to find record ${filepath}`)
       }
