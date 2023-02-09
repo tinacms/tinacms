@@ -1,8 +1,3 @@
-/**
-
-
-
-*/
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { NumberInput as BaseNumberField, InputProps } from '../components'
@@ -20,4 +15,7 @@ export const NumberFieldPlugin = {
   name: 'number',
   Component: NumberField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && typeof value !== 'number') return 'Required'
+  },
 }

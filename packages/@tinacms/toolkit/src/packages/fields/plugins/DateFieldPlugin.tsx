@@ -1,10 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
-/**
-
-
-
-*/
-
 import * as React from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { InputProps, textFieldClasses } from '../components'
@@ -71,4 +65,7 @@ export const DateFieldPlugin = {
   Component: DateField,
   format,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }
