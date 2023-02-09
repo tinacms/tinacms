@@ -142,6 +142,7 @@ export const remarkToSlate = (
 
     return {
       type: 'li',
+      // @ts-ignore
       children: content.children.map((child) => {
         switch (child.type) {
           case 'list':
@@ -173,7 +174,10 @@ export const remarkToSlate = (
               ],
             }
           case 'html':
-            return html(child)
+            return {
+              type: 'lic',
+              children: html_inline(child),
+            }
 
           /**
            * This wouldn't be supported right now, but since formatting
@@ -185,7 +189,10 @@ export const remarkToSlate = (
            *   {{% my-shortcode %}}
            */
           case 'leafDirective': {
-            return directiveElement(child, field, imageCallback)
+            return {
+              type: 'lic',
+              children: [directiveElement(child, field, imageCallback)],
+            }
           }
           case 'code':
           case 'thematicBreak':

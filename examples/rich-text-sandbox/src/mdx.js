@@ -1221,9 +1221,15 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
               ],
             }
           case 'html':
-            return html(child)
+            return {
+              type: 'lic',
+              children: html_inline(child),
+            }
           case 'leafDirective': {
-            return directiveElement(child, field, imageCallback)
+            return {
+              type: 'lic',
+              children: [directiveElement(child, field, imageCallback)],
+            }
           }
           case 'code':
           case 'thematicBreak':
