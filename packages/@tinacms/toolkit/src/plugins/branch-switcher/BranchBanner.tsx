@@ -11,49 +11,10 @@ import { useCMS } from '../../react-tinacms'
 import { useBranchData } from './BranchData'
 import { BranchSwitcher } from './BranchSwitcher'
 
-enum PREVIEW_STATE {
-  NOT_AVAILABLE,
-  WAITING_FOR_PREVIEW,
-  PREVIEW_READY,
-}
-
-const usePreviewStatus = () => {
-  const cms = useCMS()
-  const client = cms.api.tina
-
-  const [previewUrl, setPreviewUrl] = React.useState('')
-  const [previewState, setPreviewState] = React.useState<PREVIEW_STATE>(
-    PREVIEW_STATE.NOT_AVAILABLE
-  )
-  React.useEffect(() => {
-    const interval = setInterval(async () => {
-      const pullNumber = window.localStorage.getItem(
-        'tinacms-current-pull-number'
-      )
-      const res = await client.vercelStatus({ pullNumber })
-
-      if (res.status?.toLowerCase() === 'ready') {
-        setPreviewUrl(res.previewUrl)
-        setPreviewState(PREVIEW_STATE.PREVIEW_READY)
-      } else if (res.status?.toLowerCase() === 'building') {
-        setPreviewState(PREVIEW_STATE.WAITING_FOR_PREVIEW)
-      } // TODO handle error
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [client, previewState, previewUrl, setPreviewState, setPreviewUrl, cms])
-
-  return {
-    previewUrl: previewUrl + window.location.href.split('#/~')[1],
-    previewState,
-  }
-}
-
 export const BranchBanner = () => {
   const [open, setOpen] = React.useState(false)
   const openModal = () => setOpen(true)
   const { currentBranch } = useBranchData()
-
-  const { previewUrl, previewState } = usePreviewStatus()
 
   return (
     <>
@@ -63,26 +24,6 @@ export const BranchBanner = () => {
           <BiGitBranch className="w-5 h-auto text-blue-500/70" /> Branch
           <BranchButton currentBranch={currentBranch} openModal={openModal} />
         </span>
-        {/* <Button
-          className="group text-[12px] h-7 px-3 flex-shrink-0 gap-2"
-          size="custom"
-          variant="white"
-          as="a"
-          href={previewUrl || '#'}
-          disabled={previewState !== PREVIEW_STATE.PREVIEW_READY}
-        >
-          {previewState === PREVIEW_STATE.WAITING_FOR_PREVIEW ? (
-            <>
-              <FaSpinner className="w-4 h-auto text-blue-500 opacity-70 animate-spin" />{' '}
-              Building
-            </>
-          ) : (
-            <>
-              <BiLinkExternal className="w-4 h-auto text-blue-500 opacity-70" />{' '}
-              Preview
-            </>
-          )}
-        </Button> */}
       </div>
       {open && (
         <BranchModal
