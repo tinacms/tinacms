@@ -89,6 +89,7 @@ export const markdownToAst = (
   if (useMdx) {
     extensions.push(mdx())
     mdxFromMarkdown().forEach((mdastExt) => {
+      // @ts-ignore version mismatch?
       mdastExtensions.push(mdastExt)
     })
   }
