@@ -120,6 +120,7 @@ export const parseMDX = (
       return { type: 'root', children: [] }
     }
   } catch (e: any) {
+    // Since the MDX parser failed, fallback to the parser without MDX
     try {
       tree = markdownToAst(value, field, false)
       if (tree) {
