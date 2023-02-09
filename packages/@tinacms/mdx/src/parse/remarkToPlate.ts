@@ -172,10 +172,24 @@ export const remarkToSlate = (
                 ),
               ],
             }
+          case 'html':
+            return html(child)
+
+          /**
+           * This wouldn't be supported right now, but since formatting
+           * under a list item can get scooped up incorrectly, we support it
+           *
+           * ```
+           * - my list item
+           *
+           *   {{% my-shortcode %}}
+           */
+          case 'leafDirective': {
+            return directiveElement(child, field, imageCallback)
+          }
           case 'code':
           case 'thematicBreak':
           case 'table':
-          case 'html':
             throw new RichTextParseError(
               `${child.type} inside list item is not supported`,
               child.position
@@ -204,9 +218,21 @@ export const remarkToSlate = (
       case 'heading':
       case 'paragraph':
         return flattenPhrasingContent(content.children)
+      /**
+       * Eg.
+       *
+       * >>> my content
+       */
+      case 'html':
+        return [html_inline(content)]
+      case 'blockquote':
+      // TODO
       default:
-        throw new Error(
-          `UnwrapBlock: Unknown block content of type ${content.type}`
+        throw new RichTextParseError(
+          // @ts-ignore
+          `UnwrapBlock: Unknown block content of type ${content.type}`,
+          // @ts-ignore
+          content.position
         )
     }
   }
@@ -252,6 +278,8 @@ export const remarkToSlate = (
       case 'image':
       case 'strong':
         return phrashingMark(content)
+      case 'html':
+        return html_inline(content)
       default:
         throw new Error(
           `StaticPhrasingContent: ${content.type} is not yet supported`
@@ -352,13 +380,28 @@ export const remarkToSlate = (
         accum.push({ type: 'a', url: node.url, title: node.title, children })
         break
       }
+      case 'html':
       case 'text':
         const markProps: { [key: string]: boolean } = {}
         marks.forEach((mark) => (markProps[mark] = true))
         accum.push({ type: 'text', text: node.value, ...markProps })
         break
+      /**
+       * Eg. this is a line break
+       *                 vv
+       * _Some italicized
+       * Vitaly, co-founder of SmashingMag_
+       */
+      case 'break':
+        accum.push(breakContent())
+        break
       default:
-        throw new Error(`Unexpected inline element of type ${node.type}`)
+        // throw new Error(`Unexpected inline element of type ${node.type}`)
+        throw new RichTextParseError(
+          `Unexpected inline element of type ${node.type}`,
+          // @ts-ignore
+          node?.position
+        )
     }
     return accum
   }

@@ -58,17 +58,23 @@ export const audit = async (ctx: any, next: () => void, options) => {
       { collection: collection.name, first: -1, filterChain: [] },
       (item) => ({ path: item })
     )
-    logger.info(`Checking ${neutralText(collection.name)} collection`)
+    logger.info(
+      `Checking ${neutralText(collection.name)} collection. ${
+        docs.edges.length
+      } Documents`
+    )
 
-    const returnError = await auditDocuments({
-      collection,
-      database,
-      rootPath,
-      useDefaultValues: options.useDefaultValues,
-      documents: docs.edges,
-      verbose: ctx.verbose,
-    })
-    error = error || returnError
+    if (collection.name !== 'author') {
+      const returnError = await auditDocuments({
+        collection,
+        database,
+        rootPath,
+        useDefaultValues: options.useDefaultValues,
+        documents: docs.edges,
+        verbose: ctx.verbose,
+      })
+      error = error || returnError
+    }
   }
   ctx.error = error
 

@@ -1,12 +1,12 @@
-// src/parse/index.ts
+// ../mdx/src/parse/index.ts
 import { mdx } from 'micromark-extension-mdx'
 import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
-// src/parse/remarkToPlate.ts
+// ../mdx/src/parse/remarkToPlate.ts
 import { flatten } from 'lodash-es'
 
-// src/parse/acorn.ts
+// ../mdx/src/parse/acorn.ts
 var extractAttributes = (attributes2, fields, imageCallback) => {
   const properties = {}
   attributes2.forEach((attribute) => {
@@ -211,11 +211,11 @@ var trimFragments = (string) => {
   return value
 }
 
-// src/stringify/index.ts
+// ../mdx/src/stringify/index.ts
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 
-// src/stringify/acorn.ts
+// ../mdx/src/stringify/acorn.ts
 import { format } from 'prettier'
 var stringifyPropsInline = (element, field, imageCallback) => {
   return stringifyProps(element, field, true, imageCallback)
@@ -468,7 +468,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// src/stringify/marks.ts
+// ../mdx/src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -672,7 +672,7 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// src/extensions/tina-shortcodes/to-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 import { stringifyEntitiesLight } from 'stringify-entities'
 import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow'
 import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing'
@@ -787,7 +787,7 @@ function inlineDirectiveLabel(node) {
   )
 }
 
-// src/stringify/index.ts
+// ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return
@@ -1019,7 +1019,7 @@ var getMarks = (content) => {
   return marks
 }
 
-// src/parse/mdx.ts
+// ../mdx/src/parse/mdx.ts
 import { source } from 'unist-util-source'
 function mdxJsxElement(node, field, imageCallback) {
   try {
@@ -1109,7 +1109,7 @@ var directiveElement = (node, field, imageCallback, raw) => {
   }
 }
 
-// src/parse/remarkToPlate.ts
+// ../mdx/src/parse/remarkToPlate.ts
 var remarkToSlate = (root, field, imageCallback, raw) => {
   const content = (content2) => {
     switch (content2.type) {
@@ -1220,10 +1220,14 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
                 ),
               ],
             }
+          case 'html':
+            return html(child)
+          case 'leafDirective': {
+            return directiveElement(child, field, imageCallback)
+          }
           case 'code':
           case 'thematicBreak':
           case 'table':
-          case 'html':
             throw new RichTextParseError(
               `${child.type} inside list item is not supported`,
               child.position
@@ -1246,9 +1250,13 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
       case 'heading':
       case 'paragraph':
         return flattenPhrasingContent(content2.children)
+      case 'html':
+        return [html_inline(content2)]
+      case 'blockquote':
       default:
-        throw new Error(
-          `UnwrapBlock: Unknown block content of type ${content2.type}`
+        throw new RichTextParseError(
+          `UnwrapBlock: Unknown block content of type ${content2.type}`,
+          content2.position
         )
     }
   }
@@ -1289,6 +1297,8 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
       case 'image':
       case 'strong':
         return phrashingMark(content2)
+      case 'html':
+        return html_inline(content2)
       default:
         throw new Error(
           `StaticPhrasingContent: ${content2.type} is not yet supported`
@@ -1382,13 +1392,20 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
         accum.push({ type: 'a', url: node.url, title: node.title, children })
         break
       }
+      case 'html':
       case 'text':
         const markProps = {}
         marks.forEach((mark) => (markProps[mark] = true))
         accum.push({ type: 'text', text: node.value, ...markProps })
         break
+      case 'break':
+        accum.push(breakContent())
+        break
       default:
-        throw new Error(`Unexpected inline element of type ${node.type}`)
+        throw new RichTextParseError(
+          `Unexpected inline element of type ${node.type}`,
+          node?.position
+        )
     }
     return accum
   }
@@ -1456,7 +1473,7 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// src/extensions/tina-shortcodes/from-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
 import { parseEntities } from 'parse-entities'
 var enterContainer = function (token) {
   enter.call(this, 'containerDirective', token)
@@ -1592,7 +1609,7 @@ var directiveFromMarkdown = {
   },
 }
 
-// src/extensions/tina-shortcodes/shortcode-leaf.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
 import { factorySpace as factorySpace2 } from 'micromark-factory-space'
 import {
   markdownLineEnding as markdownLineEnding2,
@@ -1602,7 +1619,7 @@ import { codes as codes3 } from 'micromark-util-symbol/codes'
 import { values } from 'micromark-util-symbol/values'
 import { types as types2 } from 'micromark-util-symbol/types'
 
-// src/extensions/tina-shortcodes/factory-attributes.ts
+// ../mdx/src/extensions/tina-shortcodes/factory-attributes.ts
 import { factorySpace } from 'micromark-factory-space'
 import { factoryWhitespace } from 'micromark-factory-whitespace'
 import {
@@ -1860,7 +1877,7 @@ function factoryAttributes(
   return start
 }
 
-// src/extensions/tina-shortcodes/factory-name.ts
+// ../mdx/src/extensions/tina-shortcodes/factory-name.ts
 import {
   asciiAlpha as asciiAlpha2,
   asciiAlphanumeric as asciiAlphanumeric2,
@@ -1901,7 +1918,7 @@ function factoryName(effects, ok, nok, type, patternName) {
   return start
 }
 
-// src/extensions/tina-shortcodes/shortcode-leaf.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
 var findValue = (string) => {
   let lookupValue = null
   Object.entries(values).forEach(([key, value]) => {
@@ -2041,7 +2058,7 @@ var directiveLeaf = (pattern) => {
   }
 }
 
-// src/extensions/tina-shortcodes/shortcode-container.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
 import { ok as assert } from 'uvu/assert'
 import { factorySpace as factorySpace3 } from 'micromark-factory-space'
 import {
@@ -2348,7 +2365,7 @@ var directiveContainer = (pattern) => {
   }
 }
 
-// src/extensions/tina-shortcodes/extension.ts
+// ../mdx/src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
@@ -2380,7 +2397,7 @@ var tinaDirective = function (patterns) {
   }
 }
 
-// src/parse/index.ts
+// ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   const patterns = []
   field.templates?.forEach((template) => {
