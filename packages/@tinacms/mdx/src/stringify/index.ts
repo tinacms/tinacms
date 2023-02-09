@@ -4,7 +4,7 @@
 
 */
 
-import { toMarkdown } from 'mdast-util-to-markdown'
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
@@ -73,37 +73,31 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
       patterns.push(pattern)
     }
   })
+  /**
+   *
+   * Escaping elements which we can't accound for (eg. `<`) is usually good. But when the rich-text other tooling
+   * is responsible for parsing markdown, and Tina's only job is to provide a rich-text editor, we need to avoid
+   * escaping so things like shortcodes continue to work (eg. '{{<' would become '{{\<').
+   *
+   * We can probably be more fine-grained with this, but for now, if you've provided a `match` property on your
+   * templates, we're assuming you'll need to escape
+   *
+   */
+  const allowUnsafeTextElements = field.templates?.some(
+    (template) => !!template.match
+  )
+  const handlers: Handlers = {}
+  if (allowUnsafeTextElements) {
+    handlers['text'] = (node) => {
+      // Originally:
+      // return safe(context, node.value, safeOptions)
+      return node.value
+    }
+  }
   return toMarkdown(tree, {
     extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
     listItemIndent: 'one',
-    handlers: {
-      /**
-       * Probably a lot more configuration we can expose here for customization
-       *                             https://github.com/syntax-tree/mdast-util-to-markdown/tree/5fa790ee4cdead2a6c11b6a6f73c59eb0f9ca295/lib/util
-       *
-       * Some context on configuring https://github.com/syntax-tree/mdast-util-to-markdown/issues/31
-       *                             https://github.com/remarkjs/remark/issues/720
-       *
-       * This code is pretty simple to follow
-       *                             https://github.com/syntax-tree/mdast-util-to-markdown/blob/5fa790ee4cdead2a6c11b6a6f73c59eb0f9ca295/lib/index.js
-       *
-       * This was a more thorough example of a workaround
-       *                             https://github.com/syntax-tree/mdast-util-to-markdown/issues/31#issuecomment-1346524273
-       *
-       * This use case is pretty close to ours, our rich-text editor
-       * may be responsible for reading in/writing out markdown files
-       * but otherwise not involved in the pipeline (eg. Hugo or other
-       * static site generators). Theese guys can be stubborn in their
-       * openness to needs like this
-       *                             https://github.com/syntax-tree/mdast-util-to-markdown/issues/31#issuecomment-853072585
-       *
-       */
-      text(node) {
-        // Originally:
-        // return safe(context, node.value, safeOptions)
-        return node.value
-      },
-    },
+    handlers,
   })
 }
 
