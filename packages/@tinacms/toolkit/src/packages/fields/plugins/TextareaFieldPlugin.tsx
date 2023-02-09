@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
 import { TextArea, InputProps } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
@@ -16,4 +10,7 @@ export const TextareaFieldPlugin = {
   name: 'textarea',
   Component: TextareaField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }

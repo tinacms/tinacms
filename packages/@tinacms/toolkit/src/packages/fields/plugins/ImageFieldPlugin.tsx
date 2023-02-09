@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
@@ -129,4 +123,7 @@ export const ImageFieldPlugin = {
   name: 'image',
   Component: ImageField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }

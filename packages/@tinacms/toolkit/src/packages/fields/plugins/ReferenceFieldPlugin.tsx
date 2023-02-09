@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Reference } from './../components/Reference'
 import { parse } from './textFormat'
@@ -15,4 +9,7 @@ export const ReferenceFieldPlugin = {
   type: 'reference',
   Component: ReferenceField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }
