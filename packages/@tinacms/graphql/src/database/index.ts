@@ -189,6 +189,11 @@ export class Database {
         this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
       }
     }
+
+    // Make sure this error bubbles up to the user
+    if (!this.level) {
+      throw new GraphQLError('Error initializing LevelDB instance')
+    }
   }
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
