@@ -63,6 +63,7 @@ export const stringifyFile = (
     case '.json':
       return JSON.stringify(strippedContent, null, 2)
     case '.yaml':
+    case '.yml':
       return yaml.safeDump(strippedContent)
     case '.toml':
       return toml.stringify(strippedContent as any)
@@ -106,6 +107,7 @@ export const parseFile = <T extends object>(
       }
       return toml.parse(content) as T
     case '.yaml':
+    case '.yml':
       if (!content) {
         return {} as T
       }
