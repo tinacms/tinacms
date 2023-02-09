@@ -289,7 +289,7 @@ type ActorConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentUpdateMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateMovie(relativePath: String!, params: MovieMutation!): Movie!
@@ -298,6 +298,13 @@ type Mutation {
   createDirector(relativePath: String!, params: DirectorMutation!): Director!
   updateActor(relativePath: String!, params: ActorMutation!): Actor!
   createActor(relativePath: String!, params: ActorMutation!): Actor!
+}
+
+input DocumentUpdateMutation {
+  movie: MovieMutation
+  director: DirectorMutation
+  actor: ActorMutation
+  relativePath: String
 }
 
 input DocumentMutation {

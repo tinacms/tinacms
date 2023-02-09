@@ -300,7 +300,7 @@ type PageConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentUpdateMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateAuthor(relativePath: String!, params: AuthorMutation!): Author!
@@ -311,6 +311,14 @@ type Mutation {
   createStuff(relativePath: String!, params: StuffMutation!): Stuff!
   updatePage(relativePath: String!, params: PageMutation!): Page!
   createPage(relativePath: String!, params: PageMutation!): Page!
+}
+
+input DocumentUpdateMutation {
+  author: AuthorMutation
+  post: PostMutation
+  stuff: StuffMutation
+  page: PageMutation
+  relativePath: String
 }
 
 input DocumentMutation {

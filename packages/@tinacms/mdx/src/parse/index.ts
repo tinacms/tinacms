@@ -4,8 +4,8 @@
 
 */
 
-import { mdx } from 'micromark-extension-mdx'
-import { mdxFromMarkdown } from 'mdast-util-mdx'
+import { remark } from 'remark'
+import remarkMdx from 'remark-mdx'
 
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -87,11 +87,7 @@ export const markdownToAst = (
   const extensions = [tinaDirective(patterns)]
   const mdastExtensions = [directiveFromMarkdown]
   if (useMdx) {
-    extensions.push(mdx())
-    mdxFromMarkdown().forEach((mdastExt) => {
-      // @ts-ignore version mismatch?
-      mdastExtensions.push(mdastExt)
-    })
+    return remark().use(remarkMdx).parse(value)
   }
   return fromMarkdown(value, {
     extensions,

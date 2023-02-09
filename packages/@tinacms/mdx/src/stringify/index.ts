@@ -75,10 +75,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
   })
   return toMarkdown(tree, {
     extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
-    // extensions: [directiveToMarkdown, mdxJsxToMarkdown()],
     listItemIndent: 'one',
-    bullet: '-',
-    fences: true, // setting to false results in 4-space tabbed code
     handlers: {
       /**
        * Probably a lot more configuration we can expose here for customization

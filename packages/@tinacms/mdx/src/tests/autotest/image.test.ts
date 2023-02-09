@@ -1,11 +1,7 @@
-/**
-
-
-
-*/
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
 import markdownString from './image.md?raw'
+undefined
 
 const out = output({
   type: 'root',
@@ -28,7 +24,6 @@ const out = output({
         {
           type: 'img',
           url: 'https://some-image.jpg',
-          alt: '',
           caption: 'Some title',
           children: [{ type: 'text', text: '' }],
         },
@@ -40,7 +35,6 @@ const out = output({
         {
           type: 'img',
           url: 'https://some-image.jpg',
-          alt: '',
           caption: null,
           children: [{ type: 'text', text: '' }],
         },

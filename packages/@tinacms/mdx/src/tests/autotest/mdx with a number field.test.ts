@@ -21,7 +21,9 @@ const out = output({
 
 describe('./mdx with a number field.md', () => {
   it('parses the string in the expected AST', () => {
-    expect(parseMDX(markdownString, field, (v) => v)).toMatchObject(out)
+    const v = parseMDX(markdownString, field, (v) => v)
+    console.dir(v, { depth: null })
+    expect(v).toMatchObject(out)
   })
   it('stringifies the AST into the expect string', () => {
     expect(stringifyMDX(out, field, (v) => v)).toEqual(markdownString)

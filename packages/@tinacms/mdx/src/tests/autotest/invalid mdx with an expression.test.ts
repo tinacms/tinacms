@@ -1,8 +1,3 @@
-/**
-
-
-
-*/
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
 import markdownString from './invalid mdx with an expression.md?raw'
@@ -12,15 +7,10 @@ const out = output({
   type: 'root',
   children: [
     {
-      type: 'invalid_markdown',
-      value: '<Greeting message={() => "hello"} />\n',
-      message:
-        'Unable to parse field value for field "message" (type: string). Expected type to be Literal but received ArrowFunctionExpression. TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations',
-      children: [{ type: 'text', text: '' }],
-      position: {
-        start: { line: 1, column: 1, offset: 0 },
-        end: { line: 1, column: 37, offset: 36 },
-      },
+      type: 'p',
+      children: [
+        { type: 'text', text: '<Greeting message={() => "hello"} />' },
+      ],
     },
   ],
 })

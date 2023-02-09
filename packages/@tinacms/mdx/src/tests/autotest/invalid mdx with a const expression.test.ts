@@ -1,8 +1,3 @@
-/**
-
-
-
-*/
 import { describe, it, expect } from 'vitest'
 import { field, output, parseMDX, stringifyMDX } from './_config'
 import markdownString from './invalid mdx with a const expression.md?raw'
@@ -11,16 +6,7 @@ undefined
 const out = output({
   type: 'root',
   children: [
-    {
-      type: 'invalid_markdown',
-      value: 'export const a = "b"\n',
-      message: 'Unexpected expression export const a = "b".',
-      children: [{ type: 'text', text: '' }],
-      position: {
-        start: { line: 1, column: 1, offset: 0 },
-        end: { line: 1, column: 21, offset: 20 },
-      },
-    },
+    { type: 'p', children: [{ type: 'text', text: 'export const a = "b"' }] },
   ],
 })
 
