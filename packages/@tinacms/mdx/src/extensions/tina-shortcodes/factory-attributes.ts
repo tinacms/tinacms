@@ -57,6 +57,13 @@ export function factoryAttributes(
       effects.consume(code)
       return name
     }
+    // Skip the name, go directly to the value
+    if (code === codes.quotationMark || code === codes.apostrophe) {
+      effects.enter(attributeNameType)
+      effects.exit(attributeNameType)
+      effects.enter(attributeType)
+      return valueBefore(code)
+    }
 
     if (disallowEol && markdownSpace(code)) {
       return factorySpace(effects, between, types.whitespace)(code)

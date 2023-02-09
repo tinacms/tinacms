@@ -32855,7 +32855,7 @@ function flatten(array) {
 }
 var flatten_default = flatten
 
-// src/parse/acorn.ts
+// ../mdx/src/parse/acorn.ts
 var extractAttributes = (attributes2, fields, imageCallback) => {
   const properties = {}
   attributes2.forEach((attribute) => {
@@ -34480,7 +34480,7 @@ function joinDefinition(left, right) {
   }
 }
 
-// src/stringify/acorn.ts
+// ../mdx/src/stringify/acorn.ts
 var import_prettier = __toModule(require_standalone())
 var stringifyPropsInline = (element2, field, imageCallback) => {
   return stringifyProps(element2, field, true, imageCallback)
@@ -34736,7 +34736,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// src/stringify/marks.ts
+// ../mdx/src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -34940,7 +34940,7 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// src/extensions/tina-shortcodes/to-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
 var own4 = {}.hasOwnProperty
 var directiveToMarkdown = (patterns) => ({
   unsafe: [
@@ -35037,12 +35037,11 @@ function attributes(node, state) {
   }
   return values2.length > 0 ? values2.join(' ') + ' ' : ''
   function quoted(key2, value) {
-    return (
-      key2 +
-      (value
-        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
-        : '')
-    )
+    const v = quote + stringifyEntitiesLight(value, { subset }) + quote
+    if (key2 === '_value') {
+      return v
+    }
+    return key2 + (value ? '=' + v : '')
   }
 }
 function inlineDirectiveLabel(node) {
@@ -35051,7 +35050,7 @@ function inlineDirectiveLabel(node) {
   )
 }
 
-// src/stringify/index.ts
+// ../mdx/src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return
@@ -35317,7 +35316,7 @@ function source(value, file) {
   return results.join('')
 }
 
-// src/parse/mdx.ts
+// ../mdx/src/parse/mdx.ts
 function mdxJsxElement(node, field, imageCallback) {
   try {
     const template = field.templates?.find((template2) => {
@@ -35406,7 +35405,7 @@ var directiveElement = (node, field, imageCallback, raw) => {
   }
 }
 
-// src/parse/remarkToPlate.ts
+// ../mdx/src/parse/remarkToPlate.ts
 var remarkToSlate = (root3, field, imageCallback, raw) => {
   const content3 = (content4) => {
     switch (content4.type) {
@@ -35753,7 +35752,7 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// src/extensions/tina-shortcodes/from-markdown.ts
+// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
 var enterContainer = function (token) {
   enter.call(this, 'containerDirective', token)
 }
@@ -36238,7 +36237,7 @@ var types = {
   chunkString: 'chunkString',
 }
 
-// src/extensions/tina-shortcodes/factory-attributes.ts
+// ../mdx/src/extensions/tina-shortcodes/factory-attributes.ts
 function factoryAttributes(
   effects,
   ok3,
@@ -36283,6 +36282,12 @@ function factoryAttributes(
       effects.enter(attributeNameType)
       effects.consume(code2)
       return name
+    }
+    if (code2 === codes.quotationMark || code2 === codes.apostrophe) {
+      effects.enter(attributeNameType)
+      effects.exit(attributeNameType)
+      effects.enter(attributeType)
+      return valueBefore(code2)
     }
     if (disallowEol && markdownSpace(code2)) {
       return factorySpace(effects, between, types.whitespace)(code2)
@@ -36483,7 +36488,7 @@ function factoryAttributes(
   return start3
 }
 
-// src/extensions/tina-shortcodes/factory-name.ts
+// ../mdx/src/extensions/tina-shortcodes/factory-name.ts
 function factoryName(effects, ok3, nok, type, patternName) {
   const self2 = this
   let nameIndex = 0
@@ -36519,7 +36524,7 @@ function factoryName(effects, ok3, nok, type, patternName) {
   return start3
 }
 
-// src/extensions/tina-shortcodes/shortcode-leaf.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
 var findValue = (string3) => {
   let lookupValue = null
   Object.entries(values).forEach(([key, value]) => {
@@ -37735,7 +37740,7 @@ var constants = {
   v8MaxSafeChunkSize: 1e4,
 }
 
-// src/extensions/tina-shortcodes/shortcode-container.ts
+// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
 var directiveContainer = (pattern) => {
   const tokenizeDirectiveContainer = function (effects, ook, nnok) {
     const self2 = this
@@ -38028,7 +38033,7 @@ var directiveContainer = (pattern) => {
   }
 }
 
-// src/extensions/tina-shortcodes/extension.ts
+// ../mdx/src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
@@ -38060,7 +38065,7 @@ var tinaDirective = function (patterns) {
   }
 }
 
-// src/parse/index.ts
+// ../mdx/src/parse/index.ts
 var markdownToAst = (value, field, useMdx = true) => {
   const patterns = []
   field.templates?.forEach((template) => {

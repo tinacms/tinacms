@@ -67,13 +67,6 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
     let value = tracker.move(sequence + ' ' + patternName)
     let label: Paragraph | LeafDirective | TextDirective | undefined
 
-    // if (node.type === 'containerDirective') {
-    //   const head = (node.children || [])[0]
-    //   label = inlineDirectiveLabel(head) ? head : undefined
-    // } else {
-    //   label = node
-    // }
-
     if (label && label.children && label.children.length > 0) {
       const exit = state.enter('label')
       const labelType = `${node.type}Label` as ConstructName
@@ -159,12 +152,11 @@ function attributes(node: Directive, state: State): string {
    * @returns {string}
    */
   function quoted(key: string, value: string) {
-    return (
-      key +
-      (value
-        ? '=' + quote + stringifyEntitiesLight(value, { subset }) + quote
-        : '')
-    )
+    const v = quote + stringifyEntitiesLight(value, { subset }) + quote
+    if (key === '_value') {
+      return v
+    }
+    return key + (value ? '=' + v : '')
   }
 }
 
