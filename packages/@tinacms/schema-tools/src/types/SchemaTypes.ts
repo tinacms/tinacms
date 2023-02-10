@@ -344,6 +344,12 @@ export interface RichTypeInner extends TinaField {
   type: 'rich-text'
   isBody?: boolean
   list?: boolean
+  parser?:
+    | {
+        type: 'markdown'
+        skipEscaping?: 'all' | 'html' | 'none'
+      }
+    | { type: 'mdx' }
   templates?: (string | (Template<false> & { inline?: boolean }))[]
 }
 

@@ -5,7 +5,7 @@
 */
 
 import { remark } from 'remark'
-import remarkMdx from 'remark-mdx'
+import remarkMdx, { Root } from 'remark-mdx'
 
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -14,6 +14,7 @@ import type * as Plate from './plate'
 import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
 import { Pattern } from '../stringify'
+import { parseShortcode } from './parseShortcode'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -63,11 +64,7 @@ import { Pattern } from '../stringify'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (
-  value: string,
-  field: RichTypeInner,
-  useMdx: boolean = true
-) => {
+export const markdownToAst = (value: string, field: RichTypeInner) => {
   const patterns: Pattern[] = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -84,15 +81,13 @@ export const markdownToAst = (
       })
     }
   })
-  const extensions = [tinaDirective(patterns)]
-  const mdastExtensions = [directiveFromMarkdown]
-  if (useMdx) {
-    return remark().use(remarkMdx).parse(value)
-  }
   return fromMarkdown(value, {
-    extensions,
-    mdastExtensions,
+    extensions: [tinaDirective(patterns)],
+    mdastExtensions: [directiveFromMarkdown],
   })
+}
+export const mdxToAst = (value: string) => {
+  return remark().use(remarkMdx).parse(value)
 }
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
@@ -104,32 +99,40 @@ export const parseMDX = (
   field: RichTypeInner,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
-  let tree
   if (!value) {
     return { type: 'root', children: [] }
   }
+  let tree: Root | null
   try {
-    tree = markdownToAst(value, field)
-    if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value)
+    if (field.parser?.type === 'markdown') {
+      tree = markdownToAst(value, field)
     } else {
-      return { type: 'root', children: [] }
+      let preprocessedString = value
+      const templatesWithMatchers = field.templates?.filter(
+        (template) => template.match
+      )
+      templatesWithMatchers?.forEach((template) => {
+        if (typeof template === 'string') {
+          throw new Error('Global templates are not supported')
+        }
+        if (template.match) {
+          if (preprocessedString) {
+            preprocessedString = parseShortcode(preprocessedString, template)
+          }
+        }
+      })
+      tree = mdxToAst(preprocessedString)
     }
   } catch (e: any) {
-    // Since the MDX parser failed, fallback to the parser without MDX
-    try {
-      tree = markdownToAst(value, field, false)
-      if (tree) {
-        return remarkToSlate(tree, field, imageCallback, value)
-      } else {
-        return { type: 'root', children: [] }
-      }
-    } catch (e: any) {
-      if (e instanceof RichTextParseError) {
-        return invalidMarkdown(e, value)
-      }
-      return invalidMarkdown(new RichTextParseError(e.message), value)
+    if (e instanceof RichTextParseError) {
+      return invalidMarkdown(e, value)
     }
+    return invalidMarkdown(new RichTextParseError(e.message), value)
+  }
+  if (tree) {
+    return remarkToSlate(tree, field, imageCallback, value)
+  } else {
+    return { type: 'root', children: [] }
   }
 }
 

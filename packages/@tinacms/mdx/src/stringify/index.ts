@@ -5,6 +5,7 @@
 */
 
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
+import { text } from 'mdast-util-to-markdown/lib/handle/text'
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
@@ -16,6 +17,7 @@ import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
+import { stringifyShortcode } from './stringifyShortcode'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -50,7 +52,20 @@ export const stringifyMDX = (
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  return toTinaMarkdown(tree, field)
+  const res = toTinaMarkdown(tree, field)
+  const templatesWithMatchers = field.templates?.filter(
+    (template) => template.match
+  )
+  let preprocessedString = res
+  templatesWithMatchers?.forEach((template) => {
+    if (typeof template === 'string') {
+      throw new Error('Global templates are not supported')
+    }
+    if (template.match) {
+      preprocessedString = stringifyShortcode(preprocessedString, template)
+    }
+  })
+  return preprocessedString
 }
 
 export type Pattern = {
@@ -88,10 +103,23 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
   )
   const handlers: Handlers = {}
   if (allowUnsafeTextElements) {
-    handlers['text'] = (node) => {
-      // Originally:
-      // return safe(context, node.value, safeOptions)
-      return node.value
+    handlers['text'] = (node, parent, context, safeOptions) => {
+      if (field.parser?.type === 'markdown') {
+        if (field.parser.skipEscaping === 'all') {
+          return node.value
+        }
+        if (field.parser.skipEscaping === 'html') {
+          // Remove this character from the unsafe list, and then
+          // proceed with the original text handler
+          context.unsafe = context.unsafe.filter((unsafeItem) => {
+            if (unsafeItem.character === '<') {
+              return false
+            }
+            return true
+          })
+        }
+      }
+      return text(node, parent, context, safeOptions)
     }
   }
   return toMarkdown(tree, {

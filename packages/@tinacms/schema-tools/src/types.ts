@@ -332,6 +332,22 @@ export type RichTextField = (
         name?: string
       }
     })[]
+    /**
+     * By default, Tina parses markdown with MDX, this is a more strict parser
+     * that allows you to use structured content inside markdown (via `templates`).
+     *
+     * Specify `"markdown"` if you're having problems with Tina parsing your content.
+     */
+    parser?:
+      | {
+          type: 'markdown'
+          /**
+           * Tina will escape entities like `<` and `[` by default. You can choose to turn
+           * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
+           */
+          skipEscaping?: 'all' | 'html' | 'none'
+        }
+      | { type: 'mdx' }
   }
 
 type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)

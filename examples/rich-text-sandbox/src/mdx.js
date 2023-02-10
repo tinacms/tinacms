@@ -1,12 +1,12 @@
-// ../mdx/src/parse/index.ts
+// src/parse/index.ts
 import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
-// ../mdx/src/parse/remarkToPlate.ts
+// src/parse/remarkToPlate.ts
 import { flatten } from 'lodash-es'
 
-// ../mdx/src/parse/acorn.ts
+// src/parse/acorn.ts
 var extractAttributes = (attributes2, fields, imageCallback) => {
   const properties = {}
   attributes2.forEach((attribute) => {
@@ -211,11 +211,12 @@ var trimFragments = (string) => {
   return value
 }
 
-// ../mdx/src/stringify/index.ts
+// src/stringify/index.ts
 import { toMarkdown } from 'mdast-util-to-markdown'
+import { text as text2 } from 'mdast-util-to-markdown/lib/handle/text'
 import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 
-// ../mdx/src/stringify/acorn.ts
+// src/stringify/acorn.ts
 import { format } from 'prettier'
 var stringifyPropsInline = (element, field, imageCallback) => {
   return stringifyProps(element, field, true, imageCallback)
@@ -468,7 +469,7 @@ function assertShape(value, callback, errorMessage) {
   }
 }
 
-// ../mdx/src/stringify/marks.ts
+// src/stringify/marks.ts
 var matches = (a, b) => {
   return a.some((v) => b.includes(v))
 }
@@ -672,7 +673,7 @@ var cleanNode = (node, mark) => {
   return cleanedNode
 }
 
-// ../mdx/src/extensions/tina-shortcodes/to-markdown.ts
+// src/extensions/tina-shortcodes/to-markdown.ts
 import { stringifyEntitiesLight } from 'stringify-entities'
 import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow'
 import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing'
@@ -787,7 +788,24 @@ function inlineDirectiveLabel(node) {
   )
 }
 
-// ../mdx/src/stringify/index.ts
+// src/stringify/stringifyShortcode.ts
+function stringifyShortcode(preprocessedString, template) {
+  const match = template.match
+  const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')
+  const regex = `<[\\s]*${template.name}[\\s]*${
+    unkeyedAttributes ? '(?:_value=(.*?))?' : '(.+?)?'
+  }[\\s]*>[\\s]*((?:.|
+)*?)[\\s]*</[\\s]*${template.name}[\\s]*>`
+  const closingRegex = `
+$2
+${match.start} /${match.name || template.name} ${match.end}`
+  const replace = `${match.start} ${match.name || template.name} $1 ${
+    match.end
+  }${template.fields.find((t) => t.name == 'children') ? closingRegex : ''}`
+  return replaceAll(preprocessedString, regex, replace)
+}
+
+// src/stringify/index.ts
 var stringifyMDX = (value, field, imageCallback) => {
   if (!value) {
     return
@@ -801,7 +819,20 @@ var stringifyMDX = (value, field, imageCallback) => {
     }
   }
   const tree = rootElement(value, field, imageCallback)
-  return toTinaMarkdown(tree, field)
+  const res = toTinaMarkdown(tree, field)
+  const templatesWithMatchers = field.templates?.filter(
+    (template) => template.match
+  )
+  let preprocessedString = res
+  templatesWithMatchers?.forEach((template) => {
+    if (typeof template === 'string') {
+      throw new Error('Global templates are not supported')
+    }
+    if (template.match) {
+      preprocessedString = stringifyShortcode(preprocessedString, template)
+    }
+  })
+  return preprocessedString
 }
 var toTinaMarkdown = (tree, field) => {
   const patterns = []
@@ -820,8 +851,21 @@ var toTinaMarkdown = (tree, field) => {
   )
   const handlers = {}
   if (allowUnsafeTextElements) {
-    handlers['text'] = (node) => {
-      return node.value
+    handlers['text'] = (node, parent, context, safeOptions) => {
+      if (field.parser?.type === 'markdown') {
+        if (field.parser.skipEscaping === 'all') {
+          return node.value
+        }
+        if (field.parser.skipEscaping === 'html') {
+          context.unsafe = context.unsafe.filter((unsafeItem) => {
+            if (unsafeItem.character === '<') {
+              return false
+            }
+            return true
+          })
+        }
+      }
+      return text2(node, parent, context, safeOptions)
     }
   }
   return toMarkdown(tree, {
@@ -1022,7 +1066,7 @@ var getMarks = (content) => {
   return marks
 }
 
-// ../mdx/src/parse/mdx.ts
+// src/parse/mdx.ts
 import { source } from 'unist-util-source'
 function mdxJsxElement(node, field, imageCallback) {
   try {
@@ -1112,7 +1156,7 @@ var directiveElement = (node, field, imageCallback, raw) => {
   }
 }
 
-// ../mdx/src/parse/remarkToPlate.ts
+// src/parse/remarkToPlate.ts
 var remarkToSlate = (root, field, imageCallback, raw) => {
   const content = (content2) => {
     switch (content2.type) {
@@ -1300,7 +1344,7 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
       case 'mdxJsxTextElement':
         return mdxJsxElement(content2, field, imageCallback)
       case 'text':
-        return text2(content2)
+        return text3(content2)
       case 'inlineCode':
       case 'emphasis':
       case 'image':
@@ -1317,7 +1361,7 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
   const phrasingContent = (content2) => {
     switch (content2.type) {
       case 'text':
-        return text2(content2)
+        return text3(content2)
       case 'link':
         return link(content2)
       case 'image':
@@ -1427,7 +1471,7 @@ var remarkToSlate = (root, field, imageCallback, raw) => {
       children: [{ type: 'text', text: '' }],
     }
   }
-  const text2 = (content2) => {
+  const text3 = (content2) => {
     return {
       type: 'text',
       text: content2.value,
@@ -1482,7 +1526,7 @@ var RichTextParseError = class extends Error {
   }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/from-markdown.ts
+// src/extensions/tina-shortcodes/from-markdown.ts
 import { parseEntities } from 'parse-entities'
 var enterContainer = function (token) {
   enter.call(this, 'containerDirective', token)
@@ -1618,7 +1662,7 @@ var directiveFromMarkdown = {
   },
 }
 
-// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
+// src/extensions/tina-shortcodes/shortcode-leaf.ts
 import { factorySpace as factorySpace2 } from 'micromark-factory-space'
 import {
   markdownLineEnding as markdownLineEnding2,
@@ -1628,7 +1672,7 @@ import { codes as codes3 } from 'micromark-util-symbol/codes'
 import { values } from 'micromark-util-symbol/values'
 import { types as types2 } from 'micromark-util-symbol/types'
 
-// ../mdx/src/extensions/tina-shortcodes/factory-attributes.ts
+// src/extensions/tina-shortcodes/factory-attributes.ts
 import { factorySpace } from 'micromark-factory-space'
 import { factoryWhitespace } from 'micromark-factory-whitespace'
 import {
@@ -1886,7 +1930,7 @@ function factoryAttributes(
   return start
 }
 
-// ../mdx/src/extensions/tina-shortcodes/factory-name.ts
+// src/extensions/tina-shortcodes/factory-name.ts
 import {
   asciiAlpha as asciiAlpha2,
   asciiAlphanumeric as asciiAlphanumeric2,
@@ -1927,7 +1971,7 @@ function factoryName(effects, ok, nok, type, patternName) {
   return start
 }
 
-// ../mdx/src/extensions/tina-shortcodes/shortcode-leaf.ts
+// src/extensions/tina-shortcodes/shortcode-leaf.ts
 var findValue = (string) => {
   let lookupValue = null
   Object.entries(values).forEach(([key, value]) => {
@@ -2067,7 +2111,7 @@ var directiveLeaf = (pattern) => {
   }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/shortcode-container.ts
+// src/extensions/tina-shortcodes/shortcode-container.ts
 import { ok as assert } from 'uvu/assert'
 import { factorySpace as factorySpace3 } from 'micromark-factory-space'
 import {
@@ -2374,7 +2418,7 @@ var directiveContainer = (pattern) => {
   }
 }
 
-// ../mdx/src/extensions/tina-shortcodes/extension.ts
+// src/extensions/tina-shortcodes/extension.ts
 var tinaDirective = function (patterns) {
   const rules = {}
   patterns.forEach((pattern) => {
@@ -2406,8 +2450,25 @@ var tinaDirective = function (patterns) {
   }
 }
 
-// ../mdx/src/parse/index.ts
-var markdownToAst = (value, field, useMdx = true) => {
+// src/parse/parseShortcode.ts
+function parseShortcode(preprocessedString, template) {
+  const match = template.match
+  const unkeyedAttributes = !!template.fields.find((t) => t.name === '_value')
+  const hasChildren = !!template.fields.find((t) => t.name == 'children')
+  const replacement = `<${template.name} ${
+    unkeyedAttributes ? '_value="$1"' : '$1'
+  }>${hasChildren ? '$2' : '\n'}</${template.name}>`
+  const endRegex = `((?:.|\\n)*)${match.start}\\s/\\s*${
+    match.name || template.name
+  }[\\s]*${match.end}`
+  const regex = `${match.start}\\s*${match.name || template.name}[\\s]+${
+    unkeyedAttributes ? `['"]?(.*?)['"]?` : '(.*?)'
+  }[\\s]*${match.end}${hasChildren ? endRegex : ''}`
+  return replaceAll(preprocessedString, regex, replacement)
+}
+
+// src/parse/index.ts
+var markdownToAst = (value, field) => {
   const patterns = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -2424,44 +2485,51 @@ var markdownToAst = (value, field, useMdx = true) => {
       })
     }
   })
-  const extensions = [tinaDirective(patterns)]
-  const mdastExtensions = [directiveFromMarkdown]
-  if (useMdx) {
-    return remark().use(remarkMdx).parse(value)
-  }
   return fromMarkdown(value, {
-    extensions,
-    mdastExtensions,
+    extensions: [tinaDirective(patterns)],
+    mdastExtensions: [directiveFromMarkdown],
   })
+}
+var mdxToAst = (value) => {
+  return remark().use(remarkMdx).parse(value)
 }
 var MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 var parseMDX = (value, field, imageCallback) => {
-  let tree
   if (!value) {
     return { type: 'root', children: [] }
   }
+  let tree
   try {
-    tree = markdownToAst(value, field)
-    if (tree) {
-      return remarkToSlate(tree, field, imageCallback, value)
+    if (field.parser?.type === 'markdown') {
+      tree = markdownToAst(value, field)
     } else {
-      return { type: 'root', children: [] }
+      let preprocessedString = value
+      const templatesWithMatchers = field.templates?.filter(
+        (template) => template.match
+      )
+      templatesWithMatchers?.forEach((template) => {
+        if (typeof template === 'string') {
+          throw new Error('Global templates are not supported')
+        }
+        if (template.match) {
+          if (preprocessedString) {
+            preprocessedString = parseShortcode(preprocessedString, template)
+          }
+        }
+      })
+      tree = mdxToAst(preprocessedString)
     }
   } catch (e) {
-    try {
-      tree = markdownToAst(value, field, false)
-      if (tree) {
-        return remarkToSlate(tree, field, imageCallback, value)
-      } else {
-        return { type: 'root', children: [] }
-      }
-    } catch (e2) {
-      if (e2 instanceof RichTextParseError) {
-        return invalidMarkdown(e2, value)
-      }
-      return invalidMarkdown(new RichTextParseError(e2.message), value)
+    if (e instanceof RichTextParseError) {
+      return invalidMarkdown(e, value)
     }
+    return invalidMarkdown(new RichTextParseError(e.message), value)
+  }
+  if (tree) {
+    return remarkToSlate(tree, field, imageCallback, value)
+  } else {
+    return { type: 'root', children: [] }
   }
 }
 var invalidMarkdown = (e, value) => {
@@ -2481,5 +2549,9 @@ var invalidMarkdown = (e, value) => {
       },
     ],
   }
+}
+var replaceAll = (string, target, value) => {
+  const regex = new RegExp(target, 'g')
+  return string.valueOf().replace(regex, value)
 }
 export { parseMDX, stringifyMDX }
