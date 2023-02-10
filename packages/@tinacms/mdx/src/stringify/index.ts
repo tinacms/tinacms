@@ -98,29 +98,34 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
    * templates, we're assuming you'll need to escape
    *
    */
-  const allowUnsafeTextElements = field.templates?.some(
-    (template) => !!template.match
-  )
   const handlers: Handlers = {}
-  if (allowUnsafeTextElements) {
-    handlers['text'] = (node, parent, context, safeOptions) => {
-      if (field.parser?.type === 'markdown') {
-        if (field.parser.skipEscaping === 'all') {
-          return node.value
-        }
-        if (field.parser.skipEscaping === 'html') {
-          // Remove this character from the unsafe list, and then
-          // proceed with the original text handler
-          context.unsafe = context.unsafe.filter((unsafeItem) => {
-            if (unsafeItem.character === '<') {
-              return false
-            }
-            return true
-          })
-        }
+  handlers['text'] = (node, parent, context, safeOptions) => {
+    // Empty spaces before/after strings
+    context.unsafe = context.unsafe.filter((unsafeItem) => {
+      if (
+        unsafeItem.character === ' ' &&
+        unsafeItem.inConstruct === 'phrasing'
+      ) {
+        return false
       }
-      return text(node, parent, context, safeOptions)
+      return true
+    })
+    if (field.parser?.type === 'markdown') {
+      if (field.parser.skipEscaping === 'all') {
+        return node.value
+      }
+      if (field.parser.skipEscaping === 'html') {
+        // Remove this character from the unsafe list, and then
+        // proceed with the original text handler
+        context.unsafe = context.unsafe.filter((unsafeItem) => {
+          if (unsafeItem.character === '<') {
+            return false
+          }
+          return true
+        })
+      }
     }
+    return text(node, parent, context, safeOptions)
   }
   return toMarkdown(tree, {
     extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
@@ -135,7 +140,7 @@ export const rootElement = (
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = []
-  content.children.forEach((child) => {
+  content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback)
     if (value) {
       children.push(value)
@@ -199,7 +204,7 @@ export const blockElement = (
           )
         }
         const directiveAttributes: Record<string, string> = {}
-        attributes.forEach((att) => {
+        attributes?.forEach((att) => {
           if (att.value && typeof att.value === 'string') {
             directiveAttributes[att.name] = att.value
           }

@@ -24,7 +24,7 @@ export const extractAttributes = (
   imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
-  attributes.forEach((attribute) => {
+  attributes?.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field) => field.name === attribute.name)
     if (!field) {
@@ -145,7 +145,7 @@ const extractObjectExpression = (
   field: Extract<TinaFieldBase, { type: 'object' }>
 ) => {
   const properties: Record<string, unknown> = {}
-  expression.properties.forEach((property) => {
+  expression.properties?.forEach((property) => {
     assertType(property, 'Property')
     const { key, value } = extractKeyValue(property, field)
     properties[key] = value

@@ -9,7 +9,7 @@ import { flatten } from 'lodash-es'
 // src/parse/acorn.ts
 var extractAttributes = (attributes2, fields, imageCallback) => {
   const properties = {}
-  attributes2.forEach((attribute) => {
+  attributes2?.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field2) => field2.name === attribute.name)
     if (!field) {
@@ -101,7 +101,7 @@ var extractObject = (attribute, field) => {
 }
 var extractObjectExpression = (expression, field) => {
   const properties = {}
-  expression.properties.forEach((property) => {
+  expression.properties?.forEach((property) => {
     assertType(property, 'Property')
     const { key, value } = extractKeyValue(property, field)
     properties[key] = value
@@ -475,7 +475,7 @@ var matches = (a, b) => {
 }
 var replaceLinksWithTextNodes = (content) => {
   const newItems = []
-  content.forEach((item) => {
+  content?.forEach((item) => {
     if (item.type === 'a') {
       if (item.children.length === 1) {
         const firstChild = item.children[0]
@@ -846,27 +846,31 @@ var toTinaMarkdown = (tree, field) => {
       patterns.push(pattern)
     }
   })
-  const allowUnsafeTextElements = field.templates?.some(
-    (template) => !!template.match
-  )
   const handlers = {}
-  if (allowUnsafeTextElements) {
-    handlers['text'] = (node, parent, context, safeOptions) => {
-      if (field.parser?.type === 'markdown') {
-        if (field.parser.skipEscaping === 'all') {
-          return node.value
-        }
-        if (field.parser.skipEscaping === 'html') {
-          context.unsafe = context.unsafe.filter((unsafeItem) => {
-            if (unsafeItem.character === '<') {
-              return false
-            }
-            return true
-          })
-        }
+  handlers['text'] = (node, parent, context, safeOptions) => {
+    context.unsafe = context.unsafe.filter((unsafeItem) => {
+      if (
+        unsafeItem.character === ' ' &&
+        unsafeItem.inConstruct === 'phrasing'
+      ) {
+        return false
       }
-      return text2(node, parent, context, safeOptions)
+      return true
+    })
+    if (field.parser?.type === 'markdown') {
+      if (field.parser.skipEscaping === 'all') {
+        return node.value
+      }
+      if (field.parser.skipEscaping === 'html') {
+        context.unsafe = context.unsafe.filter((unsafeItem) => {
+          if (unsafeItem.character === '<') {
+            return false
+          }
+          return true
+        })
+      }
     }
+    return text2(node, parent, context, safeOptions)
   }
   return toMarkdown(tree, {
     extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
@@ -876,7 +880,7 @@ var toTinaMarkdown = (tree, field) => {
 }
 var rootElement = (content, field, imageCallback) => {
   const children = []
-  content.children.forEach((child) => {
+  content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback)
     if (value) {
       children.push(value)
@@ -936,7 +940,7 @@ var blockElement = (content, field, imageCallback) => {
           )
         }
         const directiveAttributes = {}
-        attributes2.forEach((att) => {
+        attributes2?.forEach((att) => {
           if (att.value && typeof att.value === 'string') {
             directiveAttributes[att.name] = att.value
           }
