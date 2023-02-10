@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import {
   Media,
   MediaStore,
@@ -269,12 +263,16 @@ export class TinaMediaStore implements MediaStore {
       })
     }
 
+    // from Tina Cloud we get the full path. In the frontend we only want the relative path.
+    // EX Tina CLoud res: /images/2021/03/01/ -> /01
     for (const dir of directories) {
+      // remove the current directory from the path
+      const realDir = dir.replace(options.directory, '').replace(/\/$/, '')
       items.push({
         type: 'dir',
         id: dir,
         directory: options.directory || '',
-        filename: dir,
+        filename: realDir,
       })
     }
 
