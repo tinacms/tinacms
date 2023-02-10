@@ -399,7 +399,7 @@ const CollectionListPage = () => {
                                   }}
                                 />
                               </div>
-                              <div className="flex flex-wrap gap-4 items-end">
+                              <form className="flex flex-wrap gap-4 items-end">
                                 <div className="flex flex-shrink-0 flex-col gap-2 items-start">
                                   <label
                                     htmlFor="filter"
@@ -557,6 +557,7 @@ const CollectionListPage = () => {
                                         reFetchCollection()
                                       }}
                                       variant="primary"
+                                      type="submit"
                                     >
                                       Search{' '}
                                       <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
@@ -586,7 +587,7 @@ const CollectionListPage = () => {
                                     )}
                                   </div>
                                 )}
-                              </div>
+                              </form>
                             </div>
                           )}
                         </div>
