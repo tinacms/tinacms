@@ -1,5 +1,11 @@
 # @tinacms/schema-tools
 
+## 1.3.1
+
+### Patch Changes
+
+- e732906b6: Support .yml file extension for yaml files
+
 ## 1.3.0
 
 ### Minor Changes

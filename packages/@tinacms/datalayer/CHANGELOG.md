@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [a8457798a]
+- Updated dependencies [94b8bb6e0]
+- Updated dependencies [e15d82c2e]
+- Updated dependencies [e732906b6]
+  - @tinacms/graphql@1.3.0
+
 ## 1.1.0
 
 ### Minor Changes
