@@ -1,0 +1,2 @@
+# https://github.com/github/linguist/blob/HEAD/docs/overrides.md
+script/**/*.html linguist-vendored
