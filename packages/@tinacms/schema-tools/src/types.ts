@@ -484,7 +484,7 @@ export interface FieldCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
   /**
    * This format will be used to parse the markdown frontmatter
    */
@@ -511,7 +511,7 @@ export interface TemplateCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
   ui?: UICollection
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead

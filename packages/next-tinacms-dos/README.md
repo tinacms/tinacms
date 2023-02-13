@@ -6,12 +6,12 @@ Manage **Digital Ocean Space media assets** in TinaCMS.
 
 ### With Yarn
 ```bash
-yarn add next-tinacms-dos
+yarn add next-tinacms-dos @tinacms/auth
 ```
 
 ### With NPM
 ```bash
-npm install next-tinacms-dos
+npm install next-tinacms-dos @tinacms/auth
 ```
 
 ## Connect with Digital Ocean Space
@@ -116,6 +116,7 @@ export default createMediaHandler({
     region: 'us-east-1',
   },
   bucket: process.env.NEXT_PUBLIC_SPACE_NAME || '',
+  mediaRoot: 'images',
   authorized: async (req, _res) => {
     if (process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT === "1") {
       return true;

@@ -399,7 +399,7 @@ const CollectionListPage = () => {
                                   }}
                                 />
                               </div>
-                              <div className="flex flex-wrap gap-4 items-end">
+                              <form className="flex flex-wrap gap-4 items-end">
                                 <div className="flex flex-shrink-0 flex-col gap-2 items-start">
                                   <label
                                     htmlFor="filter"
@@ -431,6 +431,10 @@ const CollectionListPage = () => {
                                           ...old,
                                           filterField: val,
                                         }))
+                                        // if we clear the filter, we need to re-fetch the collection
+                                        if (!val) {
+                                          reFetchCollection()
+                                        }
                                       },
                                     }}
                                   />
@@ -553,6 +557,7 @@ const CollectionListPage = () => {
                                         reFetchCollection()
                                       }}
                                       variant="primary"
+                                      type="submit"
                                     >
                                       Search{' '}
                                       <BiSearch className="w-5 h-full ml-1.5 opacity-70" />
@@ -582,7 +587,7 @@ const CollectionListPage = () => {
                                     )}
                                   </div>
                                 )}
-                              </div>
+                              </form>
                             </div>
                           )}
                         </div>
@@ -604,7 +609,7 @@ const CollectionListPage = () => {
                     </PageHeader>
                     <PageBody>
                       <div className="w-full mx-auto max-w-screen-xl">
-                        {totalCount > 0 && (
+                        {documents.length > 0 ? (
                           <table className="table-auto shadow bg-white border-b border-gray-200 w-full max-w-full rounded-lg">
                             <tbody className="divide-y divide-gray-150">
                               {documents.map((document) => {
@@ -757,6 +762,8 @@ const CollectionListPage = () => {
                               })}
                             </tbody>
                           </table>
+                        ) : (
+                          <NoDocumentsPlaceholder />
                         )}
                         <div className="pt-4">
                           <CursorPaginator
@@ -798,6 +805,16 @@ interface ResetModalProps {
   close(): void
   deleteFunc(): void
   filename: string
+}
+
+const NoDocumentsPlaceholder = () => {
+  return (
+    <div className="text-center px-5 py-3 flex flex-col items-center justify-center shadow border border-gray-100 bg-gray-50 border-b border-gray-200 w-full max-w-full rounded-lg">
+      <p className="text-base italic font-medium text-gray-300">
+        No documents found.
+      </p>
+    </div>
+  )
 }
 
 const DeleteModal = ({ close, deleteFunc, filename }: ResetModalProps) => {

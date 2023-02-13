@@ -1,9 +1,3 @@
-/**
-
-
-
-*/
-
 import * as React from 'react'
 import { ColorPicker, InputProps } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
@@ -31,4 +25,7 @@ export const ColorFieldPlugin = {
   name: 'color',
   Component: ColorField,
   parse,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
 }
