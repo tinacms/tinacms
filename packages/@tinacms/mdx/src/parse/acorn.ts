@@ -8,7 +8,6 @@ import type {
   MdxJsxAttributeValueExpression,
   MdxJsxExpressionAttribute,
 } from 'mdast-util-mdx-jsx'
-import type { JSXFragment, JSXText } from 'estree-jsx'
 import type { ExpressionStatement, ObjectExpression, Property } from 'estree'
 import type { TinaFieldBase } from '@tinacms/schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
@@ -25,7 +24,7 @@ export const extractAttributes = (
   imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
-  attributes.forEach((attribute) => {
+  attributes?.forEach((attribute) => {
     assertType(attribute, 'mdxJsxAttribute')
     const field = fields.find((field) => field.name === attribute.name)
     if (!field) {
@@ -146,7 +145,7 @@ const extractObjectExpression = (
   field: Extract<TinaFieldBase, { type: 'object' }>
 ) => {
   const properties: Record<string, unknown> = {}
-  expression.properties.forEach((property) => {
+  expression.properties?.forEach((property) => {
     assertType(property, 'Property')
     const { key, value } = extractKeyValue(property, field)
     properties[key] = value
@@ -274,14 +273,6 @@ function assertHasType(
     }
   }
   throw new Error(`Expect value to be an object with property "type"`)
-}
-
-const throwError = (field: TinaFieldBase) => {
-  throw new Error(
-    `Unexpected expression for field "${field.name}"${
-      field.list ? ' with "list": true' : ''
-    }`
-  )
 }
 
 export const trimFragments = (string: string) => {

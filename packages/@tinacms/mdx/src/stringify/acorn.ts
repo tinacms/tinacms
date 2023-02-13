@@ -4,7 +4,7 @@
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTypeInner, Template } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -22,13 +22,23 @@ export function stringifyProps(
   parentField: RichTypeInner,
   flatten: boolean,
   imageCallback: (url: string) => string
-): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] }
+): {
+  attributes: MdxJsxAttribute[]
+  children: Md.PhrasingContent[]
+  useDirective: boolean
+  directiveType: string
+}
 export function stringifyProps(
   element: Plate.MdxBlockElement,
   parentField: RichTypeInner,
   flatten: boolean,
   imageCallback: (url: string) => string
-): { attributes: MdxJsxAttribute[]; children: Md.BlockContent[] }
+): {
+  attributes: MdxJsxAttribute[]
+  children: Md.BlockContent[]
+  useDirective: boolean
+  directiveType: string
+}
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
   parentField: RichTypeInner,
@@ -37,25 +47,44 @@ export function stringifyProps(
 ): {
   attributes: MdxJsxAttribute[]
   children: Md.BlockContent[] | Md.PhrasingContent[]
+  useDirective: boolean
+  directiveType: string
 } {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.Content[] = []
-  const template = parentField.templates?.find((template) => {
+  let template: Template<false> | undefined | string
+  let useDirective = false
+  let directiveType = 'leaf'
+  template = parentField.templates?.find((template) => {
     if (typeof template === 'string') {
       throw new Error('Global templates not supported')
     }
     return template.name === element.name
   })
+  if (!template) {
+    template = parentField.templates?.find((template) => {
+      const templateName = template?.match?.name
+      return templateName === element.name
+    })
+  }
   if (!template || typeof template === 'string') {
     throw new Error(`Unable to find template for JSX element ${element.name}`)
   }
+  if (template.fields.find((f) => f.name === 'children')) {
+    directiveType = 'block'
+  }
+  useDirective = !!template.match
   Object.entries(element.props).forEach(([name, value]) => {
-    const field = template.fields.find((field) => field.name === name)
+    if (typeof template === 'string') {
+      throw new Error(`Unable to find template for JSX element ${name}`)
+    }
+    const field = template?.fields?.find((field) => field.name === name)
     if (!field) {
       if (name === 'children') {
         return
       }
-      throw new Error(`No field definition found for property ${name}`)
+      return
+      // throw new Error(`No field definition found for property ${name}`)
     }
     switch (field.type) {
       case 'reference':
@@ -224,6 +253,8 @@ export function stringifyProps(
   if (template.match) {
     // consistent mdx element rendering regardless of children makes it easier to parse
     return {
+      useDirective,
+      directiveType,
       attributes,
       children:
         children && children.length
@@ -242,7 +273,7 @@ export function stringifyProps(
     }
   }
 
-  return { attributes, children } as any
+  return { attributes, children, useDirective, directiveType } as any
 }
 
 /**
@@ -260,7 +291,6 @@ function stringifyObj(obj: unknown, flatten: boolean) {
       .replace(dummyFunc, '')
     return flatten ? res.replaceAll('\n', '').replaceAll('  ', ' ') : res
   } else {
-    console.log(obj)
     throw new Error(
       `stringifyObj must be passed an object or an array of objects, received ${typeof obj}`
     )

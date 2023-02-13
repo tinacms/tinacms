@@ -533,6 +533,23 @@ export const buildIt = async (entryPoint, packageJSON) => {
         outfile: appMDXPath,
         external: Object.keys({ ...peerDeps }),
       })
+      const sandboxMDXPath = path.join(
+        process.cwd(),
+        '..',
+        '..',
+        '..',
+        'examples',
+        'rich-text-sandbox',
+        'src',
+        'mdx.js'
+      )
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        format: 'esm',
+        outfile: sandboxMDXPath,
+        external,
+      })
     } else {
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],

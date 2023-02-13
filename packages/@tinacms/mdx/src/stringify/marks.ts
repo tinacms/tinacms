@@ -53,7 +53,7 @@ type InlineElementWithCallback = Plate.InlineElement & {
  */
 const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
   const newItems: InlineElementWithCallback[] = []
-  content.forEach((item) => {
+  content?.forEach((item) => {
     if (item.type === 'a') {
       if (item.children.length === 1) {
         const firstChild = item.children[0]

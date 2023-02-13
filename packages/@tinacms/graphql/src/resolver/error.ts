@@ -74,7 +74,7 @@ export class TinaParseDocumentError extends TinaFetchError {
   originalError: Error
   constructor(args: TypeFetchErrorArgs) {
     super(
-      `Error Parsing file ${args.file} from collection ${
+      `Error parsing file ${args.file} from collection ${
         args.collection
       }. ${auditMessage(args.includeAuditMessage)}`,
       args

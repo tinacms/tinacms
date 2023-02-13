@@ -5,11 +5,12 @@
 */
 
 import { flatten } from 'lodash-es'
-import { mdxJsxElement } from './mdx'
+import { directiveElement, mdxJsxElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
+import { ContainerDirective } from 'mdast-util-directive'
 
 export type { Position, PositionItem } from './plate'
 
@@ -30,9 +31,10 @@ declare module 'mdast' {
 }
 
 export const remarkToSlate = (
-  root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement,
+  root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
   field: RichTypeInner,
-  imageCallback: (url: string) => string
+  imageCallback: (url: string) => string,
+  raw?: string
 ): Plate.RootElement => {
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
@@ -88,6 +90,12 @@ export const remarkToSlate = (
           // @ts-ignore
           content.position
         )
+      case 'leafDirective': {
+        return directiveElement(content, field, imageCallback, raw)
+      }
+      case 'containerDirective': {
+        return directiveElement(content, field, imageCallback, raw)
+      }
       default:
         throw new RichTextParseError(
           `Content: ${content.type} is not yet supported`,
@@ -97,20 +105,19 @@ export const remarkToSlate = (
     }
   }
 
-  const html = (content: Md.HTML): Plate.HTMLElement => {
+  // Treating HTML as paragraphs so they remain editable
+  // This is only really used for non-MDX contexts
+  const html = (content: Md.HTML): Plate.ParagraphElement => {
     return {
-      type: 'html',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
+      type: 'p',
+      children: [{ type: 'text', text: content.value }],
     }
   }
 
-  const html_inline = (content: Md.HTML): Plate.HTMLInlineElement => {
-    return {
-      type: 'html_inline',
-      value: content.value,
-      children: [{ type: 'text', text: '' }],
-    }
+  // Treating HTML as text nodes so they remain editable
+  // This is only really used for non-MDX contexts
+  const html_inline = (content: Md.HTML): Plate.TextElement => {
+    return { type: 'text', text: content.value }
   }
 
   const list = (content: Md.List): Plate.List => {
@@ -135,6 +142,7 @@ export const remarkToSlate = (
 
     return {
       type: 'li',
+      // @ts-ignore
       children: content.children.map((child) => {
         switch (child.type) {
           case 'list':
@@ -165,17 +173,36 @@ export const remarkToSlate = (
                 ),
               ],
             }
+          case 'html':
+            return {
+              type: 'lic',
+              children: html_inline(child),
+            }
+
+          /**
+           * This wouldn't be supported right now, but since formatting
+           * under a list item can get scooped up incorrectly, we support it
+           *
+           * ```
+           * - my list item
+           *
+           *   {{% my-shortcode %}}
+           */
+          case 'leafDirective': {
+            return {
+              type: 'lic',
+              children: [directiveElement(child, field, imageCallback)],
+            }
+          }
           case 'code':
           case 'thematicBreak':
           case 'table':
-          case 'html':
             throw new RichTextParseError(
               `${child.type} inside list item is not supported`,
               child.position
             )
           default:
             throw new RichTextParseError(
-              // @ts-expect-error child.type should be 'never'
               `Unknown list item of type ${child.type}`,
               // @ts-expect-error child.type should be 'never'
               child.position
@@ -186,7 +213,7 @@ export const remarkToSlate = (
   }
 
   const unwrapBlockContent = (
-    content: Md.BlockContent
+    content: Md.BlockContent | Md.DefinitionContent
   ): Plate.InlineElement[] => {
     const flattenPhrasingContent = (
       children: Md.PhrasingContent[]
@@ -198,9 +225,21 @@ export const remarkToSlate = (
       case 'heading':
       case 'paragraph':
         return flattenPhrasingContent(content.children)
+      /**
+       * Eg.
+       *
+       * >>> my content
+       */
+      case 'html':
+        return [html_inline(content)]
+      case 'blockquote':
+      // TODO
       default:
-        throw new Error(
-          `UnwrapBlock: Unknown block content of type ${content.type}`
+        throw new RichTextParseError(
+          // @ts-ignore
+          `UnwrapBlock: Unknown block content of type ${content.type}`,
+          // @ts-ignore
+          content.position
         )
     }
   }
@@ -246,6 +285,8 @@ export const remarkToSlate = (
       case 'image':
       case 'strong':
         return phrashingMark(content)
+      case 'html':
+        return html_inline(content)
       default:
         throw new Error(
           `StaticPhrasingContent: ${content.type} is not yet supported`
@@ -346,13 +387,28 @@ export const remarkToSlate = (
         accum.push({ type: 'a', url: node.url, title: node.title, children })
         break
       }
+      case 'html':
       case 'text':
         const markProps: { [key: string]: boolean } = {}
         marks.forEach((mark) => (markProps[mark] = true))
         accum.push({ type: 'text', text: node.value, ...markProps })
         break
+      /**
+       * Eg. this is a line break
+       *                 vv
+       * _Some italicized
+       * Vitaly, co-founder of SmashingMag_
+       */
+      case 'break':
+        accum.push(breakContent())
+        break
       default:
-        throw new Error(`Unexpected inline element of type ${node.type}`)
+        // throw new Error(`Unexpected inline element of type ${node.type}`)
+        throw new RichTextParseError(
+          `Unexpected inline element of type ${node.type}`,
+          // @ts-ignore
+          node?.position
+        )
     }
     return accum
   }
@@ -361,7 +417,7 @@ export const remarkToSlate = (
     return {
       type: 'img',
       url: imageCallback(content.url),
-      alt: content.alt,
+      alt: content.alt || undefined, // alt cannot be `null`
       caption: content.title,
       children: [{ type: 'text', text: '' }],
     }
