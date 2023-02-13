@@ -904,6 +904,7 @@ importers:
       c8: ^7.11.3
       concat-md: ^0.5.0
       estree-jsx: ^0.0.1
+      estree-util-is-identifier-name: ^2.1.0
       jest: ^28.1.2
       jest-diff: ^28.1.1
       jest-file-snapshot: ^0.5.0
@@ -927,6 +928,7 @@ importers:
       micromark-extension-mdx: 1.0.0
       micromark-extension-mdx-jsx: 1.0.3
       micromark-extension-mdxjs: 1.0.0
+      micromark-factory-mdx-expression: ^1.0.7
       micromark-factory-space: ^1.0.0
       micromark-factory-whitespace: ^1.0.0
       micromark-util-character: ^1.1.0
@@ -956,6 +958,7 @@ importers:
       unist-util-visit-parents: ^5.1.3
       uvu: ^0.5.6
       vfile: ^4.2.0
+      vfile-message: ^3.1.4
       vite: ^3.0.2
       vitest: ^0.18.0
     dependencies:
@@ -964,6 +967,7 @@ importers:
       '@types/unist': 2.0.6
       acorn: 8.7.1
       concat-md: 0.5.0
+      estree-util-is-identifier-name: 2.1.0
       lodash-es: 4.17.21
       mdast: 3.0.0
       mdast-util-directive: 2.2.3
@@ -983,6 +987,7 @@ importers:
       micromark-extension-mdx: 1.0.0
       micromark-extension-mdx-jsx: 1.0.3
       micromark-extension-mdxjs: 1.0.0
+      micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
       micromark-util-character: 1.1.0
@@ -1004,6 +1009,7 @@ importers:
       unist-util-visit-parents: 5.1.3
       uvu: 0.5.6
       vfile: 4.2.1
+      vfile-message: 3.1.4
     devDependencies:
       '@swc/core': 1.2.215
       '@swc/jest': 0.2.21_@swc+core@1.2.215
@@ -6093,7 +6099,6 @@ packages:
     engines: { node: '>=12' }
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
-    dev: true
 
   /@csstools/selector-specificity/2.0.1_444rcjjorr3kpoqtvoodsr46pu:
     resolution:
@@ -7763,7 +7768,6 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.0.8
       '@jridgewell/sourcemap-codec': 1.4.14
-    dev: true
 
   /@manypkg/find-root/1.1.0:
     resolution:
@@ -9080,7 +9084,6 @@ packages:
     cpu: [arm]
     os: [android]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-android-arm64/1.2.216:
@@ -9092,7 +9095,6 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-darwin-arm64/1.2.216:
@@ -9104,7 +9106,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-darwin-arm64/1.3.32:
@@ -9128,7 +9129,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-darwin-x64/1.3.32:
@@ -9152,7 +9152,6 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-arm-gnueabihf/1.2.216:
@@ -9164,7 +9163,6 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-arm-gnueabihf/1.3.32:
@@ -9188,7 +9186,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-arm64-gnu/1.3.32:
@@ -9212,7 +9209,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-arm64-musl/1.3.32:
@@ -9236,7 +9232,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-x64-gnu/1.3.32:
@@ -9260,7 +9255,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-linux-x64-musl/1.3.32:
@@ -9284,7 +9278,6 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-win32-arm64-msvc/1.3.32:
@@ -9308,7 +9301,6 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-win32-ia32-msvc/1.3.32:
@@ -9332,7 +9324,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@swc/core-win32-x64-msvc/1.3.32:
@@ -9367,7 +9358,6 @@ packages:
       '@swc/core-win32-arm64-msvc': 1.2.216
       '@swc/core-win32-ia32-msvc': 1.2.216
       '@swc/core-win32-x64-msvc': 1.2.216
-    dev: true
 
   /@swc/core/1.3.32:
     resolution:
@@ -9555,7 +9545,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.4_postcss@8.4.21
+      tailwindcss: 3.2.4_aesdjsunmf4wiehhujt67my7tu
 
   /@testing-library/dom/8.14.0:
     resolution:
@@ -9702,28 +9692,24 @@ packages:
       {
         integrity: sha512-jNsYVVxU8v5g43Erja32laIDHXeoNvFEpX33OK4d6hljo3jDhCBDhx5dhCCTMWUojscpAagGiRkBKxpdl9fxqA==,
       }
-    dev: true
 
   /@tsconfig/node12/1.0.11:
     resolution:
       {
         integrity: sha512-cqefuRsh12pWyGsIoBKJA9luFu3mRxCA+ORZvA4ktLSzIuCUtWVxGIuXigEwO5/ywWFMZ2QEGKWvkZG1zDMTag==,
       }
-    dev: true
 
   /@tsconfig/node14/1.0.3:
     resolution:
       {
         integrity: sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==,
       }
-    dev: true
 
   /@tsconfig/node16/1.0.3:
     resolution:
       {
         integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==,
       }
-    dev: true
 
   /@types/abstract-leveldown/7.2.0:
     resolution:
@@ -10391,7 +10377,6 @@ packages:
       {
         integrity: sha512-x5W9s+8P4XteaxT/jKF0PSb7XEvo5VmqEWgsMlyeY4ZlLK8I6aH6g5TPPyDlLAep+GYf4kefb7HFyc7PAO3m+Q==,
       }
-    dev: true
 
   /@types/node/14.18.29:
     resolution:
@@ -13023,7 +13008,6 @@ packages:
       {
         integrity: sha512-58S9QDqG0Xx27YwPSt9fJxivjYl432YCwfDMfZ+71RAqUrZef7LrKQZ3LHLOwCS4FLNBplP533Zx895SeOCHvA==,
       }
-    dev: true
 
   /arg/5.0.2:
     resolution:
@@ -15306,7 +15290,6 @@ packages:
       {
         integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==,
       }
-    dev: true
 
   /cross-fetch/3.1.5:
     resolution:
@@ -18571,10 +18554,10 @@ packages:
       '@types/estree': 0.0.42
     dev: true
 
-  /estree-util-is-identifier-name/2.0.1:
+  /estree-util-is-identifier-name/2.1.0:
     resolution:
       {
-        integrity: sha512-rxZj1GkQhY4x1j/CSnybK9cGuMFQYFPLq0iNyopqf14aOVLFtMv7Esika+ObJWPWiOHuMOAHz3YkWoLYYRnzWQ==,
+        integrity: sha512-bEN9VHRyXAUOjkKVQVvArFym08BTWB0aJPppZZr0UNyAqWsLaVfAqP7hbaTJjzHifmB5ebnR8Wm7r7yGN/HonQ==,
       }
     dev: false
 
@@ -23921,7 +23904,6 @@ packages:
       {
         integrity: sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==,
       }
-    dev: true
 
   /makeerror/1.0.12:
     resolution:
@@ -24264,7 +24246,7 @@ packages:
       stringify-entities: 4.0.3
       unist-util-remove-position: 4.0.1
       unist-util-stringify-position: 3.0.2
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /mdast-util-mdx/1.1.0:
@@ -24730,7 +24712,7 @@ packages:
         integrity: sha512-TjYtjEMszWze51NJCZmhv7MEBcgYRgb3tJeMAJ+HQCAaZHHRBaDCccqQzGizR/H4ODefP44wRTgOn2vE5I6nZA==,
       }
     dependencies:
-      micromark-factory-mdx-expression: 1.0.6
+      micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-util-character: 1.1.0
       micromark-util-events-to-acorn: 1.1.0
@@ -24746,14 +24728,14 @@ packages:
       }
     dependencies:
       '@types/acorn': 4.0.6
-      estree-util-is-identifier-name: 2.0.1
-      micromark-factory-mdx-expression: 1.0.6
+      estree-util-is-identifier-name: 2.1.0
+      micromark-factory-mdx-expression: 1.0.7
       micromark-factory-space: 1.0.0
       micromark-util-character: 1.1.0
       micromark-util-symbol: 1.0.1
       micromark-util-types: 1.0.2
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-extension-mdx-md/1.0.0:
@@ -24791,7 +24773,7 @@ packages:
       micromark-util-types: 1.0.2
       unist-util-position-from-estree: 1.1.1
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-extension-mdxjs/1.0.0:
@@ -24833,10 +24815,10 @@ packages:
       uvu: 0.5.6
     dev: false
 
-  /micromark-factory-mdx-expression/1.0.6:
+  /micromark-factory-mdx-expression/1.0.7:
     resolution:
       {
-        integrity: sha512-WRQIc78FV7KrCfjsEf/sETopbYjElh3xAmNpLkd1ODPqxEngP42eVRGbiPEQWpRV27LzqW+XVTvQAMIIRLPnNA==,
+        integrity: sha512-QAdFbkQagTZ/eKb8zDGqmjvgevgJH3+aQpvvKrXWxNJp3o8/l2cAbbrBd0E04r0Gx6nssPpqWIjnbHFvZu5qsQ==,
       }
     dependencies:
       micromark-factory-space: 1.0.0
@@ -24846,7 +24828,7 @@ packages:
       micromark-util-types: 1.0.2
       unist-util-position-from-estree: 1.1.1
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-factory-space/1.0.0:
@@ -24964,7 +24946,7 @@ packages:
       micromark-util-types: 1.0.2
       uvu: 0.5.6
       vfile-location: 4.0.1
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-util-html-tag-name/1.1.0:
@@ -26993,7 +26975,6 @@ packages:
       postcss: 8.4.21
       ts-node: 10.9.1_3ts5pezbn3c3azuqsq74yqdemu
       yaml: 1.10.2
-    dev: true
 
   /postcss-load-config/3.1.4_postcss@8.4.14:
     resolution:
@@ -30753,7 +30734,6 @@ packages:
       resolve: 1.22.1
     transitivePeerDependencies:
       - ts-node
-    dev: true
 
   /tailwindcss/3.2.4_postcss@8.4.21:
     resolution:
@@ -31269,7 +31249,6 @@ packages:
       typescript: 4.7.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-    dev: true
 
   /tsconfig-paths/3.14.1:
     resolution:
@@ -32487,7 +32466,6 @@ packages:
       {
         integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==,
       }
-    dev: true
 
   /v8-compile-cache/2.3.0:
     resolution:
@@ -32621,6 +32599,16 @@ packages:
       unist-util-stringify-position: 3.0.2
     dev: false
 
+  /vfile-message/3.1.4:
+    resolution:
+      {
+        integrity: sha512-fa0Z6P8HUrQN4BZaX05SIVXic+7kE3b05PWAtPuYP9QLHsLKYR7/AlLW3NtOrpXRLeawpDLMsVkmk5DG0NXgWw==,
+      }
+    dependencies:
+      '@types/unist': 2.0.6
+      unist-util-stringify-position: 3.0.2
+    dev: false
+
   /vfile/2.3.0:
     resolution:
       {
@@ -32654,7 +32642,7 @@ packages:
       '@types/unist': 2.0.6
       is-buffer: 2.0.5
       unist-util-stringify-position: 3.0.2
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /vite-plugin-dts/0.5.3_vite@2.9.14:
@@ -33478,7 +33466,6 @@ packages:
         integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==,
       }
     engines: { node: '>=6' }
-    dev: true
 
   /yocto-queue/0.1.0:
     resolution:

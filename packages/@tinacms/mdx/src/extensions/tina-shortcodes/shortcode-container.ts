@@ -8,7 +8,7 @@ import { constants } from 'micromark-util-symbol/constants'
 import { types } from 'micromark-util-symbol/types'
 import { factoryAttributes } from './factory-attributes'
 import { factoryName } from './factory-name'
-import { findCode } from './shortcode-leaf'
+import { findCode, printCode } from './shortcode-leaf'
 
 export const directiveContainer: (pattern: Pattern) => Construct = (
   pattern
@@ -154,10 +154,21 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
       return effects.attempt(
         { tokenize: tokenizeClosingFence, partial: true },
         after,
+        // factorySpace(effects, chunkStart, types.linePrefix, initialSize + 1)
         initialSize
-          ? factorySpace(effects, chunkStart, types.linePrefix, initialSize + 1)
-          : chunkStart
+          ? factorySpace(
+              effects,
+              chunkHoldup,
+              types.linePrefix,
+              initialSize + 1
+            )
+          : chunkHoldup
       )(code)
+    }
+    const chunkHoldup: State = function (code) {
+      // console.log('haahaaha')
+      // printCode(code)
+      return chunkStart(code)
     }
 
     const chunkStart: State = function (code) {
@@ -280,6 +291,13 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
         }
         if (pattern.end.length - 1 === closeEndSequenceIndex) {
           effects.exit('directiveContainerFence')
+          console.log('done')
+          self.events.forEach((e) => {
+            console.log(`${e[0]} - ${e[1].type}`)
+            // if (e[1].start && e[1].end) {
+            //   console.log(`  ${self.sliceSerialize(e[1])}`)
+            // }
+          })
           return ok(code)
         }
         const nextCharacter = pattern.end[closeEndSequenceIndex]

@@ -2250,12 +2250,15 @@ var directiveContainer = (pattern) => {
         initialSize
           ? factorySpace3(
               effects,
-              chunkStart,
+              chunkHoldup,
               types3.linePrefix,
               initialSize + 1
             )
-          : chunkStart
+          : chunkHoldup
       )(code)
+    }
+    const chunkHoldup = function (code) {
+      return chunkStart(code)
     }
     const chunkStart = function (code) {
       if (code === codes4.eof) {
@@ -2362,6 +2365,10 @@ var directiveContainer = (pattern) => {
         }
         if (pattern.end.length - 1 === closeEndSequenceIndex) {
           effects2.exit('directiveContainerFence')
+          console.log('done')
+          self.events.forEach((e) => {
+            console.log(`${e[0]} - ${e[1].type}`)
+          })
           return ok2(code)
         }
         const nextCharacter = pattern.end[closeEndSequenceIndex]

@@ -82,6 +82,21 @@ const QueryMachine = (props: {
 
   const [state, send] = useMachine(machine)
   React.useEffect(() => {
+    if (cms) {
+      const unsubsribe = cms.events.subscribe(`forms:fields:onChange`, () => {
+        // Nested forms from rich-text also trigger this event
+        send({ type: 'FIELD_CHANGE' })
+      })
+      const unsubsribeReset = cms.events.subscribe(`forms:reset`, () => {
+        send({ type: 'FIELD_CHANGE' })
+      })
+      return () => {
+        unsubsribe()
+        unsubsribeReset()
+      }
+    }
+  }, [cms])
+  React.useEffect(() => {
     if (state.matches('pipeline.ready')) {
       cms.events.dispatch({ type: 'forms:register', value: 'complete' })
     } else if (state.matches('pipeline.initializing')) {

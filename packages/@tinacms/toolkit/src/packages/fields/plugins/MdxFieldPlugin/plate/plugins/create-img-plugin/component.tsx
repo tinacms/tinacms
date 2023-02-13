@@ -38,21 +38,21 @@ export const ImgEmbed = ({
   })
 
   return (
-    <div {...attributes} className="w-full mb-2">
+    <span {...attributes} className="block w-full mb-2">
       {children}
-      <Wrapper inline={false}>
+      <Wrapper inline={true}>
         <span className="relative w-full inline-flex shadow-sm rounded-md">
           {selected && (
             <span className="z-10 absolute inset-0 ring-2 ring-blue-100 ring-inset rounded-md pointer-events-none" />
           )}
-          <div className="z-10">
+          <span className="block z-10">
             <DeleteImageButton
               onClick={(e) => {
                 e.stopPropagation()
                 handleRemove()
               }}
             />
-          </div>
+          </span>
           <span
             onMouseDown={handleSelect}
             style={{ minHeight: '50px' }}
@@ -81,7 +81,7 @@ export const ImgEmbed = ({
           />
         )}
       </Wrapper>
-    </div>
+    </span>
   )
 }
 
