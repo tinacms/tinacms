@@ -123,16 +123,16 @@ export const parseMDX = (
       })
       tree = mdxToAst(preprocessedString)
     }
+    if (tree) {
+      return remarkToSlate(tree, field, imageCallback, value)
+    } else {
+      return { type: 'root', children: [] }
+    }
   } catch (e: any) {
     if (e instanceof RichTextParseError) {
       return invalidMarkdown(e, value)
     }
     return invalidMarkdown(new RichTextParseError(e.message), value)
-  }
-  if (tree) {
-    return remarkToSlate(tree, field, imageCallback, value)
-  } else {
-    return { type: 'root', children: [] }
   }
 }
 
