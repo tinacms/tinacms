@@ -1,5 +1,18 @@
 # tinacms
 
+## 1.2.1
+
+### Patch Changes
+
+- bb7f00db1: Fix issue where collections would not refresh if you chose the "None" filter after selecting a filter
+- 42536f6e2: Groups filter inputs in a form so pressing 'enter' will filter the collection list
+- 5d024e4f1: Add branch banner to sidebar and admin
+- Updated dependencies [f1f3938d9]
+- Updated dependencies [e732906b6]
+- Updated dependencies [5d024e4f1]
+  - @tinacms/toolkit@1.3.3
+  - @tinacms/schema-tools@1.3.1
+
 ## 1.2.0
 
 ### Minor Changes

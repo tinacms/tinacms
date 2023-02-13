@@ -1,5 +1,21 @@
 # tina-graphql
 
+## 1.3.0
+
+### Minor Changes
+
+- e15d82c2e: Minor bump MDX package for new parser
+
+### Patch Changes
+
+- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in Tina Cloud
+- 94b8bb6e0: Fix update Database.get to properly handle LEVEL_NOT_FOUND errors
+- e732906b6: Support .yml file extension for yaml files
+- Updated dependencies [169147490]
+- Updated dependencies [e732906b6]
+  - @tinacms/mdx@1.3.0
+  - @tinacms/schema-tools@1.3.1
+
 ## 1.2.0
 
 ### Minor Changes

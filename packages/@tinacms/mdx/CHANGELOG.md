@@ -1,5 +1,16 @@
 # @tinacms/mdx
 
+## 1.3.0
+
+### Minor Changes
+
+- 169147490: When markdown files fail to parse, fallback to the non-MDX parser
+
+### Patch Changes
+
+- Updated dependencies [e732906b6]
+  - @tinacms/schema-tools@1.3.1
+
 ## 1.2.0
 
 ### Minor Changes

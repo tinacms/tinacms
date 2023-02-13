@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.3.3
+
+### Patch Changes
+
+- f1f3938d9: Add default validation to all fields that did not have it.
+- 5d024e4f1: Add branch banner to sidebar and admin
+
 ## 1.3.2
 
 ### Patch Changes

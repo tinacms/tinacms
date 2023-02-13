@@ -1,5 +1,11 @@
 # @tinacms/app
 
+## 1.1.0
+
+### Minor Changes
+
+- 169147490: When markdown files fail to parse, fallback to the non-MDX parser
+
 ## 1.0.7
 
 ### Patch Changes

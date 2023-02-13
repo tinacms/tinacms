@@ -1,5 +1,23 @@
 # tinacms-cli
 
+## 1.2.0
+
+### Minor Changes
+
+- 169147490: When markdown files fail to parse, fallback to the non-MDX parser
+
+### Patch Changes
+
+- Updated dependencies [a8457798a]
+- Updated dependencies [94b8bb6e0]
+- Updated dependencies [169147490]
+- Updated dependencies [e15d82c2e]
+- Updated dependencies [e732906b6]
+  - @tinacms/graphql@1.3.0
+  - @tinacms/app@1.1.0
+  - @tinacms/schema-tools@1.3.1
+  - @tinacms/datalayer@1.1.1
+
 ## 1.1.0
 
 ### Minor Changes

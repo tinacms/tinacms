@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 1.1.2
+
+### Patch Changes
+
+- cfc59fdf4: Add optional mediaRoot configuration to allow specifying a configurable root folder in DO spaces
+
 ## 1.1.1
 
 ### Patch Changes
