@@ -8,6 +8,8 @@ describe('tinaShortcodes', () => {
 
 import { foo } from 'bar.js'
 
+const a = "ok"
+
 Hello, {world!}
 
 {{< okok >}}
@@ -352,6 +354,32 @@ Hello, world!
               },
             ],
             "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it.only('detects unkeyed attricutes', () => {
+    const value = `
+$ someLeaf "some string ok ok" $
+    `
+    const tree = toTree(value)
+    expect(tree).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "",
+                "type": "mdxJsxAttribute",
+                "value": "some string ok ok",
+              },
+            ],
+            "children": [],
+            "name": "someLeaf",
+            "type": "mdxJsxFlowElement",
           },
         ],
         "type": "root",

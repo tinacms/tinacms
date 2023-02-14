@@ -279,15 +279,18 @@ export function factoryTag(
       return beforeAttribute(code)
     }
 
-    // TODO: shortcut for unkeyed value
-    // if (code === codes.quotationMark) {
-    //   effects.enter(tagAttributeType)
-    //   effects.enter(tagAttributeNameType)
-    //   effects.enter(tagAttributeNamePrimaryType)
-    //   effects.exit(tagAttributeNamePrimaryType)
-    //   // effects.consume(code)
-    //   return beforeAttribute
-    // }
+    // shortcut for unkeyed value
+    if (code === codes.quotationMark) {
+      effects.exit(tagNameType)
+      effects.enter(tagAttributeType)
+      effects.enter(tagAttributeNameType)
+      effects.enter(tagAttributeNamePrimaryType)
+      effects.exit(tagAttributeNamePrimaryType)
+      effects.exit(tagAttributeNameType)
+      effects.enter(tagAttributeInitializerMarkerType)
+      effects.exit(tagAttributeInitializerMarkerType)
+      return beforeAttributeValue(code)
+    }
 
     return nok(code)
 

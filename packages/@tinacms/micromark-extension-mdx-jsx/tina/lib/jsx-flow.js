@@ -72,6 +72,7 @@ export function jsxFlow(acorn, acornOptions, addResult, pattern) {
 
     /** @type {State} */
     function after(code) {
+      // logSelf(self)
       // Another tag.
       return code === codes.lessThan
         ? start(code)
