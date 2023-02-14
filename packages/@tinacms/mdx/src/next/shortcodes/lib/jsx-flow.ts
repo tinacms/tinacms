@@ -2,7 +2,7 @@ import { factorySpace } from 'micromark-factory-space'
 import { markdownLineEnding } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes.js'
 import { types } from 'micromark-util-symbol/types.js'
-import { factoryTag } from './factory-tag.js'
+import { factoryTag } from './factory-tag'
 import type { Construct, Tokenizer, State } from 'micromark-util-types'
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 

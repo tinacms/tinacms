@@ -1,4 +1,4 @@
-import { factoryTag } from './factory-tag.js'
+import { factoryTag } from './factory-tag'
 import type { Construct, Tokenizer } from 'micromark-util-types'
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 

@@ -1,14 +1,3 @@
-/**
- * @typedef {import('micromark-util-types').TokenizeContext} TokenizeContext
- * @typedef {import('micromark-util-types').Tokenizer} Tokenizer
- * @typedef {import('micromark-util-types').Effects} Effects
- * @typedef {import('micromark-util-types').State} State
- * @typedef {import('micromark-util-types').Code} Code
- * @typedef {import('micromark-util-types').Point} Point
- * @typedef {import('micromark-factory-mdx-expression').Acorn} Acorn
- * @typedef {import('micromark-factory-mdx-expression').AcornOptions} AcornOptions
- */
-
 import { ok as assert } from 'uvu/assert'
 import {
   start as idStart,
@@ -27,96 +16,63 @@ import { constants } from 'micromark-util-symbol/constants.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { VFileMessage } from 'vfile-message'
 import { findCode } from './util'
+import type {
+  Tokenizer,
+  TokenizeContext,
+  Effects,
+  Code,
+  Point,
+  State,
+} from 'micromark-util-types'
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
+import { Pattern } from './syntax'
 
-const lazyLineEnd = { tokenize: tokenizeLazyLineEnd, partial: true }
-
-/**
- * @this {TokenizeContext}
- * @param {Effects} effects
- * @param {State} ok
- * @param {State} nok
- * @param {Acorn|undefined} acorn
- * @param {AcornOptions|undefined} acornOptions
- * @param {boolean|undefined} addResult
- * @param {boolean|undefined} allowLazy
- * @param {string} tagType
- * @param {string} tagMarkerType
- * @param {string} tagClosingMarkerType
- * @param {string} tagSelfClosingMarker
- * @param {string} tagNameType
- * @param {string} tagNamePrimaryType
- * @param {string} tagNameMemberMarkerType
- * @param {string} tagNameMemberType
- * @param {string} tagNamePrefixMarkerType
- * @param {string} tagNameLocalType
- * @param {string} tagExpressionAttributeType
- * @param {string} tagExpressionAttributeMarkerType
- * @param {string} tagExpressionAttributeValueType
- * @param {string} tagAttributeType
- * @param {string} tagAttributeNameType
- * @param {string} tagAttributeNamePrimaryType
- * @param {string} tagAttributeNamePrefixMarkerType
- * @param {string} tagAttributeNameLocalType
- * @param {string} tagAttributeInitializerMarkerType
- * @param {string} tagAttributeValueLiteralType
- * @param {string} tagAttributeValueLiteralMarkerType
- * @param {string} tagAttributeValueLiteralValueType
- * @param {string} tagAttributeValueExpressionType
- * @param {string} tagAttributeValueExpressionMarkerType
- * @param {string} tagAttributeValueExpressionValueType
- */
-// eslint-disable-next-line max-params
 export function factoryTag(
-  effects,
-  ok,
-  nok,
-  acorn,
-  acornOptions,
-  addResult,
-  allowLazy,
-  tagType,
-  tagMarkerType,
-  tagClosingMarkerType,
-  tagSelfClosingMarker,
-  tagNameType,
-  tagNamePrimaryType,
-  tagNameMemberMarkerType,
-  tagNameMemberType,
-  tagNamePrefixMarkerType,
-  tagNameLocalType,
-  tagExpressionAttributeType,
-  tagExpressionAttributeMarkerType,
-  tagExpressionAttributeValueType,
-  tagAttributeType,
-  tagAttributeNameType,
-  tagAttributeNamePrimaryType,
-  tagAttributeNamePrefixMarkerType,
-  tagAttributeNameLocalType,
-  tagAttributeInitializerMarkerType,
-  tagAttributeValueLiteralType,
-  tagAttributeValueLiteralMarkerType,
-  tagAttributeValueLiteralValueType,
-  tagAttributeValueExpressionType,
-  tagAttributeValueExpressionMarkerType,
-  tagAttributeValueExpressionValueType,
-  pattern
+  this: TokenizeContext,
+  effects: Effects,
+  ok: State,
+  nok: State,
+  acorn: Acorn | undefined,
+  acornOptions: AcornOptions | undefined,
+  addResult: boolean | undefined,
+  allowLazy: boolean | undefined,
+  tagType: string,
+  tagMarkerType: string,
+  tagClosingMarkerType: string,
+  tagSelfClosingMarker: string,
+  tagNameType: string,
+  tagNamePrimaryType: string,
+  tagNameMemberMarkerType: string,
+  tagNameMemberType: string,
+  tagNamePrefixMarkerType: string,
+  tagNameLocalType: string,
+  tagExpressionAttributeType: string,
+  tagExpressionAttributeMarkerType: string,
+  tagExpressionAttributeValueType: string,
+  tagAttributeType: string,
+  tagAttributeNameType: string,
+  tagAttributeNamePrimaryType: string,
+  tagAttributeNamePrefixMarkerType: string,
+  tagAttributeNameLocalType: string,
+  tagAttributeInitializerMarkerType: string,
+  tagAttributeValueLiteralType: string,
+  tagAttributeValueLiteralMarkerType: string,
+  tagAttributeValueLiteralValueType: string,
+  tagAttributeValueExpressionType: string,
+  tagAttributeValueExpressionMarkerType: string,
+  tagAttributeValueExpressionValueType: string,
+  pattern: Pattern
 ) {
   // eslint-disable-next-line
   const self = this
-  /** @type {State} */
-  let returnState
-  /** @type {NonNullable<Code>|undefined} */
-  let marker
-  /** @type {Point|undefined} */
-  let startPoint
+  let returnState: State
+  let marker: NonNullable<Code> | undefined
+  let startPoint: Point | undefined
   // Start at because the first character is consumed right away
   let tagOpenerIndex = 1
   let tagCloserIndex = 1
 
-  return start
-
-  /** @type {State} */
-  function start(code) {
+  const start: State = function (code) {
     startPoint = self.now()
     effects.enter(tagType)
     effects.enter(tagMarkerType)
@@ -128,8 +84,7 @@ export function factoryTag(
     return tagOpenerSequence
   }
 
-  /** @type {State} */
-  function tagOpenerSequence(code) {
+  const tagOpenerSequence: State = function (code) {
     const character = findCode(pattern.start[tagOpenerIndex])
     if (code === character) {
       effects.consume(code)
@@ -143,8 +98,7 @@ export function factoryTag(
     return nok
   }
 
-  /** @type {State} */
-  function afterStart(code) {
+  const afterStart: State = function (code) {
     /**
      * Orinal MDX factory-tag disallows this because `<` is ambiguous, but shortcodes
      * may or may not be using that character so allow space after start
@@ -161,8 +115,7 @@ export function factoryTag(
   }
 
   // Right after `<`, before an optional name.
-  /** @type {State} */
-  function beforeName(code) {
+  const beforeName: State = function (code) {
     // Closing tag.
     if (code === codes.slash) {
       effects.enter(tagClosingMarkerType)
@@ -198,8 +151,7 @@ export function factoryTag(
   }
 
   // At the start of a closing tag, right after `</`.
-  /** @type {State} */
-  function beforeClosingTagName(code) {
+  const beforeClosingTagName: State = function (code) {
     // Fragment closing tag.
     if (code === codes.greaterThan) {
       return tagEnd(code)
@@ -225,8 +177,7 @@ export function factoryTag(
   }
 
   // Inside the primary name.
-  /** @type {State} */
-  function primaryName(code) {
+  const primaryName: State = function (code) {
     // Continuation of name: remain.
     if (code === codes.dash || (code !== codes.eof && idCont(code))) {
       effects.consume(code)
@@ -260,8 +211,7 @@ export function factoryTag(
   }
 
   // After a name.
-  /** @type {State} */
-  function afterPrimaryName(code) {
+  const afterPrimaryName: State = function (code) {
     // Start of a member name.
     // eg. <Popover.PopoverButton>
     if (code === codes.dot) {
@@ -288,7 +238,7 @@ export function factoryTag(
     // End pattern
     // This is triggerd for closing tags too
     if (code === findCode(pattern.end[0])) {
-      function tagCloserSequence(code) {
+      const tagCloserSequence: State = function (code) {
         const character = findCode(pattern.end[tagCloserIndex])
         if (code === character) {
           if (pattern.end.length - 1 === tagCloserIndex) {
@@ -345,8 +295,7 @@ export function factoryTag(
   }
 
   // We’ve seen a `.` and are expecting a member name.
-  /** @type {State} */
-  function beforeMemberName(code) {
+  const beforeMemberName: State = function (code) {
     // Start of a member name.
     if (code !== codes.eof && idStart(code)) {
       effects.enter(tagNameMemberType)
@@ -363,8 +312,7 @@ export function factoryTag(
   }
 
   // Inside the member name.
-  /** @type {State} */
-  function memberName(code) {
+  const memberName: State = function (code) {
     // Continuation of member name: stay in state
     if (code === codes.dash || (code !== codes.eof && idCont(code))) {
       effects.consume(code)
@@ -398,8 +346,7 @@ export function factoryTag(
 
   // After a member name: this is the same as `afterPrimaryName` but we don’t
   // expect colons.
-  /** @type {State} */
-  function afterMemberName(code) {
+  const afterMemberName: State = function (code) {
     // Start another member name.
     if (code === codes.dot) {
       effects.enter(tagNameMemberMarkerType)
@@ -430,8 +377,7 @@ export function factoryTag(
   }
 
   // We’ve seen a `:`, and are expecting a local name.
-  /** @type {State} */
-  function beforeLocalName(code) {
+  const beforeLocalName: State = function (code) {
     // Start of a local name.
     if (code !== codes.eof && idStart(code)) {
       effects.enter(tagNameLocalType)
@@ -453,8 +399,7 @@ export function factoryTag(
   }
 
   // Inside the local name.
-  /** @type {State} */
-  function localName(code) {
+  const localName: State = function (code) {
     // Continuation of local name: stay in state
     if (code === codes.dash || (code !== codes.eof && idCont(code))) {
       effects.consume(code)
@@ -483,8 +428,7 @@ export function factoryTag(
 
   // After a local name: this is the same as `afterPrimaryName` but we don’t
   // expect colons or periods.
-  /** @type {State} */
-  function afterLocalName(code) {
+  const afterLocalName: State = function (code) {
     // End of name.
     if (
       code === codes.slash ||
@@ -509,10 +453,9 @@ export function factoryTag(
     )
   }
 
-  /** @type {State} */
-  function beforeAttribute(code) {
+  const beforeAttribute: State = function (code) {
     if (code === findCode(pattern.end[0])) {
-      function tagCloserSequence(code) {
+      const tagCloserSequence: State = function (code) {
         const character = findCode(pattern.end[tagCloserIndex])
         if (code === character) {
           if (pattern.end.length - 1 === tagCloserIndex) {
@@ -594,15 +537,13 @@ export function factoryTag(
   }
 
   // At the start of an attribute expression.
-  /** @type {State} */
-  function afterAttributeExpression(code) {
+  const afterAttributeExpression: State = function (code) {
     returnState = beforeAttribute
     return optionalEsWhitespace(code)
   }
 
   // In the attribute name.
-  /** @type {State} */
-  function attributePrimaryName(code) {
+  const attributePrimaryName: State = function (code) {
     // Continuation of the attribute name.
     if (code === codes.dash || (code !== codes.eof && idCont(code))) {
       effects.consume(code)
@@ -633,8 +574,7 @@ export function factoryTag(
   }
 
   // After an attribute name, probably finding an equals.
-  /** @type {State} */
-  function afterAttributePrimaryName(code) {
+  const afterAttributePrimaryName: State = function (code) {
     // Start of a local name.
     if (code === codes.colon) {
       effects.enter(tagAttributeNamePrefixMarkerType)
@@ -678,8 +618,7 @@ export function factoryTag(
   }
 
   // We’ve seen a `:`, and are expecting a local name.
-  /** @type {State} */
-  function beforeAttributeLocalName(code) {
+  const beforeAttributeLocalName: State = function (code) {
     // Start of a local name.
     if (code !== codes.eof && idStart(code)) {
       effects.enter(tagAttributeNameLocalType)
@@ -697,8 +636,7 @@ export function factoryTag(
   }
 
   // In the local attribute name.
-  /** @type {State} */
-  function attributeLocalName(code) {
+  const attributeLocalName: State = function (code) {
     // Continuation of the local attribute name.
     if (code === codes.dash || (code !== codes.eof && idCont(code))) {
       effects.consume(code)
@@ -730,8 +668,7 @@ export function factoryTag(
   }
 
   // After a local attribute name, expecting an equals.
-  /** @type {State} */
-  function afterAttributeLocalName(code) {
+  const afterAttributeLocalName: State = function (code) {
     // Start of an attribute value.
     if (code === codes.equalsTo) {
       effects.enter(tagAttributeInitializerMarkerType)
@@ -761,8 +698,7 @@ export function factoryTag(
   }
 
   // After an attribute value initializer, expecting quotes and such.
-  /** @type {State} */
-  function beforeAttributeValue(code) {
+  const beforeAttributeValue: State = function (code) {
     // Start of double- or single quoted value.
     if (code === codes.quotationMark || code === codes.apostrophe) {
       effects.enter(tagAttributeValueLiteralType)
@@ -804,16 +740,14 @@ export function factoryTag(
     // )
   }
 
-  /** @type {State} */
-  function afterAttributeValueExpression(code) {
+  const afterAttributeValueExpression: State = function (code) {
     effects.exit(tagAttributeType)
     returnState = beforeAttribute
     return optionalEsWhitespace(code)
   }
 
   // At the start of a quoted attribute value.
-  /** @type {State} */
-  function attributeValueQuotedStart(code) {
+  const attributeValueQuotedStart: State = function (code) {
     assert(marker !== undefined, 'expected `marker` to be defined')
 
     if (code === codes.eof) {
@@ -846,8 +780,7 @@ export function factoryTag(
   }
 
   // In a quoted attribute value.
-  /** @type {State} */
-  function attributeValueQuoted(code) {
+  const attributeValueQuoted: State = function (code) {
     if (code === codes.eof || code === marker || markdownLineEnding(code)) {
       effects.exit(tagAttributeValueLiteralValueType)
       return attributeValueQuotedStart(code)
@@ -859,8 +792,7 @@ export function factoryTag(
   }
 
   // Right after the slash on a tag, e.g., `<asd /`.
-  /** @type {State} */
-  function selfClosing(code) {
+  const selfClosing: State = function (code) {
     // End of tag.
     if (code === findCode(pattern.end[pattern.end.length - 1])) {
       return tagEnd(code)
@@ -878,8 +810,7 @@ export function factoryTag(
   }
 
   // At a `>`.
-  /** @type {State} */
-  function tagEnd(code) {
+  const tagEnd: State = function (code) {
     // assert(code === codes.greaterThan, 'expected `>`')
     effects.enter(tagMarkerType)
     effects.consume(code)
@@ -889,8 +820,7 @@ export function factoryTag(
   }
 
   // Optionally start whitespace.
-  /** @type {State} */
-  function optionalEsWhitespace(code) {
+  const optionalEsWhitespace: State = function (code) {
     if (markdownLineEnding(code)) {
       if (allowLazy) {
         effects.enter(types.lineEnding)
@@ -925,8 +855,7 @@ export function factoryTag(
   }
 
   // Continue optional whitespace.
-  /** @type {State} */
-  function optionalEsWhitespaceContinue(code) {
+  const optionalEsWhitespaceContinue: State = function (code) {
     if (
       markdownLineEnding(code) ||
       !(markdownSpace(code) || unicodeWhitespace(code))
@@ -949,12 +878,7 @@ export function factoryTag(
   }
 
   // Crash at a nonconforming character.
-  /**
-   * @param {Code} code
-   * @param {string} at
-   * @param {string} expect
-   */
-  function crash(code, at, expect) {
+  function crash(code: Code, at: string, expect: string) {
     throw new VFileMessage(
       'Unexpected ' +
         (code === codes.eof
@@ -975,17 +899,15 @@ export function factoryTag(
         (code === codes.eof ? 'eof' : 'character')
     )
   }
+
+  return start
 }
 
-/** @type {Tokenizer} */
-function tokenizeLazyLineEnd(effects, ok, nok) {
+const tokenizeLazyLineEnd: Tokenizer = function (effects, ok, nok) {
   // eslint-disable-next-line
   const self = this
 
-  return start
-
-  /** @type {State} */
-  function start(code) {
+  const start: State = function (code) {
     assert(markdownLineEnding(code), 'expected eol')
     effects.enter(types.lineEnding)
     effects.consume(code)
@@ -993,17 +915,18 @@ function tokenizeLazyLineEnd(effects, ok, nok) {
     return lineStart
   }
 
-  /** @type {State} */
-  function lineStart(code) {
+  const lineStart: State = function (code) {
     return self.parser.lazy[self.now().line] ? nok(code) : ok(code)
   }
+
+  return start
 }
 
 /**
  * @param {NonNullable<Code>} code
  * @returns {string}
  */
-function serializeCharCode(code) {
+const serializeCharCode = function (code: NonNullable<Code>): string {
   return (
     'U+' +
     code
@@ -1012,3 +935,5 @@ function serializeCharCode(code) {
       .padStart(4, '0')
   )
 }
+
+const lazyLineEnd = { tokenize: tokenizeLazyLineEnd, partial: true }

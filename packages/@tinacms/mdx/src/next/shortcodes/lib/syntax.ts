@@ -4,6 +4,13 @@ import { findCode } from './util'
 import type { Construct, Extension } from 'micromark-util-types'
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 
+export type Pattern = {
+  start: string
+  end: string
+  name: string
+  leaf: boolean
+}
+
 export type Options = {
   acorn?: Acorn
   acornOptions?: AcornOptions
