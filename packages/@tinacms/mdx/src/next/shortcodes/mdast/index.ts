@@ -1,15 +1,12 @@
 // import type { Program } from 'estree-jsx'
-type Program = unknown
+// type Program = unknown
 import type {
-  CompileContext,
-  Extension,
   Handle as FromMarkdownHandle,
   Token,
   OnEnterError,
   OnExitError,
 } from 'mdast-util-from-markdown'
 import type {
-  Options as ToMarkdownOptions,
   Handle as ToMarkdownHandle,
   Map as ToMarkdownMap,
 } from 'mdast-util-to-markdown'
