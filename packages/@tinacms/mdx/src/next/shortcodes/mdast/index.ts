@@ -1,23 +1,41 @@
-/**
- * @typedef {import('estree-jsx').Program} Program
- *
- * @typedef {import('mdast-util-from-markdown').CompileContext} CompileContext
- * @typedef {import('mdast-util-from-markdown').Extension} FromMarkdownExtension
- * @typedef {import('mdast-util-from-markdown').Handle} FromMarkdownHandle
- * @typedef {import('mdast-util-from-markdown').Token} Token
- * @typedef {import('mdast-util-from-markdown').OnEnterError} OnEnterError
- * @typedef {import('mdast-util-from-markdown').OnExitError} OnExitError
- *
- * @typedef {import('mdast-util-to-markdown').Options} ToMarkdownExtension
- * @typedef {import('mdast-util-to-markdown').Handle} ToMarkdownHandle
- * @typedef {import('mdast-util-to-markdown').Map} ToMarkdownMap
- *
- * @typedef {import('../index.js').MdxJsxAttributeValueExpression} MdxJsxAttributeValueExpression
- * @typedef {import('../index.js').MdxJsxAttribute} MdxJsxAttribute
- * @typedef {import('../index.js').MdxJsxExpressionAttribute} MdxJsxExpressionAttribute
- * @typedef {import('../index.js').MdxJsxFlowElement} MdxJsxFlowElement
- * @typedef {import('../index.js').MdxJsxTextElement} MdxJsxTextElement
- */
+// import type { Program } from 'estree-jsx'
+type Program = unknown
+import type {
+  CompileContext,
+  Extension,
+  Handle as FromMarkdownHandle,
+  Token,
+  OnEnterError,
+  OnExitError,
+} from 'mdast-util-from-markdown'
+import type {
+  Options as ToMarkdownOptions,
+  Handle as ToMarkdownHandle,
+  Map as ToMarkdownMap,
+} from 'mdast-util-to-markdown'
+import type {
+  MdxJsxAttributeValueExpression,
+  MdxJsxAttribute,
+  MdxJsxExpressionAttribute,
+  MdxJsxFlowElement,
+  MdxJsxTextElement,
+} from 'mdast-util-mdx-jsx'
+
+type Tag = {
+  name: string | undefined
+  attributes: Array<MdxJsxAttribute | MdxJsxExpressionAttribute>
+  close: boolean
+  selfClosing: boolean
+  start: Token['start']
+  end: Token['end']
+}
+
+type ToMarkdownOptions = {
+  quote: '"' | "'" | null | undefined
+  quoteSmart: boolean | null | undefined
+  tightSelfClosing: boolean | null | undefined
+  printWidth: number | null | undefined
+}
 
 /**
  * @typedef Tag
@@ -78,6 +96,315 @@ import { track } from 'mdast-util-to-markdown/lib/util/track.js'
  *   `data.estree` field set to an ESTree `Program` node.
  */
 export function mdxJsxFromMarkdown() {
+  const buffer: FromMarkdownHandle = function () {
+    this.buffer()
+  }
+
+  const data: FromMarkdownHandle = function (token) {
+    this.config?.enter?.data?.call(this, token)
+    this.config?.exit?.data?.call(this, token)
+  }
+
+  const enterMdxJsxTag: FromMarkdownHandle = function (token) {
+    const tag: Tag = {
+      name: undefined,
+      attributes: [],
+      close: false,
+      selfClosing: false,
+      start: token.start,
+      end: token.end,
+    }
+    if (!this.getData('mdxJsxTagStack')) this.setData('mdxJsxTagStack', [])
+    this.setData('mdxJsxTag', tag)
+    this.buffer()
+  }
+
+  const enterMdxJsxTagClosingMarker: FromMarkdownHandle = function (token) {
+    const stack: Array<Tag> | undefined = this.getData('mdxJsxTagStack')
+
+    if (stack?.length === 0) {
+      throw new VFileMessage(
+        'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
+        { start: token.start, end: token.end },
+        'mdast-util-mdx-jsx:unexpected-closing-slash'
+      )
+    }
+  }
+
+  const enterMdxJsxTagAnyAttribute: FromMarkdownHandle = function (token) {
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
+
+    if (tag?.close) {
+      throw new VFileMessage(
+        'Unexpected attribute in closing tag, expected the end of the tag',
+        { start: token.start, end: token.end },
+        'mdast-util-mdx-jsx:unexpected-attribute'
+      )
+    }
+  }
+
+  const enterMdxJsxTagSelfClosingMarker: FromMarkdownHandle = function (token) {
+    const tag: Tag = this.getData('mdxJsxTag')
+
+    if (tag?.close) {
+      throw new VFileMessage(
+        'Unexpected self-closing slash `/` in closing tag, expected the end of the tag',
+        { start: token.start, end: token.end },
+        'mdast-util-mdx-jsx:unexpected-self-closing-slash'
+      )
+    }
+  }
+
+  const exitMdxJsxTagClosingMarker: FromMarkdownHandle = function () {
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    if (tag) {
+      tag.close = true
+    }
+  }
+
+  const exitMdxJsxTagNamePrimary: FromMarkdownHandle = function (token) {
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    if (tag) {
+      tag.name = this.sliceSerialize(token)
+    }
+  }
+
+  const exitMdxJsxTagNameMember: FromMarkdownHandle = function (token) {
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    if (tag) {
+      tag.name += '.' + this.sliceSerialize(token)
+    }
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagNameLocal(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    tag.name += ':' + this.sliceSerialize(token)
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function enterMdxJsxTagAttribute(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    enterMdxJsxTagAnyAttribute.call(this, token)
+    tag.attributes.push({ type: 'mdxJsxAttribute', name: '', value: null })
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function enterMdxJsxTagExpressionAttribute(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    enterMdxJsxTagAnyAttribute.call(this, token)
+    tag.attributes.push({ type: 'mdxJsxExpressionAttribute', value: '' })
+    this.buffer()
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagExpressionAttribute(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const tail =
+      /** @type {MdxJsxExpressionAttribute} */ tag.attributes[
+        tag.attributes.length - 1
+      ]
+    /** @type {Program | undefined} */
+    // @ts-expect-error: custom.
+    const estree = token.estree
+
+    tail.value = this.resume()
+
+    if (estree) {
+      tail.data = { estree }
+    }
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagAttributeNamePrimary(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const node =
+      /** @type {MdxJsxAttribute} */ tag.attributes[tag.attributes.length - 1]
+    node.name = this.sliceSerialize(token)
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagAttributeNameLocal(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const node =
+      /** @type {MdxJsxAttribute} */ tag.attributes[tag.attributes.length - 1]
+    node.name += ':' + this.sliceSerialize(token)
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagAttributeValueLiteral() {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const attribute = tag.attributes[tag.attributes.length - 1]
+    // Support for unkeyed attributes
+    if (attribute.name === '') {
+      attribute.name = '_value'
+    }
+    attribute.value = parseEntities(this.resume(), { nonTerminated: false })
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagAttributeValueExpression(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const tail =
+      /** @type {MdxJsxAttribute} */ tag.attributes[tag.attributes.length - 1]
+    /** @type {MdxJsxAttributeValueExpression} */
+    const node = {
+      type: 'mdxJsxAttributeValueExpression',
+      value: this.resume(),
+    }
+    /** @type {Program | undefined} */
+    // @ts-expect-error: custom.
+    const estree = token.estree
+
+    if (estree) {
+      node.data = { estree }
+    }
+
+    tail.value = node
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTagSelfClosingMarker() {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+
+    tag.selfClosing = true
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {FromMarkdownHandle}
+   */
+  function exitMdxJsxTag(token) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const stack = /** @type {Array<Tag>} */ this.getData('mdxJsxTagStack')
+    const tail = stack[stack.length - 1]
+
+    if (tag.close && tail.name !== tag.name) {
+      throw new VFileMessage(
+        'Unexpected closing tag `' +
+          serializeAbbreviatedTag(tag) +
+          '`, expected corresponding closing tag for `' +
+          serializeAbbreviatedTag(tail) +
+          '` (' +
+          stringifyPosition(tail) +
+          ')',
+        { start: token.start, end: token.end },
+        'mdast-util-mdx-jsx:end-tag-mismatch'
+      )
+    }
+
+    // End of a tag, so drop the buffer.
+    this.resume()
+
+    if (tag.close) {
+      stack.pop()
+    } else {
+      this.enter(
+        {
+          type:
+            token.type === 'mdxJsxTextTag'
+              ? 'mdxJsxTextElement'
+              : 'mdxJsxFlowElement',
+          name: tag.name || null,
+          attributes: tag.attributes,
+          children: [],
+        },
+        token,
+        onErrorRightIsTag
+      )
+    }
+
+    if (tag.selfClosing || tag.close) {
+      this.exit(token, onErrorLeftIsTag)
+    } else {
+      stack.push(tag)
+    }
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {OnEnterError}
+   */
+  function onErrorRightIsTag(closing, open) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    const place = closing ? ' before the end of `' + closing.type + '`' : ''
+    const position = closing
+      ? { start: closing.start, end: closing.end }
+      : undefined
+
+    throw new VFileMessage(
+      'Expected a closing tag for `' +
+        serializeAbbreviatedTag(tag) +
+        '` (' +
+        stringifyPosition({ start: open.start, end: open.end }) +
+        ')' +
+        place,
+      position,
+      'mdast-util-mdx-jsx:end-tag-mismatch'
+    )
+  }
+
+  /**
+   * @this {CompileContext}
+   * @type {OnExitError}
+   */
+  function onErrorLeftIsTag(a, b) {
+    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+    throw new VFileMessage(
+      'Expected the closing tag `' +
+        serializeAbbreviatedTag(tag) +
+        '` either after the end of `' +
+        b.type +
+        '` (' +
+        stringifyPosition(b.end) +
+        ') or another opening tag after the start of `' +
+        b.type +
+        '` (' +
+        stringifyPosition(b.start) +
+        ')',
+      { start: a.start, end: a.end },
+      'mdast-util-mdx-jsx:end-tag-mismatch'
+    )
+  }
+
+  /**
+   * Serialize a tag, excluding attributes.
+   * `self-closing` is not supported, because we don’t need it yet.
+   *
+   * @param {Tag} tag
+   * @returns {string}
+   */
+  function serializeAbbreviatedTag(tag) {
+    return '<' + (tag.close ? '/' : '') + (tag.name || '') + '>'
+  }
+
   return {
     canContainEols: ['mdxJsxTextElement'],
     enter: {
@@ -130,348 +457,6 @@ export function mdxJsxFromMarkdown() {
       mdxJsxTextTagSelfClosingMarker: exitMdxJsxTagSelfClosingMarker,
       mdxJsxTextTag: exitMdxJsxTag,
     },
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function buffer() {
-    this.buffer()
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function data(token) {
-    this.config.enter.data.call(this, token)
-    this.config.exit.data.call(this, token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTag(token) {
-    /** @type {Tag} */
-    const tag = {
-      name: undefined,
-      attributes: [],
-      close: false,
-      selfClosing: false,
-      start: token.start,
-      end: token.end,
-    }
-    if (!this.getData('mdxJsxTagStack')) this.setData('mdxJsxTagStack', [])
-    this.setData('mdxJsxTag', tag)
-    this.buffer()
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTagClosingMarker(token) {
-    const stack = /** @type {Array<Tag>} */ (this.getData('mdxJsxTagStack'))
-
-    if (stack.length === 0) {
-      throw new VFileMessage(
-        'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:unexpected-closing-slash'
-      )
-    }
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTagAnyAttribute(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-
-    if (tag.close) {
-      throw new VFileMessage(
-        'Unexpected attribute in closing tag, expected the end of the tag',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:unexpected-attribute'
-      )
-    }
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTagSelfClosingMarker(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-
-    if (tag.close) {
-      throw new VFileMessage(
-        'Unexpected self-closing slash `/` in closing tag, expected the end of the tag',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:unexpected-self-closing-slash'
-      )
-    }
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagClosingMarker() {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    tag.close = true
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagNamePrimary(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    tag.name = this.sliceSerialize(token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagNameMember(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    tag.name += '.' + this.sliceSerialize(token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagNameLocal(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    tag.name += ':' + this.sliceSerialize(token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTagAttribute(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    enterMdxJsxTagAnyAttribute.call(this, token)
-    tag.attributes.push({ type: 'mdxJsxAttribute', name: '', value: null })
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function enterMdxJsxTagExpressionAttribute(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    enterMdxJsxTagAnyAttribute.call(this, token)
-    tag.attributes.push({ type: 'mdxJsxExpressionAttribute', value: '' })
-    this.buffer()
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagExpressionAttribute(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const tail = /** @type {MdxJsxExpressionAttribute} */ (
-      tag.attributes[tag.attributes.length - 1]
-    )
-    /** @type {Program | undefined} */
-    // @ts-expect-error: custom.
-    const estree = token.estree
-
-    tail.value = this.resume()
-
-    if (estree) {
-      tail.data = { estree }
-    }
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagAttributeNamePrimary(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const node = /** @type {MdxJsxAttribute} */ (
-      tag.attributes[tag.attributes.length - 1]
-    )
-    node.name = this.sliceSerialize(token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagAttributeNameLocal(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const node = /** @type {MdxJsxAttribute} */ (
-      tag.attributes[tag.attributes.length - 1]
-    )
-    node.name += ':' + this.sliceSerialize(token)
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagAttributeValueLiteral() {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const attribute = tag.attributes[tag.attributes.length - 1]
-    // Support for unkeyed attributes
-    if (attribute.name === '') {
-      attribute.name = '_value'
-    }
-    attribute.value = parseEntities(this.resume(), { nonTerminated: false })
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagAttributeValueExpression(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const tail = /** @type {MdxJsxAttribute} */ (
-      tag.attributes[tag.attributes.length - 1]
-    )
-    /** @type {MdxJsxAttributeValueExpression} */
-    const node = {
-      type: 'mdxJsxAttributeValueExpression',
-      value: this.resume(),
-    }
-    /** @type {Program | undefined} */
-    // @ts-expect-error: custom.
-    const estree = token.estree
-
-    if (estree) {
-      node.data = { estree }
-    }
-
-    tail.value = node
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTagSelfClosingMarker() {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-
-    tag.selfClosing = true
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {FromMarkdownHandle}
-   */
-  function exitMdxJsxTag(token) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const stack = /** @type {Array<Tag>} */ (this.getData('mdxJsxTagStack'))
-    const tail = stack[stack.length - 1]
-
-    if (tag.close && tail.name !== tag.name) {
-      throw new VFileMessage(
-        'Unexpected closing tag `' +
-          serializeAbbreviatedTag(tag) +
-          '`, expected corresponding closing tag for `' +
-          serializeAbbreviatedTag(tail) +
-          '` (' +
-          stringifyPosition(tail) +
-          ')',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:end-tag-mismatch'
-      )
-    }
-
-    // End of a tag, so drop the buffer.
-    this.resume()
-
-    if (tag.close) {
-      stack.pop()
-    } else {
-      this.enter(
-        {
-          type:
-            token.type === 'mdxJsxTextTag'
-              ? 'mdxJsxTextElement'
-              : 'mdxJsxFlowElement',
-          name: tag.name || null,
-          attributes: tag.attributes,
-          children: [],
-        },
-        token,
-        onErrorRightIsTag
-      )
-    }
-
-    if (tag.selfClosing || tag.close) {
-      this.exit(token, onErrorLeftIsTag)
-    } else {
-      stack.push(tag)
-    }
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {OnEnterError}
-   */
-  function onErrorRightIsTag(closing, open) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    const place = closing ? ' before the end of `' + closing.type + '`' : ''
-    const position = closing
-      ? { start: closing.start, end: closing.end }
-      : undefined
-
-    throw new VFileMessage(
-      'Expected a closing tag for `' +
-        serializeAbbreviatedTag(tag) +
-        '` (' +
-        stringifyPosition({ start: open.start, end: open.end }) +
-        ')' +
-        place,
-      position,
-      'mdast-util-mdx-jsx:end-tag-mismatch'
-    )
-  }
-
-  /**
-   * @this {CompileContext}
-   * @type {OnExitError}
-   */
-  function onErrorLeftIsTag(a, b) {
-    const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    throw new VFileMessage(
-      'Expected the closing tag `' +
-        serializeAbbreviatedTag(tag) +
-        '` either after the end of `' +
-        b.type +
-        '` (' +
-        stringifyPosition(b.end) +
-        ') or another opening tag after the start of `' +
-        b.type +
-        '` (' +
-        stringifyPosition(b.start) +
-        ')',
-      { start: a.start, end: a.end },
-      'mdast-util-mdx-jsx:end-tag-mismatch'
-    )
-  }
-
-  /**
-   * Serialize a tag, excluding attributes.
-   * `self-closing` is not supported, because we don’t need it yet.
-   *
-   * @param {Tag} tag
-   * @returns {string}
-   */
-  function serializeAbbreviatedTag(tag) {
-    return '<' + (tag.close ? '/' : '') + (tag.name || '') + '>'
   }
 }
 
