@@ -323,10 +323,12 @@ export function mdxJsxFromMarkdown() {
    */
   function exitMdxJsxTagAttributeValueLiteral() {
     const tag = /** @type {Tag} */ (this.getData('mdxJsxTag'))
-    tag.attributes[tag.attributes.length - 1].value = parseEntities(
-      this.resume(),
-      {nonTerminated: false}
-    )
+    const attribute = tag.attributes[tag.attributes.length - 1]
+    // Support for unkeyed attributes
+    if (attribute.name === '') {
+      attribute.name = '_value'
+    }
+    attribute.value = parseEntities(this.resume(), {nonTerminated: false})
   }
 
   /**

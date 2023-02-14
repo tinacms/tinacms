@@ -372,7 +372,7 @@ $ someLeaf "some string ok ok" $
           {
             "attributes": [
               {
-                "name": "",
+                "name": "_value",
                 "type": "mdxJsxAttribute",
                 "value": "some string ok ok",
               },
