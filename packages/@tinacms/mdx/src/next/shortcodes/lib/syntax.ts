@@ -1,0 +1,69 @@
+import type { Construct, Extension } from 'micromark-util-types'
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
+
+export type Options = {
+  acorn?: Acorn
+  acornOptions?: AcornOptions
+  patterns?: any[]
+  addResult?: boolean
+}
+
+import { jsxText } from './jsx-text.js'
+import { jsxFlow } from './jsx-flow.js'
+import { findCode } from './util'
+
+export function mdxJsx(options: Options = {}): Extension {
+  const acorn = options.acorn
+  /** @type {AcornOptions|undefined} */
+  let acornOptions: AcornOptions | undefined
+
+  if (acorn) {
+    if (!acorn.parse || !acorn.parseExpressionAt) {
+      throw new Error(
+        'Expected a proper `acorn` instance passed in as `options.acorn`'
+      )
+    }
+
+    acornOptions = Object.assign(
+      { ecmaVersion: 2020, sourceType: 'module' },
+      options.acornOptions,
+      { locations: true }
+    )
+  } else if (options.acornOptions || options.addResult) {
+    throw new Error('Expected an `acorn` instance passed in as `options.acorn`')
+  }
+
+  const patterns = options.patterns || []
+
+  const flowRules: Record<string, Construct[]> = {}
+  const textRules: Record<string, Construct[]> = {}
+  patterns.forEach((pattern) => {
+    const firstCharacter = findCode(pattern.start[0])?.toString()
+    if (!firstCharacter) {
+      return
+    }
+
+    if (pattern.type === 'flow') {
+      const existing = flowRules[firstCharacter]
+      flowRules[firstCharacter] = existing
+        ? [
+            ...existing,
+            jsxFlow(acorn, acornOptions, options.addResult, pattern),
+          ]
+        : [jsxFlow(acorn, acornOptions, options.addResult, pattern)]
+    } else {
+      const existing = textRules[firstCharacter]
+      textRules[firstCharacter] = existing
+        ? [
+            ...existing,
+            jsxText(acorn, acornOptions, options.addResult, pattern),
+          ]
+        : [jsxText(acorn, acornOptions, options.addResult, pattern)]
+    }
+  })
+
+  return {
+    flow: flowRules,
+    text: textRules,
+  }
+}
