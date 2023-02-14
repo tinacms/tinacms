@@ -1,6 +1,10 @@
 import {it, expect, describe} from 'vitest'
 import {toTree} from './test-utils'
 
+const patterns = [
+  {start: '$', end: '$', type: 'flow', leaf: true},
+  {start: '%', end: '%', type: 'flow', leaf: false}
+]
 describe('tinaShortcodes', () => {
   it('Expressions dont trigger errors', () => {
     const value = `
@@ -15,12 +19,12 @@ Hello, {world!}
 {{< okok >}}
 `
 
-    expect(() => toTree(value)).not.toThrow()
+    expect(() => toTree(value, patterns)).not.toThrow()
   })
 
   it('parses leaf nodes properly', () => {
     const value = `$ someLeaf $`
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -37,7 +41,7 @@ Hello, {world!}
 
   it('parses leaf nodes with properties properly', () => {
     const value = `$ someLeaf a="b" $`
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -64,7 +68,7 @@ Hello, world!
 
 % /someLeaf %
     `
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -98,7 +102,7 @@ Hello, world!
     const value = `a
 % someLeaf a="b" %
     `
-    expect(() => toTree(value)).toThrowErrorMatchingInlineSnapshot(
+    expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
       '"Expected a closing tag for `<someLeaf>` (2:1-2:19)"'
     )
   })
@@ -106,7 +110,7 @@ Hello, world!
     const value = `a
 % /someLeaf a="b" %
     `
-    expect(() => toTree(value)).toThrowErrorMatchingInlineSnapshot(
+    expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
       '"Unexpected closing slash `/` in tag, expected an open tag first"'
     )
   })
@@ -114,8 +118,8 @@ Hello, world!
     const value = `
 % someLeaf and more text %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -137,8 +141,8 @@ Hello, world!
     const value = `
 % someLeaf
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -160,8 +164,8 @@ Hello, world!
     const value = `
 %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -183,8 +187,8 @@ Hello, world!
     const value = `
 %/
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -206,8 +210,8 @@ Hello, world!
     const value = `
 % some&Leaf %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -229,8 +233,8 @@ Hello, world!
     const value = `
 % someLeaf. %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -251,8 +255,8 @@ Hello, world!
     const value = `
 % someLeaf .$ %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -274,8 +278,8 @@ Hello, world!
     const value = `
 % someLeaf.some$id %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -297,8 +301,8 @@ Hello, world!
     const value = `
 % someLeaf a+x="c" %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -320,8 +324,8 @@ Hello, world!
     const value = `
 % someLeaf ax=z %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -342,8 +346,8 @@ Hello, world!
     const value = `
 % someLeaf ax="a ok %
     `
-    expect(() => toTree(value)).not.toThrow()
-    expect(toTree(value)).toMatchInlineSnapshot(`
+    expect(() => toTree(value, patterns)).not.toThrow()
+    expect(toTree(value, patterns)).toMatchInlineSnapshot(`
       {
         "children": [
           {
@@ -361,11 +365,11 @@ Hello, world!
     `)
   })
 
-  it.only('detects unkeyed attricutes', () => {
+  it('detects unkeyed attricutes', () => {
     const value = `
 $ someLeaf "some string ok ok" $
     `
-    const tree = toTree(value)
+    const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
         "children": [

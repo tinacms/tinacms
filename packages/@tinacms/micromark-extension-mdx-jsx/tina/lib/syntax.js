@@ -50,10 +50,7 @@ export function mdxJsx(options = {}) {
     throw new Error('Expected an `acorn` instance passed in as `options.acorn`')
   }
 
-  const patterns = [
-    {start: '$', end: '$', type: 'flow', leaf: true},
-    {start: '%', end: '%', type: 'flow', leaf: false}
-  ]
+  const patterns = options.patterns || []
 
   const flowRules = {}
   const textRules = {}

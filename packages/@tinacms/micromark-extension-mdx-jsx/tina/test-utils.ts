@@ -4,10 +4,9 @@ import {mdxJsx} from './index'
 // import {mdxJsxFromMarkdown} from 'mdast-util-mdx-jsx'
 import {mdxJsxFromMarkdown} from './mdast'
 import * as acorn from 'acorn'
-
-export const toTree = (value: string) => {
+export const toTree = (value: string, patterns) => {
   const tree = fromMarkdown(value, {
-    extensions: [mdxJsx({acorn: acorn, addResult: true})],
+    extensions: [mdxJsx({acorn: acorn, addResult: true, patterns})],
     mdastExtensions: [mdxJsxFromMarkdown()]
   })
 
