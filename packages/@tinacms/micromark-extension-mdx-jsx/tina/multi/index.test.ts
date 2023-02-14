@@ -2,7 +2,7 @@ import {it, expect, describe} from 'vitest'
 import {toTree} from '../test-utils'
 
 describe('tinaShortcodes', () => {
-  it('with multistring patterns', () => {
+  it('with multistring patterns and no attributes', () => {
     const value = `
 {{< hello >}}
     `
@@ -22,14 +22,83 @@ describe('tinaShortcodes', () => {
       }
     `)
   })
-  // TODO
-  it.skip('with multistring patterns', () => {
+  it('with multistring patterns', () => {
     const value = `
-% hello %
+{{< hello a="b" >}}
     `
-    const patterns = [{start: '%', end: '%', type: 'flow', leaf: true}]
+    const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: true}]
     const tree = toTree(value, patterns)
-    console.dir(tree, {depth: null})
-    // expect(toTree(value, patterns)).toMatchInlineSnapshot(``)
+    // console.dir(tree, {depth: null})
+    expect(tree).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "a",
+                "type": "mdxJsxAttribute",
+                "value": "b",
+              },
+            ],
+            "children": [],
+            "name": "hello",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
   })
+
+  it('with multistring patterns', () => {
+    const value = `
+{{< hello a="b" >}}
+Hello, world!
+{{< /hello >}}
+    `
+    const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
+    const tree = toTree(value, patterns)
+    // console.dir(tree, {depth: null})
+    expect(tree).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "a",
+                "type": "mdxJsxAttribute",
+                "value": "b",
+              },
+            ],
+            "children": [
+              {
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Hello, world!",
+                  },
+                ],
+                "type": "paragraph",
+              },
+            ],
+            "name": "hello",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  //   it.only('with multistring patterns', () => {
+  //     const value = `
+  // {{< hello a=b >}}
+  // Hello, world!
+  // {{< /hello >}}
+  //     `
+  //     const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
+  //     const tree = toTree(value, patterns)
+  //     console.dir(tree, {depth: null})
+  //     // expect(tree).toMatchInlineSnapshot()
+  //   })
 })

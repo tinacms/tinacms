@@ -310,6 +310,7 @@ export function factoryTag(
           effects.consume(code)
           return tagCloserSequence
         }
+        tagCloserIndex = 0
         return nok
       }
       if (pattern.end.length === 1) {
@@ -521,6 +522,34 @@ export function factoryTag(
 
   /** @type {State} */
   function beforeAttribute(code) {
+    if (code === findCode(pattern.end[0])) {
+      function tagCloserSequence(code) {
+        const character = findCode(pattern.end[tagCloserIndex])
+        if (code === character) {
+          if (pattern.end.length - 1 === tagCloserIndex) {
+            return beforeAttribute(code)
+          }
+          tagCloserIndex++
+          effects.consume(code)
+          return tagCloserSequence
+        }
+        tagCloserIndex = 0
+        return nok
+      }
+      if (pattern.end.length === 1) {
+        if (pattern.leaf) {
+          effects.enter(tagSelfClosingMarker)
+          effects.exit(tagSelfClosingMarker)
+          returnState = selfClosing
+          return optionalEsWhitespace
+        } else {
+          return tagEnd(code)
+        }
+      } else {
+        effects.consume(code)
+        return tagCloserSequence
+      }
+    }
     // TODO: test this against `pattern.end`
     if (code === findCode(pattern.end[pattern.end.length - 1])) {
       if (pattern.leaf) {
