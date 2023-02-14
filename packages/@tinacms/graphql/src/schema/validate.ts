@@ -209,11 +209,14 @@ const validateField = async (
   const schema = yup.object({
     name: yup
       .string()
-      .matches(/^[a-zA-Z0-9_]*$/, {
+      .matches(/^[a-zA-Z0-9_\-]*$/, {
         message: (obj) =>
           `Field's 'name' must match ${obj.regex} at ${messageName}`,
       })
-      .required(),
+      .required()
+      .transform((value) => {
+        return value.replaceAll('-', '_')
+      }),
     type: yup
       .string()
       .oneOf(
@@ -224,5 +227,7 @@ const validateField = async (
   })
   await schema.validate(field)
 
-  return field
+  const validField = (await schema.cast(field)) as TinaFieldEnriched
+
+  return validField
 }

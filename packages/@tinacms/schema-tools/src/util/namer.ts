@@ -16,7 +16,10 @@ const capitalize = (s: string) => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 }
 const generateNamespacedFieldName = (names: string[], suffix: string = '') => {
-  return (suffix ? [...names, suffix] : names).map(capitalize).join('')
+  return (suffix ? [...names, suffix] : names)
+    .map(capitalize)
+    .join('')
+    .replaceAll('-', '_')
 }
 
 export const NAMER = {
