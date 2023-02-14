@@ -1,5 +1,5 @@
 import {it, expect, describe} from 'vitest'
-import {toTree} from '../test-utils'
+import {toTree} from '../util'
 
 describe('tinaShortcodes', () => {
   it('with multistring patterns and no attributes', () => {
@@ -14,6 +14,61 @@ describe('tinaShortcodes', () => {
           {
             "attributes": [],
             "children": [],
+            "name": "hello",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+  it('Multiple levels of nesting', () => {
+    const value = `
+{{< hello >}}
+Nested item
+
+{{< hello >}}
+
+And deeply nested item
+
+{{< /hello >}}
+
+{{< /hello >}}
+    `
+    const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
+    const tree = toTree(value, patterns)
+    expect(tree).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [],
+            "children": [
+              {
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Nested item",
+                  },
+                ],
+                "type": "paragraph",
+              },
+              {
+                "attributes": [],
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "type": "text",
+                        "value": "And deeply nested item",
+                      },
+                    ],
+                    "type": "paragraph",
+                  },
+                ],
+                "name": "hello",
+                "type": "mdxJsxFlowElement",
+              },
+            ],
             "name": "hello",
             "type": "mdxJsxFlowElement",
           },

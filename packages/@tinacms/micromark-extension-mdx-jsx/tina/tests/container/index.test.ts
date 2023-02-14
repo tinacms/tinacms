@@ -1,5 +1,5 @@
 import {it, expect, describe} from 'vitest'
-import {toTree} from './test-utils'
+import {toTree} from '../util'
 
 const patterns = [
   {start: '$', end: '$', type: 'flow', leaf: true},

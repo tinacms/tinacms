@@ -1,8 +1,8 @@
 import {fromMarkdown} from 'mdast-util-from-markdown'
 import {visit} from 'unist-util-visit'
-import {mdxJsx} from './index'
+import {mdxJsx} from '../index'
 // import {mdxJsxFromMarkdown} from 'mdast-util-mdx-jsx'
-import {mdxJsxFromMarkdown} from './mdast'
+import {mdxJsxFromMarkdown} from '../mdast'
 import * as acorn from 'acorn'
 export const toTree = (value: string, patterns) => {
   const tree = fromMarkdown(value, {
