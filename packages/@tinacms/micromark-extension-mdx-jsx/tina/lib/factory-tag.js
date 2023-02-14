@@ -23,7 +23,7 @@ import {codes} from 'micromark-util-symbol/codes.js'
 import {constants} from 'micromark-util-symbol/constants.js'
 import {types} from 'micromark-util-symbol/types.js'
 import {VFileMessage} from 'vfile-message'
-import {findCode, logSelf, printCode} from './util'
+import {findCode} from './util'
 
 const lazyLineEnd = {tokenize: tokenizeLazyLineEnd, partial: true}
 
@@ -136,20 +136,6 @@ export function factoryTag(
       }
       tagOpenerIndex++
       return tagOpenerSequence
-    }
-    return nok
-  }
-
-  /** @type {State} */
-  function tagCloserSequence(code) {
-    const character = findCode(pattern.end[tagCloserIndex])
-    if (code === character) {
-      if (pattern.end.length - 1 === tagCloserIndex) {
-        // effects.exit(tagMarkerType)
-        // return afterStart
-      }
-      tagOpenerIndex++
-      return tagCloserSequence
     }
     return nok
   }
