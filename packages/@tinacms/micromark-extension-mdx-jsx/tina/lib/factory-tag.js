@@ -161,14 +161,16 @@ export function factoryTag(
       return primaryName
     }
 
-    crash(
-      code,
-      'before name',
-      'a character that can start a name, such as a letter, `$`, or `_`' +
-        (code === codes.exclamationMark
-          ? ' (note: to create a comment in MDX, use `{/* text */}`)'
-          : '')
-    )
+    return nok(code)
+
+    // crash(
+    //   code,
+    //   'before name',
+    //   'a character that can start a name, such as a letter, `$`, or `_`' +
+    //     (code === codes.exclamationMark
+    //       ? ' (note: to create a comment in MDX, use `{/* text */}`)'
+    //       : '')
+    // )
   }
 
   // At the start of a closing tag, right after `</`.
@@ -187,14 +189,15 @@ export function factoryTag(
       return primaryName
     }
 
-    crash(
-      code,
-      'before name',
-      'a character that can start a name, such as a letter, `$`, or `_`' +
-        (code === codes.asterisk || code === codes.slash
-          ? ' (note: JS comments in JSX tags are not supported in MDX)'
-          : '')
-    )
+    return nok(code)
+    // crash(
+    //   code,
+    //   'before name',
+    //   'a character that can start a name, such as a letter, `$`, or `_`' +
+    //     (code === codes.asterisk || code === codes.slash
+    //       ? ' (note: JS comments in JSX tags are not supported in MDX)'
+    //       : '')
+    // )
   }
 
   // Inside the primary name.
@@ -221,14 +224,15 @@ export function factoryTag(
       return optionalEsWhitespace(code)
     }
 
-    crash(
-      code,
-      'in name',
-      'a name character such as letters, digits, `$`, or `_`; whitespace before attributes; or the end of the tag' +
-        (code === codes.atSign
-          ? ' (note: to create a link in MDX, use `[text](url)`)'
-          : '')
-    )
+    return nok(code)
+    // crash(
+    //   code,
+    //   'in name',
+    //   'a name character such as letters, digits, `$`, or `_`; whitespace before attributes; or the end of the tag' +
+    //     (code === codes.atSign
+    //       ? ' (note: to create a link in MDX, use `[text](url)`)'
+    //       : '')
+    // )
   }
 
   // After a name.
@@ -285,6 +289,8 @@ export function factoryTag(
     //   return beforeAttribute
     // }
 
+    return nok(code)
+
     crash(
       code,
       'after name',
@@ -301,6 +307,7 @@ export function factoryTag(
       effects.consume(code)
       return memberName
     }
+    return nok(code)
 
     crash(
       code,
@@ -332,6 +339,7 @@ export function factoryTag(
       return optionalEsWhitespace(code)
     }
 
+    // TODO: not sure when this happens
     crash(
       code,
       'in member name',
@@ -366,11 +374,13 @@ export function factoryTag(
       return beforeAttribute(code)
     }
 
-    crash(
-      code,
-      'after member name',
-      'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
-    )
+    return nok(code)
+
+    // crash(
+    //   code,
+    //   'after member name',
+    //   'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
+    // )
   }
 
   // We’ve seen a `:`, and are expecting a local name.
@@ -439,6 +449,12 @@ export function factoryTag(
       effects.exit(tagNameType)
       return beforeAttribute(code)
     }
+    if (code === findCode(pattern.end)) {
+      effects.exit(tagNameType)
+      return beforeAttribute(code)
+    }
+
+    // TODO: not sure how to trigger this one
 
     crash(
       code,
@@ -496,11 +512,11 @@ export function factoryTag(
     }
 
     return nok
-    crash(
-      code,
-      'before attribute name',
-      'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
-    )
+    // crash(
+    //   code,
+    //   'before attribute name',
+    //   'a character that can start an attribute name, such as a letter, `$`, or `_`; whitespace before attributes; or the end of the tag'
+    // )
   }
 
   // At the start of an attribute expression.
@@ -534,11 +550,12 @@ export function factoryTag(
       return optionalEsWhitespace(code)
     }
 
-    crash(
-      code,
-      'in attribute name',
-      'an attribute name character such as letters, digits, `$`, or `_`; `=` to initialize a value; whitespace before attributes; or the end of the tag'
-    )
+    return nok(code)
+    // crash(
+    //   code,
+    //   'in attribute name',
+    //   'an attribute name character such as letters, digits, `$`, or `_`; `=` to initialize a value; whitespace before attributes; or the end of the tag'
+    // )
   }
 
   // After an attribute name, probably finding an equals.
@@ -578,11 +595,12 @@ export function factoryTag(
       return optionalEsWhitespace(code)
     }
 
-    crash(
-      code,
-      'after attribute name',
-      'a character that can start an attribute name, such as a letter, `$`, or `_`; `=` to initialize a value; or the end of the tag'
-    )
+    return nok(code)
+    // crash(
+    //   code,
+    //   'after attribute name',
+    //   'a character that can start an attribute name, such as a letter, `$`, or `_`; `=` to initialize a value; or the end of the tag'
+    // )
   }
 
   // We’ve seen a `:`, and are expecting a local name.
@@ -594,6 +612,8 @@ export function factoryTag(
       effects.consume(code)
       return attributeLocalName
     }
+
+    // TODO not sure how to trigger this
 
     crash(
       code,
@@ -626,6 +646,8 @@ export function factoryTag(
       return optionalEsWhitespace(code)
     }
 
+    // TODO not sure how to trigger this
+
     crash(
       code,
       'in local attribute name',
@@ -656,6 +678,7 @@ export function factoryTag(
       return beforeAttribute(code)
     }
 
+    // TODO not sure how to trigger this
     crash(
       code,
       'after local attribute name',
@@ -696,14 +719,15 @@ export function factoryTag(
       )(code)
     }
 
-    crash(
-      code,
-      'before attribute value',
-      'a character that can start an attribute value, such as `"`, `\'`, or `{`' +
-        (code === codes.lessThan
-          ? ' (note: to use an element or fragment as a prop value in MDX, use `{<element />}`)'
-          : '')
-    )
+    return nok(code)
+    // crash(
+    //   code,
+    //   'before attribute value',
+    //   'a character that can start an attribute value, such as `"`, `\'`, or `{`' +
+    //     (code === codes.lessThan
+    //       ? ' (note: to use an element or fragment as a prop value in MDX, use `{<element />}`)'
+    //       : '')
+    // )
   }
 
   /** @type {State} */
@@ -719,11 +743,12 @@ export function factoryTag(
     assert(marker !== undefined, 'expected `marker` to be defined')
 
     if (code === codes.eof) {
-      crash(
-        code,
-        'in attribute value',
-        'a corresponding closing quote `' + String.fromCodePoint(marker) + '`'
-      )
+      return nok(code)
+      // crash(
+      //   code,
+      //   'in attribute value',
+      //   'a corresponding closing quote `' + String.fromCodePoint(marker) + '`'
+      // )
     }
 
     if (code === marker) {
@@ -767,6 +792,7 @@ export function factoryTag(
       return tagEnd(code)
     }
 
+    // Not sure how to trigger this
     crash(
       code,
       'after self-closing slash',

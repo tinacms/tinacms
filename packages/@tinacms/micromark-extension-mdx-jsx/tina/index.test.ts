@@ -108,4 +108,254 @@ Hello, world!
       '"Unexpected closing slash `/` in tag, expected an open tag first"'
     )
   })
+  it('does not throw an error when tokenization fails due to attributes not making sense', () => {
+    const value = `
+% someLeaf and more text %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf and more text %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due a missing closing tag', () => {
+    const value = `
+% someLeaf
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due a missing name', () => {
+    const value = `
+%
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "%",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due a missing closing tag name', () => {
+    const value = `
+%/
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "%/",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due weird characters in the name', () => {
+    const value = `
+% some&Leaf %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% some&Leaf %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due unexpected characters before a "."', () => {
+    const value = `
+% someLeaf. %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf. %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+  it('does not throw an error when tokenization fails due unexpected characters after a "."', () => {
+    const value = `
+% someLeaf .$ %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf .$ %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due unexpected characters in a member name', () => {
+    const value = `
+% someLeaf.some$id %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf.some$id %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due unexpected characters in an attribute name', () => {
+    const value = `
+% someLeaf a+x="c" %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf a+x=\\"c\\" %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('does not throw an error when tokenization fails due unexpected characters after an attribute name', () => {
+    const value = `
+% someLeaf ax=z %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf ax=z %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+  it('does not throw an error when tokenization fails due an unclosed attribute value', () => {
+    const value = `
+% someLeaf ax="a ok %
+    `
+    expect(() => toTree(value)).not.toThrow()
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "type": "text",
+                "value": "% someLeaf ax=\\"a ok %",
+              },
+            ],
+            "type": "paragraph",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
 })
