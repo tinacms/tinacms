@@ -1,70 +1,100 @@
 import {it, expect, describe} from 'vitest'
-import {fromMarkdown} from 'mdast-util-from-markdown'
-import {visit} from 'unist-util-visit'
-import {mdxJsx} from './index'
-import {mdxJsxFromMarkdown} from 'mdast-util-mdx-jsx'
-import * as acorn from 'acorn'
+import {toTree} from './test-utils'
 
 describe('tinaShortcodes', () => {
-  it('parses leaf shortcodes as directives', () => {
+  it('Expressions dont trigger errors', () => {
     const value = `
 {
 
 import { foo } from 'bar.js'
 
-const meh = "ok"
+Hello, {world!}
 
-$SelfClosing a="b" $
-
-% OpenEnded c="d" %
-
-% OpenEnded g="h" %
-
-$SelfClosing i="j" $
-
-Testing
-
-%/OpenEnded %
-
-Testing
-
-%/OpenEnded %
-
+{{< okok >}}
 `
 
-    try {
-      const tree = fromMarkdown(value, {
-        extensions: [mdxJsx({acorn: acorn, addResult: true})],
-        mdastExtensions: [mdxJsxFromMarkdown()]
-      })
-      console.dir(removePosition(tree, {force: true}), {depth: null})
-    } catch (e) {
-      console.log(e)
-    }
+    expect(() => toTree(value)).not.toThrow()
+  })
+
+  it('parses leaf nodes properly', () => {
+    const value = `$ someLeaf $`
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [],
+            "children": [],
+            "name": "someLeaf",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('parses leaf nodes with properties properly', () => {
+    const value = `$ someLeaf a="b" $`
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "a",
+                "type": "mdxJsxAttribute",
+                "value": "b",
+              },
+            ],
+            "children": [],
+            "name": "someLeaf",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+
+  it('parses container nodes with properties properly', () => {
+    const value = `% someLeaf a="b" %
+Hello, world!
+
+% /someLeaf %
+    `
+    expect(toTree(value)).toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "attributes": [
+              {
+                "name": "a",
+                "type": "mdxJsxAttribute",
+                "value": "b",
+              },
+            ],
+            "children": [
+              {
+                "children": [
+                  {
+                    "type": "text",
+                    "value": "Hello, world!",
+                  },
+                ],
+                "type": "paragraph",
+              },
+            ],
+            "name": "someLeaf",
+            "type": "mdxJsxFlowElement",
+          },
+        ],
+        "type": "root",
+      }
+    `)
+  })
+  it('does not throw an error when it cant complete', () => {
+    const value = `% someLeaf a="b" %
+    `
+    expect(() => toTree(value)).not.toThrow()
   })
 })
-
-// @ts-ignore
-export function removePosition(tree, options) {
-  const force =
-    typeof options === 'boolean' ? options : options ? options.force : false
-
-  visit(tree, remove)
-
-  return tree
-
-  // @ts-ignore
-  function remove(node) {
-    // node?.attributes?.forEach((att) => {
-    //   if (att?.value?.data) {
-    //     delete att?.value?.data
-    //   }
-    //   delete att.data
-    // })
-    if (force) {
-      delete node.position
-    } else {
-      node.position = undefined
-    }
-  }
-}
