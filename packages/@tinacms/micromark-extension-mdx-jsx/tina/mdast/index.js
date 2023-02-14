@@ -177,7 +177,7 @@ export function mdxJsxFromMarkdown() {
 
     if (stack.length === 0) {
       throw new VFileMessage(
-        'Unexpected closing slash `/` in tag, expected an open tag first',
+        'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
         {start: token.start, end: token.end},
         'mdast-util-mdx-jsx:unexpected-closing-slash'
       )

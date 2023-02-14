@@ -90,15 +90,26 @@ Hello, world!
     `)
   })
 
-  //   it.only('with multistring patterns', () => {
-  //     const value = `
-  // {{< hello a=b >}}
-  // Hello, world!
-  // {{< /hello >}}
-  //     `
-  //     const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
-  //     const tree = toTree(value, patterns)
-  //     console.dir(tree, {depth: null})
-  //     // expect(tree).toMatchInlineSnapshot()
-  //   })
+  it('when the opening tag cant be parsed it displays a helpful error message', () => {
+    const value = `
+  {{< hello a=invalid-formatting >}}
+  Hello, world!
+  {{< /hello >}}
+      `
+    const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
+    expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
+      '"Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly"'
+    )
+  })
+  it('when the closing tag cant be parsed it displays a helpful error message', () => {
+    const value = `
+  {{< hello a="b" >}}
+  Hello, world!
+  {{< /hello something="here" >}}
+      `
+    const patterns = [{start: '{{<', end: '>}}', type: 'flow', leaf: false}]
+    expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
+      '"Unexpected attribute in closing tag, expected the end of the tag"'
+    )
+  })
 })

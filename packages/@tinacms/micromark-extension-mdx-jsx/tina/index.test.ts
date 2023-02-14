@@ -111,7 +111,7 @@ Hello, world!
 % /someLeaf a="b" %
     `
     expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
-      '"Unexpected closing slash `/` in tag, expected an open tag first"'
+      '"Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly"'
     )
   })
   it('does not throw an error when tokenization fails due to attributes not making sense', () => {
