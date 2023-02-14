@@ -92,9 +92,20 @@ Hello, world!
       }
     `)
   })
-  it('does not throw an error when it cant complete', () => {
-    const value = `% someLeaf a="b" %
+  it('throws a helpful error when a container shortcode is not closed', () => {
+    const value = `a
+% someLeaf a="b" %
     `
-    expect(() => toTree(value)).not.toThrow()
+    expect(() => toTree(value)).toThrowErrorMatchingInlineSnapshot(
+      '"Expected a closing tag for `<someLeaf>` (2:1-2:19)"'
+    )
+  })
+  it('throws a helpful error when a container shortcode is closed, but no opened', () => {
+    const value = `a
+% /someLeaf a="b" %
+    `
+    expect(() => toTree(value)).toThrowErrorMatchingInlineSnapshot(
+      '"Unexpected closing slash `/` in tag, expected an open tag first"'
+    )
   })
 })

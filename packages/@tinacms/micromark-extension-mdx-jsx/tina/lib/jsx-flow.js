@@ -12,6 +12,7 @@ import {markdownLineEnding} from 'micromark-util-character'
 import {codes} from 'micromark-util-symbol/codes.js'
 import {types} from 'micromark-util-symbol/types.js'
 import {factoryTag} from './factory-tag.js'
+import {logSelf} from './util'
 
 /**
  * @param {Acorn|undefined} acorn
