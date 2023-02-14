@@ -81,8 +81,8 @@ const LevelProxyHandler = {
     } else if (property === 'sublevel') {
       // wrap sublevel in a proxy to intercept get
       return (...args) => {
-        // eslint-disable-next-line prefer-spread
         return new Proxy(
+          // eslint-disable-next-line prefer-spread
           target[property].apply(target, args),
           LevelProxyHandler
         )
