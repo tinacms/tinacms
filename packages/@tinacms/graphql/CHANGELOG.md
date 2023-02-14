@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 1.3.1
+
+### Patch Changes
+
+- 3bbb621cd: Fix handling of level not found to centralize it
+
 ## 1.3.0
 
 ### Minor Changes
