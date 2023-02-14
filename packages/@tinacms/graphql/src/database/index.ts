@@ -36,6 +36,7 @@ import {
   PutOp,
   CONTENT_ROOT_PREFIX,
   SUBLEVEL_OPTIONS,
+  LevelProxy,
 } from './level'
 
 type IndexStatusEvent = {
@@ -104,7 +105,8 @@ export class Database {
   constructor(public config: CreateDatabase) {
     this.tinaDirectory = config.tinaDirectory || '.tina'
     this.bridge = config.bridge
-    this.rootLevel = config.level
+    this.rootLevel =
+      config.level && (new LevelProxy(config.level) as unknown as Level)
     this.indexStatusCallback =
       config.indexStatusCallback || defaultStatusCallback
     this.onPut = config.onPut || defaultOnPut
@@ -149,32 +151,15 @@ export class Database {
   }
 
   private async updateDatabaseVersion(version: string) {
-    const metadataLevel = await this.rootLevel.sublevel(
-      '_metadata',
-      SUBLEVEL_OPTIONS
-    )
+    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
     await metadataLevel.put('metadata', { version })
   }
 
   private async getDatabaseVersion(): Promise<string | undefined> {
-    const metadataLevel = await this.rootLevel.sublevel(
-      '_metadata',
-      SUBLEVEL_OPTIONS
-    )
+    const metadataLevel = this.rootLevel.sublevel('_metadata', SUBLEVEL_OPTIONS)
 
-    let version: string | undefined
-    try {
-      const metadata = await metadataLevel.get('metadata')
-      version = metadata.version || version
-    } catch (e: any) {
-      if (e.code !== 'LEVEL_NOT_FOUND') {
-        throw e
-      }
-      if (version) {
-        await metadataLevel.put('metadata', { version })
-      }
-    }
-    return version
+    const metadata = await metadataLevel.get('metadata')
+    return metadata?.version
   }
 
   private async initLevel() {
@@ -184,10 +169,12 @@ export class Database {
     if (!this.config.version) {
       this.level = this.rootLevel
     } else {
-      const version = await this.getDatabaseVersion()
-      if (version) {
-        this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
+      let version = await this.getDatabaseVersion()
+      if (!version) {
+        version = ''
+        await this.updateDatabaseVersion(version)
       }
+      this.level = this.rootLevel.sublevel(version, SUBLEVEL_OPTIONS)
     }
 
     // Make sure this error bubbles up to the user
@@ -203,19 +190,13 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema(this.level)
       const extension = path.extname(filepath)
-      let contentObject
-      try {
-        contentObject = await this.level
-          .sublevel<string, Record<string, any>>(
-            CONTENT_ROOT_PREFIX,
-            SUBLEVEL_OPTIONS
-          )
-          .get(normalizePath(filepath))
-      } catch (e: any) {
-        if (e.code !== 'LEVEL_NOT_FOUND') {
-          throw e
-        }
-      }
+      const contentObject = await this.level
+        .sublevel<string, Record<string, any>>(
+          CONTENT_ROOT_PREFIX,
+          SUBLEVEL_OPTIONS
+        )
+        .get(normalizePath(filepath))
+
       if (!contentObject) {
         throw new GraphQLError(`Unable to find record ${filepath}`)
       }
@@ -286,19 +267,12 @@ export class Database {
       this.level
     )
 
-    let existingItem
-    try {
-      existingItem = await this.level
-        .sublevel<string, Record<string, any>>(
-          CONTENT_ROOT_PREFIX,
-          SUBLEVEL_OPTIONS
-        )
-        .get(normalizedPath)
-    } catch (e: any) {
-      if (e.code !== 'LEVEL_NOT_FOUND') {
-        throw e
-      }
-    }
+    const existingItem = await this.level
+      .sublevel<string, Record<string, any>>(
+        CONTENT_ROOT_PREFIX,
+        SUBLEVEL_OPTIONS
+      )
+      .get(normalizedPath)
 
     const delOps = existingItem
       ? makeIndexOpsForDocument(
@@ -362,19 +336,13 @@ export class Database {
           this.level
         )
 
-        let existingItem
-        try {
-          existingItem = await this.level
-            .sublevel<string, Record<string, any>>(
-              CONTENT_ROOT_PREFIX,
-              SUBLEVEL_OPTIONS
-            )
-            .get(normalizedPath)
-        } catch (e: any) {
-          if (e.code !== 'LEVEL_NOT_FOUND') {
-            throw e
-          }
-        }
+        const existingItem = await this.level
+          .sublevel<string, Record<string, any>>(
+            CONTENT_ROOT_PREFIX,
+            SUBLEVEL_OPTIONS
+          )
+          .get(normalizedPath)
+
         const delOps = existingItem
           ? makeIndexOpsForDocument(
               normalizedPath,
@@ -1171,25 +1139,19 @@ const _deleteIndexContent = async (
   )
   await sequential(documentPaths, async (filepath) => {
     const itemKey = normalizePath(filepath)
-    try {
-      const item = await rootLevel.get(itemKey)
-      if (item) {
-        await enequeueOps([
-          ...makeIndexOpsForDocument(
-            itemKey,
-            collection.name,
-            collectionIndexDefinitions,
-            item,
-            'del',
-            database.level
-          ),
-          { type: 'del', key: itemKey, sublevel: rootLevel },
-        ])
-      }
-    } catch (e: any) {
-      if (e.code !== 'LEVEL_NOT_FOUND') {
-        throw e
-      }
+    const item = await rootLevel.get(itemKey)
+    if (item) {
+      await enequeueOps([
+        ...makeIndexOpsForDocument(
+          itemKey,
+          collection.name,
+          collectionIndexDefinitions,
+          item,
+          'del',
+          database.level
+        ),
+        { type: 'del', key: itemKey, sublevel: rootLevel },
+      ])
     }
   })
 }
