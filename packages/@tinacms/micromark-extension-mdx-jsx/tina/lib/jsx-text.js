@@ -13,7 +13,7 @@ import {factoryTag} from './factory-tag.js'
  * @param {boolean|undefined} addResult
  * @returns {Construct}
  */
-export function jsxText(acorn, acornOptions, addResult) {
+export function jsxText(acorn, acornOptions, addResult, pattern) {
   return {tokenize: tokenizeJsxText}
 
   /** @type {Tokenizer} */
@@ -51,7 +51,8 @@ export function jsxText(acorn, acornOptions, addResult) {
       'mdxJsxTextTagAttributeValueLiteralValue',
       'mdxJsxTextTagAttributeValueExpression',
       'mdxJsxTextTagAttributeValueExpressionMarker',
-      'mdxJsxTextTagAttributeValueExpressionValue'
+      'mdxJsxTextTagAttributeValueExpressionValue',
+      pattern
     )
   }
 }
