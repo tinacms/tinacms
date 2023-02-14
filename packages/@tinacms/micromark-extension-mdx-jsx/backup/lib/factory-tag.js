@@ -23,7 +23,6 @@ import {codes} from 'micromark-util-symbol/codes.js'
 import {constants} from 'micromark-util-symbol/constants.js'
 import {types} from 'micromark-util-symbol/types.js'
 import {VFileMessage} from 'vfile-message'
-import {findCode, logSelf, printCode} from './util'
 
 const lazyLineEnd = {tokenize: tokenizeLazyLineEnd, partial: true}
 
@@ -95,8 +94,7 @@ export function factoryTag(
   tagAttributeValueLiteralValueType,
   tagAttributeValueExpressionType,
   tagAttributeValueExpressionMarkerType,
-  tagAttributeValueExpressionValueType,
-  pattern
+  tagAttributeValueExpressionValueType
 ) {
   // eslint-disable-next-line
   const self = this
@@ -111,6 +109,7 @@ export function factoryTag(
 
   /** @type {State} */
   function start(code) {
+    assert(code === codes.lessThan, 'expected `<`')
     startPoint = self.now()
     effects.enter(tagType)
     effects.enter(tagMarkerType)
@@ -121,15 +120,11 @@ export function factoryTag(
 
   /** @type {State} */
   function afterStart(code) {
-    /**
-     * Orinal MDX factory-tag disallows this because `<` is ambiguous, but shortcodes
-     * may or may not be using that character so allow space after start
-     */
     // Deviate from JSX, which allows arbitrary whitespace.
     // See: <https://github.com/micromark/micromark-extension-mdx-jsx/issues/7>.
-    // if (markdownLineEnding(code) || markdownSpace(code)) {
-    //   return nok(code)
-    // }
+    if (markdownLineEnding(code) || markdownSpace(code)) {
+      return nok(code)
+    }
 
     // Any other ES whitespace does not get this treatment.
     returnState = beforeName
@@ -235,7 +230,6 @@ export function factoryTag(
   /** @type {State} */
   function afterPrimaryName(code) {
     // Start of a member name.
-    // eg. <Popover.PopoverButton>
     if (code === codes.dot) {
       effects.enter(tagNameMemberMarkerType)
       effects.consume(code)
@@ -245,23 +239,12 @@ export function factoryTag(
     }
 
     // Start of a local name.
-    // eg. <xml:text>
     if (code === codes.colon) {
       effects.enter(tagNamePrefixMarkerType)
       effects.consume(code)
       effects.exit(tagNamePrefixMarkerType)
       returnState = beforeLocalName
       return optionalEsWhitespace
-    }
-
-    // TODO Start of unkeyed value
-    // eg. <div "hello" /> or <div 'hello' /> or <div hello />
-
-    // End pattern
-    // This is triggerd for closing tags too
-    if (code === findCode(pattern.end)) {
-      effects.exit(tagNameType)
-      return beforeAttribute(code)
     }
 
     // End of name.
@@ -274,16 +257,6 @@ export function factoryTag(
       effects.exit(tagNameType)
       return beforeAttribute(code)
     }
-
-    // TODO: shortcut for unkeyed value
-    // if (code === codes.quotationMark) {
-    //   effects.enter(tagAttributeType)
-    //   effects.enter(tagAttributeNameType)
-    //   effects.enter(tagAttributeNamePrimaryType)
-    //   effects.exit(tagAttributeNamePrimaryType)
-    //   // effects.consume(code)
-    //   return beforeAttribute
-    // }
 
     crash(
       code,
@@ -449,16 +422,13 @@ export function factoryTag(
 
   /** @type {State} */
   function beforeAttribute(code) {
-    // TODO: test this against `pattern.end`
-    if (code === findCode(pattern.end)) {
-      if (pattern.leaf) {
-        effects.enter(tagSelfClosingMarker)
-        effects.exit(tagSelfClosingMarker)
-        returnState = selfClosing
-        return optionalEsWhitespace
-      } else {
-        return tagEnd(code)
-      }
+    // Mark as self-closing.
+    if (code === codes.slash) {
+      effects.enter(tagSelfClosingMarker)
+      effects.consume(code)
+      effects.exit(tagSelfClosingMarker)
+      returnState = selfClosing
+      return optionalEsWhitespace
     }
 
     // End of tag.
@@ -495,7 +465,6 @@ export function factoryTag(
       return attributePrimaryName
     }
 
-    return nok
     crash(
       code,
       'before attribute name',
@@ -763,7 +732,7 @@ export function factoryTag(
   /** @type {State} */
   function selfClosing(code) {
     // End of tag.
-    if (code === findCode(pattern.end)) {
+    if (code === codes.greaterThan) {
       return tagEnd(code)
     }
 
@@ -780,7 +749,7 @@ export function factoryTag(
   // At a `>`.
   /** @type {State} */
   function tagEnd(code) {
-    // assert(code === codes.greaterThan, 'expected `>`')
+    assert(code === codes.greaterThan, 'expected `>`')
     effects.enter(tagMarkerType)
     effects.consume(code)
     effects.exit(tagMarkerType)

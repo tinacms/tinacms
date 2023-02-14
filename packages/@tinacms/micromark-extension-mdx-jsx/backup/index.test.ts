@@ -7,40 +7,20 @@ import * as acorn from 'acorn'
 
 describe('tinaShortcodes', () => {
   it('parses leaf shortcodes as directives', () => {
-    const value = `
-{
+    const value = `<Box>
+- a list
+</Box>
 
-import { foo } from 'bar.js'
+<MyComponent {...props} />
 
-const meh = "ok"
-
-$SelfClosing a="b" $
-
-% OpenEnded c="d" %
-
-% OpenEnded g="h" %
-
-$SelfClosing i="j" $
-
-Testing
-
-%/OpenEnded %
-
-Testing
-
-%/OpenEnded %
-
+<abbr title="Hypertext Markup Language">HTML</abbr> is a lovely language.
 `
 
-    try {
-      const tree = fromMarkdown(value, {
-        extensions: [mdxJsx({acorn: acorn, addResult: true})],
-        mdastExtensions: [mdxJsxFromMarkdown()]
-      })
-      console.dir(removePosition(tree, {force: true}), {depth: null})
-    } catch (e) {
-      console.log(e)
-    }
+    const tree = fromMarkdown(value, {
+      extensions: [mdxJsx({acorn: acorn, addResult: true})],
+      mdastExtensions: [mdxJsxFromMarkdown()]
+    })
+    console.dir(removePosition(tree, {force: true}), {depth: null})
   })
 })
 
@@ -55,12 +35,6 @@ export function removePosition(tree, options) {
 
   // @ts-ignore
   function remove(node) {
-    // node?.attributes?.forEach((att) => {
-    //   if (att?.value?.data) {
-    //     delete att?.value?.data
-    //   }
-    //   delete att.data
-    // })
     if (force) {
       delete node.position
     } else {

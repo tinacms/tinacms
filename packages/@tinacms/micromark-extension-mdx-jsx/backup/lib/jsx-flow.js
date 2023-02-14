@@ -19,7 +19,7 @@ import {factoryTag} from './factory-tag.js'
  * @param {boolean|undefined} addResult
  * @returns {Construct}
  */
-export function jsxFlow(acorn, acornOptions, addResult, pattern) {
+export function jsxFlow(acorn, acornOptions, addResult) {
   return {tokenize: tokenizeJsxFlow, concrete: true}
 
   /** @type {Tokenizer} */
@@ -31,6 +31,7 @@ export function jsxFlow(acorn, acornOptions, addResult, pattern) {
 
     /** @type {State} */
     function start(code) {
+      assert(code === codes.lessThan, 'expected `<`')
       return factoryTag.call(
         self,
         effects,
@@ -64,8 +65,7 @@ export function jsxFlow(acorn, acornOptions, addResult, pattern) {
         'mdxJsxFlowTagAttributeValueLiteralValue',
         'mdxJsxFlowTagAttributeValueExpression',
         'mdxJsxFlowTagAttributeValueExpressionMarker',
-        'mdxJsxFlowTagAttributeValueExpressionValue',
-        pattern
+        'mdxJsxFlowTagAttributeValueExpressionValue'
       )(code)
     }
 

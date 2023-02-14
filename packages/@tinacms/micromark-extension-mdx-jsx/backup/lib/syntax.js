@@ -23,7 +23,6 @@
 import {codes} from 'micromark-util-symbol/codes.js'
 import {jsxText} from './jsx-text.js'
 import {jsxFlow} from './jsx-flow.js'
-import {findCode} from './util'
 
 /**
  * @param {Options} [options]
@@ -50,35 +49,8 @@ export function mdxJsx(options = {}) {
     throw new Error('Expected an `acorn` instance passed in as `options.acorn`')
   }
 
-  const patterns = [
-    {start: '$', end: '$', type: 'flow', leaf: true},
-    {start: '%', end: '%', type: 'flow', leaf: false}
-  ]
-
-  const flowRules = {}
-  const textRules = {}
-  patterns.forEach((pattern) => {
-    const firstCharacter = findCode(pattern.start[0])
-
-    if (pattern.type === 'flow') {
-      flowRules[firstCharacter] = flowRules[firstCharacter]
-        ? [
-            ...flowRules[firstCharacter],
-            jsxFlow(acorn, acornOptions, options.addResult, pattern)
-          ]
-        : [jsxFlow(acorn, acornOptions, options.addResult, pattern)]
-    } else {
-      textRules[firstCharacter] = textRules[firstCharacter]
-        ? [
-            ...textRules[firstCharacter],
-            jsxText(acorn, acornOptions, options.addResult, pattern)
-          ]
-        : [jsxText(acorn, acornOptions, options.addResult, pattern)]
-    }
-  })
-
   return {
-    flow: flowRules,
-    text: textRules
+    flow: {[codes.lessThan]: jsxFlow(acorn, acornOptions, options.addResult)},
+    text: {[codes.lessThan]: jsxText(acorn, acornOptions, options.addResult)}
   }
 }
