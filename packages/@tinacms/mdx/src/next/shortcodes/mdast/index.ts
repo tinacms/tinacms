@@ -83,6 +83,7 @@ import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js
 import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js'
 import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js'
 import { track } from 'mdast-util-to-markdown/lib/util/track.js'
+import { ToMarkdownExtension } from 'mdast-util-mdx-jsx/lib'
 
 // To do: next major: use `state`, use utilities from state, rename `safeOptions` to `info`.
 
@@ -362,12 +363,9 @@ export function mdxJsxFromMarkdown() {
     }
   }
 
-  /**
-   * @this {CompileContext}
-   * @type {OnEnterError}
-   */
-  function onErrorRightIsTag(closing, open) {
-    const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
+  const onErrorRightIsTag: OnEnterError = function (closing, open) {
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
+    if (!tag) return
     const place = closing ? ' before the end of `' + closing.type + '`' : ''
     const position = closing
       ? { start: closing.start, end: closing.end }
@@ -385,11 +383,7 @@ export function mdxJsxFromMarkdown() {
     )
   }
 
-  /**
-   * @this {CompileContext}
-   * @type {OnExitError}
-   */
-  function onErrorLeftIsTag(a, b) {
+  const onErrorLeftIsTag: OnExitError = function (a, b) {
     const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
     throw new VFileMessage(
       'Expected the closing tag `' +
@@ -411,11 +405,8 @@ export function mdxJsxFromMarkdown() {
   /**
    * Serialize a tag, excluding attributes.
    * `self-closing` is not supported, because we don’t need it yet.
-   *
-   * @param {Tag} tag
-   * @returns {string}
    */
-  function serializeAbbreviatedTag(tag) {
+  function serializeAbbreviatedTag(tag: Tag) {
     return '<' + (tag.close ? '/' : '') + (tag.name || '') + '>'
   }
 
@@ -481,12 +472,10 @@ export function mdxJsxFromMarkdown() {
  * `options.fences: true` and `options.resourceLink: true` too, do not
  * overwrite them!
  *
- * @param {ToMarkdownOptions | null | undefined} [options]
- *   Configuration.
- * @returns {ToMarkdownExtension}
- *   Extension for `mdast-util-to-markdown` to enable MDX JSX.
  */
-export function mdxJsxToMarkdown(options) {
+export const mdxJsxToMarkdown: (
+  options: ToMarkdownOptions
+) => ToMarkdownExtension = function (options) {
   const options_ = options || {}
   const quote = options_.quote || '"'
   const quoteSmart = options_.quoteSmart || false
@@ -502,29 +491,12 @@ export function mdxJsxToMarkdown(options) {
     )
   }
 
-  mdxElement.peek = peekElement
-
-  return {
-    handlers: {
-      mdxJsxFlowElement: mdxElement,
-      mdxJsxTextElement: mdxElement,
-    },
-    unsafe: [
-      { character: '<', inConstruct: ['phrasing'] },
-      { atBreak: true, character: '<' },
-    ],
-    // Always generate fenced code (never indented code).
-    fences: true,
-    // Always generate links with resources (never autolinks).
-    resourceLink: true,
-  }
-
-  /**
-   * @type {ToMarkdownHandle}
-   * @param {MdxJsxFlowElement | MdxJsxTextElement} node
-   */
-  // eslint-disable-next-line complexity
-  function mdxElement(node, _, context, safeOptions) {
+  const mdxElement: ToMarkdownHandle = function (
+    node: MdxJsxFlowElement | MdxJsxTextElement,
+    _,
+    context,
+    safeOptions
+  ) {
     const tracker = track(safeOptions)
     const selfClosing =
       node.name && (!node.children || node.children.length === 0)
@@ -545,10 +517,10 @@ export function mdxJsxToMarkdown(options) {
         /** @type {string} */
         let result
 
-        if (attribute.type === 'mdxJsxExpressionAttribute') {
+        if (attribute?.type === 'mdxJsxExpressionAttribute') {
           result = '{' + (attribute.value || '') + '}'
         } else {
-          if (!attribute.name) {
+          if (!attribute?.name) {
             throw new Error('Cannot serialize attribute w/o name')
           }
 
@@ -647,15 +619,29 @@ export function mdxJsxToMarkdown(options) {
     return value
   }
 
-  /** @type {ToMarkdownMap} */
-  function map(line, _, blank) {
+  const map: ToMarkdownMap = function (line, _, blank) {
     return (blank ? '' : '  ') + line
   }
 
-  /**
-   * @type {ToMarkdownHandle}
-   */
-  function peekElement() {
+  const peekElement: ToMarkdownHandle = function () {
     return '<'
+  }
+
+  // @ts-ignore
+  mdxElement.peek = peekElement
+
+  return {
+    handlers: {
+      mdxJsxFlowElement: mdxElement,
+      mdxJsxTextElement: mdxElement,
+    },
+    unsafe: [
+      { character: '<', inConstruct: ['phrasing'] },
+      { atBreak: true, character: '<' },
+    ],
+    // Always generate fenced code (never indented code).
+    fences: true,
+    // Always generate links with resources (never autolinks).
+    resourceLink: true,
   }
 }
