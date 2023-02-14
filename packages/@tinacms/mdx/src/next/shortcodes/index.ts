@@ -1,2 +1,2 @@
 export { mdxJsx } from './lib/syntax'
-export type { Options } from './lib/syntax'
+export type { Pattern, Options } from './lib/syntax'

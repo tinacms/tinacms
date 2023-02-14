@@ -14,7 +14,7 @@ export type Pattern = {
 export type Options = {
   acorn?: Acorn
   acornOptions?: AcornOptions
-  patterns?: any[]
+  patterns?: Pattern[]
   addResult?: boolean
 }
 
