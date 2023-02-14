@@ -1,37 +1,22 @@
-/**
- * @typedef {import('micromark-util-types').Construct} Construct
- * @typedef {import('micromark-util-types').Tokenizer} Tokenizer
- * @typedef {import('micromark-util-types').State} State
- * @typedef {import('micromark-factory-mdx-expression').Acorn} Acorn
- * @typedef {import('micromark-factory-mdx-expression').AcornOptions} AcornOptions
- */
-
-import { ok as assert } from 'uvu/assert'
 import { factorySpace } from 'micromark-factory-space'
 import { markdownLineEnding } from 'micromark-util-character'
 import { codes } from 'micromark-util-symbol/codes.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { factoryTag } from './factory-tag.js'
-import { logSelf } from './util'
+import type { Construct, Tokenizer, State } from 'micromark-util-types'
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 
-/**
- * @param {Acorn|undefined} acorn
- * @param {AcornOptions|undefined} acornOptions
- * @param {boolean|undefined} addResult
- * @returns {Construct}
- */
-export function jsxFlow(acorn, acornOptions, addResult, pattern) {
-  return { tokenize: tokenizeJsxFlow, concrete: true }
-
-  /** @type {Tokenizer} */
-  function tokenizeJsxFlow(effects, ok, nok) {
+export const jsxFlow: (
+  acorn: Acorn | undefined,
+  acornOptions: AcornOptions | undefined,
+  addResult: boolean | undefined,
+  pattern: any
+) => Construct = function (acorn, acornOptions, addResult, pattern) {
+  const tokenizeJsxFlow: Tokenizer = function (effects, ok, nok) {
     // eslint-disable-next-line
     const self = this
 
-    return start
-
-    /** @type {State} */
-    function start(code) {
+    const start: State = function (code) {
       return factoryTag.call(
         self,
         effects,
@@ -70,15 +55,15 @@ export function jsxFlow(acorn, acornOptions, addResult, pattern) {
       )(code)
     }
 
-    /** @type {State} */
-    function after(code) {
-      // logSelf(self)
-      // Another tag.
+    const after: State = function (code) {
       return code === codes.lessThan
         ? start(code)
         : code === codes.eof || markdownLineEnding(code)
         ? ok(code)
         : nok(code)
     }
+
+    return start
   }
+  return { tokenize: tokenizeJsxFlow, concrete: true }
 }

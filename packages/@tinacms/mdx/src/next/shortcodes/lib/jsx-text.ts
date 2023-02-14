@@ -1,25 +1,18 @@
-/**
- * @typedef {import('micromark-util-types').Construct} Construct
- * @typedef {import('micromark-util-types').Tokenizer} Tokenizer
- * @typedef {import('micromark-factory-mdx-expression').Acorn} Acorn
- * @typedef {import('micromark-factory-mdx-expression').AcornOptions} AcornOptions
- */
-
 import { factoryTag } from './factory-tag.js'
+import type { Construct, Tokenizer } from 'micromark-util-types'
+import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 
-/**
- * @param {Acorn|undefined} acorn
- * @param {AcornOptions|undefined} acornOptions
- * @param {boolean|undefined} addResult
- * @returns {Construct}
- */
-export function jsxText(acorn, acornOptions, addResult, pattern) {
-  return { tokenize: tokenizeJsxText }
-
-  /** @type {Tokenizer} */
-  function tokenizeJsxText(effects, ok, nok) {
+export const jsxText: (
+  acorn: Acorn | undefined,
+  acornOptions: AcornOptions | undefined,
+  addResult: boolean | undefined,
+  pattern: any
+) => Construct = function (acorn, acornOptions, addResult, pattern) {
+  const tokenizeJsxText: Tokenizer = function (effects, ok, nok) {
+    // eslint-disable-next-line
+    const self = this
     return factoryTag.call(
-      this,
+      self,
       effects,
       ok,
       nok,
@@ -55,4 +48,5 @@ export function jsxText(acorn, acornOptions, addResult, pattern) {
       pattern
     )
   }
+  return { tokenize: tokenizeJsxText }
 }

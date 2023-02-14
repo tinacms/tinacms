@@ -1,3 +1,6 @@
+import { jsxText } from './jsx-text'
+import { jsxFlow } from './jsx-flow'
+import { findCode } from './util'
 import type { Construct, Extension } from 'micromark-util-types'
 import type { Acorn, AcornOptions } from 'micromark-factory-mdx-expression'
 
@@ -7,10 +10,6 @@ export type Options = {
   patterns?: any[]
   addResult?: boolean
 }
-
-import { jsxText } from './jsx-text.js'
-import { jsxFlow } from './jsx-flow.js'
-import { findCode } from './util'
 
 export function mdxJsx(options: Options = {}): Extension {
   const acorn = options.acorn
