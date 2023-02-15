@@ -1434,6 +1434,7 @@ importers:
       react-router-dom: '6'
       typescript: 4.3.5
       yup: ^0.32.0
+      zod: ^3.14.3
     dependencies:
       '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
@@ -1453,6 +1454,7 @@ importers:
       react-icons: 4.4.0_react@17.0.2
       react-router-dom: 6.3.0_sfoxds7t5ydpegc3knd667wn6m
       yup: 0.32.11
+      zod: 3.17.3
     devDependencies:
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       '@testing-library/jest-dom': 5.16.4
