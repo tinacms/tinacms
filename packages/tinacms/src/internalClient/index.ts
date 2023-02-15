@@ -571,9 +571,9 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async waitForIndexStatus() {
+  async waitForIndexStatus({ ref }: { ref: string }) {
     const isStillIndexing = async () => {
-      const { status } = await this.getIndexStatus({ ref: this.branch })
+      const { status } = await this.getIndexStatus({ ref })
       return status === 'inprogress'
     }
     return poll({ fn: isStillIndexing })
