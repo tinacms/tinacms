@@ -25,6 +25,7 @@ type Tag = {
   selfClosing: boolean
   start: Token['start']
   end: Token['end']
+  shouldFallback?: boolean
 }
 
 type ToMarkdownOptions = {
@@ -119,21 +120,27 @@ export function mdxJsxFromMarkdown() {
 
   const enterMdxJsxTagClosingMarker: FromMarkdownHandle = function (token) {
     const stack: Array<Tag> | undefined = this.getData('mdxJsxTagStack')
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
 
-    // console.log(this)
-    // console.log(this.sliceSerialize(token))
-    // if (stack?.length === 0) {
-    //   throw new VFileMessage(
-    //     'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
-    //     { start: token.start, end: token.end },
-    //     'mdast-util-mdx-jsx:unexpected-closing-slash'
-    //   )
-    // }
+    if (stack?.length === 0) {
+      // Indicate that when we're exiting this tag, we should transform
+      // it into text node instead
+      if (tag) {
+        tag.shouldFallback = true
+      }
+      // throw new VFileMessage(
+      //   'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
+      //   { start: token.start, end: token.end },
+      //   'mdast-util-mdx-jsx:unexpected-closing-slash'
+      // )
+    }
   }
 
   const enterMdxJsxTagAnyAttribute: FromMarkdownHandle = function (token) {
     const tag: Tag | undefined = this.getData('mdxJsxTag')
 
+    // We're still treating this token as invalid, but instead
+    // of erroring, we'll tokenize it as a text value
     // if (tag?.close) {
     //   throw new VFileMessage(
     //     'Unexpected attribute in closing tag, expected the end of the tag',
@@ -362,16 +369,30 @@ export function mdxJsxFromMarkdown() {
     }
 
     if (tag.selfClosing || tag.close) {
-      // this.exit(token, onErrorLeftIsTag)
-      // Instead of erroring, fallback to ordinary text
-      this.enter(
-        {
-          type: 'text',
-          value: this.sliceSerialize(token),
-        },
-        token
-      )
-      this.exit(token, onErrorLeftIsTag)
+      // this.exit(token, (left, right) => {
+      //   // Instead of erroring, fallback to ordinary text
+      //   // this.enter(
+      //   //   {
+      //   //     type: 'text',
+      //   //     value: this.sliceSerialize(token),
+      //   //   },
+      //   //   left
+      //   // )
+      //   // this.exit(left)
+      // })
+
+      if (tag.shouldFallback) {
+        this.enter(
+          {
+            type: 'text',
+            value: this.sliceSerialize(token),
+          },
+          token
+        )
+        this.exit(token)
+      } else {
+        this.exit(token, onErrorLeftIsTag)
+      }
     } else {
       stack.push(tag)
     }
@@ -397,23 +418,33 @@ export function mdxJsxFromMarkdown() {
     )
   }
 
-  const onErrorLeftIsTag: OnExitError = function (a, b) {
+  const onErrorLeftIsTag: OnExitError = function (this, a, b) {
+    console.log('me?')
     const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
-    throw new VFileMessage(
-      'Expected the closing tag `' +
-        serializeAbbreviatedTag(tag) +
-        '` either after the end of `' +
-        b.type +
-        '` (' +
-        stringifyPosition(b.end) +
-        ') or another opening tag after the start of `' +
-        b.type +
-        '` (' +
-        stringifyPosition(b.start) +
-        ')',
-      { start: a.start, end: a.end },
-      'mdast-util-mdx-jsx:end-tag-mismatch'
-    )
+    // this.enter(
+    //   {
+    //     type: 'text',
+    //     value: this.sliceSerialize(a),
+    //   },
+    //   a
+    // )
+    // this.exit(a)
+    // console.log({ left: a, right: b, tag })
+    // throw new VFileMessage(
+    //   'Expected the closing tag `' +
+    //     serializeAbbreviatedTag(tag) +
+    //     '` either after the end of `' +
+    //     b.type +
+    //     '` (' +
+    //     stringifyPosition(b.end) +
+    //     ') or another opening tag after the start of `' +
+    //     b.type +
+    //     '` (' +
+    //     stringifyPosition(b.start) +
+    //     ')',
+    //   { start: a.start, end: a.end },
+    //   'mdast-util-mdx-jsx:end-tag-mismatch'
+    // )
   }
 
   /**
