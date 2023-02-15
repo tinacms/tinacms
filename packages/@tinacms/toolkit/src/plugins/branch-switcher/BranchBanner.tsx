@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { BiChevronDown, BiGitBranch, BiLinkExternal } from 'react-icons/bi'
-import { FaSpinner } from 'react-icons/fa'
+import { BiChevronDown, BiGitBranch } from 'react-icons/bi'
 import {
   Modal,
   ModalBody,
@@ -66,8 +65,8 @@ const BranchModal = ({ close }: SubmitModalProps) => {
         <ModalBody padded={false}>
           <BranchSwitcher
             listBranches={tinaApi.listBranches.bind(tinaApi)}
-            createBranch={() => {
-              return Promise.resolve('')
+            createBranch={async (data) => {
+              return await tinaApi.createBranch(data)
             }}
             chooseBranch={setCurrentBranch}
           />
