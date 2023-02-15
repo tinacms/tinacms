@@ -238,7 +238,7 @@ const BranchSelector = ({
           {filteredBranchList.map((branch) => {
             const isCurrentBranch = branch.name === currentBranch
             // @ts-ignore
-            const indexingStatus = branch?.indexStatus?.status || 'inprogress'
+            const indexingStatus = branch?.indexStatus?.status
             return (
               <div
                 className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
@@ -259,7 +259,8 @@ const BranchSelector = ({
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
                 {branch.name}
-                {indexingStatus === 'inprogress' && (
+                {(indexingStatus === 'inprogress' ||
+                  indexingStatus === 'unknown') && (
                   <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
                     <span className="opacity-50 italic">{`Indexing`}</span>
                     <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
