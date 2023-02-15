@@ -139,7 +139,6 @@ export const BranchSwitcher = ({
             newList[index].indexStatus = indexStatus
             return newList
           })
-          console.log({ indexStatus })
         })
 
       // return
