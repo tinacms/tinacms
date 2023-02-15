@@ -79,7 +79,7 @@ export const BranchSwitcher = ({
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
-  const [branchList, setBranchList] = React.useState([])
+  const [branchList, setBranchList] = React.useState([] as Branch[])
   const { currentBranch } = useBranchData()
   const initialBranch = React.useMemo(() => currentBranch, [])
   // when modal closes, refresh page is currentBranch has changed
@@ -117,6 +117,33 @@ export const BranchSwitcher = ({
   React.useEffect(() => {
     refreshBranchList()
   }, [])
+
+  // Keep branch list up to date
+  React.useEffect(() => {
+    if (listState === 'ready') {
+      // update all branches that have indexing status of 'inprogress' or 'unknown'
+      branchList
+        .filter(
+          (x) =>
+            x?.indexStatus?.status === 'inprogress' ||
+            x?.indexStatus?.status === 'unknown'
+        )
+        .map(async (x) => {
+          const indexStatus = await cms.api.tina.waitForIndexStatus({
+            ref: x.name,
+          })
+          setBranchList((prev) => {
+            const newList = Array.from(prev)
+            const index = newList.findIndex((y) => y.name === x.name)
+            newList[index].indexStatus = indexStatus
+            return newList
+          })
+          console.log({ indexStatus })
+        })
+
+      // return
+    }
+  }, [listState, branchList.length])
 
   return (
     <div className="w-full flex justify-center p-5">
