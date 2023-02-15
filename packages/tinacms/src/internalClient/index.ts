@@ -668,8 +668,8 @@ mutation addPendingDocumentMutation(
       },
       // interval is 1000ms
       1000, // interval
-      //  timeout is 60 seconds
-      60000 // timeout
+      //  timeout is 10 min
+      600000 // timeout
     )
     return result
   }
