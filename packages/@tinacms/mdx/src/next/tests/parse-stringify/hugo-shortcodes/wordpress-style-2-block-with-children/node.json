@@ -13,13 +13,8 @@
       ],
       "children": [
         {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Posts Heading"
-            }
-          ]
+          "type": "text",
+          "text": ""
         }
       ]
     }

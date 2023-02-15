@@ -11,7 +11,12 @@
           "value": "5"
         }
       ],
-      "children": []
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ]
     }
   ]
 }

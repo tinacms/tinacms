@@ -3,6 +3,7 @@ import { Root } from 'mdast'
 import { fromMarkdown } from './markdown'
 import { fromMarkdown as fromMDX } from './mdx'
 import { compact } from 'mdast-util-compact'
+import { postProcessor } from './post-processing'
 
 export const parseMDX = (
   value: string,
@@ -19,5 +20,5 @@ export const parseMDX = (
 
 const postProcess = (tree: Root) => {
   // Some of our processing results in adjacent nodes of the same type
-  return compact(tree)
+  return postProcessor(compact(tree))
 }
