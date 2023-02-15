@@ -666,10 +666,10 @@ mutation addPendingDocumentMutation(
           return Promise.reject(err)
         }
       },
-      // interval is 1000ms
-      1000, // interval
-      //  timeout is 10 min
-      600000 // timeout
+      // interval is 5s
+      5000, // interval
+      //  timeout is 15 min
+      900000 // timeout
     )
     return result
   }
@@ -679,7 +679,6 @@ mutation addPendingDocumentMutation(
     const res = await this.fetchWithToken(url)
     const result = await res.json()
     const parsedResult = IndexStatusResponse.parse(result)
-    console.log('getIndexStatus', parsedResult, result)
     return parsedResult
   }
 
@@ -691,7 +690,6 @@ mutation addPendingDocumentMutation(
       })
       const branches = await res.json()
       const parsedBranches = ListBranchResponse.parse(branches)
-      console.log('listBranches', parsedBranches)
       const indexStatusPromises = parsedBranches.map(async (branch) => {
         const indexStatus = await this.getIndexStatus({ ref: branch.name })
         return {

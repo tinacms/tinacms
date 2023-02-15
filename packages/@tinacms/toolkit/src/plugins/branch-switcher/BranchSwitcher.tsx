@@ -11,6 +11,7 @@ import {
   BiRefresh,
   BiSearch,
 } from 'react-icons/bi'
+import { GrCircleQuestion } from 'react-icons/gr'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
@@ -286,8 +287,13 @@ const BranchSelector = ({
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
                 {branch.name}
-                {(indexingStatus === 'inprogress' ||
-                  indexingStatus === 'unknown') && (
+                {indexingStatus === 'unknown' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+                    <span className="opacity-50 italic">{`Unknown`}</span>
+                    <GrCircleQuestion className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
+                {indexingStatus === 'inprogress' && (
                   <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
                     <span className="opacity-50 italic">{`Indexing`}</span>
                     <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
