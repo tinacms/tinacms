@@ -358,10 +358,10 @@ export function mdxJsxFromMarkdown() {
           children: [],
         },
         token,
-        // onErrorRightIsTag
         // This template allows block children, so
         // we didn't mark it as self-closing. But
-        // We didn't receive a closing tag, so close it now
+        // We didn't receive a closing tag, so close it now.
+        // Without this, we would be calling onErrorRightIsTag
         (left, right) => {
           this.exit(right)
         }
@@ -369,18 +369,9 @@ export function mdxJsxFromMarkdown() {
     }
 
     if (tag.selfClosing || tag.close) {
-      // this.exit(token, (left, right) => {
-      //   // Instead of erroring, fallback to ordinary text
-      //   // this.enter(
-      //   //   {
-      //   //     type: 'text',
-      //   //     value: this.sliceSerialize(token),
-      //   //   },
-      //   //   left
-      //   // )
-      //   // this.exit(left)
-      // })
-
+      // This node would be an error in MDX, but we
+      // want to basically unwind it and treat it as a
+      // plain string instead.
       if (tag.shouldFallback) {
         this.enter(
           {
