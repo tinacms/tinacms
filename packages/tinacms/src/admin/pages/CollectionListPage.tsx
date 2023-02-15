@@ -483,8 +483,12 @@ const CollectionListPage = () => {
                                         onChange={(e) => {
                                           setVars((old) => ({
                                             ...old,
-                                            // @ts-ignore
-                                            after: e.format(),
+                                            after:
+                                              // @ts-ignore
+                                              typeof e.format === 'function'
+                                                ? // @ts-ignore
+                                                  e.format()
+                                                : '',
                                             booleanEquals: null,
                                             startsWith: '',
                                           }))
@@ -506,8 +510,12 @@ const CollectionListPage = () => {
                                         onChange={(e) => {
                                           setVars((old) => ({
                                             ...old,
-                                            // @ts-ignore
-                                            before: e.format(),
+                                            before:
+                                              // @ts-ignore
+                                              typeof e.format === 'function'
+                                                ? // @ts-ignore
+                                                  e.format()
+                                                : '',
                                             booleanEquals: null,
                                             startsWith: '',
                                           }))
