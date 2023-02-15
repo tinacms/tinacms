@@ -6,7 +6,9 @@ describe('tinaShortcodes', () => {
     const value = `
 As part of a {{< hello >}} line of text
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -39,7 +41,9 @@ As part of a {{< hello >}} line of text
     const value = `
 As part of a {{< hello >}} line of {{< /hello >}} text
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: false }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: false },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -77,7 +81,9 @@ As part of a {{< hello >}} line of {{< /hello >}} text
     const value = `
 As part of a{{< hello >}} end.
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -111,7 +117,9 @@ As part of a{{< hello >}} end.
     const value = `
 As part of a {{< hello >}}end.
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -145,7 +153,9 @@ As part of a {{< hello >}}end.
     const value = `
 As part of a [testing]({{< hello >}}) end.
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -179,7 +189,9 @@ As part of a [testing]({{< hello >}}) end.
     const value = `
 As part of a {{< hello a=b >}} end.
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'text', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'text', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     // console.dir(tree, {depth: null})
     expect(tree).toMatchInlineSnapshot(`

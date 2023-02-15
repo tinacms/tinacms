@@ -8,6 +8,7 @@ export type Pattern = {
   start: string
   end: string
   name: string
+  type: 'inline' | 'flow'
   leaf: boolean
 }
 

@@ -15,7 +15,7 @@ import { codes } from 'micromark-util-symbol/codes.js'
 import { constants } from 'micromark-util-symbol/constants.js'
 import { types } from 'micromark-util-symbol/types.js'
 import { VFileMessage } from 'vfile-message'
-import { findCode } from './util'
+import { findCode, printCode } from './util'
 import type {
   Tokenizer,
   TokenizeContext,
@@ -71,6 +71,7 @@ export function factoryTag(
   // Start at because the first character is consumed right away
   let tagOpenerIndex = 1
   let tagCloserIndex = 1
+  let nameIndex = 1
 
   const start: State = function (code) {
     startPoint = self.now()
@@ -131,7 +132,11 @@ export function factoryTag(
     }
 
     // Start of a name.
-    if (code !== codes.eof && idStart(code)) {
+    if (
+      code !== codes.eof &&
+      idStart(code) &&
+      findCode(pattern.name[0]) === code
+    ) {
       effects.enter(tagNameType)
       effects.enter(tagNamePrimaryType)
       effects.consume(code)
@@ -179,10 +184,18 @@ export function factoryTag(
   // Inside the primary name.
   const primaryName: State = function (code) {
     // Continuation of name: remain.
-    if (code === codes.dash || (code !== codes.eof && idCont(code))) {
+    const nextCharacterInName = pattern.name[nameIndex]
+    const nextCodeInName = nextCharacterInName
+      ? findCode(nextCharacterInName)
+      : null
+    // if (code === codes.dash || (code !== codes.eof && idCont(code))) {
+    if (nextCodeInName === code) {
       effects.consume(code)
+      nameIndex++
       return primaryName
     }
+    // Reset nameIndex
+    nameIndex = 0
 
     // End of name.
     if (

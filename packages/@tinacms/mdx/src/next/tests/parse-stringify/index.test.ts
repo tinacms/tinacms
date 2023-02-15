@@ -7,7 +7,15 @@ describe('rich-text with MDX', () => {
     const tree = parseMDX(
       `# hello
 
-{{< testing >}}
+{{< some-feature >}}
+
+{{< other-feature >}}
+
+Testing
+
+{{< /other-feature >}}
+
+{{< /some-feature >}}
     `,
       {
         name: 'body',
@@ -18,7 +26,24 @@ describe('rich-text with MDX', () => {
             name: 'someFeature',
             label: 'Some feature',
             match: { start: '{{<', end: '>}}', name: 'some-feature' },
-            fields: [{ name: '_value', type: 'string' }],
+            fields: [
+              { name: '_value', type: 'string' },
+              {
+                name: 'children',
+                type: 'rich-text',
+                templates: [
+                  {
+                    name: 'otherFeature',
+                    label: 'Other feature',
+                    match: { start: '{{<', end: '>}}', name: 'other-feature' },
+                    fields: [
+                      { name: '_value', type: 'string' },
+                      { name: 'children', type: 'rich-text' },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         ],
       }

@@ -2,8 +2,8 @@ import { it, expect, describe } from 'vitest'
 import { toTree } from '../util'
 
 const patterns = [
-  { start: '$', end: '$', type: 'flow', leaf: true },
-  { start: '%', end: '%', type: 'flow', leaf: false },
+  { start: '$', end: '$', type: 'flow', name: 'someLeaf', leaf: true },
+  { start: '%', end: '%', type: 'flow', name: 'someLeaf', leaf: false },
 ]
 describe('tinaShortcodes', () => {
   it('Expressions dont trigger errors', () => {

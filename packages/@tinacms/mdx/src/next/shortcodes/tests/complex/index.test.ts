@@ -6,7 +6,9 @@ describe('tinaShortcodes', () => {
     const value = `
 {{< hello >}}
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'flow', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -35,7 +37,9 @@ And deeply nested item
 
 {{< /hello >}}
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: false }]
+    const patterns = [
+      { start: '{{<', end: '>}}', name: 'hello', type: 'flow', leaf: false },
+    ]
     const tree = toTree(value, patterns)
     expect(tree).toMatchInlineSnapshot(`
       {
@@ -81,7 +85,9 @@ And deeply nested item
     const value = `
 {{< hello a="b" >}}
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: true }]
+    const patterns = [
+      { start: '{{<', end: '>}}', type: 'flow', name: 'hello', leaf: true },
+    ]
     const tree = toTree(value, patterns)
     // console.dir(tree, {depth: null})
     expect(tree).toMatchInlineSnapshot(`
@@ -111,7 +117,9 @@ And deeply nested item
 Hello, world!
 {{< /hello >}}
     `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: false }]
+    const patterns = [
+      { start: '{{<', end: '>}}', type: 'flow', name: 'hello', leaf: false },
+    ]
     const tree = toTree(value, patterns)
     // console.dir(tree, {depth: null})
     expect(tree).toMatchInlineSnapshot(`
@@ -151,7 +159,9 @@ Hello, world!
   Hello, world!
   {{< /hello >}}
       `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: false }]
+    const patterns = [
+      { start: '{{<', end: '>}}', type: 'flow', name: 'hello', leaf: false },
+    ]
     expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
       '"Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly"'
     )
@@ -162,7 +172,9 @@ Hello, world!
   Hello, world!
   {{< /hello something="here" >}}
       `
-    const patterns = [{ start: '{{<', end: '>}}', type: 'flow', leaf: false }]
+    const patterns = [
+      { start: '{{<', end: '>}}', type: 'flow', name: 'hello', leaf: false },
+    ]
     expect(() => toTree(value, patterns)).toThrowErrorMatchingInlineSnapshot(
       '"Unexpected attribute in closing tag, expected the end of the tag"'
     )
