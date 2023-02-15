@@ -4,7 +4,13 @@ import { useBranchData } from './BranchData'
 import { BaseTextField } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
-import { BiGitBranch, BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
+import {
+  BiError,
+  BiGitBranch,
+  BiPlus,
+  BiRefresh,
+  BiSearch,
+} from 'react-icons/bi'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
 import { AiFillWarning } from 'react-icons/ai'
 import { FaSpinner } from 'react-icons/fa'
@@ -91,7 +97,8 @@ export const BranchSwitcher = ({
       branchName: value,
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      chooseBranch(createdBranchName)
+      // @ts-ignore
+      cms.alerts.success('Branch created.')
       await refreshBranchList()
     })
   }, [])
@@ -230,20 +237,41 @@ const BranchSelector = ({
         <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200">
           {filteredBranchList.map((branch) => {
             const isCurrentBranch = branch.name === currentBranch
+            // @ts-ignore
+            const indexingStatus = branch?.indexStatus?.status
             return (
               <div
-                className={`cursor-pointer relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
-                  isCurrentBranch
-                    ? 'bg-blue-50 text-blue-800 pointer-events-none'
-                    : ''
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                  indexingStatus !== 'complete'
+                    ? 'bg-gray-50 text-gray-400 pointer-events-none'
+                    : isCurrentBranch
+                    ? 'cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
+                    : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                 }`}
                 key={branch.name}
-                onClick={() => onChange(branch.name)}
+                onClick={() => {
+                  if (indexingStatus === 'complete') {
+                    onChange(branch.name)
+                  }
+                }}
               >
                 {isCurrentBranch && (
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
-                {branch.name} : {branch?.indexStatus?.status}
+                {branch.name}
+                {/* @ts-ignore */}
+                {indexingStatus === 'inprogress' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+                    <span className="opacity-50 italic">{`Indexing`}</span>
+                    <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
+                  </span>
+                )}
+                {indexingStatus === 'failed' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+                    <span className="opacity-50 italic">{`Indexing failed`}</span>
+                    <BiError className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>
                 )}
