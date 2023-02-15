@@ -129,7 +129,7 @@ export const BranchSwitcher = ({
             x?.indexStatus?.status === 'inprogress' ||
             x?.indexStatus?.status === 'unknown'
         )
-        .map(async (x) => {
+        .forEach(async (x) => {
           const indexStatus = await cms.api.tina.waitForIndexStatus({
             ref: x.name,
           })
@@ -140,8 +140,6 @@ export const BranchSwitcher = ({
             return newList
           })
         })
-
-      // return
     }
   }, [listState, branchList.length])
 
