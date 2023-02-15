@@ -48,7 +48,7 @@ Testing
         ],
       }
     )
-    console.dir(removePosition(tree), { depth: null })
+    // console.dir(removePosition(tree), { depth: null })
     expect(true).toBe(true)
   })
 })

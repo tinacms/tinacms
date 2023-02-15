@@ -913,6 +913,7 @@ importers:
       jest-matcher-utils: ^28.1.1
       lodash-es: ^4.17.21
       mdast: ^3.0.0
+      mdast-util-compact: ^4.1.1
       mdast-util-directive: ^2.2.2
       mdast-util-from-markdown: ^1.3.0
       mdast-util-frontmatter: ^1.0.0
@@ -975,6 +976,7 @@ importers:
       estree-util-is-identifier-name: 2.1.0
       lodash-es: 4.17.21
       mdast: 3.0.0
+      mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.3
       mdast-util-frontmatter: 1.0.1
       mdast-util-gfm: 2.0.2
@@ -25269,6 +25271,16 @@ packages:
       }
     dependencies:
       unist-util-visit: 2.0.3
+    dev: false
+
+  /mdast-util-compact/4.1.1:
+    resolution:
+      {
+        integrity: sha512-h/UFPIkf4ZlJw50k9UC+CkY+/urhFHZB25GXGh0f+kbqSulzZMSEGWeFjAe2jEQsFu9bSjf0s/TdZXsjvtmxIQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      unist-util-visit: 4.1.2
     dev: false
 
   /mdast-util-definitions/4.0.0:

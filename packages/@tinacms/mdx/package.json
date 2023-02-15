@@ -42,6 +42,7 @@
     "estree-util-is-identifier-name": "^2.1.0",
     "lodash-es": "^4.17.21",
     "mdast": "^3.0.0",
+    "mdast-util-compact": "^4.1.1",
     "mdast-util-directive": "^2.2.2",
     "mdast-util-frontmatter": "^1.0.0",
     "mdast-util-gfm": "^2.0.1",

@@ -120,25 +120,27 @@ export function mdxJsxFromMarkdown() {
   const enterMdxJsxTagClosingMarker: FromMarkdownHandle = function (token) {
     const stack: Array<Tag> | undefined = this.getData('mdxJsxTagStack')
 
-    if (stack?.length === 0) {
-      throw new VFileMessage(
-        'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:unexpected-closing-slash'
-      )
-    }
+    // console.log(this)
+    // console.log(this.sliceSerialize(token))
+    // if (stack?.length === 0) {
+    //   throw new VFileMessage(
+    //     'Unexpected closing slash `/` in tag, expected an open tag first, be sure your opening tag is formatted properly',
+    //     { start: token.start, end: token.end },
+    //     'mdast-util-mdx-jsx:unexpected-closing-slash'
+    //   )
+    // }
   }
 
   const enterMdxJsxTagAnyAttribute: FromMarkdownHandle = function (token) {
     const tag: Tag | undefined = this.getData('mdxJsxTag')
 
-    if (tag?.close) {
-      throw new VFileMessage(
-        'Unexpected attribute in closing tag, expected the end of the tag',
-        { start: token.start, end: token.end },
-        'mdast-util-mdx-jsx:unexpected-attribute'
-      )
-    }
+    // if (tag?.close) {
+    //   throw new VFileMessage(
+    //     'Unexpected attribute in closing tag, expected the end of the tag',
+    //     { start: token.start, end: token.end },
+    //     'mdast-util-mdx-jsx:unexpected-attribute'
+    //   )
+    // }
   }
 
   const enterMdxJsxTagSelfClosingMarker: FromMarkdownHandle = function (token) {
@@ -349,11 +351,26 @@ export function mdxJsxFromMarkdown() {
           children: [],
         },
         token,
-        onErrorRightIsTag
+        // onErrorRightIsTag
+        // This template allows block children, so
+        // we didn't mark it as self-closing. But
+        // We didn't receive a closing tag, so close it now
+        (left, right) => {
+          this.exit(right)
+        }
       )
     }
 
     if (tag.selfClosing || tag.close) {
+      // this.exit(token, onErrorLeftIsTag)
+      // Instead of erroring, fallback to ordinary text
+      this.enter(
+        {
+          type: 'text',
+          value: this.sliceSerialize(token),
+        },
+        token
+      )
       this.exit(token, onErrorLeftIsTag)
     } else {
       stack.push(tag)

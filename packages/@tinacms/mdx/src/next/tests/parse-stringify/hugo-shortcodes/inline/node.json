@@ -1,0 +1,52 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "some-feature",
+          "attributes": [
+            {
+              "type": "mdxJsxAttribute",
+              "name": "_value",
+              "value": "abc"
+            }
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "text",
+          "value": "When not separated by whitespace"
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "some-feature",
+          "attributes": [
+            {
+              "type": "mdxJsxAttribute",
+              "name": "_value",
+              "value": "123"
+            }
+          ],
+          "children": []
+        },
+        {
+          "type": "text",
+          "value": "it still works"
+        }
+      ]
+    }
+  ]
+}
