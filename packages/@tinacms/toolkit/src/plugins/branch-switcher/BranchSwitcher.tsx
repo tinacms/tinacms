@@ -305,6 +305,12 @@ const BranchSelector = ({
                     <BiError className="w-5 h-auto opacity-70" />
                   </span>
                 )}
+                {indexingStatus === 'timeout' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+                    <span className="opacity-50 italic">{`Indexing timed out`}</span>
+                    <BiError className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>
                 )}

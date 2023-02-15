@@ -646,32 +646,42 @@ mutation addPendingDocumentMutation(
   }
 
   async waitForIndexStatus({ ref }: { ref: string }) {
-    const result = await asyncPoll(
-      async (): Promise<AsyncData<any>> => {
-        try {
-          const result = await this.getIndexStatus({ ref })
-          if (
-            !(result.status === 'inprogress' || result.status === 'unknown')
-          ) {
-            return Promise.resolve({
-              done: true,
-              data: result,
-            })
-          } else {
-            return Promise.resolve({
-              done: false,
-            })
+    try {
+      const result = await asyncPoll(
+        async (): Promise<AsyncData<any>> => {
+          try {
+            const result = await this.getIndexStatus({ ref })
+            if (
+              !(result.status === 'inprogress' || result.status === 'unknown')
+            ) {
+              return Promise.resolve({
+                done: true,
+                data: result,
+              })
+            } else {
+              return Promise.resolve({
+                done: false,
+              })
+            }
+          } catch (err) {
+            return Promise.reject(err)
           }
-        } catch (err) {
-          return Promise.reject(err)
+        },
+        // interval is 5s
+        5000, // interval
+        //  timeout is 15 min
+        900000 // timeout
+      )
+      return result
+    } catch (error) {
+      if (error.message === 'AsyncPoller: reached timeout') {
+        console.warn(error)
+        return {
+          status: 'timeout',
         }
-      },
-      // interval is 5s
-      5000, // interval
-      //  timeout is 15 min
-      900000 // timeout
-    )
-    return result
+      }
+      throw error
+    }
   }
 
   async getIndexStatus({ ref }: { ref: string }) {

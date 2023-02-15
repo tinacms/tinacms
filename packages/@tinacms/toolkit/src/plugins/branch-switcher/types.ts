@@ -1,6 +1,6 @@
 export interface Branch {
   indexStatus: {
-    status?: 'unknown' | 'complete' | 'failed' | 'inprogress'
+    status?: 'unknown' | 'complete' | 'failed' | 'inprogress' | 'timeout'
     timestamp?: number
   }
   name: string
