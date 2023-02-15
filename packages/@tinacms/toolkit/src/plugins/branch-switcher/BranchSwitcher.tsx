@@ -323,7 +323,7 @@ const BranchSelector = ({
             size="medium"
             variant="white"
             disabled={newBranchName === ''}
-            onClick={() => onCreateBranch(newBranchName)}
+            onClick={() => onCreateBranch(stringToBranchName(newBranchName))}
           >
             <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
           </Button>
@@ -331,4 +331,15 @@ const BranchSelector = ({
       </div>
     </div>
   )
+}
+
+const stringToBranchName = (string) => {
+  return string
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
 }
