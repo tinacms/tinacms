@@ -1,0 +1,11 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "recent-posts",
+      "attributes": [],
+      "children": []
+    }
+  ]
+}

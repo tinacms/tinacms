@@ -1,0 +1,27 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "paragraph",
+      "children": [
+        {
+          "type": "mdxJsxTextElement",
+          "name": "recent-posts",
+          "attributes": [
+            {
+              "type": "mdxJsxAttribute",
+              "name": "posts",
+              "value": "5"
+            }
+          ],
+          "children": [
+            {
+              "type": "text",
+              "value": "Posts Heading"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

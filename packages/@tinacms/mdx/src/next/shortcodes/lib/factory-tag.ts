@@ -203,7 +203,7 @@ export function factoryTag(
       code === codes.slash ||
       code === codes.colon ||
       code === codes.greaterThan ||
-      code === codes.leftCurlyBrace ||
+      code === findCode(pattern.end[0]) ||
       markdownLineEndingOrSpace(code) ||
       unicodeWhitespace(code)
     ) {

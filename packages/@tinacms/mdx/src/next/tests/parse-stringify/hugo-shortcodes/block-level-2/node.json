@@ -1,0 +1,31 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "heading",
+      "depth": 1,
+      "children": [
+        {
+          "type": "text",
+          "value": "hello"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "some-feature",
+      "attributes": [],
+      "children": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "value": "Testing this thing"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
