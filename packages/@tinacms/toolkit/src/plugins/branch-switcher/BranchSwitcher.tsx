@@ -238,7 +238,7 @@ const BranchSelector = ({
           {filteredBranchList.map((branch) => {
             const isCurrentBranch = branch.name === currentBranch
             // @ts-ignore
-            const indexingStatus = branch?.indexStatus?.status
+            const indexingStatus = branch?.indexStatus?.status || 'inprogress'
             return (
               <div
                 className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
@@ -259,7 +259,6 @@ const BranchSelector = ({
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
                 {branch.name}
-                {/* @ts-ignore */}
                 {indexingStatus === 'inprogress' && (
                   <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
                     <span className="opacity-50 italic">{`Indexing`}</span>
@@ -280,20 +279,27 @@ const BranchSelector = ({
           })}
         </div>
       )}
-      <div className="flex justify-between items-center w-full gap-3">
-        <BaseTextField
-          placeholder="Branch Name"
-          value={newBranchName}
-          onChange={(e) => setNewBranchName(e.target.value)}
-        />
-        <Button
-          className="flex-0 flex items-center gap-2 whitespace-nowrap"
-          size="medium"
-          variant="primary"
-          onClick={() => onCreateBranch(newBranchName)}
-        >
-          <BiPlus className="w-5 h-auto opacity-70" /> Create New
-        </Button>
+      <div className="border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3">
+        <div className="text-sm">
+          Create a new branch from <b>{currentBranch}</b>. Once created you will
+          need to wait for indexing to complete before you can switch branches.
+        </div>
+        <div className="flex justify-between items-center w-full gap-3">
+          <BaseTextField
+            placeholder="Branch Name"
+            value={newBranchName}
+            onChange={(e) => setNewBranchName(e.target.value)}
+          />
+          <Button
+            className="flex-0 flex items-center gap-2 whitespace-nowrap"
+            size="medium"
+            variant="white"
+            disabled={newBranchName === ''}
+            onClick={() => onCreateBranch(newBranchName)}
+          >
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+          </Button>
+        </div>
       </div>
     </div>
   )
