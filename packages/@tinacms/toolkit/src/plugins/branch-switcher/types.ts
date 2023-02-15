@@ -1,10 +1,14 @@
-/**
-
-*/
-import { TinaCMS } from '../../tina-cms'
-
 export interface Branch {
+  indexStatus: {
+    status?: 'unknown' | 'complete' | 'failed' | 'inprogress'
+    timestamp?: number
+  }
   name: string
+  protected?: boolean
+  commit?: {
+    sha?: string
+    url?: string
+  }
 }
 
 export interface BranchSwitcherProps {

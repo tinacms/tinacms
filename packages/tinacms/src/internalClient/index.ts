@@ -1,6 +1,4 @@
-/**
-
-*/
+import { z } from 'zod'
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
 //@ts-ignore can't locate BranchChangeEvent
@@ -46,6 +44,59 @@ const captureBranchName = /^refs\/heads\/(.*)/
 const parseRefForBranchName = (ref: string) => {
   const matches = ref.match(captureBranchName)
   return matches[1]
+}
+
+const ListBranchResponse = z
+  .object({
+    name: z.string(),
+    protected: z.boolean(),
+    commit: z.object({ sha: z.string(), url: z.string() }),
+  })
+  .array()
+
+const IndexStatusResponse = z.object({
+  status: z
+    .union([
+      z.literal('complete'),
+      z.literal('unknown'),
+      z.literal('failed'),
+      z.literal('inprogress'),
+    ])
+    .optional(),
+  timestamp: z.number().optional(),
+})
+
+function poll({
+  fn,
+  timeout,
+  interval,
+}: {
+  fn: () => Promise<boolean>
+  timeout?: number
+  interval?: number
+}) {
+  // default timeout to 60 seconds
+  const endTime = Number(new Date()) + (timeout || 60000)
+  // default interval to 1000ms
+  interval = interval || 1000
+
+  const checkCondition = function (resolve, reject) {
+    // If the condition is met, we're done!
+    const result = fn()
+    if (result) {
+      resolve(result)
+    }
+    // If the condition isn't met but the timeout hasn't elapsed, go again
+    else if (Number(new Date()) < endTime) {
+      setTimeout(checkCondition, interval, resolve, reject)
+    }
+    // Didn't match and too much time, reject!
+    else {
+      reject(new Error('timed out for ' + fn + ': '))
+    }
+  }
+
+  return new Promise(checkCondition)
 }
 
 export class Client {
@@ -520,12 +571,46 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  async waitForIndexStatus() {
+    const isStillIndexing = async () => {
+      const { status } = await this.getIndexStatus({ ref: this.branch })
+      return status === 'inprogress'
+    }
+    return poll({ fn: isStillIndexing })
+  }
+
+  async getIndexStatus({ ref }: { ref: string }) {
+    const url = `${this.contentApiBase}/db/${this.clientId}/status/${ref}`
+    const res = await this.fetchWithToken(url)
+    const result = await res.json()
+    const parsedResult = IndexStatusResponse.parse(result)
+    console.log('getIndexStatus', parsedResult, result)
+    return parsedResult
+  }
+
   async listBranches() {
-    const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
-    const res = await this.fetchWithToken(url, {
-      method: 'GET',
-    })
-    return res.json()
+    try {
+      const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
+      const res = await this.fetchWithToken(url, {
+        method: 'GET',
+      })
+      const branches = await res.json()
+      const parsedBranches = ListBranchResponse.parse(branches)
+      console.log('listBranches', parsedBranches)
+      const indexStatusPromises = parsedBranches.map(async (branch) => {
+        const indexStatus = await this.getIndexStatus({ ref: branch.name })
+        return {
+          ...branch,
+          indexStatus,
+        }
+      })
+      const indexStatus = await Promise.all(indexStatusPromises)
+
+      return indexStatus
+    } catch (error) {
+      console.error('There was an error listing branches.', error)
+      throw error
+    }
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`

@@ -179,6 +179,11 @@ const BranchSelector = ({
   currentBranch,
   onCreateBranch,
   onChange,
+}: {
+  branchList: Branch[]
+  currentBranch: string
+  onCreateBranch: (branchName: string) => void
+  onChange: (branchName: string) => void
 }) => {
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
@@ -232,13 +237,13 @@ const BranchSelector = ({
                     ? 'bg-blue-50 text-blue-800 pointer-events-none'
                     : ''
                 }`}
-                key={branch}
+                key={branch.name}
                 onClick={() => onChange(branch.name)}
               >
                 {isCurrentBranch && (
                   <BiGitBranch className="w-5 h-auto text-blue-500/70" />
                 )}
-                {branch.name}
+                {branch.name} : {branch?.indexStatus?.status}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>
                 )}
