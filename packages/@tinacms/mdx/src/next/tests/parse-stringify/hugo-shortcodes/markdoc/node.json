@@ -4,46 +4,50 @@
     {
       "type": "mdxJsxFlowElement",
       "name": "callout",
-      "attributes": [
-        {
-          "type": "mdxJsxAttribute",
-          "name": "type",
-          "value": "note"
-        }
-      ],
       "children": [
         {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Tags are composable!"
-            }
-          ]
+          "type": "text",
+          "text": ""
         }
-      ]
+      ],
+      "props": {
+        "type": "note",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Tags are composable!"
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "type": "mdxJsxFlowElement",
       "name": "callout",
-      "attributes": [
-        {
-          "type": "mdxJsxAttribute",
-          "name": "type",
-          "value": "warning"
-        }
-      ],
       "children": [
         {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Tags aren't composable!"
-            }
-          ]
+          "type": "text",
+          "text": ""
         }
-      ]
+      ],
+      "props": {
+        "type": "warning",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Tags aren't composable!"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

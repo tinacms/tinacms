@@ -14,18 +14,25 @@
     {
       "type": "mdxJsxFlowElement",
       "name": "some-feature",
-      "attributes": [],
       "children": [
         {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "Testing this thing"
-            }
-          ]
+          "type": "text",
+          "text": ""
         }
-      ]
+      ],
+      "props": {
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Testing this thing"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

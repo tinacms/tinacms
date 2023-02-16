@@ -17,6 +17,11 @@
     "types": [
       "vite/client"
     ],
+    "paths": {
+      "unist-util-visit": [
+        "./index.d.ts"
+      ] // this mapping is relative to "baseUrl"
+    }
   },
   "exclude": [
     "node_modules",

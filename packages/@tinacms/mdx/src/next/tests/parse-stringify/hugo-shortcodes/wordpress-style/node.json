@@ -4,8 +4,13 @@
     {
       "type": "mdxJsxFlowElement",
       "name": "recent-posts",
-      "attributes": [],
-      "children": []
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {}
     }
   ]
 }

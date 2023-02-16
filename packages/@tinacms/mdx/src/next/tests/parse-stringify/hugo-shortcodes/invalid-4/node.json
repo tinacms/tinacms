@@ -13,24 +13,26 @@
     {
       "type": "mdxJsxFlowElement",
       "name": "some-feature",
-      "attributes": [
-        {
-          "type": "mdxJsxAttribute",
-          "name": "a",
-          "value": "b"
-        }
-      ],
       "children": [
         {
-          "type": "paragraph",
-          "children": [
-            {
-              "type": "text",
-              "value": "And we didn't close it out, but it should still work"
-            }
-          ]
+          "type": "text",
+          "text": ""
         }
-      ]
+      ],
+      "props": {
+        "a": "b",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "And we didn't close it out, but it should still work"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
