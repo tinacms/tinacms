@@ -17,11 +17,6 @@
     "types": [
       "vite/client"
     ],
-    "paths": {
-      "mdast-util-mdx-jsx": [
-        "./src/index.d.ts"
-      ] // this mapping is relative to "baseUrl"
-    }
   },
   "exclude": [
     "node_modules",

@@ -14,22 +14,6 @@ import { ContainerDirective } from 'mdast-util-directive'
 
 export type { Position, PositionItem } from './plate'
 
-declare module 'mdast' {
-  interface StaticPhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
-  }
-  interface PhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
-  }
-
-  interface BlockContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
-  }
-  interface ContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
-  }
-}
-
 export const remarkToSlate = (
   root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
   field: RichTypeInner,

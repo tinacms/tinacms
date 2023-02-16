@@ -19,22 +19,6 @@ import { stringifyProps } from './acorn'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 import { stringifyShortcode } from './stringifyShortcode'
 
-declare module 'mdast' {
-  interface StaticPhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
-  }
-  interface PhrasingContentMap {
-    mdxJsxTextElement: MdxJsxTextElement
-  }
-
-  interface BlockContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
-  }
-  interface ContentMap {
-    mdxJsxFlowElement: MdxJsxFlowElement
-  }
-}
-
 export const stringifyMDX = (
   value: Plate.RootElement,
   field: RichTypeInner,

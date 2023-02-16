@@ -7,21 +7,9 @@ expect.extend({ toMatchFile })
 
 // @ts-ignore
 export function removePosition(tree) {
-  visit(tree, remove)
+  ;[...walkThrough(tree)]
 
   return tree
-
-  // @ts-ignore
-  function remove(node) {
-    // @ts-ignore
-    node?.attributes?.forEach((att) => {
-      if (att?.value?.data) {
-        delete att?.value?.data
-      }
-      delete att.data
-    })
-    delete node.position
-  }
 }
 
 export const print = (tree: object) => {
@@ -30,4 +18,20 @@ export const print = (tree: object) => {
 
 export const nodePath = (dir: string) => {
   return path.join(dir, './node.json')
+}
+
+const walkThrough = function* (obj: object) {
+  // @ts-ignore
+  const walk = function* (x: object & { position?: object }, previous = []) {
+    for (let key of Object.keys(x)) {
+      if (key === 'position') {
+        delete x.position
+      }
+      // @ts-ignore
+      if (typeof x[key] === 'object') yield* walk(x[key], [...previous, key])
+      // @ts-ignore
+      else yield [[...previous, key], x[key]]
+    }
+  }
+  yield* walk(obj)
 }

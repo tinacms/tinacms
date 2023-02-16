@@ -4,19 +4,26 @@
     {
       "type": "mdxJsxFlowElement",
       "name": "recent-posts",
-      "attributes": [
-        {
-          "type": "mdxJsxAttribute",
-          "name": "posts",
-          "value": "5"
-        }
-      ],
       "children": [
         {
           "type": "text",
           "text": ""
         }
-      ]
+      ],
+      "props": {
+        "posts": "5",
+        "children": [
+          {
+            "type": "paragraph",
+            "children": [
+              {
+                "type": "text",
+                "value": "Posts Heading"
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }
