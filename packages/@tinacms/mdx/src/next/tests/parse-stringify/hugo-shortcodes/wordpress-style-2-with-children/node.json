@@ -2,24 +2,34 @@
   "type": "root",
   "children": [
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "mdxJsxTextElement",
           "name": "recent-posts",
-          "attributes": [
-            {
-              "type": "mdxJsxAttribute",
-              "name": "posts",
-              "value": "5"
-            }
-          ],
           "children": [
             {
               "type": "text",
-              "value": "Posts Heading"
+              "text": ""
             }
-          ]
+          ],
+          "props": {
+            "posts": "5",
+            "children": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "Posts Heading"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         }
       ]
     }

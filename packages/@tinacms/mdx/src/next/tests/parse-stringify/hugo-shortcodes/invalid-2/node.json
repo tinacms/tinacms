@@ -2,11 +2,11 @@
   "type": "root",
   "children": [
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "Unexpected attribute in closing {{% /some-feature a=\"b\" %}} tag turns into regular text"
+          "text": "Unexpected attribute in closing {{% /some-feature a=\"b\" %}} tag turns into regular text"
         }
       ]
     }

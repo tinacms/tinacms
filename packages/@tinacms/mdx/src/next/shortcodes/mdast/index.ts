@@ -1,5 +1,14 @@
-// import type { Program } from 'estree-jsx'
-// type Program = unknown
+import { ccount } from 'ccount'
+import { parseEntities } from 'parse-entities'
+import { stringifyPosition } from 'unist-util-stringify-position'
+import { VFileMessage } from 'vfile-message'
+import { stringifyEntitiesLight } from 'stringify-entities'
+import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js'
+import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js'
+import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js'
+import { track } from 'mdast-util-to-markdown/lib/util/track.js'
+// import { ToMarkdownExtension } from 'mdast-util-mdx-jsx/lib'
+import { Pattern } from '../lib/syntax'
 import type {
   Handle as FromMarkdownHandle,
   Token,
@@ -28,72 +37,6 @@ type Tag = {
   shouldFallback?: boolean
 }
 
-type ToMarkdownOptions = {
-  quote: '"' | "'" | null | undefined
-  quoteSmart: boolean | null | undefined
-  tightSelfClosing: boolean | null | undefined
-  printWidth: number | null | undefined
-}
-
-/**
- * @typedef Tag
- *   Single tag.
- * @property {string | undefined} name
- *   Name of tag, or `undefined` for fragment.
- *
- *   > 👉 **Note**: `null` is used in the AST for fragments, as it serializes in
- *   > JSON.
- * @property {Array<MdxJsxAttribute | MdxJsxExpressionAttribute>} attributes
- *   Attributes.
- * @property {boolean} close
- *   Whether the tag is closing (`</x>`).
- * @property {boolean} selfClosing
- *   Whether the tag is self-closing (`<x/>`).
- * @property {Token['start']} start
- *   Start point.
- * @property {Token['start']} end
- *   End point.
- *
- * @typedef ToMarkdownOptions
- *   Configuration.
- * @property {'"' | "'" | null | undefined} [quote='"']
- *   Preferred quote to use around attribute values.
- * @property {boolean | null | undefined} [quoteSmart=false]
- *   Use the other quote if that results in less bytes.
- * @property {boolean | null | undefined} [tightSelfClosing=false]
- *   Do not use an extra space when closing self-closing elements: `<img/>`
- *   instead of `<img />`.
- * @property {number | null | undefined} [printWidth=Infinity]
- *   Try and wrap syntax at this width.
- *
- *   When set to a finite number (say, `80`), the formatter will print
- *   attributes on separate lines when a tag doesn’t fit on one line.
- *   The normal behavior is to print attributes with spaces between them
- *   instead of line endings.
- */
-
-import { ccount } from 'ccount'
-import { parseEntities } from 'parse-entities'
-import { stringifyPosition } from 'unist-util-stringify-position'
-import { VFileMessage } from 'vfile-message'
-import { stringifyEntitiesLight } from 'stringify-entities'
-import { containerFlow } from 'mdast-util-to-markdown/lib/util/container-flow.js'
-import { containerPhrasing } from 'mdast-util-to-markdown/lib/util/container-phrasing.js'
-import { indentLines } from 'mdast-util-to-markdown/lib/util/indent-lines.js'
-import { track } from 'mdast-util-to-markdown/lib/util/track.js'
-import { ToMarkdownExtension } from 'mdast-util-mdx-jsx/lib'
-
-// To do: next major: use `state`, use utilities from state, rename `safeOptions` to `info`.
-
-/**
- * Create an extension for `mdast-util-from-markdown` to enable MDX JSX.
- *
- * @returns {FromMarkdownExtension}
- *   Extension for `mdast-util-from-markdown` to enable MDX JSX.
- *
- *   When using the syntax extension with `addResult`, nodes will have a
- *   `data.estree` field set to an ESTree `Program` node.
- */
 export function mdxJsxFromMarkdown() {
   const buffer: FromMarkdownHandle = function () {
     this.buffer()
@@ -373,14 +316,25 @@ export function mdxJsxFromMarkdown() {
       // want to basically unwind it and treat it as a
       // plain string instead.
       if (tag.shouldFallback) {
-        this.enter(
-          {
-            type: 'text',
-            value: this.sliceSerialize(token),
-          },
-          token
-        )
-        this.exit(token)
+        if (token.type === 'mdxJsxFlowTag') {
+          this.enter(
+            {
+              type: 'paragraph',
+              children: [{ type: 'text', value: this.sliceSerialize(token) }],
+            },
+            token
+          )
+          this.exit(token)
+        } else {
+          this.enter(
+            {
+              type: 'text',
+              value: this.sliceSerialize(token),
+            },
+            token
+          )
+          this.exit(token)
+        }
       } else {
         this.exit(token, onErrorLeftIsTag)
       }
@@ -410,7 +364,6 @@ export function mdxJsxFromMarkdown() {
   }
 
   const onErrorLeftIsTag: OnExitError = function (this, a, b) {
-    console.log('me?')
     const tag = /** @type {Tag} */ this.getData('mdxJsxTag')
     // this.enter(
     //   {
@@ -509,9 +462,14 @@ export function mdxJsxFromMarkdown() {
  * overwrite them!
  *
  */
-export const mdxJsxToMarkdown: (
-  options: ToMarkdownOptions
-) => ToMarkdownExtension = function (options) {
+export const mdxJsxToMarkdown = function (options: {
+  quote?: '"' | "'"
+  quoteSmart?: boolean
+  tightSelfClosing?: boolean
+  printWidth?: number
+  patterns: Pattern[]
+}) {
+  const patterns = options.patterns || []
   const options_ = options || {}
   const quote = options_.quote || '"'
   const quoteSmart = options_.quoteSmart || false
@@ -533,14 +491,18 @@ export const mdxJsxToMarkdown: (
     context,
     safeOptions
   ) {
+    const pattern = patterns.find((p) => p.name === node.name)
+    if (!pattern) {
+      // FIXME
+      return ''
+    }
     const tracker = track(safeOptions)
-    const selfClosing =
-      node.name && (!node.children || node.children.length === 0)
+    const selfClosing = pattern.leaf
     const exit = context.enter(node.type)
     let index = -1
     /** @type {Array<string>} */
     const serializedAttributes = []
-    let value = tracker.move('<' + (node.name || ''))
+    let value = tracker.move(pattern.start + ' ' + (node.name || ''))
 
     // None.
     if (node.attributes && node.attributes.length > 0) {
@@ -581,7 +543,11 @@ export const mdxJsxToMarkdown: (
               appliedQuote
           }
 
-          result = left + (right ? '=' : '') + right
+          if (left === '_value') {
+            result = right
+          } else {
+            result = left + (right ? '=' : '') + right
+          }
         }
 
         serializedAttributes.push(result)
@@ -622,18 +588,19 @@ export const mdxJsxToMarkdown: (
 
     if (selfClosing) {
       value += tracker.move(
-        (tightSelfClosing || attributesOnTheirOwnLine ? '' : ' ') + '/'
+        tightSelfClosing || attributesOnTheirOwnLine ? '' : ''
       )
     }
 
-    value += tracker.move('>')
+    value += tracker.move(' ' + pattern.end)
 
-    if (node.children && node.children.length > 0) {
+    if (node.children) {
       if (node.type === 'mdxJsxFlowElement') {
         tracker.shift(2)
         value += tracker.move('\n')
         value += tracker.move(
-          indentLines(containerFlow(node, context, tracker.current()), map)
+          // indentLines(containerFlow(node, context, tracker.current()), map)
+          containerFlow(node, context, tracker.current())
         )
         value += tracker.move('\n')
       } else {
@@ -648,7 +615,9 @@ export const mdxJsxToMarkdown: (
     }
 
     if (!selfClosing) {
-      value += tracker.move('</' + (node.name || '') + '>')
+      value += tracker.move(
+        pattern.start + ' /' + (node.name || ' ') + ' ' + pattern.end
+      )
     }
 
     exit()

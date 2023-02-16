@@ -2,24 +2,29 @@
   "type": "root",
   "children": [
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "Unexpected attribute in closing"
+          "text": "Unexpected attribute in closing"
         }
       ]
     },
     {
-      "type": "text",
-      "value": "{{% /some-feature a=\"b\" %}}"
-    },
-    {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "tag turns into regular text"
+          "text": "{{% /some-feature a=\"b\" %}}"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "tag turns into regular text"
         }
       ]
     }

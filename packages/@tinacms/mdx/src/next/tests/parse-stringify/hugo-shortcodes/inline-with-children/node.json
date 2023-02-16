@@ -2,33 +2,42 @@
   "type": "root",
   "children": [
     {
-      "type": "heading",
-      "depth": 1,
+      "type": "h1",
       "children": [
         {
           "type": "text",
-          "value": "hello "
+          "text": "hello "
         },
         {
           "type": "mdxJsxTextElement",
           "name": "some-feature",
-          "attributes": [
-            {
-              "type": "mdxJsxAttribute",
-              "name": "_value",
-              "value": "abc"
-            }
-          ],
           "children": [
             {
               "type": "text",
-              "value": " and some more text "
+              "text": ""
             }
-          ]
+          ],
+          "props": {
+            "_value": "abc",
+            "children": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": " and some more text "
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         },
         {
           "type": "text",
-          "value": "."
+          "text": "."
         }
       ]
     }

@@ -6,11 +6,7 @@
 
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
 import { text } from 'mdast-util-to-markdown/lib/handle/text'
-import {
-  mdxJsxToMarkdown,
-  MdxJsxTextElement,
-  MdxJsxFlowElement,
-} from 'mdast-util-mdx-jsx'
+import { mdxJsxToMarkdown } from 'mdast-util-mdx-jsx'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
@@ -18,6 +14,7 @@ import { eat } from './marks'
 import { stringifyProps } from './acorn'
 import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
 import { stringifyShortcode } from './stringifyShortcode'
+import { stringifyMDX as stringigyMDXNext } from '../next/stringify'
 
 export const stringifyMDX = (
   value: Plate.RootElement,
@@ -34,6 +31,9 @@ export const stringifyMDX = (
     if (value?.children[0].type === 'invalid_markdown') {
       return value.children[0].value
     }
+  }
+  if (field.parser?.type === 'markdown') {
+    return stringigyMDXNext(value, field, imageCallback)
   }
   const tree = rootElement(value, field, imageCallback)
   const res = toTinaMarkdown(tree, field)

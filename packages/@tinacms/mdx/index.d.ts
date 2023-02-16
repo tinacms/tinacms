@@ -10,3 +10,19 @@ declare module 'unist-util-visit' {
     callback: (node: T) => void
   ) => void
 }
+
+// Add custom data tracked to turn markdown into a tree.
+declare module 'mdast-util-from-markdown' {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface CompileData {
+    /**
+     * Current MDX JSX tag.
+     */
+    mdxJsxTag?: Tag | undefined
+
+    /**
+     * Current stack of open MDX JSX tags.
+     */
+    mdxJsxTagStack?: Tag[] | undefined
+  }
+}

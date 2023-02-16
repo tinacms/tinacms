@@ -2,11 +2,11 @@
   "type": "root",
   "children": [
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "{{< some-other \"shortcode\" >}}"
+          "text": "{{< some-other \"shortcode\" >}}"
         }
       ]
     }

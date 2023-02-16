@@ -1,32 +1,58 @@
 import { visit } from 'unist-util-visit'
-import { Root, Content, ListItem } from 'mdast'
+import { Root } from 'mdast'
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
-// import { remarkToSlate } from '../../parse/remarkToPlate'
+import { remarkToSlate } from '../../parse/remarkToPlate'
 import { RichTypeInner } from '@tinacms/schema-tools'
 
-// const visit = (a: any, s: string, b: any) => { }
-
-export const postProcessor = (tree: Root, field: RichTypeInner) => {
-  visit(tree, 'listItem', moveListItemChildrenToLIC)
-  visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow)
-
-  return tree
-}
-
-const moveListItemChildrenToLIC = (node: ListItem) => {}
-const addPropsToMdxFlow = (node: MdxJsxFlowElement | MdxJsxTextElement) => {
-  const props = {}
-  node.attributes.forEach((attribute) => {
-    if (attribute.type === 'mdxJsxAttribute') {
-      props[attribute.name] = attribute.value
-    } else {
-      throw new Error('HANDLE mdxJsxExpressionAttribute')
+export const postProcessor = (
+  tree: Root,
+  field: RichTypeInner,
+  imageCallback: (s: string) => string
+) => {
+  // Since were using our own interpretation of MDX, these props
+  // don't adhere to the MDAST spec, casting as any
+  const addPropsToMdxFlow = (
+    node: (MdxJsxFlowElement | MdxJsxTextElement) & {
+      props: any
+      children: any
     }
-  })
-  if (node.children.length) {
-    props.children = node.children
+  ) => {
+    const props: Record<string, any> = {}
+    node.attributes.forEach((attribute) => {
+      if (attribute.type === 'mdxJsxAttribute') {
+        props[attribute.name] = attribute.value
+      } else {
+        throw new Error('HANDLE mdxJsxExpressionAttribute')
+      }
+    })
+    if (node.children.length) {
+      let tree
+      if (node.type === 'mdxJsxTextElement') {
+        tree = postProcessor(
+          {
+            type: 'root',
+            children: [{ type: 'paragraph', children: node.children }],
+          },
+          field,
+          imageCallback
+        )
+      } else {
+        tree = postProcessor(
+          { type: 'root', children: node.children },
+          field,
+          imageCallback
+        )
+      }
+      props.children = tree
+    }
+    node.props = props
+    // @ts-ignore
+    delete node.attributes
+    node.children = [{ type: 'text', text: '' }]
   }
-  node.props = props
-  delete node.attributes
-  node.children = [{ type: 'text', text: '' }]
+
+  visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow)
+  visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow)
+
+  return remarkToSlate(tree, field, imageCallback)
 }

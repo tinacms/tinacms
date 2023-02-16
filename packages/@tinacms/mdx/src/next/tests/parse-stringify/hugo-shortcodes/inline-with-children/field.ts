@@ -12,7 +12,7 @@ export const field: RichTypeInner = {
       match: { start: '{{<', end: '>}}', name: 'some-feature' },
       fields: [
         { name: '_value', type: 'string' },
-        { name: 'children', type: 'string' },
+        { name: 'children', type: 'rich-text' },
       ],
     },
   ],

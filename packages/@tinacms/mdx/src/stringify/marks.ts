@@ -112,11 +112,17 @@ const inlineElementExceptLink = (
         field,
         imageCallback
       )
+      let c = children
+      if (children.length) {
+        if (children[0]?.type === 'paragraph') {
+          c = children[0].children[0]
+        }
+      }
       return {
         type: 'mdxJsxTextElement',
         name: content.name,
         attributes,
-        children,
+        children: c,
       }
     }
     case 'html_inline': {

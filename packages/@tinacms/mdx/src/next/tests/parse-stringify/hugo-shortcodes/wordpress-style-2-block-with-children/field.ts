@@ -11,7 +11,7 @@ export const field: RichTypeInner = {
       match: { start: '[', end: ']', name: 'recent-posts' },
       fields: [
         { name: 'posts', type: 'string' },
-        { name: 'children', type: 'string' },
+        { name: 'children', type: 'rich-text' },
       ],
     },
   ],

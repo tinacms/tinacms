@@ -2,38 +2,38 @@
   "type": "root",
   "children": [
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "{"
+          "text": "{"
         }
       ]
     },
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "import { foo } from 'bar.js'"
+          "text": "import { foo } from 'bar.js'"
         }
       ]
     },
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "const a = \"ok\""
+          "text": "const a = \"ok\""
         }
       ]
     },
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "Hello, {world!}"
+          "text": "Hello, {world!}"
         }
       ]
     }

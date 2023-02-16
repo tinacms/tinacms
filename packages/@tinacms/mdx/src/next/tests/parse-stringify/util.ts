@@ -20,17 +20,23 @@ export const nodePath = (dir: string) => {
   return path.join(dir, './node.json')
 }
 
+export const mdPath = (dir: string) => {
+  return path.join(dir, './out.md')
+}
+
 const walkThrough = function* (obj: object) {
   // @ts-ignore
   const walk = function* (x: object & { position?: object }, previous = []) {
-    for (let key of Object.keys(x)) {
-      if (key === 'position') {
-        delete x.position
+    if (x) {
+      for (let key of Object.keys(x)) {
+        if (key === 'position') {
+          delete x.position
+        }
+        // @ts-ignore
+        if (typeof x[key] === 'object') yield* walk(x[key], [...previous, key])
+        // @ts-ignore
+        else yield [[...previous, key], x[key]]
       }
-      // @ts-ignore
-      if (typeof x[key] === 'object') yield* walk(x[key], [...previous, key])
-      // @ts-ignore
-      else yield [[...previous, key], x[key]]
     }
   }
   yield* walk(obj)

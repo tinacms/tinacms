@@ -9,7 +9,7 @@ export const field: RichTypeInner = {
       name: 'someFeature',
       label: 'Some feature',
       match: { start: '{{%', end: '%}}', name: 'some-feature' },
-      fields: [{ name: 'children', type: 'string' }],
+      fields: [{ name: 'children', type: 'rich-text' }],
     },
   ],
 }

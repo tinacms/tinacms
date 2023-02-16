@@ -6,7 +6,7 @@
 
 import { remark } from 'remark'
 import remarkMdx, { Root } from 'remark-mdx'
-
+import { parseMDX as parseMDXNext } from '../next/parse'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
@@ -105,7 +105,7 @@ export const parseMDX = (
   let tree: Root | null
   try {
     if (field.parser?.type === 'markdown') {
-      tree = markdownToAst(value, field)
+      return parseMDXNext(value, field, imageCallback)
     } else {
       let preprocessedString = value
       const templatesWithMatchers = field.templates?.filter(

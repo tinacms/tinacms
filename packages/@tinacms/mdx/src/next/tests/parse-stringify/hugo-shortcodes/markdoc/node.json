@@ -12,17 +12,20 @@
       ],
       "props": {
         "type": "note",
-        "children": [
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "type": "text",
-                "value": "Tags are composable!"
-              }
-            ]
-          }
-        ]
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Tags are composable!"
+                }
+              ]
+            }
+          ]
+        }
       }
     },
     {
@@ -36,17 +39,20 @@
       ],
       "props": {
         "type": "warning",
-        "children": [
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "type": "text",
-                "value": "Tags aren't composable!"
-              }
-            ]
-          }
-        ]
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Tags aren't composable!"
+                }
+              ]
+            }
+          ]
+        }
       }
     }
   ]

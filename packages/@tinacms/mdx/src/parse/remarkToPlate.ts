@@ -5,12 +5,14 @@
 */
 
 import { flatten } from 'lodash-es'
-import { directiveElement, mdxJsxElement } from './mdx'
+import { directiveElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { ContainerDirective } from 'mdast-util-directive'
+
+const mdxJsxElement = (node) => node
 
 export type { Position, PositionItem } from './plate'
 
@@ -464,9 +466,9 @@ export class RichTextParseError extends Error {
     super(message)
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, RichTextParseError)
-    }
+    // if (Error.captureStackTrace) {
+    //   Error.captureStackTrace(this, RichTextParseError)
+    // }
 
     this.name = 'RichTextParseError'
     // Custom debugging information

@@ -2,49 +2,50 @@
   "type": "root",
   "children": [
     {
-      "type": "heading",
-      "depth": 1,
+      "type": "h1",
       "children": [
         {
           "type": "text",
-          "value": "hello "
+          "text": "hello "
         },
         {
           "type": "mdxJsxTextElement",
           "name": "some-feature",
-          "attributes": [
+          "children": [
             {
-              "type": "mdxJsxAttribute",
-              "name": "_value",
-              "value": "abc"
+              "type": "text",
+              "text": ""
             }
           ],
-          "children": []
+          "props": {
+            "_value": "abc"
+          }
         }
       ]
     },
     {
-      "type": "paragraph",
+      "type": "p",
       "children": [
         {
           "type": "text",
-          "value": "When not separated by whitespace"
+          "text": "When not separated by whitespace"
         },
         {
           "type": "mdxJsxTextElement",
           "name": "some-feature",
-          "attributes": [
+          "children": [
             {
-              "type": "mdxJsxAttribute",
-              "name": "_value",
-              "value": "123"
+              "type": "text",
+              "text": ""
             }
           ],
-          "children": []
+          "props": {
+            "_value": "123"
+          }
         },
         {
           "type": "text",
-          "value": "it still works"
+          "text": "it still works"
         }
       ]
     }
