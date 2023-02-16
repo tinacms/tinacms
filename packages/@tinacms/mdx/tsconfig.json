@@ -10,10 +10,25 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ESNext",
-    "types": ["vite/client"]
+    "types": [
+      "vite/client"
+    ],
+    "paths": {
+      "mdast-util-mdx-jsx": [
+        "./src/index.d.ts"
+      ] // this mapping is relative to "baseUrl"
+    }
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src", "vite-env.d.ts"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src",
+    "vite-env.d.ts"
+  ]
 }

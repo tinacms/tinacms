@@ -97,8 +97,6 @@
     "@tailwindcss/typography": "^0.5.9",
     "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
-    "@types/estree": "^0.0.50",
-    "@types/estree-jsx": "^1.0.0",
     "@types/express": "^4.17.8",
     "@types/fs-extra": "^9.0.2",
     "@types/jest": "^26.0.4",
