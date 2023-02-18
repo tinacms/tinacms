@@ -142,6 +142,7 @@ export class TinaAdminApi {
                     filename
                     extension
                   }
+                  _values
                 }
               }
             }
@@ -188,6 +189,7 @@ export class TinaAdminApi {
                     filename
                     extension
                   }
+                  _values
                 }
               }
             }
