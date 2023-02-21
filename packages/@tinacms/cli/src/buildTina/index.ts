@@ -1,14 +1,5 @@
 /**
- Copyright 2021 Forestry.io Holdings, Inc.
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+
  */
 
 import fs from 'fs-extra'
@@ -19,28 +10,24 @@ import {
   Database,
   getASTSchema,
 } from '@tinacms/graphql'
-import {
-  AuditFileSystemBridge,
-  FilesystemBridge,
-  IsomorphicBridge,
-  LevelStore,
-} from '@tinacms/datalayer'
+import { AuditFileSystemBridge, FilesystemBridge } from '@tinacms/datalayer'
+import { MemoryLevel } from 'memory-level'
 import path from 'path'
 import { DocumentNode } from 'graphql'
 import { compileSchema, resetGeneratedFolder } from '../cmds/compile'
 import { genClient, genTypes } from '../cmds/query-gen'
-import { makeIsomorphicOptions } from './git'
 import { viteBuild } from '@tinacms/app'
 import { spin } from '../utils/spinner'
 import { isProjectTs } from './attachPath'
 import { logger } from '../logger'
-import { logText } from '../utils/theme'
+import { logText, warnText } from '../utils/theme'
 
 interface ClientGenOptions {
   noSDK?: boolean
   local?: boolean
   verbose?: boolean
   port?: number
+  rootPath?: string
 }
 
 interface BuildOptions {
@@ -61,15 +48,12 @@ export const buildSetupCmdBuild = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database } = await buildSetup({
+  await buildSetup({
     ...opts,
     rootPath,
-    useMemoryStore: true,
   })
   // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
@@ -80,15 +64,12 @@ export const buildSetupCmdServerStart = async (
   opts: BuildSetupOptions
 ) => {
   const rootPath = ctx.rootPath as string
-  const { bridge, database } = await buildSetup({
+  await buildSetup({
     ...opts,
     rootPath,
-    useMemoryStore: false,
   })
   // attach to context
-  ctx.bridge = bridge
-  ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
@@ -103,70 +84,36 @@ export const buildSetupCmdAudit = async (
     : new AuditFileSystemBridge(rootPath)
 
   await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
-  const store = new LevelStore(rootPath, false)
 
-  const database = await createDatabase({ store, bridge })
+  const database = await createDatabase({
+    level: new MemoryLevel<string, Record<string, any>>({
+      valueEncoding: 'json',
+    }),
+    bridge,
+  })
 
   // attach to context
   ctx.bridge = bridge
   ctx.database = database
-  ctx.builder = new ConfigBuilder(database)
+  ctx.builder = new ConfigBuilder(ctx.database)
 
   next()
 }
 
-const buildSetup = async ({
-  isomorphicGitBridge,
-  rootPath,
-  useMemoryStore,
-}: BuildSetupOptions & {
-  rootPath: string
-  useMemoryStore: boolean
-}) => {
-  const fsBridge = new FilesystemBridge(rootPath)
-  const isomorphicOptions =
-    isomorphicGitBridge && (await makeIsomorphicOptions(fsBridge))
-
-  /**
-   * To work with Github directly, replace the Bridge and Store
-   * and ensure you've provided your access token.
-   * NOTE: when talking the the tinacms repo, you must
-   * give your personal access token access to the TinaCMS org
-   */
-  // const ghConfig = {
-  //   rootPath: 'examples/tina-cloud-starter',
-  //   accessToken: '<my-token>',
-  //   owner: 'tinacms',
-  //   repo: 'tinacms',
-  //   ref: 'add-data-store',
-  // }
-  // const bridge = new GithubBridge(ghConfig)
-  // const store = new GithubStore(ghConfig)
-
-  const bridge = isomorphicGitBridge
-    ? new IsomorphicBridge(rootPath, isomorphicOptions)
-    : fsBridge
-
-  // const store = experimentalData
-  //   ? new LevelStore(rootPath, useMemoryStore)
-  //   : new FilesystemStore({ rootPath })
-
+const buildSetup = async ({ rootPath }: { rootPath: string }) => {
   await fs.ensureDirSync(path.join(rootPath, '.tina', '__generated__'))
-
-  const store = new LevelStore(rootPath, useMemoryStore)
-
-  const database = await createDatabase({ store, bridge })
-
-  return { database, bridge, store }
 }
 
 export const buildCmdBuild = async (
   ctx: {
     builder: ConfigBuilder
+    database: Database
+    graphQLSchema: DocumentNode
     rootPath: string
     usingTs: boolean
     schema: unknown
     apiUrl: string
+    tinaSchema: any
   },
   next: () => void,
   options: Omit<
@@ -175,17 +122,20 @@ export const buildCmdBuild = async (
   >
 ) => {
   // always skip indexing in the "build" command
-  const { schema } = await ctx.builder.build({
+  const { schema, graphQLSchema, tinaSchema } = await ctx.builder.build({
     rootPath: ctx.rootPath,
     ...options,
   })
   ctx.schema = schema
+  ctx.graphQLSchema = graphQLSchema
+  ctx.tinaSchema = tinaSchema
   const apiUrl = await ctx.builder.genTypedClient({
     compiledSchema: schema,
     local: options.local,
     noSDK: options.noSDK,
     verbose: options.verbose,
     usingTs: ctx.usingTs,
+    rootPath: ctx.rootPath,
     port: options.port,
   })
   ctx.apiUrl = apiUrl
@@ -199,7 +149,11 @@ export const buildCmdBuild = async (
 }
 
 export const auditCmdBuild = async (
-  ctx: { builder: ConfigBuilder; rootPath: string; database: Database },
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+  },
   next: () => void,
   options: Omit<
     BuildOptions & BuildSetupOptions,
@@ -217,6 +171,34 @@ export const auditCmdBuild = async (
       await ctx.database.indexContent({ graphQLSchema, tinaSchema })
     },
     text: 'Indexing local files',
+  })
+
+  next()
+}
+
+export const indexIntoSelfHostedDatabase = async (
+  ctx: {
+    builder: ConfigBuilder
+    isSelfHostedDatabase?: boolean
+    rootPath: string
+    database: Database
+    graphQLSchema: DocumentNode
+    schema: any
+    tinaSchema: any
+  },
+  next: () => void
+) => {
+  if (!ctx.isSelfHostedDatabase) {
+    return next()
+  }
+
+  const { graphQLSchema, tinaSchema } = ctx
+
+  await spin({
+    waitFor: async () => {
+      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+    },
+    text: 'Indexing to self-hosted database',
   })
 
   next()
@@ -241,19 +223,46 @@ export class ConfigBuilder {
     this.database.clearCache()
 
     await fs.mkdirp(tinaGeneratedPath)
-    await this.database.store.close()
     await resetGeneratedFolder({
       tinaGeneratedPath,
       usingTs,
       isBuild: !local,
     })
-    await this.database.store.open()
 
     const compiledSchema = await compileSchema({
       verbose,
       dev,
       rootPath,
     })
+    // FIXME: the bridge is initialized before we have access to the config,
+    // ideally this is available to us during Bridge init but as a workaround
+    // we add it here.
+    if (
+      this.database.bridge.addOutputPath &&
+      compiledSchema.config?.localContentPath
+    ) {
+      if (compiledSchema?.config?.media?.tina) {
+        throw new Error(
+          `"media.tina" is not supported when the "localContentPath" property is present.`
+        )
+      }
+      let localContentPath = compiledSchema.config.localContentPath
+      if (!localContentPath.startsWith('/')) {
+        localContentPath = path.join(process.cwd(), '.tina', localContentPath)
+      }
+      if (await fs.pathExists(localContentPath)) {
+        logger.info(logText(`Using separate content path ${localContentPath}`))
+      } else {
+        logger.warn(
+          warnText(
+            `Using separate content path ${localContentPath}
+  but no directory was found at that location, creating one...`
+          )
+        )
+        await fs.mkdir(localContentPath)
+      }
+      this.database.bridge.addOutputPath(localContentPath)
+    }
 
     const { graphQLSchema, tinaSchema } = await buildSchema(
       rootPath,
@@ -271,19 +280,20 @@ export class ConfigBuilder {
     verbose,
     local,
     port,
+    rootPath,
   }: ClientGenOptions & {
     usingTs: boolean
     compiledSchema: any
   }) {
     const astSchema = await getASTSchema(this.database)
 
-    await genTypes({ schema: astSchema, usingTs }, () => {}, {
+    await genTypes({ schema: astSchema, usingTs, rootPath }, () => {}, {
       noSDK,
       verbose,
     })
 
     return genClient(
-      { tinaSchema: compiledSchema, usingTs },
+      { tinaSchema: compiledSchema, usingTs, rootPath },
       {
         local,
         port,
@@ -311,6 +321,7 @@ export const buildAdmin = async ({
         outputFolder: schema?.config?.build?.outputFolder as string,
         publicFolder: schema?.config?.build?.publicFolder as string,
         apiUrl,
+        host: schema?.config?.build?.host ?? false,
       })
     }
     // Local runs an asset server as a long-lived task, don't show spinning animation

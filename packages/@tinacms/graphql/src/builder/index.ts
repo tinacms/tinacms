@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { Database } from '../database'
@@ -365,7 +356,7 @@ export class Builder {
         astBuilder.InputValueDefinition({
           name: 'params',
           required: true,
-          type: await this._buildReferenceMutation({
+          type: await this._buildUpdateDocumentMutationParams({
             namespace: ['document'],
             collections: collections.map((collection) => collection.name),
           }),
@@ -409,7 +400,6 @@ export class Builder {
       type: astBuilder.TYPES.MultiCollectionDocument,
     })
   }
-
   /**
    * ```graphql
    * # ex.
@@ -1172,6 +1162,31 @@ export class Builder {
     })
   }
 
+  private _buildUpdateDocumentMutationParams = async (field: {
+    namespace: string[]
+    collections: string[]
+  }) => {
+    const fields = await sequential(
+      this.tinaSchema.getCollectionsByName(field.collections),
+      async (collection) => {
+        return astBuilder.InputValueDefinition({
+          name: collection.name,
+          type: NAMER.dataMutationTypeName([collection.name]),
+        })
+      }
+    )
+    fields.push(
+      astBuilder.InputValueDefinition({
+        name: 'relativePath',
+        type: astBuilder.TYPES.String,
+      })
+    )
+    return astBuilder.InputObjectTypeDefinition({
+      name: NAMER.dataMutationUpdateTypeName(field.namespace),
+      fields,
+    })
+  }
+
   private _buildObjectOrUnionData = async (
     collectableTemplate:
       | { type: 'union'; namespace: string[]; templates: Template[] }
@@ -1264,16 +1279,14 @@ export class Builder {
     collection?: Collection | ObjectField
     collections?: Collection[]
   }) => {
-    const extra = this.database.store.supportsIndexing()
-      ? [
-          await this._connectionFilterBuilder({
-            fieldName,
-            namespace,
-            collection,
-            collections,
-          }),
-        ]
-      : []
+    const extra = [
+      await this._connectionFilterBuilder({
+        fieldName,
+        namespace,
+        collection,
+        collections,
+      }),
+    ]
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,

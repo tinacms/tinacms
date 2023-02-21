@@ -25,6 +25,8 @@
     "@headlessui/react": "^1.5.0",
     "@tailwindcss/typography": "^0.4.1",
     "@tinacms/auth": "workspace:*",
+    "@tinacms/graphql": "workspace:*",
+    "@tinacms/datalayer": "workspace:*",
     "date-fns": "^2.23.0",
     "next": "12.2.4",
     "next-tinacms-cloudinary": "workspace:*",

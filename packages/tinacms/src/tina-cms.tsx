@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import React, { useState } from 'react'
@@ -23,7 +14,7 @@ import styles from './styles.css'
 import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { useTina } from './edit-state'
-import { parseURL } from './utils/parseUrl'
+import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
 
 const errorButtonStyles = {
@@ -209,6 +200,8 @@ export const TinaCMSProvider2 = ({
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
 
+  const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
+
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -220,7 +213,10 @@ export const TinaCMSProvider2 = ({
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||
     // If in not in localMode check if clientId and branch are defined
-    (!isLocalClient && (!branch || !clientId))
+    (!isLocalClient &&
+      (!branch || !clientId) &&
+      // if they pass a custom apiURL, we don't need to throw an error
+      !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
       'Invalid setup. See https://tina.io/docs/tina-cloud/connecting-site/ for more information.'
@@ -238,9 +234,9 @@ export const TinaCMSProvider2 = ({
     <>
       <TinaCloudProvider
         branch={branch}
-        clientId={clientId}
+        clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
-        isLocalClient={isLocalClient}
+        isLocalClient={isLocalOverride || isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
@@ -380,7 +376,7 @@ const FormRegistrar = ({
 
   React.useEffect(() => {
     onPayloadStateChange({ payload, isLoading })
-    setFormsRegistering && setFormsRegistering(isLoading)
+    setFormsRegistering && setFormsRegistering(isLoading as boolean)
   }, [JSON.stringify(payload), isLoading])
 
   return isLoading ? (

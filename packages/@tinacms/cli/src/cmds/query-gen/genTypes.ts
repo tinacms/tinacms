@@ -1,18 +1,9 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { GraphQLSchema, printSchema } from 'graphql'
-import { Schema } from '@tinacms/schema-tools/dist/types'
+import { SchemaWithConfig } from '@tinacms/schema-tools/dist/types'
 
 import fs from 'fs-extra'
 import p from 'path'
@@ -21,13 +12,20 @@ import { logText, warnText } from '../../utils/theme'
 import { logger } from '../../logger'
 import { transform } from 'esbuild'
 export const TINA_HOST = 'content.tinajs.io'
-const root = process.cwd()
-const generatedPath = p.join(root, '.tina', '__generated__')
 
 export async function genClient(
-  { tinaSchema, usingTs }: { tinaSchema: Schema; usingTs?: boolean },
+  {
+    tinaSchema,
+    usingTs,
+    rootPath,
+  }: {
+    tinaSchema: SchemaWithConfig
+    usingTs?: boolean
+    rootPath: string
+  },
   options
 ) {
+  const generatedPath = p.join(rootPath, '.tina', '__generated__')
   const branch = tinaSchema?.config?.branch
   const clientId = tinaSchema?.config?.clientId
   const token = tinaSchema.config?.token
@@ -35,7 +33,11 @@ export async function genClient(
     tinaSchema?.config?.tinaioConfig?.contentApiUrlOverride ||
     `https://${TINA_HOST}`
 
-  if ((!branch || !clientId || !token) && !options?.local) {
+  if (
+    (!branch || !clientId || !token) &&
+    !options?.local &&
+    !tinaSchema?.config?.contentApiUrlOverride
+  ) {
     const missing = []
     if (!branch) missing.push('branch')
     if (!clientId) missing.push('clientId')
@@ -48,9 +50,13 @@ export async function genClient(
     )
   }
 
-  const apiURL = options.local
+  let apiURL = options.local
     ? `http://localhost:${options.port || 4001}/graphql`
     : `${baseUrl}/content/${clientId}/github/${branch}`
+
+  if (tinaSchema.config?.contentApiUrlOverride) {
+    apiURL = tinaSchema.config.contentApiUrlOverride
+  }
 
   const clientPath = p.join(generatedPath, `client.${usingTs ? 'ts' : 'js'}`)
   fs.writeFileSync(
@@ -65,15 +71,19 @@ export default client;
 }
 
 export async function genTypes(
-  { schema, usingTs }: { schema: GraphQLSchema; usingTs?: boolean },
+  {
+    schema,
+    usingTs,
+    rootPath,
+  }: { schema: GraphQLSchema; usingTs?: boolean; rootPath: string },
   next: () => void,
   options
 ) {
-  const typesPath = process.cwd() + '/.tina/__generated__/types.ts'
-  const typesJSPath = process.cwd() + '/.tina/__generated__/types.js'
-  const typesDPath = process.cwd() + '/.tina/__generated__/types.d.ts'
-  const fragPath = process.cwd() + '/.tina/__generated__/*.{graphql,gql}'
-  const queryPathGlob = process.cwd() + '/.tina/queries/**/*.{graphql,gql}'
+  const typesPath = rootPath + '/.tina/__generated__/types.ts'
+  const typesJSPath = rootPath + '/.tina/__generated__/types.js'
+  const typesDPath = rootPath + '/.tina/__generated__/types.d.ts'
+  const fragPath = rootPath + '/.tina/__generated__/*.{graphql,gql}'
+  const queryPathGlob = rootPath + '/.tina/queries/**/*.{graphql,gql}'
 
   const typescriptTypes = await generateTypes(
     schema,
@@ -101,7 +111,7 @@ export async function genTypes(
   }
 
   const schemaString = await printSchema(schema)
-  const schemaPath = process.cwd() + '/.tina/__generated__/schema.gql'
+  const schemaPath = rootPath + '/.tina/__generated__/schema.gql'
 
   await fs.outputFile(
     schemaPath,

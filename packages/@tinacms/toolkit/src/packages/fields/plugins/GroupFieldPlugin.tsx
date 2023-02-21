@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -22,7 +10,7 @@ import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { wrapFieldWithError } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -37,7 +25,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
+export const Group = wrapFieldWithError(({ tinaForm, field }: GroupProps) => {
   const cms = useCMS()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (

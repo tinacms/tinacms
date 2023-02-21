@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -49,24 +37,26 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   }
 }
 
-type WrapProps = FieldRenderProps<unknown> & {
-  children: JSX.Element
-  tinaForm: Form
-}
-export const Wrap = (props: WrapProps) => {
-  return (
-    <FieldMeta
-      name={props.input.name}
-      label={props.field.label}
-      description={props.field.description}
-      error={props.meta.error}
-      index={props.index}
-      tinaForm={props.tinaForm}
-      actionSlot={props.actionSlot}
-    >
-      {props.children}
-    </FieldMeta>
-  )
+// Same as above but excludes the label, useful for fields that have their own label
+export function wrapFieldWithError<ExtraFieldProps = {}, InputProps = {}>(
+  Field:
+    | React.FunctionComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
+) {
+  return (props: InputFieldType<ExtraFieldProps, InputProps>) => {
+    return (
+      <FieldMeta
+        name={props.input.name}
+        label={false}
+        description={props.field.description}
+        error={props.meta.error}
+        index={props.index}
+        tinaForm={props.tinaForm}
+      >
+        <Field {...props} />
+      </FieldMeta>
+    )
+  }
 }
 
 interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
@@ -190,7 +180,7 @@ export const FieldError = ({
 }) => {
   return (
     <span
-      className={`block font-sans text-xs font-normal text-red-500 pt-2 whitespace-normal m-0 ${className}`}
+      className={`block font-sans text-xs font-normal text-red-500 pt-3 animate-slide-in whitespace-normal m-0  ${className}`}
       {...props}
     >
       {children}

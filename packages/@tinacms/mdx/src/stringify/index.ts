@@ -1,33 +1,23 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
-import { toMarkdown } from 'mdast-util-to-markdown'
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
+import { text } from 'mdast-util-to-markdown/lib/handle/text'
 import {
   mdxJsxToMarkdown,
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
-import { replaceAll } from '../parse'
-import type { RichTextField } from '@tinacms/schema-tools/dist/types'
+import type { RichTextField } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
 import { stringifyProps } from './acorn'
+import { directiveToMarkdown } from '../extensions/tina-shortcodes/to-markdown'
+import { stringifyShortcode } from './stringifyShortcode'
 
 declare module 'mdast' {
   interface StaticPhrasingContentMap {
@@ -61,10 +51,8 @@ export const stringifyMDX = (
       return value.children[0].value
     }
   }
-  const res = toMarkdown(rootElement(value, field, imageCallback), {
-    extensions: [mdxJsxToMarkdown()],
-    listItemIndent: 'one',
-  })
+  const tree = rootElement(value, field, imageCallback)
+  const res = toTinaMarkdown(tree, field)
   const templatesWithMatchers = field.templates?.filter(
     (template) => template.match
   )
@@ -74,20 +62,76 @@ export const stringifyMDX = (
       throw new Error('Global templates are not supported')
     }
     if (template.match) {
-      preprocessedString = replaceAll(
-        preprocessedString,
-        // replace all instances of the match string with the template. Looks like this: <Match>{any number of spaces}`
-        `<${template.name}>[\n\r\\s]*\``,
-        `${template.match.start} `
-      )
-      preprocessedString = replaceAll(
-        preprocessedString,
-        `\`[\n\r\\s]*</${template.name}>`,
-        ` ${template.match.end}`
-      )
+      preprocessedString = stringifyShortcode(preprocessedString, template)
     }
   })
   return preprocessedString
+}
+
+export type Pattern = {
+  start: string
+  end: string
+  name: string
+  templateName: string
+  type: 'block' | 'leaf'
+}
+
+export const toTinaMarkdown = (tree: Md.Root, field: RichTextField) => {
+  const patterns: Pattern[] = []
+  field.templates?.forEach((template) => {
+    if (typeof template === 'string') {
+      return
+    }
+    if (template && template.match) {
+      const pattern = template.match as Pattern
+      pattern.templateName = template.name
+      patterns.push(pattern)
+    }
+  })
+  /**
+   *
+   * Escaping elements which we can't accound for (eg. `<`) is usually good. But when the rich-text other tooling
+   * is responsible for parsing markdown, and Tina's only job is to provide a rich-text editor, we need to avoid
+   * escaping so things like shortcodes continue to work (eg. '{{<' would become '{{\<').
+   *
+   * We can probably be more fine-grained with this, but for now, if you've provided a `match` property on your
+   * templates, we're assuming you'll need to escape
+   *
+   */
+  const handlers: Handlers = {}
+  handlers['text'] = (node, parent, context, safeOptions) => {
+    // Empty spaces before/after strings
+    context.unsafe = context.unsafe.filter((unsafeItem) => {
+      if (
+        unsafeItem.character === ' ' &&
+        unsafeItem.inConstruct === 'phrasing'
+      ) {
+        return false
+      }
+      return true
+    })
+    if (field.parser?.type === 'markdown') {
+      if (field.parser.skipEscaping === 'all') {
+        return node.value
+      }
+      if (field.parser.skipEscaping === 'html') {
+        // Remove this character from the unsafe list, and then
+        // proceed with the original text handler
+        context.unsafe = context.unsafe.filter((unsafeItem) => {
+          if (unsafeItem.character === '<') {
+            return false
+          }
+          return true
+        })
+      }
+    }
+    return text(node, parent, context, safeOptions)
+  }
+  return toMarkdown(tree, {
+    extensions: [directiveToMarkdown(patterns), mdxJsxToMarkdown()],
+    listItemIndent: 'one',
+    handlers,
+  })
 }
 
 export const rootElement = (
@@ -96,7 +140,7 @@ export const rootElement = (
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = []
-  content.children.forEach((child) => {
+  content.children?.forEach((child) => {
     const value = blockElement(child, field, imageCallback)
     if (value) {
       children.push(value)
@@ -130,7 +174,12 @@ export const blockElement = (
       // Ignore empty blocks
       if (content.children.length === 1) {
         const onlyChild = content.children[0]
-        if (onlyChild && onlyChild.type === 'text' && onlyChild.text === '') {
+        if (
+          onlyChild &&
+          // Slate text nodes don't get a `type` property for text nodes
+          (onlyChild.type === 'text' || !onlyChild.type) &&
+          onlyChild.text === ''
+        ) {
           return null
         }
       }
@@ -145,12 +194,37 @@ export const blockElement = (
         value: content.value,
       }
     case 'mdxJsxFlowElement':
-      const { children, attributes } = stringifyProps(
-        content,
-        field,
-        false,
-        imageCallback
-      )
+      const { children, attributes, useDirective, directiveType } =
+        stringifyProps(content, field, false, imageCallback)
+      if (useDirective) {
+        const name = content.name
+        if (!name) {
+          throw new Error(
+            `Expective shortcode to have a name but it was not defined`
+          )
+        }
+        const directiveAttributes: Record<string, string> = {}
+        attributes?.forEach((att) => {
+          if (att.value && typeof att.value === 'string') {
+            directiveAttributes[att.name] = att.value
+          }
+        })
+        if (directiveType === 'leaf') {
+          return {
+            type: 'leafDirective',
+            name,
+            attributes: directiveAttributes,
+            children: [],
+          }
+        } else {
+          return {
+            type: 'containerDirective',
+            name,
+            attributes: directiveAttributes,
+            children: children,
+          }
+        }
+      }
       return {
         type: 'mdxJsxFlowElement',
         name: content.name,

@@ -1,37 +1,96 @@
-/**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import { useBranchData } from './BranchData'
 import { BaseTextField } from '../../packages/fields'
 import { Button } from '../../packages/styles'
 import { LoadingDots } from '../../packages/form-builder'
-import { BiPlus, BiRefresh, BiSearch } from 'react-icons/bi'
+import {
+  BiError,
+  BiGitBranch,
+  BiPlus,
+  BiRefresh,
+  BiSearch,
+} from 'react-icons/bi'
+import { GrCircleQuestion } from 'react-icons/gr'
 import { MdArrowForward, MdOutlineClear } from 'react-icons/md'
-import { useCMS } from '../../packages/react-core'
 import { AiFillWarning } from 'react-icons/ai'
+import { FaSpinner } from 'react-icons/fa'
+import { useCMS } from '../../packages/react-core'
 
 type ListState = 'loading' | 'ready' | 'error'
+
+export const BranchCreator = ({ callback, createBranch, chooseBranch }) => {
+  const [newBranchName, setNewBranchName] = React.useState('')
+  const branchName = newBranchName.toLowerCase().replaceAll(' ', '-')
+  const [isCreating, setIsCreating] = React.useState(false)
+  const { currentBranch } = useBranchData()
+
+  const handleCreateBranch = React.useCallback((value) => {
+    setIsCreating(true)
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      chooseBranch(createdBranchName)
+      callback(createdBranchName)
+    })
+  }, [])
+
+  return (
+    <div className="w-full flex flex-col items-stretch w-full gap-4">
+      <BaseTextField
+        placeholder="Name"
+        value={newBranchName}
+        disabled={isCreating}
+        onChange={(e) => setNewBranchName(e.target.value)}
+      />
+      <BaseTextField
+        placeholder="Branch Name"
+        value={branchName}
+        disabled={true}
+        readOnly
+      />
+      <Button
+        className="flex-grow flex items-center gap-2 whitespace-nowrap"
+        size="medium"
+        variant="primary"
+        disabled={isCreating}
+        onClick={() => handleCreateBranch(branchName)}
+      >
+        {isCreating ? (
+          <>
+            <FaSpinner className="w-5 h-auto opacity-70 animate-spin" /> Create
+            Branch
+          </>
+        ) : (
+          <>
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+          </>
+        )}
+      </Button>
+    </div>
+  )
+}
 
 export const BranchSwitcher = ({
   listBranches,
   createBranch,
+  chooseBranch,
 }: BranchSwitcherProps) => {
   const cms = useCMS()
   const isLocalMode = cms.api?.tina?.isLocalMode
   const [listState, setListState] = React.useState<ListState>('loading')
-  const [branchList, setBranchList] = React.useState([])
-  const { currentBranch, setCurrentBranch } = useBranchData()
+  const [branchList, setBranchList] = React.useState([] as Branch[])
+  const { currentBranch } = useBranchData()
+  const initialBranch = React.useMemo(() => currentBranch, [])
+  // when modal closes, refresh page is currentBranch has changed
+  React.useEffect(() => {
+    return () => {
+      if (initialBranch != currentBranch) {
+        window.location.reload()
+      }
+    }
+  }, [currentBranch])
 
   const handleCreateBranch = React.useCallback((value) => {
     setListState('loading')
@@ -39,7 +98,8 @@ export const BranchSwitcher = ({
       branchName: value,
       baseBranch: currentBranch,
     }).then(async (createdBranchName) => {
-      setCurrentBranch(createdBranchName)
+      // @ts-ignore
+      cms.alerts.success('Branch created.')
       await refreshBranchList()
     })
   }, [])
@@ -58,6 +118,30 @@ export const BranchSwitcher = ({
   React.useEffect(() => {
     refreshBranchList()
   }, [])
+
+  // Keep branch list up to date
+  React.useEffect(() => {
+    if (listState === 'ready') {
+      // update all branches that have indexing status of 'inprogress' or 'unknown'
+      branchList
+        .filter(
+          (x) =>
+            x?.indexStatus?.status === 'inprogress' ||
+            x?.indexStatus?.status === 'unknown'
+        )
+        .forEach(async (x) => {
+          const indexStatus = await cms.api.tina.waitForIndexStatus({
+            ref: x.name,
+          })
+          setBranchList((prev) => {
+            const newList = Array.from(prev)
+            const index = newList.findIndex((y) => y.name === x.name)
+            newList[index].indexStatus = indexStatus
+            return newList
+          })
+        })
+    }
+  }, [listState, branchList.length])
 
   return (
     <div className="w-full flex justify-center p-5">
@@ -102,7 +186,7 @@ export const BranchSwitcher = ({
                   handleCreateBranch(newBranch)
                 }}
                 onChange={(branchName) => {
-                  setCurrentBranch(branchName)
+                  chooseBranch(branchName)
                 }}
               />
             ) : (
@@ -127,12 +211,26 @@ const BranchSelector = ({
   currentBranch,
   onCreateBranch,
   onChange,
+}: {
+  branchList: Branch[]
+  currentBranch: string
+  onCreateBranch: (branchName: string) => void
+  onChange: (branchName: string) => void
 }) => {
   const [newBranchName, setNewBranchName] = React.useState('')
   const [filter, setFilter] = React.useState('')
   const filteredBranchList = branchList.filter(
-    (branch) => !filter || branch.name.includes(filter)
+    (branch) =>
+      !filter || branch.name.includes(filter) || branch.name === currentBranch
   )
+  const currentBranchItem = branchList.find(
+    (branch) => branch.name === currentBranch
+  )
+  const currentIndex = filteredBranchList.findIndex(
+    (branch) => branch.name === currentBranch
+  )
+  filteredBranchList.splice(currentIndex, 1)
+  filteredBranchList.unshift(currentBranchItem)
 
   return (
     <div className="flex flex-col gap-3">
@@ -164,17 +262,52 @@ const BranchSelector = ({
         <div className="min-w-[192px] max-h-[24rem] overflow-y-auto flex flex-col w-full h-full rounded-lg shadow-inner bg-white border border-gray-200">
           {filteredBranchList.map((branch) => {
             const isCurrentBranch = branch.name === currentBranch
+            // @ts-ignore
+            const indexingStatus = branch?.indexStatus?.status
             return (
               <div
-                className={`cursor-pointer relative text-base py-1.5 px-3 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50 ${
-                  isCurrentBranch
-                    ? 'bg-blue-50 text-blue-800 pointer-events-none'
-                    : ''
+                className={`relative text-base py-1.5 px-3 flex items-center gap-1.5 border-l-0 border-t-0 border-r-0 border-b border-gray-50 w-full outline-none transition-all ease-out duration-150 ${
+                  indexingStatus !== 'complete'
+                    ? 'bg-gray-50 text-gray-400 pointer-events-none'
+                    : isCurrentBranch
+                    ? 'cursor-pointer bg-blue-50 text-blue-800 pointer-events-none hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
+                    : 'cursor-pointer hover:text-blue-500 focus:text-blue-500 focus:bg-gray-50 hover:bg-gray-50'
                 }`}
-                key={branch}
-                onClick={() => onChange(branch.name)}
+                key={branch.name}
+                onClick={() => {
+                  if (indexingStatus === 'complete') {
+                    onChange(branch.name)
+                  }
+                }}
               >
+                {isCurrentBranch && (
+                  <BiGitBranch className="w-5 h-auto text-blue-500/70" />
+                )}
                 {branch.name}
+                {indexingStatus === 'unknown' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+                    <span className="opacity-50 italic">{`Unknown`}</span>
+                    <GrCircleQuestion className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
+                {indexingStatus === 'inprogress' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-blue-500">
+                    <span className="opacity-50 italic">{`Indexing`}</span>
+                    <FaSpinner className="w-5 h-auto opacity-70 animate-spin" />
+                  </span>
+                )}
+                {indexingStatus === 'failed' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+                    <span className="opacity-50 italic">{`Indexing failed`}</span>
+                    <BiError className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
+                {indexingStatus === 'timeout' && (
+                  <span className="flex-1 w-full flex justify-end items-center gap-2 text-red-500">
+                    <span className="opacity-50 italic">{`Indexing timed out`}</span>
+                    <BiError className="w-5 h-auto opacity-70" />
+                  </span>
+                )}
                 {isCurrentBranch && (
                   <span className="opacity-70 italic">{` (current)`}</span>
                 )}
@@ -183,21 +316,39 @@ const BranchSelector = ({
           })}
         </div>
       )}
-      <div className="flex justify-between items-center w-full gap-3">
-        <BaseTextField
-          placeholder="Branch Name"
-          value={newBranchName}
-          onChange={(e) => setNewBranchName(e.target.value)}
-        />
-        <Button
-          className="flex-0 flex items-center gap-2 whitespace-nowrap"
-          size="medium"
-          variant="primary"
-          onClick={() => onCreateBranch(newBranchName)}
-        >
-          <BiPlus className="w-5 h-auto opacity-70" /> Create New
-        </Button>
+      <div className="border-t border-gray-150 pt-4 mt-3 flex flex-col gap-3">
+        <div className="text-sm">
+          Create a new branch from <b>{currentBranch}</b>. Once created you will
+          need to wait for indexing to complete before you can switch branches.
+        </div>
+        <div className="flex justify-between items-center w-full gap-3">
+          <BaseTextField
+            placeholder="Branch Name"
+            value={newBranchName}
+            onChange={(e) => setNewBranchName(e.target.value)}
+          />
+          <Button
+            className="flex-0 flex items-center gap-2 whitespace-nowrap"
+            size="medium"
+            variant="white"
+            disabled={newBranchName === ''}
+            onClick={() => onCreateBranch(stringToBranchName(newBranchName))}
+          >
+            <BiPlus className="w-5 h-auto opacity-70" /> Create Branch
+          </Button>
+        </div>
       </div>
     </div>
   )
+}
+
+const stringToBranchName = (string) => {
+  return string
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
 }

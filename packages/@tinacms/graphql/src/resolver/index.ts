@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import path from 'path'
@@ -30,13 +21,13 @@ import type { TinaSchema } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from '../types'
 
 import { TinaGraphQLError, TinaParseDocumentError } from './error'
-import { FilterCondition, makeFilterChain } from '@tinacms/datalayer'
 import { collectConditionsForField, resolveReferences } from './filter-utils'
 import {
   resolveMediaRelativeToCloud,
   resolveMediaCloudToRelative,
 } from './media-utils'
 import { GraphQLError } from 'graphql'
+import { FilterCondition, makeFilterChain } from '../database/datalayer'
 
 interface ResolverConfig {
   config?: GraphQLConfig
@@ -401,6 +392,7 @@ export class Resolver {
     isDeletion,
     isAddPendingDocument,
     isCollectionSpecific,
+    isUpdateName,
   }: {
     args: unknown
     collection?: string
@@ -409,6 +401,7 @@ export class Resolver {
     isDeletion?: boolean
     isAddPendingDocument?: boolean
     isCollectionSpecific?: boolean
+    isUpdateName?: boolean
   }) => {
     /**
      * `collectionName` is passed in:
@@ -463,15 +456,43 @@ export class Resolver {
           isAddPendingDocument,
         })
       }
-      if (isDeletion) {
-        if (!alreadyExists) {
+      // if we are deleting a document or updating its name we should check if it exists
+      if (!alreadyExists) {
+        if (isDeletion) {
           throw new Error(
             `Unable to delete document, ${realPath} does not exist`
           )
         }
+        if (isUpdateName) {
+          throw new Error(
+            `Unable to update document, ${realPath} does not exist`
+          )
+        }
+      }
+      if (isDeletion) {
         const doc = await this.getDocument(realPath)
         await this.deleteDocument(realPath)
         return doc
+      }
+      if (isUpdateName) {
+        // Must provide a new relative path in the params
+        assertShape<{ params: string }>(args, (yup) =>
+          yup.object({ params: yup.object().required() })
+        )
+        assertShape<{ relativePath: string }>(args?.params, (yup) =>
+          yup.object({ relativePath: yup.string().required() })
+        )
+        // Get the real document
+        const doc = await this.getDocument(realPath)
+        const newRealPath = path.join(
+          collection?.path,
+          args.params.relativePath
+        )
+        // Update the document
+        await this.database.put(newRealPath, doc._rawData, collection.name)
+        // Delete the old document
+        await this.deleteDocument(realPath)
+        return this.getDocument(newRealPath)
       }
       /**
        * updateDocument, update<Collection>Document
@@ -669,6 +690,7 @@ export class Resolver {
     Object.entries(fieldParams).forEach(([fieldName, fieldValue]) => {
       if (Array.isArray(fieldValue)) {
         if (fieldValue.length === 0) {
+          accum[fieldName] = []
           return
         }
       }

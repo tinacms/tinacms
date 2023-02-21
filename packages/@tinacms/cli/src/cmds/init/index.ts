@@ -1,16 +1,8 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 import path from 'path'
+import { format } from 'prettier'
 import {
   cmdText,
   focusText,
@@ -26,15 +18,29 @@ import { Telemetry } from '@tinacms/metrics'
 import { nextPostPage } from './setup-files'
 import { extendNextScripts } from '../../utils/script-helpers'
 import { configExamples } from './setup-files/config'
+import { hasForestryConfig } from '../forestry-migrate/util'
+import { generateCollections } from '../forestry-migrate'
+import { spin } from '../../utils/spinner'
+import { ErrorSingleton } from '../forestry-migrate/util/errorSingleton'
 
-interface Framework {
-  name: 'next' | 'other'
+export interface Framework {
+  name: 'next' | 'hugo' | 'jekyll' | 'other'
   reactive: boolean
 }
 
 export async function initStaticTina(ctx: any, next: () => void, options) {
   const baseDir = ctx.rootPath
   logger.level = 'info'
+
+  // Choose your ClientID
+  const clientId = await chooseClientId()
+
+  let token: string | null = null
+  // Choose your Read Only token
+  if (clientId) {
+    token = await chooseToken({ clientId })
+  }
+
   // Choose package manager
   const packageManager = await choosePackageManager()
 
@@ -47,8 +53,25 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   // Choose public folder
   const publicFolder: string = await choosePublicFolder({ framework })
 
+  // Detect forestry config
+  const forestryPath = await hasForestryConfig({ rootPath: ctx.rootPath })
+
+  let collections: string | null | undefined
+
+  // If there is a forestry config, ask user to migrate it to tina collections
+  if (forestryPath.exists) {
+    collections = await forestryMigrate({
+      forestryPath: forestryPath.path,
+      rootPath: ctx.rootPath,
+    })
+  }
+
   // Report telemetry
-  await reportTelemetry(usingTypescript, options.noTelemetry)
+  await reportTelemetry({
+    usingTypescript,
+    hasForestryConfig: forestryPath.exists,
+    noTelemetry: options.noTelemetry,
+  })
 
   // Check for package.json
   const hasPackageJSON = await fs.pathExistsSync('package.json')
@@ -73,11 +96,21 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
 
   await addDependencies(packageManager)
 
-  // add .tina/config.{js,ts}
-  await addConfigFile({ publicFolder, baseDir, usingTypescript, framework })
+  // add .tina/config.{js,ts}]
+  await addConfigFile({
+    publicFolder,
+    baseDir,
+    usingTypescript,
+    framework,
+    collections,
+    token,
+    clientId,
+  })
 
-  // add /content/posts/hello-world.md
-  await addContentFile({ baseDir })
+  if (!forestryPath.exists) {
+    // add /content/posts/hello-world.md
+    await addContentFile({ baseDir })
+  }
 
   if (framework.reactive) {
     await addReactiveFile[framework.name]({
@@ -88,6 +121,28 @@ export async function initStaticTina(ctx: any, next: () => void, options) {
   }
 
   logNextSteps({ packageManager, framework })
+}
+
+const chooseClientId = async () => {
+  const option = await prompts({
+    name: 'clientId',
+    type: 'text',
+    message: `What is your Tina Cloud Client ID? (Hit enter to skip and set up yourself later)\n${logText(
+      "Don't have a Client ID? Create one here: "
+    )}${linkText('https://app.tina.io/projects/new')}`,
+  })
+  return option['clientId'] as string
+}
+
+const chooseToken = async ({ clientId }: { clientId: string }) => {
+  const option = await prompts({
+    name: 'token',
+    type: 'text',
+    message: `What is your Tina Cloud Read Only Token?\n${logText(
+      "Don't have a Read Only Token? Create one here: "
+    )}${linkText(`https://app.tina.io/projects/${clientId}/tokens`)}`,
+  })
+  return option['token'] as string
 }
 
 const choosePackageManager = async () => {
@@ -115,15 +170,28 @@ const chooseTypescript = async () => {
 }
 
 const choosePublicFolder = async ({ framework }: { framework: Framework }) => {
-  if (framework.name === 'next') {
-    return 'public'
+  let suggestion = 'public'
+  switch (framework.name) {
+    case 'next':
+      return 'public'
+    case 'hugo':
+      return 'static'
+    case 'jekyll':
+      suggestion = 'public'
+      break
   }
   const option = await prompts({
     name: 'selection',
     type: 'text',
-    message: 'Where are public assets stored? (default: "public")',
+    message:
+      `Where are public assets stored? (default: "${suggestion}")\n` +
+      logText(
+        `Not sure what value to use? Refer to our "Frameworks" doc: ${linkText(
+          'https://tina.io/docs/integration/frameworks/#configuring-tina-with-each-framework'
+        )}`
+      ),
   })
-  return option['selection'] || 'public'
+  return option['selection'] || suggestion
 }
 
 const chooseFramework = async () => {
@@ -133,8 +201,10 @@ const chooseFramework = async () => {
     message: 'What framework are you using?',
     choices: [
       { title: 'Next.js', value: { name: 'next', reactive: true } },
+      { title: 'Hugo', value: { name: 'hugo', reactive: false } },
+      { title: 'Jekyll', value: { name: 'jekyll', reactive: false } },
       {
-        title: 'Other (SSG frameworks like hugo, jekyll, etc.)',
+        title: 'Other (SSG frameworks like gatsby, etc.)',
         value: { name: 'other', reactive: false },
       },
     ] as { title: string; value: Framework }[],
@@ -142,10 +212,63 @@ const chooseFramework = async () => {
   return option['selection'] as Framework
 }
 
-const reportTelemetry = async (
-  usingTypescript: boolean,
+const forestryMigrate = async ({
+  forestryPath,
+  rootPath,
+}: {
+  forestryPath: string
+  rootPath: string
+}): Promise<string> => {
+  logger.info(
+    `It looks like you have a ${focusText(
+      '.forestry/settings.yml'
+    )} file in your project.`
+  )
+
+  logger.info(
+    `This migration will update some of your content to match tina.  Please ${focusText(
+      'save a backup of your content'
+    )} before doing this migration. (This can be done with git)`
+  )
+
+  const option = await prompts({
+    name: 'selection',
+    type: 'confirm',
+    initial: true,
+    message: `Please note that this is a beta version and may contain some issues\nWould you like to migrate your Forestry templates?\n${logText(
+      'Note: This migration will not be perfect, but it will get you started.'
+    )}`,
+  })
+  if (!option['selection']) {
+    return null
+  }
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+  await spin({
+    waitFor: async () => {
+      await delay(2000)
+    },
+    text: '',
+  })
+  const collections = await generateCollections({
+    forestryPath,
+    rootPath,
+  })
+
+  // print errors
+  ErrorSingleton.getInstance().printNameErrors()
+
+  return JSON.stringify(collections, null, 2)
+}
+
+const reportTelemetry = async ({
+  hasForestryConfig,
+  noTelemetry,
+  usingTypescript,
+}: {
+  usingTypescript: boolean
   noTelemetry: boolean
-) => {
+  hasForestryConfig: boolean
+}) => {
   if (noTelemetry) {
     logger.info(logText('Telemetry disabled'))
   }
@@ -155,6 +278,7 @@ const reportTelemetry = async (
     event: {
       name: 'tinacms:cli:init:invoke',
       schemaFileType,
+      hasForestryConfig,
     },
   })
 }
@@ -203,17 +327,17 @@ const addDependencies = async (packageManager) => {
   await execShellCommand(packageManagers[packageManager])
 }
 
-const addConfigFile = async ({
-  framework,
-  baseDir,
-  publicFolder,
-  usingTypescript,
-}: {
+export interface AddConfigArgs {
   publicFolder: string
   baseDir: string
   usingTypescript: boolean
   framework: Framework
-}) => {
+  collections?: string
+  token?: string
+  clientId?: string
+}
+const addConfigFile = async (args: AddConfigArgs) => {
+  const { baseDir, usingTypescript } = args
   const configPath = path.join(
     '.tina',
     `config.${usingTypescript ? 'ts' : 'js'}`
@@ -227,10 +351,7 @@ const addConfigFile = async ({
     })
     if (override['selection']) {
       logger.info(logText(`Overriding file at ${configPath}.`))
-      await fs.outputFileSync(
-        fullConfigPath,
-        config({ publicFolder, framework })
-      )
+      await fs.outputFileSync(fullConfigPath, config(args))
     } else {
       logger.info(logText(`Not overriding file at ${configPath}.`))
     }
@@ -240,7 +361,7 @@ const addConfigFile = async ({
         `Adding config file at .tina/config.${usingTypescript ? 'ts' : 'js'}`
       )
     )
-    await fs.outputFileSync(fullConfigPath, config({ publicFolder, framework }))
+    await fs.outputFileSync(fullConfigPath, config(args))
   }
 }
 
@@ -283,16 +404,23 @@ const logNextSteps = ({
     )}`
   )
 }
-const frameworkDevCmds = {
-  other: ({ packageManager }: { packageManager: string }) => {
-    const packageManagers = {
-      pnpm: `pnpm`,
-      npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
-      yarn: `yarn`,
-    }
-    const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
-    return installText
-  },
+
+const other = ({ packageManager }: { packageManager: string }) => {
+  const packageManagers = {
+    pnpm: `pnpm`,
+    npm: `npx`, // npx is the way to run executables that aren't in your "scripts"
+    yarn: `yarn`,
+  }
+  const installText = `${packageManagers[packageManager]} tinacms dev -c "<your dev command>"`
+  return installText
+}
+
+const frameworkDevCmds: {
+  [key in Framework['name']]: (args?: { packageManager: string }) => string
+} = {
+  other,
+  hugo: other,
+  jekyll: other,
   next: ({ packageManager }: { packageManager: string }) => {
     const packageManagers = {
       pnpm: `pnpm`,
@@ -304,8 +432,8 @@ const frameworkDevCmds = {
   },
 }
 
-const config = (args: { publicFolder: string; framework: Framework }) => {
-  return configExamples[args.framework.name](args)
+const config = (args: AddConfigArgs) => {
+  return format(configExamples[args.framework.name](args))
 }
 
 const content = `---

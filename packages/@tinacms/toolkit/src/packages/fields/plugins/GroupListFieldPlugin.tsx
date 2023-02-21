@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -23,11 +11,11 @@ import { IconButton } from '../../styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { FieldDescription } from './wrapFieldWithMeta'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 import { useCMS } from '../../react-core/use-cms'
 import { BiPencil } from 'react-icons/bi'
+import { EmptyList, ListFieldMeta, ListPanel } from './ListFieldMeta'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -61,9 +49,10 @@ interface GroupProps {
   field: GroupFieldDefinititon
   form: any
   tinaForm: Form
+  index?: number
 }
 
-const Group = ({ tinaForm, form, field, input }: GroupProps) => {
+const Group = ({ tinaForm, form, field, input, meta, index }: GroupProps) => {
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -83,29 +72,40 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
     [field.itemProps]
   )
 
+  // @ts-ignore
+  const isMax = items.length >= (field.max || Infinity)
+  // @ts-ignore
+  const isMin = items.length <= (field.min || 0)
+  // @ts-ignore
+  const fixedLength = field.min === field.max
+
   return (
-    <>
-      <GroupListHeader>
-        <GroupListMeta>
-          {field.label !== false && (
-            <GroupLabel>{field.label || field.name}</GroupLabel>
-          )}
-          {field.description && (
-            <FieldDescription className="whitespace-nowrap text-ellipsis overflow-hidden">
-              {field.description}
-            </FieldDescription>
-          )}
-        </GroupListMeta>
-        <IconButton onClick={addItem} variant="primary" size="small">
-          <AddIcon className="w-5/6 h-auto" />
-        </IconButton>
-      </GroupListHeader>
+    <ListFieldMeta
+      name={input.name}
+      label={field.label}
+      description={field.description}
+      error={meta.error}
+      index={index}
+      tinaForm={tinaForm}
+      actions={
+        (!fixedLength || (fixedLength && !isMax)) && (
+          <IconButton
+            onClick={addItem}
+            disabled={isMax}
+            variant="primary"
+            size="small"
+          >
+            <AddIcon className="w-5/6 h-auto" />
+          </IconButton>
+        )
+      }
+    >
       <ListPanel>
         <div>
           <Droppable droppableId={field.name} type={field.name}>
             {(provider) => (
               <div ref={provider.innerRef}>
-                {items.length === 0 && <EmptyState />}
+                {items.length === 0 && <EmptyList />}
                 {items.map((item: any, index: any) => (
                   <Item
                     // NOTE: Supressing warnings, but not helping with render perf
@@ -114,6 +114,8 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
                     field={field}
                     item={item}
                     index={index}
+                    isMin={isMin}
+                    fixedLength={fixedLength}
                     {...itemProps(item)}
                   />
                 ))}
@@ -123,11 +125,9 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
           </Droppable>
         </div>
       </ListPanel>
-    </>
+    </ListFieldMeta>
   )
 }
-
-export const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
@@ -135,9 +135,20 @@ interface ItemProps {
   index: number
   item: any
   label?: string
+  isMin: boolean
+  fixedLength: boolean
 }
 
-const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+const Item = ({
+  tinaForm,
+  field,
+  index,
+  item,
+  label,
+  isMin,
+  fixedLength,
+  ...p
+}: ItemProps) => {
   const cms = useCMS()
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
@@ -188,7 +199,9 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
               <GroupLabel>{title}</GroupLabel>
               <BiPencil className="h-5 w-auto fill-current text-gray-200 group-hover:text-inherit transition-colors duration-150 ease-out" />
             </ItemClickTarget>
-            <ItemDeleteButton onClick={removeItem} />
+            {(!fixedLength || (fixedLength && !isMin)) && (
+              <ItemDeleteButton disabled={isMin} onClick={removeItem} />
+            )}
           </ItemHeader>
           <FormPortal>
             {({ zIndexShift }) => (
@@ -238,34 +251,6 @@ export const GroupLabel = ({
   )
 }
 
-export const GroupListHeader = ({ children }: { children?: any }) => {
-  return (
-    <span className="relative flex gap-2 w-full justify-between items-center mb-2">
-      {children}
-    </span>
-  )
-}
-
-export const GroupListMeta = ({ children }: { children?: any }) => {
-  return <div className="flex-1 truncate">{children}</div>
-}
-
-export const ListPanel = ({ children }) => {
-  return (
-    <div className="relative mb-6 rounded-md bg-gray-100 shadow">
-      {children}
-    </div>
-  )
-}
-
-export const EmptyList = ({ children }) => {
-  return (
-    <div className="text-center rounded bg-gray-100 text-gray-400 p-3 text-sm italic font-regular">
-      {children}
-    </div>
-  )
-}
-
 export const ItemHeader = ({
   isDragging,
   children,
@@ -293,10 +278,12 @@ export const ItemHeader = ({
   )
 }
 
-export const ItemDeleteButton = ({ onClick }) => {
+export const ItemDeleteButton = ({ onClick, disabled = false }) => {
   return (
     <button
-      className="w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500"
+      className={`w-8 px-1 py-2.5 flex items-center justify-center hover:bg-gray-50 text-gray-200 hover:text-red-500 ${
+        disabled && 'pointer-events-none opacity-30 cursor-not-allowed'
+      }`}
       onClick={onClick}
     >
       <TrashIcon className="fill-current transition-colors ease-out duration-100" />

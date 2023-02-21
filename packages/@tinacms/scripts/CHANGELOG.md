@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.0.2
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
+## 1.0.1
+
+### Patch Changes
+
+- b2952a298: Adds meta wrapper for list-type fields that displays errors. Adds optional min/max for list-type fields that controls add/remove UI. Removes duplicate label from group field.
+
 ## 1.0.0
 
 ### Major Changes

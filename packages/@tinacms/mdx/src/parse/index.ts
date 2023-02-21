@@ -1,27 +1,21 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
 import { remark } from 'remark'
-import remarkMdx from 'remark-mdx'
+import remarkMdx, { Root } from 'remark-mdx'
+
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTextField } from '@tinacms/schema-tools/dist/types'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
+import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
+import { tinaDirective } from '../extensions/tina-shortcodes/extension'
+import { Pattern } from '../stringify'
+import { parseShortcode } from './parseShortcode'
 /**
  * ### Convert the MDXAST into an API-friendly format
  *
@@ -72,48 +66,30 @@ import type * as Plate from './plate'
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
 export const markdownToAst = (value: string, field: RichTextField) => {
-  const templatesWithMatchers = field.templates?.filter(
-    (template) => template.match
-  )
-  let preprocessedString = value
-  templatesWithMatchers?.forEach((template) => {
+  const patterns: Pattern[] = []
+  field.templates?.forEach((template) => {
     if (typeof template === 'string') {
-      throw new Error('Global templates are not supported')
+      return
     }
-    if (template.match) {
-      if (preprocessedString) {
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.start,
-          `<${template.name}>\``
-        )
-        preprocessedString = replaceAll(
-          preprocessedString,
-          template.match.end,
-          `\`</${template.name}>`
-        )
-      }
+    if (template && template.match) {
+      patterns.push({
+        ...template.match,
+        name: template.match?.name || template.name,
+        templateName: template.name,
+        type: template.fields.find((f) => f.name === 'children')
+          ? 'block'
+          : 'leaf',
+      })
     }
   })
-  try {
-    // Remark Root is not the same as mdast for some reason
-    const tree = remark().use(remarkMdx).parse(preprocessedString) as Md.Root
-    if (!tree) {
-      throw new Error('Error parsing markdown')
-    }
-    // NOTE: if we want to provide error highlighing in the raw editor
-    // we could keep this info around in edit mode
-    // Delete useless position info
-    // visit(tree, (node) => {
-    //   delete node.position
-    // })
-    return tree
-  } catch (e) {
-    // @ts-ignore VMessage is the error type but it's not accessible
-    throw new RichTextParseError(e, e.position)
-  }
+  return fromMarkdown(value, {
+    extensions: [tinaDirective(patterns)],
+    mdastExtensions: [directiveFromMarkdown],
+  })
 }
-
+export const mdxToAst = (value: string) => {
+  return remark().use(remarkMdx).parse(value)
+}
 export const MDX_PARSE_ERROR_MSG =
   'TinaCMS supports a stricter version of markdown and a subset of MDX. https://tina.io/docs/editing/mdx/#differences-from-other-mdx-implementations'
 export const MDX_PARSE_ERROR_MSG_HTML =
@@ -124,11 +100,32 @@ export const parseMDX = (
   field: RichTextField,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
-  let tree
+  if (!value) {
+    return { type: 'root', children: [] }
+  }
+  let tree: Root | null
   try {
-    tree = markdownToAst(value, field)
+    if (field.parser?.type === 'markdown') {
+      tree = markdownToAst(value, field)
+    } else {
+      let preprocessedString = value
+      const templatesWithMatchers = field.templates?.filter(
+        (template) => template.match
+      )
+      templatesWithMatchers?.forEach((template) => {
+        if (typeof template === 'string') {
+          throw new Error('Global templates are not supported')
+        }
+        if (template.match) {
+          if (preprocessedString) {
+            preprocessedString = parseShortcode(preprocessedString, template)
+          }
+        }
+      })
+      tree = mdxToAst(preprocessedString)
+    }
     if (tree) {
-      return remarkToSlate(tree, field, imageCallback)
+      return remarkToSlate(tree, field, imageCallback, value)
     } else {
       return { type: 'root', children: [] }
     }

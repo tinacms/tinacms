@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -29,13 +17,14 @@ import { Button } from '../../styles'
 import { FormsView } from './SidebarBody'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoMdClose } from 'react-icons/io'
-import { LocalWarning } from './LocalWarning'
+import { BillingWarning, LocalWarning } from './LocalWarning'
 import { MdOutlineArrowBackIos } from 'react-icons/md'
 import { Nav } from './Nav'
 import { ResizeHandle } from './ResizeHandle'
 import { Transition } from '@headlessui/react'
 import { useWindowWidth } from '@react-hook/window-size'
 import { CloudConfigPlugin } from '../../react-cloud-config'
+import { BranchBanner } from '../../../plugins/branch-switcher'
 
 export const SidebarContext = React.createContext<any>(null)
 
@@ -120,6 +109,17 @@ const Sidebar = ({
 }: SidebarProps) => {
   const cms = useCMS()
   const collectionsInfo = useFetchCollections(cms)
+
+  const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
+    cms.flags.get('branch-switcher')
+  )
+  React.useEffect(() => {
+    cms.events.subscribe('flag:set', ({ key, value }) => {
+      if (key === 'branch-switcher') {
+        setBranchingEnabled(value)
+      }
+    })
+  }, [cms.events])
 
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   const cloudConfigs = cms.plugins.getType<CloudConfigPlugin>('cloud-config')
@@ -297,6 +297,7 @@ const Sidebar = ({
               displayNav={displayNav}
               renderNav={renderNav}
               isLocalMode={cms.api?.tina?.isLocalMode}
+              branchingEnabled={branchingEnabled}
             />
             <FormsView>
               <sidebar.placeholder />
@@ -423,7 +424,12 @@ export const updateBodyDisplacement = ({
   }
 }
 
-const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
+const SidebarHeader = ({
+  branchingEnabled,
+  renderNav,
+  displayNav,
+  isLocalMode,
+}) => {
   const { toggleFullscreen, displayState, setMenuIsOpen, toggleSidebarOpen } =
     React.useContext(SidebarContext)
 
@@ -432,6 +438,9 @@ const SidebarHeader = ({ renderNav, displayNav, isLocalMode }) => {
   return (
     <div className="flex-grow-0 w-full overflow-visible z-20">
       {isLocalMode && <LocalWarning />}
+      {!isLocalMode && <BillingWarning />}
+      {branchingEnabled && !isLocalMode && <BranchBanner />}
+
       <div className="mt-4 -mb-14 w-full flex items-center justify-between pointer-events-none">
         {displayMenuButton && (
           <Button

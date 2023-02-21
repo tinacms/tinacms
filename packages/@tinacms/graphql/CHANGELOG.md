@@ -1,5 +1,100 @@
 # tina-graphql
 
+## 1.3.1
+
+### Patch Changes
+
+- 3bbb621cd: Fix handling of level not found to centralize it
+
+## 1.3.0
+
+### Minor Changes
+
+- e15d82c2e: Minor bump MDX package for new parser
+
+### Patch Changes
+
+- a8457798a: Fix LevelDB initialization to throw a GraphQL error that can be handled correctly in Tina Cloud
+- 94b8bb6e0: Fix update Database.get to properly handle LEVEL_NOT_FOUND errors
+- e732906b6: Support .yml file extension for yaml files
+- Updated dependencies [169147490]
+- Updated dependencies [e732906b6]
+  - @tinacms/mdx@1.3.0
+  - @tinacms/schema-tools@1.3.1
+
+## 1.2.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- 50f86caed: Adds filtering to the admin IU
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+  - @tinacms/mdx@1.2.0
+  - @tinacms/schema-tools@1.3.0
+
+## 1.1.0
+
+### Minor Changes
+
+- e8776aa59: Add new GraphQL endpoint for updating a documents name
+
+### Patch Changes
+
+- e7c404bcf: Support remote path configuration for separate content repos
+
+  Tina now supports serving content from a separate Git repo.
+
+  ### Local development workflow
+
+  To enable this during local development, point
+  this config at the root of the content repo.
+
+  > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
+
+  ```ts
+  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  ```
+
+  ### Production workflow
+
+  For production, your config should use the `clientId`, `branch`, and `token` values that are associated with your _content repo_.
+
+- b7b05d03f: Add tinaDirectory property to the database, allowing it to be configured
+- 4533d5d66: Fix usse where user could not save top level empty array
+- Updated dependencies [84fe97ca7]
+- Updated dependencies [e7c404bcf]
+  - @tinacms/schema-tools@1.2.1
+  - @tinacms/datalayer@1.0.1
+  - @tinacms/mdx@1.1.1
+
+## 1.0.5
+
+### Patch Changes
+
+- 7d41435df: added ability to use toml in markdown frontmatter
+- Updated dependencies [7d41435df]
+- Updated dependencies [3165f397d]
+- Updated dependencies [a68f1ac27]
+- Updated dependencies [7ff63fdd9]
+- Updated dependencies [b2952a298]
+  - @tinacms/schema-tools@1.2.0
+  - @tinacms/mdx@1.1.0
+  - @tinacms/datalayer@1.0.0
+
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [7554ea362]
+- Updated dependencies [4ebc44068]
+  - @tinacms/schema-tools@1.1.0
+  - @tinacms/mdx@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes

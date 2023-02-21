@@ -1,4 +1,4 @@
-import { Post } from "../../components/post";
+import { Post } from "../../components/posts/post";
 import { client } from "../../.tina/__generated__/client";
 import { useTina } from "tinacms/dist/react";
 import { Layout } from "../../components/layout";
@@ -12,10 +12,10 @@ export default function BlogPostPage(
     variables: props.variables,
     data: props.data,
   });
-  if (data && data.posts) {
+  if (data && data.post) {
     return (
-      <Layout rawData={data} data={data.global}>
-        <Post {...data.posts} />;
+      <Layout rawData={data} data={data.global as any}>
+        <Post {...data.post} />
       </Layout>
     );
   }
@@ -27,7 +27,7 @@ export default function BlogPostPage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const tinaProps = await client.queries.BlogPostQuery({
+  const tinaProps = await client.queries.blogPostQuery({
     relativePath: `${params.filename}.mdx`,
   });
   return {
@@ -45,9 +45,9 @@ export const getStaticProps = async ({ params }) => {
  * be viewable at http://localhost:3000/posts/hello
  */
 export const getStaticPaths = async () => {
-  const postsListData = await client.queries.postsConnection();
+  const postsListData = await client.queries.postConnection();
   return {
-    paths: postsListData.data.postsConnection.edges.map((post) => ({
+    paths: postsListData.data.postConnection.edges.map((post) => ({
       params: { filename: post.node._sys.filename },
     })),
     fallback: "blocking",

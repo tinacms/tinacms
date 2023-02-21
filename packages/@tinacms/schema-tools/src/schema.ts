@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 import {
   Schema,
@@ -115,15 +106,57 @@ export class TinaSchema {
     return null
   }
   public getCollectionByFullPath = (filepath: string) => {
-    const collection = this.getCollections().find((collection) => {
+    const possibleCollections = this.getCollections().filter((collection) => {
       return filepath
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
     })
-    if (!collection) {
+
+    // No matches
+    if (possibleCollections.length === 0) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
     }
-    return collection
+    // One match
+    if (possibleCollections.length === 1) {
+      return possibleCollections[0]
+    }
+    if (possibleCollections.length > 1) {
+      /**
+       * If there are multiple matches, we want to return the collection
+       * with the longest path.
+       *
+       * This is to handle the case where a collection is nested
+       * inside another collection.
+       *
+       * For example:
+       *
+       * Collection 1:
+       * ```
+       * {
+       *  name: 'Collection 1',
+       *  path : 'content'
+       * }
+       * ```
+       *
+       * Collection 2:
+       *
+       * {
+       *  name: 'Collection 2',
+       *  path : 'content/posts'
+       * }
+       *
+       * For example if we have a file at `content/posts/hello-world.md` it will match on collection 2.
+       * Even though it also matches collection 1.
+       *
+       */
+      const longestMatch = possibleCollections.reduce((acc, collection) => {
+        if (collection.path.length > acc.path.length) {
+          return collection
+        }
+        return acc
+      })
+      return longestMatch
+    }
   }
   public getCollectionAndTemplateByFullPath = (
     filepath: string,
@@ -273,7 +306,15 @@ export class TinaSchema {
           return { [_template]: this.transformCollectablePayload(rest, field) }
         }
       } else {
-        return value
+        if (field.list) {
+          assertShape<object[]>(value, (yup) => yup.array(yup.object()))
+          return value.map((item) => {
+            return this.transformCollectablePayload(item, field)
+          })
+        } else {
+          assertShape<object>(value, (yup) => yup.object())
+          return this.transformCollectablePayload(value, field)
+        }
       }
     else {
       return value

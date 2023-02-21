@@ -300,7 +300,7 @@ type RelativeConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentUpdateMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateMovie(relativePath: String!, params: MovieMutation!): Movie!
@@ -313,6 +313,15 @@ type Mutation {
   createActor(relativePath: String!, params: ActorMutation!): Actor!
   updateRelative(relativePath: String!, params: RelativeMutation!): Relative!
   createRelative(relativePath: String!, params: RelativeMutation!): Relative!
+}
+
+input DocumentUpdateMutation {
+  movie: MovieMutation
+  director: DirectorMutation
+  crew: CrewMutation
+  actor: ActorMutation
+  relative: RelativeMutation
+  relativePath: String
 }
 
 input DocumentMutation {

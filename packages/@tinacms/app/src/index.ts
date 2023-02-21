@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import fs from 'fs-extra'
@@ -28,12 +19,14 @@ export const viteBuild = async ({
   publicFolder,
   local: l,
   apiUrl,
+  host,
 }: {
   local: boolean
   rootPath: string
   publicFolder: string
   outputFolder: string
   apiUrl: string
+  host: boolean | string
 }) => {
   const local = l
   const localBuild = l
@@ -117,6 +110,33 @@ export const viteBuild = async ({
     TINA_IMPORT: configPrebuildPath,
   }
 
+  // TODO: make this configurable
+  const publicEnv: Record<string, string> = {}
+  Object.keys(process.env).forEach((key) => {
+    if (
+      key.startsWith('TINA_PUBLIC_') ||
+      key.startsWith('NEXT_PUBLIC_') ||
+      key === 'NODE_ENV' ||
+      key === 'HEAD'
+    ) {
+      try {
+        // if the value is a string, we can just use it
+        if (typeof process.env[key] === 'string') {
+          publicEnv[key] = process.env[key] as string
+        } else {
+          // otherwise, we need to stringify it
+          publicEnv[key] = JSON.stringify(process.env[key])
+        }
+      } catch (error) {
+        // if we can't stringify it, we'll just warn the user
+        console.warn(
+          `Could not stringify public env process.env.${key} env variable`
+        )
+        console.warn(error)
+      }
+    }
+  })
+
   const config: InlineConfig = {
     root: appRootPath,
     base: `/${outputFolder}/`,
@@ -141,7 +161,7 @@ export const viteBuild = async ({
        * `process.env` with `{}` are problematic, because browsers don't understand the `{}.` syntax,
        * but node does. This was a surprise, but using `new Object()` seems to do the trick.
        */
-      'process.env': `new Object(${JSON.stringify(process.env)})`,
+      'process.env': `new Object(${JSON.stringify(publicEnv)})`,
       __API_URL__: `"${apiUrl}"`,
     },
     // NextJS forces es5 on tsconfig, specifying it here ignores that
@@ -150,6 +170,7 @@ export const viteBuild = async ({
       target: 'es2020',
     },
     server: {
+      host,
       port: 5173,
       fs: {
         strict: false,
@@ -157,7 +178,9 @@ export const viteBuild = async ({
     },
     resolve: {
       alias,
-      dedupe: ['graphql'],
+      dedupe: process.env.MONOREPO_DEV
+        ? ['graphql', 'tinacms', '@tinacms/toolkit']
+        : ['graphql'],
     },
     build: {
       sourcemap: true,

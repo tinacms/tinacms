@@ -1,53 +1,38 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import Progress from 'progress'
-import type { Bridge, Database } from '@tinacms/graphql'
-import type { Schema } from '@tinacms/schema-tools/dist/types'
+import type { SchemaWithConfig } from '@tinacms/schema-tools/dist/types'
+import type { Bridge } from '@tinacms/datalayer'
+import type { Database } from '@tinacms/graphql'
+import { parseURL } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
 
 //  This was taken from packages/tinacms/src/unifiedClient/index.ts
 // TODO: maybe move this to a shared util package?
 
-async function request<DataType extends Record<string, any> = any>(args: {
+async function request(args: {
   url: string
   token: string
-  variables?: Record<string, any>
-  query: string
-}): Promise<{ data: DataType; query: string }> {
-  let data: DataType = {} as DataType
+}): Promise<{ status: string; timestamp: number }> {
   const headers = new Headers()
   if (args.token) {
     headers.append('X-API-KEY', args.token)
   }
   headers.append('Content-Type', 'application/json')
 
-  const bodyString = JSON.stringify({
-    query: args.query,
-    variables: args?.variables || {},
-  })
   const url = args?.url
 
   const res = await fetch(url, {
-    method: 'POST',
+    method: 'GET',
     headers,
-    body: bodyString,
     redirect: 'follow',
   })
   const json = await res.json()
   if (!res.ok) {
     let additionalInfo = ''
-    if (res.status === 401) {
+    if (res.status === 401 || res.status === 403) {
       additionalInfo =
         'Please check that your client ID, URL and read only token are configured properly.'
     }
@@ -68,8 +53,8 @@ async function request<DataType extends Record<string, any> = any>(args: {
     )
   }
   return {
-    data: json?.data as DataType,
-    query: args.query,
+    status: json?.status,
+    timestamp: json?.timestamp,
   }
 }
 
@@ -80,27 +65,27 @@ export const checkClientInfo = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: Schema
+    schema?: SchemaWithConfig
     apiUrl: string
+    isSelfHostedDatabase: boolean
   },
   next,
   _options: { verbose?: boolean }
 ) => {
+  if (ctx.isSelfHostedDatabase) {
+    return next()
+  }
+
   const config = ctx.schema?.config
   const token = config.token
-  const url = ctx.apiUrl
-
+  const { clientId, branch, host } = parseURL(ctx.apiUrl)
+  const url = `https://${host}/db/${clientId}/status/${branch}`
   const bar = new Progress('Checking clientId, token and branch. :prog', 1)
 
   try {
     await request({
       token,
       url,
-      query: `query {
-        collections {
-          name
-        }
-      }`,
     })
     bar.tick({
       prog: '✅',

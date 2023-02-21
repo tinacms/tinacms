@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/app",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "exports": {
     ".": {
@@ -39,14 +39,15 @@
     "unlink": "cd appFiles && cp -RL node_modules node_modules2 && rm -rf node_modules && mv node_modules2 node_modules"
   },
   "devDependencies": {
-    "@tinacms/mdx": "workspace:*",
-    "@tinacms/scripts": "workspace:*",
     "@tinacms/schema-tools": "workspace:*",
     "@types/fs-extra": "^9.0.1",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
-    "jest": "^27.0.6",
-    "tinacms": "workspace:*"
+    "@tinacms/scripts": "workspace:*",
+    "tinacms": "workspace:*",
+    "@tinacms/toolkit": "workspace:*",
+    "@tinacms/mdx": "workspace:*",
+    "jest": "^27.0.6"
   },
   "dependencies": {
     "@headlessui/react": "1.6.6",

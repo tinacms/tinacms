@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 import type { RichTextField } from '@tinacms/schema-tools/dist/types'
@@ -156,8 +144,8 @@ export const field: RichTextField = {
       ],
     },
     {
-      name: 'Shortcode1',
-      label: 'Shortcode 1',
+      name: 'rimg',
+      label: 'rimg',
       inline: true,
       match: {
         start: '{{<',
@@ -165,35 +153,95 @@ export const field: RichTextField = {
       },
       fields: [
         {
-          name: 'text',
-          label: 'Text',
+          name: 'src',
+          label: 'Src',
           type: 'string',
           required: true,
           isTitle: true,
-          ui: {
-            component: 'textarea',
-          },
         },
       ],
     },
     {
-      name: 'Shortcode2',
-      label: 'Shortcode 2',
+      name: 'adPanel',
+      label: 'Ad Panel',
       inline: true,
       match: {
         start: '{{%',
         end: '%}}',
+        name: 'ad-panel-leaderboard',
       },
       fields: [
         {
-          name: 'text',
+          name: '_value',
           required: true,
           isTitle: true,
-          label: 'Text',
+          label: 'Value',
           type: 'string',
-          ui: {
-            component: 'textarea',
-          },
+        },
+      ],
+    },
+    {
+      name: 'pullQuote',
+      label: 'Pull Quote',
+      inline: true,
+      match: {
+        start: '{{%',
+        end: '%}}',
+        name: 'pull-quote',
+      },
+      fields: [
+        {
+          name: 'children',
+          type: 'rich-text',
+        },
+      ],
+    },
+    {
+      name: 'featurePanel',
+      label: 'Feature Panel',
+      inline: true,
+      match: {
+        start: '{{%',
+        end: '%}}',
+        name: 'feature-panel',
+      },
+      fields: [
+        {
+          name: '_value',
+          required: true,
+          isTitle: true,
+          label: 'Value',
+          type: 'string',
+        },
+      ],
+    },
+    {
+      name: 'signature',
+      label: 'Signature',
+      match: {
+        start: '{{<',
+        end: '>}}',
+      },
+      fields: [
+        {
+          name: 'foo',
+          label: 'foo label',
+          type: 'string',
+        },
+      ],
+    },
+    {
+      name: 'unkeyedSignature',
+      label: 'Unkeyed Signature',
+      match: {
+        start: '{{<',
+        end: '>}}',
+      },
+      fields: [
+        {
+          name: '_value',
+          label: 'Value',
+          type: 'string',
         },
       ],
     },

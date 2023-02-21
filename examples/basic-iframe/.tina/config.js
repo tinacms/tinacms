@@ -1,8 +1,45 @@
 import { defineConfig } from 'tinacms'
 
 export default defineConfig({
+  // Example of how you can override the frontend url
+  // contentApiUrlOverride: 'http://localhost:3000/api/gql',
   admin: {
     auth: {
+      // Get token function examples (can be removed)
+      getToken: async () => {
+        return {
+          id_token: 'Foo',
+        }
+      },
+      // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
+      async authenticate() {
+        console.log('Authenticating...')
+        localStorage.setItem(
+          'logan',
+          JSON.stringify({ name: 'Logan', role: 'admin' })
+        )
+        return {}
+      },
+      async logOut() {
+        console.log('logOut...')
+        localStorage.removeItem('logan')
+        window.location.href = '/'
+      },
+      async getUser() {
+        console.log('getUser...')
+        const userStr = localStorage.getItem('logan')
+        if (!userStr) {
+          return undefined
+        } else {
+          try {
+            return JSON.parse(userStr)
+          } catch {
+            return null
+          }
+        }
+      },
+
+      // Other methods
       onLogin: () => {
         console.log('Logged in!')
         // hook function to be called when the user logs in
@@ -17,6 +54,8 @@ export default defineConfig({
   clientId: null,
   token: null,
   build: {
+    // can set the host of the vite config here
+    // host: true,
     outputFolder: 'admin',
     publicFolder: 'public',
   },
@@ -34,6 +73,11 @@ export default defineConfig({
         label: 'Test',
         templates: [
           {
+            name: 'tem1',
+            label: 'Template 1',
+            fields: [{ type: 'string', name: 'foo' }],
+          },
+          {
             name: 'tem2',
             label: 'Template 2',
             fields: [{ type: 'string', name: 'bar' }],
@@ -45,6 +89,8 @@ export default defineConfig({
         path: 'content/page',
         label: 'Page',
         format: 'mdx',
+        frontmatterFormat: 'toml',
+        frontmatterDelimiters: ['+++', '+++'],
         fields: [
           {
             label: 'Title',
