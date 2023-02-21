@@ -1,2 +1,2 @@
-export { stringifyMDX } from './shortcodes/stringify'
+export { stringifyMDX } from './stringify'
 export { parseMDX } from './parse'

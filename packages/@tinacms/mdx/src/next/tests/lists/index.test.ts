@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest'
 import { parseMDX } from '../../parse'
-import { stringifyMDX } from '../../shortcodes/stringify'
+import { stringifyMDX } from '../../stringify'
 import { field } from './field'
 import input from './in.md?raw'
 import * as util from '../util'

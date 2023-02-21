@@ -3,7 +3,7 @@ import { parseMDX } from '../../parse'
 import { field } from './field'
 import input from './in.md?raw'
 import * as util from '../util'
-import { stringifyMDX } from '../../shortcodes/stringify'
+import { stringifyMDX } from '../../stringify'
 
 it('matches input', () => {
   const tree = parseMDX(input, field, (v) => v)
