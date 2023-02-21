@@ -12,7 +12,7 @@
     },
     {
       "type": "mdxJsxFlowElement",
-      "name": "some-feature",
+      "name": "someFeature",
       "children": [
         {
           "type": "text",
@@ -25,7 +25,7 @@
           "children": [
             {
               "type": "mdxJsxFlowElement",
-              "name": "other-feature",
+              "name": "otherFeature",
               "children": [
                 {
                   "type": "text",

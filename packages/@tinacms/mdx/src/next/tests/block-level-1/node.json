@@ -12,7 +12,7 @@
     },
     {
       "type": "mdxJsxFlowElement",
-      "name": "some-feature",
+      "name": "someFeature",
       "children": [
         {
           "type": "text",

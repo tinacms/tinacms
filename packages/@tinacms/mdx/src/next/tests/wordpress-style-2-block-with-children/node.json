@@ -3,7 +3,7 @@
   "children": [
     {
       "type": "mdxJsxFlowElement",
-      "name": "recent-posts",
+      "name": "someFeature",
       "children": [
         {
           "type": "text",

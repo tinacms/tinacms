@@ -11,7 +11,7 @@ export const fromMarkdown = (value: string, field: RichTypeInner) => {
   const acornDefault = acorn as unknown as Options['acorn']
   const tree = mdastFromMarkdown(value, {
     extensions: [mdxJsx({ acorn: acornDefault, patterns, addResult: true })],
-    mdastExtensions: [mdxJsxFromMarkdown()],
+    mdastExtensions: [mdxJsxFromMarkdown({ patterns })],
   })
 
   return tree

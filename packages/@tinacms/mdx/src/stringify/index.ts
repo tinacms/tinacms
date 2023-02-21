@@ -11,6 +11,7 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
+import { stringifyMDX as stringifyMDXNext } from '../next'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
@@ -40,6 +41,9 @@ export const stringifyMDX = (
   field: RichTypeInner,
   imageCallback: (url: string) => string
 ) => {
+  if (field.parser?.type === 'markdown') {
+    return stringifyMDXNext(value, field, imageCallback)
+  }
   if (!value) {
     return
   }

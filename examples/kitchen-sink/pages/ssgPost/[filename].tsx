@@ -12,7 +12,7 @@ export default function Home(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const variables = { relativePath: `${params.filename}.mdx` }
+  const variables = { relativePath: `${params.filename}.md` }
   const props = await client.queries.ssgPost(variables)
   return {
     props: { ...props, variables },

@@ -14,6 +14,7 @@ export const getFieldPatterns = (field: RichTypeInner) => {
         start: template.match.start,
         end: template.match.end,
         name: template.match.name || template.name,
+        templateName: template.name,
         type: template.inline ? 'inline' : 'flow',
         leaf: !template.fields.some((f) => f.name === 'children'),
       })

@@ -10,7 +10,7 @@
         },
         {
           "type": "mdxJsxTextElement",
-          "name": "some-feature",
+          "name": "someFeature",
           "children": [
             {
               "type": "text",

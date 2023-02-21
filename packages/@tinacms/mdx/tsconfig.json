@@ -17,11 +17,6 @@
     "types": [
       "vite/client"
     ],
-    "paths": {
-      "unist-util-visit": [
-        "./src/index.d.ts"
-      ]
-    }
   },
   "exclude": [
     "node_modules",

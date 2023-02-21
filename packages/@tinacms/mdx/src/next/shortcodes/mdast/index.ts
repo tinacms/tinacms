@@ -37,7 +37,7 @@ type Tag = {
   shouldFallback?: boolean
 }
 
-export function mdxJsxFromMarkdown() {
+export function mdxJsxFromMarkdown({ patterns }: { patterns: Pattern[] }) {
   const buffer: FromMarkdownHandle = function () {
     this.buffer()
   }
@@ -290,13 +290,15 @@ export function mdxJsxFromMarkdown() {
     if (tag.close) {
       stack.pop()
     } else {
+      const pattern = patterns.find((pattern) => pattern.name === tag.name)
+      const tagName = pattern?.templateName || tag.name
       this.enter(
         {
           type:
             token.type === 'mdxJsxTextTag'
               ? 'mdxJsxTextElement'
               : 'mdxJsxFlowElement',
-          name: tag.name || null,
+          name: tagName || null,
           attributes: tag.attributes,
           children: [],
         },
@@ -492,18 +494,19 @@ export const mdxJsxToMarkdown = function (
     context,
     safeOptions
   ) {
-    const pattern = patterns.find((p) => p.name === node.name)
+    const pattern = patterns.find((p) => p.templateName === node.name)
     if (!pattern) {
       // FIXME
       return ''
     }
+    const patternName = pattern.name || pattern?.templateName
     const tracker = track(safeOptions)
     const selfClosing = pattern.leaf
     const exit = context.enter(node.type)
     let index = -1
     /** @type {Array<string>} */
     const serializedAttributes = []
-    let value = tracker.move(pattern.start + ' ' + (node.name || ''))
+    let value = tracker.move(pattern.start + ' ' + (patternName || ''))
 
     // None.
     if (node.attributes && node.attributes.length > 0) {
@@ -617,7 +620,7 @@ export const mdxJsxToMarkdown = function (
 
     if (!selfClosing) {
       value += tracker.move(
-        pattern.start + ' /' + (node.name || ' ') + ' ' + pattern.end
+        pattern.start + ' /' + (patternName || ' ') + ' ' + pattern.end
       )
     }
 

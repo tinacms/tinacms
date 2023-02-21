@@ -75,10 +75,9 @@ export function mdxJsxElement(
       props,
     }
   } catch (e) {
-    console.log(e)
-    // if (e instanceof Error) {
-    //   throw new RichTextParseError(e.message, node.position)
-    // }
+    if (e instanceof Error) {
+      throw new RichTextParseError(e.message, node.position)
+    }
     throw e
   }
 }

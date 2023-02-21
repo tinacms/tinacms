@@ -6,8 +6,8 @@ export const field: RichTypeInner = {
   parser: { type: 'markdown' },
   templates: [
     {
-      name: 'someFeature',
-      label: 'Some feature',
+      name: 'RecentPosts',
+      label: 'Recent Posts',
       match: { start: '[', end: ']', name: 'recent-posts' },
       fields: [{ name: 'posts', type: 'string' }],
     },
