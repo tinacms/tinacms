@@ -3,7 +3,6 @@ import { visit } from 'unist-util-visit'
 import { remarkToSlate } from '../../parse/remarkToPlate'
 import { RichTypeInner } from '@tinacms/schema-tools'
 import type { Root } from 'mdast'
-import './post-processing-types'
 
 export const postProcessor = (
   tree: Root,
