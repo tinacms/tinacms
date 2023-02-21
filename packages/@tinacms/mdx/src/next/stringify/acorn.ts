@@ -4,7 +4,7 @@ import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../../parse/plate'
 import type * as Md from 'mdast'
 import { rootElement } from './pre-processing'
-import { stringifyMDX } from './'
+import { stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
