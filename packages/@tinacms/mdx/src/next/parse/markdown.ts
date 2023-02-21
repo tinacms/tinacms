@@ -16,5 +16,3 @@ export const fromMarkdown = (value: string, field: RichTypeInner) => {
 
   return tree
 }
-
-type RichTextTemplate = Template<false> & { inline?: boolean }

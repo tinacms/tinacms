@@ -1,6 +1,6 @@
-import { getMarks } from '../../stringify'
+import { getMarks } from '../../../stringify'
 import type * as Md from 'mdast'
-import type * as Plate from '../../parse/plate'
+import type * as Plate from '../../../parse/plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import { stringifyPropsInline } from './acorn'
 

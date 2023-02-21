@@ -1,7 +1,7 @@
 import { format } from 'prettier'
 import type { RichTypeInner, Template } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
-import * as Plate from '../../parse/plate'
+import * as Plate from '../../../parse/plate'
 import type * as Md from 'mdast'
 import { rootElement } from './pre-processing'
 import { stringifyMDX } from '.'

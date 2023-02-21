@@ -54,5 +54,5 @@ export const postProcessor = (
   visit(tree, 'mdxJsxFlowElement', addPropsToMdxFlow)
   visit(tree, 'mdxJsxTextElement', addPropsToMdxFlow)
 
-  return remarkToSlate(tree, field, imageCallback)
+  return remarkToSlate(tree, field, imageCallback, '', true)
 }

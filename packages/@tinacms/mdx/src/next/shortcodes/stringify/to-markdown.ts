@@ -1,10 +1,10 @@
 import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
 import { text } from 'mdast-util-to-markdown/lib/handle/text'
-import { mdxJsxToMarkdown } from '../shortcodes/mdast'
+import { mdxJsxToMarkdown } from '../mdast'
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
-import { Pattern } from '../shortcodes'
-import { getFieldPatterns } from '../util'
+import { Pattern } from '..'
+import { getFieldPatterns } from '../../util'
 
 export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
   const patterns = getFieldPatterns(field)

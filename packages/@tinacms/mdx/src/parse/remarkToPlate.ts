@@ -5,7 +5,7 @@
 */
 
 import { flatten } from 'lodash-es'
-import { directiveElement, mdxJsxElement } from './mdx'
+import { directiveElement, mdxJsxElement as mdxJsxElementDefault } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
 import type { RichTypeInner } from '@tinacms/schema-tools'
@@ -34,8 +34,13 @@ export const remarkToSlate = (
   root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
   field: RichTypeInner,
   imageCallback: (url: string) => string,
-  raw?: string
+  raw?: string,
+  skipMDXProcess?: boolean
 ): Plate.RootElement => {
+  const mdxJsxElement = skipMDXProcess
+    ? (node: any) => node
+    : mdxJsxElementDefault
+
   const content = (content: Md.Content): Plate.BlockElement => {
     switch (content.type) {
       case 'blockquote':
