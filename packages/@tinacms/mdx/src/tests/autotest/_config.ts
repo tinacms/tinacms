@@ -181,6 +181,22 @@ export const field: RichTypeInner = {
       ],
     },
     {
+      name: 'pullQuote',
+      label: 'Pull Quote',
+      inline: true,
+      match: {
+        start: '{{%',
+        end: '%}}',
+        name: 'pull-quote',
+      },
+      fields: [
+        {
+          name: 'children',
+          type: 'rich-text',
+        },
+      ],
+    },
+    {
       name: 'featurePanel',
       label: 'Feature Panel',
       inline: true,

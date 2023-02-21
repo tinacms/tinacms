@@ -25,6 +25,7 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
 import { useEditState } from '@tinacms/sharedctx'
+import { Client } from '../internalClient'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -130,6 +131,12 @@ export const TinaAdmin = ({
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true
         if (isTinaAdminEnabled) {
+          const tinaClient: Client = cms.api?.tina
+          const collectionWithRouter =
+            tinaClient?.schema?.config?.collections.find((x) => {
+              return typeof x?.ui?.router === 'function'
+            })
+          const hasRouter = Boolean(collectionWithRouter)
           return (
             <Router>
               {/* @ts-ignore */}
@@ -192,7 +199,7 @@ export const TinaAdmin = ({
                 <Route
                   path="/"
                   element={
-                    <MaybeRedirectToPreview redirect={!!preview}>
+                    <MaybeRedirectToPreview redirect={!!preview && hasRouter}>
                       <DefaultWrapper cms={cms}>
                         <DashboardPage />
                       </DefaultWrapper>

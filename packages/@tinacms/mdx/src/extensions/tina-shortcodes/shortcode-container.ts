@@ -263,7 +263,7 @@ export const directiveContainer: (pattern: Pattern) => Construct = (
             types.whitespace
           )
         }
-        if (code === codes.backslash) {
+        if (code === codes.slash) {
           effects.consume(code)
           return closingSequenceName
         }
