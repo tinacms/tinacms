@@ -1,0 +1,32 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Unexpected attribute in closing"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "{{% /some-feature a=\"b\" %}}"
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "tag turns into regular text"
+        }
+      ]
+    }
+  ]
+}

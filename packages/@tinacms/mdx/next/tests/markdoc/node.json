@@ -1,0 +1,59 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "callout",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "type": "note",
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Tags are composable!"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "callout",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "type": "warning",
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Tags aren't composable!"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

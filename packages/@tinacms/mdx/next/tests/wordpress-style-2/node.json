@@ -1,0 +1,18 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "recent-posts",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "posts": "5"
+      }
+    }
+  ]
+}

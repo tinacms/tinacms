@@ -883,9 +883,8 @@ importers:
       '@tailwindcss/typography': ^0.5.9
       '@tinacms/schema-tools': workspace:*
       '@tinacms/scripts': workspace:*
+      '@types/acorn': ^4.0.0
       '@types/cors': ^2.8.7
-      '@types/estree': ^0.0.50
-      '@types/estree-jsx': ^1.0.0
       '@types/express': ^4.17.8
       '@types/fs-extra': ^9.0.2
       '@types/jest': ^26.0.4
@@ -902,21 +901,24 @@ importers:
       '@vitejs/plugin-react': ^2.1.0
       acorn: ^8.7.1
       c8: ^7.11.3
+      ccount: ^2.0.1
       concat-md: ^0.5.0
       estree-jsx: ^0.0.1
+      estree-util-is-identifier-name: ^2.1.0
       jest: ^28.1.2
       jest-diff: ^28.1.1
       jest-file-snapshot: ^0.5.0
       jest-matcher-utils: ^28.1.1
       lodash-es: ^4.17.21
       mdast: ^3.0.0
+      mdast-util-compact: ^4.1.1
       mdast-util-directive: ^2.2.2
       mdast-util-from-markdown: ^1.3.0
       mdast-util-frontmatter: ^1.0.0
       mdast-util-gfm: ^2.0.1
       mdast-util-gfm-table: ^1.0.6
       mdast-util-mdx: 2.0.0
-      mdast-util-mdx-jsx: ^2.0.1
+      mdast-util-mdx-jsx: ^2.0.2
       mdast-util-to-markdown: ^1.3.0
       mdast-util-toc: ^6.1.0
       micromark: ^3.1.0
@@ -927,6 +929,7 @@ importers:
       micromark-extension-mdx: 1.0.0
       micromark-extension-mdx-jsx: 1.0.3
       micromark-extension-mdxjs: 1.0.0
+      micromark-factory-mdx-expression: ^1.0.0
       micromark-factory-space: ^1.0.0
       micromark-factory-whitespace: ^1.0.0
       micromark-util-character: ^1.1.0
@@ -952,10 +955,12 @@ importers:
       typedoc-plugin-markdown: ^3.13.6
       typescript: ^4.7.4
       unist-util-source: ^4.0.2
+      unist-util-stringify-position: ^3.0.3
       unist-util-visit: ^4.1.0
       unist-util-visit-parents: ^5.1.3
       uvu: ^0.5.6
       vfile: ^4.2.0
+      vfile-message: ^3.1.4
       vite: ^3.0.2
       vitest: ^0.18.0
     dependencies:
@@ -963,9 +968,12 @@ importers:
       '@types/mdast': 3.0.10
       '@types/unist': 2.0.6
       acorn: 8.7.1
+      ccount: 2.0.1
       concat-md: 0.5.0
+      estree-util-is-identifier-name: 2.1.0
       lodash-es: 4.17.21
       mdast: 3.0.0
+      mdast-util-compact: 4.1.1
       mdast-util-directive: 2.2.3
       mdast-util-from-markdown: 1.3.0
       mdast-util-frontmatter: 1.0.1
@@ -983,6 +991,7 @@ importers:
       micromark-extension-mdx: 1.0.0
       micromark-extension-mdx-jsx: 1.0.3
       micromark-extension-mdxjs: 1.0.0
+      micromark-factory-mdx-expression: 1.0.6
       micromark-factory-space: 1.0.0
       micromark-factory-whitespace: 1.0.0
       micromark-util-character: 1.1.0
@@ -1000,19 +1009,20 @@ importers:
       typedoc: 0.23.21_typescript@4.7.4
       typedoc-plugin-markdown: 3.13.6_typedoc@0.23.21
       unist-util-source: 4.0.2
+      unist-util-stringify-position: 3.0.3
       unist-util-visit: 4.1.0
       unist-util-visit-parents: 5.1.3
       uvu: 0.5.6
       vfile: 4.2.1
+      vfile-message: 3.1.4
     devDependencies:
       '@swc/core': 1.2.215
       '@swc/jest': 0.2.21_@swc+core@1.2.215
       '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.4
       '@tailwindcss/typography': 0.5.9_tailwindcss@3.2.4
       '@tinacms/scripts': link:../scripts
+      '@types/acorn': 4.0.6
       '@types/cors': 2.8.12
-      '@types/estree': 0.0.50
-      '@types/estree-jsx': 1.0.0
       '@types/express': 4.17.13
       '@types/fs-extra': 9.0.13
       '@types/jest': 26.0.24
@@ -9741,7 +9751,6 @@ packages:
       }
     dependencies:
       '@types/estree': 0.0.52
-    dev: false
 
   /@types/aria-query/4.2.2:
     resolution:
@@ -9935,15 +9944,6 @@ packages:
     dependencies:
       '@types/estree': 0.0.52
     dev: false
-
-  /@types/estree-jsx/1.0.0:
-    resolution:
-      {
-        integrity: sha512-3qvGd0z8F2ENTGr/GG1yViqfiKmRfrXVx5sJyHGFu3z7m5g5utCQtGp/g29JnjflhtQJBv1WDQukHiT58xPcYQ==,
-      }
-    dependencies:
-      '@types/estree': 0.0.52
-    dev: true
 
   /@types/estree/0.0.42:
     resolution:
@@ -18573,10 +18573,10 @@ packages:
       '@types/estree': 0.0.42
     dev: true
 
-  /estree-util-is-identifier-name/2.0.1:
+  /estree-util-is-identifier-name/2.1.0:
     resolution:
       {
-        integrity: sha512-rxZj1GkQhY4x1j/CSnybK9cGuMFQYFPLq0iNyopqf14aOVLFtMv7Esika+ObJWPWiOHuMOAHz3YkWoLYYRnzWQ==,
+        integrity: sha512-bEN9VHRyXAUOjkKVQVvArFym08BTWB0aJPppZZr0UNyAqWsLaVfAqP7hbaTJjzHifmB5ebnR8Wm7r7yGN/HonQ==,
       }
     dev: false
 
@@ -24029,6 +24029,16 @@ packages:
       unist-util-visit: 2.0.3
     dev: false
 
+  /mdast-util-compact/4.1.1:
+    resolution:
+      {
+        integrity: sha512-h/UFPIkf4ZlJw50k9UC+CkY+/urhFHZB25GXGh0f+kbqSulzZMSEGWeFjAe2jEQsFu9bSjf0s/TdZXsjvtmxIQ==,
+      }
+    dependencies:
+      '@types/mdast': 3.0.10
+      unist-util-visit: 4.1.0
+    dev: false
+
   /mdast-util-definitions/4.0.0:
     resolution:
       {
@@ -24120,7 +24130,7 @@ packages:
       micromark-util-normalize-identifier: 1.0.0
       micromark-util-symbol: 1.0.1
       micromark-util-types: 1.0.2
-      unist-util-stringify-position: 3.0.2
+      unist-util-stringify-position: 3.0.3
       uvu: 0.5.6
     transitivePeerDependencies:
       - supports-color
@@ -24247,8 +24257,8 @@ packages:
       parse-entities: 4.0.0
       stringify-entities: 4.0.3
       unist-util-remove-position: 4.0.1
-      unist-util-stringify-position: 3.0.2
-      vfile-message: 3.1.2
+      unist-util-stringify-position: 3.0.3
+      vfile-message: 3.1.4
     dev: false
 
   /mdast-util-mdx-jsx/2.0.2:
@@ -24261,12 +24271,12 @@ packages:
       '@types/hast': 2.3.4
       '@types/mdast': 3.0.10
       ccount: 2.0.1
-      mdast-util-to-markdown: 1.3.0
+      mdast-util-to-markdown: 1.5.0
       parse-entities: 4.0.0
       stringify-entities: 4.0.3
       unist-util-remove-position: 4.0.1
-      unist-util-stringify-position: 3.0.2
-      vfile-message: 3.1.2
+      unist-util-stringify-position: 3.0.3
+      vfile-message: 3.1.4
     dev: false
 
   /mdast-util-mdx/1.1.0:
@@ -24748,14 +24758,14 @@ packages:
       }
     dependencies:
       '@types/acorn': 4.0.6
-      estree-util-is-identifier-name: 2.0.1
+      estree-util-is-identifier-name: 2.1.0
       micromark-factory-mdx-expression: 1.0.6
       micromark-factory-space: 1.0.0
       micromark-util-character: 1.1.0
       micromark-util-symbol: 1.0.1
       micromark-util-types: 1.0.2
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-extension-mdx-md/1.0.0:
@@ -24793,7 +24803,7 @@ packages:
       micromark-util-types: 1.0.2
       unist-util-position-from-estree: 1.1.1
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-extension-mdxjs/1.0.0:
@@ -24848,7 +24858,7 @@ packages:
       micromark-util-types: 1.0.2
       unist-util-position-from-estree: 1.1.1
       uvu: 0.5.6
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-factory-space/1.0.0:
@@ -24966,7 +24976,7 @@ packages:
       micromark-util-types: 1.0.2
       uvu: 0.5.6
       vfile-location: 4.0.1
-      vfile-message: 3.1.2
+      vfile-message: 3.1.4
     dev: false
 
   /micromark-util-html-tag-name/1.1.0:
@@ -32053,6 +32063,15 @@ packages:
       '@types/unist': 2.0.6
     dev: false
 
+  /unist-util-stringify-position/3.0.3:
+    resolution:
+      {
+        integrity: sha512-k5GzIBZ/QatR8N5X2y+drfpWG8IDBzdnVj6OInRNWm1oXrzydiaAT2OQiA8DPRRZyAKb9b6I2a6PxYklZD0gKg==,
+      }
+    dependencies:
+      '@types/unist': 2.0.6
+    dev: false
+
   /unist-util-visit-parents/2.1.2:
     resolution:
       {
@@ -32613,14 +32632,14 @@ packages:
       unist-util-stringify-position: 2.0.3
     dev: false
 
-  /vfile-message/3.1.2:
+  /vfile-message/3.1.4:
     resolution:
       {
-        integrity: sha512-QjSNP6Yxzyycd4SVOtmKKyTsSvClqBPJcd00Z0zuPj3hOIjg0rUPG6DbFGPvUKRgYyaIWLPKpuEclcuvb3H8qA==,
+        integrity: sha512-fa0Z6P8HUrQN4BZaX05SIVXic+7kE3b05PWAtPuYP9QLHsLKYR7/AlLW3NtOrpXRLeawpDLMsVkmk5DG0NXgWw==,
       }
     dependencies:
       '@types/unist': 2.0.6
-      unist-util-stringify-position: 3.0.2
+      unist-util-stringify-position: 3.0.3
     dev: false
 
   /vfile/2.3.0:
@@ -32655,8 +32674,8 @@ packages:
     dependencies:
       '@types/unist': 2.0.6
       is-buffer: 2.0.5
-      unist-util-stringify-position: 3.0.2
-      vfile-message: 3.1.2
+      unist-util-stringify-position: 3.0.3
+      vfile-message: 3.1.4
     dev: false
 
   /vite-plugin-dts/0.5.3_vite@2.9.14:
