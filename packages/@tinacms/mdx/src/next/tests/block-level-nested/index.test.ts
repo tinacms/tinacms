@@ -2,7 +2,7 @@ import { it, expect } from 'vitest'
 import { parseMDX } from '../../parse'
 import { field } from './field'
 import input from './in.md?raw'
-import * as util from '../../util'
+import * as util from '../util'
 import { stringifyMDX } from '../../stringify'
 
 it('matches input', () => {

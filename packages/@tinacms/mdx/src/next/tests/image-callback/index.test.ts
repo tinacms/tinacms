@@ -3,7 +3,7 @@ import { parseMDX } from '../../parse'
 import { stringifyMDX } from '../../stringify'
 import { field } from './field'
 import input from './in.md?raw'
-import * as util from '../../util'
+import * as util from '../util'
 
 it('matches input', () => {
   const parseImageCallback = (v: string) => `http://some-url${v}`
