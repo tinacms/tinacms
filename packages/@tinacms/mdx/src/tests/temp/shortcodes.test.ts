@@ -28,6 +28,22 @@ const out = output({
       type: 'p',
       children: [{ type: 'text', text: '<invalidhtml>' }],
     },
+    {
+      type: 'mdxJsxFlowElement',
+      name: 'pullQuote',
+      props: {
+        children: {
+          type: 'root',
+          children: [
+            {
+              type: 'p',
+              children: [{ type: 'text', text: 'Some text' }],
+            },
+          ],
+        },
+      },
+      children: [{ type: 'text', text: '' }],
+    },
     { type: 'p', children: [{ type: 'text', text: '<' }] },
     { type: 'p', children: [{ type: 'text', text: '<' }] },
     { type: 'p', children: [{ type: 'text', text: '[ hello' }] },

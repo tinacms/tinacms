@@ -4,6 +4,10 @@
 
 <invalidhtml>
 
+{{% pull-quote %}}
+Some text
+{{% /pull-quote %}}
+
 <
 
 \<

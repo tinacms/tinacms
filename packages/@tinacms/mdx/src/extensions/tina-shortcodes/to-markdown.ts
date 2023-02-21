@@ -102,7 +102,7 @@ const handleDirective: (patterns: Pattern[]) => ToMarkdownHandle = function (
       }
 
       value += tracker.move('\n' + sequence)
-      value += tracker.move(' \\' + patternName + ' ' + pattern.end)
+      value += tracker.move(' /' + patternName + ' ' + pattern.end)
     }
 
     exit()
