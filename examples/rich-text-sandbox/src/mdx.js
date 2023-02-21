@@ -403,10 +403,17 @@ var mdxJsxToMarkdown = function (options) {
     value += tracker.move(' ' + pattern.end)
     if (node.children) {
       if (node.type === 'mdxJsxFlowElement') {
-        tracker.shift(2)
-        value += tracker.move('\n')
-        value += tracker.move(containerFlow(node, context, tracker.current()))
-        value += tracker.move('\n')
+        const emptyChildren =
+          node.children.length === 1 &&
+          node.children[0]?.type === 'paragraph' &&
+          node.children[0].children[0]?.type === 'text' &&
+          node.children[0].children[0].value === ''
+        if (!emptyChildren) {
+          tracker.shift(2)
+          value += tracker.move('\n')
+          value += tracker.move(containerFlow(node, context, tracker.current()))
+          value += tracker.move('\n')
+        }
       } else {
         value += tracker.move(
           containerPhrasing(node, context, {
