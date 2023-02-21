@@ -215,6 +215,7 @@ export interface TinaField {
   description?: string
   required?: boolean
   indexed?: boolean
+  alias?: string
   // list?: boolean
   /**
    * Any items passed to the UI field will be passed to the underlying field.

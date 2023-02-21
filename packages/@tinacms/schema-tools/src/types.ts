@@ -224,6 +224,7 @@ export interface BaseField {
   label?: string | boolean
   required?: boolean
   name: string
+  alias?: string
   description?: string
 }
 
@@ -476,6 +477,7 @@ export interface Template {
 export interface FieldCollection {
   label?: string
   name: string
+  alias?: string
   path: string
   format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
   /**

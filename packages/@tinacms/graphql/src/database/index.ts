@@ -154,6 +154,23 @@ export class Database {
           : undefined
       const { collection, template } =
         tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
+
+      const replaceAliasesWithNames = (obj: any) => {
+        Object.keys(obj).forEach((key) => {
+          const field = template.fields.find((field) => field.alias === key)
+          // console.log('template_fields', template.fields)
+
+          if (field) {
+            obj[field.name] = obj[key]
+            delete obj[key]
+          }
+          if (typeof obj[key] === 'object') {
+            replaceAliasesWithNames(obj[key])
+          }
+        })
+      }
+      replaceAliasesWithNames(contentObject)
+
       const field = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
@@ -293,6 +310,21 @@ export class Database {
       } else {
         payload = data
       }
+
+      const replaceKeysWithAliases = (obj: any) => {
+        Object.keys(obj).forEach((key) => {
+          const field = template.fields.find((field) => field.name === key)
+          if (field && field.alias) {
+            obj[field.alias] = obj[key]
+            delete obj[key]
+          }
+          if (typeof obj[key] === 'object') {
+            replaceKeysWithAliases(obj[key])
+          }
+        })
+      }
+      replaceKeysWithAliases(payload)
+
       const extension = path.extname(filepath)
       const stringifiedFile = stringifyFile(
         payload,

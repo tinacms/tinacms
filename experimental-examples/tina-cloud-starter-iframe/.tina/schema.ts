@@ -71,6 +71,11 @@ const schema = defineSchema({
       },
       fields: [
         {
+          type: "string",
+          name: "foo_bar",
+          alias: "foo-bar",
+        },
+        {
           label: "3 layer nesting",
           name: "pageBlocks3",
           type: "object",
@@ -449,17 +454,6 @@ const schema = defineSchema({
       label: "Pages",
       name: "pages",
       path: "content/pages",
-      ui: {
-        router: ({ document }) => {
-          if (document._sys.filename === "home") {
-            return "/";
-          }
-          if (document._sys.filename === "about") {
-            return `/about`;
-          }
-          return undefined;
-        },
-      },
       fields: [
         {
           type: "object",
