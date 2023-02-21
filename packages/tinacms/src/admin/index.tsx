@@ -137,7 +137,6 @@ export const TinaAdmin = ({
               return typeof x?.ui?.router === 'function'
             })
           const hasRouter = Boolean(collectionWithRouter)
-          console.log('hasRouter', hasRouter)
           return (
             <Router>
               {/* @ts-ignore */}
