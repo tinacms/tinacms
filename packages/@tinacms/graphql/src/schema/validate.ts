@@ -213,10 +213,7 @@ const validateField = async (
         message: (obj) =>
           `Field's 'name' must match ${obj.regex} at ${messageName}`,
       })
-      .required()
-      .transform((value) => {
-        return value.replaceAll('-', '_')
-      }),
+      .required(),
     type: yup
       .string()
       .oneOf(
