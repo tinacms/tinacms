@@ -4,7 +4,7 @@
 
 */
 
-import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
+import { Handlers, toMarkdown, defaultHandlers } from 'mdast-util-to-markdown'
 import { text } from 'mdast-util-to-markdown/lib/handle/text'
 import {
   mdxJsxToMarkdown,
@@ -98,6 +98,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
    * templates, we're assuming you'll need to escape
    *
    */
+  // @ts-ignore
   const handlers: Handlers = {}
   handlers['text'] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings

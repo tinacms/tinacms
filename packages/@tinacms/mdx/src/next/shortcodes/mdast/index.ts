@@ -17,6 +17,7 @@ import type {
 import type {
   Handle as ToMarkdownHandle,
   Map as ToMarkdownMap,
+  Options,
 } from 'mdast-util-to-markdown'
 import type {
   MdxJsxAttributeValueExpression,
@@ -93,7 +94,7 @@ export function mdxJsxFromMarkdown() {
   }
 
   const enterMdxJsxTagSelfClosingMarker: FromMarkdownHandle = function (token) {
-    const tag: Tag = this.getData('mdxJsxTag')
+    const tag: Tag | undefined = this.getData('mdxJsxTag')
 
     if (tag?.close) {
       throw new VFileMessage(
@@ -461,13 +462,14 @@ export function mdxJsxFromMarkdown() {
  * overwrite them!
  *
  */
-export const mdxJsxToMarkdown = function (options: {
-  quote?: '"' | "'"
-  quoteSmart?: boolean
-  tightSelfClosing?: boolean
-  printWidth?: number
-  patterns: Pattern[]
-}) {
+export const mdxJsxToMarkdown = function (
+  options: Options & {
+    printWidth?: number
+    quoteSmart?: boolean
+    tightSelfClosing?: boolean
+    patterns: Pattern[]
+  }
+) {
   const patterns = options.patterns || []
   const options_ = options || {}
   const quote = options_.quote || '"'
@@ -635,12 +637,13 @@ export const mdxJsxToMarkdown = function (options: {
   mdxElement.peek = peekElement
 
   return {
+    ...options,
     handlers: {
       mdxJsxFlowElement: mdxElement,
       mdxJsxTextElement: mdxElement,
     },
     unsafe: [
-      { character: '<', inConstruct: ['phrasing'] },
+      { character: '<', inConstruct: ['phrasing' as const] },
       { atBreak: true, character: '<' },
     ],
     // Always generate fenced code (never indented code).

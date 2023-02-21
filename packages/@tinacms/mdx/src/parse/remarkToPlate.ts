@@ -209,7 +209,7 @@ export const remarkToSlate = (
           default:
             throw new RichTextParseError(
               `Unknown list item of type ${child.type}`,
-              // @ts-expect-error child.type should be 'never'
+              // `directive` can be one of these, but we aren't supporting it
               child.position
             )
         }

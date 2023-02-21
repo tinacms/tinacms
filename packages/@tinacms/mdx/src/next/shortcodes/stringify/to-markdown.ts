@@ -18,6 +18,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
    * templates, we're assuming you'll need to escape
    *
    */
+  // @ts-ignore
   const handlers: Handlers = {}
   handlers['text'] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings
