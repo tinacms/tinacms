@@ -3,56 +3,56 @@ import { defineConfig } from 'tinacms'
 export default defineConfig({
   // Example of how you can override the frontend url
   // contentApiUrlOverride: 'http://localhost:3000/api/gql',
-  admin: {
-    auth: {
-      // Get token function examples (can be removed)
-      getToken: async () => {
-        return {
-          id_token: 'Foo',
-        }
-      },
-      // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
-      async authenticate() {
-        console.log('Authenticating...')
-        localStorage.setItem(
-          'logan',
-          JSON.stringify({ name: 'Logan', role: 'admin' })
-        )
-        return {}
-      },
-      async logOut() {
-        console.log('logOut...')
-        localStorage.removeItem('logan')
-        window.location.href = '/'
-      },
-      async getUser() {
-        console.log('getUser...')
-        const userStr = localStorage.getItem('logan')
-        if (!userStr) {
-          return undefined
-        } else {
-          try {
-            return JSON.parse(userStr)
-          } catch {
-            return null
-          }
-        }
-      },
+  // admin: {
+  //   auth: {
+  //     // Get token function examples (can be removed)
+  //     getToken: async () => {
+  //       return {
+  //         id_token: 'Foo',
+  //       }
+  //     },
+  //     // This is called when they want to authenticate a user. For a lot of implementations it just may be redirecting to the login page
+  //     async authenticate() {
+  //       console.log('Authenticating...')
+  //       localStorage.setItem(
+  //         'logan',
+  //         JSON.stringify({ name: 'Logan', role: 'admin' })
+  //       )
+  //       return {}
+  //     },
+  //     async logOut() {
+  //       console.log('logOut...')
+  //       localStorage.removeItem('logan')
+  //       window.location.href = '/'
+  //     },
+  //     async getUser() {
+  //       console.log('getUser...')
+  //       const userStr = localStorage.getItem('logan')
+  //       if (!userStr) {
+  //         return undefined
+  //       } else {
+  //         try {
+  //           return JSON.parse(userStr)
+  //         } catch {
+  //           return null
+  //         }
+  //       }
+  //     },
 
-      // Other methods
-      onLogin: () => {
-        console.log('Logged in!')
-        // hook function to be called when the user logs in
-      },
-      onLogout: () => {
-        console.log('Logged out!')
-        // hook function to be called when the user logs out
-      },
-    },
-  },
-  branch: '',
-  clientId: null,
-  token: null,
+  //     // Other methods
+  //     onLogin: () => {
+  //       console.log('Logged in!')
+  //       // hook function to be called when the user logs in
+  //     },
+  //     onLogout: () => {
+  //       console.log('Logged out!')
+  //       // hook function to be called when the user logs out
+  //     },
+  //   },
+  // },
+  branch: 'main',
+  clientId: 'e5ffb587-740f-4464-b32c-2eaacdfc72e1',
+  token: '991ffb7db4631016c55c7cabb9822753900098b7',
   build: {
     // can set the host of the vite config here
     // host: true,
