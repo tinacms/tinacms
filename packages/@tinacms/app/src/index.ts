@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import fs from 'fs-extra'
 import path from 'path'
 import { build, createServer, splitVendorChunkPlugin } from 'vite'

@@ -24,7 +24,10 @@ import { initStaticTina } from './init'
 import { attachDatabase } from '../buildTina/attachDatabase'
 import { attachPath } from '../buildTina/attachPath'
 import { warnText } from '../utils/theme'
-import { checkClientInfo } from './statusChecks/checkClientInformation'
+import {
+  checkClientInfo,
+  checkGraphqlSchema,
+} from './statusChecks/checkClientInformation'
 
 export const CMD_START_SERVER = 'server:start'
 export const CMD_DEV = 'dev'
@@ -197,6 +200,7 @@ export const baseCmds: Command[] = [
           buildSetupCmdBuild,
           buildCmdBuild,
           checkClientInfo,
+          checkGraphqlSchema,
           waitForDB,
           indexIntoSelfHostedDatabase,
         ],

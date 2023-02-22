@@ -552,6 +552,7 @@ importers:
       '@graphql-codegen/typescript-generic-sdk': ^2.1.4
       '@graphql-codegen/typescript-operations': ^2.1.4
       '@graphql-codegen/visitor-plugin-common': ^2.4.0
+      '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/graphql-file-loader': ^7.2.0
       '@graphql-tools/load': ^7.3.2
       '@tinacms/app': workspace:*
@@ -621,6 +622,7 @@ importers:
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
+      '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/graphql-file-loader': 7.4.0_graphql@15.8.0
       '@graphql-tools/load': 7.7.0_graphql@15.8.0
       '@tinacms/app': link:../app

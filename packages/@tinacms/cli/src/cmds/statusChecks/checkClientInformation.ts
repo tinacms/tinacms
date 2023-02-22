@@ -1,8 +1,12 @@
-/**
-
-*/
-
 import Progress from 'progress'
+import {
+  getIntrospectionQuery,
+  buildClientSchema,
+  print,
+  buildSchema,
+} from 'graphql'
+import { diff } from '@graphql-inspector/core'
+
 import type { Bridge } from '@tinacms/datalayer'
 import type { Database } from '@tinacms/graphql'
 import type { TinaCloudSchema } from '@tinacms/schema-tools'
@@ -107,6 +111,83 @@ export const checkClientInfo = async (
     )
 
     throw e
+  }
+
+  next()
+}
+
+export const fetchRemoteGraphqlSchema = async ({
+  url,
+  token,
+}: {
+  url: string
+  token?: string
+}) => {
+  const headers = new Headers()
+  if (token) {
+    headers.append('X-API-KEY', token)
+  }
+  const body = JSON.stringify({ query: getIntrospectionQuery(), variables: {} })
+
+  headers.append('Content-Type', 'application/json')
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body,
+  })
+  const data = await res.json()
+  return data?.data
+}
+
+export const checkGraphqlSchema = async (
+  ctx: {
+    builder: ConfigBuilder
+    rootPath: string
+    database: Database
+    bridge: Bridge
+    usingTs: boolean
+    schema?: TinaCloudSchema<false>
+    apiUrl: string
+    isSelfHostedDatabase: boolean
+  },
+  next,
+  _options: { verbose?: boolean }
+) => {
+  const bar = new Progress(
+    'Checking local GraphQL Schema matches server. :prog',
+    1
+  )
+  const config = ctx.schema?.config
+  const token = config.token
+  const url = ctx.apiUrl
+
+  // Get the remote schema from the graphql endpoint
+  const remoteSchema = await fetchRemoteGraphqlSchema({
+    url,
+    token,
+  })
+
+  const remoteGqlSchema = buildClientSchema(remoteSchema)
+
+  // This will always be the filesystem bridge.
+  const localSchemaDocument = await ctx.database.getGraphQLSchemaFromBridge()
+  const localGraphqlSchema = buildSchema(print(localSchemaDocument))
+  const diffResult = await diff(localGraphqlSchema, remoteGqlSchema)
+
+  if (diffResult.length === 0) {
+    bar.tick({
+      prog: '✅',
+    })
+  } else {
+    bar.tick({
+      prog: '❌',
+    })
+    let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to Github to update your remote GraphQL schema.`
+    if (config?.branch) {
+      errorMessage += `\n\nAddition info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+    }
+    throw new Error(errorMessage)
   }
 
   next()
