@@ -42,6 +42,7 @@ import {
   DEFAULT_NUMERIC_LPAD,
 } from '@tinacms/datalayer'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
+import { replaceAliasesWithNames, replaceKeysWithAliases } from './alias-utils'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -295,19 +296,7 @@ export class Database {
         payload = data
       }
 
-      const replaceKeysWithAliases = (obj: any) => {
-        Object.keys(obj).forEach((key) => {
-          const field = template.fields.find((field) => field.name === key)
-          if (field && field.alias) {
-            obj[field.alias] = obj[key]
-            delete obj[key]
-          }
-          if (typeof obj[key] === 'object') {
-            replaceKeysWithAliases(obj[key])
-          }
-        })
-      }
-      replaceKeysWithAliases(payload)
+      replaceKeysWithAliases(template, payload)
 
       const extension = path.extname(filepath)
       const stringifiedFile = stringifyFile(
@@ -764,21 +753,7 @@ const _indexContent = async (
         }
       )
 
-      const replaceAliasesWithNames = (obj: any) => {
-        Object.keys(obj).forEach((key) => {
-          const field = collection.fields.find((field) => field.alias === key)
-          // console.log('template_fields', template.fields)
-
-          if (field) {
-            obj[field.name] = obj[key]
-            delete obj[key]
-          }
-          if (typeof obj[key] === 'object') {
-            replaceAliasesWithNames(obj[key])
-          }
-        })
-      }
-      replaceAliasesWithNames(data)
+      replaceAliasesWithNames(collection, data)
 
       if (database.store.supportsSeeding()) {
         await database.store.seed(normalizePath(filepath), data, seedOptions)
