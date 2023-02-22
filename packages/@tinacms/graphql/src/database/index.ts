@@ -27,7 +27,12 @@ import type {
 } from '@tinacms/datalayer'
 
 import type { DocumentNode } from 'graphql'
-import type { TinaSchema } from '@tinacms/schema-tools'
+import type {
+  CollectionTemplateable,
+  Templateable,
+  TinaCloudCollection,
+  TinaSchema,
+} from '@tinacms/schema-tools'
 import type {
   TinaCloudSchemaBase,
   CollectionFieldsWithNamespace,
@@ -245,6 +250,38 @@ export class Database {
     }
   }
 
+  public async getTemplateDetailsForFile(
+    collection: TinaCloudCollection<true>,
+    data: { [key: string]: unknown }
+  ) {
+    const tinaSchema = await this.getSchema()
+    const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+
+    let template: Templateable | undefined
+    if (templateInfo.type === 'object') {
+      template = templateInfo.template
+    }
+    if (templateInfo.type === 'union') {
+      if (hasOwnProperty(data, '_template')) {
+        template = templateInfo.templates.find(
+          (t) => lastItem(t.namespace) === data._template
+        )
+      } else {
+        throw new Error(
+          `Expected _template to be provided for document in an ambiguous collection`
+        )
+      }
+    }
+    if (!template) {
+      throw new Error(`Unable to determine template`)
+    }
+
+    return {
+      template: template,
+      info: templateInfo,
+    }
+  }
+
   public stringifyFile = async (
     filepath: string,
     data: { [key: string]: unknown }
@@ -255,27 +292,8 @@ export class Database {
       const tinaSchema = await this.getSchema()
       const collection = tinaSchema.getCollectionByFullPath(filepath)
 
-      const templateInfo = await tinaSchema.getTemplatesForCollectable(
-        collection
-      )
-      let template
-      if (templateInfo.type === 'object') {
-        template = templateInfo.template
-      }
-      if (templateInfo.type === 'union') {
-        if (hasOwnProperty(data, '_template')) {
-          template = templateInfo.templates.find(
-            (t) => lastItem(t.namespace) === data._template
-          )
-        } else {
-          throw new Error(
-            `Expected _template to be provided for document in an ambiguous collection`
-          )
-        }
-      }
-      if (!template) {
-        throw new Error(`Unable to determine template`)
-      }
+      const { template, info: templateInfo } =
+        await this.getTemplateDetailsForFile(collection, data)
       const field = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
@@ -740,6 +758,9 @@ const _indexContent = async (
     }
   }
 
+  const tinaSchema = await database.getSchema()
+  const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+
   await sequential(documentPaths, async (filepath) => {
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
@@ -753,7 +774,9 @@ const _indexContent = async (
         }
       )
 
-      replaceAliasesWithNames(collection, data)
+      const template = getTemplateForFile(templateInfo, data as any)
+
+      replaceAliasesWithNames(template, data)
 
       if (database.store.supportsSeeding()) {
         await database.store.seed(normalizePath(filepath), data, seedOptions)
@@ -793,4 +816,25 @@ const _deleteIndexContent = async (
   await sequential(documentPaths, async (filepath) => {
     database.store.delete(filepath, deleteOptions)
   })
+}
+
+const getTemplateForFile = (
+  templateInfo: CollectionTemplateable,
+  data: { [key: string]: unknown }
+) => {
+  if (templateInfo.type === 'object') {
+    return templateInfo.template
+  }
+  if (templateInfo.type === 'union') {
+    if (hasOwnProperty(data, '_template')) {
+      return templateInfo.templates.find(
+        (t) => lastItem(t.namespace) === data._template
+      )
+    } else {
+      throw new Error(
+        `Expected _template to be provided for document in an ambiguous collection`
+      )
+    }
+  }
+  throw new Error(`Unable to determine template`)
 }
