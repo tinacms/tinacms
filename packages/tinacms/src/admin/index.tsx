@@ -1,8 +1,4 @@
-/**
-
-*/
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   HashRouter as Router,
   Routes,
@@ -10,7 +6,7 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom'
-import { TinaCMS } from '@tinacms/toolkit'
+import { TinaCMS, useCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -26,6 +22,7 @@ import ScreenPage from './pages/ScreenPage'
 
 import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
+import { TinaAdminApi } from './api'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -104,10 +101,42 @@ const PreviewInner = ({ preview, config }) => {
   return <Preview url={url} iframeRef={ref} {...config} />
 }
 
+const CheckSchema = ({
+  schemaJson,
+  children,
+}: {
+  schemaJson?: unknown
+  children: JSX.Element
+}) => {
+  const cms = useCMS()
+  const api = new TinaAdminApi(cms)
+  const url = api.api.contentApiUrl
+  useEffect(() => {
+    if (schemaJson && cms) {
+      api
+        .checkGraphqlSchema({
+          localSchema: schemaJson,
+        })
+        .then((x) => {
+          if (x === false) {
+            cms.alerts.error(
+              'GraphQL Schema Mismatch. Editing may not work. If you just switched branches, try going back to the previous branch'
+            )
+          } else {
+            cms.alerts.info('GraphQL Schema is up to date')
+          }
+        })
+    }
+  }, [cms, JSON.stringify(schemaJson || {}), url])
+  return children
+}
+
 export const TinaAdmin = ({
   preview,
   config,
+  schemaJson,
 }: {
+  schemaJson?: any
   preview?: (props: object) => JSX.Element
   config: object
 }) => {
@@ -138,76 +167,80 @@ export const TinaAdmin = ({
             })
           const hasRouter = Boolean(collectionWithRouter)
           return (
-            <Router>
-              {/* @ts-ignore */}
-              <SetPreviewFlag preview={preview} cms={cms} />
-              <Routes>
-                {preview && (
+            <CheckSchema schemaJson={schemaJson}>
+              <Router>
+                {/* @ts-ignore */}
+                <SetPreviewFlag preview={preview} cms={cms} />
+                <Routes>
+                  {preview && (
+                    <Route
+                      path="/~/*"
+                      element={
+                        <PreviewInner config={config} preview={preview} />
+                      }
+                    />
+                  )}
                   <Route
-                    path="/~/*"
-                    element={<PreviewInner config={config} preview={preview} />}
-                  />
-                )}
-                <Route
-                  path="collections/:collectionName/new"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <CollectionCreatePage />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="collections/:collectionName/:templateName/new"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <CollectionCreatePage />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="collections/:collectionName/*"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <CollectionUpdatePage />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="collections/:collectionName"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <CollectionListPage />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="screens/:screenName"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <ScreenPage />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="logout"
-                  element={
-                    <DefaultWrapper cms={cms}>
-                      <LogoutRedirect />
-                    </DefaultWrapper>
-                  }
-                />
-                <Route
-                  path="/"
-                  element={
-                    <MaybeRedirectToPreview redirect={!!preview && hasRouter}>
+                    path="collections/:collectionName/new"
+                    element={
                       <DefaultWrapper cms={cms}>
-                        <DashboardPage />
+                        <CollectionCreatePage />
                       </DefaultWrapper>
-                    </MaybeRedirectToPreview>
-                  }
-                />
-              </Routes>
-            </Router>
+                    }
+                  />
+                  <Route
+                    path="collections/:collectionName/:templateName/new"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionCreatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/:collectionName/*"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionUpdatePage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="collections/:collectionName"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <CollectionListPage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="screens/:screenName"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <ScreenPage />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="logout"
+                    element={
+                      <DefaultWrapper cms={cms}>
+                        <LogoutRedirect />
+                      </DefaultWrapper>
+                    }
+                  />
+                  <Route
+                    path="/"
+                    element={
+                      <MaybeRedirectToPreview redirect={!!preview && hasRouter}>
+                        <DefaultWrapper cms={cms}>
+                          <DashboardPage />
+                        </DefaultWrapper>
+                      </MaybeRedirectToPreview>
+                    }
+                  />
+                </Routes>
+              </Router>
+            </CheckSchema>
           )
         } else {
           return (

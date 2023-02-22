@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import * as commander from 'commander'
 //@ts-ignore
 import { version, name } from '../package.json'
