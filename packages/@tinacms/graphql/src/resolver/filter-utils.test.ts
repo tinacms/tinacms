@@ -352,36 +352,6 @@ describe('resolveReferences', () => {
       `"Template nonExistentTemplate not found"`
     )
   })
-
-  it('resolves reference in object with template where filter references global template', async () => {
-    const filter = {
-      details: {
-        globalTemplate: {
-          author: {
-            authors: {
-              name: {
-                startsWith: 'Foo',
-              },
-            },
-          },
-        },
-      },
-    }
-    const fields: TinaFieldInner<false>[] = [
-      {
-        type: 'object',
-        name: 'details',
-        templates: ['globalTemplate'],
-      },
-    ]
-
-    const resolver = jest.fn()
-    await expect(
-      resolveReferences(filter, fields, resolver)
-    ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"Global templates not yet supported for queries"`
-    )
-  })
 })
 
 describe('collectConditionsForField', () => {
@@ -652,37 +622,5 @@ describe('collectConditionsForField', () => {
     collectConditionsForField(rootFieldName, field, filterNode, '', collector)
     expect(conditions).toHaveLength(1)
     expect(conditions[0]).toEqual(expectedCondition)
-  })
-
-  it('fails with global template', () => {
-    const conditions: FilterCondition[] = []
-    const collector = (condition: FilterCondition) => conditions.push(condition)
-    const parentFieldName = 'items'
-    const templateName = 'my-global-template'
-    const field: TinaFieldInner<false> = {
-      type: 'object',
-      name: parentFieldName,
-      list: true,
-      templates: [templateName],
-    }
-    const filterExpression: Record<string, any> = {
-      gte: 18,
-    }
-    const filterNode = {
-      [templateName]: {
-        age: filterExpression,
-      },
-    }
-    expect(() => {
-      collectConditionsForField(
-        parentFieldName,
-        field,
-        filterNode,
-        '',
-        collector
-      )
-    }).toThrowErrorMatchingInlineSnapshot(
-      `"Global templates not yet supported for queries"`
-    )
   })
 })

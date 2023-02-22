@@ -4,7 +4,7 @@
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner, Template } from '@tinacms/schema-tools'
+import type { RichTypeInner, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -52,7 +52,7 @@ export function stringifyProps(
 } {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.Content[] = []
-  let template: Template<false> | undefined | string
+  let template: RichTextTemplate<false> | undefined
   let useDirective = false
   let directiveType = 'leaf'
   template = parentField.templates?.find((template) => {

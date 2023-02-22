@@ -493,7 +493,7 @@ export class Builder {
     depth: number
   ) => {
     const selections = []
-    if (typeof collection.fields === 'object') {
+    if (collection.fields?.length > 0) {
       await sequential(collection.fields, async (x) => {
         const field = await this._buildFieldNodeForFragments(x, depth)
         selections.push(field)
@@ -522,7 +522,7 @@ export class Builder {
       case 'rich-text':
         return astBuilder.FieldNodeDefinition(field)
       case 'object':
-        if (typeof field.fields === 'object') {
+        if (field.fields?.length > 0) {
           const selections = []
           await sequential(field.fields, async (item) => {
             const field = await this._buildFieldNodeForFragments(item, depth)
@@ -536,7 +536,7 @@ export class Builder {
               ...filterSelections(selections),
             ],
           })
-        } else if (typeof field.templates === 'object') {
+        } else if (field.templates?.length > 0) {
           const selections = []
           await sequential(field.templates, async (tem) => {
             if (typeof tem === 'object') {
@@ -552,6 +552,7 @@ export class Builder {
             ],
           })
         }
+      // TODO: Should we throw here?
       case 'reference':
         if (depth >= this.maxDepth) return false
 

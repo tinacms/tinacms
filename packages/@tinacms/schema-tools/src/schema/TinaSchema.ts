@@ -90,17 +90,6 @@ export class TinaSchema {
       ) || []
     )
   }
-  public getGlobalTemplate = (templateName: string) => {
-    const globalTemplate = this.schema.templates?.find(
-      (template) => template.name === templateName
-    )
-    if (!globalTemplate) {
-      throw new Error(
-        `Expected to find global template of name ${templateName}`
-      )
-    }
-    return globalTemplate
-  }
   public getCollectionByFullPath = (filepath: string) => {
     const possibleCollections = this.getCollections().filter((collection) => {
       return filepath
@@ -349,10 +338,7 @@ export class TinaSchema {
       extraFields = collection.references
     }
     if (collection.fields) {
-      const template =
-        typeof collection.fields === 'string'
-          ? this.getGlobalTemplate(collection.fields)
-          : collection
+      const template = collection
 
       if (
         typeof template.fields === 'string' ||
@@ -376,10 +362,7 @@ export class TinaSchema {
           namespace: collection.namespace,
           type: 'union',
           templates: collection.templates.map((templateOrTemplateString) => {
-            const template =
-              typeof templateOrTemplateString === 'string'
-                ? this.getGlobalTemplate(templateOrTemplateString)
-                : templateOrTemplateString
+            const template = templateOrTemplateString
             return {
               ...template,
               fields: [...template.fields, ...extraFields],

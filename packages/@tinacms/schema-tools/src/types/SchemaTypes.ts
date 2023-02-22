@@ -29,7 +29,6 @@ export type UIField<F extends UIField = any, Shape = any> = {
 }
 
 export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
-  templates?: GlobalTemplate<WithNamespace>[]
   collections: TinaCloudCollection<WithNamespace>[]
   /**
    * @deprecated use `defineConfig` in a config.{js,ts} file instead
@@ -45,7 +44,6 @@ export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
  * createTinaSchema step
  */
 export interface TinaCloudSchemaWithNamespace {
-  templates?: GlobalTemplate<true>[]
   collections: TinaCloudCollection<true>[]
   config?: TinaCloudSchemaConfig
   namespace: string[]
@@ -155,12 +153,12 @@ export type TinaTemplate = Template<false>
 
 interface CollectionTemplatesInner<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | GlobalTemplate<WithNamespace>)[]
+  templates: Template<WithNamespace>[]
   fields?: undefined
 }
 export interface CollectionTemplatesWithNamespace<WithNamespace extends boolean>
   extends BaseCollection {
-  templates: (string | GlobalTemplate<WithNamespace>)[]
+  templates: Template<WithNamespace>[]
   fields?: undefined
   references?: ReferenceType<WithNamespace>[]
   namespace: WithNamespace extends true ? string[] : undefined
@@ -332,12 +330,29 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   ui?: UIField<any, string[]>
 }
 
+export type RichTextTemplate<WithNamespace extends boolean> =
+  Template<WithNamespace> & {
+    inline?: boolean
+    match?: {
+      start: string
+      end: string
+      name?: string
+    }
+  }
+
 export interface RichTypeWithNamespace extends TinaField {
   type: 'rich-text'
   namespace: string[]
   isBody?: boolean
   list?: boolean
-  templates?: (string | (Template<true> & { inline?: boolean }))[]
+  templates?: (Template<true> & {
+    inline?: boolean
+    match?: {
+      start: string
+      end: string
+      name?: string
+    }
+  })[]
 }
 
 export interface RichTypeInner extends TinaField {
@@ -350,7 +365,14 @@ export interface RichTypeInner extends TinaField {
         skipEscaping?: 'all' | 'html' | 'none'
       }
     | { type: 'mdx' }
-  templates?: (string | (Template<false> & { inline?: boolean }))[]
+  templates?: (Template<false> & {
+    inline?: boolean
+    match?: {
+      start: string
+      end: string
+      name?: string
+    }
+  })[]
 }
 
 export type ObjectType<WithNamespace extends boolean> =
@@ -390,15 +412,7 @@ interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
   visualSelector?: boolean
   required?: false
   list?: boolean
-  /**
-   * templates can either be an array of Tina templates or a reference to
-   * global template definition.
-   *
-   * You should use `templates` when your object can be any one of multiple shapes (polymorphic)
-   *
-   * You can only provide one of `fields` or `template`, but not both
-   */
-  templates: (string | Template<WithNamespace>)[]
+  templates: Template<WithNamespace>[]
   fields?: undefined
 }
 
@@ -415,15 +429,7 @@ interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
     defaultItem?: DefaultItem<Record<string, any>>
   }
   list?: boolean
-  /**
-   * templates can either be an array of Tina templates or a reference to
-   * global template definition.
-   *
-   * You should use `templates` when your object can be any one of multiple shapes (polymorphic)
-   *
-   * You can only provide one of `fields` or `template`, but not both
-   */
-  templates: (string | Template<WithNamespace>)[]
+  templates: Template<WithNamespace>[]
   fields?: undefined
   namespace: WithNamespace extends true ? string[] : undefined
 }
@@ -449,7 +455,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
    *
    * You can only provide one of `fields` or `templates`, but not both.
    */
-  fields: string | TinaFieldInner<WithNamespace>[]
+  fields: TinaFieldInner<WithNamespace>[]
   templates?: undefined
   list?: boolean
 }
@@ -472,35 +478,14 @@ interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
    *
    * You can only provide one of `fields` or `templates`, but not both.
    */
-  fields: string | TinaFieldInner<WithNamespace>[]
+  fields: TinaFieldInner<WithNamespace>[]
   templates?: undefined
   namespace: WithNamespace extends true ? string[] : undefined
   list?: boolean
 }
 
-/**
- * Global Templates are defined once, and can be used anywhere by referencing the 'name' of the template
- *
- * TODO: ensure we don't permit infite loop with self-references
- */
-export type GlobalTemplate<WithNamespace extends boolean> =
-  WithNamespace extends true
-    ? {
-        label: string
-        name: string
-        ui?: UICollection
-        fields: TinaFieldInner<WithNamespace>[]
-        namespace: WithNamespace extends true ? string[] : undefined
-      }
-    : {
-        label: string
-        name: string
-        ui?: UICollection
-        fields: TinaFieldInner<WithNamespace>[]
-      }
-
-export type TinaCloudTemplateBase = GlobalTemplate<false>
-export type TinaCloudTemplateEnriched = GlobalTemplate<true>
+export type TinaCloudTemplateBase = Template<false>
+export type TinaCloudTemplateEnriched = Template<true>
 /**
  * Templates allow you to define an object as polymorphic
  */
@@ -509,11 +494,6 @@ export type Template<WithNamespace extends boolean> = WithNamespace extends true
       label: string
       name: string
       fields: TinaFieldInner<WithNamespace>[]
-      match?: {
-        start: string
-        end: string
-        name?: string
-      }
       ui?: object | (UIField<any, any> & { previewSrc: string })
       namespace: WithNamespace extends true ? string[] : undefined
     }
@@ -522,11 +502,6 @@ export type Template<WithNamespace extends boolean> = WithNamespace extends true
       name: string
       ui?: object | (UIField<any, any> & { previewSrc: string })
       fields: TinaFieldInner<WithNamespace>[]
-      match?: {
-        start: string
-        end: string
-        name?: string
-      }
     }
 
 // Builder types
@@ -555,8 +530,8 @@ export type CollectionTemplateable =
 
 export type Collectable = {
   namespace: string[]
-  templates?: (string | Templateable)[]
-  fields?: string | TinaFieldEnriched[]
+  templates?: Templateable[]
+  fields?: TinaFieldEnriched[]
   references?: ReferenceType<true>[]
 }
 

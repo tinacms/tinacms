@@ -165,9 +165,6 @@ const validateCollection = async (
     templates = await sequential(
       validCollection.templates,
       async (template) => {
-        if (typeof template === 'string') {
-          throw new Error(`Global templates are not yet supported`)
-        }
         const fields = await sequential(template.fields, async (field) => {
           return validateField(field)
         })

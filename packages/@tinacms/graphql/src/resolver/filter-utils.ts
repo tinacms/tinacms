@@ -50,18 +50,7 @@ export const resolveReferences = async (
         }
       } else if (fieldDefinition.type === 'object') {
         if (fieldDefinition.templates) {
-          const globalTemplates = {}
-          for (const template of (fieldDefinition as ObjectType<false>)
-            .templates) {
-            if (typeof template === 'string') {
-              globalTemplates[template] = 1
-            }
-          }
           for (const templateName of Object.keys(filter[fieldKey])) {
-            if (templateName in globalTemplates) {
-              throw new Error('Global templates not yet supported for queries')
-            }
-
             const template = (
               fieldDefinition as ObjectType<false>
             ).templates.find(
@@ -123,17 +112,7 @@ const collectConditionsForObjectField = (
   collectCondition: (condition: FilterCondition) => void
 ) => {
   if (field.list && field.templates) {
-    const globalTemplates = {}
-    for (const template of field.templates) {
-      if (typeof template === 'string') {
-        globalTemplates[template] = 1
-      }
-    }
-
     for (const [filterKey, childFilterNode] of Object.entries(filterNode)) {
-      if (filterKey in globalTemplates) {
-        throw new Error('Global templates not yet supported for queries')
-      }
       const template = field.templates.find(
         (template) =>
           !(typeof template === 'string') && template.name === filterKey

@@ -4,12 +4,12 @@
 
 */
 
-import { Template } from '@tinacms/schema-tools'
+import { RichTextTemplate } from '@tinacms/schema-tools'
 import { replaceAll } from '.'
 
 export function parseShortcode(
   preprocessedString: string,
-  template: Template<false> & { inline?: boolean }
+  template: RichTextTemplate<false>
 ) {
   const match = template.match!
 

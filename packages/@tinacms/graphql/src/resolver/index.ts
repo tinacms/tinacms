@@ -176,10 +176,7 @@ export class Resolver {
 
   public buildObjectMutations = (fieldValue: any, field: Collectable) => {
     if (field.fields) {
-      const objectTemplate =
-        typeof field.fields === 'string'
-          ? this.tinaSchema.getGlobalTemplate(field.fields)
-          : field
+      const objectTemplate = field
       if (Array.isArray(fieldValue)) {
         return fieldValue.map((item) =>
           // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
@@ -204,9 +201,6 @@ export class Resolver {
             )
           }
           const templates = field.templates.map((templateOrTemplateName) => {
-            if (typeof templateOrTemplateName === 'string') {
-              return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
-            }
             return templateOrTemplateName
           })
           const [templateName] = Object.entries(item)[0]
@@ -232,9 +226,6 @@ export class Resolver {
           )
         }
         const templates = field.templates.map((templateOrTemplateName) => {
-          if (typeof templateOrTemplateName === 'string') {
-            return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
-          }
           return templateOrTemplateName
         })
         const [templateName] = Object.entries(fieldValue)[0]
