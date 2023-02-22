@@ -71,7 +71,6 @@ export type Option =
       label: string
       value: string
     }
-// import { TinaCMSSchema } from './schema2'
 import type React from 'react'
 
 type Meta = {
