@@ -3,7 +3,7 @@
 */
 
 import { z } from 'zod'
-import { TinaFieldInner } from '../types/SchemaTypes'
+import { TinaFieldInner } from '../types/index'
 import { findDuplicates } from '../util'
 
 const TypeName = [

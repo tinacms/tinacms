@@ -16,7 +16,6 @@ import {
   TinaCloudTemplateEnriched,
   TinaCloudCollection,
   validateTinaCloudSchemaConfig,
-  TinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
 const FIELD_TYPES: TinaFieldBase['type'][] = [
