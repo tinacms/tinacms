@@ -33,7 +33,6 @@ export class TinaAdminApi {
     const schema1 = schemaFromCloud
     const schema2 = buildSchema(print(localSchema))
     const diffOutput = await diff(schema1, schema2)
-    console.log('diffOutput', diffOutput)
     if (diffOutput.length > 0) {
       return false
     } else {
