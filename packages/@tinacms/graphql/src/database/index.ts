@@ -155,22 +155,6 @@ export class Database {
       const { collection, template } =
         tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
 
-      const replaceAliasesWithNames = (obj: any) => {
-        Object.keys(obj).forEach((key) => {
-          const field = template.fields.find((field) => field.alias === key)
-          // console.log('template_fields', template.fields)
-
-          if (field) {
-            obj[field.name] = obj[key]
-            delete obj[key]
-          }
-          if (typeof obj[key] === 'object') {
-            replaceAliasesWithNames(obj[key])
-          }
-        })
-      }
-      replaceAliasesWithNames(contentObject)
-
       const field = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
@@ -779,6 +763,23 @@ const _indexContent = async (
           frontmatterFormat: collection?.frontmatterFormat,
         }
       )
+
+      const replaceAliasesWithNames = (obj: any) => {
+        Object.keys(obj).forEach((key) => {
+          const field = collection.fields.find((field) => field.alias === key)
+          // console.log('template_fields', template.fields)
+
+          if (field) {
+            obj[field.name] = obj[key]
+            delete obj[key]
+          }
+          if (typeof obj[key] === 'object') {
+            replaceAliasesWithNames(obj[key])
+          }
+        })
+      }
+      replaceAliasesWithNames(data)
+
       if (database.store.supportsSeeding()) {
         await database.store.seed(normalizePath(filepath), data, seedOptions)
       }
