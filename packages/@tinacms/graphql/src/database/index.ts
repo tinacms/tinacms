@@ -195,9 +195,22 @@ export class Database {
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    const { stringifiedFile, payload, keepTemplateKey } =
-      await this.stringifyFile(filepath, data)
+    const dataFields = await this.getDataFields(filepath, data)
     const collection = await this.collectionForPath(filepath)
+
+    const templateInfo = await this.getTemplateDetailsForFile(
+      collection,
+      dataFields
+    )
+    const keepTemplateKey = templateInfo.info.type === 'union'
+    const stringifiedFile = await this.stringifyFile(
+      filepath,
+      dataFields,
+      collection,
+      templateInfo.template,
+      keepTemplateKey
+    )
+
     let collectionIndexDefinitions
     if (collection) {
       const indexDefinitions = await this.getIndexDefinitions()
@@ -206,7 +219,7 @@ export class Database {
     if (this.store.supportsSeeding()) {
       await this.bridge.put(normalizePath(filepath), stringifiedFile)
     }
-    await this.store.put(normalizePath(filepath), payload, {
+    await this.store.put(normalizePath(filepath), dataFields, {
       keepTemplateKey,
       collection: collection?.name,
       indexDefinitions: collectionIndexDefinitions,
@@ -216,26 +229,38 @@ export class Database {
   public put = async (
     filepath: string,
     data: { [key: string]: unknown },
-    collection?: string
+    collectionName?: string
   ) => {
     try {
       if (SYSTEM_FILES.includes(filepath)) {
         throw new Error(`Unexpected put for config file ${filepath}`)
       } else {
         let collectionIndexDefinitions
-        if (collection) {
+        if (collectionName) {
           const indexDefinitions = await this.getIndexDefinitions()
-          collectionIndexDefinitions = indexDefinitions?.[collection]
+          collectionIndexDefinitions = indexDefinitions?.[collectionName]
         }
 
-        const { stringifiedFile, payload, keepTemplateKey } =
-          await this.stringifyFile(filepath, data)
+        const dataFields = await this.getDataFields(filepath, data)
+        const collection = await this.collectionForPath(filepath)
+        const templateInfo = await this.getTemplateDetailsForFile(
+          collection,
+          dataFields
+        )
+        const keepTemplateKey = templateInfo.info.type === 'union'
+        const stringifiedFile = await this.stringifyFile(
+          filepath,
+          dataFields,
+          collection,
+          templateInfo.template,
+          keepTemplateKey
+        )
         if (this.store.supportsSeeding()) {
           await this.bridge.put(normalizePath(filepath), stringifiedFile)
         }
-        await this.store.put(normalizePath(filepath), payload, {
+        await this.store.put(normalizePath(filepath), dataFields, {
           keepTemplateKey,
-          collection: collection,
+          collection: collectionName,
           indexDefinitions: collectionIndexDefinitions,
         })
       }
@@ -244,7 +269,7 @@ export class Database {
       throw new TinaFetchError(`Error in PUT for ${filepath}`, {
         originalError: error,
         file: filepath,
-        collection: collection,
+        collection: collectionName,
         stack: error.stack,
       })
     }
@@ -282,7 +307,7 @@ export class Database {
     }
   }
 
-  public stringifyFile = async (
+  public getDataFields = async (
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
@@ -294,7 +319,7 @@ export class Database {
 
       const { template, info: templateInfo } =
         await this.getTemplateDetailsForFile(collection, data)
-      const field = template.fields.find((field) => {
+      const bodyField = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
@@ -303,35 +328,41 @@ export class Database {
         return false
       })
       let payload: { [key: string]: unknown } = {}
-      if (['md', 'mdx'].includes(collection.format) && field) {
+      if (['md', 'mdx'].includes(collection.format) && bodyField) {
         Object.entries(data).forEach(([key, value]) => {
-          if (key !== field.name) {
+          if (key !== bodyField.name) {
             payload[key] = value
           }
         })
-        payload['$_body'] = data[field.name]
+        payload['$_body'] = data[bodyField.name]
       } else {
         payload = data
       }
 
-      replaceKeysWithAliases(template, payload)
-
-      const extension = path.extname(filepath)
-      const stringifiedFile = stringifyFile(
-        payload,
-        extension,
-        templateInfo.type === 'union',
-        {
-          frontmatterFormat: collection?.frontmatterFormat,
-          frontmatterDelimiters: collection?.frontmatterDelimiters,
-        }
-      )
-      return {
-        stringifiedFile,
-        payload,
-        keepTemplateKey: templateInfo.type === 'union',
-      }
+      return payload
     }
+  }
+
+  public stringifyFile = async (
+    filepath: string,
+    payload: { [key: string]: unknown },
+    collection: TinaCloudCollection<true>,
+    template?: Templateable,
+    writeTemplateKey?: boolean
+  ) => {
+    const aliasedData = replaceKeysWithAliases(template, payload)
+
+    const extension = path.extname(filepath)
+    const stringifiedFile = stringifyFile(
+      aliasedData,
+      extension,
+      writeTemplateKey, //templateInfo.type === 'union',
+      {
+        frontmatterFormat: collection?.frontmatterFormat,
+        frontmatterDelimiters: collection?.frontmatterDelimiters,
+      }
+    )
+    return stringifiedFile
   }
 
   /**
@@ -344,7 +375,23 @@ export class Database {
 
   public flush = async (filepath: string) => {
     const data = await this.get<{ [key: string]: unknown }>(filepath)
-    const { stringifiedFile } = await this.stringifyFile(filepath, data)
+
+    const dataFields = await this.getDataFields(filepath, data)
+    const collection = await this.collectionForPath(filepath)
+
+    const templateInfo = await this.getTemplateDetailsForFile(
+      collection,
+      dataFields
+    )
+    const keepTemplateKey = templateInfo.info.type === 'union'
+    const stringifiedFile = await this.stringifyFile(
+      filepath,
+      dataFields,
+      collection,
+      templateInfo.template,
+      keepTemplateKey
+    )
+
     return stringifiedFile
   }
 
@@ -776,10 +823,12 @@ const _indexContent = async (
 
       const template = getTemplateForFile(templateInfo, data as any)
 
-      replaceAliasesWithNames(template, data)
-
       if (database.store.supportsSeeding()) {
-        await database.store.seed(normalizePath(filepath), data, seedOptions)
+        await database.store.seed(
+          normalizePath(filepath),
+          replaceAliasesWithNames(template, data),
+          seedOptions
+        )
       }
     } catch (error) {
       throw new TinaFetchError(`Unable to seed ${filepath}`, {
