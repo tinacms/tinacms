@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import React, { Suspense } from 'react'
 import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
@@ -10,6 +6,8 @@ import { Preview } from './preview'
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
 import config from 'TINA_IMPORT'
+// @ts-expect-error
+import schemaJson from 'SCHEMA_IMPORT'
 
 const RawEditor = React.lazy(() => import('./fields/rich-text'))
 
@@ -46,7 +44,7 @@ export const TinaAdminWrapper = () => {
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config} schema={schema} client={{ apiUrl: __API_URL__ }}>
       <SetPreview outputFolder={config.build.outputFolder} />
-      <TinaAdmin preview={Preview} config={config} />
+      <TinaAdmin preview={Preview} config={config} schemaJson={schemaJson} />
     </TinaCMS>
   )
 }
