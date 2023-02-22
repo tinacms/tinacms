@@ -1396,6 +1396,7 @@ importers:
 
   packages/tinacms:
     specifiers:
+      '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
       '@graphql-tools/utils': ^8.6.1
       '@headlessui/react': ^1.5.0
@@ -1436,6 +1437,7 @@ importers:
       yup: ^0.32.0
       zod: ^3.14.3
     dependencies:
+      '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
@@ -6818,6 +6820,20 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /@graphql-inspector/core/4.0.0_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-lgyc6ozmU5WbdlFx7Uftb96cS9ahYmu6hL41ZswK3KQcS6s7AM7zGu8gNDSdXtAGw8eARm8+Ql4+8J1+/72/+A==,
+      }
+    peerDependencies:
+      graphql: ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      dependency-graph: 0.11.0
+      graphql: 15.8.0
+      object-inspect: 1.12.3
+      tslib: 2.4.0
     dev: false
 
   /@graphql-tools/graphql-file-loader/7.4.0_graphql@15.8.0:
@@ -16640,7 +16656,7 @@ packages:
       is-shared-array-buffer: 1.0.2
       is-string: 1.0.7
       is-weakref: 1.0.2
-      object-inspect: 1.12.2
+      object-inspect: 1.12.3
       object-keys: 1.1.1
       object.assign: 4.1.4
       regexp.prototype.flags: 1.4.3
@@ -26117,10 +26133,10 @@ packages:
       }
     engines: { node: '>= 6' }
 
-  /object-inspect/1.12.2:
+  /object-inspect/1.12.3:
     resolution:
       {
-        integrity: sha512-z+cPxW0QGUp0mcqcsgQyLVRDoXFQbXOwBaqyF7VIgI4TWNQsDHrBpUQslRmIfAoYWdYzs6UlKJtB2XJpTaNSpQ==,
+        integrity: sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==,
       }
 
   /object-keys/1.1.1:
@@ -29351,7 +29367,7 @@ packages:
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.1.3
-      object-inspect: 1.12.2
+      object-inspect: 1.12.3
 
   /signal-exit/3.0.7:
     resolution:

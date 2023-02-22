@@ -1,8 +1,4 @@
-/**
-
-*/
-
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   HashRouter as Router,
   Routes,
@@ -26,6 +22,7 @@ import ScreenPage from './pages/ScreenPage'
 
 import { useEditState } from '@tinacms/sharedctx'
 import { Client } from '../internalClient'
+import { TinaAdminApi } from './api'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -107,7 +104,9 @@ const PreviewInner = ({ preview, config }) => {
 export const TinaAdmin = ({
   preview,
   config,
+  schemaJson,
 }: {
+  schemaJson?: any
   preview?: (props: object) => JSX.Element
   config: object
 }) => {
@@ -128,6 +127,18 @@ export const TinaAdmin = ({
   return (
     <GetCMS>
       {(cms: TinaCMS) => {
+        useEffect(() => {
+          if (schemaJson) {
+            const api = new TinaAdminApi(cms)
+            api
+              .checkGraphqlSchema({
+                localSchema: schemaJson,
+              })
+              .then((x) => {
+                console.log({ x })
+              })
+          }
+        }, [cms])
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true
         if (isTinaAdminEnabled) {
