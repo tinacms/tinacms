@@ -8,7 +8,7 @@
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import type { GraphQLConfig, RichTypeInner } from '../types'
-import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
 import { SlateNodeType, plateElements } from './parse'
 import type { Content, PhrasingContent } from 'mdast'
 import { resolveMediaCloudToRelative } from '../resolver/media-utils'
@@ -17,7 +17,7 @@ export const stringifyMDX = (
   value: unknown,
   field: RichTypeInner,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
@@ -50,7 +50,7 @@ const stringifyChildren = (
   children: any[],
   field,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) => {
   if (!children) {
     return []
@@ -67,7 +67,7 @@ export const stringify = (
   node: { type: typeof plateElements },
   field: RichTypeInner,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ): Content => {
   if (!node.type) {
     // Inline code cannot have other marks like bold and emphasis

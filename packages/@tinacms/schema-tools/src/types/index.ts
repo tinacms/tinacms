@@ -34,15 +34,13 @@ export type UIField<F extends UIField = any, Shape = any> = {
   defaultValue?: Shape
 }
 
-export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
+export interface TinaCloudSchema<WithNamespace extends boolean = false> {
   collections: TinaCloudCollection<WithNamespace>[]
   /**
    * @deprecated use `defineConfig` in a config.{js,ts} file instead
    */
   config?: Config
 }
-export type TinaCloudSchemaBase = TinaCloudSchema<false>
-export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
 
 type MaybeNamespace<WithNamespace extends boolean> = WithNamespace extends true
   ? { namespace: string[] }

@@ -46,7 +46,6 @@ export const createBuilder = async ({
  */
 export class Builder {
   private maxDepth: number
-  // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
   constructor(

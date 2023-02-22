@@ -12,7 +12,7 @@ import { isNull } from 'lodash'
 
 import type { RichTypeInner } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from '../types'
-import type { TinaCloudSchemaEnriched } from '@tinacms/schema-tools'
+import type { TinaCloudSchema } from '@tinacms/schema-tools'
 
 import { TinaField } from '..'
 import type { Content } from 'mdast'
@@ -22,7 +22,7 @@ export const parseMDX = (
   value: string,
   field: RichTypeInner,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
   return parseMDXInner(tree, field, graphQLconfig, schema)
@@ -80,7 +80,7 @@ export const parseMDXInner = (
   tree: any,
   field: RichTypeInner,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) => {
   // Delete useless position info
   visit(tree, (node) => {
@@ -157,7 +157,7 @@ const parseField = (
   field: TinaField,
   props,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) => {
   switch (field.type) {
     case 'boolean':
@@ -618,7 +618,7 @@ export const defaultNodeTypes: NodeTypes = {
 export default function remarkToSlate(
   node: MdxAstNode,
   graphQLconfig: GraphQLConfig,
-  schema: TinaCloudSchemaEnriched
+  schema: TinaCloudSchema<true>
 ) {
   const types = {
     ...defaultNodeTypes,
