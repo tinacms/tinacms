@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 type Doc = {
@@ -341,6 +332,22 @@ export type RichTextField = (
         name?: string
       }
     })[]
+    /**
+     * By default, Tina parses markdown with MDX, this is a more strict parser
+     * that allows you to use structured content inside markdown (via `templates`).
+     *
+     * Specify `"markdown"` if you're having problems with Tina parsing your content.
+     */
+    parser?:
+      | {
+          type: 'markdown'
+          /**
+           * Tina will escape entities like `<` and `[` by default. You can choose to turn
+           * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
+           */
+          skipEscaping?: 'all' | 'html' | 'none'
+        }
+      | { type: 'mdx' }
   }
 
 type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
@@ -477,7 +484,7 @@ export interface FieldCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
   /**
    * This format will be used to parse the markdown frontmatter
    */
@@ -504,7 +511,7 @@ export interface TemplateCollection {
   label?: string
   name: string
   path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'toml'
+  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
   ui?: UICollection
   /**
    * @deprecated - use `ui.defaultItem` on the each `template` instead
@@ -532,8 +539,8 @@ export interface Schema {
 
 export type TokenObject = {
   id_token: string
-  access_token: string
-  refresh_token: string
+  access_token?: string
+  refresh_token?: string
 }
 
 export interface Config<
@@ -542,8 +549,44 @@ export interface Config<
   DocumentCreatorCallback = undefined,
   Store = undefined
 > {
+  contentApiUrlOverride?: string
   admin?: {
     auth?: {
+      /**
+       * If you wish to use the local auth provider, set this to true
+       *
+       * This will take precedence over the customAuth option (if set to true)
+       *
+       **/
+      useLocalAuth?: boolean
+      /**
+       * If you are using a custom auth provider, set this to true
+       **/
+      customAuth?: boolean
+      /**
+       *  Used for getting the token from the custom auth provider
+       *
+       * @returns {Promise<TokenObject | null>}
+       **/
+      getToken?: () => Promise<TokenObject | null>
+      /**
+       *  Used to logout from the custom auth provider
+       *
+       **/
+      logout?: () => Promise<void>
+      /**
+       *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+       *
+       *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
+       *
+       **/
+      getUser?: () => Promise<any | null>
+      /**
+       * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
+       *
+       **/
+      authenticate?: () => Promise<any | null>
+
       onLogin?: (args: { token: TokenObject }) => Promise<void>
       onLogout?: () => Promise<void>
     }
@@ -577,6 +620,19 @@ export interface Config<
      */
     referenceDepth?: number
   }
+  /**
+   *
+   * Tina supports serving content from a separate Git repo. To enable this during local development, point
+   * this config at the root of the content repo.
+   *
+   * NOTE: Relative paths are fine to use here, but you should use an environment variable for this, as each developer on your team may have a different
+   * location to the path.
+   *
+   * ```ts
+   * localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+   * ```
+   */
+  localContentPath?: string
   /**
    * Tina is compiled as a single-page app and placed in the public directory
    * of your application.

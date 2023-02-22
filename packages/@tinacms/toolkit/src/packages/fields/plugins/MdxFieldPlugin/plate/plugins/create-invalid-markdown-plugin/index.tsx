@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import React from 'react'
@@ -44,10 +35,13 @@ export function ErrorMessage({ error }) {
         </h3>
         <div className="mt-2 max-w-xl text-sm text-red-800 space-y-4">
           <p>{message}</p>
-          <p>
-            To fix these errors, edit your content locally and then restart the
-            Tina server.
-          </p>
+          <p>To fix these errors, edit the content in raw-mode.</p>
+          <button
+            onClick={() => setRawMode(true)}
+            className="rounded-l-md border-r-0 shadow rounded-md bg-white cursor-pointer relative inline-flex items-center px-2 py-2 border border-gray-200 hover:text-white text-sm font-medium transition-all ease-out duration-150 hover:bg-gray-500 focus:z-10 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500"
+          >
+            Switch to raw-mode
+          </button>
         </div>
         {/* <div className="mt-5">
           <button

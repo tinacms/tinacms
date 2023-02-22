@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -91,15 +79,16 @@ export const RawEditor = (props: RichTextType) => {
   React.useEffect(() => {
     // @ts-ignore no access to the rich-text type from this package
     const parsedValue = parseMDX(value, field, (value) => value)
-    if (parsedValue.children[0]) {
-      if (parsedValue.children[0].type === 'invalid_markdown') {
-        const invalidMarkdown = parsedValue.children[0]
-        setError(invalidMarkdown)
-        return
-      }
+    if (
+      parsedValue.children[0] &&
+      parsedValue.children[0].type === 'invalid_markdown'
+    ) {
+      const invalidMarkdown = parsedValue.children[0]
+      setError(invalidMarkdown)
+    } else {
+      setError(null)
     }
     props.input.onChange(parsedValue)
-    setError(null)
   }, [JSON.stringify(debouncedValue)])
 
   React.useEffect(() => {
@@ -197,15 +186,16 @@ export const RawEditor = (props: RichTextType) => {
             fontSize: 14,
             lineHeight: 2,
             formatOnPaste: true,
-            lineNumbers: 'off',
+            lineNumbers: 'on',
+            lineNumbersMinChars: 2,
             formatOnType: true,
             fixedOverflowWidgets: true,
             // Takes too much horizontal space for iframe
             folding: false,
             renderLineHighlight: 'none',
             scrollbar: {
-              verticalScrollbarSize: 1,
-              horizontalScrollbarSize: 1,
+              verticalScrollbarSize: 4,
+              horizontalScrollbarSize: 4,
               // https://github.com/microsoft/monaco-editor/issues/2007#issuecomment-644425664
               alwaysConsumeMouseWheel: false,
             },

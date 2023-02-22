@@ -1,5 +1,13 @@
 # create-tina-app
 
+## 1.0.3
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+  - @tinacms/metrics@1.0.2
+
 ## 1.0.2
 
 ### Patch Changes

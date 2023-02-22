@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { build } from 'vite'
@@ -486,9 +477,17 @@ export const buildIt = async (entryPoint, packageJSON) => {
             !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
         ),
       })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
+        external,
+      })
     } else if (['@tinacms/mdx'].includes(packageJSON.name)) {
       const peerDeps = packageJSON.peerDependencies
-      const external = Object.keys({ ...peerDeps })
       await esbuild({
         entryPoints: [path.join(process.cwd(), entry)],
         bundle: true,
@@ -499,6 +498,15 @@ export const buildIt = async (entryPoint, packageJSON) => {
         target: 'node12',
         format: 'cjs',
         outfile: path.join(process.cwd(), 'dist', 'index.js'),
+        external: Object.keys({ ...peerDeps }),
+      })
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        target: 'es2020',
+        format: 'esm',
+        outfile: path.join(process.cwd(), 'dist', 'index.es.js'),
         external,
       })
       /**
@@ -523,6 +531,23 @@ export const buildIt = async (entryPoint, packageJSON) => {
         bundle: true,
         format: 'esm',
         outfile: appMDXPath,
+        external: Object.keys({ ...peerDeps }),
+      })
+      const sandboxMDXPath = path.join(
+        process.cwd(),
+        '..',
+        '..',
+        '..',
+        'examples',
+        'rich-text-sandbox',
+        'src',
+        'mdx.js'
+      )
+      await esbuild({
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        format: 'esm',
+        outfile: sandboxMDXPath,
         external,
       })
     } else {

@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.2
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
 ## 1.0.1
 
 ### Patch Changes

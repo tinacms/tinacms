@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import React, { useState } from 'react'
@@ -34,6 +25,7 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage'
 import ScreenPage from './pages/ScreenPage'
 
 import { useEditState } from '@tinacms/sharedctx'
+import { Client } from '../internalClient'
 
 const Redirect = () => {
   React.useEffect(() => {
@@ -139,6 +131,12 @@ export const TinaAdmin = ({
         const isTinaAdminEnabled =
           cms.flags.get('tina-admin') === false ? false : true
         if (isTinaAdminEnabled) {
+          const tinaClient: Client = cms.api?.tina
+          const collectionWithRouter =
+            tinaClient?.schema?.config?.collections.find((x) => {
+              return typeof x?.ui?.router === 'function'
+            })
+          const hasRouter = Boolean(collectionWithRouter)
           return (
             <Router>
               {/* @ts-ignore */}
@@ -201,7 +199,7 @@ export const TinaAdmin = ({
                 <Route
                   path="/"
                   element={
-                    <MaybeRedirectToPreview redirect={!!preview}>
+                    <MaybeRedirectToPreview redirect={!!preview && hasRouter}>
                       <DefaultWrapper cms={cms}>
                         <DashboardPage />
                       </DefaultWrapper>

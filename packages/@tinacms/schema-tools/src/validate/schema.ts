@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { z } from 'zod'
@@ -16,7 +7,15 @@ import { name } from './properties'
 import { findDuplicates } from '../util'
 import { TinaFieldZod } from './fields'
 import { tinaConfigZod } from './tinaCloudSchemaConfig'
-const FORMATS = ['json', 'md', 'markdown', 'mdx', 'toml', 'yaml'] as const
+const FORMATS = [
+  'json',
+  'md',
+  'markdown',
+  'mdx',
+  'toml',
+  'yaml',
+  'yml',
+] as const
 
 const Template = z
   .object({
@@ -39,7 +38,14 @@ const Template = z
 
 const TinaCloudCollectionBase = z.object({
   label: z.string().optional(),
-  name: name,
+  name: name.superRefine((val, ctx) => {
+    if (val === 'relativePath') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `name cannot be 'relativePath'. 'relativePath' is a reserved field name.`,
+      })
+    }
+  }),
   format: z.enum(FORMATS).optional(),
 })
 

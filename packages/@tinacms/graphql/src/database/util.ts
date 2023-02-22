@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import * as yup from 'yup'
@@ -72,6 +63,7 @@ export const stringifyFile = (
     case '.json':
       return JSON.stringify(strippedContent, null, 2)
     case '.yaml':
+    case '.yml':
       return yaml.safeDump(strippedContent)
     case '.toml':
       return toml.stringify(strippedContent as any)
@@ -115,6 +107,7 @@ export const parseFile = <T extends object>(
       }
       return toml.parse(content) as T
     case '.yaml':
+    case '.yml':
       if (!content) {
         return {} as T
       }
@@ -127,3 +120,11 @@ export const parseFile = <T extends object>(
 export type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
 
 export const normalizePath = (filepath: string) => filepath.replace(/\\/g, '/')
+
+export const atob = (b64Encoded: string) => {
+  return Buffer.from(b64Encoded, 'base64').toString()
+}
+
+export const btoa = (string: string) => {
+  return Buffer.from(string).toString('base64')
+}
