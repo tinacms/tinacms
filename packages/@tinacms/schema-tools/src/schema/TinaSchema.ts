@@ -2,7 +2,7 @@ import {
   TinaCloudSchemaEnriched,
   TinaCloudSchemaBase,
   TinaCloudCollection,
-  Templateable,
+  Template,
   Collectable,
   CollectionTemplateable,
   TinaFieldEnriched,
@@ -148,7 +148,7 @@ export class TinaSchema {
     templateName?: string
   ): {
     collection: TinaCloudCollection<true>
-    template: Templateable
+    template: Template<true>
   } => {
     let template
     const collection = this.getCollectionByFullPath(filepath)
@@ -187,7 +187,7 @@ export class TinaSchema {
   }: {
     data?: unknown
     collection: Collectable
-  }): Templateable => {
+  }): Template<true> => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':
@@ -334,9 +334,6 @@ export class TinaSchema {
     collection: Collectable
   ): CollectionTemplateable => {
     let extraFields: TinaFieldEnriched[] = []
-    if (collection.references) {
-      extraFields = collection.references
-    }
     if (collection.fields) {
       const template = collection
 
@@ -350,7 +347,6 @@ export class TinaSchema {
       return {
         namespace: collection.namespace,
         type: 'object',
-        // @ts-ignore FIXME: Templateable should have a 'name' property
         template: {
           ...template,
           fields: [...template.fields, ...extraFields],

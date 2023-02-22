@@ -24,7 +24,6 @@ import type {
   TinaFieldEnriched,
   CollectionTemplateable,
   Collectable,
-  Templateable,
   TinaFieldInner,
   Template,
 } from '@tinacms/schema-tools'
@@ -843,7 +842,7 @@ export class Builder {
     return this._buildTemplateFilter(t.template)
   }
 
-  private _buildTemplateFilter = async (template: Templateable) => {
+  private _buildTemplateFilter = async (template: Template<true>) => {
     const fields = []
     await sequential(template.fields, async (field) => {
       const f = await this._buildFieldFilter(field)
@@ -877,7 +876,7 @@ export class Builder {
     return this._buildTemplateMutation(t.template)
   }
 
-  private _buildTemplateMutation = async (template: Templateable) => {
+  private _buildTemplateMutation = async (template: Template<true>) => {
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(template.namespace),
       fields: await sequential(template.fields, (field) => {
@@ -1419,7 +1418,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
   }
 
   private _buildTemplateData = async (
-    { namespace, fields }: Templateable,
+    { namespace, fields }: Template<true>,
     extraFields = [],
     extraInterfaces = []
   ) => {

@@ -125,7 +125,6 @@ export const resolveField = (
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
           templates[lastItem(template.namespace)] = {
-            // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
             namespace: [...field.namespace, templateName],
@@ -159,7 +158,6 @@ export const resolveField = (
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
           templates[lastItem(template.namespace)] = {
-            // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
             inline: template.inline,

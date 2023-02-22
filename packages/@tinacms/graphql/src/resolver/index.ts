@@ -11,8 +11,7 @@ import { parseMDX, stringifyMDX } from '../mdx'
 
 import type {
   Collectable,
-  ReferenceTypeWithNamespace,
-  Templateable,
+  ReferenceType,
   TinaCloudCollection,
   TinaFieldEnriched,
   Template,
@@ -526,7 +525,7 @@ export class Resolver {
 
   private referenceResolver = async (
     filter: Record<string, object>,
-    fieldDefinition: ReferenceTypeWithNamespace
+    fieldDefinition: ReferenceType<true>
   ) => {
     const referencedCollection = this.tinaSchema.getCollection(
       fieldDefinition.collections[0]
@@ -681,7 +680,7 @@ export class Resolver {
 
   private buildFieldMutations = (
     fieldParams: FieldParams,
-    template: Templateable
+    template: Template<true>
   ) => {
     const accum: { [key: string]: unknown } = {}
     Object.entries(fieldParams).forEach(([fieldName, fieldValue]) => {

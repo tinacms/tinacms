@@ -32,8 +32,9 @@ import type {
   Collection,
   Template,
 } from '@tinacms/schema-tools/dist/types'
+import { TinaSchema } from '@tinacms/schema-tools'
 
-export type { Config, Schema, Collection, Template, SchemaField }
+export type { Config, Schema, Collection, Template, SchemaField, TinaSchema }
 
 /**
  * @deprecated use `SchemaField` instead
@@ -50,10 +51,6 @@ export type TinaTemplate = Template
 /**
  * @deprecated use `Template` instead
  */
-export type Templateable = Template
-/**
- * @deprecated use `Template` instead
- */
 export type TinaCloudTemplatebase = Template
 /**
  * @deprecated use `Collection` instead
@@ -63,10 +60,6 @@ export type TinaCloudCollection = Collection
  * @deprecated use `Collection` instead
  */
 export type TinaCollection = Collection
-/**
- * @deprecated use `Schema` instead
- */
-export type TinaSchema = Schema
 /**
  * @deprecated use `Schema` instead
  */

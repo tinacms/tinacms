@@ -44,16 +44,9 @@ export interface TinaCloudSchema<WithNamespace extends boolean, Store = any> {
 export type TinaCloudSchemaBase = TinaCloudSchema<false>
 export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
 
-/**
- * As part of the build process, each node is given a `path: string[]` key
- * to help with namespacing type names, this is added as part of the
- * createTinaSchema step
- */
-export interface TinaCloudSchemaWithNamespace {
-  collections: TinaCloudCollection<true>[]
-  config?: Config
-  namespace: string[]
-}
+type MaybeNamespace<WithNamespace extends boolean> = WithNamespace extends true
+  ? { namespace: string[] }
+  : {}
 
 export type TinaCloudCollection<WithNamespace extends boolean> =
   | CollectionFields<WithNamespace>
@@ -150,44 +143,59 @@ interface BaseCollection {
   match?: string
 }
 
-export type CollectionTemplates<WithNamespace extends boolean> =
-  WithNamespace extends true
-    ? CollectionTemplatesWithNamespace<WithNamespace>
-    : CollectionTemplatesInner<WithNamespace>
-
 export type TinaTemplate = Template<false>
+// const collections: TinaCloudCollectionEnriched[] = [{
+//   name: '',
+//   path: '',
+//   // namespace: [],
+//   fields: []
+// }]
+// const schema = {
+//   collections
+// }
+// new TinaSchema(schema)
 
-interface CollectionTemplatesInner<WithNamespace extends boolean>
-  extends BaseCollection {
+export type CollectionTemplates<WithNamespace extends boolean> = {
+  label?: string
+  name: string
+  path: string
+  defaultItem?: DefaultItem<Record<string, any>>
+  indexes?: TinaIndex[]
+  format?: FormatType
+  /**
+   * This format will be used to parse the markdown frontmatter
+   */
+  frontmatterFormat?: 'yaml' | 'toml' | 'json'
+  /**
+   * The delimiters used to parse the frontmatter.
+   */
+  frontmatterDelimiters?: [string, string] | string
+  ui?: UICollection
+  match?: string
   templates: Template<WithNamespace>[]
   fields?: undefined
-}
-export interface CollectionTemplatesWithNamespace<WithNamespace extends boolean>
-  extends BaseCollection {
-  templates: Template<WithNamespace>[]
-  fields?: undefined
-  references?: ReferenceType<WithNamespace>[]
-  namespace: WithNamespace extends true ? string[] : undefined
-}
+} & MaybeNamespace<WithNamespace>
 
-type CollectionFields<WithNamespace extends boolean> =
-  WithNamespace extends true
-    ? CollectionFieldsWithNamespace<WithNamespace>
-    : CollectionFieldsInner<WithNamespace>
-
-export interface CollectionFieldsWithNamespace<WithNamespace extends boolean>
-  extends BaseCollection {
+export type CollectionFields<WithNamespace extends boolean> = {
+  label?: string
+  name: string
+  path: string
+  defaultItem?: DefaultItem<Record<string, any>>
+  indexes?: TinaIndex[]
+  format?: FormatType
+  /**
+   * This format will be used to parse the markdown frontmatter
+   */
+  frontmatterFormat?: 'yaml' | 'toml' | 'json'
+  /**
+   * The delimiters used to parse the frontmatter.
+   */
+  frontmatterDelimiters?: [string, string] | string
+  ui?: UICollection
+  match?: string
   fields: TinaFieldInner<WithNamespace>[]
   templates?: undefined
-  references?: ReferenceType<WithNamespace>[]
-  namespace: string[]
-}
-
-interface CollectionFieldsInner<WithNamespace extends boolean>
-  extends BaseCollection {
-  fields: TinaFieldInner<WithNamespace>[]
-  templates?: undefined
-}
+} & MaybeNamespace<WithNamespace>
 
 export type TinaFieldInner<WithNamespace extends boolean> =
   | ScalarType<WithNamespace>
@@ -219,9 +227,8 @@ export interface TinaField {
   ui?: Record<string, any>
 }
 
-type ScalarType<WithNamespace extends boolean> = WithNamespace extends true
-  ? ScalarTypeWithNamespace
-  : ScalarTypeInner
+type ScalarType<WithNamespace extends boolean> = ScalarTypeInner &
+  MaybeNamespace<WithNamespace>
 
 export type Option =
   | string
@@ -234,11 +241,7 @@ type ScalarTypeInner = TinaField &
   TinaScalarField & {
     options?: Option[]
   }
-type ScalarTypeWithNamespace = TinaField &
-  TinaScalarField & {
-    options?: Option[]
-    namespace: string[]
-  }
+
 type TinaScalarField =
   | StringField
   | BooleanField
@@ -314,25 +317,29 @@ type ImageField =
       ui?: object | UIField<any, string[]>
     }
 
-export type ReferenceType<WithNamespace extends boolean> =
-  WithNamespace extends true ? ReferenceTypeWithNamespace : ReferenceTypeInner
+export type ReferenceType<WithNamespace extends boolean> = ReferenceTypeInner &
+  MaybeNamespace<WithNamespace>
 
-export type RichType<WithNamespace extends boolean> = WithNamespace extends true
-  ? RichTypeWithNamespace
-  : RichTypeInner
+export type RichType<WithNamespace extends boolean = false> =
+  RichTypeInner<WithNamespace> & MaybeNamespace<WithNamespace>
+
+export type RichTypeInner<WithNamespace extends boolean = false> = TinaField & {
+  type: 'rich-text'
+  isBody?: boolean
+  list?: boolean
+  parser?:
+    | {
+        type: 'markdown'
+        skipEscaping?: 'all' | 'html' | 'none'
+      }
+    | { type: 'mdx' }
+  templates?: RichTextTemplate<WithNamespace>[]
+}
+
 export interface ReferenceTypeInner extends TinaField {
   type: 'reference'
   list?: boolean
-  reverseLookup?: { label: string; name: string }
   collections: string[]
-  ui?: UIField<any, string[]>
-}
-export interface ReferenceTypeWithNamespace extends TinaField {
-  type: 'reference'
-  list?: boolean
-  collections: string[]
-  reverseLookup?: { label: string; name: string }
-  namespace: string[]
   ui?: UIField<any, string[]>
 }
 
@@ -345,49 +352,12 @@ export type RichTextTemplate<WithNamespace extends boolean> =
       name?: string
     }
   }
-
-export interface RichTypeWithNamespace extends TinaField {
-  type: 'rich-text'
-  namespace: string[]
-  isBody?: boolean
-  list?: boolean
-  templates?: (Template<true> & {
-    inline?: boolean
-    match?: {
-      start: string
-      end: string
-      name?: string
-    }
-  })[]
-}
-
-export interface RichTypeInner extends TinaField {
-  type: 'rich-text'
-  isBody?: boolean
-  list?: boolean
-  parser?:
-    | {
-        type: 'markdown'
-        skipEscaping?: 'all' | 'html' | 'none'
-      }
-    | { type: 'mdx' }
-  templates?: (Template<false> & {
-    inline?: boolean
-    match?: {
-      start: string
-      end: string
-      name?: string
-    }
-  })[]
-}
-
 export type ObjectType<WithNamespace extends boolean> =
   | ObjectTemplates<WithNamespace>
   | ObjectFields<WithNamespace>
 
-type ObjectTemplates<WithNamespace extends boolean> = WithNamespace extends true
-  ? ObjectTemplatesWithNamespace<WithNamespace>
-  : ObjectTemplatesInner<WithNamespace>
+type ObjectTemplates<WithNamespace extends boolean> =
+  ObjectTemplatesInner<WithNamespace> & MaybeNamespace<WithNamespace>
 
 type ObjectTemplatesInner<WithNamespace extends boolean> =
   | ObjectTemplatesInnerWithList<WithNamespace>
@@ -422,27 +392,8 @@ interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
   fields?: undefined
 }
 
-interface ObjectTemplatesWithNamespace<WithNamespace extends boolean>
-  extends TinaField {
-  type: 'object'
-  visualSelector?: boolean
-  required?: false
-  ui?: UIField<any, Record<string, any>> & {
-    itemProps?(item: Record<string, any>): {
-      key?: string
-      label?: string
-    }
-    defaultItem?: DefaultItem<Record<string, any>>
-  }
-  list?: boolean
-  templates: Template<WithNamespace>[]
-  fields?: undefined
-  namespace: WithNamespace extends true ? string[] : undefined
-}
-
-type ObjectFields<WithNamespace extends boolean> = WithNamespace extends true
-  ? InnerObjectFieldsWithNamespace<WithNamespace>
-  : InnerObjectFields<WithNamespace>
+type ObjectFields<WithNamespace extends boolean> =
+  InnerObjectFields<WithNamespace> & MaybeNamespace<WithNamespace>
 
 interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   type: 'object'
@@ -466,55 +417,23 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   list?: boolean
 }
 
-interface InnerObjectFieldsWithNamespace<WithNamespace extends boolean>
-  extends TinaField {
-  type: 'object'
-  visualSelector?: boolean
-  required?: false
-  ui?: UIField<any, Record<string, any>> & {
-    itemProps?(item: Record<string, any>): {
-      key?: string
-      label?: string
-    }
-    defaultItem?: DefaultItem<Record<string, any>>
-  }
-  /**
-   * fields can either be an array of Tina fields, or a reference to the fields
-   * of a global template definition.
-   *
-   * You can only provide one of `fields` or `templates`, but not both.
-   */
-  fields: TinaFieldInner<WithNamespace>[]
-  templates?: undefined
-  namespace: WithNamespace extends true ? string[] : undefined
-  list?: boolean
-}
-
 export type TinaCloudTemplateBase = Template<false>
 export type TinaCloudTemplateEnriched = Template<true>
 /**
  * Templates allow you to define an object as polymorphic
  */
-export type Template<WithNamespace extends boolean> = WithNamespace extends true
-  ? {
-      label: string
-      name: string
-      fields: TinaFieldInner<WithNamespace>[]
-      ui?: object | (UIField<any, any> & { previewSrc: string })
-      namespace: WithNamespace extends true ? string[] : undefined
-    }
-  : {
-      label: string
-      name: string
-      ui?: object | (UIField<any, any> & { previewSrc: string })
-      fields: TinaFieldInner<WithNamespace>[]
-    }
+export type Template<WithNamespace extends boolean = false> = {
+  label?: string
+  name: string
+  ui?: object | (UIField<any, any> & { previewSrc: string })
+  fields: TinaFieldInner<WithNamespace>[]
+} & MaybeNamespace<WithNamespace>
 
 // Builder types
 export type CollectionTemplateableUnion = {
   namespace: string[]
   type: 'union'
-  templates: Templateable[]
+  templates: Template<true>[]
 }
 export type CollectionTemplateableObject = {
   namespace: string[]
@@ -528,30 +447,22 @@ export type CollectionTemplateableObject = {
     defaultItem?: DefaultItem<Record<string, any>>
   }
   required?: false
-  template: Templateable
+  template: Template<true>
 }
 export type CollectionTemplateable =
   | CollectionTemplateableUnion
   | CollectionTemplateableObject
 
-export type Collectable = {
-  namespace: string[]
-  templates?: Templateable[]
-  fields?: TinaFieldEnriched[]
-  references?: ReferenceType<true>[]
-}
-
-export type Templateable = {
-  name: string
-  namespace: string[]
-  fields: TinaFieldEnriched[]
-  ui?: object
-}
+export type Collectable = Pick<
+  TinaCloudCollection<true>,
+  'namespace' | 'templates' | 'fields' | 'name'
+> & { label?: string }
+// export type Collectable = TinaCloudCollection<true>
 
 export type ResolveFormArgs = {
   collection: TinaCloudCollection<true>
   basename: string
-  template: Templateable
+  template: Template<true>
   schema: TinaSchema
 }
 

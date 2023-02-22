@@ -3,12 +3,7 @@
 */
 import { Client, Field, Form, FormOptions, TinaCMS } from 'tinacms'
 import { assign, createMachine, sendParent } from 'xstate'
-import {
-  resolveForm,
-  Templateable,
-  TinaFieldEnriched,
-  TinaSchema,
-} from 'tinacms'
+import { resolveForm, Template, TinaFieldEnriched, TinaSchema } from 'tinacms'
 
 export type FieldType = Field & TinaFieldEnriched
 export type FormValues = Record<string, unknown>
@@ -53,7 +48,7 @@ export const documentMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QAoC2BDAxgCwJYDswBKAOgNwBdd0AbXALwKgGIIB7Qs-ANzYGswJNFjyFS5KrQZMEBXpnRUOAbQAMAXUSgADm1iVcHLSAAeiAEwAWSyUsA2VQE4AzAHYArABoQAT0QAORxJHEMdLd1d7d3NXWIBfOO9hHAJiLgMpRnwWMAAnXLZckm0aRQAzQtQhDBSxdMk6LKhZHjYFJXw1TSQQXX0O4zMEKxt7JzcvXwtVd2DQu2d-ZwBGVWX-dwTEkHw2CDhjZNE0iWpGpmM+gyMeoctzbz8EVaDLUNdAtfvIze2j1NIuTA6AgTx0emu+EGiEszlUtlcdncdnMkyey3WtlC-mWjmW7ncTlRCSSNWOpDyBVylwhA1uMLhCKRKLRFlxcxC4UiSJikRJIH+Yhp-UMUPpz38j0Q6y2cSAA */
   createMachine(
     {
-      tsTypes: {} as import('./document-machine.typegen').Typegen0,
+      // tsTypes: {} as ,
       schema: {
         context: {} as ContextType,
         services: {} as {
@@ -174,14 +169,14 @@ export const documentMachine =
           const collection = schema.getCollection(
             node._internalSys.collection.name
           )
-          let template: Templateable
+          let template: Template
           if (collection.templates) {
             template = collection.templates.find((template) => {
               if (typeof template === 'string') {
                 throw new Error(`Global templates not supported`)
               }
               return template.name === node._internalSys.template
-            }) as Templateable
+            }) as Template
           } else {
             template = collection
           }

@@ -31,7 +31,8 @@ const FIELD_TYPES: TinaFieldBase['type'][] = [
 
 export const validateSchema = async (
   schema: TinaCloudSchemaBase
-): Promise<TinaCloudSchemaBase> => {
+  // TODO: maybe will need to add a return type back
+) => {
   const schema2: TinaCloudSchemaEnriched =
     addNamespaceToSchema<TinaCloudSchemaEnriched>(
       _.cloneDeep(schema) as unknown as TinaCloudSchemaEnriched
@@ -45,7 +46,6 @@ export const validateSchema = async (
     const config = validateTinaCloudSchemaConfig(schema2.config)
     return {
       collections,
-      // @ts-ignore
       config,
     }
   }
