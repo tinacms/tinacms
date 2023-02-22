@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import fs from 'fs-extra'
 import path from 'path'
 import { build, createServer, splitVendorChunkPlugin } from 'vite'
@@ -32,6 +28,7 @@ export const viteBuild = async ({
   const localBuild = l
   const node_env = JSON.stringify(process.env.NODE_ENV)
   const generatedPath = path.join(rootPath, '.tina', '__generated__')
+  const schemaImport = path.join(generatedPath, '_graphql.json')
   /**
    * The final location of the SPA assets
    * @example public/admin
@@ -108,6 +105,7 @@ export const viteBuild = async ({
 
   const alias = {
     TINA_IMPORT: configPrebuildPath,
+    SCHEMA_IMPORT: schemaImport,
   }
 
   // TODO: make this configurable
