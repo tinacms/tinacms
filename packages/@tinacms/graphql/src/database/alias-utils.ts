@@ -10,7 +10,7 @@ export const replaceAliasesWithNames = (template: Templateable, obj: any) => {
 
     const outputKey = fieldWithMatchingAlias?.name || key
     output[outputKey] =
-      typeof output[key] === 'object'
+      typeof obj[key] === 'object'
         ? replaceAliasesWithNames(template, obj[key])
         : obj[key]
   })
@@ -26,14 +26,11 @@ export const replaceKeysWithAliases = (
   Object.keys(obj).forEach((key) => {
     const field = template.fields.find((field) => field.name === key)
 
-    if (field?.alias) {
-      output[field.alias] =
-        field.type === 'object'
-          ? replaceKeysWithAliases(template, obj[key])
-          : obj[key]
-    } else {
-      output[key] = obj[key]
-    }
+    const outputKey = field?.alias || key
+    output[outputKey] =
+      typeof obj[key] === 'object'
+        ? replaceKeysWithAliases(template, obj[key])
+        : obj[key]
   })
   return output
 }
