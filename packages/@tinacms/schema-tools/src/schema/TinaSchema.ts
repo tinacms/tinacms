@@ -1,5 +1,5 @@
 import {
-  TinaCloudSchema,
+  Schema,
   Collection,
   Template,
   Collectable,
@@ -25,13 +25,11 @@ type Meta = {
  *
  */
 export class TinaSchema {
-  public schema: TinaCloudSchema<true>
+  public schema: Schema<true>
   /**
    * Create a schema class from a user defined schema object
    */
-  constructor(
-    public config: { version?: Version; meta?: Meta } & TinaCloudSchema
-  ) {
+  constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
   }

@@ -23,7 +23,7 @@ import { logger } from '../../logger'
 import type { Bridge } from '@tinacms/datalayer'
 import type { Database } from '@tinacms/graphql'
 import { buildAdmin, ConfigBuilder } from '../../buildTina'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 import { spin } from '../../utils/spinner'
 
 const buildLock = new AsyncLock()
@@ -49,7 +49,7 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema<false>
+    schema?: Schema<false>
   },
   next,
   {

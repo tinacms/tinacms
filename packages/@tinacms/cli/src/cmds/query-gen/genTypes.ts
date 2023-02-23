@@ -3,7 +3,7 @@
 */
 
 import { GraphQLSchema, printSchema } from 'graphql'
-import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools'
 
 import fs from 'fs-extra'
 import p from 'path'
@@ -19,7 +19,7 @@ export async function genClient(
     usingTs,
     rootPath,
   }: {
-    tinaSchema: TinaCloudSchema<false>
+    tinaSchema: Schema<false>
     usingTs?: boolean
     rootPath: string
   },

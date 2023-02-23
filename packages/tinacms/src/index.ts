@@ -27,11 +27,11 @@ export { NAMER, resolveForm } from '@tinacms/schema-tools'
 import type {
   Config,
   SchemaField,
-  Schema,
+  // Schema,
   // Collection,
   Template,
 } from '@tinacms/schema-tools/dist/types'
-import { TinaSchema, Collection } from '@tinacms/schema-tools'
+import { TinaSchema, Schema, Collection } from '@tinacms/schema-tools'
 
 export type { Config, Schema, Collection, Template, SchemaField, TinaSchema }
 

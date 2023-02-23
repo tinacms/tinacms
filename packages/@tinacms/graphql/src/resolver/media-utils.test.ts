@@ -2,7 +2,7 @@
 
 */
 
-import { TinaCloudSchema } from '@tinacms/schema-tools'
+import { Schema } from '@tinacms/schema-tools'
 import type { GraphQLConfig } from '../types'
 import {
   resolveMediaRelativeToCloud,
@@ -10,7 +10,7 @@ import {
 } from './media-utils'
 
 describe('resolveMedia', () => {
-  const schema: TinaCloudSchema<true> = {
+  const schema: Schema<true> = {
     config: {
       branch: '',
       clientId: '',
@@ -95,7 +95,7 @@ describe('resolveMedia', () => {
    * Missing `media: { tina: { ... }}` config should return the value, regardless of `useRelativeMedia`
    */
   it('persists value when no `tina` config is provided regardless of `useRelativeMedia`', () => {
-    const otherSchema: TinaCloudSchema<true> = {
+    const otherSchema: Schema<true> = {
       config: {
         branch: '',
         clientId: '',

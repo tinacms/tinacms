@@ -5,7 +5,7 @@ import { diff } from '@graphql-inspector/core'
 
 import type { TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
-import type { Collection, DocumentForm } from './types'
+import type { CollectionResponse, DocumentForm } from './types'
 
 export interface FilterArgs {
   filterField: string
@@ -123,7 +123,7 @@ export class TinaAdminApi {
 
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
-      const response: { collection: Collection } =
+      const response: { collection: CollectionResponse } =
         order === 'asc'
           ? await this.api.request(
               `#graphql

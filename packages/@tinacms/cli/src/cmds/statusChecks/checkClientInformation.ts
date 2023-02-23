@@ -9,7 +9,7 @@ import { diff } from '@graphql-inspector/core'
 
 import type { Bridge } from '@tinacms/datalayer'
 import type { Database } from '@tinacms/graphql'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 import { parseURL } from '@tinacms/schema-tools'
 import { ConfigBuilder } from '../../buildTina'
 
@@ -69,7 +69,7 @@ export const checkClientInfo = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema<false>
+    schema?: Schema<false>
     apiUrl: string
     isSelfHostedDatabase: boolean
   },
@@ -147,7 +147,7 @@ export const checkGraphqlSchema = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: TinaCloudSchema<false>
+    schema?: Schema<false>
     apiUrl: string
     isSelfHostedDatabase: boolean
   },

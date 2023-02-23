@@ -2,7 +2,7 @@
 
 */
 
-import { TinaCloudSchema } from '../types'
+import { Schema } from '../types'
 import { validateSchema } from '.'
 
 let consoleErrMock
@@ -12,7 +12,7 @@ beforeEach(() => {
 afterEach(() => {
   consoleErrMock.mockRestore()
 })
-const validSchemaWithTemplates: TinaCloudSchema<false> = {
+const validSchemaWithTemplates: Schema<false> = {
   collections: [
     {
       name: 'page',
@@ -30,7 +30,7 @@ const validSchemaWithTemplates: TinaCloudSchema<false> = {
   ],
 }
 
-const validSchema: TinaCloudSchema<false> = {
+const validSchema: Schema<false> = {
   collections: [
     {
       name: 'page',
@@ -219,7 +219,7 @@ const schemaWitNoName = {
     },
   ],
 }
-const schemaWithDuplicateName: TinaCloudSchema<false> = {
+const schemaWithDuplicateName: Schema<false> = {
   collections: [
     {
       name: 'foo',
@@ -234,7 +234,7 @@ const schemaWithDuplicateName: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithDuplicateTemplates: TinaCloudSchema<false> = {
+const schemaWithDuplicateTemplates: Schema<false> = {
   collections: [
     {
       name: 'foo',
@@ -255,7 +255,7 @@ const schemaWithDuplicateTemplates: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithDeeplyNestedError: TinaCloudSchema<false> = {
+const schemaWithDeeplyNestedError: Schema<false> = {
   collections: [
     {
       name: 'foo',
@@ -324,7 +324,7 @@ const schemaWithTemplatesAndFields = {
   ],
 }
 
-const schemaWithEmptyFields: TinaCloudSchema<false> = {
+const schemaWithEmptyFields: Schema<false> = {
   collections: [
     {
       name: 'foo',
@@ -335,7 +335,7 @@ const schemaWithEmptyFields: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
+const schemaWithEmptyTemplates: Schema<false> = {
   collections: [
     {
       name: 'foo',
@@ -345,7 +345,7 @@ const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
     },
   ],
 }
-const schemaWithInvalidFiledNesterUnderRichText: TinaCloudSchema<false> = {
+const schemaWithInvalidFiledNesterUnderRichText: Schema<false> = {
   collections: [
     {
       name: 'foo',

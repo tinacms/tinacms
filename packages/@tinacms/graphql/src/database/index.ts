@@ -10,7 +10,7 @@ import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import type {
   Collection,
-  TinaCloudSchema,
+  Schema,
   TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools'
@@ -495,7 +495,7 @@ export class Database {
     const _graphql = await this.bridge.get(graphqlPath)
     return JSON.parse(_graphql)
   }
-  public getTinaSchema = async (level?: Level): Promise<TinaCloudSchema> => {
+  public getTinaSchema = async (level?: Level): Promise<Schema> => {
     await this.initLevel()
     const schemaPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_schema.json`)
@@ -505,7 +505,7 @@ export class Database {
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
       )
-      .get(schemaPath)) as unknown as TinaCloudSchema
+      .get(schemaPath)) as unknown as Schema
   }
 
   public getSchema = async (level?: Level) => {

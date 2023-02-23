@@ -3,7 +3,7 @@
 */
 
 import type { GraphQLConfig } from '../types'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import type { Schema } from '@tinacms/schema-tools'
 
 /**
  * Strips away the Tina Cloud Asset URL from an `image` value
@@ -16,7 +16,7 @@ import type { TinaCloudSchema } from '@tinacms/schema-tools'
 export const resolveMediaCloudToRelative = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true },
-  schema: TinaCloudSchema<true>
+  schema: Schema<true>
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
@@ -53,7 +53,7 @@ export const resolveMediaCloudToRelative = (
 export const resolveMediaRelativeToCloud = (
   value: string,
   config: GraphQLConfig = { useRelativeMedia: true },
-  schema: TinaCloudSchema<true>
+  schema: Schema<true>
 ) => {
   if (config && value) {
     if (config.useRelativeMedia === true) {
@@ -79,7 +79,7 @@ const cleanUpSlashes = (path: string): string => {
   return ''
 }
 
-const hasTinaMediaConfig = (schema: TinaCloudSchema<true>): boolean => {
+const hasTinaMediaConfig = (schema: Schema<true>): boolean => {
   if (
     schema.config?.media?.tina?.publicFolder &&
     schema.config?.media?.tina?.mediaRoot

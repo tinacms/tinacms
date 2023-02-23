@@ -9,7 +9,7 @@ import * as yup from 'yup'
 
 import {
   TinaField,
-  TinaCloudSchema,
+  Schema,
   Collection,
   Template,
   validateTinaCloudSchemaConfig,
@@ -27,12 +27,12 @@ const FIELD_TYPES: TinaField<false>['type'][] = [
 ]
 
 export const validateSchema = async (
-  schema: TinaCloudSchema
+  schema: Schema
   // TODO: maybe will need to add a return type back
 ) => {
-  const schema2: TinaCloudSchema<true> = addNamespaceToSchema<
-    TinaCloudSchema<true>
-  >(_.cloneDeep(schema) as unknown as TinaCloudSchema<true>)
+  const schema2: Schema<true> = addNamespaceToSchema<Schema<true>>(
+    _.cloneDeep(schema) as unknown as Schema<true>
+  )
   const collections = await sequential(
     schema2.collections,
     async (collection) => validateCollection(collection)

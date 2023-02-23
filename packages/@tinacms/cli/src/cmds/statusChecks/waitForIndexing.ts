@@ -3,7 +3,7 @@
 */
 
 import Progress from 'progress'
-import { parseURL, TinaCloudSchema } from '@tinacms/schema-tools'
+import { parseURL, Schema } from '@tinacms/schema-tools'
 
 import { logger } from '../../logger'
 import { spin } from '../../utils/spinner'
@@ -30,7 +30,7 @@ class IndexFailedError extends Error {
 
 export const waitForDB = async (
   ctx: {
-    schema?: TinaCloudSchema<true>
+    schema?: Schema<true>
     apiUrl: string
     isSelfHostedDatabase?: boolean
   },

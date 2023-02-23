@@ -13,11 +13,7 @@ import {
 } from 'graphql'
 
 import gql from 'graphql-tag'
-import {
-  TinaSchema,
-  addNamespaceToSchema,
-  TinaCloudSchema,
-} from '@tinacms/schema-tools'
+import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -28,7 +24,7 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
-  schema?: TinaCloudSchema<false>
+  schema?: Schema<false>
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -719,7 +715,7 @@ export class LocalClient extends Client {
   constructor(
     props?: {
       customContentApiUrl?: string
-      schema?: TinaCloudSchema<false>
+      schema?: Schema<false>
     } & Omit<ServerOptions, 'clientId' | 'branch'>
   ) {
     const clientProps = {
