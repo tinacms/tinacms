@@ -41,7 +41,7 @@ import {
   SUBLEVEL_OPTIONS,
   LevelProxy,
 } from './level'
-import { replaceKeysWithAliases } from './alias-utils'
+import { replaceAliasesWithNames, replaceKeysWithAliases } from './alias-utils'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -1156,19 +1156,25 @@ const _indexContent = async (
       )
       const normalizedPath = normalizePath(filepath)
 
+      const aliasedData = replaceAliasesWithNames(
+        getTemplateForFile(templateInfo, data as any),
+        data
+      )
+
+      console.log('aliasedData', aliasedData)
       await enqueueOps([
         ...makeIndexOpsForDocument<Record<string, any>>(
           normalizedPath,
           collection?.name,
           collectionIndexDefinitions,
-          data,
+          aliasedData,
           'put',
           level
         ),
         {
           type: 'put',
           key: normalizedPath,
-          value: data as any,
+          value: aliasedData as any,
           sublevel: level.sublevel<string, Record<string, any>>(
             CONTENT_ROOT_PREFIX,
             SUBLEVEL_OPTIONS
