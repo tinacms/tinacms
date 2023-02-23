@@ -1,13 +1,419 @@
 import type { FC } from 'react'
-import {
-  SchemaField,
-  RichTextField,
-  ReferenceField,
-  ObjectField,
-  RichTextTemplate,
-} from '../types'
+import type React from 'react'
 
-export type { RichTextTemplate }
+type Meta = {
+  active?: boolean
+  dirty?: boolean
+  error?: any
+}
+
+type Component<Type, List> = (props: {
+  field: SchemaField & { namespace: string[] }
+  input: {
+    /**
+     * The full name of the field, for fields nested inside object
+     * fields, this will be the full path:
+     *
+     * `myObject.0.title`
+     */
+    name: string
+    onBlur: (event?: React.FocusEvent<Type>) => void
+    /**
+     * The value provided will be saved to the form so it
+     * should match the configured type:
+     *
+     * `input.onChange('some string')`
+     */
+    onChange: (event: React.ChangeEvent<Type>) => void
+    onFocus: (event?: React.FocusEvent<Type>) => void
+    type?: string
+    value: List extends true ? Type[] : Type
+  }
+  meta: Meta
+}) => any
+
+type UIField<Type, List extends boolean> = {
+  max?: List extends true ? number : never
+  min?: List extends true ? number : never
+  /**
+   * Override the label from parent object
+   */
+  label?: string
+  /**
+   * Override the description from parent object
+   */
+  description?: string
+  /**
+   * A React component which will be used in the Tina form. Be sure
+   * to import React into the config file.
+   *
+   * Note: Any Tailwind classes provided here will be compiled as part
+   * of the Tina stylesheet
+   *
+   * eg:
+   * ```tsx
+   *  component: (props) => {
+   *    const { input, field } = props
+   *    return (
+   *      <div className="my-4">
+   *        <label
+   *          htmlFor={input.name}
+   *          className="block text-sm font-medium"
+   *        >
+   *          {field.name}
+   *        </label>
+   *        <div className="mt-1">
+   *          <input
+   *            id={input.name}
+   *            className="py-2 px-4 block"
+   *            type="text"
+   *            {...input}
+   *          />
+   *        </div>
+   *      </div>
+   *    )
+   *  }
+   * ```
+   *
+   * Note: If the form has already been registered with the cms, you
+   * can provide it's name here (eg. `textarea`)
+   */
+  component?: Component<Type, List> | string | null
+  /**
+   * Optional: Prepare data for use in the component. This is useful
+   * if you don't have access to the component directly
+   */
+  parse?: (
+    value: List extends true ? Type[] : Type,
+    name: string,
+    field: Field
+  ) => List extends true ? Type[] : Type
+  /**
+   * Optional: Prepare data for saving. This is useful
+   * if you don't have access to the component directly
+   */
+  format?: (
+    value: Type,
+    name: string,
+    field: Field
+  ) => List extends true ? Type[] : Type
+  /**
+   * Optional: Return undefined when valid. Return a string or an object when there are errors.
+   *
+   * ```ts
+   * validate: (value) => {
+   *   if(value.length > 40){
+   *      return 'Title cannot be more than 40 characters long'
+   *   }
+   * }
+   * ```
+   */
+  validate?(
+    value: List extends true ? Type[] : Type,
+    allValues: { [key: string]: any },
+    meta: Meta,
+    field: UIField<Type, List>
+  ): (List extends true ? Type[] : Type) | undefined | void
+  /**
+   * @deprecated use `defaultItem` at the collection level instead
+   */
+  defaultValue?: List extends true ? Type[] : Type
+}
+type FieldGeneric<
+  Type,
+  List extends boolean | undefined,
+  ExtraFieldUIProps = {}
+> = List extends true
+  ? {
+      list: true
+      ui?: UIField<Type, true> & ExtraFieldUIProps
+    }
+  : List extends false
+  ? {
+      list?: false
+      ui?: UIField<Type, false> & ExtraFieldUIProps
+    }
+  : {
+      list?: undefined
+      ui?: UIField<Type, false> & ExtraFieldUIProps
+    }
+
+export interface BaseField {
+  label?: string | boolean
+  required?: boolean
+  indexed?: boolean
+  name: string
+  description?: string
+}
+
+export type StringField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, true>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'string'
+    isTitle?: boolean
+    isBody?: boolean
+    options?: Option[]
+  }
+
+export type NumberField = (
+  | FieldGeneric<number, undefined>
+  | FieldGeneric<number, true>
+  | FieldGeneric<number, false>
+) &
+  BaseField & {
+    type: 'number'
+  }
+
+export type BooleanField = (
+  | FieldGeneric<boolean, undefined>
+  | FieldGeneric<boolean, true>
+  | FieldGeneric<boolean, false>
+) &
+  BaseField & {
+    type: 'boolean'
+  }
+
+type DateFormatProps = {
+  /**
+   * Customize the way the format is rendered
+   * ```
+   * dateFormat: 'YYYY MM DD'
+   * ```
+   */
+  dateFormat?: string
+  timeFormat?: string
+}
+export type DateTimeField = (
+  | FieldGeneric<string, undefined, DateFormatProps>
+  | FieldGeneric<string, true, DateFormatProps>
+  | FieldGeneric<string, false, DateFormatProps>
+) &
+  BaseField & {
+    type: 'datetime'
+  }
+
+export type ImageField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, true>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'image'
+  }
+
+export type ReferenceField = (
+  | FieldGeneric<string, undefined>
+  | FieldGeneric<string, false>
+) &
+  BaseField & {
+    type: 'reference'
+    /**
+     * The names of the collections this field can use as a reference
+     * ```ts
+     * {
+     *   type: 'reference',
+     *   name: 'author',
+     *   collections: ['author'],
+     * }
+     * ```
+     */
+    collections: string[]
+  }
+
+type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
+export type RichTextField<WithNamespace extends boolean = false> = (
+  | FieldGeneric<RichTextAst, undefined>
+  | FieldGeneric<RichTextAst, false>
+) &
+  BaseField & {
+    type: 'rich-text'
+    /**
+     * When using Markdown or MDX formats, this field's value
+     * will be saved to the markdown body, while all other values
+     * will be stored as frontmatter
+     */
+    isBody?: boolean
+    templates?: RichTextTemplate<WithNamespace>[]
+    /**
+     * By default, Tina parses markdown with MDX, this is a more strict parser
+     * that allows you to use structured content inside markdown (via `templates`).
+     *
+     * Specify `"markdown"` if you're having problems with Tina parsing your content.
+     */
+    parser?:
+      | {
+          type: 'markdown'
+          /**
+           * Tina will escape entities like `<` and `[` by default. You can choose to turn
+           * off all escaping, or specify HTML, so `<div>` will not be turned into `\<div>`
+           */
+          skipEscaping?: 'all' | 'html' | 'none'
+        }
+      | { type: 'mdx' }
+  }
+export type RichTextTemplate<WithNamespace extends boolean> =
+  Template<WithNamespace> & {
+    inline?: boolean
+    /**
+     * If you have some custom shortcode logic in your markdown,
+     * you can specify it in the 'match' property and Tina will
+     * handle it as if it were a jsx element:
+     *
+     * ```
+     * # This is my markdown, it uses some custom shortcode
+     * syntax {{ myshortcode title="hello!" }}.
+     *
+     * {
+     *   match: {
+     *     start: "{{"
+     *     end: "}}"
+     *   }
+     * }
+     * ```
+     */
+    match?: {
+      start: string
+      end: string
+      name?: string
+    }
+  }
+
+type ObjectListUiProps = {
+  /**
+   * Override the properties passed to the field
+   * component. This is mostly useful for controlling
+   * the display value via callback on `itemProps.label`
+   */
+  itemProps?(item: Record<string, any>): {
+    key?: string
+    /**
+     * Control the display value when object
+     * items are shown in a compact list, eg:
+     *
+     * ```ts
+     * itemProps: (values) => ({
+     *   label: values?.title || 'Showcase Item',
+     * }),
+     * ```
+     */
+    label?: string
+  }
+  /**
+   * The value will be used when a new object is inserted, eg:
+   *
+   * ```ts
+   * {
+   *   title: "My Headline",
+   *   description: "Some description"
+   * }
+   * ```
+   *
+   * Note: when supplying a value for a `rich-text` field, you must supply
+   * the the value as an object.
+   * ```ts
+   * {
+   *   title: "My Headline",
+   *   description: "Some description"
+   *   // This is field a rich-text field
+   *   body: {
+   *     type: "root",
+   *     children: [{
+   *       type: "p",
+   *       children: [{
+   *         type: "text",
+   *         value: "This is some placeholder text"
+   *       }]
+   *     }]
+   *   }
+   * }
+   * ```
+   *
+   */
+  defaultItem?: DefaultItem<Record<string, any>>
+}
+
+type ObjectUiProps = {
+  visualSelector?: boolean
+}
+
+export type ObjectField<WithNamespace extends boolean = false> =
+  | (
+      | FieldGeneric<string, undefined, ObjectUiProps>
+      | FieldGeneric<string, true, ObjectUiProps>
+      | FieldGeneric<string, false, ObjectUiProps>
+    ) &
+      MaybeNamespace<WithNamespace> &
+      BaseField &
+      (
+        | {
+            type: 'object'
+            fields: Field<WithNamespace>[]
+            templates?: undefined
+            ui?: Template['ui']
+          }
+        | {
+            type: 'object'
+            fields?: undefined
+            templates: Template<WithNamespace>[]
+          }
+      )
+
+type Field<WithNamespace extends boolean = false> = (
+  | StringField
+  | NumberField
+  | BooleanField
+  | DateTimeField
+  | ImageField
+  | ReferenceField
+  | RichTextField<WithNamespace>
+  | ObjectField<WithNamespace>
+) &
+  MaybeNamespace<WithNamespace>
+
+type MaybeNamespace<WithNamespace extends boolean = false> =
+  WithNamespace extends true ? { namespace: string[] } : {}
+// Aliasing to SchemaField as Field is taken by internal use (which is exported)
+type SchemaField<WithNamespace extends boolean = false> = Field<WithNamespace>
+
+export type { SchemaField }
+
+export type Template<WithNamespace extends boolean = false> = {
+  label?: string | boolean
+  name: string
+  ui?: {
+    /**
+     * Override the properties passed to the field
+     * component. This is mostly useful for controlling
+     * the display value via callback on `itemProps.label`
+     */
+    itemProps?(item: Record<string, any>): {
+      key?: string
+      /**
+       * Control the display value when object
+       * items are shown in a compact list, eg:
+       *
+       * ```ts
+       * itemProps: (values) => ({
+       *   label: values?.title || 'Showcase Item',
+       * }),
+       * ```
+       */
+      label?: string | boolean // FIXME: this is reused is places that don't accept a boolean
+    }
+    defaultItem?: DefaultItem<Record<string, any>>
+    /**
+     * When used in relation to the `visualSelector`,
+     * provide an image URL to be used as the preview
+     * in the blocks selector menu
+     */
+    previewSrc?: string
+  }
+  fields: Field<WithNamespace>[]
+} & MaybeNamespace<WithNamespace>
+
 export type ObjectType<WithNamespace extends boolean = false> =
   ObjectField<WithNamespace>
 export type RichTextType<WithNamespace extends boolean = false> =
@@ -196,26 +602,26 @@ export type TinaCMSConfig<
   Store = undefined
 > = Config<CMSCallback, FormifyCallback, DocumentCreatorCallback, Store>
 
-type UIField<F extends UIField = any, Shape = any> = {
-  // name?: string
-  label?: string | boolean
-  description?: string
-  // TODO type component
-  component?: FC<any> | string | null
-  // inlineComponent?: FC<any>
-  parse?: (value: Shape, name: string, field: F) => any
-  format?: (value: Shape, name: string, field: F) => any
-  validate?(
-    value: Shape,
-    allValues: any,
-    meta: any,
-    field: UIField<F, Shape>
-  ): string | object | undefined | void
-  /**
-   * @deprecated use `defaultItem` at the collection level instead
-   */
-  defaultValue?: Shape
-}
+// type UIField<F extends UIField = any, Shape = any> = {
+//   // name?: string
+//   label?: string | boolean
+//   description?: string
+//   // TODO type component
+//   component?: FC<any> | string | null
+//   // inlineComponent?: FC<any>
+//   parse?: (value: Shape, name: string, field: F) => any
+//   format?: (value: Shape, name: string, field: F) => any
+//   validate?(
+//     value: Shape,
+//     allValues: any,
+//     meta: any,
+//     field: UIField<F, Shape>
+//   ): string | object | undefined | void
+//   /**
+//    * @deprecated use `defaultItem` at the collection level instead
+//    */
+//   defaultValue?: Shape
+// }
 
 /** @deprecated use Schema instead */
 export type TinaCloudSchema<WithNamespace extends boolean = false> =
@@ -233,10 +639,6 @@ export interface Schema<WithNamespace extends boolean = false> {
    */
   config?: Config
 }
-
-type MaybeNamespace<WithNamespace extends boolean> = WithNamespace extends true
-  ? { namespace: string[] }
-  : {}
 
 export type Collection<WithNamespace extends boolean = false> =
   | FieldCollection<WithNamespace>
@@ -402,15 +804,15 @@ export type UITemplate = {
   previewSrc?: string
 }
 
-/**
- * Templates allow you to define an object as polymorphic
- */
-export type Template<WithNamespace extends boolean = false> = {
-  label?: string | boolean
-  name: string
-  ui?: UITemplate
-  fields: TinaField<WithNamespace>[]
-} & MaybeNamespace<WithNamespace>
+// /**
+//  * Templates allow you to define an object as polymorphic
+//  */
+// export type Template<WithNamespace extends boolean = false> = {
+//   label?: string | boolean
+//   name: string
+//   ui?: UITemplate
+//   fields: TinaField<WithNamespace>[]
+// } & MaybeNamespace<WithNamespace>
 
 // Builder types
 export type CollectionTemplateableUnion = {
@@ -422,7 +824,7 @@ export type CollectionTemplateableObject = {
   namespace: string[]
   type: 'object'
   visualSelector?: boolean
-  ui?: UIField<any, Record<string, any>> & {
+  ui?: UIField<any, any> & {
     itemProps?(item: Record<string, any>): {
       key?: string
       label?: string | boolean

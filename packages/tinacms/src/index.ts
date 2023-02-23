@@ -24,15 +24,9 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
-import type {
-  // Config,
-  SchemaField,
-  // Schema,
-  // Collection,
-  // Template,
-} from '@tinacms/schema-tools/dist/types'
 import {
   TinaSchema,
+  SchemaField,
   Config,
   Schema,
   Collection,
