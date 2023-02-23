@@ -1,5 +1,5 @@
 import { collectConditionsForField, resolveReferences } from './filter-utils'
-import { ReferenceType, TinaFieldInner } from '@tinacms/schema-tools'
+import { ReferenceType, TinaField } from '@tinacms/schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
 describe('resolveReferences', () => {
@@ -16,7 +16,7 @@ describe('resolveReferences', () => {
         eq: 'My Blog Post',
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'reference',
         name: 'author',
@@ -69,7 +69,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'reference',
         name: 'author',
@@ -107,7 +107,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'reference',
         name: 'author',
@@ -131,7 +131,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'reference',
         name: 'author',
@@ -184,7 +184,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'object',
         name: 'details',
@@ -242,7 +242,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'object',
         name: 'details',
@@ -310,7 +310,7 @@ describe('resolveReferences', () => {
         },
       },
     }
-    const fields: TinaFieldInner<false>[] = [
+    const fields: TinaField[] = [
       {
         type: 'object',
         name: 'details',
@@ -344,7 +344,7 @@ describe('collectConditionsForField', () => {
     const conditions: FilterCondition[] = []
     const collector = (condition: FilterCondition) => conditions.push(condition)
     const fieldName = 'age'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'number',
       name: fieldName,
     }
@@ -369,7 +369,7 @@ describe('collectConditionsForField', () => {
     const collector = (condition: FilterCondition) => conditions.push(condition)
     const parentFieldName = 'items'
     const childFieldName = 'age'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: parentFieldName,
       list: true,
@@ -389,7 +389,7 @@ describe('collectConditionsForField', () => {
     const expectedCondition: FilterCondition = {
       filterPath: `${parentFieldName}[*].${childFieldName}`,
       filterExpression: {
-        _type: (field.fields[0] as TinaFieldInner<false>).type,
+        _type: (field.fields[0] as TinaField).type,
         ...filterExpression,
       },
     }
@@ -403,7 +403,7 @@ describe('collectConditionsForField', () => {
     const collector = (condition: FilterCondition) => conditions.push(condition)
     const parentFieldName = 'items'
     const childFieldName = 'age'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: parentFieldName,
       list: false,
@@ -423,7 +423,7 @@ describe('collectConditionsForField', () => {
     const expectedCondition: FilterCondition = {
       filterPath: `${parentFieldName}.${childFieldName}`,
       filterExpression: {
-        _type: (field.fields[0] as TinaFieldInner<false>).type,
+        _type: (field.fields[0] as TinaField).type,
         ...filterExpression,
       },
     }
@@ -439,7 +439,7 @@ describe('collectConditionsForField', () => {
     const childFieldName = 'person'
     const grandchildFieldName = 'age'
     const type = 'number'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: parentFieldName,
       list: false,
@@ -481,7 +481,7 @@ describe('collectConditionsForField', () => {
     const collector = (condition: FilterCondition) => conditions.push(condition)
     const parentFieldName = 'items'
     const childFieldName = 'age'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: parentFieldName,
       list: true,
@@ -519,7 +519,7 @@ describe('collectConditionsForField', () => {
     const childFieldName = 'age'
     const templateName = 'features'
     const childType = 'number'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: parentFieldName,
       list: true,
@@ -564,7 +564,7 @@ describe('collectConditionsForField', () => {
     const childFieldName = 'age'
     const templateName = 'features'
     const childType = 'number'
-    const field: TinaFieldInner<false> = {
+    const field: TinaField = {
       type: 'object',
       name: rootFieldName,
       fields: [

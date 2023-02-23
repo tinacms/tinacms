@@ -14,7 +14,7 @@ export interface CreateClientProps {
   owner?: string
   repo?: string
   branch?: string
-  schema?: Schema<false>
+  schema?: Schema
   apiUrl?: string
 }
 export const createClient = ({

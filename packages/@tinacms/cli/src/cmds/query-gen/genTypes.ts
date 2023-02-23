@@ -19,7 +19,7 @@ export async function genClient(
     usingTs,
     rootPath,
   }: {
-    tinaSchema: Schema<false>
+    tinaSchema: Schema
     usingTs?: boolean
     rootPath: string
   },

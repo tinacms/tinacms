@@ -12,7 +12,7 @@ beforeEach(() => {
 afterEach(() => {
   consoleErrMock.mockRestore()
 })
-const validSchemaWithTemplates: Schema<false> = {
+const validSchemaWithTemplates: Schema = {
   collections: [
     {
       name: 'page',
@@ -30,7 +30,7 @@ const validSchemaWithTemplates: Schema<false> = {
   ],
 }
 
-const validSchema: Schema<false> = {
+const validSchema: Schema = {
   collections: [
     {
       name: 'page',
@@ -219,7 +219,7 @@ const schemaWitNoName = {
     },
   ],
 }
-const schemaWithDuplicateName: Schema<false> = {
+const schemaWithDuplicateName: Schema = {
   collections: [
     {
       name: 'foo',
@@ -234,7 +234,7 @@ const schemaWithDuplicateName: Schema<false> = {
   ],
 }
 
-const schemaWithDuplicateTemplates: Schema<false> = {
+const schemaWithDuplicateTemplates: Schema = {
   collections: [
     {
       name: 'foo',
@@ -255,7 +255,7 @@ const schemaWithDuplicateTemplates: Schema<false> = {
   ],
 }
 
-const schemaWithDeeplyNestedError: Schema<false> = {
+const schemaWithDeeplyNestedError: Schema = {
   collections: [
     {
       name: 'foo',
@@ -324,7 +324,7 @@ const schemaWithTemplatesAndFields = {
   ],
 }
 
-const schemaWithEmptyFields: Schema<false> = {
+const schemaWithEmptyFields: Schema = {
   collections: [
     {
       name: 'foo',
@@ -335,7 +335,7 @@ const schemaWithEmptyFields: Schema<false> = {
   ],
 }
 
-const schemaWithEmptyTemplates: Schema<false> = {
+const schemaWithEmptyTemplates: Schema = {
   collections: [
     {
       name: 'foo',
@@ -345,7 +345,7 @@ const schemaWithEmptyTemplates: Schema<false> = {
     },
   ],
 }
-const schemaWithInvalidFiledNesterUnderRichText: Schema<false> = {
+const schemaWithInvalidFiledNesterUnderRichText: Schema = {
   collections: [
     {
       name: 'foo',

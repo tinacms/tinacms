@@ -31,7 +31,7 @@ jest.setTimeout(10000)
 
 export const setup = async (
   rootPath: string,
-  schema: Schema<false>,
+  schema: Schema,
   level: Level
 ): Promise<{
   database: Database
@@ -93,7 +93,7 @@ export type Fixture =
 
 export const setupFixture = async (
   rootPath: string,
-  schema: Schema<false>,
+  schema: Schema,
   level: Level,
   fixture: Fixture,
   suffix?: string,
@@ -197,7 +197,7 @@ export const setupFixture = async (
 
 export const setupFixture2 = async (
   rootPath: string,
-  schema: Schema<false>,
+  schema: Schema,
   level: Level,
   fixture: Fixture,
   suffix?: string,

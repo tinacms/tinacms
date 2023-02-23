@@ -52,7 +52,7 @@ export function stringifyProps(
 } {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.Content[] = []
-  let template: RichTextTemplate<false> | undefined
+  let template: RichTextTemplate | undefined
   let useDirective = false
   let directiveType = 'leaf'
   template = parentField.templates?.find((template) => {

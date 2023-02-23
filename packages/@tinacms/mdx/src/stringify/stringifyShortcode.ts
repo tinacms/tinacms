@@ -9,7 +9,7 @@ import { replaceAll } from '../parse'
 
 export function stringifyShortcode(
   preprocessedString: string,
-  template: RichTextTemplate<false>
+  template: RichTextTemplate
 ) {
   const match = template.match!
   const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')

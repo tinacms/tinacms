@@ -69,7 +69,7 @@ export const checkClientInfo = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: Schema<false>
+    schema?: Schema
     apiUrl: string
     isSelfHostedDatabase: boolean
   },
@@ -147,7 +147,7 @@ export const checkGraphqlSchema = async (
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: Schema<false>
+    schema?: Schema
     apiUrl: string
     isSelfHostedDatabase: boolean
   },

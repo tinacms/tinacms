@@ -559,7 +559,7 @@ export class Resolver {
 
   private async resolveFilterConditions(
     filter: Record<string, Record<string, object>>,
-    fields: TinaField<false>[],
+    fields: TinaField[],
     collectionName
   ) {
     const conditions: FilterCondition[] = []
@@ -612,19 +612,19 @@ export class Resolver {
       if (collection.fields) {
         conditions = await this.resolveFilterConditions(
           args.filter as Record<string, Record<string, object>>,
-          collection.fields as TinaField<false>[],
+          collection.fields as TinaField[],
           collection.name
         )
       } else if (collection.templates) {
         for (const templateName of Object.keys(args.filter)) {
-          const template = (collection.templates as Template<false>[]).find(
+          const template = (collection.templates as Template[]).find(
             (template) => template.name === templateName
           )
 
           if (template) {
             conditions = await this.resolveFilterConditions(
               args.filter[templateName],
-              template.fields as TinaField<false>[],
+              template.fields as TinaField[],
               `${collection.name}.${templateName}`
             )
           } else {

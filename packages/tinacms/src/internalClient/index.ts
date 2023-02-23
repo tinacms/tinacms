@@ -24,7 +24,7 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
-  schema?: Schema<false>
+  schema?: Schema
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -715,7 +715,7 @@ export class LocalClient extends Client {
   constructor(
     props?: {
       customContentApiUrl?: string
-      schema?: Schema<false>
+      schema?: Schema
     } & Omit<ServerOptions, 'clientId' | 'branch'>
   ) {
     const clientProps = {

@@ -51,9 +51,7 @@ export const resolveReferences = async (
       } else if (fieldDefinition.type === 'object') {
         if (fieldDefinition.templates) {
           for (const templateName of Object.keys(filter[fieldKey])) {
-            const template = (
-              fieldDefinition as ObjectType<false>
-            ).templates.find(
+            const template = (fieldDefinition as ObjectType).templates.find(
               (template) =>
                 !(typeof template === 'string') &&
                 template.name === templateName
@@ -106,7 +104,7 @@ const collectConditionsForChildFields = (
 
 const collectConditionsForObjectField = (
   fieldName: string,
-  field: ObjectType<false>,
+  field: ObjectType,
   filterNode: Record<string, object>,
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void
@@ -116,7 +114,7 @@ const collectConditionsForObjectField = (
       const template = field.templates.find(
         (template) =>
           !(typeof template === 'string') && template.name === filterKey
-      ) as Template<false>
+      ) as Template
       const jsonPath = `${fieldName}[?(@._template=="${filterKey}")]`
       const filterPath = pathExpression
         ? `${pathExpression}.${jsonPath}`

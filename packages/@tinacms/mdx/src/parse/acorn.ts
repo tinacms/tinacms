@@ -13,14 +13,14 @@ import type { TinaField } from '@tinacms/schema-tools'
 import { MDX_PARSE_ERROR_MSG, parseMDX } from '.'
 
 type TinaStringField =
-  | Extract<TinaField<false>, { type: 'string' }>
-  | Extract<TinaField<false>, { type: 'datetime' }>
-  | Extract<TinaField<false>, { type: 'image' }>
-  | Extract<TinaField<false>, { type: 'reference' }>
+  | Extract<TinaField, { type: 'string' }>
+  | Extract<TinaField, { type: 'datetime' }>
+  | Extract<TinaField, { type: 'image' }>
+  | Extract<TinaField, { type: 'reference' }>
 
 export const extractAttributes = (
   attributes: (MdxJsxAttribute | MdxJsxExpressionAttribute)[],
-  fields: TinaField<false>[],
+  fields: TinaField[],
   imageCallback: (image: string) => string
 ) => {
   const properties: Record<string, unknown> = {}
@@ -51,7 +51,7 @@ export const extractAttributes = (
 }
 const extractAttribute = (
   attribute: MdxJsxAttribute,
-  field: TinaField<false>,
+  field: TinaField,
   imageCallback: (image: string) => string
 ) => {
   switch (field.type) {
@@ -99,7 +99,7 @@ const extractAttribute = (
 
 const extractScalar = <
   T extends Extract<
-    TinaField<false>,
+    TinaField,
     | { type: 'string' }
     | { type: 'boolean' }
     | { type: 'number' }
@@ -124,7 +124,7 @@ const extractScalar = <
   }
 }
 
-const extractObject = <T extends Extract<TinaField<false>, { type: 'object' }>>(
+const extractObject = <T extends Extract<TinaField, { type: 'object' }>>(
   attribute: ExpressionStatement,
   field: T
 ) => {
@@ -142,7 +142,7 @@ const extractObject = <T extends Extract<TinaField<false>, { type: 'object' }>>(
 }
 const extractObjectExpression = (
   expression: ObjectExpression,
-  field: Extract<TinaField<false>, { type: 'object' }>
+  field: Extract<TinaField, { type: 'object' }>
 ) => {
   const properties: Record<string, unknown> = {}
   expression.properties?.forEach((property) => {
@@ -154,7 +154,7 @@ const extractObjectExpression = (
 }
 
 const getField = (
-  objectField: Extract<TinaField<false>, { type: 'object' }>,
+  objectField: Extract<TinaField, { type: 'object' }>,
   name: string
 ) => {
   if (objectField.fields) {
@@ -167,7 +167,7 @@ const getField = (
 
 const extractKeyValue = (
   property: Property,
-  parentField: Extract<TinaField<false>, { type: 'object' }>
+  parentField: Extract<TinaField, { type: 'object' }>
 ) => {
   assertType(property.key, 'Identifier')
   const key = property.key.name

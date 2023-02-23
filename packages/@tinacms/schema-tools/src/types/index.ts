@@ -255,7 +255,7 @@ export type RichTextField<WithNamespace extends boolean = false> = (
         }
       | { type: 'mdx' }
   }
-export type RichTextTemplate<WithNamespace extends boolean> =
+export type RichTextTemplate<WithNamespace extends boolean = false> =
   Template<WithNamespace> & {
     inline?: boolean
     /**
@@ -628,7 +628,7 @@ interface BaseCollection {
   match?: string
 }
 
-type TemplateCollection<WithNamespace extends boolean> = {
+type TemplateCollection<WithNamespace extends boolean = false> = {
   /**
    * In most cases, just using fields is enough, however templates can be used when there are multiple variants of the same collection or object. For example in a "page" collection there might be a need for a marketing page template and a content page template, both under the collection "page".
    *
@@ -639,7 +639,7 @@ type TemplateCollection<WithNamespace extends boolean> = {
 } & BaseCollection &
   MaybeNamespace<WithNamespace>
 
-type FieldCollection<WithNamespace extends boolean> = {
+type FieldCollection<WithNamespace extends boolean = false> = {
   /**
    * Fields define the shape of the content and the user input.
    *
@@ -792,36 +792,36 @@ export type TinaCloudSchemaConfig<DeleteMe = undefined> = Config
 export type TinaCloudSchema<WithNamespace extends boolean = false> =
   Schema<WithNamespace>
 /** @deprecated use Schema instead */
-export type TinaCloudSchemaBase = TinaCloudSchema<false>
+export type TinaCloudSchemaBase = TinaCloudSchema
 /** @deprecated use Schema instead */
 export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
 /** @deprecated use Schema instead */
 export type TinaCloudSchemaWithNamespace = TinaCloudSchema<true>
 /** @deprecated use Collection instead */
-export type TinaCloudCollection<WithNamespace extends boolean> =
+export type TinaCloudCollection<WithNamespace extends boolean = false> =
   Collection<WithNamespace>
 /** @deprecated use Collection instead */
-export type TinaCloudCollectionBase = TinaCloudCollection<false>
+export type TinaCloudCollectionBase = TinaCloudCollection
 /** @deprecated use Collection instead */
 export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
 /** @deprecated use Template instead */
-export type TinaTemplate = Template<false>
+export type TinaTemplate = Template
 /** @deprecated use Template instead */
-export type TinaCloudTemplateBase = Template<false>
+export type TinaCloudTemplateBase = Template
 /** @deprecated use Template instead */
 export type TinaCloudTemplateEnriched = Template<true>
 /** @deprecated use Collection instead */
 export type CollectionFieldsWithNamespace = FieldCollection<true>
 /** @deprecated use Collection instead */
-export type CollectionTemplates = TemplateCollection<false>
+export type CollectionTemplates = TemplateCollection
 /** @deprecated use Collection instead */
 export type CollectionTemplatesWithNamespace = TemplateCollection<true>
 /** @deprecated use Template instead */
 export type GlobalTemplate = Template
 /** @deprecated use TinaField instead */
-export type TinaFieldBase = TinaField<false>
+export type TinaFieldBase = TinaField
 /** @deprecated use TinaField instead */
-export type TinaFieldInner = TinaField<false>
+export type TinaFieldInner = TinaField
 /** @deprecated use TinaField instead */
 export type TinaFieldEnriched = TinaField<true>
 /** @deprecated use ObjectField instead */
@@ -834,7 +834,7 @@ export type RichTextType<WithNamespace extends boolean = false> =
 export type ReferenceType<WithNamespace extends boolean = false> =
   ReferenceField & MaybeNamespace<WithNamespace>
 /** @deprecated use ReferenceField instead */
-export type ReferenceTypeInner = ReferenceType<false>
+export type ReferenceTypeInner = ReferenceType
 /** @deprecated use ReferenceField instead */
 export type ReferenceTypeWithNamespace = ReferenceType<true>
 /** @deprecated use RichTextField instead */

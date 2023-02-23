@@ -49,7 +49,7 @@ export async function startServer(
     database: Database
     bridge: Bridge
     usingTs: boolean
-    schema?: Schema<false>
+    schema?: Schema
   },
   next,
   {

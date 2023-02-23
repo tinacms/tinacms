@@ -9,7 +9,7 @@ import { replaceAll } from '.'
 
 export function parseShortcode(
   preprocessedString: string,
-  template: RichTextTemplate<false>
+  template: RichTextTemplate
 ) {
   const match = template.match!
 

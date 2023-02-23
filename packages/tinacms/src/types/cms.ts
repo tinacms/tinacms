@@ -35,7 +35,7 @@ interface BaseProviderProps {
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
-  schema?: Schema<false>
+  schema?: Schema
 }
 
 // TODO: This type can probably be deprecated and removed

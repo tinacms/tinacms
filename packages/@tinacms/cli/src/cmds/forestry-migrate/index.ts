@@ -69,7 +69,7 @@ export const generateCollections = async ({
   const forestryYaml = yaml.load(forestryConfig.toString())
 
   const forestrySchema = parseSections({ val: forestryYaml })
-  const collections: Collection<false>[] = []
+  const collections: Collection[] = []
 
   const sections = forestrySchema.sections
 
@@ -147,7 +147,7 @@ export const generateCollections = async ({
             }
           })
           // Add the collection to the list of collections with its templates
-          const c: Collection<false> = {
+          const c: Collection = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -198,7 +198,7 @@ export const generateCollections = async ({
               console.error(e)
             }
           })
-          const c: Collection<false> = {
+          const c: Collection = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -223,7 +223,7 @@ export const generateCollections = async ({
         )
         break
 
-      // const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+      // const fields: TinaFieldInner[] = [BODY_FIELD]
       // // Go though all templates
       // for (let currentTemplateName of templateMap.keys()) {
       //   const { templateObj, fields: additionalFields } =
@@ -239,7 +239,7 @@ export const generateCollections = async ({
 
       // const dir = path.dirname(section.path)
 
-      // const c: Collection<false> = {
+      // const c: Collection = {
       //   label: section.label,
       //   name: stringifyLabel(section.label),
       //   path: dir,

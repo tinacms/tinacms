@@ -4,7 +4,7 @@
 
 import { Schema } from '../../../types'
 
-const tinaSchema: Schema<false> = {
+const tinaSchema: Schema = {
   collections: [
     {
       label: 'Movie',

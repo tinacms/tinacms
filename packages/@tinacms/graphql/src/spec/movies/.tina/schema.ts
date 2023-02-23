@@ -5,7 +5,7 @@
 import { Schema } from '../../../types'
 import { richBody } from './body'
 
-const tinaSchema: Schema<false> = {
+const tinaSchema: Schema = {
   collections: [
     {
       label: 'Movie',

@@ -15,7 +15,7 @@ import {
   validateTinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
-const FIELD_TYPES: TinaField<false>['type'][] = [
+const FIELD_TYPES: TinaField['type'][] = [
   'string',
   'number',
   'boolean',
@@ -26,10 +26,7 @@ const FIELD_TYPES: TinaField<false>['type'][] = [
   'rich-text',
 ]
 
-export const validateSchema = async (
-  schema: Schema
-  // TODO: maybe will need to add a return type back
-) => {
+export const validateSchema = async (schema: Schema) => {
   const schema2: Schema<true> = addNamespaceToSchema<Schema<true>>(
     _.cloneDeep(schema) as unknown as Schema<true>
   )
