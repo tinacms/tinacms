@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.3.4
+
+### Patch Changes
+
+- 0e6093a8d: Fixes branch switcher accessed from the branch banner, adds indexing status to branch list, improves UI clarity.
+
 ## 1.3.3
 
 ### Patch Changes
