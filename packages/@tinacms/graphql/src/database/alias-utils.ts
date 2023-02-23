@@ -3,8 +3,10 @@ import { Templateable, TinaFieldEnriched } from '@tinacms/schema-tools/src'
 export const replaceAliasesWithNames = (template: Templateable, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      const foo = getTemplateForData(template, item).fields
-      return _replaceAliasesWithNames(foo, item)
+      return _replaceAliasesWithNames(
+        getTemplateForData(template, item).fields,
+        item
+      )
     })
   } else {
     return _replaceAliasesWithNames(
@@ -66,15 +68,33 @@ export const replaceKeysWithAliases = (
   template: Templateable,
   obj: any
 ): object => {
+  if ((template as any).list) {
+    return (obj as any[]).map((item) => {
+      return _replaceKeysWithAliases(
+        getTemplateForData(template, item).fields,
+        item
+      )
+    })
+  } else {
+    return _replaceKeysWithAliases(
+      getTemplateForData(template, obj).fields,
+      obj
+    )
+  }
+}
+
+const _replaceKeysWithAliases = (
+  fields: TinaFieldEnriched[],
+  obj: any
+): object => {
   const output: object = {}
   Object.keys(obj).forEach((key) => {
-    const field = template.fields.find((field) => field.name === key)
+    const field = fields.find((field) => field.name === key)
 
     const outputKey = field?.alias || key
-    //TODO - Handle nested aliases better. We should instead check on object fieldtype, as we're likely not handling arrays properly
     output[outputKey] =
-      typeof obj[key] === 'object'
-        ? replaceKeysWithAliases(template, obj[key])
+      field?.type === 'object'
+        ? replaceKeysWithAliases(field as any, obj[key])
         : obj[key]
   })
   return output
