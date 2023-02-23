@@ -1,5 +1,5 @@
 import { collectConditionsForField, resolveReferences } from './filter-utils'
-import { ReferenceTypeInner, TinaFieldInner } from '@tinacms/schema-tools'
+import { ReferenceType, TinaFieldInner } from '@tinacms/schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
 describe('resolveReferences', () => {
@@ -32,10 +32,7 @@ describe('resolveReferences', () => {
     await resolveReferences(
       filter,
       fields,
-      (
-        filterParam: Record<string, object>,
-        fieldDefinition: ReferenceTypeInner
-      ) => {
+      (filterParam: Record<string, object>, fieldDefinition: ReferenceType) => {
         expect(filterParam).toEqual(filter)
         expect(fieldDefinition).toEqual(fields[0])
         const values = [filePath]
@@ -83,10 +80,7 @@ describe('resolveReferences', () => {
     await resolveReferences(
       filter,
       fields,
-      (
-        filterParam: Record<string, object>,
-        fieldDefinition: ReferenceTypeInner
-      ) => {
+      (filterParam: Record<string, object>, fieldDefinition: ReferenceType) => {
         expect(filterParam).toEqual(filter)
         expect(fieldDefinition).toEqual(fields[0])
         return Promise.resolve({
@@ -161,10 +155,7 @@ describe('resolveReferences', () => {
     await resolveReferences(
       filter,
       fields,
-      (
-        filterParam: Record<string, object>,
-        fieldDefinition: ReferenceTypeInner
-      ) => {
+      (filterParam: Record<string, object>, fieldDefinition: ReferenceType) => {
         expect(filterParam).toEqual(filter)
         expect(fieldDefinition).toEqual(fields[0])
         return Promise.resolve({
@@ -211,10 +202,7 @@ describe('resolveReferences', () => {
     await resolveReferences(
       filter,
       fields,
-      (
-        filterParam: Record<string, object>,
-        fieldDefinition: ReferenceTypeInner
-      ) => {
+      (filterParam: Record<string, object>, fieldDefinition: ReferenceType) => {
         expect(filterParam).toEqual(filter['details'])
         expect(fieldDefinition).toEqual((fields[0] as any).fields[0])
         const values = [filePath]
@@ -278,10 +266,7 @@ describe('resolveReferences', () => {
     await resolveReferences(
       filter,
       fields,
-      (
-        filterParam: Record<string, object>,
-        fieldDefinition: ReferenceTypeInner
-      ) => {
+      (filterParam: Record<string, object>, fieldDefinition: ReferenceType) => {
         expect(filterParam).toEqual(filter['details']['authorTemplate'])
         expect(fieldDefinition).toEqual(
           (fields[0] as any).templates[0].fields[0]

@@ -54,10 +54,10 @@ const out = output({
   ],
 })
 
-import { RichType } from '@tinacms/schema-tools'
+import { RichTextType } from '@tinacms/schema-tools'
 
 describe('./shortcodes.md escaping ALL', () => {
-  const f: RichType = {
+  const f: RichTextType = {
     ...field,
     parser: { type: 'markdown', skipEscaping: 'all' },
   }
@@ -72,7 +72,7 @@ describe('./shortcodes.md escaping ALL', () => {
 })
 
 describe('./shortcodes.md escaping HTML', () => {
-  const f: RichType = {
+  const f: RichTextType = {
     ...field,
     parser: { type: 'markdown', skipEscaping: 'html' },
   }

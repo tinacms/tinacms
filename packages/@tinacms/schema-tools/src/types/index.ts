@@ -153,7 +153,7 @@ export type TinaField<WithNamespace extends boolean = false> =
   | ScalarType<WithNamespace>
   | ObjectType<WithNamespace>
   | ReferenceType<WithNamespace>
-  | RichType<WithNamespace>
+  | RichTextType<WithNamespace>
 
 export interface TinaFieldBase {
   name: string
@@ -260,28 +260,27 @@ type ImageField =
       ui?: object | UIField<any, string[]>
     }
 
-export type ReferenceType<WithNamespace extends boolean> = ReferenceTypeInner &
-  MaybeNamespace<WithNamespace>
+export type RichTextType<WithNamespace extends boolean = false> =
+  TinaFieldBase & {
+    type: 'rich-text'
+    isBody?: boolean
+    list?: boolean
+    parser?:
+      | {
+          type: 'markdown'
+          skipEscaping?: 'all' | 'html' | 'none'
+        }
+      | { type: 'mdx' }
+    templates?: RichTextTemplate<WithNamespace>[]
+  } & MaybeNamespace<WithNamespace>
 
-export type RichType<WithNamespace extends boolean = false> = TinaFieldBase & {
-  type: 'rich-text'
-  isBody?: boolean
-  list?: boolean
-  parser?:
-    | {
-        type: 'markdown'
-        skipEscaping?: 'all' | 'html' | 'none'
-      }
-    | { type: 'mdx' }
-  templates?: RichTextTemplate<WithNamespace>[]
-} & MaybeNamespace<WithNamespace>
-
-export interface ReferenceTypeInner extends TinaFieldBase {
-  type: 'reference'
-  list?: boolean
-  collections: string[]
-  ui?: UIField<any, string[]>
-}
+export type ReferenceType<WithNamespace extends boolean = false> =
+  TinaFieldBase & {
+    type: 'reference'
+    list?: boolean
+    collections: string[]
+    ui?: UIField<any, string[]>
+  } & MaybeNamespace<WithNamespace>
 
 export type RichTextTemplate<WithNamespace extends boolean> =
   Template<WithNamespace> & {

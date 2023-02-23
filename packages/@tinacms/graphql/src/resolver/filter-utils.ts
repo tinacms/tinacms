@@ -4,7 +4,7 @@
 
 import type {
   ObjectType,
-  ReferenceTypeInner,
+  ReferenceType,
   Template,
   TinaField,
 } from '@tinacms/schema-tools'
@@ -12,7 +12,7 @@ import { FilterCondition } from '../database/datalayer'
 
 export type ReferenceResolver = (
   filter: Record<string, object>,
-  fieldDefinition: ReferenceTypeInner
+  fieldDefinition: ReferenceType
 ) => Promise<{
   edges: {
     node: any

@@ -4,7 +4,7 @@
 
 */
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
-import type { RichType } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import type * as Plate from './plate'
 import { extractAttributes } from './acorn'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
@@ -17,19 +17,19 @@ export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxTextElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichType,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Plate.MdxInlineElement
 export function mdxJsxElement(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   node: MdxJsxFlowElement,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  field: RichType,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Plate.MdxBlockElement
 export function mdxJsxElement(
   node: MdxJsxTextElement | MdxJsxFlowElement,
-  field: RichType,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ):
   | Plate.MdxInlineElement
@@ -84,7 +84,7 @@ export function mdxJsxElement(
 
 export const directiveElement = (
   node: ContainerDirective | LeafDirective,
-  field: RichType,
+  field: RichTextType,
   imageCallback: (url: string) => string,
   raw?: string
 ): Plate.BlockElement | Plate.ParagraphElement => {

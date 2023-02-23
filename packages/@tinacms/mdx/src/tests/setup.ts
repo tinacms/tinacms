@@ -3,14 +3,14 @@
 
 
 */
-import type { RichType } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import { format } from 'prettier'
 import type { BlockElement, RootElement } from '../parse/plate'
 import { parseMDX } from '../parse/index'
 import { writeFile } from 'fs'
 import { join } from 'path'
 
-export type { BlockElement, RichType }
+export type { BlockElement, RichTextType }
 
 export const output = (object: RootElement) => object
 
@@ -52,7 +52,7 @@ export const run = (
   dirname: string,
   content: any,
   outputString: any,
-  field: RichType
+  field: RichTextType
 ) => {
   Object.entries(content).forEach(([name, content]) => {
     if (typeof content !== 'string') {
@@ -98,7 +98,7 @@ export const runInner = (
   dirname: string,
   content: string,
   outputString: Record<string, string>,
-  field: RichType
+  field: RichTextType
 ) => {
   const tsFilename = name.replace('.md', '.test.ts')
   if (!outputString[tsFilename]) {
