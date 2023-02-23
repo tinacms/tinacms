@@ -29,9 +29,9 @@ import type {
   SchemaField,
   // Schema,
   // Collection,
-  Template,
+  // Template,
 } from '@tinacms/schema-tools/dist/types'
-import { TinaSchema, Schema, Collection } from '@tinacms/schema-tools'
+import { TinaSchema, Schema, Collection, Template } from '@tinacms/schema-tools'
 
 export type { Config, Schema, Collection, Template, SchemaField, TinaSchema }
 

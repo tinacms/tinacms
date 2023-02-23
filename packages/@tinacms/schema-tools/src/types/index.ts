@@ -143,6 +143,7 @@ interface BaseCollection {
   match?: string
 }
 
+/** @deprecated use Template instead */
 export type TinaTemplate = Template<false>
 
 type CollectionTemplates<WithNamespace extends boolean> = {
