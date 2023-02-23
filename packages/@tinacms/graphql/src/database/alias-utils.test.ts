@@ -20,6 +20,21 @@ const template: Templateable = {
           namespace: [],
           type: 'string',
         },
+        {
+          name: 'arrayField',
+          namespace: [],
+          type: 'object',
+          nameOverride: 'array-override',
+          list: true,
+          fields: [
+            {
+              name: 'textField',
+              nameOverride: 'textField-override',
+              namespace: [],
+              type: 'string',
+            },
+          ],
+        },
       ],
     },
     { name: 'normalField', namespace: [], type: 'string' },
@@ -46,6 +61,25 @@ describe('replaceNameOverrides', () => {
           field1: 1,
           objectfield: {
             aliasedSubfield: 3,
+          },
+        })
+      })
+
+      it('should return aliased list fields', () => {
+        const obj = {
+          a: 1,
+          c: {
+            'array-override': [
+              {
+                'textField-override': 'val',
+              },
+            ],
+          },
+        }
+        expect(replaceNameOverrides(template, obj)).toEqual({
+          field1: 1,
+          objectfield: {
+            arrayField: [{ textField: 'val' }],
           },
         })
       })
@@ -166,6 +200,23 @@ describe('applyNameOverrides', () => {
             d: 2,
           },
         }
+        expect(applyNameOverrides(template, obj)).toEqual(expected)
+      })
+
+      it('should return aliased list fields', () => {
+        const obj = {
+          field1: 1,
+          objectfield: {
+            arrayField: [{ textField: 'val' }],
+          },
+        }
+        const expected = {
+          a: 1,
+          c: {
+            'array-override': [{ 'textField-override': 'val' }],
+          },
+        }
+
         expect(applyNameOverrides(template, obj)).toEqual(expected)
       })
     })
