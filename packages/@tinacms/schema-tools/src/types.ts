@@ -1,6 +1,4 @@
-/**
-
-*/
+import type { FC } from 'react'
 
 type Doc = {
   _sys: {
@@ -68,7 +66,8 @@ type Doc = {
 export type Option =
   | string
   | {
-      label: string
+      label?: string
+      icon?: FC
       value: string
     }
 import type React from 'react'
@@ -213,6 +212,7 @@ type FieldGeneric<
 export interface BaseField {
   label?: string | boolean
   required?: boolean
+  indexed?: boolean
   name: string
   description?: string
 }
@@ -225,6 +225,7 @@ export type StringField = (
   BaseField & {
     type: 'string'
     isTitle?: boolean
+    isBody?: boolean
     options?: Option[]
   }
 
@@ -294,7 +295,7 @@ export type ReferenceField = (
   }
 
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }
-export type RichTextField = (
+export type RichTextField<WithNamespace extends boolean = false> = (
   | FieldGeneric<RichTextAst, undefined>
   | FieldGeneric<RichTextAst, false>
 ) &
@@ -306,31 +307,7 @@ export type RichTextField = (
      * will be stored as frontmatter
      */
     isBody?: boolean
-    templates?: (Template & {
-      inline?: boolean
-      /**
-       * If you have some custom shortcode logic in your markdown,
-       * you can specify it in the 'match' property and Tina will
-       * handle it as if it were a jsx element:
-       *
-       * ```
-       * # This is my markdown, it uses some custom shortcode
-       * syntax {{ myshortcode title="hello!" }}.
-       *
-       * {
-       *   match: {
-       *     start: "{{"
-       *     end: "}}"
-       *   }
-       * }
-       * ```
-       */
-      match?: {
-        start: string
-        end: string
-        name?: string
-      }
-    })[]
+    templates?: RichTextTemplate<WithNamespace>[]
     /**
      * By default, Tina parses markdown with MDX, this is a more strict parser
      * that allows you to use structured content inside markdown (via `templates`).
@@ -347,6 +324,32 @@ export type RichTextField = (
           skipEscaping?: 'all' | 'html' | 'none'
         }
       | { type: 'mdx' }
+  }
+export type RichTextTemplate<WithNamespace extends boolean> =
+  Template<WithNamespace> & {
+    inline?: boolean
+    /**
+     * If you have some custom shortcode logic in your markdown,
+     * you can specify it in the 'match' property and Tina will
+     * handle it as if it were a jsx element:
+     *
+     * ```
+     * # This is my markdown, it uses some custom shortcode
+     * syntax {{ myshortcode title="hello!" }}.
+     *
+     * {
+     *   match: {
+     *     start: "{{"
+     *     end: "}}"
+     *   }
+     * }
+     * ```
+     */
+    match?: {
+      start: string
+      end: string
+      name?: string
+    }
   }
 
 type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
@@ -409,44 +412,49 @@ type ObjectUiProps = {
   visualSelector?: boolean
 }
 
-export type ObjectField =
+export type ObjectField<WithNamespace extends boolean = false> =
   | (
       | FieldGeneric<string, undefined, ObjectUiProps>
       | FieldGeneric<string, true, ObjectUiProps>
       | FieldGeneric<string, false, ObjectUiProps>
     ) &
+      MaybeNamespace<WithNamespace> &
       BaseField &
       (
         | {
             type: 'object'
-            fields: Field[]
+            fields: Field<WithNamespace>[]
             templates?: undefined
             ui?: Template['ui']
           }
         | {
             type: 'object'
             fields?: undefined
-            templates: Template[]
+            templates: Template<WithNamespace>[]
           }
       )
 
-type Field =
+type Field<WithNamespace extends boolean = false> = (
   | StringField
   | NumberField
   | BooleanField
   | DateTimeField
   | ImageField
   | ReferenceField
-  | RichTextField
-  | ObjectField
+  | RichTextField<WithNamespace>
+  | ObjectField<WithNamespace>
+) &
+  MaybeNamespace<WithNamespace>
 
+type MaybeNamespace<WithNamespace extends boolean = false> =
+  WithNamespace extends true ? { namespace: string[] } : {}
 // Aliasing to SchemaField as Field is taken by internal use (which is exported)
-type SchemaField = Field
+type SchemaField<WithNamespace extends boolean = false> = Field<WithNamespace>
 
 export type { SchemaField }
 
-export interface Template {
-  label?: string
+export type Template<WithNamespace extends boolean = false> = {
+  label?: string | boolean
   name: string
   ui?: {
     /**
@@ -466,7 +474,7 @@ export interface Template {
        * }),
        * ```
        */
-      label?: string
+      label?: string | boolean // FIXME: this is reused is places that don't accept a boolean
     }
     defaultItem?: DefaultItem<Record<string, any>>
     /**
@@ -476,8 +484,8 @@ export interface Template {
      */
     previewSrc?: string
   }
-  fields: Field[]
-}
+  fields: Field<WithNamespace>[]
+} & MaybeNamespace<WithNamespace>
 
 // export interface FieldCollection {
 //   label?: string

@@ -7,13 +7,7 @@ import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
 /**
- *
  * Turns a field the schema (schema.{js,ts} file) into a valid front end FieldConfig
- *
- *
- * @param  {TinaField} field. The field that will be transformed
- * @param  {TinaSchema} schema the entireT Tina Schema
- * @returns unknown
  */
 export const resolveField = (
   field: TinaField<true>,
@@ -21,7 +15,7 @@ export const resolveField = (
 ): {
   [key: string]: unknown
   name: string
-  component: string
+  component: TinaField<true>['ui']['component']
   type: string
 } => {
   const extraFields = field.ui || {}
@@ -101,6 +95,7 @@ export const resolveField = (
         ...extraFields,
       }
     case 'object':
+      field.templates[0]
       const templateInfo = schema.getTemplatesForCollectable(field)
       if (templateInfo.type === 'object') {
         // FIXME: need to finish group/group-list

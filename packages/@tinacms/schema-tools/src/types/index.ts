@@ -1,4 +1,19 @@
 import type { FC } from 'react'
+import {
+  SchemaField,
+  RichTextField,
+  ReferenceField,
+  ObjectField,
+  RichTextTemplate,
+} from '../types'
+
+export type { RichTextTemplate }
+export type ObjectType<WithNamespace extends boolean = false> =
+  ObjectField<WithNamespace>
+export type RichTextType<WithNamespace extends boolean = false> =
+  RichTextField<WithNamespace>
+export type ReferenceType<WithNamespace extends boolean = false> =
+  ReferenceField & MaybeNamespace<WithNamespace>
 
 /**
  * @deprecated use Config instead
@@ -183,7 +198,7 @@ export type TinaCMSConfig<
 
 type UIField<F extends UIField = any, Shape = any> = {
   // name?: string
-  label?: string
+  label?: string | boolean
   description?: string
   // TODO type component
   component?: FC<any> | string | null
@@ -348,28 +363,7 @@ type IndexType = {
 export type TinaTemplate = Template<false>
 
 export type TinaField<WithNamespace extends boolean = false> =
-  | ScalarType<WithNamespace>
-  | ObjectType<WithNamespace>
-  | ReferenceType<WithNamespace>
-  | RichTextType<WithNamespace>
-
-interface TinaFieldBase {
-  name: string
-  label?: string
-  description?: string
-  required?: boolean
-  indexed?: boolean
-  // list?: boolean
-  /**
-   * Any items passed to the UI field will be passed to the underlying field.
-   * NOTE: only serializable values are supported, so functions like `validate`
-   * will be ignored.
-   */
-  ui?: Record<string, any>
-}
-
-type ScalarType<WithNamespace extends boolean> = ScalarTypeInner &
-  MaybeNamespace<WithNamespace>
+  SchemaField<WithNamespace> & MaybeNamespace<WithNamespace>
 
 export type Option =
   | string
@@ -378,182 +372,6 @@ export type Option =
       icon?: FC
       value: string
     }
-type ScalarTypeInner = TinaFieldBase &
-  TinaScalarField & {
-    options?: Option[]
-  }
-
-type TinaScalarField =
-  | StringField
-  | BooleanField
-  | DateTimeField
-  | NumberField
-  | ImageField
-
-type StringField =
-  | {
-      type: 'string'
-      isBody?: boolean
-      list?: false
-      isTitle?: boolean
-      ui?: UIField<any, string>
-    }
-  | {
-      type: 'string'
-      isBody?: boolean
-      list: true
-      isTitle?: never
-      ui?: UIField<any, string[]> & { defaultItem?: DefaultItem<string> }
-    }
-
-type BooleanField =
-  | {
-      type: 'boolean'
-      list?: false
-      ui?: object | UIField<any, boolean>
-    }
-  | {
-      type: 'boolean'
-      list: true
-      ui?: object | UIField<any, boolean[]>
-    }
-
-type NumberField =
-  | {
-      type: 'number'
-      list?: false
-      ui?: object | UIField<any, number>
-    }
-  | {
-      type: 'number'
-      list: true
-      ui?: object | UIField<any, number[]>
-    }
-
-type DateTimeField =
-  | {
-      type: 'datetime'
-      dateFormat?: string
-      timeFormat?: string
-      list?: false
-      ui?: object | UIField<any, string>
-    }
-  | {
-      type: 'datetime'
-      dateFormat?: string
-      timeFormat?: string
-      list: true
-      ui?: object | UIField<any, string[]>
-    }
-
-type ImageField =
-  | {
-      type: 'image'
-      list?: false
-      ui?: object | UIField<any, string>
-    }
-  | {
-      type: 'image'
-      list: true
-      ui?: object | UIField<any, string[]>
-    }
-
-export type RichTextType<WithNamespace extends boolean = false> =
-  TinaFieldBase & {
-    type: 'rich-text'
-    isBody?: boolean
-    list?: boolean
-    parser?:
-      | {
-          type: 'markdown'
-          skipEscaping?: 'all' | 'html' | 'none'
-        }
-      | { type: 'mdx' }
-    templates?: RichTextTemplate<WithNamespace>[]
-  } & MaybeNamespace<WithNamespace>
-
-export type ReferenceType<WithNamespace extends boolean = false> =
-  TinaFieldBase & {
-    type: 'reference'
-    list?: boolean
-    collections: string[]
-    ui?: UIField<any, string[]>
-  } & MaybeNamespace<WithNamespace>
-
-export type RichTextTemplate<WithNamespace extends boolean> =
-  Template<WithNamespace> & {
-    inline?: boolean
-    match?: {
-      start: string
-      end: string
-      name?: string
-    }
-  }
-export type ObjectType<WithNamespace extends boolean> =
-  | ObjectTemplates<WithNamespace>
-  | ObjectFields<WithNamespace>
-
-type ObjectTemplates<WithNamespace extends boolean> =
-  ObjectTemplatesInner<WithNamespace> & MaybeNamespace<WithNamespace>
-
-type ObjectTemplatesInner<WithNamespace extends boolean> =
-  | ObjectTemplatesInnerWithList<WithNamespace>
-  | ObjectTemplatesInnerWithoutList<WithNamespace>
-interface ObjectTemplatesInnerWithList<WithNamespace extends boolean>
-  extends ObjectTemplatesInnerBase<WithNamespace> {
-  list?: true
-  ui?:
-    | object
-    | ({
-        // TODO: we could Type item based on fields or templates? (might be hard)
-        itemProps?(item: Record<string, any>): {
-          key?: string
-          label?: string
-        }
-        defaultItem?: DefaultItem<Record<string, any>>
-      } & UIField<any, string>)
-}
-interface ObjectTemplatesInnerWithoutList<WithNamespace extends boolean>
-  extends ObjectTemplatesInnerBase<WithNamespace> {
-  list?: false
-  ui?: object | UIField<any, string>
-}
-
-interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
-  extends TinaFieldBase {
-  type: 'object'
-  visualSelector?: boolean
-  required?: false
-  list?: boolean
-  templates: Template<WithNamespace>[]
-  fields?: undefined
-}
-
-type ObjectFields<WithNamespace extends boolean> =
-  InnerObjectFields<WithNamespace> & MaybeNamespace<WithNamespace>
-
-interface InnerObjectFields<WithNamespace extends boolean>
-  extends TinaFieldBase {
-  type: 'object'
-  visualSelector?: boolean
-  required?: false
-  ui?: UIField<any, Record<string, any>> & {
-    itemProps?(item: Record<string, any>): {
-      key?: string
-      label?: string
-    }
-    defaultItem?: DefaultItem<Record<string, any>>
-  }
-  /**
-   * fields can either be an array of Tina fields, or a reference to the fields
-   * of a global template definition.
-   *
-   * You can only provide one of `fields` or `templates`, but not both.
-   */
-  fields: TinaField<WithNamespace>[]
-  templates?: undefined
-  list?: boolean
-}
 
 export type UITemplate = {
   /**
@@ -573,7 +391,7 @@ export type UITemplate = {
      * }),
      * ```
      */
-    label?: string
+    label?: string | boolean
   }
   defaultItem?: DefaultItem<Record<string, any>>
   /**
@@ -588,7 +406,7 @@ export type UITemplate = {
  * Templates allow you to define an object as polymorphic
  */
 export type Template<WithNamespace extends boolean = false> = {
-  label?: string
+  label?: string | boolean
   name: string
   ui?: UITemplate
   fields: TinaField<WithNamespace>[]
@@ -607,7 +425,7 @@ export type CollectionTemplateableObject = {
   ui?: UIField<any, Record<string, any>> & {
     itemProps?(item: Record<string, any>): {
       key?: string
-      label?: string
+      label?: string | boolean
     }
     defaultItem?: DefaultItem<Record<string, any>>
   }
@@ -621,4 +439,4 @@ export type CollectionTemplateable =
 export type Collectable = Pick<
   Collection<true>,
   'namespace' | 'templates' | 'fields' | 'name'
-> & { label?: string }
+> & { label?: string | boolean }

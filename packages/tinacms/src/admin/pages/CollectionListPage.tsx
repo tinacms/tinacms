@@ -419,7 +419,10 @@ const CollectionListPage = () => {
                                         value: '',
                                       },
                                       ...filterFields.map((x) => ({
-                                        label: x.label || x.name,
+                                        label:
+                                          (typeof x.label === 'string' &&
+                                            x.label) ||
+                                          x.name,
                                         value: x.name,
                                       })),
                                     ]}
