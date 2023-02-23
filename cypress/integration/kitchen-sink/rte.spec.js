@@ -1,7 +1,3 @@
-/**
-
-*/
-
 // Not really an error? see https://github.com/cypress-io/cypress/issues/8418
 const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/
 Cypress.on('uncaught:exception', (err) => {
