@@ -51,6 +51,7 @@ export const Preview = (
         />
       )}
       <iframe
+        data-test="tina-iframe"
         id="tina-iframe"
         ref={props.iframeRef}
         className="h-screen w-full bg-white"
@@ -81,6 +82,28 @@ const QueryMachine = (props: {
   )
 
   const [state, send] = useMachine(machine)
+  React.useEffect(() => {
+    const unsubscribeFieldChange = cms.events.subscribe(
+      `forms:fields:onChange`,
+      (event) => {
+        // Nested forms from rich-text also trigger this event
+        if (Object.keys(state.context.documentMap).includes(event.formId)) {
+          send({ type: 'FIELD_CHANGE' })
+        }
+      }
+    )
+    const unsubscribeReset = cms.events.subscribe(`forms:reset`, (event) => {
+      if (Object.keys(state.context.documentMap).includes(event.formId)) {
+        send({ type: 'FIELD_CHANGE' })
+      }
+    })
+
+    return () => {
+      unsubscribeFieldChange()
+      unsubscribeReset()
+    }
+  }, [cms, state.context.documentMap])
+
   React.useEffect(() => {
     if (state.matches('pipeline.ready')) {
       cms.events.dispatch({ type: 'forms:register', value: 'complete' })

@@ -3,10 +3,7 @@
 */
 
 import type { TinaCMS } from '@tinacms/toolkit'
-import type {
-  TinaCloudSchema,
-  TinaCloudSchemaConfig,
-} from '@tinacms/schema-tools'
+import type { Schema, Config } from '@tinacms/schema-tools'
 import type { TinaCloudMediaStoreClass } from '../auth'
 import type { useDocumentCreatorPlugin } from '../hooks/use-content-creator'
 import type { formifyCallback } from '../hooks/use-graphql-forms'
@@ -38,7 +35,7 @@ interface BaseProviderProps {
     | TinaCloudMediaStoreClass
     | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
-  schema?: TinaCloudSchema<false>
+  schema?: Schema
 }
 
 // TODO: This type can probably be deprecated and removed
@@ -67,4 +64,4 @@ type QueryProviderProps =
 export type TinaCMSProviderDefaultProps = QueryProviderProps &
   APIProviderProps &
   BaseProviderProps &
-  TinaCloudSchemaConfig
+  Config

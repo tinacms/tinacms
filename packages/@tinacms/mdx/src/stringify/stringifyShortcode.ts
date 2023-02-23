@@ -4,12 +4,12 @@
 
 */
 
-import { Template } from '@tinacms/schema-tools'
+import { RichTextTemplate } from '@tinacms/schema-tools'
 import { replaceAll } from '../parse'
 
 export function stringifyShortcode(
   preprocessedString: string,
-  template: Template<false> & { inline?: boolean }
+  template: RichTextTemplate
 ) {
   const match = template.match!
   const unkeyedAttributes = !!template.fields.find((t) => t.name == '_value')

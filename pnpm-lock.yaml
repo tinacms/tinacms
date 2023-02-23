@@ -407,29 +407,6 @@ importers:
       postcss-nesting: 10.1.9_postcss@8.4.16
       tailwindcss: 2.2.19_3vnygek3yzhyjlvmmgk3sqgzme
 
-  experimental-examples/unit-test-example:
-    specifiers:
-      '@tinacms/cli': workspace:*
-      eslint: '7'
-      eslint-config-next: 12.0.3
-      glob: ^7.2.0
-      next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      react-is: ^17.0.2
-      tinacms: workspace:*
-    dependencies:
-      glob: 7.2.3
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
-      tinacms: link:../../packages/tinacms
-    devDependencies:
-      '@tinacms/cli': link:../../packages/@tinacms/cli
-      eslint: 7.32.0
-      eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
-
   packages/@tinacms/app:
     specifiers:
       '@headlessui/react': 1.6.6
@@ -552,6 +529,7 @@ importers:
       '@graphql-codegen/typescript-generic-sdk': ^2.1.4
       '@graphql-codegen/typescript-operations': ^2.1.4
       '@graphql-codegen/visitor-plugin-common': ^2.4.0
+      '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/graphql-file-loader': ^7.2.0
       '@graphql-tools/load': ^7.3.2
       '@tinacms/app': workspace:*
@@ -621,6 +599,7 @@ importers:
       '@graphql-codegen/typescript-generic-sdk': 2.3.12_graphql@15.8.0
       '@graphql-codegen/typescript-operations': 2.4.2_graphql@15.8.0
       '@graphql-codegen/visitor-plugin-common': 2.9.1_graphql@15.8.0
+      '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/graphql-file-loader': 7.4.0_graphql@15.8.0
       '@graphql-tools/load': 7.7.0_graphql@15.8.0
       '@tinacms/app': link:../app
@@ -1406,6 +1385,7 @@ importers:
 
   packages/tinacms:
     specifiers:
+      '@graphql-inspector/core': ^4.0.0
       '@graphql-tools/relay-operation-optimizer': ^6.4.1
       '@graphql-tools/utils': ^8.6.1
       '@headlessui/react': ^1.5.0
@@ -1446,6 +1426,7 @@ importers:
       yup: ^0.32.0
       zod: ^3.14.3
     dependencies:
+      '@graphql-inspector/core': 4.0.0_graphql@15.8.0
       '@graphql-tools/relay-operation-optimizer': 6.5.0_qyboaezk4cm6zsf5jfobzggyaa
       '@headlessui/react': 1.6.5_sfoxds7t5ydpegc3knd667wn6m
       '@heroicons/react': 1.0.6_react@17.0.2
@@ -6828,6 +6809,20 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /@graphql-inspector/core/4.0.0_graphql@15.8.0:
+    resolution:
+      {
+        integrity: sha512-lgyc6ozmU5WbdlFx7Uftb96cS9ahYmu6hL41ZswK3KQcS6s7AM7zGu8gNDSdXtAGw8eARm8+Ql4+8J1+/72/+A==,
+      }
+    peerDependencies:
+      graphql: ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
+    dependencies:
+      dependency-graph: 0.11.0
+      graphql: 15.8.0
+      object-inspect: 1.12.3
+      tslib: 2.4.0
     dev: false
 
   /@graphql-tools/graphql-file-loader/7.4.0_graphql@15.8.0:
@@ -16611,7 +16606,7 @@ packages:
       is-shared-array-buffer: 1.0.2
       is-string: 1.0.7
       is-weakref: 1.0.2
-      object-inspect: 1.12.2
+      object-inspect: 1.12.3
       object-keys: 1.1.1
       object.assign: 4.1.4
       regexp.prototype.flags: 1.4.3
@@ -26252,10 +26247,10 @@ packages:
       }
     engines: { node: '>= 6' }
 
-  /object-inspect/1.12.2:
+  /object-inspect/1.12.3:
     resolution:
       {
-        integrity: sha512-z+cPxW0QGUp0mcqcsgQyLVRDoXFQbXOwBaqyF7VIgI4TWNQsDHrBpUQslRmIfAoYWdYzs6UlKJtB2XJpTaNSpQ==,
+        integrity: sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==,
       }
 
   /object-keys/1.1.1:
@@ -29455,7 +29450,7 @@ packages:
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.1.3
-      object-inspect: 1.12.2
+      object-inspect: 1.12.3
 
   /signal-exit/3.0.7:
     resolution:

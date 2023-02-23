@@ -2,7 +2,7 @@
 
 */
 
-import { TinaCloudSchemaConfig } from '../types/index'
+import { Config } from '../types/index'
 
 import z from 'zod'
 const tinaConfigKey = z
@@ -22,9 +22,7 @@ export const tinaConfigZod = z.object({
     .optional(),
 })
 
-export const validateTinaCloudSchemaConfig = (
-  config: unknown
-): TinaCloudSchemaConfig => {
-  const newConfig = tinaConfigZod.parse(config) as TinaCloudSchemaConfig
+export const validateTinaCloudSchemaConfig = (config: unknown): Config => {
+  const newConfig = tinaConfigZod.parse(config) as Config
   return newConfig
 }

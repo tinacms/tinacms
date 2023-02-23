@@ -8,18 +8,14 @@ import { sequential } from '../util'
 import * as yup from 'yup'
 
 import {
-  TinaFieldBase,
-  TinaFieldEnriched,
-  TinaCloudSchemaEnriched,
-  TinaCloudSchemaBase,
-  TinaCloudCollectionEnriched,
-  TinaCloudTemplateEnriched,
-  TinaCloudCollection,
+  TinaField,
+  Schema,
+  Collection,
+  Template,
   validateTinaCloudSchemaConfig,
-  TinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
-const FIELD_TYPES: TinaFieldBase['type'][] = [
+const FIELD_TYPES: TinaField['type'][] = [
   'string',
   'number',
   'boolean',
@@ -30,13 +26,10 @@ const FIELD_TYPES: TinaFieldBase['type'][] = [
   'rich-text',
 ]
 
-export const validateSchema = async (
-  schema: TinaCloudSchemaBase
-): Promise<TinaCloudSchemaBase> => {
-  const schema2: TinaCloudSchemaEnriched =
-    addNamespaceToSchema<TinaCloudSchemaEnriched>(
-      _.cloneDeep(schema) as unknown as TinaCloudSchemaEnriched
-    )
+export const validateSchema = async (schema: Schema) => {
+  const schema2: Schema<true> = addNamespaceToSchema<Schema<true>>(
+    _.cloneDeep(schema) as unknown as Schema<true>
+  )
   const collections = await sequential(
     schema2.collections,
     async (collection) => validateCollection(collection)
@@ -46,7 +39,6 @@ export const validateSchema = async (
     const config = validateTinaCloudSchemaConfig(schema2.config)
     return {
       collections,
-      // @ts-ignore
       config,
     }
   }
@@ -55,9 +47,7 @@ export const validateSchema = async (
   }
 }
 
-const validationCollectionsPathAndMatch = (
-  collections: TinaCloudCollection<true>[]
-) => {
+const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
   // Early return if no two `path` are the same
   const paths = collections.map((x) => x.path)
   if (paths.length === new Set(paths).size) {
@@ -121,7 +111,7 @@ const validationCollectionsPathAndMatch = (
   }, Object.create(null))
 
   Object.keys(groupbyPath).forEach((key) => {
-    const collectionsArr: TinaCloudCollection<true>[] = groupbyPath[key]
+    const collectionsArr: Collection<true>[] = groupbyPath[key]
     if (collectionsArr.length === 1) {
       return
     }
@@ -137,10 +127,10 @@ const validationCollectionsPathAndMatch = (
 
 // TODO: use ZOD instead of Yup
 const validateCollection = async (
-  collection: TinaCloudCollectionEnriched
-): Promise<TinaCloudCollectionEnriched> => {
-  let templates: TinaCloudTemplateEnriched[] = []
-  let fields: TinaFieldEnriched[] = []
+  collection: Collection<true>
+): Promise<Collection<true>> => {
+  let templates: Template<true>[] = []
+  let fields: TinaField<true>[] = []
   const messageName = collection.namespace.join('.')
   const collectionSchema = yup.object({
     name: yup
@@ -160,21 +150,18 @@ const validateCollection = async (
   await collectionSchema.validate(collection)
   const validCollection = (await collectionSchema.cast(
     collection
-  )) as TinaCloudCollectionEnriched
+  )) as Collection<true>
   if (validCollection.templates) {
     templates = await sequential(
       validCollection.templates,
       async (template) => {
-        if (typeof template === 'string') {
-          throw new Error(`Global templates are not yet supported`)
-        }
         const fields = await sequential(template.fields, async (field) => {
           return validateField(field)
         })
         return {
           ...validCollection,
           ...fields,
-        } as TinaCloudTemplateEnriched
+        } as Template<true>
       }
     )
   }
@@ -188,14 +175,14 @@ const validateCollection = async (
     return {
       ...validCollection,
       fields,
-    } as TinaCloudCollectionEnriched
+    } as Collection<true>
   }
 
   return collection
 }
 const validateField = async (
-  field: TinaFieldEnriched
-): Promise<TinaFieldEnriched> => {
+  field: TinaField<true>
+): Promise<TinaField<true>> => {
   const messageName = field.namespace.join('.')
   const schema = yup.object({
     name: yup

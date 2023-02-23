@@ -4,7 +4,7 @@
 
 */
 
-import { Handlers, toMarkdown, defaultHandlers } from 'mdast-util-to-markdown'
+import { Handlers, toMarkdown } from 'mdast-util-to-markdown'
 import { text } from 'mdast-util-to-markdown/lib/handle/text'
 import {
   mdxJsxToMarkdown,
@@ -12,7 +12,7 @@ import {
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
 import { stringifyMDX as stringifyMDXNext } from '../next'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
 import { eat } from './marks'
@@ -38,7 +38,7 @@ declare module 'mdast' {
 
 export const stringifyMDX = (
   value: Plate.RootElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ) => {
   if (field.parser?.type === 'markdown') {
@@ -80,7 +80,7 @@ export type Pattern = {
   type: 'block' | 'leaf'
 }
 
-export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
+export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
   const patterns: Pattern[] = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -141,7 +141,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTypeInner) => {
 
 export const rootElement = (
   content: Plate.RootElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.Root => {
   const children: Md.Content[] = []
@@ -159,7 +159,7 @@ export const rootElement = (
 
 export const blockElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.Content | null => {
   switch (content.type) {
@@ -279,7 +279,7 @@ export const blockElement = (
 }
 const listItemElement = (
   content: Plate.ListItemElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.ListItem => {
   return {
@@ -300,7 +300,7 @@ const listItemElement = (
 }
 const blockContentElement = (
   content: Plate.BlockElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.BlockContent => {
   switch (content.type) {

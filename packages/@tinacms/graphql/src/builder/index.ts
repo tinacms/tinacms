@@ -20,12 +20,10 @@ import type {
 } from 'graphql'
 
 import type {
-  TinaCloudCollectionEnriched,
-  TinaFieldEnriched,
+  Collection,
+  TinaField,
   CollectionTemplateable,
   Collectable,
-  Templateable,
-  TinaFieldInner,
   Template,
 } from '@tinacms/schema-tools'
 import { TinaSchema } from '@tinacms/schema-tools'
@@ -47,7 +45,6 @@ export const createBuilder = async ({
  */
 export class Builder {
   private maxDepth: number
-  // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
   constructor(
@@ -76,7 +73,7 @@ export class Builder {
    * @param collections
    */
   public buildCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   ) => {
     const name = 'collection'
     const typeName = 'Collection'
@@ -164,7 +161,7 @@ export class Builder {
    * @param collections
    */
   public buildMultiCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   ) => {
     const name = 'collections'
     const typeName = 'Collection'
@@ -223,9 +220,7 @@ export class Builder {
    *
    * @param collections
    */
-  public multiCollectionDocument = async (
-    collections: TinaCloudCollectionEnriched[]
-  ) => {
+  public multiCollectionDocument = async (collections: Collection<true>[]) => {
     const name = 'document'
     const args = [
       astBuilder.InputValueDefinition({
@@ -304,7 +299,7 @@ export class Builder {
    * @param collections
    */
   public buildCreateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'createDocument',
@@ -347,7 +342,7 @@ export class Builder {
    * @param collections
    */
   public buildUpdateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'updateDocument',
@@ -389,7 +384,7 @@ export class Builder {
    * @param collections
    */
   public buildDeleteCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'deleteDocument',
@@ -422,9 +417,7 @@ export class Builder {
    *
    * @param collection
    */
-  public collectionDocument = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionDocument = async (collection: Collection<true>) => {
     const name = NAMER.queryName([collection.name])
     const type = await this._buildCollectionDocumentType(collection)
     const args = [
@@ -457,9 +450,7 @@ export class Builder {
    * @public
    * @param collection a Tina Cloud collection
    */
-  public collectionFragment = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionFragment = async (collection: Collection<true>) => {
     const name = NAMER.dataTypeName(collection.namespace)
     const fragmentName = NAMER.fragmentName(collection.namespace)
     const selections = await this._getCollectionFragmentSelections(
@@ -489,11 +480,11 @@ export class Builder {
    *
    * */
   private _getCollectionFragmentSelections = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: Collection<true>,
     depth: number
   ) => {
     const selections = []
-    if (typeof collection.fields === 'object') {
+    if (collection.fields?.length > 0) {
       await sequential(collection.fields, async (x) => {
         const field = await this._buildFieldNodeForFragments(x, depth)
         selections.push(field)
@@ -510,7 +501,7 @@ export class Builder {
   }
 
   private _buildFieldNodeForFragments: (
-    field: TinaFieldInner<true>,
+    field: TinaField<true>,
     depth: number
   ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
@@ -522,7 +513,7 @@ export class Builder {
       case 'rich-text':
         return astBuilder.FieldNodeDefinition(field)
       case 'object':
-        if (typeof field.fields === 'object') {
+        if (field.fields?.length > 0) {
           const selections = []
           await sequential(field.fields, async (item) => {
             const field = await this._buildFieldNodeForFragments(item, depth)
@@ -536,7 +527,7 @@ export class Builder {
               ...filterSelections(selections),
             ],
           })
-        } else if (typeof field.templates === 'object') {
+        } else if (field.templates?.length > 0) {
           const selections = []
           await sequential(field.templates, async (tem) => {
             if (typeof tem === 'object') {
@@ -552,6 +543,7 @@ export class Builder {
             ],
           })
         }
+      // TODO: Should we throw here?
       case 'reference':
         if (depth >= this.maxDepth) return false
 
@@ -653,7 +645,7 @@ export class Builder {
    * @param collection
    */
   public updateCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
+    collection: Collection<true>
   ) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
@@ -688,7 +680,7 @@ export class Builder {
    * @param collection
    */
   public createCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
+    collection: Collection<true>
   ) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
@@ -725,9 +717,7 @@ export class Builder {
    *
    * @param collection
    */
-  public collectionDocumentList = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionDocumentList = async (collection: Collection<true>) => {
     const connectionName = NAMER.referenceConnectionType(collection.namespace)
 
     await this.database.addToLookupMap({
@@ -751,7 +741,7 @@ export class Builder {
   public buildStaticDefinitions = () => staticDefinitions
 
   private _buildCollectionDocumentType = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: Collection<true>,
     suffix: string = '',
     extraFields: FieldDefinitionNode[] = [],
     extraInterfaces: NamedTypeNode[] = []
@@ -842,7 +832,7 @@ export class Builder {
     return this._buildTemplateFilter(t.template)
   }
 
-  private _buildTemplateFilter = async (template: Templateable) => {
+  private _buildTemplateFilter = async (template: Template<true>) => {
     const fields = []
     await sequential(template.fields, async (field) => {
       const f = await this._buildFieldFilter(field)
@@ -876,7 +866,7 @@ export class Builder {
     return this._buildTemplateMutation(t.template)
   }
 
-  private _buildTemplateMutation = async (template: Templateable) => {
+  private _buildTemplateMutation = async (template: Template<true>) => {
     return astBuilder.InputObjectTypeDefinition({
       name: NAMER.dataMutationTypeName(template.namespace),
       fields: await sequential(template.fields, (field) => {
@@ -890,7 +880,7 @@ export class Builder {
     collections,
   }: {
     fieldName: string
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
   }) => {
     const types: string[] = []
     collections.forEach((collection) => {
@@ -932,7 +922,7 @@ export class Builder {
     fieldName: string
     namespace: string[]
     nodeType: string | TypeDefinitionNode
-    collections: TinaCloudCollectionEnriched[]
+    collections: Collection<true>[]
     connectionNamespace: string[]
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
@@ -951,7 +941,7 @@ export class Builder {
     })
   }
 
-  private _buildFieldFilter = async (field: TinaFieldEnriched) => {
+  private _buildFieldFilter = async (field: TinaField<true>) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1115,7 +1105,7 @@ export class Builder {
     }
   }
 
-  private _buildFieldMutation = async (field: TinaFieldEnriched) => {
+  private _buildFieldMutation = async (field: TinaField<true>) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1209,7 +1199,7 @@ export class Builder {
     collectableTemplate: CollectionTemplateable,
     extraFields = [],
     extraInterfaces = [],
-    collection?: TinaCloudCollectionEnriched
+    collection?: Collection<true>
   ): Promise<UnionTypeDefinitionNode | ObjectTypeDefinitionNode> => {
     if (collectableTemplate.type === 'union') {
       const name = NAMER.dataTypeName(collectableTemplate.namespace)
@@ -1343,7 +1333,7 @@ export class Builder {
     })
   }
 
-  private _buildDataField = async (field: TinaFieldEnriched) => {
+  private _buildDataField = async (field: TinaField<true>) => {
     const listWarningMsg = `
 WARNING: The user interface for ${field.type} does not support \`list: true\`
 Visit https://tina.io/docs/errors/ui-not-supported/ for more information
@@ -1418,7 +1408,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
   }
 
   private _buildTemplateData = async (
-    { namespace, fields }: Templateable,
+    { namespace, fields }: Template<true>,
     extraFields = [],
     extraInterfaces = []
   ) => {
