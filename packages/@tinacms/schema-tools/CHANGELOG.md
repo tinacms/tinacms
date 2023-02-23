@@ -1,5 +1,45 @@
 # @tinacms/schema-tools
 
+## 1.3.1
+
+### Patch Changes
+
+- e732906b6: Support .yml file extension for yaml files
+
+## 1.3.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
+## 1.2.1
+
+### Patch Changes
+
+- 84fe97ca7: Fix issue where deeply nested template objects inside field objects weren't transformed on save properly
+- e7c404bcf: Support remote path configuration for separate content repos
+
+  Tina now supports serving content from a separate Git repo.
+
+  ### Local development workflow
+
+  To enable this during local development, point
+  this config at the root of the content repo.
+
+  > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
+
+  ```ts
+  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  ```
+
+  ### Production workflow
+
+  For production, your config should use the `clientId`, `branch`, and `token` values that are associated with your _content repo_.
+
 ## 1.2.0
 
 ### Minor Changes

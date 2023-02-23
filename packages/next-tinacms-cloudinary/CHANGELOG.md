@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 4.1.2
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
 ## 4.1.1
 
 ### Patch Changes

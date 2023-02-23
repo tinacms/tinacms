@@ -1,5 +1,37 @@
 # @tinacms/mdx
 
+## 1.3.0
+
+### Minor Changes
+
+- 169147490: When markdown files fail to parse, fallback to the non-MDX parser
+
+### Patch Changes
+
+- Updated dependencies [e732906b6]
+  - @tinacms/schema-tools@1.3.1
+
+## 1.2.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+  - @tinacms/schema-tools@1.3.0
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [84fe97ca7]
+- Updated dependencies [e7c404bcf]
+  - @tinacms/schema-tools@1.2.1
+
 ## 1.1.0
 
 ### Minor Changes

@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import { ModalBuilder } from './AuthModal'
@@ -60,7 +51,10 @@ export const AuthWallInner = ({
   getModalActions,
 }: TinaCloudAuthWallProps) => {
   const client: Client = cms.api.tina
-  const isLocal = client.isLocalMode
+  // Weather or not we are using Tina Cloud for auth
+  const isTinaCloud =
+    !client.isLocalMode &&
+    !client.schema?.config?.config?.admin?.auth?.customAuth
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
@@ -100,11 +94,13 @@ export const AuthWallInner = ({
     <>
       {activeModal === 'authenticate' && (
         <ModalBuilder
-          title={isLocal ? 'Enter into edit mode' : 'Tina Cloud Authorization'}
+          title={
+            isTinaCloud ? 'Tina Cloud Authorization' : 'Enter into edit mode'
+          }
           message={
-            isLocal
-              ? 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
-              : 'To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account.'
+            isTinaCloud
+              ? 'To save edits, Tina Cloud authorization is required. On save, changes will get commited using your account.'
+              : 'To save edits, enter into edit mode. On save, changes will saved to the local filesystem.'
           }
           close={close}
           actions={[
@@ -124,7 +120,7 @@ export const AuthWallInner = ({
               primary: false,
             },
             {
-              name: isLocal ? 'Enter Edit Mode' : 'Continue to Tina Cloud',
+              name: isTinaCloud ? 'Continue to Tina Cloud' : 'Enter Edit Mode',
               action: async () => {
                 const token = await client.authenticate()
                 if (typeof client?.onLogin === 'function') {
@@ -246,6 +242,7 @@ export const TinaCloudProvider = (
       branchSwitcher = new BranchSwitcherPlugin({
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
+        chooseBranch: setCurrentBranch,
       })
       cms.plugins.add(branchSwitcher)
     }

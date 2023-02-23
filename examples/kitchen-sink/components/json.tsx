@@ -24,13 +24,13 @@ export function Json(props: { src: object }) {
           <div className="h-full overflow-scroll">
             <Explorer2
               value={props.src}
-              renderRichText={({ value }) => {
-                return (
-                  <div className="font-sans px-2 border-l-2 bg-gray-50 w-full prose">
-                    <TinaMarkdown content={value} />
-                  </div>
-                )
-              }}
+              // renderRichText={({ value }) => {
+              //   return (
+              //     <div className="font-sans px-2 border-l-2 bg-gray-50 w-full prose">
+              //       <TinaMarkdown content={value} />
+              //     </div>
+              //   )
+              // }}
               renderValue={({ value, keyName, parentValue, parentKeyName }) => {
                 let fieldName = ''
                 if (!isNaN(Number(keyName))) {
