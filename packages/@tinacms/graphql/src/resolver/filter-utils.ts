@@ -4,15 +4,15 @@
 
 import type {
   ObjectType,
-  ReferenceTypeInner,
+  ReferenceType,
   Template,
-  TinaFieldInner,
+  TinaField,
 } from '@tinacms/schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
 export type ReferenceResolver = (
   filter: Record<string, object>,
-  fieldDefinition: ReferenceTypeInner
+  fieldDefinition: ReferenceType
 ) => Promise<{
   edges: {
     node: any
@@ -22,11 +22,11 @@ export type ReferenceResolver = (
 
 export const resolveReferences = async (
   filter: any,
-  fields: TinaFieldInner<false>[],
+  fields: TinaField[],
   resolver: ReferenceResolver
 ) => {
   for (const fieldKey of Object.keys(filter)) {
-    const fieldDefinition = (fields as TinaFieldInner<false>[]).find(
+    const fieldDefinition = (fields as TinaField[]).find(
       (f) => f.name === fieldKey
     )
     // resolve top level references
@@ -50,21 +50,8 @@ export const resolveReferences = async (
         }
       } else if (fieldDefinition.type === 'object') {
         if (fieldDefinition.templates) {
-          const globalTemplates = {}
-          for (const template of (fieldDefinition as ObjectType<false>)
-            .templates) {
-            if (typeof template === 'string') {
-              globalTemplates[template] = 1
-            }
-          }
           for (const templateName of Object.keys(filter[fieldKey])) {
-            if (templateName in globalTemplates) {
-              throw new Error('Global templates not yet supported for queries')
-            }
-
-            const template = (
-              fieldDefinition as ObjectType<false>
-            ).templates.find(
+            const template = (fieldDefinition as ObjectType).templates.find(
               (template) =>
                 !(typeof template === 'string') &&
                 template.name === templateName
@@ -82,7 +69,7 @@ export const resolveReferences = async (
         } else {
           await resolveReferences(
             filter[fieldKey],
-            fieldDefinition.fields as TinaFieldInner<false>[],
+            fieldDefinition.fields as TinaField[],
             resolver
           )
         }
@@ -95,7 +82,7 @@ export const resolveReferences = async (
 
 const collectConditionsForChildFields = (
   filterNode: Record<string, object>,
-  fields: TinaFieldInner<false>[],
+  fields: TinaField[],
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void
 ) => {
@@ -117,27 +104,17 @@ const collectConditionsForChildFields = (
 
 const collectConditionsForObjectField = (
   fieldName: string,
-  field: ObjectType<false>,
+  field: ObjectType,
   filterNode: Record<string, object>,
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void
 ) => {
   if (field.list && field.templates) {
-    const globalTemplates = {}
-    for (const template of field.templates) {
-      if (typeof template === 'string') {
-        globalTemplates[template] = 1
-      }
-    }
-
     for (const [filterKey, childFilterNode] of Object.entries(filterNode)) {
-      if (filterKey in globalTemplates) {
-        throw new Error('Global templates not yet supported for queries')
-      }
       const template = field.templates.find(
         (template) =>
           !(typeof template === 'string') && template.name === filterKey
-      ) as Template<false>
+      ) as Template
       const jsonPath = `${fieldName}[?(@._template=="${filterKey}")]`
       const filterPath = pathExpression
         ? `${pathExpression}.${jsonPath}`
@@ -158,7 +135,7 @@ const collectConditionsForObjectField = (
 
     collectConditionsForChildFields(
       filterNode,
-      field.fields as TinaFieldInner<false>[],
+      field.fields as TinaField[],
       filterPath,
       collectCondition
     )
@@ -167,7 +144,7 @@ const collectConditionsForObjectField = (
 
 export const collectConditionsForField = (
   fieldName: string,
-  field: TinaFieldInner<false>,
+  field: TinaField,
   filterNode: Record<string, object>,
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void

@@ -8,7 +8,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { build, Platform } from 'esbuild'
 import type { Loader } from 'esbuild'
-import type { TinaCloudSchema } from '@tinacms/graphql'
+import type { Schema } from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
 import { fileExists, getPath } from '../../lib'
 import { logger } from '../../logger'
@@ -327,7 +327,7 @@ export const transpile = async (
   if (verbose) logger.info(logText(`Javascript built`))
 }
 
-export const defineSchema = (config: TinaCloudSchema) => {
+export const defineSchema = (config: Schema) => {
   return config
 }
 

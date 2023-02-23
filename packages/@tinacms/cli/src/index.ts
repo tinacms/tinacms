@@ -7,11 +7,9 @@ import { logText } from './utils/theme'
 export { defineSchema } from './cmds/compile'
 import { logger } from './logger'
 export type {
-  TinaCloudSchema,
+  Schema,
   TinaSchema,
-  TinaCloudCollection,
-  TinaCollection,
-  TinaField,
+  Collection,
   TinaTemplate,
 } from '@tinacms/graphql'
 

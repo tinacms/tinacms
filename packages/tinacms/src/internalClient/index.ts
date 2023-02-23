@@ -12,15 +12,8 @@ import {
   parse,
 } from 'graphql'
 
-import { formify } from './formify'
-import { formify as formify2 } from '../hooks/formify'
-
 import gql from 'graphql-tag'
-import {
-  TinaSchema,
-  addNamespaceToSchema,
-  TinaCloudSchema,
-} from '@tinacms/schema-tools'
+import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -31,7 +24,7 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
-  schema?: TinaCloudSchema<false>
+  schema?: Schema
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -381,29 +374,6 @@ mutation addPendingDocumentMutation(
     return parse(data.getOptimizedQuery)
   }
 
-  async requestWithForm<ReturnType>(
-    query: (gqlTag: typeof gql) => DocumentNode,
-    {
-      variables,
-      useUnstableFormify,
-    }: { variables; useUnstableFormify?: boolean }
-  ) {
-    const schema = await this.getSchema()
-    let formifiedQuery
-    if (useUnstableFormify) {
-      const res = await formify2({
-        schema,
-        query: print(query(gql)),
-        getOptimizedQuery: this.getOptimizedQuery,
-      })
-      formifiedQuery = res.formifiedQuery
-    } else {
-      formifiedQuery = formify(query(gql), schema)
-    }
-
-    return this.request<ReturnType>(print(formifiedQuery), { variables })
-  }
-
   async request<ReturnType>(
     query: ((gqlTag: typeof gql) => DocumentNode) | string,
     { variables }: { variables: object }
@@ -745,7 +715,7 @@ export class LocalClient extends Client {
   constructor(
     props?: {
       customContentApiUrl?: string
-      schema?: TinaCloudSchema<false>
+      schema?: Schema
     } & Omit<ServerOptions, 'clientId' | 'branch'>
   ) {
     const clientProps = {

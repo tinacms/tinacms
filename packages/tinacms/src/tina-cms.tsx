@@ -2,18 +2,13 @@
 
 */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { TinaCloudProvider } from './auth'
-import { useGraphqlForms } from './hooks/use-graphql-forms'
 
 import { LocalClient } from './internalClient/index'
-import { EditContext, TinaDataContext } from '@tinacms/sharedctx'
-import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
 import styles from './styles.css'
-import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-import { useTina } from './edit-state'
 import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
 
@@ -245,23 +240,7 @@ export const TinaCMSProvider2 = ({
         schema={{ ...schema, config: { ...schema.config, ...props } }}
       >
         <style>{styles}</style>
-        <ErrorBoundary>
-          <DocumentCreator documentCreatorCallback={documentCreatorCallback} />
-          <TinaDataProvider formifyCallback={formifyCallback}>
-            {typeof props.children == 'function' ? (
-              <TinaQuery
-                {...props}
-                variables={props.variables}
-                data={props.data}
-                query={query}
-                formifyCallback={formifyCallback}
-                children={props.children as any}
-              />
-            ) : (
-              props.children
-            )}
-          </TinaDataProvider>
-        </ErrorBoundary>
+        <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>
   )
@@ -279,110 +258,6 @@ const DocumentCreator = ({
   useDocumentCreatorPlugin(documentCreatorCallback)
 
   return null
-}
-
-interface TinaQueryProps {
-  /** The query from getStaticProps */
-  query: string
-  /** Any variables from getStaticProps */
-  variables: object
-  /** The `data` from getStaticProps */
-  data: object
-  /** Your React page component */
-  children: (props: { data: object }) => React.ReactNode
-  /** Callback if you need access to the "formify" API */
-  formifyCallback?: formifyCallback
-  /** Callback if you need access to the "document creator" API */
-}
-
-//Legacy'ish Container that auto-registers forms/document creator
-const TinaQuery = (props: TinaQueryProps) => {
-  return <TinaQueryInner key={`rootQuery-${props.query}`} {...props} />
-}
-
-const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
-  const { data: liveData, isLoading } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
-  })
-
-  return (
-    <>
-      {children(
-        isLoading || !props.query ? props : { ...props, data: liveData }
-      )}
-    </>
-  )
-}
-
-// TinaDataProvider can only manage one "request" object at a timee
-export const TinaDataProvider = ({
-  children,
-  formifyCallback,
-}: {
-  children: any
-  formifyCallback: formifyCallback
-}) => {
-  const [request, setRequest] = useState<{ query: string; variables: object }>()
-  const [state, setState] = React.useState({
-    payload: undefined,
-    isLoading: true,
-  })
-
-  return (
-    <TinaDataContext.Provider
-      value={{
-        setRequest,
-        isLoading: state.isLoading,
-        state: { payload: state.payload },
-      }}
-    >
-      <FormRegistrar
-        key={request?.query} // unload on page/query change
-        request={request}
-        formifyCallback={formifyCallback}
-        onPayloadStateChange={setState}
-      />
-      {children}
-    </TinaDataContext.Provider>
-  )
-}
-
-const FormRegistrar = ({
-  request,
-  formifyCallback,
-  onPayloadStateChange,
-}: {
-  request: { query: string; variables: object }
-  formifyCallback: formifyCallback
-  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
-}) => {
-  const cms = useCMS()
-  const { setFormsRegistering } = React.useContext(EditContext)
-
-  const [payload, isLoading] = useGraphqlForms({
-    query: request?.query,
-    variables: request?.variables,
-    formify: (args) => {
-      if (formifyCallback) {
-        return formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
-  })
-
-  React.useEffect(() => {
-    onPayloadStateChange({ payload, isLoading })
-    setFormsRegistering && setFormsRegistering(isLoading as boolean)
-  }, [JSON.stringify(payload), isLoading])
-
-  return isLoading ? (
-    <Loader>
-      <></>
-    </Loader>
-  ) : null
 }
 
 const Loader = (props: { children: React.ReactNode }) => {
