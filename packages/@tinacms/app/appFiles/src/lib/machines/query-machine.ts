@@ -564,19 +564,6 @@ export const queryMachine =
               }
             }
           })
-          if (context.cms) {
-            context.cms.events.subscribe(`forms:fields:onChange`, (event) => {
-              // Nested forms from rich-text also trigger this event
-              if (Object.keys(context.documentMap).includes(event.formId)) {
-                callback({ type: 'FIELD_CHANGE' })
-              }
-            })
-            context.cms.events.subscribe(`forms:reset`, (event) => {
-              if (Object.keys(context.documentMap).includes(event.formId)) {
-                callback({ type: 'FIELD_CHANGE' })
-              }
-            })
-          }
         },
       },
     }
