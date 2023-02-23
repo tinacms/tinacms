@@ -1,7 +1,7 @@
 import { getMarks } from '../../stringify'
 import type * as Md from 'mdast'
 import type * as Plate from '../../parse/plate'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextField } from '@tinacms/schema-tools'
 import { stringifyPropsInline } from './acorn'
 
 const matches = (a: string[], b: string[]) => {
@@ -81,7 +81,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
  */
 const inlineElementExceptLink = (
   content: InlineElementWithCallback,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent => {
   switch (content.type) {
@@ -146,7 +146,7 @@ const text = (content: { text: string }) => {
 
 export const eat = (
   c: InlineElementWithCallback[],
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c)

@@ -1,7 +1,7 @@
-import type { RichTypeInner, Template } from '@tinacms/schema-tools'
+import type { RichTextField, RichTextTemplate } from '@tinacms/schema-tools'
 import type { Pattern } from './shortcodes'
 
-export const getFieldPatterns = (field: RichTypeInner) => {
+export const getFieldPatterns = (field: RichTextField) => {
   const patterns: Pattern[] = []
   const templates: RichTextTemplate[] = []
   hoistAllTemplates(field, templates)
@@ -29,7 +29,7 @@ export const getFieldPatterns = (field: RichTypeInner) => {
 // making multiple passes at it. Instead, just treat all templates
 // as top-level.
 const hoistAllTemplates = (
-  field: RichTypeInner,
+  field: RichTextField,
   templates: RichTextTemplate[] = []
 ) => {
   field.templates?.forEach((template) => {
@@ -45,4 +45,3 @@ const hoistAllTemplates = (
   })
   return templates
 }
-type RichTextTemplate = Template<false> & { inline?: boolean }

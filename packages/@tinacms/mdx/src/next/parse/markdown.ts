@@ -3,10 +3,10 @@ import { mdxJsx } from '../shortcodes'
 import { mdxJsxFromMarkdown } from '../shortcodes/mdast'
 import { getFieldPatterns } from '../util'
 import * as acorn from 'acorn'
-import type { RichTypeInner, Template } from '@tinacms/schema-tools'
+import type { RichTextField, Template } from '@tinacms/schema-tools'
 import type { Options } from '../shortcodes'
 
-export const fromMarkdown = (value: string, field: RichTypeInner) => {
+export const fromMarkdown = (value: string, field: RichTextField) => {
   const patterns = getFieldPatterns(field)
   const acornDefault = acorn as unknown as Options['acorn']
   const tree = mdastFromMarkdown(value, {

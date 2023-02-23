@@ -1,12 +1,12 @@
 import { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { visit } from 'unist-util-visit'
 import { remarkToSlate } from '../../parse/remarkToPlate'
-import { RichTypeInner } from '@tinacms/schema-tools'
+import { RichTextField } from '@tinacms/schema-tools'
 import type { Root } from 'mdast'
 
 export const postProcessor = (
   tree: Root,
-  field: RichTypeInner,
+  field: RichTextField,
   imageCallback: (s: string) => string
 ) => {
   // Since were using our own interpretation of MDX, these props
