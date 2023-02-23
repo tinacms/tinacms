@@ -117,7 +117,7 @@ export interface UICollection {
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
 
-export type IndexType = {
+type IndexType = {
   name: string
   fields: {
     name: string
@@ -164,7 +164,7 @@ export type TinaField<WithNamespace extends boolean = false> =
   | ReferenceType<WithNamespace>
   | RichTextType<WithNamespace>
 
-export interface TinaFieldBase {
+interface TinaFieldBase {
   name: string
   label?: string
   description?: string
