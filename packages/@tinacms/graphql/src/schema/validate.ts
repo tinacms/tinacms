@@ -200,7 +200,7 @@ const validateField = async (
   const schema = yup.object({
     name: yup
       .string()
-      .matches(/^[a-zA-Z0-9_\-]*$/, {
+      .matches(/^[a-zA-Z0-9_]*$/, {
         message: (obj) =>
           `Field's 'name' must match ${obj.regex} at ${messageName}`,
       })
