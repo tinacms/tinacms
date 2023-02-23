@@ -214,15 +214,20 @@ export type ReferenceField = (
     type: 'reference'
     /**
      * The names of the collections this field can use as a reference
+     * and the fields selected from the collection query
      * ```ts
      * {
      *   type: 'reference',
      *   name: 'author',
      *   collections: ['author'],
+     *   collectionFields: [
+     *     { author: ['name', 'avatar'] },
+     *   ],
      * }
      * ```
      */
     collections: string[]
+    collectionFields?: { [name: string]: string[] }
   }
 
 type RichTextAst = { type: 'root'; children: Record<string, unknown>[] }

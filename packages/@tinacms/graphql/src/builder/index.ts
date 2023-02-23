@@ -547,6 +547,8 @@ export class Builder {
         }
       // TODO: Should we throw here?
       case 'reference':
+        // TODO: Allow manual selection of fields to avoid recursive references instead of maxDepth property option
+        // Circular references are rarely intentional and the API should offer some way to avoid them
         if (depth >= this.maxDepth) return false
 
         if (!('collections' in field)) {
@@ -556,7 +558,26 @@ export class Builder {
         const selections = []
 
         await sequential(field.collections, async (col) => {
-          const collection = this.tinaSchema.getCollection(col)
+          let collection = this.tinaSchema.getCollection(col)
+
+          // TODO: Allow field.collections to be a Collection Object with properties for name and fields/templates to merge and filter the collection query
+          // This is just a workaround that only works with static fields and doesn't require any refactor, since it's adding a new option property,
+          // but it'd be interesting to handle this feature within the field.collections option property and consider templates' fields as well
+          if (
+            collection.fields &&
+            field.collectionFields &&
+            field.collectionFields[col]
+          ) {
+            const fieldsToSelect = field.collectionFields[col]
+            // Using let + spread to set filtered fields array without changing the original fields array
+            collection = {
+              ...collection,
+              templates: undefined,
+              fields: collection.fields.filter(({ name }) =>
+                fieldsToSelect.includes(name)
+              ),
+            }
+          }
 
           selections.push({
             kind: 'InlineFragment',
