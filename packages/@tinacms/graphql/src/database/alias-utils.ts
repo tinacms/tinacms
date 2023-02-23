@@ -1,6 +1,6 @@
-import { Templateable, TinaFieldEnriched } from '@tinacms/schema-tools/src'
+import { Template, TinaFieldEnriched } from '@tinacms/schema-tools/src'
 
-export const replaceNameOverrides = (template: Templateable, obj: any) => {
+export const replaceNameOverrides = (template: Template, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
       return _replaceNameOverrides(
@@ -62,10 +62,7 @@ const getTemplateForData = (field: any, data: any) => {
   throw new Error('No template found for field ' + field.name)
 }
 
-export const applyNameOverrides = (
-  template: Templateable,
-  obj: any
-): object => {
+export const applyNameOverrides = (template: Template, obj: any): object => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
       return _applyNameOverrides(
