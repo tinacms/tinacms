@@ -247,7 +247,7 @@ export class Database {
     data: { [key: string]: unknown }
   ) => {
     await this.initLevel()
-    const dataFields = await this.getDataFields(filepath, data)
+    const dataFields = await this.formatBodyOnPayload(filepath, data)
 
     const collection = await this.collectionForPath(filepath)
 
@@ -336,7 +336,7 @@ export class Database {
         }
 
         const normalizedPath = normalizePath(filepath)
-        const dataFields = await this.getDataFields(filepath, data)
+        const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
         const templateInfo = await this.getTemplateDetailsForFile(
           collection,
@@ -441,40 +441,35 @@ export class Database {
     }
   }
 
-  public getDataFields = async (
+  public formatBodyOnPayload = async (
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    if (SYSTEM_FILES.includes(filepath)) {
-      throw new Error(`Unexpected put for config file ${filepath}`)
-    } else {
-      const tinaSchema = await this.getSchema(this.level)
-      const collection = tinaSchema.getCollectionByFullPath(filepath)
+    const tinaSchema = await this.getSchema(this.level)
+    const collection = tinaSchema.getCollectionByFullPath(filepath)
 
-      const { template, info: templateInfo } =
-        await this.getTemplateDetailsForFile(collection, data)
-      const bodyField = template.fields.find((field) => {
-        if (field.type === 'string' || field.type === 'rich-text') {
-          if (field.isBody) {
-            return true
-          }
+    const { template } = await this.getTemplateDetailsForFile(collection, data)
+    const bodyField = template.fields.find((field) => {
+      if (field.type === 'string' || field.type === 'rich-text') {
+        if (field.isBody) {
+          return true
         }
-        return false
-      })
-      let payload: { [key: string]: unknown } = {}
-      if (['md', 'mdx'].includes(collection.format) && bodyField) {
-        Object.entries(data).forEach(([key, value]) => {
-          if (key !== bodyField.name) {
-            payload[key] = value
-          }
-        })
-        payload['$_body'] = data[bodyField.name]
-      } else {
-        payload = data
       }
-
-      return payload
+      return false
+    })
+    let payload: { [key: string]: unknown } = {}
+    if (['md', 'mdx'].includes(collection.format) && bodyField) {
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== bodyField.name) {
+          payload[key] = value
+        }
+      })
+      payload['$_body'] = data[bodyField.name]
+    } else {
+      payload = data
     }
+
+    return payload
   }
 
   public stringifyFile = async (
@@ -510,7 +505,7 @@ export class Database {
   public flush = async (filepath: string) => {
     const data = await this.get<{ [key: string]: unknown }>(filepath)
 
-    const dataFields = await this.getDataFields(filepath, data)
+    const dataFields = await this.formatBodyOnPayload(filepath, data)
     const collection = await this.collectionForPath(filepath)
 
     const templateInfo = await this.getTemplateDetailsForFile(
