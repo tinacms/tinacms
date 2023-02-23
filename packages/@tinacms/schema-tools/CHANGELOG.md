@@ -1,5 +1,12 @@
 # @tinacms/schema-tools
 
+## 1.3.2
+
+### Patch Changes
+
+- 892b4e39e: Fix issue where return type for `ui.validate` was incorrect
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+
 ## 1.3.1
 
 ### Patch Changes

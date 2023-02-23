@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 1.2.2
+
+### Patch Changes
+
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+- Updated dependencies [aa0250979]
+- Updated dependencies [892b4e39e]
+- Updated dependencies [3b1fe23ef]
+- Updated dependencies [c97ffc20d]
+  - @tinacms/graphql@1.3.2
+  - @tinacms/schema-tools@1.3.2
+  - @tinacms/app@1.1.1
+  - @tinacms/datalayer@1.1.3
+
 ## 1.2.1
 
 ### Patch Changes
