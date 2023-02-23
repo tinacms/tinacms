@@ -407,29 +407,6 @@ importers:
       postcss-nesting: 10.1.9_postcss@8.4.16
       tailwindcss: 2.2.19_3vnygek3yzhyjlvmmgk3sqgzme
 
-  experimental-examples/unit-test-example:
-    specifiers:
-      '@tinacms/cli': workspace:*
-      eslint: '7'
-      eslint-config-next: 12.0.3
-      glob: ^7.2.0
-      next: 12.2.4
-      react: 17.0.2
-      react-dom: 17.0.2
-      react-is: ^17.0.2
-      tinacms: workspace:*
-    dependencies:
-      glob: 7.2.3
-      next: 12.2.4_sfoxds7t5ydpegc3knd667wn6m
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
-      tinacms: link:../../packages/tinacms
-    devDependencies:
-      '@tinacms/cli': link:../../packages/@tinacms/cli
-      eslint: 7.32.0
-      eslint-config-next: 12.0.3_eslint@7.32.0+next@12.2.4
-
   packages/@tinacms/app:
     specifiers:
       '@headlessui/react': 1.6.6
