@@ -1,7 +1,7 @@
 /**
 
 */
-import { TinaSchema, TinaCloudSchemaBase } from '@tinacms/schema-tools'
+import { TinaSchema, Schema } from '@tinacms/schema-tools'
 
 import { validateSchema } from './validate'
 // @ts-ignore File '...' is not under 'rootDir'
@@ -11,7 +11,7 @@ export const createSchema = async ({
   schema,
   flags = [],
 }: {
-  schema: TinaCloudSchemaBase
+  schema: Schema
   flags?: string[]
 }) => {
   const validSchema = await validateSchema(schema)

@@ -8,7 +8,7 @@ import { flatten } from 'lodash-es'
 import { directiveElement, mdxJsxElement } from './mdx'
 import type * as Md from 'mdast'
 import type * as Plate from './plate'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import type { MdxJsxTextElement, MdxJsxFlowElement } from 'mdast-util-mdx-jsx'
 import { ContainerDirective } from 'mdast-util-directive'
 
@@ -32,7 +32,7 @@ declare module 'mdast' {
 
 export const remarkToSlate = (
   root: Md.Root | MdxJsxFlowElement | MdxJsxTextElement | ContainerDirective,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string,
   raw?: string
 ): Plate.RootElement => {

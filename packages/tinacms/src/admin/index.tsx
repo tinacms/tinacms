@@ -122,8 +122,6 @@ const CheckSchema = ({
             cms.alerts.error(
               'GraphQL Schema Mismatch. Editing may not work. If you just switched branches, try going back to the previous branch'
             )
-          } else {
-            cms.alerts.info('GraphQL Schema is up to date')
           }
         })
     }

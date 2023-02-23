@@ -9,7 +9,7 @@ import remarkMdx, { Root } from 'remark-mdx'
 
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import type * as Plate from './plate'
 import { directiveFromMarkdown } from '../extensions/tina-shortcodes/from-markdown'
 import { tinaDirective } from '../extensions/tina-shortcodes/extension'
@@ -64,7 +64,7 @@ import { parseShortcode } from './parseShortcode'
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form value with no additional work.
  */
-export const markdownToAst = (value: string, field: RichTypeInner) => {
+export const markdownToAst = (value: string, field: RichTextType) => {
   const patterns: Pattern[] = []
   field.templates?.forEach((template) => {
     if (typeof template === 'string') {
@@ -96,7 +96,7 @@ export const MDX_PARSE_ERROR_MSG_HTML =
 
 export const parseMDX = (
   value: string,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (s: string) => string
 ): Plate.RootElement => {
   if (!value) {

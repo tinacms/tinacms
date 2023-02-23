@@ -2,10 +2,10 @@
 
 */
 
-import { TinaCloudSchema } from '../../..'
+import { Schema } from '../../..'
 import { blocksCollection } from './blocks'
 
-const tinaSchema: TinaCloudSchema = {
+const tinaSchema: Schema = {
   collections: [
     {
       label: 'Author',

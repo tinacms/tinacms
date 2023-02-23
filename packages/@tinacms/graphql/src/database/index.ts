@@ -9,14 +9,13 @@ import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import type {
-  CollectionFieldsWithNamespace,
   CollectionTemplateable,
-  CollectionTemplatesWithNamespace,
-  Templateable,
   TinaCloudCollection,
-  TinaCloudSchemaBase,
-  TinaFieldInner,
+  Collection,
+  Schema,
+  TinaField,
   TinaSchema,
+  Template,
 } from '@tinacms/schema-tools'
 import type { Bridge } from '../database/bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
@@ -119,11 +118,7 @@ export class Database {
 
   private collectionForPath = async (
     filepath: string
-  ): Promise<
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
-    | undefined
-  > => {
+  ): Promise<Collection<true> | undefined> => {
     const tinaSchema = await this.getSchema(this.level)
     return tinaSchema.getCollectionByFullPath(filepath)
   }
@@ -134,11 +129,7 @@ export class Database {
   private async partitionPathsByCollection(documentPaths: string[]) {
     const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
-    const collections: Record<
-      string,
-      | CollectionFieldsWithNamespace<true>
-      | CollectionTemplatesWithNamespace<true>
-    > = {}
+    const collections: Record<string, Collection<true>> = {}
     for (const documentPath of documentPaths) {
       const collection = await this.collectionForPath(documentPath)
       if (collection) {
@@ -403,7 +394,7 @@ export class Database {
     const tinaSchema = await this.getSchema()
     const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
 
-    let template: Templateable | undefined
+    let template: Template | undefined
     if (templateInfo.type === 'object') {
       template = templateInfo.template
     }
@@ -548,9 +539,7 @@ export class Database {
     const _graphql = await this.bridge.get(graphqlPath)
     return JSON.parse(_graphql)
   }
-  public getTinaSchema = async (
-    level?: Level
-  ): Promise<TinaCloudSchemaBase> => {
+  public getTinaSchema = async (level?: Level): Promise<Schema> => {
     await this.initLevel()
     const schemaPath = normalizePath(
       path.join(this.getGeneratedFolder(), `_schema.json`)
@@ -560,7 +549,7 @@ export class Database {
         CONTENT_ROOT_PREFIX,
         SUBLEVEL_OPTIONS
       )
-      .get(schemaPath)) as unknown as TinaCloudSchemaBase
+      .get(schemaPath)) as unknown as Schema
   }
 
   public getSchema = async (level?: Level) => {
@@ -588,7 +577,7 @@ export class Database {
             }
 
             if (collection.fields) {
-              for (const field of collection.fields as TinaFieldInner<true>[]) {
+              for (const field of collection.fields as TinaField<true>[]) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
                   field.type ===
@@ -618,7 +607,7 @@ export class Database {
                 indexDefinitions[index.name] = {
                   fields: index.fields.map((indexField) => ({
                     name: indexField.name,
-                    type: (collection.fields as TinaFieldInner<true>[]).find(
+                    type: (collection.fields as TinaField<true>[]).find(
                       (field) => indexField.name === field.name
                     )?.type,
                   })),
@@ -1104,9 +1093,7 @@ const _indexContent = async (
   level: Level,
   documentPaths: string[],
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?:
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
+  collection?: Collection<true>
 ) => {
   let collectionIndexDefinitions
   if (collection) {
@@ -1173,9 +1160,7 @@ const _deleteIndexContent = async (
   database: Database,
   documentPaths: string[],
   enequeueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?:
-    | CollectionFieldsWithNamespace<true>
-    | CollectionTemplatesWithNamespace<true>
+  collection?: Collection<true>
 ) => {
   let collectionIndexDefinitions
   if (collection) {

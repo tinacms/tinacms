@@ -65,6 +65,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
 
   return (
     <Button
+      data-test={name.replace(/\s/g, '-').toLowerCase()}
       variant={primary ? 'primary' : 'secondary'}
       onClick={onClick}
       busy={submitting}

@@ -1,5 +1,12 @@
 # @tinacms/app
 
+## 1.1.1
+
+### Patch Changes
+
+- 3b1fe23ef: Remove rich-text sandbox app, fix issue with registering forms
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+
 ## 1.1.0
 
 ### Minor Changes
