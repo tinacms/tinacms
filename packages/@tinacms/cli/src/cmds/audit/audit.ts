@@ -10,7 +10,7 @@ import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
 type AuditArgs = {
-  collection: TinaCloudCollection
+  collection: TinaCloudCollection<true>
   database: Database
   rootPath: string
   documents: { node: { path: string } }[]

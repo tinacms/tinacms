@@ -11,9 +11,8 @@ import {
   TinaFieldBase,
   TinaFieldEnriched,
   TinaCloudSchema,
-  TinaCloudCollectionEnriched,
-  TinaCloudTemplateEnriched,
   TinaCloudCollection,
+  Template,
   validateTinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
@@ -134,9 +133,9 @@ const validationCollectionsPathAndMatch = (
 
 // TODO: use ZOD instead of Yup
 const validateCollection = async (
-  collection: TinaCloudCollectionEnriched
-): Promise<TinaCloudCollectionEnriched> => {
-  let templates: TinaCloudTemplateEnriched[] = []
+  collection: TinaCloudCollection<true>
+): Promise<TinaCloudCollection<true>> => {
+  let templates: Template<true>[] = []
   let fields: TinaFieldEnriched[] = []
   const messageName = collection.namespace.join('.')
   const collectionSchema = yup.object({
@@ -157,7 +156,7 @@ const validateCollection = async (
   await collectionSchema.validate(collection)
   const validCollection = (await collectionSchema.cast(
     collection
-  )) as TinaCloudCollectionEnriched
+  )) as TinaCloudCollection<true>
   if (validCollection.templates) {
     templates = await sequential(
       validCollection.templates,
@@ -168,7 +167,7 @@ const validateCollection = async (
         return {
           ...validCollection,
           ...fields,
-        } as TinaCloudTemplateEnriched
+        } as Template<true>
       }
     )
   }
@@ -182,7 +181,7 @@ const validateCollection = async (
     return {
       ...validCollection,
       fields,
-    } as TinaCloudCollectionEnriched
+    } as TinaCloudCollection<true>
   }
 
   return collection

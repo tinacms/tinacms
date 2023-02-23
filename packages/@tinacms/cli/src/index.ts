@@ -10,7 +10,6 @@ export type {
   TinaCloudSchema,
   TinaSchema,
   TinaCloudCollection,
-  TinaCollection,
   TinaField,
   TinaTemplate,
 } from '@tinacms/graphql'

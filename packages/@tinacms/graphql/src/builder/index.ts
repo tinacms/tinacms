@@ -20,7 +20,7 @@ import type {
 } from 'graphql'
 
 import type {
-  TinaCloudCollectionEnriched,
+  TinaCloudCollection,
   TinaFieldEnriched,
   CollectionTemplateable,
   Collectable,
@@ -74,7 +74,7 @@ export class Builder {
    * @param collections
    */
   public buildCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     const name = 'collection'
     const typeName = 'Collection'
@@ -162,7 +162,7 @@ export class Builder {
    * @param collections
    */
   public buildMultiCollectionDefinition = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     const name = 'collections'
     const typeName = 'Collection'
@@ -222,7 +222,7 @@ export class Builder {
    * @param collections
    */
   public multiCollectionDocument = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     const name = 'document'
     const args = [
@@ -302,7 +302,7 @@ export class Builder {
    * @param collections
    */
   public buildCreateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'createDocument',
@@ -345,7 +345,7 @@ export class Builder {
    * @param collections
    */
   public buildUpdateCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'updateDocument',
@@ -387,7 +387,7 @@ export class Builder {
    * @param collections
    */
   public buildDeleteCollectionDocumentMutation = async (
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   ) => {
     return astBuilder.FieldDefinition({
       name: 'deleteDocument',
@@ -420,9 +420,7 @@ export class Builder {
    *
    * @param collection
    */
-  public collectionDocument = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionDocument = async (collection: TinaCloudCollection<true>) => {
     const name = NAMER.queryName([collection.name])
     const type = await this._buildCollectionDocumentType(collection)
     const args = [
@@ -455,9 +453,7 @@ export class Builder {
    * @public
    * @param collection a Tina Cloud collection
    */
-  public collectionFragment = async (
-    collection: TinaCloudCollectionEnriched
-  ) => {
+  public collectionFragment = async (collection: TinaCloudCollection<true>) => {
     const name = NAMER.dataTypeName(collection.namespace)
     const fragmentName = NAMER.fragmentName(collection.namespace)
     const selections = await this._getCollectionFragmentSelections(
@@ -487,7 +483,7 @@ export class Builder {
    *
    * */
   private _getCollectionFragmentSelections = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: TinaCloudCollection<true>,
     depth: number
   ) => {
     const selections = []
@@ -652,7 +648,7 @@ export class Builder {
    * @param collection
    */
   public updateCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
+    collection: TinaCloudCollection<true>
   ) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
@@ -687,7 +683,7 @@ export class Builder {
    * @param collection
    */
   public createCollectionDocumentMutation = async (
-    collection: TinaCloudCollectionEnriched
+    collection: TinaCloudCollection<true>
   ) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
@@ -725,7 +721,7 @@ export class Builder {
    * @param collection
    */
   public collectionDocumentList = async (
-    collection: TinaCloudCollectionEnriched
+    collection: TinaCloudCollection<true>
   ) => {
     const connectionName = NAMER.referenceConnectionType(collection.namespace)
 
@@ -750,7 +746,7 @@ export class Builder {
   public buildStaticDefinitions = () => staticDefinitions
 
   private _buildCollectionDocumentType = async (
-    collection: TinaCloudCollectionEnriched,
+    collection: TinaCloudCollection<true>,
     suffix: string = '',
     extraFields: FieldDefinitionNode[] = [],
     extraInterfaces: NamedTypeNode[] = []
@@ -889,7 +885,7 @@ export class Builder {
     collections,
   }: {
     fieldName: string
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
   }) => {
     const types: string[] = []
     collections.forEach((collection) => {
@@ -931,7 +927,7 @@ export class Builder {
     fieldName: string
     namespace: string[]
     nodeType: string | TypeDefinitionNode
-    collections: TinaCloudCollectionEnriched[]
+    collections: TinaCloudCollection<true>[]
     connectionNamespace: string[]
   }) => {
     const connectionName = NAMER.referenceConnectionType(namespace)
@@ -1208,7 +1204,7 @@ export class Builder {
     collectableTemplate: CollectionTemplateable,
     extraFields = [],
     extraInterfaces = [],
-    collection?: TinaCloudCollectionEnriched
+    collection?: TinaCloudCollection<true>
   ): Promise<UnionTypeDefinitionNode | ObjectTypeDefinitionNode> => {
     if (collectableTemplate.type === 'union') {
       const name = NAMER.dataTypeName(collectableTemplate.namespace)

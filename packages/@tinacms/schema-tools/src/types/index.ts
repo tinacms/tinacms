@@ -1,6 +1,3 @@
-/**
-
-*/
 import type { FC } from 'react'
 
 import { TinaSchema } from '../schema'
@@ -49,9 +46,6 @@ type MaybeNamespace<WithNamespace extends boolean> = WithNamespace extends true
 export type TinaCloudCollection<WithNamespace extends boolean> =
   | CollectionFields<WithNamespace>
   | CollectionTemplates<WithNamespace>
-
-export type TinaCloudCollectionBase = TinaCloudCollection<false>
-export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
 
 type FormatType = 'json' | 'md' | 'markdown' | 'mdx'
 
@@ -142,16 +136,6 @@ interface BaseCollection {
 }
 
 export type TinaTemplate = Template<false>
-// const collections: TinaCloudCollectionEnriched[] = [{
-//   name: '',
-//   path: '',
-//   // namespace: [],
-//   fields: []
-// }]
-// const schema = {
-//   collections
-// }
-// new TinaSchema(schema)
 
 export type CollectionTemplates<WithNamespace extends boolean> = {
   label?: string
@@ -415,8 +399,6 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
   list?: boolean
 }
 
-export type TinaCloudTemplateBase = Template<false>
-export type TinaCloudTemplateEnriched = Template<true>
 /**
  * Templates allow you to define an object as polymorphic
  */
