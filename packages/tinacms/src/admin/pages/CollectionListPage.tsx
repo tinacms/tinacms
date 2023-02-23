@@ -35,7 +35,11 @@ import {
   Toggle,
   textFieldClasses,
 } from '@tinacms/toolkit'
-import type { Collection, Template, DocumentSys } from '../types'
+import type {
+  CollectionResponse,
+  TemplateResponse,
+  DocumentSys,
+} from '../types'
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
 import { RouteMappingPlugin } from '../plugins/route-mapping'
@@ -44,12 +48,12 @@ import { TinaAdminApi } from '../api'
 import { useState } from 'react'
 import { CursorPaginator } from '@tinacms/toolkit'
 import { useEffect } from 'react'
-import type { TinaCloudCollection } from '@tinacms/schema-tools'
+import type { Collection } from '@tinacms/schema-tools'
 
 const LOCAL_STORAGE_KEY = 'tinacms.admin.collection.list.page'
 const isSSR = typeof window === 'undefined'
 
-const TemplateMenu = ({ templates }: { templates: Template[] }) => {
+const TemplateMenu = ({ templates }: { templates: TemplateResponse[] }) => {
   return (
     <Menu as="div" className="relative inline-block text-left">
       {() => (
@@ -98,9 +102,9 @@ const handleNavigate = (
   navigate: NavigateFunction,
   cms: TinaCMS,
   // FIXME: `Collection` is deceiving because it's just the value we get back from the API request
-  collection: Collection,
+  collection: CollectionResponse,
   // The actual Collection definition
-  collectionDefinition: TinaCloudCollection<true>,
+  collectionDefinition: Collection<true>,
   document: DocumentSys
 ) => {
   /**
@@ -228,10 +232,10 @@ const CollectionListPage = () => {
             }
           >
             {(
-              collection: Collection,
+              collection: CollectionResponse,
               _loading,
               reFetchCollection,
-              collectionExtra: TinaCloudCollection<true>
+              collectionExtra: Collection<true>
             ) => {
               const totalCount = collection.documents.totalCount
               const documents = collection.documents.edges

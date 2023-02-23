@@ -10,7 +10,7 @@ import * as yup from 'yup'
 import {
   TinaField,
   TinaCloudSchema,
-  TinaCloudCollection,
+  Collection,
   Template,
   validateTinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
@@ -50,9 +50,7 @@ export const validateSchema = async (
   }
 }
 
-const validationCollectionsPathAndMatch = (
-  collections: TinaCloudCollection<true>[]
-) => {
+const validationCollectionsPathAndMatch = (collections: Collection<true>[]) => {
   // Early return if no two `path` are the same
   const paths = collections.map((x) => x.path)
   if (paths.length === new Set(paths).size) {
@@ -116,7 +114,7 @@ const validationCollectionsPathAndMatch = (
   }, Object.create(null))
 
   Object.keys(groupbyPath).forEach((key) => {
-    const collectionsArr: TinaCloudCollection<true>[] = groupbyPath[key]
+    const collectionsArr: Collection<true>[] = groupbyPath[key]
     if (collectionsArr.length === 1) {
       return
     }
@@ -132,8 +130,8 @@ const validationCollectionsPathAndMatch = (
 
 // TODO: use ZOD instead of Yup
 const validateCollection = async (
-  collection: TinaCloudCollection<true>
-): Promise<TinaCloudCollection<true>> => {
+  collection: Collection<true>
+): Promise<Collection<true>> => {
   let templates: Template<true>[] = []
   let fields: TinaField<true>[] = []
   const messageName = collection.namespace.join('.')
@@ -155,7 +153,7 @@ const validateCollection = async (
   await collectionSchema.validate(collection)
   const validCollection = (await collectionSchema.cast(
     collection
-  )) as TinaCloudCollection<true>
+  )) as Collection<true>
   if (validCollection.templates) {
     templates = await sequential(
       validCollection.templates,
@@ -180,7 +178,7 @@ const validateCollection = async (
     return {
       ...validCollection,
       fields,
-    } as TinaCloudCollection<true>
+    } as Collection<true>
   }
 
   return collection

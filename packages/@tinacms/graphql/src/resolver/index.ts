@@ -12,7 +12,7 @@ import { parseMDX, stringifyMDX } from '../mdx'
 import type {
   Collectable,
   ReferenceType,
-  TinaCloudCollection,
+  Collection,
   TinaField,
   Template,
   TinaSchema,
@@ -250,7 +250,7 @@ export class Resolver {
     args,
     isAddPendingDocument,
   }: {
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
     realPath: string
     args: unknown
     isAddPendingDocument: boolean
@@ -315,7 +315,7 @@ export class Resolver {
     isAddPendingDocument,
     isCollectionSpecific,
   }: {
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
     realPath: string
     args: unknown
     isAddPendingDocument: boolean
@@ -604,7 +604,7 @@ export class Resolver {
     hydrator,
   }: {
     args: Record<string, Record<string, object> | string | number>
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
     hydrator?: (string) => any
   }) => {
     let conditions: FilterCondition[]

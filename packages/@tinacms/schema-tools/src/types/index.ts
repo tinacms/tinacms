@@ -32,7 +32,7 @@ type UIField<F extends UIField = any, Shape = any> = {
 }
 
 export interface TinaCloudSchema<WithNamespace extends boolean = false> {
-  collections: TinaCloudCollection<WithNamespace>[]
+  collections: Collection<WithNamespace>[]
   /**
    * @deprecated use `defineConfig` in a config.{js,ts} file instead
    */
@@ -43,9 +43,13 @@ type MaybeNamespace<WithNamespace extends boolean> = WithNamespace extends true
   ? { namespace: string[] }
   : {}
 
-export type TinaCloudCollection<WithNamespace extends boolean> =
+export type Collection<WithNamespace extends boolean = false> =
   | CollectionFields<WithNamespace>
   | CollectionTemplates<WithNamespace>
+
+/** @deprecated use Collection instead */
+export type TinaCloudCollection<WithNamespace extends boolean> =
+  Collection<WithNamespace>
 
 type FormatType = 'json' | 'md' | 'markdown' | 'mdx'
 
@@ -103,7 +107,7 @@ export interface UICollection {
    */
   router?: (args: {
     document: Document
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
   }) => string | undefined
 }
 
@@ -137,13 +141,13 @@ interface BaseCollection {
 
 export type TinaTemplate = Template<false>
 
-export type CollectionTemplates<WithNamespace extends boolean> = {
+type CollectionTemplates<WithNamespace extends boolean> = {
   templates: Template<WithNamespace>[]
   fields?: undefined
 } & BaseCollection &
   MaybeNamespace<WithNamespace>
 
-export type CollectionFields<WithNamespace extends boolean> = {
+type CollectionFields<WithNamespace extends boolean> = {
   fields: TinaField<WithNamespace>[]
   templates?: undefined
 } & BaseCollection &
@@ -392,6 +396,6 @@ export type CollectionTemplateable =
   | CollectionTemplateableObject
 
 export type Collectable = Pick<
-  TinaCloudCollection<true>,
+  Collection<true>,
   'namespace' | 'templates' | 'fields' | 'name'
 > & { label?: string }

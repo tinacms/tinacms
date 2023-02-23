@@ -9,8 +9,7 @@ import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import type {
-  CollectionFields,
-  CollectionTemplates,
+  Collection,
   TinaCloudSchema,
   TinaField,
   TinaSchema,
@@ -115,9 +114,7 @@ export class Database {
 
   private collectionForPath = async (
     filepath: string
-  ): Promise<
-    CollectionFields<true> | CollectionTemplates<true> | undefined
-  > => {
+  ): Promise<Collection<true> | undefined> => {
     const tinaSchema = await this.getSchema(this.level)
     return tinaSchema.getCollectionByFullPath(filepath)
   }
@@ -128,10 +125,7 @@ export class Database {
   private async partitionPathsByCollection(documentPaths: string[]) {
     const pathsByCollection: Record<string, string[]> = {}
     const nonCollectionPaths: string[] = []
-    const collections: Record<
-      string,
-      CollectionFields<true> | CollectionTemplates<true>
-    > = {}
+    const collections: Record<string, Collection<true>> = {}
     for (const documentPath of documentPaths) {
       const collection = await this.collectionForPath(documentPath)
       if (collection) {
@@ -1055,7 +1049,7 @@ const _indexContent = async (
   level: Level,
   documentPaths: string[],
   enqueueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?: CollectionFields<true> | CollectionTemplates<true>
+  collection?: Collection<true>
 ) => {
   let collectionIndexDefinitions
   if (collection) {
@@ -1113,7 +1107,7 @@ const _deleteIndexContent = async (
   database: Database,
   documentPaths: string[],
   enequeueOps: (ops: BatchOp[]) => Promise<void>,
-  collection?: CollectionFields<true> | CollectionTemplates<true>
+  collection?: Collection<true>
 ) => {
   let collectionIndexDefinitions
   if (collection) {

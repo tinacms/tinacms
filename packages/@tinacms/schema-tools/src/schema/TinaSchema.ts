@@ -1,6 +1,6 @@
 import {
   TinaCloudSchema,
-  TinaCloudCollection,
+  Collection,
   Template,
   Collectable,
   CollectionTemplateable,
@@ -52,9 +52,7 @@ export class TinaSchema {
     )
     return paths
   }
-  public getCollection = (
-    collectionName: string
-  ): TinaCloudCollection<true> => {
+  public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
     )
@@ -143,7 +141,7 @@ export class TinaSchema {
     filepath: string,
     templateName?: string
   ): {
-    collection: TinaCloudCollection<true>
+    collection: Collection<true>
     template: Template<true>
   } => {
     let template

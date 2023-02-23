@@ -3,7 +3,7 @@
 */
 
 import { resolveField } from './resolveField'
-import type { Template, TinaCloudCollection } from '../types/index'
+import type { Template, Collection } from '../types/index'
 import type { TinaSchema } from './TinaSchema'
 
 /**
@@ -26,7 +26,7 @@ export const resolveForm = ({
 }
 
 type ResolveFormArgs = {
-  collection: TinaCloudCollection<true>
+  collection: Collection<true>
   basename: string
   template: Template<true>
   schema: TinaSchema

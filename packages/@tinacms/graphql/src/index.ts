@@ -8,7 +8,7 @@ import { buildASTSchema } from 'graphql'
 
 import type {
   TinaCloudSchema,
-  TinaCloudCollection,
+  Collection,
   Template as TinaTemplate,
 } from '@tinacms/schema-tools'
 
@@ -60,7 +60,7 @@ export const getASTSchema = async (database: Database) => {
 }
 
 export type TinaSchema = TinaCloudSchema
-export type { TinaTemplate, TinaCloudSchema, TinaCloudCollection }
+export type { TinaTemplate, TinaCloudSchema, Collection }
 
 // Bridge exports
 export {

@@ -3,14 +3,14 @@
 */
 
 import { resolve } from '@tinacms/graphql'
-import type { Database, TinaCloudCollection } from '@tinacms/graphql'
+import type { Database, Collection } from '@tinacms/graphql'
 import path from 'path'
 import { logger } from '../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
 type AuditArgs = {
-  collection: TinaCloudCollection<true>
+  collection: Collection<true>
   database: Database
   rootPath: string
   documents: { node: { path: string } }[]

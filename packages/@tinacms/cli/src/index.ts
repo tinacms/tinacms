@@ -9,7 +9,7 @@ import { logger } from './logger'
 export type {
   TinaCloudSchema,
   TinaSchema,
-  TinaCloudCollection,
+  Collection,
   TinaTemplate,
 } from '@tinacms/graphql'
 

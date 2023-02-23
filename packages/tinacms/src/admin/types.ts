@@ -2,7 +2,7 @@
 
 */
 
-export interface Template {
+export interface TemplateResponse {
   name: string
   label: string
   fields: any[]
@@ -39,12 +39,12 @@ export interface DocumentSys {
   }
 }
 
-export interface Collection {
+export interface CollectionResponse {
   label: string
   name: string
   slug: string
   format?: string
-  templates?: Template[]
+  templates?: TemplateResponse[]
   documents?: {
     totalCount?: number
     pageInfo: {

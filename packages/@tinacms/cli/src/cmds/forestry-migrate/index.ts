@@ -7,11 +7,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import minimatch from 'minimatch'
 import { parseFile, stringifyFile } from '@tinacms/graphql'
-import type {
-  TinaCloudCollection,
-  UICollection,
-  TinaField,
-} from '@tinacms/schema-tools'
+import type { Collection, UICollection, TinaField } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
 import { warnText } from '../../utils/theme'
@@ -73,7 +69,7 @@ export const generateCollections = async ({
   const forestryYaml = yaml.load(forestryConfig.toString())
 
   const forestrySchema = parseSections({ val: forestryYaml })
-  const collections: TinaCloudCollection<false>[] = []
+  const collections: Collection<false>[] = []
 
   const sections = forestrySchema.sections
 
@@ -151,7 +147,7 @@ export const generateCollections = async ({
             }
           })
           // Add the collection to the list of collections with its templates
-          const c: TinaCloudCollection<false> = {
+          const c: Collection<false> = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -202,7 +198,7 @@ export const generateCollections = async ({
               console.error(e)
             }
           })
-          const c: TinaCloudCollection<false> = {
+          const c: Collection<false> = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -243,7 +239,7 @@ export const generateCollections = async ({
 
       // const dir = path.dirname(section.path)
 
-      // const c: TinaCloudCollection<false> = {
+      // const c: Collection<false> = {
       //   label: section.label,
       //   name: stringifyLabel(section.label),
       //   path: dir,
