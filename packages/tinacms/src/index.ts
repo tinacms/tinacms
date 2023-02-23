@@ -26,23 +26,23 @@ export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
 import {
   TinaSchema,
-  SchemaField,
+  TinaField,
   Config,
   Schema,
   Collection,
   Template,
 } from '@tinacms/schema-tools'
 
-export type { Config, Schema, Collection, Template, SchemaField, TinaSchema }
+export type { Config, Schema, Collection, Template, TinaField, TinaSchema }
 
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaFieldEnriched = SchemaField
+export type TinaFieldEnriched = TinaField
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaField = SchemaField
+export type SchemaField = TinaField
 /**
  * @deprecated use `Template` instead
  */

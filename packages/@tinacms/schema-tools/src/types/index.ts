@@ -8,7 +8,7 @@ type Meta = {
 }
 
 type Component<Type, List> = (props: {
-  field: SchemaField & { namespace: string[] }
+  field: TinaField & { namespace: string[] }
   input: {
     /**
      * The full name of the field, for fields nested inside object
@@ -374,12 +374,11 @@ type Field<WithNamespace extends boolean = false> = (
 ) &
   MaybeNamespace<WithNamespace>
 
+export type TinaField<WithNamespace extends boolean = false> =
+  Field<WithNamespace> & MaybeNamespace<WithNamespace>
+
 type MaybeNamespace<WithNamespace extends boolean = false> =
   WithNamespace extends true ? { namespace: string[] } : {}
-// Aliasing to SchemaField as Field is taken by internal use (which is exported)
-type SchemaField<WithNamespace extends boolean = false> = Field<WithNamespace>
-
-export type { SchemaField }
 
 export type Template<WithNamespace extends boolean = false> = {
   label?: string | boolean
@@ -720,9 +719,6 @@ type IndexType = {
   }[]
 }
 
-export type TinaField<WithNamespace extends boolean = false> =
-  SchemaField<WithNamespace> & MaybeNamespace<WithNamespace>
-
 export type Option =
   | string
   | {
@@ -760,17 +756,6 @@ export type UITemplate = {
   previewSrc?: string
 }
 
-// /**
-//  * Templates allow you to define an object as polymorphic
-//  */
-// export type Template<WithNamespace extends boolean = false> = {
-//   label?: string | boolean
-//   name: string
-//   ui?: UITemplate
-//   fields: TinaField<WithNamespace>[]
-// } & MaybeNamespace<WithNamespace>
-
-// Builder types
 export type CollectionTemplateableUnion = {
   namespace: string[]
   type: 'union'
@@ -854,3 +839,6 @@ export type ReferenceTypeInner = ReferenceType<false>
 export type ReferenceTypeWithNamespace = ReferenceType<true>
 /** @deprecated use RichTextField instead */
 export type RichTypeWithNamespace = RichTextField<true>
+/** @deprecated use TinaField instead */
+export type SchemaField<WithNamespace extends boolean = false> =
+  TinaField<WithNamespace>
