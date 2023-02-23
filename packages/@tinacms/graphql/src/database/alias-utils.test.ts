@@ -12,7 +12,15 @@ const template: Templateable = {
       namespace: [],
       type: 'object',
       nameOverride: 'c',
-      fields: [{ name: 'subfield', namespace: [], type: 'string' }],
+      fields: [
+        { name: 'subfield', namespace: [], type: 'string' },
+        {
+          name: 'aliasedSubfield',
+          nameOverride: 'd',
+          namespace: [],
+          type: 'string',
+        },
+      ],
     },
     { name: 'normalField', namespace: [], type: 'string' },
   ],
@@ -26,49 +34,68 @@ describe('replaceNameOverrides', () => {
     })
   })
   describe('with payload', () => {
-    it('should return an object with field names replaced with their nameOverrides', () => {
-      const obj = {
-        a: 1,
-        b: {
-          subfield: 2,
-        },
-        normalField: 'value',
-      }
-      expect(replaceNameOverrides(template, obj)).toEqual({
-        field1: 1,
-        field2: {
-          subfield: 2,
-        },
-        normalField: 'value',
+    describe('with nested alias', () => {
+      it('should return an object with field names replaced with their nameOverrides', () => {
+        const obj = {
+          a: 1,
+          c: {
+            d: 3,
+          },
+        }
+        expect(replaceNameOverrides(template, obj)).toEqual({
+          field1: 1,
+          objectfield: {
+            aliasedSubfield: 3,
+          },
+        })
       })
     })
 
-    it('should return an object with nested objects with field names replaced with their nameOverrides', () => {
-      const obj = {
-        a: 1,
-        c: {
-          subfield: 2,
-        },
-      }
-      const expected = {
-        field1: 1,
-        objectfield: {
-          subfield: 2,
-        },
-      }
-      expect(replaceNameOverrides(template, obj)).toEqual(expected)
-    })
+    describe('with root level alias', () => {
+      it('should return an object with field names replaced with their nameOverrides', () => {
+        const obj = {
+          a: 1,
+          b: {
+            subfield: 2,
+          },
+          normalField: 'value',
+        }
+        expect(replaceNameOverrides(template, obj)).toEqual({
+          field1: 1,
+          field2: {
+            subfield: 2,
+          },
+          normalField: 'value',
+        })
+      })
 
-    it('should not modify the input object', () => {
-      const obj = {
-        a: 1,
-        c: {
-          subfield: 2,
-        },
-      }
-      const originalObj = { ...obj }
-      replaceNameOverrides(template, obj)
-      expect(obj).toEqual(originalObj)
+      it('should return nested objects in response', () => {
+        const obj = {
+          a: 1,
+          c: {
+            subfield: 2,
+          },
+        }
+        const expected = {
+          field1: 1,
+          objectfield: {
+            subfield: 2,
+          },
+        }
+        expect(replaceNameOverrides(template, obj)).toEqual(expected)
+      })
+
+      it('should not modify the input object', () => {
+        const obj = {
+          a: 1,
+          c: {
+            subfield: 2,
+          },
+        }
+        const originalObj = { ...obj }
+        replaceNameOverrides(template, obj)
+        expect(obj).toEqual(originalObj)
+      })
     })
   })
 })
@@ -81,46 +108,66 @@ describe('applyNameOverrides', () => {
     })
   })
   describe('with payload', () => {
-    it('should replace the field names in a simple object with their corresponding nameOverrides specified in the `template`', () => {
-      const obj = {
-        field1: 1,
-        field2: 2,
-        normalfield: 'value',
-      }
-      const expected = {
-        a: 1,
-        b: 2,
-        normalfield: 'value',
-      }
-      expect(applyNameOverrides(template, obj)).toEqual(expected)
+    describe('with root-level nameOverride', () => {
+      it('should replace the field names', () => {
+        const obj = {
+          field1: 1,
+          field2: 2,
+          normalfield: 'value',
+        }
+        const expected = {
+          a: 1,
+          b: 2,
+          normalfield: 'value',
+        }
+        expect(applyNameOverrides(template, obj)).toEqual(expected)
+      })
+
+      it('should replace the field names for nested fields', () => {
+        const obj = {
+          field1: 1,
+          objectfield: {
+            subfield: 2,
+          },
+        }
+        const expected = {
+          a: 1,
+          c: {
+            subfield: 2,
+          },
+        }
+        expect(applyNameOverrides(template, obj)).toEqual(expected)
+      })
+
+      it('should not modify the input object', () => {
+        const obj = {
+          field1: 1,
+          objectfield: {
+            subfield: 2,
+          },
+        }
+        const originalObj = { ...obj }
+        applyNameOverrides(template, obj)
+        expect(obj).toEqual(originalObj)
+      })
     })
 
-    it('should replace the field names in an object with nested objects with their corresponding nameOverrides specified in the `template`', () => {
-      const obj = {
-        field1: 1,
-        objectfield: {
-          subfield: 2,
-        },
-      }
-      const expected = {
-        a: 1,
-        c: {
-          subfield: 2,
-        },
-      }
-      expect(applyNameOverrides(template, obj)).toEqual(expected)
-    })
-
-    it('should not modify the input object', () => {
-      const obj = {
-        field1: 1,
-        objectfield: {
-          subfield: 2,
-        },
-      }
-      const originalObj = { ...obj }
-      applyNameOverrides(template, obj)
-      expect(obj).toEqual(originalObj)
+    describe('with nested nameOverride', () => {
+      it('should return an object with field names replaced with their nameOverrides', () => {
+        const obj = {
+          field1: 1,
+          objectfield: {
+            aliasedSubfield: 2,
+          },
+        }
+        const expected = {
+          a: 1,
+          c: {
+            d: 2,
+          },
+        }
+        expect(applyNameOverrides(template, obj)).toEqual(expected)
+      })
     })
   })
 })
