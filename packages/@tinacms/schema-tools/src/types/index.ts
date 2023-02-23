@@ -138,63 +138,24 @@ interface BaseCollection {
 export type TinaTemplate = Template<false>
 
 export type CollectionTemplates<WithNamespace extends boolean> = {
-  label?: string
-  name: string
-  path: string
-  defaultItem?: DefaultItem<Record<string, any>>
-  indexes?: TinaIndex[]
-  format?: FormatType
-  /**
-   * This format will be used to parse the markdown frontmatter
-   */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json'
-  /**
-   * The delimiters used to parse the frontmatter.
-   */
-  frontmatterDelimiters?: [string, string] | string
-  ui?: UICollection
-  match?: string
   templates: Template<WithNamespace>[]
   fields?: undefined
-} & MaybeNamespace<WithNamespace>
+} & BaseCollection &
+  MaybeNamespace<WithNamespace>
 
 export type CollectionFields<WithNamespace extends boolean> = {
-  label?: string
-  name: string
-  path: string
-  defaultItem?: DefaultItem<Record<string, any>>
-  indexes?: TinaIndex[]
-  format?: FormatType
-  /**
-   * This format will be used to parse the markdown frontmatter
-   */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json'
-  /**
-   * The delimiters used to parse the frontmatter.
-   */
-  frontmatterDelimiters?: [string, string] | string
-  ui?: UICollection
-  match?: string
-  fields: TinaFieldInner<WithNamespace>[]
+  fields: TinaField<WithNamespace>[]
   templates?: undefined
-} & MaybeNamespace<WithNamespace>
+} & BaseCollection &
+  MaybeNamespace<WithNamespace>
 
-export type TinaFieldInner<WithNamespace extends boolean> =
+export type TinaField<WithNamespace extends boolean = false> =
   | ScalarType<WithNamespace>
   | ObjectType<WithNamespace>
   | ReferenceType<WithNamespace>
   | RichType<WithNamespace>
 
-export type TinaFieldBase = TinaFieldInner<false>
-export type TinaFieldEnriched = TinaFieldInner<true> & {
-  /**
-   * The parentTypename will always be an object type, either the type of a
-   * collection (ie. `Post`) or of an object field (ie. `PageBlocks`).
-   */
-  parentTypename?: string
-}
-
-export interface TinaField {
+export interface TinaFieldBase {
   name: string
   label?: string
   description?: string
@@ -219,7 +180,7 @@ export type Option =
       icon?: FC
       value: string
     }
-type ScalarTypeInner = TinaField &
+type ScalarTypeInner = TinaFieldBase &
   TinaScalarField & {
     options?: Option[]
   }
@@ -305,20 +266,21 @@ export type ReferenceType<WithNamespace extends boolean> = ReferenceTypeInner &
 export type RichType<WithNamespace extends boolean = false> =
   RichTypeInner<WithNamespace> & MaybeNamespace<WithNamespace>
 
-export type RichTypeInner<WithNamespace extends boolean = false> = TinaField & {
-  type: 'rich-text'
-  isBody?: boolean
-  list?: boolean
-  parser?:
-    | {
-        type: 'markdown'
-        skipEscaping?: 'all' | 'html' | 'none'
-      }
-    | { type: 'mdx' }
-  templates?: RichTextTemplate<WithNamespace>[]
-}
+export type RichTypeInner<WithNamespace extends boolean = false> =
+  TinaFieldBase & {
+    type: 'rich-text'
+    isBody?: boolean
+    list?: boolean
+    parser?:
+      | {
+          type: 'markdown'
+          skipEscaping?: 'all' | 'html' | 'none'
+        }
+      | { type: 'mdx' }
+    templates?: RichTextTemplate<WithNamespace>[]
+  }
 
-export interface ReferenceTypeInner extends TinaField {
+export interface ReferenceTypeInner extends TinaFieldBase {
   type: 'reference'
   list?: boolean
   collections: string[]
@@ -365,7 +327,7 @@ interface ObjectTemplatesInnerWithoutList<WithNamespace extends boolean>
 }
 
 interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
-  extends TinaField {
+  extends TinaFieldBase {
   type: 'object'
   visualSelector?: boolean
   required?: false
@@ -377,7 +339,8 @@ interface ObjectTemplatesInnerBase<WithNamespace extends boolean>
 type ObjectFields<WithNamespace extends boolean> =
   InnerObjectFields<WithNamespace> & MaybeNamespace<WithNamespace>
 
-interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
+interface InnerObjectFields<WithNamespace extends boolean>
+  extends TinaFieldBase {
   type: 'object'
   visualSelector?: boolean
   required?: false
@@ -394,7 +357,7 @@ interface InnerObjectFields<WithNamespace extends boolean> extends TinaField {
    *
    * You can only provide one of `fields` or `templates`, but not both.
    */
-  fields: TinaFieldInner<WithNamespace>[]
+  fields: TinaField<WithNamespace>[]
   templates?: undefined
   list?: boolean
 }
@@ -406,7 +369,7 @@ export type Template<WithNamespace extends boolean = false> = {
   label?: string
   name: string
   ui?: object | (UIField<any, any> & { previewSrc: string })
-  fields: TinaFieldInner<WithNamespace>[]
+  fields: TinaField<WithNamespace>[]
 } & MaybeNamespace<WithNamespace>
 
 // Builder types

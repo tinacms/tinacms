@@ -12,7 +12,7 @@ import type {
   CollectionFields,
   CollectionTemplates,
   TinaCloudSchema,
-  TinaFieldInner,
+  TinaField,
   TinaSchema,
 } from '@tinacms/schema-tools'
 import type { Bridge } from '../database/bridge'
@@ -539,7 +539,7 @@ export class Database {
             }
 
             if (collection.fields) {
-              for (const field of collection.fields as TinaFieldInner<true>[]) {
+              for (const field of collection.fields as TinaField<true>[]) {
                 if (
                   (field.indexed !== undefined && field.indexed === false) ||
                   field.type ===
@@ -569,7 +569,7 @@ export class Database {
                 indexDefinitions[index.name] = {
                   fields: index.fields.map((indexField) => ({
                     name: indexField.name,
-                    type: (collection.fields as TinaFieldInner<true>[]).find(
+                    type: (collection.fields as TinaField<true>[]).find(
                       (field) => indexField.name === field.name
                     )?.type,
                   })),

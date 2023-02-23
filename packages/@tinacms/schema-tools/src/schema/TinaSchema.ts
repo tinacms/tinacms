@@ -4,7 +4,7 @@ import {
   Template,
   Collectable,
   CollectionTemplateable,
-  TinaFieldEnriched,
+  TinaField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
 
@@ -257,7 +257,7 @@ export class TinaSchema {
     return accumulator
   }
 
-  private transformField = (field: TinaFieldEnriched, value: unknown) => {
+  private transformField = (field: TinaField<true>, value: unknown) => {
     if (field.type === 'object')
       if (field.templates) {
         if (field.list) {
@@ -329,7 +329,7 @@ export class TinaSchema {
   public getTemplatesForCollectable = (
     collection: Collectable
   ): CollectionTemplateable => {
-    let extraFields: TinaFieldEnriched[] = []
+    let extraFields: TinaField<true>[] = []
     if (collection.fields) {
       const template = collection
 

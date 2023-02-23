@@ -2,7 +2,7 @@
 
 */
 
-import { TinaFieldEnriched } from '../types/index'
+import { TinaField } from '../types/index'
 import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
@@ -11,12 +11,12 @@ import { lastItem, NAMER } from '../util'
  * Turns a field the schema (schema.{js,ts} file) into a valid front end FieldConfig
  *
  *
- * @param  {TinaFieldEnriched} field. The field that will be transformed
+ * @param  {TinaField} field. The field that will be transformed
  * @param  {TinaSchema} schema the entireT Tina Schema
  * @returns unknown
  */
 export const resolveField = (
-  field: TinaFieldEnriched,
+  field: TinaField<true>,
   schema: TinaSchema
 ): {
   [key: string]: unknown
@@ -24,11 +24,6 @@ export const resolveField = (
   component: string
   type: string
 } => {
-  field
-  field.parentTypename = NAMER.dataTypeName(
-    // Get the type of the parent namespace
-    field.namespace.filter((_, i) => i < field.namespace.length - 1)
-  )
   const extraFields = field.ui || {}
   switch (field.type) {
     case 'number':

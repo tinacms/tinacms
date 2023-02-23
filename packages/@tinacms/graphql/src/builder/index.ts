@@ -21,10 +21,9 @@ import type {
 
 import type {
   TinaCloudCollection,
-  TinaFieldEnriched,
+  TinaField,
   CollectionTemplateable,
   Collectable,
-  TinaFieldInner,
   Template,
 } from '@tinacms/schema-tools'
 import { TinaSchema } from '@tinacms/schema-tools'
@@ -504,7 +503,7 @@ export class Builder {
   }
 
   private _buildFieldNodeForFragments: (
-    field: TinaFieldInner<true>,
+    field: TinaField<true>,
     depth: number
   ) => Promise<SelectionSetNode | FieldNode | false> = async (field, depth) => {
     switch (field.type) {
@@ -946,7 +945,7 @@ export class Builder {
     })
   }
 
-  private _buildFieldFilter = async (field: TinaFieldEnriched) => {
+  private _buildFieldFilter = async (field: TinaField<true>) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1110,7 +1109,7 @@ export class Builder {
     }
   }
 
-  private _buildFieldMutation = async (field: TinaFieldEnriched) => {
+  private _buildFieldMutation = async (field: TinaField<true>) => {
     switch (field.type) {
       case 'boolean':
         return astBuilder.InputValueDefinition({
@@ -1338,7 +1337,7 @@ export class Builder {
     })
   }
 
-  private _buildDataField = async (field: TinaFieldEnriched) => {
+  private _buildDataField = async (field: TinaField<true>) => {
     const listWarningMsg = `
 WARNING: The user interface for ${field.type} does not support \`list: true\`
 Visit https://tina.io/docs/errors/ui-not-supported/ for more information

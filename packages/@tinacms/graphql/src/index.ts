@@ -10,7 +10,6 @@ import type {
   TinaCloudSchema,
   TinaCloudCollection,
   Template as TinaTemplate,
-  TinaFieldBase,
 } from '@tinacms/schema-tools'
 
 import { buildDotTinaFiles } from './build'
@@ -61,7 +60,6 @@ export const getASTSchema = async (database: Database) => {
 }
 
 export type TinaSchema = TinaCloudSchema
-export type TinaField = TinaFieldBase
 export type { TinaTemplate, TinaCloudSchema, TinaCloudCollection }
 
 // Bridge exports

@@ -8,15 +8,14 @@ import { sequential } from '../util'
 import * as yup from 'yup'
 
 import {
-  TinaFieldBase,
-  TinaFieldEnriched,
+  TinaField,
   TinaCloudSchema,
   TinaCloudCollection,
   Template,
   validateTinaCloudSchemaConfig,
 } from '@tinacms/schema-tools'
 
-const FIELD_TYPES: TinaFieldBase['type'][] = [
+const FIELD_TYPES: TinaField<false>['type'][] = [
   'string',
   'number',
   'boolean',
@@ -136,7 +135,7 @@ const validateCollection = async (
   collection: TinaCloudCollection<true>
 ): Promise<TinaCloudCollection<true>> => {
   let templates: Template<true>[] = []
-  let fields: TinaFieldEnriched[] = []
+  let fields: TinaField<true>[] = []
   const messageName = collection.namespace.join('.')
   const collectionSchema = yup.object({
     name: yup
@@ -187,8 +186,8 @@ const validateCollection = async (
   return collection
 }
 const validateField = async (
-  field: TinaFieldEnriched
-): Promise<TinaFieldEnriched> => {
+  field: TinaField<true>
+): Promise<TinaField<true>> => {
   const messageName = field.namespace.join('.')
   const schema = yup.object({
     name: yup

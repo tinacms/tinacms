@@ -10,7 +10,7 @@ import { parseFile, stringifyFile } from '@tinacms/graphql'
 import type {
   TinaCloudCollection,
   UICollection,
-  TinaFieldInner,
+  TinaField,
 } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
@@ -41,7 +41,7 @@ export const generateAllCollections = async ({
   ).map((tem) => path.basename(tem, '.yml'))
   const templateMap = new Map<
     string,
-    { fields: TinaFieldInner<false>[]; templateObj: any }
+    { fields: TinaField[]; templateObj: any }
   >()
   const proms = allTemplates.map(async (tem) => {
     try {
@@ -111,7 +111,7 @@ export const generateCollections = async ({
             label: string
             name: string
             ui?: UICollection
-            fields: TinaFieldInner<false>[]
+            fields: TinaField[]
           }[] = []
           forestryTemplates.forEach((tem) => {
             try {
@@ -167,7 +167,7 @@ export const generateCollections = async ({
           }
           collections.push(c)
         } else {
-          const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+          const fields: TinaField[] = [BODY_FIELD]
 
           // This is a collection with fields
           forestryTemplates?.forEach((tem) => {

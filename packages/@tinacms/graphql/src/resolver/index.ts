@@ -13,9 +13,8 @@ import type {
   Collectable,
   ReferenceType,
   TinaCloudCollection,
-  TinaFieldEnriched,
+  TinaField,
   Template,
-  TinaFieldInner,
   TinaSchema,
 } from '@tinacms/schema-tools'
 
@@ -560,7 +559,7 @@ export class Resolver {
 
   private async resolveFilterConditions(
     filter: Record<string, Record<string, object>>,
-    fields: TinaFieldInner<false>[],
+    fields: TinaField<false>[],
     collectionName
   ) {
     const conditions: FilterCondition[] = []
@@ -613,7 +612,7 @@ export class Resolver {
       if (collection.fields) {
         conditions = await this.resolveFilterConditions(
           args.filter as Record<string, Record<string, object>>,
-          collection.fields as TinaFieldInner<false>[],
+          collection.fields as TinaField<false>[],
           collection.name
         )
       } else if (collection.templates) {
@@ -625,7 +624,7 @@ export class Resolver {
           if (template) {
             conditions = await this.resolveFilterConditions(
               args.filter[templateName],
-              template.fields as TinaFieldInner<false>[],
+              template.fields as TinaField<false>[],
               `${collection.name}.${templateName}`
             )
           } else {
@@ -736,7 +735,7 @@ export class Resolver {
   }
 
   private resolveFieldData = async (
-    { namespace, ...field }: TinaFieldEnriched,
+    { namespace, ...field }: TinaField<true>,
     rawData: unknown,
     accumulator: { [key: string]: unknown }
   ) => {

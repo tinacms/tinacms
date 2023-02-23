@@ -6,7 +6,7 @@ import type {
   ObjectType,
   ReferenceTypeInner,
   Template,
-  TinaFieldInner,
+  TinaField,
 } from '@tinacms/schema-tools'
 import { FilterCondition } from '../database/datalayer'
 
@@ -22,11 +22,11 @@ export type ReferenceResolver = (
 
 export const resolveReferences = async (
   filter: any,
-  fields: TinaFieldInner<false>[],
+  fields: TinaField[],
   resolver: ReferenceResolver
 ) => {
   for (const fieldKey of Object.keys(filter)) {
-    const fieldDefinition = (fields as TinaFieldInner<false>[]).find(
+    const fieldDefinition = (fields as TinaField[]).find(
       (f) => f.name === fieldKey
     )
     // resolve top level references
@@ -71,7 +71,7 @@ export const resolveReferences = async (
         } else {
           await resolveReferences(
             filter[fieldKey],
-            fieldDefinition.fields as TinaFieldInner<false>[],
+            fieldDefinition.fields as TinaField[],
             resolver
           )
         }
@@ -84,7 +84,7 @@ export const resolveReferences = async (
 
 const collectConditionsForChildFields = (
   filterNode: Record<string, object>,
-  fields: TinaFieldInner<false>[],
+  fields: TinaField[],
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void
 ) => {
@@ -137,7 +137,7 @@ const collectConditionsForObjectField = (
 
     collectConditionsForChildFields(
       filterNode,
-      field.fields as TinaFieldInner<false>[],
+      field.fields as TinaField[],
       filterPath,
       collectCondition
     )
@@ -146,7 +146,7 @@ const collectConditionsForObjectField = (
 
 export const collectConditionsForField = (
   fieldName: string,
-  field: TinaFieldInner<false>,
+  field: TinaField,
   filterNode: Record<string, object>,
   pathExpression: string,
   collectCondition: (condition: FilterCondition) => void
