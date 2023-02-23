@@ -263,22 +263,18 @@ type ImageField =
 export type ReferenceType<WithNamespace extends boolean> = ReferenceTypeInner &
   MaybeNamespace<WithNamespace>
 
-export type RichType<WithNamespace extends boolean = false> =
-  RichTypeInner<WithNamespace> & MaybeNamespace<WithNamespace>
-
-export type RichTypeInner<WithNamespace extends boolean = false> =
-  TinaFieldBase & {
-    type: 'rich-text'
-    isBody?: boolean
-    list?: boolean
-    parser?:
-      | {
-          type: 'markdown'
-          skipEscaping?: 'all' | 'html' | 'none'
-        }
-      | { type: 'mdx' }
-    templates?: RichTextTemplate<WithNamespace>[]
-  }
+export type RichType<WithNamespace extends boolean = false> = TinaFieldBase & {
+  type: 'rich-text'
+  isBody?: boolean
+  list?: boolean
+  parser?:
+    | {
+        type: 'markdown'
+        skipEscaping?: 'all' | 'html' | 'none'
+      }
+    | { type: 'mdx' }
+  templates?: RichTextTemplate<WithNamespace>[]
+} & MaybeNamespace<WithNamespace>
 
 export interface ReferenceTypeInner extends TinaFieldBase {
   type: 'reference'

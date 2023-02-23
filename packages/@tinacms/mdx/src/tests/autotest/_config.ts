@@ -3,11 +3,11 @@
 
 
 */
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichType } from '@tinacms/schema-tools'
 export { output } from '../setup'
 export { parseMDX, stringifyMDX } from '../..'
 
-export const field: RichTypeInner = {
+export const field: RichType = {
   name: 'body',
   type: 'rich-text',
   templates: [

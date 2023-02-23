@@ -4,7 +4,7 @@
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner, RichTextTemplate } from '@tinacms/schema-tools'
+import type { RichType, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -12,14 +12,14 @@ import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTypeInner,
+  field: RichType,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -30,7 +30,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement,
-  parentField: RichTypeInner,
+  parentField: RichType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -41,7 +41,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
