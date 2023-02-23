@@ -25,13 +25,19 @@ import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
 import type {
-  Config,
+  // Config,
   SchemaField,
   // Schema,
   // Collection,
   // Template,
 } from '@tinacms/schema-tools/dist/types'
-import { TinaSchema, Schema, Collection, Template } from '@tinacms/schema-tools'
+import {
+  TinaSchema,
+  Config,
+  Schema,
+  Collection,
+  Template,
+} from '@tinacms/schema-tools'
 
 export type { Config, Schema, Collection, Template, SchemaField, TinaSchema }
 

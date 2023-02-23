@@ -7,7 +7,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import minimatch from 'minimatch'
 import { parseFile, stringifyFile } from '@tinacms/graphql'
-import type { Collection, UICollection, TinaField } from '@tinacms/schema-tools'
+import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
 import { warnText } from '../../utils/theme'
@@ -106,7 +106,7 @@ export const generateCollections = async ({
           const templates: {
             label: string
             name: string
-            ui?: UICollection
+            ui?: UITemplate
             fields: TinaField[]
           }[] = []
           forestryTemplates.forEach((tem) => {

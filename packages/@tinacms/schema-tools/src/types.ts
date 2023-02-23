@@ -18,53 +18,53 @@ type Doc = {
 /**
  *
  */
-export interface UICollection {
-  /*ObjectUiProps*
-   * Customize the way filenames are generated during content creation
-   */
-  filename?: {
-    /**
-     * A callback which receives form values as an argument. The return value
-     * here will be used as the filename (the extension is not necessary)
-     *
-     * eg:
-     * ```ts
-     * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
-     * ```
-     */
-    slugify?: (values: Record<string, any>) => string
-    /**
-     * When set to `true`, editors won't be able to modify the filename
-     */
-    readonly?: boolean
-  }
-  /**
-   * Forms for this collection will be editable from the global sidebar rather than the form panel
-   */
-  global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
-  /**
-   * Provide the path that your document is viewable on your site
-   *
-   * eg:
-   * ```ts
-   * router: ({ document }) => {
-   *   return `blog-posts/${document._sys.filename}`;
-   * }
-   * ```
-   */
-  router?: (args: {
-    document: Doc
-    collection: Collection
-  }) => string | undefined
-  /**
-   * Determines whether or not this collection can accept new docments
-   * or allow documents to be deleted from the CMS.
-   */
-  allowedActions?: {
-    create?: boolean
-    delete?: boolean
-  }
-}
+// export interface UICollection {
+//   /*ObjectUiProps*
+//    * Customize the way filenames are generated during content creation
+//    */
+//   filename?: {
+//     /**
+//      * A callback which receives form values as an argument. The return value
+//      * here will be used as the filename (the extension is not necessary)
+//      *
+//      * eg:
+//      * ```ts
+//      * slugify: (values) => values.title.toLowerCase().split(" ").join("-")
+//      * ```
+//      */
+//     slugify?: (values: Record<string, any>) => string
+//     /**
+//      * When set to `true`, editors won't be able to modify the filename
+//      */
+//     readonly?: boolean
+//   }
+//   /**
+//    * Forms for this collection will be editable from the global sidebar rather than the form panel
+//    */
+//   global?: boolean | { icon?: any; layout: 'fullscreen' | 'popup' }
+//   /**
+//    * Provide the path that your document is viewable on your site
+//    *
+//    * eg:
+//    * ```ts
+//    * router: ({ document }) => {
+//    *   return `blog-posts/${document._sys.filename}`;
+//    * }
+//    * ```
+//    */
+//   router?: (args: {
+//     document: Doc
+//     collection: Collection
+//   }) => string | undefined
+//   /**
+//    * Determines whether or not this collection can accept new docments
+//    * or allow documents to be deleted from the CMS.
+//    */
+//   allowedActions?: {
+//     create?: boolean
+//     delete?: boolean
+//   }
+// }
 export type Option =
   | string
   | {
@@ -479,237 +479,237 @@ export interface Template {
   fields: Field[]
 }
 
-export interface FieldCollection {
-  label?: string
-  name: string
-  path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
-  /**
-   * This format will be used to parse the markdown frontmatter
-   */
-  frontmatterFormat?: 'yaml' | 'toml' | 'json'
-  /**
-   * The delimiters used to parse the frontmatter.
-   */
-  frontmatterDelimiters?: [string, string] | string
-  ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
-  /**
-   * @deprecated - use `ui.defaultItem` instead
-   */
-  defaultItem?: DefaultItem<Record<string, any>>
-  templates?: never
-  /**
-   * Fields define the shape of the content and the user input.
-   *
-   * https://tina.io/docs/reference/fields/
-   */
-  fields: Field[]
-}
+// export interface FieldCollection {
+//   label?: string
+//   name: string
+//   path: string
+//   format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
+//   /**
+//    * This format will be used to parse the markdown frontmatter
+//    */
+//   frontmatterFormat?: 'yaml' | 'toml' | 'json'
+//   /**
+//    * The delimiters used to parse the frontmatter.
+//    */
+//   frontmatterDelimiters?: [string, string] | string
+//   ui?: UICollection & { defaultItem?: DefaultItem<Record<string, any>> }
+//   /**
+//    * @deprecated - use `ui.defaultItem` instead
+//    */
+//   defaultItem?: DefaultItem<Record<string, any>>
+//   templates?: never
+//   /**
+//    * Fields define the shape of the content and the user input.
+//    *
+//    * https://tina.io/docs/reference/fields/
+//    */
+//   fields: Field[]
+// }
 
-export interface TemplateCollection {
-  label?: string
-  name: string
-  path: string
-  format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
-  ui?: UICollection
-  /**
-   * @deprecated - use `ui.defaultItem` on the each `template` instead
-   */
-  defaultItem?: DefaultItem<Record<string, any>>
-  /**
-   * In most cases, just using fields is enough, however templates can be used when there are multiple variants of the same collection or object. For example in a "page" collection there might be a need for a marketing page template and a content page template, both under the collection "page".
-   *
-   * https://tina.io/docs/reference/templates/
-   */
-  templates?: Template[]
-  fields?: never
-}
+// export interface TemplateCollection {
+//   label?: string
+//   name: string
+//   path: string
+//   format?: 'json' | 'md' | 'markdown' | 'mdx' | 'yaml' | 'yml' | 'toml'
+//   ui?: UICollection
+//   /**
+//    * @deprecated - use `ui.defaultItem` on the each `template` instead
+//    */
+//   defaultItem?: DefaultItem<Record<string, any>>
+//   /**
+//    * In most cases, just using fields is enough, however templates can be used when there are multiple variants of the same collection or object. For example in a "page" collection there might be a need for a marketing page template and a content page template, both under the collection "page".
+//    *
+//    * https://tina.io/docs/reference/templates/
+//    */
+//   templates?: Template[]
+//   fields?: never
+// }
 
-export type Collection = FieldCollection | TemplateCollection
+// export type Collection = FieldCollection | TemplateCollection
 
-export interface Schema {
-  /**
-   * Collections represent a type of content (EX, blog post, page, author, etc). We recommend using singular naming in a collection (Ex: use post and not posts).
-   *
-   * https://tina.io/docs/reference/collections/
-   */
-  collections: Collection[]
-}
+// export interface Schema {
+//   /**
+//    * Collections represent a type of content (EX, blog post, page, author, etc). We recommend using singular naming in a collection (Ex: use post and not posts).
+//    *
+//    * https://tina.io/docs/reference/collections/
+//    */
+//   collections: Collection[]
+// }
 
-export type TokenObject = {
-  id_token: string
-  access_token?: string
-  refresh_token?: string
-}
+// export type TokenObject = {
+//   id_token: string
+//   access_token?: string
+//   refresh_token?: string
+// }
 
-export interface Config<
-  CMSCallback = undefined,
-  FormifyCallback = undefined,
-  DocumentCreatorCallback = undefined,
-  Store = undefined
-> {
-  contentApiUrlOverride?: string
-  admin?: {
-    auth?: {
-      /**
-       * If you wish to use the local auth provider, set this to true
-       *
-       * This will take precedence over the customAuth option (if set to true)
-       *
-       **/
-      useLocalAuth?: boolean
-      /**
-       * If you are using a custom auth provider, set this to true
-       **/
-      customAuth?: boolean
-      /**
-       *  Used for getting the token from the custom auth provider
-       *
-       * @returns {Promise<TokenObject | null>}
-       **/
-      getToken?: () => Promise<TokenObject | null>
-      /**
-       *  Used to logout from the custom auth provider
-       *
-       **/
-      logout?: () => Promise<void>
-      /**
-       *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
-       *
-       *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
-       *
-       **/
-      getUser?: () => Promise<any | null>
-      /**
-       * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
-       *
-       **/
-      authenticate?: () => Promise<any | null>
+// export interface Config<
+//   CMSCallback = undefined,
+//   FormifyCallback = undefined,
+//   DocumentCreatorCallback = undefined,
+//   Store = undefined
+// > {
+//   contentApiUrlOverride?: string
+//   admin?: {
+//     auth?: {
+//       /**
+//        * If you wish to use the local auth provider, set this to true
+//        *
+//        * This will take precedence over the customAuth option (if set to true)
+//        *
+//        **/
+//       useLocalAuth?: boolean
+//       /**
+//        * If you are using a custom auth provider, set this to true
+//        **/
+//       customAuth?: boolean
+//       /**
+//        *  Used for getting the token from the custom auth provider
+//        *
+//        * @returns {Promise<TokenObject | null>}
+//        **/
+//       getToken?: () => Promise<TokenObject | null>
+//       /**
+//        *  Used to logout from the custom auth provider
+//        *
+//        **/
+//       logout?: () => Promise<void>
+//       /**
+//        *  Used for getting the user from the custom auth provider. If this returns a truthy value, the user will be logged in and the CMS will be enabled.
+//        *
+//        *  If this returns a falsy value, the user will be logged out and the CMS will be disabled.
+//        *
+//        **/
+//       getUser?: () => Promise<any | null>
+//       /**
+//        * Used to authenticate the user with the custom auth provider. This is called when the user clicks the login button.
+//        *
+//        **/
+//       authenticate?: () => Promise<any | null>
 
-      onLogin?: (args: { token: TokenObject }) => Promise<void>
-      onLogout?: () => Promise<void>
-    }
-  }
-  // schema: TinaCloudSchema<false>
-  /**
-   * The Schema is used to define the shape of the content.
-   *
-   * https://tina.io/docs/reference/schema/
-   */
-  schema: Schema
-  /**
-   * The base branch to pull content from. Note that this is ignored for local development
-   */
-  branch: string | null
-  /**
-   * Your clientId from  app.tina.io
-   */
-  clientId: string | null
-  /**
-   * Your read only token from app.tina.io
-   */
-  token: string | null
-  /**
-   * Configurations for the autogenerated GraphQL HTTP client
-   */
-  client?: {
-    /**
-     * Autogenerated queries will traverse references to a given depth
-     * @default 2
-     */
-    referenceDepth?: number
-  }
-  /**
-   *
-   * Tina supports serving content from a separate Git repo. To enable this during local development, point
-   * this config at the root of the content repo.
-   *
-   * NOTE: Relative paths are fine to use here, but you should use an environment variable for this, as each developer on your team may have a different
-   * location to the path.
-   *
-   * ```ts
-   * localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
-   * ```
-   */
-  localContentPath?: string
-  /**
-   * Tina is compiled as a single-page app and placed in the public directory
-   * of your application.
-   */
-  build: {
-    /**
-     * The folder where your application stores assets, eg. `"public"`
-     */
-    publicFolder: string
-    /**
-     * The value specified here will determine the path when visiting the TinaCMS dashboard.
-     *
-     * Eg. `"admin"` will be viewable at `[your-development-url]/admin/index.html`
-     *
-     * Note that for most framworks you can omit the `index.html` portion, for Next.js see the [rewrites section](https://nextjs.org/docs/api-reference/next.config.js/rewrites)
-     */
-    outputFolder: string
-    /**
-     *
-     *  the host option for the vite config. This is useful when trying to run tinacms dev in a docker container.
-     *
-     * See https://vitejs.dev/config/server-options.html#server-host for more details
-     */
-    host?: string | boolean
-  }
-  media?:
-    | {
-        /**
-         * Load a media store like Cloudinary
-         *
-         * ```ts
-         * loadCustomStore = async () => {
-         *   const pack = await import("next-tinacms-cloudinary");
-         *   return pack.TinaCloudCloudinaryMediaStore;
-         * }
-         * ```
-         */
-        loadCustomStore: () => Promise<Store>
-        tina?: never
-      }
-    | {
-        /**
-         * Use Git-backed assets for media, these values will
-         * [Learn more](https://tina.io/docs/reference/media/repo-based/)
-         */
-        tina: {
-          /**
-           * The folder where your application stores assets, eg. `"public"`
-           */
-          publicFolder: string
-          /**
-           * The root folder for media managed by Tina. For example, `"uploads"`
-           * would store content in `"<my-public-folder>/uploads"`
-           */
-          mediaRoot: string
-        }
-        loadCustomStore?: never
-      }
-  /**
-   * Used to override the default Tina Cloud API URL
-   *
-   * [mostly for internal use only]
-   */
-  tinaioConfig?: {
-    assetsApiUrlOverride?: string // https://assets.tinajs.io
-    frontendUrlOverride?: string // https://app.tina.io
-    identityApiUrlOverride?: string // https://identity.tinajs.io
-    contentApiUrlOverride?: string // https://content.tinajs.io
-  }
-  cmsCallback?: CMSCallback
-  formifyCallback?: FormifyCallback
-  documentCreatorCallback?: DocumentCreatorCallback
-}
-export type TinaCMSConfig<
-  CMSCallback = undefined,
-  FormifyCallback = undefined,
-  DocumentCreatorCallback = undefined,
-  Store = undefined
-> = Config<CMSCallback, FormifyCallback, DocumentCreatorCallback, Store>
+//       onLogin?: (args: { token: TokenObject }) => Promise<void>
+//       onLogout?: () => Promise<void>
+//     }
+//   }
+//   // schema: TinaCloudSchema<false>
+//   /**
+//    * The Schema is used to define the shape of the content.
+//    *
+//    * https://tina.io/docs/reference/schema/
+//    */
+//   schema: Schema
+//   /**
+//    * The base branch to pull content from. Note that this is ignored for local development
+//    */
+//   branch: string | null
+//   /**
+//    * Your clientId from  app.tina.io
+//    */
+//   clientId: string | null
+//   /**
+//    * Your read only token from app.tina.io
+//    */
+//   token: string | null
+//   /**
+//    * Configurations for the autogenerated GraphQL HTTP client
+//    */
+//   client?: {
+//     /**
+//      * Autogenerated queries will traverse references to a given depth
+//      * @default 2
+//      */
+//     referenceDepth?: number
+//   }
+//   /**
+//    *
+//    * Tina supports serving content from a separate Git repo. To enable this during local development, point
+//    * this config at the root of the content repo.
+//    *
+//    * NOTE: Relative paths are fine to use here, but you should use an environment variable for this, as each developer on your team may have a different
+//    * location to the path.
+//    *
+//    * ```ts
+//    * localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+//    * ```
+//    */
+//   localContentPath?: string
+//   /**
+//    * Tina is compiled as a single-page app and placed in the public directory
+//    * of your application.
+//    */
+//   build: {
+//     /**
+//      * The folder where your application stores assets, eg. `"public"`
+//      */
+//     publicFolder: string
+//     /**
+//      * The value specified here will determine the path when visiting the TinaCMS dashboard.
+//      *
+//      * Eg. `"admin"` will be viewable at `[your-development-url]/admin/index.html`
+//      *
+//      * Note that for most framworks you can omit the `index.html` portion, for Next.js see the [rewrites section](https://nextjs.org/docs/api-reference/next.config.js/rewrites)
+//      */
+//     outputFolder: string
+//     /**
+//      *
+//      *  the host option for the vite config. This is useful when trying to run tinacms dev in a docker container.
+//      *
+//      * See https://vitejs.dev/config/server-options.html#server-host for more details
+//      */
+//     host?: string | boolean
+//   }
+//   media?:
+//     | {
+//         /**
+//          * Load a media store like Cloudinary
+//          *
+//          * ```ts
+//          * loadCustomStore = async () => {
+//          *   const pack = await import("next-tinacms-cloudinary");
+//          *   return pack.TinaCloudCloudinaryMediaStore;
+//          * }
+//          * ```
+//          */
+//         loadCustomStore: () => Promise<Store>
+//         tina?: never
+//       }
+//     | {
+//         /**
+//          * Use Git-backed assets for media, these values will
+//          * [Learn more](https://tina.io/docs/reference/media/repo-based/)
+//          */
+//         tina: {
+//           /**
+//            * The folder where your application stores assets, eg. `"public"`
+//            */
+//           publicFolder: string
+//           /**
+//            * The root folder for media managed by Tina. For example, `"uploads"`
+//            * would store content in `"<my-public-folder>/uploads"`
+//            */
+//           mediaRoot: string
+//         }
+//         loadCustomStore?: never
+//       }
+//   /**
+//    * Used to override the default Tina Cloud API URL
+//    *
+//    * [mostly for internal use only]
+//    */
+//   tinaioConfig?: {
+//     assetsApiUrlOverride?: string // https://assets.tinajs.io
+//     frontendUrlOverride?: string // https://app.tina.io
+//     identityApiUrlOverride?: string // https://identity.tinajs.io
+//     contentApiUrlOverride?: string // https://content.tinajs.io
+//   }
+//   cmsCallback?: CMSCallback
+//   formifyCallback?: FormifyCallback
+//   documentCreatorCallback?: DocumentCreatorCallback
+// }
+// export type TinaCMSConfig<
+//   CMSCallback = undefined,
+//   FormifyCallback = undefined,
+//   DocumentCreatorCallback = undefined,
+//   Store = undefined
+// > = Config<CMSCallback, FormifyCallback, DocumentCreatorCallback, Store>
 
-export {}
+// export {}
