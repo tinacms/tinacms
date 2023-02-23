@@ -3,7 +3,7 @@
 */
 
 import { z } from 'zod'
-import { TinaField } from '../types/index'
+import type { TinaField as TinaFieldType } from '../types/index'
 import { findDuplicates } from '../util'
 
 const TypeName = [
@@ -113,7 +113,7 @@ const ReferenceField = FieldWithList.extend({
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore --- Not sure why this is giving a type error here
-export const TinaFieldZod: z.ZodType<TinaField<false>> = z.lazy(() => {
+export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
   // needs to be redefined here to avoid circle deps
   const TemplateTemp = z
     .object({
