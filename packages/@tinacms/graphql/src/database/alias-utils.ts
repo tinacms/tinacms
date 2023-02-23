@@ -55,6 +55,7 @@ export const replaceKeysWithAliases = (
     const field = template.fields.find((field) => field.name === key)
 
     const outputKey = field?.alias || key
+    //TODO - Handle nested aliases better. We should instead check on object fieldtype, as we're likely not handling arrays properly
     output[outputKey] =
       typeof obj[key] === 'object'
         ? replaceKeysWithAliases(template, obj[key])
