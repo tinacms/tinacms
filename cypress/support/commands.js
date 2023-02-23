@@ -39,7 +39,16 @@ Cypress.Commands.add('focusRTE', () => {
 })
 
 Cypress.Commands.add('getPageRTEBody', () => {
-  return cy.get(`[data-test="rich-text-body"]`)
+  return cy
+    .get(`iframe[data-test="tina-iframe"]`)
+    .should('exist')
+    .its('0.contentDocument')
+    .should('exist')
+    .its('body')
+    .should('not.be.undefined')
+    .then(cy.wrap)
+    .find('[data-test="rich-text-body"]')
+    .should('exist')
 })
 
 Cypress.Commands.add('login', () => {
@@ -73,7 +82,7 @@ Cypress.Commands.add(
     if (markdown) return
     // if (markdown !== null) cy.task('writemdx', markdown)
 
-    cy.visit('/')
+    cy.visit('/admin/index.html#/~')
 
     cy.login()
 
