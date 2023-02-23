@@ -251,17 +251,10 @@ export class Database {
 
     const collection = await this.collectionForPath(filepath)
 
-    const templateInfo = await this.getTemplateDetailsForFile(
-      collection,
-      dataFields
-    )
-    const keepTemplateKey = templateInfo.info.type === 'union'
     const stringifiedFile = await this.stringifyFile(
       filepath,
       dataFields,
-      collection,
-      templateInfo.template,
-      keepTemplateKey
+      collection
     )
 
     let collectionIndexDefinitions
@@ -338,17 +331,11 @@ export class Database {
         const normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
-        const templateInfo = await this.getTemplateDetailsForFile(
-          collection,
-          dataFields
-        )
-        const keepTemplateKey = templateInfo.info.type === 'union'
+
         const stringifiedFile = await this.stringifyFile(
           filepath,
           dataFields,
-          collection,
-          templateInfo.template,
-          keepTemplateKey
+          collection
         )
 
         if (this.bridge) {
@@ -475,11 +462,18 @@ export class Database {
   public stringifyFile = async (
     filepath: string,
     payload: { [key: string]: unknown },
-    collection: TinaCloudCollection<true>,
-    template?: Templateable,
-    writeTemplateKey?: boolean
+    collection: TinaCloudCollection<true>
   ) => {
-    const aliasedData = replaceKeysWithAliases(template, payload)
+    const templateDetails = await this.getTemplateDetailsForFile(
+      collection,
+      payload
+    )
+    const writeTemplateKey = templateDetails.info.type === 'union'
+
+    const aliasedData = replaceKeysWithAliases(
+      templateDetails.template,
+      payload
+    )
 
     const extension = path.extname(filepath)
     const stringifiedFile = stringifyFile(
@@ -507,18 +501,10 @@ export class Database {
 
     const dataFields = await this.formatBodyOnPayload(filepath, data)
     const collection = await this.collectionForPath(filepath)
-
-    const templateInfo = await this.getTemplateDetailsForFile(
-      collection,
-      dataFields
-    )
-    const keepTemplateKey = templateInfo.info.type === 'union'
     const stringifiedFile = await this.stringifyFile(
       filepath,
       dataFields,
-      collection,
-      templateInfo.template,
-      keepTemplateKey
+      collection
     )
 
     return stringifiedFile
@@ -1156,7 +1142,6 @@ const _indexContent = async (
         data
       )
 
-      console.log('aliasedData', aliasedData)
       await enqueueOps([
         ...makeIndexOpsForDocument<Record<string, any>>(
           normalizedPath,
