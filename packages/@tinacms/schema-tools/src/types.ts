@@ -186,7 +186,7 @@ type UIField<Type, List extends boolean> = {
     allValues: { [key: string]: any },
     meta: Meta,
     field: UIField<Type, List>
-  ): (List extends true ? Type[] : Type) | undefined | void
+  ): string | void
   /**
    * @deprecated use `defaultItem` at the collection level instead
    */
