@@ -32,7 +32,7 @@ type Component<Type, List> = (props: {
   meta: Meta
 }) => any
 
-type UIField<Type, List extends boolean> = {
+export type UIField<Type, List extends boolean> = {
   max?: List extends true ? number : never
   min?: List extends true ? number : never
   /**
@@ -119,6 +119,7 @@ type UIField<Type, List extends boolean> = {
    */
   defaultValue?: List extends true ? Type[] : Type
 }
+
 type FieldGeneric<
   Type,
   List extends boolean | undefined,
@@ -414,18 +415,6 @@ export type Template<WithNamespace extends boolean = false> = {
   fields: Field<WithNamespace>[]
 } & MaybeNamespace<WithNamespace>
 
-export type ObjectType<WithNamespace extends boolean = false> =
-  ObjectField<WithNamespace>
-export type RichTextType<WithNamespace extends boolean = false> =
-  RichTextField<WithNamespace>
-export type ReferenceType<WithNamespace extends boolean = false> =
-  ReferenceField & MaybeNamespace<WithNamespace>
-
-/**
- * @deprecated use Config instead
- */
-export type TinaCloudSchemaConfig<DeleteMe = undefined> = Config
-
 type TokenObject = {
   id_token: string
   access_token?: string
@@ -480,7 +469,6 @@ export interface Config<
       onLogout?: () => Promise<void>
     }
   }
-  // schema: TinaCloudSchema<false>
   /**
    * The Schema is used to define the shape of the content.
    *
@@ -602,31 +590,6 @@ export type TinaCMSConfig<
   Store = undefined
 > = Config<CMSCallback, FormifyCallback, DocumentCreatorCallback, Store>
 
-// type UIField<F extends UIField = any, Shape = any> = {
-//   // name?: string
-//   label?: string | boolean
-//   description?: string
-//   // TODO type component
-//   component?: FC<any> | string | null
-//   // inlineComponent?: FC<any>
-//   parse?: (value: Shape, name: string, field: F) => any
-//   format?: (value: Shape, name: string, field: F) => any
-//   validate?(
-//     value: Shape,
-//     allValues: any,
-//     meta: any,
-//     field: UIField<F, Shape>
-//   ): string | object | undefined | void
-//   /**
-//    * @deprecated use `defaultItem` at the collection level instead
-//    */
-//   defaultValue?: Shape
-// }
-
-/** @deprecated use Schema instead */
-export type TinaCloudSchema<WithNamespace extends boolean = false> =
-  Schema<WithNamespace>
-
 export interface Schema<WithNamespace extends boolean = false> {
   /**
    * Collections represent a type of content (EX, blog post, page, author, etc). We recommend using singular naming in a collection (Ex: use post and not posts).
@@ -687,10 +650,6 @@ type FieldCollection<WithNamespace extends boolean> = {
   templates?: undefined
 } & BaseCollection &
   MaybeNamespace<WithNamespace>
-
-/** @deprecated use Collection instead */
-export type TinaCloudCollection<WithNamespace extends boolean> =
-  Collection<WithNamespace>
 
 type Document = {
   _sys: {
@@ -760,9 +719,6 @@ type IndexType = {
     name: string
   }[]
 }
-
-/** @deprecated use Template instead */
-export type TinaTemplate = Template<false>
 
 export type TinaField<WithNamespace extends boolean = false> =
   SchemaField<WithNamespace> & MaybeNamespace<WithNamespace>
@@ -842,3 +798,59 @@ export type Collectable = Pick<
   Collection<true>,
   'namespace' | 'templates' | 'fields' | 'name'
 > & { label?: string | boolean }
+
+/**
+ * @deprecated use Config instead
+ */
+export type TinaCloudSchemaConfig<DeleteMe = undefined> = Config
+/** @deprecated use Schema instead */
+export type TinaCloudSchema<WithNamespace extends boolean = false> =
+  Schema<WithNamespace>
+/** @deprecated use Schema instead */
+export type TinaCloudSchemaBase = TinaCloudSchema<false>
+/** @deprecated use Schema instead */
+export type TinaCloudSchemaEnriched = TinaCloudSchema<true>
+/** @deprecated use Schema instead */
+export type TinaCloudSchemaWithNamespace = TinaCloudSchema<true>
+/** @deprecated use Collection instead */
+export type TinaCloudCollection<WithNamespace extends boolean> =
+  Collection<WithNamespace>
+/** @deprecated use Collection instead */
+export type TinaCloudCollectionBase = TinaCloudCollection<false>
+/** @deprecated use Collection instead */
+export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
+/** @deprecated use Template instead */
+export type TinaTemplate = Template<false>
+/** @deprecated use Template instead */
+export type TinaCloudTemplateBase = Template<false>
+/** @deprecated use Template instead */
+export type TinaCloudTemplateEnriched = Template<true>
+/** @deprecated use Collection instead */
+export type CollectionFieldsWithNamespace = FieldCollection<true>
+/** @deprecated use Collection instead */
+export type CollectionTemplates = TemplateCollection<false>
+/** @deprecated use Collection instead */
+export type CollectionTemplatesWithNamespace = TemplateCollection<true>
+/** @deprecated use Template instead */
+export type GlobalTemplate = Template
+/** @deprecated use TinaField instead */
+export type TinaFieldBase = TinaField<false>
+/** @deprecated use TinaField instead */
+export type TinaFieldInner = TinaField<false>
+/** @deprecated use TinaField instead */
+export type TinaFieldEnriched = TinaField<true>
+/** @deprecated use ObjectField instead */
+export type ObjectType<WithNamespace extends boolean = false> =
+  ObjectField<WithNamespace>
+/** @deprecated use RichTextField instead */
+export type RichTextType<WithNamespace extends boolean = false> =
+  RichTextField<WithNamespace>
+/** @deprecated use ReferenceField instead */
+export type ReferenceType<WithNamespace extends boolean = false> =
+  ReferenceField & MaybeNamespace<WithNamespace>
+/** @deprecated use ReferenceField instead */
+export type ReferenceTypeInner = ReferenceType<false>
+/** @deprecated use ReferenceField instead */
+export type ReferenceTypeWithNamespace = ReferenceType<true>
+/** @deprecated use RichTextField instead */
+export type RichTypeWithNamespace = RichTextField<true>
