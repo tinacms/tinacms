@@ -2,46 +2,9 @@
 
 */
 
-import { Form, GlobalFormPlugin, useCMS } from '@tinacms/toolkit'
+import { Form, GlobalFormPlugin } from '@tinacms/toolkit'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { assertShape } from '../utils'
-import { useFormify } from './formify'
-
-export function useGraphqlForms<T extends object>({
-  variables,
-  onSubmit,
-  query,
-  formify,
-  eventList,
-}: {
-  query: string
-  variables: object
-  onSubmit?: (args: onSubmitArgs) => void
-  formify?: formifyCallback
-  /**
-   * This is a test utility which allows us to keep track of all the events
-   * received by this hook. See `experimental-examples/unit-test-example/pages/index.js
-   * for usage.
-   */
-  eventList?: []
-}): [T, Boolean] {
-  const cms = useCMS()
-
-  const state = useFormify({
-    query,
-    cms,
-    variables,
-    formify,
-    eventList: eventList,
-    onSubmit,
-  })
-
-  if (!query) {
-    return [state.data as T, false]
-  }
-
-  return [state.data as T, state.status !== 'done']
-}
 
 export const transformDocumentIntoMutationRequestPayload = (
   document: {

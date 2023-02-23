@@ -12,9 +12,6 @@ import {
   parse,
 } from 'graphql'
 
-import { formify } from './formify'
-import { formify as formify2 } from '../hooks/formify'
-
 import gql from 'graphql-tag'
 import {
   TinaSchema,
@@ -379,29 +376,6 @@ mutation addPendingDocumentMutation(
       }
     )
     return parse(data.getOptimizedQuery)
-  }
-
-  async requestWithForm<ReturnType>(
-    query: (gqlTag: typeof gql) => DocumentNode,
-    {
-      variables,
-      useUnstableFormify,
-    }: { variables; useUnstableFormify?: boolean }
-  ) {
-    const schema = await this.getSchema()
-    let formifiedQuery
-    if (useUnstableFormify) {
-      const res = await formify2({
-        schema,
-        query: print(query(gql)),
-        getOptimizedQuery: this.getOptimizedQuery,
-      })
-      formifiedQuery = res.formifiedQuery
-    } else {
-      formifiedQuery = formify(query(gql), schema)
-    }
-
-    return this.request<ReturnType>(print(formifiedQuery), { variables })
   }
 
   async request<ReturnType>(

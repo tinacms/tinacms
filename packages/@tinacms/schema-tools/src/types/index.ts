@@ -10,7 +10,7 @@ export type TinaCloudSchemaConfig<DeleteMe = undefined> = Config
 
 export type { Config }
 
-export type UIField<F extends UIField = any, Shape = any> = {
+type UIField<F extends UIField = any, Shape = any> = {
   // name?: string
   label?: string
   description?: string
@@ -61,13 +61,6 @@ type Document = {
     extension: string
   }
 }
-export type TinaIndex = {
-  name: string
-  fields: {
-    name: string
-  }[]
-}
-
 export interface UICollection {
   /**
    * Customize the way filenames are generated during content creation
@@ -116,12 +109,19 @@ export interface UICollection {
 
 export type DefaultItem<ReturnType> = ReturnType | (() => ReturnType)
 
+export type IndexType = {
+  name: string
+  fields: {
+    name: string
+  }[]
+}
+
 interface BaseCollection {
   label?: string
   name: string
   path: string
   defaultItem?: DefaultItem<Record<string, any>>
-  indexes?: TinaIndex[]
+  indexes?: IndexType[]
   format?: FormatType
   /**
    * This format will be used to parse the markdown frontmatter
@@ -400,13 +400,3 @@ export type Collectable = Pick<
   TinaCloudCollection<true>,
   'namespace' | 'templates' | 'fields' | 'name'
 > & { label?: string }
-// export type Collectable = TinaCloudCollection<true>
-
-export type ResolveFormArgs = {
-  collection: TinaCloudCollection<true>
-  basename: string
-  template: Template<true>
-  schema: TinaSchema
-}
-
-// export * from './config'
