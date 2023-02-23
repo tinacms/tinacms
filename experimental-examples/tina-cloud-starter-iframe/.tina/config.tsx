@@ -60,7 +60,7 @@ const config = defineStaticConfig({
           {
             type: "string",
             name: "foobar",
-            alias: "foo-bar",
+            nameOverride: "foo-bar",
           },
           {
             type: "image",

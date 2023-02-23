@@ -1,32 +1,32 @@
 import { Templateable } from '@tinacms/schema-tools/src'
-import { replaceAliasesWithNames, replaceKeysWithAliases } from './alias-utils'
+import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
 
 const template: Templateable = {
   name: 'template',
   namespace: [],
   fields: [
-    { name: 'field1', namespace: [], type: 'string', alias: 'a' },
-    { name: 'field2', namespace: [], type: 'string', alias: 'b' },
+    { name: 'field1', namespace: [], type: 'string', nameOverride: 'a' },
+    { name: 'field2', namespace: [], type: 'string', nameOverride: 'b' },
     {
       name: 'objectfield',
       namespace: [],
       type: 'object',
-      alias: 'c',
+      nameOverride: 'c',
       fields: [{ name: 'subfield', namespace: [], type: 'string' }],
     },
     { name: 'normalField', namespace: [], type: 'string' },
   ],
 }
 
-describe('replaceAliasesWithNames', () => {
+describe('replaceNameOverrides', () => {
   describe('with empty payload', () => {
     it('should return an empty object', () => {
       const obj = {}
-      expect(replaceAliasesWithNames(template, obj)).toEqual({})
+      expect(replaceNameOverrides(template, obj)).toEqual({})
     })
   })
   describe('with payload', () => {
-    it('should return an object with field names replaced with their aliases', () => {
+    it('should return an object with field names replaced with their nameOverrides', () => {
       const obj = {
         a: 1,
         b: {
@@ -34,7 +34,7 @@ describe('replaceAliasesWithNames', () => {
         },
         normalField: 'value',
       }
-      expect(replaceAliasesWithNames(template, obj)).toEqual({
+      expect(replaceNameOverrides(template, obj)).toEqual({
         field1: 1,
         field2: {
           subfield: 2,
@@ -43,7 +43,7 @@ describe('replaceAliasesWithNames', () => {
       })
     })
 
-    it('should return an object with nested objects with field names replaced with their aliases', () => {
+    it('should return an object with nested objects with field names replaced with their nameOverrides', () => {
       const obj = {
         a: 1,
         c: {
@@ -56,7 +56,7 @@ describe('replaceAliasesWithNames', () => {
           subfield: 2,
         },
       }
-      expect(replaceAliasesWithNames(template, obj)).toEqual(expected)
+      expect(replaceNameOverrides(template, obj)).toEqual(expected)
     })
 
     it('should not modify the input object', () => {
@@ -67,21 +67,21 @@ describe('replaceAliasesWithNames', () => {
         },
       }
       const originalObj = { ...obj }
-      replaceAliasesWithNames(template, obj)
+      replaceNameOverrides(template, obj)
       expect(obj).toEqual(originalObj)
     })
   })
 })
 
-describe('replaceKeysWithAliases', () => {
+describe('applyNameOverrides', () => {
   describe('with empty payload', () => {
     it('should return an empty object', () => {
       const obj = {}
-      expect(replaceKeysWithAliases(template, obj)).toEqual({})
+      expect(applyNameOverrides(template, obj)).toEqual({})
     })
   })
   describe('with payload', () => {
-    it('should replace the field names in a simple object with their corresponding aliases specified in the `template`', () => {
+    it('should replace the field names in a simple object with their corresponding nameOverrides specified in the `template`', () => {
       const obj = {
         field1: 1,
         field2: 2,
@@ -92,10 +92,10 @@ describe('replaceKeysWithAliases', () => {
         b: 2,
         normalfield: 'value',
       }
-      expect(replaceKeysWithAliases(template, obj)).toEqual(expected)
+      expect(applyNameOverrides(template, obj)).toEqual(expected)
     })
 
-    it('should replace the field names in an object with nested objects with their corresponding aliases specified in the `template`', () => {
+    it('should replace the field names in an object with nested objects with their corresponding nameOverrides specified in the `template`', () => {
       const obj = {
         field1: 1,
         objectfield: {
@@ -108,7 +108,7 @@ describe('replaceKeysWithAliases', () => {
           subfield: 2,
         },
       }
-      expect(replaceKeysWithAliases(template, obj)).toEqual(expected)
+      expect(applyNameOverrides(template, obj)).toEqual(expected)
     })
 
     it('should not modify the input object', () => {
@@ -119,7 +119,7 @@ describe('replaceKeysWithAliases', () => {
         },
       }
       const originalObj = { ...obj }
-      replaceKeysWithAliases(template, obj)
+      applyNameOverrides(template, obj)
       expect(obj).toEqual(originalObj)
     })
   })

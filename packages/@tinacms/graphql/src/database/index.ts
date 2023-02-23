@@ -41,7 +41,7 @@ import {
   SUBLEVEL_OPTIONS,
   LevelProxy,
 } from './level'
-import { replaceAliasesWithNames, replaceKeysWithAliases } from './alias-utils'
+import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -470,10 +470,7 @@ export class Database {
     )
     const writeTemplateKey = templateDetails.info.type === 'union'
 
-    const aliasedData = replaceKeysWithAliases(
-      templateDetails.template,
-      payload
-    )
+    const aliasedData = applyNameOverrides(templateDetails.template, payload)
 
     const extension = path.extname(filepath)
     const stringifiedFile = stringifyFile(
@@ -1137,7 +1134,7 @@ const _indexContent = async (
       )
       const normalizedPath = normalizePath(filepath)
 
-      const aliasedData = replaceAliasesWithNames(
+      const aliasedData = replaceNameOverrides(
         getTemplateForFile(templateInfo, data as any),
         data
       )

@@ -1,33 +1,31 @@
 import { Templateable, TinaFieldEnriched } from '@tinacms/schema-tools/src'
 
-export const replaceAliasesWithNames = (template: Templateable, obj: any) => {
+export const replaceNameOverrides = (template: Templateable, obj: any) => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      return _replaceAliasesWithNames(
+      return _replaceNameOverrides(
         getTemplateForData(template, item).fields,
         item
       )
     })
   } else {
-    return _replaceAliasesWithNames(
-      getTemplateForData(template, obj).fields,
-      obj
-    )
+    return _replaceNameOverrides(getTemplateForData(template, obj).fields, obj)
   }
 }
 
-const _replaceAliasesWithNames = (fields: TinaFieldEnriched[], obj: any) => {
+const _replaceNameOverrides = (fields: TinaFieldEnriched[], obj: any) => {
   const output: object = {}
 
   Object.keys(obj).forEach((key) => {
     const field = fields.find(
       (fieldWithMatchingAlias) =>
-        (fieldWithMatchingAlias?.alias || fieldWithMatchingAlias?.name) === key
+        (fieldWithMatchingAlias?.nameOverride ||
+          fieldWithMatchingAlias?.name) === key
     )
 
     output[field?.name || key] =
       field?.type == 'object'
-        ? replaceAliasesWithNames(field as any, obj[key])
+        ? replaceNameOverrides(field as any, obj[key])
         : obj[key]
   })
 
@@ -64,37 +62,31 @@ const getTemplateForData = (field: any, data: any) => {
   throw new Error('No template found for field ' + field.name)
 }
 
-export const replaceKeysWithAliases = (
+export const applyNameOverrides = (
   template: Templateable,
   obj: any
 ): object => {
   if ((template as any).list) {
     return (obj as any[]).map((item) => {
-      return _replaceKeysWithAliases(
+      return _applyNameOverrides(
         getTemplateForData(template, item).fields,
         item
       )
     })
   } else {
-    return _replaceKeysWithAliases(
-      getTemplateForData(template, obj).fields,
-      obj
-    )
+    return _applyNameOverrides(getTemplateForData(template, obj).fields, obj)
   }
 }
 
-const _replaceKeysWithAliases = (
-  fields: TinaFieldEnriched[],
-  obj: any
-): object => {
+const _applyNameOverrides = (fields: TinaFieldEnriched[], obj: any): object => {
   const output: object = {}
   Object.keys(obj).forEach((key) => {
     const field = fields.find((field) => field.name === key)
 
-    const outputKey = field?.alias || key
+    const outputKey = field?.nameOverride || key
     output[outputKey] =
       field?.type === 'object'
-        ? replaceKeysWithAliases(field as any, obj[key])
+        ? applyNameOverrides(field as any, obj[key])
         : obj[key]
   })
   return output
