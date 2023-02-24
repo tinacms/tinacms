@@ -4,7 +4,7 @@
 
 */
 import { format } from 'prettier'
-import type { RichTypeInner, Template } from '@tinacms/schema-tools'
+import type { RichTextType, RichTextTemplate } from '@tinacms/schema-tools'
 import type { MdxJsxAttribute } from 'mdast-util-mdx-jsx'
 import * as Plate from '../parse/plate'
 import type * as Md from 'mdast'
@@ -12,14 +12,14 @@ import { rootElement, stringifyMDX } from '.'
 
 export const stringifyPropsInline = (
   element: Plate.MdxInlineElement,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): { attributes: MdxJsxAttribute[]; children: Md.PhrasingContent[] } => {
   return stringifyProps(element, field, true, imageCallback)
 }
 export function stringifyProps(
   element: Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichTextType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -30,7 +30,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement,
-  parentField: RichTypeInner,
+  parentField: RichTextType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -41,7 +41,7 @@ export function stringifyProps(
 }
 export function stringifyProps(
   element: Plate.MdxBlockElement | Plate.MdxInlineElement,
-  parentField: RichTypeInner,
+  parentField: RichTextType,
   flatten: boolean,
   imageCallback: (url: string) => string
 ): {
@@ -52,7 +52,7 @@ export function stringifyProps(
 } {
   const attributes: MdxJsxAttribute[] = []
   const children: Md.Content[] = []
-  let template: Template<false> | undefined | string
+  let template: RichTextTemplate | undefined
   let useDirective = false
   let directiveType = 'leaf'
   template = parentField.templates?.find((template) => {

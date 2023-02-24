@@ -2,9 +2,9 @@
 
 */
 
-import { TinaCloudSchema } from '../../../types'
+import { Schema } from '../../../types'
 
-const tinaSchema: TinaCloudSchema<false> = {
+const tinaSchema: Schema = {
   collections: [
     {
       label: 'Movie',

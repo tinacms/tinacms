@@ -1,11 +1,11 @@
-/**
-
-*/
-
 import type { TinaCMS } from '@tinacms/toolkit'
+import { print, buildSchema } from 'graphql'
+
+import { diff } from '@graphql-inspector/core'
+
 import type { TinaSchema } from '@tinacms/schema-tools'
 import type { Client } from '../internalClient'
-import type { Collection, DocumentForm } from './types'
+import type { CollectionResponse, DocumentForm } from './types'
 
 export interface FilterArgs {
   filterField: string
@@ -26,6 +26,18 @@ export class TinaAdminApi {
 
   async isAuthenticated() {
     return await this.api.isAuthenticated()
+  }
+
+  async checkGraphqlSchema({ localSchema }: { localSchema: any }) {
+    const schemaFromCloud = await this.api.getSchema()
+    const schema1 = schemaFromCloud
+    const schema2 = buildSchema(print(localSchema))
+    const diffOutput = await diff(schema1, schema2)
+    if (diffOutput.length > 0) {
+      return false
+    } else {
+      return true
+    }
   }
 
   fetchCollections() {
@@ -111,7 +123,7 @@ export class TinaAdminApi {
 
     if (includeDocuments === true) {
       const sort = sortKey || this.schema.getIsTitleFieldName(collectionName)
-      const response: { collection: Collection } =
+      const response: { collection: CollectionResponse } =
         order === 'asc'
           ? await this.api.request(
               `#graphql

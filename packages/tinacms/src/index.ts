@@ -6,7 +6,6 @@ export * from './internalClient'
 export * from './auth'
 export * from './utils'
 export * from './tina-cms'
-export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
@@ -25,24 +24,25 @@ import { formifyCallback } from './hooks/use-graphql-forms'
 import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
-import type {
+import {
+  TinaSchema,
+  TinaField,
   Config,
-  SchemaField,
   Schema,
   Collection,
   Template,
-} from '@tinacms/schema-tools/dist/types'
+} from '@tinacms/schema-tools'
 
-export type { Config, Schema, Collection, Template, SchemaField }
+export type { Config, Schema, Collection, Template, TinaField, TinaSchema }
 
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaFieldEnriched = SchemaField
+export type TinaFieldEnriched = TinaField
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaField = SchemaField
+export type SchemaField = TinaField
 /**
  * @deprecated use `Template` instead
  */
@@ -50,23 +50,15 @@ export type TinaTemplate = Template
 /**
  * @deprecated use `Template` instead
  */
-export type Templateable = Template
-/**
- * @deprecated use `Template` instead
- */
 export type TinaCloudTemplatebase = Template
 /**
  * @deprecated use `Collection` instead
  */
-export type TinaCloudCollection = Collection
+export type TinaCloudCollectionCollection = Collection
 /**
  * @deprecated use `Collection` instead
  */
 export type TinaCollection = Collection
-/**
- * @deprecated use `Schema` instead
- */
-export type TinaSchema = Schema
 /**
  * @deprecated use `Schema` instead
  */

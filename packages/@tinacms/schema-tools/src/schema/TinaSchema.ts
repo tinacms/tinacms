@@ -1,15 +1,10 @@
-/**
-
-*/
-
 import {
-  TinaCloudSchemaEnriched,
-  TinaCloudSchemaBase,
-  TinaCloudCollection,
-  Templateable,
+  Schema,
+  Collection,
+  Template,
   Collectable,
   CollectionTemplateable,
-  TinaFieldEnriched,
+  TinaField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
 
@@ -30,16 +25,11 @@ type Meta = {
  *
  */
 export class TinaSchema {
-  public schema: TinaCloudSchemaEnriched
+  public schema: Schema<true>
   /**
-   *
    * Create a schema class from a user defined schema object
-   *
-   * @param  {{version?:Version;meta?:Meta}&TinaCloudSchemaBase} config
    */
-  constructor(
-    public config: { version?: Version; meta?: Meta } & TinaCloudSchemaBase
-  ) {
+  constructor(public config: { version?: Version; meta?: Meta } & Schema) {
     // @ts-ignore
     this.schema = config
   }
@@ -60,9 +50,7 @@ export class TinaSchema {
     )
     return paths
   }
-  public getCollection = (
-    collectionName: string
-  ): TinaCloudCollection<true> => {
+  public getCollection = (collectionName: string): Collection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
     )
@@ -93,17 +81,6 @@ export class TinaSchema {
         this.getCollection(collection.name)
       ) || []
     )
-  }
-  public getGlobalTemplate = (templateName: string) => {
-    const globalTemplate = this.schema.templates?.find(
-      (template) => template.name === templateName
-    )
-    if (!globalTemplate) {
-      throw new Error(
-        `Expected to find global template of name ${templateName}`
-      )
-    }
-    return globalTemplate
   }
   public getCollectionByFullPath = (filepath: string) => {
     const possibleCollections = this.getCollections().filter((collection) => {
@@ -162,8 +139,8 @@ export class TinaSchema {
     filepath: string,
     templateName?: string
   ): {
-    collection: TinaCloudCollection<true>
-    template: Templateable
+    collection: Collection<true>
+    template: Template<true>
   } => {
     let template
     const collection = this.getCollectionByFullPath(filepath)
@@ -202,7 +179,7 @@ export class TinaSchema {
   }: {
     data?: unknown
     collection: Collectable
-  }): Templateable => {
+  }): Template<true> => {
     const templateInfo = this.getTemplatesForCollectable(collection)
     switch (templateInfo.type) {
       case 'object':
@@ -276,7 +253,7 @@ export class TinaSchema {
     return accumulator
   }
 
-  private transformField = (field: TinaFieldEnriched, value: unknown) => {
+  private transformField = (field: TinaField<true>, value: unknown) => {
     if (field.type === 'object')
       if (field.templates) {
         if (field.list) {
@@ -348,15 +325,9 @@ export class TinaSchema {
   public getTemplatesForCollectable = (
     collection: Collectable
   ): CollectionTemplateable => {
-    let extraFields: TinaFieldEnriched[] = []
-    if (collection.references) {
-      extraFields = collection.references
-    }
+    let extraFields: TinaField<true>[] = []
     if (collection.fields) {
-      const template =
-        typeof collection.fields === 'string'
-          ? this.getGlobalTemplate(collection.fields)
-          : collection
+      const template = collection
 
       if (
         typeof template.fields === 'string' ||
@@ -368,7 +339,6 @@ export class TinaSchema {
       return {
         namespace: collection.namespace,
         type: 'object',
-        // @ts-ignore FIXME: Templateable should have a 'name' property
         template: {
           ...template,
           fields: [...template.fields, ...extraFields],
@@ -380,10 +350,7 @@ export class TinaSchema {
           namespace: collection.namespace,
           type: 'union',
           templates: collection.templates.map((templateOrTemplateString) => {
-            const template =
-              typeof templateOrTemplateString === 'string'
-                ? this.getGlobalTemplate(templateOrTemplateString)
-                : templateOrTemplateString
+            const template = templateOrTemplateString
             return {
               ...template,
               fields: [...template.fields, ...extraFields],

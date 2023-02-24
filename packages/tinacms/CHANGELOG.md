@@ -1,5 +1,23 @@
 # tinacms
 
+## 1.2.2
+
+### Patch Changes
+
+- 0e6093a8d: Fixes branch switcher accessed from the branch banner, adds indexing status to branch list, improves UI clarity.
+- 9d38f4b78: Only redirect to preview if the user is using a router.
+
+  See [this video](https://www.loom.com/share/69345c21c3f94c57997ac0a19c9768a8) for more details.
+
+- b984f1a7c: Fixes the error when a user clears the date filter input
+- 071b8fe59: remove schema info log when schema in up to date
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+- Updated dependencies [0e6093a8d]
+- Updated dependencies [892b4e39e]
+- Updated dependencies [c97ffc20d]
+  - @tinacms/toolkit@1.3.4
+  - @tinacms/schema-tools@1.3.2
+
 ## 1.2.1
 
 ### Patch Changes

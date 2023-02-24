@@ -6,7 +6,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import yaml from 'js-yaml'
 import z from 'zod'
-import type { TinaFieldInner, TinaTemplate } from '@tinacms/schema-tools'
+import type { TinaField, TinaTemplate } from '@tinacms/schema-tools'
 import { logger } from '../../../logger'
 import { warnText } from '../../../utils/theme'
 import { ErrorSingleton } from './errorSingleton'
@@ -141,7 +141,7 @@ export const transformForestryFieldsToTinaFields = ({
   template: string
   skipBlocks?: boolean
 }) => {
-  const tinaFields: TinaFieldInner<false>[] = []
+  const tinaFields: TinaField[] = []
 
   fields?.forEach((forestryField) => {
     if (forestryField.name === 'menu') {
@@ -152,7 +152,7 @@ export const transformForestryFieldsToTinaFields = ({
       )
       return
     }
-    let field: TinaFieldInner<false>
+    let field: TinaField
     switch (forestryField.type) {
       // Single filed types
       case 'text':
@@ -352,7 +352,7 @@ export const getFieldsFromTemplates: (_args: {
   rootPath: string
   skipBlocks?: boolean
 }) => {
-  fields: TinaFieldInner<false>[]
+  fields: TinaField[]
   templateObj: any
   template: {
     label?: string
