@@ -82,12 +82,6 @@ export class S3MediaStore implements MediaStore {
     }
   }
 
-  // @ts-ignore
-  previewSrc = (publicId: string | Media): string => {
-    if (typeof publicId === 'string') return publicId
-    return publicId.previewSrc
-  }
-
   parse = (img) => {
     return img.src
   }
