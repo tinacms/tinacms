@@ -19,7 +19,7 @@ export class CloudinaryMediaStore implements MediaStore {
   accept = 'text/*,application/*,image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
-    let newFiles: Media[] = []
+    const newFiles: Media[] = []
 
     for (const item of media) {
       const { file, directory } = item
@@ -56,7 +56,7 @@ export class CloudinaryMediaStore implements MediaStore {
         id: fileRes.public_id,
         filename: fileRes.original_filename,
         directory: '/',
-        previewSrc: fileRes.url,
+        thumbnail: fileRes.url,
         src: fileRes.url,
       }
 
@@ -92,12 +92,6 @@ export class CloudinaryMediaStore implements MediaStore {
       items: items.map((item) => item),
       nextOffset: offset,
     }
-  }
-
-  // @ts-ignore
-  previewSrc = (publicId: string | Media): string => {
-    if (typeof publicId === 'string') return publicId
-    return publicId.previewSrc
   }
 
   parse = (img) => {
