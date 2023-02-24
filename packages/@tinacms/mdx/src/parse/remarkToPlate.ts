@@ -204,7 +204,6 @@ export const remarkToSlate = (
           default:
             throw new RichTextParseError(
               `Unknown list item of type ${child.type}`,
-              // @ts-expect-error child.type should be 'never'
               child.position
             )
         }
