@@ -202,5 +202,7 @@ const validateField = async (
   })
   await schema.validate(field)
 
-  return field
+  const validField = (await schema.cast(field)) as TinaField<true>
+
+  return validField
 }

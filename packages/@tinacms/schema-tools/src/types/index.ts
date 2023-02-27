@@ -144,6 +144,7 @@ export interface BaseField {
   required?: boolean
   indexed?: boolean
   name: string
+  nameOverride?: string
   description?: string
 }
 
