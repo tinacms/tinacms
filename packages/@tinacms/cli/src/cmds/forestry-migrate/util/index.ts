@@ -22,23 +22,30 @@ import { ErrorSingleton } from './errorSingleton'
 
 const errorSingletonInstance = ErrorSingleton.getInstance()
 
-export const stringifyName = (name: string, template: string) => {
-  const testRegex = /^[a-zA-Z0-9_]*$/
-  const updateRegex = /[^a-zA-Z0-9]/g
+const NAME_TEST_REGEX = /^[a-zA-Z0-9_]*$/
+const NAME_UPDATE_REGEX = /[^a-zA-Z0-9]/g
 
-  if (testRegex.test(name)) {
+export const getTinaFieldsFromName = (name: string) => {
+  if (name == 'id') {
+    return { name: 'custom_id', nameOverride: 'id' }
+  } else {
+    if (NAME_TEST_REGEX.test(name)) {
+      return { name }
+    } else {
+      return {
+        name: name.replace(NAME_UPDATE_REGEX, '_'),
+        nameOverride: name,
+      }
+    }
+  }
+}
+
+export const stringifyTemplateName = (name: string, template: string) => {
+  if (NAME_TEST_REGEX.test(name)) {
     return name
   } else {
-    const newName = name.replace(updateRegex, '_')
+    const newName = name.replace(NAME_UPDATE_REGEX, '_')
     errorSingletonInstance.addErrorName({ name, newName, template })
-    // logger.error(
-    //   `${dangerText(
-    //     `Name, "${name}" used in Frontmatter template "${template}.yaml" must be alphanumeric and can only contain underscores.`
-    //   )}\n "${name}" will be updated to ${newName} in  TinaCMS if you wish to edit attribute ${name} you will have to update your content and code to use ${newName} instead. See ${linkText(
-    //     'https://tina.io/docs/forestry/common-errors/#migrating-fields-with-non-alphanumeric-characters'
-    //   )} for more information.`
-    // )
-
     // replace everything that is not alphanumeric or underscore with an underscore
     return newName
   }
@@ -167,14 +174,14 @@ export const transformForestryFieldsToTinaFields = ({
       case 'text':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
         }
         break
       case 'textarea':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           ui: {
             component: 'textarea',
@@ -184,28 +191,28 @@ export const transformForestryFieldsToTinaFields = ({
       case 'datetime':
         field = {
           type: forestryField.type,
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
         }
         break
       case 'number':
         field = {
           type: 'number',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
         }
         break
       case 'boolean':
         field = {
           type: 'boolean',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
         }
         break
       case 'color':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           ui: {
             component: 'color',
@@ -215,7 +222,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'file':
         field = {
           type: 'image',
-          name: stringifyName(forestryField.name || 'image', template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
         }
         break
@@ -223,7 +230,7 @@ export const transformForestryFieldsToTinaFields = ({
         if (forestryField.config?.options) {
           field = {
             type: 'string',
-            name: stringifyName(forestryField.name, template),
+            ...getTinaFieldsFromName(forestryField.name),
             label: forestryField.label,
             options: forestryField.config?.options || [],
           }
@@ -252,7 +259,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'list':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           list: true,
         }
@@ -263,7 +270,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'tag_list':
         field = {
           type: 'string',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           list: true,
           ui: {
@@ -276,7 +283,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group':
         field = {
           type: 'object',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           fields: transformForestryFieldsToTinaFields({
             fields: forestryField.fields,
@@ -289,7 +296,7 @@ export const transformForestryFieldsToTinaFields = ({
       case 'field_group_list':
         field = {
           type: 'object',
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           label: forestryField.label,
           list: true,
           fields: transformForestryFieldsToTinaFields({
@@ -314,7 +321,7 @@ export const transformForestryFieldsToTinaFields = ({
           const t: TinaTemplate = {
             fields,
             label: template.label,
-            name: stringifyName(tem, tem),
+            name: stringifyTemplateName(tem, tem),
           }
           templates.push(t)
         })
@@ -323,7 +330,7 @@ export const transformForestryFieldsToTinaFields = ({
           type: 'object',
           list: true,
           label: forestryField.label,
-          name: stringifyName(forestryField.name, template),
+          ...getTinaFieldsFromName(forestryField.name),
           templates,
         }
         break
