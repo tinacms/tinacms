@@ -635,9 +635,6 @@ importers:
 
   packages/@tinacms/datalayer:
     specifiers:
-      '@octokit/auth-app': ^4.0.9
-      '@octokit/graphql': ^5.0.5
-      '@octokit/rest': ^19.0.7
       '@tinacms/graphql': workspace:*
       '@tinacms/scripts': workspace:*
       '@types/fs-extra': ^9.0.2
@@ -650,50 +647,13 @@ importers:
       '@types/node': ^14.17.34
       '@types/normalize-path': ^3.0.0
       '@types/yup': ^0.29.7
-      encoding-down: ^7.1.0
-      fast-glob: ^3.2.5
-      fs-extra: ^9.0.1
-      glob-parent: ^6.0.2
-      graphql: 15.8.0
-      gray-matter: ^4.0.2
-      isomorphic-git: ^1.10.3
       jest: 27.0.6
       jest-diff: 27.0.6
       jest-file-snapshot: ^0.5.0
       jest-matcher-utils: 27.0.6
-      js-yaml: ^3.14.0
-      jsonpath-plus: ^6.0.1
-      level: ^7.0.1
-      leveldown: ^6.1.0
-      levelup: ^5.1.1
-      lodash: ^4.17.20
-      memdown: ^6.1.1
-      normalize-path: ^3.0.0
-      prettier: ^2.2.1
       typescript: 4.3.5
-      yup: ^0.32.9
     dependencies:
-      '@octokit/auth-app': 4.0.9
-      '@octokit/graphql': 5.0.5
-      '@octokit/rest': 19.0.7
       '@tinacms/graphql': link:../graphql
-      encoding-down: 7.1.0
-      fast-glob: 3.2.11
-      fs-extra: 9.1.0
-      glob-parent: 6.0.2
-      graphql: 15.8.0
-      gray-matter: 4.0.3
-      isomorphic-git: 1.18.3
-      js-yaml: 3.14.1
-      jsonpath-plus: 6.0.1
-      level: 7.0.1
-      leveldown: 6.1.1
-      levelup: 5.1.1
-      lodash: 4.17.21
-      memdown: 6.1.1
-      normalize-path: 3.0.0
-      prettier: 2.7.1
-      yup: 0.32.11
     devDependencies:
       '@tinacms/scripts': link:../scripts
       '@types/fs-extra': 9.0.13
@@ -7874,77 +7834,6 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  /@octokit/auth-app/4.0.9:
-    resolution:
-      {
-        integrity: sha512-VFpKIXhHO+kVJtane5cEvdYPtjDKCOI0uKsRrsZfJP+uEu7rcPbQCLCcRKgyT+mUIzGr1IIOmwP/lFqSip1dXA==,
-      }
-    engines: { node: '>= 14' }
-    dependencies:
-      '@octokit/auth-oauth-app': 5.0.5
-      '@octokit/auth-oauth-user': 2.1.1
-      '@octokit/request': 6.2.3
-      '@octokit/request-error': 3.0.3
-      '@octokit/types': 9.0.0
-      '@types/lru-cache': 5.1.1
-      deprecation: 2.3.1
-      lru-cache: 6.0.0
-      universal-github-app-jwt: 1.1.1
-      universal-user-agent: 6.0.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@octokit/auth-oauth-app/5.0.5:
-    resolution:
-      {
-        integrity: sha512-UPX1su6XpseaeLVCi78s9droxpGtBWIgz9XhXAx9VXabksoF0MyI5vaa1zo1njyYt6VaAjFisC2A2Wchcu2WmQ==,
-      }
-    engines: { node: '>= 14' }
-    dependencies:
-      '@octokit/auth-oauth-device': 4.0.4
-      '@octokit/auth-oauth-user': 2.1.1
-      '@octokit/request': 6.2.3
-      '@octokit/types': 9.0.0
-      '@types/btoa-lite': 1.0.0
-      btoa-lite: 1.0.0
-      universal-user-agent: 6.0.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@octokit/auth-oauth-device/4.0.4:
-    resolution:
-      {
-        integrity: sha512-Xl85BZYfqCMv+Uvz33nVVUjE7I/PVySNaK6dRRqlkvYcArSr9vRcZC9KVjXYObGRTCN6mISeYdakAZvWEN4+Jw==,
-      }
-    engines: { node: '>= 14' }
-    dependencies:
-      '@octokit/oauth-methods': 2.0.5
-      '@octokit/request': 6.2.3
-      '@octokit/types': 9.0.0
-      universal-user-agent: 6.0.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@octokit/auth-oauth-user/2.1.1:
-    resolution:
-      {
-        integrity: sha512-JgqnNNPf9CaWLxWm9uh2WgxcaVYhxBR09NVIPTiMU2dVZ3FObOHs3njBiLNw+zq84k+rEdm5Y7AsiASrZ84Apg==,
-      }
-    engines: { node: '>= 14' }
-    dependencies:
-      '@octokit/auth-oauth-device': 4.0.4
-      '@octokit/oauth-methods': 2.0.5
-      '@octokit/request': 6.2.3
-      '@octokit/types': 9.0.0
-      btoa-lite: 1.0.0
-      universal-user-agent: 6.0.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
   /@octokit/auth-token/2.5.0:
     resolution:
       {
@@ -8045,30 +7934,6 @@ packages:
       '@octokit/request': 6.2.3
       '@octokit/types': 9.0.0
       universal-user-agent: 6.0.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /@octokit/oauth-authorization-url/5.0.0:
-    resolution:
-      {
-        integrity: sha512-y1WhN+ERDZTh0qZ4SR+zotgsQUE1ysKnvBt1hvDRB2WRzYtVKQjn97HEPzoehh66Fj9LwNdlZh+p6TJatT0zzg==,
-      }
-    engines: { node: '>= 14' }
-    dev: false
-
-  /@octokit/oauth-methods/2.0.5:
-    resolution:
-      {
-        integrity: sha512-yQP6B5gE3axNxuM3U9KqWs/ErAQ+WLPaPgC/7EjsZsQibkf8sjdAfF8/y/EJW+Dd05XQvadX4WhQZPMnO1SE1A==,
-      }
-    engines: { node: '>= 14' }
-    dependencies:
-      '@octokit/oauth-authorization-url': 5.0.0
-      '@octokit/request': 6.2.3
-      '@octokit/request-error': 3.0.3
-      '@octokit/types': 9.0.0
-      btoa-lite: 1.0.0
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -9509,13 +9374,6 @@ packages:
       '@types/node': 18.7.18
     dev: true
 
-  /@types/btoa-lite/1.0.0:
-    resolution:
-      {
-        integrity: sha512-wJsiX1tosQ+J5+bY5LrSahHxr2wT+uME5UDwdN1kg4frt40euqA+wzECkmq4t5QbveHiJepfdThgQrPw6KiSlg==,
-      }
-    dev: false
-
   /@types/cacheable-request/6.0.2:
     resolution:
       {
@@ -9921,15 +9779,6 @@ packages:
       }
     dev: true
 
-  /@types/jsonwebtoken/9.0.1:
-    resolution:
-      {
-        integrity: sha512-c5ltxazpWabia/4UzhIoaDcIza4KViOQhdbjRlfcIGVnsE3c3brkz9Z+F/EeJIECOQP7W7US2hNE930cWWkPiw==,
-      }
-    dependencies:
-      '@types/node': 18.14.2
-    dev: false
-
   /@types/keyv/3.1.4:
     resolution:
       {
@@ -10052,6 +9901,7 @@ packages:
       {
         integrity: sha512-ssE3Vlrys7sdIzs5LOxCzTVMsU7i9oa/IaW92wF32JFb3CVczqOkru2xspuKczHEbG3nvmPY7IFqVmGGHdNbYw==,
       }
+    dev: true
 
   /@types/mdast/3.0.10:
     resolution:
@@ -13750,13 +13600,6 @@ packages:
       buffer: 5.7.1
     dev: false
 
-  /btoa-lite/1.0.0:
-    resolution:
-      {
-        integrity: sha512-gvW7InbIyF8AicrqWoptdW08pUxuhq8BEgowNajy9RhiE86fmGAGl+bLKo6oB8QP0CkqHLowfN0oJdKC/J6LbA==,
-      }
-    dev: false
-
   /buffer-crc32/0.2.13:
     resolution:
       {
@@ -15629,17 +15472,6 @@ packages:
         integrity: sha512-4tvttepXG1VaYGrRibk5EwJd1t4udunSOVMdLSAL6mId1ix438oPwPZMALY41FCijukO1L0twNcGsdzS7dHgDg==,
       }
     engines: { node: '>=10' }
-    dev: false
-
-  /deferred-leveldown/7.0.0:
-    resolution:
-      {
-        integrity: sha512-QKN8NtuS3BC6m0B8vAnBls44tX1WXAFATUsJlruyAYbZpysWV3siH6o/i3g9DCHauzodksO60bdj5NazNbjCmg==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      abstract-leveldown: 7.2.0
-      inherits: 2.0.4
     dev: false
 
   /define-lazy-prop/2.0.0:
@@ -20269,14 +20101,6 @@ packages:
       }
     engines: { node: '>= 4' }
 
-  /ignore/5.2.0:
-    resolution:
-      {
-        integrity: sha512-CmxgYGiEPCLhfLnpPp1MoRmifwEIOgjcHXxOBjv7mY96c+eWScsOP9c112ZyLdWHi0FxHjI+4uVhKYp/gcdRmQ==,
-      }
-    engines: { node: '>= 4' }
-    dev: false
-
   /ignore/5.2.4:
     resolution:
       {
@@ -21269,26 +21093,6 @@ packages:
     transitivePeerDependencies:
       - encoding
     dev: true
-
-  /isomorphic-git/1.18.3:
-    resolution:
-      {
-        integrity: sha512-CVTNt0uU5RQ4g626LxqUyShdoeD15uZppKA0tk7iY/PyikCbRG594a7BksU4JZcOC6RsqUkURdIlFyKhAfdbqg==,
-      }
-    engines: { node: '>=12' }
-    dependencies:
-      async-lock: 1.3.2
-      clean-git-ref: 2.0.1
-      crc-32: 1.2.2
-      diff3: 0.0.3
-      ignore: 5.2.0
-      minimisted: 2.0.1
-      pako: 1.0.11
-      pify: 4.0.1
-      readable-stream: 3.6.0
-      sha.js: 2.4.11
-      simple-get: 4.0.1
-    dev: false
 
   /isomorphic-git/1.21.0:
     resolution:
@@ -23079,41 +22883,6 @@ packages:
     engines: { node: '>=10' }
     dev: false
 
-  /level-iterator-stream/5.0.0:
-    resolution:
-      {
-        integrity: sha512-wnb1+o+CVFUDdiSMR/ZymE2prPs3cjVLlXuDeSq9Zb8o032XrabGEXcTCsBxprAtseO3qvFeGzh6406z9sOTRA==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      inherits: 2.0.4
-      readable-stream: 3.6.0
-    dev: false
-
-  /level-js/6.1.0:
-    resolution:
-      {
-        integrity: sha512-i7mPtkZm68aewfv0FnIUWvFUFfoyzIvVKnUmuQGrelEkP72vSPTaA1SGneWWoCV5KZJG4wlzbJLp1WxVNGuc6A==,
-      }
-    dependencies:
-      abstract-leveldown: 7.2.0
-      buffer: 6.0.3
-      inherits: 2.0.4
-      ltgt: 2.2.1
-      run-parallel-limit: 1.1.0
-    dev: false
-
-  /level-packager/6.0.1:
-    resolution:
-      {
-        integrity: sha512-8Ezr0XM6hmAwqX9uu8IGzGNkWz/9doyPA8Oo9/D7qcMI6meJC+XhIbNYHukJhIn8OGdlzQs/JPcL9B8lA2F6EQ==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      encoding-down: 7.1.0
-      levelup: 5.1.1
-    dev: false
-
   /level-supports/2.1.0:
     resolution:
       {
@@ -23139,18 +22908,6 @@ packages:
       buffer: 6.0.3
       module-error: 1.0.2
 
-  /level/7.0.1:
-    resolution:
-      {
-        integrity: sha512-w3E64+ALx2eZf8RV5JL4kIcE0BFAvQscRYd1yU4YVqZN9RGTQxXSvH202xvK15yZwFFxRXe60f13LJjcJ//I4Q==,
-      }
-    engines: { node: '>=10.12.0' }
-    dependencies:
-      level-js: 6.1.0
-      level-packager: 6.0.1
-      leveldown: 6.1.1
-    dev: false
-
   /leveldown/6.1.1:
     resolution:
       {
@@ -23162,21 +22919,6 @@ packages:
       abstract-leveldown: 7.2.0
       napi-macros: 2.0.0
       node-gyp-build: 4.4.0
-    dev: false
-
-  /levelup/5.1.1:
-    resolution:
-      {
-        integrity: sha512-0mFCcHcEebOwsQuk00WJwjLI6oCjbBuEYdh/RaRqhjnyVlzqf41T1NnDtCedumZ56qyIh8euLFDqV1KfzTAVhg==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      catering: 2.1.1
-      deferred-leveldown: 7.0.0
-      level-errors: 3.0.1
-      level-iterator-stream: 5.0.0
-      level-supports: 2.1.0
-      queue-microtask: 1.2.3
     dev: false
 
   /leven/2.1.0:
@@ -23585,13 +23327,6 @@ packages:
     engines: { node: '>=10' }
     dependencies:
       yallist: 4.0.0
-
-  /ltgt/2.2.1:
-    resolution:
-      {
-        integrity: sha512-AI2r85+4MquTw9ZYqabu4nMwy9Oftlfa/e/52t9IjtfG+mGBbTNdAoZ3RQKLHR6r0wQnwZnPIEh/Ya6XTWAKNA==,
-      }
-    dev: false
 
   /lunr/2.3.9:
     resolution:
@@ -24216,20 +23951,6 @@ packages:
         integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==,
       }
     engines: { node: '>= 0.6' }
-    dev: false
-
-  /memdown/6.1.1:
-    resolution:
-      {
-        integrity: sha512-vh2RiuVrn6Vv73088C1KzLwy9+hhRwoZsgddYqIoVuFFrcoc2Rt+lq/KrmkFn6ulko7AtQ0AvqtYid35exb38A==,
-      }
-    engines: { node: '>=10' }
-    dependencies:
-      abstract-leveldown: 7.2.0
-      buffer: 6.0.3
-      functional-red-black-tree: 1.0.1
-      inherits: 2.0.4
-      ltgt: 2.2.1
     dev: false
 
   /memfs-or-file-map-to-github-branch/1.2.1:
@@ -28865,15 +28586,6 @@ packages:
     engines: { node: '>=0.12.0' }
     dev: false
 
-  /run-parallel-limit/1.1.0:
-    resolution:
-      {
-        integrity: sha512-jJA7irRNM91jaKc3Hcl1npHsFLOXOoTkPCUL1JEa1R82O2miplXXRaGdjW/KM/98YQWDhJLiSs793CnXfblJUw==,
-      }
-    dependencies:
-      queue-microtask: 1.2.3
-    dev: false
-
   /run-parallel/1.2.0:
     resolution:
       {
@@ -31733,16 +31445,6 @@ packages:
       '@types/unist': 2.0.6
       unist-util-is: 5.1.1
       unist-util-visit-parents: 5.1.3
-    dev: false
-
-  /universal-github-app-jwt/1.1.1:
-    resolution:
-      {
-        integrity: sha512-G33RTLrIBMFmlDV4u4CBF7dh71eWwykck4XgaxaIVeZKOYZRAAxvcGMRFTUclVY6xoUPQvO4Ne5wKGxYm/Yy9w==,
-      }
-    dependencies:
-      '@types/jsonwebtoken': 9.0.1
-      jsonwebtoken: 9.0.0
     dev: false
 
   /universal-user-agent/6.0.0:
