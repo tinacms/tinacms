@@ -13,7 +13,7 @@ export const name = z
       ctx.addIssue({
         code: 'custom',
         message: `name, "${val}" must be alphanumeric and can only contain underscores. (No spaces, dashes, special characters, etc.)
-If you only wan to display this value in the CMS UI, you can use the label property to customize it.
+If you only want to display this value in the CMS UI, you can use the label property to customize it.
 
 If you need to use this value in your content you can use the \`nameOverride\` property to customize the value. For example:
 \`\`\`
