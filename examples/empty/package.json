@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/node": "^17.0.21",
     "eslint": "7",
-    "eslint-config-next": "12.0.3"
+    "eslint-config-next": "13.2.1"
   },
   "version": null
 }
