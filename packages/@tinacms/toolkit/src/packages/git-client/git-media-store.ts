@@ -41,9 +41,6 @@ export class GitMediaStore implements MediaStore {
 
     return uploaded
   }
-  async previewSrc(src: string) {
-    return src
-  }
   async list(options?: MediaListOptions): Promise<MediaList> {
     const directory = options?.directory ?? ''
     const offset = (options?.offset as number) ?? 0

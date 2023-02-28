@@ -32,10 +32,10 @@ export function MediaItem({
       onClick={() => onClick(item)}
     >
       <div className="w-[56px] h-[56px] rounded-[5px] overflow-hidden flex justify-center flex-shrink-0 mr-3">
-        {item.previewSrc ? (
+        {item.thumbnail ? (
           <img
             className="object-cover w-full min-h-full object-center"
-            src={item.previewSrc}
+            src={item.thumbnail}
             alt={item.filename}
           />
         ) : (

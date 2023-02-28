@@ -207,11 +207,13 @@ export const remarkToSlate = (
               child.position
             )
           default:
+            let position: Plate.Position | undefined
+            if (child.type !== 'containerDirective') {
+              position = child.position
+            }
             throw new RichTextParseError(
               `Unknown list item of type ${child.type}`,
-              // `directive` can be one of these, but we aren't supporting it
-              // @ts-ignore
-              child.position
+              position
             )
         }
       }),

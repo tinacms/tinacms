@@ -122,17 +122,14 @@ async function uploadMedia(
   const command = new PutObjectCommand(params)
 
   try {
+    const src = cdnUrl + prefix + filename
     await client.send(command)
     res.json({
       type: 'file',
       id: prefix + filename,
       filename,
       directory: prefix,
-      previewSrc:
-        cdnUrl +
-        (mediaRoot
-          ? path.join(mediaRoot, prefix + filename)
-          : prefix + filename),
+      thumbnail: src,
       src:
         cdnUrl +
         (mediaRoot
@@ -265,12 +262,13 @@ function getDOSToTinaFunc(cdnUrl: string, mediaRoot: string) {
     const filename = path.basename(strippedKey)
     const directory = path.dirname(strippedKey) + '/'
 
+    const src = cdnUrl + file.Key
     return {
       id: file.Key,
       filename,
       directory,
-      src: cdnUrl + file.Key,
-      previewSrc: cdnUrl + file.Key,
+      src: src,
+      thumbnail: src,
       type: 'file',
     }
   }

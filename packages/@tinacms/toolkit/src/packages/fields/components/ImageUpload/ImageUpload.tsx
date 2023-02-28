@@ -14,7 +14,7 @@ interface ImageUploadProps {
   onClear?: () => void
   onClick?: () => void
   value?: string
-  previewSrc?: string
+  src?: string
   loading?: boolean
 }
 
@@ -43,7 +43,7 @@ export const ImageUpload = ({
   onClear,
   onClick,
   value,
-  previewSrc,
+  src,
   loading,
 }: ImageUploadProps) => {
   const cms = useCMS()
@@ -66,7 +66,7 @@ export const ImageUpload = ({
             <ImageLoadingIndicator />
           ) : (
             <>
-              <StyledImage src={previewSrc} />
+              <StyledImage src={src} />
               {onClear && (
                 <DeleteImageButton
                   onClick={(e) => {

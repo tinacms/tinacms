@@ -9,10 +9,13 @@ import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
 import type {
+  CollectionTemplateable,
+  TinaCloudCollection,
   Collection,
   Schema,
   TinaField,
   TinaSchema,
+  Template,
 } from '@tinacms/schema-tools'
 import type { Bridge } from '../database/bridge'
 import { TinaFetchError, TinaQueryError } from '../resolver/error'
@@ -37,6 +40,7 @@ import {
   SUBLEVEL_OPTIONS,
   LevelProxy,
 } from './level'
+import { replaceNameOverrides, applyNameOverrides } from './alias-utils'
 
 type IndexStatusEvent = {
   status: 'inprogress' | 'complete' | 'failed'
@@ -198,6 +202,7 @@ export class Database {
           : undefined
       const { collection, template } =
         tinaSchema.getCollectionAndTemplateByFullPath(filepath, templateName)
+
       const field = template.fields.find((field) => {
         if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
@@ -233,11 +238,16 @@ export class Database {
     data: { [key: string]: unknown }
   ) => {
     await this.initLevel()
-    const { stringifiedFile, payload } = await this.stringifyFile(
-      filepath,
-      data
-    )
+    const dataFields = await this.formatBodyOnPayload(filepath, data)
+
     const collection = await this.collectionForPath(filepath)
+
+    const stringifiedFile = await this.stringifyFile(
+      filepath,
+      dataFields,
+      collection
+    )
+
     let collectionIndexDefinitions
     if (collection) {
       const indexDefinitions = await this.getIndexDefinitions(this.level)
@@ -253,7 +263,7 @@ export class Database {
       normalizedPath,
       collection?.name,
       collectionIndexDefinitions,
-      payload,
+      dataFields,
       'put',
       this.level
     )
@@ -282,7 +292,7 @@ export class Database {
       {
         type: 'put',
         key: normalizedPath,
-        value: payload,
+        value: dataFields,
         sublevel: this.level.sublevel<string, Record<string, any>>(
           CONTENT_ROOT_PREFIX,
           SUBLEVEL_OPTIONS
@@ -296,7 +306,7 @@ export class Database {
   public put = async (
     filepath: string,
     data: { [key: string]: unknown },
-    collection?: string
+    collectionName?: string
   ) => {
     await this.initLevel()
     try {
@@ -304,25 +314,30 @@ export class Database {
         throw new Error(`Unexpected put for config file ${filepath}`)
       } else {
         let collectionIndexDefinitions
-        if (collection) {
+        if (collectionName) {
           const indexDefinitions = await this.getIndexDefinitions(this.level)
-          collectionIndexDefinitions = indexDefinitions?.[collection]
+          collectionIndexDefinitions = indexDefinitions?.[collectionName]
         }
 
         const normalizedPath = normalizePath(filepath)
-        const { stringifiedFile, payload } = await this.stringifyFile(
+        const dataFields = await this.formatBodyOnPayload(filepath, data)
+        const collection = await this.collectionForPath(filepath)
+
+        const stringifiedFile = await this.stringifyFile(
           filepath,
-          data
+          dataFields,
+          collection
         )
+
         if (this.bridge) {
           await this.bridge.put(normalizedPath, stringifiedFile)
         }
         await this.onPut(normalizedPath, stringifiedFile)
         const putOps = makeIndexOpsForDocument(
           normalizedPath,
-          collection,
+          collectionName,
           collectionIndexDefinitions,
-          payload,
+          dataFields,
           'put',
           this.level
         )
@@ -337,7 +352,7 @@ export class Database {
         const delOps = existingItem
           ? makeIndexOpsForDocument(
               normalizedPath,
-              collection,
+              collectionName,
               collectionIndexDefinitions,
               existingItem,
               'del',
@@ -351,7 +366,7 @@ export class Database {
           {
             type: 'put',
             key: normalizedPath,
-            value: payload,
+            value: dataFields,
             sublevel: this.level.sublevel<string, Record<string, any>>(
               CONTENT_ROOT_PREFIX,
               SUBLEVEL_OPTIONS
@@ -366,78 +381,99 @@ export class Database {
       throw new TinaFetchError(`Error in PUT for ${filepath}`, {
         originalError: error,
         file: filepath,
-        collection: collection,
+        collection: collectionName,
         stack: error.stack,
       })
     }
   }
 
-  public stringifyFile = async (
+  public async getTemplateDetailsForFile(
+    collection: TinaCloudCollection<true>,
+    data: { [key: string]: unknown }
+  ) {
+    const tinaSchema = await this.getSchema()
+    const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+
+    let template: Template | undefined
+    if (templateInfo.type === 'object') {
+      template = templateInfo.template
+    }
+    if (templateInfo.type === 'union') {
+      if (hasOwnProperty(data, '_template')) {
+        template = templateInfo.templates.find(
+          (t) => lastItem(t.namespace) === data._template
+        )
+      } else {
+        throw new Error(
+          `Expected _template to be provided for document in an ambiguous collection`
+        )
+      }
+    }
+    if (!template) {
+      throw new Error(`Unable to determine template`)
+    }
+
+    return {
+      template: template,
+      info: templateInfo,
+    }
+  }
+
+  public formatBodyOnPayload = async (
     filepath: string,
     data: { [key: string]: unknown }
   ) => {
-    if (SYSTEM_FILES.includes(filepath)) {
-      throw new Error(`Unexpected put for config file ${filepath}`)
-    } else {
-      const tinaSchema = await this.getSchema(this.level)
-      const collection = tinaSchema.getCollectionByFullPath(filepath)
+    const tinaSchema = await this.getSchema(this.level)
+    const collection = tinaSchema.getCollectionByFullPath(filepath)
 
-      const templateInfo = await tinaSchema.getTemplatesForCollectable(
-        collection
-      )
-      let template
-      if (templateInfo.type === 'object') {
-        template = templateInfo.template
-      }
-      if (templateInfo.type === 'union') {
-        if (hasOwnProperty(data, '_template')) {
-          template = templateInfo.templates.find(
-            (t) => lastItem(t.namespace) === data._template
-          )
-        } else {
-          throw new Error(
-            `Expected _template to be provided for document in an ambiguous collection`
-          )
+    const { template } = await this.getTemplateDetailsForFile(collection, data)
+    const bodyField = template.fields.find((field) => {
+      if (field.type === 'string' || field.type === 'rich-text') {
+        if (field.isBody) {
+          return true
         }
       }
-      if (!template) {
-        throw new Error(`Unable to determine template`)
-      }
-      const field = template.fields.find((field) => {
-        if (field.type === 'string' || field.type === 'rich-text') {
-          if (field.isBody) {
-            return true
-          }
+      return false
+    })
+    let payload: { [key: string]: unknown } = {}
+    if (['md', 'mdx'].includes(collection.format) && bodyField) {
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== bodyField.name) {
+          payload[key] = value
         }
-        return false
       })
-      let payload: { [key: string]: unknown } = {}
-      if (['md', 'mdx'].includes(collection.format) && field) {
-        Object.entries(data).forEach(([key, value]) => {
-          if (key !== field.name) {
-            payload[key] = value
-          }
-        })
-        payload['$_body'] = data[field.name]
-      } else {
-        payload = data
-      }
-      const extension = path.extname(filepath)
-      const stringifiedFile = stringifyFile(
-        payload,
-        extension,
-        templateInfo.type === 'union',
-        {
-          frontmatterFormat: collection?.frontmatterFormat,
-          frontmatterDelimiters: collection?.frontmatterDelimiters,
-        }
-      )
-      return {
-        stringifiedFile,
-        payload,
-        keepTemplateKey: templateInfo.type === 'union',
-      }
+      payload['$_body'] = data[bodyField.name]
+    } else {
+      payload = data
     }
+
+    return payload
+  }
+
+  public stringifyFile = async (
+    filepath: string,
+    payload: { [key: string]: unknown },
+    collection: TinaCloudCollection<true>
+  ) => {
+    const templateDetails = await this.getTemplateDetailsForFile(
+      collection,
+      payload
+    )
+    const writeTemplateKey = templateDetails.info.type === 'union'
+
+    const aliasedData = applyNameOverrides(templateDetails.template, payload)
+
+    const extension = path.extname(filepath)
+    const stringifiedFile = stringifyFile(
+      aliasedData,
+      extension,
+      writeTemplateKey, //templateInfo.type === 'union',
+      {
+        frontmatterFormat: collection?.frontmatterFormat,
+        frontmatterDelimiters: collection?.frontmatterDelimiters,
+      }
+    )
+    return stringifiedFile
   }
 
   /**
@@ -450,7 +486,15 @@ export class Database {
 
   public flush = async (filepath: string) => {
     const data = await this.get<{ [key: string]: unknown }>(filepath)
-    const { stringifiedFile } = await this.stringifyFile(filepath, data)
+
+    const dataFields = await this.formatBodyOnPayload(filepath, data)
+    const collection = await this.collectionForPath(filepath)
+    const stringifiedFile = await this.stringifyFile(
+      filepath,
+      dataFields,
+      collection
+    )
+
     return stringifiedFile
   }
 
@@ -1060,6 +1104,9 @@ const _indexContent = async (
     }
   }
 
+  const tinaSchema = await database.getSchema()
+  const templateInfo = await tinaSchema.getTemplatesForCollectable(collection)
+
   await sequential(documentPaths, async (filepath) => {
     try {
       const dataString = await database.bridge.get(normalizePath(filepath))
@@ -1073,19 +1120,25 @@ const _indexContent = async (
         }
       )
       const normalizedPath = normalizePath(filepath)
+
+      const aliasedData = replaceNameOverrides(
+        getTemplateForFile(templateInfo, data as any),
+        data
+      )
+
       await enqueueOps([
         ...makeIndexOpsForDocument<Record<string, any>>(
           normalizedPath,
           collection?.name,
           collectionIndexDefinitions,
-          data,
+          aliasedData,
           'put',
           level
         ),
         {
           type: 'put',
           key: normalizedPath,
-          value: data as any,
+          value: aliasedData as any,
           sublevel: level.sublevel<string, Record<string, any>>(
             CONTENT_ROOT_PREFIX,
             SUBLEVEL_OPTIONS
@@ -1139,4 +1192,25 @@ const _deleteIndexContent = async (
       ])
     }
   })
+}
+
+const getTemplateForFile = (
+  templateInfo: CollectionTemplateable,
+  data: { [key: string]: unknown }
+) => {
+  if (templateInfo.type === 'object') {
+    return templateInfo.template
+  }
+  if (templateInfo.type === 'union') {
+    if (hasOwnProperty(data, '_template')) {
+      return templateInfo.templates.find(
+        (t) => lastItem(t.namespace) === data._template
+      )
+    } else {
+      throw new Error(
+        `Expected _template to be provided for document in an ambiguous collection`
+      )
+    }
+  }
+  throw new Error(`Unable to determine template`)
 }

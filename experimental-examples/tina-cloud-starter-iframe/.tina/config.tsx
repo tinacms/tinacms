@@ -58,6 +58,11 @@ const config = defineStaticConfig({
             required: true,
           },
           {
+            type: "string",
+            name: "foobar",
+            nameOverride: "foo-bar",
+          },
+          {
             type: "image",
             name: "heroImg",
             label: "Hero Image",

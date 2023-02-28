@@ -19,7 +19,7 @@ export class DOSMediaStore implements MediaStore {
   accept = 'text/*,application/*,image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
-    let newFiles: Media[] = []
+    const newFiles: Media[] = []
 
     for (const item of media) {
       const { file, directory } = item
@@ -81,12 +81,6 @@ export class DOSMediaStore implements MediaStore {
       items: items.map((item) => item),
       nextOffset: offset,
     }
-  }
-
-  // @ts-ignore
-  previewSrc = (publicId: string | Media): string => {
-    if (typeof publicId === 'string') return publicId
-    return publicId.previewSrc
   }
 
   parse = (img) => {
