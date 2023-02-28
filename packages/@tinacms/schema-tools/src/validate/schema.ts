@@ -36,7 +36,7 @@ const Template = z
     }
   })
 
-const TinaCloudCollectionBase = z.object({
+export const CollectionBaseSchema = z.object({
   label: z.string().optional(),
   name: name.superRefine((val, ctx) => {
     if (val === 'relativePath') {
@@ -46,11 +46,12 @@ const TinaCloudCollectionBase = z.object({
       })
     }
   }),
+  path: z.string().transform((val) => val.replace(/^\/|\/$/g, '')),
   format: z.enum(FORMATS).optional(),
 })
 
 // Zod did not handel this union very well so we will handle it ourselves
-const TinaCloudCollection = TinaCloudCollectionBase.extend({
+const TinaCloudCollection = CollectionBaseSchema.extend({
   fields: z
     .array(TinaFieldZod)
     .min(1)
