@@ -4,6 +4,7 @@ query DocumentQuery($collection: String!, $relativePath: String!) {
     ...PostParts
     ...DocumentationParts
     ...AuthorParts
+    ...SsgPostParts
   }
 }
 
@@ -21,6 +22,7 @@ query NodeQuery($id: String!) {
       ...PostParts
       ...DocumentationParts
       ...AuthorParts
+      ...SsgPostParts
     }
   }
 }

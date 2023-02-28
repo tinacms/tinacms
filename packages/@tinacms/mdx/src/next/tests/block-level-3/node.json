@@ -1,0 +1,54 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "Testing again"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "featurePanel",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "_value": "Test"
+      }
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "pullQuote",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "foo": "Testing",
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Things"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

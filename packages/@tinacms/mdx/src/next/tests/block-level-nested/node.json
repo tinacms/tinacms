@@ -1,0 +1,57 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h1",
+      "children": [
+        {
+          "type": "text",
+          "text": "hello"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "someFeature",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "otherFeature",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "props": {
+                "children": {
+                  "type": "root",
+                  "children": [
+                    {
+                      "type": "p",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Testing this thing"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

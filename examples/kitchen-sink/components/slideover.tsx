@@ -23,7 +23,11 @@ export const useCollections = (): Item[] => {
       const items = res.data.collections
         .filter((collection) => {
           // Only show items which have matching routes
-          if (['page', 'post', 'documentation'].includes(collection.name)) {
+          if (
+            ['page', 'post', 'documentation', 'ssgPost'].includes(
+              collection.name
+            )
+          ) {
             return true
           }
           return false

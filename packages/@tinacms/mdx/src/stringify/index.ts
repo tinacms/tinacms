@@ -11,6 +11,7 @@ import {
   MdxJsxTextElement,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx'
+import { stringifyMDX as stringifyMDXNext } from '../next'
 import type { RichTextType } from '@tinacms/schema-tools'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
@@ -40,6 +41,9 @@ export const stringifyMDX = (
   field: RichTextType,
   imageCallback: (url: string) => string
 ) => {
+  if (field.parser?.type === 'markdown') {
+    return stringifyMDXNext(value, field, imageCallback)
+  }
   if (!value) {
     return
   }
@@ -98,6 +102,7 @@ export const toTinaMarkdown = (tree: Md.Root, field: RichTextType) => {
    * templates, we're assuming you'll need to escape
    *
    */
+  // @ts-ignore
   const handlers: Handlers = {}
   handlers['text'] = (node, parent, context, safeOptions) => {
     // Empty spaces before/after strings

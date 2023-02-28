@@ -1,1 +1,0 @@
-<Greeting message={() => "hello"} />

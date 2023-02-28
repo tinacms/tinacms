@@ -6,7 +6,7 @@
 
 import { remark } from 'remark'
 import remarkMdx, { Root } from 'remark-mdx'
-
+import { parseMDX as parseMDXNext } from '../next'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { remarkToSlate, RichTextParseError } from './remarkToPlate'
 import type { RichTextType } from '@tinacms/schema-tools'
@@ -105,24 +105,23 @@ export const parseMDX = (
   let tree: Root | null
   try {
     if (field.parser?.type === 'markdown') {
-      tree = markdownToAst(value, field)
-    } else {
-      let preprocessedString = value
-      const templatesWithMatchers = field.templates?.filter(
-        (template) => template.match
-      )
-      templatesWithMatchers?.forEach((template) => {
-        if (typeof template === 'string') {
-          throw new Error('Global templates are not supported')
-        }
-        if (template.match) {
-          if (preprocessedString) {
-            preprocessedString = parseShortcode(preprocessedString, template)
-          }
-        }
-      })
-      tree = mdxToAst(preprocessedString)
+      return parseMDXNext(value, field, imageCallback)
     }
+    let preprocessedString = value
+    const templatesWithMatchers = field.templates?.filter(
+      (template) => template.match
+    )
+    templatesWithMatchers?.forEach((template) => {
+      if (typeof template === 'string') {
+        throw new Error('Global templates are not supported')
+      }
+      if (template.match) {
+        if (preprocessedString) {
+          preprocessedString = parseShortcode(preprocessedString, template)
+        }
+      }
+    })
+    tree = mdxToAst(preprocessedString)
     if (tree) {
       return remarkToSlate(tree, field, imageCallback, value)
     } else {
