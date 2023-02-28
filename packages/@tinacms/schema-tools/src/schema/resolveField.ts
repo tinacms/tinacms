@@ -95,7 +95,6 @@ export const resolveField = (
         ...extraFields,
       }
     case 'object':
-      field.templates[0]
       const templateInfo = schema.getTemplatesForCollectable(field)
       if (templateInfo.type === 'object') {
         // FIXME: need to finish group/group-list
