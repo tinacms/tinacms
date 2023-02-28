@@ -208,7 +208,7 @@ importers:
       react-icons: ^4.3.1
       react-is: 17.0.2
       styled-components: ^5.1.3
-      styled-jsx: ^3.2.5
+      styled-jsx: ^5.1.2
       tailwindcss: 3.2.4
       tinacms: workspace:*
       typescript: ^4.5.2
@@ -226,7 +226,7 @@ importers:
       react-icons: 4.7.1_react@17.0.2
       react-is: 17.0.2
       styled-components: 5.3.5_281a4fa50a045c9112baf635f3bc27a7
-      styled-jsx: 3.4.7_react@17.0.2
+      styled-jsx: 5.1.2_react@17.0.2
       tailwindcss: 3.2.4
       tinacms: link:../../packages/tinacms
       typescript: 4.8.4
@@ -5654,17 +5654,6 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
-
-  /@babel/types/7.8.3:
-    resolution:
-      {
-        integrity: sha512-jBD+G8+LWpMBBWvVcdr4QysjUE4mU/syrhN17o1u3gx0/WzJB1kwiVZAXRtWbsIPOwW8pF/YJV5+nmetPzepXg==,
-      }
-    dependencies:
-      esutils: 2.0.3
-      lodash: 4.17.21
-      to-fast-properties: 2.0.0
-    dev: false
 
   /@bcoe/v8-coverage/0.2.3:
     resolution:
@@ -13681,13 +13670,6 @@ packages:
     engines: { node: '>=0.6' }
     dev: false
 
-  /big.js/5.2.2:
-    resolution:
-      {
-        integrity: sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==,
-      }
-    dev: false
-
   /binary-extensions/2.2.0:
     resolution:
       {
@@ -14967,15 +14949,6 @@ packages:
         integrity: sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==,
       }
     engines: { node: '>= 0.6' }
-
-  /convert-source-map/1.7.0:
-    resolution:
-      {
-        integrity: sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==,
-      }
-    dependencies:
-      safe-buffer: 5.1.2
-    dev: false
 
   /convert-source-map/1.8.0:
     resolution:
@@ -16271,14 +16244,6 @@ packages:
         integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==,
       }
     dev: true
-
-  /emojis-list/2.1.0:
-    resolution:
-      {
-        integrity: sha512-knHEZMgs8BB+MInokmNTg/OyPlAddghe1YBgNwJBc5zsJi/uyIcXoSDsL/W9ymOsBoBGdPIHXYJ9+qKFwRwDng==,
-      }
-    engines: { node: '>= 0.10' }
-    dev: false
 
   /encodeurl/1.0.2:
     resolution:
@@ -22907,6 +22872,7 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
+    dev: true
 
   /json5/2.2.3:
     resolution:
@@ -23333,18 +23299,6 @@ packages:
       js-yaml: 3.14.1
       pify: 4.0.1
       strip-bom: 3.0.0
-    dev: false
-
-  /loader-utils/1.2.3:
-    resolution:
-      {
-        integrity: sha512-fkpz8ejdnEMG3s37wGL07iSBDg99O9D5yflE9RGNH3hRdx9SOwYfnGYdZOUIZitN8E+E2vkq3MUMYMvPYl5ZZA==,
-      }
-    engines: { node: '>=4.0.0' }
-    dependencies:
-      big.js: 5.2.2
-      emojis-list: 2.1.0
-      json5: 1.0.1
     dev: false
 
   /local-pkg/0.4.2:
@@ -29721,14 +29675,6 @@ packages:
       }
     engines: { node: '>=0.10.0' }
 
-  /source-map/0.7.3:
-    resolution:
-      {
-        integrity: sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==,
-      }
-    engines: { node: '>= 8' }
-    dev: false
-
   /source-map/0.7.4:
     resolution:
       {
@@ -29996,13 +29942,6 @@ packages:
         integrity: sha512-QwiXZgpRcKkhTj2Scnn++4PKtWsH0kpzZ62L2R6c/LUVYv7hVnZqcg2+sMuT6R7Jusu1vviK/MFsu6kNJfWlEQ==,
       }
     engines: { node: '>=4' }
-    dev: false
-
-  /string-hash/1.1.3:
-    resolution:
-      {
-        integrity: sha512-kJUvRUFK49aub+a7T1nNE66EJbZBMnBgoC1UbCZ5n6bsZKBRga4KgBRTMn/pFkeCZSYtNeSyMxPDM0AXWELk2A==,
-      }
     dev: false
 
   /string-length/4.0.2:
@@ -30321,25 +30260,6 @@ packages:
       supports-color: 5.5.0
     dev: false
 
-  /styled-jsx/3.4.7_react@17.0.2:
-    resolution:
-      {
-        integrity: sha512-PkImcCsovR39byv4Tz83tAPsYs2CiTPOmDSplhe0lsIFVYJyd7rzJ7fbm41vSNsF/lnO+Ob5n/jgMookwY0pww==,
-      }
-    peerDependencies:
-      react: 15.x.x || 16.x.x || 17.x.x
-    dependencies:
-      '@babel/types': 7.8.3
-      babel-plugin-syntax-jsx: 6.18.0
-      convert-source-map: 1.7.0
-      loader-utils: 1.2.3
-      react: 17.0.2
-      source-map: 0.7.3
-      string-hash: 1.1.3
-      stylis: 3.5.4
-      stylis-rule-sheet: 0.0.10_stylis@3.5.4
-    dev: false
-
   /styled-jsx/5.0.2:
     resolution:
       {
@@ -30431,24 +30351,6 @@ packages:
     dependencies:
       client-only: 0.0.1
       react: 17.0.2
-    dev: false
-
-  /stylis-rule-sheet/0.0.10_stylis@3.5.4:
-    resolution:
-      {
-        integrity: sha512-nTbZoaqoBnmK+ptANthb10ZRZOGC+EmTLLUxeYIuHNkEKcmKgXX1XWKkUBT2Ac4es3NybooPe0SmvKdhKJZAuw==,
-      }
-    peerDependencies:
-      stylis: ^3.5.0
-    dependencies:
-      stylis: 3.5.4
-    dev: false
-
-  /stylis/3.5.4:
-    resolution:
-      {
-        integrity: sha512-8/3pSmthWM7lsPBKv7NXkzn2Uc9W7NotcwGNpJaa3k7WMM1XDCA4MgT5k/8BIexd5ydZdboXtU90XH9Ec4Bv/Q==,
-      }
     dev: false
 
   /sucrase/3.22.0:
