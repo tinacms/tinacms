@@ -1,7 +1,3 @@
-/**
-
-*/
-
 import { ZodError } from 'zod'
 import type { Schema } from '../types/index'
 import { parseZodError } from '../util/parseZodErrors'

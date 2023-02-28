@@ -5,6 +5,7 @@
 import { z } from 'zod'
 import type { TinaField as TinaFieldType } from '../types/index'
 import { findDuplicates } from '../util'
+import { name } from './properties'
 
 const TypeName = [
   'string',
@@ -22,20 +23,6 @@ const typeRequiredError = `type is required and must be one of ${TypeName.join(
   ', '
 )}`
 
-const nameProp = z
-  .string({
-    required_error: 'name must be provided',
-    invalid_type_error: 'name must be a sting',
-  })
-  .superRefine((val, ctx) => {
-    if (val.includes(' '))
-      ctx.addIssue({
-        message: `name "${val}" cannot contain spaces`,
-        code: z.ZodIssueCode.custom,
-        fatal: true,
-      })
-  })
-
 const Option = z.union(
   [
     z.string(),
@@ -52,7 +39,7 @@ const Option = z.union(
   }
 )
 const TinaField = z.object({
-  name: nameProp,
+  name,
   label: z.string().or(z.boolean()).optional(),
   description: z.string().optional(),
   required: z.boolean().optional(),
@@ -118,7 +105,7 @@ export const TinaFieldZod: z.ZodType<TinaFieldType> = z.lazy(() => {
   const TemplateTemp = z
     .object({
       label: z.string().optional(),
-      name: nameProp,
+      name,
       fields: z.array(TinaFieldZod),
       match: z
         .object({
