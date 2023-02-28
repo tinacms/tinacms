@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import {
@@ -120,13 +111,14 @@ async function uploadMedia(
     const command = new PutObjectCommand(params)
     try {
       await client.send(command)
+      const src = cdnUrl + prefix + filename
       res.json({
         type: 'file',
         id: prefix + filename,
         filename,
         directory: prefix,
-        previewSrc: cdnUrl + prefix + filename,
-        src: cdnUrl + prefix + filename,
+        thumbnail: src,
+        src,
       })
     } catch (e) {
       res.status(500).send(findErrorMessage(e))
@@ -237,12 +229,13 @@ function getS3ToTinaFunc(cdnUrl) {
     const filename = path.basename(file.Key)
     const directory = path.dirname(file.Key) + '/'
 
+    const src = cdnUrl + file.Key
     return {
       id: file.Key,
       filename,
       directory,
-      src: cdnUrl + file.Key,
-      previewSrc: cdnUrl + file.Key,
+      src: src,
+      thumbnail: src,
       type: 'file',
     }
   }

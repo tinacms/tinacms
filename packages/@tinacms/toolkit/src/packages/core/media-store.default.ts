@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -38,9 +26,6 @@ export class DummyMediaStore implements MediaStore {
       directory,
       filename: file.name,
     }))
-  }
-  async previewSrc(filename: string) {
-    return filename
   }
   async list(): Promise<MediaList> {
     const items: Media[] = []
@@ -134,13 +119,14 @@ export class TinaMediaStore implements MediaStore {
             throw new Error(`Upload error: '${matches[2]}'`)
           }
         }
+        const src = `https://assets.tina.io/${this.api.clientId}/${path}`
         newFiles.push({
           directory: item.directory,
           filename: item.file.name,
           id: item.file.name,
           type: 'file',
-          previewSrc: `https://assets.tina.io/${this.api.clientId}/${path}`,
-          src: `https://assets.tina.io/${this.api.clientId}/${path}`,
+          thumbnail: src,
+          src,
         })
       }
     }
@@ -200,7 +186,6 @@ export class TinaMediaStore implements MediaStore {
           id: file.name,
           filename: file.name,
           directory,
-          previewSrc: filePath,
           src: filePath,
         }
 
@@ -222,9 +207,10 @@ export class TinaMediaStore implements MediaStore {
     }
   }
 
-  async previewSrc(filename: string) {
-    return filename
+  private genThumbnail(src: string) {
+    return !this.isLocal ? `${src}?fit=crop&max-w=56&max-h=56` : src
   }
+
   async list(options?: MediaListOptions): Promise<MediaList> {
     this.setup()
 
@@ -275,9 +261,7 @@ export class TinaMediaStore implements MediaStore {
         id: file.filename,
         filename: file.filename,
         src: file.src,
-        previewSrc: !this.isLocal
-          ? `${file.src}?fit=crop&max-w=56&max-h=56`
-          : file.src,
+        thumbnail: this.genThumbnail(file.src),
       })
     }
 

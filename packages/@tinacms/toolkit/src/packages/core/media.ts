@@ -1,18 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
@@ -47,9 +35,9 @@ export interface Media {
   src?: string
 
   /**
-   * A url that provides an image preview of the media file
+   * A url that provides a smaller image of the media file
    */
-  previewSrc?: string
+  thumbnail?: string
 }
 
 export interface MediaUploadOptions {
@@ -84,16 +72,6 @@ export interface MediaStore {
    * Delete a media object from the store.
    */
   delete(media: Media): Promise<void>
-
-  /**
-   * Given a `src` string it returns a url for previewing that content.
-   * This is helpful in cases where the file may not be available in production yet.
-   */
-  previewSrc(
-    src: string,
-    fieldPath?: string,
-    formValues?: any
-  ): Promise<string> | string
 
   /**
    * Lists all media in a specific directory.
@@ -199,39 +177,6 @@ export class MediaManager implements MediaStore {
         type: 'media:delete:failure',
         media,
         error,
-      })
-      throw error
-    }
-  }
-
-  previewSrc = async (
-    src: string,
-    fieldName: string = '',
-    formValues: any = {}
-  ): Promise<string> => {
-    try {
-      this.events.dispatch({
-        type: 'media:preview:start',
-        src,
-        fieldName,
-        formValues,
-      })
-      const url = await this.store.previewSrc(src, fieldName, formValues)
-      this.events.dispatch({
-        type: 'media:preview:success',
-        src,
-        url,
-        fieldName,
-        formValues,
-      })
-      return url
-    } catch (error) {
-      this.events.dispatch({
-        type: 'media:preview:failure',
-        src,
-        error,
-        fieldName,
-        formValues,
       })
       throw error
     }

@@ -1,8 +1,0 @@
-
-query GetBlockPageDocument {
-  blockPage(relativePath: "blockPage1.mdx") {
-    ... on Document {
-      id
-    }
-  }
-}

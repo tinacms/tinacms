@@ -1,5 +1,72 @@
 # tinacms
 
+## 1.2.2
+
+### Patch Changes
+
+- 0e6093a8d: Fixes branch switcher accessed from the branch banner, adds indexing status to branch list, improves UI clarity.
+- 9d38f4b78: Only redirect to preview if the user is using a router.
+
+  See [this video](https://www.loom.com/share/69345c21c3f94c57997ac0a19c9768a8) for more details.
+
+- b984f1a7c: Fixes the error when a user clears the date filter input
+- 071b8fe59: remove schema info log when schema in up to date
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+- Updated dependencies [0e6093a8d]
+- Updated dependencies [892b4e39e]
+- Updated dependencies [c97ffc20d]
+  - @tinacms/toolkit@1.3.4
+  - @tinacms/schema-tools@1.3.2
+
+## 1.2.1
+
+### Patch Changes
+
+- bb7f00db1: Fix issue where collections would not refresh if you chose the "None" filter after selecting a filter
+- 42536f6e2: Groups filter inputs in a form so pressing 'enter' will filter the collection list
+- 5d024e4f1: Add branch banner to sidebar and admin
+- Updated dependencies [f1f3938d9]
+- Updated dependencies [e732906b6]
+- Updated dependencies [5d024e4f1]
+  - @tinacms/toolkit@1.3.3
+  - @tinacms/schema-tools@1.3.1
+
+## 1.2.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- 50f86caed: Adds filtering to the admin IU
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+- Updated dependencies [50f86caed]
+  - @tinacms/schema-tools@1.3.0
+  - @tinacms/sharedctx@1.0.1
+  - @tinacms/toolkit@1.3.2
+
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [09e716538]
+  - @tinacms/toolkit@1.3.1
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [84fe97ca7]
+- Updated dependencies [b4facb6ca]
+- Updated dependencies [e7c404bcf]
+- Updated dependencies [e8776aa59]
+- Updated dependencies [e019a200a]
+  - @tinacms/schema-tools@1.2.1
+  - @tinacms/toolkit@1.3.0
+
 ## 1.1.3
 
 ### Patch Changes

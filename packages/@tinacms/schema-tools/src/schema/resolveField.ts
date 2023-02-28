@@ -1,43 +1,23 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
-import { TinaFieldEnriched } from '../types/index'
+import { TinaField } from '../types/index'
 import { TinaSchema } from './TinaSchema'
 import { lastItem, NAMER } from '../util'
 
 /**
- *
  * Turns a field the schema (schema.{js,ts} file) into a valid front end FieldConfig
- *
- *
- * @param  {TinaFieldEnriched} field. The field that will be transformed
- * @param  {TinaSchema} schema the entireT Tina Schema
- * @returns unknown
  */
 export const resolveField = (
-  field: TinaFieldEnriched,
+  field: TinaField<true>,
   schema: TinaSchema
 ): {
   [key: string]: unknown
   name: string
-  component: string
+  component: TinaField<true>['ui']['component']
   type: string
 } => {
-  field
-  field.parentTypename = NAMER.dataTypeName(
-    // Get the type of the parent namespace
-    field.namespace.filter((_, i) => i < field.namespace.length - 1)
-  )
   const extraFields = field.ui || {}
   switch (field.type) {
     case 'number':
@@ -115,6 +95,7 @@ export const resolveField = (
         ...extraFields,
       }
     case 'object':
+      field.templates[0]
       const templateInfo = schema.getTemplatesForCollectable(field)
       if (templateInfo.type === 'object') {
         // FIXME: need to finish group/group-list
@@ -134,7 +115,6 @@ export const resolveField = (
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
           templates[lastItem(template.namespace)] = {
-            // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
             namespace: [...field.namespace, templateName],
@@ -168,7 +148,6 @@ export const resolveField = (
           const templateName = lastItem(template.namespace)
           typeMap[templateName] = NAMER.dataTypeName(template.namespace)
           templates[lastItem(template.namespace)] = {
-            // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
             inline: template.inline,

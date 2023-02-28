@@ -1,29 +1,15 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
-import React, { useState } from 'react'
+import React from 'react'
 import { TinaCloudProvider } from './auth'
-import { useGraphqlForms } from './hooks/use-graphql-forms'
 
 import { LocalClient } from './internalClient/index'
-import { EditContext, TinaDataContext } from '@tinacms/sharedctx'
-import type { formifyCallback } from './hooks/use-graphql-forms'
 // @ts-ignore importing css is not recognized
 import styles from './styles.css'
-import { useCMS } from '@tinacms/toolkit'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-import { useTina } from './edit-state'
-import { parseURL } from './utils/parseUrl'
+import { parseURL } from '@tinacms/schema-tools'
 import { TinaCMSProviderDefaultProps } from './types/cms'
 
 const errorButtonStyles = {
@@ -208,6 +194,8 @@ export const TinaCMSProvider2 = ({
   }
   const apiURL = props?.client?.apiUrl || props?.apiURL
 
+  const isLocalOverride = schema?.config?.admin?.auth?.useLocalAuth
+
   const { branch, clientId, isLocalClient } = apiURL
     ? parseURL(apiURL)
     : {
@@ -220,7 +208,10 @@ export const TinaCMSProvider2 = ({
     // Check if local client is defined
     typeof isLocalClient === 'undefined' ||
     // If in not in localMode check if clientId and branch are defined
-    (!isLocalClient && (!branch || !clientId))
+    (!isLocalClient &&
+      (!branch || !clientId) &&
+      // if they pass a custom apiURL, we don't need to throw an error
+      !schema.config.contentApiUrlOverride)
   ) {
     throw new Error(
       'Invalid setup. See https://tina.io/docs/tina-cloud/connecting-site/ for more information.'
@@ -238,9 +229,9 @@ export const TinaCMSProvider2 = ({
     <>
       <TinaCloudProvider
         branch={branch}
-        clientId={clientId}
+        clientId={clientId || schema?.config?.clientId}
         tinaioConfig={props.tinaioConfig}
-        isLocalClient={isLocalClient}
+        isLocalClient={isLocalOverride || isLocalClient}
         cmsCallback={props.cmsCallback}
         mediaStore={props.mediaStore}
         apiUrl={apiURL}
@@ -249,23 +240,7 @@ export const TinaCMSProvider2 = ({
         schema={{ ...schema, config: { ...schema.config, ...props } }}
       >
         <style>{styles}</style>
-        <ErrorBoundary>
-          <DocumentCreator documentCreatorCallback={documentCreatorCallback} />
-          <TinaDataProvider formifyCallback={formifyCallback}>
-            {typeof props.children == 'function' ? (
-              <TinaQuery
-                {...props}
-                variables={props.variables}
-                data={props.data}
-                query={query}
-                formifyCallback={formifyCallback}
-                children={props.children as any}
-              />
-            ) : (
-              props.children
-            )}
-          </TinaDataProvider>
-        </ErrorBoundary>
+        <ErrorBoundary>{props.children}</ErrorBoundary>
       </TinaCloudProvider>
     </>
   )
@@ -283,110 +258,6 @@ const DocumentCreator = ({
   useDocumentCreatorPlugin(documentCreatorCallback)
 
   return null
-}
-
-interface TinaQueryProps {
-  /** The query from getStaticProps */
-  query: string
-  /** Any variables from getStaticProps */
-  variables: object
-  /** The `data` from getStaticProps */
-  data: object
-  /** Your React page component */
-  children: (props: { data: object }) => React.ReactNode
-  /** Callback if you need access to the "formify" API */
-  formifyCallback?: formifyCallback
-  /** Callback if you need access to the "document creator" API */
-}
-
-//Legacy'ish Container that auto-registers forms/document creator
-const TinaQuery = (props: TinaQueryProps) => {
-  return <TinaQueryInner key={`rootQuery-${props.query}`} {...props} />
-}
-
-const TinaQueryInner = ({ children, ...props }: TinaQueryProps) => {
-  const { data: liveData, isLoading } = useTina({
-    query: props.query,
-    variables: props.variables,
-    data: props.data,
-  })
-
-  return (
-    <>
-      {children(
-        isLoading || !props.query ? props : { ...props, data: liveData }
-      )}
-    </>
-  )
-}
-
-// TinaDataProvider can only manage one "request" object at a timee
-export const TinaDataProvider = ({
-  children,
-  formifyCallback,
-}: {
-  children: any
-  formifyCallback: formifyCallback
-}) => {
-  const [request, setRequest] = useState<{ query: string; variables: object }>()
-  const [state, setState] = React.useState({
-    payload: undefined,
-    isLoading: true,
-  })
-
-  return (
-    <TinaDataContext.Provider
-      value={{
-        setRequest,
-        isLoading: state.isLoading,
-        state: { payload: state.payload },
-      }}
-    >
-      <FormRegistrar
-        key={request?.query} // unload on page/query change
-        request={request}
-        formifyCallback={formifyCallback}
-        onPayloadStateChange={setState}
-      />
-      {children}
-    </TinaDataContext.Provider>
-  )
-}
-
-const FormRegistrar = ({
-  request,
-  formifyCallback,
-  onPayloadStateChange,
-}: {
-  request: { query: string; variables: object }
-  formifyCallback: formifyCallback
-  onPayloadStateChange: ({ payload: object, isLoading: boolean }) => void
-}) => {
-  const cms = useCMS()
-  const { setFormsRegistering } = React.useContext(EditContext)
-
-  const [payload, isLoading] = useGraphqlForms({
-    query: request?.query,
-    variables: request?.variables,
-    formify: (args) => {
-      if (formifyCallback) {
-        return formifyCallback(args, cms)
-      } else {
-        return args.createForm(args.formConfig)
-      }
-    },
-  })
-
-  React.useEffect(() => {
-    onPayloadStateChange({ payload, isLoading })
-    setFormsRegistering && setFormsRegistering(isLoading)
-  }, [JSON.stringify(payload), isLoading])
-
-  return isLoading ? (
-    <Loader>
-      <></>
-    </Loader>
-  ) : null
 }
 
 const Loader = (props: { children: React.ReactNode }) => {

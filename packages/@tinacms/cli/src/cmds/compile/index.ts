@@ -1,25 +1,16 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import * as _ from 'lodash'
 import { BuildSchemaError, ExecuteSchemaError } from '../start-server/errors'
 import fs from 'fs-extra'
 import path from 'path'
-import { build } from 'esbuild'
+import { build, Platform } from 'esbuild'
 import type { Loader } from 'esbuild'
-import type { TinaCloudSchema } from '@tinacms/graphql'
+import type { Schema } from '@tinacms/graphql'
 import { logText } from '../../utils/theme'
-import { fileExists, getClientPath, getPath } from '../../lib'
+import { fileExists, getPath } from '../../lib'
 import { logger } from '../../logger'
 
 const generatedFilesToRemove = [
@@ -265,13 +256,14 @@ export const compileSchema = async (options: {
   return schema
 }
 
-const transpile = async (
+export const transpile = async (
   inputFile,
   outputFile,
   tempDir,
   verbose,
   define,
-  packageJSONFilePath: string
+  packageJSONFilePath: string,
+  platform: Platform = 'neutral'
 ) => {
   if (verbose) logger.info(logText('Building javascript...'))
 
@@ -296,7 +288,7 @@ const transpile = async (
   const prebuiltInputPath = path.join(tempDir, 'temp-output.jsx')
   await build({
     bundle: true,
-    platform: 'neutral',
+    platform,
     target: ['es2020'],
     entryPoints: [inputFile],
     treeShaking: true,
@@ -319,7 +311,7 @@ const transpile = async (
   const outputPath = path.join(tempDir, outputFile)
   await build({
     bundle: true,
-    platform: 'neutral',
+    platform,
     target: ['node10.4'],
     entryPoints: [prebuiltInputPath],
     // Since this code is run via CLI, convert it to cjs
@@ -335,7 +327,7 @@ const transpile = async (
   if (verbose) logger.info(logText(`Javascript built`))
 }
 
-export const defineSchema = (config: TinaCloudSchema) => {
+export const defineSchema = (config: Schema) => {
   return config
 }
 

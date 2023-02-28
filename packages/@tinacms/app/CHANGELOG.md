@@ -1,5 +1,59 @@
 # @tinacms/app
 
+## 1.1.1
+
+### Patch Changes
+
+- 3b1fe23ef: Remove rich-text sandbox app, fix issue with registering forms
+- c97ffc20d: Add schema checks to ensure the local and server schema are the same.
+
+## 1.1.0
+
+### Minor Changes
+
+- 169147490: When markdown files fail to parse, fallback to the non-MDX parser
+
+## 1.0.7
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+
+## 1.0.6
+
+### Patch Changes
+
+- 61f8c0e50: Fix issue where all env vars where send to the admin
+
+## 1.0.5
+
+### Patch Changes
+
+- c5a603c75: Fix bug where 2 versions of Graphql could be installed
+- 23942cfcb: Add support for --rootPath argument in CLI commands
+- e7c404bcf: Support remote path configuration for separate content repos
+
+  Tina now supports serving content from a separate Git repo.
+
+  ### Local development workflow
+
+  To enable this during local development, point
+  this config at the root of the content repo.
+
+  > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
+
+  ```ts
+  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  ```
+
+  ### Production workflow
+
+  For production, your config should use the `clientId`, `branch`, and `token` values that are associated with your _content repo_.
+
+- e938b9d91: feat: Add line numbers to raw editor
+  feat: More visible error-display in raw editor
+- 31dacc176: Only dedupe when using monorepo dev
+
 ## 1.0.4
 
 ### Patch Changes

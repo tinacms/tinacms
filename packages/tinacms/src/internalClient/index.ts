@@ -1,15 +1,4 @@
-/**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+import { z } from 'zod'
 
 import { AUTH_TOKEN_KEY, TokenObject, authenticate } from '../auth/authenticate'
 //@ts-ignore can't locate BranchChangeEvent
@@ -23,15 +12,8 @@ import {
   parse,
 } from 'graphql'
 
-import { formify } from './formify'
-import { formify as formify2 } from '../hooks/formify'
-
 import gql from 'graphql-tag'
-import {
-  TinaSchema,
-  addNamespaceToSchema,
-  TinaCloudSchema,
-} from '@tinacms/schema-tools'
+import { TinaSchema, addNamespaceToSchema, Schema } from '@tinacms/schema-tools'
 
 export type OnLoginFunc = (args: { token: TokenObject }) => Promise<void>
 
@@ -42,12 +24,11 @@ export type TinaIOConfig = {
   contentApiUrlOverride?: string // https://content.tinajs.io
 }
 interface ServerOptions {
-  schema?: TinaCloudSchema<false>
+  schema?: Schema
   clientId: string
   branch: string
   customContentApiUrl?: string
   getTokenFn?: () => Promise<TokenObject>
-  onLogin?: OnLoginFunc
   tinaioConfig?: TinaIOConfig
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
@@ -56,6 +37,133 @@ const captureBranchName = /^refs\/heads\/(.*)/
 const parseRefForBranchName = (ref: string) => {
   const matches = ref.match(captureBranchName)
   return matches[1]
+}
+
+const ListBranchResponse = z
+  .object({
+    name: z.string(),
+    protected: z.boolean(),
+    commit: z.object({ sha: z.string(), url: z.string() }),
+  })
+  .array()
+
+const IndexStatusResponse = z.object({
+  status: z
+    .union([
+      z.literal('complete'),
+      z.literal('unknown'),
+      z.literal('failed'),
+      z.literal('inprogress'),
+    ])
+    .optional(),
+  timestamp: z.number().optional(),
+})
+
+/**
+ * The function you pass to `asyncPoll` should return a promise
+ * that resolves with object that satisfies this interface.
+ *
+ * The `done` property indicates to the async poller whether to
+ * continue polling or not.
+ *
+ * When done is `true` that means you've got what you need
+ * and the poller will resolve with `data`.
+ *
+ * When done is `false` taht means you don't have what you need
+ * and the poller will continue polling.
+ */
+export interface AsyncData<T> {
+  done: boolean
+  data?: T
+}
+
+/**
+ * Your custom function you provide to the async poller should
+ * satisfy this interface. Your function returns a promise that
+ * resolves with `AsyncData` to indicate to the poller whether
+ * you have what you need or we should continue polling.
+ */
+export interface AsyncFunction<T> extends Function {
+  (): PromiseLike<AsyncData<T>>
+}
+
+/**
+* How to repeatedly call an async function until get a desired result.
+*
+* Inspired by the following gist:
+* https://gist.github.com/twmbx/2321921670c7e95f6fad164fbdf3170e#gistcomment-3053587
+* https://davidwalsh.name/javascript-polling
+*
+* Usage:
+  asyncPoll(
+      async (): Promise<AsyncData<any>> => {
+          try {
+              const result = await getYourAsyncResult();
+              if (result.isWhatYouWant) {
+                  return Promise.resolve({
+                      done: true,
+                      data: result,
+                  });
+              } else {
+                  return Promise.resolve({
+                      done: false
+                  });
+              }
+          } catch (err) {
+              return Promise.reject(err);
+          }
+      },
+      500,    // interval
+      15000,  // timeout
+  );
+*/
+export async function asyncPoll<T>(
+  /**
+   * Function to call periodically until it resolves or rejects.
+   *
+   * It should resolve as soon as possible indicating if it found
+   * what it was looking for or not. If not then it will be reinvoked
+   * after the `pollInterval` if we haven't timed out.
+   *
+   * Rejections will stop the polling and be propagated.
+   */
+  fn: AsyncFunction<T>,
+  /**
+   * Milliseconds to wait before attempting to resolve the promise again.
+   * The promise won't be called concurrently. This is the wait period
+   * after the promise has resolved/rejected before trying again for a
+   * successful resolve so long as we haven't timed out.
+   *
+   * Default 5 seconds.
+   */
+  pollInterval: number = 5 * 1000,
+  /**
+   * Max time to keep polling to receive a successful resolved response.
+   * If the promise never resolves before the timeout then this method
+   * rejects with a timeout error.
+   *
+   * Default 30 seconds.
+   */
+  pollTimeout: number = 30 * 1000
+): Promise<T> {
+  const endTime = new Date().getTime() + pollTimeout
+  const checkCondition = (resolve: Function, reject: Function): void => {
+    Promise.resolve(fn())
+      .then((result) => {
+        const now = new Date().getTime()
+        if (result.done) {
+          resolve(result.data)
+        } else if (now < endTime) {
+          setTimeout(checkCondition, pollInterval, resolve, reject)
+        } else {
+          reject(new Error('AsyncPoller: reached timeout'))
+        }
+      })
+      .catch((err) => {
+        reject(err)
+      })
+  }
+  return new Promise(checkCondition)
 }
 
 export class Client {
@@ -80,6 +188,15 @@ export class Client {
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.onLogin = options.schema?.config?.admin?.auth?.onLogin
     this.onLogout = options.schema?.config?.admin?.auth?.onLogout
+    if (options.schema?.config?.admin?.auth?.logout) {
+      this.onLogout = options.schema?.config?.admin?.auth?.logout
+    }
+    if (options.schema?.config?.admin?.auth?.getUser) {
+      this.getUser = options.schema?.config?.admin?.auth?.getUser
+    }
+    if (options.schema?.config?.admin?.auth?.authenticate) {
+      this.authenticate = options.schema?.config?.admin?.auth?.authenticate
+    }
     if (options.schema) {
       const enrichedSchema = new TinaSchema({
         version: { fullVersion: '', major: '', minor: '', patch: '' },
@@ -89,6 +206,11 @@ export class Client {
       this.schema = enrichedSchema
     }
     this.options = options
+
+    if (options.schema?.config?.contentApiUrlOverride) {
+      this.options.customContentApiUrl =
+        options.schema.config.contentApiUrlOverride
+    }
     this.setBranch(options.branch)
     this.events.subscribe<BranchChangeEvent>(
       'branch:change',
@@ -140,6 +262,10 @@ export class Client {
         }
         this.getToken = options.getTokenFn
         break
+    }
+    // if the user provides a getToken function in the config we can use that
+    if (options.schema?.config?.admin?.auth?.getToken) {
+      this.getToken = options.schema?.config?.admin?.auth?.getToken
     }
   }
 
@@ -246,29 +372,6 @@ mutation addPendingDocumentMutation(
       }
     )
     return parse(data.getOptimizedQuery)
-  }
-
-  async requestWithForm<ReturnType>(
-    query: (gqlTag: typeof gql) => DocumentNode,
-    {
-      variables,
-      useUnstableFormify,
-    }: { variables; useUnstableFormify?: boolean }
-  ) {
-    const schema = await this.getSchema()
-    let formifiedQuery
-    if (useUnstableFormify) {
-      const res = await formify2({
-        schema,
-        query: print(query(gql)),
-        getOptimizedQuery: this.getOptimizedQuery,
-      })
-      formifiedQuery = res.formifiedQuery
-    } else {
-      formifiedQuery = formify(query(gql), schema)
-    }
-
-    return this.request<ReturnType>(print(formifiedQuery), { variables })
   }
 
   async request<ReturnType>(
@@ -512,12 +615,75 @@ mutation addPendingDocumentMutation(
     }
   }
 
+  async waitForIndexStatus({ ref }: { ref: string }) {
+    try {
+      const result = await asyncPoll(
+        async (): Promise<AsyncData<any>> => {
+          try {
+            const result = await this.getIndexStatus({ ref })
+            if (
+              !(result.status === 'inprogress' || result.status === 'unknown')
+            ) {
+              return Promise.resolve({
+                done: true,
+                data: result,
+              })
+            } else {
+              return Promise.resolve({
+                done: false,
+              })
+            }
+          } catch (err) {
+            return Promise.reject(err)
+          }
+        },
+        // interval is 5s
+        5000, // interval
+        //  timeout is 15 min
+        900000 // timeout
+      )
+      return result
+    } catch (error) {
+      if (error.message === 'AsyncPoller: reached timeout') {
+        console.warn(error)
+        return {
+          status: 'timeout',
+        }
+      }
+      throw error
+    }
+  }
+
+  async getIndexStatus({ ref }: { ref: string }) {
+    const url = `${this.contentApiBase}/db/${this.clientId}/status/${ref}`
+    const res = await this.fetchWithToken(url)
+    const result = await res.json()
+    const parsedResult = IndexStatusResponse.parse(result)
+    return parsedResult
+  }
+
   async listBranches() {
-    const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
-    const res = await this.fetchWithToken(url, {
-      method: 'GET',
-    })
-    return res.json()
+    try {
+      const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
+      const res = await this.fetchWithToken(url, {
+        method: 'GET',
+      })
+      const branches = await res.json()
+      const parsedBranches = ListBranchResponse.parse(branches)
+      const indexStatusPromises = parsedBranches.map(async (branch) => {
+        const indexStatus = await this.getIndexStatus({ ref: branch.name })
+        return {
+          ...branch,
+          indexStatus,
+        }
+      })
+      const indexStatus = await Promise.all(indexStatusPromises)
+
+      return indexStatus
+    } catch (error) {
+      console.error('There was an error listing branches.', error)
+      throw error
+    }
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
@@ -549,7 +715,7 @@ export class LocalClient extends Client {
   constructor(
     props?: {
       customContentApiUrl?: string
-      schema?: TinaCloudSchema<false>
+      schema?: Schema
     } & Omit<ServerOptions, 'clientId' | 'branch'>
   ) {
     const clientProps = {
@@ -578,11 +744,7 @@ export class LocalClient extends Client {
     return { access_token: 'LOCAL', id_token: 'LOCAL', refresh_token: 'LOCAL' }
   }
 
-  async isAuthorized(): Promise<boolean> {
-    return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
-  }
-
-  async isAuthenticated(): Promise<boolean> {
+  async getUser(): Promise<boolean> {
     return localStorage.getItem(LOCAL_CLIENT_KEY) === 'true'
   }
 }

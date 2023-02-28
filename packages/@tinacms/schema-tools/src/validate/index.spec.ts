@@ -1,17 +1,8 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
-import { TinaCloudSchema } from '../types'
+import { Schema } from '../types'
 import { validateSchema } from '.'
 
 let consoleErrMock
@@ -21,7 +12,7 @@ beforeEach(() => {
 afterEach(() => {
   consoleErrMock.mockRestore()
 })
-const validSchemaWithTemplates: TinaCloudSchema<false> = {
+const validSchemaWithTemplates: Schema = {
   collections: [
     {
       name: 'page',
@@ -39,7 +30,7 @@ const validSchemaWithTemplates: TinaCloudSchema<false> = {
   ],
 }
 
-const validSchema: TinaCloudSchema<false> = {
+const validSchema: Schema = {
   collections: [
     {
       name: 'page',
@@ -228,7 +219,7 @@ const schemaWitNoName = {
     },
   ],
 }
-const schemaWithDuplicateName: TinaCloudSchema<false> = {
+const schemaWithDuplicateName: Schema = {
   collections: [
     {
       name: 'foo',
@@ -243,7 +234,7 @@ const schemaWithDuplicateName: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithDuplicateTemplates: TinaCloudSchema<false> = {
+const schemaWithDuplicateTemplates: Schema = {
   collections: [
     {
       name: 'foo',
@@ -264,7 +255,7 @@ const schemaWithDuplicateTemplates: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithDeeplyNestedError: TinaCloudSchema<false> = {
+const schemaWithDeeplyNestedError: Schema = {
   collections: [
     {
       name: 'foo',
@@ -333,7 +324,7 @@ const schemaWithTemplatesAndFields = {
   ],
 }
 
-const schemaWithEmptyFields: TinaCloudSchema<false> = {
+const schemaWithEmptyFields: Schema = {
   collections: [
     {
       name: 'foo',
@@ -344,7 +335,7 @@ const schemaWithEmptyFields: TinaCloudSchema<false> = {
   ],
 }
 
-const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
+const schemaWithEmptyTemplates: Schema = {
   collections: [
     {
       name: 'foo',
@@ -354,7 +345,7 @@ const schemaWithEmptyTemplates: TinaCloudSchema<false> = {
     },
   ],
 }
-const schemaWithInvalidFiledNesterUnderRichText: TinaCloudSchema<false> = {
+const schemaWithInvalidFiledNesterUnderRichText: Schema = {
   collections: [
     {
       name: 'foo',

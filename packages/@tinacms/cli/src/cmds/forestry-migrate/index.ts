@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import fs from 'fs-extra'
@@ -16,11 +7,7 @@ import path from 'path'
 import yaml from 'js-yaml'
 import minimatch from 'minimatch'
 import { parseFile, stringifyFile } from '@tinacms/graphql'
-import type {
-  TinaCloudCollection,
-  UICollection,
-  TinaFieldInner,
-} from '@tinacms/schema-tools'
+import type { Collection, TinaField, UITemplate } from '@tinacms/schema-tools'
 import { getFieldsFromTemplates, parseSections } from './util'
 import { logger } from '../../logger'
 import { warnText } from '../../utils/theme'
@@ -50,7 +37,7 @@ export const generateAllCollections = async ({
   ).map((tem) => path.basename(tem, '.yml'))
   const templateMap = new Map<
     string,
-    { fields: TinaFieldInner<false>[]; templateObj: any }
+    { fields: TinaField[]; templateObj: any }
   >()
   const proms = allTemplates.map(async (tem) => {
     try {
@@ -82,7 +69,7 @@ export const generateCollections = async ({
   const forestryYaml = yaml.load(forestryConfig.toString())
 
   const forestrySchema = parseSections({ val: forestryYaml })
-  const collections: TinaCloudCollection<false>[] = []
+  const collections: Collection[] = []
 
   const sections = forestrySchema.sections
 
@@ -119,8 +106,8 @@ export const generateCollections = async ({
           const templates: {
             label: string
             name: string
-            ui?: UICollection
-            fields: TinaFieldInner<false>[]
+            ui?: UITemplate
+            fields: TinaField[]
           }[] = []
           forestryTemplates.forEach((tem) => {
             try {
@@ -160,7 +147,7 @@ export const generateCollections = async ({
             }
           })
           // Add the collection to the list of collections with its templates
-          const c: TinaCloudCollection<false> = {
+          const c: Collection = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -176,7 +163,7 @@ export const generateCollections = async ({
           }
           collections.push(c)
         } else {
-          const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+          const fields: TinaField[] = [BODY_FIELD]
 
           // This is a collection with fields
           forestryTemplates?.forEach((tem) => {
@@ -211,7 +198,7 @@ export const generateCollections = async ({
               console.error(e)
             }
           })
-          const c: TinaCloudCollection<false> = {
+          const c: Collection = {
             label: section.label,
             name: stringifyLabel(section.label),
             path: section.path,
@@ -236,7 +223,7 @@ export const generateCollections = async ({
         )
         break
 
-      // const fields: TinaFieldInner<false>[] = [BODY_FIELD]
+      // const fields: TinaFieldInner[] = [BODY_FIELD]
       // // Go though all templates
       // for (let currentTemplateName of templateMap.keys()) {
       //   const { templateObj, fields: additionalFields } =
@@ -252,7 +239,7 @@ export const generateCollections = async ({
 
       // const dir = path.dirname(section.path)
 
-      // const c: TinaCloudCollection<false> = {
+      // const c: Collection = {
       //   label: section.label,
       //   name: stringifyLabel(section.label),
       //   path: dir,

@@ -1,28 +1,16 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import { format } from 'prettier'
 import type { BlockElement, RootElement } from '../parse/plate'
 import { parseMDX } from '../parse/index'
 import { writeFile } from 'fs'
 import { join } from 'path'
 
-export type { BlockElement, RichTypeInner }
+export type { BlockElement, RichTextType }
 
 export const output = (object: RootElement) => object
 
@@ -64,7 +52,7 @@ export const run = (
   dirname: string,
   content: any,
   outputString: any,
-  field: RichTypeInner
+  field: RichTextType
 ) => {
   Object.entries(content).forEach(([name, content]) => {
     if (typeof content !== 'string') {
@@ -110,7 +98,7 @@ export const runInner = (
   dirname: string,
   content: string,
   outputString: Record<string, string>,
-  field: RichTypeInner
+  field: RichTextType
 ) => {
   const tsFilename = name.replace('.md', '.test.ts')
   if (!outputString[tsFilename]) {

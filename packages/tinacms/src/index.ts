@@ -1,21 +1,11 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 export * from './internalClient'
 export * from './auth'
 export * from './utils'
 export * from './tina-cms'
-export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
@@ -28,30 +18,31 @@ import { TinaCMSProvider2, DocumentCreatorCallback } from './tina-cms'
 import type { TinaCMSProviderDefaultProps } from './types/cms'
 export type { TinaCMSProviderDefaultProps }
 export default TinaCMSProvider2
-import { TinaCMS } from '@tinacms/toolkit'
+import { MediaStore, TinaCMS } from '@tinacms/toolkit'
 import { formifyCallback } from './hooks/use-graphql-forms'
 
 import { validateSchema } from '@tinacms/schema-tools'
 export { NAMER, resolveForm } from '@tinacms/schema-tools'
 
-import type {
+import {
+  TinaSchema,
+  TinaField,
   Config,
-  SchemaField,
   Schema,
   Collection,
   Template,
-} from '@tinacms/schema-tools/dist/types'
+} from '@tinacms/schema-tools'
 
-export type { Config, Schema, Collection, Template, SchemaField }
+export type { Config, Schema, Collection, Template, TinaField, TinaSchema }
 
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaFieldEnriched = SchemaField
+export type TinaFieldEnriched = TinaField
 /**
- * @deprecated use `SchemaField` instead
+ * @deprecated use `TinaField` instead
  */
-export type TinaField = SchemaField
+export type SchemaField = TinaField
 /**
  * @deprecated use `Template` instead
  */
@@ -59,23 +50,15 @@ export type TinaTemplate = Template
 /**
  * @deprecated use `Template` instead
  */
-export type Templateable = Template
-/**
- * @deprecated use `Template` instead
- */
 export type TinaCloudTemplatebase = Template
 /**
  * @deprecated use `Collection` instead
  */
-export type TinaCloudCollection = Collection
+export type TinaCloudCollectionCollection = Collection
 /**
  * @deprecated use `Collection` instead
  */
 export type TinaCollection = Collection
-/**
- * @deprecated use `Schema` instead
- */
-export type TinaSchema = Schema
 /**
  * @deprecated use `Schema` instead
  */
@@ -97,7 +80,8 @@ export const defineStaticConfig = (
   config: Config<
     (cms: TinaCMS) => TinaCMS,
     formifyCallback,
-    DocumentCreatorCallback
+    DocumentCreatorCallback,
+    MediaStore
   >
 ) => {
   if (!config.schema) {

@@ -1,25 +1,13 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 */
 
 import { getMarks } from './index'
 import type * as Md from 'mdast'
 import type * as Plate from '../parse/plate'
-import type { RichTypeInner } from '@tinacms/schema-tools'
+import type { RichTextType } from '@tinacms/schema-tools'
 import { stringifyPropsInline } from './acorn'
 
 const matches = (a: string[], b: string[]) => {
@@ -65,7 +53,7 @@ type InlineElementWithCallback = Plate.InlineElement & {
  */
 const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
   const newItems: InlineElementWithCallback[] = []
-  content.forEach((item) => {
+  content?.forEach((item) => {
     if (item.type === 'a') {
       if (item.children.length === 1) {
         const firstChild = item.children[0]
@@ -99,7 +87,7 @@ const replaceLinksWithTextNodes = (content: Plate.InlineElement[]) => {
  */
 const inlineElementExceptLink = (
   content: InlineElementWithCallback,
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent => {
   switch (content.type) {
@@ -155,7 +143,7 @@ const text = (content: { text: string }) => {
 
 export const eat = (
   c: InlineElementWithCallback[],
-  field: RichTypeInner,
+  field: RichTextType,
   imageCallback: (url: string) => string
 ): Md.PhrasingContent[] => {
   const content = replaceLinksWithTextNodes(c)

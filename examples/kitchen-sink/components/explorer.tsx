@@ -115,7 +115,7 @@ const UnknownRenderer = ({
   }
   if (typeOfValue === 'object') {
     /* @ts-ignore */
-    if (value?.type === 'root') {
+    if (value?.type === 'root' && renderRichText) {
       return (
         <div className="flex gap-2">
           <button

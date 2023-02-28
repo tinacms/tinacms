@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import path from 'path'
@@ -16,15 +7,15 @@ import fs from 'fs-extra'
 import { toMatchFile } from 'jest-file-snapshot'
 import { buildASTSchema, printSchema } from 'graphql'
 
-import { FilesystemBridge } from '@tinacms/datalayer'
-import type { Store } from '@tinacms/datalayer'
-import type { TinaCloudSchema } from '@tinacms/schema-tools'
+import { FilesystemBridge } from '../database/bridge/filesystem'
+import type { Schema } from '@tinacms/schema-tools'
 
 import { resolve } from '../resolve'
 import { createDatabase } from '../database'
 import { Database } from '../database'
 import { sequential } from '../util'
 import { buildDotTinaFiles } from '../build'
+import { Level } from '../database/level'
 
 class MockFilesystemBridge extends FilesystemBridge {
   constructor(rootPath: string) {
@@ -40,15 +31,15 @@ jest.setTimeout(10000)
 
 export const setup = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
-  store: Store
+  schema: Schema,
+  level: Level
 ): Promise<{
   database: Database
 }> => {
   const setupBridge = new FilesystemBridge(rootPath)
   const setupDatabase = await createDatabase({
     bridge: setupBridge,
-    store,
+    level,
   })
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database: setupDatabase,
@@ -60,7 +51,7 @@ export const setup = async (
   const database = await createDatabase({
     // @ts-ignore
     bridge,
-    store,
+    level,
   })
   const schemaString = await database.getGraphQLSchemaFromBridge()
   // @ts-ignore
@@ -102,14 +93,14 @@ export type Fixture =
 
 export const setupFixture = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
-  store: Store,
+  schema: Schema,
+  level: Level,
   fixture: Fixture,
   suffix?: string,
   queryName: string = '_query',
   folder: string = 'requests'
 ) => {
-  const { database } = await setup(rootPath, schema, store)
+  const { database } = await setup(rootPath, schema, level)
   const basePath = path.join(rootPath, folder, fixture.name)
 
   const query = await fs
@@ -206,14 +197,14 @@ export const setupFixture = async (
 
 export const setupFixture2 = async (
   rootPath: string,
-  schema: TinaCloudSchema<false>,
-  store: Store,
+  schema: Schema,
+  level: Level,
   fixture: Fixture,
   suffix?: string,
   queryName: string = '_query',
   folder: string = 'requests'
 ) => {
-  const { database } = await setup(rootPath, schema, store)
+  const { database } = await setup(rootPath, schema, level)
   const basePath = path.join(rootPath, folder, fixture.name)
 
   const query = await fs

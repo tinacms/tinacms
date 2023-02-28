@@ -1,8 +1,10 @@
 import { getStaticPropsForTina } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { useTina } from 'tinacms/dist/react'
 import { Layout } from '../components/Layout'
 export default function Home(props) {
-  const { body, subtitle, heading } = props.data.page
+  const { data } = useTina({ ...props })
+  const { heading, subtitle, body } = data.page
   return (
     <Layout>
       <h1 data-test="heading">{heading}</h1>

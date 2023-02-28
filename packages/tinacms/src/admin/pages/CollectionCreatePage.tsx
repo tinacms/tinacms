@@ -1,14 +1,5 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
 import {
@@ -22,7 +13,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
 import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
-import type { GlobalTemplate } from '@tinacms/schema-tools'
+import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
 import GetCollection from '../components/GetCollection'
@@ -146,10 +137,10 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
 
   // the schema is being passed in from the frontend so we can use that
   const schemaCollection = schema.getCollection(collection.name)
-  const template: GlobalTemplate<true> = schema.getTemplateForData({
+  const template: Template<true> = schema.getTemplateForData({
     collection: schemaCollection,
     data: { _template: templateName },
-  }) as GlobalTemplate<true>
+  }) as Template<true>
 
   const formInfo = resolveForm({
     collection: schemaCollection,
@@ -158,7 +149,7 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
     template,
   })
 
-  let slugFunction = template?.ui?.filename?.slugify
+  let slugFunction = schemaCollection.ui?.filename?.slugify
 
   if (!slugFunction) {
     const titleField = template?.fields.find(
@@ -203,13 +194,13 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             ? wrapFieldsWithMeta(({ field, input, meta }) => {
                 return (
                   <FilenameInput
-                    readonly={template?.ui?.filename?.readonly}
+                    readonly={schemaCollection?.ui?.filename?.readonly}
                     {...input}
                   />
                 )
               })
             : 'text',
-          disabled: template?.ui?.filename?.readonly,
+          disabled: schemaCollection?.ui?.filename?.readonly,
           description: (
             <span>
               A unique filename for the content.

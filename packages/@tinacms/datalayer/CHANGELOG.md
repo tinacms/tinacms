@@ -1,5 +1,66 @@
 # tina-graphql
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [aa0250979]
+  - @tinacms/graphql@1.3.2
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [3bbb621cd]
+  - @tinacms/graphql@1.3.1
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [a8457798a]
+- Updated dependencies [94b8bb6e0]
+- Updated dependencies [e15d82c2e]
+- Updated dependencies [e732906b6]
+  - @tinacms/graphql@1.3.0
+
+## 1.1.0
+
+### Minor Changes
+
+- efd56e769: Replace Store with AbstractLevel in Database. Update CLI to allow user to configure Database.
+
+### Patch Changes
+
+- efd56e769: Remove license headers
+- Updated dependencies [efd56e769]
+- Updated dependencies [efd56e769]
+- Updated dependencies [50f86caed]
+  - @tinacms/graphql@1.2.0
+
+## 1.0.1
+
+### Patch Changes
+
+- e7c404bcf: Support remote path configuration for separate content repos
+
+  Tina now supports serving content from a separate Git repo.
+
+  ### Local development workflow
+
+  To enable this during local development, point
+  this config at the root of the content repo.
+
+  > NOTE: Relative paths are fine to use here, but make sure it's relative to the `.tina/config` file
+
+  ```ts
+  localContentPath: process.env.REMOTE_ROOT_PATH // eg. '../../my-content-repo'
+  ```
+
+  ### Production workflow
+
+  For production, your config should use the `clientId`, `branch`, and `token` values that are associated with your _content repo_.
+
 ## 1.0.0
 
 ### Major Changes

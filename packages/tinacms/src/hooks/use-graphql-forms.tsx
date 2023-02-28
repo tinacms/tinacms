@@ -1,56 +1,10 @@
 /**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+
 */
 
-import { Form, GlobalFormPlugin, useCMS } from '@tinacms/toolkit'
+import { Form, GlobalFormPlugin } from '@tinacms/toolkit'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import { assertShape } from '../utils'
-import { useFormify } from './formify'
-
-export function useGraphqlForms<T extends object>({
-  variables,
-  onSubmit,
-  query,
-  formify,
-  eventList,
-}: {
-  query: string
-  variables: object
-  onSubmit?: (args: onSubmitArgs) => void
-  formify?: formifyCallback
-  /**
-   * This is a test utility which allows us to keep track of all the events
-   * received by this hook. See `experimental-examples/unit-test-example/pages/index.js
-   * for usage.
-   */
-  eventList?: []
-}): [T, Boolean] {
-  const cms = useCMS()
-
-  const state = useFormify({
-    query,
-    cms,
-    variables,
-    formify,
-    eventList: eventList,
-    onSubmit,
-  })
-
-  if (!query) {
-    return [state.data as T, false]
-  }
-
-  return [state.data as T, state.status !== 'done']
-}
 
 export const transformDocumentIntoMutationRequestPayload = (
   document: {
