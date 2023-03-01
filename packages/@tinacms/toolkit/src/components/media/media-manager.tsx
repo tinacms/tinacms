@@ -25,11 +25,10 @@ import {
 import { Button } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
-import { MediaItem } from './media-item'
+import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
-import { ButtonToggle } from '../../packages/fields'
 import { CloseIcon } from '../../packages/icons'
 
 // taken from https://davidwalsh.name/javascript-polling
@@ -416,9 +415,13 @@ export function MediaPicker({
 
         <ul
           {...rootProps}
-          className={`flex flex-1 flex-col h-full overflow-y-auto divide-y divide-gray-100 ${
-            isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
-          }`}
+          className={`h-full overflow-y-auto ${
+            viewMode === 'list' &&
+            'flex flex-1 flex-col divide-y divide-gray-100'
+          } ${
+            viewMode === 'grid' &&
+            'w-full grid grid-cols-[repeat(auto-fit,_minmax(240px,_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4'
+          } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
         >
           <input {...getInputProps()} />
 
@@ -426,15 +429,21 @@ export function MediaPicker({
             <EmptyMediaList hasTinaMedia={hasTinaMedia} />
           )}
 
-          {list.items.map((item: Media) => (
-            <MediaItem
-              key={item.id}
-              item={item}
-              onClick={onClickMediaItem}
-              onSelect={selectMediaItem}
-              onDelete={deleteMediaItem}
-            />
-          ))}
+          {viewMode === 'list' &&
+            list.items.map((item: Media) => (
+              <ListMediaItem
+                key={item.id}
+                item={item}
+                onClick={onClickMediaItem}
+                onSelect={selectMediaItem}
+                onDelete={deleteMediaItem}
+              />
+            ))}
+
+          {viewMode === 'grid' &&
+            list.items.map((item: Media) => (
+              <GridMediaItem key={item.id} item={item} />
+            ))}
         </ul>
         <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
           <CursorPaginator

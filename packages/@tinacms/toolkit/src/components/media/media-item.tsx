@@ -17,7 +17,7 @@ interface MediaItemProps {
   onDelete?(_item: Media): void
 }
 
-export function MediaItem({
+export function ListMediaItem({
   item,
   onClick,
   onSelect,
@@ -27,7 +27,7 @@ export function MediaItem({
   return (
     <li
       className={
-        'flex gap-3 items-center py-2 pl-2 pr-3 bg-white transition duration-300 ease-linear hover:drop-shadow-md ' +
+        'flex gap-3 items-center py-2 pl-2 pr-3 bg-white transition duration-150 ease-out hover:bg-white/50 ' +
         (item.type === 'dir' ? 'cursor-pointer' : '')
       }
       onClick={() => onClick(item)}
@@ -71,3 +71,27 @@ const Filename = ({ className = '', ...props }) => (
     {...props}
   />
 )
+
+export function GridMediaItem({ item }) {
+  const FileIcon = item.type === 'dir' ? Folder : File
+  return (
+    <li
+      className={
+        'relative aspect-w-1 aspect-h-1 border border-gray-100 rounded-md overflow-hidden flex justify-center flex-shrink-0 transition duration-150 ease-out shadow hover:shadow-md hover:scale-103 hover:border-gray-150' +
+        (item.type === 'dir' ? 'cursor-pointer' : '')
+      }
+    >
+      <div className="absolute w-full h-full">
+        {item.thumbnail ? (
+          <img
+            className="object-cover w-full h-full object-center"
+            src={item.thumbnail}
+            alt={item.filename}
+          />
+        ) : (
+          <FileIcon className="w-[47%] h-full fill-gray-300" />
+        )}
+      </div>
+    </li>
+  )
+}
