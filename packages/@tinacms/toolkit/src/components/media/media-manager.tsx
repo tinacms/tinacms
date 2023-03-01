@@ -167,6 +167,7 @@ export function MediaPicker({
   const [showSync, setShowSync] = useState(false)
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [activeItem, setActiveItem] = useState<Media | false>(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -241,6 +242,22 @@ export function MediaPicker({
           : join(item.directory, item.filename)
       )
       resetOffset()
+    }
+  }
+
+  const onClickGridMediaItem = (item: Media) => {
+    if (!item) {
+      setActiveItem(false)
+    } else if (item.type === 'dir') {
+      // Only join when there is a directory to join to
+      setDirectory(
+        item.directory === '.' || item.directory === ''
+          ? item.filename
+          : join(item.directory, item.filename)
+      )
+      resetOffset()
+    } else {
+      setActiveItem(item)
     }
   }
 
@@ -413,38 +430,59 @@ export function MediaPicker({
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
 
-        <ul
-          {...rootProps}
-          className={`h-full overflow-y-auto ${
-            viewMode === 'list' &&
-            'flex flex-1 flex-col divide-y divide-gray-100'
-          } ${
-            viewMode === 'grid' &&
-            'w-full grid grid-cols-[repeat(auto-fit,_minmax(240px,_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4'
-          } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
-        >
-          <input {...getInputProps()} />
+        <div className="flex h-full overflow-hidden">
+          <ul
+            {...rootProps}
+            className={`h-full overflow-y-auto ${
+              viewMode === 'list' &&
+              'flex flex-1 flex-col divide-y divide-gray-100'
+            } ${
+              viewMode === 'grid' &&
+              'w-full grid grid-cols-[repeat(auto-fit,_minmax(240px,_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4'
+            } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+          >
+            <input {...getInputProps()} />
 
-          {listState === 'loaded' && list.items.length === 0 && (
-            <EmptyMediaList hasTinaMedia={hasTinaMedia} />
-          )}
+            {listState === 'loaded' && list.items.length === 0 && (
+              <EmptyMediaList hasTinaMedia={hasTinaMedia} />
+            )}
 
-          {viewMode === 'list' &&
-            list.items.map((item: Media) => (
-              <ListMediaItem
-                key={item.id}
-                item={item}
-                onClick={onClickMediaItem}
-                onSelect={selectMediaItem}
-                onDelete={deleteMediaItem}
+            {viewMode === 'list' &&
+              list.items.map((item: Media) => (
+                <ListMediaItem
+                  key={item.id}
+                  item={item}
+                  onClick={onClickMediaItem}
+                  onSelect={selectMediaItem}
+                  onDelete={deleteMediaItem}
+                />
+              ))}
+
+            {viewMode === 'grid' &&
+              list.items.map((item: Media) => (
+                <GridMediaItem
+                  key={item.id}
+                  item={item}
+                  onClick={onClickGridMediaItem}
+                  active={activeItem && activeItem.id === item.id}
+                />
+              ))}
+          </ul>
+
+          {activeItem && (
+            <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-1/2 max-w-lg min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md">
+              <img
+                className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
+                src={activeItem.thumbnail}
+                alt={activeItem.filename}
               />
-            ))}
+              <h3 className="text-base flex-grow w-full break-words truncate">
+                {activeItem.filename}
+              </h3>
+            </div>
+          )}
+        </div>
 
-          {viewMode === 'grid' &&
-            list.items.map((item: Media) => (
-              <GridMediaItem key={item.id} item={item} />
-            ))}
-        </ul>
         <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
           <CursorPaginator
             hasNext={hasNext}
