@@ -1005,7 +1005,6 @@ export class Database {
       const documentPaths = await this.bridge.glob(normalPath, format)
       // filter paths based on match
       const match = `${normalPath}/${collection.match}.${format}`
-      console.log('match', match)
       const filteredPaths = collection.match
         ? micromatch(documentPaths, [match])
         : documentPaths
