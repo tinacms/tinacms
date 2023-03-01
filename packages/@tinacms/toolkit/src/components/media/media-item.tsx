@@ -8,6 +8,7 @@ import { Media } from '../../packages/core'
 import { Folder, File } from '../../packages/icons'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
+import { BiArrowToBottom } from 'react-icons/bi'
 
 interface MediaItemProps {
   item: Media
@@ -26,15 +27,15 @@ export function MediaItem({
   return (
     <li
       className={
-        'flex items-center p-2 bg-white rounded-[5px] transition duration-300 ease-linear hover:drop-shadow-md ' +
+        'flex gap-3 items-center py-2 pl-2 pr-3 bg-white transition duration-300 ease-linear hover:drop-shadow-md ' +
         (item.type === 'dir' ? 'cursor-pointer' : '')
       }
       onClick={() => onClick(item)}
     >
-      <div className="w-[56px] h-[56px] rounded-[5px] overflow-hidden flex justify-center flex-shrink-0 mr-3">
+      <div className="w-20 h-20 border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
         {item.thumbnail ? (
           <img
-            className="object-cover w-full min-h-full object-center"
+            className="object-cover w-full h-full object-center"
             src={item.thumbnail}
             alt={item.filename}
           />
@@ -43,15 +44,20 @@ export function MediaItem({
         )}
       </div>
       <Filename>{item.filename}</Filename>
-      <div className="flex justify-end gap-2 items-center ml-2">
+      <div className="flex justify-end gap-3 items-center group transition duration-150 ease-out opacity-70 hover:opacity-100">
         {onSelect && item.type === 'file' && (
-          <Button size="medium" onClick={() => onSelect(item)}>
-            Insert
+          <Button size="medium" variant="white" onClick={() => onSelect(item)}>
+            Insert{' '}
+            <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-blue-500 opacity-70" />
           </Button>
         )}
         {onDelete && item.type === 'file' && (
-          <IconButton size="medium" onClick={() => onDelete(item)}>
-            <TrashIcon className="w-5/6 h-auto" />
+          <IconButton
+            variant="ghost"
+            size="medium"
+            onClick={() => onDelete(item)}
+          >
+            <TrashIcon className="w-6 h-auto" />
           </IconButton>
         )}
       </div>

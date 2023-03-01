@@ -30,6 +30,7 @@ import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
 import { ButtonToggle } from '../../packages/fields'
+import { CloseIcon } from '../../packages/icons'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -115,7 +116,17 @@ export function MediaManager() {
   return (
     <Modal>
       <FullscreenModal>
-        <ModalHeader close={close}>Media Manager</ModalHeader>
+        <div className="w-full bg-gray-50 flex items-center justify-between px-5 pt-3 m-0">
+          <h2 className="text-gray-500 font-sans font-medium text-base leading-none m-0 block truncate">
+            Media Manager
+          </h2>
+          <div
+            onClick={close}
+            className="flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700"
+          >
+            <CloseIcon className="w-6 h-auto" />
+          </div>
+        </div>
         <ModalBody className="flex h-full flex-col">
           <MediaPicker {...request} close={close} />
         </ModalBody>
@@ -356,37 +367,35 @@ export function MediaPicker({
   return (
     <>
       <MediaPickerWrap>
-        <div className="flex items-center bg-white border-b border-gray-100 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
+        <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
           {/* viewMode toggle */}
-          <div className="">
-            <div
-              className={`flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 w-full justify-between rounded-md`}
+          <div
+            className={`grow-0 flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 justify-between rounded-md`}
+          >
+            <button
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-l-md ${
+                viewMode === 'list'
+                  ? 'bg-white text-blue-500 shadow'
+                  : 'text-gray-400'
+              }`}
+              onClick={() => {
+                setViewMode('list')
+              }}
             >
-              <button
-                className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-l-md ${
-                  viewMode === 'list'
-                    ? 'bg-white text-blue-500 shadow'
-                    : 'text-gray-400'
-                }`}
-                onClick={() => {
-                  setViewMode('list')
-                }}
-              >
-                <BiListUl className="w-8 h-full opacity-70" />
-              </button>
-              <button
-                className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-r-md ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-blue-500 shadow'
-                    : 'text-gray-400'
-                }`}
-                onClick={() => {
-                  setViewMode('grid')
-                }}
-              >
-                <BiGridAlt className="w-6 h-full opacity-70" />
-              </button>
-            </div>
+              <BiListUl className="w-8 h-full opacity-70" />
+            </button>
+            <button
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-r-md ${
+                viewMode === 'grid'
+                  ? 'bg-white text-blue-500 shadow'
+                  : 'text-gray-400'
+              }`}
+              onClick={() => {
+                setViewMode('grid')
+              }}
+            >
+              <BiGridAlt className="w-6 h-full opacity-70" />
+            </button>
           </div>
 
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
@@ -404,9 +413,10 @@ export function MediaPicker({
           )}
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
+
         <ul
           {...rootProps}
-          className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
+          className={`flex flex-1 flex-col h-full overflow-y-auto divide-y divide-gray-100 ${
             isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
           }`}
         >
@@ -426,7 +436,7 @@ export function MediaPicker({
             />
           ))}
         </ul>
-        <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+        <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
           <CursorPaginator
             hasNext={hasNext}
             navigateNext={navigateNext}
