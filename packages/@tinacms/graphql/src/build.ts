@@ -5,7 +5,7 @@
 import _ from 'lodash'
 import fs from 'fs-extra'
 import { print, OperationDefinitionNode, DocumentNode } from 'graphql'
-import { TinaSchema } from '@tinacms/schema-tools'
+import { TinaSchema, Config } from '@tinacms/schema-tools'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
 import { astBuilder, NAMER } from './ast-builder'
@@ -25,14 +25,14 @@ export const buildDotTinaFiles = async ({
   buildSDK = true,
 }: {
   database: Database
-  config: TinaSchema['config']
+  config: Config
   flags?: string[]
   buildSDK?: boolean
 }) => {
   if (flags.indexOf('experimentalData') === -1) {
     flags.push('experimentalData')
   }
-  const tinaSchema = await createSchema({ schema: config, flags })
+  const tinaSchema = await createSchema({ schema: config.schema, flags })
   const builder = await createBuilder({
     database,
     tinaSchema,

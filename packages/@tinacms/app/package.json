@@ -1,67 +1,24 @@
 {
   "name": "@tinacms/app",
   "version": "1.1.1",
-  "main": "dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.js"
-    },
-    "./dist/test-utils": {
-      "types": "./dist/test-utils.d.ts",
-      "import": "./dist/test-utils.es.js",
-      "require": "./dist/test-utils.js"
-    }
-  },
-  "files": [
-    "appFiles",
-    "dist"
-  ],
-  "typings": "dist/index.d.ts",
+  "type": "module",
+  "main": "index.html",
   "license": "Apache-2.0",
-  "buildConfig": {
-    "entryPoints": [
-      {
-        "name": "src/index.ts",
-        "target": "node"
-      },
-      {
-        "name": "src/test-utils.ts",
-        "target": "node"
-      }
-    ]
-  },
-  "scripts": {
-    "types": "rm dist/index.d.ts && touch dist/index.d.ts && echo \"export declare const viteBuild: (args: any) => any\" > dist/index.d.ts",
-    "build": "tinacms-scripts build && npm --prefix ./appFiles i --legacy-peer-deps --omit=dev --no-package-lock",
-    "inline": "cd appFiles && npm --prefix ./ i --legacy-peer-deps --omit=dev --no-package-lock && cd .. && npm run unlink",
-    "unlink": "cd appFiles && cp -RL node_modules node_modules2 && rm -rf node_modules && mv node_modules2 node_modules"
-  },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.1",
     "@types/react": "17.0.2",
     "@types/react-dom": "17.0.2",
-    "@tinacms/scripts": "workspace:*",
-    "tinacms": "workspace:*",
-    "@tinacms/toolkit": "workspace:*",
-    "@tinacms/mdx": "workspace:*",
-    "jest": "^27.0.6"
+    "typescript": "^4.6.4"
   },
   "dependencies": {
     "@xstate/react": "3.0.0",
+    "tinacms": "workspace:*",
+    "@tinacms/toolkit": "workspace:*",
+    "@tinacms/mdx": "workspace:*",
     "xstate": "4.32.1",
     "@headlessui/react": "1.6.6",
     "final-form": "4.20.7",
     "graphql": "15.8.0",
     "@heroicons/react": "1.0.6",
-    "styled-components": "5.3.5",
-    "@tailwindcss/aspect-ratio": "^0.4.0",
-    "@tailwindcss/line-clamp": "^0.3.1",
-    "@tailwindcss/typography": "^0.5.4",
-    "@vitejs/plugin-react": "^2.1.0",
-    "autoprefixer": "^10.4.0",
-    "fs-extra": "^9.0.1",
     "postcss": "^8.4.14",
     "postcss-nested": "^5.0.6",
     "react": "17.0.2",
@@ -69,10 +26,7 @@
     "react-is": "17.0.2",
     "react-router-dom": "6.3.0",
     "tailwindcss": "^3.1.6",
-    "typescript": "^4.6.4",
-    "vite": "3.1.8",
     "@monaco-editor/react": "4.4.5",
-    "monaco-editor": "0.31.0",
-    "webfontloader": "1.6.28"
+    "monaco-editor": "0.31.0"
   }
 }

@@ -1,6 +1,3 @@
-/**
-
-*/
 import tailwind from 'tailwindcss'
 import { Plugin } from 'vite'
 import postcssNested from 'postcss-nested/index.js'
@@ -11,14 +8,14 @@ import lineClamp from '@tailwindcss/line-clamp'
 import aspectRatio from '@tailwindcss/aspect-ratio'
 import path from 'path'
 
-export const viteTina = (): Plugin => {
+export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
   return {
     name: 'vite-plugin-tina',
     config: (viteConfig) => {
       const plugins: Plugin[] = []
       const content = [
-        path.join(__dirname, '../appFiles/src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
-        path.join(viteConfig.root, '../prebuild/config.js'),
+        path.join(spaPath, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}'),
+        path.join(configFilePath),
       ]
 
       const tw = tailwind({

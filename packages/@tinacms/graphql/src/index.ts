@@ -25,6 +25,7 @@ export type {
   CreateDatabase,
 } from './database'
 import type { Database } from './database'
+import type { Config } from '@tinacms/schema-tools'
 
 export { sequential, assertShape } from './util'
 export { stringifyFile, parseFile } from './database/util'
@@ -34,20 +35,13 @@ export { buildDotTinaFiles }
 export type DummyType = unknown
 
 export const buildSchema = async (
-  rootPath: string,
   database: Database,
+  config: Config,
   flags?: string[]
 ) => {
-  const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
-  const config = await fs
-    .readFileSync(path.join(tempConfig, 'schema.json'))
-    .toString()
-  await fs.remove(tempConfig)
-
-  // only build the files, do not index
   const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
     database,
-    config: JSON.parse(config),
+    config: config,
     flags,
   })
 
