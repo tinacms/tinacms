@@ -1003,7 +1003,8 @@ export class Database {
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const documentPaths = await this.bridge.glob(
         normalizePath(collection.path),
-        collection.format || 'md'
+        collection.format || 'md',
+        collection.match
       )
       await _indexContent(this, level, documentPaths, enqueueOps, collection)
     })
