@@ -1,10 +1,8 @@
-/**
-
-*/
-
 import path from 'path'
 import type { DocumentNode } from 'graphql'
 import { GraphQLError } from 'graphql'
+import micromatch from 'micromatch'
+
 import { createSchema } from '../schema/createSchema'
 import { atob, btoa, lastItem, sequential } from '../util'
 import { normalizePath, parseFile, stringifyFile } from './util'
@@ -1001,11 +999,18 @@ export class Database {
       }
     }
     await sequential(tinaSchema.getCollections(), async (collection) => {
-      const documentPaths = await this.bridge.glob(
-        normalizePath(collection.path),
-        collection.format || 'md'
-      )
-      await _indexContent(this, level, documentPaths, enqueueOps, collection)
+      const normalPath = normalizePath(collection.path)
+      const format = collection.format || 'md'
+      // Get all possible paths for this collection
+      const documentPaths = await this.bridge.glob(normalPath, format)
+      // filter paths based on match
+      const match = `${normalPath}/${collection.match}.${format}`
+      console.log('match', match)
+      const filteredPaths = collection.match
+        ? micromatch(documentPaths, [match])
+        : documentPaths
+
+      await _indexContent(this, level, filteredPaths, enqueueOps, collection)
     })
     while (operations.length) {
       await level.batch(operations.splice(0, 25))
