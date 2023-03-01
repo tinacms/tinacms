@@ -8,6 +8,7 @@ import { Media } from '../../packages/core'
 import { Folder, File } from '../../packages/icons'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
+import { isImage } from './utils'
 
 interface MediaItemProps {
   item: Media
@@ -32,7 +33,7 @@ export function MediaItem({
       onClick={() => onClick(item)}
     >
       <div className="w-[56px] h-[56px] rounded-[5px] overflow-hidden flex justify-center flex-shrink-0 mr-3">
-        {item.thumbnail ? (
+        {isImage(item.thumbnail) ? (
           <img
             className="object-cover w-full min-h-full object-center"
             src={item.thumbnail}
