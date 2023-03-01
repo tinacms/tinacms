@@ -7,7 +7,7 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
-import { BiCloudUpload } from 'react-icons/bi'
+import { BiCloudUpload, BiGridAlt, BiListUl } from 'react-icons/bi'
 import {
   Modal,
   ModalHeader,
@@ -29,6 +29,7 @@ import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
+import { ButtonToggle } from '../../packages/fields'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -154,6 +155,8 @@ export function MediaPicker({
   })
 
   const [showSync, setShowSync] = useState(false)
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   /**
    * current offset is last element in offsetHistory[]
@@ -353,7 +356,39 @@ export function MediaPicker({
   return (
     <>
       <MediaPickerWrap>
-        <div className="flex items-center bg-white border-b border-gray-100 gap-x-3 py-3 px-5 shadow-sm flex-shrink-0">
+        <div className="flex items-center bg-white border-b border-gray-100 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
+          {/* viewMode toggle */}
+          <div className="">
+            <div
+              className={`flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 w-full justify-between rounded-md`}
+            >
+              <button
+                className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-l-md ${
+                  viewMode === 'list'
+                    ? 'bg-white text-blue-500 shadow'
+                    : 'text-gray-400'
+                }`}
+                onClick={() => {
+                  setViewMode('list')
+                }}
+              >
+                <BiListUl className="w-8 h-full opacity-70" />
+              </button>
+              <button
+                className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-r-md ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-blue-500 shadow'
+                    : 'text-gray-400'
+                }`}
+                onClick={() => {
+                  setViewMode('grid')
+                }}
+              >
+                <BiGridAlt className="w-6 h-full opacity-70" />
+              </button>
+            </div>
+          </div>
+
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           {!isLocal && hasTinaMedia && (
             <Button
