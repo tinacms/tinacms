@@ -307,6 +307,7 @@ export class Database {
     collectionName?: string
   ) => {
     await this.initLevel()
+
     try {
       if (SYSTEM_FILES.includes(filepath)) {
         throw new Error(`Unexpected put for config file ${filepath}`)
@@ -320,6 +321,21 @@ export class Database {
         const normalizedPath = normalizePath(filepath)
         const dataFields = await this.formatBodyOnPayload(filepath, data)
         const collection = await this.collectionForPath(filepath)
+
+        // If a collection match is specified, make sure the file matches the glob.
+        // TODO: Maybe we should service this error better in the frontend?
+        if (collection.match) {
+          const normalPath = normalizePath(collection.path)
+          const matchGlob = `${normalPath}/${collection.match}.${
+            collection.format || 'md'
+          }`
+          const match = micromatch.isMatch(filepath, matchGlob)
+          if (!match) {
+            throw new GraphQLError(
+              `File ${filepath} does not match collection ${collection.name} glob ${matchGlob}. Please change the filename or update matches for ${collection.name} in your config file.`
+            )
+          }
+        }
 
         const stringifiedFile = await this.stringifyFile(
           filepath,
