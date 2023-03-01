@@ -104,6 +104,7 @@
     "@types/lodash.upperfirst": "^4.3.6",
     "@types/lru-cache": "^5.1.0",
     "@types/mdast": "^3.0.10",
+    "@types/micromatch": "^4.0.2",
     "@types/node": "^14.17.34",
     "@types/normalize-path": "^3.0.0",
     "@types/ws": "^7.2.6",
