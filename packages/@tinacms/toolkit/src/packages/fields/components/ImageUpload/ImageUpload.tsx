@@ -8,6 +8,7 @@ import { IconButton } from '../../../styles'
 import { TrashIcon } from '../../../icons'
 import { LoadingDots } from '../../../form-builder'
 import { useCMS } from '../../../../react-tinacms/use-cms'
+import { dropzoneAcceptFromString } from '../../../../components/media/utils'
 
 interface ImageUploadProps {
   onDrop: (_acceptedFiles: any[]) => void
@@ -49,7 +50,9 @@ export const ImageUpload = ({
   const cms = useCMS()
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: cms.media.accept || 'image/*',
+    accept: dropzoneAcceptFromString(
+      cms.media.accept || 'text/*,application/pdf,image/*'
+    ),
     onDrop,
     noClick: !!onClick,
   })

@@ -16,7 +16,7 @@ export class DOSMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
   }
-  accept = 'text/*,application/*,image/*'
+  accept = 'text/*,application/pdf,image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []
