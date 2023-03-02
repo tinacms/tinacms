@@ -1,7 +1,7 @@
 import { Cli } from 'clipanion'
 //@ts-ignore
 import { version, name } from '../package.json'
-import { DevCommand } from './next/dev'
+import { DevCommand } from './next/commands/dev-command'
 
 export type {
   Schema,

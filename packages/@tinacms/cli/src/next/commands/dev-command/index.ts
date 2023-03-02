@@ -10,13 +10,13 @@ import {
   Database,
   TinaLevelClient,
 } from '@tinacms/graphql'
-import { ConfigManager } from '../config-manager'
+import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
-import { logger, summary } from '../../logger'
+import { logger, summary } from '../../../logger'
 import { createDBServer, createDevServer } from './server'
-import { Codegen } from '../codegen'
+import { Codegen } from '../../codegen'
 import chalk from 'chalk'
-import { startSubprocess2 } from '../../cmds/startSubprocess'
+import { startSubprocess2 } from '../../../cmds/startSubprocess'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
