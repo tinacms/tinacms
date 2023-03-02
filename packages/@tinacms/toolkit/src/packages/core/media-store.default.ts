@@ -14,6 +14,7 @@ import {
   E_BAD_ROUTE,
 } from './media'
 import { CMS } from './cms'
+import { DEFAULT_UPLOAD_TYPES } from '../../components/media/utils'
 
 const s3ErrorRegex = /<Error>.*<Code>(.+)<\/Code>.*<Message>(.+)<\/Message>.*/
 
@@ -78,7 +79,7 @@ export class TinaMediaStore implements MediaStore {
     return await this.api.isAuthenticated()
   }
 
-  accept = 'text/*,application/pdf,image/*'
+  accept = DEFAULT_UPLOAD_TYPES
 
   private async persist_cloud(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []

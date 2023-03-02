@@ -9,6 +9,7 @@ import type {
   MediaStore,
   MediaUploadOptions,
 } from '@tinacms/toolkit'
+import { DEFAULT_UPLOAD_TYPES } from '../../@tinacms/toolkit/src/components/media'
 
 import { E_UNAUTHORIZED, E_BAD_ROUTE, interpretErrorMessage } from './errors'
 
@@ -16,7 +17,7 @@ export class CloudinaryMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
   }
-  accept = 'text/*,application/pdf,image/*'
+  accept = DEFAULT_UPLOAD_TYPES
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     const newFiles: Media[] = []

@@ -23,13 +23,13 @@ import {
   MediaListError,
 } from '../../packages/core'
 import { Button } from '../../packages/styles'
-import { useDropzone, Accept } from 'react-dropzone'
+import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
 import { MediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
-import { dropzoneAcceptFromString } from './utils'
+import { DEFAULT_UPLOAD_TYPES, dropzoneAcceptFromString } from './utils'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -252,9 +252,7 @@ export function MediaPicker({
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: dropzoneAcceptFromString(
-      cms.media.accept || 'text/*,application/pdf,image/*'
-    ),
+    accept: dropzoneAcceptFromString(cms.media.accept || DEFAULT_UPLOAD_TYPES),
     multiple: true,
     onDrop: async (files) => {
       try {
