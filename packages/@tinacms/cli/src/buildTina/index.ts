@@ -174,7 +174,7 @@ export const auditCmdBuild = async (
     text: 'Indexing local files',
   })
   if (warnings.length > 0) {
-    logger.warn(`Indexing completed with ${warnings.length} warnings`)
+    logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
     warnings.forEach((warning) => {
       logger.warn(warnText(`${warning}`))
     })
@@ -210,7 +210,7 @@ export const indexIntoSelfHostedDatabase = async (
     text: 'Indexing to self-hosted database',
   })
   if (warnings.length > 0) {
-    logger.warn(`Indexing completed with ${warnings.length} warnings`)
+    logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
     warnings.forEach((warning) => {
       logger.warn(warnText(`${warning}`))
     })

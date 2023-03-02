@@ -206,7 +206,7 @@ export async function startServer(
         text: 'Indexing local files',
       })
       if (warnings.length > 0) {
-        logger.warn(`Indexing completed with ${warnings.length} warnings`)
+        logger.warn(`Indexing completed with ${warnings.length} warning(s)`)
         warnings.forEach((warning) => {
           logger.warn(warnText(`${warning}`))
         })
