@@ -194,12 +194,23 @@ export async function startServer(
         rootPath: ctx.rootPath,
       })
 
+      const warnings: string[] = []
       await spin({
         waitFor: async () => {
-          await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+          const res = await ctx.database.indexContent({
+            graphQLSchema,
+            tinaSchema,
+          })
+          warnings.push(...res.warnings)
         },
-        text: logText('Indexing local files'),
+        text: 'Indexing local files',
       })
+      if (warnings.length > 0) {
+        logger.warn(`Indexing completed with ${warnings.length} warnings`)
+        warnings.forEach((warning) => {
+          logger.warn(warnText(`${warning}`))
+        })
+      }
 
       await buildAdmin({
         local: true,

@@ -165,13 +165,20 @@ export const auditCmdBuild = async (
     ...options,
     verbose: true,
   })
-
+  const warnings: string[] = []
   await spin({
     waitFor: async () => {
-      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+      const res = await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+      warnings.push(...res.warnings)
     },
     text: 'Indexing local files',
   })
+  if (warnings.length > 0) {
+    logger.warn(`Indexing completed with ${warnings.length} warnings`)
+    warnings.forEach((warning) => {
+      logger.warn(warnText(`${warning}`))
+    })
+  }
 
   next()
 }
@@ -194,13 +201,20 @@ export const indexIntoSelfHostedDatabase = async (
 
   const { graphQLSchema, tinaSchema } = ctx
 
+  const warnings: string[] = []
   await spin({
     waitFor: async () => {
-      await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+      const res = await ctx.database.indexContent({ graphQLSchema, tinaSchema })
+      warnings.push(...res.warnings)
     },
     text: 'Indexing to self-hosted database',
   })
-
+  if (warnings.length > 0) {
+    logger.warn(`Indexing completed with ${warnings.length} warnings`)
+    warnings.forEach((warning) => {
+      logger.warn(warnText(`${warning}`))
+    })
+  }
   next()
 }
 

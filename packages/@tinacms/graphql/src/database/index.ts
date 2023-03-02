@@ -829,11 +829,14 @@ export class Database {
     }
   }
 
-  private async indexStatusCallbackWrapper(fn: () => Promise<void>) {
+  private async indexStatusCallbackWrapper<T>(
+    fn: () => Promise<T>
+  ): Promise<T> {
     await this.indexStatusCallback({ status: 'inprogress' })
     try {
-      await fn()
+      const result = await fn()
       await this.indexStatusCallback({ status: 'complete' })
+      return result
     } catch (error) {
       await this.indexStatusCallback({ status: 'failed', error })
       throw error
@@ -853,7 +856,7 @@ export class Database {
       throw new Error('No bridge configured')
     }
     await this.initLevel()
-    await this.indexStatusCallbackWrapper(async () => {
+    const result = await this.indexStatusCallbackWrapper(async () => {
       const lookup =
         lookupFromLockFile ||
         JSON.parse(
@@ -889,7 +892,7 @@ export class Database {
         normalizePath(path.join(this.getGeneratedFolder(), '_lookup.json')),
         lookup
       )
-      await this._indexAllContent(nextLevel)
+      const result = await this._indexAllContent(nextLevel)
 
       if (this.config.version) {
         await this.updateDatabaseVersion(nextVersion)
@@ -898,7 +901,9 @@ export class Database {
         }
         this.level = nextLevel
       }
+      return result
     })
+    return result
   }
 
   public deleteContentByPaths = async (documentPaths: string[]) => {
@@ -1004,6 +1009,7 @@ export class Database {
   }
 
   public _indexAllContent = async (level: Level) => {
+    const warnings: string[] = []
     const tinaSchema = await this.getSchema(level)
     const operations: PutOp[] = []
     const enqueueOps = async (ops: PutOp[]): Promise<void> => {
@@ -1014,6 +1020,10 @@ export class Database {
         await level.batch(batchOps)
       }
     }
+    // This map is used to map files to there collections
+    const filesSeen = new Map<string, string[]>()
+    // This is used to track which files have duplicate collections so we do not have to loop over all files at the end
+    const duplicateFiles = new Set<string>()
     await sequential(tinaSchema.getCollections(), async (collection) => {
       const normalPath = normalizePath(collection.path)
       const format = collection.format || 'md'
@@ -1025,11 +1035,31 @@ export class Database {
         ? micromatch(documentPaths, [match])
         : documentPaths
 
+      filteredPaths.forEach((path) => {
+        if (filesSeen.has(path)) {
+          filesSeen.get(path).push(collection.name)
+          duplicateFiles.add(path)
+        } else {
+          filesSeen.set(path, [collection.name])
+        }
+      })
+      duplicateFiles.forEach((path) => {
+        warnings.push(
+          // TODO: link to docs
+          `"${path}" Found in collections ${filesSeen
+            .get(path)
+            .join(
+              ', '
+            )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections to limit the scope of a collection.`
+        )
+      })
+
       await _indexContent(this, level, filteredPaths, enqueueOps, collection)
     })
     while (operations.length) {
       await level.batch(operations.splice(0, 25))
     }
+    return { warnings }
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
