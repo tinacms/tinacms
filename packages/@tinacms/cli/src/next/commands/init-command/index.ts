@@ -1,7 +1,4 @@
 import { Command, Option } from 'clipanion'
-import fs from 'fs-extra'
-import path from 'path'
-import chokidar from 'chokidar'
 import {
   createDatabase,
   FilesystemBridge,
@@ -12,25 +9,15 @@ import {
 } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
-import { createDBServer } from './server'
-import { audit } from './audit'
-import { Codegen } from '../../codegen'
-import chalk from 'chalk'
-import { startSubprocess2 } from '../../../cmds/startSubprocess'
+import { initStaticTina } from '../../../cmds/init'
 
-export class AuditCommand extends Command {
-  static paths = [['audit']]
+export class InitCommand extends Command {
+  static paths = [['init']]
   rootPath = Option.String('--rootPath', {
     description: 'Specify the root directory to run the CLI from',
   })
   verbose = Option.Boolean('-v, --verbose', false, {
     description: 'increase verbosity of logged output',
-  })
-  clean = Option.Boolean('--clean', false, {
-    description: 'Clean the output',
-  })
-  useDefaultValues = Option.Boolean('--useDefaultValues', false, {
-    description: 'When cleaning the output, use defaults on the config',
   })
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
@@ -47,33 +34,9 @@ export class AuditCommand extends Command {
   }
 
   async execute(): Promise<number | void> {
-    const configManager = new ConfigManager(this.rootPath)
-    logger.info('Starting Tina Audit')
-
-    try {
-      await configManager.processConfig()
-    } catch (e) {
-      logger.error(e.message)
-      // logger.error(
-      //   'Unable to start dev server, please fix your Tina config and try again'
-      // )
-      process.exit(1)
-    }
-
-    const database = await this.createAndInitializeDatabase(configManager)
-    const { tinaSchema, graphQLSchema } = await buildSchema(
-      database,
-      configManager.config
-    )
-
-    await database.indexContent({ tinaSchema, graphQLSchema })
-
-    await audit({
-      database,
-      clean: this.clean,
+    await initStaticTina({
+      rootPath: this.rootPath,
       noTelemetry: this.noTelemetry,
-      useDefaultValues: this.useDefaultValues,
-      verbose: this.verbose,
     })
     // summary({
     //   heading: 'Tina Dev Server is running...',
