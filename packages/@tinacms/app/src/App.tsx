@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import TinaCMS, { TinaAdmin, useCMS, MdxFieldPluginExtendible } from 'tinacms'
 import { TinaEditProvider, useEditState } from 'tinacms/dist/edit-state'
 import { Preview } from './preview'
+import Playground from './Playground'
 
 // TODO: Resolve this to local file in tsconfig.json
 // @ts-expect-error
@@ -44,7 +45,12 @@ export const TinaAdminWrapper = () => {
     // @ts-ignore JSX element type 'TinaCMS' does not have any construct or call signatures.ts(2604)
     <TinaCMS {...config} schema={schema} client={{ apiUrl: __API_URL__ }}>
       <SetPreview outputFolder={config.build.outputFolder} />
-      <TinaAdmin preview={Preview} config={config} schemaJson={schemaJson} />
+      <TinaAdmin
+        preview={Preview}
+        Playground={Playground}
+        config={config}
+        schemaJson={schemaJson}
+      />
     </TinaCMS>
   )
 }

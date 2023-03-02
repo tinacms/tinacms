@@ -142,6 +142,15 @@ export const createDevServer = async (
               await mediaRouter.handleList(req, res)
               return
             }
+            if (req.url === '/altair') {
+              res.end(
+                JSON.stringify({
+                  status:
+                    'The GraphQL playground has moved to <your-dev-url>/index.html/graphql',
+                })
+              )
+              return
+            }
             if (req.url === '/graphql') {
               // @ts-ignore FIXME: req type doesn't match
               const { query, variables } = req.body
