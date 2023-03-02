@@ -2,18 +2,18 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import { MemoryLevel } from 'memory-level'
 import {
   createDatabase,
   FilesystemBridge,
   buildSchema,
   getASTSchema,
-  resolve,
+  Database,
+  TinaLevelClient,
 } from '@tinacms/graphql'
 import { ConfigManager } from '../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../logger'
-import { createDevServer } from './server'
+import { createDBServer, createDevServer } from './server'
 import { Codegen } from '../codegen'
 import chalk from 'chalk'
 import { startSubprocess2 } from '../../cmds/startSubprocess'
@@ -58,85 +58,55 @@ export class DevCommand extends Command {
     description: `Start dev server`,
   })
 
+  async catch(error: any): Promise<void> {
+    console.error(error)
+    logger.error('Error occured during tinacms dev')
+  }
+
   async execute(): Promise<number | void> {
     const configManager = new ConfigManager(this.rootPath)
     logger.info('Starting Tina Dev Server')
 
-    // setup() Re-runs on config changes
-    const setup = async () => {
-      try {
-        await configManager.processConfig()
-      } catch (e) {
-        logger.error(e.message)
-        console.trace()
-        logger.error(
-          'Unable to start dev server, please fix your Tina config and try again'
-        )
-        process.exit(1)
-      }
-
-      const database = createDatabase({
-        bridge: new FilesystemBridge(configManager.rootPath),
-        level: new MemoryLevel({ valueEncoding: 'json' }),
-      })
-
-      const res = await buildSchema(database, configManager.config)
-      await database.indexContent({
-        graphQLSchema: res.graphQLSchema,
-        tinaSchema: res.tinaSchema,
-      })
-
-      const astSchema = await getASTSchema(database)
-
-      const codegen = new Codegen({
-        configManager: configManager,
-        noSDK: this.noSDK,
-        local: true,
-        port: Number(this.port),
-        schema: astSchema,
-      })
-
-      const { codeString, schemaString } = await codegen.genTypes()
-      const { apiURL, clientString } = await codegen.genClient()
-
-      await fs.outputFile(configManager.generatedGraphQLGQLPath, schemaString)
-      await fs.outputFile(configManager.generatedTypesTSFilePath, codeString)
-      await fs.outputFile(configManager.generatedClientFilePath, clientString)
-      await fs.outputFile(configManager.outputHTMLFilePath, devHTML)
-      return { database, apiURL }
+    try {
+      await configManager.processConfig()
+    } catch (e) {
+      logger.error(e.message)
+      logger.error(
+        'Unable to start dev server, please fix your Tina config and try again'
+      )
+      process.exit(1)
     }
-    const { database, apiURL } = await setup()
+
+    const database = await this.createAndInitializeDatabase(configManager)
+    const { apiURL, clientString, codeString, schemaString } =
+      await this.createAndExecuteCodegen(database, configManager)
+
+    await fs.outputFile(configManager.generatedGraphQLGQLPath, schemaString)
+    await fs.outputFile(configManager.generatedTypesTSFilePath, codeString)
+    await fs.outputFile(configManager.generatedClientFilePath, clientString)
+    await fs.outputFile(configManager.outputHTMLFilePath, devHTML)
+
+    const result = await buildSchema(database, configManager.config)
+
+    await database.indexContent(result)
 
     const server = await createDevServer(configManager, database, apiURL)
     await server.listen(Number(this.port))
 
-    const collectionContentFiles = []
-    configManager.config.schema.collections.forEach((collection) => {
-      const collectionGlob = `${path.join(
-        configManager.rootPath,
-        collection.path
-      )}/**/*.${collection.format || 'md'}`
-      collectionContentFiles.push(collectionGlob)
-    })
-    chokidar.watch(collectionContentFiles).on('change', async (changedFile) => {
-      // TODO: update this content, probably sharing code from audit
-      logger.info(
-        `Detected change at ${chalk.cyan(
-          configManager.printRelativePath(changedFile)
-        )}`
-      )
-    })
+    this.watchContentFiles(configManager)
+
     server.watcher.on('change', async (changedPath) => {
       if (changedPath.includes('__generated__')) {
         return
       }
       try {
-        await setup()
+        // await setup()
         logger.info('Tina config updated')
       } catch (e) {
         logger.error(e.message)
       }
     })
+
     summary({
       heading: 'Tina Dev Server is running...',
       items: [
@@ -186,5 +156,75 @@ export class DevCommand extends Command {
     })
     logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
     await startSubprocess2({ command: this.subCommand })
+  }
+
+  async createAndInitializeDatabase(configManager: ConfigManager) {
+    let database: Database
+    const bridge = new FilesystemBridge(configManager.rootPath)
+    if (
+      configManager.hasSelfHostedConfig &&
+      configManager.config.contentApiUrlOverride
+    ) {
+      database = (await configManager.loadDatabaseFile()) as Database
+      database.bridge = bridge
+    } else {
+      if (
+        configManager.hasSelfHostedConfig &&
+        !configManager.config.contentApiUrlOverride
+      ) {
+        logger.warn(
+          `Found a database config file at ${configManager.printRelativePath(
+            configManager.selfHostedDatabaseFilePath
+          )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
+        )
+      }
+      const level = new TinaLevelClient()
+      level.openConnection()
+      database = createDatabase({
+        bridge,
+        level,
+      })
+    }
+
+    // Initialize the host TCP server
+    createDBServer()
+
+    return database
+  }
+
+  async createAndExecuteCodegen(
+    database: Database,
+    configManager: ConfigManager
+  ) {
+    const codegen = new Codegen({
+      schema: await getASTSchema(database),
+      configManager: configManager,
+      port: Number(this.port),
+      noSDK: this.noSDK,
+      local: true,
+    })
+
+    const { codeString, schemaString } = await codegen.genTypes()
+    const { apiURL, clientString } = await codegen.genClient()
+    return { apiURL, clientString, codeString, schemaString }
+  }
+
+  watchContentFiles(configManager: ConfigManager) {
+    const collectionContentFiles = []
+    configManager.config.schema.collections.forEach((collection) => {
+      const collectionGlob = `${path.join(
+        configManager.rootPath,
+        collection.path
+      )}/**/*.${collection.format || 'md'}`
+      collectionContentFiles.push(collectionGlob)
+    })
+    chokidar.watch(collectionContentFiles).on('change', async (changedFile) => {
+      // TODO: update this content, probably sharing code from audit
+      logger.info(
+        `Detected change at ${chalk.cyan(
+          configManager.printRelativePath(changedFile)
+        )}`
+      )
+    })
   }
 }

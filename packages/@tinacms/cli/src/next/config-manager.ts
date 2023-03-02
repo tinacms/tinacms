@@ -32,6 +32,7 @@ export class ConfigManager {
   generatedQueriesGlob: string
   outputFolderPath: string
   outputHTMLFilePath: string
+  selfHostedDatabaseFilePath?: string
   spaRootPath: string
   spaHTMLPath: string
 
@@ -39,13 +40,20 @@ export class ConfigManager {
     this.rootPath = rootPath
   }
 
+  hasSelfHostedConfig() {
+    return !!this.selfHostedDatabaseFilePath
+  }
+
   async processConfig() {
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath)
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
     )
+    this.selfHostedDatabaseFilePath = await this.getPathWithExtension(
+      path.join(this.tinaFolderPath, 'database')
+    )
     this.generatedFolderPath = path.join(this.tinaFolderPath, GENERATED_FOLDER)
-    this.config = await this.loadConfig(
+    this.config = await this.loadConfigFile(
       this.generatedFolderPath,
       this.tinaConfigFilePath
     )
@@ -149,7 +157,24 @@ export class ConfigManager {
     return result
   }
 
-  async loadConfig(generatedFolderPath: string, configFilePath: string) {
+  async loadDatabaseFile() {
+    // Date.now because imports are cached, we don't have a
+    // good way of invalidating them when this file changes
+    // https://github.com/nodejs/modules/issues/307
+    const tmpdir = path.join(os.tmpdir(), Date.now().toString())
+    const outfile = path.join(tmpdir, 'database.build.js')
+    await esbuild.build({
+      entryPoints: [this.selfHostedDatabaseFilePath],
+      bundle: true,
+      platform: 'node',
+      outfile: outfile,
+    })
+    const result = require(outfile)
+    await fs.removeSync(outfile)
+    return result.default
+  }
+
+  async loadConfigFile(generatedFolderPath: string, configFilePath: string) {
     // Date.now because imports are cached, we don't have a
     // good way of invalidating them when this file changes
     // https://github.com/nodejs/modules/issues/307
