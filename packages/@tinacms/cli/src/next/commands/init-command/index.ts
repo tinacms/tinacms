@@ -1,13 +1,4 @@
 import { Command, Option } from 'clipanion'
-import {
-  createDatabase,
-  FilesystemBridge,
-  buildSchema,
-  getASTSchema,
-  Database,
-  TinaLevelClient,
-} from '@tinacms/graphql'
-import { ConfigManager } from '../../config-manager'
 import { logger, summary } from '../../../logger'
 import { initStaticTina } from '../../../cmds/init'
 
@@ -54,39 +45,5 @@ export class InitCommand extends Command {
     //   ],
     // })
     process.exit()
-  }
-
-  async createAndInitializeDatabase(configManager: ConfigManager) {
-    let database: Database
-    const bridge = new FilesystemBridge(configManager.rootPath)
-    if (
-      configManager.hasSelfHostedConfig() &&
-      configManager.config.contentApiUrlOverride
-    ) {
-      database = (await configManager.loadDatabaseFile()) as Database
-      database.bridge = bridge
-    } else {
-      if (
-        configManager.hasSelfHostedConfig() &&
-        !configManager.config.contentApiUrlOverride
-      ) {
-        logger.warn(
-          `Found a database config file at ${configManager.printRelativePath(
-            configManager.selfHostedDatabaseFilePath
-          )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
-        )
-      }
-      const level = new TinaLevelClient()
-      level.openConnection()
-      database = createDatabase({
-        bridge,
-        level,
-      })
-    }
-
-    // Initialize the host TCP server
-    createDBServer()
-
-    return database
   }
 }
