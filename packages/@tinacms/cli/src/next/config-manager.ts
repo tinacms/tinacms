@@ -4,6 +4,7 @@ import os from 'os'
 import * as esbuild from 'esbuild'
 import * as url from 'url'
 import { Config } from '@tinacms/schema-tools'
+import * as dotenv from 'dotenv'
 
 const TINA_FOLDER = 'tina'
 const LEGACY_TINA_FOLDER = '.tina'
@@ -19,6 +20,7 @@ export class ConfigManager {
   tinaFolderPath: string
   tinaConfigFilePath: string
   tinaSpaPackagePath: string
+  envFilePath: string
   generatedFolderPath: string
   generatedGraphQLGQLPath: string
   generatedGraphQLJSONPath: string
@@ -28,8 +30,11 @@ export class ConfigManager {
   generatedTypesJSFilePath: string
   generatedTypesDFilePath: string
   generatedClientFilePath: string
-  generatedFragmentsGlob: string
-  generatedQueriesGlob: string
+  generatedQueriesFilePath: string
+  generatedFragmentsFilePath: string
+  generatedQueriesAndFragmentsGlob: string
+  userQueriesAndFragmentsGlob: string
+  publicFolderPath: string
   outputFolderPath: string
   outputHTMLFilePath: string
   selfHostedDatabaseFilePath?: string
@@ -37,7 +42,7 @@ export class ConfigManager {
   spaHTMLPath: string
 
   constructor(rootPath: string = process.cwd()) {
-    this.rootPath = rootPath
+    this.rootPath = rootPath.endsWith('/') ? rootPath.slice(0, -1) : rootPath
   }
 
   hasSelfHostedConfig() {
@@ -46,6 +51,13 @@ export class ConfigManager {
 
   async processConfig() {
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath)
+
+    // TODO - .env should potentially be configurable
+    this.envFilePath = path.resolve(
+      path.join(this.tinaFolderPath, '..', '.env')
+    )
+    dotenv.config({ path: this.envFilePath })
+
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
     )
@@ -73,6 +85,14 @@ export class ConfigManager {
       this.generatedFolderPath,
       LOOKUP_JSON_FILE
     )
+    this.generatedQueriesFilePath = path.join(
+      this.generatedFolderPath,
+      'queries.gql'
+    )
+    this.generatedFragmentsFilePath = path.join(
+      this.generatedFolderPath,
+      'frags.gql'
+    )
     this.generatedTypesTSFilePath = path.join(
       this.generatedFolderPath,
       'types.ts'
@@ -85,11 +105,11 @@ export class ConfigManager {
       this.generatedFolderPath,
       'types.d.ts'
     )
-    this.generatedQueriesGlob = path.join(
+    this.userQueriesAndFragmentsGlob = path.join(
       this.tinaFolderPath,
       'queries/**/*.{graphql,gql}'
     )
-    this.generatedFragmentsGlob = path.join(
+    this.generatedQueriesAndFragmentsGlob = path.join(
       this.generatedFolderPath,
       '*.{graphql,gql}'
     )
@@ -98,9 +118,12 @@ export class ConfigManager {
       this.generatedFolderPath,
       'client.ts'
     )
-    this.outputFolderPath = path.join(
+    this.publicFolderPath = path.join(
       this.rootPath,
-      this.config.build.publicFolder,
+      this.config.build.publicFolder
+    )
+    this.outputFolderPath = path.join(
+      this.publicFolderPath,
       this.config.build.outputFolder
     )
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
@@ -131,8 +154,14 @@ export class ConfigManager {
   printGeneratedTypesFilePath() {
     return this.generatedTypesTSFilePath.replace(`${this.rootPath}/`, '')
   }
+  printoutputHTMLFilePath() {
+    return this.outputHTMLFilePath.replace(`${this.publicFolderPath}/`, '')
+  }
   printRelativePath(filename: string) {
-    return filename.replace(`${this.rootPath}/`, '')
+    if (filename) {
+      return filename.replace(`${this.rootPath}/`, '')
+    }
+    throw `No path provided to print`
   }
 
   /**
@@ -186,6 +215,7 @@ export class ConfigManager {
     await esbuild.build({
       entryPoints: [configFilePath],
       bundle: true,
+      target: ['es2020'],
       platform: 'node',
       outfile,
     })

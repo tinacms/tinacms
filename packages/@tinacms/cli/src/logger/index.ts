@@ -187,8 +187,6 @@ export const summary = (content: {
     outString.push(``)
   })
 
-  outString.push(``)
-
   note(outString.join('\n'), content.heading)
 }
 

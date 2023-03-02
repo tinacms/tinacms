@@ -46,12 +46,6 @@ export class DevCommand extends Command {
   noTelemetry = Option.Boolean('--noTelemetry', false, {
     description: 'Disable anonymous telemetry that is collected',
   })
-  dev = Option.Boolean('--dev', false, {
-    description: 'Uses NODE_ENV=development when compiling client and schema',
-  })
-  local = Option.Boolean('--local', {
-    description: 'Use the local file system graphql server',
-  })
 
   static usage = Command.Usage({
     category: `Commands`,
@@ -78,17 +72,24 @@ export class DevCommand extends Command {
     }
 
     const database = await this.createAndInitializeDatabase(configManager)
-    const { apiURL, clientString, codeString, schemaString } =
-      await this.createAndExecuteCodegen(database, configManager)
+    const { tinaSchema, graphQLSchema, queryDoc, fragDoc } = await buildSchema(
+      database,
+      configManager.config
+    )
 
-    await fs.outputFile(configManager.generatedGraphQLGQLPath, schemaString)
-    await fs.outputFile(configManager.generatedTypesTSFilePath, codeString)
-    await fs.outputFile(configManager.generatedClientFilePath, clientString)
+    const codegen = new Codegen({
+      schema: await getASTSchema(database),
+      configManager: configManager,
+      noSDK: this.noSDK,
+      port: Number(this.port),
+      queryDoc,
+      fragDoc,
+    })
+    const { apiURL } = await codegen.execute()
+
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML)
 
-    const result = await buildSchema(database, configManager.config)
-
-    await database.indexContent(result)
+    await database.indexContent({ tinaSchema, graphQLSchema })
 
     const server = await createDevServer(configManager, database, apiURL)
     await server.listen(Number(this.port))
@@ -122,6 +123,10 @@ export class DevCommand extends Command {
               key: 'API playground',
               value: `http://localhost:${this.port}/altair`,
             },
+            {
+              key: 'CMS',
+              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
+            },
           ],
         },
         {
@@ -154,22 +159,24 @@ export class DevCommand extends Command {
         },
       ],
     })
-    logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
-    await startSubprocess2({ command: this.subCommand })
+    if (this.subCommand) {
+      logger.info(`Starting subprocess: ${chalk.cyan(this.subCommand)}`)
+      await startSubprocess2({ command: this.subCommand })
+    }
   }
 
   async createAndInitializeDatabase(configManager: ConfigManager) {
     let database: Database
     const bridge = new FilesystemBridge(configManager.rootPath)
     if (
-      configManager.hasSelfHostedConfig &&
+      configManager.hasSelfHostedConfig() &&
       configManager.config.contentApiUrlOverride
     ) {
       database = (await configManager.loadDatabaseFile()) as Database
       database.bridge = bridge
     } else {
       if (
-        configManager.hasSelfHostedConfig &&
+        configManager.hasSelfHostedConfig() &&
         !configManager.config.contentApiUrlOverride
       ) {
         logger.warn(
@@ -190,23 +197,6 @@ export class DevCommand extends Command {
     createDBServer()
 
     return database
-  }
-
-  async createAndExecuteCodegen(
-    database: Database,
-    configManager: ConfigManager
-  ) {
-    const codegen = new Codegen({
-      schema: await getASTSchema(database),
-      configManager: configManager,
-      port: Number(this.port),
-      noSDK: this.noSDK,
-      local: true,
-    })
-
-    const { codeString, schemaString } = await codegen.genTypes()
-    const { apiURL, clientString } = await codegen.genClient()
-    return { apiURL, clientString, codeString, schemaString }
   }
 
   watchContentFiles(configManager: ConfigManager) {

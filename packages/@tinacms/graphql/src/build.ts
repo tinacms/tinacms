@@ -46,11 +46,21 @@ export const buildDotTinaFiles = async ({
       await database.bridge.get('.tina/__generated__/_graphql.json')
     )
   }
+  let fragDoc = ''
+  let queryDoc = ''
   if (buildSDK) {
-    await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
-    await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
+    fragDoc = await _buildFragments(
+      builder,
+      tinaSchema,
+      database.bridge.rootPath
+    )
+    queryDoc = await _buildQueries(
+      builder,
+      tinaSchema,
+      database.bridge.rootPath
+    )
   }
-  return { graphQLSchema, tinaSchema }
+  return { graphQLSchema, tinaSchema, fragDoc, queryDoc }
 }
 
 const _buildFragments = async (
@@ -78,34 +88,7 @@ const _buildFragments = async (
     ),
   }
 
-  // TODO: These should possibly be outputted somewhere else?
-  const fragPath = path.join(rootPath, '.tina', '__generated__')
-
-  await fs.outputFile(path.join(fragPath, 'frags.gql'), print(fragDoc))
-  // is the file bigger then 100kb?
-  if (
-    (await (await fs.stat(path.join(fragPath, 'frags.gql'))).size) >
-    // convert to 100 kb to bytes
-    100 * 1024
-  ) {
-    console.warn(
-      'Warning: frags.gql is very large (>100kb). Consider setting the reference depth to 1 or 0. See code snippet below.'
-    )
-    console.log(
-      `const schema = defineSchema({
-        config: {
-            client: {
-                referenceDepth: 1,
-            },
-        }
-        // ...
-    })`
-    )
-  }
-  //   await fs.outputFileSync(
-  //     path.join(fragPath, 'frags.json'),
-  //     JSON.stringify(fragDoc, null, 2)
-  //   )
+  return print(fragDoc)
 }
 
 const _buildQueries = async (
@@ -151,14 +134,7 @@ const _buildQueries = async (
     ),
   }
 
-  const fragPath = path.join(rootPath, '.tina', '__generated__')
-
-  await fs.outputFile(path.join(fragPath, 'queries.gql'), print(queryDoc))
-  // We dont this them for now
-  // await fs.outputFileSync(
-  //   path.join(fragPath, 'queries.json'),
-  //   JSON.stringify(queryDoc, null, 2)
-  // )
+  return print(queryDoc)
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {

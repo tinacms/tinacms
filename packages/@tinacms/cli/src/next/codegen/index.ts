@@ -1,3 +1,4 @@
+import fs from 'fs-extra'
 import { GraphQLSchema, printSchema } from 'graphql'
 import { generateTypes } from './codegen'
 import { transform } from 'esbuild'
@@ -7,27 +8,59 @@ export const TINA_HOST = 'content.tinajs.io'
 export class Codegen {
   configManager: ConfigManager
   noSDK: boolean
-  local: boolean
   port?: number
   schema: GraphQLSchema
+  queryDoc: string
+  fragDoc: string
+
   constructor({
     configManager,
     noSDK,
-    local,
     port,
     schema,
+    queryDoc,
+    fragDoc,
   }: {
     configManager: ConfigManager
     noSDK: boolean
-    local: boolean
     port?: number
     schema: GraphQLSchema
+    queryDoc: string
+    fragDoc: string
   }) {
     this.configManager = configManager
     this.noSDK = noSDK
-    this.local = local
     this.port = port
     this.schema = schema
+    ;(this.queryDoc = queryDoc), (this.fragDoc = fragDoc)
+  }
+
+  async execute() {
+    const { apiURL, clientString } = await this.genClient()
+
+    await fs.outputFile(
+      this.configManager.generatedQueriesFilePath,
+      this.queryDoc
+    )
+    await fs.outputFile(
+      this.configManager.generatedFragmentsFilePath,
+      this.fragDoc
+    )
+    await maybeWarnFragmentSize(this.configManager.generatedFragmentsFilePath)
+
+    const { codeString, schemaString } = await this.genTypes()
+
+    await fs.outputFile(
+      this.configManager.generatedGraphQLGQLPath,
+      schemaString
+    )
+    await fs.outputFile(this.configManager.generatedTypesTSFilePath, codeString)
+    await fs.outputFile(
+      this.configManager.generatedClientFilePath,
+      clientString
+    )
+
+    return { apiURL }
   }
 
   async genClient() {
@@ -40,7 +73,7 @@ export class Codegen {
 
     if (
       (!branch || !clientId || !token) &&
-      !this.local &&
+      !this.port &&
       !this.configManager.config.contentApiUrlOverride
     ) {
       const missing = []
@@ -55,7 +88,7 @@ export class Codegen {
       )
     }
 
-    let apiURL = this.local
+    let apiURL = this.port
       ? `http://localhost:${this.port}/graphql`
       : `${baseUrl}/content/${clientId}/github/${branch}`
 
@@ -74,8 +107,8 @@ export default client;
   async genTypes() {
     const typescriptTypes = await generateTypes(
       this.schema,
-      this.configManager.generatedQueriesGlob,
-      this.configManager.generatedFragmentsGlob,
+      this.configManager.userQueriesAndFragmentsGlob,
+      this.configManager.generatedQueriesAndFragmentsGlob,
       this.noSDK
     )
     const codeString = `//@ts-nocheck
@@ -98,5 +131,28 @@ schema {
 }
 `
     return { codeString, schemaString }
+  }
+}
+
+const maybeWarnFragmentSize = async (filepath: string) => {
+  if (
+    // is the file bigger then 100kb?
+    (await (await fs.stat(filepath)).size) >
+    // convert to 100 kb to bytes
+    100 * 1024
+  ) {
+    console.warn(
+      'Warning: frags.gql is very large (>100kb). Consider setting the reference depth to 1 or 0. See code snippet below.'
+    )
+    console.log(
+      `const schema = defineSchema({
+        config: {
+            client: {
+                referenceDepth: 1,
+            },
+        }
+        // ...
+    })`
+    )
   }
 }

@@ -1,9 +1,3 @@
-/**
-
-*/
-
-import fs from 'fs-extra'
-import path from 'path'
 import { buildASTSchema } from 'graphql'
 
 import type {
@@ -39,13 +33,11 @@ export const buildSchema = async (
   config: Config,
   flags?: string[]
 ) => {
-  const { graphQLSchema, tinaSchema } = await buildDotTinaFiles({
+  return buildDotTinaFiles({
     database,
     config: config,
     flags,
   })
-
-  return { graphQLSchema, tinaSchema }
 }
 
 export const getASTSchema = async (database: Database) => {
