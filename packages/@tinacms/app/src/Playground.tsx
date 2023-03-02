@@ -4,7 +4,7 @@ import { GraphiQL } from 'graphiql'
 import 'graphiql/graphiql.css'
 
 const fetcher = createGraphiQLFetcher({
-  url: 'http://localhost:4001/graphql',
+  url: __API_URL__,
 })
 
 const Playground = () => (
