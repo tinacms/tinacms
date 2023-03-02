@@ -344,9 +344,20 @@ const config = (cwd = '') => {
               transform: 'translateY(0)',
             },
           },
+          slideInLeft: {
+            '0%': {
+              opacity: '0',
+              transform: 'translateX(2rem)',
+            },
+            '100%': {
+              opacity: '1',
+              transform: 'translateX(0)',
+            },
+          },
         },
         animation: {
           'slide-in': 'slideIn 150ms ease-out 1 normal forwards',
+          'slide-in-left': 'slideInLeft 150ms ease-out 1 normal forwards',
           'spin-reverse': 'spin 1s linear infinite reverse',
         },
         scale: {

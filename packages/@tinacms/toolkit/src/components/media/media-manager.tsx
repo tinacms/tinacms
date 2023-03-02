@@ -7,7 +7,12 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
-import { BiCloudUpload, BiGridAlt, BiListUl } from 'react-icons/bi'
+import {
+  BiArrowToBottom,
+  BiCloudUpload,
+  BiGridAlt,
+  BiListUl,
+} from 'react-icons/bi'
 import {
   Modal,
   ModalHeader,
@@ -29,7 +34,7 @@ import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
-import { CloseIcon } from '../../packages/icons'
+import { CloseIcon, TrashIcon } from '../../packages/icons'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -433,12 +438,12 @@ export function MediaPicker({
         <div className="flex h-full overflow-hidden">
           <ul
             {...rootProps}
-            className={`h-full overflow-y-auto ${
+            className={`h-full overflow-y-auto transition duration-150 ease-out ${
               viewMode === 'list' &&
               'flex flex-1 flex-col divide-y divide-gray-100'
             } ${
               viewMode === 'grid' &&
-              'w-full grid grid-cols-[repeat(auto-fit,_minmax(240px,_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4'
+              'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
             } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
           >
             <input {...getInputProps()} />
@@ -469,16 +474,40 @@ export function MediaPicker({
               ))}
           </ul>
 
-          {activeItem && (
-            <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-1/2 max-w-lg min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md">
+          {viewMode === 'grid' && activeItem && (
+            <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
               <img
                 className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
                 src={activeItem.thumbnail}
                 alt={activeItem.filename}
               />
-              <h3 className="text-base flex-grow w-full break-words truncate">
+              <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
                 {activeItem.filename}
               </h3>
+              <div className="grow flex flex-col justify-end items-start">
+                <div className="flex w-full gap-3">
+                  {selectMediaItem && (
+                    <Button
+                      size="medium"
+                      variant="primary"
+                      className="grow"
+                      onClick={() => selectMediaItem(activeItem)}
+                    >
+                      Insert
+                      <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+                    </Button>
+                  )}
+                  <Button
+                    variant="white"
+                    size="medium"
+                    className="grow max-w-[40%]"
+                    onClick={() => deleteMediaItem(activeItem)}
+                  >
+                    Delete
+                    <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>

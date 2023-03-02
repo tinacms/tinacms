@@ -76,7 +76,7 @@ export function GridMediaItem({ item, active, onClick }) {
   const FileIcon = item.type === 'dir' ? Folder : File
   return (
     <li
-      className={`relative aspect-w-1 aspect-h-1 border border-gray-100 rounded-md overflow-hidden flex justify-center flex-shrink-0 transition duration-150 ease-out ${
+      className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 transition duration-150 ease-out ${
         active
           ? 'shadow-outline'
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
