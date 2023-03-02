@@ -539,6 +539,7 @@ importers:
       memory-level: ^1.0.0
       minimatch: ^5.1.2
       multer: 1.4.5-lts.1
+      node-fetch: '2'
       normalize-path: ^3.0.0
       postcss-nested: ^5.0.6
       prettier: ^2.2.1
@@ -598,6 +599,7 @@ importers:
       memory-level: 1.0.0
       minimatch: 5.1.2
       multer: 1.4.5-lts.1
+      node-fetch: 2.6.7
       normalize-path: 3.0.0
       postcss-nested: 5.0.6
       prettier: 2.7.1
@@ -7568,7 +7570,7 @@ packages:
       '@ardatan/relay-compiler': 12.0.0_graphql@15.8.0
       '@graphql-tools/utils': 8.8.0_graphql@15.8.0
       graphql: 15.8.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -20227,7 +20229,7 @@ packages:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
       graphql: 15.8.0
-      tslib: 2.4.0
+      tslib: 2.5.0
     dev: false
 
   /graphql-type-json/0.3.2_graphql@15.8.0:

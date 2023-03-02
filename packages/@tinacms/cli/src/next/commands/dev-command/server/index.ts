@@ -6,7 +6,7 @@ import { tinaTailwind } from '../tailwind'
 import { ConfigManager } from '../../../config-manager'
 import { createMediaRouter } from './routes'
 import { parseMediaFolder } from './models/media'
-import { transform } from 'esbuild'
+import { transform as esbuildTransform } from 'esbuild'
 import { pipeline } from 'readable-stream'
 import { createServer } from 'net'
 import { ManyLevelHost } from 'many-level'
@@ -99,16 +99,16 @@ export const createDevServer = async (
       tinaTailwind(configManager.spaRootPath, configManager.tinaConfigFilePath),
       {
         name: 'transform-tsx',
-        transform(code, id) {
+        async transform(code, id) {
           // Vite isn't picking up the right transform for tsx
           // files, we could opt-out of this if the file isn't
           // .tsx but seems to work ok for now.
           // TODO: other loaders needed (eg svg)?
           if (id === configManager.tinaConfigFilePath) {
-            return transform(code, { loader: 'tsx' })
-          }
-          return {
-            code,
+            const result = await esbuildTransform(code, { loader: 'tsx' })
+            return {
+              code: result.code,
+            }
           }
         },
       },

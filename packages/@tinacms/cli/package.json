@@ -97,6 +97,7 @@
     "memory-level": "^1.0.0",
     "minimatch": "^5.1.2",
     "multer": "1.4.5-lts.1",
+    "node-fetch": "2",
     "normalize-path": "^3.0.0",
     "postcss-nested": "^5.0.6",
     "prettier": "^2.2.1",

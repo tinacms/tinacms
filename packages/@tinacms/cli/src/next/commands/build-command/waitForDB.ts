@@ -3,7 +3,8 @@
 */
 
 import Progress from 'progress'
-import { parseURL, Schema } from '@tinacms/schema-tools'
+import { Config, parseURL, Schema } from '@tinacms/schema-tools'
+import fetch, { Headers } from 'node-fetch'
 
 import { logger } from '../../../logger'
 import { spin } from '../../../utils/spinner'
@@ -29,23 +30,13 @@ class IndexFailedError extends Error {
 }
 
 export const waitForDB = async (
-  ctx: {
-    schema?: Schema<true>
-    apiUrl: string
-    isSelfHostedDatabase?: boolean
-  },
-  next,
-  options: { verbose?: boolean }
+  config: Config<true>,
+  apiUrl: string,
+  verbose?: boolean
 ) => {
-  const token = ctx.schema.config.token
-  if (ctx.isSelfHostedDatabase) {
-    return next()
-  }
-  const { clientId, branch, isLocalClient, host } = parseURL(ctx.apiUrl)
+  const token = config.token
+  const { clientId, branch, isLocalClient, host } = parseURL(apiUrl)
 
-  if (isLocalClient) {
-    return next()
-  }
   const bar = new Progress(
     'Checking indexing process in Tina Cloud... :prog',
     1
@@ -53,7 +44,7 @@ export const waitForDB = async (
 
   const pollForStatus = async () => {
     try {
-      if (options.verbose) {
+      if (verbose) {
         logger.info(logText('Polling for status...'))
       }
       const headers = new Headers()
@@ -80,11 +71,10 @@ export const waitForDB = async (
         bar.tick({
           prog: '✅',
         })
-        return next()
 
         // Index Inprogress
       } else if (status === STATUS_INPROGRESS) {
-        if (options.verbose) {
+        if (verbose) {
           logger.info(logText(`${statusMessage}, trying again in 5 seconds`))
         }
         setTimeout(pollForStatus, POLLING_INTERVAL)

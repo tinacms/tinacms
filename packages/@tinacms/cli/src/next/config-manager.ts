@@ -37,6 +37,7 @@ export class ConfigManager {
   publicFolderPath: string
   outputFolderPath: string
   outputHTMLFilePath: string
+  outputGitignorePath: string
   selfHostedDatabaseFilePath?: string
   spaRootPath: string
   spaHTMLPath: string
@@ -127,15 +128,13 @@ export class ConfigManager {
       this.config.build.outputFolder
     )
     this.outputHTMLFilePath = path.join(this.outputFolderPath, 'index.html')
+    this.outputGitignorePath = path.join(this.outputFolderPath, '.gitignore')
+
     // This package lists `index.html` as it's main field export
     this.spaHTMLPath = url.pathToFileURL(
       require.resolve('@tinacms/app')
     ).pathname
     this.spaRootPath = this.spaHTMLPath.replace('/index.html', '')
-  }
-
-  validateConfig() {
-    // validateSchema({ schema: this.config.schema })
   }
 
   async getTinaFolderPath(rootPath) {
@@ -210,7 +209,7 @@ export class ConfigManager {
     const tmpdir = path.join(os.tmpdir(), Date.now().toString())
     const outfile = path.join(tmpdir, 'config.build.jsx')
     const outfile2 = path.join(tmpdir, 'config.build.js')
-    const tempTSConfigFile = path.join(generatedFolderPath, 'tsconfig.json')
+    const tempTSConfigFile = path.join(tmpdir, 'tsconfig.json')
     await fs.outputFileSync(tempTSConfigFile, '{}')
     await esbuild.build({
       entryPoints: [configFilePath],

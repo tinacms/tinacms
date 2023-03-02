@@ -1,3 +1,4 @@
+import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
@@ -10,9 +11,9 @@ import {
   TinaLevelClient,
 } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
-import { devHTML } from './html'
+import { prodHTML } from './html'
 import { logger, summary } from '../../../logger'
-import { createDBServer, createDevServer } from './server'
+import { createDBServer, buildProductionSpa } from './server'
 import { Codegen } from '../../codegen'
 import { parseURL } from '@tinacms/schema-tools'
 import {
@@ -45,8 +46,9 @@ export class BuildCommand extends Command {
   })
 
   async catch(error: any): Promise<void> {
-    logger.error(error.message)
+    // logger.error(error.message)
     console.log(error)
+    process.exit(1)
   }
 
   async execute(): Promise<number | void> {
@@ -76,11 +78,19 @@ export class BuildCommand extends Command {
     })
     const { apiURL } = await codegen.execute()
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML)
+    await fs.outputFile(configManager.outputHTMLFilePath, prodHTML)
 
-    // await this.checkClientInfo(configManager, apiURL)
-    // await this.checkGraphqlSchema(configManager, database, apiURL)
-    // await waitForDB()
+    await this.checkClientInfo(configManager, apiURL)
+    await this.checkGraphqlSchema(configManager, database, apiURL)
+    await waitForDB(configManager.config, apiURL, false)
+
+    await buildProductionSpa(configManager, database, apiURL)
+
+    // When the build completes, add the gitignore
+    await fs.outputFile(
+      configManager.outputGitignorePath,
+      'index.html\nassets/'
+    )
 
     summary({
       heading: 'Tina build complete',
@@ -125,6 +135,7 @@ export class BuildCommand extends Command {
         },
       ],
     })
+    process.exit()
   }
 
   async createAndInitializeDatabase(configManager: ConfigManager) {
@@ -177,20 +188,30 @@ export class BuildCommand extends Command {
         prog: '✅',
       })
     } catch (e) {
-      bar.tick({
-        prog: '❌',
-      })
-      throw new Error(
-        `Error when checking client information. You provided \n\n ${JSON.stringify(
+      summary({
+        heading: 'Error when checking client information',
+        items: [
           {
-            branch: config?.branch,
-            clientId: config?.clientId,
-            token: config?.token,
+            emoji: '❌',
+            heading: 'You provided',
+            subItems: [
+              {
+                key: 'branch',
+                value: config.branch,
+              },
+              {
+                key: 'clientId',
+                value: config.clientId,
+              },
+              {
+                key: 'token',
+                value: config.token,
+              },
+            ],
           },
-          null,
-          2
-        )}\n\n Please check you have the correct "clientId", "branch" and "token" configured. For more information see https://tina.io/docs/tina-cloud/connecting-site/`
-      )
+        ],
+      })
+      throw e
     }
   }
 
