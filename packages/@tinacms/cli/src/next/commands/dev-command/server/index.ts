@@ -100,6 +100,9 @@ export const createDevServer = async (
       {
         name: 'transform-tsx',
         async transform(code, id) {
+          // FIXME: this seems to only happen in the monorepo
+          // so it's not used in the vite build fro now
+          //
           // Vite isn't picking up the right transform for tsx
           // files, we could opt-out of this if the file isn't
           // .tsx but seems to work ok for now.
