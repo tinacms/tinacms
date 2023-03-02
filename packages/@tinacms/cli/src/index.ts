@@ -3,6 +3,7 @@ import { Cli } from 'clipanion'
 import { version, name } from '../package.json'
 import { DevCommand } from './next/commands/dev-command'
 import { BuildCommand } from './next/commands/build-command'
+import { AuditCommand } from './next/commands/audit-command'
 
 export type {
   Schema,
@@ -19,5 +20,6 @@ const cli = new Cli({
 
 cli.register(DevCommand)
 cli.register(BuildCommand)
+cli.register(AuditCommand)
 
 export default cli

@@ -143,7 +143,14 @@ export class ConfigManager {
     if (tinaFolderExists) {
       return tinaFolderPath
     }
-    return path.join(rootPath, LEGACY_TINA_FOLDER)
+    const legacyFolderPath = path.join(rootPath, LEGACY_TINA_FOLDER)
+    const legacyFolderExists = await fs.pathExists(legacyFolderPath)
+    if (legacyFolderExists) {
+      return legacyFolderPath
+    }
+    throw new Error(
+      `Unable to find Tina folder, if you're working in folder outside of the Tina config be sure to specify --rootPath`
+    )
   }
 
   printGeneratedClientFilePath() {
