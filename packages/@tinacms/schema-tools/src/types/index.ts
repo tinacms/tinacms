@@ -627,6 +627,7 @@ interface BaseCollection {
    */
   frontmatterDelimiters?: [string, string] | string
   match?: string
+  exclude?: string
 }
 
 type TemplateCollection<WithNamespace extends boolean = false> = {

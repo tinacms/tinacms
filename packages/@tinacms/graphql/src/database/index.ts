@@ -325,14 +325,19 @@ export class Database {
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
         if (collection.match) {
-          const normalPath = normalizePath(collection.path)
-          const matchGlob = `${normalPath}/${collection.match}.${
-            collection.format || 'md'
-          }`
-          const match = micromatch.isMatch(filepath, matchGlob)
+          const matches = this.tinaSchema.getMatches({ collection })
+
+          const match = micromatch.isMatch(filepath, matches)
+
           if (!match) {
             throw new GraphQLError(
-              `File ${filepath} does not match collection ${collection.name} glob ${matchGlob}. Please change the filename or update matches for ${collection.name} in your config file.`
+              `File ${filepath} does not match collection ${
+                collection.name
+              } glob ${matches.join(
+                ','
+              )}. Please change the filename or update matches for ${
+                collection.name
+              } in your config file.`
             )
           }
         }
@@ -1029,11 +1034,11 @@ export class Database {
       const format = collection.format || 'md'
       // Get all possible paths for this collection
       const documentPaths = await this.bridge.glob(normalPath, format)
-      // filter paths based on match
-      const match = `${normalPath}/${collection.match}.${format}`
-      const filteredPaths = collection.match
-        ? micromatch(documentPaths, [match])
-        : documentPaths
+
+      // filter paths based on match and exclude
+      const matches = this.tinaSchema.getMatches({ collection })
+      const filteredPaths =
+        matches.length > 0 ? micromatch(documentPaths, matches) : documentPaths
 
       filteredPaths.forEach((path) => {
         if (filesSeen.has(path)) {
@@ -1046,8 +1051,9 @@ export class Database {
       duplicateFiles.forEach((path) => {
         warnings.push(
           // TODO: link to docs
-          `"${path}" Found in collections multiple collections: ${filesSeen
+          `"${path}" Found in multiple collections: ${filesSeen
             .get(path)
+            .map((collection) => `"${collection}"`)
             .join(
               ', '
             )}. This can cause unexpected behavior. We recommend updating the \`match\` property of those collections so that each file is in only one collection.`

@@ -1,3 +1,4 @@
+import micromatch from 'micromatch'
 import {
   Schema,
   Collection,
@@ -7,6 +8,7 @@ import {
   TinaField,
 } from '../types/index'
 import { lastItem, assertShape } from '../util'
+import { normalizePath } from '../util/normalizePath'
 
 type Version = {
   fullVersion: string
@@ -89,6 +91,14 @@ export class TinaSchema {
       // filter out file extensions that don't match the collection format
       if (fileExtension !== (collection.format || 'md')) {
         return false
+      }
+      if (collection.match || collection.exclude) {
+        // if the collection has a match or exclude, we need to check if the file matches
+        const matches = this.getMatches({ collection })
+        const match = micromatch.isMatch(filepath, matches)
+        if (!match) {
+          return false
+        }
       }
       return filepath
         .replace(/\\/g, '/')
@@ -371,5 +381,34 @@ export class TinaSchema {
         )
       }
     }
+  }
+
+  /**
+   * This function returns an array of glob matches for a given collection.
+   *
+   * @param collection The collection to get the matches for. Can be a string or a collection object.
+   * @returns An array of glob matches.
+   */
+  public getMatches({
+    collection: collectionOrString,
+  }: {
+    collection: string | Collection
+  }) {
+    const collection =
+      typeof collectionOrString === 'string'
+        ? this.getCollection(collectionOrString)
+        : collectionOrString
+    const normalPath = normalizePath(collection.path)
+    const format = collection.format || 'md'
+    const matches: string[] = []
+    if (collection.match) {
+      const match = `${normalPath}/${collection.match}.${format}`
+      matches.push(match)
+    }
+    if (collection.exclude) {
+      const exclude = `!(${normalPath}/${collection.exclude}.${format})`
+      matches.push(exclude)
+    }
+    return matches
   }
 }
