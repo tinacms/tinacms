@@ -1,4 +1,4 @@
-export const devHTML = `<!DOCTYPE html>
+export const devHTML = (port: string) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,16 +8,16 @@ export const devHTML = `<!DOCTYPE html>
 
   <!-- if development -->
   <script type="module">
-    import RefreshRuntime from 'http://localhost:4001/@react-refresh'
+    import RefreshRuntime from 'http://localhost:${port}/@react-refresh'
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
   </script>
-  <script type="module" src="http://localhost:4001/@vite/client"></script>
+  <script type="module" src="http://localhost:${port}/@vite/client"></script>
   <script
     type="module"
-    src="http://localhost:4001/src/main.tsx"
+    src="http://localhost:${port}/src/main.tsx"
   ></script>
   <body class="tina-tailwind">
     <div id="root"></div>

@@ -48,52 +48,6 @@ export const note = (message = '', title = '') => {
     )}\n${msg}\n${chalk.gray('├' + '─'.repeat(len + 2) + '╯')}\n`
   )
 }
-export function logCreateAppResult(
-  pkgManager: string,
-  result: { outDir: string; docs: string[] },
-  ranInstall: boolean
-) {
-  const outString = []
-
-  // outString.push(
-  //   `🦄 ${chalk.bgMagenta(' Success! ')} ${chalk.cyan(
-  //     `Project created in`
-  //   )} ${chalk.bold(chalk.magenta('.tina'))} ${chalk.cyan(`directory`)}`
-  // )
-  // outString.push(``)
-
-  outString.push(`🦙 ${chalk.cyan(`Tina Config:`)}`)
-  outString.push(
-    `   API url:        ${chalk.cyan('http://localhost:4001/graphql')}`
-  )
-  outString.push(
-    `   API playground: ${chalk.cyan('http://localhost:4001/altair')}`
-  )
-  outString.push(
-    `   Tina CMS Admin: ${chalk.cyan('<your-dev-server>/admin/index.html')}`
-  )
-  outString.push(``)
-
-  outString.push(`🤍 ${chalk.cyan('Auto-generated files...')}`)
-  outString.push(
-    `   GraphQL Client: ${chalk.cyan('.tina/__generated__/client')}`
-  )
-  outString.push(
-    `   Typescript Types: ${chalk.cyan('.tina/__generated__/types')}`
-  )
-  outString.push(``)
-
-  outString.push(`👀 ${chalk.cyan('Useful links')}`)
-  outString.push(
-    `   Custom queries: ${chalk.cyan('https://tina.io/querying/')}`
-  )
-  outString.push(
-    `   Visual editing: ${chalk.cyan('https://tina.io/visual-editing/')}`
-  )
-  outString.push(``)
-
-  return outString.join('\n')
-}
 
 export const log = (message = '') => {
   process.stdout.write(

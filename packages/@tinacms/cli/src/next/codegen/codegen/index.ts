@@ -18,7 +18,8 @@ export const generateTypes = async (
   schema: GraphQLSchema,
   queryPathGlob = process.cwd(),
   fragDocPath = process.cwd(),
-  noSDK: boolean
+  noSDK: boolean,
+  apiURL: string
 ) => {
   let docs = []
   let fragDocs = []
@@ -53,7 +54,7 @@ export const generateTypes = async (
       typescriptSdk: {
         plugin: typescriptSdkPlugin,
       },
-      AddGeneratedClient,
+      AddGeneratedClient: AddGeneratedClient(apiURL),
     },
   })
   return res

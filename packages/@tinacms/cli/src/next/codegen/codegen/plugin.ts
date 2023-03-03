@@ -4,13 +4,11 @@
 
 import type { PluginFunction } from '@graphql-codegen/plugin-helpers'
 
-export const AddGeneratedClientFunc: PluginFunction = (
-  _schema,
-  _documents,
-  _config,
-  _info
+export const AddGeneratedClientFunc: (apiURL: string) => PluginFunction = (
+  apiURL
 ) => {
-  return `
+  return (_schema, _documents, _config, _info) => {
+    return `
 // TinaSDK generated code
 import { createClient, TinaClient } from "tinacms/dist/client";
 
@@ -37,7 +35,7 @@ const generateRequester = (client: TinaClient) => {
  **/
 export const ExperimentalGetTinaClient = () =>
   getSdk(
-    generateRequester(createClient({ url: "http://localhost:4001/graphql", queries }))
+    generateRequester(createClient({ url: "${apiURL}", queries }))
   );
 
 export const queries = (client: TinaClient) => {
@@ -45,8 +43,9 @@ export const queries = (client: TinaClient) => {
   return getSdk(requester);
 };
 `
+  }
 }
 
-export const AddGeneratedClient = {
-  plugin: AddGeneratedClientFunc,
-}
+export const AddGeneratedClient = (apiURL: string) => ({
+  plugin: AddGeneratedClientFunc(apiURL),
+})

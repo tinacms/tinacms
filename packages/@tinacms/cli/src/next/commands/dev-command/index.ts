@@ -21,7 +21,7 @@ import { ViteDevServer } from 'vite'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
-  port = Option.String(`-p, --port`, '4001', {
+  port = Option.String('-p, --port', '4001', {
     description: 'Specify a port to run the server on. (default 4001)',
   })
   subCommand = Option.String('-c, --command', {
@@ -88,10 +88,9 @@ export class DevCommand extends Command {
     })
     const { apiURL } = await codegen.execute()
 
-    await fs.outputFile(configManager.outputHTMLFilePath, devHTML)
-
     await database.indexContent({ tinaSchema, graphQLSchema })
 
+    await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     const server = await createDevServer(configManager, database, apiURL)
     await server.listen(Number(this.port))
 
@@ -122,7 +121,7 @@ export class DevCommand extends Command {
             },
             {
               key: 'API playground',
-              value: `http://localhost:${this.port}/altair`,
+              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}#/graphql`,
             },
             {
               key: 'CMS',
