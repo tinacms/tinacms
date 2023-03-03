@@ -10,12 +10,12 @@ const supportedFileTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'image/*',
 ]
-export const DEFAULT_UPLOAD_TYPES = supportedFileTypes.join(',')
+export const DEFAULT_MEDIA_UPLOAD_TYPES = supportedFileTypes.join(',')
 
 export const dropzoneAcceptFromString = (str: string) => {
   return Object.assign(
     {},
-    ...(str || DEFAULT_UPLOAD_TYPES).split(',').map((x) => ({ [x]: [] }))
+    ...(str || DEFAULT_MEDIA_UPLOAD_TYPES).split(',').map((x) => ({ [x]: [] }))
   )
 }
 
