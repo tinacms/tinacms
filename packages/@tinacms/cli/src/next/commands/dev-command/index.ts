@@ -17,6 +17,7 @@ import { createDBServer, createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import chalk from 'chalk'
 import { startSubprocess2 } from '../../../utils/start-subprocess'
+import { ViteDevServer } from 'vite'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
@@ -94,7 +95,7 @@ export class DevCommand extends Command {
     const server = await createDevServer(configManager, database, apiURL)
     await server.listen(Number(this.port))
 
-    this.watchContentFiles(configManager, database)
+    this.watchContentFiles(configManager, database, server)
 
     server.watcher.on('change', async (changedPath) => {
       if (changedPath.includes('__generated__')) {
@@ -199,7 +200,11 @@ export class DevCommand extends Command {
     return database
   }
 
-  watchContentFiles(configManager: ConfigManager, database: Database) {
+  watchContentFiles(
+    configManager: ConfigManager,
+    database: Database,
+    server: ViteDevServer
+  ) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
@@ -228,6 +233,8 @@ export class DevCommand extends Command {
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printRelativePath(changedFile)
+        // Optionally we can reload the page when this happens
+        // server.ws.send({ type: 'full-reload', path: '*' })
         logger.info(
           `Detected change at ${chalk.cyan(
             pathFromRoot
