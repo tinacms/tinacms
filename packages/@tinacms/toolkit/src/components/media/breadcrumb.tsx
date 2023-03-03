@@ -8,8 +8,9 @@ import React from 'react'
 import { LeftArrowIcon } from '../../packages/icons'
 
 // Fixed issue where dirname was being used in the frontend
-function dirname(path) {
-  return path.match(/.*\//)
+function dirname(path): string | undefined {
+  const pattern = new RegExp('(?<prevDir>.*)\/')
+  return path.match(pattern)?.groups?.prevDir
 }
 
 interface BreadcrumbProps {
@@ -30,7 +31,7 @@ const BreadcrumbButton = ({ className = '', ...props }) => (
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   directory = directory.replace(/^\/|\/$/g, '')
 
-  let prevDir = dirname(directory) || ''
+  let prevDir: string = dirname(directory) || ''
   if (prevDir === '.') {
     prevDir = ''
   }
