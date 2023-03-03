@@ -550,6 +550,7 @@ importers:
       progress: ^2.0.3
       prompts: ^2.4.1
       readable-stream: ^4.3.0
+      rollup-plugin-visualizer: ^5.9.0
       tailwindcss: ^3.2.7
       typescript: 4.3.5
       url-pattern: ^1.0.3
@@ -610,6 +611,7 @@ importers:
       progress: 2.0.3
       prompts: 2.4.2
       readable-stream: 4.3.0
+      rollup-plugin-visualizer: 5.9.0
       tailwindcss: 3.2.7
       url-pattern: 1.0.3
       vite: 4.1.4
@@ -16819,7 +16821,6 @@ packages:
         integrity: sha512-Ds09qNh8yw3khSjiJjiUInaGX9xlqZDY7JVryGxdxV7NPeuqQfplOpQ66yJFZut3jLa5zOwkXw1g9EI2uKh4Og==,
       }
     engines: { node: '>=8' }
-    dev: true
 
   /define-properties/1.1.4:
     resolution:
@@ -21751,7 +21752,6 @@ packages:
       }
     engines: { node: '>=8' }
     hasBin: true
-    dev: true
 
   /is-extendable/0.1.1:
     resolution:
@@ -22162,7 +22162,6 @@ packages:
     engines: { node: '>=8' }
     dependencies:
       is-docker: 2.2.1
-    dev: true
 
   /is/3.3.0:
     resolution:
@@ -27082,7 +27081,6 @@ packages:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
-    dev: true
 
   /optionator/0.8.3:
     resolution:
@@ -29895,6 +29893,25 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+
+  /rollup-plugin-visualizer/5.9.0:
+    resolution:
+      {
+        integrity: sha512-bbDOv47+Bw4C/cgs0czZqfm8L82xOZssk4ayZjG40y9zbXclNk7YikrZTDao6p7+HDiGxrN0b65SgZiVm9k1Cg==,
+      }
+    engines: { node: '>=14' }
+    hasBin: true
+    peerDependencies:
+      rollup: 2.x || 3.x
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      open: 8.4.2
+      picomatch: 2.3.1
+      source-map: 0.7.4
+      yargs: 17.5.1
+    dev: false
 
   /rollup/2.75.7:
     resolution:
