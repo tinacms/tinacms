@@ -33,7 +33,7 @@ export function ListMediaItem({
       }
       onClick={() => onClick(item)}
     >
-      <div className="w-20 h-20 border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
+      <div className="w-20 h-20 bg-gray-50 shadow border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
         {isImage(item.thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
@@ -41,7 +41,7 @@ export function ListMediaItem({
             alt={item.filename}
           />
         ) : (
-          <FileIcon className="w-[47%] h-full fill-gray-300" />
+          <FileIcon className="w-3/5 h-full fill-gray-300" />
         )}
       </div>
       <Filename>{item.filename}</Filename>
@@ -77,14 +77,14 @@ export function GridMediaItem({ item, active, onClick }) {
   const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   return (
     <li
-      className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 transition duration-150 ease-out ${
+      className={`relative pb-[100%] h-0 block shadow border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 transition duration-150 ease-out ${
         active
           ? 'shadow-outline'
           : 'shadow hover:shadow-md hover:scale-103 hover:border-gray-150'
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       <button
-        className="absolute w-full h-full flex items-center justify-center bg-white"
+        className="absolute w-full h-full flex items-center justify-center bg-gray-50"
         onClick={() => {
           if (!active) {
             onClick(item)

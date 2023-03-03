@@ -447,7 +447,7 @@ export function MediaPicker({
         <div className="flex h-full overflow-hidden">
           <ul
             {...rootProps}
-            className={`h-full overflow-y-auto transition duration-150 ease-out ${
+            className={`h-full bg-white overflow-y-auto transition duration-150 ease-out ${
               viewMode === 'list' &&
               'flex flex-1 flex-col divide-y divide-gray-100'
             } ${
