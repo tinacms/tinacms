@@ -94,7 +94,7 @@ export class DevCommand extends Command {
     const server = await createDevServer(configManager, database, apiURL)
     await server.listen(Number(this.port))
 
-    this.watchContentFiles(configManager)
+    this.watchContentFiles(configManager, database)
 
     server.watcher.on('change', async (changedPath) => {
       if (changedPath.includes('__generated__')) {
@@ -199,7 +199,7 @@ export class DevCommand extends Command {
     return database
   }
 
-  watchContentFiles(configManager: ConfigManager) {
+  watchContentFiles(configManager: ConfigManager, database: Database) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
@@ -208,13 +208,41 @@ export class DevCommand extends Command {
       )}/**/*.${collection.format || 'md'}`
       collectionContentFiles.push(collectionGlob)
     })
-    chokidar.watch(collectionContentFiles).on('change', async (changedFile) => {
-      // TODO: update this content, probably sharing code from audit
-      logger.info(
-        `Detected change at ${chalk.cyan(
-          configManager.printRelativePath(changedFile)
-        )}`
-      )
-    })
+    let ready = false
+    chokidar
+      .watch(collectionContentFiles)
+      .on('ready', () => {
+        ready = true
+      })
+      .on('add', async (addedFile) => {
+        if (!ready) {
+          return
+        }
+        const pathFromRoot = configManager.printRelativePath(addedFile)
+        logger.info(
+          `Detected new file at ${chalk.cyan(
+            pathFromRoot
+          )}. Adding to datalayer.`
+        )
+        database.indexContentByPaths([pathFromRoot])
+      })
+      .on('change', async (changedFile) => {
+        const pathFromRoot = configManager.printRelativePath(changedFile)
+        logger.info(
+          `Detected change at ${chalk.cyan(
+            pathFromRoot
+          )}. Updating in datalayer.`
+        )
+        database.indexContentByPaths([pathFromRoot])
+      })
+      .on('unlink', async (removedFile) => {
+        const pathFromRoot = configManager.printRelativePath(removedFile)
+        logger.info(
+          `Detected deletion at ${chalk.cyan(
+            pathFromRoot
+          )}. Deleting from datalayer.`
+        )
+        database.deleteContentByPaths([pathFromRoot])
+      })
   }
 }

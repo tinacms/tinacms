@@ -161,7 +161,7 @@ export const createDevServer = async (
                 database,
                 query,
                 variables,
-                verbose: true,
+                verbose: false,
               })
               res.end(JSON.stringify(result))
               return
