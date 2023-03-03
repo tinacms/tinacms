@@ -63,3 +63,4 @@ export type { TinaUIProps } from './components/TinaUI'
 
 export { useLocalStorage } from './hooks/use-local-storage'
 export { CursorPaginator } from './components/media/pagination'
+export { DEFAULT_MEDIA_UPLOAD_TYPES } from './components/media'

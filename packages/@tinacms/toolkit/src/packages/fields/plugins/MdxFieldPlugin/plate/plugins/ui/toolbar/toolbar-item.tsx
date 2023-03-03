@@ -18,6 +18,7 @@ import {
 import type { PlateEditor } from '@udecode/plate-headless'
 import type { MdxTemplate } from '../../../types'
 import { insertImg } from '../../create-img-plugin'
+import { useCMS } from '../../../../../../../react-core'
 
 export type ToolbarItemType = {
   label: string
@@ -43,6 +44,8 @@ export const ToolbarItem = ({
 }: ToolbarItemType) => {
   const editor = useEditorState()!
   const [selection, setSelection] = React.useState(null)
+
+  const cms = useCMS()
 
   React.useEffect(() => {
     if (editor.selection) {
@@ -103,7 +106,14 @@ export const ToolbarItem = ({
           }}
           onMouseDown={(e) => {
             e.preventDefault()
-            insertImg(editor)
+
+            cms.media.open({
+              allowDelete: true,
+              directory: '', //TODO: get actual directory?
+              onSelect: (media) => {
+                insertImg(editor, media)
+              },
+            })
           }}
         >
           <span className="sr-only">{label}</span>

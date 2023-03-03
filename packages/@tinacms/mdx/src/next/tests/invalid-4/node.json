@@ -1,0 +1,41 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "p",
+      "children": [
+        {
+          "type": "text",
+          "text": "The shortcode below allows children, but we didn't provide any"
+        }
+      ]
+    },
+    {
+      "type": "mdxJsxFlowElement",
+      "name": "someFeature",
+      "children": [
+        {
+          "type": "text",
+          "text": ""
+        }
+      ],
+      "props": {
+        "a": "b",
+        "children": {
+          "type": "root",
+          "children": [
+            {
+              "type": "p",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "And we didn't close it out, but it should still work"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

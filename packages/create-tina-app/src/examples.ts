@@ -46,6 +46,12 @@ export const EXAMPLES: Example[] = [
     isInternal: false,
     gitURL: 'https://github.com/tinacms/tina-remix-starter',
   },
+  {
+    title: 'Docusaurus Starter',
+    value: 'tinasaurus',
+    isInternal: false,
+    gitURL: 'https://github.com/tinacms/tinasaurus',
+  },
 ]
 
 export const downloadExample = async (example: Example, root: string) => {

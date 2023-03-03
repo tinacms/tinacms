@@ -1,0 +1,45 @@
+{
+  "type": "root",
+  "children": [
+    {
+      "type": "h1",
+      "children": [
+        {
+          "type": "text",
+          "text": "hello "
+        },
+        {
+          "type": "mdxJsxTextElement",
+          "name": "someFeature",
+          "children": [
+            {
+              "type": "text",
+              "text": ""
+            }
+          ],
+          "props": {
+            "_value": "abc",
+            "children": {
+              "type": "root",
+              "children": [
+                {
+                  "type": "p",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": " and some more text "
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "type": "text",
+          "text": "."
+        }
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import { Folder, File } from '../../packages/icons'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
 import { BiArrowToBottom } from 'react-icons/bi'
+import { isImage } from './utils'
 
 interface MediaItemProps {
   item: Media
@@ -33,7 +34,7 @@ export function ListMediaItem({
       onClick={() => onClick(item)}
     >
       <div className="w-20 h-20 border border-gray-100 rounded overflow-hidden flex justify-center flex-shrink-0">
-        {item.thumbnail ? (
+        {isImage(item.thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
             src={item.thumbnail}

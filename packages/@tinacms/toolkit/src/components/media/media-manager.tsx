@@ -35,6 +35,7 @@ import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
+import { DEFAULT_MEDIA_UPLOAD_TYPES, dropzoneAcceptFromString } from './utils'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -287,7 +288,9 @@ export function MediaPicker({
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: cms.media.accept || 'image/*',
+    accept: dropzoneAcceptFromString(
+      cms.media.accept || DEFAULT_MEDIA_UPLOAD_TYPES
+    ),
     multiple: true,
     onDrop: async (files) => {
       try {

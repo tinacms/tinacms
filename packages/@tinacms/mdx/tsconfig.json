@@ -10,10 +10,20 @@
     "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "module": "ESNext",
-    "lib": ["ESNext"],
+    "lib": [
+      "ESNext"
+    ],
     "target": "ESNext",
-    "types": ["vite/client"]
+    "types": [
+      "vite/client"
+    ],
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src", "vite-env.d.ts"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src",
+    "vite-env.d.ts"
+  ]
 }
