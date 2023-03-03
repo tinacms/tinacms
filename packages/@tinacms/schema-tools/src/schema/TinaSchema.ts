@@ -83,7 +83,13 @@ export class TinaSchema {
     )
   }
   public getCollectionByFullPath = (filepath: string) => {
+    const fileExtension = filepath.split('.').pop()
+
     const possibleCollections = this.getCollections().filter((collection) => {
+      // filter out file extensions that don't match the collection format
+      if (fileExtension !== (collection.format || 'md')) {
+        return false
+      }
       return filepath
         .replace(/\\/g, '/')
         .startsWith(collection.path.replace(/\/?$/, '/'))
