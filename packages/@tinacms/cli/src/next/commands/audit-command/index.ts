@@ -1,22 +1,15 @@
 import { Command, Option } from 'clipanion'
-import fs from 'fs-extra'
-import path from 'path'
-import chokidar from 'chokidar'
 import {
   createDatabase,
   FilesystemBridge,
   buildSchema,
-  getASTSchema,
   Database,
   TinaLevelClient,
 } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
-import { logger, summary } from '../../../logger'
+import { logger } from '../../../logger'
 import { createDBServer } from './server'
 import { audit } from './audit'
-import { Codegen } from '../../codegen'
-import chalk from 'chalk'
-import { startSubprocess2 } from '../../../cmds/startSubprocess'
 
 export class AuditCommand extends Command {
   static paths = [['audit']]
@@ -75,21 +68,7 @@ export class AuditCommand extends Command {
       useDefaultValues: this.useDefaultValues,
       verbose: this.verbose,
     })
-    // summary({
-    //   heading: 'Tina Dev Server is running...',
-    //   items: [
-    //     {
-    //       emoji: '🦙',
-    //       heading: 'Tina Config',
-    //       subItems: [
-    //         {
-    //           key: 'API url',
-    //           value: 'Good',
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // })
+
     process.exit()
   }
 

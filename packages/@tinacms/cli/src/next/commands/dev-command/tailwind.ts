@@ -11,6 +11,7 @@ import path from 'path'
 export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
   return {
     name: 'vite-plugin-tina',
+    // @ts-ignore
     config: (viteConfig) => {
       const plugins: Plugin[] = []
       const content = [
@@ -240,6 +241,7 @@ export const tinaTailwind = (spaPath: string, configFilePath): Plugin => {
         ],
       }) as unknown as Plugin
       plugins.push(tailwindNesting)
+      // @ts-ignore
       plugins.push(postcssNested)
       plugins.push(tw)
 
