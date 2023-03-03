@@ -43,6 +43,7 @@ export const createConfig = async (
       alias: {
         TINA_IMPORT: configManager.tinaConfigFilePath,
         SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
+        CLIENT_IMPORT: configManager.generatedTypesTSFilePath,
       },
       dedupe: ['graphql', 'tinacms', '@tinacms/toolkit', 'react', 'react-dom'],
     },
