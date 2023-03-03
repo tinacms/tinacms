@@ -324,7 +324,7 @@ export class Database {
 
         // If a collection match is specified, make sure the file matches the glob.
         // TODO: Maybe we should service this error better in the frontend?
-        if (collection.match) {
+        if (collection.match?.exclude || collection.match?.include) {
           const matches = this.tinaSchema.getMatches({ collection })
 
           const match = micromatch.isMatch(filepath, matches)
