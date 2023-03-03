@@ -1,7 +1,7 @@
 import { createGraphiQLFetcher } from '@graphiql/toolkit'
 import { GraphiQL } from 'graphiql'
 
-import 'graphiql/graphiql.css'
+import 'graphiql/graphiql.min.css'
 
 const fetcher = createGraphiQLFetcher({
   url: __API_URL__,
