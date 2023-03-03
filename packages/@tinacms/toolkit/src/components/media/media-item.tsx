@@ -93,7 +93,7 @@ export function GridMediaItem({ item, active, onClick }) {
           }
         }}
       >
-        {item.thumbnail ? (
+        {isImage(item.thumbnail) ? (
           <img
             className="object-cover w-full h-full object-center"
             src={item.thumbnail}
