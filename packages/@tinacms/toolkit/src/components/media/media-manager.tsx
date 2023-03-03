@@ -7,7 +7,12 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useCMS } from '../../react-tinacms/use-cms'
-import { BiCloudUpload } from 'react-icons/bi'
+import {
+  BiArrowToBottom,
+  BiCloudUpload,
+  BiGridAlt,
+  BiListUl,
+} from 'react-icons/bi'
 import {
   Modal,
   ModalHeader,
@@ -16,6 +21,7 @@ import {
   PopupModal,
   ModalActions,
 } from '../../packages/react-modals'
+import { BiFolder, BiFile } from 'react-icons/bi'
 import {
   MediaList,
   Media,
@@ -25,11 +31,16 @@ import {
 import { Button } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
 import { CursorPaginator } from './pagination'
-import { MediaItem } from './media-item'
+import { ListMediaItem, GridMediaItem } from './media-item'
 import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
-import { DEFAULT_MEDIA_UPLOAD_TYPES, dropzoneAcceptFromString } from './utils'
+import { CloseIcon, TrashIcon } from '../../packages/icons'
+import {
+  DEFAULT_MEDIA_UPLOAD_TYPES,
+  dropzoneAcceptFromString,
+  isImage,
+} from './utils'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -115,7 +126,17 @@ export function MediaManager() {
   return (
     <Modal>
       <FullscreenModal>
-        <ModalHeader close={close}>Media Manager</ModalHeader>
+        <div className="w-full bg-gray-50 flex items-center justify-between px-5 pt-3 m-0">
+          <h2 className="text-gray-500 font-sans font-medium text-base leading-none m-0 block truncate">
+            Media Manager
+          </h2>
+          <div
+            onClick={close}
+            className="flex items-center fill-gray-400 cursor-pointer transition-colors duration-100 ease-out hover:fill-gray-700"
+          >
+            <CloseIcon className="w-6 h-auto" />
+          </div>
+        </div>
         <ModalBody className="flex h-full flex-col">
           <MediaPicker {...request} close={close} />
         </ModalBody>
@@ -155,6 +176,9 @@ export function MediaPicker({
   })
 
   const [showSync, setShowSync] = useState(false)
+
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [activeItem, setActiveItem] = useState<Media | false>(false)
 
   /**
    * current offset is last element in offsetHistory[]
@@ -210,6 +234,7 @@ export function MediaPicker({
         setListState('error')
       })
   }
+
   useEffect(() => {
     if (!cms.media.isConfigured) return
     loadMedia()
@@ -229,6 +254,22 @@ export function MediaPicker({
           : join(item.directory, item.filename)
       )
       resetOffset()
+    }
+  }
+
+  const onClickGridMediaItem = (item: Media) => {
+    if (!item) {
+      setActiveItem(false)
+    } else if (item.type === 'dir') {
+      // Only join when there is a directory to join to
+      setDirectory(
+        item.directory === '.' || item.directory === ''
+          ? item.filename
+          : join(item.directory, item.filename)
+      )
+      resetOffset()
+    } else {
+      setActiveItem(item)
     }
   }
 
@@ -356,7 +397,37 @@ export function MediaPicker({
   return (
     <>
       <MediaPickerWrap>
-        <div className="flex items-center bg-white border-b border-gray-100 gap-x-3 py-3 px-5 shadow-sm flex-shrink-0">
+        <div className="flex items-center bg-gray-50 border-b border-gray-150 gap-x-4 py-3 px-5 shadow-sm flex-shrink-0">
+          {/* viewMode toggle */}
+          <div
+            className={`grow-0 flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 justify-between rounded-md`}
+          >
+            <button
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-l-md ${
+                viewMode === 'grid'
+                  ? 'bg-white text-blue-500 shadow'
+                  : 'text-gray-400'
+              }`}
+              onClick={() => {
+                setViewMode('grid')
+              }}
+            >
+              <BiGridAlt className="w-6 h-full opacity-70" />
+            </button>
+            <button
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-r-md ${
+                viewMode === 'list'
+                  ? 'bg-white text-blue-500 shadow'
+                  : 'text-gray-400'
+              }`}
+              onClick={() => {
+                setViewMode('list')
+              }}
+            >
+              <BiListUl className="w-8 h-full opacity-70" />
+            </button>
+          </div>
+
           <Breadcrumb directory={directory} setDirectory={setDirectory} />
           {!isLocal && hasTinaMedia && (
             <Button
@@ -372,29 +443,56 @@ export function MediaPicker({
           )}
           <UploadButton onClick={onClick} uploading={uploading} />
         </div>
-        <ul
-          {...rootProps}
-          className={`flex flex-1 flex-col gap-4 p-5 m-0 h-full overflow-y-auto ${
-            isDragActive ? `border-2 border-blue-500 rounded-lg` : ``
-          }`}
-        >
-          <input {...getInputProps()} />
 
-          {listState === 'loaded' && list.items.length === 0 && (
-            <EmptyMediaList hasTinaMedia={hasTinaMedia} />
-          )}
+        <div className="flex h-full overflow-hidden">
+          <ul
+            {...rootProps}
+            className={`h-full bg-white overflow-y-auto transition duration-150 ease-out ${
+              viewMode === 'list' &&
+              'flex flex-1 flex-col divide-y divide-gray-100'
+            } ${
+              viewMode === 'grid' &&
+              'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
+            } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+          >
+            <input {...getInputProps()} />
 
-          {list.items.map((item: Media) => (
-            <MediaItem
-              key={item.id}
-              item={item}
-              onClick={onClickMediaItem}
-              onSelect={selectMediaItem}
-              onDelete={deleteMediaItem}
+            {listState === 'loaded' && list.items.length === 0 && (
+              <EmptyMediaList hasTinaMedia={hasTinaMedia} />
+            )}
+
+            {viewMode === 'list' &&
+              list.items.map((item: Media) => (
+                <ListMediaItem
+                  key={item.id}
+                  item={item}
+                  onClick={onClickMediaItem}
+                  onSelect={selectMediaItem}
+                  onDelete={deleteMediaItem}
+                />
+              ))}
+
+            {viewMode === 'grid' &&
+              list.items.map((item: Media) => (
+                <GridMediaItem
+                  key={item.id}
+                  item={item}
+                  onClick={onClickGridMediaItem}
+                  active={activeItem && activeItem.id === item.id}
+                />
+              ))}
+          </ul>
+
+          {viewMode === 'grid' && activeItem && (
+            <ActiveItemPreview
+              activeItem={activeItem}
+              selectMediaItem={selectMediaItem}
+              deleteMediaItem={deleteMediaItem}
             />
-          ))}
-        </ul>
-        <div className="bg-white border-t border-gray-100 py-3 px-5 shadow-sm z-10">
+          )}
+        </div>
+
+        <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
           <CursorPaginator
             hasNext={hasNext}
             navigateNext={navigateNext}
@@ -414,6 +512,55 @@ export function MediaPicker({
         />
       )}
     </>
+  )
+}
+
+const ActiveItemPreview = ({
+  activeItem,
+  selectMediaItem,
+  deleteMediaItem,
+}) => {
+  return (
+    <div className="p-4 shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
+      {isImage(activeItem.thumbnail) ? (
+        <img
+          className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
+          src={activeItem.thumbnail}
+          alt={activeItem.filename}
+        />
+      ) : (
+        <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
+          <BiFile className="w-14 h-auto fill-gray-300" />
+        </span>
+      )}
+      <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
+        {activeItem.filename}
+      </h3>
+      <div className="grow w-full flex flex-col justify-end items-start">
+        <div className="flex w-full gap-3">
+          {selectMediaItem && (
+            <Button
+              size="medium"
+              variant="primary"
+              className="grow"
+              onClick={() => selectMediaItem(activeItem)}
+            >
+              Insert
+              <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+            </Button>
+          )}
+          <Button
+            variant="white"
+            size="medium"
+            className="grow max-w-[40%]"
+            onClick={() => deleteMediaItem(activeItem)}
+          >
+            Delete
+            <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
 
