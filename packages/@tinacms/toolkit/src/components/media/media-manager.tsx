@@ -228,6 +228,7 @@ export function MediaPicker({
         setListState('error')
       })
   }
+
   useEffect(() => {
     if (!cms.media.isConfigured) return
     loadMedia()
@@ -475,40 +476,11 @@ export function MediaPicker({
           </ul>
 
           {viewMode === 'grid' && activeItem && (
-            <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
-              <img
-                className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-                src={activeItem.thumbnail}
-                alt={activeItem.filename}
-              />
-              <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
-                {activeItem.filename}
-              </h3>
-              <div className="grow flex flex-col justify-end items-start">
-                <div className="flex w-full gap-3">
-                  {selectMediaItem && (
-                    <Button
-                      size="medium"
-                      variant="primary"
-                      className="grow"
-                      onClick={() => selectMediaItem(activeItem)}
-                    >
-                      Insert
-                      <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="white"
-                    size="medium"
-                    className="grow max-w-[40%]"
-                    onClick={() => deleteMediaItem(activeItem)}
-                  >
-                    Delete
-                    <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ActiveItemPreview
+              activeItem={activeItem}
+              selectMediaItem={selectMediaItem}
+              deleteMediaItem={deleteMediaItem}
+            />
           )}
         </div>
 
@@ -532,6 +504,49 @@ export function MediaPicker({
         />
       )}
     </>
+  )
+}
+
+const ActiveItemPreview = ({
+  activeItem,
+  selectMediaItem,
+  deleteMediaItem,
+}) => {
+  return (
+    <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
+      <img
+        className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
+        src={activeItem.thumbnail}
+        alt={activeItem.filename}
+      />
+      <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
+        {activeItem.filename}
+      </h3>
+      <div className="grow flex flex-col justify-end items-start">
+        <div className="flex w-full gap-3">
+          {selectMediaItem && (
+            <Button
+              size="medium"
+              variant="primary"
+              className="grow"
+              onClick={() => selectMediaItem(activeItem)}
+            >
+              Insert
+              <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+            </Button>
+          )}
+          <Button
+            variant="white"
+            size="medium"
+            className="grow max-w-[40%]"
+            onClick={() => deleteMediaItem(activeItem)}
+          >
+            Delete
+            <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+          </Button>
+        </div>
+      </div>
+    </div>
   )
 }
 
