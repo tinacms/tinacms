@@ -36,8 +36,6 @@ export class Codegen {
   }
 
   async execute() {
-    const { apiURL, clientString } = await this.genClient()
-
     await fs.outputFile(
       this.configManager.generatedQueriesFilePath,
       this.queryDoc
@@ -48,17 +46,42 @@ export class Codegen {
     )
     await maybeWarnFragmentSize(this.configManager.generatedFragmentsFilePath)
 
+    const { apiURL, clientString } = await this.genClient()
     const { codeString, schemaString } = await this.genTypes()
 
     await fs.outputFile(
       this.configManager.generatedGraphQLGQLPath,
       schemaString
     )
-    await fs.outputFile(this.configManager.generatedTypesTSFilePath, codeString)
-    await fs.outputFile(
-      this.configManager.generatedClientFilePath,
-      clientString
-    )
+    if (this.configManager.isUsingTs()) {
+      await fs.outputFile(
+        this.configManager.generatedTypesTSFilePath,
+        codeString
+      )
+      await fs.outputFile(
+        this.configManager.generatedClientTSFilePath,
+        clientString
+      )
+      await unlinkIfExists(this.configManager.generatedClientJSFilePath)
+      await unlinkIfExists(this.configManager.generatedTypesDFilePath)
+      await unlinkIfExists(this.configManager.generatedTypesJSFilePath)
+    } else {
+      await fs.outputFile(
+        this.configManager.generatedTypesDFilePath,
+        codeString
+      )
+      const jsCode = await transform(codeString, { loader: 'ts' })
+      await fs.outputFile(
+        this.configManager.generatedTypesJSFilePath,
+        jsCode.code
+      )
+      await fs.outputFile(
+        this.configManager.generatedClientJSFilePath,
+        clientString
+      )
+      await unlinkIfExists(this.configManager.generatedTypesTSFilePath)
+      await unlinkIfExists(this.configManager.generatedClientTSFilePath)
+    }
 
     return { apiURL }
   }
@@ -154,5 +177,11 @@ const maybeWarnFragmentSize = async (filepath: string) => {
         // ...
     })`
     )
+  }
+}
+
+const unlinkIfExists = async (filepath: string) => {
+  if (await fs.existsSync(filepath)) {
+    await fs.unlinkSync(filepath)
   }
 }

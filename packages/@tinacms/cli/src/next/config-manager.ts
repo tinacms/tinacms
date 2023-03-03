@@ -29,7 +29,8 @@ export class ConfigManager {
   generatedTypesTSFilePath: string
   generatedTypesJSFilePath: string
   generatedTypesDFilePath: string
-  generatedClientFilePath: string
+  generatedClientTSFilePath: string
+  generatedClientJSFilePath: string
   generatedQueriesFilePath: string
   generatedFragmentsFilePath: string
   generatedQueriesAndFragmentsGlob: string
@@ -44,6 +45,10 @@ export class ConfigManager {
 
   constructor(rootPath: string = process.cwd()) {
     this.rootPath = rootPath.endsWith('/') ? rootPath.slice(0, -1) : rootPath
+  }
+
+  isUsingTs() {
+    return ['.ts', '.tsx'].includes(path.extname(this.tinaConfigFilePath))
   }
 
   hasSelfHostedConfig() {
@@ -115,9 +120,13 @@ export class ConfigManager {
       '*.{graphql,gql}'
     )
     // TODO: make these match the behavior where this matches the config format
-    this.generatedClientFilePath = path.join(
+    this.generatedClientTSFilePath = path.join(
       this.generatedFolderPath,
       'client.ts'
+    )
+    this.generatedClientJSFilePath = path.join(
+      this.generatedFolderPath,
+      'client.js'
     )
     this.publicFolderPath = path.join(
       this.rootPath,
@@ -154,7 +163,10 @@ export class ConfigManager {
   }
 
   printGeneratedClientFilePath() {
-    return this.generatedClientFilePath.replace(`${this.rootPath}/`, '')
+    if (this.isUsingTs()) {
+      return this.generatedClientTSFilePath.replace(`${this.rootPath}/`, '')
+    }
+    return this.generatedClientJSFilePath.replace(`${this.rootPath}/`, '')
   }
 
   printGeneratedTypesFilePath() {
