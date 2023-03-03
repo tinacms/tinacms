@@ -395,19 +395,7 @@ export function MediaPicker({
             className={`grow-0 flex divide-x divide-gray-150 shadow-inner bg-gray-50 border border-gray-150 justify-between rounded-md`}
           >
             <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-l-md ${
-                viewMode === 'list'
-                  ? 'bg-white text-blue-500 shadow'
-                  : 'text-gray-400'
-              }`}
-              onClick={() => {
-                setViewMode('list')
-              }}
-            >
-              <BiListUl className="w-8 h-full opacity-70" />
-            </button>
-            <button
-              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-r-md ${
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2.5 py-1 transition-all ease-out duration-150 rounded-l-md ${
                 viewMode === 'grid'
                   ? 'bg-white text-blue-500 shadow'
                   : 'text-gray-400'
@@ -417,6 +405,18 @@ export function MediaPicker({
               }}
             >
               <BiGridAlt className="w-6 h-full opacity-70" />
+            </button>
+            <button
+              className={`relative whitespace-nowrap flex items-center justify-center flex-1 block font-medium text-base px-2 py-1 transition-all ease-out duration-150 rounded-r-md ${
+                viewMode === 'list'
+                  ? 'bg-white text-blue-500 shadow'
+                  : 'text-gray-400'
+              }`}
+              onClick={() => {
+                setViewMode('list')
+              }}
+            >
+              <BiListUl className="w-8 h-full opacity-70" />
             </button>
           </div>
 
