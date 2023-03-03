@@ -21,6 +21,7 @@ import {
   PopupModal,
   ModalActions,
 } from '../../packages/react-modals'
+import { BiFolder, BiFile } from 'react-icons/bi'
 import {
   MediaList,
   Media,
@@ -35,7 +36,11 @@ import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
-import { DEFAULT_MEDIA_UPLOAD_TYPES, dropzoneAcceptFromString } from './utils'
+import {
+  DEFAULT_MEDIA_UPLOAD_TYPES,
+  dropzoneAcceptFromString,
+  isImage,
+} from './utils'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -516,16 +521,22 @@ const ActiveItemPreview = ({
   deleteMediaItem,
 }) => {
   return (
-    <div className="p-4 shrink-0 h-full flex flex-col gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
-      <img
-        className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-        src={activeItem.thumbnail}
-        alt={activeItem.filename}
-      />
+    <div className="p-4 shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
+      {isImage(activeItem.thumbnail) ? (
+        <img
+          className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
+          src={activeItem.thumbnail}
+          alt={activeItem.filename}
+        />
+      ) : (
+        <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
+          <BiFile className="w-14 h-auto fill-gray-300" />
+        </span>
+      )}
       <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
         {activeItem.filename}
       </h3>
-      <div className="grow flex flex-col justify-end items-start">
+      <div className="grow w-full flex flex-col justify-end items-start">
         <div className="flex w-full gap-3">
           {selectMediaItem && (
             <Button

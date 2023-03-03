@@ -5,7 +5,7 @@
 */
 import React from 'react'
 import { Media } from '../../packages/core'
-import { Folder, File } from '../../packages/icons'
+import { BiFolder, BiFile } from 'react-icons/bi'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
 import { BiArrowToBottom } from 'react-icons/bi'
@@ -24,7 +24,7 @@ export function ListMediaItem({
   onSelect,
   onDelete,
 }: MediaItemProps) {
-  const FileIcon = item.type === 'dir' ? Folder : File
+  const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   return (
     <li
       className={
@@ -74,7 +74,7 @@ const Filename = ({ className = '', ...props }) => (
 )
 
 export function GridMediaItem({ item, active, onClick }) {
-  const FileIcon = item.type === 'dir' ? Folder : File
+  const FileIcon = item.type === 'dir' ? BiFolder : BiFile
   return (
     <li
       className={`relative pb-[100%] h-0 block border border-gray-100 rounded-md overflow-hidden flex justify-center shrink-0 transition duration-150 ease-out ${
@@ -84,7 +84,7 @@ export function GridMediaItem({ item, active, onClick }) {
       } ${item.type === 'dir' ? 'cursor-pointer' : ''}`}
     >
       <button
-        className="absolute w-full h-full"
+        className="absolute w-full h-full flex items-center justify-center bg-white"
         onClick={() => {
           if (!active) {
             onClick(item)
@@ -100,7 +100,12 @@ export function GridMediaItem({ item, active, onClick }) {
             alt={item.filename}
           />
         ) : (
-          <FileIcon className="w-[47%] h-full fill-gray-300" />
+          <div className="p-4 w-full flex flex-col gap-4 items-center justify-center">
+            <FileIcon className="w-[30%] h-auto fill-gray-300" />
+            <span className="block text-base text-gray-600 w-full break-words truncate">
+              {item.filename}
+            </span>
+          </div>
         )}
       </button>
     </li>
