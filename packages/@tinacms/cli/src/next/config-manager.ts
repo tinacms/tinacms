@@ -18,6 +18,7 @@ export class ConfigManager {
   config: Config
   rootPath: string
   tinaFolderPath: string
+  isUsingLegacyFolder: boolean
   tinaConfigFilePath: string
   tinaSpaPackagePath: string
   envFilePath: string
@@ -67,6 +68,11 @@ export class ConfigManager {
     this.tinaConfigFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'config')
     )
+    if (!this.tinaConfigFilePath) {
+      throw new Error(
+        `Unable to find confg file in ${this.tinaFolderPath}. Looking for a file named "config.{ts,tsx,js,jsx}"`
+      )
+    }
     this.selfHostedDatabaseFilePath = await this.getPathWithExtension(
       path.join(this.tinaFolderPath, 'database')
     )
@@ -150,11 +156,13 @@ export class ConfigManager {
     const tinaFolderPath = path.join(rootPath, TINA_FOLDER)
     const tinaFolderExists = await fs.pathExists(tinaFolderPath)
     if (tinaFolderExists) {
+      this.isUsingLegacyFolder = false
       return tinaFolderPath
     }
     const legacyFolderPath = path.join(rootPath, LEGACY_TINA_FOLDER)
     const legacyFolderExists = await fs.pathExists(legacyFolderPath)
     if (legacyFolderExists) {
+      this.isUsingLegacyFolder = true
       return legacyFolderPath
     }
     throw new Error(

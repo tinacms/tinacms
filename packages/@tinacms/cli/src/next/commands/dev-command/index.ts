@@ -62,33 +62,55 @@ export class DevCommand extends Command {
     const configManager = new ConfigManager(this.rootPath)
     logger.info('Starting Tina Dev Server')
 
-    try {
-      await configManager.processConfig()
-    } catch (e) {
-      logger.error(e.message)
-      logger.error(
-        'Unable to start dev server, please fix your Tina config and try again'
-      )
-      process.exit(1)
+    // Initialize the host TCP server
+    createDBServer()
+
+    const setup = async () => {
+      try {
+        await configManager.processConfig()
+      } catch (e) {
+        logger.error(e.message)
+        logger.error(
+          'Unable to start dev server, please fix your Tina config and try again'
+        )
+        process.exit(1)
+      }
+
+      const database = await this.createAndInitializeDatabase(configManager)
+      const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
+        await buildSchema(database, configManager.config)
+      if (!configManager.isUsingLegacyFolder) {
+        delete require.cache[configManager.generatedSchemaJSONPath]
+        delete require.cache[configManager.generatedLookupJSONPath]
+        delete require.cache[configManager.generatedGraphQLJSONPath]
+
+        const schemaObject = require(configManager.generatedSchemaJSONPath)
+        const lookupObject = require(configManager.generatedLookupJSONPath)
+        const graphqlSchemaObject = require(configManager.generatedGraphQLJSONPath)
+        await fs.writeFileSync(
+          path.join(configManager.tinaFolderPath, 'tina-lock.json'),
+          JSON.stringify({
+            schema: schemaObject,
+            lookup: lookupObject,
+            graphql: graphqlSchemaObject,
+          })
+        )
+      }
+
+      const codegen = new Codegen({
+        schema: await getASTSchema(database),
+        configManager: configManager,
+        noSDK: this.noSDK,
+        port: Number(this.port),
+        queryDoc,
+        fragDoc,
+      })
+      const { apiURL } = await codegen.execute()
+
+      await database.indexContent({ tinaSchema, graphQLSchema })
+      return { apiURL, database }
     }
-
-    const database = await this.createAndInitializeDatabase(configManager)
-    const { tinaSchema, graphQLSchema, queryDoc, fragDoc } = await buildSchema(
-      database,
-      configManager.config
-    )
-
-    const codegen = new Codegen({
-      schema: await getASTSchema(database),
-      configManager: configManager,
-      noSDK: this.noSDK,
-      port: Number(this.port),
-      queryDoc,
-      fragDoc,
-    })
-    const { apiURL } = await codegen.execute()
-
-    await database.indexContent({ tinaSchema, graphQLSchema })
+    const { apiURL, database } = await setup()
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
     const server = await createDevServer(configManager, database, apiURL)
@@ -101,7 +123,7 @@ export class DevCommand extends Command {
         return
       }
       try {
-        // await setup()
+        await setup()
         logger.info('Tina config updated')
       } catch (e) {
         logger.error(e.message)
@@ -190,11 +212,11 @@ export class DevCommand extends Command {
       database = createDatabase({
         bridge,
         level,
+        tinaDirectory: configManager.printRelativePath(
+          configManager.tinaFolderPath
+        ),
       })
     }
-
-    // Initialize the host TCP server
-    createDBServer()
 
     return database
   }

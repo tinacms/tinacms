@@ -37,7 +37,7 @@ export const createConfig = async (
   })
   const config: InlineConfig = {
     root: configManager.spaRootPath,
-    base: `/public/`,
+    base: `/${configManager.outputFolderPath}/`, // FIXME: normalize this?
     appType: 'spa',
     resolve: {
       alias: {
