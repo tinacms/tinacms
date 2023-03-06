@@ -11,7 +11,9 @@ import {
   setNodes,
 } from '@udecode/plate-headless'
 import { ReactEditor } from 'slate-react'
-import { insertBlockElement } from '../core/common'
+import { insertBlockElement, insertInlineElement } from '../core/common'
+import { Media } from '../../../../../../core/media'
+import { isImage } from '../../../../../../../components/media/utils'
 
 export const ELEMENT_IMG = 'img'
 
@@ -29,14 +31,23 @@ export const createImgPlugin = createPluginFactory({
   },
 })
 
-export const insertImg = (editor: PlateEditor) => {
-  insertBlockElement(editor, {
-    type: ELEMENT_IMG,
-    children: [{ text: '' }],
-    url: '',
-    caption: '',
-    alt: '',
-  })
+export const insertImg = (editor: PlateEditor, media: Media) => {
+  if (isImage(media.src)) {
+    insertBlockElement(editor, {
+      type: ELEMENT_IMG,
+      children: [{ text: '' }],
+      url: media.src,
+      caption: '',
+      alt: '',
+    })
+  } else {
+    insertInlineElement(editor, {
+      type: 'a',
+      url: media.src,
+      title: media.filename,
+      children: [{ text: media.filename }],
+    })
+  }
 
   // FIXME: not sure why this was needed
   normalizeEditor(editor, { force: true })

@@ -1168,7 +1168,7 @@ importers:
       react-color: ^2.17.3
       react-datetime: ^2.16.3
       react-dom: 17.0.2
-      react-dropzone: 12.1.0
+      react-dropzone: 14.2.3
       react-final-form: ^6.3.0
       react-icons: ^4.3.1
       react-is: ^17.0.2
@@ -1209,7 +1209,7 @@ importers:
       react-beautiful-dnd: 13.1.0_sfoxds7t5ydpegc3knd667wn6m
       react-color: 2.19.3_react@17.0.2
       react-datetime: 2.16.3_tonpzznxmdkdqlpcs7osdmovtq
-      react-dropzone: 12.1.0_react@17.0.2
+      react-dropzone: 14.2.3_react@17.0.2
       react-final-form: 6.5.9_s44h3cxpdxv6cks4bnqewerqda
       react-icons: 4.4.0_react@17.0.2
       react-onclickoutside: 6.12.2_sfoxds7t5ydpegc3knd667wn6m
@@ -19371,12 +19371,12 @@ packages:
       flat-cache: 3.0.4
     dev: true
 
-  /file-selector/0.5.0:
+  /file-selector/0.6.0:
     resolution:
       {
-        integrity: sha512-s8KNnmIDTBoD0p9uJ9uD0XY38SCeBOtj0UMXyQSLg1Ypfrfj8+dAvwsLjYQkQ2GjhVtp2HrnF5cJzMhBjfD8HA==,
+        integrity: sha512-QlZ5yJC0VxHxQQsQhXvBaC7VRJ2uaxTf+Tfpu4Z/OcVQJVpZO+DGU0rkoVW5ce2SccxugvpBJoMvUs59iILYdw==,
       }
-    engines: { node: '>= 10' }
+    engines: { node: '>= 12' }
     dependencies:
       tslib: 2.5.0
     dev: false
@@ -28235,17 +28235,17 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
-  /react-dropzone/12.1.0_react@17.0.2:
+  /react-dropzone/14.2.3_react@17.0.2:
     resolution:
       {
-        integrity: sha512-iBYHA1rbopIvtzokEX4QubO6qk5IF/x3BtKGu74rF2JkQDXnwC4uO/lHKpaw4PJIV6iIAYOlwLv2FpiGyqHNog==,
+        integrity: sha512-O3om8I+PkFKbxCukfIR3QAGftYXDZfOE2N1mr/7qebQJHs7U+/RSL/9xomJNpRg9kM5h9soQSdf0Gc7OHF5Fug==,
       }
     engines: { node: '>= 10.13' }
     peerDependencies:
-      react: '>= 16.8'
+      react: '>= 16.8 || 18.0.0'
     dependencies:
       attr-accept: 2.2.2
-      file-selector: 0.5.0
+      file-selector: 0.6.0
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
