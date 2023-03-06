@@ -215,7 +215,7 @@ export class BuildCommand extends Command {
       })
       let errorMessage = `The local GraphQL schema doesn't match the remote GraphQL schema. Please push up your changes to Github to update your remote GraphQL schema.`
       if (config?.branch) {
-        errorMessage += `\n\nAddition info: Branch: ${config.branch}, Client ID: ${config.clientId} `
+        errorMessage += `\n\nAdditional info: Branch: ${config.branch}, Client ID: ${config.clientId} `
       }
       throw new Error(errorMessage)
     }
