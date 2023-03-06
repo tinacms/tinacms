@@ -21,7 +21,7 @@ export function CursorPaginator({
   navigatePrev,
   hasNext,
   hasPrev,
-  variant = 'secondary',
+  variant = 'white',
 }: MediaPaginatorProps) {
   return (
     <div className="w-full flex flex-shrink-0 justify-end gap-2 items-center">
