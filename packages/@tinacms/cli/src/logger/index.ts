@@ -141,7 +141,11 @@ export const summary = (content: {
     outString.push(``)
   })
 
-  note(outString.join('\n'), content.heading)
+  if (process.env.CI) {
+    logger.info(JSON.stringify(content, null, 2))
+  } else {
+    note(outString.join('\n'), content.heading)
+  }
 }
 
 const unicode = isUnicodeSupported()

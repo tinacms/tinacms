@@ -84,7 +84,7 @@ export const createDevServer = async (
             res.end(
               JSON.stringify({
                 status:
-                  'The GraphQL playground has moved to <your-dev-url>/index.html/graphql',
+                  'The GraphQL playground has moved to <your-dev-url>/index.html#/graphql',
               })
             )
             return
