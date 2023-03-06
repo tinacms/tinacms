@@ -230,7 +230,12 @@ const BranchSelector = ({
     (branch) => branch.name === currentBranch
   )
   filteredBranchList.splice(currentIndex, 1)
-  filteredBranchList.unshift(currentBranchItem)
+  filteredBranchList.unshift(
+    currentBranchItem || {
+      name: currentBranch,
+      indexStatus: { status: 'failed' },
+    }
+  )
 
   return (
     <div className="flex flex-col gap-3">
