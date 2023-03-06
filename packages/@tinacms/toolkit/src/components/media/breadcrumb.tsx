@@ -8,11 +8,6 @@ import React from 'react'
 import { LeftArrowIcon } from '../../packages/icons'
 import { IconButton } from '../../packages/styles'
 
-// Fixed issue where dirname was being used in the frontend
-function dirname(path) {
-  return path.match(/.*\//)
-}
-
 interface BreadcrumbProps {
   directory?: string
   setDirectory: (_directory: string) => void
@@ -29,21 +24,21 @@ const BreadcrumbButton = ({ className = '', ...props }) => (
 )
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
-  directory = directory.replace(/^\/|\/$/g, '')
+  const displayDirectory = directory.replace(/^\/|\/$/g, '')
 
-  let prevDir = dirname(directory) || ''
-  if (prevDir === '.') {
-    prevDir = ''
+  const goBack = () => {
+    const folders = directory.split('/')
+    let prevDir = ''
+    if (folders.length > 1) {
+      prevDir = folders.slice(0, folders.length - 1).join('/')
+    }
+    setDirectory(prevDir)
   }
 
   return (
     <div className="w-full flex items-center text-[16px] text-gray-300">
       {directory !== '' && (
-        <IconButton
-          variant="ghost"
-          className="mr-2"
-          onClick={() => setDirectory(prevDir)}
-        >
+        <IconButton variant="ghost" className="mr-2" onClick={goBack}>
           <LeftArrowIcon
             className={`w-7 h-auto fill-gray-300 hover:fill-gray-900 transition duration-150 ease-out`}
           />
@@ -59,8 +54,8 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       >
         Media
       </BreadcrumbButton>
-      {directory &&
-        directory.split('/').map((part, index, parts) => {
+      {displayDirectory &&
+        displayDirectory.split('/').map((part, index, parts) => {
           const currentDir = parts.slice(0, index + 1).join('/')
           return (
             <BreadcrumbButton
