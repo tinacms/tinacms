@@ -59,6 +59,10 @@ export class ConfigManager {
     return !!this.selfHostedDatabaseFilePath
   }
 
+  hasSeparateContentRoot() {
+    return this.rootPath !== this.contentRootPath
+  }
+
   async processConfig() {
     this.tinaFolderPath = await this.getTinaFolderPath(this.rootPath)
 

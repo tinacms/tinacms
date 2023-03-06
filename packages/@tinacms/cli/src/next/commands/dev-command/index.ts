@@ -143,7 +143,37 @@ export class DevCommand extends Command {
       }
     })
 
-    const summaryItems = []
+    const subItems = []
+
+    if (configManager.hasSeparateContentRoot()) {
+      subItems.push({
+        key: 'Content repo',
+        value: configManager.contentRootPath,
+      })
+    }
+
+    const summaryItems = [
+      {
+        emoji: '🦙',
+        heading: 'Tina Config',
+        subItems: [
+          {
+            key: 'CMS',
+            value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
+          },
+          {
+            key: 'API url',
+            value: apiURL,
+          },
+          {
+            key: 'API playground',
+            value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}#/graphql`,
+          },
+          ...subItems,
+        ],
+      },
+    ]
+
     if (!this.noSDK) {
       summaryItems.push({
         emoji: '🤖',
@@ -164,24 +194,6 @@ export class DevCommand extends Command {
     summary({
       heading: 'Tina Dev Server is running...',
       items: [
-        {
-          emoji: '🦙',
-          heading: 'Tina Config',
-          subItems: [
-            {
-              key: 'CMS',
-              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
-            },
-            {
-              key: 'API url',
-              value: apiURL,
-            },
-            {
-              key: 'API playground',
-              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}#/graphql`,
-            },
-          ],
-        },
         ...summaryItems,
         // {
         //   emoji: '📚',
