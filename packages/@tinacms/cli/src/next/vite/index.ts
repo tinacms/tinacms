@@ -54,7 +54,7 @@ export const createConfig = async (
 
   const config: InlineConfig = {
     root: configManager.spaRootPath,
-    base: `/${configManager.outputFolderPath}/`, // FIXME: normalize this?
+    base: `/${configManager.config.build.outputFolder}/`, // FIXME: normalize this?
     appType: 'spa',
     resolve: {
       alias,
@@ -77,6 +77,7 @@ export const createConfig = async (
        */
       'process.env': `new Object(${JSON.stringify(publicEnv)})`,
       __API_URL__: `"${apiURL}"`,
+      __TOKEN__: `"${configManager.config.token}"`,
     },
     server: {
       fs: {

@@ -10,6 +10,7 @@ import 'graphiql/graphiql.min.css'
 
 const fetcher = createGraphiQLFetcher({
   url: __API_URL__,
+  headers: { 'X-API-KEY': __TOKEN__ },
 })
 
 const Playground = () => {
@@ -79,46 +80,50 @@ const Playground = () => {
             </a>
           </div>
           <nav className="space-y-1" aria-label="Sidebar">
-            {Object.entries(autoQueries).map(([key, value]) => {
-              const collection = collectionInfo?.collections.find(
-                ({ name }) => name === key
-              )
-              let variables = ''
-              let relativePath = ''
-              if (collection) {
-                relativePath =
-                  collection.documents.edges[0].node._sys.relativePath
-                variables = JSON.stringify({ relativePath }, null, 2)
-              }
-              return (
-                <button
-                  key={key}
-                  className={classNames(
-                    false
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'flex items-center rounded-md px-3 py-2 text-sm font-medium w-full text-left'
-                  )}
-                  onClick={async () => {
-                    if (typeof value === 'function') {
-                      const v = await value({})
-                      const ast = parse(v.query)
-                      setVariables(variables)
-                      setQuery(print(ast))
-                    }
-                  }}
-                >
-                  <span className="truncate">
-                    {key}{' '}
-                    {relativePath && (
-                      <span className="pl-2 text-sm text-gray-300">
-                        ({relativePath})
+            <ul>
+              {Object.entries(autoQueries).map(([key, value]) => {
+                const collection = collectionInfo?.collections.find(
+                  ({ name }) => name === key
+                )
+                let variables = ''
+                let relativePath = ''
+                if (collection) {
+                  relativePath =
+                    collection.documents.edges[0].node._sys.relativePath
+                  variables = JSON.stringify({ relativePath }, null, 2)
+                }
+                return (
+                  <li>
+                    <button
+                      key={key}
+                      className={classNames(
+                        false
+                          ? 'bg-gray-100 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        'flex items-center rounded-md px-3 py-2 text-sm font-medium w-full text-left'
+                      )}
+                      onClick={async () => {
+                        if (typeof value === 'function') {
+                          const v = await value({})
+                          const ast = parse(v.query)
+                          setVariables(variables)
+                          setQuery(print(ast))
+                        }
+                      }}
+                    >
+                      <span className="truncate">
+                        {key}{' '}
+                        {relativePath && (
+                          <span className="pl-2 text-sm text-gray-300">
+                            ({relativePath})
+                          </span>
+                        )}{' '}
                       </span>
-                    )}{' '}
-                  </span>
-                </button>
-              )
-            })}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
           </nav>
         </div>
       </div>

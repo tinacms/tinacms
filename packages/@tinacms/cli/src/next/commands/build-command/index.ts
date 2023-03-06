@@ -78,8 +78,6 @@ export class BuildCommand extends Command {
     })
     const apiURL = await codegen.execute()
 
-    await fs.outputFile(configManager.outputHTMLFilePath, prodHTML)
-
     await this.checkClientInfo(configManager, apiURL)
     await this.checkGraphqlSchema(configManager, database, apiURL)
     await waitForDB(configManager.config, apiURL, false)
