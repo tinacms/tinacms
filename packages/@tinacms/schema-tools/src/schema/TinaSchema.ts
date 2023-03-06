@@ -405,4 +405,16 @@ export class TinaSchema {
     }
     return matches
   }
+
+  public matchFiles({
+    collection,
+    files,
+  }: {
+    collection: string | Collection
+    files: string[]
+  }) {
+    const matches = this.getMatches({ collection })
+    const matchedFiles = micromatch(files, matches)
+    return matchedFiles
+  }
 }

@@ -1,9 +1,4 @@
-/**
-
-*/
-
 import {
-  BaseTextField,
   BillingWarning,
   Form,
   FormBuilder,
@@ -12,7 +7,7 @@ import {
 } from '@tinacms/toolkit'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import React, { useMemo, useState } from 'react'
-import { TinaSchema, resolveForm } from '@tinacms/schema-tools'
+import { TinaSchema, resolveForm, normalizePath } from '@tinacms/schema-tools'
 import type { Template } from '@tinacms/schema-tools'
 
 import GetCMS from '../components/GetCMS'
@@ -221,6 +216,22 @@ const RenderForm = ({ cms, collection, templateName, mutationInfo }) => {
             const isValid = /^[_a-zA-Z0-9][\.\-_\/a-zA-Z0-9]*$/.test(value)
             if (value && !isValid) {
               return 'Must begin with a-z, A-Z, 0-9, or _ and contain only a-z, A-Z, 0-9, -, _, ., or /.'
+            }
+            // check if the filename is allowed by the collection.
+            if (
+              schemaCollection.match?.exclude ||
+              schemaCollection.match?.include
+            ) {
+              const filePath = `${normalizePath(
+                schemaCollection.path
+              )}/${value}.${schemaCollection.format || 'md'}`
+              const match = schema.matchFiles({
+                files: [filePath],
+                collection: schemaCollection,
+              })
+              if (match.length === 0) {
+                return `The filename "${value}" is not allowed for this collection.`
+              }
             }
           },
         },
