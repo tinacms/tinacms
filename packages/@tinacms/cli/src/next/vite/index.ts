@@ -3,6 +3,7 @@ import { InlineConfig, Plugin, splitVendorChunkPlugin } from 'vite'
 import { Database } from '@tinacms/graphql'
 import { tinaTailwind } from './tailwind'
 import { ConfigManager } from '../config-manager'
+import normalizePath from 'normalize-path'
 
 export const createConfig = async (
   configManager: ConfigManager,
@@ -54,7 +55,7 @@ export const createConfig = async (
 
   const config: InlineConfig = {
     root: configManager.spaRootPath,
-    base: `/${configManager.config.build.outputFolder}/`, // FIXME: normalize this?
+    base: `/${normalizePath(configManager.config.build.outputFolder)}/`,
     appType: 'spa',
     resolve: {
       alias,

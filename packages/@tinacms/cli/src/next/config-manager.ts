@@ -5,6 +5,7 @@ import * as esbuild from 'esbuild'
 import * as url from 'url'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
+import normalizePath from 'normalize-path'
 
 const TINA_FOLDER = 'tina'
 const LEGACY_TINA_FOLDER = '.tina'
@@ -45,7 +46,7 @@ export class ConfigManager {
   spaHTMLPath: string
 
   constructor(rootPath: string = process.cwd()) {
-    this.rootPath = rootPath.endsWith('/') ? rootPath.slice(0, -1) : rootPath
+    this.rootPath = normalizePath(rootPath)
   }
 
   isUsingTs() {
