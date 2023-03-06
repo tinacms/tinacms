@@ -60,22 +60,24 @@ const CollectionUpdatePage = () => {
             }
 
             return (
-              <GetDocument
-                cms={cms}
-                collectionName={collection.name}
-                relativePath={relativePath}
-              >
-                {(document) => (
-                  <RenderForm
-                    cms={cms}
-                    document={document}
-                    filename={filename}
-                    relativePath={relativePath}
-                    collection={collection}
-                    mutationInfo={mutationInfo}
-                  />
-                )}
-              </GetDocument>
+              <PageWrapper>
+                <GetDocument
+                  cms={cms}
+                  collectionName={collection.name}
+                  relativePath={relativePath}
+                >
+                  {(document) => (
+                    <RenderForm
+                      cms={cms}
+                      document={document}
+                      filename={filename}
+                      relativePath={relativePath}
+                      collection={collection}
+                      mutationInfo={mutationInfo}
+                    />
+                  )}
+                </GetDocument>
+              </PageWrapper>
             )
           }}
         </GetCollection>
@@ -141,33 +143,31 @@ const RenderForm = ({
   const headerPadding = renderNavToggle ? 'px-20' : 'px-6'
 
   return (
-    <PageWrapper>
-      <>
-        {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
-        <div
-          className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
-        >
-          <div className="max-w-form mx-auto">
-            <div className="mb-2">
-              <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
-                <Link
-                  to={`/collections/${collection.name}`}
-                  className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
-                >
-                  {collection.label ? collection.label : collection.name}
-                </Link>
-                <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
-              </span>
-              <span className="text-xl text-gray-700 font-medium leading-tight">
-                Edit {`${filename}.${collection.format}`}
-              </span>
-            </div>
-            <FormStatus pristine={formIsPristine} />
+    <>
+      {cms?.api?.tina?.isLocalMode ? <LocalWarning /> : <BillingWarning />}
+      <div
+        className={`py-4 border-b border-gray-200 bg-white ${headerPadding}`}
+      >
+        <div className="max-w-form mx-auto">
+          <div className="mb-2">
+            <span className="block text-sm leading-tight uppercase text-gray-400 mb-1">
+              <Link
+                to={`/collections/${collection.name}`}
+                className="inline-block text-current hover:text-blue-400 focus:underline focus:outline-none focus:text-blue-400 font-medium transition-colors duration-150 ease-out"
+              >
+                {collection.label ? collection.label : collection.name}
+              </Link>
+              <HiChevronRight className="inline-block -mt-0.5 opacity-50" />
+            </span>
+            <span className="text-xl text-gray-700 font-medium leading-tight">
+              Edit {`${filename}.${collection.format}`}
+            </span>
           </div>
+          <FormStatus pristine={formIsPristine} />
         </div>
-        <FormBuilder form={form} onPristineChange={setFormIsPristine} />
-      </>
-    </PageWrapper>
+      </div>
+      <FormBuilder form={form} onPristineChange={setFormIsPristine} />
+    </>
   )
 }
 
