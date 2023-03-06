@@ -42,14 +42,14 @@ export const createConfig = async (
     TINA_IMPORT: configManager.tinaConfigFilePath,
     SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
   }
-  if (!noSDK) {
-    alias['CLIENT_IMPORT'] = configManager.generatedTypesTSFilePath
-  } else {
+  if (noSDK) {
     alias['CLIENT_IMPORT'] = path.join(
       configManager.spaRootPath,
       'src',
       'dummy-client.ts'
     )
+  } else {
+    alias['CLIENT_IMPORT'] = configManager.generatedTypesTSFilePath
   }
 
   const config: InlineConfig = {

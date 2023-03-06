@@ -161,16 +161,16 @@ export class DevCommand extends Command {
           heading: 'Tina Config',
           subItems: [
             {
+              key: 'CMS',
+              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
+            },
+            {
               key: 'API url',
               value: apiURL,
             },
             {
               key: 'API playground',
               value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}#/graphql`,
-            },
-            {
-              key: 'CMS',
-              value: `<your-dev-server-url>/${configManager.printoutputHTMLFilePath()}`,
             },
           ],
         },
