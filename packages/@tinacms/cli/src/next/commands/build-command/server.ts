@@ -1,12 +1,11 @@
-import { build, createServer as createViteServer, InlineConfig } from 'vite'
+import { build } from 'vite'
 import { Database } from '@tinacms/graphql'
-import { tinaTailwind } from '../tailwind'
-import { ConfigManager } from '../../../config-manager'
+import { ConfigManager } from '../../config-manager'
 import { pipeline } from 'readable-stream'
 import { createServer } from 'net'
 import { ManyLevelHost } from 'many-level'
 import { MemoryLevel } from 'memory-level'
-import { createConfig } from '../../../vite'
+import { createConfig } from '../../vite'
 
 export const createDBServer = () => {
   const levelHost = new ManyLevelHost(
@@ -29,7 +28,8 @@ export const createDBServer = () => {
 export const buildProductionSpa = async (
   configManager: ConfigManager,
   database: Database,
-  apiURL: string
+  apiURL: string,
+  noSDK: boolean
 ) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -57,6 +57,6 @@ export const buildProductionSpa = async (
       }
     }
   })
-  const config = await createConfig(configManager, database, apiURL, [])
+  const config = await createConfig(configManager, database, apiURL, [], noSDK)
   return build(config)
 }

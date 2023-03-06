@@ -50,12 +50,12 @@ export class DevCommand extends Command {
 
   static usage = Command.Usage({
     category: `Commands`,
-    description: `Start dev server`,
+    description: `Builds Tina and starts the dev server`,
   })
 
   async catch(error: any): Promise<void> {
-    console.error(error)
     logger.error('Error occured during tinacms dev')
+    process.exit(1)
   }
 
   async execute(): Promise<number | void> {
@@ -100,12 +100,12 @@ export class DevCommand extends Command {
       const codegen = new Codegen({
         schema: await getASTSchema(database),
         configManager: configManager,
-        noSDK: this.noSDK,
         port: Number(this.port),
+        noSDK: this.noSDK,
         queryDoc,
         fragDoc,
       })
-      const { apiURL } = await codegen.execute()
+      const apiURL = await codegen.execute()
 
       await database.indexContent({ tinaSchema, graphQLSchema })
       return { apiURL, database }
@@ -113,7 +113,12 @@ export class DevCommand extends Command {
     const { apiURL, database } = await setup()
 
     await fs.outputFile(configManager.outputHTMLFilePath, devHTML(this.port))
-    const server = await createDevServer(configManager, database, apiURL)
+    const server = await createDevServer(
+      configManager,
+      database,
+      apiURL,
+      this.noSDK
+    )
     await server.listen(Number(this.port))
 
     this.watchContentFiles(configManager, database, server)
@@ -129,6 +134,24 @@ export class DevCommand extends Command {
         logger.error(e.message)
       }
     })
+
+    const summaryItems = []
+    if (!this.noSDK) {
+      summaryItems.push({
+        emoji: '🤖',
+        heading: 'Auto-generated files',
+        subItems: [
+          {
+            key: 'GraphQL Client',
+            value: configManager.printGeneratedClientFilePath(),
+          },
+          {
+            key: 'Typescript Types',
+            value: configManager.printGeneratedTypesFilePath(),
+          },
+        ],
+      })
+    }
 
     summary({
       heading: 'Tina Dev Server is running...',
@@ -151,34 +174,21 @@ export class DevCommand extends Command {
             },
           ],
         },
-        {
-          emoji: '🤖',
-          heading: 'Auto-generated files',
-          subItems: [
-            {
-              key: 'GraphQL Client',
-              value: configManager.printGeneratedClientFilePath(),
-            },
-            {
-              key: 'Typescript Types',
-              value: configManager.printGeneratedTypesFilePath(),
-            },
-          ],
-        },
-        {
-          emoji: '📚',
-          heading: 'Useful links',
-          subItems: [
-            {
-              key: 'Custom queries',
-              value: 'https://tina.io/querying',
-            },
-            {
-              key: 'Visual editing',
-              value: 'https://tina.io/visual-editing',
-            },
-          ],
-        },
+        ...summaryItems,
+        // {
+        //   emoji: '📚',
+        //   heading: 'Useful links',
+        //   subItems: [
+        //     {
+        //       key: 'Custom queries',
+        //       value: 'https://tina.io/querying',
+        //     },
+        //     {
+        //       key: 'Visual editing',
+        //       value: 'https://tina.io/visual-editing',
+        //     },
+        //   ],
+        // },
       ],
     })
     if (this.subCommand) {

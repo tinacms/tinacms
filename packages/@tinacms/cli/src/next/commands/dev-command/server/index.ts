@@ -32,7 +32,8 @@ export const createDBServer = () => {
 export const createDevServer = async (
   configManager: ConfigManager,
   database: Database,
-  apiURL: string
+  apiURL: string,
+  noSDK: boolean
 ) => {
   const plugins = [
     {
@@ -111,6 +112,6 @@ export const createDevServer = async (
     },
   ]
   return createViteServer(
-    await createConfig(configManager, database, apiURL, plugins)
+    await createConfig(configManager, database, apiURL, plugins, noSDK)
   )
 }

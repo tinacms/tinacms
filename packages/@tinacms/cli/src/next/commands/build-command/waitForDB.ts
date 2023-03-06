@@ -3,7 +3,7 @@
 */
 
 import Progress from 'progress'
-import { Config, parseURL, Schema } from '@tinacms/schema-tools'
+import { Config, parseURL } from '@tinacms/schema-tools'
 import fetch, { Headers } from 'node-fetch'
 
 import { logger } from '../../../logger'
@@ -105,7 +105,7 @@ export const waitForDB = async (
     }
   }
 
-  spin({
+  await spin({
     text: 'Checking indexing process in Tina Cloud...',
     waitFor: pollForStatus,
   })

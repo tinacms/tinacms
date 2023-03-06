@@ -25,10 +25,11 @@ const Playground = () => {
   }>()
   React.useEffect(() => {
     const run = async () => {
-      const q = queries({ request: async () => query })
-      setCollectionInfo(
-        await cms.api.tina.request(
-          `
+      if (queries) {
+        const q = queries({ request: async () => query })
+        setCollectionInfo(
+          await cms.api.tina.request(
+            `
       query {
         collections {
           name
@@ -46,10 +47,11 @@ const Playground = () => {
         }
       }
       `,
-          { variables: {} }
+            { variables: {} }
+          )
         )
-      )
-      setAutoQueries(q)
+        setAutoQueries(q)
+      }
     }
     run()
   }, [])

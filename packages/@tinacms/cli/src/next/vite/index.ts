@@ -1,3 +1,4 @@
+import path from 'path'
 import { InlineConfig, Plugin, splitVendorChunkPlugin } from 'vite'
 import { Database } from '@tinacms/graphql'
 import { tinaTailwind } from './tailwind'
@@ -7,7 +8,8 @@ export const createConfig = async (
   configManager: ConfigManager,
   database: Database,
   apiURL: string,
-  plugins: Plugin[]
+  plugins: Plugin[],
+  noSDK: boolean
 ) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -35,16 +37,27 @@ export const createConfig = async (
       }
     }
   })
+
+  const alias = {
+    TINA_IMPORT: configManager.tinaConfigFilePath,
+    SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
+  }
+  if (!noSDK) {
+    alias['CLIENT_IMPORT'] = configManager.generatedTypesTSFilePath
+  } else {
+    alias['CLIENT_IMPORT'] = path.join(
+      configManager.spaRootPath,
+      'src',
+      'dummy-client.ts'
+    )
+  }
+
   const config: InlineConfig = {
     root: configManager.spaRootPath,
     base: `/${configManager.outputFolderPath}/`, // FIXME: normalize this?
     appType: 'spa',
     resolve: {
-      alias: {
-        TINA_IMPORT: configManager.tinaConfigFilePath,
-        SCHEMA_IMPORT: configManager.generatedGraphQLJSONPath,
-        CLIENT_IMPORT: configManager.generatedTypesTSFilePath,
-      },
+      alias,
       dedupe: ['graphql', 'tinacms', '@tinacms/toolkit', 'react', 'react-dom'],
     },
     define: {

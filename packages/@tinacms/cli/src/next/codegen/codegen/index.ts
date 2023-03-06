@@ -18,16 +18,13 @@ export const generateTypes = async (
   schema: GraphQLSchema,
   queryPathGlob = process.cwd(),
   fragDocPath = process.cwd(),
-  noSDK: boolean,
   apiURL: string
 ) => {
   let docs = []
   let fragDocs = []
 
-  if (!noSDK) {
-    docs = await loadGraphQLDocuments(queryPathGlob)
-    fragDocs = await loadGraphQLDocuments(fragDocPath)
-  }
+  docs = await loadGraphQLDocuments(queryPathGlob)
+  fragDocs = await loadGraphQLDocuments(fragDocPath)
 
   // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
   const res = await codegen({

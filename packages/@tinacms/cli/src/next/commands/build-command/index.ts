@@ -76,7 +76,7 @@ export class BuildCommand extends Command {
       queryDoc,
       fragDoc,
     })
-    const { apiURL } = await codegen.execute()
+    const apiURL = await codegen.execute()
 
     await fs.outputFile(configManager.outputHTMLFilePath, prodHTML)
 
@@ -84,13 +84,31 @@ export class BuildCommand extends Command {
     await this.checkGraphqlSchema(configManager, database, apiURL)
     await waitForDB(configManager.config, apiURL, false)
 
-    await buildProductionSpa(configManager, database, apiURL)
+    await buildProductionSpa(configManager, database, apiURL, this.noSDK)
 
     // When the build completes, add the gitignore
     await fs.outputFile(
       configManager.outputGitignorePath,
       'index.html\nassets/'
     )
+
+    const summaryItems = []
+    if (!this.noSDK) {
+      summaryItems.push({
+        emoji: '🤖',
+        heading: 'Auto-generated files',
+        subItems: [
+          {
+            key: 'GraphQL Client',
+            value: configManager.printGeneratedClientFilePath(),
+          },
+          {
+            key: 'Typescript Types',
+            value: configManager.printGeneratedTypesFilePath(),
+          },
+        ],
+      })
+    }
 
     summary({
       heading: 'Tina build complete',
@@ -105,34 +123,21 @@ export class BuildCommand extends Command {
             },
           ],
         },
-        {
-          emoji: '🤖',
-          heading: 'Auto-generated files',
-          subItems: [
-            {
-              key: 'GraphQL Client',
-              value: configManager.printGeneratedClientFilePath(),
-            },
-            {
-              key: 'Typescript Types',
-              value: configManager.printGeneratedTypesFilePath(),
-            },
-          ],
-        },
-        {
-          emoji: '📚',
-          heading: 'Useful links',
-          subItems: [
-            {
-              key: 'Custom queries',
-              value: 'https://tina.io/querying',
-            },
-            {
-              key: 'Visual editing',
-              value: 'https://tina.io/visual-editing',
-            },
-          ],
-        },
+        ...summaryItems,
+        // {
+        //   emoji: '📚',
+        //   heading: 'Useful links',
+        //   subItems: [
+        //     {
+        //       key: 'Custom queries',
+        //       value: 'https://tina.io/querying',
+        //     },
+        //     {
+        //       key: 'Visual editing',
+        //       value: 'https://tina.io/visual-editing',
+        //     },
+        //   ],
+        // },
       ],
     })
     process.exit()
