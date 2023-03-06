@@ -1,22 +1,17 @@
 import { Command, Option } from 'clipanion'
-import {
-  createDatabase,
-  FilesystemBridge,
-  buildSchema,
-  Database,
-  TinaLevelClient,
-} from '@tinacms/graphql'
+import { buildSchema } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { logger } from '../../../logger'
-import { createDBServer } from './server'
 import { audit } from './audit'
+import { createAndInitializeDatabase, createDBServer } from '../../database'
+import { AuditFileSystemBridge } from '@tinacms/graphql'
 
 export class AuditCommand extends Command {
   static paths = [['audit']]
   rootPath = Option.String('--rootPath', {
     description: 'Specify the root directory to run the CLI from',
   })
-  verbose = Option.Boolean('-v, --verbose', false, {
+  verbose = Option.Boolean('-v,--verbose', false, {
     description: 'increase verbosity of logged output',
   })
   clean = Option.Boolean('--clean', false, {
@@ -34,8 +29,10 @@ export class AuditCommand extends Command {
   })
 
   async catch(error: any): Promise<void> {
-    console.error(error)
     logger.error('Error occured during tinacms audit')
+    if (this.verbose) {
+      console.error(error)
+    }
     process.exit(1)
   }
 
@@ -53,7 +50,12 @@ export class AuditCommand extends Command {
       process.exit(1)
     }
 
-    const database = await this.createAndInitializeDatabase(configManager)
+    // Initialize the host TCP server
+    createDBServer()
+    const database = await createAndInitializeDatabase(
+      configManager,
+      this.clean ? undefined : new AuditFileSystemBridge(configManager.rootPath)
+    )
     const { tinaSchema, graphQLSchema } = await buildSchema(
       database,
       configManager.config
@@ -70,39 +72,5 @@ export class AuditCommand extends Command {
     })
 
     process.exit()
-  }
-
-  async createAndInitializeDatabase(configManager: ConfigManager) {
-    let database: Database
-    const bridge = new FilesystemBridge(configManager.rootPath)
-    if (
-      configManager.hasSelfHostedConfig() &&
-      configManager.config.contentApiUrlOverride
-    ) {
-      database = (await configManager.loadDatabaseFile()) as Database
-      database.bridge = bridge
-    } else {
-      if (
-        configManager.hasSelfHostedConfig() &&
-        !configManager.config.contentApiUrlOverride
-      ) {
-        logger.warn(
-          `Found a database config file at ${configManager.printRelativePath(
-            configManager.selfHostedDatabaseFilePath
-          )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
-        )
-      }
-      const level = new TinaLevelClient()
-      level.openConnection()
-      database = createDatabase({
-        bridge,
-        level,
-      })
-    }
-
-    // Initialize the host TCP server
-    createDBServer()
-
-    return database
   }
 }

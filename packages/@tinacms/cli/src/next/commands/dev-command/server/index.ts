@@ -1,39 +1,18 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import { createServer as createViteServer, Plugin } from 'vite'
+import { createServer as createViteServer } from 'vite'
 import { resolve as gqlResolve, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../../config-manager'
 import { parseMediaFolder, createMediaRouter } from './media'
 import { transform as esbuildTransform } from 'esbuild'
-import { pipeline } from 'readable-stream'
-import { createServer } from 'net'
-import { ManyLevelHost } from 'many-level'
-import { MemoryLevel } from 'memory-level'
 import { createConfig } from '../../../vite'
-
-export const createDBServer = () => {
-  const levelHost = new ManyLevelHost(
-    // @ts-ignore
-    new MemoryLevel<string, Record<string, any>>({
-      valueEncoding: 'json',
-    })
-  )
-  const dbserver = createServer(function (socket) {
-    // Pipe socket into host stream and vice versa
-    return pipeline(socket, levelHost.createRpcStream(), socket, () => {
-      // Disconnected
-    })
-  })
-  dbserver.listen(9000)
-
-  return dbserver
-}
 
 export const createDevServer = async (
   configManager: ConfigManager,
   database: Database,
   apiURL: string,
-  noSDK: boolean
+  noSDK: boolean,
+  noWatch: boolean
 ) => {
   const plugins = [
     {
@@ -112,6 +91,6 @@ export const createDevServer = async (
     },
   ]
   return createViteServer(
-    await createConfig(configManager, database, apiURL, plugins, noSDK)
+    await createConfig(configManager, database, apiURL, plugins, noSDK, noWatch)
   )
 }

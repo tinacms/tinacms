@@ -6,6 +6,7 @@ import * as url from 'url'
 import { Config } from '@tinacms/schema-tools'
 import * as dotenv from 'dotenv'
 import normalizePath from 'normalize-path'
+import { logger } from '../logger'
 
 const TINA_FOLDER = 'tina'
 const LEGACY_TINA_FOLDER = '.tina'
@@ -22,6 +23,7 @@ export class ConfigManager {
   isUsingLegacyFolder: boolean
   tinaConfigFilePath: string
   tinaSpaPackagePath: string
+  contentRootPath?: string
   envFilePath: string
   generatedFolderPath: string
   generatedGraphQLGQLPath: string
@@ -106,6 +108,16 @@ export class ConfigManager {
       this.generatedFolderPath,
       'frags.gql'
     )
+    const fullLocalContentPath = path.join(
+      this.tinaFolderPath,
+      this.config.localContentPath
+    )
+    if (await fs.existsSync(fullLocalContentPath)) {
+      logger.info(`Using separate content repo at ${fullLocalContentPath}`)
+      this.contentRootPath = fullLocalContentPath
+    } else {
+      this.contentRootPath = this.rootPath
+    }
     this.generatedTypesTSFilePath = path.join(
       this.generatedFolderPath,
       'types.ts'
@@ -187,6 +199,12 @@ export class ConfigManager {
   printRelativePath(filename: string) {
     if (filename) {
       return filename.replace(`${this.rootPath}/`, '')
+    }
+    throw `No path provided to print`
+  }
+  printContentRelativePath(filename: string) {
+    if (filename) {
+      return filename.replace(`${this.contentRootPath}/`, '')
     }
     throw `No path provided to print`
   }

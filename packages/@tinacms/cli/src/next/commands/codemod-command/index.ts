@@ -10,7 +10,7 @@ export class CodemodCommand extends Command {
   rootPath = Option.String('--rootPath', {
     description: 'Specify the root directory to run the CLI from',
   })
-  verbose = Option.Boolean('-v, --verbose', false, {
+  verbose = Option.Boolean('-v,--verbose', false, {
     description: 'increase verbosity of logged output',
   })
   static usage = Command.Usage({

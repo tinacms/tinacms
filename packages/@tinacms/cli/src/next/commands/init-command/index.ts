@@ -12,7 +12,7 @@ export class InitCommand extends Command {
   })
   static usage = Command.Usage({
     category: `Commands`,
-    description: `Add Tina Cloud to an existing project`,
+    description: `Add Tina to an existing project`,
   })
 
   async catch(error: any): Promise<void> {

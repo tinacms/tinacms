@@ -1,4 +1,4 @@
-import { Cli } from 'clipanion'
+import { Cli, Builtins } from 'clipanion'
 //@ts-ignore
 import { version, name } from '../package.json'
 import { DevCommand } from './next/commands/dev-command'
@@ -26,5 +26,8 @@ cli.register(AuditCommand)
 cli.register(InitCommand)
 // Uncomment when cloud supports /tina & tina-lock.json
 // cli.register(CodemodCommand)
+cli.register(Builtins.DefinitionsCommand)
+cli.register(Builtins.HelpCommand)
+cli.register(Builtins.VersionCommand)
 
 export default cli

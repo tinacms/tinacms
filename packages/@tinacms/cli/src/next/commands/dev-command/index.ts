@@ -2,40 +2,33 @@ import { Command, Option } from 'clipanion'
 import fs from 'fs-extra'
 import path from 'path'
 import chokidar from 'chokidar'
-import {
-  createDatabase,
-  FilesystemBridge,
-  buildSchema,
-  getASTSchema,
-  Database,
-  TinaLevelClient,
-} from '@tinacms/graphql'
+import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
 import { devHTML } from './html'
 import { logger, summary } from '../../../logger'
-import { createDBServer, createDevServer } from './server'
+import { createDevServer } from './server'
 import { Codegen } from '../../codegen'
 import chalk from 'chalk'
 import { startSubprocess2 } from '../../../utils/start-subprocess'
-import { ViteDevServer } from 'vite'
+import { createAndInitializeDatabase, createDBServer } from '../../database'
 
 export class DevCommand extends Command {
   static paths = [['dev'], ['server:start']]
-  port = Option.String('-p, --port', '4001', {
+  port = Option.String('-p,--port', '4001', {
     description: 'Specify a port to run the server on. (default 4001)',
   })
-  subCommand = Option.String('-c, --command', {
+  subCommand = Option.String('-c,--command', {
     description: 'The sub-command to run',
   })
   rootPath = Option.String('--rootPath', {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
-  watchFolders = Option.String('-w, --watchFolders', {
+  watchFolders = Option.String('-w,--watchFolders', {
     description:
       'a list of folders (relative to where this is being run) that the cli will watch for changes',
   })
-  verbose = Option.Boolean('-v, --verbose', false, {
+  verbose = Option.Boolean('-v,--verbose', false, {
     description: 'increase verbosity of logged output',
   })
   noWatch = Option.Boolean('--noWatch', false, {
@@ -51,14 +44,26 @@ export class DevCommand extends Command {
   static usage = Command.Usage({
     category: `Commands`,
     description: `Builds Tina and starts the dev server`,
+    examples: [
+      [`A basic example`, `$0 dev`],
+      [`A second example`, `$0 dev --rootPath`],
+    ],
   })
 
   async catch(error: any): Promise<void> {
     logger.error('Error occured during tinacms dev')
+    if (this.verbose) {
+      console.error(error)
+    }
     process.exit(1)
   }
 
   async execute(): Promise<number | void> {
+    if (this.watchFolders) {
+      logger.warn(
+        '--watchFolders has been deprecated, if you still need it please open a ticket at https://github.com/tinacms/tinacms/issues'
+      )
+    }
     const configManager = new ConfigManager(this.rootPath)
     logger.info('Starting Tina Dev Server')
 
@@ -76,7 +81,7 @@ export class DevCommand extends Command {
         process.exit(1)
       }
 
-      const database = await this.createAndInitializeDatabase(configManager)
+      const database = await createAndInitializeDatabase(configManager)
       const { tinaSchema, graphQLSchema, queryDoc, fragDoc } =
         await buildSchema(database, configManager.config)
       if (!configManager.isUsingLegacyFolder) {
@@ -117,11 +122,14 @@ export class DevCommand extends Command {
       configManager,
       database,
       apiURL,
-      this.noSDK
+      this.noSDK,
+      this.noWatch
     )
     await server.listen(Number(this.port))
 
-    this.watchContentFiles(configManager, database, server)
+    if (!this.noWatch) {
+      this.watchContentFiles(configManager, database)
+    }
 
     server.watcher.on('change', async (changedPath) => {
       if (changedPath.includes('__generated__')) {
@@ -197,49 +205,11 @@ export class DevCommand extends Command {
     }
   }
 
-  async createAndInitializeDatabase(configManager: ConfigManager) {
-    let database: Database
-    const bridge = new FilesystemBridge(configManager.rootPath)
-    if (
-      configManager.hasSelfHostedConfig() &&
-      configManager.config.contentApiUrlOverride
-    ) {
-      database = (await configManager.loadDatabaseFile()) as Database
-      database.bridge = bridge
-    } else {
-      if (
-        configManager.hasSelfHostedConfig() &&
-        !configManager.config.contentApiUrlOverride
-      ) {
-        logger.warn(
-          `Found a database config file at ${configManager.printRelativePath(
-            configManager.selfHostedDatabaseFilePath
-          )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
-        )
-      }
-      const level = new TinaLevelClient()
-      level.openConnection()
-      database = createDatabase({
-        bridge,
-        level,
-        tinaDirectory: configManager.printRelativePath(
-          configManager.tinaFolderPath
-        ),
-      })
-    }
-
-    return database
-  }
-
-  watchContentFiles(
-    configManager: ConfigManager,
-    database: Database,
-    server: ViteDevServer
-  ) {
+  watchContentFiles(configManager: ConfigManager, database: Database) {
     const collectionContentFiles = []
     configManager.config.schema.collections.forEach((collection) => {
       const collectionGlob = `${path.join(
-        configManager.rootPath,
+        configManager.contentRootPath,
         collection.path
       )}/**/*.${collection.format || 'md'}`
       collectionContentFiles.push(collectionGlob)
@@ -254,7 +224,7 @@ export class DevCommand extends Command {
         if (!ready) {
           return
         }
-        const pathFromRoot = configManager.printRelativePath(addedFile)
+        const pathFromRoot = configManager.printContentRelativePath(addedFile)
         logger.info(
           `Detected new file at ${chalk.cyan(
             pathFromRoot
@@ -263,7 +233,7 @@ export class DevCommand extends Command {
         database.indexContentByPaths([pathFromRoot])
       })
       .on('change', async (changedFile) => {
-        const pathFromRoot = configManager.printRelativePath(changedFile)
+        const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
         logger.info(
@@ -274,7 +244,7 @@ export class DevCommand extends Command {
         database.indexContentByPaths([pathFromRoot])
       })
       .on('unlink', async (removedFile) => {
-        const pathFromRoot = configManager.printRelativePath(removedFile)
+        const pathFromRoot = configManager.printContentRelativePath(removedFile)
         logger.info(
           `Detected deletion at ${chalk.cyan(
             pathFromRoot

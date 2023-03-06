@@ -2,18 +2,10 @@ import fetch, { Headers } from 'node-fetch'
 import { Command, Option } from 'clipanion'
 import Progress from 'progress'
 import fs from 'fs-extra'
-import {
-  createDatabase,
-  FilesystemBridge,
-  buildSchema,
-  getASTSchema,
-  Database,
-  TinaLevelClient,
-} from '@tinacms/graphql'
+import { buildSchema, getASTSchema, Database } from '@tinacms/graphql'
 import { ConfigManager } from '../../config-manager'
-import { prodHTML } from './html'
 import { logger, summary } from '../../../logger'
-import { createDBServer, buildProductionSpa } from './server'
+import { buildProductionSpa } from './server'
 import { Codegen } from '../../codegen'
 import { parseURL } from '@tinacms/schema-tools'
 import {
@@ -23,6 +15,7 @@ import {
 } from 'graphql'
 import { diff } from '@graphql-inspector/core'
 import { waitForDB } from './waitForDB'
+import { createAndInitializeDatabase, createDBServer } from '../../database'
 
 export class BuildCommand extends Command {
   static paths = [['build']]
@@ -30,7 +23,7 @@ export class BuildCommand extends Command {
     description:
       'Specify the root directory to run the CLI from (defaults to current working directory)',
   })
-  verbose = Option.Boolean('-v, --verbose', false, {
+  verbose = Option.Boolean('-v,--verbose', false, {
     description: 'increase verbosity of logged output',
   })
   noSDK = Option.Boolean('--noSDK', false, {
@@ -46,8 +39,9 @@ export class BuildCommand extends Command {
   })
 
   async catch(error: any): Promise<void> {
-    // logger.error(error.message)
-    console.log(error)
+    if (this.verbose) {
+      console.error(error)
+    }
     process.exit(1)
   }
 
@@ -63,7 +57,9 @@ export class BuildCommand extends Command {
       process.exit(1)
     }
 
-    const database = await this.createAndInitializeDatabase(configManager)
+    // Initialize the host TCP server
+    createDBServer()
+    const database = await createAndInitializeDatabase(configManager)
     const { queryDoc, fragDoc } = await buildSchema(
       database,
       configManager.config
@@ -139,40 +135,6 @@ export class BuildCommand extends Command {
       ],
     })
     process.exit()
-  }
-
-  async createAndInitializeDatabase(configManager: ConfigManager) {
-    let database: Database
-    const bridge = new FilesystemBridge(configManager.rootPath)
-    if (
-      configManager.hasSelfHostedConfig() &&
-      configManager.config.contentApiUrlOverride
-    ) {
-      database = (await configManager.loadDatabaseFile()) as Database
-      database.bridge = bridge
-    } else {
-      if (
-        configManager.hasSelfHostedConfig() &&
-        !configManager.config.contentApiUrlOverride
-      ) {
-        logger.warn(
-          `Found a database config file at ${configManager.printRelativePath(
-            configManager.selfHostedDatabaseFilePath
-          )} but there was no "contentApiUrlOverride" set. Falling back to built-in datalayer`
-        )
-      }
-      const level = new TinaLevelClient()
-      level.openConnection()
-      database = createDatabase({
-        bridge,
-        level,
-      })
-    }
-
-    // Initialize the host TCP server
-    createDBServer()
-
-    return database
   }
 
   async checkClientInfo(configManager: ConfigManager, apiURL: string) {

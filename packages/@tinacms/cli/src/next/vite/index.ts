@@ -10,7 +10,8 @@ export const createConfig = async (
   database: Database,
   apiURL: string,
   plugins: Plugin[],
-  noSDK: boolean
+  noSDK: boolean,
+  noWatch: boolean
 ) => {
   // TODO: make this configurable
   const publicEnv: Record<string, string> = {}
@@ -81,6 +82,11 @@ export const createConfig = async (
       __TOKEN__: `"${configManager.config.token}"`,
     },
     server: {
+      watch: noWatch
+        ? {
+            ignored: ['**/*'],
+          }
+        : undefined,
       fs: {
         strict: false,
       },

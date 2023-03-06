@@ -7,8 +7,6 @@ import { logger } from '../../../logger'
 import { assertShape } from '@tinacms/graphql'
 import chalk from 'chalk'
 
-const rootPath = process.cwd()
-
 export const audit = async ({
   database,
   clean,
@@ -76,7 +74,6 @@ export const audit = async ({
     const returnError = await auditDocuments({
       collection,
       database,
-      rootPath,
       useDefaultValues: useDefaultValues,
       documents: docs.edges,
       verbose: verbose,
@@ -97,7 +94,6 @@ export const audit = async ({
 type AuditArgs = {
   collection: Collection<true>
   database: Database
-  rootPath: string
   documents: { node: { path: string } }[]
   useDefaultValues: boolean
   verbose?: boolean
