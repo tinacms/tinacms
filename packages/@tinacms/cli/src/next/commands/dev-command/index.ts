@@ -74,10 +74,13 @@ export class DevCommand extends Command {
       try {
         await configManager.processConfig()
       } catch (e) {
-        logger.error(e.message)
         logger.error(
           'Unable to start dev server, please fix your Tina config and try again'
         )
+        logger.error(e.message)
+        if (this.verbose) {
+          console.error(e)
+        }
         process.exit(1)
       }
 
@@ -227,6 +230,13 @@ export class DevCommand extends Command {
       collectionContentFiles.push(collectionGlob)
     })
     let ready = false
+    /**
+     * This has no way of knowing whether the change to the file came from someone manually
+     * editing in their IDE or Tina pushing the update via the Filesystem bridge. It's a simple
+     * enough update that it's fine that when Tina pushes a change, we go and push that same
+     * thing back through the database, and Tina Cloud does the same thing when it receives
+     * a push from Github.
+     */
     chokidar
       .watch(collectionContentFiles)
       .on('ready', () => {
@@ -237,31 +247,16 @@ export class DevCommand extends Command {
           return
         }
         const pathFromRoot = configManager.printContentRelativePath(addedFile)
-        logger.info(
-          `Detected new file at ${chalk.cyan(
-            pathFromRoot
-          )}. Adding to datalayer.`
-        )
         database.indexContentByPaths([pathFromRoot])
       })
       .on('change', async (changedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(changedFile)
         // Optionally we can reload the page when this happens
         // server.ws.send({ type: 'full-reload', path: '*' })
-        logger.info(
-          `Detected change at ${chalk.cyan(
-            pathFromRoot
-          )}. Updating in datalayer.`
-        )
         database.indexContentByPaths([pathFromRoot])
       })
       .on('unlink', async (removedFile) => {
         const pathFromRoot = configManager.printContentRelativePath(removedFile)
-        logger.info(
-          `Detected deletion at ${chalk.cyan(
-            pathFromRoot
-          )}. Deleting from datalayer.`
-        )
         database.deleteContentByPaths([pathFromRoot])
       })
   }

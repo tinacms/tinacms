@@ -114,9 +114,12 @@ export class ConfigManager {
     )
     const fullLocalContentPath = path.join(
       this.tinaFolderPath,
-      this.config.localContentPath
+      this.config.localContentPath || ''
     )
-    if (await fs.existsSync(fullLocalContentPath)) {
+    if (
+      this.config.localContentPath &&
+      (await fs.existsSync(fullLocalContentPath))
+    ) {
       logger.info(`Using separate content repo at ${fullLocalContentPath}`)
       this.contentRootPath = fullLocalContentPath
     } else {
