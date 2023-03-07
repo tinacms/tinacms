@@ -20,6 +20,24 @@ const BODY_FIELD = {
 const stringifyLabel = (label: string) => {
   return label.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()
 }
+const transformForestryMatchToTinaMatch = (match: string) => {
+  const newMatch = match
+    // remove white space
+    .replace(' ', '')
+    // replace all common extensions with nothing
+    .replace(/\.?(mdx|md|json|yaml|yml|toml)/g, '')
+    // replaces everything after the first . with nothing
+    ?.replace(/\..*$/g, '')
+    // remove {} if there is any left
+    ?.replace('{}', '')
+
+  if (match !== newMatch) {
+    // TODO: add link to docs
+    logger.warn(`Warning: Match ${match} was transformed to ${newMatch}`)
+  }
+
+  return newMatch
+}
 type Ext = 'mdx' | 'md' | 'json' | 'yaml' | 'yml' | 'toml'
 
 function checkExt(ext: string): Ext | false {
@@ -84,7 +102,24 @@ export const generateCollections = async ({
     // TODO: What should we do with read only sections?
     if (section.read_only) return
 
-    // switch (section.type) {
+    const baseCollection: Omit<Collection, 'fields' | 'templates'> = {
+      label: section.label,
+      name: stringifyLabel(section.label),
+      path: section.path,
+    }
+    // Add include and exclude if they exist
+    if (section.match) {
+      baseCollection.match = {
+        ...(baseCollection?.match || {}),
+        include: transformForestryMatchToTinaMatch(section.match),
+      }
+    }
+    if (section.exclude) {
+      baseCollection.match = {
+        ...(baseCollection?.match || {}),
+        exclude: transformForestryMatchToTinaMatch(section.exclude),
+      }
+    }
     if (section.type === 'directory') {
       const forestryTemplates = section?.templates || []
 
@@ -154,9 +189,7 @@ export const generateCollections = async ({
         })
         // Add the collection to the list of collections with its templates
         const c: Collection = {
-          label: section.label,
-          name: stringifyLabel(section.label),
-          path: section.path,
+          ...baseCollection,
           templates,
         }
         if (section?.create === 'none') {
@@ -205,9 +238,7 @@ export const generateCollections = async ({
           }
         })
         const c: Collection = {
-          label: section.label,
-          name: stringifyLabel(section.label),
-          path: section.path,
+          ...baseCollection,
           fields,
         }
         if (section?.create === 'none') {
@@ -261,8 +292,7 @@ export const generateCollections = async ({
         }
 
         collections.push({
-          label: section.label,
-          name: stringifyLabel(section.label),
+          ...baseCollection,
           path: dir,
           format: ext,
           ui: {
