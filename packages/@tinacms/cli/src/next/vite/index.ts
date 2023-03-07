@@ -51,7 +51,9 @@ export const createConfig = async (
       'dummy-client.ts'
     )
   } else {
-    alias['CLIENT_IMPORT'] = configManager.generatedTypesTSFilePath
+    alias['CLIENT_IMPORT'] = configManager.isUsingTs()
+      ? configManager.generatedTypesTSFilePath
+      : configManager.generatedTypesJSFilePath
   }
 
   const config: InlineConfig = {
