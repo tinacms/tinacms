@@ -42,6 +42,7 @@ import {
   dropzoneAcceptFromString,
   isImage,
 } from './utils'
+import { BiCopyAlt } from 'react-icons/bi'
 
 // taken from https://davidwalsh.name/javascript-polling
 async function poll(
@@ -247,18 +248,6 @@ export function MediaPicker({
   }, [offset, directory, cms.media.isConfigured])
 
   const onClickMediaItem = (item: Media) => {
-    if (item.type === 'dir') {
-      // Only join when there is a directory to join to
-      setDirectory(
-        item.directory === '.' || item.directory === ''
-          ? item.filename
-          : join(item.directory, item.filename)
-      )
-      resetOffset()
-    }
-  }
-
-  const onClickGridMediaItem = (item: Media) => {
     if (!item) {
       setActiveItem(false)
     } else if (item.type === 'dir') {
@@ -446,59 +435,58 @@ export function MediaPicker({
         </div>
 
         <div className="flex h-full overflow-hidden">
-          <ul
-            {...rootProps}
-            className={`h-full bg-white overflow-y-auto transition duration-150 ease-out ${
-              viewMode === 'list' &&
-              'flex flex-1 flex-col divide-y divide-gray-100'
-            } ${
-              viewMode === 'grid' &&
-              'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
-            } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
-          >
-            <input {...getInputProps()} />
+          <div className="flex w-full flex-col h-full">
+            <ul
+              {...rootProps}
+              className={`h-full grow bg-white overflow-y-auto transition duration-150 ease-out ${
+                viewMode === 'list' &&
+                'w-full flex flex-1 flex-col divide-y divide-gray-100'
+              } ${
+                viewMode === 'grid' &&
+                'w-full grid grid-cols-[repeat(auto-fit,_minmax(min(100%,_max(220px,_100%/8)),_1fr))] auto-rows-auto grid-flow-dense p-4 gap-4 content-start'
+              } ${isDragActive ? `border-2 border-blue-500 rounded-lg` : ``}`}
+            >
+              <input {...getInputProps()} />
 
-            {listState === 'loaded' && list.items.length === 0 && (
-              <EmptyMediaList hasTinaMedia={hasTinaMedia} />
-            )}
+              {listState === 'loaded' && list.items.length === 0 && (
+                <EmptyMediaList hasTinaMedia={hasTinaMedia} />
+              )}
 
-            {viewMode === 'list' &&
-              list.items.map((item: Media) => (
-                <ListMediaItem
-                  key={item.id}
-                  item={item}
-                  onClick={onClickMediaItem}
-                  onSelect={selectMediaItem}
-                  onDelete={deleteMediaItem}
-                />
-              ))}
+              {viewMode === 'list' &&
+                list.items.map((item: Media) => (
+                  <ListMediaItem
+                    key={item.id}
+                    item={item}
+                    onClick={onClickMediaItem}
+                    active={activeItem && activeItem.id === item.id}
+                  />
+                ))}
 
-            {viewMode === 'grid' &&
-              list.items.map((item: Media) => (
-                <GridMediaItem
-                  key={item.id}
-                  item={item}
-                  onClick={onClickGridMediaItem}
-                  active={activeItem && activeItem.id === item.id}
-                />
-              ))}
-          </ul>
+              {viewMode === 'grid' &&
+                list.items.map((item: Media) => (
+                  <GridMediaItem
+                    key={item.id}
+                    item={item}
+                    onClick={onClickMediaItem}
+                    active={activeItem && activeItem.id === item.id}
+                  />
+                ))}
+            </ul>
 
-          {viewMode === 'grid' && activeItem && (
-            <ActiveItemPreview
-              activeItem={activeItem}
-              selectMediaItem={selectMediaItem}
-              deleteMediaItem={deleteMediaItem}
-            />
-          )}
-        </div>
+            <div className="bg-gray-50 shrink-0 grow-0 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
+              <CursorPaginator
+                hasNext={hasNext}
+                navigateNext={navigateNext}
+                hasPrev={hasPrev}
+                navigatePrev={navigatePrev}
+              />
+            </div>
+          </div>
 
-        <div className="bg-gray-50 border-t border-gray-150 py-3 px-5 shadow-sm z-10">
-          <CursorPaginator
-            hasNext={hasNext}
-            navigateNext={navigateNext}
-            hasPrev={hasPrev}
-            navigatePrev={navigatePrev}
+          <ActiveItemPreview
+            activeItem={activeItem}
+            selectMediaItem={selectMediaItem}
+            deleteMediaItem={deleteMediaItem}
           />
         </div>
       </MediaPickerWrap>
@@ -522,46 +510,61 @@ const ActiveItemPreview = ({
   deleteMediaItem,
 }) => {
   return (
-    <div className="p-4 shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto w-[40%] max-w-[460px] min-w-[240px] bg-white border-l border-gray-100 bg-white shadow-md animate-slide-in-left">
-      {isImage(activeItem.thumbnail) ? (
-        <img
-          className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
-          src={activeItem.thumbnail}
-          alt={activeItem.filename}
-        />
-      ) : (
-        <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
-          <BiFile className="w-14 h-auto fill-gray-300" />
-        </span>
-      )}
-      <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
-        {activeItem.filename}
-      </h3>
-      <p>{absoluteImgURL(activeItem.src)}</p>
-      <div className="grow w-full flex flex-col justify-end items-start">
-        <div className="flex w-full gap-3">
-          {selectMediaItem && (
-            <Button
-              size="medium"
-              variant="primary"
-              className="grow"
-              onClick={() => selectMediaItem(activeItem)}
-            >
-              Insert
-              <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
-            </Button>
+    <div
+      className={`shrink-0 h-full flex flex-col items-start gap-3 overflow-y-auto bg-white border-l border-gray-100 bg-white shadow-md transition ease-out duration-150 ${
+        activeItem
+          ? `p-4 opacity-100 w-[40%] max-w-[460px] min-w-[240px]`
+          : `translate-x-8 opacity-0 w-[0px]`
+      }`}
+    >
+      {activeItem && (
+        <>
+          {isImage(activeItem.thumbnail) ? (
+            <img
+              className="object-cover border border-gray-100 rounded-md overflow-hidden w-full h-auto max-h-[40%] object-center shadow"
+              src={activeItem.thumbnail}
+              alt={activeItem.filename}
+            />
+          ) : (
+            <span className="p-3 border border-gray-100 rounded-md overflow-hidden bg-gray-50 shadow">
+              <BiFile className="w-14 h-auto fill-gray-300" />
+            </span>
           )}
-          <Button
-            variant="white"
-            size="medium"
-            className="grow max-w-[40%]"
-            onClick={() => deleteMediaItem(activeItem)}
-          >
-            Delete
-            <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
-          </Button>
-        </div>
-      </div>
+          <div className="grow h-full shrink flex flex-col gap-3 items-start justify-start">
+            <h3 className="text-lg text-gray-600 w-full break-words truncate">
+              {activeItem.filename}
+            </h3>
+            <CopyField
+              value={absoluteImgURL(activeItem.src)}
+              label="Absolute URL"
+            />
+          </div>
+          <div className="shrink-0 w-full flex flex-col justify-end items-start">
+            <div className="flex w-full gap-3">
+              {selectMediaItem && (
+                <Button
+                  size="medium"
+                  variant="primary"
+                  className="grow"
+                  onClick={() => selectMediaItem(activeItem)}
+                >
+                  Insert
+                  <BiArrowToBottom className="ml-1 -mr-0.5 w-6 h-auto text-white opacity-70" />
+                </Button>
+              )}
+              <Button
+                variant="white"
+                size="medium"
+                className="grow max-w-[40%]"
+                onClick={() => deleteMediaItem(activeItem)}
+              >
+                Delete
+                <TrashIcon className="ml-1 -mr-0.5 w-6 h-auto text-red-500 opacity-70" />
+              </Button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -660,5 +663,59 @@ const SyncModal = ({ close, syncFunc, folder, branch }) => {
         </ModalActions>
       </PopupModal>
     </Modal>
+  )
+}
+
+interface CopyFieldProps {
+  label?: string
+  description?: string
+  value: any
+}
+
+export const CopyField = ({ label, description, value }: CopyFieldProps) => {
+  const [clientIdCopied, setClientIdCopied] = React.useState(false)
+  const [fadeOut, setFadeOut] = React.useState(false)
+
+  return (
+    <div className="w-full">
+      {label && (
+        <label className="w-full mb-1 block flex-1  text-sm font-bold leading-5 text-gray-700">
+          {label}
+        </label>
+      )}
+      <span
+        onClick={() => {
+          if (clientIdCopied === true) return
+          setClientIdCopied(true)
+          setTimeout(() => {
+            setFadeOut(true)
+          }, 2500)
+          setTimeout(() => {
+            setClientIdCopied(false)
+            setFadeOut(false)
+          }, 3000)
+
+          navigator.clipboard.writeText(value)
+        }}
+        className={`relative overflow-hidden appearance-none flex items-center w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md transition duration-150 ease-in-out text-sm leading-4 cursor-pointer hover:bg-white hover:text-blue-500 ${
+          clientIdCopied ? `pointer-events-none` : ``
+        }`}
+      >
+        <BiCopyAlt className="relative text-blue-500 w-5 h-auto mr-1.5 -ml-0.5 z-20" />{' '}
+        {value}{' '}
+        {clientIdCopied && (
+          <span
+            className={`${
+              fadeOut ? `opacity-0` : `opacity-100`
+            } text-blue-600 transition-opacity	duration-500 absolute right-0 w-full h-full px-3 py-2 bg-white bg-opacity-90 text-center tracking-wide font-bold z-10`}
+          >
+            Copied to clipboard!
+          </span>
+        )}
+      </span>
+      {description && (
+        <p className="mt-2 text-sm text-gray-500">{description}</p>
+      )}
+    </div>
   )
 }
