@@ -1,5 +1,12 @@
 # create-tina-app
 
+## 1.0.4
+
+### Patch Changes
+
+- a9e04bf33: feat: Add docusaurus starter to cli
+  - @tinacms/metrics@1.0.2
+
 ## 1.0.3
 
 ### Patch Changes

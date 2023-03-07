@@ -1,5 +1,15 @@
 # next-tinacms-s3
 
+## 1.2.0
+
+### Minor Changes
+
+- 4cd5cd4f7: Refactor: Remove previewSrc from imageAPI
+
+### Patch Changes
+
+- 0b7687424: support pdf uploads
+
 ## 1.1.1
 
 ### Patch Changes
