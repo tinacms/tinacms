@@ -25,7 +25,7 @@ export const createDevServer = async (
         // files, we could opt-out of this if the file isn't
         // .tsx but seems to work ok for now.
         // TODO: other loaders needed (eg svg)?
-        if (id === configManager.tinaConfigFilePath) {
+        if (id.startsWith(configManager.rootPath)) {
           const result = await esbuildTransform(code, { loader: 'tsx' })
           return {
             code: result.code,
