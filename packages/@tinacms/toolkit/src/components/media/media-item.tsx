@@ -9,7 +9,7 @@ import { BiFolder, BiFile } from 'react-icons/bi'
 import { Button, IconButton } from '../../packages/styles'
 import { TrashIcon } from '../../packages/icons'
 import { BiArrowToBottom } from 'react-icons/bi'
-import { isImage } from './utils'
+import { absoluteImgURL, isImage } from './utils'
 
 interface MediaItemProps {
   item: Media
@@ -45,6 +45,7 @@ export function ListMediaItem({
         )}
       </div>
       <Filename>{item.filename}</Filename>
+      <p>{absoluteImgURL(item.src)}</p>
       <div className="flex justify-end gap-3 items-center group transition duration-150 ease-out opacity-70 hover:opacity-100">
         {onSelect && item.type === 'file' && (
           <Button size="medium" variant="white" onClick={() => onSelect(item)}>

@@ -37,6 +37,7 @@ import { LoadingDots } from '../../packages/form-builder'
 import { IoMdSync } from 'react-icons/io'
 import { CloseIcon, TrashIcon } from '../../packages/icons'
 import {
+  absoluteImgURL,
   DEFAULT_MEDIA_UPLOAD_TYPES,
   dropzoneAcceptFromString,
   isImage,
@@ -536,6 +537,7 @@ const ActiveItemPreview = ({
       <h3 className="text-lg text-gray-600 flex-grow w-full break-words truncate">
         {activeItem.filename}
       </h3>
+      <p>{absoluteImgURL(activeItem.src)}</p>
       <div className="grow w-full flex flex-col justify-end items-start">
         <div className="flex w-full gap-3">
           {selectMediaItem && (
